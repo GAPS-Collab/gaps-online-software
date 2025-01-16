@@ -838,21 +838,25 @@ def plot_paddle_charge2d(reader      = None,\
 
 ###############################################
 
-def mtb_rate_plot(reader            = None,
+def mtb_rate_plot(datafiles         = None,
                   mtbmonidata       = [],
                   use_gcutime       = False,
                   mtb_moni_interval = 10,
                   plot_dir          = None):
     """
+    Show the rate and lost_rate as read from MTB register over time
 
     # Arguments
 
-        * reader
+        * datafiles:  Can be either str, pathlib.Path or a list of these, or None.
+                      If not None, walk over them and extract the MTB moni data
         
     """
     if reader is not None and mtbmonidata:
         raise ValueError("Giving a reader and a list of MTBMoniData is confusng, since we don't know which one to use!")
-    
+    if reader is not None:
+        pass
+ 
     xlabel = 'MET [s] (gcu)'
     
     if not use_gcutime:

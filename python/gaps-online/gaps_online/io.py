@@ -5,6 +5,7 @@ Work with telemetry and .tof.gaps files
 import numpy as np
 import re
 import sys
+import time
 
 if sys.version_info.minor <= 10:
     from datetime import datetime, timezone
@@ -73,6 +74,13 @@ except ImportError as e:
 
 ##################################################################
 
+def convert_ts_date_to_unix(datestring):
+    datestring = datestring.replace('UTC', '')
+    ts = datetime.strptime(ts, '%y%m%d_%H%M%S')
+    ts = ts.replace(tzinfo=timezone.utc)
+    return time.mktime(ts)
+
+##################################################################
 
 def get_ts_from_toffile(fname):
     """

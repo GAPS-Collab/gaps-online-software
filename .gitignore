@@ -1,7 +1,9 @@
 # specific rye and jupyter notebook artefacts
+*.python-version
+
 analysis/merge_tcfc/.gitignore
 analysis/merge_tcfc/.python-version
-analysis/merge_tcfc/src/
+analysis/mergew_tcfc/src/
 
 analysis/run_vetting/plots*
 analysis/run_vetting/src/*
@@ -23,14 +25,18 @@ gaps-db/resources/scripts/README.md
 gaps-db/resources/scripts/src/
 analysis/run_vetting/.ipynb_checkpoints/
 analysis/run_vetting/.python-version
-
+python/gaps-online/gaps_online/__pycache__/
+python/gaps-online/gaps_online/db/__pycache__/
+python/doc/_autosummary/
 .ipynb_checkpoints/*
+
+*__pycache__/*
 
 # build artifacts
 tof/liftof/build/*
 *.so
 
-# other files which might be in the repositor
+# other files which might be in the repository
 data/*
 dataclasses/*
 
@@ -71,6 +77,7 @@ tof/tof-calibration/python_calibration_scripts/tofpy/__pycache__/*
 python/gaps-online/gaps_online/tof/__pycache__/*
 
 # build products
+tof/dataclasses/C++/include/TOFCommon.h
 tof/dataclasses/rust/tof-dataclasses/target/*
 tof/liftof/target/*
 tof/dataclasses/test/target/*
@@ -81,11 +88,16 @@ tof/liftof/liftof-tui/target/*
 tof/liftof/liftof-lib/target/*
 caraspace/target/*
 build/*
+telemetry/dataclasses/rust/telemetry-dataclasses/target/*
+python/pybindings/target/*
+# automatically generated file during a test
+tof/liftof/liftof-lib/liftof-config-test.toml
+tof/liftof/releases/*
 
-
-
+ 
 # vim fragments
 *.swp
+*.swo
 
 # django created files
 gaps-db/gaps_db/tof_db/migrations/*
