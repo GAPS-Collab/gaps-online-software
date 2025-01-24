@@ -284,27 +284,35 @@
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.io.get_telemetry_binaries" title="gaps_online.io.get_telemetry_binaries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_telemetry_binaries</span></code></a>(unix_time_start, ...)</p></td>
-<td><p>Get the relevant telemetry data files for time period from a directory</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.io.get_tof_binaries" title="gaps_online.io.get_tof_binaries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_tof_binaries</span></code></a>(run_id[, data_dir, ending])</p></td>
-<td><p>This allows to get binary data written by either liftof ('.tof.gaps') files or through the caraspace library ('.gaps').</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.io.get_ts_from_binfile" title="gaps_online.io.get_ts_from_binfile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_ts_from_binfile</span></code></a>(fname)</p></td>
-<td><p>Get the timestamp from a .gaps.tof file</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.io.get_ts_from_toffile" title="gaps_online.io.get_ts_from_toffile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_ts_from_toffile</span></code></a>(fname)</p></td>
-<td><p>Get the timestamp from a .tof.gaps file</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.io.grace_get_telemetry_binaries" title="gaps_online.io.grace_get_telemetry_binaries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grace_get_telemetry_binaries</span></code></a>(...[, data_dir])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.io.convert_ts_date_to_unix" title="gaps_online.io.convert_ts_date_to_unix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_ts_date_to_unix</span></code></a>(datestring)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.io.safe_unpack_merged_event" title="gaps_online.io.safe_unpack_merged_event"><code class="xref py py-obj docutils literal notranslate"><span class="pre">safe_unpack_merged_event</span></code></a>(pack)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.io.get_telemetry_binaries" title="gaps_online.io.get_telemetry_binaries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_telemetry_binaries</span></code></a>(unix_time_start, ...)</p></td>
+<td><p>Get the relevant telemetry data files for time period from a directory</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.io.get_tof_binaries" title="gaps_online.io.get_tof_binaries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_tof_binaries</span></code></a>(run_id[, data_dir, ending])</p></td>
+<td><p>This allows to get binary data written by either liftof ('.tof.gaps') files or through the caraspace library ('.gaps').</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.io.get_ts_from_binfile" title="gaps_online.io.get_ts_from_binfile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_ts_from_binfile</span></code></a>(fname)</p></td>
+<td><p>Get the timestamp from a .gaps.tof file</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.io.get_ts_from_toffile" title="gaps_online.io.get_ts_from_toffile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_ts_from_toffile</span></code></a>(fname)</p></td>
+<td><p>Get the timestamp from a .tof.gaps file</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.io.grace_get_telemetry_binaries" title="gaps_online.io.grace_get_telemetry_binaries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grace_get_telemetry_binaries</span></code></a>(...[, data_dir])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.io.safe_unpack_merged_event" title="gaps_online.io.safe_unpack_merged_event"><code class="xref py py-obj docutils literal notranslate"><span class="pre">safe_unpack_merged_event</span></code></a>(pack)</p></td>
 <td><p>Error checked unpack function for MergedEvents from telemetry packets</p></td>
 </tr>
 </tbody>
 </table>
 </div>
+<dl class="py function">
+<dt class="sig sig-object py" id="gaps_online.io.convert_ts_date_to_unix">
+<span class="sig-prename descclassname"><span class="pre">gaps_online.io.</span></span><span class="sig-name descname"><span class="pre">convert_ts_date_to_unix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datestring</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.io.convert_ts_date_to_unix" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="gaps_online.io.get_ts_from_toffile">
 <span class="sig-prename descclassname"><span class="pre">gaps_online.io.</span></span><span class="sig-name descname"><span class="pre">get_ts_from_toffile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.io.get_ts_from_toffile" title="Link to this definition">#</a></dt>
@@ -439,6 +447,7 @@ False       for unpacking errors or if the packet does not</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.convert_ts_date_to_unix"><code class="docutils literal notranslate"><span class="pre">convert_ts_date_to_unix()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.get_ts_from_toffile"><code class="docutils literal notranslate"><span class="pre">get_ts_from_toffile()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.get_ts_from_binfile"><code class="docutils literal notranslate"><span class="pre">get_ts_from_binfile()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.io.get_tof_binaries"><code class="docutils literal notranslate"><span class="pre">get_tof_binaries()</span></code></a></li>

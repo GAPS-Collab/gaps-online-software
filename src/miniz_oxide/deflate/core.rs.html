@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/miniz_oxide-0.8.2/src/deflate/core.rs`."><title>core.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="miniz_oxide" data-themes="" data-resource-suffix="" data-rustdoc-version="1.83.0 (90b35a623 2024-11-26)" data-channel="1.83.0" data-search-js="search-f0d225181b97f9a4.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">miniz_oxide/deflate/</div>core.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/miniz_oxide-0.8.3/src/deflate/core.rs`."><title>core.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-42caa33d.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="miniz_oxide" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0 (9fc6b4312 2025-01-07)" data-channel="1.84.0" data-search-js="search-92e6798f.js" data-settings-js="settings-0f613d39.js" ><script src="../../../static.files/storage-59e33391.js"></script><script defer src="../../../static.files/src-script-56102188.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">miniz_oxide/deflate/</div>core.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
 <a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -2457,76 +2457,7 @@
 <a href="#2456" id="2456">2456</a>
 <a href="#2457" id="2457">2457</a>
 <a href="#2458" id="2458">2458</a>
-<a href="#2459" id="2459">2459</a>
-<a href="#2460" id="2460">2460</a>
-<a href="#2461" id="2461">2461</a>
-<a href="#2462" id="2462">2462</a>
-<a href="#2463" id="2463">2463</a>
-<a href="#2464" id="2464">2464</a>
-<a href="#2465" id="2465">2465</a>
-<a href="#2466" id="2466">2466</a>
-<a href="#2467" id="2467">2467</a>
-<a href="#2468" id="2468">2468</a>
-<a href="#2469" id="2469">2469</a>
-<a href="#2470" id="2470">2470</a>
-<a href="#2471" id="2471">2471</a>
-<a href="#2472" id="2472">2472</a>
-<a href="#2473" id="2473">2473</a>
-<a href="#2474" id="2474">2474</a>
-<a href="#2475" id="2475">2475</a>
-<a href="#2476" id="2476">2476</a>
-<a href="#2477" id="2477">2477</a>
-<a href="#2478" id="2478">2478</a>
-<a href="#2479" id="2479">2479</a>
-<a href="#2480" id="2480">2480</a>
-<a href="#2481" id="2481">2481</a>
-<a href="#2482" id="2482">2482</a>
-<a href="#2483" id="2483">2483</a>
-<a href="#2484" id="2484">2484</a>
-<a href="#2485" id="2485">2485</a>
-<a href="#2486" id="2486">2486</a>
-<a href="#2487" id="2487">2487</a>
-<a href="#2488" id="2488">2488</a>
-<a href="#2489" id="2489">2489</a>
-<a href="#2490" id="2490">2490</a>
-<a href="#2491" id="2491">2491</a>
-<a href="#2492" id="2492">2492</a>
-<a href="#2493" id="2493">2493</a>
-<a href="#2494" id="2494">2494</a>
-<a href="#2495" id="2495">2495</a>
-<a href="#2496" id="2496">2496</a>
-<a href="#2497" id="2497">2497</a>
-<a href="#2498" id="2498">2498</a>
-<a href="#2499" id="2499">2499</a>
-<a href="#2500" id="2500">2500</a>
-<a href="#2501" id="2501">2501</a>
-<a href="#2502" id="2502">2502</a>
-<a href="#2503" id="2503">2503</a>
-<a href="#2504" id="2504">2504</a>
-<a href="#2505" id="2505">2505</a>
-<a href="#2506" id="2506">2506</a>
-<a href="#2507" id="2507">2507</a>
-<a href="#2508" id="2508">2508</a>
-<a href="#2509" id="2509">2509</a>
-<a href="#2510" id="2510">2510</a>
-<a href="#2511" id="2511">2511</a>
-<a href="#2512" id="2512">2512</a>
-<a href="#2513" id="2513">2513</a>
-<a href="#2514" id="2514">2514</a>
-<a href="#2515" id="2515">2515</a>
-<a href="#2516" id="2516">2516</a>
-<a href="#2517" id="2517">2517</a>
-<a href="#2518" id="2518">2518</a>
-<a href="#2519" id="2519">2519</a>
-<a href="#2520" id="2520">2520</a>
-<a href="#2521" id="2521">2521</a>
-<a href="#2522" id="2522">2522</a>
-<a href="#2523" id="2523">2523</a>
-<a href="#2524" id="2524">2524</a>
-<a href="#2525" id="2525">2525</a>
-<a href="#2526" id="2526">2526</a>
-<a href="#2527" id="2527">2527</a>
-<a href="#2528" id="2528">2528</a></pre></div><pre class="rust"><code><span class="doccomment">//! Streaming compression functionality.
+<a href="#2459" id="2459">2459</a></pre></div><pre class="rust"><code><span class="doccomment">//! Streaming compression functionality.
 
 </span><span class="kw">use </span>alloc::boxed::Box;
 <span class="kw">use </span>core::convert::TryInto;
@@ -2539,15 +2470,17 @@
     update_hash, HashBuffers, LocalBuf, LZ_CODE_BUF_SIZE, LZ_DICT_FULL_SIZE, LZ_HASH_BITS,
     LZ_HASH_SHIFT, LZ_HASH_SIZE, OUT_BUF_SIZE,
 };
+<span class="kw">use </span><span class="kw">crate</span>::deflate::stored::compress_stored;
+<span class="kw">use </span><span class="kw">crate</span>::deflate::zlib;
 <span class="kw">use </span><span class="kw">crate</span>::shared::{update_adler32, HUFFMAN_LENGTH_ORDER, MZ_ADLER32_INIT};
 <span class="kw">use </span><span class="kw">crate</span>::DataFormat;
 
 <span class="comment">// Currently not bubbled up outside this module, so can fill in with more
 // context eventually if needed.
 </span><span class="kw">type </span><span class="prelude-ty">Result</span>&lt;T, E = Error&gt; = core::result::Result&lt;T, E&gt;;
-<span class="kw">struct </span>Error {}
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Error {}
 
-<span class="kw">const </span>MAX_PROBES_MASK: i32 = <span class="number">0xFFF</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>MAX_PROBES_MASK: i32 = <span class="number">0xFFF</span>;
 
 <span class="kw">const </span>MAX_SUPPORTED_HUFF_CODESIZE: usize = <span class="number">32</span>;
 
@@ -2685,7 +2618,7 @@
 
 <span class="doccomment">/// The maximum number of checks for matches in the hash table the compressor will make for each
 /// compression level.
-</span><span class="kw">const </span>NUM_PROBES: [u32; <span class="number">11</span>] = [<span class="number">0</span>, <span class="number">1</span>, <span class="number">6</span>, <span class="number">32</span>, <span class="number">16</span>, <span class="number">32</span>, <span class="number">128</span>, <span class="number">256</span>, <span class="number">512</span>, <span class="number">768</span>, <span class="number">1500</span>];
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>NUM_PROBES: [u32; <span class="number">11</span>] = [<span class="number">0</span>, <span class="number">1</span>, <span class="number">6</span>, <span class="number">32</span>, <span class="number">16</span>, <span class="number">32</span>, <span class="number">128</span>, <span class="number">256</span>, <span class="number">512</span>, <span class="number">768</span>, <span class="number">1500</span>];
 
 <span class="attr">#[derive(Copy, Clone)]
 </span><span class="kw">struct </span>SymFreq {
@@ -2825,122 +2758,13 @@
 <span class="doccomment">/// Size of the chained hash table.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>LZ_DICT_SIZE: usize = <span class="number">32_768</span>;
 <span class="doccomment">/// Mask used when stepping through the hash chains.
-</span><span class="kw">const </span>LZ_DICT_SIZE_MASK: usize = (LZ_DICT_SIZE <span class="kw">as </span>u32 - <span class="number">1</span>) <span class="kw">as </span>usize;
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>LZ_DICT_SIZE_MASK: usize = (LZ_DICT_SIZE <span class="kw">as </span>u32 - <span class="number">1</span>) <span class="kw">as </span>usize;
 <span class="doccomment">/// The minimum length of a match.
-</span><span class="kw">const </span>MIN_MATCH_LEN: u8 = <span class="number">3</span>;
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>MIN_MATCH_LEN: u8 = <span class="number">3</span>;
 <span class="doccomment">/// The maximum length of a match.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>MAX_MATCH_LEN: usize = <span class="number">258</span>;
 
-<span class="kw">const </span>DEFAULT_FLAGS: u32 = NUM_PROBES[<span class="number">4</span>] | TDEFL_WRITE_ZLIB_HEADER;
-
-<span class="kw">mod </span>zlib {
-    <span class="kw">use super</span>::{TDEFL_FORCE_ALL_RAW_BLOCKS, TDEFL_RLE_MATCHES};
-
-    <span class="kw">const </span>DEFAULT_CM: u8 = <span class="number">8</span>;
-    <span class="kw">const </span>DEFAULT_CINFO: u8 = <span class="number">7 </span>&lt;&lt; <span class="number">4</span>;
-    <span class="kw">const </span>_DEFAULT_FDICT: u8 = <span class="number">0</span>;
-    <span class="kw">const </span>DEFAULT_CMF: u8 = DEFAULT_CM | DEFAULT_CINFO;
-    <span class="comment">// CMF used for RLE (technically it uses a window size of 0 but the lowest that can
-    // be specified in the header corresponds to a window size of 1 &lt;&lt; (0 + 8) aka 256.
-    </span><span class="kw">const </span>MIN_CMF: u8 = DEFAULT_CM; <span class="comment">// | 0
-    </span><span class="doccomment">/// The 16-bit value consisting of CMF and FLG must be divisible by this to be valid.
-    </span><span class="kw">const </span>FCHECK_DIVISOR: u8 = <span class="number">31</span>;
-
-    <span class="doccomment">/// Generate FCHECK from CMF and FLG (without FCKECH )so that they are correct according to the
-    /// specification, i.e (CMF*256 + FCHK) % 31 = 0.
-    /// Returns flg with the FCHKECK bits added (any existing FCHECK bits are ignored).
-    </span><span class="kw">fn </span>add_fcheck(cmf: u8, flg: u8) -&gt; u8 {
-        <span class="kw">let </span>rem = ((usize::from(cmf) * <span class="number">256</span>) + usize::from(flg)) % usize::from(FCHECK_DIVISOR);
-
-        <span class="comment">// Clear existing FCHECK if any
-        </span><span class="kw">let </span>flg = flg &amp; <span class="number">0b11100000</span>;
-
-        <span class="comment">// Casting is safe as rem can't overflow since it is a value mod 31
-        // We can simply add the value to flg as (31 - rem) will never be above 2^5
-        </span>flg + (FCHECK_DIVISOR - rem <span class="kw">as </span>u8)
-    }
-
-    <span class="kw">const fn </span>zlib_level_from_flags(flags: u32) -&gt; u8 {
-        <span class="kw">use </span><span class="kw">super</span>::NUM_PROBES;
-
-        <span class="kw">let </span>num_probes = flags &amp; (<span class="kw">super</span>::MAX_PROBES_MASK <span class="kw">as </span>u32);
-        <span class="kw">if </span>(flags &amp; <span class="kw">super</span>::TDEFL_GREEDY_PARSING_FLAG != <span class="number">0</span>)
-            || (flags &amp; <span class="kw">super</span>::TDEFL_RLE_MATCHES != <span class="number">0</span>)
-        {
-            <span class="kw">if </span>num_probes &lt;= <span class="number">1 </span>{
-                <span class="number">0
-            </span>} <span class="kw">else </span>{
-                <span class="number">1
-            </span>}
-        } <span class="kw">else if </span>num_probes &gt;= NUM_PROBES[<span class="number">9</span>] {
-            <span class="number">3
-        </span>} <span class="kw">else </span>{
-            <span class="number">2
-        </span>}
-    }
-
-    <span class="kw">const fn </span>cmf_from_flags(flags: u32) -&gt; u8 {
-        <span class="kw">if </span>(flags &amp; TDEFL_RLE_MATCHES == <span class="number">0</span>) &amp;&amp; (flags &amp; TDEFL_FORCE_ALL_RAW_BLOCKS == <span class="number">0</span>) {
-            DEFAULT_CMF
-        <span class="comment">// If we are using RLE encoding or no compression the window bits can be set as the
-        // minimum.
-        </span>} <span class="kw">else </span>{
-            MIN_CMF
-        }
-    }
-
-    <span class="doccomment">/// Get the zlib header for the level using the default window size and no
-    /// dictionary.
-    </span><span class="kw">fn </span>header_from_level(level: u8, flags: u32) -&gt; [u8; <span class="number">2</span>] {
-        <span class="kw">let </span>cmf = cmf_from_flags(flags);
-        [cmf, add_fcheck(cmf, level &lt;&lt; <span class="number">6</span>)]
-    }
-
-    <span class="doccomment">/// Create a zlib header from the given compression flags.
-    /// Only level is considered.
-    </span><span class="kw">pub fn </span>header_from_flags(flags: u32) -&gt; [u8; <span class="number">2</span>] {
-        <span class="kw">let </span>level = zlib_level_from_flags(flags);
-        header_from_level(level, flags)
-    }
-
-    <span class="attr">#[cfg(test)]
-    </span><span class="kw">mod </span>test {
-        <span class="attr">#[test]
-        </span><span class="kw">fn </span>zlib() {
-            <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::<span class="kw-2">*</span>;
-            <span class="kw">use super</span>::<span class="kw-2">*</span>;
-
-            <span class="kw">let </span>test_level = |level, expected| {
-                <span class="kw">let </span>flags = create_comp_flags_from_zip_params(
-                    level,
-                    MZ_DEFAULT_WINDOW_BITS,
-                    CompressionStrategy::Default <span class="kw">as </span>i32,
-                );
-                <span class="macro">assert_eq!</span>(zlib_level_from_flags(flags), expected);
-            };
-
-            <span class="macro">assert_eq!</span>(zlib_level_from_flags(DEFAULT_FLAGS), <span class="number">2</span>);
-            test_level(<span class="number">0</span>, <span class="number">0</span>);
-            test_level(<span class="number">1</span>, <span class="number">0</span>);
-            test_level(<span class="number">2</span>, <span class="number">1</span>);
-            test_level(<span class="number">3</span>, <span class="number">1</span>);
-            <span class="kw">for </span>i <span class="kw">in </span><span class="number">4</span>..=<span class="number">8 </span>{
-                test_level(i, <span class="number">2</span>)
-            }
-            test_level(<span class="number">9</span>, <span class="number">3</span>);
-            test_level(<span class="number">10</span>, <span class="number">3</span>);
-        }
-
-        <span class="attr">#[test]
-        </span><span class="kw">fn </span>test_header() {
-            <span class="kw">let </span>header = <span class="kw">super</span>::header_from_level(<span class="number">3</span>, <span class="number">0</span>);
-            <span class="macro">assert_eq!</span>(
-                ((usize::from(header[<span class="number">0</span>]) * <span class="number">256</span>) + usize::from(header[<span class="number">1</span>])) % <span class="number">31</span>,
-                <span class="number">0
-            </span>);
-        }
-    }
-}
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>DEFAULT_FLAGS: u32 = NUM_PROBES[<span class="number">4</span>] | TDEFL_WRITE_ZLIB_HEADER;
 
 <span class="attr">#[cfg(test)]
 #[inline]
@@ -2958,12 +2782,12 @@
 
 <span class="doccomment">/// Main compression struct.
 </span><span class="kw">pub struct </span>CompressorOxide {
-    lz: LZOxide,
-    params: ParamsOxide,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) lz: LZOxide,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) params: ParamsOxide,
     <span class="doccomment">/// Put HuffmanOxide on the heap with default trick to avoid
     /// excessive stack copies.
-    </span>huff: Box&lt;HuffmanOxide&gt;,
-    dict: DictOxide,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) huff: Box&lt;HuffmanOxide&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) dict: DictOxide,
 }
 
 <span class="kw">impl </span>CompressorOxide {
@@ -3160,7 +2984,7 @@
     }
 }
 
-<span class="kw">struct </span>CallbackOxide&lt;<span class="lifetime">'a</span>&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CallbackOxide&lt;<span class="lifetime">'a</span>&gt; {
     in_buf: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]&gt;,
     in_buf_size: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>usize&gt;,
     out_buf_size: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>usize&gt;,
@@ -3211,6 +3035,10 @@
             CallbackOut::Buf(<span class="kw-2">ref mut </span>cb) =&gt; cb.flush_output(saved_output, params),
         }
     }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>buf(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]&gt; {
+        <span class="self">self</span>.in_buf
+    }
 }
 
 <span class="kw">struct </span>OutputBufferOxide&lt;<span class="lifetime">'a</span>&gt; {
@@ -3223,7 +3051,10 @@
 }
 
 <span class="kw">impl </span>OutputBufferOxide&lt;<span class="lifetime">'_</span>&gt; {
-    <span class="kw">fn </span>put_bits(<span class="kw-2">&amp;mut </span><span class="self">self</span>, bits: u32, len: u32) {
+    <span class="doccomment">/// Write bits to the bit buffer and flushes
+    /// the bit buffer so any whole bytes are output
+    /// to the underlying buffer.
+    </span><span class="kw">fn </span>put_bits(<span class="kw-2">&amp;mut </span><span class="self">self</span>, bits: u32, len: u32) {
         <span class="comment">// TODO: Removing this assertion worsens performance
         // Need to figure out why
         </span><span class="macro">assert!</span>(bits &lt;= ((<span class="number">1u32 </span>&lt;&lt; len) - <span class="number">1u32</span>));
@@ -3236,6 +3067,14 @@
             <span class="self">self</span>.bit_buffer &gt;&gt;= <span class="number">8</span>;
             <span class="self">self</span>.bits_in -= <span class="number">8</span>;
         }
+    }
+
+    <span class="attr">#[inline]
+    </span><span class="doccomment">/// Write the provided bits to the bit buffer without flushing
+    /// anything. Does not check if there is actually space for it.
+    </span><span class="kw">fn </span>put_bits_no_flush(<span class="kw-2">&amp;mut </span><span class="self">self</span>, bits: u32, len: u32) {
+        <span class="self">self</span>.bit_buffer |= bits &lt;&lt; <span class="self">self</span>.bits_in;
+        <span class="self">self</span>.bits_in += len;
     }
 
     <span class="kw">const fn </span>save(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SavedOutputBufferOxide {
@@ -3254,11 +3093,21 @@
         <span class="self">self</span>.local = saved.local;
     }
 
-    <span class="kw">fn </span>pad_to_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+    <span class="attr">#[inline]
+    </span><span class="doccomment">/// Pad the bit buffer to a whole byte with
+    /// zeroes and write that byte to the output buffer.
+    </span><span class="kw">fn </span>pad_to_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">if </span><span class="self">self</span>.bits_in != <span class="number">0 </span>{
             <span class="kw">let </span>len = <span class="number">8 </span>- <span class="self">self</span>.bits_in;
             <span class="self">self</span>.put_bits(<span class="number">0</span>, len);
         }
+    }
+
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>write_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, bytes: <span class="kw-2">&amp;</span>[u8]) {
+        <span class="macro">debug_assert_eq!</span>(<span class="self">self</span>.bits_in, <span class="number">0</span>);
+        <span class="self">self</span>.inner[<span class="self">self</span>.inner_pos..<span class="self">self</span>.inner_pos + bytes.len()].copy_from_slice(bytes);
+        <span class="self">self</span>.inner_pos += bytes.len();
     }
 }
 
@@ -3303,7 +3152,7 @@
 /// NOTE: Only the literal/lengths have enough symbols to actually use
 /// the full array. It's unclear why it's defined like this in miniz,
 /// it could be for cache/alignment reasons.
-</span><span class="kw">struct </span>HuffmanOxide {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>HuffmanOxide {
     <span class="doccomment">/// Number of occurrences of each symbol.
     </span><span class="kw">pub </span>count: [[u16; MAX_HUFF_SYMBOLS]; MAX_HUFF_TABLES],
     <span class="doccomment">/// The bits of the huffman code assigned to the symbol
@@ -3695,10 +3544,10 @@
 
         <span class="self">self</span>.optimize_table(<span class="number">2</span>, MAX_HUFF_SYMBOLS_2, <span class="number">7</span>, <span class="bool-val">false</span>);
 
-        output.put_bits(<span class="number">2</span>, <span class="number">2</span>);
+        output.put_bits_no_flush(<span class="number">2</span>, <span class="number">2</span>);
 
-        output.put_bits((num_lit_codes - <span class="number">257</span>) <span class="kw">as </span>u32, <span class="number">5</span>);
-        output.put_bits((num_dist_codes - <span class="number">1</span>) <span class="kw">as </span>u32, <span class="number">5</span>);
+        output.put_bits_no_flush((num_lit_codes - <span class="number">257</span>) <span class="kw">as </span>u32, <span class="number">5</span>);
+        output.put_bits_no_flush((num_dist_codes - <span class="number">1</span>) <span class="kw">as </span>u32, <span class="number">5</span>);
 
         <span class="kw">let </span><span class="kw-2">mut </span>num_bit_lengths = <span class="number">18
             </span>- HUFFMAN_LENGTH_ORDER
@@ -3738,7 +3587,7 @@
     }
 }
 
-<span class="kw">struct </span>DictOxide {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DictOxide {
     <span class="doccomment">/// The maximum number of checks in the hash chain, for the initial,
     /// and the lazy match respectively.
     </span><span class="kw">pub </span>max_probes: [u32; <span class="number">2</span>],
@@ -3878,7 +3727,8 @@
                     // position to match against.
                     </span>probe_pos = next_probe_pos &amp; LZ_DICT_SIZE_MASK;
 
-                    <span class="kw">if </span><span class="self">self</span>.read_as_u16(probe_pos + match_len <span class="kw">as </span>usize - <span class="number">1</span>) == c01 {
+                    <span class="comment">// TODO: This bounds check does not get optimized out
+                    </span><span class="kw">if </span><span class="self">self</span>.read_as_u16(probe_pos + match_len <span class="kw">as </span>usize - <span class="number">1</span>) == c01 {
                         <span class="kw">break </span><span class="lifetime">'found</span>;
                     }
                 }
@@ -3932,7 +3782,7 @@
     }
 }
 
-<span class="kw">struct </span>ParamsOxide {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ParamsOxide {
     <span class="kw">pub </span>flags: u32,
     <span class="kw">pub </span>greedy_parsing: bool,
     <span class="kw">pub </span>block_index: u32,
@@ -4007,7 +3857,7 @@
     }
 }
 
-<span class="kw">struct </span>LZOxide {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>LZOxide {
     <span class="kw">pub </span>codes: [u8; LZ_CODE_BUF_SIZE],
     <span class="kw">pub </span>code_position: usize,
     <span class="kw">pub </span>flag_position: usize,
@@ -4177,7 +4027,7 @@
     compress_lz_codes(huff, output, <span class="kw-2">&amp;</span>lz.codes[..lz.code_position])
 }
 
-<span class="kw">fn </span>flush_block(
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>flush_block(
     d: <span class="kw-2">&amp;mut </span>CompressorOxide,
     callback: <span class="kw-2">&amp;mut </span>CallbackOxide,
     flush: TDEFLFlush,
@@ -4190,8 +4040,13 @@
         output.bit_buffer = d.params.saved_bit_buffer;
         output.bits_in = d.params.saved_bits_in;
 
-        <span class="kw">let </span>use_raw_block = (d.params.flags &amp; TDEFL_FORCE_ALL_RAW_BLOCKS != <span class="number">0</span>)
+        <span class="comment">// TODO: Don't think this second condition should be here but need to verify.
+        </span><span class="kw">let </span>use_raw_block = (d.params.flags &amp; TDEFL_FORCE_ALL_RAW_BLOCKS != <span class="number">0</span>)
             &amp;&amp; (d.dict.lookahead_pos - d.dict.code_buf_dict_pos) &lt;= d.dict.size;
+        <span class="macro">debug_assert_eq!</span>(
+            use_raw_block,
+            d.params.flags &amp; TDEFL_FORCE_ALL_RAW_BLOCKS != <span class="number">0
+        </span>);
 
         <span class="macro">assert!</span>(d.params.flush_remaining == <span class="number">0</span>);
         d.params.flush_ofs = <span class="number">0</span>;
@@ -4202,7 +4057,7 @@
         <span class="comment">// If we are at the start of the stream, write the zlib header if requested.
         </span><span class="kw">if </span>d.params.flags &amp; TDEFL_WRITE_ZLIB_HEADER != <span class="number">0 </span>&amp;&amp; d.params.block_index == <span class="number">0 </span>{
             <span class="kw">let </span>header = zlib::header_from_flags(d.params.flags);
-            output.put_bits(header[<span class="number">0</span>].into(), <span class="number">8</span>);
+            output.put_bits_no_flush(header[<span class="number">0</span>].into(), <span class="number">8</span>);
             output.put_bits(header[<span class="number">1</span>].into(), <span class="number">8</span>);
         }
 
@@ -4246,9 +4101,14 @@
             output.put_bits(!d.lz.total_bytes &amp; <span class="number">0xFFFF</span>, <span class="number">16</span>);
 
             <span class="comment">// Write the actual bytes.
-            </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..d.lz.total_bytes {
-                <span class="kw">let </span>pos = (d.dict.code_buf_dict_pos + i <span class="kw">as </span>usize) &amp; LZ_DICT_SIZE_MASK;
-                output.put_bits(u32::from(d.dict.b.dict[pos]), <span class="number">8</span>);
+            </span><span class="kw">let </span>start = d.dict.code_buf_dict_pos &amp; LZ_DICT_SIZE_MASK;
+            <span class="kw">let </span>end = (d.dict.code_buf_dict_pos + d.lz.total_bytes <span class="kw">as </span>usize) &amp; LZ_DICT_SIZE_MASK;
+            <span class="kw">let </span>dict = <span class="kw-2">&amp;mut </span>d.dict.b.dict;
+            <span class="kw">if </span>start &lt; end {
+                output.write_bytes(<span class="kw-2">&amp;</span>dict[start..end]);
+            } <span class="kw">else </span>{
+                output.write_bytes(<span class="kw-2">&amp;</span>dict[start..LZ_DICT_SIZE]);
+                output.write_bytes(<span class="kw-2">&amp;</span>dict[..end]);
             }
         } <span class="kw">else if </span>!comp_success {
             output.load(saved_buffer);
@@ -4278,7 +4138,8 @@
         d.huff.count[<span class="number">0</span>][..MAX_HUFF_SYMBOLS_0].fill(<span class="number">0</span>);
         d.huff.count[<span class="number">1</span>][..MAX_HUFF_SYMBOLS_1].fill(<span class="number">0</span>);
 
-        d.lz.code_position = <span class="number">1</span>;
+        <span class="comment">// Clear LZ buffer for the next block.
+        </span>d.lz.code_position = <span class="number">1</span>;
         d.lz.flag_position = <span class="number">0</span>;
         d.lz.num_flags_left = <span class="number">8</span>;
         d.dict.code_buf_dict_pos += d.lz.total_bytes <span class="kw">as </span>usize;
@@ -4294,7 +4155,7 @@
     <span class="prelude-val">Ok</span>(callback.flush_output(saved_buffer, <span class="kw-2">&amp;mut </span>d.params))
 }
 
-<span class="kw">fn </span>record_literal(h: <span class="kw-2">&amp;mut </span>HuffmanOxide, lz: <span class="kw-2">&amp;mut </span>LZOxide, lit: u8) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>record_literal(h: <span class="kw-2">&amp;mut </span>HuffmanOxide, lz: <span class="kw-2">&amp;mut </span>LZOxide, lit: u8) {
     lz.total_bytes += <span class="number">1</span>;
     lz.write_code(lit);
 
@@ -4418,9 +4279,9 @@
             u32::from(MIN_MATCH_LEN) - <span class="number">1
         </span>};
         <span class="kw">let </span>cur_pos = lookahead_pos &amp; LZ_DICT_SIZE_MASK;
-        <span class="kw">if </span>d.params.flags &amp; (TDEFL_RLE_MATCHES | TDEFL_FORCE_ALL_RAW_BLOCKS) != <span class="number">0 </span>{
+        <span class="kw">if </span>d.params.flags &amp; TDEFL_RLE_MATCHES != <span class="number">0 </span>{
             <span class="comment">// If TDEFL_RLE_MATCHES is set, we only look for repeating sequences of the current byte.
-            </span><span class="kw">if </span>d.dict.size != <span class="number">0 </span>&amp;&amp; d.params.flags &amp; TDEFL_FORCE_ALL_RAW_BLOCKS == <span class="number">0 </span>{
+            </span><span class="kw">if </span>d.dict.size != <span class="number">0 </span>{
                 <span class="kw">let </span>c = d.dict.b.dict[(cur_pos.wrapping_sub(<span class="number">1</span>)) &amp; LZ_DICT_SIZE_MASK];
                 cur_match_len = d.dict.b.dict[cur_pos..(cur_pos + lookahead_size)]
                     .iter()
@@ -4495,11 +4356,10 @@
         d.dict.size = cmp::min(d.dict.size + len_to_move, LZ_DICT_SIZE);
 
         <span class="kw">let </span>lz_buf_tight = d.lz.code_position &gt; LZ_CODE_BUF_SIZE - <span class="number">8</span>;
-        <span class="kw">let </span>raw = d.params.flags &amp; TDEFL_FORCE_ALL_RAW_BLOCKS != <span class="number">0</span>;
         <span class="kw">let </span>fat = ((d.lz.code_position * <span class="number">115</span>) &gt;&gt; <span class="number">7</span>) &gt;= d.lz.total_bytes <span class="kw">as </span>usize;
-        <span class="kw">let </span>fat_or_raw = (d.lz.total_bytes &gt; <span class="number">31 </span>* <span class="number">1024</span>) &amp;&amp; (fat || raw);
+        <span class="kw">let </span>buf_fat = (d.lz.total_bytes &gt; <span class="number">31 </span>* <span class="number">1024</span>) &amp;&amp; fat;
 
-        <span class="kw">if </span>lz_buf_tight || fat_or_raw {
+        <span class="kw">if </span>lz_buf_tight || buf_fat {
             d.params.src_pos = src_pos;
             <span class="comment">// These values are used in flush_block, so we need to write them back here.
             </span>d.dict.lookahead_size = lookahead_size;
@@ -4826,11 +4686,13 @@
 
     <span class="kw">let </span>one_probe = d.params.flags &amp; MAX_PROBES_MASK <span class="kw">as </span>u32 == <span class="number">1</span>;
     <span class="kw">let </span>greedy = d.params.flags &amp; TDEFL_GREEDY_PARSING_FLAG != <span class="number">0</span>;
-    <span class="kw">let </span>filter_or_rle_or_raw = d.params.flags
-        &amp; (TDEFL_FILTER_MATCHES | TDEFL_FORCE_ALL_RAW_BLOCKS | TDEFL_RLE_MATCHES)
-        != <span class="number">0</span>;
+    <span class="kw">let </span>filter_or_rle = d.params.flags &amp; (TDEFL_FILTER_MATCHES | TDEFL_FORCE_ALL_RAW_BLOCKS) != <span class="number">0</span>;
 
-    <span class="kw">let </span>compress_success = <span class="kw">if </span>one_probe &amp;&amp; greedy &amp;&amp; !filter_or_rle_or_raw {
+    <span class="kw">let </span>raw = d.params.flags &amp; TDEFL_FORCE_ALL_RAW_BLOCKS != <span class="number">0</span>;
+
+    <span class="kw">let </span>compress_success = <span class="kw">if </span>raw {
+        compress_stored(d, callback)
+    } <span class="kw">else if </span>one_probe &amp;&amp; greedy &amp;&amp; !filter_or_rle {
         compress_fast(d, callback)
     } <span class="kw">else </span>{
         compress_normal(d, callback)

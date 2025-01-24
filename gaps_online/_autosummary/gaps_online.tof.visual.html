@@ -307,8 +307,8 @@ FIXME - might get moved around</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.tof.visual.eventbld_hb_plots" title="gaps_online.tof.visual.eventbld_hb_plots"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eventbld_hb_plots</span></code></a>([reader, heartbeats])</p></td>
 <td><p>Plot the relevant quantities from the event builder heartbeats</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.tof.visual.mtb_rate_plot" title="gaps_online.tof.visual.mtb_rate_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtb_rate_plot</span></code></a>([reader, mtbmonidata, ...])</p></td>
-<td><p># Arguments</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.tof.visual.mtb_rate_plot" title="gaps_online.tof.visual.mtb_rate_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtb_rate_plot</span></code></a>([datafiles, mtbmonidata, ...])</p></td>
+<td><p>Show the rate and lost_rate as read from MTB register over time</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.tof.visual.plot_hg_lg_hits" title="gaps_online.tof.visual.plot_hg_lg_hits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_hg_lg_hits</span></code></a>([reader, events, plot_dir, ...])</p></td>
 <td><p>Plot the HG vs the LG (trigger) hits</p></td>
@@ -518,11 +518,16 @@ to the ReadoutBoard</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="gaps_online.tof.visual.mtb_rate_plot">
-<span class="sig-prename descclassname"><span class="pre">gaps_online.tof.visual.</span></span><span class="sig-name descname"><span class="pre">mtb_rate_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reader</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mtbmonidata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_gcutime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mtb_moni_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.visual.mtb_rate_plot" title="Link to this definition">#</a></dt>
-<dd><p># Arguments</p>
+<span class="sig-prename descclassname"><span class="pre">gaps_online.tof.visual.</span></span><span class="sig-name descname"><span class="pre">mtb_rate_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datafiles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mtbmonidata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_gcutime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mtb_moni_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.visual.mtb_rate_plot" title="Link to this definition">#</a></dt>
+<dd><p>Show the rate and lost_rate as read from MTB register over time</p>
+<p># Arguments</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>reader</p></li>
+<li><dl class="simple">
+<dt>datafiles:  Can be either str, pathlib.Path or a list of these, or None.</dt><dd><p>If not None, walk over them and extract the MTB moni data</p>
+</dd>
+</dl>
+</li>
 </ul>
 </div></blockquote>
 </dd></dl>

@@ -8,6 +8,7 @@ gaps\_online.io
 
    .. autosummary::
    
+      convert_ts_date_to_unix
       get_telemetry_binaries
       get_tof_binaries
       get_ts_from_binfile
