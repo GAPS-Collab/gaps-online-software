@@ -1,6 +1,6 @@
 [package]
 name = "tof-dataclasses"
-version = "0.10.8"
+version = "0.10.9"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -47,8 +47,8 @@ crossbeam-channel = "0.5"
 statistical       = "1.0"  # FIXME - replace this with our own implementation
 toml              = "0.8"
 ureq              = "2.12" # FIXME - make this a feature
-polars            = { version = "0.41", features = ["lazy"], optional = true }
-pyo3              = { version = "0.21", features = ["extension-module"], optional = true }
+polars            = { version = "0.46", features = ["lazy"], optional = true }
+pyo3              = { version = "0.23", features = ["extension-module"], optional = true }
 # serialization library
 caraspace         = { version = "0.10", path = "../../../../caraspace", optional = true }
 

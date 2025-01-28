@@ -32,7 +32,7 @@ impl PyTofPacketReader {
   /// Create a new instance of a TofPacketReader. 
   #[new]
   #[pyo3(signature = (filename, filter=PacketType::Unknown,start=0, nevents=0))]
-  fn new(filename : &PyAny, filter : PacketType, start : usize, nevents : usize) -> PyResult<Self> {
+  fn new<'py>(filename : Bound<'py, PyAny>, filter : PacketType, start : usize, nevents : usize) -> PyResult<Self> {
     let input_str : String;
     match filename.extract::<String>() {
       Ok(_fname) => {

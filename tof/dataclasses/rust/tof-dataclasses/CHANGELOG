@@ -1,5 +1,9 @@
 # LELEWAA series
 
+## v0.10.9
+* Update to polars 0.46, pyo3 0.23 (we are now 
+  compatible with python 3.13)
+
 ## v0.10.8
 * Alert system - TofAlert as a general container for 
   any kind of anomaly

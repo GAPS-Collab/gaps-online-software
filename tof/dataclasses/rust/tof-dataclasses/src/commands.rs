@@ -38,7 +38,7 @@ cfg_if::cfg_if! {
 pub use factory::*;
 
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
-#[cfg_attr(feature = "pybindings", pyclass)]
+#[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
 #[repr(u8)]
 pub enum TofReturnCode {
   Unknown = 0,
@@ -86,7 +86,7 @@ impl FromRandom for TofReturnCode {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
-#[cfg_attr(feature = "pybindings", pyclass)]
+#[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
 #[repr(u8)]
 pub enum TofCommandCode {
   Unknown                  = 0u8,

@@ -34,8 +34,8 @@ telemetry-dataclasses = { path = "../../telemetry/dataclasses/rust/telemetry-dat
 caraspace             = { version = "0.10", path = "../../caraspace", features = ["pybindings"], optional = true}
 # somehow pyo3 is very picky with the version
 liftof-lib            = { version = "0.10", optional = true, path = '../../tof/liftof/liftof-lib', features = ["database"] }
-pyo3                  = { version = "0.21", features = ["extension-module"] }
-pyo3-log              = "0.10"
-pyo3-polars           = "0.15"
-numpy                 = "0.21"
+pyo3                  = { version = "0.23", features = ["extension-module"] }
+pyo3-log              = "0.12"
+pyo3-polars           = "0.20"
+numpy                 = "0.23"
 comfy-table           = "7.1"

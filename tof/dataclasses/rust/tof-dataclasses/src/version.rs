@@ -18,7 +18,7 @@ use pyo3::pyclass;
 /// this on to anyting
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
-#[cfg_attr(feature = "pybindings", pyclass)]
+#[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
 pub enum ProtocolVersion {
   Unknown  = 0u8,
   V1       = 64u8,

@@ -335,9 +335,9 @@ impl PyTofRunConfig {
     self.config.to_bytestream()
   }
   
-  fn __getitem__(&self, py: Python, key: &str) -> PyResult<Option<PyObject>> {  
+  fn __getitem__<'a>(&self, py: Python<'a>, key: &str) -> PyResult<Option<Bound<'a,PyAny>>> {  
     match key {
-      "runtime"          => Ok(Some(self.config.runtime.into_py(py))),
+      "runtime"          => Ok(Some(self.config.runtime.into_pyobject(py).unwrap())),
       _     => Err(PyKeyError::new_err(format!("Key '{}' not found", key)))
     }
   }
@@ -429,13 +429,13 @@ impl PyTofRBConfig {
     self.config.to_bytestream()
   }
   
-  fn __getitem__(&self, py: Python, key: &str) -> PyResult<Option<PyObject>> {  
+  fn __getitem__<'a>(&self, py: Python<'a>, key: &str) -> PyResult<Option<Bound<'a,PyAny>>> {  
     match key {
-      "rb_moni_interval"  => Ok(Some(self.config.rb_moni_interval.into_py(py))),
-      "pa_moni_every_x"   => Ok(Some(self.config.pa_moni_every_x.into_py(py))),
-      "pb_moni_every_x"   => Ok(Some(self.config.pb_moni_every_x.into_py(py))),
-      "ltb_moni_every_x"  => Ok(Some(self.config.ltb_moni_every_x.into_py(py))),
-      "drs_deadtime_instead_fpga_temp" => Ok(Some(self.config.drs_deadtime_instead_fpga_temp.into_py(py))),
+      "rb_moni_interval"  => Ok(Some(self.config.rb_moni_interval.into_pyobject(py).unwrap())),
+      "pa_moni_every_x"   => Ok(Some(self.config.pa_moni_every_x .into_pyobject(py).unwrap())),
+      "pb_moni_every_x"   => Ok(Some(self.config.pb_moni_every_x .into_pyobject(py).unwrap())),
+      "ltb_moni_every_x"  => Ok(Some(self.config.ltb_moni_every_x.into_pyobject(py).unwrap())),
+      "drs_deadtime_instead_fpga_temp" => Ok(Some(self.config.drs_deadtime_instead_fpga_temp.into_pyobject(py).unwrap())),
       _                   => Err(PyKeyError::new_err(format!("Key '{}' not found", key)))
     }
   }
@@ -576,16 +576,16 @@ impl PyDataPublisherConfig {
     self.config.to_bytestream()
   }
   
-  fn __getitem__(&self, py: Python, key: &str) -> PyResult<Option<PyObject>> {  
+  fn __getitem__<'a>(&self, py: Python<'a>, key: &str) -> PyResult<Option<Bound<'a,PyAny>>> {  
     match key {
-      "mbytes_per_file"          => Ok(Some(self.config.mbytes_per_file.into_py(py))),
-      "discard_event_fraction"   => Ok(Some(self.config.discard_event_fraction.into_py(py))),
-      "send_mtb_event_packets"   => Ok(Some(self.config.send_mtb_event_packets.into_py(py))),
-      "send_rbwaveform_packets"  => Ok(Some(self.config.send_rbwaveform_packets.into_py(py))),
-      "send_rbwf_every_x_event"  => Ok(Some(self.config.send_rbwf_every_x_event.into_py(py))),
-      "send_tof_summary_packets" => Ok(Some(self.config.send_tof_summary_packets.into_py(py))),
-      "send_tof_event_packets"   => Ok(Some(self.config.send_tof_event_packets.into_py(py))),
-      "hb_send_interval"         => Ok(Some(self.config.hb_send_interval.into_py(py))),
+      "mbytes_per_file"          => Ok(Some(self.config.mbytes_per_file         .into_pyobject(py).unwrap())),
+      "discard_event_fraction"   => Ok(Some(self.config.discard_event_fraction  .into_pyobject(py).unwrap())),
+      "send_mtb_event_packets"   => Ok(Some(self.config.send_mtb_event_packets  .into_pyobject(py).unwrap())),
+      "send_rbwaveform_packets"  => Ok(Some(self.config.send_rbwaveform_packets .into_pyobject(py).unwrap())),
+      "send_rbwf_every_x_event"  => Ok(Some(self.config.send_rbwf_every_x_event .into_pyobject(py).unwrap())),
+      "send_tof_summary_packets" => Ok(Some(self.config.send_tof_summary_packets.into_pyobject(py).unwrap())),
+      "send_tof_event_packets"   => Ok(Some(self.config.send_tof_event_packets  .into_pyobject(py).unwrap())),
+      "hb_send_interval"         => Ok(Some(self.config.hb_send_interval        .into_pyobject(py).unwrap())),
       _     => Err(PyKeyError::new_err(format!("Key '{}' not found", key)))
     }
   }
@@ -753,18 +753,18 @@ impl PyTriggerConfig {
     self.config.hb_send_interval = hb_int;
   }
 
-  fn __getitem__(&self, py: Python, key: &str) -> PyResult<Option<PyObject>> {  
+  fn __getitem__<'a>(&self, py: Python<'a>, key: &str) -> PyResult<Option<Bound<'a,PyAny>>> {  
     match key {
-      "gaps_trigger_use_beta"  => Ok(Some(self.config.gaps_trigger_use_beta.into_py(py))),
-      "prescale"               => Ok(Some(self.config.prescale.into_py(py))),
-      "trigger_type"           => Ok(Some(self.config.trigger_type.into_py(py))),
-      "use_combo_trigger"      => Ok(Some(self.config.use_combo_trigger.into_py(py))),
-      "combo_trigger_type"     => Ok(Some(self.config.combo_trigger_type.into_py(py))),
-      "combo_trigger_prescale" => Ok(Some(self.config.combo_trigger_prescale.into_py(py))),
-      "trace_suppression"      => Ok(Some(self.config.trace_suppression.into_py(py))),
-      "mtb_moni_interval"      => Ok(Some(self.config.mtb_moni_interval.into_py(py))),
-      "tiu_ignore_busy"        => Ok(Some(self.config.tiu_ignore_busy.into_py(py))),
-      "hb_send_interval"       => Ok(Some(self.config.hb_send_interval.into_py(py))),
+      "gaps_trigger_use_beta"  => Ok(Some(self.config.gaps_trigger_use_beta .into_pyobject(py).unwrap())),
+      "prescale"               => Ok(Some(self.config.prescale              .into_pyobject(py).unwrap())),
+      "trigger_type"           => Ok(Some(self.config.trigger_type          .into_pyobject(py).unwrap())),
+      "use_combo_trigger"      => Ok(Some(self.config.use_combo_trigger     .into_pyobject(py).unwrap())),
+      "combo_trigger_type"     => Ok(Some(self.config.combo_trigger_type    .into_pyobject(py).unwrap())),
+      "combo_trigger_prescale" => Ok(Some(self.config.combo_trigger_prescale.into_pyobject(py).unwrap())),
+      "trace_suppression"      => Ok(Some(self.config.trace_suppression     .into_pyobject(py).unwrap())),
+      "mtb_moni_interval"      => Ok(Some(self.config.mtb_moni_interval     .into_pyobject(py).unwrap())),
+      "tiu_ignore_busy"        => Ok(Some(self.config.tiu_ignore_busy       .into_pyobject(py).unwrap())),
+      "hb_send_interval"       => Ok(Some(self.config.hb_send_interval      .into_pyobject(py).unwrap())),
       _     => Err(PyKeyError::new_err(format!("Key '{}' not found", key)))
     }
   }
@@ -953,17 +953,17 @@ impl PyTOFEventBuilderConfig{
     self.config.to_bytestream()
   }
  
-  fn __getitem__(&self, py: Python, key: &str) -> PyResult<Option<PyObject>> {  
+  fn __getitem__<'a>(&self, py: Python<'a>, key: &str) -> PyResult<Option<Bound<'a,PyAny>>> {  
     match key {
-      "cachesize"        => Ok(Some(self.config.cachesize.into_py(py))),
-      "n_mte_per_loop"   => Ok(Some(self.config.n_mte_per_loop.into_py(py))),
-      "n_rbe_per_loop"   => Ok(Some(self.config.n_rbe_per_loop.into_py(py))),
-      "te_timeout_sec"   => Ok(Some(self.config.te_timeout_sec.into_py(py))),
-      "sort_events"      => Ok(Some(self.config.sort_events.into_py(py))),
-      "build_strategy"   => Ok(Some(self.config.build_strategy.into_py(py))),
-      "wait_nrb"         => Ok(Some(self.config.wait_nrb.into_py(py))),
-      "greediness"       => Ok(Some(self.config.greediness.into_py(py))),
-      "hb_send_interval" => Ok(Some(self.config.hb_send_interval.into_py(py))),
+      "cachesize"        => Ok(Some(self.config.cachesize       .into_pyobject(py).unwrap())),
+      "n_mte_per_loop"   => Ok(Some(self.config.n_mte_per_loop  .into_pyobject(py).unwrap())),
+      "n_rbe_per_loop"   => Ok(Some(self.config.n_rbe_per_loop  .into_pyobject(py).unwrap())),
+      "te_timeout_sec"   => Ok(Some(self.config.te_timeout_sec  .into_pyobject(py).unwrap())),
+      "sort_events"      => Ok(Some(self.config.sort_events     .into_pyobject(py).unwrap())),
+      "build_strategy"   => Ok(Some(self.config.build_strategy  .into_pyobject(py).unwrap())),
+      "wait_nrb"         => Ok(Some(self.config.wait_nrb        .into_pyobject(py).unwrap())),
+      "greediness"       => Ok(Some(self.config.greediness      .into_pyobject(py).unwrap())),
+      "hb_send_interval" => Ok(Some(self.config.hb_send_interval.into_pyobject(py).unwrap())),
       _     => Err(PyKeyError::new_err(format!("Key '{}' not found", key)))
     }
   }
@@ -1336,7 +1336,7 @@ impl PyRBCalibration {
     for ch in 0..9 {
       data.push(self.cali.v_offsets[ch].to_vec());
     }
-    let pyarray = PyArray::from_vec2_bound(py, &data).unwrap();
+    let pyarray = PyArray::from_vec2(py, &data).unwrap();
     Ok(pyarray)
   }
   
@@ -1346,7 +1346,7 @@ impl PyRBCalibration {
     for ch in 0..9 {
       data.push(self.cali.v_dips[ch].to_vec());
     }
-    let pyarray = PyArray::from_vec2_bound(py, &data).unwrap();
+    let pyarray = PyArray::from_vec2(py, &data).unwrap();
     Ok(pyarray)
   }
   
@@ -1356,7 +1356,7 @@ impl PyRBCalibration {
     for ch in 0..9 {
       data.push(self.cali.v_inc[ch].to_vec());
     }
-    let pyarray = PyArray::from_vec2_bound(py, &data).unwrap();
+    let pyarray = PyArray::from_vec2(py, &data).unwrap();
     Ok(pyarray)
   }
   
@@ -1366,7 +1366,7 @@ impl PyRBCalibration {
     for ch in 0..9 {
       data.push(self.cali.tbin[ch].to_vec());
     }
-    let pyarray = PyArray::from_vec2_bound(py, &data).unwrap();
+    let pyarray = PyArray::from_vec2(py, &data).unwrap();
     Ok(pyarray)
   }
 
@@ -1398,7 +1398,7 @@ impl PyRBCalibration {
 //  for ch in 0..9 {
 //    data.push(self.cali.tbin[ch].to_vec());
 //  }
-//  let pyarray = PyArray::from_vec2_bound(py, &data).unwrap();
+//  let pyarray = PyArray::from_vec2(py, &data).unwrap();
 //  Ok(pyarray)
 //}
 #[pyclass]
@@ -3090,7 +3090,7 @@ impl PyRBEvent {
 
   fn get_waveform<'_py>(&self, py: Python<'_py>, channel : usize) -> PyResult<Bound<'_py, PyArray1<u16>>> {  
     let wf  = self.event.get_channel_by_id(channel).unwrap().clone();
-    let arr = PyArray1::<u16>::from_vec_bound(py, wf);
+    let arr = PyArray1::<u16>::from_vec(py, wf);
     Ok(arr)
   }
   
@@ -3322,42 +3322,42 @@ impl PyRBWaveform {
   #[getter]
   fn adc_a<'_py>(&self, py: Python<'_py>) ->  PyResult<Bound<'_py, PyArray1<u16>>> {
     let wf  = self.wf.adc_a.clone();
-    let arr = PyArray1::<u16>::from_vec_bound(py, wf);
+    let arr = PyArray1::<u16>::from_vec(py, wf);
     Ok(arr)
   }
   
   #[getter]
   fn adc_b<'_py>(&self, py: Python<'_py>) ->  PyResult<Bound<'_py, PyArray1<u16>>> {
     let wf  = self.wf.adc_b.clone();
-    let arr = PyArray1::<u16>::from_vec_bound(py, wf);
+    let arr = PyArray1::<u16>::from_vec(py, wf);
     Ok(arr)
   }
   
   #[getter]
   fn voltages_a<'_py>(&self, py: Python<'_py>) ->  PyResult<Bound<'_py, PyArray1<f32>>> {
     let wf  = self.wf.voltages_a.clone();
-    let arr = PyArray1::<f32>::from_vec_bound(py, wf);
+    let arr = PyArray1::<f32>::from_vec(py, wf);
     Ok(arr)
   }
 
   #[getter]
   fn times_a<'_py>(&self, py: Python<'_py>) ->  PyResult<Bound<'_py, PyArray1<f32>>> {
     let times  = self.wf.nanoseconds_a.clone();
-    let arr    = PyArray1::<f32>::from_vec_bound(py, times);
+    let arr    = PyArray1::<f32>::from_vec(py, times);
     Ok(arr)
   }
 
   #[getter]
   fn voltages_b<'_py>(&self, py: Python<'_py>) ->  PyResult<Bound<'_py, PyArray1<f32>>> {
     let wf  = self.wf.voltages_b.clone();
-    let arr = PyArray1::<f32>::from_vec_bound(py, wf);
+    let arr = PyArray1::<f32>::from_vec(py, wf);
     Ok(arr)
   }
 
   #[getter]
   fn times_b<'_py>(&self, py: Python<'_py>) ->  PyResult<Bound<'_py, PyArray1<f32>>> {
     let times  = self.wf.nanoseconds_b.clone();
-    let arr    = PyArray1::<f32>::from_vec_bound(py, times);
+    let arr    = PyArray1::<f32>::from_vec(py, times);
     Ok(arr)
   }
 

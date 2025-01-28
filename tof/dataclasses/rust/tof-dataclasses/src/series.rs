@@ -90,14 +90,14 @@ pub trait MoniSeries<T>
 
   #[cfg(feature = "polars")]
   fn get_dataframe(&self) -> PolarsResult<DataFrame> {
-    let mut series = Vec::<Series>::new();
+    let mut series = Vec::<Column>::new();
     for k in Self::keys() {
       match self.get_series(k) {
         None => {
           error!("Unable to get series for {}", k);
         }
         Some(ser) => {
-          series.push(ser);
+          series.push(ser.into());
         }
       }
     }

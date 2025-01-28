@@ -44,7 +44,7 @@ use std::fmt;
 
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
-#[cfg_attr(feature = "pybindings", pyclass)]
+#[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
 pub enum EventStatus {
   Unknown                = 0u8,
   CRC32Wrong             = 10u8,
