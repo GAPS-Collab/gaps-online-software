@@ -493,12 +493,18 @@ pub struct Paddle {
   pub height            : f32, 
   pub width             : f32, 
   pub length            : f32, 
+  pub normal_x          : f32,
+  pub normal_y          : f32,
+  pub normal_z          : f32,
   pub global_pos_x_l0   : f32, 
   pub global_pos_y_l0   : f32, 
   pub global_pos_z_l0   : f32, 
   pub global_pos_x_l0_A : f32, 
   pub global_pos_y_l0_A : f32, 
   pub global_pos_z_l0_A : f32, 
+  pub global_pos_x_l0_B : f32, 
+  pub global_pos_y_l0_B : f32, 
+  pub global_pos_z_l0_B : f32, 
 }
 
 impl Paddle {
@@ -524,12 +530,18 @@ impl Paddle {
       height            : 0.0, 
       width             : 0.0, 
       length            : 0.0, 
+      normal_x          : 0.0,
+      normal_y          : 0.0,
+      normal_z          : 0.0,
       global_pos_x_l0   : 0.0, 
       global_pos_y_l0   : 0.0, 
       global_pos_z_l0   : 0.0, 
       global_pos_x_l0_A : 0.0, 
       global_pos_y_l0_A : 0.0, 
       global_pos_z_l0_A : 0.0, 
+      global_pos_x_l0_B : 0.0, 
+      global_pos_y_l0_B : 0.0, 
+      global_pos_z_l0_B : 0.0, 
     }
   }
 
@@ -574,8 +586,12 @@ impl fmt::Display for Paddle {
     repr += &(format!("\n    \u{21B3} [{:.2}, {:.2}, {:.2}]", self.length, self.width, self.height));
     repr += "\n   center [mm]:";
     repr += &(format!("\n    \u{21B3} [{:.2}, {:.2}, {:.2}]", self.global_pos_x_l0, self.global_pos_y_l0, self.global_pos_z_l0));
+    repr += "\n   normal vector:";
+    repr += &(format!("\n    \u{21B3} [{:.2}, {:.2}, {:.2}]", self.normal_x, self.normal_y, self.normal_z));
     repr += "\n   A-side [mm]:";
     repr += &(format!("\n    \u{21B3} [{:.2}, {:.2}, {:.2}]>", self.global_pos_x_l0_A, self.global_pos_y_l0_A, self.global_pos_z_l0_A));
+    repr += "\n   B-side [mm]:";
+    repr += &(format!("\n    \u{21B3} [{:.2}, {:.2}, {:.2}]>", self.global_pos_x_l0_B, self.global_pos_y_l0_B, self.global_pos_z_l0_B));
     write!(f, "{}", repr)
   }
 }
