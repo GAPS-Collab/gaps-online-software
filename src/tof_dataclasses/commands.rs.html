@@ -1106,7 +1106,7 @@
 <span class="kw">pub use </span>factory::<span class="kw-2">*</span>;
 
 <span class="attr">#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
-#[cfg_attr(feature = <span class="string">"pybindings"</span>, pyclass)]
+#[cfg_attr(feature = <span class="string">"pybindings"</span>, pyclass(eq, eq_int))]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>TofReturnCode {
   Unknown = <span class="number">0</span>,
@@ -1154,7 +1154,7 @@
 }
 
 <span class="attr">#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
-#[cfg_attr(feature = <span class="string">"pybindings"</span>, pyclass)]
+#[cfg_attr(feature = <span class="string">"pybindings"</span>, pyclass(eq, eq_int))]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>TofCommandCode {
   Unknown                  = <span class="number">0u8</span>,

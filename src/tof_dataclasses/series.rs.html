@@ -518,14 +518,14 @@
 
   <span class="attr">#[cfg(feature = <span class="string">"polars"</span>)]
   </span><span class="kw">fn </span>get_dataframe(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; PolarsResult&lt;DataFrame&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>series = Vec::&lt;Series&gt;::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>series = Vec::&lt;Column&gt;::new();
     <span class="kw">for </span>k <span class="kw">in </span><span class="self">Self</span>::keys() {
       <span class="kw">match </span><span class="self">self</span>.get_series(k) {
         <span class="prelude-val">None </span>=&gt; {
           <span class="macro">error!</span>(<span class="string">"Unable to get series for {}"</span>, k);
         }
         <span class="prelude-val">Some</span>(ser) =&gt; {
-          series.push(ser);
+          series.push(ser.into());
         }
       }
     }

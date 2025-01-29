@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/winnow-0.6.24/src/parser.rs`."><title>parser.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-42caa33d.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="winnow" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0 (9fc6b4312 2025-01-07)" data-channel="1.84.0" data-search-js="search-92e6798f.js" data-settings-js="settings-0f613d39.js" ><script src="../../static.files/storage-59e33391.js"></script><script defer src="../../static.files/src-script-56102188.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">winnow/</div>parser.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/winnow-0.6.25/src/parser.rs`."><title>parser.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-42caa33d.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="winnow" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0 (9fc6b4312 2025-01-07)" data-channel="1.84.0" data-search-js="search-92e6798f.js" data-settings-js="settings-0f613d39.js" ><script src="../../static.files/storage-59e33391.js"></script><script defer src="../../static.files/src-script-56102188.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">winnow/</div>parser.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
 <a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -1371,14 +1371,21 @@
 <a href="#1370" id="1370">1370</a>
 <a href="#1371" id="1371">1371</a>
 <a href="#1372" id="1372">1372</a>
-<a href="#1373" id="1373">1373</a></pre></div><pre class="rust"><code><span class="doccomment">//! Basic types to build the parsers
+<a href="#1373" id="1373">1373</a>
+<a href="#1374" id="1374">1374</a>
+<a href="#1375" id="1375">1375</a>
+<a href="#1376" id="1376">1376</a>
+<a href="#1377" id="1377">1377</a>
+<a href="#1378" id="1378">1378</a>
+<a href="#1379" id="1379">1379</a>
+<a href="#1380" id="1380">1380</a></pre></div><pre class="rust"><code><span class="doccomment">//! Basic types to build the parsers
 
 </span><span class="kw">use </span><span class="kw">crate</span>::ascii::Caseless <span class="kw">as </span>AsciiCaseless;
 <span class="kw">use </span><span class="kw">crate</span>::combinator::impls;
 <span class="attr">#[cfg(feature = <span class="string">"unstable-recover"</span>)]
 #[cfg(feature = <span class="string">"std"</span>)]
 </span><span class="kw">use </span><span class="kw">crate</span>::error::FromRecoverableError;
-<span class="kw">use </span><span class="kw">crate</span>::error::{AddContext, FromExternalError, IResult, PResult, ParseError, ParserError};
+<span class="kw">use </span><span class="kw">crate</span>::error::{AddContext, FromExternalError, PResult, ParseError, ParserError};
 <span class="kw">use </span><span class="kw">crate</span>::stream::{Compare, Location, ParseSlice, Stream, StreamIsPartial};
 <span class="attr">#[cfg(feature = <span class="string">"unstable-recover"</span>)]
 #[cfg(feature = <span class="string">"std"</span>)]
@@ -1468,7 +1475,7 @@
     ///
     /// &lt;/div&gt;
     </span><span class="attr">#[inline(always)]
-    </span><span class="kw">fn </span>parse_peek(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>input: I) -&gt; IResult&lt;I, O, E&gt; {
+    </span><span class="kw">fn </span>parse_peek(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>input: I) -&gt; PResult&lt;(I, O), E&gt; {
         <span class="kw">match </span><span class="self">self</span>.parse_next(<span class="kw-2">&amp;mut </span>input) {
             <span class="prelude-val">Ok</span>(o) =&gt; <span class="prelude-val">Ok</span>((input, o)),
             <span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Err</span>(err),
@@ -2533,6 +2540,11 @@
     }
 }
 
+<span class="doccomment">/// Trait alias for [`Parser`] to ease the transition to the next release
+</span><span class="kw">pub trait </span>ModalParser&lt;I, O, E&gt;: Parser&lt;I, O, E&gt; {}
+
+<span class="kw">impl</span>&lt;I, O, E, P&gt; ModalParser&lt;I, O, E&gt; <span class="kw">for </span>P <span class="kw">where </span>P: Parser&lt;I, O, E&gt; {}
+
 <span class="doccomment">/// Collect all errors when parsing the input
 ///
 /// [`Parser`]s will need to use [`Recoverable&lt;I, _&gt;`] for their input.
@@ -2637,8 +2649,9 @@
 <span class="doccomment">/// Deprecated
 </span><span class="attr">#[inline(always)]
 #[deprecated(since = <span class="string">"0.6.23"</span>)]
+#[allow(deprecated)]
 </span><span class="kw">pub fn </span>unpeek&lt;<span class="lifetime">'a</span>, I, O, E&gt;(
-    <span class="kw-2">mut </span>peek: <span class="kw">impl </span>FnMut(I) -&gt; IResult&lt;I, O, E&gt; + <span class="lifetime">'a</span>,
+    <span class="kw-2">mut </span>peek: <span class="kw">impl </span>FnMut(I) -&gt; <span class="kw">crate</span>::error::IResult&lt;I, O, E&gt; + <span class="lifetime">'a</span>,
 ) -&gt; <span class="kw">impl </span>FnMut(<span class="kw-2">&amp;mut </span>I) -&gt; PResult&lt;O, E&gt;
 <span class="kw">where
     </span>I: Clone,
@@ -2658,6 +2671,7 @@
     <span class="kw">use </span><span class="kw">crate</span>::binary::be_u16;
     <span class="kw">use </span><span class="kw">crate</span>::error::ErrMode;
     <span class="kw">use </span><span class="kw">crate</span>::error::ErrorKind;
+    <span class="kw">use </span><span class="kw">crate</span>::error::IResult;
     <span class="kw">use </span><span class="kw">crate</span>::error::InputError;
     <span class="kw">use </span><span class="kw">crate</span>::error::Needed;
     <span class="kw">use </span><span class="kw">crate</span>::token::take;

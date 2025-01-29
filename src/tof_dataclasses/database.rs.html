@@ -1636,7 +1636,23 @@
 <a href="#1635" id="1635">1635</a>
 <a href="#1636" id="1636">1636</a>
 <a href="#1637" id="1637">1637</a>
-<a href="#1638" id="1638">1638</a></pre></div><pre class="rust"><code><span class="doccomment">//! Database access &amp; entities of the TOF
+<a href="#1638" id="1638">1638</a>
+<a href="#1639" id="1639">1639</a>
+<a href="#1640" id="1640">1640</a>
+<a href="#1641" id="1641">1641</a>
+<a href="#1642" id="1642">1642</a>
+<a href="#1643" id="1643">1643</a>
+<a href="#1644" id="1644">1644</a>
+<a href="#1645" id="1645">1645</a>
+<a href="#1646" id="1646">1646</a>
+<a href="#1647" id="1647">1647</a>
+<a href="#1648" id="1648">1648</a>
+<a href="#1649" id="1649">1649</a>
+<a href="#1650" id="1650">1650</a>
+<a href="#1651" id="1651">1651</a>
+<a href="#1652" id="1652">1652</a>
+<a href="#1653" id="1653">1653</a>
+<a href="#1654" id="1654">1654</a></pre></div><pre class="rust"><code><span class="doccomment">//! Database access &amp; entities of the TOF
 //!
 //! A local .sqlite database is shipped with 
 //! this packet and allows to access all
@@ -2131,12 +2147,18 @@
   <span class="kw">pub </span>height            : f32, 
   <span class="kw">pub </span>width             : f32, 
   <span class="kw">pub </span>length            : f32, 
+  <span class="kw">pub </span>normal_x          : f32,
+  <span class="kw">pub </span>normal_y          : f32,
+  <span class="kw">pub </span>normal_z          : f32,
   <span class="kw">pub </span>global_pos_x_l0   : f32, 
   <span class="kw">pub </span>global_pos_y_l0   : f32, 
   <span class="kw">pub </span>global_pos_z_l0   : f32, 
   <span class="kw">pub </span>global_pos_x_l0_A : f32, 
   <span class="kw">pub </span>global_pos_y_l0_A : f32, 
   <span class="kw">pub </span>global_pos_z_l0_A : f32, 
+  <span class="kw">pub </span>global_pos_x_l0_B : f32, 
+  <span class="kw">pub </span>global_pos_y_l0_B : f32, 
+  <span class="kw">pub </span>global_pos_z_l0_B : f32, 
 }
 
 <span class="kw">impl </span>Paddle {
@@ -2162,12 +2184,18 @@
       height            : <span class="number">0.0</span>, 
       width             : <span class="number">0.0</span>, 
       length            : <span class="number">0.0</span>, 
+      normal_x          : <span class="number">0.0</span>,
+      normal_y          : <span class="number">0.0</span>,
+      normal_z          : <span class="number">0.0</span>,
       global_pos_x_l0   : <span class="number">0.0</span>, 
       global_pos_y_l0   : <span class="number">0.0</span>, 
       global_pos_z_l0   : <span class="number">0.0</span>, 
       global_pos_x_l0_A : <span class="number">0.0</span>, 
       global_pos_y_l0_A : <span class="number">0.0</span>, 
       global_pos_z_l0_A : <span class="number">0.0</span>, 
+      global_pos_x_l0_B : <span class="number">0.0</span>, 
+      global_pos_y_l0_B : <span class="number">0.0</span>, 
+      global_pos_z_l0_B : <span class="number">0.0</span>, 
     }
   }
 
@@ -2212,8 +2240,12 @@
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n    \u{21B3} [{:.2}, {:.2}, {:.2}]"</span>, <span class="self">self</span>.length, <span class="self">self</span>.width, <span class="self">self</span>.height));
     repr += <span class="string">"\n   center [mm]:"</span>;
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n    \u{21B3} [{:.2}, {:.2}, {:.2}]"</span>, <span class="self">self</span>.global_pos_x_l0, <span class="self">self</span>.global_pos_y_l0, <span class="self">self</span>.global_pos_z_l0));
+    repr += <span class="string">"\n   normal vector:"</span>;
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n    \u{21B3} [{:.2}, {:.2}, {:.2}]"</span>, <span class="self">self</span>.normal_x, <span class="self">self</span>.normal_y, <span class="self">self</span>.normal_z));
     repr += <span class="string">"\n   A-side [mm]:"</span>;
     repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n    \u{21B3} [{:.2}, {:.2}, {:.2}]&gt;"</span>, <span class="self">self</span>.global_pos_x_l0_A, <span class="self">self</span>.global_pos_y_l0_A, <span class="self">self</span>.global_pos_z_l0_A));
+    repr += <span class="string">"\n   B-side [mm]:"</span>;
+    repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n    \u{21B3} [{:.2}, {:.2}, {:.2}]&gt;"</span>, <span class="self">self</span>.global_pos_x_l0_B, <span class="self">self</span>.global_pos_y_l0_B, <span class="self">self</span>.global_pos_z_l0_B));
     <span class="macro">write!</span>(f, <span class="string">"{}"</span>, repr)
   }
 }

@@ -189,7 +189,8 @@
 <a href="#188" id="188">188</a>
 <a href="#189" id="189">189</a>
 <a href="#190" id="190">190</a>
-<a href="#191" id="191">191</a></pre></div><pre class="rust"><code><span class="kw">use </span>sysinfo::{System, SystemExt, DiskExt, CpuExt, RefreshKind, CpuRefreshKind};
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a></pre></div><pre class="rust"><code><span class="kw">use </span>sysinfo::{System, SystemExt, DiskExt, CpuExt, RefreshKind, CpuRefreshKind};
 <span class="comment">// use std::{thread, time::Duration};
 
 </span><span class="kw">use </span><span class="kw">crate</span>::helper::cpu_type::{CPUInfo, CPUInfoDebug};
@@ -311,11 +312,12 @@
 
         uptime
     }
-    <span class="kw">pub fn </span>read_disk_usage(sys: <span class="kw-2">&amp;</span>System) -&gt; u8 {
+    <span class="comment">// FIXME - hardcoded mountpoint for tofdata (data drive)
+    </span><span class="kw">pub fn </span>read_disk_usage(sys: <span class="kw-2">&amp;</span>System) -&gt; u8 {
         <span class="kw">let </span><span class="kw-2">mut </span>available_space = Default::default();
         <span class="kw">let </span><span class="kw-2">mut </span>total_space = Default::default();
         <span class="kw">for </span>disk <span class="kw">in </span>sys.disks() {
-            <span class="kw">if </span>disk.mount_point().as_os_str() == <span class="string">"/" </span>{
+            <span class="kw">if </span>disk.mount_point().as_os_str() == <span class="string">"/tofdata" </span>{
                 available_space = disk.available_space();
                 total_space = disk.total_space();
             }
@@ -379,4 +381,5 @@
 
         cpu_freq
     }
-}</code></pre></div></section></main></body></html>
+}
+</code></pre></div></section></main></body></html>

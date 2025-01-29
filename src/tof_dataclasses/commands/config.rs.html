@@ -1931,7 +1931,7 @@
 <span class="doccomment">/// Build Strategy
 /// 
 </span><span class="attr">#[derive(Debug, Copy, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-#[cfg_attr(feature = <span class="string">"pybindings"</span>, pyclass)]
+#[cfg_attr(feature = <span class="string">"pybindings"</span>, pyclass(eq, eq_int))]
 </span><span class="kw">pub enum </span>BuildStrategy {
   Unknown,
   Smart,

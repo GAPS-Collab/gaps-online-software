@@ -857,7 +857,7 @@
 
 </span><span class="attr">#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
-#[cfg_attr(feature = <span class="string">"pybindings"</span>, pyclass)]
+#[cfg_attr(feature = <span class="string">"pybindings"</span>, pyclass(eq, eq_int))]
 </span><span class="kw">pub enum </span>TriggerType {
   Unknown         = <span class="number">0u8</span>,
   <span class="doccomment">/// -&gt; 1-10 "pysics" triggers
@@ -1020,7 +1020,7 @@
 </span><span class="doccomment">/// LTB Thresholds as passed on by the MTB
 /// [See also](https://gaps1.astro.ucla.edu/wiki/gaps/images/gaps/5/52/LTB_Data_Format.pdf)
 </span><span class="attr">#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
-#[cfg_attr(feature = <span class="string">"pybindings"</span>, pyclass)]
+#[cfg_attr(feature = <span class="string">"pybindings"</span>, pyclass(eq, eq_int))]
 #[repr(u8)]
 </span><span class="kw">pub enum </span>LTBThreshold {
   NoHit = <span class="number">0u8</span>,

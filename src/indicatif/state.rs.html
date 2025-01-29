@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/indicatif-0.17.9/src/state.rs`."><title>state.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-42caa33d.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="indicatif" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0 (9fc6b4312 2025-01-07)" data-channel="1.84.0" data-search-js="search-92e6798f.js" data-settings-js="settings-0f613d39.js" ><script src="../../static.files/storage-59e33391.js"></script><script defer src="../../static.files/src-script-56102188.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">indicatif/</div>state.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/indicatif-0.17.11/src/state.rs`."><title>state.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-42caa33d.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="indicatif" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0 (9fc6b4312 2025-01-07)" data-channel="1.84.0" data-search-js="search-92e6798f.js" data-settings-js="settings-0f613d39.js" ><script src="../../static.files/storage-59e33391.js"></script><script defer src="../../static.files/src-script-56102188.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">indicatif/</div>state.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
 <a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -816,9 +816,23 @@
 <a href="#815" id="815">815</a>
 <a href="#816" id="816">816</a>
 <a href="#817" id="817">817</a>
-<a href="#818" id="818">818</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
+<a href="#818" id="818">818</a>
+<a href="#819" id="819">819</a>
+<a href="#820" id="820">820</a>
+<a href="#821" id="821">821</a>
+<a href="#822" id="822">822</a>
+<a href="#823" id="823">823</a>
+<a href="#824" id="824">824</a>
+<a href="#825" id="825">825</a>
+<a href="#826" id="826">826</a>
+<a href="#827" id="827">827</a>
+<a href="#828" id="828">828</a>
+<a href="#829" id="829">829</a>
+<a href="#830" id="830">830</a>
+<a href="#831" id="831">831</a>
+<a href="#832" id="832">832</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 <span class="kw">use </span>std::io;
-<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::sync::{Arc, OnceLock};
 <span class="kw">use </span>std::time::Duration;
 <span class="attr">#[cfg(not(target_arch = <span class="string">"wasm32"</span>))]
 </span><span class="kw">use </span>std::time::Instant;
@@ -827,7 +841,7 @@
 <span class="attr">#[cfg(target_arch = <span class="string">"wasm32"</span>)]
 </span><span class="kw">use </span>web_time::Instant;
 
-<span class="kw">use </span><span class="kw">crate</span>::draw_target::ProgressDrawTarget;
+<span class="kw">use </span><span class="kw">crate</span>::draw_target::{LineType, ProgressDrawTarget};
 <span class="kw">use </span><span class="kw">crate</span>::style::ProgressStyle;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>BarState {
@@ -931,6 +945,13 @@
         <span class="self">self</span>.update_estimate_and_draw(now);
     }
 
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>dec_length(<span class="kw-2">&amp;mut </span><span class="self">self</span>, now: Instant, delta: u64) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(len) = <span class="self">self</span>.state.len {
+            <span class="self">self</span>.state.len = <span class="prelude-val">Some</span>(len.saturating_sub(delta));
+        }
+        <span class="self">self</span>.update_estimate_and_draw(now);
+    }
+
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_tab_width(<span class="kw-2">&amp;mut </span><span class="self">self</span>, tab_width: usize) {
         <span class="self">self</span>.tab_width = tab_width;
         <span class="self">self</span>.state.message.set_tab_width(tab_width);
@@ -967,15 +988,14 @@
         };
 
         <span class="kw">let </span><span class="kw-2">mut </span>draw_state = drawable.state();
-        <span class="kw">let </span>lines: Vec&lt;String&gt; = msg.lines().map(Into::into).collect();
+        <span class="kw">let </span>lines: Vec&lt;LineType&gt; = msg.lines().map(|l| LineType::Text(Into::into(l))).collect();
         <span class="comment">// Empty msg should trigger newline as we are in println
         </span><span class="kw">if </span>lines.is_empty() {
-            draw_state.lines.push(String::new());
+            draw_state.lines.push(LineType::Empty);
         } <span class="kw">else </span>{
             draw_state.lines.extend(lines);
         }
 
-        draw_state.orphan_lines_count = draw_state.lines.len();
         <span class="kw">if let </span><span class="prelude-val">Some</span>(width) = width {
             <span class="kw">if </span>!<span class="macro">matches!</span>(<span class="self">self</span>.state.status, Status::DoneHidden) {
                 <span class="self">self</span>.style
@@ -1002,8 +1022,6 @@
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>draw(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>force_draw: bool, now: Instant) -&gt; io::Result&lt;()&gt; {
-        <span class="kw">let </span>width = <span class="self">self</span>.draw_target.width();
-
         <span class="comment">// `|= self.is_finished()` should not be needed here, but we used to always draw for
         // finished progress bars, so it's kept as to not cause compatibility issues in weird cases.
         </span>force_draw |= <span class="self">self</span>.state.is_finished();
@@ -1011,6 +1029,9 @@
             <span class="prelude-val">Some</span>(drawable) =&gt; drawable,
             <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(()),
         };
+
+        <span class="comment">// Getting the width can be expensive; thus this should happen after checking drawable.
+        </span><span class="kw">let </span>width = drawable.width();
 
         <span class="kw">let </span><span class="kw-2">mut </span>draw_state = drawable.state();
 
@@ -1165,21 +1186,20 @@
     NoTabs(Cow&lt;<span class="lifetime">'static</span>, str&gt;),
     WithTabs {
         original: Cow&lt;<span class="lifetime">'static</span>, str&gt;,
-        expanded: String,
+        expanded: OnceLock&lt;String&gt;,
         tab_width: usize,
     },
 }
 
 <span class="kw">impl </span>TabExpandedString {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(s: Cow&lt;<span class="lifetime">'static</span>, str&gt;, tab_width: usize) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>expanded = s.replace(<span class="string">'\t'</span>, <span class="kw-2">&amp;</span><span class="string">" "</span>.repeat(tab_width));
-        <span class="kw">if </span>s == expanded {
+        <span class="kw">if </span>!s.contains(<span class="string">'\t'</span>) {
             <span class="self">Self</span>::NoTabs(s)
         } <span class="kw">else </span>{
             <span class="self">Self</span>::WithTabs {
                 original: s,
-                expanded,
                 tab_width,
+                expanded: OnceLock::new(),
             }
         }
     }
@@ -1190,20 +1210,24 @@
                 <span class="macro">debug_assert!</span>(!s.contains(<span class="string">'\t'</span>));
                 s
             }
-            <span class="self">Self</span>::WithTabs { expanded, .. } =&gt; expanded,
+            <span class="self">Self</span>::WithTabs {
+                original,
+                tab_width,
+                expanded,
+            } =&gt; expanded.get_or_init(|| original.replace(<span class="string">'\t'</span>, <span class="kw-2">&amp;</span><span class="string">" "</span>.repeat(<span class="kw-2">*</span>tab_width))),
         }
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_tab_width(<span class="kw-2">&amp;mut </span><span class="self">self</span>, new_tab_width: usize) {
         <span class="kw">if let </span><span class="self">Self</span>::WithTabs {
-            original,
             expanded,
             tab_width,
+            ..
         } = <span class="self">self
         </span>{
             <span class="kw">if </span><span class="kw-2">*</span>tab_width != new_tab_width {
                 <span class="kw-2">*</span>tab_width = new_tab_width;
-                <span class="kw-2">*</span>expanded = original.replace(<span class="string">'\t'</span>, <span class="kw-2">&amp;</span><span class="string">" "</span>.repeat(new_tab_width));
+                expanded.take();
             }
         }
     }
@@ -1397,6 +1421,10 @@
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>inc(<span class="kw-2">&amp;</span><span class="self">self</span>, delta: u64) {
         <span class="self">self</span>.pos.fetch_add(delta, Ordering::SeqCst);
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>dec(<span class="kw-2">&amp;</span><span class="self">self</span>, delta: u64) {
+        <span class="self">self</span>.pos.fetch_sub(delta, Ordering::SeqCst);
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set(<span class="kw-2">&amp;</span><span class="self">self</span>, pos: u64) {

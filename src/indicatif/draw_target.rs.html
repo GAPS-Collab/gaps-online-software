@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/indicatif-0.17.9/src/draw_target.rs`."><title>draw_target.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-42caa33d.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="indicatif" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0 (9fc6b4312 2025-01-07)" data-channel="1.84.0" data-search-js="search-92e6798f.js" data-settings-js="settings-0f613d39.js" ><script src="../../static.files/storage-59e33391.js"></script><script defer src="../../static.files/src-script-56102188.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">indicatif/</div>draw_target.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/indicatif-0.17.11/src/draw_target.rs`."><title>draw_target.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-42caa33d.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="indicatif" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0 (9fc6b4312 2025-01-07)" data-channel="1.84.0" data-search-js="search-92e6798f.js" data-settings-js="settings-0f613d39.js" ><script src="../../static.files/storage-59e33391.js"></script><script defer src="../../static.files/src-script-56102188.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">indicatif/</div>draw_target.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
 <a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -737,7 +737,58 @@
 <a href="#736" id="736">736</a>
 <a href="#737" id="737">737</a>
 <a href="#738" id="738">738</a>
-<a href="#739" id="739">739</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::io;
+<a href="#739" id="739">739</a>
+<a href="#740" id="740">740</a>
+<a href="#741" id="741">741</a>
+<a href="#742" id="742">742</a>
+<a href="#743" id="743">743</a>
+<a href="#744" id="744">744</a>
+<a href="#745" id="745">745</a>
+<a href="#746" id="746">746</a>
+<a href="#747" id="747">747</a>
+<a href="#748" id="748">748</a>
+<a href="#749" id="749">749</a>
+<a href="#750" id="750">750</a>
+<a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
+<a href="#753" id="753">753</a>
+<a href="#754" id="754">754</a>
+<a href="#755" id="755">755</a>
+<a href="#756" id="756">756</a>
+<a href="#757" id="757">757</a>
+<a href="#758" id="758">758</a>
+<a href="#759" id="759">759</a>
+<a href="#760" id="760">760</a>
+<a href="#761" id="761">761</a>
+<a href="#762" id="762">762</a>
+<a href="#763" id="763">763</a>
+<a href="#764" id="764">764</a>
+<a href="#765" id="765">765</a>
+<a href="#766" id="766">766</a>
+<a href="#767" id="767">767</a>
+<a href="#768" id="768">768</a>
+<a href="#769" id="769">769</a>
+<a href="#770" id="770">770</a>
+<a href="#771" id="771">771</a>
+<a href="#772" id="772">772</a>
+<a href="#773" id="773">773</a>
+<a href="#774" id="774">774</a>
+<a href="#775" id="775">775</a>
+<a href="#776" id="776">776</a>
+<a href="#777" id="777">777</a>
+<a href="#778" id="778">778</a>
+<a href="#779" id="779">779</a>
+<a href="#780" id="780">780</a>
+<a href="#781" id="781">781</a>
+<a href="#782" id="782">782</a>
+<a href="#783" id="783">783</a>
+<a href="#784" id="784">784</a>
+<a href="#785" id="785">785</a>
+<a href="#786" id="786">786</a>
+<a href="#787" id="787">787</a>
+<a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
+<a href="#790" id="790">790</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::io;
 <span class="kw">use </span>std::ops::{Add, AddAssign, Sub};
 <span class="kw">use </span>std::slice::SliceIndex;
 <span class="kw">use </span>std::sync::{Arc, RwLock, RwLockWriteGuard};
@@ -1034,7 +1085,7 @@
     },
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Drawable&lt;<span class="lifetime">'a</span>&gt; {
+<span class="kw">impl </span>Drawable&lt;<span class="lifetime">'_</span>&gt; {
     <span class="doccomment">/// Adjust `last_line_count` such that the next draw operation keeps/clears additional lines
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>adjust_last_line_count(<span class="kw-2">&amp;mut </span><span class="self">self</span>, adjust: LineAdjust) {
         <span class="kw">let </span>last_line_count: <span class="kw-2">&amp;mut </span>VisualLines = <span class="kw">match </span><span class="self">self </span>{
@@ -1090,6 +1141,14 @@
             } =&gt; draw_state.draw_to_term(term_like, last_line_count),
         }
     }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>width(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u16&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Term { term, .. } =&gt; <span class="prelude-val">Some</span>(term.size().<span class="number">1</span>),
+            <span class="self">Self</span>::Multi { state, .. } =&gt; state.width(),
+            <span class="self">Self</span>::TermLike { term_like, .. } =&gt; <span class="prelude-val">Some</span>(term_like.width()),
+        }
+    }
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>LineAdjust {
@@ -1101,7 +1160,7 @@
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DrawStateWrapper&lt;<span class="lifetime">'a</span>&gt; {
     state: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>DrawState,
-    orphan_lines: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Vec&lt;String&gt;&gt;,
+    orphan_lines: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Vec&lt;LineType&gt;&gt;,
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; DrawStateWrapper&lt;<span class="lifetime">'a</span>&gt; {
@@ -1112,7 +1171,7 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>for_multi(state: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>DrawState, orphan_lines: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Vec&lt;String&gt;) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>for_multi(state: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>DrawState, orphan_lines: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>Vec&lt;LineType&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             state,
             orphan_lines: <span class="prelude-val">Some</span>(orphan_lines),
@@ -1136,9 +1195,19 @@
 
 <span class="kw">impl </span>Drop <span class="kw">for </span>DrawStateWrapper&lt;<span class="lifetime">'_</span>&gt; {
     <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(orphaned) = <span class="kw-2">&amp;mut </span><span class="self">self</span>.orphan_lines {
-            orphaned.extend(<span class="self">self</span>.state.lines.drain(..<span class="self">self</span>.state.orphan_lines_count));
-            <span class="self">self</span>.state.orphan_lines_count = <span class="number">0</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(text_lines) = <span class="kw-2">&amp;mut </span><span class="self">self</span>.orphan_lines {
+            <span class="comment">// Filter out the lines that do not contain progress information
+            // Store the filtered out lines in orphaned
+            </span><span class="kw">let </span><span class="kw-2">mut </span>lines = Vec::new();
+
+            <span class="kw">for </span>line <span class="kw">in </span><span class="self">self</span>.state.lines.drain(..) {
+                <span class="kw">match </span><span class="kw-2">&amp;</span>line {
+                    LineType::Text(<span class="kw">_</span>) | LineType::Empty =&gt; text_lines.push(line),
+                    <span class="kw">_ </span>=&gt; lines.push(line),
+                }
+            }
+
+            <span class="self">self</span>.state.lines = lines;
         }
     }
 }
@@ -1199,11 +1268,7 @@
 </span><span class="attr">#[derive(Clone, Debug, Default)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DrawState {
     <span class="doccomment">/// The lines to print (can contain ANSI codes)
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) lines: Vec&lt;String&gt;,
-    <span class="doccomment">/// The number [`Self::lines`] entries that shouldn't be reaped by the next tick.
-    ///
-    /// Note that this number may be different than the number of visual lines required to draw [`Self::lines`].
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) orphan_lines_count: usize,
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) lines: Vec&lt;LineType&gt;,
     <span class="doccomment">/// True if we should move the cursor up when possible instead of clearing lines.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) move_cursor: bool,
     <span class="doccomment">/// Controls how the multi progress is aligned if some of its progress bars get removed, default is `Top`
@@ -1211,22 +1276,26 @@
 }
 
 <span class="kw">impl </span>DrawState {
-    <span class="kw">fn </span>draw_to_term(
+    <span class="doccomment">/// Draw the current state to the terminal
+    /// We expect a few things:
+    /// - self.lines contains n lines of text/empty then m lines of bars
+    /// - None of those lines contain newlines
+    </span><span class="kw">fn </span>draw_to_term(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         term: <span class="kw-2">&amp;</span>(<span class="kw">impl </span>TermLike + <span class="question-mark">?</span>Sized),
-        last_line_count: <span class="kw-2">&amp;mut </span>VisualLines,
-    ) -&gt; io::Result&lt;()&gt; {
+        bar_count: <span class="kw-2">&amp;mut </span>VisualLines, <span class="comment">// The number of dynamic lines printed at the previous tick
+    </span>) -&gt; io::Result&lt;()&gt; {
         <span class="kw">if </span>panicking() {
             <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
 
         <span class="kw">if </span>!<span class="self">self</span>.lines.is_empty() &amp;&amp; <span class="self">self</span>.move_cursor {
             <span class="comment">// Move up to first line (assuming the last line doesn't contain a '\n') and then move to then front of the line
-            </span>term.move_cursor_up(last_line_count.as_usize().saturating_sub(<span class="number">1</span>))<span class="question-mark">?</span>;
+            </span>term.move_cursor_up(bar_count.as_usize().saturating_sub(<span class="number">1</span>))<span class="question-mark">?</span>;
             term.write_str(<span class="string">"\r"</span>)<span class="question-mark">?</span>;
         } <span class="kw">else </span>{
             <span class="comment">// Fork of console::clear_last_lines that assumes that the last line doesn't contain a '\n'
-            </span><span class="kw">let </span>n = last_line_count.as_usize();
+            </span><span class="kw">let </span>n = bar_count.as_usize();
             term.move_cursor_up(n.saturating_sub(<span class="number">1</span>))<span class="question-mark">?</span>;
             <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n {
                 term.clear_line()<span class="question-mark">?</span>;
@@ -1237,11 +1306,16 @@
             term.move_cursor_up(n.saturating_sub(<span class="number">1</span>))<span class="question-mark">?</span>;
         }
 
-        <span class="kw">let </span>width = term.width() <span class="kw">as </span>usize;
-        <span class="kw">let </span>visual_lines = <span class="self">self</span>.visual_line_count(.., width);
+        <span class="kw">let </span>term_width = term.width() <span class="kw">as </span>usize;
+
+        <span class="comment">// Here we calculate the terminal vertical real estate that the state requires
+        </span><span class="kw">let </span>full_height = <span class="self">self</span>.visual_line_count(.., term_width);
+
         <span class="kw">let </span>shift = <span class="kw">match </span><span class="self">self</span>.alignment {
-            MultiProgressAlignment::Bottom <span class="kw">if </span>visual_lines &lt; <span class="kw-2">*</span>last_line_count =&gt; {
-                <span class="kw">let </span>shift = <span class="kw-2">*</span>last_line_count - visual_lines;
+            <span class="comment">// If we align to the bottom and the new height is less than before, clear the lines
+            // that are not used by the new content.
+            </span>MultiProgressAlignment::Bottom <span class="kw">if </span>full_height &lt; <span class="kw-2">*</span>bar_count =&gt; {
+                <span class="kw">let </span>shift = <span class="kw-2">*</span>bar_count - full_height;
                 <span class="kw">for _ in </span><span class="number">0</span>..shift.as_usize() {
                     term.write_line(<span class="string">""</span>)<span class="question-mark">?</span>;
                 }
@@ -1250,66 +1324,53 @@
             <span class="kw">_ </span>=&gt; VisualLines::default(),
         };
 
-        <span class="kw">let </span>term_height = term.height() <span class="kw">as </span>usize;
-        <span class="kw">let </span>term_width = term.width() <span class="kw">as </span>usize;
-        <span class="kw">let </span>len = <span class="self">self</span>.lines.len();
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.orphan_lines_count &lt;= <span class="self">self</span>.lines.len());
-        <span class="kw">let </span>orphan_visual_line_count =
-            <span class="self">self</span>.visual_line_count(..<span class="self">self</span>.orphan_lines_count, term_width);
-        <span class="kw">let </span><span class="kw-2">mut </span>real_len = VisualLines::default();
-        <span class="kw">let </span><span class="kw-2">mut </span>last_line_filler = <span class="number">0</span>;
-        <span class="kw">for </span>(idx, line) <span class="kw">in </span><span class="self">self</span>.lines.iter().enumerate() {
-            <span class="kw">let </span>line_width = console::measure_text_width(line);
-            <span class="kw">let </span>diff = <span class="kw">if </span>line.is_empty() {
-                <span class="comment">// Empty line are new line
-                </span><span class="number">1
-            </span>} <span class="kw">else </span>{
-                <span class="comment">// Calculate real length based on terminal width
-                // This take in account linewrap from terminal
-                </span><span class="kw">let </span>terminal_len = (line_width <span class="kw">as </span>f64 / term_width <span class="kw">as </span>f64).ceil() <span class="kw">as </span>usize;
+        <span class="comment">// Accumulate the displayed height in here. This differs from `full_height` in that it will
+        // accurately reflect the number of lines that have been displayed on the terminal, if the
+        // full height exceeds the terminal height.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>real_height = VisualLines::default();
 
-                <span class="comment">// If the line is effectively empty (for example when it consists
-                // solely of ANSI color code sequences, count it the same as a
-                // new line. If the line is measured to be len = 0, we will
-                // subtract with overflow later.
-                </span>usize::max(terminal_len, <span class="number">1</span>)
-            }
-            .into();
-            <span class="comment">// Have all orphan lines been drawn?
-            </span><span class="kw">if </span><span class="self">self</span>.orphan_lines_count &lt;= idx {
-                <span class="comment">// If so, then `real_len` should be at least `orphan_visual_line_count`.
-                </span><span class="macro">debug_assert!</span>(orphan_visual_line_count &lt;= real_len);
-                <span class="comment">// Don't consider orphan lines when comparing to terminal height.
-                </span><span class="kw">if </span>real_len - orphan_visual_line_count + diff &gt; term_height.into() {
+        <span class="kw">for </span>(idx, line) <span class="kw">in </span><span class="self">self</span>.lines.iter().enumerate() {
+            <span class="kw">let </span>line_height = line.wrapped_height(term_width);
+
+            <span class="comment">// Check here for bar lines that exceed the terminal height
+            </span><span class="kw">if </span><span class="macro">matches!</span>(line, LineType::Bar(<span class="kw">_</span>)) {
+                <span class="comment">// Stop here if printing this bar would exceed the terminal height
+                </span><span class="kw">if </span>real_height + line_height &gt; term.height().into() {
                     <span class="kw">break</span>;
                 }
+
+                real_height += line_height;
             }
-            real_len += diff;
-            <span class="kw">if </span>idx != <span class="number">0 </span>{
+
+            <span class="comment">// Print a new line if this is not the first line printed this tick
+            // the first line will automatically wrap due to the filler below
+            </span><span class="kw">if </span>idx != <span class="number">0 </span>{
                 term.write_line(<span class="string">""</span>)<span class="question-mark">?</span>;
             }
-            term.write_str(line)<span class="question-mark">?</span>;
-            <span class="kw">if </span>idx + <span class="number">1 </span>== len {
-                <span class="comment">// Keep the cursor on the right terminal side
-                // So that next user writes/prints will happen on the next line
-                </span>last_line_filler = term_width.saturating_sub(line_width);
+
+            term.write_str(line.as_ref())<span class="question-mark">?</span>;
+
+            <span class="kw">if </span>idx + <span class="number">1 </span>== <span class="self">self</span>.lines.len() {
+                <span class="comment">// For the last line of the output, keep the cursor on the right terminal
+                // side so that next user writes/prints will happen on the next line
+                </span><span class="kw">let </span>last_line_filler = line_height.as_usize() * term_width - line.console_width();
+                term.write_str(<span class="kw-2">&amp;</span><span class="string">" "</span>.repeat(last_line_filler))<span class="question-mark">?</span>;
             }
         }
-        term.write_str(<span class="kw-2">&amp;</span><span class="string">" "</span>.repeat(last_line_filler))<span class="question-mark">?</span>;
 
         term.flush()<span class="question-mark">?</span>;
-        <span class="kw-2">*</span>last_line_count = real_len - orphan_visual_line_count + shift;
+        <span class="kw-2">*</span>bar_count = real_height + shift;
+
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="self">self</span>.lines.clear();
-        <span class="self">self</span>.orphan_lines_count = <span class="number">0</span>;
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>visual_line_count(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        range: <span class="kw">impl </span>SliceIndex&lt;[String], Output = [String]&gt;,
+        range: <span class="kw">impl </span>SliceIndex&lt;[LineType], Output = [LineType]&gt;,
         width: usize,
     ) -&gt; VisualLines {
         visual_line_count(<span class="kw-2">&amp;</span><span class="self">self</span>.lines[range], width)
@@ -1363,21 +1424,55 @@
 
 <span class="doccomment">/// Calculate the number of visual lines in the given lines, after
 /// accounting for line wrapping and non-printable characters.
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>visual_line_count(lines: <span class="kw-2">&amp;</span>[<span class="kw">impl </span>AsRef&lt;str&gt;], width: usize) -&gt; VisualLines {
-    <span class="kw">let </span><span class="kw-2">mut </span>real_lines = <span class="number">0</span>;
-    <span class="kw">for </span>line <span class="kw">in </span>lines {
-        <span class="kw">let </span>effective_line_length = console::measure_text_width(line.as_ref());
-        real_lines += usize::max(
-            (effective_line_length <span class="kw">as </span>f64 / width <span class="kw">as </span>f64).ceil() <span class="kw">as </span>usize,
-            <span class="number">1</span>,
-        );
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>visual_line_count(lines: <span class="kw-2">&amp;</span>[LineType], width: usize) -&gt; VisualLines {
+    lines.iter().fold(VisualLines::default(), |acc, line| {
+        acc.saturating_add(line.wrapped_height(width))
+    })
+}
+
+<span class="attr">#[derive(Clone, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>LineType {
+    Text(String),
+    Bar(String),
+    Empty,
+}
+
+<span class="kw">impl </span>LineType {
+    <span class="kw">fn </span>wrapped_height(<span class="kw-2">&amp;</span><span class="self">self</span>, width: usize) -&gt; VisualLines {
+        <span class="comment">// Calculate real length based on terminal width
+        // This take in account linewrap from terminal
+        </span><span class="kw">let </span>terminal_len = (<span class="self">self</span>.console_width() <span class="kw">as </span>f64 / width <span class="kw">as </span>f64).ceil() <span class="kw">as </span>usize;
+
+        <span class="comment">// If the line is effectively empty (for example when it consists
+        // solely of ANSI color code sequences, count it the same as a
+        // new line. If the line is measured to be len = 0, we will
+        // subtract with overflow later.
+        </span>usize::max(terminal_len, <span class="number">1</span>).into()
     }
 
-    real_lines.into()
+    <span class="kw">fn </span>console_width(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        console::measure_text_width(<span class="self">self</span>.as_ref())
+    }
+}
+
+<span class="kw">impl </span>AsRef&lt;str&gt; <span class="kw">for </span>LineType {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            LineType::Text(s) | LineType::Bar(s) =&gt; s,
+            LineType::Empty =&gt; <span class="string">""</span>,
+        }
+    }
+}
+
+<span class="kw">impl </span>PartialEq&lt;str&gt; <span class="kw">for </span>LineType {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="self">self</span>.as_ref() == other
+    }
 }
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">crate</span>::draw_target::LineType;
     <span class="kw">use crate</span>::{MultiProgress, ProgressBar, ProgressDrawTarget};
 
     <span class="attr">#[test]
@@ -1471,7 +1566,14 @@
         ];
 
         <span class="kw">for </span>case <span class="kw">in </span>lines_and_expectations.iter() {
-            <span class="kw">let </span>result = <span class="kw">super</span>::visual_line_count(case.lines, case.width);
+            <span class="kw">let </span>result = <span class="kw">super</span>::visual_line_count(
+                <span class="kw-2">&amp;</span>case
+                    .lines
+                    .iter()
+                    .map(|s| LineType::Text(s.to_string()))
+                    .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;(),
+                case.width,
+            );
             <span class="macro">assert_eq!</span>(result, case.expectation.into(), <span class="string">"case: {:?}"</span>, case);
         }
     }

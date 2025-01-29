@@ -281,7 +281,7 @@
 
 <span class="attr">#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 #[repr(u8)]
-#[cfg_attr(feature = <span class="string">"pybindings"</span>, pyclass)]
+#[cfg_attr(feature = <span class="string">"pybindings"</span>, pyclass(eq, eq_int))]
 </span><span class="kw">pub enum </span>EventStatus {
   Unknown                = <span class="number">0u8</span>,
   CRC32Wrong             = <span class="number">10u8</span>,

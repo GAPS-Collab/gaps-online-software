@@ -266,7 +266,13 @@
 <a href="#265" id="265">265</a>
 <a href="#266" id="266">266</a>
 <a href="#267" id="267">267</a>
-<a href="#268" id="268">268</a></pre></div><pre class="rust"><code><span class="comment">// @generated automatically by Diesel CLI.
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a></pre></div><pre class="rust"><code><span class="comment">// @generated automatically by Diesel CLI.
 
 </span><span class="macro">diesel::table!</span> {
     auth_group (id) {
@@ -422,32 +428,38 @@
 
 <span class="macro">diesel::table!</span> {
     tof_db_paddle (paddle_id) {
-        paddle_id -&gt; SmallInt,
-        volume_id -&gt; BigInt,
-        panel_id -&gt; SmallInt,
-        mtb_link_id -&gt; SmallInt,
-        rb_id -&gt; SmallInt,
-        rb_chA -&gt; SmallInt,
-        rb_chB -&gt; SmallInt,
-        ltb_id -&gt; SmallInt,
-        ltb_chA -&gt; SmallInt,
-        ltb_chB -&gt; SmallInt,
-        pb_id -&gt; SmallInt,
-        pb_chA -&gt; SmallInt,
-        pb_chB -&gt; SmallInt,
-        cable_len -&gt; Float,
-        dsi -&gt; SmallInt,
-        j_rb -&gt; SmallInt,
-        j_ltb -&gt; SmallInt,
-        height -&gt; Float,
-        width -&gt; Float,
-        length -&gt; Float,
-        global_pos_x_l0 -&gt; Float,
-        global_pos_y_l0 -&gt; Float,
-        global_pos_z_l0 -&gt; Float,
+        paddle_id         -&gt; SmallInt,
+        volume_id         -&gt; BigInt,
+        panel_id          -&gt; SmallInt,
+        mtb_link_id       -&gt; SmallInt,
+        rb_id             -&gt; SmallInt,
+        rb_chA            -&gt; SmallInt,
+        rb_chB            -&gt; SmallInt,
+        ltb_id            -&gt; SmallInt,
+        ltb_chA           -&gt; SmallInt,
+        ltb_chB           -&gt; SmallInt,
+        pb_id             -&gt; SmallInt,
+        pb_chA            -&gt; SmallInt,
+        pb_chB            -&gt; SmallInt,
+        cable_len         -&gt; Float,
+        dsi               -&gt; SmallInt,
+        j_rb              -&gt; SmallInt,
+        j_ltb             -&gt; SmallInt,
+        height            -&gt; Float,
+        width             -&gt; Float,
+        length            -&gt; Float,
+        normal_x          -&gt; Float,
+        normal_y          -&gt; Float,
+        normal_z          -&gt; Float,
+        global_pos_x_l0   -&gt; Float,
+        global_pos_y_l0   -&gt; Float,
+        global_pos_z_l0   -&gt; Float,
         global_pos_x_l0_A -&gt; Float,
         global_pos_y_l0_A -&gt; Float,
         global_pos_z_l0_A -&gt; Float,
+        global_pos_x_l0_B -&gt; Float,
+        global_pos_y_l0_B -&gt; Float,
+        global_pos_z_l0_B -&gt; Float,
     }
 }
 
