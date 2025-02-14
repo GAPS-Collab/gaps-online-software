@@ -1,3 +1,5 @@
+#! /usr/bin/env python 
+
 from glob import glob
 
 
@@ -69,9 +71,10 @@ if __name__ == '__main__':
                         help='The run end time, e.g. as taken from the elog')
     parser.add_argument('-r','--run-id', default=-1, type=int,\
                         help='TOF Run id (only relevant when working with TOF files')
-    #parser.add_argument('-o','--outdir',\
-    #                    help='Outdir to save plots',
-    #                    default='')
+    parser.add_argument('-o','--outdir',\
+                        help='Outdir for caraspace output files',
+                        type=Path,
+                        default=None)
     parser.add_argument('-v','--verbose', action='store_true',\
                         help='More verbose output')
     parser.add_argument('--reprocess', action='store_true', \
@@ -82,7 +85,10 @@ if __name__ == '__main__':
         settings = go.liftof.LiftofSettings()
         settings = settings.from_file('settings.toml')
 
-    cr_outdir = args.tof_dir / 'caraspace' / f'{args.run_id}'
+    if args.outdir is None:
+        cr_outdir = args.tof_dir / 'caraspace' / f'{args.run_id}'
+    else:
+        cr_outdir = args.outdir
     cr_outdir.mkdir(parents=True, exist_ok=True)
     cr_outdir = str(cr_outdir)
 
@@ -116,7 +122,10 @@ if __name__ == '__main__':
                         # ln case this is monitoring information,
                         # throw it away, so that we start with a 
                         # merged event
-                        if pack.packet_type != go.io.TelemetryPacketType.MergedEvent:
+                        if not pack.packet_type in [go.io.TelemetryPacketType.InterestingEvent,
+                                                    go.io.TelemetryPacketType.BoringEvent,
+                                                    go.io.TelemetryPacketType.NoGapsTriggerEvent]:
+                        #if pack.packet_type != go.io.TelemetryPacketType.MergedEvent:
                             continue
                         
                         ev = go.events.MergedEvent()
@@ -213,7 +222,10 @@ if __name__ == '__main__':
             # we create a single frame for each packet
             frame = go.io.CRFrame()
             frame.put_telemetrypacket(pack, str(pack.packet_type))
-            if pack.packet_type != go.io.TelemetryPacketType.MergedEvent:
+            if not pack.packet_type in [go.io.TelemetryPacketType.InterestingEvent,
+                                        go.io.TelemetryPacketType.BoringEvent,
+                                        go.io.TelemetryPacketType.NoGapsTriggerEvent]:
+            #if pack.packet_type != go.io.TelemetryPacketType.MergedEvent:
                 # nothing to merge. Add to the joint file and move on
                 writer.add_frame(frame)
                 frames_written += 1
@@ -319,4 +331,3 @@ if __name__ == '__main__':
         print (f'--> Buffer size of TOF events which are behind the telemetry stream  : {len(tofevent_buffer_later)}')
         print (f'--> {frames_written} frames written!')
         print (f'--> {frame}')
-        #raise
