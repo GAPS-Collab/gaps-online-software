@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap_builder-4.5.27/src/builder/range.rs`."><title>range.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-42caa33d.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="clap_builder" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0 (9fc6b4312 2025-01-07)" data-channel="1.84.0" data-search-js="search-92e6798f.js" data-settings-js="settings-0f613d39.js" ><script src="../../../static.files/storage-59e33391.js"></script><script defer src="../../../static.files/src-script-56102188.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">clap_builder/builder/</div>range.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clap_builder-4.5.30/src/builder/range.rs`."><title>range.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-42caa33d.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="clap_builder" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.1 (e71f9a9a9 2025-01-27)" data-channel="1.84.1" data-search-js="search-92e6798f.js" data-settings-js="settings-0f613d39.js" ><script src="../../../static.files/storage-59e33391.js"></script><script defer src="../../../static.files/src-script-56102188.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">clap_builder/builder/</div>range.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
 <a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -284,7 +284,19 @@
 <a href="#283" id="283">283</a>
 <a href="#284" id="284">284</a>
 <a href="#285" id="285">285</a>
-<a href="#286" id="286">286</a></pre></div><pre class="rust"><code><span class="doccomment">/// Values per occurrence for an argument
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a></pre></div><pre class="rust"><code><span class="doccomment">/// Values per occurrence for an argument
 </span><span class="attr">#[derive(Copy, Clone, PartialEq, Eq, Hash)]
 </span><span class="kw">pub struct </span>ValueRange {
     start_inclusive: usize,
@@ -302,6 +314,17 @@
     </span><span class="kw">pub const </span>SINGLE: <span class="self">Self </span>= <span class="self">Self </span>{
         start_inclusive: <span class="number">1</span>,
         end_inclusive: <span class="number">1</span>,
+    };
+
+    <span class="attr">#[cfg(debug_assertions)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>OPTIONAL: <span class="self">Self </span>= <span class="self">Self </span>{
+        start_inclusive: <span class="number">0</span>,
+        end_inclusive: <span class="number">1</span>,
+    };
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>FULL: <span class="self">Self </span>= <span class="self">Self </span>{
+        start_inclusive: <span class="number">0</span>,
+        end_inclusive: usize::MAX,
     };
 
     <span class="doccomment">/// Create a range
@@ -421,9 +444,7 @@
 
 <span class="kw">impl </span>From&lt;std::ops::RangeFull&gt; <span class="kw">for </span>ValueRange {
     <span class="kw">fn </span>from(<span class="kw">_</span>: std::ops::RangeFull) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>start_inclusive = <span class="number">0</span>;
-        <span class="kw">let </span>end_inclusive = usize::MAX;
-        <span class="self">Self</span>::raw(start_inclusive, end_inclusive)
+        <span class="self">Self</span>::FULL
     }
 }
 
@@ -462,7 +483,10 @@
 <span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>ValueRange {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
         <span class="macro">ok!</span>(<span class="self">self</span>.start_inclusive.fmt(f));
-        <span class="kw">if </span>!<span class="self">self</span>.is_fixed() {
+        <span class="kw">if </span><span class="self">self</span>.is_fixed() {
+        } <span class="kw">else if </span><span class="self">self</span>.end_inclusive == usize::MAX {
+            <span class="macro">ok!</span>(<span class="string">".."</span>.fmt(f));
+        } <span class="kw">else </span>{
             <span class="macro">ok!</span>(<span class="string">"..="</span>.fmt(f));
             <span class="macro">ok!</span>(<span class="self">self</span>.end_inclusive.fmt(f));
         }

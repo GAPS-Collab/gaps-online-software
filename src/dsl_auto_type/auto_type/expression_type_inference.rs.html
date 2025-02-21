@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dsl_auto_type-0.1.2/src/auto_type/expression_type_inference.rs`."><title>expression_type_inference.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-42caa33d.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="dsl_auto_type" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0 (9fc6b4312 2025-01-07)" data-channel="1.84.0" data-search-js="search-92e6798f.js" data-settings-js="settings-0f613d39.js" ><script src="../../../static.files/storage-59e33391.js"></script><script defer src="../../../static.files/src-script-56102188.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">dsl_auto_type/auto_type/</div>expression_type_inference.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dsl_auto_type-0.1.3/src/auto_type/expression_type_inference.rs`."><title>expression_type_inference.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-42caa33d.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="dsl_auto_type" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.1 (e71f9a9a9 2025-01-27)" data-channel="1.84.1" data-search-js="search-92e6798f.js" data-settings-js="settings-0f613d39.js" ><script src="../../../static.files/storage-59e33391.js"></script><script defer src="../../../static.files/src-script-56102188.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5f194d8c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">dsl_auto_type/auto_type/</div>expression_type_inference.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
 <a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
@@ -389,7 +389,55 @@
 <a href="#388" id="388">388</a>
 <a href="#389" id="389">389</a>
 <a href="#390" id="390">390</a>
-<a href="#391" id="391">391</a></pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a></pre></div><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
 <span class="kw">pub use </span><span class="kw">super</span>::settings_builder::InferrerSettingsBuilder;
 
@@ -435,7 +483,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) function_types_case: Case,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, <span class="lifetime">'p</span>&gt; LocalVariablesMap&lt;<span class="lifetime">'a</span>, <span class="lifetime">'p</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; LocalVariablesMap&lt;<span class="lifetime">'a</span>, <span class="lifetime">'_</span>&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>inferrer(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>) -&gt; TypeInferrer&lt;<span class="lifetime">'a</span>&gt; {
         TypeInferrer {
             local_variables_map: <span class="self">self</span>,
@@ -524,7 +572,7 @@
                 <span class="comment">// This is either a local variable or we should assume that the type exists at
                 // the same path as the function (with applied casing for last segment)
                 </span><span class="kw">let </span>path_is_ident = path.get_ident();
-                <span class="kw">if </span>path_is_ident.map_or(<span class="bool-val">false</span>, |ident| ident == <span class="string">"self"</span>) {
+                <span class="kw">if </span>path_is_ident.is_some_and(|ident| ident == <span class="string">"self"</span>) {
                     <span class="macro">parse_quote!</span>(<span class="self">Self</span>)
                 } <span class="kw">else if let </span><span class="prelude-val">Some</span>(LetStatementInferredType { type_, errors }) = path_is_ident
                     .and_then(|path_single_ident| {
@@ -692,6 +740,54 @@
                         }
                     }
                 }
+            }
+            (syn::Expr::Binary(binary_expression), <span class="prelude-val">None</span>) =&gt; {
+                <span class="kw">let </span>op_span = Span::mixed_site().located_at(binary_expression.op.span());
+                <span class="kw">let </span>trait_name = <span class="kw">match </span>binary_expression.op {
+                    syn::BinOp::Add(<span class="kw">_</span>) =&gt; <span class="string">"Add"</span>,
+                    syn::BinOp::Sub(<span class="kw">_</span>) =&gt; <span class="string">"Sub"</span>,
+                    syn::BinOp::Mul(<span class="kw">_</span>) =&gt; <span class="string">"Mul"</span>,
+                    syn::BinOp::Div(<span class="kw">_</span>) =&gt; <span class="string">"Div"</span>,
+                    syn::BinOp::Rem(<span class="kw">_</span>) =&gt; <span class="string">"Rem"</span>,
+                    syn::BinOp::BitXor(<span class="kw">_</span>) =&gt; <span class="string">"BitXor"</span>,
+                    syn::BinOp::BitAnd(<span class="kw">_</span>) =&gt; <span class="string">"BitAnd"</span>,
+                    syn::BinOp::BitOr(<span class="kw">_</span>) =&gt; <span class="string">"BitOr"</span>,
+                    syn::BinOp::Shl(<span class="kw">_</span>) =&gt; <span class="string">"Shl"</span>,
+                    syn::BinOp::Shr(<span class="kw">_</span>) =&gt; <span class="string">"Shr"</span>,
+                    syn::BinOp::And(<span class="kw">_</span>)
+                    | syn::BinOp::Or(<span class="kw">_</span>)
+                    | syn::BinOp::Eq(<span class="kw">_</span>)
+                    | syn::BinOp::Lt(<span class="kw">_</span>)
+                    | syn::BinOp::Le(<span class="kw">_</span>)
+                    | syn::BinOp::Ne(<span class="kw">_</span>)
+                    | syn::BinOp::Ge(<span class="kw">_</span>)
+                    | syn::BinOp::Gt(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="macro">parse_quote!</span>(bool)),
+                    syn::BinOp::AddAssign(<span class="kw">_</span>)
+                    | syn::BinOp::SubAssign(<span class="kw">_</span>)
+                    | syn::BinOp::MulAssign(<span class="kw">_</span>)
+                    | syn::BinOp::DivAssign(<span class="kw">_</span>)
+                    | syn::BinOp::RemAssign(<span class="kw">_</span>)
+                    | syn::BinOp::BitXorAssign(<span class="kw">_</span>)
+                    | syn::BinOp::BitAndAssign(<span class="kw">_</span>)
+                    | syn::BinOp::BitOrAssign(<span class="kw">_</span>)
+                    | syn::BinOp::ShlAssign(<span class="kw">_</span>)
+                    | syn::BinOp::ShrAssign(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="macro">parse_quote!</span>(())),
+                    <span class="kw">_ </span>=&gt; {
+                        <span class="comment">// This is here because the `BinOp` enum is marked as #[non_exhaustive],
+                        // but in effect we really support all the variants
+                        </span><span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new(
+                            op_span,
+                            <span class="macro">format_args!</span>(
+                                <span class="string">"unsupported binary operator for auto_type: {:?}"</span>,
+                                binary_expression.op
+                            ),
+                        ));
+                    }
+                };
+                <span class="kw">let </span>trait_name_ident = syn::Ident::new(trait_name, op_span);
+                <span class="kw">let </span>left_type = <span class="self">self</span>.infer_expression_type(<span class="kw-2">&amp;</span>binary_expression.left, <span class="prelude-val">None</span>);
+                <span class="kw">let </span>right_type = <span class="self">self</span>.infer_expression_type(<span class="kw-2">&amp;</span>binary_expression.right, <span class="prelude-val">None</span>);
+                <span class="macro">parse_quote!</span>(&lt;#left_type <span class="kw">as </span>::core::ops::#trait_name_ident&lt;#right_type&gt;&gt;::Output)
             }
             (<span class="kw">_</span>, <span class="prelude-val">None</span>) =&gt; {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new(
