@@ -380,7 +380,7 @@ fn main() {
       match get_mtb_link_id() {
         Err(err) => error!("Unable to obtain MTB link id! {err}"),
         Ok(link_id) => {
-          if link_id as u8 != rb_expected_link_id {
+          if link_id as u8 == rb_expected_link_id {
             println!("=> We received the correct link id from the MTB!");
           } else {
             error!("Received unexpected MTB link ID {}!", link_id);
