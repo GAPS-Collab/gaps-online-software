@@ -1,5 +1,8 @@
 use std::fmt;
-use std::fs::File;
+use std::fs::{
+  self,
+  File,
+};
 use std::io;
 use std::io::SeekFrom;
 use std::io::Seek;
@@ -8,6 +11,8 @@ use std::path::Path;
 use std::collections::HashMap;
 use std::fs::OpenOptions;
 use std::io::Read;
+use std::io::ErrorKind;
+use regex::Regex;
 
 use log::{
   debug,
@@ -135,8 +140,13 @@ pub fn get_gaps_events(filename : String) -> Vec<GapsEvent> {
 /// Read GAPS binary files ("Berkeley binaries)
 #[derive(Debug)]
 pub struct TelemetryPacketReader {
-  /// Read from this file
-  pub filename        : String,
+  /// Reader will emit packets from these files,
+  /// if one file is exhausted, it moves on to 
+  /// the next file automatically
+  pub filenames       : Vec<String>,
+  /// The index of the file the reader is 
+  /// currently reading
+  pub file_index      : usize,
   file_reader         : BufReader<File>,
   /// Current (byte) position in the file
   cursor              : usize,
@@ -165,33 +175,86 @@ impl fmt::Display for TelemetryPacketReader {
     } else {
       range_repr += "..)";
     }
-    let repr = format!("<TelemetryPacketReader : file {}, read {} packets, filter {}, range {}>", self.filename, self.n_packs_read, self.filter, range_repr);
+    let repr = format!("<TelemetryPacketReader : read {} packets, filter {}, range {},\n files {:?}>", self.n_packs_read, self.filter, range_repr, self.filenames);
     write!(f, "{}", repr)
   }
 }
 
 impl TelemetryPacketReader {
+  
+  fn list_path_contents_sorted(input: &str) -> Result<Vec<String>, io::Error> {
+    let path = Path::new(input);
+    match fs::metadata(path) {
+      Ok(metadata) => {
+        if metadata.is_file() {
+          let fname = String::from(input);
+          return Ok(vec![fname]);
+        } 
+        if metadata.is_dir() {
+          let re = Regex::new(r"RAW(\d{6})_(\d{6})\.bin$").unwrap();
 
-  pub fn new(filename : String) -> TelemetryPacketReader {
-    let fname_c = filename.clone();
-    let file = OpenOptions::new().create(false).append(false).read(true).open(fname_c).expect("Unable to open file {filename}");
-    let packet_reader = Self { 
-      filename,
-      file_reader     : BufReader::new(file),
-      cursor          : 0,
-      filter          : TelemetryPacketType::Unknown,
-      n_packs_read    : 0,
-      skip_ahead      : 0,
-      stop_after      : 0,
-      n_packs_skipped : 0,
-    };
-    packet_reader
+          let mut entries: Vec<(u32, u32, String)> = fs::read_dir(path)?
+            .filter_map(Result::ok) // Ignore unreadable entries
+            .filter_map(|entry| {
+              let filename = format!("{}/{}", path.display(), entry.file_name().into_string().ok()?);
+              re.captures(&filename.clone()).map(|caps| {
+                let date = caps.get(1)?.as_str().parse::<u32>().ok()?;
+                let time = caps.get(2)?.as_str().parse::<u32>().ok()?;
+                Some((date, time, filename))
+              })?
+            })
+            .collect();
+
+          // Sort by (date, time)
+          entries.sort_by(|a, b| (a.0, a.1).cmp(&(b.0, b.1)));
+          // Return only filenames
+          return Ok(entries.into_iter().map(|(_, _, name)| name).collect());
+        } 
+        Err(io::Error::new(ErrorKind::Other, "Path exists but is neither a file nor a directory"))
+      }
+      Err(e) => Err(e),
+    }
+  }
+
+  pub fn new(filename_or_directory : String) -> Self {
+    let firstfile : String;
+    match Self::list_path_contents_sorted(&filename_or_directory) {
+      Err(err) => {
+        error!("{} does not seem to be either a valid directory or an existing file! {err}", filename_or_directory);
+        panic!("Unable to open files!");
+      }
+      Ok(files) => {
+        firstfile = files[0].clone();
+        match OpenOptions::new().create(false).append(false).read(true).open(&firstfile) {
+          Err(err) => {
+            error!("Unable to open file {firstfile}! {err}");
+            panic!("Unable to create reader from {filename_or_directory}!");
+          }
+          Ok(file) => {
+            let packet_reader = Self { 
+              filenames       : files,
+              file_index      : 0,
+              file_reader     : BufReader::new(file),
+              cursor          : 0,
+              filter          : TelemetryPacketType::Unknown,
+              n_packs_read    : 0,
+              skip_ahead      : 0,
+              stop_after      : 0,
+              n_packs_skipped : 0,
+            };
+            packet_reader
+          }
+        }
+      }
+    }
   } 
 
   /// Get an index of the file - count number of packets
   ///
   /// Returns the number of all PacketTypes in the file
   pub fn get_packet_index(&mut self) -> io::Result<HashMap<u8, usize>> {
+    error!("The packet index function is currently broken and will only show the packet index for one file, not for all!");
+    error!("FIXME!");
     let mut index  = HashMap::<u8, usize>::new();
     let mut buffer = [0];
     loop {
@@ -289,9 +352,33 @@ impl TelemetryPacketReader {
   } // end fn
 
   pub fn rewind(&mut self) -> io::Result<()> {
-    self.file_reader.rewind()?;
+    let firstfile = &self.filenames[0];
+    match OpenOptions::new().create(false).append(false).read(true).open(&firstfile) {
+      Err(err) => {
+        error!("Unable to open file {firstfile}! {err}");
+        panic!("Unable to create reader from {firstfile}!");
+      }
+      Ok(file) => {
+        self.file_reader  = BufReader::new(file);
+      }
+    }   
+    self.file_index = 0;
     self.cursor = 0;
     Ok(())
+  }
+
+  /// Get the next file ready
+  fn prime_next_file(&mut self) -> Option<usize> {
+    if self.file_index == self.filenames.len() -1 {
+      return None;
+    } else {
+      self.file_index += 1;
+      let nextfilename = self.filenames[self.file_index].clone();
+      let nextfile     = OpenOptions::new().create(false).append(false).read(true).open(nextfilename).expect("Unable to open file {nextfilename}");
+      self.file_reader = BufReader::new(nextfile);
+      self.cursor      = 0;
+      return Some(self.file_index);
+    }
   }
 
   /// Return the next tofpacket in the stream
@@ -301,13 +388,13 @@ impl TelemetryPacketReader {
   /// again.
   pub fn get_next_packet(&mut self) -> Option<TelemetryPacket> {
     // filter::Unknown corresponds to allowing any
-
     let mut buffer = [0];
     loop {
       match self.file_reader.read_exact(&mut buffer) {
         Err(err) => {
           debug!("Unable to read from file! {err}");
-          return None;
+          self.prime_next_file()?;
+          return self.get_next_packet();
         }
         Ok(_) => {
           self.cursor += 1;
@@ -319,7 +406,8 @@ impl TelemetryPacketReader {
         match self.file_reader.read_exact(&mut buffer) {
           Err(err) => {
             debug!("Unable to read from file! {err}");
-            return None;
+            self.prime_next_file()?;
+            return self.get_next_packet();
           }
           Ok(_) => {
             self.cursor += 1;
@@ -333,7 +421,8 @@ impl TelemetryPacketReader {
           match self.file_reader.read_exact(&mut buffer) {
              Err(err) => {
               debug!("Unable to read from file! {err}");
-              return None;
+              self.prime_next_file()?;
+              return self.get_next_packet();
             }
             Ok(_) => {
               self.cursor += 1;
@@ -348,7 +437,8 @@ impl TelemetryPacketReader {
           match self.file_reader.read_exact(&mut buffer_ts) {
             Err(err) => {
               debug!("Unable to read from file! {err}");
-              return None;
+              self.prime_next_file()?;
+              return self.get_next_packet();
             }
             Ok(_) => {
               self.cursor += 4;
@@ -359,7 +449,8 @@ impl TelemetryPacketReader {
           match self.file_reader.read_exact(&mut buffer_counter) {
             Err(err) => {
               debug!("Unable to read from file! {err}");
-              return None;
+              self.prime_next_file()?;
+              return self.get_next_packet();
             }
             Ok(_) => {
               self.cursor += 2;
@@ -381,7 +472,8 @@ impl TelemetryPacketReader {
           match self.file_reader.read_exact(&mut buffer_checksum) {
             Err(err) => {
               debug!("Unable to read from file! {err}");
-              return None;
+              self.prime_next_file()?;
+              return self.get_next_packet();
             }
             Ok(_) => {
               self.cursor += 2;
@@ -400,7 +492,8 @@ impl TelemetryPacketReader {
             match self.file_reader.seek(SeekFrom::Current(size as i64)) {
               Err(err) => {
                 debug!("Unable to read more data! {err}");
-                return None; 
+                self.prime_next_file()?;
+                return self.get_next_packet();
               }
               Ok(_) => {
                 self.cursor += size as usize;
@@ -415,7 +508,8 @@ impl TelemetryPacketReader {
             match self.file_reader.seek(SeekFrom::Current(size as i64)) {
               Err(err) => {
                 debug!("Unable to read more data! {err}");
-                return None; 
+                self.prime_next_file()?;
+                return self.get_next_packet();
               }
               Ok(_) => {
                 self.n_packs_skipped += 1;
@@ -429,7 +523,8 @@ impl TelemetryPacketReader {
             match self.file_reader.seek(SeekFrom::Current(size as i64)) {
               Err(err) => {
                 debug!("Unable to read more data! {err}");
-                return None; 
+                self.prime_next_file()?;
+                return self.get_next_packet();
               }
               Ok(_) => {
                 self.cursor += size as usize;
@@ -458,7 +553,8 @@ impl TelemetryPacketReader {
           match self.file_reader.read_exact(&mut payload) {
             Err(err) => {
               debug!("Unable to read from file! {err}");
-              return None;
+              self.prime_next_file()?;
+              return self.get_next_packet();
             }
             Ok(_) => {
               self.cursor += tp.header.length as usize;
