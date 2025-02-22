@@ -1,15 +1,12 @@
 use numpy::{
-    PyArray,
-    PyArray1,
-    PyArray2, 
-    //pyarray_bound,
-    //PyArrayMethods,
-    //ndarray::Array,
+  PyArray,
+  PyArray1,
+  PyArray2, 
 };
 
 use pyo3_polars::{
-    PyDataFrame,
-    //PySeries
+  PyDataFrame,
+  //PySeries
 };
 
 use pyo3::Python;
@@ -2727,13 +2724,7 @@ impl PyRBEventHeader {
 #[pyclass]
 #[pyo3(name="TofEventSummary")]
 pub struct PyTofEventSummary {
-  event : TofEventSummary,
-}
-
-impl PyTofEventSummary {
-  pub fn set_event(&mut self, event : TofEventSummary) {
-    self.event = event;
-  }
+  pub event : TofEventSummary,
 }
 
 #[pymethods]
@@ -2743,6 +2734,11 @@ impl PyTofEventSummary {
     Self {
       event : TofEventSummary::new(),
     }
+  }
+
+  #[getter]
+  fn pointcloud(&self) -> Option<Vec<(f32,f32,f32,f32,f32)>> {
+    self.event.get_pointcloud()
   }
 
   #[getter]
@@ -3003,7 +2999,7 @@ impl PyTofEvent {
   fn get_summary(&self) -> PyTofEventSummary {
     let ts = self.event.get_summary();
     let mut pyts = PyTofEventSummary::new();
-    pyts.set_event(ts);
+    pyts.event = ts;
     return pyts;
   }
 
@@ -3164,6 +3160,31 @@ impl PyTofHit {
   fn set_paddle(&mut self, plen : f32, clen : f32) {
     self.hit.paddle_len = plen;
     self.hit.cable_len  = clen;
+  }
+
+  #[getter]
+  fn x(&self) -> f32 {
+    self.hit.x
+  }
+  
+  #[getter]
+  fn y(&self) -> f32 {
+    self.hit.y
+  }
+
+  #[getter]
+  fn z(&self) -> f32 {
+    self.hit.z
+  }
+
+  #[getter]
+  fn get_t0_nocable(&self) -> f32 {
+    self.hit.get_t0_nocable()
+  }
+
+  #[getter]
+  fn get_obeys_causality(&self) -> bool {
+    self.hit.obeys_causality()
   }
 
   /// Reconstructed particle interaction time,

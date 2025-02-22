@@ -170,7 +170,7 @@ impl PyMergedEvent {
           }
           Ok(ts)    => {
             let mut pyts = PyTofEventSummary::new();
-            pyts.set_event(ts);
+            pyts.event = ts;
             return Ok(pyts);
           }
         }
@@ -530,7 +530,7 @@ impl PyGapsEvent {
   #[getter]
   fn tof(&self) -> PyTofEventSummary {
     let mut tof =  PyTofEventSummary::new();
-    tof.set_event(self.event.tof.clone());
+    tof.event = self.event.tof.clone();
     tof
   }
 

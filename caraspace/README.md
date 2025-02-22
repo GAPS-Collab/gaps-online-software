@@ -1,11 +1,14 @@
-# CaraSpace - a spiritual successor of IceTray written in Rust
+# CaraSpace - simple, highly efficient serializztion library for balloon project
+
+
+## spiritual success of IceTray, a serialization/data accessibility framework developed for IceCube
 
 The [IceTray framework](https://docs.icecube.aq/icetray/main/info/overview.html#what-is-icetray) is IceCube's standard software 
 framework for simulation and analysis. 
 The basic design concept, is a series of a sequence of Frames, which are containers able to hold any kind of "FrameObject". These 
 frame objects might be a reconstruction, a hitseries or geometry information.
 
-While not a complete rewrite, the goal of this project is to follow the design in the same spirit, basically providing a unified 
+While not a rewrite, the goal of this project is to follow the design in the same spirit, basically providing a unified 
 format for the GAPS TOF only stream as well as any Telemetry data.
 
 Currently, this works with TofPackets and TelemetryPacktes.
@@ -53,7 +56,6 @@ frame.put_tofpacket(tp, "tofstream")
 print (frame)
 # add it
 writer.add_frame(frame)
-
 
 # read our data
 fname = glob('foo/Run69*')[0]
