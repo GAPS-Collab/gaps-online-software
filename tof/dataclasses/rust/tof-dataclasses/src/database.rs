@@ -557,6 +557,18 @@ impl Paddle {
       }
     }
   }
+
+  /// The principal is the direction along the longest
+  /// dimension from A -> B
+  pub fn principal(&self) -> (f32,f32,f32) {
+    let mut pr = (self.global_pos_x_l0_B - self.global_pos_x_l0_A,
+                  self.global_pos_y_l0_B - self.global_pos_y_l0_A,
+                  self.global_pos_z_l0_B - self.global_pos_z_l0_A);
+    let length = f32::sqrt(pr.0.powf(2.0) + pr.1.powf(2.0) + pr.2.powf(2.0)); 
+    pr = (pr.0/length, pr.1/length, pr.2/length);
+    return pr;
+  }
+
 }
 
 impl fmt::Display for Paddle {
