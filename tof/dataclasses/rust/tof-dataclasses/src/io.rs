@@ -33,7 +33,6 @@ const ALGO : crc::Algorithm<u32> = crc::Algorithm {
 
 use std::fmt;
 
-//extern crate crc;
 use crc::Crc;
 
 use std::path::Path;
@@ -42,18 +41,24 @@ use std::fs::{
     File,
     OpenOptions
 };
+
 use std::io;
 use std::io::{
-    BufReader,
-    Seek,
-    SeekFrom,
-    Read,
-    Write,
+  ErrorKind,
+  BufReader,
+  Seek,
+  SeekFrom,
+  Read,
+  Write,
 };
+
 use std::collections::{
-    VecDeque,
-    HashMap
+  VecDeque,
+  HashMap
 };
+
+
+
 
 extern crate chrono;
 use chrono::{DateTime, Utc};
@@ -61,6 +66,7 @@ use chrono::{DateTime, Utc};
 extern crate indicatif;
 use indicatif::{ProgressBar, ProgressStyle};
 use crossbeam_channel::Sender;
+use regex::Regex;
 
 use crate::events::{
     RBEvent,
@@ -807,14 +813,15 @@ pub trait PacketReader {
 
 
 
-/// Read serialized TofPackets from an existing file
+/// Read serialized TofPackets from an existing file or directory
 ///
-/// This is mainly to read stream files previously
-/// written by TofPacketWriter
+/// This can read the "TOF stream" files, typically suffixed with .tof.gaps
+/// These files are typically written by a TofPacketReader instance, e.g. as 
+/// on the TOF flight computer
 #[derive(Debug)]
 pub struct TofPacketReader {
   /// Read from this file
-  pub filename        : String,
+  pub filenames       : Vec<String>,
   file_reader         : BufReader<File>,
   /// Current (byte) position in the file
   cursor              : usize,
@@ -828,6 +835,8 @@ pub struct TofPacketReader {
   pub skip_ahead      : usize,
   /// Stop reading after n packets
   pub stop_after      : usize,
+  /// The index of the current file in the internal "filenames" vector.
+  pub file_index      : usize,
 }
 
 impl fmt::Display for TofPacketReader {
@@ -843,28 +852,126 @@ impl fmt::Display for TofPacketReader {
     } else {
       range_repr += "..)";
     }
-    let repr = format!("<TofPacketReader : file {}, read {} packets, filter {}, range {}>", self.filename, self.n_packs_read, self.filter, range_repr);
+    let repr = format!("<TofPacketReader :read {} packets, filter {}, range {}\n files {:?}>", self.n_packs_read, self.filter, range_repr, self.filenames);
     write!(f, "{}", repr)
   }
 }
 
 impl TofPacketReader {
 
-  pub fn new(filename : String) -> TofPacketReader {
-    let fname_c = filename.clone();
-    let file = OpenOptions::new().create(false).append(false).read(true).open(fname_c).expect("Unable to open file {filename}");
-    let packet_reader = Self { 
-      filename,
-      file_reader     : BufReader::new(file),
-      cursor          : 0,
-      filter          : PacketType::Unknown,
-      n_packs_read    : 0,
-      skip_ahead      : 0,
-      stop_after      : 0,
-      n_packs_skipped : 0,
-    };
-    packet_reader
-  } 
+  fn list_path_contents_sorted(input: &str) -> Result<Vec<String>, io::Error> {
+    let path = Path::new(input);
+    match fs::metadata(path) {
+      Ok(metadata) => {
+        if metadata.is_file() {
+          //return Ok(vec![path.file_name()
+          let fname = String::from(input);
+          return Ok(vec![fname]);
+          //return Ok(vec![path
+          //  .and_then(|name| name.to_str())
+          //  .map(String::from)
+          //  .ok_or_else(|| io::Error::new(ErrorKind::InvalidData, "Invalid filename"))?]);
+        } 
+        if metadata.is_dir() {
+          let re = Regex::new(r"Run\d+_\d+\.(\d{6})_(\d{6})UTC\.tof\.gaps$").unwrap();
+
+          let mut entries: Vec<(u32, u32, String)> = fs::read_dir(path)?
+            .filter_map(Result::ok) // Ignore unreadable entries
+            .filter_map(|entry| {
+              //let filename = String::from(entry.file_name().into_string().ok()?); // Convert to String
+              let filename = format!("{}/{}", path.display(), entry.file_name().into_string().ok()?);
+              re.captures(&filename.clone()).map(|caps| {
+                let date = caps.get(1)?.as_str().parse::<u32>().ok()?;
+                let time = caps.get(2)?.as_str().parse::<u32>().ok()?;
+                Some((date, time, filename))
+              })?
+            })
+            .collect();
+
+          // Sort by (date, time)
+          entries.sort_by(|a, b| (a.0, a.1).cmp(&(b.0, b.1)));
+          // Return only filenames
+          return Ok(entries.into_iter().map(|(_, _, name)| name).collect());
+        } 
+        Err(io::Error::new(ErrorKind::Other, "Path exists but is neither a file nor a directory"))
+      }
+      Err(e) => Err(e),
+    }
+  }
+
+  /// Setup a new Reader, allowing the argument to be either the name of a single file or 
+  /// the name of a directory
+  pub fn new(filename_or_directory : String) -> TofPacketReader {
+    let firstfile : String;
+    match TofPacketReader::list_path_contents_sorted(&filename_or_directory) {
+      Err(err) => {
+        error!("{} does not seem to be either a valid directory or an existing file! {err}", filename_or_directory);
+        panic!("Unable to open files!");
+      }
+      Ok(files) => {
+        firstfile = files[0].clone();
+        match OpenOptions::new().create(false).append(false).read(true).open(&firstfile) {
+          Err(err) => {
+            error!("Unable to open file {firstfile}! {err}");
+            panic!("Unable to create reader from {filename_or_directory}!");
+          }
+          Ok(file) => {
+            let packet_reader = Self { 
+              filenames       : files,
+              file_reader     : BufReader::new(file),
+              cursor          : 0,
+              filter          : PacketType::Unknown,
+              n_packs_read    : 0,
+              skip_ahead      : 0,
+              stop_after      : 0,
+              n_packs_skipped : 0,
+              file_index      : 0,
+            };
+            packet_reader
+          }
+        }
+      }
+    } 
+  }
+
+  /// The very first TofPacket for a reader
+  ///
+  ///
+  pub fn first_packet(&mut self) -> Option<TofPacket> {
+    self.rewind();
+    let pack = self.get_next_packet();
+    self.rewind();
+    return pack;
+  }
+
+  /// Te very last TofPacket for a reader
+  pub fn last_packet(&mut self) -> Option<TofPacket> { 
+    self.file_index = self.filenames.len() - 1;
+    let lastfilename = self.filenames[self.file_index].clone();
+    let lastfile     = OpenOptions::new().create(false).append(false).read(true).open(lastfilename).expect("Unable to open file {nextfilename}");
+    self.file_reader = BufReader::new(lastfile);
+    self.cursor      = 0;
+    let mut tp = TofPacket::new();
+    let mut idx = 0;
+    loop {
+      match self.get_next_packet() {
+        None => {
+          self.rewind();
+          if idx == 0 {
+            return None;
+          } else {
+            return Some(tp);
+          }
+        }
+        Some(pack) => {
+          idx += 1;
+          tp = pack;
+          continue;
+        }
+      }
+    }
+  }
+
 
   #[deprecated(since="0.10.0", note="Use public attribute instead!")]
   pub fn set_filter(&mut self, ptype : PacketType) {
@@ -954,8 +1061,18 @@ impl TofPacketReader {
   } // end fn
 
   pub fn rewind(&mut self) -> io::Result<()> {
-    self.file_reader.rewind()?;
-    self.cursor = 0;
+    let firstfile = &self.filenames[0];
+    match OpenOptions::new().create(false).append(false).read(true).open(&firstfile) {
+      Err(err) => {
+        error!("Unable to open file {firstfile}! {err}");
+        panic!("Unable to create reader from {firstfile}!");
+      }
+      Ok(file) => {
+        self.file_reader  = BufReader::new(file);
+      }
+    }   
+    self.cursor     = 0;
+    self.file_index = 0;
     Ok(())
   }
 
@@ -972,7 +1089,16 @@ impl TofPacketReader {
       match self.file_reader.read_exact(&mut buffer) {
         Err(err) => {
           debug!("Unable to read from file! {err}");
-          return None;
+          if self.file_index == self.filenames.len() -1 {
+            return None;
+          } else {
+            self.file_index += 1;
+            let nextfilename = self.filenames[self.file_index].clone();
+            let nextfile     = OpenOptions::new().create(false).append(false).read(true).open(nextfilename).expect("Unable to open file {nextfilename}");
+            self.file_reader = BufReader::new(nextfile);
+            self.cursor      = 0;
+            return self.get_next_packet();
+          }
         }
         Ok(_) => {
           self.cursor += 1;
@@ -984,7 +1110,16 @@ impl TofPacketReader {
         match self.file_reader.read_exact(&mut buffer) {
           Err(err) => {
             debug!("Unable to read from file! {err}");
-            return None;
+            if self.file_index == self.filenames.len() -1 {
+              return None;
+            } else {
+              self.file_index += 1;
+              let nextfilename = self.filenames[self.file_index].clone();
+              let nextfile = OpenOptions::new().create(false).append(false).read(true).open(nextfilename).expect("Unable to open file {nextfilename}");
+              self.file_reader = BufReader::new(nextfile);
+              self.cursor      = 0;
+              return self.get_next_packet();
+            }
           }
           Ok(_) => {
             self.cursor += 1;
@@ -998,7 +1133,16 @@ impl TofPacketReader {
           match self.file_reader.read_exact(&mut buffer) {
              Err(err) => {
               debug!("Unable to read from file! {err}");
-              return None;
+              if self.file_index == self.filenames.len() -1 {
+                return None;
+              } else {
+                self.file_index += 1;
+                let nextfilename = self.filenames[self.file_index].clone();
+                let nextfile = OpenOptions::new().create(false).append(false).read(true).open(nextfilename).expect("Unable to open file {nextfilename}");
+                self.cursor      = 0;
+                self.file_reader = BufReader::new(nextfile);
+                return self.get_next_packet();
+              }
             }
             Ok(_) => {
               self.cursor += 1;
@@ -1010,7 +1154,16 @@ impl TofPacketReader {
           match self.file_reader.read_exact(&mut buffer_psize) {
             Err(err) => {
               debug!("Unable to read from file! {err}");
-              return None;
+              if self.file_index == self.filenames.len() -1 {
+                return None;
+              } else {
+                self.file_index += 1;
+                let nextfilename = self.filenames[self.file_index].clone();
+                let nextfile = OpenOptions::new().create(false).append(false).read(true).open(nextfilename).expect("Unable to open file {nextfilename}");
+                self.cursor      = 0;
+                self.file_reader = BufReader::new(nextfile);
+                return self.get_next_packet();
+              }
             }
             Ok(_) => {
               self.cursor += 4;
@@ -1022,7 +1175,16 @@ impl TofPacketReader {
             match self.file_reader.seek(SeekFrom::Current(size as i64)) {
               Err(err) => {
                 debug!("Unable to read more data! {err}");
-                return None; 
+                if self.file_index == self.filenames.len() -1 {
+                  return None;
+                } else {
+                  self.file_index += 1;
+                  let nextfilename = self.filenames[self.file_index].clone();
+                  let nextfile = OpenOptions::new().create(false).append(false).read(true).open(nextfilename).expect("Unable to open file {nextfilename}");
+                  self.cursor      = 0;
+                  self.file_reader = BufReader::new(nextfile);
+                  return self.get_next_packet();
+                }
               }
               Ok(_) => {
                 self.cursor += size as usize;
@@ -1037,7 +1199,16 @@ impl TofPacketReader {
             match self.file_reader.seek(SeekFrom::Current(size as i64)) {
               Err(err) => {
                 debug!("Unable to read more data! {err}");
-                return None; 
+                if self.file_index == self.filenames.len() -1 {
+                  return None;
+                } else {
+                  self.file_index += 1;
+                  let nextfilename = self.filenames[self.file_index].clone();
+                  let nextfile = OpenOptions::new().create(false).append(false).read(true).open(nextfilename).expect("Unable to open file {nextfilename}");
+                  self.cursor      = 0;
+                  self.file_reader = BufReader::new(nextfile);
+                  return self.get_next_packet();
+                }
               }
               Ok(_) => {
                 self.n_packs_skipped += 1;
@@ -1051,7 +1222,16 @@ impl TofPacketReader {
             match self.file_reader.seek(SeekFrom::Current(size as i64)) {
               Err(err) => {
                 debug!("Unable to read more data! {err}");
-                return None; 
+                if self.file_index == self.filenames.len() -1 {
+                  return None;
+                } else {
+                  self.file_index += 1;
+                  let nextfilename = self.filenames[self.file_index].clone();
+                  let nextfile = OpenOptions::new().create(false).append(false).read(true).open(nextfilename).expect("Unable to open file {nextfilename}");
+                  self.cursor      = 0;
+                  self.file_reader = BufReader::new(nextfile);
+                  return self.get_next_packet();
+                }
               }
               Ok(_) => {
                 self.cursor += size as usize;
@@ -1068,7 +1248,16 @@ impl TofPacketReader {
           match self.file_reader.read_exact(&mut payload) {
             Err(err) => {
               debug!("Unable to read from file! {err}");
-              return None;
+              if self.file_index == self.filenames.len() -1 {
+                return None;
+              } else {
+                self.file_index += 1;
+                let nextfilename = self.filenames[self.file_index].clone();
+                let nextfile = OpenOptions::new().create(false).append(false).read(true).open(nextfilename).expect("Unable to open file {nextfilename}");
+                self.cursor      = 0;
+                self.file_reader = BufReader::new(nextfile);
+                return self.get_next_packet();
+              }
             }
             Ok(_) => {
               self.cursor += size as usize;
@@ -1080,7 +1269,16 @@ impl TofPacketReader {
           match self.file_reader.read_exact(&mut tail) {
             Err(err) => {
               debug!("Unable to read from file! {err}");
-              return None;
+              if self.file_index == self.filenames.len() -1 {
+                return None;
+              } else {
+                self.file_index += 1;
+                let nextfilename = self.filenames[self.file_index].clone();
+                let nextfile = OpenOptions::new().create(false).append(false).read(true).open(nextfilename).expect("Unable to open file {nextfilename}");
+                self.cursor      = 0;
+                self.file_reader = BufReader::new(nextfile);
+                return self.get_next_packet();
+              }
             }
             Ok(_) => {
               self.cursor += 2;
