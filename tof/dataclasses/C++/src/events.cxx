@@ -612,12 +612,13 @@ TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
   TofEvent event = TofEvent();
   // FIXME - we need more of these checks
   // update expected_size as we go
-  usize expected_size = 4
-      + 2
+  usize expected_size = 2 // header
+      + 2 // compression & quality
       + TofEventHeader::SIZE
       + MasterTriggerEvent::SIZE
-      + 12;
+      + 4; // size for hits & rbevents
   if (stream.size() - pos < expected_size) {
+    log_error("Incomplete readout! Expecting at least " << expected_size << " bytes, but only got " << stream.size());
     event.status = EventStatus::IncompleteReadout;
     return event;
   }
@@ -636,8 +637,7 @@ TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
   u32 mask          = Gaps::parse_u32(stream, pos);
   u32 n_rbevents    = get_n_rbevents(mask);
   u32 n_missing     = get_n_rbmissinghits(mask);
-  log_debug("Expecting " << n_rbevents << " RBEvents, " << n_missing << " RBMissingHits");
-  //std::cout << "Expecting " << n_rbevents << " RBEvents, " << n_missing << " RBMissingHits" << std::endl;
+  log_debug("Expecting " << n_rbevents << " RBEvents, " << n_missing << " milssing hits");
   for (u32 k=0; k< n_rbevents; k++) {
     //std::cout << "rb event " << k << std::endl;
     RBEvent rb_event = RBEvent::from_bytestream(stream, pos);
@@ -925,6 +925,16 @@ std::string MasterTriggerEvent::to_string() const {
   }
   repr += ">";
   return repr;
+}
+
+Vec<TofHit> TofEvent::get_hits() const {
+  Vec<TofHit> hits;
+  for (auto &rb : rb_events) {
+    for (auto &h : rb.hits) {
+      hits.push_back(h);
+    }
+  }
+  return hits;
 }
 
 std::string TofEvent::to_string() const {

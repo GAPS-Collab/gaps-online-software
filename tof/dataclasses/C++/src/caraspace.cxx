@@ -9,10 +9,63 @@
 #include "parsers.h"
 #include "caraspace.hpp"
 
+
 namespace fs = std::filesystem;
 
-Gaps::CRFrame::CRFrame() {
-};
+//--------------------------------------------------
+
+Gaps::CRFrameObject Gaps::CRFrameObject::from_bytestream(Vec<u8> stream, usize &pos) {
+  auto f_obj = CRFrameObject();
+  if (stream.size() < 2) {
+    log_error("CRFrame::HeadInvalid");
+    return f_obj;
+    //return Err(CRSerializationError::HeadInvalid {});
+  }
+  auto head = parse_u16(stream, pos);
+  if (head != CRFrameObject::HEAD) {
+    log_error("CRFrame doesn't start with HEAD signature of " << CRFrame::HEAD);
+    return f_obj;
+  }
+  
+  f_obj.version     = parse_u8(stream, pos);
+  f_obj.ftype      = static_cast<CRFrameObjectType>(parse_u8(stream, pos));
+  auto payload_size = parse_u32(stream, pos);
+  pos += payload_size; 
+  auto tail = parse_u16(stream, pos);
+  if (tail != CRFrameObject::TAIL) {
+    log_error("Packet does not end with CRTAIL signature");
+    return f_obj;
+  }
+  pos -= 2; // for tail parsing
+  pos -= payload_size;
+  auto buffer    = Gaps::slice(stream, pos, pos + payload_size ); 
+  f_obj.payload = buffer; 
+  return f_obj;
+}
+
+std::string Gaps::CRFrameObject::to_string() {
+  std::string repr = "<CRFrameObject";
+  usize p_len = payload.size();
+  // FIXME - implement the string representation for ftype
+  repr += std::format("\n  size  : {}", static_cast<u8>(ftype) ); 
+  if (p_len >= 8) {
+    repr += std::format("\n  payload ({} bytes) : [{} {} {} {} .. {} {} {} {}]", 
+       p_len,
+       payload[0],
+       payload[1],
+       payload[2],
+       payload[3],
+       payload[p_len - 4],
+       payload[p_len - 3],
+       payload[p_len - 2],
+       payload[p_len - 1]);     
+  } else {
+    repr += std::format("\n payload ({} bytes)", p_len);
+  }
+  return repr;
+}
+
+// ---------------------------------------------------------------
 
 std::map<std::string, std::tuple<u64, Gaps::CRFrameObjectType>> Gaps::CRFrame::parse_index(Vec<u8> stream, usize &pos) {
   std::map<std::string, std::tuple<u64, Gaps::CRFrameObjectType>> index;
@@ -49,42 +102,72 @@ Gaps::CRFrame Gaps::CRFrame::from_bytestream(Vec<u8> stream,
     return frame;
   }
   u64 fr_size = parse_u64(stream, pos); 
-  pos += fr_size;
+  pos += fr_size - 2; // count from the beginning
+  std::cout << "fr size : " << fr_size << std::endl;
   u16 tail    = parse_u16(stream, pos);
   if (tail != CRFrame::TAIL) {
     log_error("CRFrame doesn't conclude with TAIL signature of " << CRFrame::TAIL);
     return frame;
   }
   // now go back and get the content
-  pos -= fr_size - 2; // wind back
-  u64 size          = parse_u64(stream, pos);
+  pos -= fr_size - 2; // wind back, accounting for tail
+  u64 size = parse_u64(stream, pos); // account for size
+  std::cout << "size : " << size << std::endl;
   frame.index       = parse_index(stream, pos);
   Vec<u8> packet_bytestream(stream.begin()+ pos,
                             stream.begin()+ pos + size)  ;
   frame.bytestorage = packet_bytestream;
   return frame;
-    //if stream.len() < 2 {
-    //  return Err(CRSerializationError::HeadInvalid {});
-    //}
-    //let head = parse_u16(stream, pos);
-    //if Self::CRHEAD != head {
-    //  error!("FrameObject does not start with HEAD signature");
-    //  return Err(CRSerializationError::HeadInvalid {});
-    //}
-    //let fr_size   = parse_u64(stream, pos) as usize; 
-    //*pos += fr_size as usize;
-    //let tail = parse_u16(stream, pos);
-    //if Self::CRTAIL != tail {
-    //  error!("FrameObject does not end with TAIL signature");
-    //  return Err(CRSerializationError::TailInvalid {});
-    //}
-    //*pos -= fr_size - 2; // wind back
-    //let mut frame = CRFrame::new();
-    //let size    = parse_u64(stream, pos) as usize;
-    //frame.index = Self::parse_index(stream, pos);
-    //frame.bytestorage = stream[*pos..*pos + size].to_vec();
-    //Ok(frame)
 }
+
+TofPacket Gaps::CRFrame::get_tofpacket(std::string name) {
+  TofPacket tp;
+  //let mut lookup : (usize, CRFrameObjectType);
+  usize pos = 0;
+  CRFrameObjectType dtype = CRFrameObjectType::Unknown;
+  if (index.contains(name)) {
+    pos   = std::get<0>(index.at(name));
+    dtype = static_cast<CRFrameObjectType>(std::get<1>(index.at(name)));
+  } else {
+    log_error("Unable to find TofPacket " << name << " in frame!");
+  }
+  if (dtype == CRFrameObjectType::TofPacket) {
+    auto f_obj = CRFrameObject::from_bytestream(bytestorage, pos);
+    std::cout << f_obj.to_string() << std::endl;
+    pos        = 0;
+    tp         = TofPacket::from_bytestream(f_obj.payload, pos); 
+    std::cout << tp << std::endl;
+  } else {
+    log_error("Trying to get TofPacket " << name << " however, that is of type " << static_cast<u8>(dtype)); 
+    return tp;
+  }
+  return tp;
+}
+
+Gaps::TelemetryPacket Gaps::CRFrame::get_telemetrypacket(std::string name) {
+  Gaps::TelemetryPacket tp;
+  usize pos = 0;
+  CRFrameObjectType dtype = CRFrameObjectType::Unknown;
+  if (index.contains(name)) {
+    pos   = std::get<0>(index.at(name));
+    dtype = static_cast<CRFrameObjectType>(std::get<1>(index.at(name)));
+  } else {
+    log_error("Unable to find TelemetryPacket " << name << " in frame!");
+  }
+  if (dtype == CRFrameObjectType::TelemetryPacket) {
+    auto f_obj = CRFrameObject::from_bytestream(bytestorage, pos);
+    std::cout << f_obj.to_string() << std::endl;
+    pos        = 0;
+    tp         = TelemetryPacket::from_bytestream(f_obj.payload, pos); 
+    std::cout << tp.to_string() << std::endl;
+  } else {
+    log_error("Trying to get TofPacket " << name << " however, that is of type " << static_cast<u8>(dtype)); 
+    return tp;
+  }
+  return tp;
+}
+
+//------------------------------------------------------------
 
 Gaps::CRReader::CRReader() {
 };
@@ -137,18 +220,24 @@ Gaps::CRFrame Gaps::CRReader::get_next_frame() {
         throw std::runtime_error("No more frames in file!");
       } 
       if (byte == 0xAA) {
-        u8 packet_type = stream_file_.get();
-        bytestream buffer = bytestream(4);
-        stream_file_.read(reinterpret_cast<char*>(buffer.data()), 4);
+        Vec<u8> payload = {0xAA, 0xAA};
+        //u8 packet_type = stream_file_.get();
+        Vec<u8> buffer = bytestream(8);
+        stream_file_.read(reinterpret_cast<char*>(buffer.data()), 8);
         usize pos = 0;
-        u32 p_size       = Gaps::parse_u32(buffer, pos);
-        Gaps::CRFrame frame;
-        //packet.packet_type  = static_cast<PacketType>(packet_type);
-        //packet.payload_size = p_size;
-        //buffer = bytestream(p_size);
-        //stream_file_.read(reinterpret_cast<char*>(buffer.data()), p_size);
-        //buffer.resize(stream_file_.gcount());
-        //packet.payload = std::move(buffer);
+        //u64 p_size;
+        u64 p_size       = Gaps::parse_u64(buffer, pos);
+        payload.insert(payload.end(), buffer.begin(), buffer.end());
+        buffer = bytestream(p_size);
+        stream_file_.read(reinterpret_cast<char*>(buffer.data()), p_size);
+        payload.insert(payload.end(), buffer.begin(), buffer.end());
+        u64 pos_in_frame = 0;
+        // from_bytestream is broken
+        //auto frame = Gaps::CRFrame::from_bytestream(payload, pos_in_frame);
+        auto frame = CRFrame();
+        frame.index = CRFrame::parse_index(buffer, pos_in_frame);
+        buffer = Gaps::slice(buffer, pos_in_frame, p_size); 
+        frame.bytestorage = std::move(buffer);
         n_packets_read_++;
         return frame;
       }

@@ -125,7 +125,7 @@ TofPacket TofPacket::from_bytestream(const Vec<u8> &bytestream,
   packet.head = value;
   packet.packet_type  = static_cast<PacketType>(bytestream[pos]); pos+=1;
   packet.payload_size = Gaps::parse_u32(bytestream, pos);
-  log_debug("Found TofPacket of type " << packet_type_to_stirng(packet.packet_type) << " with " << packet.payload_size << " bytes payload!");
+  log_debug("Found TofPacket of type " << packet_type_to_string(packet.packet_type) << " with " << packet.payload_size << " bytes payload!");
   usize payload_end = pos + packet.payload_size;
   Vec<u8> packet_bytestream(bytestream.begin()+ pos,
                             bytestream.begin()+ payload_end)  ;
@@ -133,7 +133,7 @@ TofPacket TofPacket::from_bytestream(const Vec<u8> &bytestream,
   pos += packet.payload_size;
   u16 tail = Gaps::parse_u16(bytestream, pos);
   if (tail != TofPacket::TAIL)
-    {log_error("TofPacket doesn't conclude with TAIL signature of " << TofPacket::TAIL);}
+    {log_error("TofPacket doesn't conclude with TAIL signature of " << TofPacket::TAIL << " but " << tail << " instead!");}
   return packet;
 }
 

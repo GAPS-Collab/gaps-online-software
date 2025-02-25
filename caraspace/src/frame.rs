@@ -207,7 +207,7 @@ impl CRSerializeable for CRFrameObject {
   
   /// Decode a serializable from a bytestream  
   fn deserialize(stream : &Vec<u8>, 
-                     pos    : &mut usize)
+                 pos    : &mut usize)
     -> Result<Self, CRSerializationError>
     where Self : Sized {
     if stream.len() < 2 {

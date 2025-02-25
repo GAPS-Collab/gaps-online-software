@@ -439,6 +439,8 @@ struct TofEvent {
   TofEventHeader header;
   MasterTriggerEvent mt_event;
 
+  /// Get all hits from all rb_events
+  Vec<TofHit> get_hits() const;
 
   /// A container holding the individual events from all RBs with 
   /// triggers in this event  
