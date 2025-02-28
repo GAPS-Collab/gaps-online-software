@@ -1270,8 +1270,10 @@ TofEventSummary TofEventSummary::from_bytestream(const Vec<u8> &stream,
   tes.quality           = Gaps::parse_u8(stream, pos);
   tes.timestamp32       = Gaps::parse_u32(stream, pos);
   tes.timestamp16       = Gaps::parse_u16(stream, pos);
-  tes.primary_beta      = Gaps::parse_u16(stream, pos); 
-  tes.primary_charge    = Gaps::parse_u16(stream, pos); 
+  tes.run_id            = Gaps::parse_u16(stream, pos);
+  //tes.primary_beta      = Gaps::parse_u16(stream, pos); 
+  //tes.primary_charge    = Gaps::parse_u16(stream, pos); 
+  tes.drs_dead_lost_hits = Gaps::parse_u16(stream, pos);
   tes.dsi_j_mask        = Gaps::parse_u32(stream, pos);
   u8 n_channel_masks    = Gaps::parse_u8(stream, pos);
   for (u8 k=0;k<n_channel_masks;k++) {
@@ -1290,6 +1292,17 @@ TofEventSummary TofEventSummary::from_bytestream(const Vec<u8> &stream,
   return tes;
 }
 
+TofEventSummary TofEventSummary::from_tofpacket(const TofPacket &packet) {
+  TofEventSummary event;
+  if (packet.packet_type != PacketType::TofEventSummary) {
+    log_error("Wrong packet type! " << packet_type_to_string(packet.packet_type));
+    return event;
+  } 
+  u64 _pos = 0;
+  event = TofEventSummary::from_bytestream(packet.payload, _pos);
+  return event;
+}
+
 u64 TofEventSummary::get_timestamp48() const {
   return ((u64)timestamp16 << 32) | (u64)timestamp32;
 }
@@ -1297,20 +1310,17 @@ u64 TofEventSummary::get_timestamp48() const {
 std::string TofEventSummary::to_string() const {
   std::ostringstream oss;
   oss << status;  // Use the << operator to stream the enum
-    
   std::string repr = "<TofEventSummary";
   //repr += std::format("\n  format test {:.2f}", get_time_a() );
+  repr += std::format("\n  Run ID             : {}", run_id);
+  repr += std::format("\n  Event ID           : {}", event_id);
   repr += std::format("\n  Status             : {}", oss.str());
-  repr += std::format("\n  Quality            : {}", quality);
   repr += std::format("\n  Trigger Sources    : {}", trigger_sources);
   repr += std::format("\n  N trig paddles     : {}", n_trigger_paddles);
-  repr += std::format("\n  Event ID           : {}", event_id);
   repr += std::format("\n  timestamp32        : {}", timestamp32)      ;
   repr += std::format("\n  timestamp16        : {}", timestamp16)      ;
   repr += std::format("\n  |->timestamp48     : {}", get_timestamp48());
   repr += std::format("\n  NHits       (reco) : {}", hits.size());
-  repr += std::format("\n  Prim Beta   (reco) : {}", primary_beta);
-  repr += std::format("\n  Prim Charge (reco) : {}", primary_beta);
   repr += "\n** Trigger Sources **";
   for (const auto &ts : get_trigger_sources()) {
     repr += std::format("\n -- {}", (u8)ts);

@@ -5,10 +5,14 @@
 
 #include "tof_typedefs.h"
 #include "packets/tof_packet.h"
-#include "telemetry.hpp"
+#include "telemetry_dataclasses.hpp"
+
 
 namespace Gaps {
-
+  /// Get all files in a certain directory in case it is a directory, for 
+  /// a single file just get the file <3 ChatGPT
+  std::vector<std::string> list_path_contents_sorted(const std::string& input);
+  
   enum class CRFrameObjectType : u8 {
     Unknown           = 0,
     TofPacket         = 10,
@@ -46,7 +50,7 @@ namespace Gaps {
     
     /// extract a tofpacket if this frame object is of the correct type
     TofPacket get_tofpacket(std::string name);
-    Gaps::TelemetryPacket get_telemetrypacket(std::string name);
+    Gaps::Telemetry::Packet get_telemetrypacket(std::string name);
 
   //pub fn get<T : CRSerializeable + Frameable>(&self, name : String) -> Result<T, CRSerializationError> {
 
@@ -54,15 +58,11 @@ namespace Gaps {
 
   struct CRReader {
     CRReader();
-    CRReader(std::string filename);
+    CRReader(std::string pathname);
+    void set_path(std:: string pathname);
     CRReader(const CRReader&) = delete;
-    /// Set a filename where to read packets from. This is a binary file format,
-    /// typically ending in ".tof.gaps"
-    /// Walk over the file and return the next packet
-    void set_filename(std:: string);
     CRFrame get_next_frame();
-    std::string get_filename() const;
-    /// Return the filename we assigned
+    Vec<std::string> get_filenames() const;
     /// All packets have been read from the file. 
     /// If they should be read again, the reader 
     /// has to be created again
@@ -70,11 +70,15 @@ namespace Gaps {
     /// The number of files this reader has read
     /// from the file
     bool      n_packets_read() const;
+
   private:  
-    bool           exhausted_;
-    usize          n_packets_read_;
-    std::string    filename_;
-    std::ifstream  stream_file_;
+    bool             exhausted_        ;
+    usize            n_packets_read_   ;
+    Vec<std::string> filenames_        ;
+    std::ifstream    stream_file_      ;
+    usize            fileindex_        ;
+    void             prime_next_file_();
+
   };
 }
 #endif

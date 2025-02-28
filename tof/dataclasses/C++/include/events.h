@@ -111,10 +111,10 @@ struct std::formatter<EventStatus> : std::formatter<std::string> {
 /*********************************************************/
 
 static const u8 TRIGGERTYPE_UNKNOWN      = 0;
-static const u8 TRIGGERTYPE_GAPS         = 4;
 static const u8 TRIGGERTYPE_ANY          = 1;
 static const u8 TRIGGERTYPE_TRACK        = 2;
 static const u8 TRIGGERTYPE_TRACKCENTRAL = 3;
+static const u8 TRIGGERTYPE_GAPS         = 4;
 static const u8 TRIGGERTYPE_POISSON      = 100;
 static const u8 TRIGGERTYPE_FORCED       = 101;
 
@@ -633,6 +633,18 @@ struct TofEventSummary {
   /// the same as the number of hits!
   u8          n_trigger_paddles ; 
   u32         event_id          ; 
+  u16         run_id            ;
+  u32         timestamp32       ; 
+  u16         timestamp16       ; 
+  // deprecated, won't get serialized
+  u16         primary_beta      ; 
+  u16         primary_charge    ;
+  u16         drs_dead_lost_hits; 
+  u32         dsi_j_mask        ;
+  Vec<u16>    channel_mask      ;
+  u64         mtb_link_mask     ;
+  Vec<TofHit> hits              ;
+  
   // flight computer event variable packet
   u8          n_hits_umb        ;
   u8          n_hits_cbe        ;
@@ -640,18 +652,8 @@ struct TofEventSummary {
   f32         tot_edep_umb      ;
   f32         tot_edep_cbe      ;
   f32         tot_edep_cor      ;
-
-  u32         timestamp32       ; 
-  u16         timestamp16       ; 
-  /// reconstructed primary beta
-  u16         primary_beta      ; 
-  /// reconstructed primary charge
-  u16         primary_charge    ; 
-  u32         dsi_j_mask        ;
-  Vec<u16>    channel_mask      ;
-  u64         mtb_link_mask     ;
-  Vec<TofHit> hits              ;
   
+  static TofEventSummary from_tofpacket(const TofPacket &packet);
   static TofEventSummary from_bytestream(const Vec<u8> &stream, 
                                          u64 &pos);
   // combined timestamp
