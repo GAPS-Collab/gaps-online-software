@@ -465,8 +465,8 @@ void GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm) {
 
   FILE *fp;
   char label[50], line[500];
-  char srcdir[200] = "/home/gaps/software/gaps-online-software/";
-  char codedir[200] = "src/gaps-db/resources/master-spreadsheet/";
+  char srcdir[200] = "/home/gaps/software/gaps_os_pro/";
+  char codedir[200] = "gaps-db/resources/master-spreadsheet/";
   char fname[501];
   int status;
   float value;
