@@ -13,3 +13,6 @@
 [submodule "resources/extern/sqlite_orm"]
 	path = resources/extern/sqlite_orm
 	url = https://github.com/fnc12/sqlite_orm.git
+[submodule "resources/extern/result"]
+	path = resources/extern/result
+	url = https://github.com/tylerreisinger/result

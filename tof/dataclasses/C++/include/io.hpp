@@ -27,17 +27,6 @@
  */
 
 
-/**
- * Read event headers from a RB binary file
- *
- */
-Vec<RBEventHeader> get_rbeventheaders(const String &filename, bool is_header=false);
-
-/**
- * Generic extractor for all types of deserializable dataclasse
- */ 
-//typedef
-
 
 /**
  * Extract only event ids from a bytestream with raw readoutboard binary data

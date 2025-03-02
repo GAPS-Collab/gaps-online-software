@@ -6,7 +6,10 @@
 #include "tof_typedefs.h"
 #include "packets/tof_packet.h"
 #include "telemetry_dataclasses.hpp"
+#include "result/result.h"
+#include "errors.hpp"
 
+namespace r = result;
 
 namespace Gaps {
   /// Get all files in a certain directory in case it is a directory, for 
@@ -49,7 +52,7 @@ namespace Gaps {
     static std::map<std::string, std::tuple<u64, CRFrameObjectType>> parse_index(Vec<u8> stream, usize &pos);
     
     /// extract a tofpacket if this frame object is of the correct type
-    TofPacket get_tofpacket(std::string name);
+    auto get_tofpacket(std::string name) -> r::Result<TofPacket,Gaps::IOError>;
     Gaps::Telemetry::Packet get_telemetrypacket(std::string name);
 
   //pub fn get<T : CRSerializeable + Frameable>(&self, name : String) -> Result<T, CRSerializationError> {

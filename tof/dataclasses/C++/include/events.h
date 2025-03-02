@@ -26,6 +26,11 @@
 #include "events/tof_event_header.hpp"
 #include "calibration.h"
 #include "version.h"
+#include "errors.hpp"
+#include "result/result.h"
+
+namespace r = result;
+namespace g = Gaps;
 
 class RBCalibration;
 
@@ -177,22 +182,22 @@ struct RBEventHeader {
   static const u16 TAIL = 0x5555;
   static const u16 SIZE = 30; // size in bytes with HEAD and TAIL
 
-  u8   rb_id                 ;
-  u32  event_id              ;
-  u8   status_byte           ;
-  u16  channel_mask          ;
-  u16  stop_cell             ;
-  u16  ch9_amp               ;
-  u16  ch9_freq              ;
-  u16  ch9_phase             ; 
-  u16  fpga_temp             ;
-  u32  timestamp32           ;
-  u16  timestamp16           ;
+  u8   rb_id                 = 0;
+  u32  event_id              = 0;
+  u8   status_byte           = 0;
+  u16  channel_mask          = 0;
+  u16  stop_cell             = 0;
+  u16  ch9_amp               = 0;
+  u16  ch9_freq              = 0;
+  u16  ch9_phase             = 0; 
+  u16  fpga_temp             = 0;
+  u32  timestamp32           = 0;
+  u16  timestamp16           = 0;
   
   RBEventHeader();
  
-  static RBEventHeader from_bytestream(const Vec<u8> &bytestream,
-                                       u64 &pos);
+  static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos)
+    -> r::Result<RBEventHeader, g::IOError>;
 
   Vec<u8> get_channels()    const;
   u8      get_nchan()       const;
@@ -229,11 +234,11 @@ struct RBEvent {
   static const u16 TAIL = 0x5555;
 
   // data type will be an enum
-  u8 data_type;
-  EventStatus status;
-  RBEventHeader header;
-  Vec<Vec<u16>> adc; 
-  Vec<TofHit> hits;
+  u8 data_type         = 0;
+  EventStatus status   = EventStatus::Unknown;
+  RBEventHeader header = RBEventHeader();
+  Vec<Vec<u16>> adc    = Vec<Vec<u16>>(); 
+  Vec<TofHit> hits     = Vec<TofHit>();  
  
   RBEvent();
 
@@ -350,26 +355,26 @@ struct MasterTriggerEvent {
   static const u16 HEAD = 0xAAAA;
   /// end struct marker
   static const u16 TAIL = 0x5555;
-  /// the struct has a fixed size of SIZE
-  static const usize SIZE = 45; // size in bytes
+  /// Variable size for MasterTriggerEvent
+  static const usize SIZE = 0; // size in bytes
   /// 
-  EventStatus event_status;
+  EventStatus event_status = EventStatus::Unknown;
   /// event_id as assigned by the MasterTriggerBoard
-  u32 event_id            ; 
+  u32 event_id             = 0; 
   /// MTB timestamp
-  u32 timestamp           ; 
+  u32 timestamp            = 0; 
   /// Tracker (?) timestamp
-  u32 tiu_timestamp       ; 
+  u32 tiu_timestamp        = 0; 
   /// GAPS GPS clock value (slow)
-  u32 tiu_gps32           ; 
+  u32 tiu_gps32            = 0; 
   /// GAPS GPS clock value (fast)
-  u32 tiu_gps16           ; 
+  u32 tiu_gps16            = 0; 
   /// triggered paddles as seen by the MTB
-  u32 crc                 ;
-  u16 trigger_source      ;
-  u32 dsi_j_mask          ;
-  Vec<u16> channel_mask   ;
-  u64 mtb_link_mask       ;
+  u32 crc                  = 0;
+  u16 trigger_source       = 0;
+  u32 dsi_j_mask           = 0;
+  Vec<u16> channel_mask    = Vec<u16>();
+  u64 mtb_link_mask        = 0;
   
   MasterTriggerEvent();
   
@@ -463,8 +468,8 @@ struct TofEvent {
    *                    the stream
    *
    */
-  static TofEvent from_bytestream(const Vec<u8> &bytestream,
-                                  u64 &pos);
+  static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos)
+    -> r::Result<TofEvent, g::IOError>;
 
   /**
    * Factory function for TofEvents.

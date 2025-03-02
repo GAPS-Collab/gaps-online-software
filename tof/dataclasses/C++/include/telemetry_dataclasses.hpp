@@ -6,6 +6,11 @@
 //!
 
 #include "tof_typedefs.h"
+#include "result/result.h"
+#include "errors.hpp"
+
+namespace g = Gaps;
+namespace r = result;
 
 namespace Gaps {
   namespace Telemetry {
@@ -57,9 +62,10 @@ namespace Gaps {
       u16             length   {0};
       u16             checksum {0};
     
-      f64 get_gcutime();
-      std::string to_string();
-      static PacketHeader from_bytestream(Vec<u8> const &stream, usize &pos);
+      auto get_gcutime() -> f64;
+      auto to_string()   -> std::string;
+      static auto from_bytestream(Vec<u8> const &stream, usize &pos)
+        -> r::Result<PacketHeader, g::IOError>;
     };
 
     struct Packet {
@@ -79,7 +85,7 @@ namespace Gaps {
       i64 oscillator     {-1};
       f64 energy         {0};
     
-      std::string to_string();
+      auto to_string() -> std::string;
     };
    
    struct TrkEvent {
@@ -89,7 +95,7 @@ namespace Gaps {
       u32         event_time;
       Vec<TrkHit> hits;
 
-      std::string to_string();
+      auto to_string() -> std::string;
    };
      
     struct TofMetaData {
@@ -105,7 +111,7 @@ namespace Gaps {
       f32  tot_edep_cor {0};
       
       static TofMetaData from_bytestream(Vec<u8> const &stream, usize &pos);
-      std::string to_string();
+      auto to_string() -> std::string;
     };
      
     struct TrkCalibratedHit {
@@ -134,24 +140,25 @@ namespace Gaps {
      // std::vector<uint64_t> tracker_oscillators;
       
       PacketHeader  header;
-      u8            version;
-      u8            flags0;
-      u8            flags1;
+      u8            version = 0;
+      u8            flags0  = 0;
+      u8            flags1  = 0;
       Vec<u8>       row_flags;
-      u64           creation_time;
-      u32           event_id;
-      u8            n_tof_hits;
-      u16           n_trk_hits;
+      u64           creation_time = 0;
+      u32           event_id      = 0;
+      u8            n_tof_hits    = 0;
+      u16           n_trk_hits    = 0;
       Vec<TrkEvent> tracker_events;  
       Vec<TrkHit>   trk_hits;
       Vec<u8>       tof_data;
       Vec<u8>       raw_data;
       TofMetaData   tof_meta;
       TrkMetaData   tracker_meta;
-      Vec<u64>      tracker_oscillators {10,0};
+      Vec<u64>      tracker_oscillators = Vec<u64>(10,0) ;
     
-      std::string to_string();
-      static MergedEvent from_bytestream(Vec<u8> const &stream, usize &pos);
+      auto to_string() -> std::string;
+      static auto from_bytestream(Vec<u8> const &stream, usize &pos)
+        -> r::Result<MergedEvent, g::IOError>;
     };
   }
 }

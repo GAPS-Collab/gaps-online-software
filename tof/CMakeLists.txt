@@ -95,6 +95,7 @@ if(BUILD_CXXBINDINGS)
       dataclasses/C++/src/legacy.cxx
       dataclasses/C++/src/logging.cxx
       dataclasses/C++/src/version.cxx
+      dataclasses/C++/src/telemetry_dataclasses.cxx
       $<$<BOOL:${BUILD_CARASPACE}>:dataclasses/C++/src/caraspace.cxx>
       $<$<BOOL:${BUILD_CXXDB}>:dataclasses/C++/src/database.cxx>
   )
@@ -106,6 +107,7 @@ if(BUILD_CXXBINDINGS)
                               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include>
                               $<$<BOOL:${BUILD_CXXDB}>:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/sqlite_orm/include/sqlite_orm>
                               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include>
+                              $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/result>
                               $<INSTALL_INTERFACE:include> 
                               #${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
                               #${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include

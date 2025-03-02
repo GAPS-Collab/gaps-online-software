@@ -14,6 +14,9 @@
 
 #include "spdlog/cfg/env.h"
 
+namespace g = Gaps;
+using namespace result;
+
 /// masks to decode LTB hit masks
 const u16 LTB_CH0 = 0x3   ;
 const u16 LTB_CH1 = 0xc   ;
@@ -115,30 +118,35 @@ u8 RBEventHeader::get_nchan() const {
 
 /*************************************/
 
-RBEventHeader RBEventHeader::from_bytestream(const Vec<u8> &stream,
-                                             u64 &pos){
-  Gaps::set_loglevel(Gaps::LOGLEVEL::info);
-  RBEventHeader header;
-  u16 head                  = Gaps::parse_u16(stream, pos);
-  if (head != RBEventHeader::HEAD) {
-    //log_error("[RBEventHeader::from_bytestream] Header signature " << head << " invalid!");
+auto RBEventHeader::from_bytestream(const Vec<u8> &stream, u64 &pos)\
+  -> Result<RBEventHeader, g::IOError> {
+  //Gaps::set_loglevel(Gaps::LOGLEVEL::info);
+  if (stream.size() < RBEventHeader::SIZE) {
+    auto message = std::format("RBEventHeader can not be parsed from a string with size {}, when {} bytes are expected!", stream.size(), RBEventHeader::SIZE);
+    auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
+    return Err(err);
   }
-  header.rb_id               = Gaps::parse_u8(stream , pos);  
-  header.event_id            = Gaps::parse_u32(stream, pos);  
-  header.channel_mask        = Gaps::parse_u16(stream, pos);   
-  header.status_byte         = Gaps::parse_u8(stream , pos); 
-  header.stop_cell           = Gaps::parse_u16(stream, pos);  
-  header.ch9_amp             = Gaps::parse_u16(stream, pos);  
-  header.ch9_freq            = Gaps::parse_u16(stream, pos);  
-  header.ch9_phase           = Gaps::parse_u32(stream, pos);  
-  header.fpga_temp           = Gaps::parse_u16(stream, pos);  
-  header.timestamp32         = Gaps::parse_u32(stream, pos);
-  header.timestamp16         = Gaps::parse_u16(stream, pos);
-  u16 tail                   = Gaps::parse_u16(stream, pos);
+  RBEventHeader header;
+  u16 head                  = g::parse_u16(stream, pos);
+  if (head != RBEventHeader::HEAD) {
+    log_error("[RBEventHeader::from_bytestream] Header signature " << head << " invalid!");
+  }
+  header.rb_id               = g::parse_u8(stream , pos);  
+  header.event_id            = g::parse_u32(stream, pos);  
+  header.channel_mask        = g::parse_u16(stream, pos);   
+  header.status_byte         = g::parse_u8(stream , pos); 
+  header.stop_cell           = g::parse_u16(stream, pos);  
+  header.ch9_amp             = g::parse_u16(stream, pos);  
+  header.ch9_freq            = g::parse_u16(stream, pos);  
+  header.ch9_phase           = g::parse_u32(stream, pos);  
+  header.fpga_temp           = g::parse_u16(stream, pos);  
+  header.timestamp32         = g::parse_u32(stream, pos);
+  header.timestamp16         = g::parse_u16(stream, pos);
+  u16 tail                   = g::parse_u16(stream, pos);
   if (tail != RBEventHeader::TAIL) {
     log_error("Tail signature incorrect! Got tail " << tail);
   }
-  return header; 
+  return Ok(header); 
 }
 
 /*************************************/
@@ -344,7 +352,12 @@ RBEvent RBEvent::from_bytestream(const Vec<u8> &stream,
   u8 nhits        = Gaps::parse_u8(stream, pos);
   //spdlog::info("{}", event.data_type);
   //spdlog::info("{}", event.status);
-  event.header    = RBEventHeader::from_bytestream(stream, pos);
+  auto header     = RBEventHeader::from_bytestream(stream, pos);
+  if (header.is_err()) {
+    // FIXME
+    return event;
+  }
+  event.header    = header.unwrap();
   log_debug("Decoded RBEventHeader!");
   if (event.header.is_event_fragment() || event.header.drs_lost_trigger()) {
     return event;
@@ -362,11 +375,9 @@ RBEvent RBEvent::from_bytestream(const Vec<u8> &stream,
   }
   // Decode the hits
   for (u8 k=0;k<nhits;k++) {
-    //std::cout << "next hit" << std::endl;
     auto hit = TofHit::from_bytestream(stream, pos);
     event.hits.push_back(hit);
   }
-  //std::cout << "hits finished!" << std::endl;
   u16 tail = Gaps::parse_u16(stream, pos);
   if (tail != RBEvent::TAIL) {
     log_error("After parsing the event, we found an invalid tail signature " << tail);
@@ -606,8 +617,8 @@ TofEvent::TofEvent() {
 
 /**********************************************************/
 
-TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
-                                   u64 &pos) {
+auto TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
+  -> Result<TofEvent, g::IOError> {
   spdlog::cfg::load_env_levels();
   TofEvent event = TofEvent();
   // FIXME - we need more of these checks
@@ -615,19 +626,24 @@ TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
   usize expected_size = 2 // header
       + 2 // compression & quality
       + TofEventHeader::SIZE
-      + MasterTriggerEvent::SIZE
+      //MasterTriggerEvent can have variable size
+      //+ MasterTriggerEvent::SIZE
       + 4; // size for hits & rbevents
   if (stream.size() - pos < expected_size) {
     log_error("Incomplete readout! Expecting at least " << expected_size << " bytes, but only got " << stream.size());
     event.status = EventStatus::IncompleteReadout;
-    return event;
+    auto message = std::format("TofEvent can not be parsed from a vector with size {}, when {} bytes are expected!", stream.size(), expected_size);
+    auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
+    return Err(err);
   }
   log_debug("Start decoding at pos " << pos);
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != TofEvent::HEAD)  {
     log_error("No header signature found!");  
     event.status = EventStatus::IncompleteReadout;
-    return event;
+    auto message = std::format("TofEvent has incorrect header!");
+    auto err = g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, message);
+    return Err(err);
   }
   // for now skip quality and compression level
   pos += 2;
@@ -637,9 +653,7 @@ TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
   u32 mask          = Gaps::parse_u32(stream, pos);
   u32 n_rbevents    = get_n_rbevents(mask);
   u32 n_missing     = get_n_rbmissinghits(mask);
-  log_debug("Expecting " << n_rbevents << " RBEvents, " << n_missing << " milssing hits");
   for (u32 k=0; k< n_rbevents; k++) {
-    //std::cout << "rb event " << k << std::endl;
     RBEvent rb_event = RBEvent::from_bytestream(stream, pos);
     event.rb_events.push_back(rb_event);
     if (rb_event.status == EventStatus::IncompleteReadout) {
@@ -651,10 +665,9 @@ TofEvent TofEvent::from_bytestream(const Vec<u8> &stream,
     RBMissingHit missy = RBMissingHit::from_bytestream(stream, pos);
     event.missing_hits.push_back(missy);
   }
-  
   //  event.compression_level = CompressionLevel::from_u8(&parse_u8(stream, pos));
   //  event.quality           = EventQuality::from_u8(&parse_u8(stream, pos));
-  return event;
+  return Ok(event);
 }
   
 /**********************************************************/
@@ -666,7 +679,8 @@ TofEvent TofEvent::from_tofpacket(const TofPacket &packet) {
     return event;
   } 
   u64 _pos = 0;
-  event = TofEvent::from_bytestream(packet.payload, _pos);
+  // FIXME
+  event = TofEvent::from_bytestream(packet.payload, _pos).unwrap();
   return event;
 }
 
@@ -1051,7 +1065,6 @@ TofHit TofHit::from_bytestream(const Vec<u8> &bytestream,
  // UPDATE - get version byte first!
  u64 ver_pos       = pos + 22; // version byte is at position 23
  if (bytestream.size() <= ver_pos) {
-   //std::cout << "stream too short! " << ver_pos << " " << bytestream.size() << std::endl;
    return hit;
  }
  u8  version        = Gaps::parse_u8(bytestream, ver_pos) & 0xc0;

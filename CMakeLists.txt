@@ -154,3 +154,26 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/gaps-online/gaps_online
         DESTINATION ${INSTALL_PYTHON_DIR}
        )
 
+## ----------------------------------=---
+## External dependencies (header only)
+## ----------------------------------=---
+
+## create directories first
+install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/include/cxxopts)
+install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/include/result)
+install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/include/sqlite_orm)
+
+
+## install all the header-only libraries into the include directory
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/extern/cxxopts/include/cxxopts.hpp
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/include/cxxopts/)
+
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/extern/result/result/result.h
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/include/result)
+
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/extern/sqlite_orm/include/sqlite_orm/sqlite_orm.h
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/include/sqlite_orm)
+
+## For spdlog, we just copy the whole thing
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/resources/extern/spdlog/include/spdlog DESTINATION ${CMAKE_INSTALL_PREFIX}/include/spdlog)
+

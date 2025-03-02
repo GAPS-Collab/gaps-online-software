@@ -3,6 +3,10 @@
 #include "logging.hpp"
 
 namespace gtl = Gaps::Telemetry;
+namespace g   = Gaps;
+
+// make it more look like rust
+using namespace result;
 
 //----------------------------------------
 
@@ -55,31 +59,29 @@ f64 gtl::PacketHeader::get_gcutime(){
   return timestamp * 0.064 + 1631030675.0;
 };
   
-gtl::PacketHeader gtl::PacketHeader::from_bytestream(Vec<u8> const &stream,
-                                                       usize &pos) {
+auto  gtl::PacketHeader::from_bytestream(Vec<u8> const &stream, usize &pos)
+  -> Result<PacketHeader, g::IOError> {
   gtl::PacketHeader ph;
   if (stream.size() < pos + gtl::PacketHeader::SIZE) {
     log_error("The telemetry header is too short! (" << stream.size() << " bytes when " << gtl::PacketHeader::SIZE << " are expected");
     pos += gtl::PacketHeader::SIZE;
-    return ph;
+    return Ok(ph);
   }
   if (parse_u16(stream, pos) != gtl::PacketHeader::HEAD) {
     log_error("The given position " << pos-2 << " does not point to a valid header signature of " << gtl::PacketHeader::HEAD);
     pos += gtl::PacketHeader::SIZE - 2;
-    return ph;
+    return Ok(ph);
   }
   ph.sync  = PacketHeader::HEAD;
-  auto foo = parse_u8 (stream, pos);
-  pos -= 1;
   ph.ptype     = static_cast<gtl::BfswPacketType>(parse_u8 (stream, pos));
   ph.timestamp = parse_u32(stream, pos);
   ph.counter   = parse_u16(stream, pos);
   ph.length    = parse_u16(stream, pos);
   ph.checksum  = parse_u16(stream, pos);
-  return ph;
+  return Ok(ph);
 }
 
-std::string gtl::PacketHeader::to_string() {
+auto gtl::PacketHeader::to_string() -> std::string {
   std::string repr = "<PacketHeader:";
   repr += std::format("\n  Header      : {}" ,sync);
   repr += std::format("\n  Packet Type : {}" ,bfsw_ptype_to_str(ptype));
@@ -93,11 +95,11 @@ std::string gtl::PacketHeader::to_string() {
 //----------------------------------------
 
 gtl::Packet gtl::Packet::from_bytestream(Vec<u8> const &stream,
-                                           usize &pos) {
+                                         usize &pos) {
   gtl::Packet packet;
-  gtl::PacketHeader header = gtl::PacketHeader::from_bytestream(stream, pos);
+  auto header = gtl::PacketHeader::from_bytestream(stream, pos).unwrap();
+  // FIXME
   packet.header  = header;
-  //auto payload   = Gaps::slice(stream, pos, pos + header.length - gtl::PacketHeader::SIZE);
   auto payload   = Gaps::slice(stream, pos, pos + header.length);
   packet.payload = std::move(payload);
   return packet;
@@ -182,7 +184,7 @@ std::string gtl::TofMetaData::to_string() {
 
 //----------------------------------------
 
-std::string gtl::MergedEvent::to_string() {
+auto gtl::MergedEvent::to_string() -> std::string {
   std::string repr = "<MergedEvent";
   repr += std::format("\n  Header : {}", header.to_string());
   repr += std::format("\n  Creation Time : {}" ,creation_time);
@@ -191,7 +193,7 @@ std::string gtl::MergedEvent::to_string() {
   repr += std::format("\n  Flags1        : {}" ,flags1);
   repr += std::format("\n  N Tof hits    : {}" ,n_tof_hits);
   repr += std::format("\n  Tof bytes     : {}" ,tof_data.size());
-  repr += std::format("\n  Trk bytes     : {}>" ,raw_data.size());
+  repr += std::format("\n  Trk hits      : {}>" ,trk_hits.size());
   //    PacketHeader header;
   //    u64 creation_time;
   //    u32 event_id;
@@ -205,12 +207,12 @@ std::string gtl::MergedEvent::to_string() {
   return repr;
 }
 
-gtl::MergedEvent gtl::MergedEvent::from_bytestream(Vec<u8> const &stream,
-                                                   usize &pos) {
+auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos) 
+    -> r::Result<MergedEvent, g::IOError> {
   auto evt     = MergedEvent();
   //evt.header   = PacketHeader::from_bytestream(stream, pos);
   evt.version   = parse_u8(stream, pos);
-  evt.flags0   = parse_u8(stream, pos);
+  evt.flags0    = parse_u8(stream, pos);
   if (evt.version == 1) {
     for (u8 k=0; k<8; k++) {
       evt.row_flags.push_back(parse_u8(stream, pos)); 
@@ -218,6 +220,7 @@ gtl::MergedEvent gtl::MergedEvent::from_bytestream(Vec<u8> const &stream,
   } else {
     evt.flags1   = parse_u8(stream, pos);
   }
+
   evt.event_id   = parse_u32(stream, pos);
   evt.n_tof_hits = parse_u8(stream, pos);
   // FIXME - only for version 1, version 0
@@ -228,14 +231,24 @@ gtl::MergedEvent gtl::MergedEvent::from_bytestream(Vec<u8> const &stream,
   //}
   u16 num_tof_bytes = parse_u16(stream, pos);
   evt.tof_data.clear();
+  if (stream.size() < pos + num_tof_bytes) {
+    std::string message = std::format("Stream does not contain enough TOF bytes!");
+    log_error("" << message);
+    auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
+    return Err(err);
+  }
   evt.tof_data = Gaps::slice(stream, pos, pos + num_tof_bytes);
   pos += num_tof_bytes;
   u8 tracker_delim = parse_u8(stream, pos);
+
   if(tracker_delim != 0xbb) {
-    log_error("Got incorrect tracker delimiter flag of " << tracker_delim);
-    return evt;
+    std::string message = std::format("Incorrect tracker delmiter flag ({})!", tracker_delim);
+    log_error("" << message);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongDelimiter, message);
+    return Err(err);
   }
   evt.n_trk_hits = parse_u16(stream, pos); 
+
 
   for(u16 j = 0; j < evt.n_trk_hits; ++j) {
      u16 strip_id = parse_u16(stream, pos);
@@ -250,23 +263,32 @@ gtl::MergedEvent gtl::MergedEvent::from_bytestream(Vec<u8> const &stream,
   }
   u8 osci_delim = parse_u8(stream, pos);
   if(osci_delim != 0xcc) {
-    log_error("Got incorrect osci_delim (" << osci_delim << ")"); 
-    return evt;
+    std::string message = std::format("Incorrect osci delmiter flag ({})!", osci_delim);
+    log_error("" << message);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongDelimiter, message);
+    return Err(err);
   }
   u8 osc_flags = parse_u8(stream, pos);
   Vec<u8> oscillator_idx;
   for(u8 j = 0; j < 8; ++j) {
     if((osc_flags >> j) & 0b1) {
-      oscillator_idx.push_back(j);
+      oscillator_idx.push_back((u8)j);
     }
+  }
+  if (pos + 6*oscillator_idx.size() > stream.size()) {
+    std::string message = std::format("Stream does not contain enough bytes for {} trk oscillators!! Only {} bytes left!", oscillator_idx.size(), stream.size() - pos);
+    log_error("" << message);
+    auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
+    return Err(err);
   }
   for(auto idx : oscillator_idx) {
     u32 lower = parse_u32(stream, pos);
     u16 upper = parse_u16(stream, pos);
+    //std::cout << (int)idx << " pos " << pos << " size " << stream.size() << std::endl;
     u64 osc = (static_cast<uint64_t>(upper) << 32) | lower;
     evt.tracker_oscillators[idx] = osc;
   }
-  return evt;
+  return Ok(evt);
 }  
 
 //template <typename T> int unpack(const T& bytes, size_t i) {

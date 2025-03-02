@@ -14,8 +14,11 @@
 #include "parsers.h"
 #include "caraspace.hpp"
 
+namespace g    = Gaps;
 namespace fs   = std::filesystem;
 namespace gtel = Gaps::Telemetry;
+
+using namespace result;
 
 std::vector<std::string> Gaps::list_path_contents_sorted(const std::string& input) {
   fs::path path(input);
@@ -155,7 +158,7 @@ Gaps::CRFrame Gaps::CRFrame::from_bytestream(Vec<u8> stream,
   }
   u64 fr_size = parse_u64(stream, pos); 
   pos += fr_size - 2; // count from the beginning
-  std::cout << "fr size : " << fr_size << std::endl;
+  //std::cout << "fr size : " << fr_size << std::endl;
   u16 tail    = parse_u16(stream, pos);
   if (tail != CRFrame::TAIL) {
     log_error("CRFrame doesn't conclude with TAIL signature of " << CRFrame::TAIL);
@@ -164,7 +167,7 @@ Gaps::CRFrame Gaps::CRFrame::from_bytestream(Vec<u8> stream,
   // now go back and get the content
   pos -= fr_size - 2; // wind back, accounting for tail
   u64 size = parse_u64(stream, pos); // account for size
-  std::cout << "size : " << size << std::endl;
+  //std::cout << "size : " << size << std::endl;
   frame.index       = parse_index(stream, pos);
   Vec<u8> packet_bytestream(stream.begin()+ pos,
                             stream.begin()+ pos + size)  ;
@@ -172,7 +175,8 @@ Gaps::CRFrame Gaps::CRFrame::from_bytestream(Vec<u8> stream,
   return frame;
 }
 
-TofPacket Gaps::CRFrame::get_tofpacket(std::string name) {
+auto Gaps::CRFrame::get_tofpacket(std::string name)
+  -> Result<TofPacket,g::IOError> {
   TofPacket tp;
   //let mut lookup : (usize, CRFrameObjectType);
   usize pos = 0;
@@ -181,19 +185,24 @@ TofPacket Gaps::CRFrame::get_tofpacket(std::string name) {
     pos   = std::get<0>(index.at(name));
     dtype = static_cast<CRFrameObjectType>(std::get<1>(index.at(name)));
   } else {
-    log_error("Unable to find TofPacket " << name << " in frame!");
+     log_debug("Unable to find TofPacket " << name << " in frame!");
+     std::string msg = std::format("Can't find TofPacket {} in frame!", name);
+     auto err = g::IOError(g::IOError::ErrorKind::PacketNotFound, msg);
+     return Err(err);
   }
   if (dtype == CRFrameObjectType::TofPacket) {
     auto f_obj = CRFrameObject::from_bytestream(bytestorage, pos);
-    std::cout << f_obj.to_string() << std::endl;
+    //std::cout << f_obj.to_string() << std::endl;
     pos        = 0;
     tp         = TofPacket::from_bytestream(f_obj.payload, pos); 
-    std::cout << tp << std::endl;
+    //std::cout << tp << std::endl;
   } else {
-    log_error("Trying to get TofPacket " << name << " however, that is of type " << static_cast<u8>(dtype)); 
-    return tp;
+    log_debug("Trying to get TofPacket " << name << " however, that is of type " << static_cast<u8>(dtype)); 
+    std::string msg = std::format("Trying to get TofPacket {}, but it is of type {}", name, (int)static_cast<u8>(dtype));
+    auto err = g::IOError(g::IOError::ErrorKind::WrongPacketType, msg);
+    return Err(err);
   }
-  return tp;
+  return Ok(tp);
 }
 
 gtel::Packet Gaps::CRFrame::get_telemetrypacket(std::string name) {
@@ -208,10 +217,10 @@ gtel::Packet Gaps::CRFrame::get_telemetrypacket(std::string name) {
   }
   if (dtype == CRFrameObjectType::TelemetryPacket) {
     auto f_obj = CRFrameObject::from_bytestream(bytestorage, pos);
-    std::cout << f_obj.to_string() << std::endl;
+    //std::cout << f_obj.to_string() << std::endl;
     pos        = 0;
     tp         = gtel::Packet::from_bytestream(f_obj.payload, pos); 
-    std::cout << tp.to_string() << std::endl;
+    //std::cout << tp.to_string() << std::endl;
   } else {
     log_error("Trying to get TofPacket " << name << " however, that is of type " << static_cast<u8>(dtype)); 
     return tp;
@@ -275,7 +284,7 @@ void Gaps::CRReader::prime_next_file_() {
 Gaps::CRFrame Gaps::CRReader::get_next_frame() {
   while (true) { 
     if (stream_file_.eof()) {
-      std::cout << "ex 1" << std::endl;
+      //std::cout << "ex 1" << std::endl;
       prime_next_file_();
       return get_next_frame();
     } 
@@ -283,7 +292,7 @@ Gaps::CRFrame Gaps::CRReader::get_next_frame() {
     if (byte == 0xAA) {
       byte = stream_file_.get();
       if (stream_file_.eof()) {
-        std::cout << "ex 2" << std::endl;
+        //std::cout << "ex 2" << std::endl;
         exhausted_ = true;
         prime_next_file_();
         return get_next_frame();
