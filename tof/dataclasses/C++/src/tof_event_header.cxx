@@ -6,12 +6,17 @@
 //#include "spdlog/spdlog.h"
 //#include "spdlog/cfg/env.h"
 
-TofEventHeader TofEventHeader::from_bytestream(const Vec<u8> &stream, 
-                                               u64 &pos) {
-  log_debug("Start decoding at pos " <<  pos);
+using namespace result;
+namespace g = Gaps;
+
+auto TofEventHeader::from_bytestream(const Vec<u8> &stream, u64 &pos) 
+  -> Result<TofEventHeader, g::IOError> {
+  SPDLOG_DEBUG("Start decoding at pos {}", pos);
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != TofEventHeader::HEAD)  {
-    log_error("No header signature found!");  
+    auto msg = std::format("No header signature found!");
+    spdlog::error(msg);
+    return Err(g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, msg));
   }
   TofEventHeader header      = TofEventHeader();
   header.run_id              = Gaps::parse_u32(stream, pos);
@@ -35,32 +40,34 @@ TofEventHeader TofEventHeader::from_bytestream(const Vec<u8> &stream,
   header.n_paddles           = Gaps::parse_u8(stream, pos); 
   u16 tail                   = Gaps::parse_u16(stream, pos);
   if (tail != TAIL) {
-    log_error("TAIL signature not found! Got " << tail << " instead.");
+    auto msg = std::format("No tail signature found! Got {} instead.", tail);
+    spdlog::error(msg);
+    return Err(g::IOError(g::IOError::ErrorKind::WrongTailBytes, msg));
   }
-  return header;
+  return Ok(header);
 } 
   
 std::string TofEventHeader::to_string() const {
   std::string repr = "<TofEventHeader";
-  repr += "\n  Run   ID          : " + std::to_string(run_id              );
-  repr += "\n  Event ID          : " + std::to_string(event_id            );
-  repr += "\n  Timestamp 32      : " + std::to_string(timestamp32         );
-  repr += "\n  Timestamp 16      : " + std::to_string(timestamp16         );
-  repr += "\n  Prim. Beta        : " + std::to_string(primary_beta        );
-  repr += "\n  Prim. Beta Unc    : " + std::to_string(primary_beta_unc    );
-  repr += "\n  Prim. Charge      : " + std::to_string(primary_charge      );
-  repr += "\n  Prim. Charge unc  : " + std::to_string(primary_charge_unc  );
-  repr += "\n  Prim. Outer Tof X : " + std::to_string(primary_outer_tof_x );
-  repr += "\n  Prim. Outer Tof Y : " + std::to_string(primary_outer_tof_y );
-  repr += "\n  Prim. Outer Tof Z : " + std::to_string(primary_outer_tof_z );
-  repr += "\n  Prim. Inner Tof X : " + std::to_string(primary_inner_tof_x );
-  repr += "\n  Prim. Inner Tof Y : " + std::to_string(primary_inner_tof_y );
-  repr += "\n  Prim. Inner Tof Z : " + std::to_string(primary_inner_tof_z );
-  repr += "\n  NHit  Outer Tof   : " + std::to_string(nhit_outer_tof      );
-  repr += "\n  NHit  Inner Tof   : " + std::to_string(nhit_inner_tof      );
-  repr += "\n  TriggerInfo       : " + std::to_string(trigger_info        );
-  repr += "\n  Ctr ETX           : " + std::to_string(ctr_etx             );
-  repr += "\n  NPaddles          : " + std::to_string(n_paddles           ) + ">";
+  repr += std::format("\n  Run   ID          : {}",run_id              );
+  repr += std::format("\n  Event ID          : {}",event_id            );
+  repr += std::format("\n  Timestamp 32      : {}",timestamp32         );
+  repr += std::format("\n  Timestamp 16      : {}",timestamp16         );
+  repr += std::format("\n  Prim. Beta        : {}",primary_beta        );
+  repr += std::format("\n  Prim. Beta Unc    : {}",primary_beta_unc    );
+  repr += std::format("\n  Prim. Charge      : {}",primary_charge      );
+  repr += std::format("\n  Prim. Charge unc  : {}",primary_charge_unc  );
+  repr += std::format("\n  Prim. Outer Tof X : {}",primary_outer_tof_x );
+  repr += std::format("\n  Prim. Outer Tof Y : {}",primary_outer_tof_y );
+  repr += std::format("\n  Prim. Outer Tof Z : {}",primary_outer_tof_z );
+  repr += std::format("\n  Prim. Inner Tof X : {}",primary_inner_tof_x );
+  repr += std::format("\n  Prim. Inner Tof Y : {}",primary_inner_tof_y );
+  repr += std::format("\n  Prim. Inner Tof Z : {}",primary_inner_tof_z );
+  repr += std::format("\n  NHit  Outer Tof   : {}",nhit_outer_tof      );
+  repr += std::format("\n  NHit  Inner Tof   : {}",nhit_inner_tof      );
+  repr += std::format("\n  TriggerInfo       : {}",trigger_info        );
+  repr += std::format("\n  Ctr ETX           : {}",ctr_etx             );
+  repr += std::format("\n  NPaddles          : {}>",n_paddles          );
   return repr;
 }
 

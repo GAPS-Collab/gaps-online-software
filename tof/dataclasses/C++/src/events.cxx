@@ -647,7 +647,14 @@ auto TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
   }
   // for now skip quality and compression level
   pos += 2;
-  event.header      = TofEventHeader::from_bytestream(stream, pos);
+  auto header      = TofEventHeader::from_bytestream(stream, pos);
+  if (!header.is_ok()) {
+    auto msg = std::format("TofEventHeader corrup!");
+    spdlog::error(msg);
+    auto err = g::IOError(g::IOError::ErrorKind::EventHeaderCorrupt);
+    return Err(err);
+  }
+  event.header = header.unwrap();
   event.mt_event    = MasterTriggerEvent::from_bytestream(stream, pos);
   //pos += 45; // for now skip master trigger event
   u32 mask          = Gaps::parse_u32(stream, pos);

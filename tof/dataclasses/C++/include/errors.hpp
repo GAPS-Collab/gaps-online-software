@@ -11,7 +11,9 @@ namespace Gaps {
         WrongDelimiter,
         PacketNotFound,
         WrongPacketType,
-        WrongHeaderBytes
+        WrongHeaderBytes,
+        WrongTailBytes,
+        EventHeaderCorrupt
       };
      
       IOError(ErrorKind kind, std::string reason = ""):
