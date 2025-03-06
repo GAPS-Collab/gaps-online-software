@@ -16,7 +16,7 @@ dependencies = [
     "jupyter>=1.1.1",
     "vtk>=9.3.1",
     "cmocean>=4.0.3",
-    "pydashi>=2.0.0",
+    "pydashi>=2.0.1",
     "nbstripout>=0.7.1",
     "uproot>=5.4.1",
     "jinja2>=3.1.4",
@@ -26,6 +26,7 @@ dependencies = [
     "scikit-learn>=1.5.2",
     "canvasxpress>=2025.1.5.1949",
     "htmlmin>=0.1.12",
+    "marimo>=0.11.2",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"

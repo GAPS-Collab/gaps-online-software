@@ -27,17 +27,6 @@
  */
 
 
-/**
- * Read event headers from a RB binary file
- *
- */
-Vec<RBEventHeader> get_rbeventheaders(const String &filename, bool is_header=false);
-
-/**
- * Generic extractor for all types of deserializable dataclasse
- */ 
-//typedef
-
 
 /**
  * Extract only event ids from a bytestream with raw readoutboard binary data
@@ -83,21 +72,6 @@ Vec<TofEvent> unpack_tofevents_from_tofpackets(const Vec<u8> &bytestream, u64 st
  * @param filename : Binary file with TofPacket data.
  */
 Vec<TofEvent> unpack_tofevents_from_tofpackets(const String filename);
-
-///**
-// * Extract TofEvents from a stream of binary data 
-// *
-// * @param bytestream : Binary TofEvent data.
-// * @param start_pos  : Byte position to start searching from in bytestream
-// */
-//Vec<TofPacket> get_tofpackets(const Vec<u8> &bytestream, u64 start_pos);
-//
-///**
-// * Extract TofEvents from a file on disk
-// *
-// * @param filename : Full path to binary file with TofEvents.
-// */
-//Vec<TofPacket> get_tofpackets(const String filename);
 
 namespace Gaps {
 

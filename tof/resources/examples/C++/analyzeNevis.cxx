@@ -209,6 +209,9 @@ int main(int argc, char *argv[]){
   u32 n_tofevents = 0;
   u32 n_tes = 0;
 
+  // A flag for printing out info for various events
+  bool pr_evt = false;
+  
   for (int k=0; k<nfiles; k++) { 
     auto packets = get_tofpackets(fnames[k]);
     spdlog::info("We loaded {} packets from {}", packets.size(), fnames[k]);
@@ -257,13 +260,15 @@ int main(int argc, char *argv[]){
 	if (verbose) {
           //std::cout << ev << std::endl;
 	}
-       //printf("Event %ld: RBs -", evt_ctr);
+	//printf("Event %ld: RBs -", evt_ctr);
 	//printf("%ld.", evt_ctr);
-	//if ( evt_ctr>39411809 && evt_ctr<41564676 ) {
-	//std::cout << "Type " << p.packet_type;
-	// printf(" %ld %ld %d %d\n", evt_ctr, evt_ctr,
-	//	 ev.header.timestamp32, ev.header.n_paddles);
-	  //}
+	pr_evt = false;
+	if ( evt_ctr>6590000 && evt_ctr<415646760000 ) pr_evt = true;
+	if (pr_evt) {
+	  std::cout << "Type " << p.packet_type;
+	  printf(" %ld %ld %d %d\n", evt_ctr, evt_ctr,
+		 ev.header.timestamp32, ev.header.n_paddles);
+	}
 	/*for (int k=0;k<NRB;k++) {
 	  if (k%9==0) printf("\n");
 	  int n = ev.rb_events[k].header.rb_id;
@@ -290,27 +295,6 @@ int main(int argc, char *argv[]){
 	  if (verbose) {
 	      std::cout << rb_event << std::endl;
           }
-
-	  if (0 && evt_ctr>39411809 && evt_ctr<41564676 ) {
-	    //std::cout << "Type " << p.packet_type;
-	    //printf(" %d %d %d %d\n", hdr->counter, mev.event_id,
-	    //       hdr->timestamp, rb_event.n_trigger_paddles);
-	    //printf(" %ld %ld %d %ld\n", evt_ctr, evt_ctr,
-	    //	   ev.header.timestamp32, rb_event.hits.size());
-	    auto sfit = rb_event.header.get_sine_fit();
-	    //for (int j=0; j<3; j++) printf(" %7.4f",sfit[j]); printf("\n");
-	    for (int i=0; i<rb_event.hits.size(); i++) {
-                printf("%3d",rb_event.hits[i].paddle_id);
-                printf(" %7.2f %7.2f %7.2f %7.2f %6.2f %6.2f",
-                  rb_event.hits[i].get_time_a(), rb_event.hits[i].get_time_b(),
-                  rb_event.hits[i].get_peak_a(), rb_event.hits[i].get_peak_b(),
-                  rb_event.hits[i].get_charge_a(),rb_event.hits[i].get_charge_b());
-                printf(" %7.4f %5.2f %5.2f %4.2f %4.2f\n",
-		       sfit[2], rb_event.hits[i].baseline_a,
-                  rb_event.hits[i].baseline_b, rb_event.hits[i].baseline_a_rms,
-                  rb_event.hits[i].baseline_b_rms);
-	      }
-	}
 
 	  Vec<Vec<f32>> volts;
 	  Vec<Vec<f32>> times;
@@ -339,6 +323,30 @@ int main(int argc, char *argv[]){
 	    }
 	    Phi[rbid] = FitSine(ch9_volts,ch9_times);
 	    //printf("Fhase: %d - %7.4f\n", rbid, Phi[rbid]);
+
+	    if (pr_evt) {
+	      //std::cout << "Type " << p.packet_type;
+	      //printf(" %d %d %d %d\n", hdr->counter, mev.event_id,
+	      //       hdr->timestamp, rb_event.n_trigger_paddles);
+	      //printf(" %ld %ld %d %ld\n", evt_ctr, evt_ctr,
+	      //	   ev.header.timestamp32, rb_event.hits.size());
+	      auto sfit = rb_event.header.get_sine_fit();
+	      //for (int j=0; j<3; j++) printf(" %7.4f",sfit[j]); printf("\n");
+	      for (int i=0; i<rb_event.hits.size(); i++) {
+                printf("%3d",rb_event.hits[i].paddle_id);
+                printf(" %7.2f %7.2f %7.2f %7.2f %6.2f %6.2f",
+		  rb_event.hits[i].get_time_a(), rb_event.hits[i].get_time_b(),
+		  rb_event.hits[i].get_peak_a(), rb_event.hits[i].get_peak_b(),
+		  rb_event.hits[i].get_charge_a(),
+		  rb_event.hits[i].get_charge_b());
+                printf(" %7.4f %5.2f %5.2f %4.2f %4.2f\n",
+		  //sfit[2], rb_event.hits[i].baseline_a,
+		  Phi[rbid], rb_event.hits[i].baseline_a,
+		  rb_event.hits[i].baseline_b, rb_event.hits[i].baseline_a_rms,
+		  rb_event.hits[i].baseline_b_rms);
+	      }
+	    }
+
 	    // Now, initialize the ch9 Waveform for this RB. 
 	    wch9[rbid] = new GAPS::Waveform(ch9_volts.data(),
 					    ch9_times.data(), rbid,0);
@@ -482,8 +490,8 @@ void GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm) {
 
   FILE *fp;
   char label[50], line[500];
-  char srcdir[200] = "/home/gaps/software/gaps-online-software/";
-  char codedir[200] = "src/gaps-db/resources/master-spreadsheet/";
+  char srcdir[200] = "/home/gaps/software/gaps_os_pro/";
+  char codedir[200] = "gaps-db/resources/master-spreadsheet/";
   char fname[501];
   int status;
   float value;

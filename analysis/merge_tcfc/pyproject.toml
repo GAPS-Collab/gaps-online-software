@@ -13,10 +13,13 @@ dependencies = [
     "django>=5.1.1",
     "vtk>=9.3.1",
     "dashi>=0.0.0",
-    "pydashi>=2.0.0",
+    "pydashi>=2.0.1",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
+
+[tool.rye.scripts]
+merge = {cmd = "./merge_tcfc.py"}
 
 [build-system]
 requires = ["hatchling"]

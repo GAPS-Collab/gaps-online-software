@@ -1,20 +1,32 @@
+//! FIXME - all this needs work. If we continue to use C++, 
+//! this should reflect the rust API more closely
+
 #include <fstream>
 #include <iostream>
 #include <regex>
+// FIXME - remove uneccessary
+#include <iostream>
+#include <filesystem>
+#include <vector>
+#include <string>
+#include <algorithm>
 
 #include "logging.hpp"
 #include "parsers.h"
 #include "calibration.h"
 #include "io.hpp"
 
+namespace fs = std::filesystem;
+
 u8 extract_rbid(const String& filename) {
-  std::regex pattern("rb(\\d+)_cal"); // Match "RB" followed by digits, an underscore, and more digits
+  std::regex pattern(R"(RB(\d{2})_\d+_\d+UTC\.cali\.tof\.gaps$)"); // Match "RB" followed by digits, an underscore, and more digits
   std::smatch match;
   if (std::regex_search(filename, match, pattern)) {
     log_debug("Filename matches pattern for RB ID " << match[1].str() << "!");
     u32 number1 = std::stoi(match[1].str());
     return number1;
   } else {
+    log_error("Unable to extract RB id from " << filename);
     return 0; // Return an invalid pair if no match is found
   }
 }
@@ -588,10 +600,10 @@ RBCalibration RBCalibration::from_bytestream(const Vec<u8> &stream,
 /************************************************/
 
 RBCalibration RBCalibration::from_file(const String &filename, bool discard_events) {
-    auto cali_pack = get_tofpackets(filename)[0];
-    u64 pos = 0;
-    RBCalibration cali = RBCalibration::from_bytestream(cali_pack.payload, pos, discard_events);
-    return cali;
+  auto cali_pack = get_tofpackets(filename)[0];
+  u64 pos = 0;
+  RBCalibration cali = RBCalibration::from_bytestream(cali_pack.payload, pos, discard_events);
+  return cali;
 }
 
 /************************************************/
@@ -663,7 +675,30 @@ std::string RBCalibration::to_string() const {
   return repr;
 }
 
-/************************************************/
+//------------------------------------------------
+
+std::map<u8, RBCalibration> Gaps::load_tof_calibrations(std::string const &pathname) {
+  std::map<u8, RBCalibration> cali;
+  fs::path path(pathname);
+  if (!fs::exists(path)) {
+    log_error("Path " << pathname << "does not exist.");
+    return cali;
+  }
+  if (fs::is_directory(path)) {
+    for (const auto& entry : fs::directory_iterator(path)) {
+      if (entry.is_regular_file()) {
+        std::string filename = entry.path().string();
+        u8 rbid = extract_rbid(filename);
+        std::cout << "Reading " << filename << " for RB " << (int)rbid << std::endl;
+        auto rb_cali = RBCalibration::from_file(filename);
+        cali.insert(std::make_pair(rbid, rb_cali));
+      }
+    }
+  }
+  return cali;
+}
+
+//------------------------------------------------
 
 std::ostream& operator<<(std::ostream& os, const RBCalibration& cali){ 
   os << cali.to_string();

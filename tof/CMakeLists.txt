@@ -95,6 +95,7 @@ if(BUILD_CXXBINDINGS)
       dataclasses/C++/src/legacy.cxx
       dataclasses/C++/src/logging.cxx
       dataclasses/C++/src/version.cxx
+      dataclasses/C++/src/telemetry_dataclasses.cxx
       $<$<BOOL:${BUILD_CARASPACE}>:dataclasses/C++/src/caraspace.cxx>
       $<$<BOOL:${BUILD_CXXDB}>:dataclasses/C++/src/database.cxx>
   )
@@ -106,6 +107,7 @@ if(BUILD_CXXBINDINGS)
                               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include>
                               $<$<BOOL:${BUILD_CXXDB}>:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/sqlite_orm/include/sqlite_orm>
                               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include>
+                              $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/result>
                               $<INSTALL_INTERFACE:include> 
                               #${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
                               #${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
@@ -358,6 +360,7 @@ if (BUILD_EXAMPLES)
   add_executable(${unpack-example}
       ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/unpack-tofpackets.cxx
   )
+  set_property(TARGET ${unpack-example} PROPERTY CXX_STANDARD 20)
   target_include_directories(${unpack-example} 
                             PUBLIC
                             ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
@@ -378,6 +381,7 @@ if (BUILD_EXAMPLES)
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/MainFrame.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/Waveform.cpp
     )
+    set_property(TARGET ${display-example} PROPERTY CXX_STANDARD 20)
     target_include_directories(${display-example} 
                               PUBLIC
                               ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
@@ -400,6 +404,7 @@ if (BUILD_EXAMPLES)
     add_executable(${analyze-example}
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/analyzeTofpackets.cxx
     )
+    set_property(TARGET ${analyze-example} PROPERTY CXX_STANDARD 20)
     target_include_directories(${analyze-example} 
                               PUBLIC
                               ${CMAKE_CURRENT_SOURCE_DIR}/../resources/example/spdlog/include
@@ -419,6 +424,7 @@ if (BUILD_EXAMPLES)
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/MainFrame.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/Waveform.cpp
     )
+    set_property(TARGET ${display-sydney} PROPERTY CXX_STANDARD 20)
     target_include_directories(${display-sydney} 
                               PUBLIC
                               ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
@@ -442,6 +448,7 @@ if (BUILD_EXAMPLES)
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/analyzeSydney.cxx
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/EventSydney.cpp
     )
+    set_property(TARGET ${analyze-sydney} PROPERTY CXX_STANDARD 20)
     target_include_directories(${analyze-sydney} 
                               PUBLIC
                               ${CMAKE_CURRENT_SOURCE_DIR}/../resources/example/spdlog/include
@@ -463,6 +470,7 @@ if (BUILD_EXAMPLES)
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/analyzeNevis.cxx
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/EventGAPS.cpp
     )
+    set_property(TARGET ${analyze-nevis} PROPERTY CXX_STANDARD 20)
     target_include_directories(${analyze-nevis} 
                               PUBLIC
                               ${CMAKE_CURRENT_SOURCE_DIR}/../resources/example/spdlog/include
@@ -484,6 +492,7 @@ if (BUILD_EXAMPLES)
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/analyzeRene.cxx
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/EventRene.cpp
     )
+    set_property(TARGET ${analyze-rene} PROPERTY CXX_STANDARD 20)
     target_include_directories(${analyze-rene} 
                               PUBLIC
                               ${CMAKE_CURRENT_SOURCE_DIR}/../resources/example/spdlog/include
@@ -504,6 +513,7 @@ if (BUILD_EXAMPLES)
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/analyzePadrick.cxx
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/EventPadrick.cpp
     )
+    set_property(TARGET ${analyze-padrick} PROPERTY CXX_STANDARD 20)
     target_include_directories(${analyze-padrick} 
                               PUBLIC
                               ${CMAKE_CURRENT_SOURCE_DIR}/../resources/example/spdlog/include

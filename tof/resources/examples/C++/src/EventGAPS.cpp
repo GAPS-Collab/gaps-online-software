@@ -47,7 +47,7 @@ EventGAPS::~EventGAPS(void) {
 void EventGAPS::InitializeVariables(unsigned long int evt_ctr=0) {
   
   evtno    = evt_ctr;
-  sc_speed = 154.0;   // in mm/s
+  sc_speed = 154.0;   // Scintillator speed of light, in mm/ns
   
   // Reset everything that is stored by SiPM channel number
   for (int i=0; i<NTOT; i++) {
@@ -502,7 +502,8 @@ void EventGAPS::InitializeHistograms(void) {
 ////////////////////////////////////////////////////////////////////////////
 void EventGAPS::WriteHistograms() {
   
-  TFile *outfile = TFile::Open("/home/gaps/zweerink/outfile.root","RECREATE"); 
+  //TFile *outfile=TFile::Open("/home/gaps/zweerink/outfile.root","RECREATE"); 
+  TFile *outfile = TFile::Open("./outfile.root","RECREATE"); 
   
   // For reasons I don't understand, the code to make subdirectories
   // is not compiling properly and gives an error (below) when run
@@ -1160,7 +1161,7 @@ void EventGAPS::FillOffsetHistos(void) {
 	int cube_start = 25+panel*NCUBS;
 	for (int j=0; j<NCUBS; j++) { // Any Hit paddles?
 	  int cube_paddle = cube_start+j;
-	  if (tip d1 IsHit[cube_paddle] ) {
+	  if ( IsHit[cube_paddle] ) {
 	    //printf("%d %d\n",j,cube_paddle);
 	    // Good paddle combo, calculate HitT and Tdist
 	    if ( ABS(delta[cube_paddle]) < 0.70*Dimension[cube_paddle][0] &&
@@ -1185,7 +1186,8 @@ void EventGAPS::FillOffsetHistos(void) {
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 void EventGAPS::WriteOffsetHistos(void) {
-  TFile *outfile = TFile::Open("/home/gaps/zweerink/offset.root","RECREATE"); 
+  //TFile *outfile=TFile::Open("/home/gaps/zweerink/offset.root","RECREATE"); 
+  TFile *outfile = TFile::Open("./offset.root","RECREATE"); 
   
   for (int i = 1; i < NCUBT; i++) {
     for (int j = 0; j < NUMBC; j++) {

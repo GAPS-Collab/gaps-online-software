@@ -4,10 +4,10 @@ use half::f16;
 
 use crate::errors::SerializationError;
 use crate::serialization::{
-    parse_u8,
-    parse_u16,
-    parse_f16,
-    Serialization
+  parse_u8,
+  parse_u16,
+  parse_f16,
+  Serialization
 };
 use crate::ProtocolVersion;
 
@@ -113,6 +113,12 @@ pub struct TofHit {
   /// serialized and has to be set after the hit has been 
   /// created
   pub cable_len      : f32,
+  /// The coordinates will not get serialized
+  /// and has to be set after the hit has been 
+  /// created
+  pub x              : f32,
+  pub y              : f32,
+  pub z              : f32,
 
   // deprecated values (prior to V1 version)
   pub timestamp32    : u32,
@@ -172,6 +178,7 @@ impl fmt::Display for TofHit {
     energy_dep    {:.2}   
     pos_across    {:.2}   
     t0            {:.2}  
+    x, y, z       {:.2} {:.2} {:.2}
   ** V1 variables
     phase (ch9)   {:.4}
     baseline A/B  {:.2} {:.2}
@@ -190,6 +197,9 @@ impl fmt::Display for TofHit {
             self.get_edep(),
             self.get_pos(),
             self.get_t0(),
+            self.x,
+            self.y,
+            self.z,
             self.phase,
             self.baseline_a,
             self.baseline_b,
@@ -317,8 +327,11 @@ impl TofHit {
       peak_b         : f16::from_f32(0.0),
       charge_a       : f16::from_f32(0.0),
       charge_b       : f16::from_f32(0.0),
-      paddle_len     : 0.0,
-      cable_len      : 0.0,
+      paddle_len     : f32::NAN,
+      cable_len      : f32::NAN,
+      x              : f32::NAN,
+      y              : f32::NAN,
+      z              : f32::NAN,
       
       charge_min_i   : 0,
       // deprecated  
@@ -348,6 +361,15 @@ impl TofHit {
   pub fn set_paddle(&mut self, paddle : &Paddle) {
     self.cable_len  = paddle.cable_len;
     self.paddle_len = paddle.length * 10.0; // stupid units!
+    let pr          = paddle.principal();
+    //println!("Principal {:?}", pr);
+    let rel_pos     = self.get_pos() - self.paddle_len/2.0;
+    let pos         = (paddle.global_pos_x_l0*10.0 + pr.0*rel_pos,
+                       paddle.global_pos_y_l0*10.0 + pr.1*rel_pos,
+                       paddle.global_pos_z_l0*10.0 + pr.2*rel_pos);
+    self.x          = pos.0;
+    self.y          = pos.1;
+    self.z          = pos.2;
   }
 
   /// Get the (official) paddle id
@@ -402,21 +424,21 @@ impl TofHit {
   ///
   /// **This will be measured from the A side**
   pub fn get_pos(&self) -> f32 {
-    //(self.time_a.to_f32() - self.get_t0())*C_LIGHT_PADDLE*10.0 // 10 for cm->mm 
-    // FIX - we are actually resetting the particle interaction time to 0 for this
-    //(self.time_a.to_f32() - self.get_t0())*C_LIGHT_PADDLE*10.0 // 10 for cm->mm
-    // FIX - paddle units!! 
-    if self.time_a == self.time_b {
-      return 0.5*self.paddle_len;
-    }
-    if self.time_a < self.time_b {
-      // it is closer to A side
-      return 0.5*self.paddle_len - (self.time_b.to_f32() - self.time_a.to_f32())*0.5*C_LIGHT_PADDLE*10.0;
-      //return (self.time_b.to_f32() - self.time_a.to_f32())*C_LIGHT_PADDLE*10.0; 
-    }
-    else {
-      return self.paddle_len*0.5 + (self.time_a.to_f32() - self.time_b.to_f32())*0.5*C_LIGHT_PADDLE*10.0;
-    }
+    let t0 = self.get_t0_nocable();
+    let clean_tA = self.time_a.to_f32() - t0;
+    return clean_tA*C_LIGHT_PADDLE*10.0; 
+  }
+
+  /// If the two reconstructed pulse times are not related to each other by the paddle length,
+  /// meaning that they can't be caused by the same event, we dub this hit as "not following
+  /// causality"
+  pub fn obeys_causality(&self) -> bool {
+    (self.paddle_len/(10.0*C_LIGHT_PADDLE)) - f32::abs((self.time_a.to_f32() - self.time_b.to_f32())) > 0.0
+    && self.get_t0_nocable() > 0.0
+  }
+
+  pub fn get_t0_nocable(&self) -> f32 {
+    0.5*(self.time_a.to_f32() + self.time_b.to_f32() - (self.paddle_len/(10.0*C_LIGHT_PADDLE)))
   }
 
   /// Calculate the interaction time based on the peak timings measured 

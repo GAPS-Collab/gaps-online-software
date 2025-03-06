@@ -193,6 +193,7 @@ fn py_create_rb_ch_to_pid_a_map(db_path : String) -> PyResult<RbChPidMapping> {
   }
 }
 
+
 /// Map RB ID/Ch to Paddle ID. A side exclusively.
 ///
 /// This will query the database and then create a map
@@ -265,6 +266,7 @@ fn tof_io<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(py_create_rb_ch_to_pid_b_map, m)?)?;
   m.add_function(wrap_pyfunction!(py_create_mtb_connection_to_pid_map, m)?)?;
   m.add_function(wrap_pyfunction!(py_summarize_toffile, m)?)?;
+  //m.add_class::<PyAdapter>()?;
   m.add_class::<PyTofPacket>()?;
   m.add_class::<PyTofPacketReader>()?;
   m.add_class::<PacketType>()?;

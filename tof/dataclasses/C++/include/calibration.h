@@ -9,12 +9,12 @@
 
 #include <vector>
 #include <string>
+#include <map>
 
 #include "tof_typedefs.h"
 #include "events.h"
 
 class RBEvent;
-
 
 /// The original "RemoveSpikes" from the
 /// DRS4 manual
@@ -76,6 +76,7 @@ struct RBCalibration {
   /// load a calibration from a txt file with constants
   /// This does not allow to load the data assigned to 
   /// the calibration
+  [[deprecated("Replaced by from_file, we will no longer write human readable calibration files")]]
   static RBCalibration from_txtfile(const String &filename);
 
 
@@ -97,6 +98,13 @@ struct RBCalibration {
     /// Check if the channel follows the convention 1-9
     bool channel_check(u8 channel) const;
 };
+
+// FIXME - we want to put everything in this namespace,
+// start with the new stuff
+namespace Gaps {
+  /// convenience function to load all the calibration files from a certain directory
+  std::map<u8, RBCalibration> load_tof_calibrations(std::string const &pathname);
+}
 
 std::ostream& operator<<(std::ostream& os, const RBCalibration& pck);
 

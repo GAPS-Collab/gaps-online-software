@@ -1,9 +1,4 @@
-//! Event strucutures for data reconrded byi the tof
-//!
-//! Compressed format containing analysis results of 
-//! the waveforms for individual paddles.
-//! Each paddle has a "paddle packet"
-//!
+//! Event strucutures for data reconrded by the tof
 //!
 
 use std::time::Instant;
@@ -48,8 +43,16 @@ use crate::events::master_trigger::{
 
 use crate::ProtocolVersion;
 
-#[cfg(feature ="database")]
-use crate::database::DsiJChPidMapping;
+cfg_if::cfg_if! {
+  if #[cfg(feature = "database")]  {
+    use crate::database::DsiJChPidMapping;
+    use crate::database::Paddle;
+    use std::collections::HashMap;
+  }
+}
+
+// #[cfg(feature ="database")]
+// use crate::database::Paddle;
 
 // This looks like a TODO
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
@@ -702,6 +705,7 @@ pub struct TofEventSummary {
   pub tot_edep_umb       : f32,
   pub tot_edep_cbe       : f32,
   pub tot_edep_cor       : f32,
+  pub paddles_set        : bool,
 }
 
 impl TofEventSummary {
@@ -730,7 +734,45 @@ impl TofEventSummary {
       channel_mask       : Vec::<u16>::new(),
       mtb_link_mask      : 0,
       hits               : Vec::<TofHit>::new(),
+      paddles_set        : false,
     }
+  }
+ 
+  #[cfg(feature="database")]
+  pub fn set_paddles(&mut self, paddles : &HashMap<u8, Paddle>) {
+    let mut nerror = 0u8;
+    for h in &mut self.hits {
+      match paddles.get(&h.paddle_id) {
+        None => {
+          error!("Got paddle id {} which is not in given map!", h.paddle_id);
+          nerror += 1;
+          continue;
+        }
+        Some(pdl) => {
+          h.set_paddle(pdl);
+        }
+      }
+    }
+    if nerror == 0 {
+      self.paddles_set = true;
+    }
+  }
+
+  /// Get the pointcloud of this event, sorted by time
+  /// 
+  /// # Returns
+  ///   (f32, f32, f32, f32, f32) : (x,y,z,t,edep)
+  pub fn get_pointcloud(&self) -> Option<Vec<(f32,f32,f32,f32,f32)>> {
+    let mut pc = Vec::<(f32,f32,f32,f32,f32)>::new();
+    if !self.paddles_set {
+      error!("Before getting the pointcloud, paddle information needs to be set for this event. Call TofEventSummary;:set_paddle");
+      return None;
+    }
+    for h in &self.hits {
+      let result = (h.x, h.y, h.z, h.get_t0(), h.get_edep());
+      pc.push(result);
+    }
+    Some(pc)
   }
 
   /// Compare the MasterTriggerEvent::trigger_hits with 

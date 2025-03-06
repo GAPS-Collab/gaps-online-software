@@ -7,6 +7,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import numpy as np
+import tqdm
 
 import charmingbeauty as cb
 import charmingbeauty.layout as lo
@@ -758,10 +759,11 @@ def plot_rb_paddles(rb):
     # Arguments:
         rb : go.db.ReadoutBoard
     """
-    poc = {k : 0 for k in range(161)}
+    poc  = {k : 0 for k in range(161)}
     for pid in rb.pids:
         poc[pid] = 1
     cmap = lambda x: 'royalblue' if x == 1 else 'lightsteelblue'
+    
     fig1,axs1 = tof_projection_xy(paddle_occupancy = poc,
                                   cmap = cmap,
                                   show_cbar = False)
@@ -838,7 +840,7 @@ def plot_paddle_charge2d(reader      = None,\
 
 ###############################################
 
-def mtb_rate_plot(datafiles         = None,
+def mtb_rate_plot(datafiles  : str  = None,
                   mtbmonidata       = [],
                   use_gcutime       = False,
                   mtb_moni_interval = 10,
@@ -848,23 +850,44 @@ def mtb_rate_plot(datafiles         = None,
 
     # Arguments
 
-        * datafiles:  Can be either str, pathlib.Path or a list of these, or None.
-                      If not None, walk over them and extract the MTB moni data
-        
+        * datafilse         : Either a single filename or a directory with files
+        * mtbmonidata       : Instead of a list of files, a list of tuples (gcutime, MTBMoniData) 
+                              can be given.
+        * mtb_moni_interval : In case we don't have a gcu time, specify the sampling interval 
+                              for MTBMoniData (this can be obtained from the run<runid>.toml file
+        * plot_dir          : To save the plot as a .webp, specify a directory
     """
-    if reader is not None and mtbmonidata:
+    if datafiles is not None and mtbmonidata:
         raise ValueError("Giving a reader and a list of MTBMoniData is confusng, since we don't know which one to use!")
-    if reader is not None:
-        pass
- 
-    xlabel = 'MET [s] (gcu)'
+    if datafiles is not None:
+        from ..io import TofPacketReader
+        from ..io import TofPacketType
+        from .monitoring import MtbMoniData
+        # is the MtbMoniDataSeries ready?
+        datafiles = str(datafiles)
+        reader = TofPacketReader(datafiles, filter = TofPacketType.MonitorMtb)
+        def extract_mtb(pack):
+            mtb = MtbMoniData()
+            mtb.from_tofpacket(pack)
+            return mtb
+        mtbmonidata = [extract_mtb(pack) for pack in tqdm.tqdm(reader, desc='Extracting MTBMoniData...')]
+
+    xlabel = 'MET [h] (gcutime)'
     
-    if not use_gcutime:
-        print(f'Will plot {len(mtbmonidata)} MrbMoniData rates')
-        met = np.array(range(len(mtbmonidata)))*mtb_moni_interval/3600 + mtb_moni_interval
-        xlabel  = 'MET [h] (monitime)'
+    if use_gcutime:
+        met     = np.array([j[0] for j in mtbmonidata])
+        met    -= met[0]
+        met     = met/3600
+        rates   = np.array([j[1].rate for j in mtbmonidata])
+        l_rates = np.array([j[1].lost_rate for j in mtbmonidata])
+    else:
+        print(f'-> Plotting {len(mtbmonidata)} MrbMoniData rates')
+        met     = np.array(range(len(mtbmonidata)))*mtb_moni_interval 
+        met    += mtb_moni_interval 
+        met     = met / 3600
         rates   = np.array([k.rate for k in mtbmonidata])
         l_rates = np.array([k.lost_rate for k in mtbmonidata])
+        xlabel  = 'MET [h] (monitime)'
         
     fig = plt.figure(figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT)
     ax  = fig.gca()
@@ -914,18 +937,22 @@ def plot_hg_lg_hits(reader   = None,
     no_hitmissing    = 0
     one_hitmissing   = 0
     lttwo_hitmissing = 0
+    extra_hits       = 0
     for k in hits:
         if k[0] == k[1]:
             no_hitmissing += 1
-        elif abs(k[0] - k[1]) == 1:
+        elif (k[1] - k[0]) == 1:
             one_hitmissing += 1
-        else:
+        elif (k[1] - k[0]) > 1:
             lttwo_hitmissing += 1
+        elif (k[0] > k[1]):
+            extra_hits += 1
             
     textbox  = f'NHits : {len(hits):.2e}\n'
     textbox += f'{100*no_hitmissing/len(hits):.2f} \% for N(LG) == N(HG)\n'
-    textbox += f'{100*one_hitmissing/len(hits):.2f}\% for abs(N(LG) - N(HG)) = 1\n'
-    textbox += f'{100*lttwo_hitmissing/len(hits):.2f}\% for abs(N(LG) - N(HG)) $>=$ 2'
+    textbox += f'{100*one_hitmissing/len(hits):.2f}\% for N(LG) - N(HG) == 1\n'
+    textbox += f'{100*lttwo_hitmissing/len(hits):.2f}\% for N(LG) - N(HG) $>=$ 2\n'
+    textbox += f'{100*extra_hits/len(hits):.2f}\% with N(HG) $>$ N(LG)\n'
     fig = plt.figure(figsize=lo.FIGSIZE_A4_LANDSCAPE)
     ax  = plt.gca()
     nhits        = [k[0] for k in hits]
@@ -942,7 +969,7 @@ def plot_hg_lg_hits(reader   = None,
     ax.set_xlabel('TOF hits', loc='right')
     ax.set_ylabel('events', loc='top')
     ax.set_title('TOF HG (readout) vs LG (data) hits', loc='right')
-    ax.text(0.5, 0.7, textbox, transform=fig.transFigure, fontsize=10)
+    ax.text(0.5, 0.6, textbox, transform=fig.transFigure, fontsize=10)
     ax.legend(frameon=False, fontsize=8, ncol=3, bbox_to_anchor=(0.45,1.01),\
               bbox_transform=fig.transFigure)
     return fig, hits
