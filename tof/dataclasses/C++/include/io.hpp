@@ -73,21 +73,6 @@ Vec<TofEvent> unpack_tofevents_from_tofpackets(const Vec<u8> &bytestream, u64 st
  */
 Vec<TofEvent> unpack_tofevents_from_tofpackets(const String filename);
 
-///**
-// * Extract TofEvents from a stream of binary data 
-// *
-// * @param bytestream : Binary TofEvent data.
-// * @param start_pos  : Byte position to start searching from in bytestream
-// */
-//Vec<TofPacket> get_tofpackets(const Vec<u8> &bytestream, u64 start_pos);
-//
-///**
-// * Extract TofEvents from a file on disk
-// *
-// * @param filename : Full path to binary file with TofEvents.
-// */
-//Vec<TofPacket> get_tofpackets(const String filename);
-
 namespace Gaps {
 
   /// Read serialized TofPackets from 

@@ -1,7 +1,13 @@
 #ifndef TOFHEADER_H_DEFINED
 #define TOFHEADER_H_DEFINED
 
+#include "result/result.h"
+
+#include "errors.hpp"
 #include "tof_typedefs.h"
+
+namespace r = result;
+namespace g = Gaps;
 
 struct TofEventHeader {
   static const u16 HEAD   = 0xAAAA;
@@ -50,8 +56,8 @@ struct TofEventHeader {
   /// get the timestamp
   f64 get_timestamp48() const;
 
-  static TofEventHeader from_bytestream(const Vec<u8> &stream,
-                                        u64 &pos);
+  static auto from_bytestream(const Vec<u8> &stream, u64 &pos)
+    -> r::Result<TofEventHeader, g::IOError>;
 
 }; // end TofEventHeader
 
