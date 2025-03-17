@@ -2,6 +2,7 @@
 #define CARASPACE_H_INCLUDED
 #include <iostream>
 #include <fstream>
+#include <cmath>
 
 #include "tof_typedefs.h"
 #include "packets/tof_packet.h"
@@ -47,7 +48,7 @@ namespace Gaps {
     
     std::map<std::string, std::tuple<u64, CRFrameObjectType>> index;
     Vec<u8> bytestorage;
-    std::string to_string() const;
+    auto to_string() const -> std::string;
     
     static std::map<std::string, std::tuple<u64, CRFrameObjectType>> parse_index(Vec<u8> stream, usize &pos);
     

@@ -76,7 +76,8 @@ namespace Gaps {
     };
 
     struct TrkHit {
-      // this is stupid
+      // using i32 here makes no sense in my eyes, but I defer to 
+      // bfsw
       i32 layer          {-1};
       i32 row            {-1};
       i32 module         {-1};
@@ -85,7 +86,7 @@ namespace Gaps {
       i64 oscillator     {-1};
       f64 energy         {0};
     
-      auto to_string() -> std::string;
+      auto to_string() const -> std::string;
     };
    
    struct TrkEvent {

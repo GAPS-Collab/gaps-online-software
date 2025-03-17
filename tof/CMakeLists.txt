@@ -394,6 +394,26 @@ if (BUILD_EXAMPLES)
 
     )
   endif (BUILD_CXXDB)
+  if (BUILD_CARASPACE)
+    set(caraspace-example "read-caraspace")
+    add_executable(${caraspace-example}
+      ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/read-caraspace.cxx
+    )
+    set_property(TARGET ${caraspace-example} PROPERTY CXX_STANDARD 20)
+    target_include_directories(${caraspace-example} 
+                              PUBLIC
+                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
+                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+                              ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+                              )
+    target_link_libraries(${caraspace-example}
+                          PRIVATE
+                          ${GAPSTOF_LIBRARY_SHARED})
+    install(TARGETS ${caraspace-example}
+            DESTINATION ${INSTALL_EXAMPLES_DIR}
+
+    )
+  endif (BUILD_CARASPACE)
   if (BUILD_ROOTCOMPONENTS)
     set(display-example "displayTofpackets")
     add_executable(${display-example}

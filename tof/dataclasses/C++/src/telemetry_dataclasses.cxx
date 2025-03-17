@@ -115,7 +115,7 @@ std::string gtl::Packet::to_string() {
 
 //----------------------------------------
 
-std::string gtl::TrkHit::to_string() {
+std::string gtl::TrkHit::to_string() const {
   std::string repr = "<TrackerHit:";
   repr += std::format("\n  Layer      : {}", layer);
   repr += std::format("\n  Row        : {}", row);
