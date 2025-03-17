@@ -51,7 +51,7 @@ namespace Gaps {
   };
 
   /// Get a paddle from the database
-  auto get_tofpaddles(std::string dbname) -> std::map<u8, TofPaddle>;        
+  auto get_tofpaddles() -> std::map<u8, TofPaddle>;        
 }
 
 std::ostream& operator<<(std::ostream& os, const Gaps::TofPaddle& paddle);

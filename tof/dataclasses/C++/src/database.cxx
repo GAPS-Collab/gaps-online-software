@@ -1,7 +1,10 @@
 #ifdef BUILD_CXXDB
 #include <cmath>
+#include <cstdlib>
 #include <format>
 #include <iostream>
+
+#include "spdlog/spdlog.h"
 #include "database.h"
 
 using namespace sqlite_orm;
@@ -44,7 +47,16 @@ std::string Gaps::TofPaddle::to_string() const {
   return repr;
 }
 
-std::map<u8, Gaps::TofPaddle> Gaps::get_tofpaddles(std::string dbname) {
+auto Gaps::get_tofpaddles() -> std::map<u8, Gaps::TofPaddle> {
+  // FIXME - find a better name for the database variable
+  //         env name
+  auto paddle_map = std::map<u8, Gaps::TofPaddle>();
+  auto db_path = std::getenv("DATABASE_URL");
+  if (db_path == nullptr) {
+    spdlog::error("Unable to retrieve database! The DATABASE_URL shell variable is not set. Did you load the setup-env.sh shell?");
+    return paddle_map;
+  } 
+  std::string dbname(db_path);
   auto storage = make_storage(dbname,
     make_table("tof_db_paddle",
       make_column("paddle_id"        , &Gaps::TofPaddle::paddle_id, primary_key()        ),
@@ -81,7 +93,6 @@ std::map<u8, Gaps::TofPaddle> Gaps::get_tofpaddles(std::string dbname) {
       make_column("global_pos_z_l0_B", &Gaps::TofPaddle::global_pos_z_l0_B)));          
   
   auto paddles = storage.get_all<Gaps::TofPaddle>();
-  auto paddle_map = std::map<u8, Gaps::TofPaddle>();
   for (auto p : paddles) {
     paddle_map.insert({p.paddle_id, p});
   }  
