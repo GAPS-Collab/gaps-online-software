@@ -6,7 +6,10 @@
  * The API will not be stable until V1.0 and is thus 
  * subject to change. Please refer to the respective 
  * README.md
- *
+ * 
+ * Updated in March 2025 to reflect changes in the C++
+ * API, mainly incorporating Result for a better error 
+ * checking
  */
 
 #include <iostream>
@@ -24,7 +27,7 @@ int main(int argc, char *argv[]){
   cxxopts::Options options("unpack-tofpackets", "Unpack example for .tof.gaps files with TofPackets.");
   options.add_options()
   ("h,help", "Print help")
-  ("c,calibration", "Calibration file (in txt format)", cxxopts::value<std::string>()->default_value(""))
+  ("c,calibration", "Folder with binary calibration files for each RB", cxxopts::value<std::string>()->default_value(""))
   ("file", "A file with TofPackets in it", cxxopts::value<std::string>())
   ("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
   ;
@@ -44,22 +47,17 @@ int main(int argc, char *argv[]){
   // -> Gaps relevant code starts here
  
   auto calname = result["calibration"].as<std::string>();
-  RBCalibration cali;
+  std::map<u8,RBCalibration> cali;
   if (calname != "") {
     // obviously here we have to get all the calibration files, 
     // but for the sake of the example let's use only one
     // Ultimatly, they will be stored in the stream.
-    spdlog::info("Will use calibration file {}", calname);
-    cali = RBCalibration::from_txtfile(calname);
+    spdlog::info("Will use calibrations from {}", calname);
+    cali = Gaps::load_tof_calibrations(calname);
   }
 
-  // the reader is something for the future, when the 
-  // files get bigger so they might not fit into memory
-  // at the same time
-  //auto reader = Gaps::TofPacketReader(fname); 
-  // for now, we have to load the whole file in memory
-  auto packets = get_tofpackets(fname);
-  spdlog::info("We loaded {} packets from {}", packets.size(), fname);
+  // Setup a "TofPacketReader", 
+  auto reader = Gaps::TofPacketReader(fname); 
 
   u32 n_rbcalib = 0;
   u32 n_rbmoni  = 0;
@@ -68,50 +66,57 @@ int main(int argc, char *argv[]){
   u32 n_mtbmoni = 0;
   u32 n_unknown = 0;
   u32 n_tofevents = 0;
-  for (auto const &p : packets) {
-    // print it
-    std::cout << p << std::endl;
-    // there will be a more generic way to unpack TofPackets in the future
-    // for now we have to use the packet_type field
+  while (!reader.is_exhausted()) {
+    auto p = reader.get_next_packet();
     switch (p.packet_type) {
-      case PacketType::RBCalibration : {
-        // if you have the packet payload, the second argument 
-        // (position in stream) will always be 0
-        //
-        // pos keeps track of the current position in bytestream, 
-        // thus passed by reference so we need an rvalue
-        //
-        // the usize is a typedef from tof_typedefs.h and used
-        // to make the rust and C++ code look more similar, so that 
-        // is easier to compare them.
-        usize pos = 0;
-        auto cali = RBCalibration::from_bytestream(p.payload, pos);
-        if (verbose) {
-          std::cout << cali << std::endl;
-        }
-        n_rbcalib++;
-        break;
-      }
-      // this only works for the data I combined
-      // recently, NOT for the "stream" kind of data
-      // THe format will change as well soon.
+  //    case PacketType::RBCalibration : {
+  //      // if you have the packet payload, the second argument 
+  //      // (position in stream) will always be 0
+  //      //
+  //      // pos keeps track of the current position in bytestream, 
+  //      // thus passed by reference so we need an rvalue
+  //      //
+  //      // the usize is a typedef from tof_typedefs.h and used
+  //      // to make the rust and C++ code look more similar, so that 
+  //      // is easier to compare them.
+  //      usize pos = 0;
+  //      auto cali = RBCalibration::from_bytestream(p.payload, pos);
+  //      if (verbose) {
+  //        std::cout << cali << std::endl;
+  //      }
+  //      n_rbcalib++;
+  //      break;
+  //    }
+  //    // this only works for the data I combined
+  //    // recently, NOT for the "stream" kind of data
+  //    // THe format will change as well soon.
       case PacketType::TofEvent : {
         usize pos = 0;
-        auto ev = TofEvent::from_bytestream(p.payload, pos);
+        auto r = TofEvent::from_bytestream(p.payload, pos);
+        TofEvent ev;
+        if (!r.is_ok()) {
+          spdlog::warn("Got broken TofEvent!");
+          continue;
+        } else {
+          ev = r.unwrap();
+        }
+        
         if (verbose) {
           std::cout << ev << std::endl;
-          for (auto const &rbid : ev.get_rbids()) {
-            RBEvent rb_event = ev.get_rbevent(rbid);
-            if ((calname != "") && cali.rb_id == rbid ){
-              // Vec<f32> is a typedef for std::vector<float32>
-              Vec<Vec<f32>> volts = cali.voltages(rb_event, true); // second argument is for spike cleaning
-                                                              // (C++ implementation still causes a 
-                                                              // segfault sometimes
-              Vec<Vec<f32>> times = cali.nanoseconds(rb_event);
-              // volts and times are now ch 0-8 with the waveforms
-              // for this event.
+        }
+        for (auto const &rbid : ev.get_rbids()) {
+          RBEvent rb_event = ev.get_rbevent(rbid);
+          if (cali.contains(rbid)) {
+            // Vec<f32> is a typedef for std::vector<float32>
+            Vec<Vec<f32>> volts = cali[rbid].voltages(rb_event, true); // second argument is for spike cleaning
+                                                            // (C++ implementation still causes a 
+                                                            // segfault sometimes
+            Vec<Vec<f32>> times = cali[rbid].nanoseconds(rb_event);
+            // volts and times are now ch 0-8 with the waveforms
+            // for this event.
 
-            }
+          }
+          if (verbose) {
             std::cout << rb_event << std::endl;
           }
         }
@@ -136,7 +141,7 @@ int main(int argc, char *argv[]){
         n_mte++;
         break;
       }
-	/*case PacketType::TOFCmpMoni : {
+    /*case PacketType::TOFCmpMoni : {
         usize pos = 0;
         auto tcmoni = TofCmpMoniData::from_bytestream(p.payload, pos);
         if (verbose) {
@@ -144,7 +149,7 @@ int main(int argc, char *argv[]){
         }
         n_tcmoni++;
         break;
-	}*/
+    }*/
       case PacketType::MTBMoni : {
         usize pos = 0;
         auto mtbmoni = MtbMoniData::from_bytestream(p.payload, pos);
@@ -161,9 +166,8 @@ int main(int argc, char *argv[]){
         n_unknown++;
         break;
       }
-    }
-  }
-  
+    } // end switch
+  } // end for loop
   std::cout << "-- -- packets summary:" << std::endl;
   
   std::cout << "-- -- RBCalibration     : " << n_rbcalib << "\t (packets) " <<  std::endl;

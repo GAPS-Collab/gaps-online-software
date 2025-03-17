@@ -31,20 +31,27 @@ namespace Gaps {
     f32 height            ;         
     f32 width             ;         
     f32 length            ;         
+    f32 normal_x          ;
+    f32 normal_y          ;
+    f32 normal_z          ;
     f32 global_pos_x_l0   ;         
     f32 global_pos_y_l0   ;         
     f32 global_pos_z_l0   ;         
     f32 global_pos_x_l0_A ;         
     f32 global_pos_y_l0_A ;         
     f32 global_pos_z_l0_A ;         
+    f32 global_pos_x_l0_B ;         
+    f32 global_pos_y_l0_B ;         
+    f32 global_pos_z_l0_B ;         
   
     std::string to_string() const;
+  
+    /// Vector along the longest axis
+    auto get_principal() const -> Vec<f32>;
   };
 
-
-
   /// Get a paddle from the database
-  std::map<u8, TofPaddle> get_tofpaddles(std::string dbname);
+  auto get_tofpaddles() -> std::map<u8, TofPaddle>;        
 }
 
 std::ostream& operator<<(std::ostream& os, const Gaps::TofPaddle& paddle);

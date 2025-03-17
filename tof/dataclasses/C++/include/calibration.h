@@ -103,7 +103,7 @@ struct RBCalibration {
 // start with the new stuff
 namespace Gaps {
   /// convenience function to load all the calibration files from a certain directory
-  std::map<u8, RBCalibration> load_tof_calibrations(std::string const &pathname);
+  auto load_tof_calibrations(std::string const &pathname) -> std::map<u8, RBCalibration>;
 }
 
 std::ostream& operator<<(std::ostream& os, const RBCalibration& pck);

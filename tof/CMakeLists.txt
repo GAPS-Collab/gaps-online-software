@@ -374,6 +374,26 @@ if (BUILD_EXAMPLES)
           DESTINATION ${INSTALL_EXAMPLES_DIR}
 
   )
+  if (BUILD_CXXDB)
+    set(paddle-example "show-paddles")
+    add_executable(${paddle-example}
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/show-paddles.cxx
+    )
+    set_property(TARGET ${paddle-example} PROPERTY CXX_STANDARD 20)
+    target_include_directories(${paddle-example} 
+                              PUBLIC
+                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
+                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+                              ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+                              )
+    target_link_libraries(${paddle-example}
+                          PRIVATE
+                          ${GAPSTOF_LIBRARY_SHARED})
+    install(TARGETS ${paddle-example}
+            DESTINATION ${INSTALL_EXAMPLES_DIR}
+
+    )
+  endif (BUILD_CXXDB)
   if (BUILD_ROOTCOMPONENTS)
     set(display-example "displayTofpackets")
     add_executable(${display-example}
