@@ -243,6 +243,17 @@ class Paddle(models.Model):
                                      null=False,
                                      default=0.0,
                                      help_text="Global X (L0) position of the B side")
+    
+
+    coax_cable_time           = models.FloatField(
+                                     null=False,
+                                     default=0.0,
+                                     help_text="Time the signal lingers in the cox cable as calculated by Jeff")
+    harting_cable_time        = models.FloatField(
+                                     null=False,
+                                     default=0.0,
+                                     help_text="Time the signal lingers in the harting cable as calculated by Jeff")
+
     @property 
     def principal(self):
         """
@@ -552,6 +563,8 @@ class Paddle(models.Model):
         _repr += f'\n   cable len [cm] :'
         _repr += f'\n    \u21B3 {self.cable_len}'
         _repr += f'\n    (Harting -> RB)'
+        _repr += f'\n   cable times [ns] (JAZ) :'
+        _repr += f'\n    \u21B3 Coax: {self.coax_cable_time} Harting: {self.harting_cable_time}'
         _repr += f'\n  ** Coordinates (L0) & dimensions **'
         _repr += f'\n   length, width, height [cm]'
         _repr += f'\n    \u21B3 [{self.length:.2f}, {self.width:.2f}, {self.height:.2f}]'
@@ -1061,9 +1074,10 @@ class TrackerStrip(models.Model):
     """
     Geometry information about each tracker strip
     """
-    strip_id            = models.PositiveIntegerF9eld(
+    strip_id            = models.PositiveIntegerField(
                             primary_key=True,
                             null=False,
+                            default=0,
                             unique=True,
                             help_text="The unique identifier for this strip, which is Layer-Row-Module-Channel (5 digit number)")
     layer               = models.IntegerField(null=False, default=0) 
