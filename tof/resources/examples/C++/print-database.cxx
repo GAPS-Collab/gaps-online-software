@@ -1,5 +1,5 @@
 /**
- * Binary to illustrate how to use the tof paddle 
+ * Binary to illustrate how to use the gaps-online-sw 
  * database.
  * To use this example, the code has to be build with
  * BUILD_CXXDB=ON
@@ -38,6 +38,13 @@ int main(int argc, char *argv[]){
   for (auto const &p : paddles) {
     std::cout << "************* PADDLE " << (int)p.first << "***********" << std::endl;
     std::cout << p.second << std::endl;
+    std::cout << "\n\n" << std::endl;
+  }
+
+  auto strips = Gaps::get_trackerstrips();
+  for (auto const &strip : strips) {
+    std::cout << "************* Strip " << (int)strip.first << "***********" << std::endl;
+    std::cout << strip.second << std::endl;
     std::cout << "\n\n" << std::endl;
   }
   spdlog::info("Finished");

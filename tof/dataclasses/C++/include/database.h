@@ -44,7 +44,7 @@ namespace Gaps {
     f32 global_pos_y_l0_B ;         
     f32 global_pos_z_l0_B ;         
   
-    std::string to_string() const;
+    auto to_string() const -> std::string;
   
     /// Vector along the longest axis
     auto get_principal() const -> Vec<f32>;
@@ -52,9 +52,36 @@ namespace Gaps {
 
   /// Get a paddle from the database
   auto get_tofpaddles() -> std::map<u8, TofPaddle>;        
+  
+  struct TrackerStrip {
+    u32 strip_id           ;
+    i32 layer              ; 
+    i32 row                ; 
+    i32 module             ; 
+    i32 channel            ;  
+    f32 global_pos_x_l0    ;
+    f32 global_pos_y_l0    ;
+    f32 global_pos_z_l0    ;
+    f32 global_pos_x_det_l0;
+    f32 global_pos_y_det_l0;
+    f32 global_pos_z_det_l0;
+    f32 principal_x        ;
+    f32 principal_y        ;
+    f32 principal_z        ;
+    u64 volume_id          ;
+  
+    auto to_string() const -> std::string;
+    auto create_id() const -> u32; 
+    static auto create_id(u32 layer, u32 row, u32 module, u32 channel) -> u32;
+    /// Vector along the longest axis
+    auto get_principal() const -> Vec<f32>;
+  };
+  
+  auto get_trackerstrips() -> std::map<u32, TrackerStrip>;        
 }
 
 std::ostream& operator<<(std::ostream& os, const Gaps::TofPaddle& paddle);
 
+std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStrip& strip);
 
 #endif

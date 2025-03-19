@@ -375,9 +375,10 @@ if (BUILD_EXAMPLES)
 
   )
   if (BUILD_CXXDB)
-    set(paddle-example "show-paddles")
+    # no longer just a paddle example, but also has tracker strips now
+    set(paddle-example "print-database")
     add_executable(${paddle-example}
-        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/show-paddles.cxx
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/${paddle-example}.cxx
     )
     set_property(TARGET ${paddle-example} PROPERTY CXX_STANDARD 20)
     target_include_directories(${paddle-example} 

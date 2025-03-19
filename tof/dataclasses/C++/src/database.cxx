@@ -47,6 +47,31 @@ std::string Gaps::TofPaddle::to_string() const {
   return repr;
 }
 
+std::string Gaps::TrackerStrip::to_string() const {
+  auto repr = std::string("<TrackerStrip: ");
+  repr += std::format("\n  StripID            : {}", strip_id   );
+  repr += std::format("\n  VolumeID           : {}", volume_id  );  
+  repr += std::format("\n  Row                : {}", row);                    
+  repr += std::format("\n  Module             : {}", module);                   
+  repr += std::format("\n  Channel            : {}", channel);                  
+  repr += std::format("\n  Volume ID          : {}", volume_id);  
+  repr += std::format("\n  -- str pos. (from sim) --");
+  repr += std::format("\n  X: {} Y: {} Z: {}", global_pos_x_l0, global_pos_y_l0, global_pos_z_l0);                 
+  repr += std::format("\n  -- det pos. (from sim) --");
+  repr += std::format("\n  X: {} Y: {} Z: {}", global_pos_x_det_l0, global_pos_y_det_l0, global_pos_z_det_l0);               
+  repr += std::format("\n  -- principal dir (from sim) --");
+  repr += std::format("\n  X: {} Y: {} Z: {}>", principal_x, principal_y, principal_z);                 
+  return repr;
+}
+
+auto Gaps::TrackerStrip::create_id() const -> u32 {
+  return Gaps::TrackerStrip::create_id(layer, row, module, channel);
+}; 
+
+auto Gaps::TrackerStrip::create_id(u32 layer, u32 row, u32 module, u32 channel) -> u32 {
+  return channel + module*100 + row*10000 + layer*10000;
+};
+
 auto Gaps::get_tofpaddles() -> std::map<u8, Gaps::TofPaddle> {
   // FIXME - find a better name for the database variable
   //         env name
@@ -99,6 +124,41 @@ auto Gaps::get_tofpaddles() -> std::map<u8, Gaps::TofPaddle> {
   return paddle_map;
 }
 
+auto Gaps::get_trackerstrips() -> std::map<u32, Gaps::TrackerStrip> {
+  // FIXME - find a better name for the database variable
+  //         env name
+  auto strip_map = std::map<u32, Gaps::TrackerStrip>();
+  auto db_path = std::getenv("DATABASE_URL");
+  if (db_path == nullptr) {
+    spdlog::error("Unable to retrieve database! The DATABASE_URL shell variable is not set. Did you load the setup-env.sh shell?");
+    return strip_map;
+  } 
+  std::string dbname(db_path);
+  auto storage = make_storage(dbname,
+    make_table("tof_db_trackerstrip",
+      make_column("strip_id"           , &Gaps::TrackerStrip::strip_id, primary_key()),
+      make_column("layer"              , &Gaps::TrackerStrip::layer), 
+      make_column("row"                , &Gaps::TrackerStrip::row), 
+      make_column("module"             , &Gaps::TrackerStrip::module), 
+      make_column("channel"            , &Gaps::TrackerStrip::channel),  
+      make_column("global_pos_x_l0"    , &Gaps::TrackerStrip::global_pos_x_l0),
+      make_column("global_pos_y_l0"    , &Gaps::TrackerStrip::global_pos_y_l0),
+      make_column("global_pos_z_l0"    , &Gaps::TrackerStrip::global_pos_z_l0),
+      make_column("global_pos_x_det_l0", &Gaps::TrackerStrip::global_pos_x_det_l0),
+      make_column("global_pos_y_det_l0", &Gaps::TrackerStrip::global_pos_y_det_l0),
+      make_column("global_pos_z_det_l0", &Gaps::TrackerStrip::global_pos_z_det_l0),
+      make_column("principal_x"        , &Gaps::TrackerStrip::principal_x),
+      make_column("principal_y"        , &Gaps::TrackerStrip::principal_y),
+      make_column("principal_z"        , &Gaps::TrackerStrip::principal_z),
+      make_column("volume_id"          , &Gaps::TrackerStrip::volume_id)));  
+  
+  auto strips = storage.get_all<Gaps::TrackerStrip>();
+  for (auto const &strip : strips) {
+    strip_map.insert({strip.strip_id, strip});
+  }  
+  return strip_map;
+}
+
 auto Gaps::TofPaddle::get_principal() const -> Vec<f32> {
   Vec<f32> pr(3,0);
   pr[0] = global_pos_x_l0_A - global_pos_x_l0;
@@ -117,4 +177,10 @@ std::ostream& operator<<(std::ostream& os, const Gaps::TofPaddle& tp) {
   os << tp.to_string();
   return os;
 }
+
+std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStrip& ts) {
+  os << ts.to_string();
+  return os;
+}
+
 #endif
