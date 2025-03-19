@@ -16,6 +16,7 @@
 
 class RBEvent;
 
+
 /// The original "RemoveSpikes" from the
 /// DRS4 manual
 void spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]);
@@ -107,5 +108,8 @@ namespace Gaps {
 }
 
 std::ostream& operator<<(std::ostream& os, const RBCalibration& pck);
+
+/// shortcut for the typically used map of rb_id -> calibrations
+typedef std::map<u8, RBCalibration> RBCalibrationMap;
 
 #endif

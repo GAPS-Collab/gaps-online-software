@@ -44,8 +44,8 @@ std::vector<std::string> Gaps::list_path_contents_sorted(const std::string& inpu
         std::smatch match;
         if (std::regex_search(filename, match, re) && match.size() > 2) {
           try {
-            uint32_t date = std::stoul(match[1].str());
-            uint32_t time = std::stoul(match[2].str());
+            u32 date = std::stoul(match[1].str());
+            u32 time = std::stoul(match[2].str());
             entries.emplace_back(date, time, filename);
           } catch (const std::exception&) {
             continue;
@@ -244,6 +244,36 @@ Gaps::CRReader::CRReader(String pathname) : CRReader::CRReader() {
 Vec<std::string> Gaps::CRReader::get_filenames() const {
   return filenames_;
 }
+    
+auto Gaps::CRReader::get_rbcalibrations(u8 n_rb) -> RBCalibrationMap {
+  RBCalibrationMap cali_map;
+  auto frame = Gaps::CRFrame();
+  std::string calipackname = "PacketType.RBCalibration";
+  while (!is_exhausted()) {
+    try {
+      frame = get_next_frame();
+    } catch (const std::exception& e) {
+      std::string emessage = std::format("--> Exception '{}' caught!", e.what());
+      //std::string message = std::format("--> File {} with {} frames processed! In     total, we proceseed {} frames", l0file, n_frames_processed_file, n_frames_processe    d);
+      std::cout << emessage << std::endl;
+      //std::cout << message << std::endl;
+      break;
+    }
+    if (cali_map.size() == (usize)n_rb) {
+      break;
+    }
+    if (frame.index.contains(calipackname)) {
+      u64 pos = 0;
+      auto cali_pack = frame.get_tofpacket(calipackname);
+      if (cali_pack.is_ok()) {
+        auto rb_cali   = RBCalibration::from_bytestream(cali_pack.unwrap().payload, pos);
+        cali_map.insert(std::make_pair(rb_cali.rb_id, rb_cali));
+        ++n_rb;
+      } // FIXME error check!
+    } 
+  }
+  return cali_map; 
+};     
 
 void Gaps::CRReader::set_path(std::string pathname) {
   auto files = list_path_contents_sorted(pathname);
