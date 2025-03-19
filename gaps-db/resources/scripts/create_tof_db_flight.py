@@ -32,6 +32,8 @@ if __name__ == '__main__':
                         help='Set this flag if creating a db for teststand purposes. This will have less strict error checking.')
     parser.add_argument('--volid-map', default="",\
                         help=".json file with mapping pid->volid")
+    parser.add_argument('--cable-map', default="",\
+                        help=".json file with mapping pid->cable transit times coax/harting")
     #parser.add_argument('--level0-geo', default="",\
     #                    help=".json file with mapping volid->l0 geo coord")
     parser.add_argument('--dry-run', action='store_true', default=False,\
@@ -67,6 +69,10 @@ if __name__ == '__main__':
         args.create_paddle_table = False
         print("Not creating PID table without volid map and level0 geo!")
     
+    if not args.cable_map:
+        args.create_paddle_table = False
+        print('Not creating Paddle table witout cable timeings map!')
+
     if args.create_rat_table:
         try:
             sheet = polars.read_excel(args.input, sheet_name=SPREADSHEET_RATS)
@@ -141,7 +147,7 @@ if __name__ == '__main__':
         print('-- Creating paddle table!')
         coords     = polars.read_excel(args.coordinates)
         volid_map  = json.load(open(args.volid_map))
-        #level0_geo = json.load(open(args.level0_geo))
+        cable_map  = json.load(open(args.cable_map))
         sheet      = polars.read_excel(args.input, sheet_name=SPREADSHEET_PADDLE_END)
         rows       = [r for r in sheet.rows()][1:321]
         # how this works is that we have line 0,1 for paddle 1, 2,3 for paddle 2 etc...
@@ -206,6 +212,10 @@ if __name__ == '__main__':
             paddle.length              = float(length)
             paddle.height              = float(height)
             paddle.width               = float(width )
+            # the cable times from Jeff
+            paddle.coax_cable_time     = float(cable_map[str(paddle.paddle_id)][0])
+            paddle.harting_cable_time  = float(cable_map[str(paddle.paddle_id)][1])
+            
             # check in which direction the paddle is oriented, 
             # hopefully this is global coordinate
             paddle_end_loc             = r[2]

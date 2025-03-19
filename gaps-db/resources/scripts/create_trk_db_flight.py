@@ -27,6 +27,7 @@ if __name__ == '__main__':
     for k in jsondata:
         sd = jsondata[k]
         strip = m.TrackerStrip()
+        strip.strip_id  = strip.create_id()
         strip.layer     = int(sd['layer'])
         strip.row       = int(sd['row'])
         strip.module    = int(sd['module'])

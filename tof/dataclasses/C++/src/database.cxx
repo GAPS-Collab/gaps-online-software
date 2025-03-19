@@ -8,7 +8,6 @@
 #include "database.h"
 
 using namespace sqlite_orm;
-//using namespace Gaps;
 
 std::string Gaps::TofPaddle::to_string() const {
   auto repr = std::string("<TofPaddle: ");
@@ -26,6 +25,8 @@ std::string Gaps::TofPaddle::to_string() const {
   repr += std::format("\n  pb_chA              : {} ", pb_chA           );         
   repr += std::format("\n  pb_chB              : {} ", pb_chB           );         
   repr += std::format("\n  cable_len           : {} ", cable_len        );         
+  repr += std::format("\n  coax cbl time [ns]  : {} ", coax_cable_time  );         
+  repr += std::format("\n  hart. cbl time [ns] : {} ", harting_cable_time);         
   repr += std::format("\n  dsi                 : {} ", dsi              );         
   repr += std::format("\n  j_rb                : {} ", j_rb             );         
   repr += std::format("\n  j_ltb               : {} ", j_ltb            );         
@@ -115,7 +116,9 @@ auto Gaps::get_tofpaddles() -> std::map<u8, Gaps::TofPaddle> {
       make_column("global_pos_z_l0_A", &Gaps::TofPaddle::global_pos_z_l0_A),          
       make_column("global_pos_x_l0_B", &Gaps::TofPaddle::global_pos_x_l0_B),          
       make_column("global_pos_y_l0_B", &Gaps::TofPaddle::global_pos_y_l0_B),          
-      make_column("global_pos_z_l0_B", &Gaps::TofPaddle::global_pos_z_l0_B)));          
+      make_column("global_pos_z_l0_B", &Gaps::TofPaddle::global_pos_z_l0_B),          
+      make_column("coax_cable_time"  , &Gaps::TofPaddle::coax_cable_time),          
+      make_column("harting_cable_time", &Gaps::TofPaddle::harting_cable_time)));          
   
   auto paddles = storage.get_all<Gaps::TofPaddle>();
   for (auto p : paddles) {

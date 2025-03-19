@@ -119,6 +119,10 @@ pub struct TofHit {
   pub x              : f32,
   pub y              : f32,
   pub z              : f32,
+  /// cable times will get populated from the db
+  pub coax_cable_time : f32,
+  pub harting_cable_time: f32,
+
 
   // deprecated values (prior to V1 version)
   pub timestamp32    : u32,
@@ -174,6 +178,8 @@ impl fmt::Display for TofHit {
   ** paddle {} ** 
     Length        {:.2}
     Harting cable length {:.2}
+    Coax cbl time {:.2}
+    Hart cbl time {:.2}
   ** reconstructed interaction
     energy_dep    {:.2}   
     pos_across    {:.2}   
@@ -194,6 +200,8 @@ impl fmt::Display for TofHit {
             paddle_info,
             self.paddle_len,
             self.cable_len,
+            self.coax_cable_time,
+            self.harting_cable_time,
             self.get_edep(),
             self.get_pos(),
             self.get_t0(),
@@ -329,6 +337,8 @@ impl TofHit {
       charge_b       : f16::from_f32(0.0),
       paddle_len     : f32::NAN,
       cable_len      : f32::NAN,
+      coax_cable_time: f32::NAN,
+      harting_cable_time : f32::NAN,
       x              : f32::NAN,
       y              : f32::NAN,
       z              : f32::NAN,
@@ -360,6 +370,8 @@ impl TofHit {
   #[cfg(feature="database")]
   pub fn set_paddle(&mut self, paddle : &Paddle) {
     self.cable_len  = paddle.cable_len;
+    self.coax_cable_time = paddle.coax_cable_time;
+    self.harting_cable_time = paddle.harting_cable_time;
     self.paddle_len = paddle.length * 10.0; // stupid units!
     let pr          = paddle.principal();
     //println!("Principal {:?}", pr);

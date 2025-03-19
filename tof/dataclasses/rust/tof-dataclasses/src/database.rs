@@ -505,6 +505,8 @@ pub struct Paddle {
   pub global_pos_x_l0_B : f32, 
   pub global_pos_y_l0_B : f32, 
   pub global_pos_z_l0_B : f32, 
+  pub coax_cable_time   : f32,
+  pub harting_cable_time: f32,
 }
 
 impl Paddle {
@@ -541,7 +543,9 @@ impl Paddle {
       global_pos_z_l0_A : 0.0, 
       global_pos_x_l0_B : 0.0, 
       global_pos_y_l0_B : 0.0, 
-      global_pos_z_l0_B : 0.0, 
+      global_pos_z_l0_B : 0.0,
+      coax_cable_time   : 0.0, 
+      harting_cable_time: 0.0
     }
   }
 
@@ -593,6 +597,8 @@ impl fmt::Display for Paddle {
     repr += "\n   cable len [cm] :";
     repr += &(format!("\n    \u{21B3} {:.2}", self.cable_len));
     repr += "\n    (Harting -> RB)";
+    repr += "\n   cable times [ns] (JAZ) :";
+    repr += &(format!("\n    \u{21B3} {:.2} {:.2}", self.coax_cable_time, self.harting_cable_time));
     repr += "\n  ** Coordinates (L0) & dimensions **";
     repr += "\n   length, width, height [mm]";
     repr += &(format!("\n    \u{21B3} [{:.2}, {:.2}, {:.2}]", self.length, self.width, self.height));

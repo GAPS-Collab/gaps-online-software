@@ -43,6 +43,8 @@ namespace Gaps {
     f32 global_pos_x_l0_B ;         
     f32 global_pos_y_l0_B ;         
     f32 global_pos_z_l0_B ;         
+    f32 coax_cable_time   ;
+    f32 harting_cable_time;
   
     auto to_string() const -> std::string;
   
