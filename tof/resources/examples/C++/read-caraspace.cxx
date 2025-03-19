@@ -34,6 +34,7 @@ int main(int argc, char *argv[]){
   options.add_options()
   ("h,help", "Print help")
   //("c,calibration", "Folder with binary calibration files for each RB", cxxopts::value<std::string>()->default_value(""))
+  ("file", "A Caraspace file", cxxopts::value<std::string>())
   ("directory", "A directory containing .gaps (caraspace) files, e.g. L0 Gaps files", cxxopts::value<std::string>())
   ("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
   ;

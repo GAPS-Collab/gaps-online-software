@@ -114,36 +114,57 @@ int main(int argc, char *argv[]){
         continue;
       }
 
-      if (verbose) {
-        std::cout << "---- TELEMETRY -----" << std::endl;
-        std::cout << frame.to_string() << std::endl;
-        std::cout << pack.to_string() << std::endl;
+      TofPacket tp;
+      if (frame.index.contains(tp_name)) {
+        auto tdata = frame.get_tofpacket(tp_name);
+        if (tdata.is_err()) {
+          continue;
+        }
+        tp = tdata.unwrap();
+        u64 pos = 0;
+        auto evdata = TofEvent::from_bytestream(tp.payload, pos);
+        if (evdata.is_err()) {
+          continue;
+        }
+        auto ev = evdata.unwrap();
+        for (TofHit const &h : ev.get_hits()) {
+          // calculate tof for a certain paddle combination from 
+          // telemetry data
+          // for now, just to test, we will check the value of the phase
+          phases.push_back(h.phase);      
+        }
       }
-      usize pos = 0;
-      auto result = gt::MergedEvent::from_bytestream(pack.payload, pos);
-      // in case of errors, we just move on
-      if (result.is_err()) {
-        std::string message = result.unwrap_err().reason;
-        spdlog::error(message);
-        ++n_telemetry_errors;
-        continue;
-      }
-      auto m_ev = result.unwrap();
-      auto tofdata = TofEventSummary::from_bytestream(m_ev.tof_data, pos);
-      //if (tofdata.is_err()) {
-      //  ++n_tof_telemetry_err;
+
+      //if (verbose) {
+      //  std::cout << "---- TELEMETRY -----" << std::endl;
+      //  std::cout << frame.to_string() << std::endl;
+      //  std::cout << pack.to_string() << std::endl;
+      //}
+      //usize pos = 0;
+      //auto result = gt::MergedEvent::from_bytestream(pack.payload, pos);
+      //// in case of errors, we just move on
+      //if (result.is_err()) {
+      //  std::string message = result.unwrap_err().reason;
+      //  spdlog::error(message);
+      //  ++n_telemetry_errors;
       //  continue;
       //}
-      //TofEventSummary tes = tofdata.unwrap();
-      for (TofHit const &h : tofdata.hits) {
-        // calculate tof for a certain paddle combination from 
-        // telemetry data
-        // for now, just to test, we will check the value of the phase
-        phases.push_back(h.phase);      
-      }
-      for (gt::TrkHit const &h : m_ev.trk_hits) {
-        std::cout << h.to_string() << std::endl;
-      }
+      //auto m_ev = result.unwrap();
+      //auto tofdata = TofEventSummary::from_bytestream(m_ev.tof_data, pos);
+      ////if (tofdata.is_err()) {
+      ////  ++n_tof_telemetry_err;
+      ////  continue;
+      ////}
+      ////TofEventSummary tes = tofdata.unwrap();
+      //for (TofHit const &h : tofdata.hits) {
+      //  // calculate tof for a certain paddle combination from 
+      //  // telemetry data
+      //  // for now, just to test, we will check the value of the phase
+      //  phases.push_back(h.phase);      
+      //}
+      //for (gt::TrkHit const &h : m_ev.trk_hits) {
+      //  std::cout << h.to_string() << std::endl;
+      //}
 
       if (n_frames_processed % 1000 == 0) {
         auto end = std::chrono::high_resolution_clock::now();
