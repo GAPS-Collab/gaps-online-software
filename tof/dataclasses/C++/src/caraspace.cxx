@@ -72,23 +72,24 @@ std::vector<std::string> Gaps::list_path_contents_sorted(const std::string& inpu
 Gaps::CRFrameObject Gaps::CRFrameObject::from_bytestream(Vec<u8> stream, usize &pos) {
   auto f_obj = CRFrameObject();
   if (stream.size() < 2) {
-    log_error("CRFrame::HeadInvalid");
+    spdlog::error("CRFrame::HeadInvalid");
     return f_obj;
     //return Err(CRSerializationError::HeadInvalid {});
   }
   auto head = parse_u16(stream, pos);
-  if (head != CRFrameObject::HEAD) {
-    log_error("CRFrame doesn't start with HEAD signature of " << CRFrame::HEAD);
+  if (head != HEAD) {
+    //FIXME - throws linker error - but why?
+    //spdlog::error("CRFrameObject doesn't start with HEAD signature of {}!", HEAD);
     return f_obj;
   }
   
   f_obj.version     = parse_u8(stream, pos);
-  f_obj.ftype      = static_cast<CRFrameObjectType>(parse_u8(stream, pos));
+  f_obj.ftype       = static_cast<CRFrameObjectType>(parse_u8(stream, pos));
   auto payload_size = parse_u32(stream, pos);
   pos += payload_size; 
   auto tail = parse_u16(stream, pos);
   if (tail != CRFrameObject::TAIL) {
-    log_error("Packet does not end with CRTAIL signature");
+    spdlog::error("Packet does not end with CRTAIL signature");
     return f_obj;
   }
   pos -= 2; // for tail parsing
@@ -135,7 +136,7 @@ std::map<std::string, std::tuple<u64, Gaps::CRFrameObjectType>> Gaps::CRFrame::p
   return index;
 }
 
-std::string Gaps::CRFrame::to_string() const {
+auto Gaps::CRFrame::to_string() const -> std::string {
   std::string repr = "<CRFrame : ";
   repr += std::format("\n  size  : {}", bytestorage.size() ); 
   repr += "\n  --- index ---";
@@ -153,7 +154,7 @@ Gaps::CRFrame Gaps::CRFrame::from_bytestream(Vec<u8> stream,
   // FIXME - error checking
   u16 head    = parse_u16(stream, pos);
   if (head != CRFrame::HEAD) {
-    log_error("CRFrame doesn't start with HEAD signature of " << CRFrame::HEAD);
+    spdlog::error("CRFrame doesn't start with HEAD signature of {}!", CRFrame::HEAD);
     return frame;
   }
   u64 fr_size = parse_u64(stream, pos); 
@@ -161,7 +162,7 @@ Gaps::CRFrame Gaps::CRFrame::from_bytestream(Vec<u8> stream,
   //std::cout << "fr size : " << fr_size << std::endl;
   u16 tail    = parse_u16(stream, pos);
   if (tail != CRFrame::TAIL) {
-    log_error("CRFrame doesn't conclude with TAIL signature of " << CRFrame::TAIL);
+    spdlog::error("CRFrame doesn't conclude with TAIL signature of {}!", CRFrame::TAIL);
     return frame;
   }
   // now go back and get the content
@@ -185,7 +186,7 @@ auto Gaps::CRFrame::get_tofpacket(std::string name)
     pos   = std::get<0>(index.at(name));
     dtype = static_cast<CRFrameObjectType>(std::get<1>(index.at(name)));
   } else {
-     log_debug("Unable to find TofPacket " << name << " in frame!");
+     spdlog::debug("Unable to find TofPacket {} in frame!", name);
      std::string msg = std::format("Can't find TofPacket {} in frame!", name);
      auto err = g::IOError(g::IOError::ErrorKind::PacketNotFound, msg);
      return Err(err);
@@ -286,7 +287,7 @@ void Gaps::CRReader::set_path(std::string pathname) {
     auto file_size = stream_file_.tellg();
     stream_file_.seekg (0, stream_file_.beg);
     auto fs_string = std::format("{:4.2f}", (f64)file_size/1e6);
-    log_info("Will read packets from " << files[0]  << " [" << fs_string << " MB]");
+    spdlog::info("Will read packets from {} [{} MB]", files[0], fs_string);
   }
 }
 
@@ -306,7 +307,7 @@ void Gaps::CRReader::prime_next_file_() {
     stream_file_.seekg (0, stream_file_.beg);
   } else {
     exhausted_ = true;
-    log_info("CRReader is exhausted!");
+    spdlog::info("CRReader is exhausted!");
     throw std::runtime_error("CRReader is exhausted!");
   }
 }

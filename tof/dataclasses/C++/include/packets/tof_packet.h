@@ -4,7 +4,11 @@
 #include <cstdint>
 #include <vector>
 
+#include "result/result.h"
 #include "tof_typedefs.h"
+#include "errors.hpp"
+
+namespace r = result;
 
 static const u8 UNKNOWN            =  0;
 static const u8 COMMAND            = 10;
@@ -51,10 +55,8 @@ enum class PacketType : u8 {
   RBCalibration     = RBCALIBRATION      ,
 };
 
-
-
 /// String representation of enum "PacketType"
-std::string packet_type_to_string(PacketType pt);
+auto packet_type_to_string(PacketType pt) -> std::string;
 
 std::ostream& operator<<(std::ostream& os, const PacketType& pck);
 
@@ -79,8 +81,8 @@ concept HasFromByteStream = requires(const Vec<u8>& stream, usize &pos) {
 /// => The packet has a size of 9 + PAYLOAD.size()
 /// 
 struct TofPacket {
-  static const u16 HEAD = 0xAAAA;
-  static const u16 TAIL = 0x5555;
+  static constexpr u16 HEAD = 0xAAAA;
+  static constexpr u16 TAIL = 0x5555;
   
   u16 head = 0xAAAA;
   u16 tail = 0x5555;
@@ -97,12 +99,12 @@ struct TofPacket {
   
   /// Transcode the bytestream into the respective 
   /// TofPacket
-  static TofPacket from_bytestream(const Vec<u8> &bytestream,
-                                   u64 &pos);
+  static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos) 
+    -> r::Result<TofPacket, Gaps::IOError>;
 
   /// A representative representation of the TofPacket 
   /// very usefule for debugging
-  std::string to_string() const;
+  auto to_string() const -> std::string;
   
   /// A generic unpacking method - unpack everything which
   /// is stored within the payload 

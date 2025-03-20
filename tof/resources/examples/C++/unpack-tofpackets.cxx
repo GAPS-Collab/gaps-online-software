@@ -67,7 +67,12 @@ int main(int argc, char *argv[]){
   u32 n_unknown = 0;
   u32 n_tofevents = 0;
   while (!reader.is_exhausted()) {
-    auto p = reader.get_next_packet();
+    auto pdata = reader.get_next_packet();
+    if (pdata.is_err()) {
+      spdlog::error("I/O issue when reading next packet!");
+      continue;
+    }
+    auto p = pdata.unwrap();
     switch (p.packet_type) {
   //    case PacketType::RBCalibration : {
   //      // if you have the packet payload, the second argument 

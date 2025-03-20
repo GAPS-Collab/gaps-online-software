@@ -646,8 +646,9 @@ struct TofEventSummary {
   f32         tot_edep_cbe      ;
   f32         tot_edep_cor      ;
   
-  static auto from_tofpacket(const TofPacket &packet)          -> TofEventSummary;
-  static auto from_bytestream(const Vec<u8> &stream, u64 &pos) -> TofEventSummary;
+  static auto from_tofpacket(const TofPacket &packet)          
+    -> r::Result<TofEventSummary, g::IOError>;
+  static auto from_bytestream(const Vec<u8> &stream, u64 &pos) -> r::Result<TofEventSummary, g::IOError> ;
   // combined timestamp
   auto get_timestamp48() const -> u64;
  

@@ -26,8 +26,8 @@ namespace Gaps {
   };
 
   struct CRFrameObject {
-    static const u16 HEAD = 0xAAAA;
-    static const u16 TAIL = 0x5555;
+    static constexpr u16 HEAD = 0xAAAA;
+    static constexpr u16 TAIL = 0x5555;
     
     u8 version;
     CRFrameObjectType ftype;

@@ -18,11 +18,11 @@
  */
 struct LTBMoniData {
   /// struct begin marker bytes
-  static const u16 HEAD = 0xAAAA;
+  static constexpr u16 HEAD = 0xAAAA;
   /// struct end marker bytes
-  static const u16 TAIL = 0x5555;
+  static constexpr u16 TAIL = 0x5555;
   /// byte size with HEAD + TAIL
-  static const u8  SIZE = 25; 
+  static constexpr u8  SIZE = 25; 
   
   /// FIXME - this might be the RB id
   u8                 board_id  ; 
@@ -51,9 +51,9 @@ std::ostream& operator<<(std::ostream& os, const LTBMoniData& moni);
  *
  */ 
 struct RBMoniData {
-  static const u16 HEAD = 0xAAAA;
-  static const u16 TAIL = 0x5555;
-  static const u8  SIZE = 151;
+  static constexpr u16 HEAD = 0xAAAA;
+  static constexpr u16 TAIL = 0x5555;
+  static constexpr u8  SIZE = 151;
 
   u8  board_id           ;  
   /// Rate as recorded by the board itself
@@ -114,9 +114,9 @@ std::ostream& operator<<(std::ostream& os, const RBMoniData& moni);
  * Sensors on the Power Board
  */ 
 struct PBMoniData {
-  static const u16 HEAD = 0xAAAA;
-  static const u16 TAIL = 0x5555;
-  static const u8  SIZE = 89;
+  static constexpr u16 HEAD = 0xAAAA;
+  static constexpr u16 TAIL = 0x5555;
+  static constexpr u8  SIZE = 89;
 
   u8 board_id;
   std::array<f32, 3> p3v6_preamp_vcp;
@@ -146,9 +146,9 @@ std::ostream& operator<<(std::ostream& os, const PBMoniData& moni);
  * Preamp sensors
  */
 struct PAMoniData {
-  static const u16 HEAD = 0xAAAA;
-  static const u16 TAIL = 0x5555;
-  static const u8  SIZE = 89;
+  static constexpr u16 HEAD = 0xAAAA;
+  static constexpr u16 TAIL = 0x5555;
+  static constexpr u8  SIZE = 89;
 
   u8 board_id;
   std::array<f32, 16> temps;
@@ -170,9 +170,9 @@ std::ostream& operator<<(std::ostream& os, const PAMoniData& moni);
  *
  */
 struct MtbMoniData : FromTofPacket<MtbMoniData> {
-  static const u16 HEAD = 0xAAAA;
-  static const u16 TAIL = 0x5555;
-  static const u8  SIZE = 6;
+  static constexpr u16 HEAD = 0xAAAA;
+  static constexpr u16 TAIL = 0x5555;
+  static constexpr u8  SIZE = 6;
   
   f32 fpga_temp    ;
   f32 fpga_vccint  ;
@@ -214,9 +214,9 @@ std::ostream& operator<<(std::ostream& os, const MtbMoniData& moni);
  * of the central tof computer
  */
 struct CPUMoniData {
-  static const u16 HEAD = 0xAAAA;
-  static const u16 TAIL = 0x5555;
-  static const u8  SIZE = 41;
+  static constexpr u16 HEAD = 0xAAAA;
+  static constexpr u16 TAIL = 0x5555;
+  static constexpr u8  SIZE = 41;
 
   u32                uptime     ; 
   u8                 disk_usage ; 

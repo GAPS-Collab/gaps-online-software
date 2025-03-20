@@ -76,6 +76,8 @@ int main(int argc, char *argv[]){
   u64 n_frames_processed  = 0;
   u64 n_telemetry_errors  = 0;
   u64 n_tof_telemetry_err = 0;
+        
+  auto start = std::chrono::high_resolution_clock::now();
 
   for (auto const &f : filenames) {
     auto start = std::chrono::high_resolution_clock::now();
@@ -123,12 +125,12 @@ int main(int argc, char *argv[]){
       }
       auto m_ev = result.unwrap();
       auto tofdata = TofEventSummary::from_bytestream(m_ev.tof_data, pos);
-      //if (tofdata.is_err()) {
-      //  ++n_tof_telemetry_err;
-      //  continue;
-      //}
-      //TofEventSummary tes = tofdata.unwrap();
-      for (TofHit const &h : tofdata.hits) {
+      if (tofdata.is_err()) {
+        ++n_tof_telemetry_err;
+        continue;
+      }
+      TofEventSummary tes = tofdata.unwrap();
+      for (TofHit const &h : tes.hits) {
         // do someting with h
       }
       for (gt::TrkHit const &h : m_ev.trk_hits) {
@@ -144,16 +146,15 @@ int main(int argc, char *argv[]){
         //std::cout << "--> Saw " << n_tofpacket_errors << " errores when reading tofstream files!" << std::endl;
         auto start = std::chrono::high_resolution_clock::now();
       }
-
-
     }
   } 
-  //auto paddles = Gaps::get_tofpaddles();
-  //for (auto const &p : paddles) {
-  //  std::cout << "************* PADDLE " << (int)p.first << "***********" << std::endl;
-  //  std::cout << p.second << std::endl;
-  //  std::cout << "\n\n" << std::endl;
-  //}
+  auto end = std::chrono::high_resolution_clock::now();
+  auto elapsed = end - start;
+  std::cout << "--> ----FINISHED--------------" << std::endl;
+  std::cout << "--> Processesd " << n_frames_processed << " frames in " << elapsed << std::endl;
+  std::cout << "--> Saw " << n_telemetry_errors << " errores when reading telemetry files!" << std::endl;
+  std::cout << "--> Saw " << n_tof_telemetry_err << " errores when reading tofdata from telemetry files!" << std::endl;
+  //std::cout << "--> Saw " << n_tofpacket_errors << " errores when reading tofstream files!" << std::endl;
   spdlog::info("Finished");
   return EXIT_SUCCESS;
 }

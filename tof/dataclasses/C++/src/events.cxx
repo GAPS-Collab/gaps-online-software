@@ -1265,13 +1265,14 @@ Vec<u8> TofEventSummary::get_rb_link_ids() const {
 }
 
 
-TofEventSummary TofEventSummary::from_bytestream(const Vec<u8> &stream, 
-                                                 u64 &pos) {
+auto TofEventSummary::from_bytestream(const Vec<u8> &stream, u64 &pos) 
+  -> Result<TofEventSummary, Gaps::IOError> {
   TofEventSummary tes;
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != TofEventSummary::HEAD) {
-    log_error("Decoding of HEAD failed! Got " << head << "instead!");
-    //return Err(SerializationError::HeadInvalid);
+    auto message = std::format("Decoding of HEAD failed! Got {} instead!", head);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, message);
+    return Err(err);
   }
   u8 status_version_u8  = Gaps::parse_u8(stream, pos);
   tes.status            = static_cast<EventStatus>(status_version_u8 & 0x3f);
@@ -1307,20 +1308,25 @@ TofEventSummary TofEventSummary::from_bytestream(const Vec<u8> &stream,
   }
   u16 tail = Gaps::parse_u16(stream, pos);
   if (tail != TofEventSummary::TAIL) {
-    log_error("Decoding of TAIL failed! Got " << tail << " instead!");
+    auto message = std::format("Decoding of TAIL failed! Got {} instead!", tail);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongTailBytes, message);
+    return Err(err);
+
   }
-  return tes;
+  return Ok(tes);
 }
 
-TofEventSummary TofEventSummary::from_tofpacket(const TofPacket &packet) {
+auto TofEventSummary::from_tofpacket(const TofPacket &packet) 
+  -> Result<TofEventSummary, g::IOError> {
   TofEventSummary event;
   if (packet.packet_type != PacketType::TofEventSummary) {
-    log_error("Wrong packet type! " << packet_type_to_string(packet.packet_type));
-    return event;
+    auto message = std::format("Wrong packet type! {}", packet_type_to_string(packet.packet_type));
+    spdlog::error(message);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongPacketType, message);
+    return Err(err);
   } 
   u64 _pos = 0;
-  event = TofEventSummary::from_bytestream(packet.payload, _pos);
-  return event;
+  return TofEventSummary::from_bytestream(packet.payload, _pos);
 }
 
 u64 TofEventSummary::get_timestamp48() const {

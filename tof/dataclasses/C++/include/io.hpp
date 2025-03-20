@@ -4,10 +4,14 @@
 #include <fstream>
 #include <functional>
 
+#include "result/result.h"
+
 #include "events.h"
 #include "packets/tof_packet.h"
 #include "serialization.h"
+#include "errors.hpp"
 
+namespace r = result;
 
 //template<typename T>
 //requires HasFromByteStream<T>
@@ -85,18 +89,18 @@ namespace Gaps {
       //TofPacketReader& operator=(const TofPacketReader&) = delete;
       /// Set a filename where to read packets from. This is a binary file format,
       /// typically ending in ".tof.gaps"
-      void      set_filename(String filename);
+      void set_filename(String filename);
       /// Walk over the file and return the next packet
-      TofPacket get_next_packet();
+      auto get_next_packet() -> r::Result<TofPacket, Gaps::IOError>;
       /// Return the filename we assigned
-      String    get_filename() const;
+      auto get_filename() const -> std::string;
       /// All packets have been read from the file. 
       /// If they should be read again, the reader 
       /// has to be created again
-      bool      is_exhausted() const;
+      auto is_exhausted() const -> bool;
       /// The number of files this reader has read
       /// from the file
-      usize     n_packets_read() const;
+      auto n_packets_read() const -> usize;
 
     private:
       std::ifstream  stream_file_;

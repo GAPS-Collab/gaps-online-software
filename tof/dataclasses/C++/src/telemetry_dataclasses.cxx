@@ -63,16 +63,16 @@ auto  gtl::PacketHeader::from_bytestream(Vec<u8> const &stream, usize &pos)
   -> Result<PacketHeader, g::IOError> {
   gtl::PacketHeader ph;
   if (stream.size() < pos + gtl::PacketHeader::SIZE) {
-    log_error("The telemetry header is too short! (" << stream.size() << " bytes when " << gtl::PacketHeader::SIZE << " are expected");
+    spdlog::error("The telemetry header is too short! ({} bytes when {} are expected!", stream.size(), gtl::PacketHeader::SIZE);
     pos += gtl::PacketHeader::SIZE;
     return Ok(ph);
   }
   if (parse_u16(stream, pos) != gtl::PacketHeader::HEAD) {
-    log_error("The given position " << pos-2 << " does not point to a valid header signature of " << gtl::PacketHeader::HEAD);
+    spdlog::error("The given position {} does not point to a valid header signature of {}", pos-2 ,gtl::PacketHeader::HEAD);
     pos += gtl::PacketHeader::SIZE - 2;
     return Ok(ph);
   }
-  ph.sync  = PacketHeader::HEAD;
+  ph.sync      = PacketHeader::HEAD;
   ph.ptype     = static_cast<gtl::BfswPacketType>(parse_u8 (stream, pos));
   ph.timestamp = parse_u32(stream, pos);
   ph.counter   = parse_u16(stream, pos);
@@ -81,7 +81,7 @@ auto  gtl::PacketHeader::from_bytestream(Vec<u8> const &stream, usize &pos)
   return Ok(ph);
 }
 
-auto gtl::PacketHeader::to_string() -> std::string {
+auto gtl::PacketHeader::to_string() const -> std::string {
   std::string repr = "<PacketHeader:";
   repr += std::format("\n  Header      : {}" ,sync);
   repr += std::format("\n  Packet Type : {}" ,bfsw_ptype_to_str(ptype));
@@ -94,8 +94,8 @@ auto gtl::PacketHeader::to_string() -> std::string {
 
 //----------------------------------------
 
-gtl::Packet gtl::Packet::from_bytestream(Vec<u8> const &stream,
-                                         usize &pos) {
+auto  gtl::Packet::from_bytestream(Vec<u8> const &stream,
+                                   usize &pos) -> gtl::Packet {
   gtl::Packet packet;
   auto header = gtl::PacketHeader::from_bytestream(stream, pos).unwrap();
   // FIXME
@@ -105,7 +105,7 @@ gtl::Packet gtl::Packet::from_bytestream(Vec<u8> const &stream,
   return packet;
 }
 
-std::string gtl::Packet::to_string() {
+auto gtl::Packet::to_string() const -> std::string {
   std::string repr = "<TelemetryPacket:";
   repr += std::format("{}", header.to_string());
   repr += "\n --------";
@@ -115,7 +115,7 @@ std::string gtl::Packet::to_string() {
 
 //----------------------------------------
 
-std::string gtl::TrkHit::to_string() const {
+auto gtl::TrkHit::to_string() const -> std::string {
   std::string repr = "<TrackerHit:";
   repr += std::format("\n  Layer      : {}", layer);
   repr += std::format("\n  Row        : {}", row);
@@ -129,7 +129,7 @@ std::string gtl::TrkHit::to_string() const {
 
 //----------------------------------------
 
-std::string gtl::TrkEvent::to_string() {
+auto gtl::TrkEvent::to_string() const -> std::string {
   std::string repr = "<TrackerEvent:";
   repr += std::format("\n  layer         : {}" ,layer);
   repr += std::format("\n  flags1        : {}" ,flags1);
@@ -167,7 +167,7 @@ gtl::TofMetaData gtl::TofMetaData::from_bytestream(Vec<u8> const &bytes, usize &
   return tm;
 }
 
-std::string gtl::TofMetaData::to_string() {
+auto gtl::TofMetaData::to_string() const -> std::string {
   std::string repr = "<TofMetaData";
   repr += std::format("\n  EventID      : {}" ,event_id);
   repr += std::format("\n  Version      : {}" ,status_version);
@@ -184,7 +184,7 @@ std::string gtl::TofMetaData::to_string() {
 
 //----------------------------------------
 
-auto gtl::MergedEvent::to_string() -> std::string {
+auto gtl::MergedEvent::to_string() const -> std::string {
   std::string repr = "<MergedEvent";
   repr += std::format("\n  Header : {}", header.to_string());
   repr += std::format("\n  Creation Time : {}" ,creation_time);
@@ -233,7 +233,7 @@ auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
   evt.tof_data.clear();
   if (stream.size() < pos + num_tof_bytes) {
     std::string message = std::format("Stream does not contain enough TOF bytes!");
-    log_error("" << message);
+    spdlog::error("{}",message);
     auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
     return Err(err);
   }
@@ -243,7 +243,7 @@ auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
 
   if(tracker_delim != 0xbb) {
     std::string message = std::format("Incorrect tracker delmiter flag ({})!", tracker_delim);
-    log_error("" << message);
+    spdlog::error("{}",message);
     auto err = g::IOError(g::IOError::ErrorKind::WrongDelimiter, message);
     return Err(err);
   }
@@ -264,7 +264,7 @@ auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
   u8 osci_delim = parse_u8(stream, pos);
   if(osci_delim != 0xcc) {
     std::string message = std::format("Incorrect osci delmiter flag ({})!", osci_delim);
-    log_error("" << message);
+    spdlog::error("{}",message);
     auto err = g::IOError(g::IOError::ErrorKind::WrongDelimiter, message);
     return Err(err);
   }
@@ -277,7 +277,7 @@ auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
   }
   if (pos + 6*oscillator_idx.size() > stream.size()) {
     std::string message = std::format("Stream does not contain enough bytes for {} trk oscillators!! Only {} bytes left!", oscillator_idx.size(), stream.size() - pos);
-    log_error("" << message);
+    spdlog::error("{}",message);
     auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
     return Err(err);
   }
