@@ -1311,7 +1311,6 @@ auto TofEventSummary::from_bytestream(const Vec<u8> &stream, u64 &pos)
     auto message = std::format("Decoding of TAIL failed! Got {} instead!", tail);
     auto err = g::IOError(g::IOError::ErrorKind::WrongTailBytes, message);
     return Err(err);
-
   }
   return Ok(tes);
 }

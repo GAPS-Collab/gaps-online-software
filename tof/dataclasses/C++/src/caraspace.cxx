@@ -195,7 +195,11 @@ auto Gaps::CRFrame::get_tofpacket(std::string name)
     auto f_obj = CRFrameObject::from_bytestream(bytestorage, pos);
     //std::cout << f_obj.to_string() << std::endl;
     pos        = 0;
-    tp         = TofPacket::from_bytestream(f_obj.payload, pos); 
+    auto tdata = TofPacket::from_bytestream(f_obj.payload, pos); 
+    if (tdata.is_err()) {
+      return tdata;
+    }
+    tp = tdata.unwrap();
     //std::cout << tp << std::endl;
   } else {
     log_debug("Trying to get TofPacket " << name << " however, that is of type " << static_cast<u8>(dtype)); 

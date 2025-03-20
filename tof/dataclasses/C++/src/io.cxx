@@ -8,6 +8,7 @@
 #include "logging.hpp"
 #include "io.hpp"
 
+using namespace result;
 namespace fs = std::filesystem;
 
 /***************************************************/
@@ -38,7 +39,8 @@ Vec<TofPacket> get_tofpackets(const Vec<u8> &bytestream, u64 start_pos, PacketTy
   u64 last_pos = start_pos += 1;
   TofPacket packet;
   while (true) {
-    packet = TofPacket::from_bytestream(bytestream, pos);
+    auto tofdata = TofPacket::from_bytestream(bytestream, pos);
+    packet = tofdata.unwrap();
     if (pos != last_pos) {
       if (filter != PacketType::Unknown) {
         if (packet.packet_type != filter) {
@@ -88,7 +90,7 @@ Vec<TofEvent> unpack_tofevents_from_tofpackets(const Vec<u8> &bytestream, u64 st
   TofEvent event;
   while (true) {
     last_pos = pos;
-    packet = TofPacket::from_bytestream(bytestream, pos);
+    packet = TofPacket::from_bytestream(bytestream, pos).unwrap();
     //if (n_packets == 100) {break;}
     if (pos != last_pos) {
       if (packet.packet_type == PacketType::TofEvent) {
@@ -154,19 +156,19 @@ Gaps::TofPacketReader::TofPacketReader(String filename) : Gaps::TofPacketReader(
 
 /***************************************************/
 
-bool Gaps::TofPacketReader::is_exhausted() const {
+auto Gaps::TofPacketReader::is_exhausted() const -> bool{
   return exhausted_;
 }
 
 /***************************************************/
 
-usize Gaps::TofPacketReader::n_packets_read() const {
+auto Gaps::TofPacketReader::n_packets_read() const -> usize {
   return n_packets_read_;
 }
 
 /***************************************************/
 
-TofPacket Gaps::TofPacketReader::get_next_packet() {
+auto Gaps::TofPacketReader::get_next_packet() -> Result<TofPacket, Gaps::IOError> {
   while (true) {
     if (stream_file_.eof()) {
       exhausted_ = true;
@@ -193,7 +195,7 @@ TofPacket Gaps::TofPacketReader::get_next_packet() {
         buffer.resize(stream_file_.gcount());
         packet.payload = std::move(buffer);
         n_packets_read_++;
-        return packet;
+        return Ok(packet);
       }
     } 
   }
