@@ -1,4 +1,5 @@
 use std::fmt;
+use std::f32::consts::PI;
 
 use half::f16;
 
@@ -109,6 +110,7 @@ pub struct TofHit {
   /// and has to be set after the hit has been 
   /// created
   pub paddle_len     : f32,
+  // These will not get serialized
   /// The Harting cable length to the RB will not get
   /// serialized and has to be set after the hit has been 
   /// created
@@ -121,7 +123,7 @@ pub struct TofHit {
   pub z              : f32,
   /// cable times will get populated from the db
   pub coax_cable_time : f32,
-  pub harting_cable_time: f32,
+  pub hart_cable_time: f32,
 
 
   // deprecated values (prior to V1 version)
@@ -201,7 +203,7 @@ impl fmt::Display for TofHit {
             self.paddle_len,
             self.cable_len,
             self.coax_cable_time,
-            self.harting_cable_time,
+            self.hart_cable_time,
             self.get_edep(),
             self.get_pos(),
             self.get_t0(),
@@ -338,7 +340,7 @@ impl TofHit {
       paddle_len     : f32::NAN,
       cable_len      : f32::NAN,
       coax_cable_time: f32::NAN,
-      harting_cable_time : f32::NAN,
+      hart_cable_time : f32::NAN,
       x              : f32::NAN,
       y              : f32::NAN,
       z              : f32::NAN,
@@ -371,14 +373,14 @@ impl TofHit {
   pub fn set_paddle(&mut self, paddle : &Paddle) {
     self.cable_len  = paddle.cable_len;
     self.coax_cable_time = paddle.coax_cable_time;
-    self.harting_cable_time = paddle.harting_cable_time;
+    self.hart_cable_time = paddle.harting_cable_time;
     self.paddle_len = paddle.length * 10.0; // stupid units!
     let pr          = paddle.principal();
     //println!("Principal {:?}", pr);
-    let rel_pos     = self.get_pos() - self.paddle_len/2.0;
-    let pos         = (paddle.global_pos_x_l0*10.0 + pr.0*rel_pos,
-                       paddle.global_pos_y_l0*10.0 + pr.1*rel_pos,
-                       paddle.global_pos_z_l0*10.0 + pr.2*rel_pos);
+    let rel_pos     = self.get_pos();
+    let pos         = (paddle.global_pos_x_l0_A*10.0 + pr.0*rel_pos,
+                       paddle.global_pos_y_l0_A*10.0 + pr.1*rel_pos,
+                       paddle.global_pos_z_l0_A*10.0 + pr.2*rel_pos);
     self.x          = pos.0;
     self.y          = pos.1;
     self.z          = pos.2;
@@ -405,8 +407,6 @@ impl TofHit {
     }
     return 0;
   }
-
-  
 
   pub fn add_peak(&mut self, peak : &Peak)  {
     if self.paddle_id != TofHit::get_pid(peak.paddle_end_id) {
@@ -435,8 +435,12 @@ impl TofHit {
   /// the two times at the paddle ends
   ///
   /// **This will be measured from the A side**
+  ///
+  /// Just to be extra clear, this assumes the two 
+  /// sets of cables for each paddle end have the
+  /// same length
   pub fn get_pos(&self) -> f32 {
-    let t0 = self.get_t0_nocable();
+    let t0 = self.get_t0_uncorrected();
     let clean_tA = self.time_a.to_f32() - t0;
     return clean_tA*C_LIGHT_PADDLE*10.0; 
   }
@@ -445,22 +449,42 @@ impl TofHit {
   /// meaning that they can't be caused by the same event, we dub this hit as "not following
   /// causality"
   pub fn obeys_causality(&self) -> bool {
-    (self.paddle_len/(10.0*C_LIGHT_PADDLE)) - f32::abs((self.time_a.to_f32() - self.time_b.to_f32())) > 0.0
-    && self.get_t0_nocable() > 0.0
+    (self.paddle_len/(10.0*C_LIGHT_PADDLE)) - f32::abs(self.time_a.to_f32() - self.time_b.to_f32()) > 0.0
+    && self.get_t0_uncorrected() > 0.0
   }
 
-  pub fn get_t0_nocable(&self) -> f32 {
-    0.5*(self.time_a.to_f32() + self.time_b.to_f32() - (self.paddle_len/(10.0*C_LIGHT_PADDLE)))
+  /// Get the cable correction time
+  pub fn get_cable_delay(&self) -> f32 {
+    self.hart_cable_time - self.coax_cable_time 
   }
 
-  /// Calculate the interaction time based on the peak timings measured 
-  /// at the paddle ends A and B
+  /// Get the delay relative to other readoutboards based 
+  /// on the channel9 sine wave
+  pub fn get_phase_delay(&self) -> f32 { 
+    let freq : f32 = 20.0e9;
+    let mut phase = self.phase.to_f32();
+    if phase < 0.0 {
+        phase += PI;
+    }
+    let phase_delay = (phase/(2.0*PI*freq))*1.0e9f32;
+    return phase_delay;
+  }
+
   ///
   /// That this works, the length of the paddle has to 
   /// be set before (in mm).
   /// This assumes that the cable on both sides of the paddle are 
   /// the same length
   pub fn get_t0(&self) -> f32 {
+    self.get_t0_uncorrected() + self.get_phase_delay() + self.get_cable_delay()
+  }
+
+  /// Calculate the interaction time based on the peak timings measured 
+  /// at the paddle ends A and B
+  ///
+  /// This does not correct for any cable length
+  /// or ch9 phase shift
+  pub fn get_t0_uncorrected(&self) -> f32 {
     0.5*(self.time_a.to_f32() + self.time_b.to_f32() - (self.paddle_len/(10.0*C_LIGHT_PADDLE)) - ((self.cable_len*2.0)/(10.0*C_LIGHT_CABLE)))
   }
 
@@ -532,137 +556,6 @@ impl TofHit {
   pub fn get_bl_b_rms(&self) -> f32 {
     self.baseline_b_rms.to_f32()
   }
-
-  ////pub fn get_timestamp48(&self) -> u64 {
-  ////  ((self.timestamp16 as u64) << 32) | self.timestamp32 as u64
-  ////}
-  //
-  //pub fn set_edep(&mut self, edep : f32) {
-  //  if edep >= 100.0 {
-  //    self.charge_min_i = u16::MAX;
-  //  } else {
-  //    self.charge_min_i = F32TOU16_EDEP*(edep.floor() as u16);
-  //  }
-  //}
-
-  //pub fn get_edep(&self) -> f32 {
-  //  self.charge_min_i as f32 * U16TOF32_EDEP
-  //}
-  //
-  //pub fn set_pos_across(&mut self, pa : f32) {
-  //  if pa >= 1800.0 {
-  //    self.pos_across = u16::MAX;
-  //  } else {
-  //    self.pos_across = F32TOU16_POS_ACROSS*(pa.floor() as u16);
-  //  }
-  //}
-
-  //pub fn get_pos_across(&self) -> f32 {
-  //  self.pos_across as f32 * U16TOF32_POS_ACROSS
-  //}
-
-  //pub fn set_t0(&mut self, t0 : f32) {
-  //  if t0 >= MAX_PEAK_TIME {
-  //    self.t0 = u16::MAX;
-  //  } else {
-  //    self.t0 = F32TOU16_T0*(t0.floor() as u16);
-  //  }
-  //}
-
-  //pub fn get_t0(&self) -> f32 {
-  //  self.t0 as f32 * U16TOF32_T0
-  //}
-
-  //pub fn set_peak_a(&mut self, peak : f32 ) {
-  //  if peak >= MAX_PEAK_HEIGHT {
-  //    self.peak_a = u16::MAX;
-  //  } else {
-  //    self.peak_a = F32TOU16_PEAK_HEIGHT*(peak.floor() as u16); 
-  //  }
-  //}
-  //
-  //pub fn get_peak_a(&self) -> f32 {
-  //  self.peak_a as f32 * U16TOF32_PEAK_HEIGHT
-  //}
-
-  //pub fn set_peak_b(&mut self, peak : f32 ) {
-  //  if peak >= MAX_PEAK_HEIGHT {
-  //    self.peak_b = u16::MAX;
-  //  } else {
-  //    self.peak_b = F32TOU16_PEAK_HEIGHT*(peak.floor() as u16); 
-  //  }
-  //}
-  //
-  //pub fn get_peak_b(&self) -> f32 {
-  //  self.peak_b as f32 * U16TOF32_PEAK_HEIGHT
-  //}
-  //
-  //pub fn set_peak(&mut self, peak : f32, side : usize ) {
-  //  assert!(side == 0 || side == 1);
-  //  if side == 0 {self.set_peak_a(peak);}
-  //  if side == 1 {self.set_peak_b(peak);}
-  //}
-
-  //pub fn set_time_a(&mut self, time : f32 ) {
-  //  if time >= MAX_PEAK_TIME {
-  //    self.time_a = u16::MAX;
-  //  } else {
-  //    self.time_a = F32TOU16_PEAK_TIME*(time.floor() as u16); 
-  //  }
-  //}
-
-  //pub fn get_time_a(&self) -> f32 {
-  //  self.time_a as f32 * U16TOF32_PEAK_TIME 
-  //}
-
-  //pub fn set_time_b(&mut self, time : f32 ) {
-  //  if time >= MAX_PEAK_TIME {
-  //    self.time_b = u16::MAX;
-  //  } else {
-  //    self.time_b = F32TOU16_PEAK_TIME*(time.floor() as u16); 
-  //  }
-  //}
-  //
-  //pub fn get_time_b(&self) -> f32 {
-  //  self.time_b as f32 * U16TOF32_PEAK_TIME 
-  //}
-  //
-  //pub fn set_time(&mut self, time : f32, side : usize ) {
-  //  assert!(side == 0 || side == 1);
-  //  if side == 0 {self.set_time_a(time);}
-  //  if side == 1 {self.set_time_b(time);}
-  //}
-
-  //pub fn set_charge_a(&mut self, charge : f32 ) {
-  //  if charge >= MAX_PEAK_CHARGE {
-  //    self.charge_a = u16::MAX;
-  //  } else {
-  //    self.charge_a = F32TOU16_PEAK_CHARGE*(charge.floor() as u16); 
-  //  }
-  //}
-  //
-  //pub fn get_charge_a(&self) -> f32 {
-  //  self.charge_a as f32 * U16TOF32_PEAK_CHARGE
-  //}
-
-  //pub fn set_charge_b(&mut self, charge : f32 ) {
-  //  if charge >= MAX_PEAK_CHARGE {
-  //    self.charge_b = u16::MAX;
-  //  } else {
-  //    self.charge_b = F32TOU16_PEAK_CHARGE*(charge.floor() as u16); 
-  //  }
-  //}
-  //
-  //pub fn get_charge_b(&self) -> f32 {
-  //  self.charge_b as f32 * U16TOF32_PEAK_CHARGE
-  //}
-  //
-  //pub fn set_charge(&mut self, charge : f32, side : usize ) {
-  //  assert!(side == 0 || side == 1);
-  //  if side == 0 {self.set_charge_a(charge);}
-  //  if side == 1 {self.set_charge_b(charge);}
-  //}
-
 
   #[cfg(feature="random")]
   pub fn from_random() -> TofHit {

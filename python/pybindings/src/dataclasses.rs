@@ -3160,8 +3160,8 @@ impl PyTofHit {
   fn set_paddle(&mut self, plen : f32, clen : f32, coax_cbl_time : f32, hart_cbl_time : f32 ) {
     self.hit.paddle_len = plen;
     self.hit.cable_len  = clen;
-    self.hit.coax_cable_time  = coax_cbl_time;
-    self.hit.harting_cable_time = hart_cbl_time;
+    self.hit.coax_cable_time = coax_cbl_time;
+    self.hit.hart_cable_time = hart_cbl_time;
   }
 
   #[getter]
@@ -3180,8 +3180,8 @@ impl PyTofHit {
   }
 
   #[getter]
-  fn get_t0_nocable(&self) -> f32 {
-    self.hit.get_t0_nocable()
+  fn get_t0_uncorrected(&self) -> f32 {
+    self.hit.get_t0_uncorrected()
   }
 
   #[getter]
@@ -3196,12 +3196,14 @@ impl PyTofHit {
 
   #[getter]
   fn get_hart_cbl_time(&self) -> f32 {
-    self.hit.harting_cable_time
+    self.hit.hart_cable_time
   }
 
   /// Reconstructed particle interaction time,
   /// calculated from the waveforms of the two
-  /// different paddle ends
+  /// different paddle ends. If the paddle has 
+  /// been set, this takes phase and cable 
+  /// length into account
   #[getter]
   fn t0(&self) -> f32 {
     self.hit.get_t0()
