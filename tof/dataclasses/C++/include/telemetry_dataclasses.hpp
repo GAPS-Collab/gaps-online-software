@@ -48,12 +48,12 @@ namespace Gaps {
       TmP214             = 214,
     };
 
-    u8 bfsw_ptype_to_u8(BfswPacketType pt);
-    std::string bfsw_ptype_to_str(BfswPacketType pt);
+    auto bfsw_ptype_to_u8(BfswPacketType pt) -> u8;
+    auto bfsw_ptype_to_str(BfswPacketType pt) -> std::string;
 
     struct PacketHeader {
-      static const u16 SIZE = 13; 
-      static const u16 HEAD = 0x90eb;
+      static constexpr u16 SIZE = 13; 
+      static constexpr u16 HEAD = 0x90eb;
 
       u16             sync     {0};
       BfswPacketType  ptype    {BfswPacketType::Unknown};
@@ -63,7 +63,7 @@ namespace Gaps {
       u16             checksum {0};
     
       auto get_gcutime() -> f64;
-      auto to_string()   -> std::string;
+      auto to_string() const -> std::string;
       static auto from_bytestream(Vec<u8> const &stream, usize &pos)
         -> r::Result<PacketHeader, g::IOError>;
     };
@@ -71,8 +71,8 @@ namespace Gaps {
     struct Packet {
       PacketHeader header;
       Vec<u8> payload;
-      std::string to_string();
-      static Packet from_bytestream(Vec<u8> const &stream, usize &pos);
+      auto to_string() const -> std::string;
+      static auto from_bytestream(Vec<u8> const &stream, usize &pos) -> Packet;
     };
 
     struct TrkHit {
@@ -96,7 +96,7 @@ namespace Gaps {
       u32         event_time;
       Vec<TrkHit> hits;
 
-      auto to_string() -> std::string;
+      auto to_string() const -> std::string;
    };
      
     struct TofMetaData {
@@ -111,13 +111,13 @@ namespace Gaps {
       f32  tot_edep_cbe {0};
       f32  tot_edep_cor {0};
       
-      static TofMetaData from_bytestream(Vec<u8> const &stream, usize &pos);
-      auto to_string() -> std::string;
+      static auto from_bytestream(Vec<u8> const &stream, usize &pos) -> TofMetaData;
+      auto to_string() const -> std::string;
     };
      
     struct TrkCalibratedHit {
-      uint16_t strip_id;
-      uint16_t adc;
+      u16 strip_id;
+      u16 adc;
       //calibrated_hit(uint16_t strip_id, uint16_t adc) : strip_id(strip_id), adc(adc) {}
      };
      
@@ -157,7 +157,7 @@ namespace Gaps {
       TrkMetaData   tracker_meta;
       Vec<u64>      tracker_oscillators = Vec<u64>(10,0) ;
     
-      auto to_string() -> std::string;
+      auto to_string() const -> std::string;
       static auto from_bytestream(Vec<u8> const &stream, usize &pos)
         -> r::Result<MergedEvent, g::IOError>;
     };

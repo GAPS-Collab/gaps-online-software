@@ -32,8 +32,8 @@ void spike_cleaning_all(Vec<Vec<f32>> &voltages, bool calibrated = true);
  *
  */ 
 struct RBCalibration {
-  static const u16 HEAD = 0xAAAA;
-  static const u16 TAIL = 0x5555;
+  static constexpr u16 HEAD = 0xAAAA;
+  static constexpr u16 TAIL = 0x5555;
   static bool serialize_event_data;
 
   /// id of the RB this calibration belongs to
@@ -70,9 +70,9 @@ struct RBCalibration {
    * @param
    * @param 
    */
-  static RBCalibration from_bytestream(const Vec<u8> &bytestream,
-                                       u64 &pos,
-                                       bool discard_events = true);
+  static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos, 
+                              bool discard_events = true)
+     -> RBCalibration;
 
   /// load a calibration from a txt file with constants
   /// This does not allow to load the data assigned to 
@@ -84,10 +84,10 @@ struct RBCalibration {
   /// Load a calibration from a file with a TofPacket of 
   /// type RBCalibration in it. This should be the default
   /// way to load a calibration file
-  static RBCalibration from_file(const String &filename,
-                                 bool discard_events = true);
+  static auto from_file(const String &filename, bool discard_events = true)
+    -> RBCalibration;
   /// String representation for printing 
-  std::string to_string() const;
+  auto to_string() const -> std::string;
 
   /// Should the associated data be loaded 
   /// in case it is available when 

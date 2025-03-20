@@ -10,10 +10,10 @@ namespace r = result;
 namespace g = Gaps;
 
 struct TofEventHeader {
-  static const u16 HEAD   = 0xAAAA;
-  static const u16 TAIL   = 0x5555;
+  static constexpr u16 HEAD   = 0xAAAA;
+  static constexpr u16 TAIL   = 0x5555;
   /// fixed size including head and tail
-  static const usize SIZE = 47; 
+  static constexpr usize SIZE = 47; 
   
   u32 run_id      = 0; 
   u32 event_id    = 0; 
@@ -51,10 +51,10 @@ struct TofEventHeader {
                                // 256 paddles.
 
   /// String representation for printing to output
-  std::string to_string() const;
+  auto to_string() const -> std::string;
 
   /// get the timestamp
-  f64 get_timestamp48() const;
+  auto get_timestamp48() const -> f64;
 
   static auto from_bytestream(const Vec<u8> &stream, u64 &pos)
     -> r::Result<TofEventHeader, g::IOError>;

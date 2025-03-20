@@ -42,10 +42,9 @@ namespace Gaps {
 
 
   struct CRFrame {
-    static const u16 HEAD = 0xAAAA;
-    static const u16 TAIL = 0x5555;
+    static constexpr u16 HEAD = 0xAAAA;
+    static constexpr u16 TAIL = 0x5555;
       
-    //std::map<std::string, usize> get_index
     static auto from_bytestream(Vec<u8> stream, usize &pos) -> CRFrame;
     
     std::map<std::string, std::tuple<u64, CRFrameObjectType>> index;
