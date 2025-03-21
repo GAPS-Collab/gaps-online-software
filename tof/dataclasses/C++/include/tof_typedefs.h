@@ -3,12 +3,15 @@
  *
  * Rationale: Make sure that numeric types
  *            have the same size on different
- *            systems, which ir relevant for 
+ *            systems, which is relevant for 
  *            (de)serialization.
  *
  * Bonus: Match rust syntax a bit more closely,
- *        so it is easier to compater to its
- *        Rust counterpart
+ *        so it is easier to compare the C++
+ *        to its Rust counterpart
+ *        Always remember! The rust library is 
+ *        the gold standard since that is what 
+ *        is run on the TOF computer
  *
  */
 #ifndef GAPSTOFTYPEDEFS_H_INCLUDED

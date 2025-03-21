@@ -18,15 +18,15 @@
 
 namespace fs = std::filesystem;
 
-u8 extract_rbid(const String& filename) {
+auto extract_rbid(const String& filename) -> u8 {
   std::regex pattern(R"(RB(\d{2})_\d+_\d+UTC\.cali\.tof\.gaps$)"); // Match "RB" followed by digits, an underscore, and more digits
   std::smatch match;
   if (std::regex_search(filename, match, pattern)) {
-    log_debug("Filename matches pattern for RB ID " << match[1].str() << "!");
+    SPDLOG_DEBUG("Filename matches pattern for RB ID {}!", match[1].str());
     u32 number1 = std::stoi(match[1].str());
     return number1;
   } else {
-    log_error("Unable to extract RB id from " << filename);
+    spdlog::error("Unable to extract RB id from {}!", filename);
     return 0; // Return an invalid pair if no match is found
   }
 }
@@ -451,7 +451,7 @@ RBCalibration::RBCalibration() {
 
 /************************************************/
 
-void RBCalibration::disable_eventdata() {
+auto RBCalibration::disable_eventdata() -> void {
   RBCalibration::serialize_event_data = false;
 }
 
@@ -524,9 +524,9 @@ Vec<f32> RBCalibration::nanoseconds(const RBEvent &event, const u8 channel) cons
 
 /************************************************/
 
-RBCalibration RBCalibration::from_bytestream(const Vec<u8> &stream,
-                                             u64 &pos,
-                                             bool discard_events) {
+auto RBCalibration::from_bytestream(const Vec<u8> &stream,
+                                    u64 &pos,
+                                    bool discard_events) -> RBCalibration {
   //::set_pattern("[%^%l%$] [%s - %!:%#] [%Y-%m-%d %H:%M:%S] -- %v");
   RBCalibration calibration = RBCalibration();
   log_debug("Start decoding at pos " << pos);
@@ -599,18 +599,15 @@ RBCalibration RBCalibration::from_bytestream(const Vec<u8> &stream,
 
 /************************************************/
 
-RBCalibration RBCalibration::from_file(const String &filename, bool discard_events) {
+auto RBCalibration::from_file(const String &filename, bool discard_events) -> RBCalibration {
   auto cali_pack = get_tofpackets(filename)[0];
   u64 pos = 0;
-  RBCalibration cali = RBCalibration::from_bytestream(cali_pack.payload, pos, discard_events);
-  return cali;
+  return RBCalibration::from_bytestream(cali_pack.payload, pos, discard_events);
 }
 
 /************************************************/
 
-RBCalibration RBCalibration::from_txtfile(const String &filename) {
-  //std::vector<Calibrations_t> all_channel_calibrations
-  //    = std::vector<Calibrations_t>{NCHN};
+auto RBCalibration::from_txtfile(const String &filename) -> RBCalibration {
   RBCalibration calibration;
   u8 rb_id = extract_rbid(filename);
   calibration.rb_id = rb_id;
@@ -635,7 +632,7 @@ RBCalibration RBCalibration::from_txtfile(const String &filename) {
 
 /************************************************/
 
-bool RBCalibration::channel_check(u8 channel) const {
+auto RBCalibration::channel_check(u8 channel) const -> bool {
   if (channel == 0) {
     log_error("Remember, channels start at 1. 0 does not exist!");
     return false;
@@ -649,7 +646,7 @@ bool RBCalibration::channel_check(u8 channel) const {
 
 /************************************************/
 
-std::string RBCalibration::to_string() const {
+auto RBCalibration::to_string() const -> std::string {
   std::string repr = "<ReadoutboardCalibration:";  
   repr += "\n RB             : " + std::to_string(rb_id);
   bool has_data = false;
@@ -677,7 +674,7 @@ std::string RBCalibration::to_string() const {
 
 //------------------------------------------------
 
-std::map<u8, RBCalibration> Gaps::load_tof_calibrations(std::string const &pathname) {
+RBCalibrationMap Gaps::load_tof_calibrations(std::string const &pathname) {
   std::map<u8, RBCalibration> cali;
   fs::path path(pathname);
   if (!fs::exists(path)) {

@@ -43,7 +43,8 @@ def get_tof_paddles(panel_id=None):
         paddles = [k for k in m.Paddle.objects.all()]
     else:
         paddles = [k for k in m.Paddle.objects.filter(panel_id=panel_id)]
-    return paddles
+    pdict = {pdl.paddle_id : pdl for pdl in paddles}
+    return pdict
 
 def get_cube_paddles():
     paddles = [k for k in m.Paddle.objects.filter(panel_id__lt=7)]

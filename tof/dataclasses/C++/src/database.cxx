@@ -9,7 +9,7 @@
 
 using namespace sqlite_orm;
 
-std::string Gaps::TofPaddle::to_string() const {
+auto Gaps::TofPaddle::to_string() const -> std::string {
   auto repr = std::string("<TofPaddle: ");
   repr += std::format("\n  paddle_id           : {} ", paddle_id        );
   repr += std::format("\n  volume_id           : {} ", volume_id        );  
@@ -48,7 +48,7 @@ std::string Gaps::TofPaddle::to_string() const {
   return repr;
 }
 
-std::string Gaps::TrackerStrip::to_string() const {
+auto Gaps::TrackerStrip::to_string() const -> std::string {
   auto repr = std::string("<TrackerStrip: ");
   repr += std::format("\n  StripID            : {}", strip_id   );
   repr += std::format("\n  VolumeID           : {}", volume_id  );  
@@ -119,7 +119,6 @@ auto Gaps::get_tofpaddles() -> std::map<u8, Gaps::TofPaddle> {
       make_column("global_pos_z_l0_B", &Gaps::TofPaddle::global_pos_z_l0_B),          
       make_column("coax_cable_time"  , &Gaps::TofPaddle::coax_cable_time),          
       make_column("harting_cable_time", &Gaps::TofPaddle::harting_cable_time)));          
-  
   auto paddles = storage.get_all<Gaps::TofPaddle>();
   for (auto p : paddles) {
     paddle_map.insert({p.paddle_id, p});

@@ -31,7 +31,7 @@ LTBMoniData LTBMoniData::from_bytestream(const Vec<u8> &stream,
   return moni;
 }
   
-std::string LTBMoniData::to_string() const {
+auto LTBMoniData::to_string() const -> std::string {
   std::string repr = "<LTBMoniData   : ";
   repr += std::format("\n  board_id              : {}"      ,board_id   );
   repr += std::format("\n  trenz temp      [\u00B0C]  : {:.2}" ,trenz_temp );
@@ -140,46 +140,46 @@ RBMoniData RBMoniData::from_bytestream(const Vec<u8> &payload,
   return moni;
 }
   
-std::string RBMoniData::to_string() const {
+auto RBMoniData::to_string() const -> std::string {
   std::string repr = "<RBMoniData : ";
-  repr += "\n board_id           : " + std::to_string(board_id         );
-  repr += "\n rate               : " + std::to_string(rate             );
-  repr += "\n tmp_drs            : " + std::to_string(tmp_drs          );
-  repr += "\n tmp_clk            : " + std::to_string(tmp_clk          );
-  repr += "\n tmp_adc            : " + std::to_string(tmp_adc          );
-  repr += "\n tmp_zynq           : " + std::to_string(tmp_zynq         );
-  repr += "\n tmp_lis3mdltr      : " + std::to_string(tmp_lis3mdltr    );
-  repr += "\n tmp_bm280          : " + std::to_string(tmp_bm280        );
-  repr += "\n pressure           : " + std::to_string(pressure         );
-  repr += "\n humidity           : " + std::to_string(humidity         );
-  repr += "\n mag_x              : " + std::to_string(mag_x            );
-  repr += "\n mag_y              : " + std::to_string(mag_y            );
-  repr += "\n mag_z              : " + std::to_string(mag_z            );
-  repr += "\n mag_tot            : " + std::to_string(mag_tot          );
-  repr += "\n drs_dvdd_voltage   : " + std::to_string(drs_dvdd_voltage );
-  repr += "\n drs_dvdd_current   : " + std::to_string(drs_dvdd_current );
-  repr += "\n drs_dvdd_power     : " + std::to_string(drs_dvdd_power   );
-  repr += "\n p3v3_voltage       : " + std::to_string(p3v3_voltage     );
-  repr += "\n p3v3_current       : " + std::to_string(p3v3_current     );
-  repr += "\n p3v3_power         : " + std::to_string(p3v3_power       );
-  repr += "\n zynq_voltage       : " + std::to_string(zynq_voltage     );
-  repr += "\n zynq_current       : " + std::to_string(zynq_current     );
-  repr += "\n zynq_power         : " + std::to_string(zynq_power       );
-  repr += "\n p3v5_voltage       : " + std::to_string(p3v5_voltage     );
-  repr += "\n p3v5_current       : " + std::to_string(p3v5_current     );
-  repr += "\n p3v5_power         : " + std::to_string(p3v5_power       );
-  repr += "\n adc_dvdd_voltage   : " + std::to_string(adc_dvdd_voltage );
-  repr += "\n adc_dvdd_current   : " + std::to_string(adc_dvdd_current );
-  repr += "\n adc_dvdd_power     : " + std::to_string(adc_dvdd_power   );
-  repr += "\n adc_avdd_voltage   : " + std::to_string(adc_avdd_voltage );
-  repr += "\n adc_avdd_current   : " + std::to_string(adc_avdd_current );
-  repr += "\n adc_avdd_power     : " + std::to_string(adc_avdd_power   );
-  repr += "\n drs_avdd_voltage   : " + std::to_string(drs_avdd_voltage );
-  repr += "\n drs_avdd_current   : " + std::to_string(drs_avdd_current );
-  repr += "\n drs_avdd_power     : " + std::to_string(drs_avdd_power   );
-  repr += "\n n1v5_voltage       : " + std::to_string(n1v5_voltage     );
-  repr += "\n n1v5_current       : " + std::to_string(n1v5_current     );
-  repr += "\n n1v5_power         : " + std::to_string(n1v5_power       );
+  repr += std::format("\n board_id           : {}",board_id         );
+  repr += std::format("\n rate               : {}",rate             );
+  repr += std::format("\n tmp_drs            : {}",tmp_drs          );
+  repr += std::format("\n tmp_clk            : {}",tmp_clk          );
+  repr += std::format("\n tmp_adc            : {}",tmp_adc          );
+  repr += std::format("\n tmp_zynq           : {}",tmp_zynq         );
+  repr += std::format("\n tmp_lis3mdltr      : {}",tmp_lis3mdltr    );
+  repr += std::format("\n tmp_bm280          : {}",tmp_bm280        );
+  repr += std::format("\n pressure           : {}",pressure         );
+  repr += std::format("\n humidity           : {}",humidity         );
+  repr += std::format("\n mag_x              : {}",mag_x            );
+  repr += std::format("\n mag_y              : {}",mag_y            );
+  repr += std::format("\n mag_z              : {}",mag_z            );
+  repr += std::format("\n mag_tot            : {}",mag_tot          );
+  repr += std::format("\n drs_dvdd_voltage   : {}",drs_dvdd_voltage );
+  repr += std::format("\n drs_dvdd_current   : {}",drs_dvdd_current );
+  repr += std::format("\n drs_dvdd_power     : {}",drs_dvdd_power   );
+  repr += std::format("\n p3v3_voltage       : {}",p3v3_voltage     );
+  repr += std::format("\n p3v3_current       : {}",p3v3_current     );
+  repr += std::format("\n p3v3_power         : {}",p3v3_power       );
+  repr += std::format("\n zynq_voltage       : {}",zynq_voltage     );
+  repr += std::format("\n zynq_current       : {}",zynq_current     );
+  repr += std::format("\n zynq_power         : {}",zynq_power       );
+  repr += std::format("\n p3v5_voltage       : {}",p3v5_voltage     );
+  repr += std::format("\n p3v5_current       : {}",p3v5_current     );
+  repr += std::format("\n p3v5_power         : {}",p3v5_power       );
+  repr += std::format("\n adc_dvdd_voltage   : {}",adc_dvdd_voltage );
+  repr += std::format("\n adc_dvdd_current   : {}",adc_dvdd_current );
+  repr += std::format("\n adc_dvdd_power     : {}",adc_dvdd_power   );
+  repr += std::format("\n adc_avdd_voltage   : {}",adc_avdd_voltage );
+  repr += std::format("\n adc_avdd_current   : {}",adc_avdd_current );
+  repr += std::format("\n adc_avdd_power     : {}",adc_avdd_power   );
+  repr += std::format("\n drs_avdd_voltage   : {}",drs_avdd_voltage );
+  repr += std::format("\n drs_avdd_current   : {}",drs_avdd_current );
+  repr += std::format("\n drs_avdd_power     : {}",drs_avdd_power   );
+  repr += std::format("\n n1v5_voltage       : {}",n1v5_voltage     );
+  repr += std::format("\n n1v5_current       : {}",n1v5_current     );
+  repr += std::format("\n n1v5_power         : {}",n1v5_power       );
   repr += ">";
   return repr;
 }
