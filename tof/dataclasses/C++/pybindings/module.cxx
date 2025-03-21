@@ -8,7 +8,6 @@
 #include <pybind11/numpy.h>
 
 #include "packets/tof_packet.h"
-#include "packets/CommandPacket.h"
 #include "packets/monitoring.h"
 #include "events/tof_event_header.hpp"
 #include "version.h"
@@ -38,46 +37,13 @@ namespace py = pybind11;
 // helpers
 
 
-std::string tof_command_to_str(const TofCommand &cmd) {
- switch (cmd) {
-   case TofCommand::PowerOn               : {return "PowerOn"              ;}
-   case TofCommand::PowerOff              : {return "PowerOff"             ;}
-   case TofCommand::PowerCycle            : {return "PowerCycle"           ;} 
-   case TofCommand::RBSetup               : {return "RBSetup"              ;}
-   case TofCommand::SetThresholds         : {return "SetThresholds"        ;} 
-   case TofCommand::SetMtConfig           : {return "SetMtConfig"          ;}
-   case TofCommand::StartValidationRun    : {return "StartValidationRun"   ;}
-   case TofCommand::RequestWaveforms      : {return "RequestWaveforms"     ;}
-   case TofCommand::DataRunStart          : {return "DataRunStart"         ;}
-   case TofCommand::DataRunEnd            : {return "DataRunEnd"           ;}
-   case TofCommand::VoltageCalibration    : {return "VoltageCalibration"   ;}
-   case TofCommand::TimingCalibration     : {return "TimingCalibration"    ;}
-   case TofCommand::CreateCalibrationFile : {return "CreateCalibrationFile";}
-   case TofCommand::RequestEvent          : {return "RequestEvent"         ;}
-   case TofCommand::RequestMoni           : {return "RequestMoni"          ;}
-   case TofCommand::UnspoolEventCache     : {return "UnspoolEventCahce"    ;}
-   case TofCommand::StreamAnyEvent        : {return "StreamAnyEvent"       ;} 
-   case TofCommand::Unknown               : {return "Unknown"              ;}
- } // end case   
- return "Unknown";
-}
-
-std::string tof_response_to_str(const TofResponse &cmd) {
- switch (cmd) {
-   case TofResponse::Success            : {return "Success"     ;}
-   case TofResponse::GeneralFailure     : {return "GeneralFailure" ;}
-   case TofResponse::EventNotReady      : {return "EventNotReady" ;}
-   case TofResponse::SerializationIssue : {return "SerializationIssue" ;}
- } // end case   
- return "Unknown";
-}
 
 /********************/
 
 [[deprecated("Currently, the CXX-Python bindings to wrap the C++ API are not recommended for personal use. Consider to use the RUST bindings instead!")]]
 PYBIND11_MODULE(gaps_tof, m) {
     m.doc() = "Gaps-online-software Python wrapper for C++ API. gaps-online-software is a software suite designed to read out (mainly) online data from the TOF subsystem of the GAPS experiment. The code has several APIs, this code here wraps the C++ API. Please find the github repo at https://github.com/GAPS-Collab/gaps-online-software to report bugs/issues.";
-    m.attr("__version__") = "0.10.1";
+    m.attr("__version__") = "0.10.2";
 
     //py::class_<PyTofPacketReader>(m, "PTofPacketReader") 
     //  .def(py::init<String>())  
@@ -141,12 +107,12 @@ PYBIND11_MODULE(gaps_tof, m) {
                     "Indicates if the reader is exhausted and needs to be recreated") 
       .def("__repr__", [](const Gaps::CRReader &reader) {
                           if (reader.is_exhausted()) {
-                            return "<CRReader [exhausted!!] : " + reader.get_filename() + " - read " + 
+                            return "<CRReader [exhausted!!] : " + reader.get_filenames()[0] + " - read " + 
                             std::to_string(reader.n_packets_read()) +
                             " CRFrames>";
                           }
                           return "<CRFrame : " + 
-                          reader.get_filename() + " - read " + std::to_string(reader.n_packets_read()) + " CRFrames>";
+                          reader.get_filenames()[0] + " - read " + std::to_string(reader.n_packets_read()) + " CRFrames>";
                           })
     ;
     #endif
@@ -185,36 +151,6 @@ PYBIND11_MODULE(gaps_tof, m) {
       .value("IncompleteReadout" , EventStatus::IncompleteReadout)
       .value("Perfect"           , EventStatus::Perfect)
 
-    ;
-    py::enum_<TofCommand>(m, "TofCommand")
-      .value("PowerOn"              ,TofCommand::PowerOn) 
-      .value("PowerOff"             ,TofCommand::PowerOff) 
-      .value("PowerCycle"           ,TofCommand::PowerCycle) 
-      .value("RBSetup"              ,TofCommand::RBSetup) 
-      .value("SetThresholds"        ,TofCommand::SetThresholds) 
-      .value("SetMtConfig"          ,TofCommand::SetMtConfig) 
-      .value("StartValidationRun"   ,TofCommand::StartValidationRun) 
-      .value("RequestWaveforms"     ,TofCommand::RequestWaveforms) 
-      .value("DataRunStart"         ,TofCommand::DataRunStart) 
-      .value("DataRunEnd"           ,TofCommand::DataRunEnd)    
-      .value("VoltageCalibration"   ,TofCommand::VoltageCalibration) 
-      .value("TimingCalibration"    ,TofCommand::TimingCalibration)
-      .value("CreateCalibrationFile",TofCommand::CreateCalibrationFile) 
-      .value("RequestEvent"         ,TofCommand::RequestEvent) 
-      .value("RequestMoni"          ,TofCommand::RequestMoni)
-      .value("UnspoolEventCache"    ,TofCommand::UnspoolEventCache)
-      .value("StreamAnyEvent"       ,TofCommand::StreamAnyEvent) 
-      .value("Unknown"              ,TofCommand::Unknown) 
-      //.export_values();
-      ;
-    
-    py::enum_<TofResponse>(m, "TofResponse")
-      .value("Success"                 ,TofResponse::Success) 
-      .value("GeneralFailure"          ,TofResponse::GeneralFailure) 
-      .value("EventNotReady"           ,TofResponse::EventNotReady) 
-      .value("EventSerializationIssue" ,TofResponse::SerializationIssue) 
-      .value("Unknown"                 ,TofResponse::Unknown) 
-      //.export_values()
     ;
 
     py::class_<RBEventHeader>(m, "RBEventHeader", "The event header contains the event id, information about active channels, temperatures, trigger stop cell etc. Basically everythin except channel adc data.")
@@ -590,7 +526,7 @@ PYBIND11_MODULE(gaps_tof, m) {
         .def(py::init())
         .def("from_bytestream",       &TofPacket::from_bytestream)
         .def_readonly("payload",      &TofPacket::payload)
-        .def("unpack",                &TofPacket::unpack<TofEvent>)
+        //.def("unpack",                &TofPacket::unpack<TofEvent>)
         .def_readonly("payload_size", &TofPacket::payload_size)
         .def_readonly("packet_type",  &TofPacket::packet_type)
         .def("__repr__",          [](const TofPacket &pkg) {
@@ -653,8 +589,6 @@ PYBIND11_MODULE(gaps_tof, m) {
        .def_readonly("tcal_data",  &RBCalibration::tcal_data)
        .def_static("disable_eventdata",   &RBCalibration::disable_eventdata,
             "Don't load event data from a calibration file (if available). Just load the calibration constants. (This only works with binary files.")
-       .def("from_txtfile" ,       &RBCalibration::from_txtfile,
-            "Initialize the RBCalibration from a file with exactly one TofPacket")
        .def_static("from_file" ,          &RBCalibration::from_file,
             "Initialize the RBCalibration from a file with exactly one TofPacket of type RBCalibration",
             py::arg("filename"), py::arg("discard_events") = true)
@@ -693,7 +627,6 @@ PYBIND11_MODULE(gaps_tof, m) {
                                           py::arg("filename"));
    m.def("get_event_ids_from_raw_stream", &get_event_ids_from_raw_stream);
    m.def("get_bytestream_from_file",      &get_bytestream_from_file);
-   m.def("get_rbeventheaders",            &get_rbeventheaders); 
    #ifdef BUILD_CXXDB 
    m.def("get_paddles",                   &Gaps::get_tofpaddles);
    #endif
