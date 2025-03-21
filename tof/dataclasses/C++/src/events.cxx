@@ -313,9 +313,8 @@ const Vec<u16>& RBEvent::get_channel_by_id(u8 channel) const {
 
 /**********************************************************/
 
-f32 RBEvent::calc_baseline(const Vec<f32> &volts,
-                           usize min_bin,
-                           usize max_bin) {
+auto RBEvent::calc_baseline(const Vec<f32> &volts, usize min_bin, usize max_bin) 
+  -> f32 {
   f32 bl     = 0;
   for (usize idx = 0; idx<volts.size(); idx++) {
     //f32 bl     = std::accumulate(ch_bl[ch].begin() + min_bin, ch_bl[ch].begin() + max_bin,0);
@@ -334,8 +333,8 @@ f32 RBEvent::calc_baseline(const Vec<f32> &volts,
 
 /**********************************************************/
 
-RBEvent RBEvent::from_bytestream(const Vec<u8> &stream,
-                                 u64 &pos) {
+auto RBEvent::from_bytestream(const Vec<u8> &stream, u64 &pos) 
+  -> RBEvent {
   RBEvent event = RBEvent();
   log_debug("Start decoding at pos " << pos);
   u16 head = Gaps::parse_u16(stream, pos);

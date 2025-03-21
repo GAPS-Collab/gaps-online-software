@@ -122,7 +122,7 @@ pub struct TofHit {
   pub y              : f32,
   pub z              : f32,
   /// cable times will get populated from the db
-  pub coax_cable_time : f32,
+  pub coax_cable_time: f32,
   pub hart_cable_time: f32,
 
 
@@ -461,7 +461,7 @@ impl TofHit {
   /// Get the delay relative to other readoutboards based 
   /// on the channel9 sine wave
   pub fn get_phase_delay(&self) -> f32 { 
-    let freq : f32 = 20.0e9;
+    let freq : f32 = 20.0e6;
     let mut phase = self.phase.to_f32();
     if phase < 0.0 {
         phase += PI;
