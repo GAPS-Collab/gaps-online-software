@@ -3210,6 +3210,16 @@ impl PyTofHit {
   }
 
   #[getter]
+  fn get_phase_delay(&self) -> f32 {
+    self.hit.get_phase_delay()
+  }
+
+  #[getter]
+  fn get_cable_delay(&self) -> f32 {
+    self.hit.get_cable_delay()
+  }
+
+  #[getter]
   fn version(&self) -> ProtocolVersion {
     self.hit.version
   }
