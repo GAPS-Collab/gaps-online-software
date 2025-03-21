@@ -267,20 +267,6 @@ if __name__ == '__main__':
             
             if k%2 != 0:
                 print (paddle)
-                # fix - there is a bug in the spreadsheet for paddle 108
-                if paddle.paddle_id == 108:
-                    if paddle.global_pos_y_l0 == 0:
-                        paddle.global_pos_y_l0 = -85.4
-                        paddle.global_pos_y_l0_A = paddle.global_pos_y_l0 - paddle.length/2
-                        paddle.global_pos_y_l0_B = paddle.global_pos_y_l0 + paddle.length/2
-                    if paddle.global_pos_x_l0 == 118.31:
-                        paddle.global_pos_x_l0 = 167.40
-                        paddle.global_pos_x_l0_A = paddle.global_pos_x_l0
-                        paddle.global_pos_x_l0_B = paddle.global_pos_x_l0
-                    if paddle.global_pos_z_l0 == 140.93:
-                        paddle.global_pos_z_l0 = 209.91
-                        paddle.global_pos_z_l0_A = paddle.global_pos_z_l0
-                        paddle.global_pos_z_l0_B = paddle.global_pos_z_l0
                 if not args.dry_run:
                     paddle.save()
 
