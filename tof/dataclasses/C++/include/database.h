@@ -51,9 +51,11 @@ namespace Gaps {
     /// Vector along the longest axis
     auto get_principal() const -> Vec<f32>;
   };
+  /// A map of paddle id -> TofPaddle
+  typedef std::map<u8,  TofPaddle> TofPaddleMap;
 
   /// Get a paddle from the database
-  auto get_tofpaddles() -> std::map<u8, TofPaddle>;        
+  auto get_tofpaddles() -> TofPaddleMap;        
   
   struct TrackerStrip {
     u32 strip_id           ;
@@ -78,8 +80,11 @@ namespace Gaps {
     /// Vector along the longest axis
     auto get_principal() const -> Vec<f32>;
   };
+
+  /// A map of strip identifier (layer-row-module-channel -> Tracker strip
+  typedef std::map<u32, TrackerStrip> TrkStripMap;
   
-  auto get_trackerstrips() -> std::map<u32, TrackerStrip>;        
+  auto get_trackerstrips() -> TrkStripMap;        
 }
 
 std::ostream& operator<<(std::ostream& os, const Gaps::TofPaddle& paddle);

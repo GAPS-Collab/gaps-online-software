@@ -36,11 +36,11 @@ struct LTBMoniData {
 
   /// Factory function - recreate LTBMoniData from 
   /// byte representation
-  static LTBMoniData from_bytestream(const Vec<u8> &stream,
-                                     usize &pos);
+  static auto from_bytestream(const Vec<u8> &stream, usize &pos)
+    -> LTBMoniData;
   
   /// String representatioin for printing
-  std::string to_string() const;
+  auto to_string() const -> std::string;
 };
 
 std::ostream& operator<<(std::ostream& os, const LTBMoniData& moni);
@@ -101,11 +101,11 @@ struct RBMoniData {
 
   RBMoniData();
 
-  static RBMoniData from_bytestream(const Vec<u8> &stream,
-                                    usize &pos);
+  static auto from_bytestream(const Vec<u8> &stream, usize &pos)
+    -> RBMoniData;
   
   /// String representatioin for printing
-  std::string to_string() const;
+  auto to_string() const -> std::string;
 };
 
 std::ostream& operator<<(std::ostream& os, const RBMoniData& moni);
@@ -133,11 +133,11 @@ struct PBMoniData {
   PBMoniData();
 
   /// Factor function - restore PAMoniData from byte-representation
-  static PBMoniData from_bytestream(const Vec<u8> &stream,
-                                    usize &pos);
+  static auto from_bytestream(const Vec<u8> &stream, usize &pos)
+     -> PBMoniData;
   
   /// String representation for pretty printing
-  std::string to_string() const;
+  auto to_string() const -> std::string;
 };
 
 std::ostream& operator<<(std::ostream& os, const PBMoniData& moni);
@@ -156,11 +156,11 @@ struct PAMoniData {
   PAMoniData();
 
   /// Factory function - restore PAMoniData from byte-representation
-  static PAMoniData from_bytestream(const Vec<u8> &stream,
-                                    usize &pos);
+  static auto from_bytestream(const Vec<u8> &stream, usize &pos)
+    -> PAMoniData;
   
   /// String representation for pretty printing
-  std::string to_string() const;
+  auto to_string() const -> std::string;
 };
   
 std::ostream& operator<<(std::ostream& os, const PAMoniData& moni);
@@ -187,24 +187,18 @@ struct MtbMoniData : FromTofPacket<MtbMoniData> {
  
   MtbMoniData();
 
-  std::string to_string()  const;
+  auto to_string()  const -> std::string;
   
-  bool get_tiu_emulation_mode() const;
-  
-  bool get_tiu_use_aux_link()   const;
-
-  bool get_tiu_bad()            const;
-
-  bool get_tiu_busy_stuck()     const;
-
-  bool get_tiu_ignore_busy()    const;
-  
+  auto get_tiu_emulation_mode() const -> bool;
+  auto get_tiu_use_aux_link()   const -> bool;
+  auto get_tiu_bad()            const -> bool;
+  auto get_tiu_busy_stuck()     const -> bool;
+  auto get_tiu_ignore_busy()    const -> bool;
   /// Convert ADC temp from adc values to Celsius
-  f32 get_fpga_temp() const;
-
+  auto get_fpga_temp() const -> f32;
   /// extract moni data from payload
-  static MtbMoniData from_bytestream(const Vec<u8>& payload,
-                                     usize& pos);
+  static auto from_bytestream(const Vec<u8>& payload, usize& pos)
+    -> MtbMoniData;
 };
 
 std::ostream& operator<<(std::ostream& os, const MtbMoniData& moni);
@@ -228,10 +222,10 @@ struct CPUMoniData {
   
   CPUMoniData(); 
   /// extract moni data from payload
-  static CPUMoniData from_bytestream(const Vec<u8>& payload,
-                                     usize &pos);
+  static auto from_bytestream(const Vec<u8>& payload, usize &pos)
+    -> CPUMoniData;
 
-  std::string to_string() const;
+  auto to_string() const -> std::string;
 };
 
 std::ostream& operator<<(std::ostream& os, const CPUMoniData& moni);

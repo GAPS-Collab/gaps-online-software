@@ -202,8 +202,8 @@ auto Gaps::CRFrame::get_tofpacket(std::string name)
     tp = tdata.unwrap();
     //std::cout << tp << std::endl;
   } else {
-    log_debug("Trying to get TofPacket " << name << " however, that is of type " << static_cast<u8>(dtype)); 
     std::string msg = std::format("Trying to get TofPacket {}, but it is of type {}", name, (int)static_cast<u8>(dtype));
+    SPDLOG_DEBUG(msg);
     auto err = g::IOError(g::IOError::ErrorKind::WrongPacketType, msg);
     return Err(err);
   }
@@ -218,7 +218,7 @@ gtel::Packet Gaps::CRFrame::get_telemetrypacket(std::string name) {
     pos   = std::get<0>(index.at(name));
     dtype = static_cast<CRFrameObjectType>(std::get<1>(index.at(name)));
   } else {
-    log_error("Unable to find TelemetryPacket " << name << " in frame!");
+    spdlog::error("Unable to find TelemetryPacket {} in frame!", name);
   }
   if (dtype == CRFrameObjectType::TelemetryPacket) {
     auto f_obj = CRFrameObject::from_bytestream(bytestorage, pos);
@@ -240,6 +240,10 @@ Gaps::CRReader::CRReader() :
   n_packets_read_ (0),
   filenames_      (Vec<std::string>()),
   fileindex_      (0) {
+  #ifdef BUILD_CXXDB
+  spdlog::info("Will load tofpaddles from DB for this reader!");
+  paddles_ = Gaps::get_tofpaddles();
+  #endif 
 };
 
 Gaps::CRReader::CRReader(String pathname) : CRReader::CRReader() {

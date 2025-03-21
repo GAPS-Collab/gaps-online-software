@@ -10,6 +10,9 @@
 #include "calibration.h"
 #include "errors.hpp"
 #include "result/result.h"
+#ifdef BUILD_CXXDB
+#include "database.h"
+#endif
 
 namespace r = result;
 
@@ -61,29 +64,39 @@ namespace Gaps {
   struct CRReader {
     CRReader();
     CRReader(std::string pathname);
-    void set_path(std:: string pathname);
     CRReader(const CRReader&) = delete;
-    CRFrame get_next_frame();
-    auto get_filenames() const -> Vec<std::string>;
+    
+    auto set_path(std:: string pathname) -> void;
+    /// Walk over the file, and return the next frame
+    /// as saved in the file. 
+    ///
+    /// Advaces all internal position markers. If the 
+    /// last frame is reached, an exception will be risen.
+    /// After the reader is exhausted, is has to be 
+    /// re-initialized
+    auto get_next_frame()       -> CRFrame;
+    auto get_filenames()  const -> Vec<std::string>;
     /// All packets have been read from the file. 
     /// If they should be read again, the reader 
     /// has to be created again
-    auto is_exhausted() const -> bool;
+    auto is_exhausted()   const -> bool;
     /// The number of files this reader has read
     /// from the file
     auto n_packets_read() const -> bool;
-    
     /// get the RBCalibration map
     /// the paramter is the number of RBs we expect in this run
     auto get_rbcalibrations(u8 n_rb) -> RBCalibrationMap;     
 
   private:  
+    #ifdef BUILD_CXXDB
+    TofPaddleMap     paddles_          ; 
+    #endif 
     bool             exhausted_        ;
     usize            n_packets_read_   ;
     Vec<std::string> filenames_        ;
     std::ifstream    stream_file_      ;
     usize            fileindex_        ;
-    void             prime_next_file_();
+    auto             prime_next_file_() -> void;
   };
 }
 #endif

@@ -5,6 +5,7 @@
 #include<bitset>
 #include<cmath>
 #include <sstream>
+#include <numbers>
 
 #include "events.h"
 #include "parsers.h"
@@ -617,6 +618,18 @@ TofEvent::TofEvent() {
 
 /**********************************************************/
 
+#ifdef BUILD_CXXDB
+auto TofEvent::set_paddlemap(const Gaps::TofPaddleMap& paddlemap) -> void {
+  for (auto &ev : rb_events) {
+    for (auto &h : ev.hits) {
+      h.set_paddle(paddlemap.at(h.paddle_id));
+    }
+  }
+};
+#endif
+
+/**********************************************************/
+
 auto TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
   -> Result<TofEvent, g::IOError> {
   spdlog::cfg::load_env_levels();
@@ -976,6 +989,33 @@ void TofHit::set_paddle_len(f32 paddle_len) {
 
 /*************************************/
 
+#ifdef BUILD_CXXDB
+auto TofHit::set_paddle(const Gaps::TofPaddle& paddle) -> void {
+  paddle_len    = paddle.length;
+  coax_cbl_time = paddle.coax_cable_time; 
+  hart_cbl_time = paddle.harting_cable_time;
+}
+
+auto TofHit::get_phase_delay() const -> f32 {
+  f32 freq = 20e6;
+  f32 phase_fixed = phase;
+  if (phase_fixed < 0) {
+    phase_fixed += std::numbers::pi_v<f32>;
+  }
+  return 1e9*phase_fixed/(2*std::numbers::pi_v<f32>*freq);
+}
+
+auto TofHit::get_cable_delay() const -> f32 {
+  return hart_cbl_time - coax_cbl_time;
+}
+
+auto TofHit::get_t0()          const -> f32 {
+  return get_t0_relative() + get_cable_delay() + get_phase_delay();
+}
+#endif
+
+/*************************************/
+
 f32 TofHit::get_time_a() const {
  if (version == Gaps::ProtocolVersion::Unknown) {
    f32 prec = 0.004;
@@ -1045,7 +1085,7 @@ f32 TofHit::get_x_pos() const {
   }
 }
 
-f32 TofHit::get_t0() const {
+f32 TofHit::get_t0_relative() const {
   return 0.5*(time_a_f32 + time_b_f32 - (paddle_len/(10.0*C_LIGHT_PADDLE)));
 }
 
@@ -1162,7 +1202,7 @@ RBWaveform RBWaveform::from_bytestream(const Vec<u8> &stream,
   return wf;
 } 
 
-std::string RBWaveform::to_string() const {
+auto RBWaveform::to_string() const -> std::string {
   std::string repr = "<RBWaveform";
   //repr += std::format("\n  format test {:.2f}", get_time_a() );
   repr += std::format("\n  Event ID  : {}", event_id);
@@ -1178,7 +1218,7 @@ std::string RBWaveform::to_string() const {
   return repr;
 }
 
-Vec<TriggerType> TofEventSummary::get_trigger_sources() const {
+auto TofEventSummary::get_trigger_sources() const -> Vec<TriggerType> {
   auto t_types = Vec<TriggerType>();
   u16 gaps_trigger = (trigger_sources >> 5 & 0x1) == 1;
   if (gaps_trigger) {
@@ -1331,6 +1371,14 @@ auto TofEventSummary::from_tofpacket(const TofPacket &packet)
 u64 TofEventSummary::get_timestamp48() const {
   return ((u64)timestamp16 << 32) | (u64)timestamp32;
 }
+
+#ifdef BUILD_CXXDB
+auto TofEventSummary::set_paddlemap(const Gaps::TofPaddleMap& paddlemap) -> void {
+  for (auto &h : hits) {
+    h.set_paddle(paddlemap.at(h.paddle_id));
+  }
+};
+#endif
 
 std::string TofEventSummary::to_string() const {
   std::ostringstream oss;

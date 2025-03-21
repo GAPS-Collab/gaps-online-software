@@ -20,6 +20,8 @@
 #include <array>
 #include <format>
 
+#include "result/result.h"
+
 #include "tof_typedefs.h"
 #include "packets/monitoring.h"
 #include "packets/tof_packet.h"
@@ -27,7 +29,9 @@
 #include "calibration.h"
 #include "version.h"
 #include "errors.hpp"
-#include "result/result.h"
+#ifdef BUILD_CXXDB
+#include "database.h"
+#endif
 
 namespace r = result;
 namespace g = Gaps;
@@ -241,7 +245,9 @@ struct TofHit  {
   u32 timestamp32;
   u16 timestamp16;
   // don't serialize
-  f32 paddle_len;  
+  f32 paddle_len    = 0;  
+  f32 coax_cbl_time = 0;
+  f32 hart_cbl_time = 0;
 
   u8 ctr_etx;
   u16 tail = 0xF0F; 
@@ -255,12 +261,21 @@ struct TofHit  {
   auto get_charge_min_i() const -> f32;
   auto get_x_pos()        const -> f32;
   auto get_t_avg()        const -> f32;
-  auto get_t0()           const -> f32;
+  /// get the interaction time of the particle,
+  /// not accounting for cable len and global phase
+  auto get_t0_relative()  const -> f32;
   auto get_timestamp48()  const -> f64;
 
   /// The paddle length will not be in the packet,
   /// but has to be added after the fact
   void set_paddle_len(f32 paddle_len);
+
+  #if BUILD_CXXDB
+  auto set_paddle(const Gaps::TofPaddle& paddle) -> void;
+  auto get_phase_delay() const -> f32;
+  auto get_cable_delay() const -> f32;
+  auto get_t0()          const -> f32;
+  #endif
 
   static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos)
     -> TofHit;
@@ -284,12 +299,12 @@ struct TofHit  {
     u16 x_pos;
     u16 t_average;
     
-    f32 time_a_f32;
-    f32 time_b_f32;
-    f32 peak_a_f32;
-    f32 peak_b_f32;
-    f32 charge_a_f32;
-    f32 charge_b_f32;
+    f32 time_a_f32   = 0;
+    f32 time_b_f32   = 0;
+    f32 peak_a_f32   = 0;
+    f32 peak_b_f32   = 0;
+    f32 charge_a_f32 = 0;
+    f32 charge_b_f32 = 0;
 };
 
 /**
@@ -511,7 +526,6 @@ struct TofEvent {
   TofEventHeader header;
   MasterTriggerEvent mt_event;
 
-
   /// A container holding the individual events from all RBs with 
   /// triggers in this event  
   Vec<RBEvent>      rb_events;
@@ -547,8 +561,15 @@ struct TofEvent {
    *                PacketType::TofPacket 
    *                
    */
-  static TofEvent from_tofpacket(const TofPacket &packet);
+  static auto from_tofpacket(const TofPacket &packet) -> TofEvent;
 
+  #ifdef BUILD_CXXDB
+  /// set a TofPaddle, that is enrich every tofhit with information
+  /// about the corresponding paddle
+  auto set_paddlemap(const Gaps::TofPaddleMap&) -> void;
+  #endif
+    
+  [[deprecated("RBMissingHit is deprecated")]]
   static auto get_n_rbmissinghits(u32 mask) -> u32;
   static auto get_n_rbevents(u32 mask) -> u32;
   /// Get all hits from all rb_events
@@ -649,6 +670,13 @@ struct TofEventSummary {
   static auto from_tofpacket(const TofPacket &packet)          
     -> r::Result<TofEventSummary, g::IOError>;
   static auto from_bytestream(const Vec<u8> &stream, u64 &pos) -> r::Result<TofEventSummary, g::IOError> ;
+  
+  #ifdef BUILD_CXXDB
+  /// set a TofPaddle, that is enrich every tofhit with information
+  /// about the corresponding paddle
+  auto set_paddlemap(const Gaps::TofPaddleMap&) -> void;
+  #endif
+
   // combined timestamp
   auto get_timestamp48() const -> u64;
  
