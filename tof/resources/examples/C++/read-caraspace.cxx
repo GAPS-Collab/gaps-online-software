@@ -124,16 +124,11 @@ int main(int argc, char *argv[]){
         continue;
       }
       auto m_ev = result.unwrap();
-      auto tofdata = TofEventSummary::from_bytestream(m_ev.tof_data, pos);
-      if (tofdata.is_err()) {
-        ++n_tof_telemetry_err;
-        continue;
-      }
-      TofEventSummary tes = tofdata.unwrap();
-      for (TofHit const &h : tes.hits) {
-        // do someting with h
-      }
       for (gt::TrkHit const &h : m_ev.trk_hits) {
+        //std::cout << h.to_string() << std::endl;
+      }
+      for (TofHit const &h : m_ev.tof_event.hits) {
+        // do someting with h
         std::cout << h.to_string() << std::endl;
       }
 

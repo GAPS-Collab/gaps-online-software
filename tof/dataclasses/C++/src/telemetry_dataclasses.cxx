@@ -187,12 +187,12 @@ auto gtl::TofMetaData::to_string() const -> std::string {
 auto gtl::MergedEvent::to_string() const -> std::string {
   std::string repr = "<MergedEvent";
   repr += std::format("\n  Header : {}", header.to_string());
-  repr += std::format("\n  Creation Time : {}" ,creation_time);
-  repr += std::format("\n  EventID       : {}" ,event_id);
-  repr += std::format("\n  Flags0        : {}" ,flags0);
-  repr += std::format("\n  Flags1        : {}" ,flags1);
-  repr += std::format("\n  N Tof hits    : {}" ,n_tof_hits);
-  repr += std::format("\n  Tof bytes     : {}" ,tof_data.size());
+  repr += std::format("\n  Creation Time : {}" , creation_time);
+  repr += std::format("\n  EventID       : {}" , event_id);
+  repr += std::format("\n  Flags0        : {}" , flags0);
+  repr += std::format("\n  Flags1        : {}" , flags1);
+  repr += std::format("\n  N Tof hits    : {}" , n_tof_hits);
+  repr += std::format("\n  Tof hits      : {}" , tof_event.hits.size());
   repr += std::format("\n  Trk hits      : {}>" ,trk_hits.size());
   //    PacketHeader header;
   //    u64 creation_time;
@@ -230,14 +230,23 @@ auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
   //  return evt;
   //}
   u16 num_tof_bytes = parse_u16(stream, pos);
-  evt.tof_data.clear();
   if (stream.size() < pos + num_tof_bytes) {
     std::string message = std::format("Stream does not contain enough TOF bytes!");
     spdlog::error("{}",message);
     auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
     return Err(err);
   }
-  evt.tof_data = Gaps::slice(stream, pos, pos + num_tof_bytes);
+  auto tof_data = Gaps::slice(stream, pos, pos + num_tof_bytes);
+  if (tof_data.size() > 0) {
+    usize tpos = 0;
+    auto tof_packet = TofPacket::from_bytestream(tof_data, tpos);
+    if (tof_packet.is_ok()) {
+      auto tof_event = TofEventSummary::from_tofpacket(tof_packet.unwrap());
+      if (tof_event.is_ok()) {
+        evt.tof_event = tof_event.unwrap();
+      }
+    }
+  }
   pos += num_tof_bytes;
   u8 tracker_delim = parse_u8(stream, pos);
 
@@ -248,8 +257,6 @@ auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
     return Err(err);
   }
   evt.n_trk_hits = parse_u16(stream, pos); 
-
-
   for(u16 j = 0; j < evt.n_trk_hits; ++j) {
      u16 strip_id = parse_u16(stream, pos);
      u16 adc      = parse_u16(stream, pos);
