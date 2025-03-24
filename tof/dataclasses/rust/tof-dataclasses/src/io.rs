@@ -938,9 +938,19 @@ impl TofPacketReader {
   ///
   ///
   pub fn first_packet(&mut self) -> Option<TofPacket> {
-    self.rewind();
+    match self.rewind() {
+      Err(err) => {
+        error!("Error when rewinding files! {err}");
+      }
+      Ok(_) => ()
+    }
     let pack = self.get_next_packet();
-    self.rewind();
+    match self.rewind() {
+      Err(err) => {
+        error!("Error when rewinding files! {err}");
+      }
+      Ok(_) => ()
+    }
     return pack;
   }
 
@@ -956,7 +966,12 @@ impl TofPacketReader {
     loop {
       match self.get_next_packet() {
         None => {
-          self.rewind();
+          match self.rewind() {
+            Err(err) => {
+              error!("Error when rewinding files! {err}");
+            }
+            Ok(_) => ()
+          }
           if idx == 0 {
             return None;
           } else {

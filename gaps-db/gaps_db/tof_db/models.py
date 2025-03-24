@@ -1100,7 +1100,7 @@ class TrackerStrip(models.Model):
                                 help_text="The VolumeId as used in the GAPS simulation code")
 
     def create_id(self):
-        return self.channel + self.module*100 + self.row*10000 + self.layer*10000
+        return self.channel + self.module*100 + self.row*10000 + self.layer*100000
 
     def __str__(self):
         return self.__repr__()

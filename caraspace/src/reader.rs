@@ -2,18 +2,30 @@
 //!
 
 use std::fmt;
+//use std::env;
 
 use std::fs::{
-    File,
-    OpenOptions
+  File,
+  OpenOptions
 };
 use std::io;
 use std::io::{
-    BufReader,
-    Seek,
-    SeekFrom,
-    Read,
+  BufReader,
+  Seek,
+  SeekFrom,
+  Read,
 };
+
+//use std::collections::HashMap;
+
+//use tof_dataclasses::database::{
+//  Paddle,
+//  connect_to_db
+//};
+//
+//use tof_dataclasses::events {
+//  TofEventSummary
+//}
 
 use crate::frame::CRFrame;
 use crate::parsers::*;
@@ -40,6 +52,11 @@ pub struct CRReader {
   pub skip_ahead      : usize,
   /// Stop reading after n packets
   pub stop_after      : usize,
+  ///// A container for TOF paddle to associate
+  ///// hits with coordinates
+  //pub paddles         : HashMap<u8,Paddle>,
+  ///// did paddle loading work
+  //pub db_loaded       : bool,
 }
 
 impl fmt::Display for CRReader {
@@ -63,6 +80,28 @@ impl fmt::Display for CRReader {
 impl CRReader {
 
   pub fn new(filename : String) -> CRReader {
+    //let mut paddles   = HashMap::<u8, Paddle>::new();
+    //let db_path       = env::var("DATABASE_URL").unwrap_or_else(|_| "".to_string());
+    //let mut db_loaded = false;
+    //match connect_to_db(db_path) {
+    //  Err(_err) => {
+    //    error!("Database can not be found! Did you load the setup-env.sh shell?");
+    //  }
+    //  Ok(mut conn) => {
+    //    match Paddle::all(&mut conn) {
+    //      None => {
+    //        error!("Unable to retrieve paddle information from DB!");
+    //      }
+    //      Some(pdls) => {
+    //        db_loaded = true;
+    //        for p in pdls {
+    //          paddles.insert(p.paddle_id as u8, p.clone());
+    //        }
+    //      }
+    //    }
+    //  }
+    //}
+
     let fname_c = filename.clone();
     let file = OpenOptions::new().create(false).append(false).read(true).open(fname_c).expect("Unable to open file {filename}");
     let packet_reader = Self { 
@@ -74,9 +113,16 @@ impl CRReader {
       skip_ahead      : 0,
       stop_after      : 0,
       n_packs_skipped : 0,
+      //paddles         : paddles,
+      //db_loaded       : db_loaded
     };
     packet_reader
   } 
+  
+  ///// Use the associated database to enrich paddle information
+  //fn add_paddleinfo(&self, event : &mut TofEventSummary) {
+  //  event.set_paddles(&self.paddles);
+  //}
 
   /// Preview the number of frames in this reader
   pub fn get_n_frames(&mut self) -> usize {
