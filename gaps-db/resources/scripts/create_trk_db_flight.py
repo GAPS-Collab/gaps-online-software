@@ -24,20 +24,25 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     jsondata = json.load(open(args.input))
+    nstrips = 0 
     for k in jsondata:
         sd = jsondata[k]
         strip = m.TrackerStrip()
-        strip.strip_id  = strip.create_id()
         strip.layer     = int(sd['layer'])
         strip.row       = int(sd['row'])
         strip.module    = int(sd['module'])
         strip.channel   = int(sd['channel'])
         strip.volume_id = int(k)
+        strip.global_pos_x_det_l0 = float(sd['det_x'])
+        strip.global_pos_y_det_l0 = float(sd['det_y'])
+        strip.global_pos_z_det_l0 = float(sd['det_z'])
         strip.global_pos_x_l0 = float(sd['x'])
         strip.global_pos_y_l0 = float(sd['y'])
         strip.global_pos_z_l0 = float(sd['z'])
+        strip.strip_id  = strip.create_id()
         print (strip)
+        nstrips += 1
         if not args.dry_run:
             strip.save()
-
+        print (f'-> We processed {nstrips} strips!')
     

@@ -221,40 +221,40 @@ if __name__ == '__main__':
             paddle_end_loc             = r[2]
             match paddle_end_loc:
                 case '+X':
-                    paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0 + paddle.length/2 
-                    paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0
-                    paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0
-                    paddle.global_pos_x_l0_B   = paddle.global_pos_x_l0 - paddle.length/2 
-                    paddle.global_pos_y_l0_B   = paddle.global_pos_y_l0
-                    paddle.global_pos_z_l0_B   = paddle.global_pos_z_l0
-                case '-X':
                     paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0 - paddle.length/2 
                     paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0
                     paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0
                     paddle.global_pos_x_l0_B   = paddle.global_pos_x_l0 + paddle.length/2 
                     paddle.global_pos_y_l0_B   = paddle.global_pos_y_l0
                     paddle.global_pos_z_l0_B   = paddle.global_pos_z_l0
+                case '-X':
+                    paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0 + paddle.length/2 
+                    paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0
+                    paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0
+                    paddle.global_pos_x_l0_B   = paddle.global_pos_x_l0 - paddle.length/2 
+                    paddle.global_pos_y_l0_B   = paddle.global_pos_y_l0
+                    paddle.global_pos_z_l0_B   = paddle.global_pos_z_l0
                 case '+Y':
                     paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0  
-                    paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0 + paddle.length/2
+                    paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0 - paddle.length/2
                     paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0
                     paddle.global_pos_x_l0_B   = paddle.global_pos_x_l0  
-                    paddle.global_pos_y_l0_B   = paddle.global_pos_y_l0 - paddle.length/2
+                    paddle.global_pos_y_l0_B   = paddle.global_pos_y_l0 + paddle.length/2
                     paddle.global_pos_z_l0_B   = paddle.global_pos_z_l0
                 case '-Y':
                     paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0 
-                    paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0 - paddle.length/2
+                    paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0 + paddle.length/2
                     paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0
                     paddle.global_pos_x_l0_B   = paddle.global_pos_x_l0 
-                    paddle.global_pos_y_l0_B   = paddle.global_pos_y_l0 + paddle.length/2
+                    paddle.global_pos_y_l0_B   = paddle.global_pos_y_l0 - paddle.length/2
                     paddle.global_pos_z_l0_B   = paddle.global_pos_z_l0
                 case '+Z':
                     paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0  
                     paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0
-                    paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0 + paddle.length/2
+                    paddle.global_pos_z_l0_A   = paddle.global_pos_z_l0 - paddle.length/2
                     paddle.global_pos_x_l0_B   = paddle.global_pos_x_l0  
                     paddle.global_pos_y_l0_B   = paddle.global_pos_y_l0
-                    paddle.global_pos_z_l0_B   = paddle.global_pos_z_l0 - paddle.length/2
+                    paddle.global_pos_z_l0_B   = paddle.global_pos_z_l0 + paddle.length/2
                 case '-Z':
                     paddle.global_pos_x_l0_A   = paddle.global_pos_x_l0  
                     paddle.global_pos_y_l0_A   = paddle.global_pos_y_l0
@@ -264,7 +264,10 @@ if __name__ == '__main__':
                     paddle.global_pos_z_l0_B   = paddle.global_pos_z_l0 - paddle.length/2
                 case _:
                     raise ValueError("Can not parse {paddle_end_loc} for paddle end location!")
-            
+            #if paddle.paddle_id == 41:
+            #    print (paddle)
+            #    print (paddle_end_loc)
+            #    raise
             if k%2 != 0:
                 print (paddle)
                 if not args.dry_run:
