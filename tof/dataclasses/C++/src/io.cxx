@@ -40,19 +40,24 @@ Vec<TofPacket> get_tofpackets(const Vec<u8> &bytestream, u64 start_pos, PacketTy
   TofPacket packet;
   while (true) {
     auto tofdata = TofPacket::from_bytestream(bytestream, pos);
-    packet = tofdata.unwrap();
-    if (pos != last_pos) {
-      if (filter != PacketType::Unknown) {
-        if (packet.packet_type != filter) {
-          last_pos = pos;
-          continue;
-        }
-      }
-      packets.push_back(packet);
-    } else {
+    if (tofdata.is_err()) {
+      spdlog::error("Unable to unpack TofPacket at position {}", pos);
       break;
+    } else {
+      packet = tofdata.unwrap();
+      if (pos != last_pos) {
+        if (filter != PacketType::Unknown) {
+          if (packet.packet_type != filter) {
+            last_pos = pos;
+            continue;
+          }
+        }
+        packets.push_back(packet);
+      } else {
+        break;
+      }
+      last_pos = pos;
     }
-    last_pos = pos;
   }
   spdlog::debug("Read out {} packets from bytestream!", packets.size());
   return packets;
