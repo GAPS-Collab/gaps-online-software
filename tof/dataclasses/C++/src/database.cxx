@@ -126,6 +126,40 @@ auto Gaps::get_tofpaddles() -> std::map<u8, Gaps::TofPaddle> {
   return paddle_map;
 }
 
+auto Gaps::get_rb_id_paddles() -> RbIdChannelPaddleIdMap {
+  RbIdChannelPaddleIdMap map;
+  for (u8 rb_id=1; rb_id<50; rb_id++) {
+    auto ch_map = std::map<u8, std::tuple<u8, TofPaddleEnd>>();
+    map.insert(std::make_pair(rb_id, ch_map));
+  }
+  auto paddles = get_tofpaddles();
+  for (auto const &pdl : paddles) {
+    map[pdl.second.rb_id].insert(std::make_pair(pdl.second.rb_chA, std::make_tuple(pdl.second.paddle_id, Gaps::TofPaddleEnd::A)));
+    map[pdl.second.rb_id].insert(std::make_pair(pdl.second.rb_chB, std::make_tuple(pdl.second.paddle_id, Gaps::TofPaddleEnd::B)));
+  }
+  return map;
+};
+
+auto Gaps::get_dsi_j_paddles() -> DsiJChnPaddleIdMap {
+  DsiJChnPaddleIdMap map;
+  for (u8 dsi=1; dsi<6; dsi++) {
+    //auto j_map = TofPaddleMap();
+    map.insert(std::make_pair(dsi, std::map<u8, std::map<u8, u8>>()));
+    for (u8 j=1; j<6; j++) {
+      map[dsi].insert(std::make_pair(j, std::map<u8, u8>()));
+      for (u8 ch=1; ch<17; ch++) {
+        map[dsi][j].insert(std::make_pair(ch, 0));
+      }
+    }
+  }
+  auto paddles = get_tofpaddles();
+  for (auto const &pdl : paddles) {
+    map[pdl.second.dsi][pdl.second.j_ltb][pdl.second.ltb_chA] = pdl.second.paddle_id;
+    map[pdl.second.dsi][pdl.second.j_ltb][pdl.second.ltb_chB] = pdl.second.paddle_id;
+  }
+  return map;
+};
+
 auto Gaps::get_trackerstrips() -> std::map<u32, Gaps::TrackerStrip> {
   // FIXME - find a better name for the database variable
   //         env name

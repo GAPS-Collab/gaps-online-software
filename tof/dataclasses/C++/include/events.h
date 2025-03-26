@@ -112,7 +112,6 @@ struct std::formatter<EventStatus> : std::formatter<std::string> {
   }
 };
 
-
 /*********************************************************/
 
 static const u8 TRIGGERTYPE_UNKNOWN      = 0;
@@ -213,7 +212,7 @@ struct RBEventHeader {
   auto is_locked_last_sec()       const -> bool;
   auto get_sine_fit()             const -> std::array<f32,3>;
   /// the combined timestamp 
-  auto  get_timestamp48()         const -> u64;
+  auto get_timestamp48()          const -> u64;
   /// string representation for printing
   auto to_string()                const -> std::string;
 };

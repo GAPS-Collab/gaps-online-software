@@ -7,6 +7,13 @@
 #include <map>
 
 namespace Gaps {
+  
+  enum class TofPaddleEnd : i16 {
+    Unknown                = 0,
+    A                      = -1,
+    B                      = 1,
+  };
+
 
   struct TofPaddle {
     u8  paddle_id         ; 
@@ -53,10 +60,20 @@ namespace Gaps {
   };
   /// A map of paddle id -> TofPaddle
   typedef std::map<u8,  TofPaddle> TofPaddleMap;
+  /// A map of RBID, RBCh -> TofPaddle
+  typedef std::map<u8, std::map<u8, std::tuple<u8, TofPaddleEnd>>> RbIdChannelPaddleIdMap;
+  /// A map of DSI,J -> TofPaddle
+  typedef std::map<u8, std::map<u8, std::map<u8, u8>>> DsiJChnPaddleIdMap;
 
   /// Get a paddle from the database
   auto get_tofpaddles() -> TofPaddleMap;        
-  
+ 
+  /// Get a paddle if the rb id and channel is known (HG)
+  auto get_rb_id_paddles() -> RbIdChannelPaddleIdMap;
+
+  /// Get a paddle if the dsi,j connection of a paddle is known (LTB, LG)
+  auto get_dsi_j_paddles() -> DsiJChnPaddleIdMap;
+
   struct TrackerStrip {
     u32 strip_id           ;
     i32 layer              ; 
