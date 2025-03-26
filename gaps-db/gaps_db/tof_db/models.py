@@ -1099,8 +1099,13 @@ class TrackerStrip(models.Model):
                                 unique=True,
                                 help_text="The VolumeId as used in the GAPS simulation code")
 
-    def create_id(self):
-        return self.channel + self.module*100 + self.row*10000 + self.layer*100000
+    @staticmethod
+    def create_id(layer, row, module, channel):
+        return channel + module*100 + row*10000 + layer*100000
+
+    # FIXME - include in save hook!
+    def get_id(self):
+        return self.create_id(self.layer, self.row, self.module, self.channel)
 
     def __str__(self):
         return self.__repr__()
@@ -1125,12 +1130,45 @@ class TrackerStripPedestal(models.Model):
     The pedestal of each strip as retreived from the 
     text file
     """
+    strip_id      = models.PositiveIntegerField(
+                        primary_key=True,
+                        null=False,
+                        default=0,
+                        unique=True,
+                        help_text="The unique identifier for this strip, which is Layer-Row-Module-Channel (5 digit number)")
     volume_id     = models.PositiveBigIntegerField(
                         default=0,
                         null=False,
                         unique=True,
                         help_text="The VolumeId as used in the GAPS simulation code")
+    utc_timestamp  = models.PositiveBigIntegerField(null=False, default=0,
+                                                    help_text="UTC Timestamp in YYMMDDHHMMSS format")
+    pedestal_mean = models.FloatField(
+                        default=0,
+                        null=False,
+                        help_text="Mean value of the pedestal distribution")
+    pedestal_sigma = models.FloatField(
+                        default=0,
+                        null=False,
+                        help_text="Width of the pedestal distribution")
+    is_mean_value  = models.BooleanField(
+                        default=True,
+                        null=False,
+                        help_text="If no pedestal is set from a file, it defaults to a mean value. If none is available, this is 0")
+    
+    def __str__(self):
+        return self.__repr__()
+    
+    def __repr__(self):
+        _repr = f'<TrackerStripPedestal [{self.strip_id}]:'
+        if self.is_mean_value:
+            _repr += '\n !! -- Mean value for all strips !!'
+            _repr += '\n !! -- values not for this individual strip !!'
+        _repr += f'\n  Volume ID : {self.volume_id}'  
+        _repr += f'\n  ped mean  : {self.pedestal_mean}'
+        _repr += f'\n  ped sigma : {self.pedestal_sigma}>'
 
+        return _repr
 
 ##########################################################################
 
