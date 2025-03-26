@@ -75,8 +75,8 @@ pub fn get_dsi_j_ch_pid_map(paddles : &Vec<Paddle>) -> DsiJChPidMapping {
   for pdl in paddles {
     let dsi  = pdl.dsi as u8;
     let   j  = pdl.j_ltb   as u8;
-    let ch_b = pdl.ltb_chA as u8;
-    let ch_a = pdl.ltb_chB as u8;
+    let ch_a = pdl.ltb_chA as u8;
+    let ch_b = pdl.ltb_chB as u8;
     let pid  = pdl.paddle_id as u8;
     let panel_id = pdl.panel_id as u8;
     mapping.get_mut(&dsi).unwrap().get_mut(&j).unwrap().insert(ch_a,(pid, panel_id));
