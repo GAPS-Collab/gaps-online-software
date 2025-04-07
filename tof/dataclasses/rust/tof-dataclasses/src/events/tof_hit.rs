@@ -441,8 +441,8 @@ impl TofHit {
   /// same length
   pub fn get_pos(&self) -> f32 {
     let t0 = self.get_t0_uncorrected();
-    let clean_tA = self.time_a.to_f32() - t0;
-    return clean_tA*C_LIGHT_PADDLE*10.0; 
+    let clean_t_a = self.time_a.to_f32() - t0;
+    return clean_t_a*C_LIGHT_PADDLE*10.0; 
   }
 
   /// If the two reconstructed pulse times are not related to each other by the paddle length,

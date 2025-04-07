@@ -9,6 +9,7 @@
 //!
 
 use std::fmt;
+use std::env;
 use std::collections::HashMap;
 
 use glob::glob;
@@ -35,8 +36,27 @@ pub type DsiJChPidMapping = DsiLtbRBMapping;
 
 /// Universal function to connect to the database
 pub fn connect_to_db(database_url : String) -> Result<diesel::SqliteConnection, ConnectionError>  {
-    //let database_url = "database.sqlite3";
-    SqliteConnection::establish(&database_url)
+  //let database_url = "database.sqlite3";
+  SqliteConnection::establish(&database_url)
+}
+
+/// Get all tof paddles in the database
+pub fn get_tofpaddles() -> Result<HashMap<u8,Paddle>, ConnectionError> {
+  let db_path  = env::var("DATABASE_URL").unwrap_or_else(|_| "".to_string());
+  let mut conn = connect_to_db(db_path)?;
+  let mut paddles = HashMap::<u8, Paddle>::new();
+  match Paddle::all(&mut conn) {
+    None => {
+      error!("We can't find any paddles in the database!");
+      return Ok(paddles);
+    }
+    Some(pdls) => {
+      for p in pdls {
+        paddles.insert(p.paddle_id as u8, p.clone());
+      }
+    }
+  }
+  return Ok(paddles);
 }
 
 /// Create a mapping of mtb link ids to rb ids

@@ -2916,6 +2916,11 @@ impl PyTofEvent {
       event : TofEvent::new(),
     }
   }
+  
+  #[getter]
+  fn pointcloud(&self) -> Option<Vec<(f32,f32,f32,f32,f32)>> {
+    self.event.get_pointcloud()
+  }
 
   fn get_missing_paddles_hg(&self, mapping : DsiJChPidMapping) -> Vec<u8> {
     self.event.get_missing_paddles_hg(&mapping)

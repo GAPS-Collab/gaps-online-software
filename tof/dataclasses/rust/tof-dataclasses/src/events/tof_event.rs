@@ -126,6 +126,7 @@ pub struct TofEvent {
   // won't get serialized
   pub creation_time     : Instant,
   pub write_to_disk     : bool, 
+  pub paddles_set       : bool
 }
 
 impl fmt::Display for TofEvent {
@@ -162,7 +163,49 @@ impl TofEvent {
       //missing_hits      : Vec::<RBMissingHit>::new(), 
       creation_time     : creation_time,
       write_to_disk     : true,
+      paddles_set       : false
     }
+  }
+  
+  #[cfg(feature="database")]
+  pub fn set_paddles(&mut self, paddles : &HashMap<u8, Paddle>) {
+    let mut nerror = 0u8;
+    for ev in &mut self.rb_events {
+      for h in &mut ev.hits {
+        match paddles.get(&h.paddle_id) {
+          None => {
+            error!("Got paddle id {} which is not in given map!", h.paddle_id);
+            nerror += 1;
+            continue;
+          }
+          Some(pdl) => {
+            h.set_paddle(pdl);
+          }
+        }
+      }
+    }
+    if nerror == 0 {
+      self.paddles_set = true;
+    }
+  }
+
+  /// Get the pointcloud of this event, sorted by time
+  /// 
+  /// # Returns
+  ///   (f32, f32, f32, f32, f32) : (x,y,z,t,edep)
+  pub fn get_pointcloud(&self) -> Option<Vec<(f32,f32,f32,f32,f32)>> {
+    let mut pc = Vec::<(f32,f32,f32,f32,f32)>::new();
+    if !self.paddles_set {
+      error!("Before getting the pointcloud, paddle information needs to be set for this event. Call TofEventSummary;:set_paddle");
+      return None;
+    }
+    for rbev in &self.rb_events {
+      for h in &rbev.hits {
+        let result = (h.x, h.y, h.z, h.get_t0(), h.get_edep());
+        pc.push(result);
+      }
+    }
+    Some(pc)
   }
 
   /// Compare the MasterTriggerEvent::trigger_hits with 

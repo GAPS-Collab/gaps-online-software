@@ -5,12 +5,19 @@ use std::collections::HashMap;
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
 
+//use log::error;
 use caraspace::prelude::*;
-
+use tof_dataclasses::database::{
+  Paddle,
+  get_tofpaddles
+};
 use tof_dataclasses::packets::TofPacket;
+//use tof_dataclasses::events::TofEventSummary;
+use tof_dataclasses::events::TofEvent;
 use telemetry_dataclasses::packets::TelemetryPacket;
 use crate::dataclasses::{
   PyTofPacket,
+  PyTofEvent,
 };
 
 use crate::telemetry::{
@@ -113,7 +120,8 @@ impl PyCRFrameObject {
 #[pyo3(name="CRFrame")]
 #[derive(Clone, Debug)]
 pub struct PyCRFrame {
-  frame : CRFrame
+  frame   : CRFrame,
+  paddles : HashMap<u8, Paddle>, 
 }
 
 #[pymethods]
@@ -121,7 +129,8 @@ impl PyCRFrame {
   #[new]
   fn new() -> Self {
     Self {
-      frame : CRFrame::new(),
+      frame   : CRFrame::new(),
+      paddles : HashMap::<u8, Paddle>::new(),
     }
   }
  
@@ -141,6 +150,16 @@ impl PyCRFrame {
     let packet    = self.frame.get::<TelemetryPacket>(name).unwrap();
     py_packet.packet = packet;
     Ok(py_packet)
+  }
+  
+  fn get_tofevent(&mut self, name : String) -> PyResult<PyTofEvent> {
+    let mut py_event  = PyTofEvent::new();
+    // FIXME
+    let packet    = self.frame.get::<TofPacket>(name).unwrap();
+    let mut event = packet.unpack::<TofEvent>().unwrap();
+    event.set_paddles(&self.paddles);
+    py_event.event  = event;
+    Ok(py_event)
   }
 
   fn get_tofpacket(&mut self, name : String) -> PyResult<PyTofPacket> {
@@ -170,15 +189,27 @@ impl PyCRFrame {
 #[pyclass]
 #[pyo3(name="CRReader")]
 pub struct PyCRReader {
-  reader : CRReader
+  reader  : CRReader,
+  paddles : HashMap<u8,Paddle>
 }
 
 #[pymethods]
 impl PyCRReader {
   #[new]
   fn new(filename : String) -> Self {
+    let mut paddles = HashMap::<u8, Paddle>::new();
+    match get_tofpaddles() {
+      Ok(pdls) => {
+        paddles = pdls;
+      }
+      Err(_err) => {
+        // FIXME!
+        //error!("Unable to get paddles from database. Maybe the 'DATABASE_URL' path is not set. Are you sure you loaded the setup-env.sh shell?");
+      }
+    }
     Self {
-      reader : CRReader::new(filename),
+      reader  : CRReader::new(filename),
+      paddles : paddles,
     }
   }
 
@@ -191,6 +222,7 @@ impl PyCRReader {
       Some(frame) => {
         let mut pyframe = PyCRFrame::new();
         pyframe.frame = frame;
+        pyframe.paddles = slf.paddles.clone();
         return Some(pyframe)
       }   
       None => {
