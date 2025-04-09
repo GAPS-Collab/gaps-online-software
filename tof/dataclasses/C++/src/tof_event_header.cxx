@@ -11,7 +11,7 @@ namespace g = Gaps;
 
 auto TofEventHeader::from_bytestream(const Vec<u8> &stream, u64 &pos) 
   -> Result<TofEventHeader, g::IOError> {
-  SPDLOG_DEBUG("Start decoding at pos {}", pos);
+  SPDLOG_TRACE("Start decoding at pos {}", pos);
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != TofEventHeader::HEAD)  {
     auto msg = std::format("No header signature found!");

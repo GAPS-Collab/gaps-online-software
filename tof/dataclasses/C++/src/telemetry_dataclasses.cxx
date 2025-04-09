@@ -258,15 +258,15 @@ auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
   }
   evt.n_trk_hits = parse_u16(stream, pos); 
   for(u16 j = 0; j < evt.n_trk_hits; ++j) {
-     u16 strip_id = parse_u16(stream, pos);
-     u16 adc      = parse_u16(stream, pos);
-     TrkHit hit;
-     hit.channel = strip_id & 0b11111;
-     hit.module  = (strip_id >> 5) & 0b111;
-     hit.row     = (strip_id >> 8) & 0b111;
-     hit.layer   = (strip_id >> 11) & 0b1111;
-     hit.adc     = adc;
-     evt.trk_hits.push_back(hit);
+    u16 strip_id = parse_u16(stream, pos);
+    u16 adc      = parse_u16(stream, pos);
+    TrkHit hit;
+    hit.channel = strip_id & 0b11111;
+    hit.module  = (strip_id >> 5) & 0b111;
+    hit.row     = (strip_id >> 8) & 0b111;
+    hit.layer   = (strip_id >> 11) & 0b1111;
+    hit.adc     = adc;
+    evt.trk_hits.push_back(hit);
   }
   u8 osci_delim = parse_u8(stream, pos);
   if(osci_delim != 0xcc) {

@@ -117,6 +117,26 @@ diesel::table! {
 }
 
 diesel::table! {
+  tof_db_trackerstrip (strip_id) {
+    strip_id            -> Integer,
+    layer               -> Integer, 
+    row                 -> Integer, 
+    module              -> Integer, 
+    channel             -> Integer,  
+    global_pos_x_l0     -> Float,
+    global_pos_y_l0     -> Float,
+    global_pos_z_l0     -> Float,
+    global_pos_x_det_l0 -> Float,
+    global_pos_y_det_l0 -> Float,
+    global_pos_z_det_l0 -> Float,
+    principal_x         -> Float,
+    principal_y         -> Float,
+    principal_z         -> Float,
+    volume_id           -> BigInt,
+  }
+}
+
+diesel::table! {
     tof_db_localtriggerboard (board_id) {
         board_id -> SmallInt,
         dsi -> Nullable<SmallInt>,
@@ -273,4 +293,5 @@ diesel::allow_tables_to_appear_in_same_query!(
     tof_db_panel,
     tof_db_rat,
     tof_db_readoutboard,
+    tof_db_trackerstrip,
 );

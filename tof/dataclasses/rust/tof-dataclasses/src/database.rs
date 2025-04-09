@@ -486,6 +486,85 @@ impl fmt::Display for DSICard {
   }
 }
 
+/// A single Tracker strip
+#[derive(Debug,PartialEq, Clone,Queryable, Selectable, serde::Serialize, serde::Deserialize)]
+#[diesel(table_name = schema::tof_db_trackerstrip)]
+#[diesel(primary_key(strip_id))]
+#[allow(non_snake_case)]
+pub struct TrackerStrip {
+    pub strip_id            : i32,
+    pub layer               : i32, 
+    pub row                 : i32, 
+    pub module              : i32, 
+    pub channel             : i32,  
+    pub global_pos_x_l0     : f32,
+    pub global_pos_y_l0     : f32,
+    pub global_pos_z_l0     : f32,
+    pub global_pos_x_det_l0 : f32,
+    pub global_pos_y_det_l0 : f32,
+    pub global_pos_z_det_l0 : f32,
+    pub principal_x         : f32,
+    pub principal_y         : f32,
+    pub principal_z         : f32,
+    pub volume_id           : i64,
+}
+
+impl TrackerStrip {
+  pub fn new() -> Self {
+    Self {
+      strip_id            : 0,
+      layer               : 0, 
+      row                 : 0, 
+      module              : 0, 
+      channel             : 0,  
+      global_pos_x_l0     : 0.0,
+      global_pos_y_l0     : 0.0,
+      global_pos_z_l0     : 0.0,
+      global_pos_x_det_l0 : 0.0,
+      global_pos_y_det_l0 : 0.0,
+      global_pos_z_det_l0 : 0.0,
+      principal_x         : 0.0,
+      principal_y         : 0.0,
+      principal_z         : 0.0,
+      volume_id           : 0,
+    }
+  }
+  
+  pub fn all(conn: &mut SqliteConnection) -> Option<Vec<Self>> {
+    use schema::tof_db_trackerstrip::dsl::*;
+    match tof_db_trackerstrip.load::<Self>(conn) {
+      Err(err) => {
+        error!("Unable to load tracker strips from db! {err}");
+        return None;
+      }
+      Ok(pdls) => {
+        return Some(pdls);
+      }
+    }
+  }
+}
+
+impl fmt::Display for TrackerStrip {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<TrackerStrip:");
+    repr += &(format!("\n   strip id           : {}", self.strip_id));     
+    repr += &(format!("\n   vid                : {}", self.volume_id));
+    repr += &(format!("\n   layer              : {}", self.layer));
+    repr += &(format!("\n   row                : {}", self.row));
+    repr += &(format!("\n   module             : {}", self.module));
+    repr += &(format!("\n   channel            : {}", self.channel));
+    repr += "\n   strip center [mm]:";
+    repr += &(format!("\n    \u{21B3} [{:.2}, {:.2}, {:.2}]", self.global_pos_x_l0, self.global_pos_y_l0, self.global_pos_z_l0));
+    repr += "\n   detector (disk) center [mm]:";
+    repr += &(format!("\n    \u{21B3} [{:.2}, {:.2}, {:.2}]", self.global_pos_x_det_l0, self.global_pos_y_det_l0, self.global_pos_z_det_l0));
+    repr += "\n   strip principal direction:";
+    repr += &(format!("\n    \u{21B3} [{:.2}, {:.2}, {:.2}]", self.principal_x, self.principal_y, self.principal_z));
+    write!(f, "{}", repr)
+  }
+}
+
+
+
 /// A single TOF paddle with 2 ends 
 /// comnected
 #[derive(Debug,PartialEq, Clone,Queryable, Selectable, serde::Serialize, serde::Deserialize)]

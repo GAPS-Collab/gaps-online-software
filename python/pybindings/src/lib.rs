@@ -96,6 +96,7 @@ use tof_dataclasses::database::{
   get_rb_ch_pid_a_map,
   get_rb_ch_pid_b_map,
   Paddle,
+  TrackerStrip,
   connect_to_db
 };
 
@@ -224,6 +225,32 @@ fn py_create_rb_ch_to_pid_b_map(db_path : String) -> PyResult<RbChPidMapping> {
 }
 
 
+/// Create a map of strip id to tracker strip
+#[pyfunction]
+#[pyo3(name="create_tracker_strip_map")]
+fn py_create_tracker_strip_map(db_path : String) -> PyResult<()> {
+  match connect_to_db(db_path) {
+    Err(err) => {
+      return Err(PyIOError::new_err(err.to_string()));
+    }
+    Ok(mut conn) => {
+      match TrackerStrip::all(&mut conn) {
+        None => {
+          return Err(PyIOError::new_err("Unable to retrieve tracker strip information from DB!"));
+        }
+        Some(strips) => {
+          //let mapping = get_rb_ch_pid_b_map(&paddles);
+          //Ok(mapping)
+          for k in strips {
+            println!("Strip : {}", k);
+          }
+          Ok(())
+        }
+      }
+    }
+  }
+}
+
 #[pymodule]
 #[pyo3(name = "analysis")]
 fn tof_analysis<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
@@ -265,6 +292,7 @@ fn tof_io<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(py_create_rb_ch_to_pid_a_map, m)?)?;
   m.add_function(wrap_pyfunction!(py_create_rb_ch_to_pid_b_map, m)?)?;
   m.add_function(wrap_pyfunction!(py_create_mtb_connection_to_pid_map, m)?)?;
+  m.add_function(wrap_pyfunction!(py_create_tracker_strip_map, m)?)?;
   m.add_function(wrap_pyfunction!(py_summarize_toffile, m)?)?;
   //m.add_class::<PyAdapter>()?;
   m.add_class::<PyTofPacket>()?;
