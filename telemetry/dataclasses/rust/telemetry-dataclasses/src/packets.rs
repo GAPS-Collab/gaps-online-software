@@ -6,6 +6,7 @@ pub mod magnetometer;
 pub use magnetometer::MagnetoMeter;
 
 use std::fmt;
+use std::collections::HashMap;
 use log::{
   //info,
   debug,
@@ -20,6 +21,10 @@ use tof_dataclasses::serialization::{
   parse_u64,
   Serialization,
   Packable
+};
+
+use tof_dataclasses::database::{
+  TrackerStrip
 };
 
 use tof_dataclasses::events::TofEventSummary;
@@ -38,7 +43,7 @@ pub fn make_systime(lower : u32, upper : u16) -> u64 {
 
 
 #[derive(Debug, Copy, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-#[cfg_attr(feature = "pybindings", pyclass)]
+#[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
 #[repr(u8)]
 pub enum TelemetryPacketType {
   Unknown            = 0,
@@ -659,7 +664,13 @@ pub struct TrackerHitV2 {
   pub module          : u16,
   pub channel         : u16,
   pub adc             : u16,
-  pub oscillator      : u64
+  pub oscillator      : u64,
+
+  // not getting serialized
+  pub x               : f32,
+  pub y               : f32,
+  pub z               : f32,
+  pub has_coordinates : bool,
 }
 
 impl TrackerHitV2 {
@@ -673,6 +684,26 @@ impl TrackerHitV2 {
       channel         : 0,
       adc             : 0,
       oscillator      : 0,
+      x               : 0.0,
+      y               : 0.0,
+      z               : 0.0,
+      has_coordinates : false,
+    }
+  }
+ 
+  /// Calculate the strip id from layer, module, row and channel
+  pub fn get_stripid(&self) -> u32 {
+    self.channel as u32 + (self.module as u32)*100 + (self.row as u32)*10000 + (self.layer as u32)*10000
+  }
+
+  pub fn set_coordinates(&mut self, strip_map : HashMap<u32, TrackerStrip>) {
+    match strip_map.get(&self.get_stripid()) {
+      None  => error!("Can not get strip for strip id {}" , self.get_stripid()),
+      Some(strip) => { 
+        self.x = strip.global_pos_x_l0;
+        self.y = strip.global_pos_y_l0;
+        self.z = strip.global_pos_z_l0;
+      }
     }
   }
 }
@@ -685,7 +716,12 @@ impl fmt::Display for TrackerHitV2 {
     repr += &(format!("\n  Module        : {}" ,self.module));
     repr += &(format!("\n  Channel       : {}" ,self.channel));
     repr += &(format!("\n  ADC           : {}" ,self.adc));
-    repr += &(format!("\n  Oscillator    : {}>",self.oscillator));
+    repr += &(format!("\n  Oscillator    : {}",self.oscillator));
+    if self.has_coordinates {
+      repr += &(format!("\n -- coordinates x : {} , y : {} , z {}>", self.x, self.y, self.z));
+    } else {
+      repr += "\n -- [no coordinates set]>";
+    }
     write!(f, "{}", repr)
   }
 }
