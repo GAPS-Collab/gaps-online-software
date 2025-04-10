@@ -48,7 +48,9 @@ log               = "0.4"
 #crossbeam-channel = "0.5"
 #statistical       = "1.0"  # FIXME - replace this with our own implementation
 #polars            = { version = "0.41", features = ["lazy"], optional = true }
-pyo3              = { version = "0.23", features = ["extension-module"], optional = true }
+pyo3               = { version = "0.23", features = ["extension-module"], optional = true }
+#tof-dataclasses    = { path = "../tof/dataclasses/rust/tof-dataclasses" , features = ["database", "advanced-algorithms"], version = "0.10"}
+
 
 # for testing / features
 rand   = { version = "0.8", optional = true}

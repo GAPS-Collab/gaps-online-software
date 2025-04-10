@@ -92,7 +92,7 @@ use rand::Rng;
 /// The Caraspace object type determines the 
 /// kind of object we are able to put in 
 /// a frame and ultimate (de)serialzie
-#[cfg_attr(feature = "pybindings", pyclass)]
+#[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u8)]
 pub enum CRFrameObjectType {

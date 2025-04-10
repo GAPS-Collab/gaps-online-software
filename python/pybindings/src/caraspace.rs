@@ -9,12 +9,18 @@ use pyo3::types::PyBytes;
 use caraspace::prelude::*;
 use tof_dataclasses::database::{
   Paddle,
-  get_tofpaddles
+  TrackerStrip,
+  get_tofpaddles,
+  get_trackerstrips
 };
 use tof_dataclasses::packets::TofPacket;
 //use tof_dataclasses::events::TofEventSummary;
 use tof_dataclasses::events::TofEvent;
-use telemetry_dataclasses::packets::TelemetryPacket;
+use telemetry_dataclasses::packets::{
+  TelemetryPacket,
+  MergedEvent
+};
+
 use crate::dataclasses::{
   PyTofPacket,
   PyTofEvent,
@@ -22,7 +28,10 @@ use crate::dataclasses::{
 
 use crate::telemetry::{
   PyTelemetryPacket,
+  PyMergedEvent,
 };
+
+use pyo3::exceptions::PyValueError;
 
 /// Parse an u8 from python bytes. 
 ///
@@ -119,9 +128,10 @@ impl PyCRFrameObject {
 #[pyclass]
 #[pyo3(name="CRFrame")]
 #[derive(Clone, Debug)]
-pub struct PyCRFrame {
+pub struct PyCRFrame{
   frame   : CRFrame,
   paddles : HashMap<u8, Paddle>, 
+  strips  : HashMap<u32, TrackerStrip>
 }
 
 #[pymethods]
@@ -131,6 +141,7 @@ impl PyCRFrame {
     Self {
       frame   : CRFrame::new(),
       paddles : HashMap::<u8, Paddle>::new(),
+      strips  : HashMap::<u32, TrackerStrip>::new(),
     }
   }
  
@@ -150,6 +161,24 @@ impl PyCRFrame {
     let packet    = self.frame.get::<TelemetryPacket>(name).unwrap();
     py_packet.packet = packet;
     Ok(py_packet)
+  }
+  
+  fn get_mergedevent(&mut self, name : String) -> PyResult<PyMergedEvent> {
+    let mut py_event    = PyMergedEvent::new();
+    let packet        = self.frame.get::<TelemetryPacket>(name).unwrap();
+    match MergedEvent::from_bytestream(&packet.payload, &mut 0) {
+      Ok(event) => {
+        py_event.event        = event;
+        py_event.event.header = packet.header.clone();
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+    for h in &mut py_event.event.tracker_hitsv2 {
+      h.set_coordinates(&self.strips);
+    }
+    Ok(py_event)
   }
   
   fn get_tofevent(&mut self, name : String) -> PyResult<PyTofEvent> {
@@ -190,7 +219,8 @@ impl PyCRFrame {
 #[pyo3(name="CRReader")]
 pub struct PyCRReader {
   reader  : CRReader,
-  paddles : HashMap<u8,Paddle>
+  paddles : HashMap<u8,Paddle>,
+  strips  : HashMap<u32, TrackerStrip>
 }
 
 #[pymethods]
@@ -198,6 +228,7 @@ impl PyCRReader {
   #[new]
   fn new(filename : String) -> Self {
     let mut paddles = HashMap::<u8, Paddle>::new();
+    let mut strips  = HashMap::<u32, TrackerStrip>::new();
     match get_tofpaddles() {
       Ok(pdls) => {
         paddles = pdls;
@@ -207,9 +238,19 @@ impl PyCRReader {
         //error!("Unable to get paddles from database. Maybe the 'DATABASE_URL' path is not set. Are you sure you loaded the setup-env.sh shell?");
       }
     }
+    match get_trackerstrips() {
+      Ok(_strips) => {
+        strips = _strips;
+      }
+      Err(_err) => {
+        // FIXME!
+        //error!("Unable to get paddles from database. Maybe the 'DATABASE_URL' path is not set. Are you sure you loaded the setup-env.sh shell?");
+      }
+    }
     Self {
       reader  : CRReader::new(filename),
       paddles : paddles,
+      strips  : strips,
     }
   }
 
@@ -222,7 +263,10 @@ impl PyCRReader {
       Some(frame) => {
         let mut pyframe = PyCRFrame::new();
         pyframe.frame = frame;
+        //FIXME - these are huge! This needs to be solved
+        //by some other method
         pyframe.paddles = slf.paddles.clone();
+        pyframe.strips  = slf.strips.clone();
         return Some(pyframe)
       }   
       None => {

@@ -696,7 +696,7 @@ impl TrackerHitV2 {
     self.channel as u32 + (self.module as u32)*100 + (self.row as u32)*10000 + (self.layer as u32)*10000
   }
 
-  pub fn set_coordinates(&mut self, strip_map : HashMap<u32, TrackerStrip>) {
+  pub fn set_coordinates(&mut self, strip_map : &HashMap<u32, TrackerStrip>) {
     match strip_map.get(&self.get_stripid()) {
       None  => error!("Can not get strip for strip id {}" , self.get_stripid()),
       Some(strip) => { 

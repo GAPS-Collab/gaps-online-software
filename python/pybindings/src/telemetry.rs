@@ -84,19 +84,13 @@ impl PyTelemetryHeader {
 #[pyclass]
 #[pyo3(name="MergedEvent")]
 pub struct PyMergedEvent {
-  event : tel_api::MergedEvent,
-}
-
-impl PyMergedEvent {
-  pub fn set_event(&mut self, event : tel_api::MergedEvent) {
-    self.event = event;
-  }
+  pub event : tel_api::MergedEvent,
 }
 
 #[pymethods]
 impl PyMergedEvent {
   #[new]
-  fn new() -> Self {
+  pub fn new() -> Self {
     Self {
       event : tel_api::MergedEvent::new(),
     }
@@ -128,8 +122,6 @@ impl PyMergedEvent {
     }
     Ok(events)
   }
-
-
 
   /// Check if TOF/tracker data can be unpacked an no errors are thrown
   #[getter]
@@ -178,13 +170,24 @@ impl PyMergedEvent {
     }
   }
 
+  #[getter]
+  fn tracker_pointcloud(&self) -> Vec<(f32, f32, f32, f32, f32)> {
+    let mut pts = Vec::<(f32,f32,f32,f32,f32)>::new();
+    for h in &self.event.tracker_hitsv2 {
+      // uses adc
+      let pt = (h.x, h.y, h.z, f32::NAN, h.adc as f32);
+      pts.push(pt);
+    }
+    pts
+  }
+
   /// Populate a merged event from a TelemetryPacket.
   ///
   /// Telemetry packet type should be 90 (MergedEvent)
   fn from_telemetrypacket(&mut self, packet : PyTelemetryPacket) -> PyResult<()> {
     match tel_api::MergedEvent::from_bytestream(&packet.packet.payload, &mut 0) {
       Ok(event) => {
-        self.set_event(event);
+        self.event = event;
         self.event.header = packet.packet.header.clone();
       }
       Err(err) => {
