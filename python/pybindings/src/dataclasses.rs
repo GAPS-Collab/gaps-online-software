@@ -2926,6 +2926,10 @@ impl PyTofEvent {
     self.event.get_missing_paddles_hg(&mapping)
   }
 
+  fn get_missing_paddles_wf(&self, mapping : DsiJChPidMapping) -> Vec<u8> {
+    self.event.get_missing_paddles_wf(&mapping)
+  }
+
   #[getter]
   fn event_id(&self) -> u32 {
     self.event.header.event_id

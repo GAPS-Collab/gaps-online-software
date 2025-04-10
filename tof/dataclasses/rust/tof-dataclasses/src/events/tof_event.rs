@@ -234,6 +234,32 @@ impl TofEvent {
     }
     missing
   }
+  
+  /// Compare the MasterTriggerEvent::trigger_hits with 
+  /// the actual recorded waveforms to determine from which paddles
+  /// we should have received waveforms from. This is 
+  /// independent of the hits, which additionally required
+  /// that the hit extraction algorithm worked.
+  #[cfg(feature="database")]
+  pub fn get_missing_paddles_wf(&self, pid_map : &DsiJChPidMapping) -> Vec<u8> {
+    let mut missing = Vec::<u8>::new();
+    let wf_pids = self.get_waveform_pids();
+    for th in self.mt_event.get_trigger_hits() {
+      let pid = pid_map.get(&th.0).unwrap().get(&th.1).unwrap().get(&th.2.0).unwrap().0;
+      // FIXME - rewrite this section so that it is more concise
+      let mut found = false;
+      for wf_pid in &wf_pids {
+        if *wf_pid == pid {
+          found = true;
+          break
+        }
+      }
+      if !found {
+        missing.push(pid);
+      }
+    }
+    missing
+  }
 
   /// Get the triggered paddle ids
   ///
@@ -312,6 +338,31 @@ impl TofEvent {
       wf.extend_from_slice(&ev.get_rbwaveforms());
     }
     wf
+  }
+
+  /// Get all waveforms of all RBEvents in this event
+  /// ISSUE - Performance, Memory
+  /// FIXME - reimplement this things where this
+  ///         returns only a reference
+  pub fn get_waveforms(&self) -> Vec<RBWaveform> {
+    let mut wfs = Vec::<RBWaveform>::new();
+    for ev in &self.rb_events {
+      for wf in &ev.get_rbwaveforms() {
+        wfs.push(wf.clone());
+      }
+    }
+    wfs
+  }
+
+  /// Get all the paddles which have waveforms
+  pub fn get_waveform_pids(&self) -> Vec<u8> {
+    let mut pids = Vec::<u8>::new();
+    for ev in &self.rb_events {
+      for wf in &ev.get_rbwaveforms() {
+        pids.push(wf.paddle_id)
+      }
+    }
+    pids
   }
 
   /// Get all hits of all RBEvents in this event
