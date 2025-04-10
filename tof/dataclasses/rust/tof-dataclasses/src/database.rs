@@ -59,6 +59,25 @@ pub fn get_tofpaddles() -> Result<HashMap<u8,Paddle>, ConnectionError> {
   return Ok(paddles);
 }
 
+/// Get all trackerstrips from the database
+pub fn get_trackerstrips() -> Result<HashMap<u32,TrackerStrip>, ConnectionError> {
+  let db_path  = env::var("DATABASE_URL").unwrap_or_else(|_| "".to_string());
+  let mut conn = connect_to_db(db_path)?;
+  let mut strips = HashMap::<u32, TrackerStrip>::new();
+  match TrackerStrip::all(&mut conn) {
+    None => {
+      error!("We can't find any tracker strips in the database!");
+      return Ok(strips);
+    }
+    Some(ts) => {
+      for s in ts {
+        strips.insert(s.get_stripid() as u32, s.clone());
+      }
+    }
+  }
+  return Ok(strips);
+}
+
 /// Create a mapping of mtb link ids to rb ids
 pub fn get_linkid_rbid_map(rbs : &Vec<ReadoutBoard>) -> HashMap<u8, u8>{
   let mut mapping = HashMap::<u8, u8>::new();
@@ -529,7 +548,11 @@ impl TrackerStrip {
       volume_id           : 0,
     }
   }
-  
+ 
+  pub fn get_stripid(&self) -> u32 {
+    self.channel as u32 + (self.module as u32)*100 + (self.row as u32)*10000 + (self.layer as u32)*10000
+  }
+
   pub fn all(conn: &mut SqliteConnection) -> Option<Vec<Self>> {
     use schema::tof_db_trackerstrip::dsl::*;
     match tof_db_trackerstrip.load::<Self>(conn) {
