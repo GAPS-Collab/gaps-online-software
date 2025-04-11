@@ -254,6 +254,18 @@ impl PyCRReader {
     }
   }
 
+  /// Start the reader from the beginning
+  /// This is equivalent to a re-initialization
+  /// of that reader.
+  fn rewind(&mut self) -> PyResult<()> {
+    match self.reader.rewind() {
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+      Ok(_) => Ok(())
+    }
+  }
+
   fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
     slf 
   }
