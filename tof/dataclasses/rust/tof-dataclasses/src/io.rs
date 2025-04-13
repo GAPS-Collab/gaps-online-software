@@ -859,6 +859,14 @@ impl fmt::Display for TofPacketReader {
 
 impl TofPacketReader {
 
+  pub fn get_current_filename(&self) -> Option<String> {
+    // should only happen when it is empty
+    if self.filenames.len() <= self.file_index {
+      return None;
+    }
+    Some(self.filenames[self.file_index].clone())
+  }
+
   fn list_path_contents_sorted(input: &str) -> Result<Vec<String>, io::Error> {
     let path = Path::new(input);
     match fs::metadata(path) {
