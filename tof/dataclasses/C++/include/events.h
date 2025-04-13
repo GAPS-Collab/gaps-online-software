@@ -274,6 +274,7 @@ struct TofHit  {
   auto get_phase_delay() const -> f32;
   auto get_cable_delay() const -> f32;
   auto get_t0()          const -> f32;
+  auto get_edep()        const -> f32;
   #endif
 
   static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos)

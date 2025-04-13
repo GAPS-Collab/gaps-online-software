@@ -529,10 +529,10 @@ auto RBCalibration::from_bytestream(const Vec<u8> &stream,
                                     bool discard_events) -> RBCalibration {
   //::set_pattern("[%^%l%$] [%s - %!:%#] [%Y-%m-%d %H:%M:%S] -- %v");
   RBCalibration calibration = RBCalibration();
-  log_debug("Start decoding at pos " << pos);
+  spdlog::debug("Start decoding at pos {}",pos);
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != RBCalibration::HEAD)  {
-    log_warn("No header signature found!");  
+    spdlog::error("No header signature found!");  
     return calibration;
   }
   calibration.rb_id         = stream[pos]; pos += 1;
@@ -599,10 +599,24 @@ auto RBCalibration::from_bytestream(const Vec<u8> &stream,
 
 /************************************************/
 
+// FIXME - this has to return Result
 auto RBCalibration::from_file(const String &filename, bool discard_events) -> RBCalibration {
-  auto cali_pack = get_tofpackets(filename)[0];
-  u64 pos = 0;
-  return RBCalibration::from_bytestream(cali_pack.payload, pos, discard_events);
+  if (!fs::exists(filename)) {
+    spdlog::critical("Can't open {}! (it does not exist)");
+  }
+  // This should exactly contain a single RBCalibration in a 
+  // TofPacket
+  auto stream = get_bytestream_from_file(filename); 
+  u64 pos     = 0;
+  auto pack   = TofPacket::from_bytestream(stream, pos);
+  if (pack.is_err()) {
+    spdlog::error("Got a TofPacket from the file, but it seems corrupt! {}", pack.unwrap_err().reason);
+    spdlog::error("Returning emtpy calibration!");
+    return RBCalibration();
+  }
+  pos = 0;
+  //auto cali_pack = get_tofpackets(filename)[0];
+  return RBCalibration::from_bytestream(pack.unwrap().payload, pos, discard_events);
 }
 
 /************************************************/
@@ -678,7 +692,7 @@ RBCalibrationMap Gaps::load_tof_calibrations(std::string const &pathname) {
   std::map<u8, RBCalibration> cali;
   fs::path path(pathname);
   if (!fs::exists(path)) {
-    log_error("Path " << pathname << "does not exist.");
+    spdlog::error("Path {} does not exist, unable to load RBCalibration!", pathname);
     return cali;
   }
   if (fs::is_directory(path)) {
