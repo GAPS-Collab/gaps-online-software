@@ -4,8 +4,17 @@ import os
 import tqdm
 import gaps_online as go
 import time
+import re
 from pathlib import Path
 from glob import glob
+
+PATTERN = re.compile('Run([0-9]*)_([0-9]*).(?P<timestamp>([0-9_]*UTC)).tof.gaps')
+
+def get_timestamp(filename):
+    ts = PATTERN.search(filename)
+    ts = ts.groupdict()['timestamp']
+    return ts
+
 
 if __name__ == '__main__':
 
@@ -121,9 +130,13 @@ if __name__ == '__main__':
     print(f'-> After cleaning we start have {len(telemetry_files)} telemetry files')
     print(f'-> The first event id {first_telly_evid} can be found at gcutime of {first_time}') 
     
+    # fix the timestamp with the timestamp from the 
+    # tof file
+    current_filename = tof_reader.current_filename
+    file_timestamp   = get_timestamp(current_filename)
     # now we have the telemetry and tof readers primed!
-    writer = go.io.CRWriter(cr_outdir, args.run_id)
-    
+    writer = go.io.CRWriter(cr_outdir, args.run_id, timestamp = file_timestamp)
+ 
     telly_exhausted = False
     telly_f_idx     = -1 # we start 1 before the filelist start
     telly_errors    = 0
@@ -152,6 +165,12 @@ if __name__ == '__main__':
     for tofpack in tof_reader:
         if done:
             break
+        # set the timestamp for the outputfile
+        current_filename = tof_reader.current_filename
+        #print (current_filename)
+        file_timestamp = get_timestamp(current_filename)
+        writer.set_file_timestamp(file_timestamp)
+        
         # in any case the L0 stream is that what is the 
         # tofstream
         frame = go.io.CRFrame()

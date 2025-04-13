@@ -254,6 +254,7 @@ impl PyCRReader {
     }
   }
 
+
   /// Start the reader from the beginning
   /// This is equivalent to a re-initialization
   /// of that reader.
@@ -302,6 +303,10 @@ impl PyCRWriter {
     Self {
       writer : CRWriter::new(filename, run_id, timestamp ),
     }
+  }
+  
+  fn set_file_timestamp(&mut self, timestamp : String) {
+    self.writer.file_timestamp = Some(timestamp);
   }
   
   fn add_frame(&mut self, frame : PyCRFrame) {
