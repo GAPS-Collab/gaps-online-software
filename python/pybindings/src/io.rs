@@ -186,6 +186,11 @@ impl PyTofPacketReader {
   }
 
   #[getter]
+  fn current_filename(&self) -> Option<String> {
+    self.reader.get_current_filename()
+  }
+
+  #[getter]
   fn first(&mut self) -> Option<PyTofPacket> {
     let mut ptp = PyTofPacket::new();
     let tp = self.reader.first_packet()?;
