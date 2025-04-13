@@ -297,9 +297,10 @@ pub struct PyCRWriter {
 #[pymethods]
 impl PyCRWriter {
   #[new]
-  fn new(filename : String, run_id : u32) -> Self {
+  #[pyo3(signature = (filename, run_id, timestamp = None))]
+  fn new(filename : String, run_id : u32, timestamp : Option<String>) -> Self {
     Self {
-      writer : CRWriter::new(filename, run_id),
+      writer : CRWriter::new(filename, run_id, timestamp ),
     }
   }
   
