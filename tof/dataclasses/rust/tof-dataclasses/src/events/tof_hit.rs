@@ -569,16 +569,45 @@ impl TofHit {
     pp.peak_b         = f16::from_f32(rng.gen::<f32>());
     pp.charge_a       = f16::from_f32(rng.gen::<f32>());
     pp.charge_b       = f16::from_f32(rng.gen::<f32>());
-    //pp.charge_min_i = rng.gen::<>();
-    //pp.pos_across   = rng.gen::<>();
-    //pp.t0           = rng.gen::<>();
-    //pp.ctr_etx      = rng.gen::<u8>();
     pp.version        = ProtocolVersion::from(rng.gen::<u8>());
     pp.baseline_a     = f16::from_f32(rng.gen::<f32>());
     pp.baseline_a_rms = f16::from_f32(rng.gen::<f32>());
     pp.baseline_b     = f16::from_f32(rng.gen::<f32>());
     pp.baseline_b_rms = f16::from_f32(rng.gen::<f32>());
     pp.phase          = f16::from_f32(rng.gen::<f32>());
+    
+    pp.paddle_len       = 0.0; 
+    pp.cable_len        = 0.0; 
+    pp.coax_cable_time  = 0.0; 
+    pp.hart_cable_time  = 0.0; 
+    pp.x                = 0.0; 
+    pp.y                = 0.0; 
+    pp.z                = 0.0; 
+    
+    //charge_min_i   : 0,
+    //// deprecated  
+    //pos_across     : 0,
+    //t0             : 0,
+    //ctr_etx        : 0,
+    //timestamp32    : 0,
+    //timestamp16    : 0,
+    //valid          : true,
+    //// v1 variables
+    //version        : ProtocolVersion::V1,
+    //reserved       : 0,
+    //baseline_a     : f16::from_f32(0.0),
+    //baseline_a_rms : f16::from_f32(0.0),
+    //baseline_b     : f16::from_f32(0.0),
+    //baseline_b_rms : f16::from_f32(0.0),
+    //phase          : f16::from_f32(0.0),
+    //// non-serialize fields
+    //ftime_a        : 0.0,
+    //ftime_b        : 0.0,
+    //fpeak_a        : 0.0,
+    //fpeak_b        : 0.0,
+    
+
+
     pp
   }
 }
@@ -589,7 +618,16 @@ fn serialization_tofhit() {
   for _ in 0..100 {
     let mut pos = 0;
     let data = TofHit::from_random();
-    let test = TofHit::from_bytestream(&data.to_bytestream(),&mut pos).unwrap();
+    let mut test = TofHit::from_bytestream(&data.to_bytestream(),&mut pos).unwrap();
+    // Manually zero these fields, since comparison with nan will fail and 
+    // from_random did not touch these
+    test.paddle_len       = 0.0; 
+    test.cable_len        = 0.0; 
+    test.coax_cable_time  = 0.0; 
+    test.hart_cable_time  = 0.0; 
+    test.x                = 0.0; 
+    test.y                = 0.0; 
+    test.z                = 0.0; 
     assert_eq!(pos, TofHit::SIZE);
     assert_eq!(data, test);
   }
