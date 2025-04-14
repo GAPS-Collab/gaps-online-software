@@ -79,12 +79,14 @@ int main(int argc, char *argv[]){
         
   auto start = std::chrono::high_resolution_clock::now();
 
+  // as an example, count tracker hits
+  u64 n_trk_hits        = 0;
+  u64 n_evt_no_trk_hits = 0;
   for (auto const &f : filenames) {
     auto start = std::chrono::high_resolution_clock::now();
     auto reader = Gaps::CRReader(f);
     u64 n_frames_processed_file = 0;
     while (!reader.is_exhausted()) {
-
       auto frame = Gaps::CRFrame();
       try {
         frame = reader.get_next_frame();
@@ -125,11 +127,15 @@ int main(int argc, char *argv[]){
       }
       auto m_ev = result.unwrap();
       for (gt::TrkHit const &h : m_ev.trk_hits) {
-        //std::cout << h.to_string() << std::endl;
+        ++n_trk_hits;
+          //std::cout << h.to_string() << std::endl;
+      }
+      if (m_ev.trk_hits.size() == 0) {
+        ++n_evt_no_trk_hits;
       }
       for (TofHit const &h : m_ev.tof_event.hits) {
         // do someting with h
-        std::cout << h.to_string() << std::endl;
+        //std::cout << h.to_string() << std::endl;
       }
 
       if (n_frames_processed % 1000 == 0) {
@@ -149,6 +155,8 @@ int main(int argc, char *argv[]){
   std::cout << "--> Processesd " << n_frames_processed << " frames in " << elapsed << std::endl;
   std::cout << "--> Saw " << n_telemetry_errors << " errores when reading telemetry files!" << std::endl;
   std::cout << "--> Saw " << n_tof_telemetry_err << " errores when reading tofdata from telemetry files!" << std::endl;
+  std::cout << "--> Saw " << n_trk_hits << " tracker hits in total!" << std::endl;
+  std::cout << "--> Saw " << n_evt_no_trk_hits << " events without any tracker hits!" << std::endl;
   //std::cout << "--> Saw " << n_tofpacket_errors << " errores when reading tofstream files!" << std::endl;
   spdlog::info("Finished");
   return EXIT_SUCCESS;
