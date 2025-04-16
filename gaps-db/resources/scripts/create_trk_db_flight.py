@@ -36,12 +36,16 @@ if __name__ == '__main__':
             strip.module    = int(sd['module'])
             strip.channel   = int(sd['channel'])
             strip.volume_id = int(k)
-            strip.global_pos_x_det_l0 = float(sd['det_x'])
-            strip.global_pos_y_det_l0 = float(sd['det_y'])
-            strip.global_pos_z_det_l0 = float(sd['det_z'])
-            strip.global_pos_x_l0 = float(sd['x'])
-            strip.global_pos_y_l0 = float(sd['y'])
-            strip.global_pos_z_l0 = float(sd['z'])
+            # we have a global shift between simulation 
+            # geometry and that what we get from Erik
+            delta_z = -20.22628 # cm
+
+            strip.global_pos_x_det_l0 = float(sd['det_x'])/10
+            strip.global_pos_y_det_l0 = float(sd['det_y'])/10
+            strip.global_pos_z_det_l0 = float(sd['det_z'])/10 + delta_z
+            strip.global_pos_x_l0 = float(sd['x'])/10
+            strip.global_pos_y_l0 = float(sd['y'])/10
+            strip.global_pos_z_l0 = float(sd['z'])/10 + delta_z
             # FIXME - this should be included in a save hook
             strip.strip_id        = strip.get_id()
             print (strip)
