@@ -73,6 +73,8 @@ int main(int argc, char *argv[]){
   std::string tel_ev_boring  = "TelemetryPacketType.BoringEvent";
   std::string tel_ev_intrst  = "TelemetryPacketType.InterestingEvent";
 
+  std::string cooling_name   = "TelemetryPacketType.CoolingHK";
+
   u64 n_frames_processed  = 0;
   u64 n_telemetry_errors  = 0;
   u64 n_tof_telemetry_err = 0;
@@ -109,6 +111,19 @@ int main(int argc, char *argv[]){
         pack = frame.get_telemetrypacket(tel_ev_intrst);
       } else {
         continue;
+      }
+
+      if (frame.index.contains(cooling_name)) {
+        pack = frame.get_telemetrypacket(cooling_name);
+        std::cout << pack.to_string() << std::endl;
+        usize pos = 0;
+        auto cooling = gt::Cooling::from_bytestream(pack.payload, pos);
+        if (cooling.is_ok()) {
+          std::cout << cooling.unwrap().to_string() << std::endl;
+        } else {
+          std::cout << cooling.unwrap_err().reason << std::endl;
+        }
+        std::exit(1);
       }
 
       if (verbose) {
