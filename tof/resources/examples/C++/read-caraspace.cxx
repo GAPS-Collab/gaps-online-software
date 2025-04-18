@@ -82,7 +82,7 @@ int main(int argc, char *argv[]){
   auto start = std::chrono::high_resolution_clock::now();
 
   auto trk_mask = Gaps::get_trackerstripmasks();
-  //auto trk_ped  = Gaps::get_tracke
+  auto trk_ped  = Gaps::get_trackerstrippedestals();
 
   // as an example, count tracker hits
   u64 n_trk_hits        = 0;
@@ -150,6 +150,9 @@ int main(int argc, char *argv[]){
         if (trk_mask[strip_id]) {
           // only count active strips
           ++n_trk_hits;
+          // just as an example - subtract a pedestal
+          auto adc_no_pedestal = h.adc - trk_ped[strip_id].pedestal_mean;
+          //adc_no_pedestal;
         } else {
           ++n_trk_hits_masked;
         }

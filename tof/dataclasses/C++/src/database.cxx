@@ -247,6 +247,41 @@ auto Gaps::get_trackerstripmasks(std::string mask_name) -> Gaps::TrkStripMaskMap
   return mask_map;
 }
 
+auto Gaps::TrackerStripPedestal::to_string() const -> std::string {
+  std::string repr = "<TrackerStripPedestal:";
+  repr += std::format("\n strip id        : {}",  strip_id );
+  repr += std::format("\n volume id       : {}",  volume_id);
+  repr += std::format("\n Timestamp (UTC) : {}",  utc_timestamp);
+  repr += std::format("\n Pedestal Mean   : {}",  pedestal_mean);
+  repr += std::format("\n Pedestal Sigma  : {}",  pedestal_sigma);
+  repr += std::format("\n IsMeanValue     : {}",  is_mean_value);
+  return repr;
+}
+
+auto Gaps::get_trackerstrippedestals() -> Gaps::TrkStripPedMap {
+  Gaps::TrkStripPedMap ped_map;
+  auto db_path = std::getenv("DATABASE_URL");
+  if (db_path == nullptr) {
+    spdlog::error("Unable to retrieve database! The DATABASE_URL shell variable is not set. Did you load the setup-env.sh shell?");
+    return ped_map;
+  } 
+  std::string dbname(db_path);
+  auto storage = make_storage(dbname,
+    make_table("tof_db_trackerstrippedestal",
+      make_column("strip_id"             , &Gaps::TrackerStripPedestal::strip_id, primary_key()),
+      make_column("volume_id"            , &Gaps::TrackerStripPedestal::volume_id),  
+      make_column("utc_timestamp"        , &Gaps::TrackerStripPedestal::utc_timestamp),
+      make_column("pedestal_mean"        , &Gaps::TrackerStripPedestal::pedestal_mean),
+      make_column("pedestal_sigma"       , &Gaps::TrackerStripPedestal::pedestal_sigma),
+      make_column("is_mean_value"        , &Gaps::TrackerStripPedestal::is_mean_value)));  
+  
+  auto pedestals = storage.get_all<Gaps::TrackerStripPedestal>();
+  for (auto const &m : pedestals) {
+    ped_map.insert({m.strip_id, m});
+  }  
+  return ped_map;
+}
+
 std::ostream& operator<<(std::ostream& os, const Gaps::TofPaddle& tp) {
   os << tp.to_string();
   return os;
@@ -258,6 +293,11 @@ std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStrip& ts) {
 }
 
 std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStripMask& ts) {
+  os << ts.to_string();
+  return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStripPedestal& ts) {
   os << ts.to_string();
   return os;
 }

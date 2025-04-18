@@ -120,6 +120,20 @@ namespace Gaps {
 
   auto get_trackerstripmasks(std::string mask_name = "") -> TrkStripMaskMap;
 
+  struct TrackerStripPedestal {
+    u32     strip_id;
+    u64     volume_id;
+    u64     utc_timestamp;
+    f32     pedestal_mean;
+    f32     pedestal_sigma;
+    bool    is_mean_value;
+  
+    auto to_string() const -> std::string; 
+  };
+  
+  typedef std::map<u32, TrackerStripPedestal> TrkStripPedMap;
+  
+  auto get_trackerstrippedestals() -> TrkStripPedMap;
 }
 
 std::ostream& operator<<(std::ostream& os, const Gaps::TofPaddle& paddle);
@@ -127,5 +141,7 @@ std::ostream& operator<<(std::ostream& os, const Gaps::TofPaddle& paddle);
 std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStrip& strip);
 
 std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStripMask& strip);
+
+std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStripPedestal& strip);
 
 #endif
