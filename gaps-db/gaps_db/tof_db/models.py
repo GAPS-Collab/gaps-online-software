@@ -1172,6 +1172,44 @@ class TrackerStripPedestal(models.Model):
 
 ##########################################################################
 
+class TrackerStripMask(models.Model):
+    strip_id      = models.PositiveIntegerField(
+                        primary_key=True,
+                        null=False,
+                        default=0,
+                        unique=True,
+                        help_text="The unique identifier for this strip, which is Layer-Row-Module-Channel (5 digit number)")
+
+    volume_id     = models.PositiveBigIntegerField(
+                        default=0,
+                        null=False,
+                        unique=True,
+                        help_text="The VolumeId as used in the GAPS simulation code")
+    utc_timestamp  = models.PositiveBigIntegerField(null=False, default=0,
+                                                    help_text="UTC Timestamp in YYMMDDHHMMSS format")
+    mask_name    = models.CharField(max_length=1024,
+                                    null=True,
+                                    default="",
+                                    help_text="A name for this strip mask. There might be serveral per same day, so having only a timestamp might be confusing")
+    active = models.BooleanField(
+                        default=True,
+                        null=False,
+                        help_text="The strip is in working condition or not")
+    
+    def __str__(self):
+        return self.__repr__()
+    
+    def __repr__(self):
+        _repr = f'<TrackerStripMask [{self.strip_id}]:'
+        _repr += f'\n  Volume ID : {self.volume_id}'  
+        _repr += f'\n  Timestamp : {self.utc_timestamp}'  
+        _repr += f'\n  Name      : {self.mask_name}'  
+        _repr += f'\n  Mask      : {self.active}>'  
+        return _repr
+
+
+##########################################################################
+
 
 class Run(models.Model):
     """

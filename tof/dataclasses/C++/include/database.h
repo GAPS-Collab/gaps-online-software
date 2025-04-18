@@ -102,10 +102,30 @@ namespace Gaps {
   typedef std::map<u32, TrackerStrip> TrkStripMap;
   
   auto get_trackerstrips() -> TrkStripMap;        
+  
+  /// Each module can have a mask, which allows to disable
+  /// trcker strips. The mask is typically a 32bit number
+  struct TrackerStripMask {
+    u32         strip_id ;
+    u64         volume_id;
+    u64         utc_timestamp;
+    std::string mask_name; 
+    bool        active     ; 
+  
+    auto to_string() const -> std::string;
+
+  };
+
+  typedef std::map<u32, bool> TrkStripMaskMap;
+
+  auto get_trackerstripmasks(std::string mask_name = "") -> TrkStripMaskMap;
+
 }
 
 std::ostream& operator<<(std::ostream& os, const Gaps::TofPaddle& paddle);
 
 std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStrip& strip);
+
+std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStripMask& strip);
 
 #endif

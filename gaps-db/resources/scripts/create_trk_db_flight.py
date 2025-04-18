@@ -11,6 +11,7 @@ import numpy as np
 import tqdm
 import tof_db.models as m
 
+from pathlib import Path
 
 if __name__ == '__main__':
 
@@ -21,6 +22,8 @@ if __name__ == '__main__':
                         help='Input json file with strip coordinates')
     parser.add_argument('--pedestals', type=str, default='',\
                         help="Filename for SiLi pedestal values")
+    parser.add_argument('--tracker-mask', type=str, default='',\
+                        help="Filename for a file with tracker masks (1 mask per strip)")
     parser.add_argument('--dry-run', action='store_true', default=False,\
                         help="Don't do anything, just print.")
 
@@ -97,6 +100,30 @@ if __name__ == '__main__':
         for ped in mean_peds:
             pedestal.pedestal_mean  = all_pedestal_mean
             pedestal.pedestal_sigma = all_pedestal_sigma
-            pedestal.save()
+            if not args.dry_run:
+                pedestal.save()
             print (pedestal)
         print (f'--> We set mean pedestal values for {len(mean_peds)}')   
+    if args.tracker_mask:
+        maskmap = dict()
+        with open(args.tracker_mask, 'r') as maskf:
+            for line in maskf.readlines():
+                module_id, mask = line.split()
+                mask = int(mask, base=16)
+                print (module_id, mask)
+                layer  = int(module_id[0])
+                row    = int(module_id[1])
+                module = int(module_id[2])
+                for k in range(32):
+                    strip_mask = mask >> k & 0x1
+                    print (m.TrackerStrip.create_id(layer, row, module, k))
+                    print (strip_mask)
+                    tsmask = m.TrackerStripMask()
+                    tsmask.strip_id = m.TrackerStrip.create_id(layer, row, module, k)
+                    vid = m.TrackerStrip.objects.filter(strip_id=tsmask.strip_id)[0].volume_id
+                    tsmask.active = bool(strip_mask)
+                    tsmask.volume_id = vid
+                    tsmask.mask_name = str(Path(args.tracker_mask).stem)
+                    print (tsmask)
+                    if not args.dry_run:
+                        tsmask.save()

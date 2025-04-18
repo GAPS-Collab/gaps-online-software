@@ -81,8 +81,12 @@ int main(int argc, char *argv[]){
         
   auto start = std::chrono::high_resolution_clock::now();
 
+  auto trk_mask = Gaps::get_trackerstripmasks();
+  //auto trk_ped  = Gaps::get_tracke
+
   // as an example, count tracker hits
   u64 n_trk_hits        = 0;
+  u64 n_trk_hits_masked = 0;
   u64 n_evt_no_trk_hits = 0;
   for (auto const &f : filenames) {
     auto start = std::chrono::high_resolution_clock::now();
@@ -123,7 +127,7 @@ int main(int argc, char *argv[]){
         } else {
           std::cout << cooling.unwrap_err().reason << std::endl;
         }
-        std::exit(1);
+        //std::exit(1);
       }
 
       if (verbose) {
@@ -142,7 +146,13 @@ int main(int argc, char *argv[]){
       }
       auto m_ev = result.unwrap();
       for (gt::TrkHit const &h : m_ev.trk_hits) {
-        ++n_trk_hits;
+        auto strip_id = Gaps::TrackerStrip::create_id(h.layer, h.row, h.module, h.channel);
+        if (trk_mask[strip_id]) {
+          // only count active strips
+          ++n_trk_hits;
+        } else {
+          ++n_trk_hits_masked;
+        }
           //std::cout << h.to_string() << std::endl;
       }
       if (m_ev.trk_hits.size() == 0) {
@@ -170,7 +180,8 @@ int main(int argc, char *argv[]){
   std::cout << "--> Processesd " << n_frames_processed << " frames in " << elapsed << std::endl;
   std::cout << "--> Saw " << n_telemetry_errors << " errores when reading telemetry files!" << std::endl;
   std::cout << "--> Saw " << n_tof_telemetry_err << " errores when reading tofdata from telemetry files!" << std::endl;
-  std::cout << "--> Saw " << n_trk_hits << " tracker hits in total!" << std::endl;
+  std::cout << "--> Saw " << n_trk_hits << " valid tracker hits!" << std::endl;
+  std::cout << "--> Saw " << n_trk_hits_masked << " inactive tracker hits!" << std::endl;
   std::cout << "--> Saw " << n_evt_no_trk_hits << " events without any tracker hits!" << std::endl;
   //std::cout << "--> Saw " << n_tofpacket_errors << " errores when reading tofstream files!" << std::endl;
   spdlog::info("Finished");

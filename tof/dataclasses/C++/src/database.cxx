@@ -208,6 +208,44 @@ auto Gaps::TofPaddle::get_principal() const -> Vec<f32> {
   }
   return pr; 
 }
+  
+auto Gaps::TrackerStripMask::to_string() const -> std::string {
+  std::string repr = "<TrackerStripMask:";
+  repr += std::format("\n strip id        : {}",  strip_id );
+  repr += std::format("\n volume id       : {}",  volume_id);
+  repr += std::format("\n Timestamp (UTC) : {}",  utc_timestamp);
+  repr += std::format("\n mask name       : {}",  mask_name); 
+  repr += std::format("\n active          : {}>", active    ); 
+  return repr;
+}
+
+auto Gaps::get_trackerstripmasks(std::string mask_name) -> Gaps::TrkStripMaskMap {
+  Gaps::TrkStripMaskMap mask_map;
+  auto db_path = std::getenv("DATABASE_URL");
+  if (db_path == nullptr) {
+    spdlog::error("Unable to retrieve database! The DATABASE_URL shell variable is not set. Did you load the setup-env.sh shell?");
+    return mask_map;
+  } 
+  std::string dbname(db_path);
+  auto storage = make_storage(dbname,
+    make_table("tof_db_trackerstripmask",
+      make_column("strip_id"             , &Gaps::TrackerStripMask::strip_id, primary_key()),
+      make_column("volume_id"            , &Gaps::TrackerStripMask::volume_id),  
+      make_column("utc_timestamp"        , &Gaps::TrackerStripMask::utc_timestamp),
+      make_column("mask_name"            , &Gaps::TrackerStripMask::mask_name),
+      make_column("active"               , &Gaps::TrackerStripMask::active)));  
+  
+  auto masks = storage.get_all<Gaps::TrackerStripMask>();
+  for (auto const &m : masks) {
+    if (mask_name != "") {
+      if (m.mask_name != mask_name) {
+        continue;
+      }
+    }
+    mask_map.insert({m.strip_id, m.active});
+  }  
+  return mask_map;
+}
 
 std::ostream& operator<<(std::ostream& os, const Gaps::TofPaddle& tp) {
   os << tp.to_string();
@@ -215,6 +253,11 @@ std::ostream& operator<<(std::ostream& os, const Gaps::TofPaddle& tp) {
 }
 
 std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStrip& ts) {
+  os << ts.to_string();
+  return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStripMask& ts) {
   os << ts.to_string();
   return os;
 }
