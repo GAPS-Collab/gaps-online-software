@@ -82,7 +82,11 @@ if __name__ == '__main__':
             strip_id = m.TrackerStrip.create_id(layer, row, mod, chn)
             print (f'-> Layer {layer}, row {row}, mod {mod}, chn {chn}')
             print (f'-> Getting pedestal for strip {strip_id}')
-            pedestal = m.TrackerStripPedestal.objects.filter(strip_id=strip_id)[0]
+            try:
+                pedestal = m.TrackerStripPedestal.objects.filter(strip_id=strip_id)[0]
+            except:
+                print ("WARNING! No pedestal for this strip!")
+                continue
             pedestal.utc_timestamp = timestamp
             pedestal.pedestal_mean  = data[4]
             pedestal.pedestal_sigma = data[5]
@@ -116,10 +120,9 @@ if __name__ == '__main__':
                 module = int(module_id[2])
                 for k in range(32):
                     strip_mask = mask >> k & 0x1
-                    print (m.TrackerStrip.create_id(layer, row, module, k))
-                    print (strip_mask)
                     tsmask = m.TrackerStripMask()
                     tsmask.strip_id = m.TrackerStrip.create_id(layer, row, module, k)
+                    print(f'-> Getting tracker strip for id {tsmask.strip_id}') 
                     vid = m.TrackerStrip.objects.filter(strip_id=tsmask.strip_id)[0].volume_id
                     tsmask.active = bool(strip_mask)
                     tsmask.volume_id = vid
