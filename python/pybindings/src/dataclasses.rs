@@ -2832,6 +2832,15 @@ impl PyTofEventSummary {
     self.event.get_edep()
   }
 
+  #[getter]
+  pub fn nhits(&self) -> usize {
+    self.event.get_nhits()
+  }
+
+  #[getter]
+  pub fn nhits_umb(&self) -> usize {
+    self.event.get_nhits_umb()
+  }
   //#[getter]
   //fn beta(&self) -> f32 {
   //  self.event.get_beta()
@@ -3055,6 +3064,16 @@ impl PyTofEvent {
       }
     }
     events
+  }
+  
+  #[getter]
+  pub fn nhits(&self) -> usize {
+    self.event.get_nhits()
+  }
+
+  #[getter]
+  pub fn nhits_umb(&self) -> usize {
+    self.event.get_nhits_umb()
   }
   
   fn __repr__(&self) -> PyResult<String> {

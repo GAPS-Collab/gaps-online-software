@@ -1155,6 +1155,14 @@ def mtb_rate_plot(datafiles  : str  = None,
 
 def plot_hg_lg_hits(reader   = None,
                     events   = [],
+                    h_nhits  = None,
+                    h_nthits = None,
+                    h_nrblnk = None,
+                    n_events = None,
+                    no_hitmissing    = None,
+                    one_hitmissing   = None,
+                    lttwo_hitmissing = None,
+                    extra_hits       = None,
                     plot_dir = None,
                     split_by_threshold = False):
     """
@@ -1165,44 +1173,57 @@ def plot_hg_lg_hits(reader   = None,
     
     if reader:
         pass 
-    if events:
-        hits = [(len(ev.hits),\
-                 len(ev.trigger_hits),\
-                 len(ev.rb_link_ids),\
-                 ev.rb_link_ids) for ev in tqdm.tqdm(events, desc='Getting hits...')]
-
-    #print(f'-> We found {len(nthits)} LG and {len(nhits)} HG hits!'
-    no_hitmissing    = 0
-    one_hitmissing   = 0
-    lttwo_hitmissing = 0
-    extra_hits       = 0
-    for k in hits:
-        if k[0] == k[1]:
-            no_hitmissing += 1
-        elif (k[1] - k[0]) == 1:
-            one_hitmissing += 1
-        elif (k[1] - k[0]) > 1:
-            lttwo_hitmissing += 1
-        elif (k[0] > k[1]):
-            extra_hits += 1
-            
-    textbox  = f'NHits : {len(hits):.2e}\n'
-    textbox += f'{100*no_hitmissing/len(hits):.2f} \% for N(LG) == N(HG)\n'
-    textbox += f'{100*one_hitmissing/len(hits):.2f}\% for N(LG) - N(HG) == 1\n'
-    textbox += f'{100*lttwo_hitmissing/len(hits):.2f}\% for N(LG) - N(HG) $>=$ 2\n'
-    textbox += f'{100*extra_hits/len(hits):.2f}\% with N(HG) $>$ N(LG)\n'
+   
+    hits = []
+    if n_events is None:
+        if events:
+            hits = [(len(ev.hits),\
+                     len(ev.trigger_hits),\
+                     len(ev.rb_link_ids),\
+                     ev.rb_link_ids) for ev in tqdm.tqdm(events, desc='Getting hits...')]
+        
+        #print(f'-> We found {len(nthits)} LG and {len(nhits)} HG hits!'
+        no_hitmissing    = 0
+        one_hitmissing   = 0
+        lttwo_hitmissing = 0
+        extra_hits       = 0
+        for k in hits:
+            if k[0] == k[1]:
+                no_hitmissing += 1
+            elif (k[1] - k[0]) == 1:
+                one_hitmissing += 1
+            elif (k[1] - k[0]) > 1:
+                lttwo_hitmissing += 1
+            elif (k[0] > k[1]):
+                extra_hits += 1
+        hghits     = [k[0] for k in hits]
+        thits      = np.array([k[1] for k in hits])
+        rblinkids  = np.array([k[2] for k in hits])
+        n_events   = len(hghits)
+        #all_expected = nthits + rblinkids
+    
+    textbox = ''
+    if n_events is not None:
+        textbox  = f'NHits : {n_events:.2e}\n'
+    if no_hitmissing is not None:
+        textbox += f'{100*no_hitmissing/n_events:.2f} \% for N(LG) == N(HG)\n'
+    if one_hitmissing is not None:
+        textbox += f'{100*one_hitmissing/n_events:.2f}\% for N(LG) - N(HG) == 1\n'
+    if lttwo_hitmissing is not None:
+        textbox += f'{100*lttwo_hitmissing/n_events:.2f}\% for N(LG) - N(HG) $>=$ 2\n'
+    if extra_hits is not None:
+        textbox += f'{100*extra_hits/n_events:.2f}\% with N(HG) $>$ N(LG)\n'
     fig = plt.figure(figsize=lo.FIGSIZE_A4_LANDSCAPE)
     ax  = plt.gca()
-    nhits        = [k[0] for k in hits]
-    nthits       = np.array([k[1] for k in hits])
-    rblinkids    = np.array([k[2] for k in hits])
-    all_expected = nthits + rblinkids
-    h   = d.factory.hist1d(nhits, np.arange(-0.5,30.5,1))
-    h2  = d.factory.hist1d(nthits, np.arange(-0.5,30.5,1))
-    h3  = d.factory.hist1d(rblinkids, np.arange(-0.5,30.5,1))
-    h.line(filled=True, alpha=0.7, color='tab:blue', label='HG')
-    h2.line(color='tab:blue', label='LG')
-    h3.line(color='tab:red', label='RB LINK ID')
+    if h_nhits is None:
+        h_nhits   = d.factory.hist1d(hghits, np.arange(-0.5,30.5,1))
+    if h_nthits is None:
+        h_nthits  = d.factory.hist1d(thits, np.arange(-0.5,30.5,1))
+    if h_nrblnk is None:
+        h_nrblnk  = d.factory.hist1d(rblinkids, np.arange(-0.5,30.5,1))
+    h_nhits .line(filled=True, alpha=0.7, color='tab:blue', label='HG')
+    h_nthits.line(color='tab:blue', label='LG')
+    h_nrblnk.line(color='tab:red', label='RB LINK ID')
     ax.set_yscale('log')
     ax.set_xlabel('TOF hits', loc='right')
     ax.set_ylabel('events', loc='top')

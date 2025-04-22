@@ -107,6 +107,7 @@ impl PyMergedEvent {
     for h in &self.event.tracker_hitsv2 {
       let mut pyhit = PyTrackerHitV2::new();
       pyhit.set_hit(h.clone());
+      //pyhit.hit = h.clone();
       hits.push(pyhit);
     }
     Ok(hits)
@@ -617,7 +618,7 @@ impl PyTrackerHit {
   fn asic_event_code(&self) -> u8 {
     self.asic_event_code
   }
-  
+
   fn __repr__(&self) -> PyResult<String> {
     Ok(format!("{}", self))
   }
@@ -681,6 +682,11 @@ impl PyTrackerHitV2 {
       adc             : 0,
       oscillator      : 0,
     }
+  }
+
+  #[getter]
+  pub fn get_stripid(&self) -> u32 {
+    self.channel as u32 + (self.module as u32)*100 + (self.row as u32)*10000 + (self.layer as u32)*10000
   }
 
   #[getter]

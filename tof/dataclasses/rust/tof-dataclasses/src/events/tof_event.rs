@@ -453,6 +453,20 @@ impl TofEvent {
     }
     lost_hits
   }
+  
+  pub fn get_nhits_umb(&self) -> usize {
+    let mut nhit = 0;
+    for h in &self.get_hits() {
+      if h.paddle_id > 60 && h.paddle_id < 109 {
+        nhit += 1;
+      }
+    }
+    nhit
+  }
+
+  pub fn get_nhits(&self) -> usize {
+    self.get_hits().len()
+  }
 }
 
 impl Packable for TofEvent {
@@ -1054,6 +1068,20 @@ impl TofEventSummary {
       tot_edep += h.get_edep();
     }
     tot_edep
+  }
+
+  pub fn get_nhits_umb(&self) -> usize {
+    let mut nhit = 0;
+    for h in &self.hits {
+      if h.paddle_id > 60 && h.paddle_id < 109 {
+        nhit += 1;
+      }
+    }
+    nhit
+  }
+
+  pub fn get_nhits(&self) -> usize {
+    self.hits.len()
   }
 
   //pub fn set_beta(&mut self, beta : f32) {
