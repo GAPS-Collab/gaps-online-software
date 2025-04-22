@@ -1266,12 +1266,6 @@ pub struct PyRBCalibration {
   pub cali : RBCalibrations,
 }
 
-impl PyRBCalibration {
-  pub fn set_cali(&mut self, cali : RBCalibrations) {
-    self.cali = cali;
-  }
-}
-
 #[pymethods]
 impl PyRBCalibration {
   #[new]
@@ -1282,7 +1276,6 @@ impl PyRBCalibration {
     }
   }
 
-
   #[getter]
   fn rb_id(&self) -> u8 {
     self.cali.rb_id
@@ -1292,7 +1285,6 @@ impl PyRBCalibration {
   fn d_v(&self) -> f32 {
     self.cali.d_v
   }
- 
 
   #[getter]
   fn vcal_data(&self) -> Vec<PyRBEvent> {
@@ -1386,6 +1378,10 @@ impl PyRBCalibration {
       }
     }
     Ok(())
+  }
+  
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.cali)) 
   }
 }
   
