@@ -101,8 +101,9 @@ namespace Gaps {
   /// A map of strip identifier (layer-row-module-channel -> Tracker strip
   typedef std::map<u32, TrackerStrip> TrkStripMap;
   
+  /// Retrieve all tracker strips from the database
   auto get_trackerstrips() -> TrkStripMap;        
-  
+
   /// Each module can have a mask, which allows to disable
   /// trcker strips. The mask is typically a 32bit number
   struct TrackerStripMask {

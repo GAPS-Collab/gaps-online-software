@@ -70,7 +70,7 @@ auto Gaps::TrackerStrip::create_id() const -> u32 {
 }; 
 
 auto Gaps::TrackerStrip::create_id(u32 layer, u32 row, u32 module, u32 channel) -> u32 {
-  return channel + module*100 + row*10000 + layer*10000;
+  return channel + module*100 + row*10000 + layer*100000;
 };
 
 auto Gaps::get_tofpaddles() -> std::map<u8, Gaps::TofPaddle> {
@@ -159,6 +159,7 @@ auto Gaps::get_dsi_j_paddles() -> DsiJChnPaddleIdMap {
   }
   return map;
 };
+
 
 auto Gaps::get_trackerstrips() -> std::map<u32, Gaps::TrackerStrip> {
   // FIXME - find a better name for the database variable
