@@ -1080,7 +1080,7 @@ f32 TofHit::get_x_pos() const {
     f32 prec = 0.005; //cm
     return prec*x_pos - 163.8;
   } else {
-    return (time_a_f32 - get_t0())*C_LIGHT_PADDLE*10.0; // 10 for cm->mm 
+    return (time_a_f32 - get_t0_relative())*C_LIGHT_PADDLE*10.0; // 10 for cm->mm 
   }
 }
 
