@@ -470,23 +470,24 @@ impl TofHit {
     // that means to distinguish 2 points, we
     // only have HALF of the sine wave
     // FIXME - implement warning?
-    while phase < PI/2.0 {
+    while phase < -PI/2.0 {
       phase += PI/2.0;
     }
     while phase > PI/2.0 {
       phase -= PI/2.0;
     }
-    let phase_delay = (phase/(2.0*PI*freq))*1.0e9f32;
-    return phase_delay;
+    (phase/(2.0*PI*freq))*1.0e9f32
   }
 
   pub fn get_phase_rollovers(&self) -> i16 {
-    let phase = self.phase.to_f32();
+    let mut phase = self.phase.to_f32();
     let mut ro = 0i16;
     while phase < PI/2.0 {
+      phase += PI/2.0;
       ro += 1;
     }
     while phase > PI/2.0 {
+      phase -= PI/2.0;
       ro -= 1;
     }
     ro

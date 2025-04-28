@@ -999,10 +999,10 @@ auto TofHit::get_phase_delay() const -> f32 {
   f32 freq = 20e6;
   f32 phase_fixed = phase;
   auto PI = std::numbers::pi_v<f32>;
-  while (phase < PI/2.0) {
+  while (phase_fixed < -PI/2.0) {
     phase_fixed += PI/2.0;
   }
-  while (phase > PI/2.0) {
+  while (phase_fixed > PI/2.0) {
     phase_fixed -= PI/2.0;
   }
   auto phase_delay = (phase_fixed/(2.0*PI*freq))*1.0e9;
