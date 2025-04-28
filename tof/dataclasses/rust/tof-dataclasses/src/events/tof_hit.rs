@@ -45,6 +45,7 @@ use crate::database::Paddle;
 //const U16TOF32_EDEP        : f32 = 180.0/(u16::MAX as f32);
 //const F32TOU16_EDEP        : u16 = ((u16::MAX as f32)/100.0) as u16;
 
+
 /// Waveform peak
 ///
 /// Helper to form TofHits
@@ -189,6 +190,7 @@ impl fmt::Display for TofHit {
     x, y, z       {:.2} {:.2} {:.2}
   ** V1 variables
     phase (ch9)   {:.4}
+      n phs ro    {}
     baseline A/B  {:.2} {:.2}
     bl. RMS  A/B  {:.2} {:.2}>",
             self.version,
@@ -211,6 +213,7 @@ impl fmt::Display for TofHit {
             self.y,
             self.z,
             self.phase,
+            self.get_phase_rollovers(),
             self.baseline_a,
             self.baseline_b,
             self.baseline_a_rms,
@@ -463,13 +466,31 @@ impl TofHit {
   pub fn get_phase_delay(&self) -> f32 { 
     let freq : f32 = 20.0e6;
     let mut phase = self.phase.to_f32();
-    if phase < 0.0 {
-        phase += PI;
+    // fit allows for negative phase shift.
+    // that means to distinguish 2 points, we
+    // only have HALF of the sine wave
+    // FIXME - implement warning?
+    while phase < PI/2.0 {
+      phase += PI/2.0;
+    }
+    while phase > PI/2.0 {
+      phase -= PI/2.0;
     }
     let phase_delay = (phase/(2.0*PI*freq))*1.0e9f32;
     return phase_delay;
   }
 
+  pub fn get_phase_rollovers(&self) -> i16 {
+    let phase = self.phase.to_f32();
+    let mut ro = 0i16;
+    while phase < PI/2.0 {
+      ro += 1;
+    }
+    while phase > PI/2.0 {
+      ro -= 1;
+    }
+    ro
+  }
   ///
   /// That this works, the length of the paddle has to 
   /// be set before (in mm).

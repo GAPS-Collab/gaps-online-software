@@ -998,10 +998,15 @@ auto TofHit::set_paddle(const Gaps::TofPaddle& paddle) -> void {
 auto TofHit::get_phase_delay() const -> f32 {
   f32 freq = 20e6;
   f32 phase_fixed = phase;
-  if (phase_fixed < 0) {
-    phase_fixed += std::numbers::pi_v<f32>;
+  auto PI = std::numbers::pi_v<f32>;
+  while (phase < PI/2.0) {
+    phase_fixed += PI/2.0;
   }
-  return 1e9*phase_fixed/(2*std::numbers::pi_v<f32>*freq);
+  while (phase > PI/2.0) {
+    phase_fixed -= PI/2.0;
+  }
+  auto phase_delay = (phase_fixed/(2.0*PI*freq))*1.0e9;
+  return phase_delay;
 }
 
 auto TofHit::get_cable_delay() const -> f32 {
