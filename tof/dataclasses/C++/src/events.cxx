@@ -604,6 +604,34 @@ u32 TofEvent::get_n_rbmissinghits(u32 mask){
 u32 TofEvent::get_n_rbevents(u32 mask){
   return (mask & 0xFF);
 }
+  
+auto TofEvent::normalize_hit_times() -> void {
+
+  if (rb_events.size() == 0) {
+    return;
+  }
+  auto PI = std::numbers::pi_v<f32>;
+  bool first_phase = false;
+  f32 phase0 = 0;
+  for (auto &rbev : rb_events) {
+    for (auto &h : rbev.hits) {
+      if (!first_phase) {
+        phase0 = h.phase;
+        first_phase = true;
+      }
+      auto t0 = h.get_t0_relative() + h.get_cable_delay();
+      auto phase_diff = h.phase - phase0;
+      while (phase_diff < - PI/2.0) {
+        phase_diff += 2.0*PI;
+      }
+      while (phase_diff > PI/2.0) {
+        phase_diff -= 2.0*PI;
+      }
+      auto t_shift = 50.0*phase_diff/(2.0*PI);
+      h.event_t0 = t0 + t_shift;
+    }
+  }
+}
 
 /**********************************************************/
 
@@ -1259,6 +1287,12 @@ auto TofEventSummary::get_trigger_sources() const -> Vec<TriggerType> {
   }
   return t_types;
 } 
+
+auto TofEventSummary::normalize_hit_times() -> void {
+  //FIXME
+}
+
+
 
 Vec<std::tuple<u8, u8, u8, LTBThreshold>> TofEventSummary::get_trigger_hits() const {
   auto hits = Vec<std::tuple<u8,u8,u8,LTBThreshold>>(); 

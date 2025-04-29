@@ -125,16 +125,21 @@ pub struct TofHit {
   /// cable times will get populated from the db
   pub coax_cable_time: f32,
   pub hart_cable_time: f32,
-
+  /// normalized t0, where we have the phase difference
+  /// limited to -pi/2 -> pi/2
+  pub event_t0       : f32,
 
   // deprecated values (prior to V1 version)
   pub timestamp32    : u32,
   pub timestamp16    : u16,
   pub ctr_etx        : u8,
   pub charge_min_i   : u16,
+  
+  /// DEPRECATED
   /// Reconstructed particle interaction position
   /// across the paddle
   pub pos_across     : u16,
+  /// DEPRECATED
   /// Reconstructed particle interaction time
   pub t0             : u16,
   
@@ -333,40 +338,41 @@ impl TofHit {
 
   pub fn new() -> Self {
     Self{
-      paddle_id      : 0,
-      time_a         : f16::from_f32(0.0),
-      time_b         : f16::from_f32(0.0),
-      peak_a         : f16::from_f32(0.0),
-      peak_b         : f16::from_f32(0.0),
-      charge_a       : f16::from_f32(0.0),
-      charge_b       : f16::from_f32(0.0),
-      paddle_len     : f32::NAN,
-      cable_len      : f32::NAN,
-      coax_cable_time: f32::NAN,
+      paddle_id       : 0,
+      time_a          : f16::from_f32(0.0),
+      time_b          : f16::from_f32(0.0),
+      peak_a          : f16::from_f32(0.0),
+      peak_b          : f16::from_f32(0.0),
+      charge_a        : f16::from_f32(0.0),
+      charge_b        : f16::from_f32(0.0),
+      paddle_len      : f32::NAN,
+      cable_len       : f32::NAN,
+      coax_cable_time : f32::NAN,
       hart_cable_time : f32::NAN,
-      x              : f32::NAN,
-      y              : f32::NAN,
-      z              : f32::NAN,
+      event_t0        : f32::NAN,
+      x               : f32::NAN,
+      y               : f32::NAN,
+      z               : f32::NAN,
       
-      charge_min_i   : 0,
-      // deprecated  
-      pos_across     : 0,
-      t0             : 0,
-      ctr_etx        : 0,
-      timestamp32    : 0,
-      timestamp16    : 0,
-      valid          : true,
-      // v1 variables
-      version        : ProtocolVersion::V1,
-      reserved       : 0,
-      baseline_a     : f16::from_f32(0.0),
-      baseline_a_rms : f16::from_f32(0.0),
-      baseline_b     : f16::from_f32(0.0),
-      baseline_b_rms : f16::from_f32(0.0),
-      phase          : f16::from_f32(0.0),
+      charge_min_i    : 0,
+      // deprecated   
+      pos_across      : 0,
+      t0              : 0,
+      ctr_etx         : 0,
+      timestamp32     : 0,
+      timestamp16     : 0,
+      valid           : true,
+      // v1 variables 
+      version         : ProtocolVersion::V1,
+      reserved        : 0,
+      baseline_a      : f16::from_f32(0.0),
+      baseline_a_rms  : f16::from_f32(0.0),
+      baseline_b      : f16::from_f32(0.0),
+      baseline_b_rms  : f16::from_f32(0.0),
+      phase           : f16::from_f32(0.0),
       // non-serialize fields
-      ftime_a        : 0.0,
-      ftime_b        : 0.0,
+      ftime_a         : 0.0,
+      ftime_b         : 0.0,
       fpeak_a        : 0.0,
       fpeak_b        : 0.0,
     }
@@ -470,13 +476,13 @@ impl TofHit {
     // that means to distinguish 2 points, we
     // only have HALF of the sine wave
     // FIXME - implement warning?
-    while phase < -PI/2.0 {
-      phase += PI/2.0;
-    }
-    while phase > PI/2.0 {
-      phase -= PI/2.0;
-    }
-    (phase/(2.0*PI*freq))*1.0e9f32
+    //while phase < -PI {
+    //  phase += 2.0*PI;
+    //}
+    //while phase > PI {
+    //  phase -= 2.0*PI;
+    //}
+    (phase/(2.0*PI*freq))*1.0e9f32 
   }
 
   pub fn get_phase_rollovers(&self) -> i16 {
@@ -492,13 +498,14 @@ impl TofHit {
     }
     ro
   }
-  ///
+  
   /// That this works, the length of the paddle has to 
   /// be set before (in mm).
   /// This assumes that the cable on both sides of the paddle are 
   /// the same length
   pub fn get_t0(&self) -> f32 {
-    self.get_t0_uncorrected() + self.get_phase_delay() + self.get_cable_delay()
+    //self.get_t0_uncorrected() + self.get_phase_delay() + self.get_cable_delay()
+    self.event_t0
   }
 
   /// Calculate the interaction time based on the peak timings measured 
@@ -507,7 +514,7 @@ impl TofHit {
   /// This does not correct for any cable length
   /// or ch9 phase shift
   pub fn get_t0_uncorrected(&self) -> f32 {
-    0.5*(self.time_a.to_f32() + self.time_b.to_f32() - (self.paddle_len/(10.0*C_LIGHT_PADDLE)) - ((self.cable_len*2.0)/(10.0*C_LIGHT_CABLE)))
+    0.5*(self.time_a.to_f32() + self.time_b.to_f32() - (self.paddle_len/(10.0*C_LIGHT_PADDLE)))// - ((self.cable_len*2.0)/(10.0*C_LIGHT_CABLE)))
   }
 
   /// Philip's energy deposition based on peak height

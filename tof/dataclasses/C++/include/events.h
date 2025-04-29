@@ -241,6 +241,9 @@ struct TofHit  {
   f32 baseline_b_rms;
   f32 phase;
 
+  // event wide calculated time
+  f32 event_t0     = 0;
+
   u32 timestamp32;
   u16 timestamp16;
   // don't serialize
@@ -574,6 +577,9 @@ struct TofEvent {
   static auto get_n_rbevents(u32 mask) -> u32;
   /// Get all hits from all rb_events
   auto get_hits() const -> Vec<TofHit>;
+  /// normalize all the hit times, taking the global ch9 
+  /// phase into account
+  auto normalize_hit_times() -> void;
 
   /// string representation for printing
   auto to_string() const -> std::string;
@@ -675,6 +681,9 @@ struct TofEventSummary {
   /// set a TofPaddle, that is enrich every tofhit with information
   /// about the corresponding paddle
   auto set_paddlemap(const Gaps::TofPaddleMap&) -> void;
+  /// normalize all the hit times, taking the global ch9 
+  /// phase into account
+  auto normalize_hit_times() -> void;
   #endif
 
   // combined timestamp

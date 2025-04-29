@@ -3,6 +3,7 @@
 
 use std::time::Instant;
 use std::fmt;
+use std::f32::consts::PI;
 
 cfg_if::cfg_if! {
   if #[cfg(feature = "random")]  {
@@ -166,7 +167,8 @@ impl TofEvent {
       paddles_set       : false
     }
   }
-  
+
+
   #[cfg(feature="database")]
   pub fn set_paddles(&mut self, paddles : &HashMap<u8, Paddle>) {
     let mut nerror = 0u8;
@@ -435,6 +437,7 @@ impl TofEvent {
         summary.hits.push(h);
       }
     }
+    summary.normalize_hit_times();
     summary
   }
   
@@ -843,6 +846,26 @@ impl TofEventSummary {
       mtb_link_mask      : 0,
       hits               : Vec::<TofHit>::new(),
       paddles_set        : false,
+    }
+  }
+  
+  #[cfg(feature="database")]
+  pub fn normalize_hit_times(&mut self) {
+    if self.hits.len() == 0 {
+      return;
+    }
+    let phase0 = self.hits[0].phase.to_f32();
+    for h in &mut self.hits {
+      let mut t0 = h.get_t0_uncorrected() + h.get_cable_delay();
+      let mut phase_diff = h.phase.to_f32() - phase0;
+      while phase_diff < - PI/2.0 {
+        phase_diff += 2.0*PI;
+      }
+      while phase_diff > PI/2.0 {
+        phase_diff -= 2.0*PI;
+      }
+      let t_shift = 50.0*phase_diff/(2.0*PI);
+      h.event_t0 = t0 + t_shift;
     }
   }
  
