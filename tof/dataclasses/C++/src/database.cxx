@@ -198,9 +198,9 @@ auto Gaps::get_trackerstrips() -> std::map<u32, Gaps::TrackerStrip> {
 
 auto Gaps::TofPaddle::get_principal() const -> Vec<f32> {
   Vec<f32> pr(3,0);
-  pr[0] = global_pos_x_l0_A - global_pos_x_l0;
-  pr[1] = global_pos_y_l0_A - global_pos_y_l0;
-  pr[2] = global_pos_z_l0_A - global_pos_z_l0;
+  pr[0] = global_pos_x_l0_B - global_pos_x_l0_A;
+  pr[1] = global_pos_y_l0_B - global_pos_y_l0_A;
+  pr[2] = global_pos_z_l0_B - global_pos_z_l0_A;
   f32 length = std::sqrt((std::pow(pr[0],2) + std::pow(pr[1],2) + std::pow(pr[2],2)));
   if (length > 0) {
     pr = {pr[0]/length, pr[1]/length, pr[2]/length};
