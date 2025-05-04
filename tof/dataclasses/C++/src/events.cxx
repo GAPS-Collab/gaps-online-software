@@ -1118,7 +1118,8 @@ f32 TofHit::get_x_pos() const {
 }
 
 f32 TofHit::get_t0_relative() const {
-  return 0.5*(time_a_f32 + time_b_f32 - (paddle_len/(10.0*C_LIGHT_PADDLE)));
+  // FIXME - we should just consistently make the paddle len in mm!
+  return 0.5*(time_a_f32 + time_b_f32 - (10.0*paddle_len/(10.0*C_LIGHT_PADDLE)));
 }
 
 f32 TofHit::get_t_avg() const {
