@@ -103,6 +103,9 @@ namespace Gaps {
   
   /// Retrieve all tracker strips from the database
   auto get_trackerstrips() -> TrkStripMap;        
+  
+  /// Get the position of a module - returns in cm
+  auto get_module_position(u8 layer, u8 row, u8 mod, const TrkStripMap&) -> Vec<f32>;
 
   /// Each module can have a mask, which allows to disable
   /// trcker strips. The mask is typically a 32bit number

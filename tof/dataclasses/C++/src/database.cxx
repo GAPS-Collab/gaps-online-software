@@ -283,6 +283,25 @@ auto Gaps::get_trackerstrippedestals() -> Gaps::TrkStripPedMap {
   return ped_map;
 }
 
+auto Gaps::get_module_position(u8 layer, u8 row, u8 mod, const Gaps::TrkStripMap& strips) -> Vec<f32> {
+  auto det_0  = strips.at(TrackerStrip::create_id(layer, row, mod, 0));
+  auto det_1  = strips.at(TrackerStrip::create_id(layer, row, mod, 8));
+  auto det_2  = strips.at(TrackerStrip::create_id(layer, row, mod, 16));
+  auto det_3  = strips.at(TrackerStrip::create_id(layer, row, mod, 24));
+  auto mod_x  = det_0.global_pos_x_det_l0 + det_1.global_pos_x_det_l0
+              + det_2.global_pos_x_det_l0 + det_3.global_pos_x_det_l0;
+  mod_x = mod_x / 4;
+  auto mod_y  = det_0.global_pos_y_det_l0 + det_1.global_pos_y_det_l0
+              + det_2.global_pos_y_det_l0 + det_3.global_pos_y_det_l0;
+  mod_y = mod_y / 4;
+  auto mod_z  = det_0.global_pos_z_det_l0 + det_1.global_pos_z_det_l0
+              + det_2.global_pos_z_det_l0 + det_3.global_pos_z_det_l0;
+  mod_z = mod_z / 4;
+  Vec<f32> result = {mod_x, mod_y, mod_z};
+  //std::cout << std::format("X {} Y {} Z {}", mod_x, mod_y, mod_z) << std::endl;
+  return result;
+}
+
 std::ostream& operator<<(std::ostream& os, const Gaps::TofPaddle& tp) {
   os << tp.to_string();
   return os;

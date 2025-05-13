@@ -383,7 +383,7 @@ fn main() {
           if link_id as u8 == rb_expected_link_id {
             println!("=> We received the correct link id from the MTB!");
           } else {
-            error!("Received unexpected MTB link ID {}!", link_id);
+            error!("Received unexpected MTB link ID {} for this board {}! We expected MTB LINK ID {}", link_id, rb_id, rb_expected_link_id);
             error!("Incorrect link ID. This might hint to issues with the MTB mapping!");
             error!("******************************************************************");
             if args.ignore_mtb_link_id_check {
