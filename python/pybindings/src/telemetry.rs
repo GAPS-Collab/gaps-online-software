@@ -66,7 +66,7 @@ impl PyTelemetryHeader {
 
   /// GCU time of packet creation
   #[getter]
-  fn timestamnp(&self) -> u32 {
+  fn timestamp(&self) -> u32 {
     self.header.timestamp
   }
 
