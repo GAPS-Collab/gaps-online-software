@@ -470,8 +470,12 @@ struct MasterTriggerEvent {
   
   /// The combined GPS 48bit timestamp
   /// into a 48bit timestamp
+  [[deprecated("The format of the gps timestamp changed and it is only 32 bits as of now")]]
   auto get_timestamp_gps48() const -> u64;
-  /// Get absolute timestamp as sent by the GPS
+  /// Get the timestamp as sent by the GPS
+  auto get_timestamp_gps() const -> u32;
+  /// Get absolute timestamp which is calculated 
+  /// with the help of the 1pps pulse from the GPS
   auto get_timestamp_abs48() const -> u64;
   auto get_rb_link_ids()     const -> Vec<u8>;
   /// Get the combination of triggered DSI/J/CH on 

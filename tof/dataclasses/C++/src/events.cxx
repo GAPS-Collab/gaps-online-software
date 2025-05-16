@@ -769,16 +769,21 @@ u64 MasterTriggerEvent::get_timestamp_gps48() const {
 
 /*************************************/
 
+auto MasterTriggerEvent::get_timestamp_gps() const -> u32 {
+  return tiu_gps32;
+}
+
+/*************************************/
+
 u64 MasterTriggerEvent::get_timestamp_abs48() const {
-  u64 gps = get_timestamp_gps48();
-  u32 ts  = timestamp;
-  // FIXME - I guess we need to cast to u64
-  // This might be a bug
-  if (ts < tiu_timestamp) {
-    // counter rollover
-    ts += (u64)std::numeric_limits<u32>::max();
+  u64 gps       = (u64)get_timestamp_gps();
+  u64 ts        = (u64)timestamp;
+  if (ts < (u64)tiu_timestamp) {
+    // it has wrapped
+    ts +=  4294967295 + 1; // u32::MAX + 1
   }
-  u64 ts_abs  = 1e9 * gps + (u64)(ts - tiu_timestamp);
+  u64 gps_mult = 100000000 * gps; 
+  u64 ts_abs = gps_mult + ts - (u64)tiu_timestamp;
   return ts_abs;
 }
 
