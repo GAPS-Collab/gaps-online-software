@@ -769,16 +769,21 @@ u64 MasterTriggerEvent::get_timestamp_gps48() const {
 
 /*************************************/
 
+auto MasterTriggerEvent::get_timestamp_gps() const -> u32 {
+  return tiu_gps32;
+}
+
+/*************************************/
+
 u64 MasterTriggerEvent::get_timestamp_abs48() const {
-  u64 gps = get_timestamp_gps48();
-  u32 ts  = timestamp;
-  // FIXME - I guess we need to cast to u64
-  // This might be a bug
-  if (ts < tiu_timestamp) {
-    // counter rollover
-    ts += (u64)std::numeric_limits<u32>::max();
+  u64 gps       = (u64)get_timestamp_gps();
+  u64 ts        = (u64)timestamp;
+  if (ts < (u64)tiu_timestamp) {
+    // it has wrapped
+    ts +=  4294967295 + 1; // u32::MAX + 1
   }
-  u64 ts_abs  = 1e9 * gps + (u64)(ts - tiu_timestamp);
+  u64 gps_mult = 100000000 * gps; 
+  u64 ts_abs = gps_mult + ts - (u64)tiu_timestamp;
   return ts_abs;
 }
 
@@ -1118,7 +1123,8 @@ f32 TofHit::get_x_pos() const {
 }
 
 f32 TofHit::get_t0_relative() const {
-  return 0.5*(time_a_f32 + time_b_f32 - (paddle_len/(10.0*C_LIGHT_PADDLE)));
+  // FIXME - we should just consistently make the paddle len in mm!
+  return 0.5*(time_a_f32 + time_b_f32 - (10.0*paddle_len/(10.0*C_LIGHT_PADDLE)));
 }
 
 f32 TofHit::get_t_avg() const {

@@ -8,10 +8,12 @@ import re
 from pathlib import Path
 from glob import glob
 
-PATTERN = re.compile('Run([0-9]*)_([0-9]*).(?P<timestamp>([0-9_]*UTC)).tof.gaps')
-
+PATTERN = re.compile('Run([0-9]*)_([0-9]*).(?P<timestamp>([0-9_]*UTC)).(tof.gaps|gaps)')
 def get_timestamp(filename):
     ts = PATTERN.search(filename)
+    if ts is None:
+        print (filename)
+        raise  ValueError(f'Unable to extract timestamp from {filename}!')
     ts = ts.groupdict()['timestamp']
     return ts
 
@@ -283,10 +285,13 @@ if __name__ == '__main__':
     cr_outdir.mkdir(parents=True, exist_ok=True)
     cr_outdir = str(cr_outdir)
     
-    writer = go.io.CRWriter(cr_outdir, args.run_id)
+    file_timestamp   = get_timestamp(inputfiles[0])
+    writer           = go.io.CRWriter(cr_outdir, args.run_id, timestamp = file_timestamp)
     frames_written = 0
     for f in inputfiles:
         reader = go.io.CRReader(str(f))
+        file_timestamp   = get_timestamp(f)
+        writer.set_file_timestamp(file_timestamp)
         for frame in reader:
             clean_frame = frame
             if frames_written % 10000 == 0: # or n_toffy_errors % 1000 == 0 or n_telly_errors % 1000 == 0:
