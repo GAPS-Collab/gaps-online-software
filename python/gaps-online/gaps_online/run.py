@@ -39,12 +39,16 @@ def load_run_from_telemetry(start, end, data_dir='/data0/gaps/csbf/csbf-data/bin
 
     for f in tqdm.tqdm(files, desc='Reading files..'):
         treader = TelemetryPacketReader(str(f))
+        m_event_types = [TelemetryPacketType.BoringEvent,\
+                         TelemetryPacketType.NoGapsTriggerEvent,\
+                         TelemetryPacketType.InterestingEvent,\
+                         TelemetryPacketType.NoTofDataEvent]
         for pack in treader:
             npackets += 1
-            if pack.header.packet_type == 90:
+            if pack.header.packet_type in m_event_types:
                 nmerged += 1
                 packets.append(pack)
-            if pack.header.packet_type == 92: # AnyTofHK
+            if pack.header.packet_type == TelemetryPacketType.AnyTofHK: # AnyTofHK
                 tp = TofPacket()
                 tp.from_bytestream(pack.payload, 0)
                 if tp.packet_type == TofPacketType.MonitorMtb:

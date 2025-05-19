@@ -222,8 +222,13 @@ if rt_import_success:
                         have packet_type == TelemetryPacketType.MergedEvent
 
         """
-        if pack.header.packet_type != TelemetryPacketType.MergedEvent:
+        ptype = pack.header.packet_type
+        if not ptype in [TelemetryPacketType.BoringEvent,\
+                         TelemetryPacketType.InterestingEvent,\
+                         TelemetryPacketType.NoGapsTriggerEvent,\
+                         TelemetryPacketType.NoTofDataEvent]:
             return None
+        #if pack.header.packet_type != TelemetryPacketType.MergedEvent:
         ev = rt.telemetry.MergedEvent()
         try:
             ev.from_telemetrypacket(pack)
