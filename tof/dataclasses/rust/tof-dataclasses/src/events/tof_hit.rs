@@ -14,7 +14,6 @@ use crate::ProtocolVersion;
 
 use crate::constants::{
   C_LIGHT_PADDLE,
-  C_LIGHT_CABLE
 };
 
 #[cfg(feature="random")]
@@ -471,7 +470,7 @@ impl TofHit {
   /// on the channel9 sine wave
   pub fn get_phase_delay(&self) -> f32 { 
     let freq : f32 = 20.0e6;
-    let mut phase = self.phase.to_f32();
+    let phase = self.phase.to_f32();
     // fit allows for negative phase shift.
     // that means to distinguish 2 points, we
     // only have HALF of the sine wave

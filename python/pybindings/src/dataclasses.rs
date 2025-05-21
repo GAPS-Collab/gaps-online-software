@@ -2866,6 +2866,23 @@ impl PyTofEventSummary {
     self.event.status
   }
 
+  /// This can get a PyTofEventSummary from a TofPacket of 
+  /// Type "TofEvent" and will discard all the waveforms 
+  /// from that packet
+  fn from_tofeventpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
+    let tp = packet.get_tp();
+    match TofEventSummary::from_tofeventpacket(tp) {
+      Ok(event) => {
+        self.event = event;
+        return Ok(());
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to unpack TofPacket! {err}");
+        return Err(PyIOError::new_err(err_msg));
+      }
+    }
+  }
+
   /// Unpack a tofpacket
   fn from_tofpacket(&mut self, packet : &PyTofPacket) -> PyResult<()> {
     let tp = packet.get_tp();

@@ -23,7 +23,11 @@ use crate::serialization::{
   search_for_u16
 };
 
-use crate::packets::PacketType;
+use crate::packets::{
+  TofPacket,
+  PacketType
+};
+
 use crate::errors::SerializationError;
 
 use crate::events::{
@@ -856,7 +860,7 @@ impl TofEventSummary {
     }
     let phase0 = self.hits[0].phase.to_f32();
     for h in &mut self.hits {
-      let mut t0 = h.get_t0_uncorrected() + h.get_cable_delay();
+      let t0 = h.get_t0_uncorrected() + h.get_cable_delay();
       let mut phase_diff = h.phase.to_f32() - phase0;
       while phase_diff < - PI/2.0 {
         phase_diff += 2.0*PI;
@@ -1107,20 +1111,43 @@ impl TofEventSummary {
     self.hits.len()
   }
 
-  //pub fn set_beta(&mut self, beta : f32) {
-  //  // expecting beta in range of 0-1. If larger
-  //  // than 1, we will save 1
-  //  if beta > 1.0 {
-  //    self.primary_beta = 1;
-  //  }
-  //  let pbeta = beta*(u16::MAX as f32).floor();
-  //  // safe, bc of multiplication with u16::MAX
-  //  self.primary_beta = pbeta as u16;
-  //}
-
-  //pub fn get_beta(&self) -> f32 {
-  //  self.primary_beta as f32/u32::MAX as f32 
-  //}
+  /// Allows to get TofEventSummary from a packet 
+  /// of type TofEvent. This will dismiss all the 
+  /// waveforms and RBEvents
+  pub fn from_tofeventpacket(pack : &TofPacket)
+    -> Result<Self, SerializationError> {
+    if pack.packet_type != PacketType::TofEvent {
+      return Err(SerializationError::IncorrectPacketType);
+    }
+    let mut pos = 0usize;
+    let stream  = &pack.payload;
+    let head    = parse_u16(stream, &mut pos);
+    if head != TofEvent::HEAD {
+      return Err(SerializationError::HeadInvalid);
+    }
+    let mut te           = TofEvent::new();
+    te.compression_level = CompressionLevel::try_from(parse_u8(stream, &mut pos)).unwrap();
+    te.quality           = EventQuality::try_from(parse_u8(stream, &mut pos)).unwrap();
+    te.header            = TofEventHeader::from_bytestream(stream, &mut pos)?;
+    te.mt_event          = MasterTriggerEvent::from_bytestream(stream, &mut pos)?;
+    
+    let v_sizes              = TofEvent::decode_size_header(&parse_u32(stream, &mut pos));
+    for k in 0..v_sizes.0 {
+      match RBEvent::from_bytestream_nowaveforms(stream, &mut pos) {
+        Err(err) => error!("Expected RBEvent {} of {}, but got serialization error {}!", k,  v_sizes.0, err),
+        Ok(ev) => {
+          te.rb_events.push(ev);
+        }
+      }
+    }
+    let tail = parse_u16(stream, &mut pos);
+    if tail != Self::TAIL {
+      error!("Decoding of TAIL failed! Got {} instead!", tail);
+      return Err(SerializationError::TailInvalid);
+    }
+    let summary = te.get_summary();
+    return Ok(summary);
+  }
 }
 
 impl Packable for TofEventSummary {
