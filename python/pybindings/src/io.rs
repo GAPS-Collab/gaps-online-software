@@ -217,6 +217,11 @@ impl PyTofPacketReader {
   //}
 
   #[getter]
+  fn get_filenames(&self) -> Vec<String> {
+    self.reader.filenames.clone()
+  }
+
+  #[getter]
   fn packet_index(&mut self) -> PyResult<HashMap<PacketType, usize>> {
     let idx = self.reader.get_packet_index()?;
     self.reader.rewind()?;

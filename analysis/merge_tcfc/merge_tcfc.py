@@ -23,7 +23,6 @@ if __name__ == '__main__':
     import argparse
     import sys
 
-
     parser = argparse.ArgumentParser(description='Scrutinize run data for issues. Input can be either telemetry binary files, TOF run files (.tof.gaps) or both')
     parser.add_argument('--telemetry-dir', default='/data0/gaps/csbf/csbf-data/binaries/ethernet',\
                         help='A directory with telemetry binaries, as received from the telemetry stream',
@@ -48,6 +47,8 @@ if __name__ == '__main__':
                         default=None)
     parser.add_argument('-v','--verbose', action='store_true',\
                         help='More verbose output')
+    parser.add_argument('--no-gps', action='store_true', \
+                        help='Ignore the GPS to find matching telemetry and tof timestamps. Only use the tof file timestamps')
     parser.add_argument('--reprocess', action='store_true', \
                         help='Recalculate tof packets with latest version of the code')
     args = parser.parse_args()
@@ -72,19 +73,29 @@ if __name__ == '__main__':
     # then we get them from the files
     tof_times_reader = go.io.TofPacketReader(f'{args.tof_dir}/{args.run_id}', filter=go.io.TofPacketType.TofEvent)
     ev               = go.events.TofEvent()
-    ev.from_tofpacket(tof_times_reader.first)
-    tof_start_time   = 1e-5*ev.get_summary().timestamp48
-    ev.from_tofpacket(tof_times_reader.last)
-    tof_end_time     = 1e-5*ev.get_summary().timestamp48
-    tof_duration     = tof_end_time - tof_start_time
-    print (f'-> Found tof start/stop times of {tof_start_time:.1f}:{tof_end_time:.1f}, that is {tof_duration/3600:.2f} h!')
-    
+    if args.no_gps:
+        first_file = tof_times_reader.filenames[0]
+        last_file  = tof_times_reader.filenames[-1]
+        tof_start_time = go.io.get_ts_from_toffile(first_file).timestamp()
+        tof_end_time   = go.io.get_ts_from_toffile(last_file).timestamp()
+        tof_duration     = tof_end_time - tof_start_time
+        tof_times_reader.rewind()
+        
+        print (f'-> Get start/stop times from TOF filenames')
+        print (f'-> Adding +90s to the tof end file')
+        tof_end_time += 90
+        print (f'-> Found tof start/stop times of {tof_start_time:.1f}:{tof_end_time:.1f}, that is {tof_duration/3600:.2f} h!')
+    else:
+        ev.from_tofpacket(tof_times_reader.first)
+        tof_start_time   = 1e-5*ev.get_summary().timestamp48
+        ev.from_tofpacket(tof_times_reader.last)
+        tof_end_time     = 1e-5*ev.get_summary().timestamp48
+        tof_duration     = tof_end_time - tof_start_time
+        print (f'-> Found tof start/stop times of {tof_start_time:.1f}:{tof_end_time:.1f}, that is {tof_duration/3600:.2f} h!')
     # set an extra time range of +- 2 mins range for the telemetry stream
     telemetry_files = go.io.get_telemetry_binaries(tof_start_time - 120,\
                                                    tof_end_time   + 120,\
                                                    data_dir=args.telemetry_dir)
-    
-
     telemetry_index = dict()
     tof_index       = dict()
     telly_errors    = 0
