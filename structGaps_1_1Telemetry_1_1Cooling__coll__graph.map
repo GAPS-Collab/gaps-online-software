@@ -1,0 +1,5 @@
+<map id="Gaps::Telemetry::Cooling" name="Gaps::Telemetry::Cooling">
+<area shape="rect" id="Node000001" title=" " alt="" coords="25,93,209,119"/>
+<area shape="rect" id="Node000002" href="$structGaps_1_1Telemetry_1_1PacketHeader.html" title=" " alt="" coords="5,5,229,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,45,120,93,115,93,115,45"/>
+</map>

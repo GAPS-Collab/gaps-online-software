@@ -310,7 +310,7 @@ FIXME - might get moved around</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.tof.visual.mtb_rate_plot" title="gaps_online.tof.visual.mtb_rate_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mtb_rate_plot</span></code></a>([datafiles, mtbmonidata, ...])</p></td>
 <td><p>Show the rate and lost_rate as read from MTB register over time</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.tof.visual.plot_hg_lg_hits" title="gaps_online.tof.visual.plot_hg_lg_hits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_hg_lg_hits</span></code></a>([reader, events, plot_dir, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.tof.visual.plot_hg_lg_hits" title="gaps_online.tof.visual.plot_hg_lg_hits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_hg_lg_hits</span></code></a>([reader, events, h_nhits, ...])</p></td>
 <td><p>Plot the HG vs the LG (trigger) hits</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.tof.visual.plot_ltb_threshold_timeseries" title="gaps_online.tof.visual.plot_ltb_threshold_timeseries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_ltb_threshold_timeseries</span></code></a>(times, ltb_hk)</p></td>
@@ -322,22 +322,25 @@ FIXME - might get moved around</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.tof.visual.plot_rb_paddles" title="gaps_online.tof.visual.plot_rb_paddles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_rb_paddles</span></code></a>(rb)</p></td>
 <td><p>Create the TOF projection plots and  mark the respective panels corresponding  to the ReadoutBoard</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.tof.visual.timeseries_multiplot" title="gaps_online.tof.visual.timeseries_multiplot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timeseries_multiplot</span></code></a>(times, variables, labels)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.tof.visual.plot_waveforms" title="gaps_online.tof.visual.plot_waveforms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_waveforms</span></code></a>(tof_ev[, calib, with_hits, ...])</p></td>
+<td><p>Return a list of figures with all the waveforms from a  specific tof event</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.tof.visual.timeseries_multiplot" title="gaps_online.tof.visual.timeseries_multiplot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timeseries_multiplot</span></code></a>(times, variables, labels)</p></td>
 <td><p>Create a general timeseries plot for multiple variables over  the mission elapsed time.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.tof.visual.timeseries_plot" title="gaps_online.tof.visual.timeseries_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timeseries_plot</span></code></a>(times, data[, title, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.tof.visual.timeseries_plot" title="gaps_online.tof.visual.timeseries_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">timeseries_plot</span></code></a>(times, data[, title, ...])</p></td>
 <td><p>Create a general timeseries plot for a variable over  the mission elapsed time</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.tof.visual.tof_2dproj" title="gaps_online.tof.visual.tof_2dproj"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tof_2dproj</span></code></a>([paddle_occupancy, cmap, show_cbar])</p></td>
-<td><p>Project the whole TOF on the 2d plane in a meaningful  way.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.tof.visual.tof_2dproj" title="gaps_online.tof.visual.tof_2dproj"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tof_2dproj</span></code></a>([event, cmap, paddle_style, ...])</p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.tof.visual.tof_projection_xy" title="gaps_online.tof.visual.tof_projection_xy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tof_projection_xy</span></code></a>([paddle_occupancy, cmap, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.tof.visual.tof_projection_xy" title="gaps_online.tof.visual.tof_projection_xy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tof_projection_xy</span></code></a>([paddle_occupancy, event, ...])</p></td>
 <td><p>Show the projection of all paddles which are facing in z-direction These are the whole Umbrella as well as  CBE TOP + Bottom.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.tof.visual.unroll_cbe_sides" title="gaps_online.tof.visual.unroll_cbe_sides"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unroll_cbe_sides</span></code></a>([paddle_occupancy, cmap, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.tof.visual.unroll_cbe_sides" title="gaps_online.tof.visual.unroll_cbe_sides"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unroll_cbe_sides</span></code></a>([paddle_occupancy, event, ...])</p></td>
 <td><p>Project the sides of the cube on xz and yz as well  as add the 'edge' paddles.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.tof.visual.unroll_cor" title="gaps_online.tof.visual.unroll_cor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unroll_cor</span></code></a>([paddle_occupancy, cmap, show_cbar])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.tof.visual.unroll_cor" title="gaps_online.tof.visual.unroll_cor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unroll_cor</span></code></a>([paddle_occupancy, event, cmap, ...])</p></td>
 <td><p>Project the cortina on xz and yz as well  as add the 'edge' paddles.</p></td>
 </tr>
 </tbody>
@@ -399,8 +402,26 @@ savevname : save plot with this filename,</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="gaps_online.tof.visual.plot_waveforms">
+<span class="sig-prename descclassname"><span class="pre">gaps_online.tof.visual.</span></span><span class="sig-name descname"><span class="pre">plot_waveforms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tof_ev</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calib</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_hits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.visual.plot_waveforms" title="Link to this definition">#</a></dt>
+<dd><p>Return a list of figures with all the waveforms from a 
+specific tof event</p>
+<dl>
+<dt># Arguments:</dt><dd><p>tof_ev    : TofEvent with waveforms
+calib     : A dictionary with RB calibrations
+with_hits : Indicate extracted hit time in the plots
+skip_bins : Zero the first [skip_bins]. This might be a</p>
+<blockquote>
+<div><p>helpful option in case there is a big spike 
+in the beginning</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="gaps_online.tof.visual.tof_projection_xy">
-<span class="sig-prename descclassname"><span class="pre">gaps_online.tof.visual.</span></span><span class="sig-name descname"><span class="pre">tof_projection_xy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paddle_occupancy={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap=&lt;matplotlib.colors.LinearSegmentedColormap</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_cbar=True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.visual.tof_projection_xy" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">gaps_online.tof.visual.</span></span><span class="sig-name descname"><span class="pre">tof_projection_xy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paddle_occupancy={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap=&lt;matplotlib.colors.LinearSegmentedColormap</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paddle_style={'edgecolor':</span> <span class="pre">'w'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'lw':</span> <span class="pre">0.4}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_cbar=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlay_panels=False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.visual.tof_projection_xy" title="Link to this definition">#</a></dt>
 <dd><p>Show the projection of all paddles which
 are facing in z-direction
 These are the whole Umbrella as well as 
@@ -410,19 +431,25 @@ it can also be 'hijacked' to just highlight certain
 paddles.</p>
 <dl>
 <dt># Keyword Arguments:</dt><dd><p>paddle_occupancy : The number of events per paddle
+event            : Plot hits from TofEvent or TofEventSummary
 cmap             : Colormap - can be lambda function</p>
 <blockquote>
 <div><p>to return color value based on 
 'occupancy' numbker</p>
 </div></blockquote>
-<p>show_cbar        : Show the colorbar on the figure</p>
+<p>show_cbar        : Show the colorbar on the figure
+overlay_panels   : Only return one axes, have the TOF CBE bottom</p>
+<blockquote>
+<div><p>and CBE TOP panels overlaid over the umbrella
+(or under it)</p>
+</div></blockquote>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="gaps_online.tof.visual.unroll_cbe_sides">
-<span class="sig-prename descclassname"><span class="pre">gaps_online.tof.visual.</span></span><span class="sig-name descname"><span class="pre">unroll_cbe_sides</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paddle_occupancy={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap=&lt;matplotlib.colors.LinearSegmentedColormap</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_cbar=True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.visual.unroll_cbe_sides" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">gaps_online.tof.visual.</span></span><span class="sig-name descname"><span class="pre">unroll_cbe_sides</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paddle_occupancy={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap=&lt;matplotlib.colors.LinearSegmentedColormap</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_cbar=True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.visual.unroll_cbe_sides" title="Link to this definition">#</a></dt>
 <dd><p>Project the sides of the cube on xz and yz as well 
 as add the 'edge' paddles.</p>
 <p>While this plot can show the occupancy of TOF paddles,
@@ -430,6 +457,7 @@ it can also be 'hijacked' to just highlight certain
 paddles.</p>
 <dl>
 <dt># Keyword Arguments:</dt><dd><p>paddle_occupancy : The number of events per paddle
+event            : Plot a tof event
 cmap             : Colormap - can be lambda function</p>
 <blockquote>
 <div><p>to return color value based on 
@@ -442,7 +470,7 @@ cmap             : Colormap - can be lambda function</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="gaps_online.tof.visual.unroll_cor">
-<span class="sig-prename descclassname"><span class="pre">gaps_online.tof.visual.</span></span><span class="sig-name descname"><span class="pre">unroll_cor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paddle_occupancy={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap=&lt;matplotlib.colors.LinearSegmentedColormap</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_cbar=True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.visual.unroll_cor" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">gaps_online.tof.visual.</span></span><span class="sig-name descname"><span class="pre">unroll_cor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paddle_occupancy={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap=&lt;matplotlib.colors.LinearSegmentedColormap</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_cbar=True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.visual.unroll_cor" title="Link to this definition">#</a></dt>
 <dd><p>Project the cortina on xz and yz as well 
 as add the 'edge' paddles.</p>
 <p>While this plot can show the occupancy of TOF paddles,
@@ -462,23 +490,8 @@ cmap             : Colormap - can be lambda function</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="gaps_online.tof.visual.tof_2dproj">
-<span class="sig-prename descclassname"><span class="pre">gaps_online.tof.visual.</span></span><span class="sig-name descname"><span class="pre">tof_2dproj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paddle_occupancy={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap=&lt;matplotlib.colors.LinearSegmentedColormap</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_cbar=True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.visual.tof_2dproj" title="Link to this definition">#</a></dt>
-<dd><p>Project the whole TOF on the 2d plane in a meaningful 
-way.</p>
-<p>While this plot can show the occupancy of TOF paddles,
-it can also be 'hijacked' to just highlight certain
-paddles.</p>
-<dl>
-<dt># Keyword Arguments:</dt><dd><p>paddle_occupancy : The number of events per paddle
-cmap             : Colormap - can be lambda function</p>
-<blockquote>
-<div><p>to return color value based on 
-'occupancy' numbker</p>
-</div></blockquote>
-<p>show_cbar        : Show the colorbar on the figure</p>
-</dd>
-</dl>
-</dd></dl>
+<span class="sig-prename descclassname"><span class="pre">gaps_online.tof.visual.</span></span><span class="sig-name descname"><span class="pre">tof_2dproj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap=&lt;matplotlib.colors.LinearSegmentedColormap</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paddle_style={'edgecolor':</span> <span class="pre">'w'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'lw':</span> <span class="pre">0.4}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_cbar=True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.visual.tof_2dproj" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="gaps_online.tof.visual.plot_rb_paddles">
@@ -518,23 +531,30 @@ to the ReadoutBoard</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="gaps_online.tof.visual.mtb_rate_plot">
-<span class="sig-prename descclassname"><span class="pre">gaps_online.tof.visual.</span></span><span class="sig-name descname"><span class="pre">mtb_rate_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datafiles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mtbmonidata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_gcutime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mtb_moni_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.visual.mtb_rate_plot" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">gaps_online.tof.visual.</span></span><span class="sig-name descname"><span class="pre">mtb_rate_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datafiles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mtbmonidata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_gcutime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mtb_moni_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.visual.mtb_rate_plot" title="Link to this definition">#</a></dt>
 <dd><p>Show the rate and lost_rate as read from MTB register over time</p>
 <p># Arguments</p>
 <blockquote>
 <div><ul class="simple">
+<li><p>datafilse         : Either a single filename or a directory with files</p></li>
 <li><dl class="simple">
-<dt>datafiles:  Can be either str, pathlib.Path or a list of these, or None.</dt><dd><p>If not None, walk over them and extract the MTB moni data</p>
+<dt>mtbmonidata<span class="classifier">Instead of a list of files, a list of tuples (gcutime, MTBMoniData) </span></dt><dd><p>can be given.</p>
 </dd>
 </dl>
 </li>
+<li><dl class="simple">
+<dt>mtb_moni_interval<span class="classifier">In case we don't have a gcu time, specify the sampling interval </span></dt><dd><p>for MTBMoniData (this can be obtained from the run&lt;runid&gt;.toml file</p>
+</dd>
+</dl>
+</li>
+<li><p>plot_dir          : To save the plot as a .webp, specify a directory</p></li>
 </ul>
 </div></blockquote>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="gaps_online.tof.visual.plot_hg_lg_hits">
-<span class="sig-prename descclassname"><span class="pre">gaps_online.tof.visual.</span></span><span class="sig-name descname"><span class="pre">plot_hg_lg_hits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reader</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_by_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.visual.plot_hg_lg_hits" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">gaps_online.tof.visual.</span></span><span class="sig-name descname"><span class="pre">plot_hg_lg_hits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reader</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h_nhits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h_nthits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h_nrblnk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_hitmissing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">one_hitmissing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lttwo_hitmissing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_hits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_by_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.visual.plot_hg_lg_hits" title="Link to this definition">#</a></dt>
 <dd><p>Plot the HG vs the LG (trigger) hits</p>
 </dd></dl>
 
@@ -587,6 +607,7 @@ builder heartbeats</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tof.visual.timeseries_plot"><code class="docutils literal notranslate"><span class="pre">timeseries_plot()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tof.visual.timeseries_multiplot"><code class="docutils literal notranslate"><span class="pre">timeseries_multiplot()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tof.visual.plot_waveforms"><code class="docutils literal notranslate"><span class="pre">plot_waveforms()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tof.visual.tof_projection_xy"><code class="docutils literal notranslate"><span class="pre">tof_projection_xy()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tof.visual.unroll_cbe_sides"><code class="docutils literal notranslate"><span class="pre">unroll_cbe_sides()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tof.visual.unroll_cor"><code class="docutils literal notranslate"><span class="pre">unroll_cor()</span></code></a></li>
@@ -643,7 +664,7 @@ builder heartbeats</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.0.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>

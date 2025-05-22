@@ -14,6 +14,7 @@ gaps\_online.tof.visual
       plot_ltb_threshold_timeseries
       plot_paddle_charge2d
       plot_rb_paddles
+      plot_waveforms
       timeseries_multiplot
       timeseries_plot
       tof_2dproj

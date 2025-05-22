@@ -118,27 +118,33 @@ Collaboration diagram for TofEvent:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aea1f5e45ce3fd1d874eb6424d7c8c84d" id="r_aea1f5e45ce3fd1d874eb6424d7c8c84d"><td class="memItemLeft" align="right" valign="top"><a id="aea1f5e45ce3fd1d874eb6424d7c8c84d" name="aea1f5e45ce3fd1d874eb6424d7c8c84d"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>to_string</b> () const</td></tr>
-<tr class="memdesc:aea1f5e45ce3fd1d874eb6424d7c8c84d"><td class="mdescLeft">&#160;</td><td class="mdescRight">string representation for printing <br /></td></tr>
-<tr class="separator:aea1f5e45ce3fd1d874eb6424d7c8c84d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a635c9efb36f792b06da1e153f39d5202" id="r_a635c9efb36f792b06da1e153f39d5202"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structRBEvent.html">RBEvent</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTofEvent.html#a635c9efb36f792b06da1e153f39d5202">get_rbevent</a> (u8 board_id) const</td></tr>
-<tr class="separator:a635c9efb36f792b06da1e153f39d5202"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a98d22145ed7cf71e2a8d667af59b557b" id="r_a98d22145ed7cf71e2a8d667af59b557b"><td class="memItemLeft" align="right" valign="top">Vec&lt; u8 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTofEvent.html#a98d22145ed7cf71e2a8d667af59b557b">get_rbids</a> () const</td></tr>
-<tr class="separator:a98d22145ed7cf71e2a8d667af59b557b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c5dfd31c631ca0f27b22c4635ca5edb" id="r_a4c5dfd31c631ca0f27b22c4635ca5edb"><td class="memItemLeft" align="right" valign="top"><a id="a4c5dfd31c631ca0f27b22c4635ca5edb" name="a4c5dfd31c631ca0f27b22c4635ca5edb"></a>
+auto&#160;</td><td class="memItemRight" valign="bottom"><b>get_hits</b> () const -&gt; Vec&lt; <a class="el" href="structTofHit.html">TofHit</a> &gt;</td></tr>
+<tr class="memdesc:a4c5dfd31c631ca0f27b22c4635ca5edb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all hits from all rb_events. <br /></td></tr>
+<tr class="separator:a4c5dfd31c631ca0f27b22c4635ca5edb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada77401a8d3aa94e1efc41adf5dea431" id="r_ada77401a8d3aa94e1efc41adf5dea431"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTofEvent.html#ada77401a8d3aa94e1efc41adf5dea431">normalize_hit_times</a> () -&gt; void</td></tr>
+<tr class="separator:ada77401a8d3aa94e1efc41adf5dea431"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55613aeb45f1cff839145483fa4b5f27" id="r_a55613aeb45f1cff839145483fa4b5f27"><td class="memItemLeft" align="right" valign="top"><a id="a55613aeb45f1cff839145483fa4b5f27" name="a55613aeb45f1cff839145483fa4b5f27"></a>
+auto&#160;</td><td class="memItemRight" valign="bottom"><b>to_string</b> () const -&gt; std::string</td></tr>
+<tr class="memdesc:a55613aeb45f1cff839145483fa4b5f27"><td class="mdescLeft">&#160;</td><td class="mdescRight">string representation for printing <br /></td></tr>
+<tr class="separator:a55613aeb45f1cff839145483fa4b5f27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f78c168e729dafdfbb14879cddf7ca3" id="r_a2f78c168e729dafdfbb14879cddf7ca3"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTofEvent.html#a2f78c168e729dafdfbb14879cddf7ca3">get_rbevent</a> (u8 board_id) const -&gt; const <a class="el" href="structRBEvent.html">RBEvent</a> &amp;</td></tr>
+<tr class="separator:a2f78c168e729dafdfbb14879cddf7ca3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac152129d9cf47ed2a9fffe6c384e9e9a" id="r_ac152129d9cf47ed2a9fffe6c384e9e9a"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTofEvent.html#ac152129d9cf47ed2a9fffe6c384e9e9a">get_rbids</a> () const -&gt; Vec&lt; u8 &gt;</td></tr>
+<tr class="separator:ac152129d9cf47ed2a9fffe6c384e9e9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:ac62d2f3b9db6a01c93cfa7f76ad30451" id="r_ac62d2f3b9db6a01c93cfa7f76ad30451"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structTofEvent.html">TofEvent</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTofEvent.html#ac62d2f3b9db6a01c93cfa7f76ad30451">from_bytestream</a> (const Vec&lt; u8 &gt; &amp;bytestream, u64 &amp;pos)</td></tr>
-<tr class="separator:ac62d2f3b9db6a01c93cfa7f76ad30451"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a42760fc8fa3384f7ff5676875dea6e77" id="r_a42760fc8fa3384f7ff5676875dea6e77"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structTofEvent.html">TofEvent</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTofEvent.html#a42760fc8fa3384f7ff5676875dea6e77">from_tofpacket</a> (const <a class="el" href="structTofPacket.html">TofPacket</a> &amp;packet)</td></tr>
-<tr class="separator:a42760fc8fa3384f7ff5676875dea6e77"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adca6aee82f12a82dd1fe6f4528e0c410" id="r_adca6aee82f12a82dd1fe6f4528e0c410"><td class="memItemLeft" align="right" valign="top"><a id="adca6aee82f12a82dd1fe6f4528e0c410" name="adca6aee82f12a82dd1fe6f4528e0c410"></a>
-static u32&#160;</td><td class="memItemRight" valign="bottom"><b>get_n_rbmissinghits</b> (u32 mask)</td></tr>
-<tr class="separator:adca6aee82f12a82dd1fe6f4528e0c410"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad22d1d24518b60ccf788ee091a8ed808" id="r_ad22d1d24518b60ccf788ee091a8ed808"><td class="memItemLeft" align="right" valign="top"><a id="ad22d1d24518b60ccf788ee091a8ed808" name="ad22d1d24518b60ccf788ee091a8ed808"></a>
-static u32&#160;</td><td class="memItemRight" valign="bottom"><b>get_n_rbevents</b> (u32 mask)</td></tr>
-<tr class="separator:ad22d1d24518b60ccf788ee091a8ed808"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4abb68e3f07b2fd8d517bc6e730027f4" id="r_a4abb68e3f07b2fd8d517bc6e730027f4"><td class="memItemLeft" align="right" valign="top">static auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTofEvent.html#a4abb68e3f07b2fd8d517bc6e730027f4">from_bytestream</a> (const Vec&lt; u8 &gt; &amp;bytestream, u64 &amp;pos) -&gt; r::Result&lt; <a class="el" href="structTofEvent.html">TofEvent</a>, <a class="el" href="classGaps_1_1IOError.html">g::IOError</a> &gt;</td></tr>
+<tr class="separator:a4abb68e3f07b2fd8d517bc6e730027f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad8a15405110414186adeb7940f8b7e79" id="r_ad8a15405110414186adeb7940f8b7e79"><td class="memItemLeft" align="right" valign="top">static auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTofEvent.html#ad8a15405110414186adeb7940f8b7e79">from_tofpacket</a> (const <a class="el" href="structTofPacket.html">TofPacket</a> &amp;packet) -&gt; <a class="el" href="structTofEvent.html">TofEvent</a></td></tr>
+<tr class="separator:ad8a15405110414186adeb7940f8b7e79"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e939a5161bf8c0ed41f1127fc6042d2" id="r_a1e939a5161bf8c0ed41f1127fc6042d2"><td class="memItemLeft" align="right" valign="top"><a id="a1e939a5161bf8c0ed41f1127fc6042d2" name="a1e939a5161bf8c0ed41f1127fc6042d2"></a>
+static auto&#160;</td><td class="memItemRight" valign="bottom"><b>get_n_rbmissinghits</b> (u32 mask) -&gt; u32</td></tr>
+<tr class="separator:a1e939a5161bf8c0ed41f1127fc6042d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a009dc21769f648f352e9da0ce2b6dacf" id="r_a009dc21769f648f352e9da0ce2b6dacf"><td class="memItemLeft" align="right" valign="top"><a id="a009dc21769f648f352e9da0ce2b6dacf" name="a009dc21769f648f352e9da0ce2b6dacf"></a>
+static auto&#160;</td><td class="memItemRight" valign="bottom"><b>get_n_rbevents</b> (u32 mask) -&gt; u32</td></tr>
+<tr class="separator:a009dc21769f648f352e9da0ce2b6dacf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -158,12 +164,12 @@ EventStatus&#160;</td><td class="memItemRight" valign="bottom"><b>status</b></td
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
-<tr class="memitem:a687698fdaba6a4b60c72e86249637c5c" id="r_a687698fdaba6a4b60c72e86249637c5c"><td class="memItemLeft" align="right" valign="top"><a id="a687698fdaba6a4b60c72e86249637c5c" name="a687698fdaba6a4b60c72e86249637c5c"></a>
-static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>HEAD</b> = 0xAAAA</td></tr>
-<tr class="separator:a687698fdaba6a4b60c72e86249637c5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a398d6fd7e169862ff376c11ee57eb944" id="r_a398d6fd7e169862ff376c11ee57eb944"><td class="memItemLeft" align="right" valign="top"><a id="a398d6fd7e169862ff376c11ee57eb944" name="a398d6fd7e169862ff376c11ee57eb944"></a>
-static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>TAIL</b> = 0x5555</td></tr>
-<tr class="separator:a398d6fd7e169862ff376c11ee57eb944"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6761856655fb9d74ed6962d09e839275" id="r_a6761856655fb9d74ed6962d09e839275"><td class="memItemLeft" align="right" valign="top"><a id="a6761856655fb9d74ed6962d09e839275" name="a6761856655fb9d74ed6962d09e839275"></a>
+static constexpr u16&#160;</td><td class="memItemRight" valign="bottom"><b>HEAD</b> = 0xAAAA</td></tr>
+<tr class="separator:a6761856655fb9d74ed6962d09e839275"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3618284d71a09636b825678c34780a82" id="r_a3618284d71a09636b825678c34780a82"><td class="memItemLeft" align="right" valign="top"><a id="a3618284d71a09636b825678c34780a82" name="a3618284d71a09636b825678c34780a82"></a>
+static constexpr u16&#160;</td><td class="memItemRight" valign="bottom"><b>TAIL</b> = 0x5555</td></tr>
+<tr class="separator:a3618284d71a09636b825678c34780a82"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A container accounting for a "complete" event of the Tof including:</p><ul>
@@ -173,8 +179,8 @@ static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>TAIL</b> 
 <li>A number of MissingHits. These are such where the MTB claims we should see data in one of the RBs, but we do not have any. </li>
 </ul>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="ac62d2f3b9db6a01c93cfa7f76ad30451" name="ac62d2f3b9db6a01c93cfa7f76ad30451"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac62d2f3b9db6a01c93cfa7f76ad30451">&#9670;&#160;</a></span>from_bytestream()</h2>
+<a id="a4abb68e3f07b2fd8d517bc6e730027f4" name="a4abb68e3f07b2fd8d517bc6e730027f4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4abb68e3f07b2fd8d517bc6e730027f4">&#9670;&#160;</a></span>from_bytestream()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -183,7 +189,7 @@ static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>TAIL</b> 
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static <a class="el" href="structTofEvent.html">TofEvent</a> TofEvent::from_bytestream </td>
+          <td class="memname">static auto TofEvent::from_bytestream </td>
           <td>(</td>
           <td class="paramtype">const Vec&lt; u8 &gt; &amp;&#160;</td>
           <td class="paramname"><em>bytestream</em>, </td>
@@ -197,7 +203,7 @@ static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>TAIL</b> 
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td>
+          <td></td><td> -&gt;  r::Result&lt; <a class="el" href="structTofEvent.html">TofEvent</a>, <a class="el" href="classGaps_1_1IOError.html">g::IOError</a> &gt;</td>
         </tr>
       </table>
   </td>
@@ -218,8 +224,8 @@ static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>TAIL</b> 
 
 </div>
 </div>
-<a id="a42760fc8fa3384f7ff5676875dea6e77" name="a42760fc8fa3384f7ff5676875dea6e77"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a42760fc8fa3384f7ff5676875dea6e77">&#9670;&#160;</a></span>from_tofpacket()</h2>
+<a id="ad8a15405110414186adeb7940f8b7e79" name="ad8a15405110414186adeb7940f8b7e79"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8a15405110414186adeb7940f8b7e79">&#9670;&#160;</a></span>from_tofpacket()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -228,11 +234,11 @@ static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>TAIL</b> 
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static <a class="el" href="structTofEvent.html">TofEvent</a> TofEvent::from_tofpacket </td>
+          <td class="memname">static auto TofEvent::from_tofpacket </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="structTofPacket.html">TofPacket</a> &amp;&#160;</td>
           <td class="paramname"><em>packet</em></td><td>)</td>
-          <td></td>
+          <td> -&gt;  <a class="el" href="structTofEvent.html">TofEvent</a></td>
         </tr>
       </table>
   </td>
@@ -252,18 +258,18 @@ static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>TAIL</b> 
 
 </div>
 </div>
-<a id="a635c9efb36f792b06da1e153f39d5202" name="a635c9efb36f792b06da1e153f39d5202"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a635c9efb36f792b06da1e153f39d5202">&#9670;&#160;</a></span>get_rbevent()</h2>
+<a id="a2f78c168e729dafdfbb14879cddf7ca3" name="a2f78c168e729dafdfbb14879cddf7ca3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f78c168e729dafdfbb14879cddf7ca3">&#9670;&#160;</a></span>get_rbevent()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="structRBEvent.html">RBEvent</a> &amp; TofEvent::get_rbevent </td>
+          <td class="memname">auto TofEvent::get_rbevent </td>
           <td>(</td>
           <td class="paramtype">u8&#160;</td>
           <td class="paramname"><em>board_id</em></td><td>)</td>
-          <td> const</td>
+          <td> const -&gt;  const <a class="el" href="structRBEvent.html">RBEvent</a> &amp;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -271,21 +277,39 @@ static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>TAIL</b> 
 
 </div>
 </div>
-<a id="a98d22145ed7cf71e2a8d667af59b557b" name="a98d22145ed7cf71e2a8d667af59b557b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a98d22145ed7cf71e2a8d667af59b557b">&#9670;&#160;</a></span>get_rbids()</h2>
+<a id="ac152129d9cf47ed2a9fffe6c384e9e9a" name="ac152129d9cf47ed2a9fffe6c384e9e9a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac152129d9cf47ed2a9fffe6c384e9e9a">&#9670;&#160;</a></span>get_rbids()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">Vec&lt; u8 &gt; TofEvent::get_rbids </td>
+          <td class="memname">auto TofEvent::get_rbids </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td> const</td>
+          <td> const -&gt;  Vec&lt; u8 &gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
 <p>Get the rb event for a specific board id. </p>
+
+</div>
+</div>
+<a id="ada77401a8d3aa94e1efc41adf5dea431" name="ada77401a8d3aa94e1efc41adf5dea431"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ada77401a8d3aa94e1efc41adf5dea431">&#9670;&#160;</a></span>normalize_hit_times()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">auto TofEvent::normalize_hit_times </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> -&gt;  void</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>normalize all the hit times, taking the global ch9 phase into account </p>
 
 </div>
 </div>

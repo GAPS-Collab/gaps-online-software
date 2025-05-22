@@ -100,9 +100,6 @@ $(document).ready(function(){initNavTree('namespaceGaps.html',''); initResizable
   <div class="headertitle"><div class="title">Gaps Namespace Reference</div></div>
 </div><!--header-->
 <div class="contents">
-
-<p>&zwj;**  
-<a href="namespaceGaps.html#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
@@ -115,24 +112,61 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGaps_1_1FatalException.html">FatalException</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Exception for log_fatal(..) macro.  <a href="classGaps_1_1FatalException.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGaps_1_1IOError.html">IOError</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGaps_1_1TofPacketReader.html">TofPacketReader</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structGaps_1_1TofPaddle.html">TofPaddle</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structGaps_1_1TrackerStrip.html">TrackerStrip</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structGaps_1_1TrackerStripMask.html">TrackerStripMask</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structGaps_1_1TrackerStripPedestal.html">TrackerStripPedestal</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
+<tr class="memitem:a84fb383b1df4955afc6ea35a9b15ff44" id="r_a84fb383b1df4955afc6ea35a9b15ff44"><td class="memItemLeft" align="right" valign="top"><a id="a84fb383b1df4955afc6ea35a9b15ff44" name="a84fb383b1df4955afc6ea35a9b15ff44"></a>
+typedef std::map&lt; u8, <a class="el" href="structGaps_1_1TofPaddle.html">TofPaddle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>TofPaddleMap</b></td></tr>
+<tr class="memdesc:a84fb383b1df4955afc6ea35a9b15ff44"><td class="mdescLeft">&#160;</td><td class="mdescRight">A map of paddle id -&gt; <a class="el" href="structGaps_1_1TofPaddle.html">TofPaddle</a>. <br /></td></tr>
+<tr class="separator:a84fb383b1df4955afc6ea35a9b15ff44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d656056027834e42a559636af22f086" id="r_a5d656056027834e42a559636af22f086"><td class="memItemLeft" align="right" valign="top"><a id="a5d656056027834e42a559636af22f086" name="a5d656056027834e42a559636af22f086"></a>
+typedef std::map&lt; u8, std::map&lt; u8, std::tuple&lt; u8, TofPaddleEnd &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>RbIdChannelPaddleIdMap</b></td></tr>
+<tr class="memdesc:a5d656056027834e42a559636af22f086"><td class="mdescLeft">&#160;</td><td class="mdescRight">A map of RBID, RBCh -&gt; <a class="el" href="structGaps_1_1TofPaddle.html">TofPaddle</a>. <br /></td></tr>
+<tr class="separator:a5d656056027834e42a559636af22f086"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac562c67ce894d03edeecb6332caa86ac" id="r_ac562c67ce894d03edeecb6332caa86ac"><td class="memItemLeft" align="right" valign="top"><a id="ac562c67ce894d03edeecb6332caa86ac" name="ac562c67ce894d03edeecb6332caa86ac"></a>
+typedef std::map&lt; u8, std::map&lt; u8, std::map&lt; u8, u8 &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>DsiJChnPaddleIdMap</b></td></tr>
+<tr class="memdesc:ac562c67ce894d03edeecb6332caa86ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">A map of DSI,J -&gt; <a class="el" href="structGaps_1_1TofPaddle.html">TofPaddle</a>. <br /></td></tr>
+<tr class="separator:ac562c67ce894d03edeecb6332caa86ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4fc4eae2e6dcffb30da7c6d1a3e3e64" id="r_aa4fc4eae2e6dcffb30da7c6d1a3e3e64"><td class="memItemLeft" align="right" valign="top"><a id="aa4fc4eae2e6dcffb30da7c6d1a3e3e64" name="aa4fc4eae2e6dcffb30da7c6d1a3e3e64"></a>
+typedef std::map&lt; u32, <a class="el" href="structGaps_1_1TrackerStrip.html">TrackerStrip</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>TrkStripMap</b></td></tr>
+<tr class="memdesc:aa4fc4eae2e6dcffb30da7c6d1a3e3e64"><td class="mdescLeft">&#160;</td><td class="mdescRight">A map of strip identifier (layer-row-module-channel -&gt; Tracker strip. <br /></td></tr>
+<tr class="separator:aa4fc4eae2e6dcffb30da7c6d1a3e3e64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab973cc2b0495c49012fb17667010ef42" id="r_ab973cc2b0495c49012fb17667010ef42"><td class="memItemLeft" align="right" valign="top"><a id="ab973cc2b0495c49012fb17667010ef42" name="ab973cc2b0495c49012fb17667010ef42"></a>
+typedef std::map&lt; u32, bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>TrkStripMaskMap</b></td></tr>
+<tr class="separator:ab973cc2b0495c49012fb17667010ef42"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afdf1ea5d924eac5baad0144da1280503" id="r_afdf1ea5d924eac5baad0144da1280503"><td class="memItemLeft" align="right" valign="top"><a id="afdf1ea5d924eac5baad0144da1280503" name="afdf1ea5d924eac5baad0144da1280503"></a>
+typedef std::map&lt; u32, <a class="el" href="structGaps_1_1TrackerStripPedestal.html">TrackerStripPedestal</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>TrkStripPedMap</b></td></tr>
+<tr class="separator:afdf1ea5d924eac5baad0144da1280503"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7e7d9bb141f5f926934e44b33429a44c" id="r_a7e7d9bb141f5f926934e44b33429a44c"><td class="memItemLeft" align="right" valign="top"><a id="a7e7d9bb141f5f926934e44b33429a44c" name="a7e7d9bb141f5f926934e44b33429a44c"></a>
 typedef spdlog::level::level_enum&#160;</td><td class="memItemRight" valign="bottom"><b>LOGLEVEL</b></td></tr>
 <tr class="separator:a7e7d9bb141f5f926934e44b33429a44c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr class="memitem:a8e2924b21458e93bc83a6ae981d47b57" id="r_a8e2924b21458e93bc83a6ae981d47b57"><td class="memItemLeft" align="right" valign="top"><a id="a8e2924b21458e93bc83a6ae981d47b57" name="a8e2924b21458e93bc83a6ae981d47b57"></a>enum class &#160;</td><td class="memItemRight" valign="bottom"><b>CRFrameObjectType</b> : u8 { <b>Unknown</b> = 0
+<tr class="memitem:a8e2924b21458e93bc83a6ae981d47b57" id="r_a8e2924b21458e93bc83a6ae981d47b57"><td class="memItemLeft" align="right" valign="top"><a id="a8e2924b21458e93bc83a6ae981d47b57" name="a8e2924b21458e93bc83a6ae981d47b57"></a>enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGaps.html#a8e2924b21458e93bc83a6ae981d47b57">CRFrameObjectType</a> : u8 { <b>Unknown</b> = 0
 , <b>TofPacket</b> = 10
 , <b>TelemetryPacket</b> = 20
  }</td></tr>
+<tr class="memdesc:a8e2924b21458e93bc83a6ae981d47b57"><td class="mdescLeft">&#160;</td><td class="mdescRight">These are objects which can be stored in a caraspace frame <br  />
+ <br /></td></tr>
 <tr class="separator:a8e2924b21458e93bc83a6ae981d47b57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a900b25ea53c4b01b14e10492303daa9c" id="r_a900b25ea53c4b01b14e10492303daa9c"><td class="memItemLeft" align="right" valign="top"><a id="a900b25ea53c4b01b14e10492303daa9c" name="a900b25ea53c4b01b14e10492303daa9c"></a>enum class &#160;</td><td class="memItemRight" valign="bottom"><b>TofPaddleEnd</b> : i16 { <b>Unknown</b> = 0
+, <b>A</b> = -1
+, <b>B</b> = 1
+ }</td></tr>
+<tr class="separator:a900b25ea53c4b01b14e10492303daa9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af99376041829a6c93b2b635455d73910" id="r_af99376041829a6c93b2b635455d73910"><td class="memItemLeft" align="right" valign="top"><a id="af99376041829a6c93b2b635455d73910" name="af99376041829a6c93b2b635455d73910"></a>enum class &#160;</td><td class="memItemRight" valign="bottom"><b>ProtocolVersion</b> : u8 { <b>Unknown</b> = PROTOCOLVERSION_UNKNOWN
 , <b>V1</b> = PROTOCOLVERSION_V1
 , <b>V2</b> = PROTOCOLVERSION_V2
@@ -142,10 +176,34 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ab8d7b9a16a46192981cd60e190d50b76" id="r_ab8d7b9a16a46192981cd60e190d50b76"><td class="memItemLeft" align="right" valign="top"><a id="ab8d7b9a16a46192981cd60e190d50b76" name="ab8d7b9a16a46192981cd60e190d50b76"></a>
-std::map&lt; u8, <a class="el" href="structGaps_1_1TofPaddle.html">TofPaddle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>get_tofpaddles</b> (std::string dbname)</td></tr>
-<tr class="memdesc:ab8d7b9a16a46192981cd60e190d50b76"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a paddle from the database. <br /></td></tr>
-<tr class="separator:ab8d7b9a16a46192981cd60e190d50b76"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad558dd12865183c97b66820bbb392ee9" id="r_ad558dd12865183c97b66820bbb392ee9"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGaps.html#ad558dd12865183c97b66820bbb392ee9">list_path_contents_sorted</a> (const std::string &amp;input)</td></tr>
+<tr class="separator:ad558dd12865183c97b66820bbb392ee9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a51061c6f5af624934c885081d8ac2c4c" id="r_a51061c6f5af624934c885081d8ac2c4c"><td class="memItemLeft" align="right" valign="top"><a id="a51061c6f5af624934c885081d8ac2c4c" name="a51061c6f5af624934c885081d8ac2c4c"></a>
+auto&#160;</td><td class="memItemRight" valign="bottom"><b>get_tofpaddles</b> () -&gt; <a class="el" href="namespaceGaps.html#a84fb383b1df4955afc6ea35a9b15ff44">TofPaddleMap</a></td></tr>
+<tr class="memdesc:a51061c6f5af624934c885081d8ac2c4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a paddle from the database. <br /></td></tr>
+<tr class="separator:a51061c6f5af624934c885081d8ac2c4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e1e5140ee555faed2b67c3eb26f5a63" id="r_a0e1e5140ee555faed2b67c3eb26f5a63"><td class="memItemLeft" align="right" valign="top"><a id="a0e1e5140ee555faed2b67c3eb26f5a63" name="a0e1e5140ee555faed2b67c3eb26f5a63"></a>
+auto&#160;</td><td class="memItemRight" valign="bottom"><b>get_rb_id_paddles</b> () -&gt; <a class="el" href="namespaceGaps.html#a5d656056027834e42a559636af22f086">RbIdChannelPaddleIdMap</a></td></tr>
+<tr class="memdesc:a0e1e5140ee555faed2b67c3eb26f5a63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a paddle if the rb id and channel is known (HG) <br /></td></tr>
+<tr class="separator:a0e1e5140ee555faed2b67c3eb26f5a63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8905976c88897fdf62e1163984c5da66" id="r_a8905976c88897fdf62e1163984c5da66"><td class="memItemLeft" align="right" valign="top"><a id="a8905976c88897fdf62e1163984c5da66" name="a8905976c88897fdf62e1163984c5da66"></a>
+auto&#160;</td><td class="memItemRight" valign="bottom"><b>get_dsi_j_paddles</b> () -&gt; <a class="el" href="namespaceGaps.html#ac562c67ce894d03edeecb6332caa86ac">DsiJChnPaddleIdMap</a></td></tr>
+<tr class="memdesc:a8905976c88897fdf62e1163984c5da66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a paddle if the dsi,j connection of a paddle is known (LTB, LG) <br /></td></tr>
+<tr class="separator:a8905976c88897fdf62e1163984c5da66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a41dba3273290cc6660d33a0ee5c511b8" id="r_a41dba3273290cc6660d33a0ee5c511b8"><td class="memItemLeft" align="right" valign="top"><a id="a41dba3273290cc6660d33a0ee5c511b8" name="a41dba3273290cc6660d33a0ee5c511b8"></a>
+auto&#160;</td><td class="memItemRight" valign="bottom"><b>get_trackerstrips</b> () -&gt; <a class="el" href="namespaceGaps.html#aa4fc4eae2e6dcffb30da7c6d1a3e3e64">TrkStripMap</a></td></tr>
+<tr class="memdesc:a41dba3273290cc6660d33a0ee5c511b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve all tracker strips from the database. <br /></td></tr>
+<tr class="separator:a41dba3273290cc6660d33a0ee5c511b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a89c0577fa812754efd900481fef12c9c" id="r_a89c0577fa812754efd900481fef12c9c"><td class="memItemLeft" align="right" valign="top"><a id="a89c0577fa812754efd900481fef12c9c" name="a89c0577fa812754efd900481fef12c9c"></a>
+auto&#160;</td><td class="memItemRight" valign="bottom"><b>get_module_position</b> (u8 layer, u8 row, u8 mod, const <a class="el" href="namespaceGaps.html#aa4fc4eae2e6dcffb30da7c6d1a3e3e64">TrkStripMap</a> &amp;) -&gt; Vec&lt; f32 &gt;</td></tr>
+<tr class="memdesc:a89c0577fa812754efd900481fef12c9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the position of a module - returns in cm. <br /></td></tr>
+<tr class="separator:a89c0577fa812754efd900481fef12c9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa891e85254e13812609ce1e8bcbc014a" id="r_aa891e85254e13812609ce1e8bcbc014a"><td class="memItemLeft" align="right" valign="top"><a id="aa891e85254e13812609ce1e8bcbc014a" name="aa891e85254e13812609ce1e8bcbc014a"></a>
+auto&#160;</td><td class="memItemRight" valign="bottom"><b>get_trackerstripmasks</b> (std::string mask_name=&quot;&quot;) -&gt; TrkStripMaskMap</td></tr>
+<tr class="separator:aa891e85254e13812609ce1e8bcbc014a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f34404b09be3f6fd69f8e09d2c045d2" id="r_a9f34404b09be3f6fd69f8e09d2c045d2"><td class="memItemLeft" align="right" valign="top"><a id="a9f34404b09be3f6fd69f8e09d2c045d2" name="a9f34404b09be3f6fd69f8e09d2c045d2"></a>
+auto&#160;</td><td class="memItemRight" valign="bottom"><b>get_trackerstrippedestals</b> () -&gt; TrkStripPedMap</td></tr>
+<tr class="separator:a9f34404b09be3f6fd69f8e09d2c045d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63983ede070cd10b4e310de973772319" id="r_a63983ede070cd10b4e310de973772319"><td class="memItemLeft" align="right" valign="top"><a id="a63983ede070cd10b4e310de973772319" name="a63983ede070cd10b4e310de973772319"></a>
 std::string&#160;</td><td class="memItemRight" valign="bottom"><b>severity_to_str</b> (const LOGLEVEL &amp;severity)</td></tr>
 <tr class="separator:a63983ede070cd10b4e310de973772319"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -195,9 +253,27 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>pversion_to_st
 <tr class="separator:a0b7fccda874dd2f4275f12622fb6b3f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>&zwj;** </p>
-<p>&zwj;** </p>
+<div class="textblock"><p>Bascially a re-write of some bfsw stuff to avoid pulling in the dependency </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="ad558dd12865183c97b66820bbb392ee9" name="ad558dd12865183c97b66820bbb392ee9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad558dd12865183c97b66820bbb392ee9">&#9670;&#160;</a></span>list_path_contents_sorted()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; std::string &gt; Gaps::list_path_contents_sorted </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>input</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get all files in a certain directory in case it is a directory, for a single file just get the file &lt;3 ChatGPT </p>
+
+</div>
+</div>
 <a id="adbed3ea3f57b77872fd060984c65e4be" name="adbed3ea3f57b77872fd060984c65e4be"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adbed3ea3f57b77872fd060984c65e4be">&#9670;&#160;</a></span>parse_f16()</h2>
 
@@ -253,7 +329,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>pversion_to_st
         </tr>
       </table>
 </div><div class="memdoc">
-<p>custom string parser. This is only used for <a class="el" href="structGaps_1_1CRFrame.html">CRFrame</a>'s index. The actual byte content of the string needs to be prefixed with its 16bit lenght </p>
+<p>custom string parser. This is only used for <a class="el" href="structGaps_1_1CRFrame.html">CRFrame</a>'s index. The actual byte content of the string needs to be prefixed with its 16bit length </p>
 
 </div>
 </div>

@@ -6,9 +6,10 @@ var searchData=
   ['rbcalibration_3',['RBCalibration',['../structRBCalibration.html',1,'']]],
   ['rbevent_4',['RBEvent',['../structRBEvent.html',1,'']]],
   ['rbeventheader_5',['RBEventHeader',['../structRBEventHeader.html',1,'']]],
-  ['rbmissinghit_6',['RBMissingHit',['../structRBMissingHit.html',1,'']]],
-  ['rbmonidata_7',['RBMoniData',['../structRBMoniData.html',1,'']]],
-  ['rbwaveform_8',['RBWaveform',['../structRBWaveform.html',1,'']]],
-  ['returns_9',['returns',['../structMasterTriggerEvent.html#autotoc_md0',1,'Returns'],['../structTofEventSummary.html#autotoc_md1',1,'Returns']]],
-  ['rust_20api_10',['Rust API',['../index.html#autotoc_md4',1,'']]]
+  ['rbidchannelpaddleidmap_6',['RbIdChannelPaddleIdMap',['../namespaceGaps.html#a5d656056027834e42a559636af22f086',1,'Gaps']]],
+  ['rbmissinghit_7',['RBMissingHit',['../structRBMissingHit.html',1,'']]],
+  ['rbmonidata_8',['RBMoniData',['../structRBMoniData.html',1,'']]],
+  ['rbwaveform_9',['RBWaveform',['../structRBWaveform.html',1,'']]],
+  ['returns_10',['returns',['../structMasterTriggerEvent.html#autotoc_md0',1,'Returns'],['../structTofEventSummary.html#autotoc_md1',1,'Returns']]],
+  ['rust_20api_11',['Rust API',['../index.html#autotoc_md4',1,'']]]
 ];

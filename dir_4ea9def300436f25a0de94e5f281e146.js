@@ -6,6 +6,7 @@ var dir_4ea9def300436f25a0de94e5f281e146 =
     [ "caraspace.hpp", "caraspace_8hpp_source.html", null ],
     [ "commands.h", "commands_8h_source.html", null ],
     [ "database.h", "database_8h_source.html", null ],
+    [ "errors.hpp", "errors_8hpp_source.html", null ],
     [ "events.h", "events_8h_source.html", null ],
     [ "io.hpp", "io_8hpp_source.html", null ],
     [ "legacy.h", "legacy_8h_source.html", null ],
@@ -13,7 +14,7 @@ var dir_4ea9def300436f25a0de94e5f281e146 =
     [ "parsers.h", "parsers_8h_source.html", null ],
     [ "serialization.h", "serialization_8h_source.html", null ],
     [ "simclasses.h", "simclasses_8h_source.html", null ],
-    [ "tof_manifest.h", "tof__manifest_8h_source.html", null ],
+    [ "telemetry_dataclasses.hpp", "telemetry__dataclasses_8hpp_source.html", null ],
     [ "tof_typedefs.h", "tof__typedefs_8h_source.html", null ],
     [ "version.h", "version_8h_source.html", null ]
 ];

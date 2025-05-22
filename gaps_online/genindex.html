@@ -250,6 +250,7 @@
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
@@ -257,6 +258,9 @@
  | <a href="#U"><strong>U</strong></a>
  | <a href="#V"><strong>V</strong></a>
  | <a href="#W"><strong>W</strong></a>
+ | <a href="#X"><strong>X</strong></a>
+ | <a href="#Y"><strong>Y</strong></a>
+ | <a href="#Z"><strong>Z</strong></a>
  
 </div>
 <h2 id="A">A</h2>
@@ -268,10 +272,12 @@
 </li>
       <li><a href="gaps_online.events.html#gaps_online.events.RBWaveform.adc_b">adc_b (gaps_online.events.RBWaveform attribute)</a>
 </li>
-      <li><a href="gaps_online.events.html#gaps_online.events.TriggerType.Any">Any (gaps_online.events.TriggerType attribute)</a>
+      <li><a href="gaps_online.io.html#gaps_online.io.TofPacketReader.add_paddleinfo">add_paddleinfo() (gaps_online.io.TofPacketReader method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gaps_online.events.html#gaps_online.events.TriggerType.Any">Any (gaps_online.events.TriggerType attribute)</a>
+</li>
       <li><a href="gaps_online.events.html#gaps_online.events.EventStatus.AnyDataMangling">AnyDataMangling (gaps_online.events.EventStatus attribute)</a>
 </li>
       <li><a href="gaps_online.io.html#gaps_online.io.TelemetryPacketType.AnyTofHK">AnyTofHK (gaps_online.io.TelemetryPacketType attribute)</a>
@@ -306,6 +312,8 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gaps_online.events.html#gaps_online.events.TofHit.cable_delay">cable_delay (gaps_online.events.TofHit attribute)</a>
+</li>
       <li><a href="_autosummary/gaps_online.tof.analysis.html#gaps_online.tof.analysis.calc_rms">calc_rms() (in module gaps_online.tof.analysis)</a>
 </li>
       <li><a href="gaps_online.events.html#gaps_online.events.RBWaveform.calibrate">calibrate() (gaps_online.events.RBWaveform method)</a>
@@ -328,6 +336,8 @@
 </li>
       <li><a href="gaps_online.events.html#gaps_online.events.EventStatus.ChnSyncErrors">ChnSyncErrors (gaps_online.events.EventStatus attribute)</a>
 </li>
+      <li><a href="gaps_online.events.html#gaps_online.events.TofHit.coax_cbl_time">coax_cbl_time (gaps_online.events.TofHit attribute)</a>
+</li>
       <li><a href="gaps_online.events.html#gaps_online.events.TriggerType.ConfigurableTrigger">ConfigurableTrigger (gaps_online.events.TriggerType attribute)</a>
 </li>
       <li><a href="_autosummary/gaps_online.io.html#gaps_online.io.convert_ts_date_to_unix">convert_ts_date_to_unix() (in module gaps_online.io)</a>
@@ -339,6 +349,8 @@
       <li><a href="gaps_online.events.html#gaps_online.events.EventStatus.CRC32Wrong">CRC32Wrong (gaps_online.events.EventStatus attribute)</a>
 </li>
       <li><a href="_autosummary/gaps_online.tof.analysis.html#gaps_online.tof.analysis.create_occupancy_dict">create_occupancy_dict() (in module gaps_online.tof.analysis)</a>
+</li>
+      <li><a href="gaps_online.io.html#gaps_online.io.TofPacketReader.current_filename">current_filename (gaps_online.io.TofPacketReader attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -390,9 +402,13 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gaps_online.io.html#gaps_online.io.TofPacketReader.filenames">filenames (gaps_online.io.TofPacketReader attribute)</a>
+</li>
       <li><a href="gaps_online.io.html#gaps_online.io.TelemetryPacketReader.filter">filter (gaps_online.io.TelemetryPacketReader attribute)</a>
 </li>
       <li><a href="_autosummary/gaps_online.tof.analysis.html#gaps_online.tof.analysis.find_paddle">find_paddle() (in module gaps_online.tof.analysis)</a>
+</li>
+      <li><a href="gaps_online.io.html#gaps_online.io.TofPacketReader.first">first (gaps_online.io.TofPacketReader attribute)</a>
 </li>
       <li><a href="gaps_online.events.html#gaps_online.events.TriggerType.FixedRate">FixedRate (gaps_online.events.TriggerType attribute)</a>
 </li>
@@ -409,6 +425,8 @@
 </li>
       </ul></li>
       <li><a href="gaps_online.events.html#gaps_online.events.MergedEvent.from_telemetrypacket">from_telemetrypacket() (gaps_online.events.MergedEvent method)</a>
+</li>
+      <li><a href="gaps_online.events.html#gaps_online.events.TofEventSummary.from_tofeventpacket">from_tofeventpacket() (gaps_online.events.TofEventSummary method)</a>
 </li>
       <li><a href="gaps_online.events.html#gaps_online.events.RBWaveform.from_tofpacket">from_tofpacket() (gaps_online.events.RBWaveform method)</a>
 
@@ -555,6 +573,8 @@
         <li><a href="gaps_online.events.html#gaps_online.events.TofEventSummary.get_missing_paddles_hg">(gaps_online.events.TofEventSummary method)</a>
 </li>
       </ul></li>
+      <li><a href="gaps_online.events.html#gaps_online.events.TofEvent.get_missing_paddles_wf">get_missing_paddles_wf() (gaps_online.events.TofEvent method)</a>
+</li>
       <li><a href="gaps_online.io.html#gaps_online.io.TelemetryPacketReader.get_packet_index">get_packet_index() (gaps_online.io.TelemetryPacketReader method)</a>
 </li>
       <li><a href="_autosummary/gaps_online.run.html#gaps_online.run.get_run_tof_status">get_run_tof_status() (in module gaps_online.run)</a>
@@ -591,6 +611,8 @@
 <h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gaps_online.events.html#gaps_online.events.TofHit.hart_cbl_time">hart_cbl_time (gaps_online.events.TofHit attribute)</a>
+</li>
       <li><a href="gaps_online.io.html#gaps_online.io.TelemetryPacket.header">header (gaps_online.io.TelemetryPacket attribute)</a>
 </li>
   </ul></td>
@@ -622,6 +644,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="gaps_online.io.html#gaps_online.io.TelemetryPacketType.LabJackHK">LabJackHK (gaps_online.io.TelemetryPacketType attribute)</a>
+</li>
+      <li><a href="gaps_online.io.html#gaps_online.io.TofPacketReader.last">last (gaps_online.io.TofPacketReader attribute)</a>
 </li>
       <li><a href="_autosummary/gaps_online.tof.calibrations.html#gaps_online.tof.calibrations.load_calibrations">load_calibrations() (in module gaps_online.tof.calibrations)</a>
 </li>
@@ -690,15 +714,35 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gaps_online.events.html#gaps_online.events.TofEvent.nhits">nhits (gaps_online.events.TofEvent attribute)</a>
+
+      <ul>
+        <li><a href="gaps_online.events.html#gaps_online.events.TofEventSummary.nhits">(gaps_online.events.TofEventSummary attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="gaps_online.events.html#gaps_online.events.TofEvent.nhits_umb">nhits_umb (gaps_online.events.TofEvent attribute)</a>
+
+      <ul>
+        <li><a href="gaps_online.events.html#gaps_online.events.TofEventSummary.nhits_umb">(gaps_online.events.TofEventSummary attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="gaps_online.events.html#gaps_online.events.EventStatus.NoChannel9">NoChannel9 (gaps_online.events.EventStatus attribute)</a>
 </li>
       <li><a href="gaps_online.io.html#gaps_online.io.TelemetryPacketType.NoGapsTriggerEvent">NoGapsTriggerEvent (gaps_online.io.TelemetryPacketType attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="gaps_online.events.html#gaps_online.events.RBCalibration.noi_data">noi_data (gaps_online.events.RBCalibration attribute)</a>
 </li>
       <li><a href="gaps_online.io.html#gaps_online.io.TelemetryPacketType.NoTofDataEvent">NoTofDataEvent (gaps_online.io.TelemetryPacketType attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gaps_online.events.html#gaps_online.events.TofHit.obeys_causality">obeys_causality (gaps_online.events.TofHit attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -732,10 +776,12 @@
 </li>
       <li><a href="gaps_online.events.html#gaps_online.events.EventStatus.Perfect">Perfect (gaps_online.events.EventStatus attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="gaps_online.events.html#gaps_online.events.TofHit.phase">phase (gaps_online.events.TofHit attribute)</a>
 </li>
+      <li><a href="gaps_online.events.html#gaps_online.events.TofHit.phase_delay">phase_delay (gaps_online.events.TofHit attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/gaps_online.tof.events.html#gaps_online.tof.events.plot">plot() (in module gaps_online.tof.events)</a>
 </li>
       <li><a href="_autosummary/gaps_online.tof.calibrations.html#gaps_online.tof.calibrations.plot_dips">plot_dips() (in module gaps_online.tof.calibrations)</a>
@@ -754,6 +800,14 @@
 </li>
       <li><a href="_autosummary/gaps_online.tof.calibrations.html#gaps_online.tof.calibrations.plot_tbins">plot_tbins() (in module gaps_online.tof.calibrations)</a>
 </li>
+      <li><a href="_autosummary/gaps_online.tof.visual.html#gaps_online.tof.visual.plot_waveforms">plot_waveforms() (in module gaps_online.tof.visual)</a>
+</li>
+      <li><a href="gaps_online.events.html#gaps_online.events.TofEvent.pointcloud">pointcloud (gaps_online.events.TofEvent attribute)</a>
+
+      <ul>
+        <li><a href="gaps_online.events.html#gaps_online.events.TofEventSummary.pointcloud">(gaps_online.events.TofEventSummary attribute)</a>
+</li>
+      </ul></li>
       <li><a href="gaps_online.events.html#gaps_online.events.TriggerType.Poisson">Poisson (gaps_online.events.TriggerType attribute)</a>
 </li>
       <li><a href="gaps_online.events.html#gaps_online.events.TofHit.pos">pos (gaps_online.events.TofHit attribute)</a>
@@ -823,6 +877,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="gaps_online.events.html#gaps_online.events.TofHit.t0">t0 (gaps_online.events.TofHit attribute)</a>
+</li>
+      <li><a href="gaps_online.events.html#gaps_online.events.TofHit.t0_uncorrected">t0_uncorrected (gaps_online.events.TofHit attribute)</a>
 </li>
       <li><a href="gaps_online.events.html#gaps_online.events.EventStatus.TailWrong">TailWrong (gaps_online.events.EventStatus attribute)</a>
 </li>
@@ -897,6 +953,8 @@
       <li><a href="gaps_online.events.html#gaps_online.events.TriggerType.TrackCentral">TrackCentral (gaps_online.events.TriggerType attribute)</a>
 </li>
       <li><a href="gaps_online.io.html#gaps_online.io.TelemetryPacketType.Tracker">Tracker (gaps_online.io.TelemetryPacketType attribute)</a>
+</li>
+      <li><a href="gaps_online.events.html#gaps_online.events.MergedEvent.tracker_pointcloud">tracker_pointcloud (gaps_online.events.MergedEvent attribute)</a>
 </li>
       <li><a href="gaps_online.events.html#gaps_online.events.MergedEvent.tracker_v1">tracker_v1 (gaps_online.events.MergedEvent attribute)</a>
 </li>
@@ -983,6 +1041,30 @@
   </ul></td>
 </tr></table>
 
+<h2 id="X">X</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gaps_online.events.html#gaps_online.events.TofHit.x">x (gaps_online.events.TofHit attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Y">Y</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gaps_online.events.html#gaps_online.events.TofHit.y">y (gaps_online.events.TofHit attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Z">Z</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="gaps_online.events.html#gaps_online.events.TofHit.z">z (gaps_online.events.TofHit attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 
 
                 </article>
@@ -1033,7 +1115,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.0.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>

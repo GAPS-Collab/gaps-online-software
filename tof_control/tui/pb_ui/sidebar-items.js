@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["draw_pb_tab"]};

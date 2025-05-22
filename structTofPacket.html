@@ -106,16 +106,16 @@ $(document).ready(function(){initNavTree('structTofPacket.html',''); initResizab
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a59825a0535181026173df4eb8142b751" id="r_a59825a0535181026173df4eb8142b751"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTofPacket.html#a59825a0535181026173df4eb8142b751">to_string</a> () const</td></tr>
-<tr class="separator:a59825a0535181026173df4eb8142b751"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff67f57ea880e444cd3e96079eb5432e" id="r_aff67f57ea880e444cd3e96079eb5432e"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTofPacket.html#aff67f57ea880e444cd3e96079eb5432e">to_string</a> () const -&gt; std::string</td></tr>
+<tr class="separator:aff67f57ea880e444cd3e96079eb5432e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7a348ad4e49dc8667f72d12d02b97653" id="r_a7a348ad4e49dc8667f72d12d02b97653"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="conceptHasFromByteStream.html">HasFromByteStream</a> T&gt; </td></tr>
 <tr class="memitem:a7a348ad4e49dc8667f72d12d02b97653"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structTofPacket.html#a7a348ad4e49dc8667f72d12d02b97653">unpack</a> ()</td></tr>
 <tr class="separator:a7a348ad4e49dc8667f72d12d02b97653"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a7ab592f11c676473ff62dac29e9e9861" id="r_a7ab592f11c676473ff62dac29e9e9861"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structTofPacket.html">TofPacket</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTofPacket.html#a7ab592f11c676473ff62dac29e9e9861">from_bytestream</a> (const Vec&lt; u8 &gt; &amp;bytestream, u64 &amp;pos)</td></tr>
-<tr class="separator:a7ab592f11c676473ff62dac29e9e9861"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a8ff47b2872470f6386c860f7ab3182" id="r_a6a8ff47b2872470f6386c860f7ab3182"><td class="memItemLeft" align="right" valign="top">static auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTofPacket.html#a6a8ff47b2872470f6386c860f7ab3182">from_bytestream</a> (const Vec&lt; u8 &gt; &amp;bytestream, u64 &amp;pos) -&gt; r::Result&lt; <a class="el" href="structTofPacket.html">TofPacket</a>, <a class="el" href="classGaps_1_1IOError.html">Gaps::IOError</a> &gt;</td></tr>
+<tr class="separator:a6a8ff47b2872470f6386c860f7ab3182"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -137,12 +137,12 @@ Vec&lt; u8 &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>payload</b
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
-<tr class="memitem:a7410ff45a13e4a3b7f9843f0f3b2379d" id="r_a7410ff45a13e4a3b7f9843f0f3b2379d"><td class="memItemLeft" align="right" valign="top"><a id="a7410ff45a13e4a3b7f9843f0f3b2379d" name="a7410ff45a13e4a3b7f9843f0f3b2379d"></a>
-static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>HEAD</b> = 0xAAAA</td></tr>
-<tr class="separator:a7410ff45a13e4a3b7f9843f0f3b2379d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1b080830a5f4ac27361b6e2dda950b28" id="r_a1b080830a5f4ac27361b6e2dda950b28"><td class="memItemLeft" align="right" valign="top"><a id="a1b080830a5f4ac27361b6e2dda950b28" name="a1b080830a5f4ac27361b6e2dda950b28"></a>
-static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>TAIL</b> = 0x5555</td></tr>
-<tr class="separator:a1b080830a5f4ac27361b6e2dda950b28"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a98fd241e2d8199dc23a353da9a08ea" id="r_a3a98fd241e2d8199dc23a353da9a08ea"><td class="memItemLeft" align="right" valign="top"><a id="a3a98fd241e2d8199dc23a353da9a08ea" name="a3a98fd241e2d8199dc23a353da9a08ea"></a>
+static constexpr u16&#160;</td><td class="memItemRight" valign="bottom"><b>HEAD</b> = 0xAAAA</td></tr>
+<tr class="separator:a3a98fd241e2d8199dc23a353da9a08ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec49277c7bdc1641b34cf93c99510ba3" id="r_aec49277c7bdc1641b34cf93c99510ba3"><td class="memItemLeft" align="right" valign="top"><a id="aec49277c7bdc1641b34cf93c99510ba3" name="aec49277c7bdc1641b34cf93c99510ba3"></a>
+static constexpr u16&#160;</td><td class="memItemRight" valign="bottom"><b>TAIL</b> = 0x5555</td></tr>
+<tr class="separator:aec49277c7bdc1641b34cf93c99510ba3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The most basic of all packets</p>
@@ -150,8 +150,8 @@ static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>TAIL</b> 
 <p>It looks like the following</p>
 <p>HEAD : u16 = 0xAAAA TYPE : u8 = PacketType SIZE : u64 PAYLOAD : [u8;6-SIZE] TAIL : u16 = 0x5555 =&gt; The packet has a fixed size of 9 bytes =&gt; The packet has a size of 9 + PAYLOAD.size() </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a7ab592f11c676473ff62dac29e9e9861" name="a7ab592f11c676473ff62dac29e9e9861"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7ab592f11c676473ff62dac29e9e9861">&#9670;&#160;</a></span>from_bytestream()</h2>
+<a id="a6a8ff47b2872470f6386c860f7ab3182" name="a6a8ff47b2872470f6386c860f7ab3182"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a8ff47b2872470f6386c860f7ab3182">&#9670;&#160;</a></span>from_bytestream()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -160,7 +160,7 @@ static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>TAIL</b> 
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static <a class="el" href="structTofPacket.html">TofPacket</a> TofPacket::from_bytestream </td>
+          <td class="memname">static auto TofPacket::from_bytestream </td>
           <td>(</td>
           <td class="paramtype">const Vec&lt; u8 &gt; &amp;&#160;</td>
           <td class="paramname"><em>bytestream</em>, </td>
@@ -174,7 +174,7 @@ static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>TAIL</b> 
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td>
+          <td></td><td> -&gt;  r::Result&lt; <a class="el" href="structTofPacket.html">TofPacket</a>, <a class="el" href="classGaps_1_1IOError.html">Gaps::IOError</a> &gt;</td>
         </tr>
       </table>
   </td>
@@ -187,17 +187,17 @@ static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>TAIL</b> 
 
 </div>
 </div>
-<a id="a59825a0535181026173df4eb8142b751" name="a59825a0535181026173df4eb8142b751"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a59825a0535181026173df4eb8142b751">&#9670;&#160;</a></span>to_string()</h2>
+<a id="aff67f57ea880e444cd3e96079eb5432e" name="aff67f57ea880e444cd3e96079eb5432e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff67f57ea880e444cd3e96079eb5432e">&#9670;&#160;</a></span>to_string()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::string TofPacket::to_string </td>
+          <td class="memname">auto TofPacket::to_string </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td> const</td>
+          <td> const -&gt;  std::string</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -229,7 +229,7 @@ template&lt;<a class="el" href="conceptHasFromByteStream.html">HasFromByteStream
   </tr>
 </table>
 </div><div class="memdoc">
-<p>A generic unpacking method - unpack everything which is stored within the payload This requires that T has a <a class="el" href="structTofPacket.html#a7ab592f11c676473ff62dac29e9e9861">from_bytestream</a> method, which is enforced at compile time by the concept HasFromByteStream </p>
+<p>A generic unpacking method - unpack everything which is stored within the payload This requires that T has a <a class="el" href="structTofPacket.html#a6a8ff47b2872470f6386c860f7ab3182">from_bytestream</a> method, which is enforced at compile time by the concept HasFromByteStream </p>
 
 </div>
 </div>

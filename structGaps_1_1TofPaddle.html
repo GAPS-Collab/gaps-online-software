@@ -102,9 +102,13 @@ $(document).ready(function(){initNavTree('structGaps_1_1TofPaddle.html',''); ini
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a781650ca57bf40edb6f1285988ca1ee2" id="r_a781650ca57bf40edb6f1285988ca1ee2"><td class="memItemLeft" align="right" valign="top"><a id="a781650ca57bf40edb6f1285988ca1ee2" name="a781650ca57bf40edb6f1285988ca1ee2"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>to_string</b> () const</td></tr>
-<tr class="separator:a781650ca57bf40edb6f1285988ca1ee2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaecbaa9d4d0a0d0d69a1288d783f6986" id="r_aaecbaa9d4d0a0d0d69a1288d783f6986"><td class="memItemLeft" align="right" valign="top"><a id="aaecbaa9d4d0a0d0d69a1288d783f6986" name="aaecbaa9d4d0a0d0d69a1288d783f6986"></a>
+auto&#160;</td><td class="memItemRight" valign="bottom"><b>to_string</b> () const -&gt; std::string</td></tr>
+<tr class="separator:aaecbaa9d4d0a0d0d69a1288d783f6986"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a278045dd80667057050c1fd2124204bc" id="r_a278045dd80667057050c1fd2124204bc"><td class="memItemLeft" align="right" valign="top"><a id="a278045dd80667057050c1fd2124204bc" name="a278045dd80667057050c1fd2124204bc"></a>
+auto&#160;</td><td class="memItemRight" valign="bottom"><b>get_principal</b> () const -&gt; Vec&lt; f32 &gt;</td></tr>
+<tr class="memdesc:a278045dd80667057050c1fd2124204bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vector along the longest axis. <br /></td></tr>
+<tr class="separator:a278045dd80667057050c1fd2124204bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -167,6 +171,15 @@ f32&#160;</td><td class="memItemRight" valign="bottom"><b>width</b></td></tr>
 <tr class="memitem:a164f8b86717faed4da3a6da5b810a573" id="r_a164f8b86717faed4da3a6da5b810a573"><td class="memItemLeft" align="right" valign="top"><a id="a164f8b86717faed4da3a6da5b810a573" name="a164f8b86717faed4da3a6da5b810a573"></a>
 f32&#160;</td><td class="memItemRight" valign="bottom"><b>length</b></td></tr>
 <tr class="separator:a164f8b86717faed4da3a6da5b810a573"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af6364fccfde30febd1b64ed0122f5fe3" id="r_af6364fccfde30febd1b64ed0122f5fe3"><td class="memItemLeft" align="right" valign="top"><a id="af6364fccfde30febd1b64ed0122f5fe3" name="af6364fccfde30febd1b64ed0122f5fe3"></a>
+f32&#160;</td><td class="memItemRight" valign="bottom"><b>normal_x</b></td></tr>
+<tr class="separator:af6364fccfde30febd1b64ed0122f5fe3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a749277dbf19c56925c0d4decc7a1aab6" id="r_a749277dbf19c56925c0d4decc7a1aab6"><td class="memItemLeft" align="right" valign="top"><a id="a749277dbf19c56925c0d4decc7a1aab6" name="a749277dbf19c56925c0d4decc7a1aab6"></a>
+f32&#160;</td><td class="memItemRight" valign="bottom"><b>normal_y</b></td></tr>
+<tr class="separator:a749277dbf19c56925c0d4decc7a1aab6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f06fa3d7cc0ac6d047396d99d3f06f2" id="r_a2f06fa3d7cc0ac6d047396d99d3f06f2"><td class="memItemLeft" align="right" valign="top"><a id="a2f06fa3d7cc0ac6d047396d99d3f06f2" name="a2f06fa3d7cc0ac6d047396d99d3f06f2"></a>
+f32&#160;</td><td class="memItemRight" valign="bottom"><b>normal_z</b></td></tr>
+<tr class="separator:a2f06fa3d7cc0ac6d047396d99d3f06f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a62d9b25a56a0684a3bb58ba996db21f7" id="r_a62d9b25a56a0684a3bb58ba996db21f7"><td class="memItemLeft" align="right" valign="top"><a id="a62d9b25a56a0684a3bb58ba996db21f7" name="a62d9b25a56a0684a3bb58ba996db21f7"></a>
 f32&#160;</td><td class="memItemRight" valign="bottom"><b>global_pos_x_l0</b></td></tr>
 <tr class="separator:a62d9b25a56a0684a3bb58ba996db21f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -185,6 +198,21 @@ f32&#160;</td><td class="memItemRight" valign="bottom"><b>global_pos_y_l0_A</b><
 <tr class="memitem:afbef1e54d071014809291de5b0b1c747" id="r_afbef1e54d071014809291de5b0b1c747"><td class="memItemLeft" align="right" valign="top"><a id="afbef1e54d071014809291de5b0b1c747" name="afbef1e54d071014809291de5b0b1c747"></a>
 f32&#160;</td><td class="memItemRight" valign="bottom"><b>global_pos_z_l0_A</b></td></tr>
 <tr class="separator:afbef1e54d071014809291de5b0b1c747"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c79d76876cca22875285c8508a3e219" id="r_a1c79d76876cca22875285c8508a3e219"><td class="memItemLeft" align="right" valign="top"><a id="a1c79d76876cca22875285c8508a3e219" name="a1c79d76876cca22875285c8508a3e219"></a>
+f32&#160;</td><td class="memItemRight" valign="bottom"><b>global_pos_x_l0_B</b></td></tr>
+<tr class="separator:a1c79d76876cca22875285c8508a3e219"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7280b6c4e7c8c2cff138711d4dc84c4c" id="r_a7280b6c4e7c8c2cff138711d4dc84c4c"><td class="memItemLeft" align="right" valign="top"><a id="a7280b6c4e7c8c2cff138711d4dc84c4c" name="a7280b6c4e7c8c2cff138711d4dc84c4c"></a>
+f32&#160;</td><td class="memItemRight" valign="bottom"><b>global_pos_y_l0_B</b></td></tr>
+<tr class="separator:a7280b6c4e7c8c2cff138711d4dc84c4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a1642193615aac2a9d6d3652dfbaeb9" id="r_a5a1642193615aac2a9d6d3652dfbaeb9"><td class="memItemLeft" align="right" valign="top"><a id="a5a1642193615aac2a9d6d3652dfbaeb9" name="a5a1642193615aac2a9d6d3652dfbaeb9"></a>
+f32&#160;</td><td class="memItemRight" valign="bottom"><b>global_pos_z_l0_B</b></td></tr>
+<tr class="separator:a5a1642193615aac2a9d6d3652dfbaeb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ce6b387e1542f38386cec05d9d2e822" id="r_a7ce6b387e1542f38386cec05d9d2e822"><td class="memItemLeft" align="right" valign="top"><a id="a7ce6b387e1542f38386cec05d9d2e822" name="a7ce6b387e1542f38386cec05d9d2e822"></a>
+f32&#160;</td><td class="memItemRight" valign="bottom"><b>coax_cable_time</b></td></tr>
+<tr class="separator:a7ce6b387e1542f38386cec05d9d2e822"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aae37625f918d7fba43b0b541d26697e6" id="r_aae37625f918d7fba43b0b541d26697e6"><td class="memItemLeft" align="right" valign="top"><a id="aae37625f918d7fba43b0b541d26697e6" name="aae37625f918d7fba43b0b541d26697e6"></a>
+f32&#160;</td><td class="memItemRight" valign="bottom"><b>harting_cable_time</b></td></tr>
+<tr class="separator:aae37625f918d7fba43b0b541d26697e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Data Documentation</h2>
 <a id="ab59fbe63cc69a3113cb5488c0b6d84d7" name="ab59fbe63cc69a3113cb5488c0b6d84d7"></a>

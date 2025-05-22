@@ -104,20 +104,30 @@ $(document).ready(function(){initNavTree('structGaps_1_1CRFrame.html',''); initR
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a9a9e3ad8bad4bbb004429128c756b72c" id="r_a9a9e3ad8bad4bbb004429128c756b72c"><td class="memItemLeft" align="right" valign="top"><a id="a9a9e3ad8bad4bbb004429128c756b72c" name="a9a9e3ad8bad4bbb004429128c756b72c"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>to_string</b> () const</td></tr>
-<tr class="separator:a9a9e3ad8bad4bbb004429128c756b72c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ec089637cb495a0ef9c47c4f3780af2" id="r_a2ec089637cb495a0ef9c47c4f3780af2"><td class="memItemLeft" align="right" valign="top"><a id="a2ec089637cb495a0ef9c47c4f3780af2" name="a2ec089637cb495a0ef9c47c4f3780af2"></a>
+auto&#160;</td><td class="memItemRight" valign="bottom"><b>to_string</b> () const -&gt; std::string</td></tr>
+<tr class="separator:a2ec089637cb495a0ef9c47c4f3780af2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abe416c06826852520516ea3fe1f8f067" id="r_abe416c06826852520516ea3fe1f8f067"><td class="memItemLeft" align="right" valign="top"><a id="abe416c06826852520516ea3fe1f8f067" name="abe416c06826852520516ea3fe1f8f067"></a>
+auto&#160;</td><td class="memItemRight" valign="bottom"><b>get_tofpacket</b> (std::string name) -&gt; r::Result&lt; <a class="el" href="structTofPacket.html">TofPacket</a>, <a class="el" href="classGaps_1_1IOError.html">Gaps::IOError</a> &gt;</td></tr>
+<tr class="memdesc:abe416c06826852520516ea3fe1f8f067"><td class="mdescLeft">&#160;</td><td class="mdescRight">extract a tofpacket if this frame object is of the correct type <br /></td></tr>
+<tr class="separator:abe416c06826852520516ea3fe1f8f067"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaccd98b65f32ed033fec0ea3b1485034" id="r_aaccd98b65f32ed033fec0ea3b1485034"><td class="memItemLeft" align="right" valign="top"><a id="aaccd98b65f32ed033fec0ea3b1485034" name="aaccd98b65f32ed033fec0ea3b1485034"></a>
+auto&#160;</td><td class="memItemRight" valign="bottom"><b>get_telemetrypacket</b> (std::string name) -&gt; <a class="el" href="structGaps_1_1Telemetry_1_1Packet.html">Gaps::Telemetry::Packet</a></td></tr>
+<tr class="separator:aaccd98b65f32ed033fec0ea3b1485034"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:ab1080037ea64d10c93def1bbfa40a1b2" id="r_ab1080037ea64d10c93def1bbfa40a1b2"><td class="memItemLeft" align="right" valign="top"><a id="ab1080037ea64d10c93def1bbfa40a1b2" name="ab1080037ea64d10c93def1bbfa40a1b2"></a>
-static <a class="el" href="structGaps_1_1CRFrame.html">CRFrame</a>&#160;</td><td class="memItemRight" valign="bottom"><b>from_bytestream</b> (Vec&lt; u8 &gt; stream, usize &amp;pos)</td></tr>
-<tr class="separator:ab1080037ea64d10c93def1bbfa40a1b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac582db004524f92f42c7f95f0a28f3d6" id="r_ac582db004524f92f42c7f95f0a28f3d6"><td class="memItemLeft" align="right" valign="top"><a id="ac582db004524f92f42c7f95f0a28f3d6" name="ac582db004524f92f42c7f95f0a28f3d6"></a>
+static auto&#160;</td><td class="memItemRight" valign="bottom"><b>from_bytestream</b> (Vec&lt; u8 &gt; stream, usize &amp;pos) -&gt; <a class="el" href="structGaps_1_1CRFrame.html">CRFrame</a></td></tr>
+<tr class="separator:ac582db004524f92f42c7f95f0a28f3d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada781a3bf498857b233d6d7e94cb27c5" id="r_ada781a3bf498857b233d6d7e94cb27c5"><td class="memItemLeft" align="right" valign="top"><a id="ada781a3bf498857b233d6d7e94cb27c5" name="ada781a3bf498857b233d6d7e94cb27c5"></a>
+static auto&#160;</td><td class="memItemRight" valign="bottom"><b>parse_index</b> (Vec&lt; u8 &gt; stream, usize &amp;pos) -&gt; std::map&lt; std::string, std::tuple&lt; u64, <a class="el" href="namespaceGaps.html#a8e2924b21458e93bc83a6ae981d47b57">CRFrameObjectType</a> &gt; &gt;</td></tr>
+<tr class="separator:ada781a3bf498857b233d6d7e94cb27c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:ad5a8eaac1a6c7362f37d61987269d92c" id="r_ad5a8eaac1a6c7362f37d61987269d92c"><td class="memItemLeft" align="right" valign="top"><a id="ad5a8eaac1a6c7362f37d61987269d92c" name="ad5a8eaac1a6c7362f37d61987269d92c"></a>
-std::map&lt; std::string, std::tuple&lt; u64, CRFrameObjectType &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>index</b></td></tr>
+std::map&lt; std::string, std::tuple&lt; u64, <a class="el" href="namespaceGaps.html#a8e2924b21458e93bc83a6ae981d47b57">CRFrameObjectType</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>index</b></td></tr>
 <tr class="separator:ad5a8eaac1a6c7362f37d61987269d92c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a94dad7da9c3fb9a7eee7ba19c3c5ba72" id="r_a94dad7da9c3fb9a7eee7ba19c3c5ba72"><td class="memItemLeft" align="right" valign="top"><a id="a94dad7da9c3fb9a7eee7ba19c3c5ba72" name="a94dad7da9c3fb9a7eee7ba19c3c5ba72"></a>
 Vec&lt; u8 &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>bytestorage</b></td></tr>
@@ -125,12 +135,12 @@ Vec&lt; u8 &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>bytestorag
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
-<tr class="memitem:a74042ed0de2762ecf478fcfe83431f75" id="r_a74042ed0de2762ecf478fcfe83431f75"><td class="memItemLeft" align="right" valign="top"><a id="a74042ed0de2762ecf478fcfe83431f75" name="a74042ed0de2762ecf478fcfe83431f75"></a>
-static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>HEAD</b> = 0xAAAA</td></tr>
-<tr class="separator:a74042ed0de2762ecf478fcfe83431f75"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aae460bbc325732d916f392ba35b5bcfb" id="r_aae460bbc325732d916f392ba35b5bcfb"><td class="memItemLeft" align="right" valign="top"><a id="aae460bbc325732d916f392ba35b5bcfb" name="aae460bbc325732d916f392ba35b5bcfb"></a>
-static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>TAIL</b> = 0x5555</td></tr>
-<tr class="separator:aae460bbc325732d916f392ba35b5bcfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aadf3e8650d2ee4600f8c12cd6f7cec07" id="r_aadf3e8650d2ee4600f8c12cd6f7cec07"><td class="memItemLeft" align="right" valign="top"><a id="aadf3e8650d2ee4600f8c12cd6f7cec07" name="aadf3e8650d2ee4600f8c12cd6f7cec07"></a>
+static constexpr u16&#160;</td><td class="memItemRight" valign="bottom"><b>HEAD</b> = 0xAAAA</td></tr>
+<tr class="separator:aadf3e8650d2ee4600f8c12cd6f7cec07"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeb005852684222597c63123da8aa8198" id="r_aeb005852684222597c63123da8aa8198"><td class="memItemLeft" align="right" valign="top"><a id="aeb005852684222597c63123da8aa8198" name="aeb005852684222597c63123da8aa8198"></a>
+static constexpr u16&#160;</td><td class="memItemRight" valign="bottom"><b>TAIL</b> = 0x5555</td></tr>
+<tr class="separator:aeb005852684222597c63123da8aa8198"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this struct was generated from the following file:<ul>
 <li>/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/C++/include/<a class="el" href="caraspace_8hpp_source.html">caraspace.hpp</a></li>

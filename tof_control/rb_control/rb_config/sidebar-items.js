@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["RBConfig"]};
+window.SIDEBAR_ITEMS = {};

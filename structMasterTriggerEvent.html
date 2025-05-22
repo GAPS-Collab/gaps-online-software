@@ -106,94 +106,96 @@ $(document).ready(function(){initNavTree('structMasterTriggerEvent.html',''); in
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a455353807880e3474df222b7f42d7268" id="r_a455353807880e3474df222b7f42d7268"><td class="memItemLeft" align="right" valign="top">u64&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#a455353807880e3474df222b7f42d7268">get_timestamp_gps48</a> () const</td></tr>
-<tr class="separator:a455353807880e3474df222b7f42d7268"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a39fdaf7835bd4691d17e3dcad9d64cda" id="r_a39fdaf7835bd4691d17e3dcad9d64cda"><td class="memItemLeft" align="right" valign="top"><a id="a39fdaf7835bd4691d17e3dcad9d64cda" name="a39fdaf7835bd4691d17e3dcad9d64cda"></a>
-u64&#160;</td><td class="memItemRight" valign="bottom"><b>get_timestamp_abs48</b> () const</td></tr>
-<tr class="memdesc:a39fdaf7835bd4691d17e3dcad9d64cda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get absolute timestamp as sent by the GPS. <br /></td></tr>
-<tr class="separator:a39fdaf7835bd4691d17e3dcad9d64cda"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aef39b0b619e9bcde4428eb5d964c5e37" id="r_aef39b0b619e9bcde4428eb5d964c5e37"><td class="memItemLeft" align="right" valign="top"><a id="aef39b0b619e9bcde4428eb5d964c5e37" name="aef39b0b619e9bcde4428eb5d964c5e37"></a>
-Vec&lt; u8 &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>get_rb_link_ids</b> () const</td></tr>
-<tr class="separator:aef39b0b619e9bcde4428eb5d964c5e37"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afae614fdc6917488140fc1cab65044ac" id="r_afae614fdc6917488140fc1cab65044ac"><td class="memItemLeft" align="right" valign="top">Vec&lt; std::tuple&lt; u8, u8, u8, LTBThreshold &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#afae614fdc6917488140fc1cab65044ac">get_trigger_hits</a> () const</td></tr>
-<tr class="separator:afae614fdc6917488140fc1cab65044ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8518a2d9aa00f6da3f2a6ee3b6b854cb" id="r_a8518a2d9aa00f6da3f2a6ee3b6b854cb"><td class="memItemLeft" align="right" valign="top"><a id="a8518a2d9aa00f6da3f2a6ee3b6b854cb" name="a8518a2d9aa00f6da3f2a6ee3b6b854cb"></a>
-Vec&lt; TriggerType &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>get_trigger_sources</b> () const</td></tr>
-<tr class="memdesc:a8518a2d9aa00f6da3f2a6ee3b6b854cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the trigger sources from trigger source byte. <br /></td></tr>
-<tr class="separator:a8518a2d9aa00f6da3f2a6ee3b6b854cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aabc131f9d53ef6256b235d953f6c3f3b" id="r_aabc131f9d53ef6256b235d953f6c3f3b"><td class="memItemLeft" align="right" valign="top"><a id="aabc131f9d53ef6256b235d953f6c3f3b" name="aabc131f9d53ef6256b235d953f6c3f3b"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>to_string</b> () const</td></tr>
-<tr class="memdesc:aabc131f9d53ef6256b235d953f6c3f3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">String representation of the struct. <br /></td></tr>
-<tr class="separator:aabc131f9d53ef6256b235d953f6c3f3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ba99075cf7568ea3097ea00bbc5043a" id="r_a5ba99075cf7568ea3097ea00bbc5043a"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#a5ba99075cf7568ea3097ea00bbc5043a">get_timestamp_gps48</a> () const -&gt; u64</td></tr>
+<tr class="separator:a5ba99075cf7568ea3097ea00bbc5043a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d8ab2286a38201ff595780f7fdaebdd" id="r_a7d8ab2286a38201ff595780f7fdaebdd"><td class="memItemLeft" align="right" valign="top"><a id="a7d8ab2286a38201ff595780f7fdaebdd" name="a7d8ab2286a38201ff595780f7fdaebdd"></a>
+auto&#160;</td><td class="memItemRight" valign="bottom"><b>get_timestamp_gps</b> () const -&gt; u32</td></tr>
+<tr class="memdesc:a7d8ab2286a38201ff595780f7fdaebdd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the timestamp as sent by the GPS. <br /></td></tr>
+<tr class="separator:a7d8ab2286a38201ff595780f7fdaebdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29d4958f77d59171abe0bbf32d46f7a8" id="r_a29d4958f77d59171abe0bbf32d46f7a8"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#a29d4958f77d59171abe0bbf32d46f7a8">get_timestamp_abs48</a> () const -&gt; u64</td></tr>
+<tr class="separator:a29d4958f77d59171abe0bbf32d46f7a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f123985f276c167e3a0fcf5306ce9e1" id="r_a2f123985f276c167e3a0fcf5306ce9e1"><td class="memItemLeft" align="right" valign="top"><a id="a2f123985f276c167e3a0fcf5306ce9e1" name="a2f123985f276c167e3a0fcf5306ce9e1"></a>
+auto&#160;</td><td class="memItemRight" valign="bottom"><b>get_rb_link_ids</b> () const -&gt; Vec&lt; u8 &gt;</td></tr>
+<tr class="separator:a2f123985f276c167e3a0fcf5306ce9e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5c22b71ee7ae15f36fa5b0279129090" id="r_af5c22b71ee7ae15f36fa5b0279129090"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#af5c22b71ee7ae15f36fa5b0279129090">get_trigger_hits</a> () const -&gt; Vec&lt; std::tuple&lt; u8, u8, u8, LTBThreshold &gt; &gt;</td></tr>
+<tr class="separator:af5c22b71ee7ae15f36fa5b0279129090"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d1a250b89e3459840a1769a12a8bed6" id="r_a9d1a250b89e3459840a1769a12a8bed6"><td class="memItemLeft" align="right" valign="top"><a id="a9d1a250b89e3459840a1769a12a8bed6" name="a9d1a250b89e3459840a1769a12a8bed6"></a>
+auto&#160;</td><td class="memItemRight" valign="bottom"><b>get_trigger_sources</b> () const -&gt; Vec&lt; TriggerType &gt;</td></tr>
+<tr class="memdesc:a9d1a250b89e3459840a1769a12a8bed6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the trigger sources from trigger source byte. <br /></td></tr>
+<tr class="separator:a9d1a250b89e3459840a1769a12a8bed6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeced23728c92d80e7f64787d79843110" id="r_aeced23728c92d80e7f64787d79843110"><td class="memItemLeft" align="right" valign="top"><a id="aeced23728c92d80e7f64787d79843110" name="aeced23728c92d80e7f64787d79843110"></a>
+auto&#160;</td><td class="memItemRight" valign="bottom"><b>to_string</b> () const -&gt; std::string</td></tr>
+<tr class="memdesc:aeced23728c92d80e7f64787d79843110"><td class="mdescLeft">&#160;</td><td class="mdescRight">String representation of the struct. <br /></td></tr>
+<tr class="separator:aeced23728c92d80e7f64787d79843110"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a92eba169f890dbdf936adba5572e06fe" id="r_a92eba169f890dbdf936adba5572e06fe"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structMasterTriggerEvent.html">MasterTriggerEvent</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#a92eba169f890dbdf936adba5572e06fe">from_bytestream</a> (const Vec&lt; u8 &gt; &amp;bytestream, u64 &amp;pos)</td></tr>
-<tr class="separator:a92eba169f890dbdf936adba5572e06fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad1add6eeca1c2685bcaa06cfcbd6286c" id="r_ad1add6eeca1c2685bcaa06cfcbd6286c"><td class="memItemLeft" align="right" valign="top">static auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMasterTriggerEvent.html#ad1add6eeca1c2685bcaa06cfcbd6286c">from_bytestream</a> (const Vec&lt; u8 &gt; &amp;bytestream, u64 &amp;pos) -&gt; <a class="el" href="structMasterTriggerEvent.html">MasterTriggerEvent</a></td></tr>
+<tr class="separator:ad1add6eeca1c2685bcaa06cfcbd6286c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a935b83acbec230d81d345178ae91ab1b" id="r_a935b83acbec230d81d345178ae91ab1b"><td class="memItemLeft" align="right" valign="top"><a id="a935b83acbec230d81d345178ae91ab1b" name="a935b83acbec230d81d345178ae91ab1b"></a>
-EventStatus&#160;</td><td class="memItemRight" valign="bottom"><b>event_status</b></td></tr>
+EventStatus&#160;</td><td class="memItemRight" valign="bottom"><b>event_status</b> = EventStatus::Unknown</td></tr>
 <tr class="separator:a935b83acbec230d81d345178ae91ab1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2fc1e8b3d4f1e769b4bce8a58a166c78" id="r_a2fc1e8b3d4f1e769b4bce8a58a166c78"><td class="memItemLeft" align="right" valign="top"><a id="a2fc1e8b3d4f1e769b4bce8a58a166c78" name="a2fc1e8b3d4f1e769b4bce8a58a166c78"></a>
-u32&#160;</td><td class="memItemRight" valign="bottom"><b>event_id</b></td></tr>
+u32&#160;</td><td class="memItemRight" valign="bottom"><b>event_id</b> = 0</td></tr>
 <tr class="memdesc:a2fc1e8b3d4f1e769b4bce8a58a166c78"><td class="mdescLeft">&#160;</td><td class="mdescRight">event_id as assigned by the MasterTriggerBoard <br /></td></tr>
 <tr class="separator:a2fc1e8b3d4f1e769b4bce8a58a166c78"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a886a68d557a93210b86b3e2d1b96bfa9" id="r_a886a68d557a93210b86b3e2d1b96bfa9"><td class="memItemLeft" align="right" valign="top"><a id="a886a68d557a93210b86b3e2d1b96bfa9" name="a886a68d557a93210b86b3e2d1b96bfa9"></a>
-u32&#160;</td><td class="memItemRight" valign="bottom"><b>timestamp</b></td></tr>
+u32&#160;</td><td class="memItemRight" valign="bottom"><b>timestamp</b> = 0</td></tr>
 <tr class="memdesc:a886a68d557a93210b86b3e2d1b96bfa9"><td class="mdescLeft">&#160;</td><td class="mdescRight">MTB timestamp. <br /></td></tr>
 <tr class="separator:a886a68d557a93210b86b3e2d1b96bfa9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a30d57d1dc8bd9e7fc55d1af7ad6ebc92" id="r_a30d57d1dc8bd9e7fc55d1af7ad6ebc92"><td class="memItemLeft" align="right" valign="top"><a id="a30d57d1dc8bd9e7fc55d1af7ad6ebc92" name="a30d57d1dc8bd9e7fc55d1af7ad6ebc92"></a>
-u32&#160;</td><td class="memItemRight" valign="bottom"><b>tiu_timestamp</b></td></tr>
+u32&#160;</td><td class="memItemRight" valign="bottom"><b>tiu_timestamp</b> = 0</td></tr>
 <tr class="memdesc:a30d57d1dc8bd9e7fc55d1af7ad6ebc92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tracker (?) timestamp. <br /></td></tr>
 <tr class="separator:a30d57d1dc8bd9e7fc55d1af7ad6ebc92"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa49962e24c04ede5087ff1876feecd36" id="r_aa49962e24c04ede5087ff1876feecd36"><td class="memItemLeft" align="right" valign="top"><a id="aa49962e24c04ede5087ff1876feecd36" name="aa49962e24c04ede5087ff1876feecd36"></a>
-u32&#160;</td><td class="memItemRight" valign="bottom"><b>tiu_gps32</b></td></tr>
+u32&#160;</td><td class="memItemRight" valign="bottom"><b>tiu_gps32</b> = 0</td></tr>
 <tr class="memdesc:aa49962e24c04ede5087ff1876feecd36"><td class="mdescLeft">&#160;</td><td class="mdescRight">GAPS GPS clock value (slow) <br /></td></tr>
 <tr class="separator:aa49962e24c04ede5087ff1876feecd36"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab7def730b945ec5fb1da944dbd95ab25" id="r_ab7def730b945ec5fb1da944dbd95ab25"><td class="memItemLeft" align="right" valign="top"><a id="ab7def730b945ec5fb1da944dbd95ab25" name="ab7def730b945ec5fb1da944dbd95ab25"></a>
-u32&#160;</td><td class="memItemRight" valign="bottom"><b>tiu_gps16</b></td></tr>
+u32&#160;</td><td class="memItemRight" valign="bottom"><b>tiu_gps16</b> = 0</td></tr>
 <tr class="memdesc:ab7def730b945ec5fb1da944dbd95ab25"><td class="mdescLeft">&#160;</td><td class="mdescRight">GAPS GPS clock value (fast) <br /></td></tr>
 <tr class="separator:ab7def730b945ec5fb1da944dbd95ab25"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab438df14fccd804df45411f51a85719b" id="r_ab438df14fccd804df45411f51a85719b"><td class="memItemLeft" align="right" valign="top"><a id="ab438df14fccd804df45411f51a85719b" name="ab438df14fccd804df45411f51a85719b"></a>
-u32&#160;</td><td class="memItemRight" valign="bottom"><b>crc</b></td></tr>
+u32&#160;</td><td class="memItemRight" valign="bottom"><b>crc</b> = 0</td></tr>
 <tr class="memdesc:ab438df14fccd804df45411f51a85719b"><td class="mdescLeft">&#160;</td><td class="mdescRight">triggered paddles as seen by the MTB <br /></td></tr>
 <tr class="separator:ab438df14fccd804df45411f51a85719b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3edd142130fbdd973d8e63a15166d6df" id="r_a3edd142130fbdd973d8e63a15166d6df"><td class="memItemLeft" align="right" valign="top"><a id="a3edd142130fbdd973d8e63a15166d6df" name="a3edd142130fbdd973d8e63a15166d6df"></a>
-u16&#160;</td><td class="memItemRight" valign="bottom"><b>trigger_source</b></td></tr>
+u16&#160;</td><td class="memItemRight" valign="bottom"><b>trigger_source</b> = 0</td></tr>
 <tr class="separator:a3edd142130fbdd973d8e63a15166d6df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc050262f6d08b8b2a2c80ca59a0a849" id="r_acc050262f6d08b8b2a2c80ca59a0a849"><td class="memItemLeft" align="right" valign="top"><a id="acc050262f6d08b8b2a2c80ca59a0a849" name="acc050262f6d08b8b2a2c80ca59a0a849"></a>
-u32&#160;</td><td class="memItemRight" valign="bottom"><b>dsi_j_mask</b></td></tr>
+u32&#160;</td><td class="memItemRight" valign="bottom"><b>dsi_j_mask</b> = 0</td></tr>
 <tr class="separator:acc050262f6d08b8b2a2c80ca59a0a849"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1093aa4c8ebdec7e23d60579fd8fd5c0" id="r_a1093aa4c8ebdec7e23d60579fd8fd5c0"><td class="memItemLeft" align="right" valign="top"><a id="a1093aa4c8ebdec7e23d60579fd8fd5c0" name="a1093aa4c8ebdec7e23d60579fd8fd5c0"></a>
-Vec&lt; u16 &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>channel_mask</b></td></tr>
+Vec&lt; u16 &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>channel_mask</b> = Vec&lt;u16&gt;()</td></tr>
 <tr class="separator:a1093aa4c8ebdec7e23d60579fd8fd5c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab05c4f3b5d0f32309e8bb47c09995194" id="r_ab05c4f3b5d0f32309e8bb47c09995194"><td class="memItemLeft" align="right" valign="top"><a id="ab05c4f3b5d0f32309e8bb47c09995194" name="ab05c4f3b5d0f32309e8bb47c09995194"></a>
-u64&#160;</td><td class="memItemRight" valign="bottom"><b>mtb_link_mask</b></td></tr>
+u64&#160;</td><td class="memItemRight" valign="bottom"><b>mtb_link_mask</b> = 0</td></tr>
 <tr class="separator:ab05c4f3b5d0f32309e8bb47c09995194"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
-<tr class="memitem:a237c05d33e1485cf4bace993c9ae6ee9" id="r_a237c05d33e1485cf4bace993c9ae6ee9"><td class="memItemLeft" align="right" valign="top"><a id="a237c05d33e1485cf4bace993c9ae6ee9" name="a237c05d33e1485cf4bace993c9ae6ee9"></a>
-static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>HEAD</b> = 0xAAAA</td></tr>
-<tr class="memdesc:a237c05d33e1485cf4bace993c9ae6ee9"><td class="mdescLeft">&#160;</td><td class="mdescRight">begin struct marker <br /></td></tr>
-<tr class="separator:a237c05d33e1485cf4bace993c9ae6ee9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a19a8c42a5953fd1ae8a0aec831863c3c" id="r_a19a8c42a5953fd1ae8a0aec831863c3c"><td class="memItemLeft" align="right" valign="top"><a id="a19a8c42a5953fd1ae8a0aec831863c3c" name="a19a8c42a5953fd1ae8a0aec831863c3c"></a>
-static const u16&#160;</td><td class="memItemRight" valign="bottom"><b>TAIL</b> = 0x5555</td></tr>
-<tr class="memdesc:a19a8c42a5953fd1ae8a0aec831863c3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">end struct marker <br /></td></tr>
-<tr class="separator:a19a8c42a5953fd1ae8a0aec831863c3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae8de2d59e0cdb02a7ad7b6073011983d" id="r_ae8de2d59e0cdb02a7ad7b6073011983d"><td class="memItemLeft" align="right" valign="top"><a id="ae8de2d59e0cdb02a7ad7b6073011983d" name="ae8de2d59e0cdb02a7ad7b6073011983d"></a>
-static const usize&#160;</td><td class="memItemRight" valign="bottom"><b>SIZE</b> = 45</td></tr>
-<tr class="memdesc:ae8de2d59e0cdb02a7ad7b6073011983d"><td class="mdescLeft">&#160;</td><td class="mdescRight">the struct has a fixed size of SIZE <br /></td></tr>
-<tr class="separator:ae8de2d59e0cdb02a7ad7b6073011983d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab0ef9b6a29d44f1771cedc15e077a16f" id="r_ab0ef9b6a29d44f1771cedc15e077a16f"><td class="memItemLeft" align="right" valign="top"><a id="ab0ef9b6a29d44f1771cedc15e077a16f" name="ab0ef9b6a29d44f1771cedc15e077a16f"></a>
+static constexpr u16&#160;</td><td class="memItemRight" valign="bottom"><b>HEAD</b> = 0xAAAA</td></tr>
+<tr class="memdesc:ab0ef9b6a29d44f1771cedc15e077a16f"><td class="mdescLeft">&#160;</td><td class="mdescRight">begin struct marker <br /></td></tr>
+<tr class="separator:ab0ef9b6a29d44f1771cedc15e077a16f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a747c17bdb302ac0a1609df7c63f52bce" id="r_a747c17bdb302ac0a1609df7c63f52bce"><td class="memItemLeft" align="right" valign="top"><a id="a747c17bdb302ac0a1609df7c63f52bce" name="a747c17bdb302ac0a1609df7c63f52bce"></a>
+static constexpr u16&#160;</td><td class="memItemRight" valign="bottom"><b>TAIL</b> = 0x5555</td></tr>
+<tr class="memdesc:a747c17bdb302ac0a1609df7c63f52bce"><td class="mdescLeft">&#160;</td><td class="mdescRight">end struct marker <br /></td></tr>
+<tr class="separator:a747c17bdb302ac0a1609df7c63f52bce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e1848db7aa8353345ce582d0ee5b688" id="r_a9e1848db7aa8353345ce582d0ee5b688"><td class="memItemLeft" align="right" valign="top"><a id="a9e1848db7aa8353345ce582d0ee5b688" name="a9e1848db7aa8353345ce582d0ee5b688"></a>
+static constexpr usize&#160;</td><td class="memItemRight" valign="bottom"><b>SIZE</b> = 0</td></tr>
+<tr class="memdesc:a9e1848db7aa8353345ce582d0ee5b688"><td class="mdescLeft">&#160;</td><td class="mdescRight">Variable size for <a class="el" href="structMasterTriggerEvent.html">MasterTriggerEvent</a>. <br /></td></tr>
+<tr class="separator:a9e1848db7aa8353345ce582d0ee5b688"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The <a class="el" href="structMasterTriggerEvent.html">MasterTriggerEvent</a> represesnts the information provided by the MTB for this one specific event. Most notably, it includes a board mask, which is the DSI/J connections which triggered, and a hit mask. The hit mask gives hit channels per DSI/J, which correspond to hit channels on a LTB.</p>
 <p>FIXME -compatibiltiy. Reading older data, we have 2 scenarios - either 113 bytes of fixed size for 20 LTBs, or 133 bytes for 25 LTBs. We can modify from_bytestream to at least not throw an error when reading older data, but this would currently be a todo of lower priority </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a92eba169f890dbdf936adba5572e06fe" name="a92eba169f890dbdf936adba5572e06fe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a92eba169f890dbdf936adba5572e06fe">&#9670;&#160;</a></span>from_bytestream()</h2>
+<a id="ad1add6eeca1c2685bcaa06cfcbd6286c" name="ad1add6eeca1c2685bcaa06cfcbd6286c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1add6eeca1c2685bcaa06cfcbd6286c">&#9670;&#160;</a></span>from_bytestream()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -202,7 +204,7 @@ static const usize&#160;</td><td class="memItemRight" valign="bottom"><b>SIZE</b
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static <a class="el" href="structMasterTriggerEvent.html">MasterTriggerEvent</a> MasterTriggerEvent::from_bytestream </td>
+          <td class="memname">static auto MasterTriggerEvent::from_bytestream </td>
           <td>(</td>
           <td class="paramtype">const Vec&lt; u8 &gt; &amp;&#160;</td>
           <td class="paramname"><em>bytestream</em>, </td>
@@ -216,7 +218,7 @@ static const usize&#160;</td><td class="memItemRight" valign="bottom"><b>SIZE</b
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td>
+          <td></td><td> -&gt;  <a class="el" href="structMasterTriggerEvent.html">MasterTriggerEvent</a></td>
         </tr>
       </table>
   </td>
@@ -230,24 +232,42 @@ static const usize&#160;</td><td class="memItemRight" valign="bottom"><b>SIZE</b
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">bytestream</td><td>Byte representation of a <a class="el" href="structMasterTriggerEvent.html">MasterTriggerEvent</a>, or including one at pos </td></tr>
-    <tr><td class="paramname">pos</td><td>: Expected position of <a class="el" href="structMasterTriggerEvent.html#a237c05d33e1485cf4bace993c9ae6ee9" title="begin struct marker">MasterTriggerEvent::HEAD</a> in the stream </td></tr>
+    <tr><td class="paramname">pos</td><td>: Expected position of <a class="el" href="structMasterTriggerEvent.html#ab0ef9b6a29d44f1771cedc15e077a16f" title="begin struct marker">MasterTriggerEvent::HEAD</a> in the stream </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="a455353807880e3474df222b7f42d7268" name="a455353807880e3474df222b7f42d7268"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a455353807880e3474df222b7f42d7268">&#9670;&#160;</a></span>get_timestamp_gps48()</h2>
+<a id="a29d4958f77d59171abe0bbf32d46f7a8" name="a29d4958f77d59171abe0bbf32d46f7a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a29d4958f77d59171abe0bbf32d46f7a8">&#9670;&#160;</a></span>get_timestamp_abs48()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">u64 MasterTriggerEvent::get_timestamp_gps48 </td>
+          <td class="memname">auto MasterTriggerEvent::get_timestamp_abs48 </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td> const</td>
+          <td> const -&gt;  u64</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Get absolute timestamp which is calculated with the help of the 1pps pulse from the GPS </p>
+
+</div>
+</div>
+<a id="a5ba99075cf7568ea3097ea00bbc5043a" name="a5ba99075cf7568ea3097ea00bbc5043a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5ba99075cf7568ea3097ea00bbc5043a">&#9670;&#160;</a></span>get_timestamp_gps48()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">auto MasterTriggerEvent::get_timestamp_gps48 </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const -&gt;  u64</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -255,17 +275,17 @@ static const usize&#160;</td><td class="memItemRight" valign="bottom"><b>SIZE</b
 
 </div>
 </div>
-<a id="afae614fdc6917488140fc1cab65044ac" name="afae614fdc6917488140fc1cab65044ac"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afae614fdc6917488140fc1cab65044ac">&#9670;&#160;</a></span>get_trigger_hits()</h2>
+<a id="af5c22b71ee7ae15f36fa5b0279129090" name="af5c22b71ee7ae15f36fa5b0279129090"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af5c22b71ee7ae15f36fa5b0279129090">&#9670;&#160;</a></span>get_trigger_hits()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">Vec&lt; std::tuple&lt; u8, u8, u8, LTBThreshold &gt; &gt; MasterTriggerEvent::get_trigger_hits </td>
+          <td class="memname">auto MasterTriggerEvent::get_trigger_hits </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td> const</td>
+          <td> const -&gt;  Vec&lt; std::tuple&lt; u8, u8, u8, LTBThreshold &gt; &gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">

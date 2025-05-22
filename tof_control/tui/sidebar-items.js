@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["cpu_app","cpu_crossterm","cpu_ui","ltb_ui","pa_ui","pb_ui","rat_app","rat_crossterm","rat_ui","rb_ui"]};

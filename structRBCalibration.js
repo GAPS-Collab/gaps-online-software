@@ -1,6 +1,6 @@
 var structRBCalibration =
 [
-    [ "to_string", "structRBCalibration.html#a15df67c92a7d9a2c93a48bf811465907", null ],
+    [ "to_string", "structRBCalibration.html#a35e300685c0bf5a44c6cb5b64369f630", null ],
     [ "voltages", "structRBCalibration.html#a56bae47243a511741f1aa28fc6fb5842", null ],
     [ "d_v", "structRBCalibration.html#a4ee866a3e9b149e803653c33989acf53", null ],
     [ "noi_data", "structRBCalibration.html#a71265fb6bc6cd97c69bc54923cc06f0e", null ],
