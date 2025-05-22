@@ -2249,6 +2249,21 @@ impl PyMtbMoniData {
   }
 
   #[getter]
+  pub fn get_vccint(&self) -> u16 {
+    self.moni.vccint
+  }
+
+  #[getter]
+  pub fn get_vccbram(&self) -> u16 {
+    self.moni.vccbram
+  }
+
+  #[getter]
+  pub fn get_vccaux(&self) -> u16 {
+    self.moni.vccaux
+  }
+
+  #[getter]
   pub fn get_rate(&self) -> u16 {
     self.moni.rate
   }
