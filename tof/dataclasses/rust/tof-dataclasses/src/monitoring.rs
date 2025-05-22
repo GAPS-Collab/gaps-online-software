@@ -1462,7 +1462,7 @@ impl MtbMoniData {
   }
   
   /// Convert ADC VCCINT from adc values to Voltage
-  fn adc_vcc_conversion(data : u16) -> f32 {
+  pub fn adc_vcc_conversion(data : u16) -> f32 {
     3.0 * data as f32 / (2_u32.pow(12-1)) as f32
   }
 

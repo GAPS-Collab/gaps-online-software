@@ -2249,18 +2249,18 @@ impl PyMtbMoniData {
   }
 
   #[getter]
-  pub fn get_vccint(&self) -> u16 {
-    self.moni.vccint
+  fn get_vccint(&self) -> f32 {
+    MtbMoniData::adc_vcc_conversion(self.moni.vccint)
   }
 
   #[getter]
-  pub fn get_vccbram(&self) -> u16 {
-    self.moni.vccbram
+  fn get_vccbram(&self) -> f32 {
+    MtbMoniData::adc_vcc_conversion(self.moni.vccbram)
   }
 
   #[getter]
-  pub fn get_vccaux(&self) -> u16 {
-    self.moni.vccaux
+  fn get_vccaux(&self) -> f32 {
+    MtbMoniData::adc_vcc_conversion(self.moni.vccaux)
   }
 
   #[getter]
