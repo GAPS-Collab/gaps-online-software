@@ -611,7 +611,7 @@ impl TofHit {
     pp.x                = 0.0; 
     pp.y                = 0.0; 
     pp.z                = 0.0; 
-    
+    pp.event_t0         = 0.0; 
     //charge_min_i   : 0,
     //// deprecated  
     //pos_across     : 0,
@@ -656,6 +656,7 @@ fn serialization_tofhit() {
     test.x                = 0.0; 
     test.y                = 0.0; 
     test.z                = 0.0; 
+    test.event_t0         = 0.0;
     assert_eq!(pos, TofHit::SIZE);
     assert_eq!(data, test);
   }

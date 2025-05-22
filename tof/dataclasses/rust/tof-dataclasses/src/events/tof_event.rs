@@ -242,6 +242,30 @@ impl TofEvent {
   }
   
   /// Compare the MasterTriggerEvent::trigger_hits with 
+  /// the actual hits to determine from which paddles
+  /// we have received more hits than we were supposed to.
+  /// These hits are neither in the trigger hits nor
+  /// rb_link_ids
+  ///
+  /// FIXME - this can be hits which are exclusively 
+  ///         within the RB integration window
+  #[cfg(feature="database")]
+  pub fn get_extra_paddles_hg(&self, pid_map : &DsiJChPidMapping) -> Vec<u8> {
+    let mut extra = Vec::<u8>::new();
+    let mut trigger_pids = Vec::<u8>::new(); 
+    for th in self.mt_event.get_trigger_hits() {
+      let pid = pid_map.get(&th.0).unwrap().get(&th.1).unwrap().get(&th.2.0).unwrap().0;
+      trigger_pids.push(pid);
+    }
+    for h in self.get_hits() {
+      if !trigger_pids.contains(&h.paddle_id) {
+        extra.push(h.paddle_id);
+      }
+    }
+    extra
+  }
+  
+  /// Compare the MasterTriggerEvent::trigger_hits with 
   /// the actual recorded waveforms to determine from which paddles
   /// we should have received waveforms from. This is 
   /// independent of the hits, which additionally required
@@ -441,6 +465,7 @@ impl TofEvent {
         summary.hits.push(h);
       }
     }
+    #[cfg(feature="database")]
     summary.normalize_hit_times();
     summary
   }
@@ -1352,6 +1377,7 @@ fn packable_tofeventsummary() {
       h.x                = 0.0; 
       h.y                = 0.0; 
       h.z                = 0.0; 
+      h.event_t0         = 0.0;
     }
     assert_eq!(data, test);
   }
