@@ -63,7 +63,6 @@ use std::collections::{
 extern crate chrono;
 use chrono::{DateTime, Utc};
 
-extern crate indicatif;
 use indicatif::{ProgressBar, ProgressStyle};
 use crossbeam_channel::Sender;
 use regex::Regex;

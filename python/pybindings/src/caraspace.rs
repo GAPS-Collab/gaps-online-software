@@ -1,9 +1,15 @@
-//! Pybindings for the caraspace library
+//! The following file is part of gaps-online-software and published 
+//! under the GPLv3 license
+//!
+//! This file contains the source for pybindings with pyO3 for the 
+//! caraspace i/o system
 
 use std::collections::HashMap;
 
 use pyo3::prelude::*;
-use pyo3::types::PyBytes;
+use pyo3::types::{
+  PyBytes,
+};
 
 //use log::error;
 use caraspace::prelude::*;
@@ -113,8 +119,7 @@ impl PyCRFrameObject {
       frame_object : CRFrameObject::new(),
     }
   }
-  
-  
+    
   fn __repr__(&self) -> PyResult<String> {
     Ok(format!("<PyO3Wrapper: {}>", self.frame_object)) 
   }
@@ -213,8 +218,17 @@ impl PyCRFrame {
   }
 }
 
-/// Read a file written by CRWriter containing 
-/// frames in a subsequent fashion
+/// Read caraspace files. Caraspace files are an aggregate filetype
+/// which allows to hold information from multiple sources in an 
+/// efficient binary format. 
+/// For the use within the GAPS experiment, L0 files are caraspace files
+/// and contain the TOF waveforms as sourced by the files written by the 
+/// TOFComputer to disk as well as the files emitted by the flight 
+/// computer (telemetry).
+///
+/// To create a new CRReader, simply call
+/// CRReader(filename_or_directory : path/string) where the argument can be either a name
+/// of an existing file or a directory with caraspace files.
 #[pyclass]
 #[pyo3(name="CRReader")]
 pub struct PyCRReader {
@@ -226,7 +240,25 @@ pub struct PyCRReader {
 #[pymethods]
 impl PyCRReader {
   #[new]
-  fn new(filename : String) -> Self {
+  fn new(filename_or_directory : &Bound<'_,PyAny>) -> PyResult<Self> {
+    let mut string_value = String::from("foo");
+    if let Ok(s) = filename_or_directory.extract::<String>() {
+       string_value = s;
+    } //else if let Ok(p) = filename_or_directory.extract::<&Path>() {
+    if let Ok(fspath_method) = filename_or_directory.getattr("__fspath__") {
+      if let Ok(fspath_result) = fspath_method.call0() {
+        if let Ok(py_string) = fspath_result.extract::<String>() {
+          string_value = py_string;
+        }
+      }
+    }
+
+    //   string_value = p.display().to_string();
+    //} else {
+    //   return Err(pyo3::exceptions::PyTypeError::new_err(
+    //     "Expected a string or a path-like object",
+    //   ));
+    //}
     let mut paddles = HashMap::<u8, Paddle>::new();
     let mut strips  = HashMap::<u32, TrackerStrip>::new();
     match get_tofpaddles() {
@@ -247,13 +279,19 @@ impl PyCRReader {
         //error!("Unable to get paddles from database. Maybe the 'DATABASE_URL' path is not set. Are you sure you loaded the setup-env.sh shell?");
       }
     }
-    Self {
-      reader  : CRReader::new(filename),
+    Ok(Self {
+      reader  : CRReader::new(string_value)?,
       paddles : paddles,
       strips  : strips,
-    }
+    })
   }
 
+  /// This is the filename we are currently 
+  /// extracting frames from 
+  #[getter]
+  fn get_current_filename(&self) -> Option<String> {
+    self.reader.get_current_filename()
+  }
 
   /// Start the reader from the beginning
   /// This is equivalent to a re-initialization
@@ -286,6 +324,45 @@ impl PyCRReader {
         return None;
       }   
     }   
+  }
+
+  /// Get the number of frames this reader can walkthrough.
+  /// Since this is going through all files, it might take
+  /// a long time
+  fn count_frames(&mut self) -> usize {
+    self.reader.get_n_frames()
+  }
+
+  #[getter]
+  fn get_first_frame(&mut self) -> Option<PyCRFrame> {
+    match self.reader.first_frame() {
+      Some(frame) => {
+        let mut pyframe = PyCRFrame::new();
+        pyframe.frame = frame;
+        return Some(pyframe);
+      }
+      None => {
+        return None;
+      }
+    }
+  }
+  
+  #[getter]
+  fn get_last_frame(&mut self) -> Option<PyCRFrame> {
+    match self.reader.last_frame() {
+      Some(frame) => {
+        let mut pyframe = PyCRFrame::new();
+        pyframe.frame = frame;
+        return Some(pyframe);
+      }
+      None => {
+        return None;
+      }
+    }
+  }
+
+  fn __repr__(&self) -> PyResult<String> {
+    Ok(format!("<PyO3Wrapper: {}>", self.reader)) 
   }
 }
 

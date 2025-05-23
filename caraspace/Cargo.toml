@@ -1,6 +1,6 @@
 [package]
 name    = "caraspace"
-version = "0.10.0"
+version = "0.10.1"
 edition = "2021"
 
 [lib]
@@ -36,8 +36,9 @@ criterion = "0.4"
 [dependencies]
 chrono            = "0.4"
 log               = "0.4"
+regex             = "1.11"
+indicatif         = "0.17"
 #half              = "2.4"
-#regex             = "1.5"
 #glob              = "0.3"
 #serde             = { version = "1.0", features = ["derive"] }
 #serde_json        = "1.0"
