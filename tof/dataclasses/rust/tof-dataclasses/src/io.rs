@@ -943,8 +943,6 @@ impl TofPacketReader {
   }
 
   /// The very first TofPacket for a reader
-  ///
-  ///
   pub fn first_packet(&mut self) -> Option<TofPacket> {
     match self.rewind() {
       Err(err) => {
@@ -962,7 +960,7 @@ impl TofPacketReader {
     return pack;
   }
 
-  /// Te very last TofPacket for a reader
+  /// The very last TofPacket for a reader
   pub fn last_packet(&mut self) -> Option<TofPacket> { 
     self.file_index = self.filenames.len() - 1;
     let lastfilename = self.filenames[self.file_index].clone();
@@ -1085,15 +1083,8 @@ impl TofPacketReader {
 
   pub fn rewind(&mut self) -> io::Result<()> {
     let firstfile = &self.filenames[0];
-    match OpenOptions::new().create(false).append(false).read(true).open(&firstfile) {
-      Err(err) => {
-        error!("Unable to open file {firstfile}! {err}");
-        panic!("Unable to create reader from {firstfile}!");
-      }
-      Ok(file) => {
-        self.file_reader  = BufReader::new(file);
-      }
-    }   
+    let file = OpenOptions::new().create(false).append(false).read(true).open(&firstfile)?;
+    self.file_reader  = BufReader::new(file);
     self.cursor     = 0;
     self.file_index = 0;
     Ok(())
