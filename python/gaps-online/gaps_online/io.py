@@ -154,13 +154,25 @@ def get_telemetry_binaries(unix_time_start, unix_time_stop,\
     t_start = datetime.fromtimestamp(unix_time_start, UTC)
     t_stop  = datetime.fromtimestamp(unix_time_stop, UTC)
     all_files = sorted([k for k in Path(f'{data_dir}').glob('*.bin')])
-    print(f'-> Found {len(all_files)} files in {data_dir}')
-    ts = [get_ts_from_binfile(f) for f in all_files]
+    #print(f'-> Found {len(all_files)} files in {data_dir}')
+    # heres some new logic yikes
+    ts = np.array([get_ts_from_binfile(f) for f in all_files])
+    all_files = np.array(all_files)[np.argsort(ts)]
+    ts = np.sort(ts)
+    i = 0
+    while(ts[i]<t_start):
+        i+=1
+    j=i
+    while(ts[j]<t_stop):
+        j+=1
+    i-=1
+    j+=1
     # FiXME - this might throw away 1 file
-    files = [f for f, ts in zip(all_files, ts) if t_start <= ts <= t_stop]
+    #files = [f for f, ts in zip(all_files, ts) if t_start <= ts <= t_stop]
+    files = all_files[i:j]
     ts = [get_ts_from_binfile(f) for f in files]
     print(f'-> Run duration {ts[-1] - ts[0]}')
-    if files:
+    if len(files)>0:
         print(f'-> Found {len(files)} files within range of {t_start} - {t_stop}')
         print(f'--> Earliest file {files[0]}')
         print(f'--> Latest file {files[-1]}')
