@@ -170,11 +170,12 @@ def plot_waveforms(tof_ev, calib : dict = None, with_hits = False, skip_bins=0):
 ###############################################
 
 def tof_projection_xy(paddle_occupancy = {}, 
-                      event = None,
-                      cmap  = matplotlib.colormaps['hot'],
-                      paddle_style   = {'edgecolor' : 'w', 'lw' : 0.4},
-                      show_cbar      = True,
-                      overlay_panels = False):
+                      event            = None,
+                      cmap             = matplotlib.colormaps['hot'],
+                      paddle_style     = {'edgecolor' : 'w', 'lw' : 0.4},
+                      show_cbar        = True,
+                      overlay_panels   = False,
+                      indicate_empty   = 'gray'):
     """
     Show the projection of all paddles which
     are facing in z-direction
@@ -195,6 +196,10 @@ def tof_projection_xy(paddle_occupancy = {},
         overlay_panels   : Only return one axes, have the TOF CBE bottom
                            and CBE TOP panels overlaid over the umbrella
                            (or under it)
+        indicate_empty   : In case we are using this for paddle occupancy,
+                           indicate empty paddles with the given color instead
+                           using a value from the color map. If this behavior is 
+                           not desired, set this to an empty string.
     """
     if overlay_panels:
         fig = plt.figure(figsize=lo.FIGSIZE_A4_SQUARE)
@@ -216,6 +221,8 @@ def tof_projection_xy(paddle_occupancy = {},
     for pdl in umb_paddles:
         if paddle_occupancy:
             color = cmap(paddle_occupancy[pdl.paddle_id])
+            if not paddle_occupancy[pdl.paddle_id] and indicate_empty:
+                color = indicate_empty
             axs[0].add_patch(pdl.draw_xy(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
@@ -251,6 +258,8 @@ def tof_projection_xy(paddle_occupancy = {},
     for pdl in cbe_top_paddles:   
         if paddle_occupancy:
             color = cmap(paddle_occupancy[pdl.paddle_id])
+            if not paddle_occupancy[pdl.paddle_id] and indicate_empty:
+                color = indicate_empty
             axs[axid].add_patch(pdl.draw_xy(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
@@ -281,6 +290,8 @@ def tof_projection_xy(paddle_occupancy = {},
     for pdl in cbe_bot_paddles:
         if paddle_occupancy:
             color = cmap(paddle_occupancy[pdl.paddle_id])
+            if not paddle_occupancy[pdl.paddle_id] and indicate_empty:
+                color = indicate_empty
             axs[axid].add_patch(pdl.draw_xy(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
@@ -327,7 +338,9 @@ def tof_projection_xy(paddle_occupancy = {},
 def unroll_cbe_sides(paddle_occupancy = {},
                      event            = None,
                      cmap             = matplotlib.colormaps['hot'],
-                     show_cbar        = True):
+                     show_cbar        = True,
+                     indicate_empty   = 'gray'
+                     ):
     """
     Project the sides of the cube on xz and yz as well 
     as add the 'edge' paddles.
@@ -343,6 +356,10 @@ def unroll_cbe_sides(paddle_occupancy = {},
                            to return color value based on 
                            'occupancy' numbker
         show_cbar        : Show the colorbar on the figure
+        indicate_empty   : In case we are using this for paddle occupancy,
+                           indicate empty paddles with the given color instead
+                           using a value from the color map. If this behavior is 
+                           not desired, set this to an empty string.
     """
     fig, axs  = plt.subplots(1, 4, sharey=True,figsize=(22, 5), gridspec_kw={'width_ratios': [1, 1, 1, 1]})
     # normal +X
@@ -380,6 +397,8 @@ def unroll_cbe_sides(paddle_occupancy = {},
     ep = ep_1[0]
     if paddle_occupancy:
         color = cmap(paddle_occupancy[ep.paddle_id])
+        if not paddle_occupancy[ep.paddle_id] and indicate_empty:
+            color = indicate_empty
         axs[0].add_patch(ep.draw_yz(fill=True, edgecolor=color, facecolor=color))
     if event is not None:
         axs[0].add_patch(ep.draw_yz(fill=True, edgecolor='k', facecolor='tab:blue', alpha=0.3))
@@ -415,6 +434,8 @@ def unroll_cbe_sides(paddle_occupancy = {},
     ep = ep_2[0]
     if paddle_occupancy:
         color = cmap(paddle_occupancy[ep.paddle_id])
+        if not paddle_occupancy[ep.paddle_id] and indicate_empty:
+            color = indicate_empty
         axs[1].add_patch(ep.draw_xz(fill=True, edgecolor=color, facecolor=color))
     else:
         if event is not None:
@@ -425,6 +446,8 @@ def unroll_cbe_sides(paddle_occupancy = {},
     for pdl in cbe_sb:
         if paddle_occupancy:
             color = cmap(paddle_occupancy[pdl.paddle_id])
+            if not paddle_occupancy[pdl.paddle_id] and indicate_empty:
+                color = indicate_empty
             axs[1].add_patch(pdl.draw_xz(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
@@ -449,6 +472,8 @@ def unroll_cbe_sides(paddle_occupancy = {},
     ep = ep_3[0]
     if paddle_occupancy:
         color = cmap(paddle_occupancy[ep.paddle_id])
+        if not paddle_occupancy[ep.paddle_id] and indicate_empty:
+            color = indicate_empty
         axs[2].add_patch(ep.draw_yz(fill=True, edgecolor=color, facecolor=color))
     else:
         if event is not None:
@@ -458,6 +483,8 @@ def unroll_cbe_sides(paddle_occupancy = {},
     for pdl in cbe_back:
         if paddle_occupancy:
             color = cmap(paddle_occupancy[pdl.paddle_id])
+            if not paddle_occupancy[pdl.paddle_id] and indicate_empty:
+                color = indicate_empty
             axs[2].add_patch(pdl.draw_yz(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
@@ -482,6 +509,8 @@ def unroll_cbe_sides(paddle_occupancy = {},
     ep = ep_4[0]
     if paddle_occupancy:
         color = cmap(paddle_occupancy[ep.paddle_id])
+        if not paddle_occupancy[ep.paddle_id] and indicate_empty:
+            color = indicate_empty
         axs[3].add_patch(ep.draw_xz(fill=True, edgecolor=color, facecolor=color))
     else:
         if event is not None:
@@ -491,6 +520,8 @@ def unroll_cbe_sides(paddle_occupancy = {},
     for pdl in cbe_bb:
         if paddle_occupancy:
             color = cmap(paddle_occupancy[pdl.paddle_id])
+            if not paddle_occupancy[pdl.paddle_id] and indicate_empty:
+                color = indicate_empty
             axs[3].add_patch(pdl.draw_xz(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
@@ -538,7 +569,8 @@ def unroll_cbe_sides(paddle_occupancy = {},
 def unroll_cor(paddle_occupancy = {},
                event            = None,
                cmap             = matplotlib.colormaps['hot'],
-               show_cbar        = True):
+               show_cbar        = True,
+               indicate_empty   = 'gray'):
     """
     Project the cortina on xz and yz as well 
     as add the 'edge' paddles.
@@ -553,6 +585,10 @@ def unroll_cor(paddle_occupancy = {},
                            to return color value based on 
                            'occupancy' numbker
         show_cbar        : Show the colorbar on the figure
+        indicate_empty   : In case we are using this for paddle occupancy,
+                           indicate empty paddles with the given color instead
+                           using a value from the color map. If this behavior is 
+                           not desired, set this to an empty string.
     """
     fig, axs  = plt.subplots(1, 4, sharey=True, figsize=(22, 5), gridspec_kw={'width_ratios': [1, 1, 1, 1]})
     # normal +X
@@ -590,6 +626,8 @@ def unroll_cor(paddle_occupancy = {},
     for ep in ep_1:
         if paddle_occupancy:
             color = cmap(paddle_occupancy[ep.paddle_id])
+            if not paddle_occupancy[ep.paddle_id] and indicate_empty:
+                color = indicate_empty
             axs[0].add_patch(ep.draw_yz(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
@@ -600,6 +638,8 @@ def unroll_cor(paddle_occupancy = {},
     for pdl in cor_front:
         if paddle_occupancy:
             color = cmap(paddle_occupancy[pdl.paddle_id])
+            if not paddle_occupancy[pdl.paddle_id] and indicate_empty:
+                color = indicate_empty
             axs[0].add_patch(pdl.draw_yz(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
@@ -623,6 +663,8 @@ def unroll_cor(paddle_occupancy = {},
     for ep in ep_2:
         if paddle_occupancy:
             color = cmap(paddle_occupancy[ep.paddle_id])
+            if not paddle_occupancy[ep.paddle_id] and indicate_empty:
+                color = indicate_empty
             axs[1].add_patch(ep.draw_xz(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
@@ -633,6 +675,8 @@ def unroll_cor(paddle_occupancy = {},
     for pdl in cor_sb:
         if paddle_occupancy:
             color = cmap(paddle_occupancy[pdl.paddle_id])
+            if not paddle_occupancy[pdl.paddle_id] and indicate_empty:
+                color = indicate_empty
             axs[1].add_patch(pdl.draw_xz(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
@@ -655,6 +699,8 @@ def unroll_cor(paddle_occupancy = {},
     for ep in ep_3:
         if paddle_occupancy:
             color = cmap(paddle_occupancy[ep.paddle_id])
+            if not paddle_occupancy[ep.paddle_id] and indicate_empty:
+                color = indicate_empty
             axs[2].add_patch(ep.draw_yz(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
@@ -665,6 +711,8 @@ def unroll_cor(paddle_occupancy = {},
     for pdl in cor_back:
         if paddle_occupancy:
             color = cmap(paddle_occupancy[pdl.paddle_id])
+            if not paddle_occupancy[pdl.paddle_id] and indicate_empty:
+                color = indicate_empty
             axs[2].add_patch(pdl.draw_yz(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
@@ -689,6 +737,8 @@ def unroll_cor(paddle_occupancy = {},
     for ep in ep_4:
         if paddle_occupancy:
             color = cmap(paddle_occupancy[ep.paddle_id])
+            if not paddle_occupancy[ep.paddle_id] and indicate_empty:
+                color = indicate_empty
             axs[3].add_patch(ep.draw_xz(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
@@ -699,6 +749,8 @@ def unroll_cor(paddle_occupancy = {},
     for pdl in cor_bb:
         if paddle_occupancy:
             color = cmap(paddle_occupancy[pdl.paddle_id])
+            if not paddle_occupancy[pdl.paddle_id] and indicate_empty:
+                color = indicate_empty
             axs[3].add_patch(pdl.draw_xz(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
