@@ -280,7 +280,7 @@ class Paddle(models.Model):
 
         # we can kind of cheat and do a cheap transform
         # the principal is either x, y or z axis, no mix-ins
-        pr = self.principal
+        pr   = self.principal
         norm = self.normal
         cube = vtk.vtkCubeSource()
         edgepaddle = False
@@ -493,8 +493,49 @@ class Paddle(models.Model):
         """
         self._cache_box_points()
         xy_points = self.points[:, :2]
-        xy_patch  = Rectangle(xy_points.min(axis=0), *(xy_points.max(axis=0) - xy_points.min(axis=0)),
-                              fill=fill, edgecolor=edgecolor, facecolor=facecolor, lw=lw, alpha=alpha)
+        #if self.paddle_id in [57]:
+        if (self.principal == np.array([0,0,1])).all() or (self.principal == np.array([0,0,-1])).all():
+            xy_patch  = Rectangle(xy_points.min(axis=0), *(xy_points.max(axis=0) - xy_points.min(axis=0)),
+                                  fill=fill, edgecolor=edgecolor, facecolor=facecolor, lw=lw, alpha=alpha)
+            # this is an edge paddle. For drawing use the angle feature of the Rectangle patch
+            #xy_anchor0 = (self.global_pos_x_l0_A - self.width/np.sqrt(2), self.global_pos_y_l0_A - self.width/np.sqrt(2))
+            corners = xy_patch.get_corners()
+            # +x +y
+            if self.paddle_id in [57,149,150,151]:
+                anchor  = (corners[1][0], corners[1][1])
+                rotation_point = (corners[1][0], corners[1][1])
+                angle = 135
+                xy_patch  = Rectangle(anchor, self.width, self.height,
+                                      rotation_point = rotation_point, angle = angle,
+                                      fill=fill, edgecolor=edgecolor, facecolor=facecolor, lw=lw, alpha=alpha)
+            # -x -y
+            if self.paddle_id in [58,152,153,154]:
+                anchor  = (corners[0][0], corners[0][1])
+                rotation_point = (corners[0][0], corners[0][1])
+                angle = 45
+                xy_patch  = Rectangle(anchor, self.width, self.height,
+                                      rotation_point = rotation_point, angle = angle,
+                                      fill=fill, edgecolor=edgecolor, facecolor=facecolor, lw=lw, alpha=alpha)
+            # corner -x -y
+            if self.paddle_id in [59,155,156,157]:
+                anchor  = (corners[3][0], corners[3][1])
+                rotation_point = (corners[3][0], corners[3][1])
+                angle = -45
+                xy_patch  = Rectangle(anchor, self.width, self.height,
+                                      rotation_point = rotation_point, angle = angle,
+                                      fill=fill, edgecolor=edgecolor, facecolor=facecolor, lw=lw, alpha=alpha)
+            # corner +x -y
+            if self.paddle_id in [60,158,159,160]:
+                anchor  = (corners[3][0], corners[3][1])
+                rotation_point = (corners[2][0], corners[2][1])
+                angle = 45
+                xy_patch  = Rectangle(anchor, self.width, self.height,
+                                      rotation_point = rotation_point, angle = angle,
+                                      fill=fill, edgecolor=edgecolor, facecolor=facecolor, lw=lw, alpha=alpha)
+
+        else:
+            xy_patch  = Rectangle(xy_points.min(axis=0), *(xy_points.max(axis=0) - xy_points.min(axis=0)),
+                                  fill=fill, edgecolor=edgecolor, facecolor=facecolor, lw=lw, alpha=alpha)
         return xy_patch
     
     def draw_xz(self, fill=False, lw=0.8, edgecolor='b', facecolor='b', alpha=0.7) -> Rectangle:
