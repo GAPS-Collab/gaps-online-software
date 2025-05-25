@@ -218,10 +218,7 @@
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.commands.html">gaps_online.commands</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.constants.html">gaps_online.constants</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="gaps_online.db.html">gaps_online.db</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="gaps_online.db.manifest.html">gaps_online.db.manifest</a></li>
-</ul>
-</details></li>
+<li class="toctree-l1"><a class="reference internal" href="gaps_online.db.html">gaps_online.db</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.events.html">gaps_online.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.io.html">gaps_online.io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.run.html">gaps_online.run</a></li>
@@ -421,7 +418,7 @@ in the beginning</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="gaps_online.tof.visual.tof_projection_xy">
-<span class="sig-prename descclassname"><span class="pre">gaps_online.tof.visual.</span></span><span class="sig-name descname"><span class="pre">tof_projection_xy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paddle_occupancy={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap=&lt;matplotlib.colors.LinearSegmentedColormap</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paddle_style={'edgecolor':</span> <span class="pre">'w'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'lw':</span> <span class="pre">0.4}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_cbar=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlay_panels=False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.visual.tof_projection_xy" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">gaps_online.tof.visual.</span></span><span class="sig-name descname"><span class="pre">tof_projection_xy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paddle_occupancy={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap=&lt;matplotlib.colors.LinearSegmentedColormap</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paddle_style={'edgecolor':</span> <span class="pre">'w'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'lw':</span> <span class="pre">0.4}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_cbar=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlay_panels=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indicate_empty='gray'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.visual.tof_projection_xy" title="Link to this definition">#</a></dt>
 <dd><p>Show the projection of all paddles which
 are facing in z-direction
 These are the whole Umbrella as well as 
@@ -443,13 +440,19 @@ overlay_panels   : Only return one axes, have the TOF CBE bottom</p>
 <div><p>and CBE TOP panels overlaid over the umbrella
 (or under it)</p>
 </div></blockquote>
+<dl class="simple">
+<dt>indicate_empty<span class="classifier">In case we are using this for paddle occupancy,</span></dt><dd><p>indicate empty paddles with the given color instead
+using a value from the color map. If this behavior is 
+not desired, set this to an empty string.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="gaps_online.tof.visual.unroll_cbe_sides">
-<span class="sig-prename descclassname"><span class="pre">gaps_online.tof.visual.</span></span><span class="sig-name descname"><span class="pre">unroll_cbe_sides</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paddle_occupancy={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap=&lt;matplotlib.colors.LinearSegmentedColormap</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_cbar=True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.visual.unroll_cbe_sides" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">gaps_online.tof.visual.</span></span><span class="sig-name descname"><span class="pre">unroll_cbe_sides</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paddle_occupancy={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap=&lt;matplotlib.colors.LinearSegmentedColormap</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_cbar=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indicate_empty='gray'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.visual.unroll_cbe_sides" title="Link to this definition">#</a></dt>
 <dd><p>Project the sides of the cube on xz and yz as well 
 as add the 'edge' paddles.</p>
 <p>While this plot can show the occupancy of TOF paddles,
@@ -463,14 +466,20 @@ cmap             : Colormap - can be lambda function</p>
 <div><p>to return color value based on 
 'occupancy' numbker</p>
 </div></blockquote>
-<p>show_cbar        : Show the colorbar on the figure</p>
+<p>show_cbar        : Show the colorbar on the figure
+indicate_empty   : In case we are using this for paddle occupancy,</p>
+<blockquote>
+<div><p>indicate empty paddles with the given color instead
+using a value from the color map. If this behavior is 
+not desired, set this to an empty string.</p>
+</div></blockquote>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="gaps_online.tof.visual.unroll_cor">
-<span class="sig-prename descclassname"><span class="pre">gaps_online.tof.visual.</span></span><span class="sig-name descname"><span class="pre">unroll_cor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paddle_occupancy={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap=&lt;matplotlib.colors.LinearSegmentedColormap</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_cbar=True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.visual.unroll_cor" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">gaps_online.tof.visual.</span></span><span class="sig-name descname"><span class="pre">unroll_cor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paddle_occupancy={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap=&lt;matplotlib.colors.LinearSegmentedColormap</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_cbar=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indicate_empty='gray'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.visual.unroll_cor" title="Link to this definition">#</a></dt>
 <dd><p>Project the cortina on xz and yz as well 
 as add the 'edge' paddles.</p>
 <p>While this plot can show the occupancy of TOF paddles,
@@ -483,7 +492,13 @@ cmap             : Colormap - can be lambda function</p>
 <div><p>to return color value based on 
 'occupancy' numbker</p>
 </div></blockquote>
-<p>show_cbar        : Show the colorbar on the figure</p>
+<p>show_cbar        : Show the colorbar on the figure
+indicate_empty   : In case we are using this for paddle occupancy,</p>
+<blockquote>
+<div><p>indicate empty paddles with the given color instead
+using a value from the color map. If this behavior is 
+not desired, set this to an empty string.</p>
+</div></blockquote>
 </dd>
 </dl>
 </dd></dl>

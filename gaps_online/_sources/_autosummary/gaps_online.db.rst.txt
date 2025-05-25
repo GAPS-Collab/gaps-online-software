@@ -4,10 +4,14 @@ gaps\_online.db
 .. automodule:: gaps_online.db
 
    
-.. rubric:: Modules
+   .. rubric:: Functions
 
-.. autosummary::
-   :toctree:
-   :recursive:
-
-   manifest
+   .. autosummary::
+   
+      get_HG_for_LG
+      get_cube_paddles
+      get_tof_paddles
+      get_tracker_strips
+      get_umbrella_paddles
+      get_vid_hid_map
+   

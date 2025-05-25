@@ -44,7 +44,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gaps_online.db';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="gaps_online.db.manifest" href="gaps_online.db.manifest.html" />
+    <link rel="next" title="gaps_online.events" href="gaps_online.events.html" />
     <link rel="prev" title="gaps_online.constants" href="gaps_online.constants.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="python"/>
@@ -219,10 +219,7 @@
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.commands.html">gaps_online.commands</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.constants.html">gaps_online.constants</a></li>
-<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">gaps_online.db</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="gaps_online.db.manifest.html">gaps_online.db.manifest</a></li>
-</ul>
-</details></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">gaps_online.db</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.events.html">gaps_online.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.io.html">gaps_online.io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.run.html">gaps_online.run</a></li>
@@ -299,15 +296,83 @@
 <span id="gaps-online-db"></span><h1>gaps_online.db<a class="headerlink" href="#module-gaps_online.db" title="Link to this heading">#</a></h1>
 <p>Higher level functions to access the sqlite database
 shipped with this project.</p>
-<p class="rubric">Modules</p>
+<p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="gaps_online.db.manifest.html#module-gaps_online.db.manifest" title="gaps_online.db.manifest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">manifest</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.db.get_HG_for_LG" title="gaps_online.db.get_HG_for_LG"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_HG_for_LG</span></code></a>(dsi, j, ch)</p></td>
+<td><p>Get the high gain (HG) connection for a given low gain  connection (LG)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.db.get_cube_paddles" title="gaps_online.db.get_cube_paddles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_cube_paddles</span></code></a>()</p></td>
 <td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.db.get_tof_paddles" title="gaps_online.db.get_tof_paddles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_tof_paddles</span></code></a>([panel_id])</p></td>
+<td><p>Get all TOF paddles</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.db.get_tracker_strips" title="gaps_online.db.get_tracker_strips"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_tracker_strips</span></code></a>()</p></td>
+<td><p>Get a list of all tracker strips</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.db.get_umbrella_paddles" title="gaps_online.db.get_umbrella_paddles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_umbrella_paddles</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.db.get_vid_hid_map" title="gaps_online.db.get_vid_hid_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_vid_hid_map</span></code></a>()</p></td>
+<td><p>Return a map of volume id to hardware id.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
+<dl class="py function">
+<dt class="sig sig-object py" id="gaps_online.db.get_HG_for_LG">
+<span class="sig-prename descclassname"><span class="pre">gaps_online.db.</span></span><span class="sig-name descname"><span class="pre">get_HG_for_LG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dsi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ch</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.db.get_HG_for_LG" title="Link to this definition">#</a></dt>
+<dd><p>Get the high gain (HG) connection for a given low gain 
+connection (LG)</p>
+<p>LG =&gt; LTB
+HG =&gt; RB
+For a dsi/j/channel connection as emitted
+by the MTB, get the respective RB/CH</p>
+<p># Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>dsi - LG DSI connection on the MTB</p></li>
+<li><p>j - LG DSI/J connection on the MTB</p></li>
+<li><p>ch - channel on the connected LTB</p></li>
+</ul>
+</div></blockquote>
+<p># Returns:</p>
+<blockquote>
+<div><p>RB ID, RB channel</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gaps_online.db.get_tof_paddles">
+<span class="sig-prename descclassname"><span class="pre">gaps_online.db.</span></span><span class="sig-name descname"><span class="pre">get_tof_paddles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">panel_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#gaps_online.db.get_tof_paddles" title="Link to this definition">#</a></dt>
+<dd><p>Get all TOF paddles</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gaps_online.db.get_cube_paddles">
+<span class="sig-prename descclassname"><span class="pre">gaps_online.db.</span></span><span class="sig-name descname"><span class="pre">get_cube_paddles</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.db.get_cube_paddles" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gaps_online.db.get_umbrella_paddles">
+<span class="sig-prename descclassname"><span class="pre">gaps_online.db.</span></span><span class="sig-name descname"><span class="pre">get_umbrella_paddles</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.db.get_umbrella_paddles" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gaps_online.db.get_tracker_strips">
+<span class="sig-prename descclassname"><span class="pre">gaps_online.db.</span></span><span class="sig-name descname"><span class="pre">get_tracker_strips</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">TrackerStrip</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#gaps_online.db.get_tracker_strips" title="Link to this definition">#</a></dt>
+<dd><p>Get a list of all tracker strips</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gaps_online.db.get_vid_hid_map">
+<span class="sig-prename descclassname"><span class="pre">gaps_online.db.</span></span><span class="sig-name descname"><span class="pre">get_vid_hid_map</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#gaps_online.db.get_vid_hid_map" title="Link to this definition">#</a></dt>
+<dd><p>Return a map of volume id to hardware id. This is in case of tof paddles a number 
+from 1-160 and for the tracker it is a number per strip which contains layer, row, 
+module, strip</p>
+</dd></dl>
+
 </section>
 
 
@@ -330,11 +395,11 @@ shipped with this project.</p>
       </div>
     </a>
     <a class="right-next"
-       href="gaps_online.db.manifest.html"
+       href="gaps_online.events.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">gaps_online.db.manifest</p>
+        <p class="prev-next-title">gaps_online.events</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -348,6 +413,23 @@ shipped with this project.</p>
                 <dialog id="pst-secondary-sidebar-modal"></dialog>
                 <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.db.get_HG_for_LG"><code class="docutils literal notranslate"><span class="pre">get_HG_for_LG()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.db.get_tof_paddles"><code class="docutils literal notranslate"><span class="pre">get_tof_paddles()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.db.get_cube_paddles"><code class="docutils literal notranslate"><span class="pre">get_cube_paddles()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.db.get_umbrella_paddles"><code class="docutils literal notranslate"><span class="pre">get_umbrella_paddles()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.db.get_tracker_strips"><code class="docutils literal notranslate"><span class="pre">get_tracker_strips()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.db.get_vid_hid_map"><code class="docutils literal notranslate"><span class="pre">get_vid_hid_map()</span></code></a></li>
+</ul>
+  </nav></div>
 
   <div class="sidebar-secondary-item">
   <div role="note" aria-label="source link">
