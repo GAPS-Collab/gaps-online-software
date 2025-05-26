@@ -439,6 +439,18 @@ impl PyTelemetryPacketReader {
     Ok(())
   }
 
+  #[getter]
+  fn get_filenames(&self) -> Vec<String> {
+    self.reader.filenames.clone()
+  }
+
+  #[getter]
+  fn get_current_file(&self) -> String {
+    if self.reader.file_index >= self.reader.filenames.len() {
+      return String::from("");
+    }
+    self.reader.filenames[self.reader.file_index].clone()
+  }
   /// Return an inventory of packets in this file, where TelemetryPacketType is
   /// represented by its associtated integer
   ///

@@ -1,3 +1,9 @@
+//! The following file is part of gaps-online-software and published 
+//! under the GPLv3 license
+//!
+//! This file contains the source for pybindings with pyO3 for the 
+//! i/o system to read Tof data files as well as telemetry files
+
 use std::collections::HashMap;
 use std::env;
 //use log::error;
