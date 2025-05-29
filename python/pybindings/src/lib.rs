@@ -17,6 +17,8 @@ pub mod caraspace;
 #[cfg(feature="telemetry")]
 use telemetry_dataclasses::packets as tel_api;
 
+use std::env;
+
 use tof_dataclasses::events::EventStatus;
 use tof_dataclasses::commands::config::BuildStrategy;
 
@@ -117,7 +119,8 @@ use tof_dataclasses::database::{
 ///               db with paddle information)
 #[pyfunction]
 #[pyo3(name="create_mtb_connection_to_pid_map")]
-fn py_create_mtb_connection_to_pid_map(db_path : String) -> PyResult<DsiJChPidMapping> {
+fn py_create_mtb_connection_to_pid_map() -> PyResult<DsiJChPidMapping> {
+  let db_path = env::var("DATABASE_URL").unwrap_or_else(|_| "".to_string());
   match connect_to_db(db_path) {
     Err(err) => {
       return Err(PyIOError::new_err(err.to_string()));
