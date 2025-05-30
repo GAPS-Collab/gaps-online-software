@@ -34,11 +34,6 @@ use crate::packets::{
   TrackerPacket,
   GapsEvent,
 };
-use tof_dataclasses::packets::{
-  TofPacket,
-  PacketType,
-};
-use tof_dataclasses::events::TofEventSummary;
 use crate::packets::TelemetryPacketType;
 
 /// Extract all merged events from a file and ignore all others
@@ -95,23 +90,7 @@ pub fn get_gaps_events(filename : String) -> Vec<GapsEvent> {
               //println!("Event ID  : {}", me.event_id);
               //println!("Tof bytes : {:?}", me.tof_data);
               //println!("len tof bytes : {}", me.tof_data.len());
-              match TofPacket::from_bytestream(&me.tof_data, &mut 0) {
-                Err(err) => {
-                  println!("Can't unpack TofPacket! {err}");
-                }
-                Ok(tp) => {
-                  println!("{}", tp);
-                  if tp.packet_type == PacketType::TofEventSummary {
-                    match TofEventSummary::from_tofpacket(&tp) {
-                      Err(err) => println!("Can't unpack TofEventSummary! {err}"),
-                      Ok(ts) => {
-                        println!("{}", ts);
-                        g_event.tof = ts;
-                      }
-                    }
-                  }
-                }
-              }
+              g_event.tof     = me.tof_event;
               g_event.tracker = me.tracker_events;
               events.push(g_event)
             }

@@ -357,7 +357,7 @@ pub struct MergedEvent {
   /// (TrackerHitV2)
   pub tracker_hitsv2      : Vec<TrackerHitV2>,
   pub tracker_oscillators : Vec<u64>,
-  pub tof_data            : Vec<u8>,
+  pub tof_event           : TofEventSummary,
   pub raw_data            : Vec<u8>,
   pub flags0              : u8,
   pub flags1              : u8,
@@ -378,7 +378,7 @@ impl MergedEvent {
       tracker_events      : Vec::<TrackerEvent>::new(),
       tracker_hitsv2      : Vec::<TrackerHitV2>::new(),
       tracker_oscillators : tracker_oscillators,
-      tof_data            : Vec::<u8>::new(),
+      tof_event           : TofEventSummary::new(),
       raw_data            : Vec::<u8>::new(),
       flags0              : 0,
       flags1              : 1,
@@ -386,27 +386,10 @@ impl MergedEvent {
     }
   }
 
-
+  #[deprecated(since="0.10.2", note="Consider using the public atttribute tof_event instead. This one makes uses of an unnessessary clone operation!")]
   pub fn get_tofeventsummary(&self) -> Result<TofEventSummary, SerializationError> {
-    match TofPacket::from_bytestream(&self.tof_data, &mut 0) {
-      Err(err) => {
-        error!("Unable to parse TofPacket! {err}");
-        return Err(err);
-      }
-      Ok(pack) => {
-        match pack.unpack::<TofEventSummary>() {
-          Err(err) => {
-            error!("Unable to parse TofEventSummary! {err}");
-            return Err(err);
-          }
-          Ok(ts)    => {
-            return Ok(ts);
-          }
-        }
-      }
-    }
+    return Ok(self.tof_event.clone());
   }
-
 
   pub fn from_bytestream(stream : &Vec<u8>,
                          pos    : &mut usize)
@@ -432,15 +415,20 @@ impl MergedEvent {
       error!("Not able to parse merged event!");
       return Err(SerializationError::StreamTooShort);
     }
-    let num_tof_bytes = parse_u16(stream, pos);
+    let num_tof_bytes = parse_u16(stream, pos) as usize;
     //println!("Num TOF bytes : {}", num_tof_bytes);
-    if stream.len() < *pos+num_tof_bytes as usize {
+    if stream.len() < *pos+num_tof_bytes {
       error!("Not enough bytes for TOF packet! Expected {}, seen {}", *pos+num_tof_bytes as usize, stream.len());
       return Err(SerializationError::StreamTooShort); 
     }
-    for _ in *pos..*pos+num_tof_bytes as usize {
-      me.tof_data.push(parse_u8(stream, pos));
+    let pos_before = *pos;
+    let tof_pack = TofPacket::from_bytestream(stream, pos)?;
+    let ts       = tof_pack.unpack::<TofEventSummary>()?;
+    // sanity check - is tofpacket as long as num_tof_bytes lets us believe?
+    if pos_before + num_tof_bytes != *pos {
+      return Err(SerializationError::WrongByteSize);
     }
+    me.tof_event = ts;
     let trk_delim    = parse_u8(stream, pos);
 
     //println!("TRK delim {}", trk_delim);
@@ -520,7 +508,7 @@ impl MergedEvent {
       }
     } else {
       error!("Unrecognized version {version}!");
-    }
+    } 
     Ok(me)
   }
 }
@@ -528,20 +516,8 @@ impl MergedEvent {
 impl fmt::Display for MergedEvent {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut repr     = String::from("<MergedEvent:");
-    let mut tof_str  = String::from("- UNABLE TO PARSE TOF DATA!");
-    let mut tof_evid = 0u32;
-    match TofPacket::from_bytestream(&self.tof_data, &mut 0) {
-      Err(err) => error!("Unable to parse TofPacket! {err}"),
-      Ok(pack) => {
-        match pack.unpack::<TofEventSummary>() {
-          Err(err) => error!("Unable to parse TofEventSummary! {err}"),
-          Ok(ts)    => {
-            tof_str  = format!("\n  {}", ts);
-            tof_evid = ts.event_id;
-          }
-        }
-      }
-    }
+    let tof_str  = format!("\n  {}", self.tof_event);
+    let tof_evid = self.tof_event.event_id;
     let mut good_hits = 0;
     let mut evids = Vec::<u32>::new();
     if self.version == 0 {

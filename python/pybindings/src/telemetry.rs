@@ -20,8 +20,6 @@ use crate::dataclasses::{
 // or maybe we want to revive the dataclasses pybindings
 // in tof-dataclasses?
 use tof_dataclasses::events as tof_api;
-use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::serialization::Serialization;
 
 #[pyclass]
 #[pyo3(name="TelemetryHeader")]
@@ -124,52 +122,34 @@ impl PyMergedEvent {
     Ok(events)
   }
 
-  /// Check if TOF/tracker data can be unpacked an no errors are thrown
+  // FIXME - do this with bound
   #[getter]
-  fn broken(&self) -> bool {
-    // since the tracker part is already deserialized, the check
-    // is only relevant for the tof part
-    match TofPacket::from_bytestream(&self.event.tof_data, &mut 0) {
-      Err(_) => {
-        //error!("Unable to parse TofPacket! {err}");
-        return true;
-      }
-      Ok(pack) => {
-        match pack.unpack::<tof_api::TofEventSummary>() {
-          Err(_) => {
-            return true;
-            //error!("Unable to parse TofEventSummary! {err}");
-          }
-          Ok(_)    => {
-            return false;
-          }
-        }
-      }
-    }
+  fn get_tof(&self) -> PyResult<PyTofEventSummary> {
+  //fn get_tof<'_py>(&self, py: Python<'_py>) -> PyResult<Bound<'_py, PyTofEventSummary>> {
+    let mut pyts = PyTofEventSummary::new();
+    pyts.event   = self.event.tof_event.clone();
+    Ok(pyts)
   }
-
-  #[getter]
-  fn tof(&self) -> PyResult<PyTofEventSummary> {
-    match TofPacket::from_bytestream(&self.event.tof_data, &mut 0) {
-      Err(err) => {
-        //error!("Unable to parse TofPacket! {err}");
-        return Err(PyValueError::new_err(err.to_string()));
-      }
-      Ok(pack) => {
-        match pack.unpack::<tof_api::TofEventSummary>() {
-          Err(err) => {
-            return Err(PyValueError::new_err(err.to_string()));
-            //error!("Unable to parse TofEventSummary! {err}");
-          }
-          Ok(ts)    => {
-            let mut pyts = PyTofEventSummary::new();
-            pyts.event = ts;
-            return Ok(pyts);
-          }
-        }
-      }
-    }
-  }
+    //match TofPacket::from_bytestream(&self.event.tof_data, &mut 0) {
+    //  Err(err) => {
+    //    //error!("Unable to parse TofPacket! {err}");
+    //    return Err(PyValueError::new_err(err.to_string()));
+    //  }
+    //  Ok(pack) => {
+    //    match pack.unpack::<tof_api::TofEventSummary>() {
+    //      Err(err) => {
+    //        return Err(PyValueError::new_err(err.to_string()));
+    //        //error!("Unable to parse TofEventSummary! {err}");
+    //      }
+    //      Ok(ts)    => {
+    //        let mut pyts = PyTofEventSummary::new();
+    //        pyts.event = ts;
+    //        return Ok(pyts);
+    //      }
+    //    }
+    //  }
+    //}
+    //}
 
   #[getter]
   fn tracker_pointcloud(&self) -> Vec<(f32, f32, f32, f32, f32)> {

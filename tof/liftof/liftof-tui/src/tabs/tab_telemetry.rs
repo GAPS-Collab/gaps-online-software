@@ -26,6 +26,7 @@ use ratatui::prelude::*;
 
 //use ratatui::terminal::Frame;
 
+
 use ratatui::Frame;
 use ratatui::layout::Rect;
 use ratatui::widgets::{
@@ -43,9 +44,9 @@ use tof_dataclasses::serialization::{
 };
 use tof_dataclasses::errors::SerializationError;
 use tof_dataclasses::packets::{
-    TofPacket,
-//    PacketType,
+  TofPacket,
 };
+use tof_dataclasses::serialization::Packable;
 
 use telemetry_dataclasses::packets::TelemetryPacketType;
 
@@ -138,15 +139,11 @@ impl TelemetryTab<'_> {
             }
             Ok(me) => {
               if let Some(sender) = &self.tp_sender {
-                match TofPacket::from_bytestream(&me.tof_data, &mut 0) {
-                  Err(err) => {
-                    error!("Can't unpack TofPacket! {err}");
-                  }
-                  Ok(tp) => {
-                    if let Err(err) = sender.send(tp) {
-                      error!("Unable to send TP over channel! {err}");
-                    }
-                  }
+                let ts = me.tof_event.clone();
+                // FIXME - we need to send TofEventSummary instead of TofPacket
+                let tp = ts.pack();
+                if let Err(err) = sender.send(tp) {
+                  error!("Unable to send TP over channel! {err}");
                 }
               }
               self.merged_queue.push_back(me);
