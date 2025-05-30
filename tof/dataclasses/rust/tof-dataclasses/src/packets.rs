@@ -79,7 +79,9 @@ use rand::Rng;
 ///
 #[derive(Debug, Clone)]
 pub struct TofPacket {
+  /// Type of the structure encoded in payload
   pub packet_type        : PacketType,
+  /// The bytestream encoded structure
   pub payload            : Vec<u8>,
   // fields which won't get serialized
   /// mark a packet as not eligible to be written to disk
@@ -433,19 +435,21 @@ impl Serialization for TofPacket {
         error!("Can not decode packet with packet type {}", packet_type_enc);
         return Err(SerializationError::UnknownPayload);}
     }
-    let payload_size = parse_u32(stream, pos);
-    *pos += payload_size as usize; 
+    let payload_size = parse_u32(stream, pos) as usize;
+    *pos += payload_size; 
     let tail = parse_u16(stream, pos);
     if Self::TAIL != tail {
       error!("Packet does not end with TAIL signature");
       return Err(SerializationError::TailInvalid {});
     }
     *pos -= 2; // for tail parsing
-    *pos -= payload_size as usize;
+    *pos -= payload_size;
 
     let mut tp = TofPacket::new();
     tp.packet_type = packet_type;
-    tp.payload.extend_from_slice(&stream[*pos..*pos+payload_size as usize]);
+    tp.payload.extend_from_slice(&stream[*pos..*pos+payload_size]);
+    // Fix position marker
+    *pos += 2 + payload_size;
     Ok(tp) 
   }
   
