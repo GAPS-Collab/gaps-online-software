@@ -172,7 +172,9 @@ impl PyCRFrame {
     let mut py_event    = PyMergedEvent::new();
     let packet        = self.frame.get::<TelemetryPacket>(name).map_err(|_| pyo3::exceptions::PyValueError::new_err("Merged Event not found"))?;
     match MergedEvent::from_bytestream(&packet.payload, &mut 0) {
-      Ok(event) => {
+      Ok(mut event) => {
+        event.tof_event.set_paddles(&self.paddles);
+        event.tof_event.normalize_hit_times();
         py_event.event        = event;
         py_event.event.header = packet.header.clone();
       }
@@ -207,6 +209,14 @@ impl PyCRFrame {
   //  let mut bs = stream.clone();
   //  self.frame.put_stream(&mut bs, name);
   //}
+
+  /// Check if the frame contains an object with the given name
+  ///
+  /// # Arguments:
+  ///   * name : The name of the object as it appears in the index
+  fn has(&self, name : &str) -> bool {
+    self.frame.has(name)
+  }
 
   #[getter]
   fn index(&self) -> HashMap<String, (u64, CRFrameObjectType)> {

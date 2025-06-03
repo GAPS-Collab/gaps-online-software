@@ -358,6 +358,13 @@ impl CRFrame {
     self.bytestorage.append(&mut stream);
   }
 
+  /// Check if the frame contains an object with the given name
+  ///
+  /// # Arguments:
+  ///   * name : The name of the object as it appears in the index
+  pub fn has(&self, name : &str) -> bool {
+    self.index.contains_key(name)
+  }
   //pub fn put_stream(&mut self, stream : &mut Vec<u8>, name : String) {
   //  let pos    = self.bytestorage.len();
   //  self.index.insert(name, pos);
