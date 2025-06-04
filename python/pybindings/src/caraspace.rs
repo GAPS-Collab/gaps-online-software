@@ -149,7 +149,33 @@ impl PyCRFrame {
       strips  : HashMap::<u32, TrackerStrip>::new(),
     }
   }
- 
+
+  /// Delete a CRFrameObject by this name from the frame
+  ///
+  /// To delete multiple objects, delete calls can be 
+  /// chained
+  /// 
+  /// # Arguments:
+  ///   * name : The name of the FrameObject to delte 
+  ///            (must be in index)
+  ///
+  /// # Returns:
+  ///   A complete copy of self, without the given object.
+  pub fn delete(&self, name : &str) -> PyResult<PyCRFrame> {
+    match self.frame.delete(name) {
+      Ok(new_frame) => {
+        let mut new_pyframe = PyCRFrame::new();
+        new_pyframe.frame   = new_frame;
+        new_pyframe.paddles = self.paddles.clone();
+        new_pyframe.strips  = self.strips.clone();
+        Ok(new_pyframe)
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
   fn put_telemetrypacket(&mut self, packet : PyTelemetryPacket, name : String) {
     let packet = packet.packet;
     self.frame.put(packet, name)
