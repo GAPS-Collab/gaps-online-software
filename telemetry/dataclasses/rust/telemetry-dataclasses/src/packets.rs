@@ -415,17 +415,19 @@ impl MergedEvent {
       error!("Not able to parse merged event!");
       return Err(SerializationError::StreamTooShort);
     }
-    let num_tof_bytes = parse_u16(stream, pos) as usize;
+   let num_tof_bytes = parse_u16(stream, pos) as usize;
     //println!("Num TOF bytes : {}", num_tof_bytes);
     if stream.len() < *pos+num_tof_bytes {
       error!("Not enough bytes for TOF packet! Expected {}, seen {}", *pos+num_tof_bytes as usize, stream.len());
       return Err(SerializationError::StreamTooShort); 
     }
     let pos_before = *pos;
-    let tof_pack = TofPacket::from_bytestream(stream, pos)?;
-    let ts       = tof_pack.unpack::<TofEventSummary>()?;
+    let tof_pack   = TofPacket::from_bytestream(stream, pos)?;
+    let ts         = tof_pack.unpack::<TofEventSummary>()?;
     // sanity check - is tofpacket as long as num_tof_bytes lets us believe?
     if pos_before + num_tof_bytes != *pos {
+      println!("Tofpacket {}", tof_pack);
+      error!("Byte misalignment. Expected {num_tof_bytes}, got {pos} - {pos_before}"); 
       return Err(SerializationError::WrongByteSize);
     }
     me.tof_event = ts;

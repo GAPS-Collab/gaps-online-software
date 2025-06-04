@@ -112,7 +112,7 @@ impl<'a> MTTab<'a> {
              mapping       : DsiJChPidMapping,
              mtlink_rb_map : HashMap<u8,u8>,
              alerts        : Arc<Mutex<HashMap<&'a str, TofAlert<'a>>>>,
-             theme         : ColorTheme) -> MTTab {
+             theme         : ColorTheme) -> MTTab<'a> {
     // check if the alerts are active
     let mut alerts_active = false;
     match alerts.lock() {
