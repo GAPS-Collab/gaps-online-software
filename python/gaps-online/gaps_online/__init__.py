@@ -4,8 +4,6 @@ pybdindings for the C++ and Rust API.
 
 - tof-dataclasses
 - plotting
-
-
 """
 try:
     import django

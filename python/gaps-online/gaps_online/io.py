@@ -37,7 +37,7 @@ try:
         # let's see if we can get the mtb connection map
         import os
         db_path = os.environ["DATABASE_URL"]
-        dsi_j_pid_map = rtd.io.create_mtb_connection_to_pid_map(db_path)
+        dsi_j_pid_map = rtd.io.create_mtb_connection_to_pid_map()
     except Exception as e:
         print(f'-> Unable to create dsi_j_pid_map! {e}')
     try:
@@ -74,6 +74,15 @@ except ImportError as e:
 
 ##################################################################
 
+class Adapter:
+    """
+    An adapter can plug into any directory and will find out what 
+    data are in there and return data independently.
+    """
+    pass
+
+##################################################################
+
 def convert_ts_date_to_unix(datestring):
     datestring = datestring.replace('UTC', '')
     ts = datetime.strptime(ts, '%y%m%d_%H%M%S')
@@ -96,6 +105,8 @@ def get_ts_from_toffile(fname):
     ts = ts.replace(tzinfo=timezone.utc)
     return ts
 
+##################################################################
+
 def get_ts_from_binfile(fname):
     """
     Get the timestamp from a .gaps.tof file
@@ -105,6 +116,8 @@ def get_ts_from_binfile(fname):
     ts = datetime.strptime(ts, '%y%m%d_%H%M%S')
     ts = ts.replace(tzinfo=timezone.utc)
     return ts
+
+##################################################################
 
 def get_tof_binaries(run_id : int, data_dir='', ending='*.gaps') -> list[Path]:
     """
@@ -137,6 +150,8 @@ def get_tof_binaries(run_id : int, data_dir='', ending='*.gaps') -> list[Path]:
         print(f'! No files have been found within {t_start} and {t_stop}!')
     #pattern = re.compile('Run(?P<runid>[0-9]*)_(?P<subrunid>[0-9]*).(?P<timestamp>[0-9_])UTC.tof.gaps')
     return files
+
+##################################################################
 
 def get_telemetry_binaries(unix_time_start, unix_time_stop,\
                            data_dir='/gaps_binaries/live/raw/ethernet'):
@@ -180,9 +195,10 @@ def get_telemetry_binaries(unix_time_start, unix_time_stop,\
         print(f'! No files have been found within {t_start} and {t_stop}!')
     return files
 
+##################################################################
 
 def grace_get_telemetry_binaries(unix_time_start, unix_time_stop,\
-                           data_dir='/gaps_binaries/live/raw/ethernet'):
+                                 data_dir='/gaps_binaries/live/raw/ethernet'):
 
     # file format is something like RAW240712_094325.bin
     t_start = datetime.fromtimestamp(unix_time_start, UTC)
