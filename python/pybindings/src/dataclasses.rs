@@ -2913,6 +2913,14 @@ impl PyTofEventSummary {
     }
   }
 
+  /// Pack a TofEventSummary into its corresponding TofPacket
+  fn pack(&self) -> PyTofPacket {
+    let mut py_packet = PyTofPacket::new();
+    py_packet.packet  = self.event.pack();
+    py_packet
+  }
+
+
   fn __repr__(&self) -> PyResult<String> {
     Ok(format!("<PyO3Wrapper: {}>", self.event)) 
   }
@@ -3354,6 +3362,11 @@ impl PyTofHit {
   #[getter]
   fn edep(&self) -> f32 {
     self.hit.get_edep()
+  }
+
+  #[getter]
+  fn get_paddle_len(&self) -> f32 {
+    self.hit.paddle_len
   }
 
   fn __repr__(&self) -> PyResult<String> {
