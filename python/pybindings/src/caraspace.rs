@@ -139,6 +139,16 @@ pub struct PyCRFrame{
   strips  : HashMap<u32, TrackerStrip>
 }
 
+//impl Default for PyCRFrame {
+//  fn default() -> Self {
+//    Self {
+//      frame   : CRFrame::new(),
+//      paddles : HashMap::<u8, Paddle>::new(),
+//      strips  : HashMap::<u32, TrackerStrip>::new(),
+//    }
+//  }
+//}
+
 #[pymethods]
 impl PyCRFrame {
   #[new]
@@ -182,9 +192,23 @@ impl PyCRFrame {
       //let packet = packet.p;
   }
 
-  fn put_tofpacket(&mut self, packet : PyTofPacket, name : String) {
+  /// Add a TofPacket to the frame. 
+  ///
+  /// # Arguments:
+  ///   name : The name under which we store the TofPacket within the index.
+  ///          If None given, use the default name, which is
+  ///          "PacketType.<ValueOf(TofPacketType)". This should be used in 
+  ///          all cases for which there is only a single TofPacket within 
+  ///          the frame.
+  #[pyo3(signature = (packet, name = None))]
+  fn put_tofpacket(&mut self, packet : PyTofPacket, name : Option<String>) -> PyResult<()> {
     let packet = packet.packet;
-    self.frame.put(packet, name);
+    if let Some(p_name) = name {
+      self.frame.put(packet, p_name);
+      Ok(())
+    } else {
+      return Err(PyValueError::new_err("Currently this is not yet implemented. Please specify a name for the TofPacket to be registered within the frame's index!"));
+    }
   }
 
   fn get_telemetrypacket(&mut self, name : String) -> PyResult<PyTelemetryPacket> {
@@ -411,10 +435,10 @@ pub struct PyCRWriter {
 #[pymethods]
 impl PyCRWriter {
   #[new]
-  #[pyo3(signature = (filename, run_id, timestamp = None))]
-  fn new(filename : String, run_id : u32, timestamp : Option<String>) -> Self {
+  #[pyo3(signature = (filename, run_id, subrun_id = None, timestamp = None))]
+  fn new(filename : String, run_id : u32, subrun_id : Option<u64>, timestamp : Option<String>) -> Self {
     Self {
-      writer : CRWriter::new(filename, run_id, timestamp ),
+      writer : CRWriter::new(filename, run_id, subrun_id, timestamp ),
     }
   }
   
