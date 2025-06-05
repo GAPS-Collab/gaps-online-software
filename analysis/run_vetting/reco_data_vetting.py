@@ -58,8 +58,8 @@ if __name__ == '__main__':
 
     cm = matplotlib.colormaps['gnuplot2']
     fig, ax = go.tof.visual.tof_projection_xy(occu, cmap=cm)
-    fig.savefig(f'{args.data_id}_occu-xy.png')
+    fig.savefig(f'{args.data_id}_12pps.pdf')
     fig, ax = go.tof.visual.unroll_cbe_sides(paddle_occupancy=occu, cmap=cm)
-    fig.savefig(f'{args.data_id}_occu-cbe.png')
+    fig.savefig(f'{args.data_id}_8pps_1pps.pdf')
     fig, ax = go.tof.visual.unroll_cor(paddle_occupancy=occu, cmap=cm)
-    fig.savefig(f'{args.data_id}_occu-cor.png')
+    fig.savefig(f'{args.data_id}_10pps_3pps.pdf')
