@@ -2747,6 +2747,41 @@ impl PyTofEventSummary {
     }
   }
 
+  pub fn normalize_hit_times(&mut self) {
+    self.event.normalize_hit_times();
+  }
+
+  /// Remove hits from the hitseries which can not 
+  /// be caused by the same particle, which means 
+  /// that for these two specific hits beta with 
+  /// respect to the first hit in the event is 
+  /// larger than one
+  /// That this works, first hits need to be 
+  /// "normalized" by calling normalize_hit_times
+  pub fn lightspeed_cleaning(&mut self, t_err : f32) -> Vec<u16> {
+    // return Vec<u16> here so that python does not 
+    // interpret it as a byte
+    let mut pids = Vec::<u16>::new();
+    for pid in self.event.lightspeed_cleaning(t_err) {
+      pids.push(pid as u16);
+    }
+    pids
+  }
+  
+  /// Remove all hits from the event's hit series which 
+  /// do NOT obey causality. that is where the timings
+  /// measured at ends A and B can not be correlated
+  /// by the assumed speed of light in the paddle
+  fn remove_non_causal_hits(&mut self) -> Vec<u16> {
+    // return Vec<u16> here so that python does not 
+    // interpret it as a byte
+    let mut pids = Vec::<u16>::new();
+    for pid in self.event.remove_non_causal_hits() {
+      pids.push(pid as u16);
+    }
+    pids
+  }
+  
   #[getter]
   fn pointcloud(&self) -> Option<Vec<(f32,f32,f32,f32,f32)>> {
     self.event.get_pointcloud()
@@ -2770,7 +2805,7 @@ impl PyTofEventSummary {
 
   /// Get all the paddle ids which have been triggered
   fn get_triggered_paddles(&self, mapping : DsiJChPidMapping) -> Vec<u8> {
-    self.event.get_triggered_paddles(mapping)
+    self.event.get_triggered_paddles(&mapping)
   }
 
   /// The hits we were not able to read out because the DRS4 chip
@@ -2838,7 +2873,7 @@ impl PyTofEventSummary {
     self.event.get_edep_cortina()
   }
 
-  /// Ttotal energy depostion in the complete TOF
+  /// Total energy depostion in the complete TOF
   ///
   /// Utilizes Philip's formula based on 
   /// peak height
@@ -2856,10 +2891,16 @@ impl PyTofEventSummary {
   pub fn nhits_umb(&self) -> usize {
     self.event.get_nhits_umb()
   }
-  //#[getter]
-  //fn beta(&self) -> f32 {
-  //  self.event.get_beta()
-  //}
+
+  #[getter]
+  fn get_nhits_cbe(&self) -> usize {
+    self.event.get_nhits_cbe()
+  }
+  
+  #[getter]
+  fn get_nhits_cor(&self) -> usize {
+    self.event.get_nhits_cor()
+  }
 
   #[getter]
   fn timestamp16(&self) -> u16 {
@@ -3218,6 +3259,20 @@ impl PyTofHit {
       hit : TofHit::new(),
     }
   }
+
+  pub fn set_timing_offset(&mut self, offset : f32) {
+    self.hit.timing_offset = offset;
+  }
+
+  /// Calculate the distance to another hit. For this 
+  /// to work, the hit coordinates have had to be 
+  /// determined, so this will only return a 
+  /// propper result after the paddle information 
+  /// is added
+  pub fn distance(&self, other : &PyTofHit) -> f32 {
+    //((self.x - other.x).powi(2) + (self.y - other.y).powi(2) + (self.z - other.z).powi(2)).sqrt()
+    self.hit.distance(&other.hit)
+  }
  
   /// Set the length and cable length for the paddle
   /// FIXME - take gaps_online.db.Paddle as argument
@@ -3246,6 +3301,22 @@ impl PyTofHit {
   #[getter]
   fn get_t0_uncorrected(&self) -> f32 {
     self.hit.get_t0_uncorrected()
+  }
+  
+  /// Event t0 is the calculated interaction time based on 
+  /// the RELATIVE phase shifts consdering ALL hits in this
+  /// event. This might be of importance to catch rollovers
+  /// in the phase of channel9. 
+  /// In total, we are restricting ourselves to a time of 
+  /// 50ns per events and adjust the phase in such a way that 
+  /// everything fits into this interval. This will 
+  /// significantly import the beta reconstruction for particles
+  /// which hit the TOF within this timing window.
+  ///
+  /// If a timing offset is set, this will be added
+  #[getter]
+  fn get_event_t0(&self) -> f32 {
+    self.hit.get_t0()
   }
 
   #[getter]

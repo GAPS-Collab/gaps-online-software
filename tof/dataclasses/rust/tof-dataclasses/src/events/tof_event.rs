@@ -296,7 +296,7 @@ impl TofEvent {
   /// Warning, this might be a bit slow
   #[cfg(feature="database")]
   pub fn get_triggered_paddles(&self, pid_map :   DsiJChPidMapping) -> Vec<u8> {
-    let mut paddles = Vec::<u8>::new();
+    let mut paddles = Vec::<u8>::with_capacity(3);
     for th in self.mt_event.get_trigger_hits() {
       let pid = pid_map.get(&th.0).unwrap().get(&th.1).unwrap().get(&th.2.0).unwrap().0;
       paddles.push(pid);
@@ -490,6 +490,26 @@ impl TofEvent {
     let mut nhit = 0;
     for h in &self.get_hits() {
       if h.paddle_id > 60 && h.paddle_id < 109 {
+        nhit += 1;
+      }
+    }
+    nhit
+  }
+  
+  pub fn get_nhits_cbe(&self) -> usize {
+    let mut nhit = 0;
+    for h in &self.get_hits() {
+      if h.paddle_id < 61 {
+        nhit += 1;
+      }
+    }
+    nhit
+  }
+
+  pub fn get_nhits_cor(&self) -> usize {
+    let mut nhit = 0;
+    for h in &self.get_hits() {
+      if h.paddle_id > 108 {
         nhit += 1;
       }
     }
@@ -877,6 +897,70 @@ impl TofEventSummary {
       paddles_set        : false,
     }
   }
+ 
+  /// Remove hits from the hitseries which can not 
+  /// be caused by the same particle, which means 
+  /// that for these two specific hits beta with 
+  /// respect to the first hit in the event is 
+  /// larger than one
+  /// That this works, first hits need to be 
+  /// "normalized" by calling normalize_hit_times
+  pub fn lightspeed_cleaning(&mut self, t_err : f32) -> Vec<u8> {
+    // first sort the hits in time
+    if self.hits.len() == 0 {
+      return Vec::<u8>::new();
+    }
+    self.hits.sort_by(|a,b| (a.event_t0).partial_cmp(&b.event_t0).unwrap());
+    let first_hit = &self.hits[0];
+    let mut clean_hits = Vec::<TofHit>::new(); 
+    let mut rm_hits    = Vec::<u8>::new();
+    // per definition, we can't remove the first hit, ever
+    clean_hits.push(first_hit.clone());
+    //error!("-----");
+    for h in self.hits.iter().skip(1) {
+      let beta = 1e-3*first_hit.distance(h)/(1e-9*(h.event_t0  - first_hit.event_t0 + 2.0*t_err))/299792458.0;
+      //error!("{}", h.event_t0);
+      //error!("BETA  {}", beta);
+      //error!("DIST  {}", first_hit.distance(h)*1e-3);
+      //error!("TDIFF {}", h.event_t0 - first_hit.event_t0);
+      if beta > 1.0 {
+        rm_hits.push(h.paddle_id);
+        continue;
+      }
+      if beta < 0.0 {
+        rm_hits.push(h.paddle_id);
+        continue;
+      }
+      clean_hits.push(*h);
+    }
+    self.hits = clean_hits;
+    rm_hits
+  }
+
+
+  /// Non causal hits have hit times in ends A and be which 
+  /// are not compatible with the speed of light in the paddle, 
+  /// that is, the hit gets registered too early. If we look 
+  /// at a plot of the reconstructed position, these hits would 
+  /// correspond to positions outside of the paddle.
+  ///
+  /// #Returns:
+  ///   A vector of paddle ids with removed hits
+  ///
+  pub fn remove_non_causal_hits(&mut self) -> Vec<u8> {
+    let mut clean_hits = Vec::<TofHit>::new();
+    let mut removed_pids = Vec::<u8>::new();
+    let nhits = self.hits.len();
+    for h in &self.hits {
+      if h.obeys_causality() {
+        clean_hits.push(*h);
+      } else {
+        removed_pids.push(h.paddle_id);
+      }
+    }
+    self.hits = clean_hits;
+    removed_pids
+  }
   
   #[cfg(feature="database")]
   pub fn normalize_hit_times(&mut self) {
@@ -966,9 +1050,9 @@ impl TofEventSummary {
   ///
   /// Warning, this might be a bit slow
   #[cfg(feature="database")]
-  pub fn get_triggered_paddles(&self, pid_map :   DsiJChPidMapping) -> Vec<u8> {
-    let mut paddles = Vec::<u8>::new();
-    for th in self.get_trigger_hits() {
+  pub fn get_triggered_paddles(&self, pid_map :   &DsiJChPidMapping) -> Vec<u8> {
+    let mut paddles = Vec::<u8>::with_capacity(3);
+    for th in &self.get_trigger_hits() {
       let pid = pid_map.get(&th.0).unwrap().get(&th.1).unwrap().get(&th.2.0).unwrap().0;
       paddles.push(pid);
     }
@@ -1126,6 +1210,26 @@ impl TofEventSummary {
     let mut nhit = 0;
     for h in &self.hits {
       if h.paddle_id > 60 && h.paddle_id < 109 {
+        nhit += 1;
+      }
+    }
+    nhit
+  }
+  
+  pub fn get_nhits_cbe(&self) -> usize {
+    let mut nhit = 0;
+    for h in &self.hits {
+      if h.paddle_id < 61  {
+        nhit += 1;
+      }
+    }
+    nhit
+  }
+  
+  pub fn get_nhits_cor(&self) -> usize {
+    let mut nhit = 0;
+    for h in &self.hits {
+      if h.paddle_id > 108  {
         nhit += 1;
       }
     }
