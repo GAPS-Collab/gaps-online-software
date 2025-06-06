@@ -443,7 +443,7 @@ impl MergedEvent {
         return Err(SerializationError::StreamTooShort);
       }
       for _ in 0..num_trk_hits { 
-        let mut hit = TrackerHitV2::new();
+        let mut hit  = TrackerHitV2::new();
         let strip_id = parse_u16(stream, pos);
         let adc      = parse_u16(stream, pos);
         hit.channel  = strip_id & 0b11111;
@@ -689,10 +689,7 @@ impl TrackerHitV2 {
 impl fmt::Display for TrackerHitV2 {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut repr = String::from("<TrackerHitV2:");
-    repr += &(format!("\n  Layer         : {}" ,self.layer));
-    repr += &(format!("\n  Row           : {}" ,self.row));
-    repr += &(format!("\n  Module        : {}" ,self.module));
-    repr += &(format!("\n  Channel       : {}" ,self.channel));
+    repr += &(format!("\n  Layer, Row, Module, Channel : {} {} {} {}" ,self.layer, self.row, self.module, self.channel));
     repr += &(format!("\n  ADC           : {}" ,self.adc));
     repr += &(format!("\n  Oscillator    : {}",self.oscillator));
     if self.has_coordinates {

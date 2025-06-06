@@ -28,6 +28,7 @@ except ImportError as e:
 
 # FIXME
 from . import tof
+from . import tracker
 from . import io
 from . import events
 from . import run
