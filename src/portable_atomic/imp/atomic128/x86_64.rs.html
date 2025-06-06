@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/portable-atomic-1.11.0/src/imp/atomic128/x86_64.rs`."><title>x86_64.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-916cea96.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="portable_atomic" data-themes="" data-resource-suffix="" data-rustdoc-version="1.87.0 (17067e9ac 2025-05-09)" data-channel="1.87.0" data-search-js="search-e7298875.js" data-settings-js="settings-d72f25bb.js" ><script src="../../../../static.files/storage-82c7156e.js"></script><script defer src="../../../../static.files/src-script-63605ae7.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-fb8c74a8.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">portable_atomic/imp/atomic128/</div>x86_64.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="comment">// SPDX-License-Identifier: Apache-2.0 OR MIT
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/portable-atomic-1.11.1/src/imp/atomic128/x86_64.rs`."><title>x86_64.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-916cea96.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="portable_atomic" data-themes="" data-resource-suffix="" data-rustdoc-version="1.87.0 (17067e9ac 2025-05-09)" data-channel="1.87.0" data-search-js="search-e7298875.js" data-settings-js="settings-d72f25bb.js" ><script src="../../../../static.files/storage-82c7156e.js"></script><script defer src="../../../../static.files/src-script-63605ae7.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-fb8c74a8.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">portable_atomic/imp/atomic128/</div>x86_64.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="comment">// SPDX-License-Identifier: Apache-2.0 OR MIT
 <a href=#2 id=2 data-nosnippet>2</a>
 <a href=#3 id=3 data-nosnippet>3</a>/*
 <a href=#4 id=4 data-nosnippet>4</a>128-bit atomic implementation on x86_64.
@@ -50,7 +50,7 @@
 <a href=#50 id=50 data-nosnippet>50</a>            portable_atomic_target_feature = <span class="string">"cmpxchg16b"</span>,
 <a href=#51 id=51 data-nosnippet>51</a>        )))]
 <a href=#52 id=52 data-nosnippet>52</a>        </span>{
-<a href=#53 id=53 data-nosnippet>53</a>            <span class="macro">debug_assert!</span>(detect::detect().has_cmpxchg16b());
+<a href=#53 id=53 data-nosnippet>53</a>            <span class="macro">debug_assert!</span>(detect::detect().cmpxchg16b());
 <a href=#54 id=54 data-nosnippet>54</a>        }
 <a href=#55 id=55 data-nosnippet>55</a>    };
 <a href=#56 id=56 data-nosnippet>56</a>}
@@ -59,7 +59,7 @@
 <a href=#59 id=59 data-nosnippet>59</a></span><span class="macro">macro_rules!</span> debug_assert_vmovdqa_atomic {
 <a href=#60 id=60 data-nosnippet>60</a>    () =&gt; {{
 <a href=#61 id=61 data-nosnippet>61</a>        <span class="macro">debug_assert_cmpxchg16b!</span>();
-<a href=#62 id=62 data-nosnippet>62</a>        <span class="macro">debug_assert!</span>(detect::detect().has_vmovdqa_atomic());
+<a href=#62 id=62 data-nosnippet>62</a>        <span class="macro">debug_assert!</span>(detect::detect().vmovdqa_atomic());
 <a href=#63 id=63 data-nosnippet>63</a>    }};
 <a href=#64 id=64 data-nosnippet>64</a>}
 <a href=#65 id=65 data-nosnippet>65</a>
@@ -234,11 +234,11 @@
 <a href=#234 id=234 data-nosnippet>234</a>        )))]
 <a href=#235 id=235 data-nosnippet>235</a>        </span>{
 <a href=#236 id=236 data-nosnippet>236</a>            <span class="comment">// Check CMPXCHG16B first to prevent mixing atomic and non-atomic access.
-<a href=#237 id=237 data-nosnippet>237</a>            </span><span class="kw">if </span>cpuid.has_cmpxchg16b() {
+<a href=#237 id=237 data-nosnippet>237</a>            </span><span class="kw">if </span>cpuid.cmpxchg16b() {
 <a href=#238 id=238 data-nosnippet>238</a>                <span class="comment">// We only use VMOVDQA when SSE is enabled. See atomic_load_vmovdqa() for more.
 <a href=#239 id=239 data-nosnippet>239</a>                </span><span class="attr">#[cfg(target_feature = <span class="string">"sse"</span>)]
 <a href=#240 id=240 data-nosnippet>240</a>                </span>{
-<a href=#241 id=241 data-nosnippet>241</a>                    <span class="kw">if </span>cpuid.has_vmovdqa_atomic() { <span class="macro-nonterminal">$vmovdqa </span>} <span class="kw">else </span>{ <span class="macro-nonterminal">$cmpxchg16b </span>}
+<a href=#241 id=241 data-nosnippet>241</a>                    <span class="kw">if </span>cpuid.vmovdqa_atomic() { <span class="macro-nonterminal">$vmovdqa </span>} <span class="kw">else </span>{ <span class="macro-nonterminal">$cmpxchg16b </span>}
 <a href=#242 id=242 data-nosnippet>242</a>                }
 <a href=#243 id=243 data-nosnippet>243</a>                <span class="attr">#[cfg(not(target_feature = <span class="string">"sse"</span>))]
 <a href=#244 id=244 data-nosnippet>244</a>                </span>{
@@ -250,7 +250,7 @@
 <a href=#250 id=250 data-nosnippet>250</a>        }
 <a href=#251 id=251 data-nosnippet>251</a>        <span class="attr">#[cfg(any(target_feature = <span class="string">"cmpxchg16b"</span>, portable_atomic_target_feature = <span class="string">"cmpxchg16b"</span>))]
 <a href=#252 id=252 data-nosnippet>252</a>        </span>{
-<a href=#253 id=253 data-nosnippet>253</a>            <span class="kw">if </span>cpuid.has_vmovdqa_atomic() { <span class="macro-nonterminal">$vmovdqa </span>} <span class="kw">else </span>{ <span class="macro-nonterminal">$cmpxchg16b </span>}
+<a href=#253 id=253 data-nosnippet>253</a>            <span class="kw">if </span>cpuid.vmovdqa_atomic() { <span class="macro-nonterminal">$vmovdqa </span>} <span class="kw">else </span>{ <span class="macro-nonterminal">$cmpxchg16b </span>}
 <a href=#254 id=254 data-nosnippet>254</a>        }
 <a href=#255 id=255 data-nosnippet>255</a>    }};
 <a href=#256 id=256 data-nosnippet>256</a>}
@@ -419,7 +419,7 @@
 <a href=#419 id=419 data-nosnippet>419</a>    // reads, 16-byte aligned, and that there are no different kinds of concurrent accesses.
 <a href=#420 id=420 data-nosnippet>420</a>    </span><span class="kw">let </span>(prev, ok) = <span class="kw">unsafe </span>{
 <a href=#421 id=421 data-nosnippet>421</a>        <span class="macro">ifunc!</span>(<span class="kw">unsafe fn</span>(dst: <span class="kw-2">*mut </span>u128, old: u128, new: u128) -&gt; (u128, bool) {
-<a href=#422 id=422 data-nosnippet>422</a>            <span class="kw">if </span>detect::detect().has_cmpxchg16b() {
+<a href=#422 id=422 data-nosnippet>422</a>            <span class="kw">if </span>detect::detect().cmpxchg16b() {
 <a href=#423 id=423 data-nosnippet>423</a>                cmpxchg16b
 <a href=#424 id=424 data-nosnippet>424</a>            } <span class="kw">else </span>{
 <a href=#425 id=425 data-nosnippet>425</a>                <span class="comment">// Use SeqCst because cmpxchg16b is always SeqCst.
@@ -762,7 +762,7 @@
 <a href=#762 id=762 data-nosnippet>762</a>            // we only calls cmpxchg16b_fn if cmpxchg16b is available.
 <a href=#763 id=763 data-nosnippet>763</a>            </span><span class="kw">unsafe </span>{
 <a href=#764 id=764 data-nosnippet>764</a>                <span class="macro">ifunc!</span>(<span class="kw">unsafe fn</span>($(<span class="macro-nonterminal">$arg</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$ret_ty</span>)<span class="question-mark">? </span>{
-<a href=#765 id=765 data-nosnippet>765</a>                    <span class="kw">if </span>detect::detect().has_cmpxchg16b() {
+<a href=#765 id=765 data-nosnippet>765</a>                    <span class="kw">if </span>detect::detect().cmpxchg16b() {
 <a href=#766 id=766 data-nosnippet>766</a>                        cmpxchg16b_seqcst_fn
 <a href=#767 id=767 data-nosnippet>767</a>                    } <span class="kw">else </span>{
 <a href=#768 id=768 data-nosnippet>768</a>                        <span class="comment">// Use SeqCst because cmpxchg16b is always SeqCst.
@@ -849,7 +849,7 @@
 <a href=#849 id=849 data-nosnippet>849</a>    </span>}
 <a href=#850 id=850 data-nosnippet>850</a>    <span class="attr">#[cfg(not(any(target_feature = <span class="string">"cmpxchg16b"</span>, portable_atomic_target_feature = <span class="string">"cmpxchg16b"</span>)))]
 <a href=#851 id=851 data-nosnippet>851</a>    </span>{
-<a href=#852 id=852 data-nosnippet>852</a>        detect::detect().has_cmpxchg16b()
+<a href=#852 id=852 data-nosnippet>852</a>        detect::detect().cmpxchg16b()
 <a href=#853 id=853 data-nosnippet>853</a>    }
 <a href=#854 id=854 data-nosnippet>854</a>}
 <a href=#855 id=855 data-nosnippet>855</a><span class="kw">const </span>IS_ALWAYS_LOCK_FREE: bool =
