@@ -170,7 +170,7 @@ impl PyCRFrame {
   
   fn get_mergedevent(&mut self, name : String) -> PyResult<PyMergedEvent> {
     let mut py_event    = PyMergedEvent::new();
-    let packet        = self.frame.get::<TelemetryPacket>(name).unwrap();
+    let packet        = self.frame.get::<TelemetryPacket>(name).map_err(|_| pyo3::exceptions::PyValueError::new_err("Merged Event not found"))?;
     match MergedEvent::from_bytestream(&packet.payload, &mut 0) {
       Ok(event) => {
         py_event.event        = event;
