@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use numpy::{
   PyArray,
   PyArray1,
@@ -2745,6 +2747,10 @@ impl PyTofEventSummary {
     Self {
       event : TofEventSummary::new(),
     }
+  }
+
+  pub fn set_timing_offsets(&mut self, timing_offsets : HashMap<u8, f32>) {
+    self.event.set_timing_offsets(timing_offsets);
   }
 
   pub fn normalize_hit_times(&mut self) {

@@ -897,7 +897,19 @@ impl TofEventSummary {
       paddles_set        : false,
     }
   }
- 
+
+  /// Set timing offsets to the event's hits
+  ///
+  /// # Arguments:
+  ///   * offsets : a hashmap paddle id -> timing offset
+  pub fn set_timing_offsets(&mut self, offsets : HashMap<u8, f32>) {
+    for h in self.hits.iter_mut() {
+      if offsets.contains_key(&h.paddle_id) {
+        h.timing_offset = offsets[&h.paddle_id]; 
+      }
+    }
+  }
+
   /// Remove hits from the hitseries which can not 
   /// be caused by the same particle, which means 
   /// that for these two specific hits beta with 
@@ -950,7 +962,6 @@ impl TofEventSummary {
   pub fn remove_non_causal_hits(&mut self) -> Vec<u8> {
     let mut clean_hits = Vec::<TofHit>::new();
     let mut removed_pids = Vec::<u8>::new();
-    let nhits = self.hits.len();
     for h in &self.hits {
       if h.obeys_causality() {
         clean_hits.push(*h);
