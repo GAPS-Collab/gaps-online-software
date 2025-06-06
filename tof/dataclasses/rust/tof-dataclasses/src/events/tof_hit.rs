@@ -115,6 +115,9 @@ pub struct TofHit {
   /// serialized and has to be set after the hit has been 
   /// created
   pub cable_len      : f32,
+  /// Another calibration constant - a non-understood
+  /// timing offsets
+  pub timing_offset  : f32,
   /// The coordinates will not get serialized
   /// and has to be set after the hit has been 
   /// created
@@ -185,6 +188,7 @@ impl fmt::Display for TofHit {
   ** paddle {} ** 
     Length        {:.2}
     Harting cable length {:.2}
+    Timing offset {:.2} (ns)
     Coax cbl time {:.2}
     Hart cbl time {:.2}
   ** reconstructed interaction
@@ -208,6 +212,7 @@ impl fmt::Display for TofHit {
             paddle_info,
             self.paddle_len,
             self.cable_len,
+            self.timing_offset,
             self.coax_cable_time,
             self.hart_cable_time,
             self.get_edep(),
@@ -345,6 +350,7 @@ impl TofHit {
       charge_a        : f16::from_f32(0.0),
       charge_b        : f16::from_f32(0.0),
       paddle_len      : f32::NAN,
+      timing_offset   : 0.0,
       cable_len       : f32::NAN,
       coax_cable_time : f32::NAN,
       hart_cable_time : f32::NAN,
@@ -376,7 +382,16 @@ impl TofHit {
       fpeak_b        : 0.0,
     }
   }
-  
+
+  /// Calculate the distance to another hit. For this 
+  /// to work, the hit coordinates have had to be 
+  /// determined, so this will only return a 
+  /// propper result after the paddle information 
+  /// is added
+  pub fn distance(&self, other : &TofHit) -> f32 {
+    ((self.x - other.x).powi(2) + (self.y - other.y).powi(2) + (self.z - other.z).powi(2)).sqrt()
+  }
+
   #[cfg(feature="database")]
   pub fn set_paddle(&mut self, paddle : &Paddle) {
     self.cable_len  = paddle.cable_len;
@@ -504,7 +519,7 @@ impl TofHit {
   /// the same length
   pub fn get_t0(&self) -> f32 {
     //self.get_t0_uncorrected() + self.get_phase_delay() + self.get_cable_delay()
-    self.event_t0
+    self.event_t0 + self.timing_offset
   }
 
   /// Calculate the interaction time based on the peak timings measured 
