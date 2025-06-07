@@ -678,7 +678,7 @@ impl PyTrackerHitV2 {
 
   #[getter]
   pub fn get_stripid(&self) -> u32 {
-    self.channel as u32 + (self.module as u32)*100 + (self.row as u32)*10000 + (self.layer as u32)*10000
+    self.channel as u32 + (self.module as u32)*100 + (self.row as u32)*10000 + (self.layer as u32)*100000
   }
 
   #[getter]
@@ -719,10 +719,7 @@ impl PyTrackerHitV2 {
 impl fmt::Display for PyTrackerHitV2 {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut repr = String::from("<PyTrackerHitV2:");
-    repr += &(format!("\n  Layer         : {}" ,self.layer));
-    repr += &(format!("\n  Row           : {}" ,self.row));
-    repr += &(format!("\n  Module        : {}" ,self.module));
-    repr += &(format!("\n  Channel       : {}" ,self.channel));
+    repr += &(format!("\n  Layer, Row, Module, Channel : {} {} {} {}" ,self.layer, self.row, self.module, self.channel));
     repr += &(format!("\n  ADC           : {}" ,self.adc));
     repr += &(format!("\n  Oscillator    : {}>",self.oscillator));
     write!(f, "{}", repr)
