@@ -923,14 +923,18 @@ impl TofEventSummary {
       return Vec::<u8>::new();
     }
     self.hits.sort_by(|a,b| (a.event_t0).partial_cmp(&b.event_t0).unwrap());
-    let first_hit = &self.hits[0];
+    let first_hit = self.hits[0].clone(); // the clone here is a bit unfortunate, 
+                                           // this can be done better with walking 
+                                           // over the list and updating references
     let mut clean_hits = Vec::<TofHit>::new(); 
     let mut rm_hits    = Vec::<u8>::new();
     // per definition, we can't remove the first hit, ever
     clean_hits.push(first_hit.clone());
     //error!("-----");
+    let mut prior_hit = first_hit;
     for h in self.hits.iter().skip(1) {
-      let beta = 1e-3*first_hit.distance(h)/(1e-9*(h.event_t0  - first_hit.event_t0 + 2.0*t_err))/299792458.0;
+      let beta = 1e-3*prior_hit.distance(h)/(1e-9*(h.event_t0  - prior_hit.event_t0 + 2.0*t_err))/299792458.0;
+      //prior_hit = h.clone();
       //error!("{}", h.event_t0);
       //error!("BETA  {}", beta);
       //error!("DIST  {}", first_hit.distance(h)*1e-3);
@@ -943,6 +947,11 @@ impl TofEventSummary {
         rm_hits.push(h.paddle_id);
         continue;
       }
+      // update the prior hit only 
+      // when it is a good one. If it 
+      // is bad we continue to compare
+      // to the first hit
+      prior_hit = h.clone();
       clean_hits.push(*h);
     }
     self.hits = clean_hits;
