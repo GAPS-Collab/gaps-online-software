@@ -9,6 +9,8 @@ import tof_db.models as m
 
 from tof_db.models import *
 
+##############################################
+
 def get_HG_for_LG(dsi, j, ch):
     """
     Get the high gain (HG) connection for a given low gain 
@@ -35,13 +37,7 @@ def get_HG_for_LG(dsi, j, ch):
     p_end = p_ends[0]
     return p_end.rb_id, p_end.rb_ch
 
-#def get_paddle(rb_id, rb_ch):
-#    """
-#    Get information about a specific paddle end for 
-#    a RB ID/Channel
-#    """
-#    rbs = m.ReadoutBoard.objects.filter(rb_id=rb_id)
-#    return rbs.get_channel(rb_ch)
+##############################################
 
 def get_tof_paddles(panel_id=None) -> dict:
     """
@@ -54,6 +50,8 @@ def get_tof_paddles(panel_id=None) -> dict:
     pdict = {pdl.paddle_id : pdl for pdl in paddles}
     return pdict
 
+##############################################
+
 def get_cube_paddles():
     paddles = [k for k in m.Paddle.objects.filter(panel_id__lt=7)]
     for pid in 57,58,59,60:
@@ -61,9 +59,13 @@ def get_cube_paddles():
         paddles.append(paddle[0])
     return paddles
 
+##############################################
+
 def get_umbrella_paddles():
     paddles = [k for k in m.Paddle.objects.filter(panel_id__gt=6).filter(panel_id__lt=14)]
     return paddles
+
+##############################################
 
 def get_tracker_strips() -> list[m.TrackerStrip]:
     """
@@ -71,6 +73,24 @@ def get_tracker_strips() -> list[m.TrackerStrip]:
     """
     strips = [k for k in m.TrackerStrip.objects.all()]
     return strips
+
+##############################################
+
+def get_tracker_strip_mask(name) -> dict:
+    """
+    Get a tracker mask from the db and 
+    return a dictionary strip_id -> bool
+    
+    # Arguments:
+        * name : Each strip mask has a unique name
+                 under which it can be retrieved from 
+                 the db
+    """
+    #strips = get_tracker_strips()
+    strip_mask = {k.strip_id : k.active for k in m.TrackerStripMask.objects.filter(mask_name = name)}
+    return strip_mask
+
+##############################################
 
 def get_vid_hid_map() -> dict:
     """
