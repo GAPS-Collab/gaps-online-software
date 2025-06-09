@@ -156,7 +156,8 @@ impl PyMergedEvent {
     let mut pts = Vec::<(f32,f32,f32,f32,f32)>::new();
     for h in &self.event.tracker_hitsv2 {
       // uses adc
-      let pt = (h.x, h.y, h.z, f32::NAN, h.adc as f32);
+      // FIXME - factor 10!
+      let pt = (10.0*h.x, 10.0*h.y, 10.0*h.z, f32::NAN, h.adc as f32);
       pts.push(pt);
     }
     pts
