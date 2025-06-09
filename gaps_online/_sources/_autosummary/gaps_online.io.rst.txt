@@ -9,10 +9,17 @@ gaps\_online.io
    .. autosummary::
    
       convert_ts_date_to_unix
+      get_fileinfo
       get_telemetry_binaries
       get_tof_binaries
       get_ts_from_binfile
       get_ts_from_toffile
       grace_get_telemetry_binaries
       safe_unpack_merged_event
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      Adapter
    

@@ -18,6 +18,7 @@ gaps\_online.tof.visual
       timeseries_multiplot
       timeseries_plot
       tof_2dproj
+      tof_hits_time_evolution
       tof_projection_xy
       unroll_cbe_sides
       unroll_cor

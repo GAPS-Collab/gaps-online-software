@@ -10,5 +10,13 @@ gaps\_online.tof.analysis
    
       calc_rms
       create_occupancy_dict
+      distance
       find_paddle
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      TofAnalysis
+      TofCuts
    

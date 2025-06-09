@@ -44,7 +44,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gaps_online';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="gaps_online.commands" href="gaps_online.commands.html" />
+    <link rel="next" title="gaps_online.analysis" href="gaps_online.analysis.html" />
     <link rel="prev" title="GAPS Online Software documentation" href="../index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="python"/>
@@ -217,11 +217,14 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="gaps_online.analysis.html">gaps_online.analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.commands.html">gaps_online.commands</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.constants.html">gaps_online.constants</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.db.html">gaps_online.db</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.events.html">gaps_online.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.io.html">gaps_online.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gaps_online.monitoring.html">gaps_online.monitoring</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gaps_online.reconstruction.html">gaps_online.reconstruction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.run.html">gaps_online.run</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.telemetry.html">gaps_online.telemetry</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="gaps_online.tof.html">gaps_online.tof</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -230,6 +233,11 @@
 <li class="toctree-l2"><a class="reference internal" href="gaps_online.tof.events.html">gaps_online.tof.events</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gaps_online.tof.monitoring.html">gaps_online.tof.monitoring</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gaps_online.tof.visual.html">gaps_online.tof.visual</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="gaps_online.tracker.html">gaps_online.tracker</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="gaps_online.tracker.analysis.html">gaps_online.tracker.analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gaps_online.tracker.visual.html">gaps_online.tracker.visual</a></li>
 </ul>
 </details></li>
 </ul>
@@ -300,29 +308,41 @@ pybdindings for the C++ and Rust API.</p>
 <p class="rubric">Modules</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="gaps_online.commands.html#module-gaps_online.commands" title="gaps_online.commands"><code class="xref py py-obj docutils literal notranslate"><span class="pre">commands</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="gaps_online.analysis.html#module-gaps_online.analysis" title="gaps_online.analysis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">analysis</span></code></a></p></td>
+<td><p>Generic plug-in, rapid analysis</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="gaps_online.commands.html#module-gaps_online.commands" title="gaps_online.commands"><code class="xref py py-obj docutils literal notranslate"><span class="pre">commands</span></code></a></p></td>
 <td><p>Tof command &amp; control.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="gaps_online.constants.html#module-gaps_online.constants" title="gaps_online.constants"><code class="xref py py-obj docutils literal notranslate"><span class="pre">constants</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="gaps_online.constants.html#module-gaps_online.constants" title="gaps_online.constants"><code class="xref py py-obj docutils literal notranslate"><span class="pre">constants</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="gaps_online.db.html#module-gaps_online.db" title="gaps_online.db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">db</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="gaps_online.db.html#module-gaps_online.db" title="gaps_online.db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">db</span></code></a></p></td>
 <td><p>Higher level functions to access the sqlite database shipped with this project.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="gaps_online.events.html#module-gaps_online.events" title="gaps_online.events"><code class="xref py py-obj docutils literal notranslate"><span class="pre">events</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="gaps_online.events.html#module-gaps_online.events" title="gaps_online.events"><code class="xref py py-obj docutils literal notranslate"><span class="pre">events</span></code></a></p></td>
 <td><p>Various containers for event structures.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="gaps_online.io.html#module-gaps_online.io" title="gaps_online.io"><code class="xref py py-obj docutils literal notranslate"><span class="pre">io</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="gaps_online.io.html#module-gaps_online.io" title="gaps_online.io"><code class="xref py py-obj docutils literal notranslate"><span class="pre">io</span></code></a></p></td>
 <td><p>Work with telemetry and .tof.gaps files</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="gaps_online.run.html#module-gaps_online.run" title="gaps_online.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="gaps_online.monitoring.html#module-gaps_online.monitoring" title="gaps_online.monitoring"><code class="xref py py-obj docutils literal notranslate"><span class="pre">monitoring</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="gaps_online.reconstruction.html#module-gaps_online.reconstruction" title="gaps_online.reconstruction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reconstruction</span></code></a></p></td>
+<td><p>GAPS first guess &amp; prototype event reconstructions</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="gaps_online.run.html#module-gaps_online.run" title="gaps_online.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a></p></td>
 <td><p>Higher level functionality to work with entire runs</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="gaps_online.telemetry.html#module-gaps_online.telemetry" title="gaps_online.telemetry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">telemetry</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="gaps_online.telemetry.html#module-gaps_online.telemetry" title="gaps_online.telemetry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">telemetry</span></code></a></p></td>
 <td><p>Interaction with telemetry stream &amp; packets.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="gaps_online.tof.html#module-gaps_online.tof" title="gaps_online.tof"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tof</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="gaps_online.tof.html#module-gaps_online.tof" title="gaps_online.tof"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tof</span></code></a></p></td>
 <td><p>GAPS online software TOF part</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="gaps_online.tracker.html#module-gaps_online.tracker" title="gaps_online.tracker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tracker</span></code></a></p></td>
+<td><p>GAPS online software TRK part</p></td>
 </tr>
 </tbody>
 </table>
@@ -349,11 +369,11 @@ pybdindings for the C++ and Rust API.</p>
       </div>
     </a>
     <a class="right-next"
-       href="gaps_online.commands.html"
+       href="gaps_online.analysis.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">gaps_online.commands</p>
+        <p class="prev-next-title">gaps_online.analysis</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
