@@ -248,7 +248,7 @@ def tof_projection_xy(paddle_occupancy = {},
             if h.paddle_id in umb_pids:
         #for j, pdl_hit in enumerate(hit_pids):
             #if pdl_hit in umb_pids:
-                print (f"adding scatter for {0.1*h.x}, {0.1*h.y}")
+                #print (f"adding scatter for {0.1*h.x}, {0.1*h.y}")
                 axs[0].scatter([0.1*h.x], [0.1*h.y], alpha = 0.8 , marker='o', s=100*h.edep,
                                lw=1.5, edgecolor=paddle_style['edgecolor'], color=cmap(cm_norm_pts(h.t0)))
 
@@ -261,6 +261,7 @@ def tof_projection_xy(paddle_occupancy = {},
             if not paddle_occupancy[pdl.paddle_id] and indicate_empty:
                 color = indicate_empty
             axs[axid].add_patch(pdl.draw_xy(fill=True, edgecolor=color, facecolor=color))
+            axs[axid].text(pdl.global_pos_x_l0 - 4, 75, f'{pdl.paddle_id}', color='w', fontsize=9)
         else:
             if event is not None:
                 axs[axid].add_patch(pdl.draw_xy(fill=False,\
@@ -293,6 +294,8 @@ def tof_projection_xy(paddle_occupancy = {},
             if not paddle_occupancy[pdl.paddle_id] and indicate_empty:
                 color = indicate_empty
             axs[axid].add_patch(pdl.draw_xy(fill=True, edgecolor=color, facecolor=color))
+            axs[axid].text(pdl.global_pos_x_l0 - 4, 75, f'{pdl.paddle_id}', color='w', fontsize=9)
+        
         else:
             if event is not None:
                 axs[axid].add_patch(pdl.draw_xy(fill=False,\
@@ -338,6 +341,7 @@ def tof_projection_xy(paddle_occupancy = {},
 def unroll_cbe_sides(paddle_occupancy = {},
                      event            = None,
                      cmap             = matplotlib.colormaps['hot'],
+                     paddle_style    = {'edgecolor' : 'w', 'lw' : 0.4},
                      show_cbar        = True,
                      indicate_empty   = 'gray'
                      ):
@@ -363,21 +367,21 @@ def unroll_cbe_sides(paddle_occupancy = {},
     """
     fig, axs  = plt.subplots(1, 4, sharey=True,figsize=(22, 5), gridspec_kw={'width_ratios': [1, 1, 1, 1]})
     # normal +X
-    cbe_front = db.Paddle.objects.filter(panel_id=3) 
+    cbe_front = list(db.Paddle.objects.filter(panel_id=3)) 
     # edge normal +X+Y
-    ep_1      = db.Paddle.objects.filter(paddle_id=57)
+    ep_1      = list(db.Paddle.objects.filter(paddle_id=57))
     # normal +Y
-    cbe_sb    = db.Paddle.objects.filter(panel_id=4)
+    cbe_sb    = list(db.Paddle.objects.filter(panel_id=4))
     # endge normal -X+Y
-    ep_2      = db.Paddle.objects.filter(paddle_id=58)
+    ep_2      = list(db.Paddle.objects.filter(paddle_id=58))
     # normal -X 
-    cbe_back  = db.Paddle.objects.filter(panel_id=5) 
+    cbe_back  = list(db.Paddle.objects.filter(panel_id=5)) 
     # edge normal -X-Y
-    ep_3      = db.Paddle.objects.filter(paddle_id=59)
+    ep_3      = list(db.Paddle.objects.filter(paddle_id=59))
     # normal -Y 
-    cbe_bb    = db.Paddle.objects.filter(panel_id=6)
+    cbe_bb    = list(db.Paddle.objects.filter(panel_id=6))
     # edge normal +X-Y
-    ep_4      = db.Paddle.objects.filter(paddle_id=60)
+    ep_4      = list(db.Paddle.objects.filter(paddle_id=60))
 
     xmin, xmax = -110,110
     ymin, ymax = -110,110
@@ -395,26 +399,29 @@ def unroll_cbe_sides(paddle_occupancy = {},
         cm_norm_pts = plt.Normalize(vmin=min(ts), vmax=max(ts))
 
     ep = ep_1[0]
-    if paddle_occupancy:
-        color = cmap(paddle_occupancy[ep.paddle_id])
-        if not paddle_occupancy[ep.paddle_id] and indicate_empty:
-            color = indicate_empty
-        axs[0].add_patch(ep.draw_yz(fill=True, edgecolor=color, facecolor=color))
-    if event is not None:
-        axs[0].add_patch(ep.draw_yz(fill=True, edgecolor='k', facecolor='tab:blue', alpha=0.3))
-    else:
-        axs[0].add_patch(ep.draw_yz(fill=True, edgecolor='k', facecolor='w'))
-    
-
+    cbe_front.append(ep_1[0])
     for pdl in cbe_front:
         if paddle_occupancy:
             color = cmap(paddle_occupancy[pdl.paddle_id])
+            if not paddle_occupancy[pdl.paddle_id] and indicate_empty:
+                color = indicate_empty
             axs[0].add_patch(pdl.draw_yz(fill=True, edgecolor=color, facecolor=color))
+        if event is not None:
+            axs[0].add_patch(pdl.draw_yz(fill=False, facecolor='tab:blue', **paddle_style))
         else:
-            if event is not None:
-                axs[0].add_patch(pdl.draw_yz(fill=True, edgecolor='k', facecolor='tab:blue', alpha=0.3))
-            else:
-                axs[0].add_patch(pdl.draw_yz(fill=True, edgecolor='k', facecolor='w'))
+            axs[0].add_patch(pdl.draw_yz(fill=True, edgecolor='k', facecolor='w'))
+    
+
+    ##for pdl in cbe_front:
+    ##    if paddle_occupancy:
+    ##        color = cmap(paddle_occupancy[pdl.paddle_id])
+    ##        axs[0].add_patch(pdl.draw_yz(fill=True, edgecolor=color, facecolor=color))
+    ##    else:
+    ##        if event is not None:
+    ##            axs[0].add_patch(pdl.draw_yz(fill=False, facecolor='tab:blue', **paddle_style))
+    ##        else:
+    ##            axs[0].add_patch(pdl.draw_yz(fill=True, edgecolor='k', facecolor='w'))
+    
     if event is not None:
         #print (hit_pids)
         cbe_front_pids = [k.paddle_id for k in cbe_front]
@@ -432,16 +439,17 @@ def unroll_cbe_sides(paddle_occupancy = {},
     
     # +Y side
     ep = ep_2[0]
-    if paddle_occupancy:
-        color = cmap(paddle_occupancy[ep.paddle_id])
-        if not paddle_occupancy[ep.paddle_id] and indicate_empty:
-            color = indicate_empty
-        axs[1].add_patch(ep.draw_xz(fill=True, edgecolor=color, facecolor=color))
-    else:
-        if event is not None:
-            axs[1].add_patch(ep.draw_xz(fill=True, edgecolor='k', facecolor='tab:blue', alpha=0.3))
-        else:
-            axs[1].add_patch(ep.draw_xz(fill=True, edgecolor='k', facecolor='w'))
+    cbe_sb.append(ep_2[0])
+    #if paddle_occupancy:
+    #    color = cmap(paddle_occupancy[ep.paddle_id])
+    #    if not paddle_occupancy[ep.paddle_id] and indicate_empty:
+    #        color = indicate_empty
+    #    axs[1].add_patch(ep.draw_xz(fill=True, edgecolor=color, facecolor=color))
+    #else:
+    #    if event is not None:
+    #        axs[1].add_patch(ep.draw_xz(fill=False, facecolor='tab:blue', **paddle_style))
+    #    else:
+    #        axs[1].add_patch(ep.draw_xz(fill=True, edgecolor='k', facecolor='w'))
 
     for pdl in cbe_sb:
         if paddle_occupancy:
@@ -451,7 +459,7 @@ def unroll_cbe_sides(paddle_occupancy = {},
             axs[1].add_patch(pdl.draw_xz(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
-                axs[1].add_patch(pdl.draw_xz(fill=True, edgecolor='k', facecolor='tab:blue', alpha=0.3))
+                axs[1].add_patch(pdl.draw_xz(fill=False, facecolor='tab:blue', **paddle_style))
             else:
                 axs[1].add_patch(pdl.draw_xz(fill=True, edgecolor='k', facecolor='w'))
    
@@ -470,16 +478,17 @@ def unroll_cbe_sides(paddle_occupancy = {},
     axs[1].invert_xaxis()
 
     ep = ep_3[0]
-    if paddle_occupancy:
-        color = cmap(paddle_occupancy[ep.paddle_id])
-        if not paddle_occupancy[ep.paddle_id] and indicate_empty:
-            color = indicate_empty
-        axs[2].add_patch(ep.draw_yz(fill=True, edgecolor=color, facecolor=color))
-    else:
-        if event is not None:
-            axs[2].add_patch(ep.draw_yz(fill=True, edgecolor='k', facecolor='tab:blue', alpha=0.3))
-        else:
-            axs[2].add_patch(ep.draw_yz(fill=True, edgecolor='k', facecolor='w'))
+    cbe_back.append(ep_3[0])
+    #if paddle_occupancy:
+    #    color = cmap(paddle_occupancy[ep.paddle_id])
+    #    if not paddle_occupancy[ep.paddle_id] and indicate_empty:
+    #        color = indicate_empty
+    #    axs[2].add_patch(ep.draw_yz(fill=True, edgecolor=color, facecolor=color))
+    #else:
+    #    if event is not None:
+    #        axs[2].add_patch(ep.draw_yz(fill=False, facecolor='tab:blue', **paddle_style))
+    #    else:
+    #        axs[2].add_patch(ep.draw_yz(fill=True, edgecolor='k', facecolor='w'))
     for pdl in cbe_back:
         if paddle_occupancy:
             color = cmap(paddle_occupancy[pdl.paddle_id])
@@ -488,7 +497,7 @@ def unroll_cbe_sides(paddle_occupancy = {},
             axs[2].add_patch(pdl.draw_yz(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
-                axs[2].add_patch(pdl.draw_yz(fill=True, edgecolor='k', facecolor='tab:blue', alpha=0.3))
+                axs[2].add_patch(pdl.draw_yz(fill=False, facecolor='tab:blue', **paddle_style))
             else:
                 axs[2].add_patch(pdl.draw_yz(fill=True, edgecolor='k', facecolor='w'))
     if event is not None:
@@ -507,16 +516,17 @@ def unroll_cbe_sides(paddle_occupancy = {},
     
     # -Y side
     ep = ep_4[0]
-    if paddle_occupancy:
-        color = cmap(paddle_occupancy[ep.paddle_id])
-        if not paddle_occupancy[ep.paddle_id] and indicate_empty:
-            color = indicate_empty
-        axs[3].add_patch(ep.draw_xz(fill=True, edgecolor=color, facecolor=color))
-    else:
-        if event is not None:
-            axs[3].add_patch(ep.draw_xz(fill=True, edgecolor='k', facecolor='tab:blue', alpha=0.3))
-        else:
-            axs[3].add_patch(ep.draw_xz(fill=True, edgecolor='k', facecolor='w'))
+    cbe_bb.append(ep_4[0])
+    #if paddle_occupancy:
+    #    color = cmap(paddle_occupancy[ep.paddle_id])
+    #    if not paddle_occupancy[ep.paddle_id] and indicate_empty:
+    #        color = indicate_empty
+    #    axs[3].add_patch(ep.draw_xz(fill=True, edgecolor=color, facecolor=color))
+    #else:
+    #    if event is not None:
+    #        axs[3].add_patch(ep.draw_xz(fill=False, edgecolor='k', facecolor='tab:blue', alpha=0.3))
+    #    else:
+    #        axs[3].add_patch(ep.draw_xz(fill=True, edgecolor='k', facecolor='w'))
     for pdl in cbe_bb:
         if paddle_occupancy:
             color = cmap(paddle_occupancy[pdl.paddle_id])
@@ -525,7 +535,7 @@ def unroll_cbe_sides(paddle_occupancy = {},
             axs[3].add_patch(pdl.draw_xz(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
-                axs[3].add_patch(pdl.draw_xz(fill=True, edgecolor='k', facecolor='tab:blue', alpha=0.3))
+                axs[3].add_patch(pdl.draw_xz(fill=False,facecolor='tab:blue', **paddle_style))
             else:
                 axs[3].add_patch(pdl.draw_xz(fill=True, edgecolor='k', facecolor='w'))
     if event is not None:
@@ -569,6 +579,7 @@ def unroll_cbe_sides(paddle_occupancy = {},
 def unroll_cor(paddle_occupancy = {},
                event            = None,
                cmap             = matplotlib.colormaps['hot'],
+               paddle_style     = {'edgecolor' : 'w', 'lw' : 0.4},
                show_cbar        = True,
                indicate_empty   = 'gray'):
     """
@@ -609,7 +620,7 @@ def unroll_cor(paddle_occupancy = {},
     ep_4      = db.Paddle.objects.filter(panel_id=21)
 
     xmin, xmax = -100,130
-    ymin, ymax = -25,175
+    ymin, ymax = -25,175 # these are the z-coordinates
     title      = 'Relative occupancy, xy projection'
     
     if event is not None:
@@ -631,9 +642,14 @@ def unroll_cor(paddle_occupancy = {},
             axs[0].add_patch(ep.draw_yz(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
-                axs[0].add_patch(ep.draw_yz(fill=True, edgecolor='k', facecolor='tab:blue', alpha=0.3))
+                axs[0].add_patch(ep.draw_yz(fill=False, facecolor='tab:blue', **paddle_style))
             else:
                 axs[0].add_patch(ep.draw_yz(fill=True, edgecolor='k', facecolor='w'))
+    if event is not None:
+        for j, pdl_hit in enumerate(hit_pids):
+            if pdl_hit in [pdl_.paddle_id for pdl_ in ep_1]:
+                axs[0].scatter([ys[j]], [zs[j]], alpha = 0.8 , marker='o', s=100*en[j],
+                               lw=1.5, edgecolor='k', color=cmap(cm_norm_pts(ts[j])))
 
     for pdl in cor_front:
         if paddle_occupancy:
@@ -643,7 +659,7 @@ def unroll_cor(paddle_occupancy = {},
             axs[0].add_patch(pdl.draw_yz(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
-                axs[0].add_patch(pdl.draw_yz(fill=True, edgecolor='k', facecolor='tab:blue', alpha=0.3))
+                axs[0].add_patch(pdl.draw_yz(fill=False, facecolor='tab:blue', **paddle_style))
             else:
                 axs[0].add_patch(pdl.draw_yz(fill=True, edgecolor='k', facecolor='w'))
     
@@ -652,6 +668,7 @@ def unroll_cor(paddle_occupancy = {},
             if pdl_hit in [pdl_.paddle_id for pdl_ in cor_front]:
                 axs[0].scatter([ys[j]], [zs[j]], alpha = 0.8 , marker='o', s=100*en[j],
                                lw=1.5, edgecolor='k', color=cmap(cm_norm_pts(ts[j])))
+
     axs[0].set_xlabel('y [cm]', loc='right')
     axs[0].set_ylabel('z [cm]', loc='top')#, rotation=90)
     #axs[0].set_aspect('equal')
@@ -668,9 +685,14 @@ def unroll_cor(paddle_occupancy = {},
             axs[1].add_patch(ep.draw_xz(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
-                axs[1].add_patch(ep.draw_xz(fill=True, edgecolor='k', facecolor='tab:blue', alpha=0.3))
+                axs[1].add_patch(ep.draw_xz(fill=False, facecolor='tab:blue', **paddle_style))
             else:
                 axs[1].add_patch(ep.draw_xz(fill=True, edgecolor='k', facecolor='w'))
+    if event is not None:
+        for j, pdl_hit in enumerate(hit_pids):
+            if pdl_hit in [pdl_.paddle_id for pdl_ in ep_2]:
+                axs[1].scatter([xs[j]], [zs[j]], alpha = 0.8 , marker='o', s=100*en[j],
+                                lw=1.5, edgecolor='k', color=cmap(cm_norm_pts(ts[j])))
 
     for pdl in cor_sb:
         if paddle_occupancy:
@@ -680,7 +702,7 @@ def unroll_cor(paddle_occupancy = {},
             axs[1].add_patch(pdl.draw_xz(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
-                axs[1].add_patch(pdl.draw_xz(fill=True, edgecolor='k', facecolor='tab:blue', alpha=0.3))
+                axs[1].add_patch(pdl.draw_xz(fill=False, facecolor='tab:blue', **paddle_style))
             else:
                 axs[1].add_patch(pdl.draw_xz(fill=True, edgecolor='k', facecolor='w'))
     if event is not None:
@@ -704,9 +726,14 @@ def unroll_cor(paddle_occupancy = {},
             axs[2].add_patch(ep.draw_yz(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
-                axs[2].add_patch(ep.draw_yz(fill=True, edgecolor='k', facecolor='tab:blue', alpha=0.3))
+                axs[2].add_patch(ep.draw_yz(fill=False, facecolor='tab:blue', **paddle_style))
             else:
                 axs[2].add_patch(ep.draw_yz(fill=True, edgecolor='k', facecolor='w'))
+    if event is not None:
+        for j, pdl_hit in enumerate(hit_pids):
+            if pdl_hit in [pdl_.paddle_id for pdl_ in ep_3]:
+                axs[2].scatter([ys[j]], [zs[j]], alpha = 0.8 , marker='o', s=100*en[j],
+                               lw=1.5, edgecolor='k', color=cmap(cm_norm_pts(ts[j])))
     
     for pdl in cor_back:
         if paddle_occupancy:
@@ -716,7 +743,7 @@ def unroll_cor(paddle_occupancy = {},
             axs[2].add_patch(pdl.draw_yz(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
-                axs[2].add_patch(pdl.draw_yz(fill=True, edgecolor='k', facecolor='tab:blue', alpha=0.3))
+                axs[2].add_patch(pdl.draw_yz(fill=False, facecolor='tab:blue', **paddle_style))
             else:
                 axs[2].add_patch(pdl.draw_yz(fill=True, edgecolor='k', facecolor='w'))
     
@@ -742,9 +769,14 @@ def unroll_cor(paddle_occupancy = {},
             axs[3].add_patch(ep.draw_xz(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
-                axs[3].add_patch(ep.draw_xz(fill=True, edgecolor='k', facecolor='tab:blue', alpha=0.3))
+                axs[3].add_patch(ep.draw_xz(fill=False, facecolor='tab:blue', **paddle_style))
             else:
                 axs[3].add_patch(ep.draw_xz(fill=True, edgecolor='k', facecolor='w'))
+    if event is not None:
+        for j, pdl_hit in enumerate(hit_pids):
+            if pdl_hit in [pdl_.paddle_id for pdl_ in ep_4]:
+                axs[3].scatter([xs[j]], [zs[j]], alpha = 0.8 , marker='o', s=100*en[j],
+                               lw=1.5, edgecolor='k', color=cmap(cm_norm_pts(ts[j])))
 
     for pdl in cor_bb:
         if paddle_occupancy:
@@ -754,7 +786,7 @@ def unroll_cor(paddle_occupancy = {},
             axs[3].add_patch(pdl.draw_xz(fill=True, edgecolor=color, facecolor=color))
         else:
             if event is not None:
-                axs[3].add_patch(pdl.draw_xz(fill=True, edgecolor='k', facecolor='tab:blue', alpha=0.3))
+                axs[3].add_patch(pdl.draw_xz(fill=False, facecolor='tab:blue', **paddle_style))
             else:
                 axs[3].add_patch(pdl.draw_xz(fill=True, edgecolor='k', facecolor='w'))
     
@@ -798,13 +830,20 @@ def unroll_cor(paddle_occupancy = {},
 def tof_2dproj(event            = None,
                cmap             = matplotlib.colormaps['seismic'],
                paddle_style     = {'edgecolor' : 'w', 'lw' : 0.4},
-               show_cbar        = True):
+               show_cbar        = True) -> list:
     """
+    Plots the entire TOF system in 2d projection, that is all panels 
+    overlaid on each other
+
+    # Returns:
+        list of figures, xy, xz, xy projections
     """
+    projection_figures = []
+
     fig = plt.figure(figsize=lo.FIGSIZE_A4_SQUARE)
     ax = fig.gca()
     paddles         = db.Paddle.objects.all()
-    title           = 'TOF XY projection'
+    title           = 'XY projection'
     if event is not None:
         ts = np.array([h.t0 for h in event.hits])
         cm_norm_pts = plt.Normalize(vmin=min(ts), vmax=max(ts))
@@ -830,7 +869,71 @@ def tof_2dproj(event            = None,
     ax.set_title(title, loc='right')
     ax.spines['top'].set_visible(True)
     ax.spines['right'].set_visible(True)
-    return fig, ax
+    projection_figures.append(fig)
+    
+    # XZ projection
+    fig = plt.figure(figsize=lo.FIGSIZE_A4_SQUARE)
+    ax = fig.gca()
+    title           = 'XZ projection'
+    if event is not None:
+        ts = np.array([h.t0 for h in event.hits])
+        cm_norm_pts = plt.Normalize(vmin=min(ts), vmax=max(ts))
+
+    for pdl in paddles:
+        if event is not None:
+            ax.add_patch(pdl.draw_xz(fill=False,\
+                                     edgecolor=paddle_style['edgecolor'],
+                                     lw=paddle_style['lw'],
+                                     facecolor='tab:blue'))#, alpha=0.3))
+        else:
+            ax.add_patch(pdl.draw_xz(fill=True, edgecolor='k', facecolor='w'))
+    if event is not None:
+        for h in event.hits:
+            ax.scatter([0.1*h.x], [0.1*h.z], alpha = 0.8 , marker='o', s=100*h.edep,
+                        lw=1.5, edgecolor=paddle_style['edgecolor'], color=cmap(cm_norm_pts(h.t0)))
+    ax.grid(0) 
+    ax.set_xlabel('x [cm]', loc='right')
+    ax.set_ylabel('z [cm]', loc='top')#, rotation=90)
+    ax.set_aspect('equal')
+    ax.set_xlim(-200, 200)
+    ax.set_ylim(-25, 250)
+    ax.set_title(title, loc='right')
+    ax.spines['top'].set_visible(True)
+    ax.spines['right'].set_visible(True)
+    projection_figures.append(fig)
+
+    # YZ projection
+    fig = plt.figure(figsize=lo.FIGSIZE_A4_SQUARE)
+    ax = fig.gca()
+    title           = 'XY projection'
+    if event is not None:
+        ts = np.array([h.t0 for h in event.hits])
+        cm_norm_pts = plt.Normalize(vmin=min(ts), vmax=max(ts))
+
+    for pdl in paddles:
+        if event is not None:
+            ax.add_patch(pdl.draw_yz(fill=False,\
+                                     edgecolor=paddle_style['edgecolor'],
+                                     lw=paddle_style['lw'],
+                                     facecolor='tab:blue'))#, alpha=0.3))
+        else:
+            ax.add_patch(pdl.draw_yz(fill=True, edgecolor='k', facecolor='w'))
+    if event is not None:
+        for h in event.hits:
+            ax.scatter([0.1*h.y], [0.1*h.z], alpha = 0.8 , marker='o', s=100*h.edep,
+                        lw=1.5, edgecolor=paddle_style['edgecolor'], color=cmap(cm_norm_pts(h.t0)))
+    ax.grid(0) 
+    ax.set_xlabel('y [cm]', loc='right')
+    ax.set_ylabel('z [cm]', loc='top')#, rotation=90)
+    ax.set_aspect('equal')
+    ax.set_xlim(-200, 200)
+    ax.set_ylim(-25, 250)
+    ax.set_title(title, loc='right')
+    ax.spines['top'].set_visible(True)
+    ax.spines['right'].set_visible(True)
+    projection_figures.append(fig)
+
+    return projection_figures
 
 ###############################################
 
@@ -858,6 +961,46 @@ def plot_rb_paddles(rb):
                            cmap = cmap,
                            show_cbar = False)
     return (fig1,fig2,fig3),(axs1,axs2,axs3)
+
+###############################################
+
+def tof_hits_time_evolution(ev, line_color='k', t_err=0.35, twindows=None):
+    """
+    A simple plot plotting normalized event
+    times on the x axis and the energy deposition
+    for each hit on the y axis.
+
+    # Return:
+        
+    """
+    fig = plt.figure(figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT)
+    ax  = fig.gca()
+    ev.normalize_hit_times()
+    hits = sorted([h for h in ev.hits], key=lambda x : x.event_t0)
+    # the first hit
+    first_hit = hits[0]
+    ax.vlines(first_hit.event_t0,0, first_hit.edep, color=line_color)
+    ax.fill_betweenx([0,first_hit.edep], first_hit.event_t0 - t_err, first_hit.event_t0 + t_err, color=line_color, alpha=0.2)
+    prior_hit = first_hit
+    for h in hits[1:]:
+        # indicate lightspeed cleaning
+        min_tdiff_cvac = 1e9*1e-3*prior_hit.distance(h)/299792458.0
+        twindow        = prior_hit.event_t0 - t_err + min_tdiff_cvac;
+        # lenient strategy
+        ax.fill_betweenx([0,prior_hit.edep], prior_hit.event_t0, twindow, color='tab:red', alpha=0.4)
+        # with an aggressive strategy, we could clean even more
+        ax.fill_betweenx([0,prior_hit.edep], twindow, twindow + 2*t_err,
+                         color='tab:blue',
+                         alpha=0.2)
+        ax.vlines(h.event_t0, 0, h.edep, color=line_color)
+        ax.fill_betweenx([0, h.edep], h.event_t0 - t_err, h.event_t0 + t_err, color=line_color, alpha=0.2)
+        prior_hit = h
+    ax.set_xlabel('Event t0 [ns]', loc='right')
+    ax.set_ylabel('Hit EDep', loc='top')
+    ax.set_title('TOF Hitseries', loc='right')
+    ax.set_ylim(bottom=0)
+    cb.visual.adjust_minor_ticks(ax, which='both')
+    return fig
 
 ###############################################
 
@@ -892,7 +1035,6 @@ def plot_ltb_threshold_timeseries(times, ltb_hk, savename = None):
     return fig
 
 ###############################################
-
 
 def plot_paddle_charge2d(reader      = None,\
                          charge_a    = [],\
