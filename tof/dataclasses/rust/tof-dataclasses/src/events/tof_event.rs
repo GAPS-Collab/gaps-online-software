@@ -902,7 +902,8 @@ impl TofEventSummary {
   ///
   /// # Arguments:
   ///   * offsets : a hashmap paddle id -> timing offset
-  pub fn set_timing_offsets(&mut self, offsets : HashMap<u8, f32>) {
+  #[cfg(feature="database")]
+  pub fn set_timing_offsets(&mut self, offsets : &HashMap<u8, f32>) {
     for h in self.hits.iter_mut() {
       if offsets.contains_key(&h.paddle_id) {
         h.timing_offset = offsets[&h.paddle_id]; 
@@ -917,11 +918,17 @@ impl TofEventSummary {
   /// larger than one
   /// That this works, first hits need to be 
   /// "normalized" by calling normalize_hit_times
-  pub fn lightspeed_cleaning(&mut self, t_err : f32) -> Vec<u8> {
+  ///
+  /// # Return:
+  ///
+  ///   * removed paddle ids, twindows
+  pub fn lightspeed_cleaning(&mut self, t_err : f32) -> (Vec<u8>, Vec<f32>) {
     // first sort the hits in time
     if self.hits.len() == 0 {
-      return Vec::<u8>::new();
+      return (Vec::<u8>::new(), Vec::<f32>::new());
     }
+    let mut twindows = Vec::<f32>::new();
+
     self.hits.sort_by(|a,b| (a.event_t0).partial_cmp(&b.event_t0).unwrap());
     let first_hit = self.hits[0].clone(); // the clone here is a bit unfortunate, 
                                            // this can be done better with walking 
@@ -932,21 +939,36 @@ impl TofEventSummary {
     clean_hits.push(first_hit.clone());
     //error!("-----");
     let mut prior_hit = first_hit;
+    //println!("TO FIRST {}",first_hit.event_t0);
     for h in self.hits.iter().skip(1) {
-      let beta = 1e-3*prior_hit.distance(h)/(1e-9*(h.event_t0  - prior_hit.event_t0 + 2.0*t_err))/299792458.0;
-      //prior_hit = h.clone();
-      //error!("{}", h.event_t0);
-      //error!("BETA  {}", beta);
-      //error!("DIST  {}", first_hit.distance(h)*1e-3);
-      //error!("TDIFF {}", h.event_t0 - first_hit.event_t0);
-      if beta > 1.0 {
+      let mut min_tdiff_cvac = 1e9*1e-3*prior_hit.distance(h)/299792458.0;
+      let twindow            = prior_hit.event_t0 + min_tdiff_cvac;
+      
+
+      // FIXME - implement different strategies
+      // this is the "default" strategy
+      //if h.event_t0 < twindow {
+      //  rm_hits.push(h.paddle_id);
+      //  twindows.push(twindow);
+      //  continue;
+      //}
+      // this is the "lenient" strategy
+      if h.event_t0 + 2.0*t_err < twindow {
         rm_hits.push(h.paddle_id);
+        twindows.push(twindow);
         continue;
       }
-      if beta < 0.0 {
-        rm_hits.push(h.paddle_id);
-        continue;
-      }
+      // this is the "aggressive" strategy
+      //if h.event_t0 - 2.0*t_err < twindow {
+      //  rm_hits.push(h.paddle_id);
+      //  continue;
+      //}
+      
+      // should we remove negative beta hits?
+      //if beta < 0.0 {
+      //  rm_hits.push(h.paddle_id);
+      //  continue;
+      //}
       // update the prior hit only 
       // when it is a good one. If it 
       // is bad we continue to compare
@@ -955,7 +977,7 @@ impl TofEventSummary {
       clean_hits.push(*h);
     }
     self.hits = clean_hits;
-    rm_hits
+    (rm_hits, twindows)
   }
 
 
@@ -987,6 +1009,11 @@ impl TofEventSummary {
     if self.hits.len() == 0 {
       return;
     }
+    // check if hit times have already been normalized
+    if self.hits[0].event_t0 == 0.0 {
+      return;
+    }
+
     let phase0 = self.hits[0].phase.to_f32();
     for h in &mut self.hits {
       let t0 = h.get_t0_uncorrected() + h.get_cable_delay();
@@ -999,6 +1026,12 @@ impl TofEventSummary {
       }
       let t_shift = 50.0*phase_diff/(2.0*PI);
       h.event_t0 = t0 + t_shift;
+    }
+    // start the first hit at 0
+    self.hits.sort_by(|a,b| (a.event_t0).partial_cmp(&b.event_t0).unwrap());
+    let t0_first_hit = self.hits[0].event_t0;
+    for h in self.hits.iter_mut() {
+      h.event_t0 -= t0_first_hit
     }
   }
  
