@@ -2606,6 +2606,10 @@ impl PyMasterTriggerEvent {
 
 }
 
+//--------------------------------------------------
+
+
+
 #[pyclass]
 #[pyo3(name="RBEventHeader")]
 pub struct PyRBEventHeader {
@@ -2750,7 +2754,7 @@ impl PyTofEventSummary {
   }
 
   pub fn set_timing_offsets(&mut self, timing_offsets : HashMap<u8, f32>) {
-    self.event.set_timing_offsets(timing_offsets);
+    self.event.set_timing_offsets(&timing_offsets);
   }
 
   pub fn normalize_hit_times(&mut self) {
@@ -2764,14 +2768,15 @@ impl PyTofEventSummary {
   /// larger than one
   /// That this works, first hits need to be 
   /// "normalized" by calling normalize_hit_times
-  pub fn lightspeed_cleaning(&mut self, t_err : f32) -> Vec<u16> {
+  pub fn lightspeed_cleaning(&mut self, t_err : f32) -> (Vec<u16>, Vec<f32>) {
     // return Vec<u16> here so that python does not 
     // interpret it as a byte
     let mut pids = Vec::<u16>::new();
-    for pid in self.event.lightspeed_cleaning(t_err) {
+    let (pids_rm, twindows) = self.event.lightspeed_cleaning(t_err);
+    for pid in pids_rm {
       pids.push(pid as u16);
     }
-    pids
+    (pids, twindows)
   }
   
   /// Remove all hits from the event's hit series which 

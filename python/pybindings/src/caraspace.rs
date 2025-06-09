@@ -21,7 +21,10 @@ use tof_dataclasses::database::{
 };
 use tof_dataclasses::packets::TofPacket;
 //use tof_dataclasses::events::TofEventSummary;
-use tof_dataclasses::events::TofEvent;
+use tof_dataclasses::events::{
+  TofEvent,
+  TofEventSummary
+};
 use telemetry_dataclasses::packets::{
   TelemetryPacket,
   MergedEvent
@@ -30,6 +33,7 @@ use telemetry_dataclasses::packets::{
 use crate::dataclasses::{
   PyTofPacket,
   PyTofEvent,
+  PyTofEventSummary,
 };
 
 use crate::telemetry::{
@@ -243,6 +247,16 @@ impl PyCRFrame {
     // FIXME
     let packet    = self.frame.get::<TofPacket>(name).unwrap();
     let mut event = packet.unpack::<TofEvent>().unwrap();
+    event.set_paddles(&self.paddles);
+    py_event.event  = event;
+    Ok(py_event)
+  }
+  
+  fn get_tofeventsummary(&mut self, name : String) -> PyResult<PyTofEventSummary> {
+    let mut py_event  = PyTofEventSummary::new();
+    // FIXME
+    let packet    = self.frame.get::<TofPacket>(name).unwrap();
+    let mut event = packet.unpack::<TofEventSummary>().unwrap();
     event.set_paddles(&self.paddles);
     py_event.event  = event;
     Ok(py_event)
