@@ -74,6 +74,30 @@ except ImportError as e:
 
 ##################################################################
 
+# universal pattern for various types of files from gaps_online
+FILENAME_PATTERN = re.compile('Run(?P<runid>[0-9]*)_(?P<subrunid>[0-9]*).(?P<timestamp>([0-9_]*UTC)).(tof.gaps|gaps)')
+
+##################################################################
+
+def get_fileinfo(filename : str) -> tuple:
+    """
+    Retrieve RunID, SubRunID as well as the datetime string from the
+    filename
+
+    # Arguments:
+        filename   : string version of the filename, full path supported.
+    """
+    ts = FILENAME_PATTERN.search(filename)
+    if ts is None:
+        raise  ValueError(f'Unable to extract timestamp from {filename}!')
+    runid    = ts.groupdict()['runid']
+    subrunid = ts.groupdict()['subrunid']
+    ts       = ts.groupdict()['timestamp']
+    return int(runid), int(subrunid), ts
+
+
+##################################################################
+
 class Adapter:
     """
     An adapter can plug into any directory and will find out what 
