@@ -607,6 +607,12 @@ impl PyTrackerHit {
     self.adc
   }
 
+  /// Change the ADC value, e.g. if the 
+  /// pedestal should be subtracted
+  fn subtract_pedestal(&mut self, pedestal : u16) {
+    self.adc -= pedestal;
+  }
+
   #[getter]
   fn asic_event_code(&self) -> u8 {
     self.asic_event_code
@@ -675,6 +681,12 @@ impl PyTrackerHitV2 {
       adc             : 0,
       oscillator      : 0,
     }
+  }
+  
+  /// Change the ADC value, e.g. if the 
+  /// pedestal should be subtracted
+  fn subtract_pedestal(&mut self, pedestal : u16) {
+    self.adc -= pedestal;
   }
 
   #[getter]
