@@ -655,6 +655,7 @@ pub struct PyTrackerHitV2 {
   pub channel         : u16,
   pub adc             : u16,
   pub oscillator      : u64,
+  pub energy          : f64,
 }
 
 impl PyTrackerHitV2 {
@@ -680,9 +681,16 @@ impl PyTrackerHitV2 {
       channel         : 0,
       adc             : 0,
       oscillator      : 0,
+      energy          : 0.0,
     }
   }
   
+  /// Set the energy field with the given energy, 
+  /// as calculated from a transfer function
+  fn set_energy(&mut self, energy : f64) {
+    self.energy = energy;
+  }
+
   /// Change the ADC value, e.g. if the 
   /// pedestal should be subtracted
   fn subtract_pedestal(&mut self, pedestal : u16) {
@@ -734,7 +742,8 @@ impl fmt::Display for PyTrackerHitV2 {
     let mut repr = String::from("<PyTrackerHitV2:");
     repr += &(format!("\n  Layer, Row, Module, Channel : {} {} {} {}" ,self.layer, self.row, self.module, self.channel));
     repr += &(format!("\n  ADC           : {}" ,self.adc));
-    repr += &(format!("\n  Oscillator    : {}>",self.oscillator));
+    repr += &(format!("\n  Oscillator    : {}" ,self.oscillator));
+    repr += &(format!("\n  Calib energy  : {}>",self.energy));
     write!(f, "{}", repr)
   }
 }
