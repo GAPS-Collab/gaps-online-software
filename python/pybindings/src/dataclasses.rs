@@ -2752,6 +2752,14 @@ impl PyTofEventSummary {
       event : TofEventSummary::new(),
     }
   }
+  
+  /// Emit a copy of self
+  fn copy(&self) -> Self {
+    let mut copy_event = PyTofEventSummary::new();
+    copy_event.event = self.event.clone();
+    copy_event
+  }
+
 
   pub fn set_timing_offsets(&mut self, timing_offsets : HashMap<u8, f32>) {
     self.event.set_timing_offsets(&timing_offsets);
@@ -2778,7 +2786,8 @@ impl PyTofEventSummary {
     }
     (pids, twindows)
   }
-  
+ 
+
   /// Remove all hits from the event's hit series which 
   /// do NOT obey causality. that is where the timings
   /// measured at ends A and B can not be correlated
@@ -3012,6 +3021,13 @@ impl PyTofEvent {
     Self {
       event : TofEvent::new(),
     }
+  }
+  
+  /// Emit a copy of self
+  fn copy(&self) -> Self {
+    let mut copy_event = PyTofEvent::new();
+    copy_event.event = self.event.clone();
+    copy_event
   }
   
   #[getter]
