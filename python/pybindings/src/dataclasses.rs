@@ -15,6 +15,8 @@ use pyo3::Python;
 
 use tof_dataclasses::ProtocolVersion;
 use tof_dataclasses::io::TofPacketReader;
+#[cfg(feature = "caraspace-serial")]
+use caraspace::reader::CRReader;
 use tof_dataclasses::packets::{
   TofPacket,
   PacketType
@@ -2341,6 +2343,30 @@ impl PyMtbMoniSeries {
     }
   }
 
+  #[cfg(feature = "caraspace-serial")]
+  /// Add an additional (Caraspace) file to the series 
+  fn add_crfile(&mut self, filename : String) {
+    let mut reader = CRReader::new(filename).expect("Unable to open file!");
+    // now we have a problem - from which frame should we get it?
+    // if we get it from the dedicated TOF stream it will be much 
+    // faster (if that is available) since it will be it's own 
+    // presence in the frame
+    for frame in reader {
+      if frame.has("PacketType.MtbMoniData") {
+        // FIXME - String argument
+        let moni_res = frame.get::<TofPacket>(String::from("PacketType.MtbMoniData")).unwrap().unpack::<MtbMoniData>();
+        match moni_res {
+          Err(err) => {
+            println!("Error unpacking MtbMoniData! {err}")
+          }
+          Ok(moni) => {
+            self.mtbmoniseries.add(moni);
+          }
+        }
+      }
+    }
+  }
+
   /// Add an additional file to the series
   fn add_file(&mut self, filename : String) {
     let mut reader = TofPacketReader::new(filename);
@@ -2352,6 +2378,8 @@ impl PyMtbMoniSeries {
     }
   }
 
+  /// Reduces the whole structure to
+  /// a single polars data frame
   fn get_dataframe(&mut self) -> PyResult<PyDataFrame> {
     match self.mtbmoniseries.get_dataframe() {
       Ok(df) => {
@@ -2364,6 +2392,7 @@ impl PyMtbMoniSeries {
     }
   }
 
+  /// Create a moni series from a file with TofPackets in it
   fn from_file(&mut self, filename : String) -> PyResult<PyDataFrame> {
     let mut reader = TofPacketReader::new(filename);
     reader.filter = PacketType::MonitorMtb;
