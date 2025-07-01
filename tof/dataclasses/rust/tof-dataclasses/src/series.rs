@@ -7,18 +7,18 @@
 use std::fmt;
 
 use std::collections::{
-    HashMap,
-    VecDeque,
+  HashMap,
+  VecDeque,
 };
 
 use crate::monitoring::{
-    MoniData,
-    RBMoniData,
-    LTBMoniData,
-    PAMoniData,
-    PBMoniData,
-    MtbMoniData, 
-    CPUMoniData,
+  MoniData,
+  RBMoniData,
+  LTBMoniData,
+  PAMoniData,
+  PBMoniData,
+  MtbMoniData, 
+  CPUMoniData,
 };
 
 #[cfg(feature = "polars")]
@@ -188,7 +188,7 @@ impl Default for RBMoniDataSeries {
 
 impl fmt::Display for RBMoniDataSeries {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, ">RBMoniDataSeries : {} boards>", self.data.len())
+    write!(f, "<RBMoniDataSeries : {} boards>", self.data.len())
   }
 }
 
@@ -341,15 +341,17 @@ impl MoniSeries<LTBMoniData> for LTBMoniDataSeries {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct MtbMoniDataSeries {
-  data        : HashMap<u8, VecDeque<MtbMoniData>>,
-  max_size    : usize,
+  data            : HashMap<u8, VecDeque<MtbMoniData>>,
+  max_size        : usize,
+  pub timestamps  : Vec<u64>,
 }
 
 impl MtbMoniDataSeries {
   pub fn new() -> Self {
     Self {
-      data     : HashMap::<u8, VecDeque<MtbMoniData>>::new(),
-      max_size : 10000,
+      data       : HashMap::<u8, VecDeque<MtbMoniData>>::new(),
+      timestamps : Vec::<u64>::new(),
+      max_size   : 10000,
     }
   }
 } 
