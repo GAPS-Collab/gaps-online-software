@@ -455,7 +455,11 @@ impl PyCRWriter {
       writer : CRWriter::new(filename, run_id, subrun_id, timestamp ),
     }
   }
-  
+ 
+  fn set_mbytes_per_file(&mut self, fsize : usize) {
+    self.writer.mbytes_per_file = fsize;
+  }
+
   fn set_file_timestamp(&mut self, timestamp : String) {
     self.writer.file_timestamp = Some(timestamp);
   }

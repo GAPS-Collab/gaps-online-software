@@ -27,6 +27,8 @@ use tof_dataclasses::heartbeats::HeartBeatDataSink;
 use tof_dataclasses::heartbeats::MTBHeartbeat;
 use tof_dataclasses::heartbeats::EVTBLDRHeartbeat;
 
+use crate::tel_api::TelemetryPacket;
+
 use tof_dataclasses::monitoring::{
   MoniData,
   MoniSeries,
@@ -2343,24 +2345,71 @@ impl PyMtbMoniSeries {
     }
   }
 
+  /// If data has been acquired from Telemetry, 
+  /// a timestamp is available
+  #[getter]
+  fn timestamps(&self) -> Vec<u64> {
+    self.mtbmoniseries.timestamps.clone()
+  }
+
   #[cfg(feature = "caraspace-serial")]
   /// Add an additional (Caraspace) file to the series 
-  fn add_crfile(&mut self, filename : String) {
+  ///
+  /// # Arguments:
+  ///   * filename : The name of the (caraspace) file to add
+  ///   * soruce   : The address in the index of the individual
+  ///                frame the MtbMoniPacket can be found. 
+  ///                Currently this can either be 'PacketType.MtbMoniData'
+  ///                or 'TelemetryPacketType.AnyTofHK' 
+  fn add_crfile(&mut self, filename : String, source : String) {
     let mut reader = CRReader::new(filename).expect("Unable to open file!");
     // now we have a problem - from which frame should we get it?
     // if we get it from the dedicated TOF stream it will be much 
     // faster (if that is available) since it will be it's own 
     // presence in the frame
+    let address = &source.clone();
     for frame in reader {
-      if frame.has("PacketType.MtbMoniData") {
+      if frame.has(address) {
         // FIXME - String argument
-        let moni_res = frame.get::<TofPacket>(String::from("PacketType.MtbMoniData")).unwrap().unpack::<MtbMoniData>();
-        match moni_res {
-          Err(err) => {
-            println!("Error unpacking MtbMoniData! {err}")
+        if source == "PacketType.MtbMoniData" {
+          let moni_res = frame.get::<TofPacket>(source.clone()).unwrap().unpack::<MtbMoniData>();
+          match moni_res {
+            Err(err) => {
+              println!("Error unpacking MtbMoniData! {err}")
+            }
+            Ok(moni) => {
+              self.mtbmoniseries.add(moni);
+            }
           }
-          Ok(moni) => {
-            self.mtbmoniseries.add(moni);
+        }
+        if source == "TelemetryPacketType.AnyTofHK" {
+          let hk_res = frame.get::<TelemetryPacket>(source.clone());
+          match hk_res {
+            Err(err) => {
+              println!("Error unpacking MtbMoniData! {err}");
+            }
+            Ok(hk) => {
+              let mut pos = 0;
+              let gcutime = hk.header.get_gcutime() as u64;
+              match TofPacket::from_bytestream(&hk.payload, &mut pos) {
+                Err(err) => {
+                  println!("Error unpacking MtbMoniData! {err}");
+                }
+                Ok(tp) => {
+                  if tp.packet_type == PacketType::MonitorMtb {
+                    match tp.unpack::<MtbMoniData>() {
+                      Err(err) => {
+                        println!("Error unpacking MtbMoniData! {err}");
+                      }
+                      Ok(moni) => {
+                        self.mtbmoniseries.add(moni);
+                        self.mtbmoniseries.timestamps.push(gcutime);
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -3295,7 +3344,6 @@ impl PyRBEvent {
     wfs
   }
   
-
   fn __repr__(&self) -> PyResult<String> {
     Ok(format!("<PyO3Wrapper: {}>", self.event)) 
   }
