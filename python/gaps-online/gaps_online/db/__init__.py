@@ -92,6 +92,17 @@ def get_tracker_strip_mask(name) -> dict:
 
 ##############################################
 
+def get_tracker_strip_pedestals() -> list[m.TrackerStripPedestal]:
+    """
+    Get a list of all tracker strips pedestals
+
+    FIXME - mark them with a name as well
+    """
+    strips = [k for k in m.TrackerStripPedestal.objects.all()]
+    return strips
+
+##############################################
+
 def get_vid_hid_map() -> dict:
     """
     Return a map of volume id to hardware id. This is in case of tof paddles a number 

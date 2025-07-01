@@ -177,10 +177,16 @@ class TofCuts:
         self.max_hit_cor      = 161
         self.max_hit_cbe      = 161
         self.max_hit_umb      = 161
+        self.min_hit_all      = 0
+        self.max_hit_all      = 161
+        self.min_cos_theta    = 0.0
+        self.max_cos_theta    = 1.0 
         self.only_causal_hits = False
         self.hit_cbe_acc      = 0 
         self.hit_umb_acc      = 0 
         self.hit_cor_acc      = 0
+        self.hit_all_acc      = 0
+        self.cos_theta_acc    = 0
         self.nevents          = 0
         self.hits_total       = 0
         self.hits_rmvd_csl    = 0
@@ -188,22 +194,40 @@ class TofCuts:
         # Require that the first hit MUST
         # be on the umbrella!
         self.fh_must_be_umb   = False
-        self.fh_umb_acc       = False
+        self.fh_umb_acc       = 0
         self.ls_cleaning_t_err = np.inf
+        # the last hit of the event must be 
+        # either on the cortina or on CBE BOT
+        self.thru_going           = False
+        self.thru_going_acc       = 0
+        # the first hits on the inner can not be on 
+        # the bottom panel
+        self.fhi_not_bot          = False
+        self.fhi_not_bot_acc      = 0
+        # more criteria for first/last hit 
+        self.fho_must_panel7      = False
+        self.fho_must_panel7_acc  = 0
+        self.lh_must_panel2       = False 
+        self.lh_must_panel2_acc   = 0 
 
     def clear_stats(self):
         """
         Zero out the event/hit counter variables
         """
-        self.hit_cbe_acc      = 0 
-        self.hit_umb_acc      = 0 
-        self.hit_cor_acc      = 0
-        self.nevents          = 0
-        self.hits_total       = 0
-        self.hits_rmvd_csl    = 0
-        self.hits_rmvd_ls     = 0
-        self.fh_umb_acc       = 0
-
+        self.hit_cbe_acc         = 0 
+        self.hit_umb_acc         = 0 
+        self.hit_cor_acc         = 0
+        self.hit_all_acc         = 0 
+        self.cos_theta_acc       = 0
+        self.nevents             = 0
+        self.hits_total          = 0
+        self.hits_rmvd_csl       = 0
+        self.hits_rmvd_ls        = 0
+        self.fh_umb_acc          = 0
+        self.thru_going_acc      = 0
+        self.fhi_not_bot_acc     = 0
+        self.fho_must_panel7_acc = 0 
+        self.lh_must_panel2_acc  = 0 
 
     @property
     def void(self):
@@ -218,6 +242,10 @@ class TofCuts:
         if self.max_hit_cbe      != 161:
             return False
         if self.max_hit_umb      != 161:
+            return False  
+        if self.min_hit_all      != 0:
+            return False 
+        if self.max_hit_all      != 161:
             return False
         if self.only_causal_hits:
             return False
@@ -225,6 +253,18 @@ class TofCuts:
             return False
         if self.fh_must_be_umb != False:
             return False
+        if self.thru_going != False:
+            return False
+        if self.fhi_not_bot != False:
+            return False
+        if self.min_cos_theta != 0:
+            return False 
+        if self.max_cos_theta != 1:
+            return False 
+        if self.fho_must_panel7:
+            return False 
+        if self.lh_must_panel2:
+            return False 
         return True
 
         
@@ -246,23 +286,45 @@ class TofCuts:
             return False
         if self.max_hit_umb  != other.max_hit_umb:
             return False
+        if self.min_hit_all  != other.min_hit_all:
+            return False
+        if self.max_hit_all  != other.max_hit_all:
+            return False
         if self.ls_cleaning_t_err != other.ls_cleaning_t_err:
             return False
         if self.fh_must_be_umb != other.fh_must_be_umb:
             return False
+        if self.thru_going != other.thru_going:
+            return False
+        if self.fhi_not_bot != other.fhi_not_bot:
+            return False
+        if self.min_cos_theta != other.min_cos_theta:
+            return False 
+        if self.max_cos_theta != other.max_cos_theta:
+            return False 
+        if self.fho_must_panel7 != other.fho_must_panel7:
+            return False 
+        if self.lh_must_panel2 != other.lh_must_panel2:
+            return False 
         return True
 
     def __iadd__(self, other):
         if not self.is_compatible(other):
             raise ValueError("Cuts are not compatible!")
-        self.nevents       += other.nevents
-        self.hit_cbe_acc   += other.hit_cbe_acc 
-        self.hit_umb_acc   += other.hit_umb_acc 
-        self.hit_cor_acc   += other.hit_cor_acc
-        self.hits_total    += other.hits_total
-        self.hits_rmvd_csl += other.hits_rmvd_csl
-        self.hits_rmvd_ls  += other.hits_rmvd_ls
-        self.fh_umb_acc    += other.fh_umb_acc
+        self.nevents             += other.nevents
+        self.hit_cbe_acc         += other.hit_cbe_acc 
+        self.hit_umb_acc         += other.hit_umb_acc 
+        self.hit_cor_acc         += other.hit_cor_acc
+        self.hit_all_acc         += other.hit_all_acc
+        self.cos_theta_acc       += other.cos_theta_acc 
+        self.hits_total          += other.hits_total
+        self.hits_rmvd_csl       += other.hits_rmvd_csl
+        self.hits_rmvd_ls        += other.hits_rmvd_ls
+        self.fh_umb_acc          += other.fh_umb_acc
+        self.thru_going_acc      += other.thru_going_acc
+        self.fhi_not_bot_acc     += other.fhi_not_bot_acc
+        self.fho_must_panel7_acc += other.fho_must_panel7_acc 
+        self.lh_must_panel2_acc  += other.lh_must_panel2_acc
         return self
 
     def __add__(self, other):
@@ -271,14 +333,6 @@ class TofCuts:
             raise ValueError("Cuts are not compatible!")
         new_cuts += self
         new_cuts += other
-        #new_cuts.nevents = self.nevents + other.nevents
-        #new_cuts.hit_cbe_acc      = self.hit_cbe_accn  + other.hit_cbe_acc 
-        #new_cuts.hit_umb_acc      = self.hit_umb_accn  + other.hit_umb_acc 
-        #new_cuts.hit_cor_acc      = self.hit_cor_accn  + other.hit_cor_acc
-        #new_cuts.hits_total       = self.hits_total    + other.hits_total
-        #new_cuts.hits_rmvd_csl    = self.hits_rmvd_csl + other.hits_rmvd_csl
-        #new_cuts.hits_rmvd_ls     = self.hits_rmvd_ls  + other.hits_rmvd_ls
-        
         return new_cuts
 
     @property
@@ -305,12 +359,50 @@ class TofCuts:
             return 0
         return self.fh_umb_acc/self.nevents
 
+    @property
+    def acc_frac_thru_going(self):
+        if self.nevents == 0:
+            return 0
+        return self.thru_going_acc/self.nevents
+    
+    @property
+    def acc_frac_fhi_not_bot(self):
+        if self.nevents == 0:
+            return 0
+        return self.fhi_not_bot_acc/self.nevents
+
+    @property
+    def acc_frac_hit_all(self):
+        if self.nevents == 0:
+            return 0
+        return self.hit_all_acc/self.nevents
+
+    @property 
+    def acc_frac_cos_theta(self):
+        if self.nevents == 0:
+            return 0 
+        return self.cos_theta_acc/self.nevents 
+
+    @property
+    def acc_frac_fho_must_panel7(self):
+        if self.nevents == 0:
+            return 0
+        return self.fho_must_panel7_acc/self.nevents 
+
+    @property
+    def acc_frac_lh_must_panel2(self):
+        if self.nevents == 0:
+            return 0
+        return self.lh_must_panel2_acc/self.nevents 
+
     def pretty_print_efficiency(self):
         _repr =  f'-- -- -- -- -- -- -- -- -- -- --'
         _repr +=  f'\n TOTAL EVENTS : {self.nevents}'
         _repr += f'\n  {self.min_hit_umb} <= NHit(UMB) <= {self.max_hit_umb} : {100*self.acc_frac_hit_umb : .2f} %' 
         _repr += f'\n  {self.min_hit_cbe} <= NHit(CBE) <= {self.max_hit_cbe} : {100*self.acc_frac_hit_cbe : .2f} %' 
         _repr += f'\n  {self.min_hit_cor} <= NHit(COR) <= {self.max_hit_cor} : {100*self.acc_frac_hit_cor : .2f} %' 
+        _repr += f'\n  {self.min_hit_all} <= NHit(TOF) <= {self.max_hit_all} : {100*self.acc_frac_hit_all : .2f} %' 
+        _repr += f'\n  {self.min_cos_theta} <= COS(THET) <= {self.max_cos_theta} : {100*self.acc_frac_cos_theta : .2f} %'  
         if self.only_causal_hits:
             if self.hits_total > 0:
                 _repr += f'\n Removed {100*self.hits_rmvd_csl/self.hits_total:.2f} % of hits due to causality cut!'
@@ -319,12 +411,22 @@ class TofCuts:
                 _repr += f'\n Removed {100*self.hits_rmvd_ls/self.hits_total:.2f} % of hits due to lightspeed cut!'
         if self.fh_must_be_umb:
             _repr += f'\n First hit must be on UMB!'
-            _repr += f'\n   -- Removed {100*self.acc_frac_fh_is_umb : .2f} %'
+            _repr += f'\n   -- Accepted {100*self.acc_frac_fh_is_umb : .2f} %'
+        if self.thru_going:
+            _repr += '\n Require through-going track!'
+            _repr += f'\n   -- Accepted {100*self.acc_frac_thru_going : .2f} %'
+        if self.fhi_not_bot:
+            _repr += '\n Require first hit on the inner TOF can not be on the Bottom 12PP'
+            _repr += f'\n   -- Accepted {100*self.acc_frac_fhi_not_bot : .2f} %'
+        if self.fho_must_panel7:
+            _repr += '\n Require first hit on the outer TOF must be on panel7'
+            _repr += f'\n   -- Accepted {100*self.acc_frac_fho_must_panel7 : .2f} %'
+        if self.lh_must_panel2:
+            _repr += '\n Require last hit must be on the bottom CBE panel'
+            _repr += f'\n   -- Accepted {100*self.acc_frac_lh_must_panel2 : .2f} %'
+
         _repr +=  f'\n-- -- -- -- -- -- -- -- -- -- --'
         return _repr 
-
-    #def accept(self, ev) -> bool: 
-    #    return True
 
     def __str__(self):
         return self.__repr__()
@@ -338,11 +440,132 @@ class TofCuts:
             _repr += f'\n --   assumed timing error {self.ls_cleaning_t_err}'
         if self.fh_must_be_umb:
             _repr += f'\n -- first hit must be on UMB'
+        if self.thru_going:
+            _repr += f'\n -- require last hit on CBE BOT or COR (thru-going tracks)'
+        if self.fhi_not_bot:
+            _repr += f'\n -- require that the first hit on the inner TOF is not on CBE BOT'
+        if self.fho_must_panel7:
+            _repr += f'\n -- require that the first hit on the outer TOF is on panel7'
+        if self.lh_must_panel2:
+            _repr += f'\n -- require that the last hit on the inner TOF is on CBE BOT'
         _repr += f'\n  {self.min_hit_umb} <= NHit(UMB) <= {self.max_hit_umb}' 
         _repr += f'\n  {self.min_hit_cbe} <= NHit(CBE) <= {self.max_hit_cbe}' 
         _repr += f'\n  {self.min_hit_cor} <= NHit(COR) <= {self.max_hit_cor}' 
+        _repr += f'\n  {self.min_hit_all} <= NHit(TOF) <= {self.max_hit_all}' 
+        _repr += f'\n  {self.min_cos_theta} <= COS(THET) <= {self.max_cos_theta}' 
         _repr += '>'
         return _repr
+    
+    def accept(self, ev):
+        """
+        Check if an event passes the selection
+        and update the counters
+        """
+        # The order of events is important. Hit cleaning 
+        # comes before the application of cuts.
+        self.hits_total += ev.nhits
+        self.nevents    += 1
+        if self.only_causal_hits:
+            rm_pids : list = ev.remove_non_causal_hits()
+            self.hits_rmvd_csl  += len(rm_pids)
+        if self.ls_cleaning_t_err != np.inf:
+            rm_pids_ls = ev.lightspeed_cleaning(self.ls_cleaning_t_err)
+            self.hits_rmvd_ls   += len(rm_pids_ls)
+
+        # get number of cbe/umb/cor hits - only for valid hits
+        nhits_cbe : int = ev.nhits_cbe
+        nhits_umb : int = ev.nhits_umb
+        nhits_cor : int = ev.nhits_cor
+        
+        # check for min/max hits on cbe, umb, cor
+        # these cuts are combined with AND
+        if not self.min_hit_all <= nhits_cbe + nhits_umb + nhits_cor <= self.max_hit_all:
+            return False
+        else:
+            self.hit_all_acc += 1
+
+        if not self.min_hit_cbe <= nhits_cbe <= self.max_hit_cbe:
+            return False
+        else:
+            self.hit_cbe_acc += 1
+
+        if not self.min_hit_umb <= nhits_umb <= self.max_hit_umb:
+            return False
+        else:
+            self.hit_umb_acc += 1
+        
+        if not self.min_hit_cor <= nhits_cor <= self.max_hit_cor:
+            return False
+        else:
+            self.hit_cor_acc += 1
+       
+        # at this point, it can still be that we don't have any TOF hits at all
+        # the following set of cuts can only be calculated if there are hits
+        #no_cos_possible = False 
+        if self.fh_must_be_umb \
+        or self.thru_going \
+        or self.fhi_not_bot \
+        or (self.min_cos_theta != 0) \
+        or (self.max_cos_theta != 1) \
+        or self.fho_must_panel7 \
+        or self.lh_must_panel2:
+            hits_sorted = sorted(ev.hits, key=lambda x: x.event_t0)
+            if len(hits_sorted) == 0:
+                # if we don't have hits, we also don't fulfill any of these conditions. simple.
+                return False
+            first_pid  = hits_sorted[0].paddle_id 
+            last_pid   = hits_sorted[-1].paddle_id
+            hits_inner = [k for k in hits_sorted if k.paddle_id < 61]
+            hits_outer = [k for k in hits_sorted if k.paddle_id > 60] 
+        # now we are sure that there are hits
+        if self.fh_must_be_umb:
+            if  (first_pid < 61 or first_pid > 108):
+                return False
+            else:
+                self.fh_umb_acc += 1
+        else:
+            self.fh_umb_acc += 1
+
+        if self.thru_going:
+            if  (last_pid in range(13,25) or 108 < last_pid):
+                self.thru_going_acc += 1
+            else:
+                return False
+        else:
+            self.thru_going_acc += 1
+        
+        if self.fhi_not_bot:
+            if len(hits_inner) == 0:
+                self.fhi_not_bot_acc += 1
+            elif (12 < hits_inner[0].paddle_id < 25):
+                return False
+            else:
+                self.fhi_not_bot_acc += 1
+        else:
+            self.fhi_not_bot_acc += 1
+        
+        if self.min_cos_theta != 0 or self.max_cos_theta != 1:
+            # FIXME - this should not happen!
+            if len(hits_inner) == 0 or len(hits_outer) == 0:
+                return False
+            dist = hits_inner[0].distance(hits_outer[0])/1000
+            cos_theta = abs(hits_inner[0].z - hits_outer[0].z)/(1000*dist)  
+            if not self.min_cos_theta <= cos_theta <= self.max_cos_theta:
+                return False
+            else:
+                self.cos_theta_acc += 1
+        if self.fho_must_panel7:
+            if first_pid not in range(61, 73):
+                return False 
+            else:
+                self.fho_must_panel7_acc += 1
+        if self.lh_must_panel2:
+            if last_pid not in range(13,25):
+                return False 
+            else:
+                self.lh_must_panel2_acc += 1
+        # if we arrive here, we passed everything
+        return True
 
 ##################################################################
 
@@ -363,11 +586,11 @@ class TofAnalysis:
         Set the bins for the different histograms for the 
         variables. Only the number of bins can be set
         """
-        self.PADDLE_PEAK_BINS   = np.linspace(0,300,     nbins)
-        self.PADDLE_CHARGE_BINS = np.linspace(0,50 ,     nbins)
-        self.PADDLE_TIMING_BINS = np.linspace(0,500,     nbins)
-        self.PADDLE_BL_BINS     = np.linspace(-5,5 ,     nbins)
-        self.PADDLE_BLRMS_BINS  = np.linspace(0,5  ,     nbins)
+        self.PADDLE_PEAK_BINS   = np.linspace(0,180,     nbins)
+        self.PADDLE_CHARGE_BINS = np.linspace(-2,60 ,     nbins)
+        self.PADDLE_TIMING_BINS = np.linspace(0,200,     nbins)
+        self.PADDLE_BL_BINS     = np.linspace(-2.5,2.5 ,     nbins)
+        self.PADDLE_BLRMS_BINS  = np.linspace(0,2  ,     nbins)
         self.PADDLE_X0_BINS     = np.linspace(-0.1, 1.1, nbins)
         self.PADDLE_T0_BINS     = np.linspace(0,500,     nbins)
         self.PADDLE_EDEP_BINS   = np.linspace(0,10 ,     nbins)
@@ -376,6 +599,18 @@ class TofAnalysis:
         self.BETA_BINS          = np.linspace(0,2  ,     nbins)
         self.TIMING_BINS        = np.linspace(-100, 300, nbins)
         self.PDELAY_BINS        = np.linspace(-60,60,    nbins)
+        self.TDIFF_BINS         = np.linspace(-1, 10, nbins)
+        self.DIST_BINS          = np.linspace(0,4, nbins)
+        self.COS_T_BINS         = np.linspace(0,1,nbins)
+        self.COS_T2_BINS        = np.linspace(0,1,int(nbins/3))
+        self.X_BINS_OUTER       = np.linspace(-2000,2000,nbins)
+        self.Y_BINS_OUTER       = np.linspace(-2000,2000,nbins)
+        self.Z_BINS_OUTER       = np.linspace(-250, 2500,nbins)
+        self.X_BINS_INNER       = np.linspace(-1000,1000,nbins)
+        self.Y_BINS_INNER       = np.linspace(-1000,1000,nbins)
+        self.Z_BINS_INNER       = np.linspace(-250, 1500,nbins)
+        self.PID_BINS_INNER     = np.arange(0.5, 60.5, 1)
+        self.PID_BINS_OUTER     = np.arange(61.5, 161.5,1)
 
     def pretty_print_statistics(self):
         """
@@ -403,15 +638,34 @@ class TofAnalysis:
         return _repr
 
     def _timing_plots(self):
+        # first tuple argument is the histogram, second the cache, 
+        # since hist1d.fill takes a long time
         tmg_plots = {
-          'beta'     : d.histogram.hist1d(self.BETA_BINS),
-          't_inner'  : d.histogram.hist1d(self.TIMING_BINS),
-          't_outer'  : d.histogram.hist1d(self.TIMING_BINS),
+          'beta'         : d.histogram.hist1d(self.BETA_BINS),
+          't_inner'      : d.histogram.hist1d(self.TIMING_BINS),
+          't_outer'      : d.histogram.hist1d(self.TIMING_BINS),
           # timing difference will not be larger than phase delay!
-          't_diff'   : d.histogram.hist1d(self.PDELAY_BINS),
-          'ph_delay' : d.histogram.hist1d(self.PDELAY_BINS)
+          't_diff'       : d.histogram.hist1d(self.TDIFF_BINS),
+          'ph_delay'     : d.histogram.hist1d(self.PDELAY_BINS),
+          'dist'         : d.histogram.hist1d(self.DIST_BINS),
+          'dist_vs_beta' : d.histogram.hist2d((self.DIST_BINS, self.BETA_BINS)),
+          'dist_vs_tdiff': d.histogram.hist2d((self.DIST_BINS, self.TDIFF_BINS)),
+          'cos_theta'    : d.histogram.hist1d(self.COS_T_BINS), 
+          'cos2_theta'   : d.histogram.hist1d(self.COS_T2_BINS),
+          'x_outer'      : d.histogram.hist1d(self.X_BINS_OUTER),
+          'y_outer'      : d.histogram.hist1d(self.Y_BINS_OUTER),
+          'z_outer'      : d.histogram.hist1d(self.Z_BINS_OUTER),
+          'x_inner'      : d.histogram.hist1d(self.X_BINS_INNER),
+          'y_inner'      : d.histogram.hist1d(self.Y_BINS_INNER),
+          'z_inner'      : d.histogram.hist1d(self.Z_BINS_INNER),
+          'pid_inner'    : d.histogram.hist1d(self.PID_BINS_INNER),
+          'pid_outer'    : d.histogram.hist1d(self.PID_BINS_OUTER),
+          'beta_vs_theta': d.histogram.hist2d((self.BETA_BINS, self.COS_T_BINS))
         }
-        return tmg_plots
+        tmg_cache = dict()
+        for k in tmg_plots.keys():
+            tmg_cache[k] = []
+        return tmg_plots, tmg_cache
 
     def _nhit_plots(self):
         nhit_plots = {
@@ -429,9 +683,14 @@ class TofAnalysis:
         Charge and timing plots for each paddle
         """
         paddle_plots = {\
+          # use cache, cache, histogram
+          # explanation - in general, the cache won't be needed for 2d histograms which are 
+          # created from other histograms
           'charge2d'  : d.histogram.hist2d((self.PADDLE_CHARGE_BINS, self.PADDLE_CHARGE_BINS)),
           'amp_a'     : d.histogram.hist1d(self.PADDLE_PEAK_BINS),
           'amp_b'     : d.histogram.hist1d(self.PADDLE_PEAK_BINS),
+          'charge_a'  : d.histogram.hist1d(self.PADDLE_CHARGE_BINS),
+          'charge_b'  : d.histogram.hist1d(self.PADDLE_CHARGE_BINS),
           'time_a'    : d.histogram.hist1d(self.PADDLE_TIMING_BINS),
           'time_b'    : d.histogram.hist1d(self.PADDLE_TIMING_BINS),
           'bl_a'      : d.histogram.hist1d(self.PADDLE_BL_BINS),
@@ -443,8 +702,12 @@ class TofAnalysis:
           'edep'      : d.histogram.hist1d(self.PADDLE_EDEP_BINS),
           'pos_edep'  : d.histogram.hist2d((self.PADDLE_X0_BINS, self.PADDLE_EDEP_BINS))
         }
-        paddle_hists = {k : copy(paddle_plots) for k in range(1,161)}
-        return paddle_hists
+        all_paddle_plots = {k : copy(paddle_plots) for k in range(161)}
+        paddle_caches = {k : dict() for k in range(161)}
+        for pid in range(161):
+            for k in paddle_plots.keys():
+                paddle_caches[pid][k] = []
+        return all_paddle_plots, paddle_caches
 
     @property
     def rate(self):
@@ -481,12 +744,14 @@ class TofAnalysis:
                       nbins         = nbins)
 
     def __init__(self, skip_mangled = True,\
-                 skip_timeout = True,\
-                 beta_analysis = True,\
-                 nbins = 90,
+                 skip_timeout    = True,\
+                 beta_analysis   = True,\
+                 nbins           = 90,
                  cuts : TofCuts  = TofCuts(),
-                 use_offsets = False,
-                 active = False):
+                 use_offsets     = False,
+                 pid_inner       = None,
+                 pid_outer       = None,
+                 active          = False):
         """
         Start a new TofAnalysis. This will add create histograms for 
         'interesting' variables and count mangled and timed out 
@@ -512,6 +777,10 @@ class TofAnalysis:
                                      created
           cuts                     : Give a cut instance to reject events & hits.
                                      Default: None (no cuts)
+          pid_outer                : Select a specific paddle instead of the first on the outer TOF 
+                                     for the beta/timing analysis
+          pid_inner                : Select a specific paddle instead of the first on the inner TOF
+                                     for the beta/timing analysis
           active                   : if True, this analysis will actually "do something"
                                      and acquire events
         """
@@ -540,12 +809,15 @@ class TofAnalysis:
         self.n_mangled     = 0
         self.n_timed_out   = 0
         self.n_events      = 0
-        self.paddle_plots  = self._paddle_plots()
+        pp_hist, pp_cache  = self._paddle_plots()
+        self.paddle_plots  = pp_hist
+        self.paddle_cache  = pp_cache
         self.nhit_plots    = self._nhit_plots()
-        self.tmg_plots     = self._timing_plots()
+        tmg_plots, tmg_cache = self._timing_plots()
+        self.tmg_plots     = tmg_plots
+        self.tmg_cache     = tmg_cache
         self.paddles       = get_tof_paddles()
-        if _pybind_imported:
-            self.hg_mapping   = create_mtb_connection_to_pid_map()
+        self.hg_mapping    = create_mtb_connection_to_pid_map()
         # hit histogram
         self.nhit          = 0
         self.no_hitmiss    = 0
@@ -555,8 +827,9 @@ class TofAnalysis:
         self.occupancy     = {k : 0 for k in range(1,161)}
         self.occupancy_t   = {k : 0 for k in range(1,161)}
         # beta analysis
-        self.pid_inner     = None
-        self.pid_outer     = None
+        # select specific paddles for beta 
+        self.pid_inner     = pid_inner
+        self.pid_outer     = pid_outer
         #######################################################
         # caches - filling dashi histograms is very slow 
         # (it is not made for it). Work around that by only 
@@ -571,25 +844,23 @@ class TofAnalysis:
         self.c_rblink           = []
         self.c_miss_hit         = []
         self.c_nc_pid           = []
-        self.c_beta             = []
-        self.c_t_inner          = []
-        self.c_t_outer          = []
-        self.c_t_diff           = []
-        self.c_ph_delay         = []
-        self.c_charges          = {k:[] for k in range(1,161)}
-        self.c_peaks_a          = {k:[] for k in range(1,161)}
-        self.c_peaks_b          = {k:[] for k in range(1,161)}
-        self.c_times_a          = {k:[] for k in range(1,161)}
-        self.c_times_b          = {k:[] for k in range(1,161)}
-        self.c_baselines_a      = {k:[] for k in range(1,161)}
-        self.c_baselines_b      = {k:[] for k in range(1,161)}
-        self.c_baselines_a_rms  = {k:[] for k in range(1,161)}
-        self.c_baselines_b_rms  = {k:[] for k in range(1,161)}
-        self.c_positions        = {k:[] for k in range(1,161)}
-        self.c_t0s              = {k:[] for k in range(1,161)}
-        self.c_edeps            = {k:[] for k in range(1,161)}
-        self.c_pos_edeps        = {k:[] for k in range(1,161)}
+        #self.c_beta             = []
+        #self.c_t_inner          = []
+        #self.c_t_outer          = []
+        #self.c_t_diff           = []
+        #self.c_ph_delay         = []
+        #self.c_dist             = []
+        #self.c_cos_theta        = []
+        #self.c_x_outer          = []
+        #self.c_y_outer          = []
+        #self.c_z_outer          = []
+        #self.c_x_inner          = []
+        #self.c_y_inner          = []
+        #self.c_z_inner          = []
+        #self.c_pid_inner        = []
+        #self.c_pid_outer        = []
    
+
     @property
     def n_mangled_frac(self):
         if self.n_events > 0:
@@ -628,13 +899,11 @@ class TofAnalysis:
         self.n_mangled     += other.n_mangled 
         self.n_timed_out   += other.n_timed_out 
         self.n_events      += other.n_events
-        for pid in range(1,161):
-            for k in self.paddle_plots[pid]:
-                self.paddle_plots[pid][k] += other.paddle_plots[pid][k]
         for k in self.nhit_plots:
             self.nhit_plots[k] += other.nhit_plots[k]
         for k in self.tmg_plots:
             self.tmg_plots[k] += other.tmg_plots[k]
+            self.tmg_cache[k].extend(other.tmg_cache[k])
         # hit histogram
         self.nhit          += other.nhit 
         self.no_hitmiss    += other.no_hitmiss
@@ -644,31 +913,37 @@ class TofAnalysis:
         for pid in range(1,161):
             self.occupancy[pid]   += other.occupancy[pid] 
             self.occupancy_t[pid] += other.occupancy_t[pid] 
+        # nhit plots
         self.c_hit             .extend(other.c_hit) 
         self.c_thit            .extend(other.c_thit) 
         self.c_rblink          .extend(other.c_rblink) 
         self.c_miss_hit        .extend(other.c_miss_hit) 
         self.c_nc_pid          .extend(other.c_nc_pid)
-        self.c_t_inner         .extend(other.c_t_inner) 
-        self.c_t_outer         .extend(other.c_t_outer) 
-        self.c_t_diff          .extend(other.c_t_diff) 
-        self.c_ph_delay        .extend(other.c_ph_delay) 
-        if _pybind_imported: # FIXME - remove all these ifs
-            self.c_beta            .extend(other.c_beta)
+        
+        # timing plots
+        #self.c_t_inner         .extend(other.c_t_inner) 
+        #self.c_t_outer         .extend(other.c_t_outer) 
+        #self.c_t_diff          .extend(other.c_t_diff) 
+        #self.c_ph_delay        .extend(other.c_ph_delay) 
+        #self.c_dist            .extend(other.c_dist)
+        #self.c_cos_theta       .extend(other.c_cos_theta)
+        #self.c_x_outer         .extend(other.c_x_outer)
+        #self.c_y_outer         .extend(other.c_y_outer)
+        #self.c_z_outer         .extend(other.c_z_outer)
+        #self.c_x_inner         .extend(other.c_x_inner)
+        #self.c_y_inner         .extend(other.c_y_inner)
+        #self.c_z_inner         .extend(other.c_z_inner)
+        #self.c_pid_inner       .extend(other.c_pid_inner)
+        #self.c_pid_outer       .extend(other.c_pid_outer)
+        #self.c_beta            .extend(other.c_beta)
+        # add paddle plots
+        #for pid in range(1,161):
+        #    for k in self.paddle_plots[pid]:
+        #        self.paddle_plots[pid][k] += other.paddle_plots[pid][k]
         for pid in range(1,161):
-            self.c_charges[pid]        .extend(other.c_charges[pid]) 
-            self.c_peaks_a[pid]        .extend(other.c_peaks_a[pid]) 
-            self.c_peaks_b[pid]        .extend(other.c_peaks_b[pid]) 
-            self.c_times_a[pid]        .extend(other.c_times_a[pid]) 
-            self.c_times_b[pid]        .extend(other.c_times_b[pid]) 
-            self.c_baselines_a[pid]    .extend(other.c_baselines_a[pid]) 
-            self.c_baselines_b[pid]    .extend(other.c_baselines_b[pid]) 
-            self.c_baselines_a_rms[pid].extend(other.c_baselines_a_rms[pid])
-            self.c_baselines_b_rms[pid].extend(other.c_baselines_b_rms[pid])
-            self.c_positions[pid]      .extend(other.c_positions[pid])
-            self.c_t0s[pid]            .extend(other.c_t0s[pid])
-            self.c_edeps[pid]          .extend(other.c_edeps[pid])
-            self.c_pos_edeps[pid]      .extend(other.c_pos_edeps[pid])
+            for k in self.paddle_plots[pid]:
+                self.paddle_plots[pid][k] += other.paddle_plots[pid][k]
+                self.paddle_cache[pid][k].extend(other.paddle_cache[pid][k])
         return self
 
     def __add__(self, other):
@@ -689,52 +964,61 @@ class TofAnalysis:
             self.nhit_plots['rblink'  ].fill(np.array(self.c_rblink)) 
             self.nhit_plots['miss_hit'].fill(np.array(self.c_miss_hit)) 
             self.nhit_plots['nc_pdls'] .fill(np.array(self.c_nc_pid))
-            if self.beta_analysis:
-                self.tmg_plots['beta'].fill(np.array(self.c_beta))   
-                self.tmg_plots['t_inner'].fill(np.array(self.c_t_inner))
-                self.tmg_plots['t_outer'].fill(np.array(self.c_t_outer))
-                self.tmg_plots['t_diff'] .fill(np.array(self.c_t_diff))
-                self.tmg_plots['ph_delay'].fill(np.array(self.c_ph_delay))
-                self.c_beta.clear()
-            self.c_t_inner .clear() 
-            self.c_t_outer .clear() 
-            self.c_t_diff  .clear() 
-            self.c_ph_delay.clear() 
+            # nhit  
             self.c_hit     .clear()
             self.c_thit    .clear()
             self.c_rblink  .clear()
             self.c_miss_hit.clear()
             self.c_nc_pid  .clear()
+            if self.beta_analysis:
+                c_dist_vs_beta  = np.array([ k for k in zip(self.tmg_cache['dist'], self.tmg_cache['beta'])])
+                c_dist_vs_tdiff = np.array([ k for k in zip(self.tmg_cache['dist'], self.tmg_cache['t_diff'])])
+                c_beta_vs_theta = np.array([ k for k in zip(self.tmg_cache['beta'], self.tmg_cache['cos_theta'])])
+                self.tmg_plots['dist_vs_beta'].fill(c_dist_vs_beta)
+                self.tmg_plots['dist_vs_tdiff'].fill(c_dist_vs_tdiff)
+                self.tmg_plots['beta_vs_theta'].fill(c_beta_vs_theta)
+                for k in self.tmg_plots:
+                    if k in ['dist_vs_beta', 'dist_vs_tdiff', 'beta_vs_theta']:
+                        continue
+                    self.tmg_plots[k].fill(np.array(self.tmg_cache[k]))
+                    self.tmg_cache[k].clear()
 
+                #self.tmg_plots['dist']    .fill(np.array(self.c_dist))
+                #self.tmg_plots['cos_theta'].fill(np.array(self.c_cos_theta))
+                #self.tmg_plots['beta'].fill(np.array(self.c_beta))   
+                #self.tmg_plots['t_inner'].fill(np.array(self.c_t_inner))
+                #self.tmg_plots['t_outer'].fill(np.array(self.c_t_outer))
+                #self.tmg_plots['t_diff'] .fill(np.array(self.c_t_diff))
+                #self.tmg_plots['ph_delay'].fill(np.array(self.c_ph_delay))
+                #self.tmg_plots['x_outer'].fill(np.array(self.c_x_outer))
+                #self.tmg_plots['y_outer'].fill(np.array(self.c_y_outer))
+                #self.tmg_plots['z_outer'].fill(np.array(self.c_z_outer))
+                #self.tmg_plots['x_inner'].fill(np.array(self.c_x_inner))
+                #self.tmg_plots['y_inner'].fill(np.array(self.c_y_inner))
+                #self.tmg_plots['z_inner'].fill(np.array(self.c_z_inner))
+                #self.tmg_plots['pid_inner'].fill(np.array(self.c_pid_inner))
+                #self.tmg_plots['pid_outer'].fill(np.array(self.c_pid_outer))
+                #self.c_beta.clear()
+                #self.c_x_outer   .clear()
+                #self.c_y_outer   .clear()
+                #self.c_z_outer   .clear()
+                #self.c_x_inner   .clear()
+                #self.c_y_inner   .clear()
+                #self.c_z_inner   .clear()
+                #self.c_pid_inner .clear()
+                #self.c_pid_outer .clear()
+                #self.c_dist.clear()
+            #self.c_t_inner .clear() 
+            #self.c_t_outer .clear() 
+            #self.c_t_diff  .clear() 
+            #self.c_ph_delay.clear() 
+            #self.c_cos_theta.clear()
+        
         for paddle_id in range(1,161):
-            if len(self.c_charges[paddle_id]) >= self.hit_cache_size:
-                self.paddle_plots[paddle_id]['charge2d' ].fill(np.array(self.c_charges[paddle_id]))
-                self.paddle_plots[paddle_id]['amp_a'    ].fill(np.array(self.c_peaks_a[paddle_id]))  
-                self.paddle_plots[paddle_id]['amp_b'    ].fill(np.array(self.c_peaks_b[paddle_id]))  
-                self.paddle_plots[paddle_id]['time_a'   ].fill(np.array(self.c_times_a[paddle_id]))  
-                self.paddle_plots[paddle_id]['time_b'   ].fill(np.array(self.c_times_b[paddle_id]))  
-                self.paddle_plots[paddle_id]['bl_a'     ].fill(np.array(self.c_baselines_a[paddle_id]))  
-                self.paddle_plots[paddle_id]['bl_b'     ].fill(np.array(self.c_baselines_b[paddle_id]))  
-                self.paddle_plots[paddle_id]['bl_a_rms' ].fill(np.array(self.c_baselines_a_rms[paddle_id]))  
-                self.paddle_plots[paddle_id]['bl_b_rms' ].fill(np.array(self.c_baselines_b_rms[paddle_id]))  
-                self.paddle_plots[paddle_id]['x0'       ].fill(np.array(self.c_positions[paddle_id]))
-                self.paddle_plots[paddle_id]['t0'       ].fill(np.array(self.c_t0s[paddle_id]))
-                self.paddle_plots[paddle_id]['edep'     ].fill(np.array(self.c_edeps[paddle_id]))
-                self.paddle_plots[paddle_id]['pos_edep' ].fill(np.array(self.c_pos_edeps[paddle_id]))
-                # clear the caches after filling
-                self.c_charges        [paddle_id] .clear()
-                self.c_peaks_a        [paddle_id] .clear()
-                self.c_peaks_b        [paddle_id] .clear()
-                self.c_times_a        [paddle_id] .clear()
-                self.c_times_b        [paddle_id] .clear()
-                self.c_baselines_a    [paddle_id] .clear()
-                self.c_baselines_b    [paddle_id] .clear()
-                self.c_baselines_a_rms[paddle_id] .clear()
-                self.c_baselines_b_rms[paddle_id] .clear()
-                self.c_positions      [paddle_id] .clear()
-                self.c_t0s            [paddle_id] .clear()
-                self.c_edeps          [paddle_id] .clear()
-                self.c_pos_edeps      [paddle_id] .clear()
+            for k in self.paddle_plots[paddle_id]:
+                if len(self.paddle_cache[paddle_id][k]) >= self.hit_cache_size:
+                    self.paddle_plots[paddle_id][k].fill(np.array(self.paddle_cache[paddle_id][k]))
+                    self.paddle_cache[paddle_id][k].clear()
 
     def finish(self):
         """
@@ -765,6 +1049,7 @@ class TofAnalysis:
         if self.finished:
             print ("WARN: Analysis has been finished already. Not able to add more events.")
             return
+        
         if self.first_ev_time == np.inf:
             self.first_ev_time = ev.timestamp48
         self.last_ev_time = ev.timestamp48
@@ -786,61 +1071,34 @@ class TofAnalysis:
         if self.use_offsets:
             ev.set_timing_offsets(self.offsets)
             #print (ev)
-        if not self.cuts.void:
-            self.cuts.nevents += 1
-            nhits_cbe = ev.nhits_cbe
-            nhits_umb = ev.nhits_umb
-            nhits_cor = ev.nhits_cor
-            
-            # Count mising hits before (!) we remove non-causal hits
-            # FIXME - this returns bytes and should return ints
-            missing        = [int(k) for k in ev.get_missing_paddles_hg(self.hg_mapping)]
-            self.c_miss_hit.extend(missing)
 
-            # in case we reject non causal hits, do that here
-            hits_rmvd_csl = 0
-            hits_rmvd_ls  = 0
-            if self.cuts.only_causal_hits or self.cuts.ls_cleaning_t_err != np.inf:
-                event_hits            = ev.nhits
-                #hits_total += event_hits
-            if self.cuts.only_causal_hits:
-                rm_pids = ev.remove_non_causal_hits()
-                self.c_nc_pid.extend(rm_pids)
-                hits_rmvd_csl  = len(rm_pids)
-            if self.cuts.ls_cleaning_t_err != np.inf:
-                rm_pids = ev.lightspeed_cleaning(self.cuts.ls_cleaning_t_err)
-                hits_rmvd_ls   = len(rm_pids)
-            cuts_passed = True
-            if self.cuts.fh_must_be_umb:
-                hits_sorted = sorted(ev.hits, key=lambda x: x.event_t0)
-                if hits_sorted:
-                    if  hits_sorted[0].paddle_id < 60 or hits_sorted[0].paddle_id > 108:
-                        cuts_passed = False
-                    else:
-                        self.cuts.fh_umb_acc += 1
-            if not self.cuts.min_hit_cbe <= nhits_cbe <= self.cuts.max_hit_cbe:
-                cuts_passed = False
-            else:
-                self.cuts.hit_cbe_acc += 1
-            if not self.cuts.min_hit_umb <= nhits_umb <= self.cuts.max_hit_umb:
-                cuts_passed = False
-            else:
-                self.cuts.hit_umb_acc += 1
-            if not self.cuts.min_hit_cor <= nhits_cor <= self.cuts.max_hit_cor:
-                cuts_passed = False
-            else:
-                self.cuts.hit_cor_acc += 1
-            if not cuts_passed:
+
+        # before cutting, calculate missing hits
+        # the problem for removing hits right now
+        # is the fact that if we do a hit cleaning,
+        # it will be only for the HG hits and not 
+        # the LG hits, so if we do a missing hit calculation 
+        # after the hit cleaning, we will artificially 
+        # increase the number of missing hits
+        # FIXME - this is currently a bit inconsistent.
+        missing        = [int(k) for k in ev.get_missing_paddles_hg(self.hg_mapping)]
+        self.c_miss_hit.extend(missing)
+
+        # since we might do hit cleaning, for now 
+        # let's explicitly copy the event, see also
+        # issue #82
+        if not self.cuts.void:
+            ev_for_cuts = ev.copy()
+            if not self.cuts.accept(ev_for_cuts):
                 return
-            if self.cuts.only_causal_hits or self.cuts.ls_cleaning_t_err != np.inf:
-                self.cuts.hits_total    = event_hits
-                self.cuts.hits_rmvd_ls  = hits_rmvd_ls
-                self.cuts.hits_rmvd_csl = hits_rmvd_csl
-        else:
-            # Still count missing hits even without cutting
-            # FIXME - this returns bytes and should return ints
-            missing        = [int(k) for k in ev.get_missing_paddles_hg(self.hg_mapping)]
-            self.c_miss_hit.extend(missing)
+        # if desired, apply the cleanings
+        if self.cuts.only_causal_hits:
+            rm_pids = ev.remove_non_causal_hits()
+            self.c_nc_pid.extend(rm_pids)
+            hits_rmvd_csl  = len(rm_pids)
+        if self.cuts.ls_cleaning_t_err != np.inf:
+            rm_pids = ev.lightspeed_cleaning(self.cuts.ls_cleaning_t_err)
+            hits_rmvd_ls   = len(rm_pids)
 
         for h in ev.trigger_hits:
             pid = find_paddle(h, self.paddles.values())
@@ -867,21 +1125,26 @@ class TofAnalysis:
                         inner_h.append(h)
                 else:
                     if h.paddle_id == self.pid_inner:
-                        inner_h = inner_h.append(h)
+                        inner_h.append(h)
             # fill the caches
-            self.c_charges[h.paddle_id].append([h.charge_a, h.charge_b])
-            self.c_peaks_a[h.paddle_id].append(h.peak_a)
-            self.c_peaks_b[h.paddle_id].append(h.peak_b)
-            self.c_times_a[h.paddle_id].append(h.time_a)
-            self.c_times_b[h.paddle_id].append(h.time_b)
-            self.c_baselines_a[h.paddle_id].append(h.baseline_a)
-            self.c_baselines_b[h.paddle_id].append(h.baseline_b)
-            self.c_baselines_a_rms[h.paddle_id].append(h.baseline_a_rms)
-            self.c_baselines_b_rms[h.paddle_id].append(h.baseline_b_rms)
-            self.c_positions[h.paddle_id].append(h.pos/h.paddle_len)
-            self.c_t0s[h.paddle_id].append(h.event_t0)
-            self.c_edeps[h.paddle_id].append(h.edep)
-            self.c_pos_edeps[h.paddle_id].append([h.pos/h.paddle_len, h.edep])
+            #if h.charge_a < 0 or h.charge_b < 0:
+            #    print (h)
+            #    raise ValueError
+            self.paddle_cache[h.paddle_id]['charge2d'].append([h.charge_a, h.charge_b])
+            self.paddle_cache[h.paddle_id]['amp_a']   .append(h.peak_a)
+            self.paddle_cache[h.paddle_id]['amp_b']   .append(h.peak_b)
+            self.paddle_cache[h.paddle_id]['time_a']  .append(h.time_a)
+            self.paddle_cache[h.paddle_id]['time_b']  .append(h.time_b)
+            self.paddle_cache[h.paddle_id]['charge_a'].append(h.charge_a)
+            self.paddle_cache[h.paddle_id]['charge_b'].append(h.charge_b)
+            self.paddle_cache[h.paddle_id]['bl_a']    .append(h.baseline_a)
+            self.paddle_cache[h.paddle_id]['bl_b']    .append(h.baseline_b)
+            self.paddle_cache[h.paddle_id]['bl_a_rms'].append(h.baseline_a_rms)
+            self.paddle_cache[h.paddle_id]['bl_b_rms'].append(h.baseline_b_rms)
+            self.paddle_cache[h.paddle_id]['x0']      .append(h.pos/h.paddle_len)
+            self.paddle_cache[h.paddle_id]['t0']      .append(h.event_t0)
+            self.paddle_cache[h.paddle_id]['edep']    .append(h.edep)
+            self.paddle_cache[h.paddle_id]['pos_edep'].append([h.pos/h.paddle_len, h.edep])
         
         # hit counting 
         n_rblink_ev    = len(ev.rb_link_ids)
@@ -910,49 +1173,28 @@ class TofAnalysis:
             #first_hit = first_hit[0].phase_delay
             #print (inner_h, outer_h)
             diff_h  = inner_h[0].event_t0 - outer_h[0].event_t0 
-            beta = (distance(inner_h[0],outer_h[0])/1000)/(diff_h*1e-9)/299792458
+            dist = distance(inner_h[0],outer_h[0])/1000
+            cos_theta = abs(outer_h[0].z - inner_h[0].z)/(1000*dist)  
+            beta = dist/(diff_h*1e-9)/299792458
+            self.tmg_cache['dist']   .append(dist)
+            self.tmg_cache['x_outer'].append(outer_h[0].x)
+            self.tmg_cache['y_outer'].append(outer_h[0].y)
+            self.tmg_cache['z_outer'].append(outer_h[0].z)
+            self.tmg_cache['x_inner'].append(inner_h[0].x)
+            self.tmg_cache['y_inner'].append(inner_h[0].y)
+            self.tmg_cache['z_inner'].append(inner_h[0].z)
+            self.tmg_cache['pid_inner'].append(inner_h[0].paddle_id)
+            self.tmg_cache['pid_outer'].append(outer_h[0].paddle_id)
+            self.tmg_cache['cos_theta'].append(cos_theta)
+            self.tmg_cache['cos2_theta'].append(cos_theta*cos_theta)
             if beta < 0:
                 beta = -1*beta
-            self.c_beta    .append(beta)
-            self.c_t_outer .append(outer_h[0].event_t0)
-            self.c_t_inner .append(inner_h[0].event_t0)  
-            self.c_t_diff  .append(inner_h[0].event_t0 - outer_h[0].event_t0)  
-            self.c_ph_delay.append(inner_h[0].phase_delay - outer_h[0].phase_delay)
-
-            #self.tmg_plots['beta'].fill(np.array([beta]))   
-             #phase_delay = inner_h[0].phase_delay - outer_h[0].phase_delay
-             #if True:
-             ##if (phase_delay > 20 or phase_delay < -20):
-             #    #    if inner_h[0].phase_delay - outer_h[0].phase_delay > 40:
-             #    result['histo_beta'].fill(np.array([beta])) 
-             #    result['last_pd_outer'] = outer_h[0].phase_delay
-             #    result['last_pd_inner'] = inner_h[0].phase_delay
-             #    for wf in tof_ev.waveforms:
-             #        if wf.paddle_id == outer_h[0].paddle_id:
-             #            rbid = wf.rb_id
-             #            for rbev in tof_ev.rbevents:
-             #                if rbev.header.rb_id == rbid:
-             #                    result['wf_outer'] = rbev.get_waveform(8)
-             #        if wf.paddle_id == inner_h[0].paddle_id:
-             #            rbid = wf.rb_id
-             #            for rbev in tof_ev.rbevents:
-             #                if rbev.header.rb_id == rbid:
-             #                    result['wf_inner'] = rbev.get_waveform(8)
-             #    #print (ev)
-             #    result['histo_t_diff_fst'].fill(np.array([last_hit - first_hit]))
-             #    result['histo_nhit'].fill(np.array([len(hits)]))
-             #    result['histo_t_diff'  ].fill(np.array([diff_h]))
-             #    result['histo_t_inner' ].fill(np.array([inner_h[0].t0]))
-             #    result['histo_t_outer' ].fill(np.array([outer_h[0].t0]))
-             #    result['histo_dist'].fill(np.array([distance(inner_h[0], outer_h[0])/1000]))
-             #    
-             #    result['histo_pdelay'].fill(np.array([phase_delay]))
-             #    result['histo_ph_out'].fill(np.array([outer_h[0].phase_delay]))
-             #    result['histo_ph_in'].fill(np.array([inner_h[0].phase_delay]))
-
-             #    result['histo_hit_pid'].fill(np.array([inner_h[0].paddle_id]))
-             #    result['histo_hit_pid'].fill(np.array([outer_h[0].paddle_id]))
-        
+            self.tmg_cache['beta']    .append(beta)
+            self.tmg_cache['t_outer'] .append(outer_h[0].event_t0)
+            self.tmg_cache['t_inner'] .append(inner_h[0].event_t0)  
+            self.tmg_cache['t_diff']  .append(inner_h[0].event_t0 - outer_h[0].event_t0)  
+            self.tmg_cache['ph_delay'].append(inner_h[0].phase_delay - outer_h[0].phase_delay)
+ 
         # fill is the massive bottleneck here, thus let's try to reduce the amount of calls 
         self.fill_histograms()    
         return 

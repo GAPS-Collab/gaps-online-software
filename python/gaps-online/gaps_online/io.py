@@ -75,7 +75,7 @@ except ImportError as e:
 ##################################################################
 
 # universal pattern for various types of files from gaps_online
-FILENAME_PATTERN = re.compile('Run(?P<runid>[0-9]*)_(?P<subrunid>[0-9]*).(?P<timestamp>([0-9_]*UTC)).(tof.gaps|gaps)')
+FILENAME_PATTERN = re.compile('Run(?P<runid>[0-9]*)_(?P<subrunid>[0-9]*).(?P<timestamp>([0-9_]*UTC)).(tofsum.gaps|tof.gaps|gaps)')
 
 ##################################################################
 
@@ -94,7 +94,6 @@ def get_fileinfo(filename : str) -> tuple:
     subrunid = ts.groupdict()['subrunid']
     ts       = ts.groupdict()['timestamp']
     return int(runid), int(subrunid), ts
-
 
 ##################################################################
 

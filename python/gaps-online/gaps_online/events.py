@@ -31,6 +31,7 @@ except ImportError as e:
 
 if import_tl_success:
     MergedEvent = tl.MergedEvent
+    TrackerHit  = tl.TrackerHitV2
 
 if import_rtd_success:
     TofEvent        = rtd.events.TofEvent

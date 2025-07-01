@@ -9,6 +9,8 @@ import numpy as np
 import iminuit
 from iminuit.cost import LeastSquares as ls
 
+import dashi as d
+import json
 #######################
 #
 ## Errors from spatial dimensions of paddles/strips
@@ -23,20 +25,6 @@ class FitStatus(Enum):
     Success        = 42
 
 ##############################################
-
-def line3d(z, x_a, y_a, z_a, dx, dy, dz):
-    """
-    describe line depending on z since that is our
-    best constrained value
-
-    This model has 6 free parameters, 3 for 
-    the anchor point and 3 for the direction
-    """
-    x = x_a + ((dx/dz) * (z - z_a))
-    y = y_a + ((dy/dz) * (z - z_a))
-    return x,y,z
-
-####################################################
 
 def line3d_2pts(z, tu_x, tu_y, tu_z, tl_x, tl_y, tl_z):
     """
@@ -59,6 +47,23 @@ def line3d_2pts(z, tu_x, tu_y, tu_z, tl_x, tl_y, tl_z):
 
 ##############################################
 
+def line3d(z, x_a, y_a, z_a, dx, dy, dz):
+    """
+    describe line depending on z since that is our
+    best constrained value
+
+    This model has 6 free parameters, 3 for 
+    the anchor point and 3 for the direction
+    """
+    # FIXME - proper treatment of ZeroDivisionError
+    if dz == 0:
+        dz = 1e-5
+    x = x_a + ((dx/dz) * (z - z_a))
+    y = y_a + ((dy/dz) * (z - z_a))
+    return x,y,z
+
+####################################################
+
 class LeastSquares:
     """
     Generic least-squares cost function with error.
@@ -75,7 +80,7 @@ class LeastSquares:
         self.y_err = y_err
 
     def __call__(self, *par):  # we accept a variable number of model parameters
-        xm,ym,zm = self.model(self.z, *par)
+        xm,ym,__ = self.model(self.z, *par)
         value    = np.sum(np.sqrt( ((self.x - xm ) ** 2 /self.x_err ** 2) + ((self.y - ym)**2 / self.y_err ** 2))) 
         #thesum = np.sum(((self.y - ym) ** 2 / self.y_err ** 2) + ((self.z - zm) ** 2 / self.z_err **2 ))
         #return thesum
@@ -83,11 +88,26 @@ class LeastSquares:
 
 #########################################################
 
-def line_fit(xs, ys, zs, errs_x=None, errs_y=None):
-    
+def line_fit(xs, ys, zs, errs_x=None, errs_y=None, errs_z=None, search_anchor = False):
+    """
+
+    # Arguments:
+
+        * search anchor : perform the fit multiple times, once per point. Select a different 
+                          anchor point for the line each time (one of the hits) until all hits
+                          have been used. Return the line with the best chi2.
+    """
+
+    assert len(xs) == len(ys) == len(zs)
+
     if errs_x is None:
         errs_x = 10*np.ones(len(xs)) 
+    if errs_y is None:
         errs_y = 10*np.ones(len(ys))
+    if errs_z is None:
+        errs_z = 1*np.ones(len(zs))
+    
+    # rerutn a line for a convenience
 
     # the line3d takes z values and needs 6 parameters
     model = LeastSquares(line3d, xs, ys, zs, errs_x, errs_y)
@@ -110,16 +130,87 @@ def line_fit(xs, ys, zs, errs_x=None, errs_y=None):
     m.migrad()
     m.migrad()
 
-    def line(line_z_vals):
-        return line3d(line_z_vals, *m.values)
-    return line, m.fval
+    if search_anchor:
+        #print ('RECO - iterative method (anchor search)')
+        current_best = (m.fval, m.values)
+        for k in range(1,len(xs)):
+            x,y,z    = xs[k],ys[k],zs[k]
+            dx,dy,dz = xs[k] - xs[k-1], ys[k] - ys[k-1], zs[k] - zs[k-1]
+            m = iminuit.Minuit(model, x, y, z, dx, dy, dz)
+            m.migrad()
+            m.migrad()
+            #recps.append((m.fval, m.values)
+            if m.fval < current_best[0]:
+                current_best = (m.fval, m.values)
+            #print (f"RECO : Use anchor {x:.2f} {y:.2f} {z:.2f} ==> chi2 {m.fval:.2f}")
+        def line(line_z_vals):
+            return line3d(line_z_vals, *current_best[1])
+        return line, current_best[0]  
+    else:
+        #print ('RECO - non-iterative method')
+        def line(line_z_vals):
+            return line3d(line_z_vals, *m.values)
+
+        return line, m.fval
 
 #########################################################3
 
 class Reconstruction:
 
-    def __init__(self):
-        pass
+    def __init__(self, nbins = 100, active = False):
+        self.active    = active
+        self.CHIBINS   = np.linspace(0,500, nbins)
+        self.COS2_BINS = np.linspace(0,1.1, nbins)
+        self.BETA_BINS = np.linspace(-0.5,1.5, nbins)
+        self.nevents   = 0
+        self.event_cache_size = 1000000
+        self.chi2_c    = []
+        self.chi2      = d.histogram.hist1d(self.CHIBINS)
+        self.cos2_c    = []
+        self.cos2      = d.histogram.hist1d(self.COS2_BINS)
+        self.beta_c    = []
+        self.beta      = d.histogram.hist1d(self.BETA_BINS)
+        self.finished  = False
+        self.offsets = dict()
+        offsets = json.load(open('offsets.json'))
+        for k in offsets:
+            k_int = int(k)
+            # currently we only have intra-panel calibrations
+            if k_int <= 12:
+                self.offsets[k_int] = offsets[k]
+
+    def __iadd__(self, other):
+        self.chi2_c.extend(other.chi2_c)
+        self.cos2_c.extend(other.cos2_c)
+        self.beta_c.extend(other.beta_c)
+        self.chi2 += other.chi2
+        self.cos2 += other.cos2 
+        self.beta += other.beta
+        self.nevents += other.nevents
+        return self
+
+    def __add__(self, other):
+        new_reco = Reconstruction()
+        new_reco += self
+        new_reco += other
+        return new_reco
+
+    def fill_histograms(self):
+        if len(self.chi2_c) > self.event_cache_size:
+            self.chi2.fill(np.array(self.chi2_c))
+            self.chi2_c.clear()
+            self.cos2.fill(np.array(self.cos2_c))
+            self.cos2_c.clear()
+            self.beta.fill(np.array(self.beta_c))
+            self.beta_c.clear()
+
+    def finish(self):
+        ev_cache_size = self.event_cache_size
+        self.event_cache_size = 1
+        self.fill_histograms()
+        self.finished = True
+        self.event_cache_size = ev_cache_size
+
 
     def reco(self, ev):
         xs = [k[0] for k in ev.tracker_pointcloud]
@@ -131,11 +222,35 @@ class Reconstruction:
         zs = [k[2] for k in ev.tracker_pointcloud]
         zs.extend([h.z for h in ev.tof.hits])
 
+        ev.tof.normalize_hit_times()
+        ev.tof.set_timing_offsets(self.offsets)
+        ev.tof.remove_non_causal_hits()
+        ev.tof.lightspeed_cleaning(0.35)
+        ts = [(h.event_t0,h.x,h.y,h.z) for h in ev.tof.hits]
+        ts = sorted(ts, key=lambda x: x[0])
+        first_t = ts[0][0]
+        last_t  = ts[-1][0]
+        diff_h = last_t - first_t
         xs = np.array(xs)
         ys = np.array(ys)
         zs = np.array(zs)
-
+        if len(xs) < 2:
+            return
         reco = line_fit(xs, ys, zs)
+        self.chi2_c.append(reco[1])
+        
+        # get the cosine by just selecting
+        # two points on the line
+        reco_f = reco[0]
+        a = reco_f(0)
+        b = reco_f(1000)
+        d = np.sqrt((a[0] - b[0])**2 + (a[1] - b[1])**2 + (a[2] - b[2])**2)
+        cos_theta = (b[2] - a[2])/d
+        dist = np.sqrt((ts[-1][1] - ts[0][1])**2 + (ts[-1][2] - ts[0][2])**2 + (ts[-1][3] - ts[0][3])**2)
+        beta = (dist/1000)/(diff_h*1e-9)/299792458  
+        print (f'RECO BETA {beta}, DIST {dist}, TDIFF {diff_h}')
+        self.beta_c.append(beta)
+        self.cos2_c.append(cos_theta*cos_theta)
         return reco
 
 #

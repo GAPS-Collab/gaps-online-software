@@ -406,10 +406,11 @@ def unroll_cbe_sides(paddle_occupancy = {},
             if not paddle_occupancy[pdl.paddle_id] and indicate_empty:
                 color = indicate_empty
             axs[0].add_patch(pdl.draw_yz(fill=True, edgecolor=color, facecolor=color))
-        if event is not None:
-            axs[0].add_patch(pdl.draw_yz(fill=False, facecolor='tab:blue', **paddle_style))
         else:
-            axs[0].add_patch(pdl.draw_yz(fill=True, edgecolor='k', facecolor='w'))
+            if event is not None:
+                axs[0].add_patch(pdl.draw_yz(fill=False, facecolor='tab:blue', **paddle_style))
+            else:
+                axs[0].add_patch(pdl.draw_yz(fill=True, edgecolor='k', facecolor='w'))
     
 
     ##for pdl in cbe_front:
@@ -830,10 +831,16 @@ def unroll_cor(paddle_occupancy = {},
 def tof_2dproj(event            = None,
                cmap             = matplotlib.colormaps['seismic'],
                paddle_style     = {'edgecolor' : 'w', 'lw' : 0.4},
-               show_cbar        = True) -> list:
+               show_cbar        = True,
+               no_ax_no_ticks   = False,
+               cs_is_energy     = False,
+               cnorm_max        = None) -> list:
     """
     Plots the entire TOF system in 2d projection, that is all panels 
     overlaid on each other
+
+    # Keyword Arguments:
+        cs_is_energy : use the colorscale for energy instead of timing
 
     # Returns:
         list of figures, xy, xz, xy projections
@@ -847,7 +854,12 @@ def tof_2dproj(event            = None,
     if event is not None:
         ts = np.array([h.t0 for h in event.hits])
         cm_norm_pts = plt.Normalize(vmin=min(ts), vmax=max(ts))
-
+        if cs_is_energy:
+            edeps = np.array([h.edep for h in event.hits])
+            if cnorm_max is None:
+                cm_norm_pts = plt.Normalize(vmin=min(edeps), vmax=max(edeps))
+            else:
+                cm_norm_pts = plt.Normalize(vmin=0, vmax=cnorm_max)
     for pdl in paddles:
         if event is not None:
             ax.add_patch(pdl.draw_xy(fill=False,\
@@ -858,8 +870,12 @@ def tof_2dproj(event            = None,
             ax.add_patch(pdl.draw_xy(fill=True, edgecolor='k', facecolor='w'))
     if event is not None:
         for h in event.hits:
-            ax.scatter([0.1*h.x], [0.1*h.y], alpha = 0.8 , marker='o', s=100*h.edep,
-                        lw=1.5, edgecolor=paddle_style['edgecolor'], color=cmap(cm_norm_pts(h.t0)))
+            if cs_is_energy:
+                ax.scatter([0.1*h.x], [0.1*h.y], alpha = 0.8 , marker='o', s=100*h.edep,
+                           lw=1.5, edgecolor=paddle_style['edgecolor'], color=cmap(cm_norm_pts(h.edep)))
+            else:
+                ax.scatter([0.1*h.x], [0.1*h.y], alpha = 0.8 , marker='o', s=100*h.edep,
+                           lw=1.5, edgecolor=paddle_style['edgecolor'], color=cmap(cm_norm_pts(h.t0)))
     ax.grid(0) 
     ax.set_xlabel('x [cm]', loc='right')
     ax.set_ylabel('y [cm]', loc='top')#, rotation=90)
@@ -867,8 +883,11 @@ def tof_2dproj(event            = None,
     ax.set_xlim(-200, 200)
     ax.set_ylim(-200, 200)
     ax.set_title(title, loc='right')
-    ax.spines['top'].set_visible(True)
-    ax.spines['right'].set_visible(True)
+    if no_ax_no_ticks:
+        ax.set_axis_off()
+    else:
+        ax.spines['top'].set_visible(True)
+        ax.spines['right'].set_visible(True)
     projection_figures.append(fig)
     
     # XZ projection
@@ -889,7 +908,11 @@ def tof_2dproj(event            = None,
             ax.add_patch(pdl.draw_xz(fill=True, edgecolor='k', facecolor='w'))
     if event is not None:
         for h in event.hits:
-            ax.scatter([0.1*h.x], [0.1*h.z], alpha = 0.8 , marker='o', s=100*h.edep,
+            if cs_is_energy:
+                ax.scatter([0.1*h.x], [0.1*h.z], alpha = 0.8 , marker='o', s=100*h.edep,
+                        lw=1.5, edgecolor=paddle_style['edgecolor'], color=cmap(cm_norm_pts(h.edep)))
+            else:
+                ax.scatter([0.1*h.x], [0.1*h.z], alpha = 0.8 , marker='o', s=100*h.edep,
                         lw=1.5, edgecolor=paddle_style['edgecolor'], color=cmap(cm_norm_pts(h.t0)))
     ax.grid(0) 
     ax.set_xlabel('x [cm]', loc='right')
@@ -898,13 +921,28 @@ def tof_2dproj(event            = None,
     ax.set_xlim(-200, 200)
     ax.set_ylim(-25, 250)
     ax.set_title(title, loc='right')
-    ax.spines['top'].set_visible(True)
-    ax.spines['right'].set_visible(True)
+
+    if no_ax_no_ticks:
+        ax.set_axis_off()
+    else:
+        ax.spines['top'].set_visible(True)
+        ax.spines['right'].set_visible(True)
+    if show_cbar:
+        cbar_ax = fig.add_axes([0.9, 0.0, 0.05, 1.0])
+        cbar_ax.set_axis_off()
+        sm = cm.ScalarMappable(cmap=cmap, norm=matplotlib.colors.Normalize())
+        #sm.set_array([0, 1])
+        #ax = plt.sca(cbar_ax)
+        if cs_is_energy:
+            plt.colorbar(sm, ax=cbar_ax, label='Energy Dep. [MeV]')
+        else:
+            plt.colorbar(sm, ax=cbar_ax, label='Timing [ns]')
+        fig.sca(ax)
     projection_figures.append(fig)
 
     # YZ projection
     fig = plt.figure(figsize=lo.FIGSIZE_A4_SQUARE)
-    ax = fig.gca()
+    ax  = fig.gca()
     title           = 'XY projection'
     if event is not None:
         ts = np.array([h.t0 for h in event.hits])
@@ -920,7 +958,11 @@ def tof_2dproj(event            = None,
             ax.add_patch(pdl.draw_yz(fill=True, edgecolor='k', facecolor='w'))
     if event is not None:
         for h in event.hits:
-            ax.scatter([0.1*h.y], [0.1*h.z], alpha = 0.8 , marker='o', s=100*h.edep,
+            if cs_is_energy:
+                ax.scatter([0.1*h.y], [0.1*h.z], alpha = 0.8 , marker='o', s=100*h.edep,
+                           lw=1.5, edgecolor=paddle_style['edgecolor'], color=cmap(cm_norm_pts(h.edep)))
+            else:
+                ax.scatter([0.1*h.y], [0.1*h.z], alpha = 0.8 , marker='o', s=100*h.edep,
                         lw=1.5, edgecolor=paddle_style['edgecolor'], color=cmap(cm_norm_pts(h.t0)))
     ax.grid(0) 
     ax.set_xlabel('y [cm]', loc='right')
@@ -929,10 +971,12 @@ def tof_2dproj(event            = None,
     ax.set_xlim(-200, 200)
     ax.set_ylim(-25, 250)
     ax.set_title(title, loc='right')
-    ax.spines['top'].set_visible(True)
-    ax.spines['right'].set_visible(True)
+    if no_ax_no_ticks:
+        ax.set_axis_off()
+    else:
+        ax.spines['top'].set_visible(True)
+        ax.spines['right'].set_visible(True)
     projection_figures.append(fig)
-
     return projection_figures
 
 ###############################################
