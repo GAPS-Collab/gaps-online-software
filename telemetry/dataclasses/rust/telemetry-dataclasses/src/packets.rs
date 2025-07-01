@@ -671,7 +671,7 @@ impl TrackerHitV2 {
  
   /// Calculate the strip id from layer, module, row and channel
   pub fn get_stripid(&self) -> u32 {
-    self.channel as u32 + (self.module as u32)*100 + (self.row as u32)*10000 + (self.layer as u32)*10000
+    self.channel as u32 + (self.module as u32)*100 + (self.row as u32)*10000 + (self.layer as u32)*100000
   }
 
   pub fn set_coordinates(&mut self, strip_map : &HashMap<u32, TrackerStrip>) {
