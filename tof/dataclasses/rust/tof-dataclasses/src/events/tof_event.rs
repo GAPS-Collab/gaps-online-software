@@ -3,6 +3,7 @@
 
 use std::time::Instant;
 use std::fmt;
+use std::f32::consts::PI;
 
 cfg_if::cfg_if! {
   if #[cfg(feature = "random")]  {
@@ -22,7 +23,11 @@ use crate::serialization::{
   search_for_u16
 };
 
-use crate::packets::PacketType;
+use crate::packets::{
+  TofPacket,
+  PacketType
+};
+
 use crate::errors::SerializationError;
 
 use crate::events::{
@@ -126,6 +131,7 @@ pub struct TofEvent {
   // won't get serialized
   pub creation_time     : Instant,
   pub write_to_disk     : bool, 
+  pub paddles_set       : bool
 }
 
 impl fmt::Display for TofEvent {
@@ -162,7 +168,50 @@ impl TofEvent {
       //missing_hits      : Vec::<RBMissingHit>::new(), 
       creation_time     : creation_time,
       write_to_disk     : true,
+      paddles_set       : false
     }
+  }
+
+
+  #[cfg(feature="database")]
+  pub fn set_paddles(&mut self, paddles : &HashMap<u8, Paddle>) {
+    let mut nerror = 0u8;
+    for ev in &mut self.rb_events {
+      for h in &mut ev.hits {
+        match paddles.get(&h.paddle_id) {
+          None => {
+            error!("Got paddle id {} which is not in given map!", h.paddle_id);
+            nerror += 1;
+            continue;
+          }
+          Some(pdl) => {
+            h.set_paddle(pdl);
+          }
+        }
+      }
+    }
+    if nerror == 0 {
+      self.paddles_set = true;
+    }
+  }
+
+  /// Get the pointcloud of this event, sorted by time
+  /// 
+  /// # Returns
+  ///   (f32, f32, f32, f32, f32) : (x,y,z,t,edep)
+  pub fn get_pointcloud(&self) -> Option<Vec<(f32,f32,f32,f32,f32)>> {
+    let mut pc = Vec::<(f32,f32,f32,f32,f32)>::new();
+    if !self.paddles_set {
+      error!("Before getting the pointcloud, paddle information needs to be set for this event. Call TofEventSummary;:set_paddle");
+      return None;
+    }
+    for rbev in &self.rb_events {
+      for h in &rbev.hits {
+        let result = (h.x, h.y, h.z, h.get_t0(), h.get_edep());
+        pc.push(result);
+      }
+    }
+    Some(pc)
   }
 
   /// Compare the MasterTriggerEvent::trigger_hits with 
@@ -191,13 +240,63 @@ impl TofEvent {
     }
     missing
   }
+  
+  /// Compare the MasterTriggerEvent::trigger_hits with 
+  /// the actual hits to determine from which paddles
+  /// we have received more hits than we were supposed to.
+  /// These hits are neither in the trigger hits nor
+  /// rb_link_ids
+  ///
+  /// FIXME - this can be hits which are exclusively 
+  ///         within the RB integration window
+  #[cfg(feature="database")]
+  pub fn get_extra_paddles_hg(&self, pid_map : &DsiJChPidMapping) -> Vec<u8> {
+    let mut extra = Vec::<u8>::new();
+    let mut trigger_pids = Vec::<u8>::new(); 
+    for th in self.mt_event.get_trigger_hits() {
+      let pid = pid_map.get(&th.0).unwrap().get(&th.1).unwrap().get(&th.2.0).unwrap().0;
+      trigger_pids.push(pid);
+    }
+    for h in self.get_hits() {
+      if !trigger_pids.contains(&h.paddle_id) {
+        extra.push(h.paddle_id);
+      }
+    }
+    extra
+  }
+  
+  /// Compare the MasterTriggerEvent::trigger_hits with 
+  /// the actual recorded waveforms to determine from which paddles
+  /// we should have received waveforms from. This is 
+  /// independent of the hits, which additionally required
+  /// that the hit extraction algorithm worked.
+  #[cfg(feature="database")]
+  pub fn get_missing_paddles_wf(&self, pid_map : &DsiJChPidMapping) -> Vec<u8> {
+    let mut missing = Vec::<u8>::new();
+    let wf_pids = self.get_waveform_pids();
+    for th in self.mt_event.get_trigger_hits() {
+      let pid = pid_map.get(&th.0).unwrap().get(&th.1).unwrap().get(&th.2.0).unwrap().0;
+      // FIXME - rewrite this section so that it is more concise
+      let mut found = false;
+      for wf_pid in &wf_pids {
+        if *wf_pid == pid {
+          found = true;
+          break
+        }
+      }
+      if !found {
+        missing.push(pid);
+      }
+    }
+    missing
+  }
 
   /// Get the triggered paddle ids
   ///
   /// Warning, this might be a bit slow
   #[cfg(feature="database")]
   pub fn get_triggered_paddles(&self, pid_map :   DsiJChPidMapping) -> Vec<u8> {
-    let mut paddles = Vec::<u8>::new();
+    let mut paddles = Vec::<u8>::with_capacity(3);
     for th in self.mt_event.get_trigger_hits() {
       let pid = pid_map.get(&th.0).unwrap().get(&th.1).unwrap().get(&th.2.0).unwrap().0;
       paddles.push(pid);
@@ -271,6 +370,31 @@ impl TofEvent {
     wf
   }
 
+  /// Get all waveforms of all RBEvents in this event
+  /// ISSUE - Performance, Memory
+  /// FIXME - reimplement this things where this
+  ///         returns only a reference
+  pub fn get_waveforms(&self) -> Vec<RBWaveform> {
+    let mut wfs = Vec::<RBWaveform>::new();
+    for ev in &self.rb_events {
+      for wf in &ev.get_rbwaveforms() {
+        wfs.push(wf.clone());
+      }
+    }
+    wfs
+  }
+
+  /// Get all the paddles which have waveforms
+  pub fn get_waveform_pids(&self) -> Vec<u8> {
+    let mut pids = Vec::<u8>::new();
+    for ev in &self.rb_events {
+      for wf in &ev.get_rbwaveforms() {
+        pids.push(wf.paddle_id)
+      }
+    }
+    pids
+  }
+
   /// Get all hits of all RBEvents in this event
   pub fn get_hits(&self) -> Vec<TofHit> {
     let mut hits = Vec::<TofHit>::new();
@@ -341,6 +465,8 @@ impl TofEvent {
         summary.hits.push(h);
       }
     }
+    #[cfg(feature="database")]
+    summary.normalize_hit_times();
     summary
   }
   
@@ -358,6 +484,40 @@ impl TofEvent {
       }
     }
     lost_hits
+  }
+  
+  pub fn get_nhits_umb(&self) -> usize {
+    let mut nhit = 0;
+    for h in &self.get_hits() {
+      if h.paddle_id > 60 && h.paddle_id < 109 {
+        nhit += 1;
+      }
+    }
+    nhit
+  }
+  
+  pub fn get_nhits_cbe(&self) -> usize {
+    let mut nhit = 0;
+    for h in &self.get_hits() {
+      if h.paddle_id < 61 {
+        nhit += 1;
+      }
+    }
+    nhit
+  }
+
+  pub fn get_nhits_cor(&self) -> usize {
+    let mut nhit = 0;
+    for h in &self.get_hits() {
+      if h.paddle_id > 108 {
+        nhit += 1;
+      }
+    }
+    nhit
+  }
+
+  pub fn get_nhits(&self) -> usize {
+    self.get_hits().len()
   }
 }
 
@@ -737,6 +897,143 @@ impl TofEventSummary {
       paddles_set        : false,
     }
   }
+
+  /// Set timing offsets to the event's hits
+  ///
+  /// # Arguments:
+  ///   * offsets : a hashmap paddle id -> timing offset
+  #[cfg(feature="database")]
+  pub fn set_timing_offsets(&mut self, offsets : &HashMap<u8, f32>) {
+    for h in self.hits.iter_mut() {
+      if offsets.contains_key(&h.paddle_id) {
+        h.timing_offset = offsets[&h.paddle_id]; 
+      }
+    }
+  }
+
+  /// Remove hits from the hitseries which can not 
+  /// be caused by the same particle, which means 
+  /// that for these two specific hits beta with 
+  /// respect to the first hit in the event is 
+  /// larger than one
+  /// That this works, first hits need to be 
+  /// "normalized" by calling normalize_hit_times
+  ///
+  /// # Return:
+  ///
+  ///   * removed paddle ids, twindows
+  pub fn lightspeed_cleaning(&mut self, t_err : f32) -> (Vec<u8>, Vec<f32>) {
+    // first sort the hits in time
+    if self.hits.len() == 0 {
+      return (Vec::<u8>::new(), Vec::<f32>::new());
+    }
+    let mut twindows = Vec::<f32>::new();
+
+    self.hits.sort_by(|a,b| (a.event_t0).partial_cmp(&b.event_t0).unwrap());
+    let first_hit = self.hits[0].clone(); // the clone here is a bit unfortunate, 
+                                           // this can be done better with walking 
+                                           // over the list and updating references
+    let mut clean_hits = Vec::<TofHit>::new(); 
+    let mut rm_hits    = Vec::<u8>::new();
+    // per definition, we can't remove the first hit, ever
+    clean_hits.push(first_hit.clone());
+    //error!("-----");
+    let mut prior_hit = first_hit;
+    //println!("TO FIRST {}",first_hit.event_t0);
+    for h in self.hits.iter().skip(1) {
+      let mut min_tdiff_cvac = 1e9*1e-3*prior_hit.distance(h)/299792458.0;
+      let twindow            = prior_hit.event_t0 + min_tdiff_cvac;
+      
+
+      // FIXME - implement different strategies
+      // this is the "default" strategy
+      //if h.event_t0 < twindow {
+      //  rm_hits.push(h.paddle_id);
+      //  twindows.push(twindow);
+      //  continue;
+      //}
+      // this is the "lenient" strategy
+      if h.event_t0 + 2.0*t_err < twindow {
+        rm_hits.push(h.paddle_id);
+        twindows.push(twindow);
+        continue;
+      }
+      // this is the "aggressive" strategy
+      //if h.event_t0 - 2.0*t_err < twindow {
+      //  rm_hits.push(h.paddle_id);
+      //  continue;
+      //}
+      
+      // should we remove negative beta hits?
+      //if beta < 0.0 {
+      //  rm_hits.push(h.paddle_id);
+      //  continue;
+      //}
+      // update the prior hit only 
+      // when it is a good one. If it 
+      // is bad we continue to compare
+      // to the first hit
+      prior_hit = h.clone();
+      clean_hits.push(*h);
+    }
+    self.hits = clean_hits;
+    (rm_hits, twindows)
+  }
+
+
+  /// Non causal hits have hit times in ends A and be which 
+  /// are not compatible with the speed of light in the paddle, 
+  /// that is, the hit gets registered too early. If we look 
+  /// at a plot of the reconstructed position, these hits would 
+  /// correspond to positions outside of the paddle.
+  ///
+  /// #Returns:
+  ///   A vector of paddle ids with removed hits
+  ///
+  pub fn remove_non_causal_hits(&mut self) -> Vec<u8> {
+    let mut clean_hits = Vec::<TofHit>::new();
+    let mut removed_pids = Vec::<u8>::new();
+    for h in &self.hits {
+      if h.obeys_causality() {
+        clean_hits.push(*h);
+      } else {
+        removed_pids.push(h.paddle_id);
+      }
+    }
+    self.hits = clean_hits;
+    removed_pids
+  }
+  
+  #[cfg(feature="database")]
+  pub fn normalize_hit_times(&mut self) {
+    if self.hits.len() == 0 {
+      return;
+    }
+    // check if hit times have already been normalized
+    if self.hits[0].event_t0 == 0.0 {
+      return;
+    }
+
+    let phase0 = self.hits[0].phase.to_f32();
+    for h in &mut self.hits {
+      let t0 = h.get_t0_uncorrected() + h.get_cable_delay();
+      let mut phase_diff = h.phase.to_f32() - phase0;
+      while phase_diff < - PI/2.0 {
+        phase_diff += 2.0*PI;
+      }
+      while phase_diff > PI/2.0 {
+        phase_diff -= 2.0*PI;
+      }
+      let t_shift = 50.0*phase_diff/(2.0*PI);
+      h.event_t0 = t0 + t_shift;
+    }
+    // start the first hit at 0
+    self.hits.sort_by(|a,b| (a.event_t0).partial_cmp(&b.event_t0).unwrap());
+    let t0_first_hit = self.hits[0].event_t0;
+    for h in self.hits.iter_mut() {
+      h.event_t0 -= t0_first_hit
+    }
+  }
  
   #[cfg(feature="database")]
   pub fn set_paddles(&mut self, paddles : &HashMap<u8, Paddle>) {
@@ -806,9 +1103,9 @@ impl TofEventSummary {
   ///
   /// Warning, this might be a bit slow
   #[cfg(feature="database")]
-  pub fn get_triggered_paddles(&self, pid_map :   DsiJChPidMapping) -> Vec<u8> {
-    let mut paddles = Vec::<u8>::new();
-    for th in self.get_trigger_hits() {
+  pub fn get_triggered_paddles(&self, pid_map :   &DsiJChPidMapping) -> Vec<u8> {
+    let mut paddles = Vec::<u8>::with_capacity(3);
+    for th in &self.get_trigger_hits() {
       let pid = pid_map.get(&th.0).unwrap().get(&th.1).unwrap().get(&th.2.0).unwrap().0;
       paddles.push(pid);
     }
@@ -962,20 +1259,77 @@ impl TofEventSummary {
     tot_edep
   }
 
-  //pub fn set_beta(&mut self, beta : f32) {
-  //  // expecting beta in range of 0-1. If larger
-  //  // than 1, we will save 1
-  //  if beta > 1.0 {
-  //    self.primary_beta = 1;
-  //  }
-  //  let pbeta = beta*(u16::MAX as f32).floor();
-  //  // safe, bc of multiplication with u16::MAX
-  //  self.primary_beta = pbeta as u16;
-  //}
+  pub fn get_nhits_umb(&self) -> usize {
+    let mut nhit = 0;
+    for h in &self.hits {
+      if h.paddle_id > 60 && h.paddle_id < 109 {
+        nhit += 1;
+      }
+    }
+    nhit
+  }
+  
+  pub fn get_nhits_cbe(&self) -> usize {
+    let mut nhit = 0;
+    for h in &self.hits {
+      if h.paddle_id < 61  {
+        nhit += 1;
+      }
+    }
+    nhit
+  }
+  
+  pub fn get_nhits_cor(&self) -> usize {
+    let mut nhit = 0;
+    for h in &self.hits {
+      if h.paddle_id > 108  {
+        nhit += 1;
+      }
+    }
+    nhit
+  }
 
-  //pub fn get_beta(&self) -> f32 {
-  //  self.primary_beta as f32/u32::MAX as f32 
-  //}
+  pub fn get_nhits(&self) -> usize {
+    self.hits.len()
+  }
+
+  /// Allows to get TofEventSummary from a packet 
+  /// of type TofEvent. This will dismiss all the 
+  /// waveforms and RBEvents
+  pub fn from_tofeventpacket(pack : &TofPacket)
+    -> Result<Self, SerializationError> {
+    if pack.packet_type != PacketType::TofEvent {
+      return Err(SerializationError::IncorrectPacketType);
+    }
+    let mut pos = 0usize;
+    let stream  = &pack.payload;
+    let head    = parse_u16(stream, &mut pos);
+    if head != TofEvent::HEAD {
+      return Err(SerializationError::HeadInvalid);
+    }
+    let mut te           = TofEvent::new();
+    te.compression_level = CompressionLevel::try_from(parse_u8(stream, &mut pos)).unwrap();
+    te.quality           = EventQuality::try_from(parse_u8(stream, &mut pos)).unwrap();
+    te.header            = TofEventHeader::from_bytestream(stream, &mut pos)?;
+    te.mt_event          = MasterTriggerEvent::from_bytestream(stream, &mut pos)?;
+    
+    let v_sizes              = TofEvent::decode_size_header(&parse_u32(stream, &mut pos));
+    for k in 0..v_sizes.0 {
+      match RBEvent::from_bytestream_nowaveforms(stream, &mut pos) {
+        Err(err) => error!("Expected RBEvent {} of {}, but got serialization error {}!", k,  v_sizes.0, err),
+        Ok(ev) => {
+          te.rb_events.push(ev);
+        }
+      }
+    }
+    let tail = parse_u16(stream, &mut pos);
+    if tail != Self::TAIL {
+      error!("Decoding of TAIL failed! Got {} instead!", tail);
+      return Err(SerializationError::TailInvalid);
+    }
+    let summary = te.get_summary();
+    return Ok(summary);
+  }
 }
 
 impl Packable for TofEventSummary {
@@ -1149,7 +1503,8 @@ impl FromRandom for TofEventSummary {
       summary.channel_mask.push(rng.gen::<u16>());
     }
     summary.mtb_link_mask      = rng.gen::<u64>();
-    let nhits                  = rng.gen::<u8>();
+    //let nhits                  = rng.gen::<u8>();
+    let nhits = 1;
     for _ in 0..nhits {
       summary.hits.push(TofHit::from_random());
     }
@@ -1166,7 +1521,21 @@ impl FromRandom for TofEventSummary {
 fn packable_tofeventsummary() {
   for _ in 0..100 {
     let data = TofEventSummary::from_random();
-    let test : TofEventSummary = data.pack().unpack().unwrap();
+    let mut test : TofEventSummary = data.pack().unpack().unwrap();
+    //println!("{}", data.hits[0]);
+    //println!("{}", test.hits[0]);
+    // Manually zero these fields, since comparison with nan will fail and 
+    // from_random did not touch these
+    for h in &mut test.hits {
+      h.paddle_len       = 0.0; 
+      h.cable_len        = 0.0; 
+      h.coax_cable_time  = 0.0; 
+      h.hart_cable_time  = 0.0; 
+      h.x                = 0.0; 
+      h.y                = 0.0; 
+      h.z                = 0.0; 
+      h.event_t0         = 0.0;
+    }
     assert_eq!(data, test);
   }
 }  

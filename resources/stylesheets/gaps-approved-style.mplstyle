@@ -1,0 +1,72 @@
+### GAPS Presentation Figure Style Sheet ###
+### K.Perez, S.Vickers, Jun/2025
+
+# Figure
+
+figure.figsize: 7, 7    
+
+figure.autolayout: True 
+
+savefig.dpi: 600
+
+# Axes
+
+axes.labelsize: 18
+
+axes.titlesize: 20
+
+axes.linewidth: 1.5        
+
+axes.grid: False  
+
+# Spines
+
+axes.spines.top: True
+
+axes.spines.right: True
+
+axes.spines.bottom: True
+
+axes.spines.left: True
+
+# Ticks
+
+xtick.direction: in
+
+ytick.direction: in
+
+xtick.labelsize: 16
+
+ytick.labelsize: 16
+
+xtick.major.size: 6
+
+ytick.major.size: 6
+
+xtick.major.width: 1.5
+
+ytick.major.width: 1.5
+
+xtick.top: True              
+
+ytick.right: True            
+
+xtick.labeltop: False        
+
+ytick.labelright: False      
+
+# Legend
+
+legend.frameon: False
+
+legend.fontsize: 14
+
+legend.loc: upper left            # can override this for best positioning    
+
+# Color
+
+axes.prop_cycle: "cycler('color', ['mediumblue', 'tomato'])"
+
+patch.linewidth: 2
+
+

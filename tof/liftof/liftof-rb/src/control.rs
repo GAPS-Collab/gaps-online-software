@@ -18,10 +18,11 @@ extern crate liftof_lib;
 ///
 /// THe link ID comes from the MTB
 pub fn get_mtb_link_id() -> Result<u32, RegisterError> {
-  trace!("Getting MTB Link ID!");
   let mut val = read_control_reg(MT_LINK_ID)?;
+  debug!("MT_LINK_ID register {:x} reads {}!", MT_LINK_ID, val);
   val = val & 0x01F8;
   val = val >> 3;
+  debug!("mtb link id reads {}", val);
   Ok(val) 
 }
 

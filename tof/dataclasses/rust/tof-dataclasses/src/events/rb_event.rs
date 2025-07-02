@@ -609,6 +609,73 @@ impl RBEvent {
     }
     Ok(&self.adc[ch as usize -1])
   }
+
+  /// Similar to the "official" from_bytestream, this will get the 
+  /// event from a bytestream, omitting the waveforms. This will allow
+  /// for a faster readout in case waveforms are not needed.
+  pub fn from_bytestream_nowaveforms(stream : &Vec<u8>, pos : &mut usize)
+    -> Result<Self, SerializationError> {
+    let mut event = Self::new();
+    if parse_u16(stream, pos) != Self::HEAD {
+      error!("The given position {} does not point to a valid header signature of {}", pos, Self::HEAD);
+      return Err(SerializationError::HeadInvalid {});
+    }
+    event.data_type = DataType::try_from(parse_u8(stream, pos)).unwrap_or(DataType::Unknown);
+    event.status    = EventStatus::try_from(parse_u8(stream, pos)).unwrap_or(EventStatus::Unknown);
+    //let nchan_data  = parse_u8(stream, pos);
+    let n_hits      = parse_u8(stream, pos);
+    event.header    = RBEventHeader::from_bytestream(stream, pos)?;
+    //let ch_ids      = event.header.get_active_data_channels();
+    let stream_len  = stream.len();
+    if event.header.is_event_fragment() {
+      debug!("Fragmented event {} found!", event.header.event_id);
+      let tail_pos = search_for_u16(Self::TAIL, stream, *pos)?;
+      * pos = tail_pos + 2 as usize;
+      // the event fragment won't have channel data, so 
+      // let's move on to the next TAIL marker:ta
+      return Ok(event);
+    }
+    if event.header.drs_lost_trigger() {
+      debug!("Event {} has lost trigger!", event.header.event_id);
+      let tail_pos = search_for_u16(Self::TAIL, stream, *pos)?;
+      * pos = tail_pos + 2 as usize;
+      return Ok(event);
+    }
+    let mut decoded_ch = Vec::<u8>::new();
+    // here is the only change to from_bytestream. 
+    // We are simply skipping the waveforms, but 
+    // still read the hits
+    for ch in event.header.get_channels().iter() {
+      if *pos + 2*NWORDS >= stream_len {
+        error!("The channel data for event {} ch {} seems corrupt! We want to get channels {:?}, but have decoded only {:?}, because the stream ends {} bytes too early!",event.header.event_id, ch, event.header.get_channels(), decoded_ch, *pos + 2*NWORDS - stream_len);
+        let tail_pos = search_for_u16(Self::TAIL, stream, *pos)?;
+        * pos = tail_pos + 2 as usize;
+        return Err(SerializationError::WrongByteSize {})
+      }
+      decoded_ch.push(*ch);
+      // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
+      *pos += 2*NWORDS;
+    }
+    for _ in 0..n_hits {
+      match TofHit::from_bytestream(stream, pos) {
+        Err(err) => {
+          error!("Can't read TofHit! Err {err}");
+          let mut h = TofHit::new();
+          h.valid = false;
+          event.hits.push(h);
+        },
+        Ok(h) => {
+          event.hits.push(h);
+        }
+      }
+    }
+    let tail = parse_u16(stream, pos);
+    if tail != Self::TAIL {
+      error!("After parsing the event, we found an invalid tail signature {}", tail);
+      return Err(SerializationError::TailInvalid);
+    }
+    Ok(event)
+  }
 }
 
 impl Packable for RBEvent {

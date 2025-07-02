@@ -20,6 +20,8 @@
 #include <array>
 #include <format>
 
+#include "result/result.h"
+
 #include "tof_typedefs.h"
 #include "packets/monitoring.h"
 #include "packets/tof_packet.h"
@@ -27,7 +29,9 @@
 #include "calibration.h"
 #include "version.h"
 #include "errors.hpp"
-#include "result/result.h"
+#ifdef BUILD_CXXDB
+#include "database.h"
+#endif
 
 namespace r = result;
 namespace g = Gaps;
@@ -39,10 +43,6 @@ class RBCalibration;
 #define N_LTBS 25
 #define N_CHN_PER_LTB 16
 
-struct RBEventHeader;
-struct RBEvent;
-struct MasterTriggerEvent;
-struct TofHit;
 
 /*********************************************************/
 
@@ -112,7 +112,6 @@ struct std::formatter<EventStatus> : std::formatter<std::string> {
   }
 };
 
-
 /*********************************************************/
 
 static const u8 TRIGGERTYPE_UNKNOWN      = 0;
@@ -178,9 +177,9 @@ std::ostream& operator<<(std::ostream& os, const LTBThreshold& thresh);
  * event status and timestamps.
  */ 
 struct RBEventHeader {
-  static const u16 HEAD = 0xAAAA;
-  static const u16 TAIL = 0x5555;
-  static const u16 SIZE = 30; // size in bytes with HEAD and TAIL
+  static constexpr u16 HEAD = 0xAAAA;
+  static constexpr u16 TAIL = 0x5555;
+  static constexpr u16 SIZE = 30; // size in bytes with HEAD and TAIL
 
   u8   rb_id                 = 0;
   u32  event_id              = 0;
@@ -199,26 +198,116 @@ struct RBEventHeader {
   static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos)
     -> r::Result<RBEventHeader, g::IOError>;
 
-  Vec<u8> get_channels()    const;
-  u8      get_nchan()       const;
-  Vec<u8> get_active_data_channels() const;
-  bool    has_ch9()            const;
-  u8      get_n_datachan()     const;
-  f32     get_fpga_temp()      const;
-  bool    is_event_fragment()  const;
-  bool    drs_lost_trigger()   const;
-  bool    lost_lock()          const;
-  bool    lost_lock_last_sec() const;
-  bool    is_locked()          const;
-  bool    is_locked_last_sec() const;
-
-  std::array<f32, 3> get_sine_fit() const;
-    
+  auto get_channels()             const -> Vec<u8>;
+  auto get_nchan()                const -> u8;
+  auto get_active_data_channels() const -> Vec<u8>;
+  auto has_ch9()                  const -> bool;
+  auto get_n_datachan()           const -> u8;
+  auto get_fpga_temp()            const -> f32;
+  auto is_event_fragment()        const -> bool;
+  auto drs_lost_trigger()         const -> bool;
+  auto lost_lock()                const -> bool;
+  auto lost_lock_last_sec()       const -> bool;
+  auto is_locked()                const -> bool;
+  auto is_locked_last_sec()       const -> bool;
+  auto get_sine_fit()             const -> std::array<f32,3>;
   /// the combined timestamp 
-  u64  get_timestamp48()    const;
-
+  auto get_timestamp48()          const -> u64;
   /// string representation for printing
-  std::string to_string() const;
+  auto to_string()                const -> std::string;
+};
+
+/***********************************************
+ * Reconstructed waveform peak information
+ * 
+ * There should be one TofHit per reconstructed
+ * peak
+ * 
+ *
+ */
+struct TofHit  {
+  static constexpr u16 HEAD = 0xF0F0;
+  static constexpr u16 TAIL = 0xF0F;
+
+  u8   paddle_id;
+  // deprecated
+  bool broken;
+
+  // new variables for V1
+  Gaps::ProtocolVersion version;
+  f32 baseline_a;
+  f32 baseline_a_rms;
+  f32 baseline_b;
+  f32 baseline_b_rms;
+  f32 phase;
+
+  // event wide calculated time
+  f32 event_t0     = 0;
+
+  u32 timestamp32;
+  u16 timestamp16;
+  // don't serialize
+  f32 paddle_len    = 0;  
+  f32 coax_cbl_time = 0;
+  f32 hart_cbl_time = 0;
+
+  u8 ctr_etx;
+  u16 tail = 0xF0F; 
+
+  auto get_time_a()       const -> f32;
+  auto get_time_b()       const -> f32;
+  auto get_peak_a()       const -> f32;
+  auto get_peak_b()       const -> f32;
+  auto get_charge_a()     const -> f32;
+  auto get_charge_b()     const -> f32;
+  auto get_charge_min_i() const -> f32;
+  auto get_x_pos()        const -> f32;
+  auto get_t_avg()        const -> f32;
+  /// get the interaction time of the particle,
+  /// not accounting for cable len and global phase
+  auto get_t0_relative()  const -> f32;
+  auto get_timestamp48()  const -> f64;
+
+  /// The paddle length will not be in the packet,
+  /// but has to be added after the fact
+  void set_paddle_len(f32 paddle_len);
+
+  #if BUILD_CXXDB
+  auto set_paddle(const Gaps::TofPaddle& paddle) -> void;
+  auto get_phase_delay() const -> f32;
+  auto get_cable_delay() const -> f32;
+  auto get_t0()          const -> f32;
+  auto get_edep()        const -> f32;
+  #endif
+
+  static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos)
+    -> TofHit;
+ 
+  // easier print out
+  auto to_string() const -> std::string;
+  
+  private:
+    // we keep this private, since 
+    // the user should use the getters
+    // to get the values converted 
+    // back to f32
+    // deprecated, but kept for compatibility
+    u16 time_a;
+    u16 time_b;
+    u16 peak_a;
+    u16 peak_b;
+    u16 charge_a;
+    u16 charge_b;
+    u16 charge_min_i;
+    u16 x_pos;
+    u16 t_average;
+    
+    f32 time_a_f32   = 0;
+    f32 time_b_f32   = 0;
+    f32 peak_a_f32   = 0;
+    f32 peak_b_f32   = 0;
+    f32 charge_a_f32 = 0;
+    f32 charge_b_f32 = 0;
 };
 
 /**
@@ -230,30 +319,30 @@ struct RBEventHeader {
  *
  */ 
 struct RBEvent {
-  static const u16 HEAD = 0xAAAA;
-  static const u16 TAIL = 0x5555;
+  static constexpr u16 HEAD = 0xAAAA;
+  static constexpr u16 TAIL = 0x5555;
 
   // data type will be an enum
-  u8 data_type         = 0;
-  EventStatus status   = EventStatus::Unknown;
-  RBEventHeader header = RBEventHeader();
-  Vec<Vec<u16>> adc    = Vec<Vec<u16>>(); 
-  Vec<TofHit> hits     = Vec<TofHit>();  
+  u8            data_type = 0;
+  EventStatus   status    = EventStatus::Unknown;
+  RBEventHeader header    = RBEventHeader();
+  Vec<Vec<u16>> adc       = Vec<Vec<u16>>(); 
+  Vec<TofHit>   hits      = Vec<TofHit>();  
  
   RBEvent();
 
-  const Vec<u16>& get_channel_by_label(u8 channel) const;
-  const Vec<u16>& get_channel_by_id(u8 channel) const;
+  auto get_channel_by_label(u8 channel) const -> const Vec<u16>&;
+  auto get_channel_by_id(u8 channel)    const -> const Vec<u16>&;
 
-  const Vec<u16>& get_channel_adc(u8 channel) const; 
+  auto get_channel_adc(u8 channel) const -> const Vec<u16>&; 
  
   /// Get the baseline for a single channel
-  static f32 calc_baseline(const Vec<f32> &volts, usize min_bin, usize max_bin); 
+  static auto calc_baseline(const Vec<f32> &volts, usize min_bin, usize max_bin) -> f32; 
 
-  static RBEvent from_bytestream(const Vec<u8> &bytestream,
-                                 u64 &pos);
+  static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos)
+    -> RBEvent;
 
-  std::string to_string() const;
+  auto to_string() const -> std::string;
 
   private:
 
@@ -261,7 +350,7 @@ struct RBEvent {
      * Check if the channel follows the convention 1-9
      *
      */
-    bool channel_check(u8 channel) const;
+    auto channel_check(u8 channel) const -> bool;
     Vec<u16> _empty_channel = Vec<u16>();
 };
 
@@ -272,10 +361,11 @@ struct RBEvent {
  * RB. RBMissingHit might help with debugging.
  */
 struct RBMissingHit {
+  [[deprecated("Unused/not useful deemed feature")]]
   
-  static const u16 HEAD = 0xAAAA;
-  static const u16 TAIL = 0x5555;
-  static const usize SIZE = 15; // bytes
+  static constexpr u16 HEAD = 0xAAAA;
+  static constexpr u16 TAIL = 0x5555;
+  static constexpr usize SIZE = 15; // bytes
   
   u32 event_id     ;  
   u8  ltb_hit_index;  
@@ -352,11 +442,11 @@ std::ostream& operator<<(std::ostream& os, const CompressionLevel& level);
  */
 struct MasterTriggerEvent {
   /// begin struct marker
-  static const u16 HEAD = 0xAAAA;
+  static constexpr u16 HEAD = 0xAAAA;
   /// end struct marker
-  static const u16 TAIL = 0x5555;
+  static constexpr u16 TAIL = 0x5555;
   /// Variable size for MasterTriggerEvent
-  static const usize SIZE = 0; // size in bytes
+  static constexpr usize SIZE = 0; // size in bytes
   /// 
   EventStatus event_status = EventStatus::Unknown;
   /// event_id as assigned by the MasterTriggerBoard
@@ -380,13 +470,14 @@ struct MasterTriggerEvent {
   
   /// The combined GPS 48bit timestamp
   /// into a 48bit timestamp
-  u64 get_timestamp_gps48() const;
-
-  /// Get absolute timestamp as sent by the GPS
-  u64 get_timestamp_abs48() const;
-  
-  Vec<u8> get_rb_link_ids() const;
-  
+  [[deprecated("The format of the gps timestamp changed and it is only 32 bits as of now")]]
+  auto get_timestamp_gps48() const -> u64;
+  /// Get the timestamp as sent by the GPS
+  auto get_timestamp_gps() const -> u32;
+  /// Get absolute timestamp which is calculated 
+  /// with the help of the 1pps pulse from the GPS
+  auto get_timestamp_abs48() const -> u64;
+  auto get_rb_link_ids()     const -> Vec<u8>;
   /// Get the combination of triggered DSI/J/CH on 
   /// the MTB which formed the trigger. This does 
   /// not include further hits which fall into the 
@@ -399,11 +490,11 @@ struct MasterTriggerEvent {
   /// # Returns
   ///
   ///   Vec<(hit)> where hit is (DSI, J, CH) 
-  Vec<std::tuple<u8, u8, u8, LTBThreshold>> get_trigger_hits() const;
-
+  auto get_trigger_hits() const 
+    -> Vec<std::tuple<u8, u8, u8, LTBThreshold>>;
 
   /// Get the trigger sources from trigger source byte
-  Vec<TriggerType> get_trigger_sources() const; 
+  auto get_trigger_sources() const -> Vec<TriggerType>; 
   /**
    * Factory function for MasterTriggerEvent
    *
@@ -415,13 +506,11 @@ struct MasterTriggerEvent {
    *                    the stream
    *
    */
-  static MasterTriggerEvent from_bytestream(const Vec<u8> &bytestream,
-                                            u64 &pos);
+  static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos)
+    -> MasterTriggerEvent;
   /// String representation of the struct
-  std::string to_string() const;
-
+  auto to_string() const -> std::string;
 };
-
 
 /**
  * A container accounting for a "complete" event of the Tof
@@ -437,15 +526,12 @@ struct MasterTriggerEvent {
  *
  */ 
 struct TofEvent {
-  static const u16 HEAD = 0xAAAA;
-  static const u16 TAIL = 0x5555;
+  static constexpr u16 HEAD = 0xAAAA;
+  static constexpr u16 TAIL = 0x5555;
 
   EventStatus status;
   TofEventHeader header;
   MasterTriggerEvent mt_event;
-
-  /// Get all hits from all rb_events
-  Vec<TofHit> get_hits() const;
 
   /// A container holding the individual events from all RBs with 
   /// triggers in this event  
@@ -482,113 +568,48 @@ struct TofEvent {
    *                PacketType::TofPacket 
    *                
    */
-  static TofEvent from_tofpacket(const TofPacket &packet);
+  static auto from_tofpacket(const TofPacket &packet) -> TofEvent;
 
-  static u32 get_n_rbmissinghits(u32 mask);
-  static u32 get_n_rbevents(u32 mask);
+  #ifdef BUILD_CXXDB
+  /// set a TofPaddle, that is enrich every tofhit with information
+  /// about the corresponding paddle
+  auto set_paddlemap(const Gaps::TofPaddleMap&) -> void;
+  #endif
+    
+  [[deprecated("RBMissingHit is deprecated")]]
+  static auto get_n_rbmissinghits(u32 mask) -> u32;
+  static auto get_n_rbevents(u32 mask) -> u32;
+  /// Get all hits from all rb_events
+  auto get_hits() const -> Vec<TofHit>;
+  /// normalize all the hit times, taking the global ch9 
+  /// phase into account
+  auto normalize_hit_times() -> void;
 
   /// string representation for printing
-  std::string to_string() const;
+  auto to_string() const -> std::string;
 
   /**
    * Get the rb event for a specific board id.
    */
-  const RBEvent& get_rbevent(u8 board_id) const; 
+  auto get_rbevent(u8 board_id) const -> const RBEvent&; 
 
   /**
    * Get the rb event for a specific board id.
    */
-  Vec<u8> get_rbids() const;
+  auto get_rbids() const -> Vec<u8>;
 
   private:
     /**
      * Check if there are more than one RBEvent per board
      * and if the eventids are matching up.
      */
-    bool passed_consistency_check();
+    auto passed_consistency_check() -> bool;
 
     /// an empty event, which can be returned 
     /// in case of a null result.
     RBEvent _empty_event = RBEvent();
 };
 
-/***********************************************
- * Reconstructed waveform peak information
- * 
- * There should be one TofHit per reconstructed
- * peak
- * 
- *
- */
-struct TofHit  {
-  static const u16 HEAD = 0xF0F0;
-  static const u16 TAIL = 0xF0F;
-
-  u8   paddle_id;
-  // deprecated
-  bool broken;
-
-  // new variables for V1
-  Gaps::ProtocolVersion version;
-  f32 baseline_a;
-  f32 baseline_a_rms;
-  f32 baseline_b;
-  f32 baseline_b_rms;
-  f32 phase;
-
-  u32 timestamp32;
-  u16 timestamp16;
-  // don't serialize
-  f32 paddle_len;  
-
-  u8 ctr_etx;
-  u16 tail = 0xF0F; 
-
-  f32 get_time_a()       const;
-  f32 get_time_b()       const;
-  f32 get_peak_a()       const;
-  f32 get_peak_b()       const;
-  f32 get_charge_a()     const;
-  f32 get_charge_b()     const;
-  f32 get_charge_min_i() const;
-  f32 get_x_pos()        const;
-  f32 get_t_avg()        const;
-  f32 get_t0()           const;
-  f64 get_timestamp48()  const;
-
-  /// The paddle length will not be in the packet,
-  /// but has to be added after the fact
-  void set_paddle_len(f32 paddle_len);
-
-  static TofHit from_bytestream(const Vec<u8> &bytestream, 
-                                       u64 &pos);
- 
-  // easier print out
-  std::string to_string() const;
-  
-  private:
-    // we keep this private, since 
-    // the user should use the getters
-    // to get the values converted 
-    // back to f32
-    // deprecated, but kept for compatibility
-    u16 time_a;
-    u16 time_b;
-    u16 peak_a;
-    u16 peak_b;
-    u16 charge_a;
-    u16 charge_b;
-    u16 charge_min_i;
-    u16 x_pos;
-    u16 t_average;
-    
-    f32 time_a_f32;
-    f32 time_b_f32;
-    f32 peak_a_f32;
-    f32 peak_b_f32;
-    f32 charge_a_f32;
-    f32 charge_b_f32;
-};
 
 /************************
  * A part of a TofEvent 
@@ -603,8 +624,8 @@ struct TofHit  {
  *
  */ 
 struct RBWaveform {
-  static const u16 HEAD = 0xAAAA;
-  static const u16 TAIL = 0x5555;
+  static constexpr u16 HEAD = 0xAAAA;
+  static constexpr u16 TAIL = 0x5555;
 
   u32       event_id  ; 
   u8        rb_id     ; 
@@ -612,10 +633,8 @@ struct RBWaveform {
   u16       stop_cell ;
   Vec<u16>  adc       ; 
   
-  static RBWaveform from_bytestream(const Vec<u8> &bytestream, 
-                                    u64 &pos);
-  
-  std::string to_string() const;
+  static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos) -> RBWaveform;
+  auto to_string() const -> std::string;
 };
 
 
@@ -626,8 +645,8 @@ struct RBWaveform {
  *
  */
 struct TofEventSummary {
-  static const u16 HEAD = 0xAAAA;
-  static const u16 TAIL = 0x5555;
+  static constexpr u16 HEAD = 0xAAAA;
+  static constexpr u16 TAIL = 0x5555;
 
   Gaps::ProtocolVersion version ;
   EventStatus status            ; 
@@ -658,13 +677,23 @@ struct TofEventSummary {
   f32         tot_edep_cbe      ;
   f32         tot_edep_cor      ;
   
-  static TofEventSummary from_tofpacket(const TofPacket &packet);
-  static TofEventSummary from_bytestream(const Vec<u8> &stream, 
-                                         u64 &pos);
+  static auto from_tofpacket(const TofPacket &packet)          
+    -> r::Result<TofEventSummary, g::IOError>;
+  static auto from_bytestream(const Vec<u8> &stream, u64 &pos) -> r::Result<TofEventSummary, g::IOError> ;
+  
+  #ifdef BUILD_CXXDB
+  /// set a TofPaddle, that is enrich every tofhit with information
+  /// about the corresponding paddle
+  auto set_paddlemap(const Gaps::TofPaddleMap&) -> void;
+  /// normalize all the hit times, taking the global ch9 
+  /// phase into account
+  auto normalize_hit_times() -> void;
+  #endif
+
   // combined timestamp
-  u64  get_timestamp48()    const;
+  auto get_timestamp48() const -> u64;
  
-  Vec<u8> get_rb_link_ids() const;
+  auto get_rb_link_ids() const -> Vec<u8>;
   
   /// Get the combination of triggered DSI/J/CH on 
   /// the MTB which formed the trigger. This does 
@@ -678,13 +707,11 @@ struct TofEventSummary {
   /// # Returns
   ///
   ///   Vec<(hit)> where hit is (DSI, J, CH) 
-  Vec<std::tuple<u8, u8, u8, LTBThreshold>> get_trigger_hits() const;
-
-
+  auto get_trigger_hits() const -> Vec<std::tuple<u8, u8, u8, LTBThreshold>>;
   /// Get the trigger sources from trigger source byte
-  Vec<TriggerType> get_trigger_sources() const; 
+  auto get_trigger_sources() const -> Vec<TriggerType>; 
   
-  std::string to_string() const;
+  auto to_string() const -> std::string;
 };
 
 std::ostream& operator<<(std::ostream& os, const TofHit& pad);

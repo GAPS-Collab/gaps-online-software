@@ -3,12 +3,10 @@
 #include "serialization.h"
 #include "parsers.h"
 
-// this is just stupid imo
-//https://stackoverflow.com/questions/4891067/weird-undefined-symbols-of-static-constants-inside-a-struct-class
-const u16 TofPacket::HEAD;
-const u16 TofPacket::TAIL;
+namespace g = Gaps;
+using namespace result;
 
-std::string packet_type_to_string(const PacketType pt) {
+auto packet_type_to_string(const PacketType pt) -> std::string {
   switch (pt) { 
       case PacketType::Unknown : {
       return "Unknown";
@@ -89,24 +87,20 @@ TofPacket::TofPacket() {
 
 /**************************************************/
 
-TofPacket TofPacket::from_bytestream(const Vec<u8> &bytestream,
-                                     u64           &pos){ 
+auto TofPacket::from_bytestream(const Vec<u8> &bytestream, u64 &pos) 
+  -> Result<TofPacket, Gaps::IOError> { 
   TofPacket packet = TofPacket();
-  if (bytestream.size() <= pos) {
-    log_debug("Bytestream exhausted, returning empty packet!");
-    return packet;
-  }
-  if (bytestream.size() <= pos + 1) {
-    log_debug("Bytestream exhausted, returning empty packet!");
-    return packet;
-  }
   if (bytestream.size() <= pos + 2) {
-    log_debug("Bytestream exhausted, returning empty packet!");
-    return packet;
+    auto message = std::format("Bytestream is too short!");
+    auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
+    return Err(err);
   }
-  u16 value = Gaps::parse_u16(bytestream, pos);
-  if (value != TofPacket::HEAD) {
-    log_warn("No header found for position " << pos << "! Bytes are " << bytestream[pos] << " " << bytestream[pos+1] << ". Decoded to " << value << " Returning EMPTY packet!");
+  u16 head = Gaps::parse_u16(bytestream, pos);
+  if (head != TofPacket::HEAD) {
+    auto message = std::format("Decoding of HEAD failed! Got {} instead!", head);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, message);
+    pos -= 2; // rewind position so that client knows we did not 
+              // parse anything
     /// print out the next/pre 5 bytes
     //spdlog::error("Byte! {}",bytestream[pos -5]);
     //spdlog::error("Byte! {}",bytestream[pos -4]);
@@ -118,11 +112,9 @@ TofPacket TofPacket::from_bytestream(const Vec<u8> &bytestream,
     //spdlog::error("Byte! {}",bytestream[pos +2]);
     //spdlog::error("Byte! {}",bytestream[pos +3]);
     //spdlog::error("Byte! {}",bytestream[pos +4]);
-    pos -= 2; // rewind position so that client knows we did not 
-              // parse anything
-    return packet;
+    return Err(err);
   }
-  packet.head = value;
+  packet.head = head;
   packet.packet_type  = static_cast<PacketType>(bytestream[pos]); pos+=1;
   packet.payload_size = Gaps::parse_u32(bytestream, pos);
   log_debug("Found TofPacket of type " << packet_type_to_string(packet.packet_type) << " with " << packet.payload_size << " bytes payload!");
@@ -132,28 +124,25 @@ TofPacket TofPacket::from_bytestream(const Vec<u8> &bytestream,
   packet.payload = packet_bytestream;
   pos += packet.payload_size;
   u16 tail = Gaps::parse_u16(bytestream, pos);
-  if (tail != TofPacket::TAIL)
-    {log_error("TofPacket doesn't conclude with TAIL signature of " << TofPacket::TAIL << " but " << tail << " instead!");}
-  return packet;
+  if (tail != TofPacket::TAIL) {
+    auto message = std::format("Decoding of TAIL failed! Got {} instead!", tail);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongTailBytes, message);
+    return Err(err);
+  }
+  return Ok(packet);
 }
 
 /**************************************************/
 
-std::string TofPacket::to_string() const
-{
-   std::string repr = "<TofPacket - type : ";
-   repr += packet_type_to_string(static_cast<PacketType>(packet_type)) + " - payload size : " + std::to_string(payload_size) + ">";
-   return repr;
-
+auto TofPacket::to_string() const -> std::string {
+  std::string repr = "<TofPacket - type : ";
+  repr += packet_type_to_string(static_cast<PacketType>(packet_type)) + " - payload size : " + std::to_string(payload_size) + ">";
+  return repr;
 }
 
 /**************************************************/
 
-std::ostream& operator<<(std::ostream& os, const TofPacket& pck)
-{ 
+std::ostream& operator<<(std::ostream& os, const TofPacket& pck) { 
   os << pck.to_string();
   return os;
 }
-
-/**************************************************/
-

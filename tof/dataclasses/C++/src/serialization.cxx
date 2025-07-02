@@ -18,7 +18,7 @@ bytestream get_bytestream_from_file(const String &filename) {
   is.seekg (0, is.end);
   u64 length = is.tellg();
   is.seekg (0, is.beg);
-  log_debug("Read " << length << " bytes from " << filename << "!");
+  spdlog::debug("Read {} bytes from {}!", length,filename);
   bytestream stream = bytestream(length);
   is.read(reinterpret_cast<char*>(stream.data()), length);
   return stream;

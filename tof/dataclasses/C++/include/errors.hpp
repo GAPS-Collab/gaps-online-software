@@ -22,5 +22,11 @@ namespace Gaps {
       ErrorKind kind;
       std::string reason;
   };
+
+  //class FatalException : public std::exception {
+  //  virtual const char* what() const throw() { 
+  //    return "Abort program due to a FatalException thrown in gaps-online-software!!";
+  //  }
+  //};
 }  
 #endif

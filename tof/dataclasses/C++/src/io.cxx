@@ -8,6 +8,7 @@
 #include "logging.hpp"
 #include "io.hpp"
 
+using namespace result;
 namespace fs = std::filesystem;
 
 /***************************************************/
@@ -38,21 +39,27 @@ Vec<TofPacket> get_tofpackets(const Vec<u8> &bytestream, u64 start_pos, PacketTy
   u64 last_pos = start_pos += 1;
   TofPacket packet;
   while (true) {
-    packet = TofPacket::from_bytestream(bytestream, pos);
-    if (pos != last_pos) {
-      if (filter != PacketType::Unknown) {
-        if (packet.packet_type != filter) {
-          last_pos = pos;
-          continue;
-        }
-      }
-      packets.push_back(packet);
-    } else {
+    auto tofdata = TofPacket::from_bytestream(bytestream, pos);
+    if (tofdata.is_err()) {
+      spdlog::error("Unable to unpack TofPacket at position {}", pos);
       break;
+    } else {
+      packet = tofdata.unwrap();
+      if (pos != last_pos) {
+        if (filter != PacketType::Unknown) {
+          if (packet.packet_type != filter) {
+            last_pos = pos;
+            continue;
+          }
+        }
+        packets.push_back(packet);
+      } else {
+        break;
+      }
+      last_pos = pos;
     }
-    last_pos = pos;
   }
-  log_debug("Read out " << packets.size() << " packets from bytestream!");
+  spdlog::debug("Read out {} packets from bytestream!", packets.size());
   return packets;
 }
 
@@ -61,18 +68,18 @@ Vec<TofPacket> get_tofpackets(const Vec<u8> &bytestream, u64 start_pos, PacketTy
 Vec<TofPacket> get_tofpackets(const String filename, PacketType filter) {
   spdlog::cfg::load_env_levels();
   if (!fs::exists(filename)) {
-    log_fatal("Can't open " << filename << " since it does not exist!");
+    spdlog::critical("Can't open {}! (it does not exist)");
   }
 
   auto stream = get_bytestream_from_file(filename); 
   bool has_ended = false;
   auto pos = search_for_2byte_marker(stream,0xAA, has_ended );
   if (has_ended) {
-    log_error("The stream ended before we found any header marker!");
+    spdlog::error("The stream ended before we found any header marker!");
   } else {
-    log_debug("Found the first header at pos " << pos);
+    spdlog::debug("Found the first header at pos {}", pos);
   }
-  log_debug("Read " << stream.size() << " bytes from " << filename);
+  spdlog::debug("Read {} bytes from {}", stream.size(), filename);
   return get_tofpackets(stream, pos, filter);
 }
 
@@ -88,22 +95,18 @@ Vec<TofEvent> unpack_tofevents_from_tofpackets(const Vec<u8> &bytestream, u64 st
   TofEvent event;
   while (true) {
     last_pos = pos;
-    packet = TofPacket::from_bytestream(bytestream, pos);
+    packet = TofPacket::from_bytestream(bytestream, pos).unwrap();
     //if (n_packets == 100) {break;}
     if (pos != last_pos) {
       if (packet.packet_type == PacketType::TofEvent) {
-        //log_info("Got packet with payload {}", packet.payload.size());  
         event = TofEvent::from_tofpacket(packet);
         events.push_back(event);
       }
-      //log_info("pos: {}", pos);
-      //packets.push_back(packet);
-      //n_packets += 1;
     } else {
       break;
     }
   }
-  log_info("Read " << events.size() << " TofEvents!");
+  spdlog::info("Read {} TofEvents!", events.size());
   return events;
 }
 
@@ -112,11 +115,11 @@ Vec<TofEvent> unpack_tofevents_from_tofpackets(const Vec<u8> &bytestream, u64 st
 Vec<TofEvent> unpack_tofevents_from_tofpackets(const String filename) {
   Vec<TofEvent> events = Vec<TofEvent>();
   auto stream = get_bytestream_from_file(filename); 
-  log_debug("Read " << stream.size() << " bytes from " <<  filename);
+  spdlog::debug("Read {} bytes from {}", stream.size(), filename);
   bool has_ended = false;
   auto pos = search_for_2byte_marker(stream, 0xAA, has_ended );
   if (has_ended) {
-    log_error("Opened file " << filename << " but no start marker " << TofPacket::HEAD << " could be found indicating that this file is no good!");
+    spdlog::error("Opened file {} but no start marker {} could be found indicating that this file is no good!", filename, TofPacket::HEAD);
     return events;
   }
   return unpack_tofevents_from_tofpackets(stream, pos);
@@ -142,10 +145,10 @@ void Gaps::TofPacketReader::set_filename(String filename) {
     auto file_size = stream_file_.tellg();
     stream_file_.seekg (0, stream_file_.beg);
     auto fs_string = std::format("{:4.2f}", (f64)file_size/1e6);
-    log_info("Will read packets from " << filename  << " [" << fs_string << " MB]");
+    spdlog::info("Will read packets from {} [{} MB]", filename, fs_string);
   } else {
     auto msg = std::format("File {} does not exist!", filename);
-    log_error(msg); 
+    spdlog::critical(msg); 
     throw std::runtime_error(msg);
   }
 }
@@ -158,19 +161,19 @@ Gaps::TofPacketReader::TofPacketReader(String filename) : Gaps::TofPacketReader(
 
 /***************************************************/
 
-bool Gaps::TofPacketReader::is_exhausted() const {
+auto Gaps::TofPacketReader::is_exhausted() const -> bool{
   return exhausted_;
 }
 
 /***************************************************/
 
-usize Gaps::TofPacketReader::n_packets_read() const {
+auto Gaps::TofPacketReader::n_packets_read() const -> usize {
   return n_packets_read_;
 }
 
 /***************************************************/
 
-TofPacket Gaps::TofPacketReader::get_next_packet() {
+auto Gaps::TofPacketReader::get_next_packet() -> Result<TofPacket, Gaps::IOError> {
   while (true) {
     if (stream_file_.eof()) {
       exhausted_ = true;
@@ -197,7 +200,7 @@ TofPacket Gaps::TofPacketReader::get_next_packet() {
         buffer.resize(stream_file_.gcount());
         packet.payload = std::move(buffer);
         n_packets_read_++;
-        return packet;
+        return Ok(packet);
       }
     } 
   }

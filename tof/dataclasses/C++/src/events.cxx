@@ -5,6 +5,7 @@
 #include<bitset>
 #include<cmath>
 #include <sstream>
+#include <numbers>
 
 #include "events.h"
 #include "parsers.h"
@@ -312,9 +313,8 @@ const Vec<u16>& RBEvent::get_channel_by_id(u8 channel) const {
 
 /**********************************************************/
 
-f32 RBEvent::calc_baseline(const Vec<f32> &volts,
-                           usize min_bin,
-                           usize max_bin) {
+auto RBEvent::calc_baseline(const Vec<f32> &volts, usize min_bin, usize max_bin) 
+  -> f32 {
   f32 bl     = 0;
   for (usize idx = 0; idx<volts.size(); idx++) {
     //f32 bl     = std::accumulate(ch_bl[ch].begin() + min_bin, ch_bl[ch].begin() + max_bin,0);
@@ -333,8 +333,8 @@ f32 RBEvent::calc_baseline(const Vec<f32> &volts,
 
 /**********************************************************/
 
-RBEvent RBEvent::from_bytestream(const Vec<u8> &stream,
-                                 u64 &pos) {
+auto RBEvent::from_bytestream(const Vec<u8> &stream, u64 &pos) 
+  -> RBEvent {
   RBEvent event = RBEvent();
   log_debug("Start decoding at pos " << pos);
   u16 head = Gaps::parse_u16(stream, pos);
@@ -604,6 +604,34 @@ u32 TofEvent::get_n_rbmissinghits(u32 mask){
 u32 TofEvent::get_n_rbevents(u32 mask){
   return (mask & 0xFF);
 }
+  
+auto TofEvent::normalize_hit_times() -> void {
+
+  if (rb_events.size() == 0) {
+    return;
+  }
+  auto PI = std::numbers::pi_v<f32>;
+  bool first_phase = false;
+  f32 phase0 = 0;
+  for (auto &rbev : rb_events) {
+    for (auto &h : rbev.hits) {
+      if (!first_phase) {
+        phase0 = h.phase;
+        first_phase = true;
+      }
+      auto t0 = h.get_t0_relative() + h.get_cable_delay();
+      auto phase_diff = h.phase - phase0;
+      while (phase_diff < - PI/2.0) {
+        phase_diff += 2.0*PI;
+      }
+      while (phase_diff > PI/2.0) {
+        phase_diff -= 2.0*PI;
+      }
+      auto t_shift = 50.0*phase_diff/(2.0*PI);
+      h.event_t0 = t0 + t_shift;
+    }
+  }
+}
 
 /**********************************************************/
 
@@ -614,6 +642,18 @@ TofEvent::TofEvent() {
   rb_events    = Vec<RBEvent>();
   missing_hits = Vec<RBMissingHit>();
 }
+
+/**********************************************************/
+
+#ifdef BUILD_CXXDB
+auto TofEvent::set_paddlemap(const Gaps::TofPaddleMap& paddlemap) -> void {
+  for (auto &ev : rb_events) {
+    for (auto &h : ev.hits) {
+      h.set_paddle(paddlemap.at(h.paddle_id));
+    }
+  }
+};
+#endif
 
 /**********************************************************/
 
@@ -729,16 +769,21 @@ u64 MasterTriggerEvent::get_timestamp_gps48() const {
 
 /*************************************/
 
+auto MasterTriggerEvent::get_timestamp_gps() const -> u32 {
+  return tiu_gps32;
+}
+
+/*************************************/
+
 u64 MasterTriggerEvent::get_timestamp_abs48() const {
-  u64 gps = get_timestamp_gps48();
-  u32 ts  = timestamp;
-  // FIXME - I guess we need to cast to u64
-  // This might be a bug
-  if (ts < tiu_timestamp) {
-    // counter rollover
-    ts += (u64)std::numeric_limits<u32>::max();
+  u64 gps       = (u64)get_timestamp_gps();
+  u64 ts        = (u64)timestamp;
+  if (ts < (u64)tiu_timestamp) {
+    // it has wrapped
+    ts +=  4294967295 + 1; // u32::MAX + 1
   }
-  u64 ts_abs  = 1e9 * gps + (u64)(ts - tiu_timestamp);
+  u64 gps_mult = 100000000 * gps; 
+  u64 ts_abs = gps_mult + ts - (u64)tiu_timestamp;
   return ts_abs;
 }
 
@@ -976,6 +1021,38 @@ void TofHit::set_paddle_len(f32 paddle_len) {
 
 /*************************************/
 
+#ifdef BUILD_CXXDB
+auto TofHit::set_paddle(const Gaps::TofPaddle& paddle) -> void {
+  paddle_len    = paddle.length;
+  coax_cbl_time = paddle.coax_cable_time; 
+  hart_cbl_time = paddle.harting_cable_time;
+}
+
+auto TofHit::get_phase_delay() const -> f32 {
+  f32 freq = 20e6;
+  f32 phase_fixed = phase;
+  auto PI = std::numbers::pi_v<f32>;
+  while (phase_fixed < -PI/2.0) {
+    phase_fixed += PI/2.0;
+  }
+  while (phase_fixed > PI/2.0) {
+    phase_fixed -= PI/2.0;
+  }
+  auto phase_delay = (phase_fixed/(2.0*PI*freq))*1.0e9;
+  return phase_delay;
+}
+
+auto TofHit::get_cable_delay() const -> f32 {
+  return hart_cbl_time - coax_cbl_time;
+}
+
+auto TofHit::get_t0()          const -> f32 {
+  return get_t0_relative() + get_cable_delay() + get_phase_delay();
+}
+#endif
+
+/*************************************/
+
 f32 TofHit::get_time_a() const {
  if (version == Gaps::ProtocolVersion::Unknown) {
    f32 prec = 0.004;
@@ -1041,12 +1118,13 @@ f32 TofHit::get_x_pos() const {
     f32 prec = 0.005; //cm
     return prec*x_pos - 163.8;
   } else {
-    return (time_a_f32 - get_t0())*C_LIGHT_PADDLE*10.0; // 10 for cm->mm 
+    return (time_a_f32 - get_t0_relative())*C_LIGHT_PADDLE*10.0; // 10 for cm->mm 
   }
 }
 
-f32 TofHit::get_t0() const {
-  return 0.5*(time_a_f32 + time_b_f32 - (paddle_len/(10.0*C_LIGHT_PADDLE)));
+f32 TofHit::get_t0_relative() const {
+  // FIXME - we should just consistently make the paddle len in mm!
+  return 0.5*(time_a_f32 + time_b_f32 - (10.0*paddle_len/(10.0*C_LIGHT_PADDLE)));
 }
 
 f32 TofHit::get_t_avg() const {
@@ -1060,6 +1138,18 @@ f64 TofHit::get_timestamp48() const {
   f64 ts48 = timestamp16 << 16 | timestamp32;
   return ts48;
 }
+
+#ifdef BUILD_CXXDB
+/// simple calculation based on Philip's 
+/// attenuation function as used in pgaps
+f32 TofHit::get_edep() const {
+  f32 x0    = get_x_pos();
+  f32 att_a = (std::exp(3.9-0.00126*( x0+paddle_len/2.))+22.15)/ (std::exp(3.9)+22.15);
+  f32 att_b = (std::exp(3.9-0.00126*(-x0+paddle_len/2.))+22.15)/ (std::exp(3.9)+22.15);
+  f32 edep  = 0.0159 * (get_peak_a()/att_a + get_peak_b()/att_b) / 2.; // vertical muon peak @ 0.97 MeV
+  return edep; 
+}
+#endif
 
 TofHit TofHit::from_bytestream(const Vec<u8> &bytestream,
                                u64 &pos) {
@@ -1162,7 +1252,7 @@ RBWaveform RBWaveform::from_bytestream(const Vec<u8> &stream,
   return wf;
 } 
 
-std::string RBWaveform::to_string() const {
+auto RBWaveform::to_string() const -> std::string {
   std::string repr = "<RBWaveform";
   //repr += std::format("\n  format test {:.2f}", get_time_a() );
   repr += std::format("\n  Event ID  : {}", event_id);
@@ -1178,7 +1268,7 @@ std::string RBWaveform::to_string() const {
   return repr;
 }
 
-Vec<TriggerType> TofEventSummary::get_trigger_sources() const {
+auto TofEventSummary::get_trigger_sources() const -> Vec<TriggerType> {
   auto t_types = Vec<TriggerType>();
   u16 gaps_trigger = (trigger_sources >> 5 & 0x1) == 1;
   if (gaps_trigger) {
@@ -1203,6 +1293,12 @@ Vec<TriggerType> TofEventSummary::get_trigger_sources() const {
   }
   return t_types;
 } 
+
+auto TofEventSummary::normalize_hit_times() -> void {
+  //FIXME
+}
+
+
 
 Vec<std::tuple<u8, u8, u8, LTBThreshold>> TofEventSummary::get_trigger_hits() const {
   auto hits = Vec<std::tuple<u8,u8,u8,LTBThreshold>>(); 
@@ -1265,13 +1361,14 @@ Vec<u8> TofEventSummary::get_rb_link_ids() const {
 }
 
 
-TofEventSummary TofEventSummary::from_bytestream(const Vec<u8> &stream, 
-                                                 u64 &pos) {
+auto TofEventSummary::from_bytestream(const Vec<u8> &stream, u64 &pos) 
+  -> Result<TofEventSummary, Gaps::IOError> {
   TofEventSummary tes;
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != TofEventSummary::HEAD) {
-    log_error("Decoding of HEAD failed! Got " << head << "instead!");
-    //return Err(SerializationError::HeadInvalid);
+    auto message = std::format("Decoding of HEAD failed! Got {} instead!", head);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, message);
+    return Err(err);
   }
   u8 status_version_u8  = Gaps::parse_u8(stream, pos);
   tes.status            = static_cast<EventStatus>(status_version_u8 & 0x3f);
@@ -1307,25 +1404,37 @@ TofEventSummary TofEventSummary::from_bytestream(const Vec<u8> &stream,
   }
   u16 tail = Gaps::parse_u16(stream, pos);
   if (tail != TofEventSummary::TAIL) {
-    log_error("Decoding of TAIL failed! Got " << tail << " instead!");
+    auto message = std::format("Decoding of TAIL failed! Got {} instead!", tail);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongTailBytes, message);
+    return Err(err);
   }
-  return tes;
+  return Ok(tes);
 }
 
-TofEventSummary TofEventSummary::from_tofpacket(const TofPacket &packet) {
+auto TofEventSummary::from_tofpacket(const TofPacket &packet) 
+  -> Result<TofEventSummary, g::IOError> {
   TofEventSummary event;
   if (packet.packet_type != PacketType::TofEventSummary) {
-    log_error("Wrong packet type! " << packet_type_to_string(packet.packet_type));
-    return event;
+    auto message = std::format("Wrong packet type! {}", packet_type_to_string(packet.packet_type));
+    spdlog::error(message);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongPacketType, message);
+    return Err(err);
   } 
   u64 _pos = 0;
-  event = TofEventSummary::from_bytestream(packet.payload, _pos);
-  return event;
+  return TofEventSummary::from_bytestream(packet.payload, _pos);
 }
 
 u64 TofEventSummary::get_timestamp48() const {
   return ((u64)timestamp16 << 32) | (u64)timestamp32;
 }
+
+#ifdef BUILD_CXXDB
+auto TofEventSummary::set_paddlemap(const Gaps::TofPaddleMap& paddlemap) -> void {
+  for (auto &h : hits) {
+    h.set_paddle(paddlemap.at(h.paddle_id));
+  }
+};
+#endif
 
 std::string TofEventSummary::to_string() const {
   std::ostringstream oss;

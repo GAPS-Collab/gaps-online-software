@@ -63,7 +63,6 @@ use std::collections::{
 extern crate chrono;
 use chrono::{DateTime, Utc};
 
-extern crate indicatif;
 use indicatif::{ProgressBar, ProgressStyle};
 use crossbeam_channel::Sender;
 use regex::Regex;
@@ -859,6 +858,14 @@ impl fmt::Display for TofPacketReader {
 
 impl TofPacketReader {
 
+  pub fn get_current_filename(&self) -> Option<String> {
+    // should only happen when it is empty
+    if self.filenames.len() <= self.file_index {
+      return None;
+    }
+    Some(self.filenames[self.file_index].clone())
+  }
+
   fn list_path_contents_sorted(input: &str) -> Result<Vec<String>, io::Error> {
     let path = Path::new(input);
     match fs::metadata(path) {
@@ -935,16 +942,24 @@ impl TofPacketReader {
   }
 
   /// The very first TofPacket for a reader
-  ///
-  ///
   pub fn first_packet(&mut self) -> Option<TofPacket> {
-    self.rewind();
+    match self.rewind() {
+      Err(err) => {
+        error!("Error when rewinding files! {err}");
+      }
+      Ok(_) => ()
+    }
     let pack = self.get_next_packet();
-    self.rewind();
+    match self.rewind() {
+      Err(err) => {
+        error!("Error when rewinding files! {err}");
+      }
+      Ok(_) => ()
+    }
     return pack;
   }
 
-  /// Te very last TofPacket for a reader
+  /// The very last TofPacket for a reader
   pub fn last_packet(&mut self) -> Option<TofPacket> { 
     self.file_index = self.filenames.len() - 1;
     let lastfilename = self.filenames[self.file_index].clone();
@@ -956,7 +971,12 @@ impl TofPacketReader {
     loop {
       match self.get_next_packet() {
         None => {
-          self.rewind();
+          match self.rewind() {
+            Err(err) => {
+              error!("Error when rewinding files! {err}");
+            }
+            Ok(_) => ()
+          }
           if idx == 0 {
             return None;
           } else {
@@ -1062,15 +1082,8 @@ impl TofPacketReader {
 
   pub fn rewind(&mut self) -> io::Result<()> {
     let firstfile = &self.filenames[0];
-    match OpenOptions::new().create(false).append(false).read(true).open(&firstfile) {
-      Err(err) => {
-        error!("Unable to open file {firstfile}! {err}");
-        panic!("Unable to create reader from {firstfile}!");
-      }
-      Ok(file) => {
-        self.file_reader  = BufReader::new(file);
-      }
-    }   
+    let file = OpenOptions::new().create(false).append(false).read(true).open(&firstfile)?;
+    self.file_reader  = BufReader::new(file);
     self.cursor     = 0;
     self.file_index = 0;
     Ok(())

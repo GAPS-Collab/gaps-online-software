@@ -1,3 +1,9 @@
+//! The following file is part of gaps-online-software and published 
+//! under the GPLv3 license
+//!
+//! This file contains the source for pybindings with pyO3 for the 
+//! i/o system to read Tof data files as well as telemetry files
+
 use std::collections::HashMap;
 use std::env;
 //use log::error;
@@ -186,6 +192,11 @@ impl PyTofPacketReader {
   }
 
   #[getter]
+  fn current_filename(&self) -> Option<String> {
+    self.reader.get_current_filename()
+  }
+
+  #[getter]
   fn first(&mut self) -> Option<PyTofPacket> {
     let mut ptp = PyTofPacket::new();
     let tp = self.reader.first_packet()?;
@@ -210,6 +221,11 @@ impl PyTofPacketReader {
   //  self.with_paddleinfo = pinfo;
   //  Ok(())
   //}
+
+  #[getter]
+  fn get_filenames(&self) -> Vec<String> {
+    self.reader.filenames.clone()
+  }
 
   #[getter]
   fn packet_index(&mut self) -> PyResult<HashMap<PacketType, usize>> {

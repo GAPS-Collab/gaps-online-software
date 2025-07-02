@@ -2,12 +2,17 @@
 #define CARASPACE_H_INCLUDED
 #include <iostream>
 #include <fstream>
+#include <cmath>
 
 #include "tof_typedefs.h"
 #include "packets/tof_packet.h"
 #include "telemetry_dataclasses.hpp"
-#include "result/result.h"
+#include "calibration.h"
 #include "errors.hpp"
+#include "result/result.h"
+#ifdef BUILD_CXXDB
+#include "database.h"
+#endif
 
 namespace r = result;
 
@@ -15,7 +20,8 @@ namespace Gaps {
   /// Get all files in a certain directory in case it is a directory, for 
   /// a single file just get the file <3 ChatGPT
   std::vector<std::string> list_path_contents_sorted(const std::string& input);
-  
+
+  /// These are objects which can be stored in a caraspace frame  
   enum class CRFrameObjectType : u8 {
     Unknown           = 0,
     TofPacket         = 10,
@@ -23,65 +29,74 @@ namespace Gaps {
   };
 
   struct CRFrameObject {
-    static const u16 HEAD = 0xAAAA;
-    static const u16 TAIL = 0x5555;
+    static constexpr u16 HEAD = 0xAAAA;
+    static constexpr u16 TAIL = 0x5555;
     
     u8 version;
     CRFrameObjectType ftype;
     Vec<u8> payload;
   
     /// Decode a serializable from a bytestream  
-    static CRFrameObject from_bytestream(Vec<u8> stream, usize &pos);
+    static auto from_bytestream(Vec<u8> stream, usize &pos) -> CRFrameObject;
      
     /// string representation for printing
-    std::string to_string();
+    auto to_string() -> std::string;
   };
 
 
   struct CRFrame {
-    static const u16 HEAD = 0xAAAA;
-    static const u16 TAIL = 0x5555;
+    static constexpr u16 HEAD = 0xAAAA;
+    static constexpr u16 TAIL = 0x5555;
       
-    //std::map<std::string, usize> get_index
-    static CRFrame from_bytestream(Vec<u8> stream, usize &pos);
+    static auto from_bytestream(Vec<u8> stream, usize &pos) -> CRFrame;
     
     std::map<std::string, std::tuple<u64, CRFrameObjectType>> index;
     Vec<u8> bytestorage;
-    std::string to_string() const;
+    auto to_string() const -> std::string;
     
-    static std::map<std::string, std::tuple<u64, CRFrameObjectType>> parse_index(Vec<u8> stream, usize &pos);
-    
+    static auto parse_index(Vec<u8> stream, usize &pos) -> std::map<std::string, std::tuple<u64, CRFrameObjectType>>;
+
     /// extract a tofpacket if this frame object is of the correct type
     auto get_tofpacket(std::string name) -> r::Result<TofPacket,Gaps::IOError>;
-    Gaps::Telemetry::Packet get_telemetrypacket(std::string name);
-
-  //pub fn get<T : CRSerializeable + Frameable>(&self, name : String) -> Result<T, CRSerializationError> {
-
+    auto get_telemetrypacket(std::string name) -> Gaps::Telemetry::Packet;
   };
 
   struct CRReader {
     CRReader();
     CRReader(std::string pathname);
-    void set_path(std:: string pathname);
     CRReader(const CRReader&) = delete;
-    CRFrame get_next_frame();
-    Vec<std::string> get_filenames() const;
+    
+    auto set_path(std:: string pathname) -> void;
+    /// Walk over the file, and return the next frame
+    /// as saved in the file. 
+    ///
+    /// Advaces all internal position markers. If the 
+    /// last frame is reached, an exception will be risen.
+    /// After the reader is exhausted, is has to be 
+    /// re-initialized
+    auto get_next_frame()       -> CRFrame;
+    auto get_filenames()  const -> Vec<std::string>;
     /// All packets have been read from the file. 
     /// If they should be read again, the reader 
     /// has to be created again
-    bool      is_exhausted() const;
+    auto is_exhausted()   const -> bool;
     /// The number of files this reader has read
     /// from the file
-    bool      n_packets_read() const;
+    auto n_packets_read() const -> bool;
+    /// get the RBCalibration map
+    /// the paramter is the number of RBs we expect in this run
+    auto get_rbcalibrations(u8 n_rb) -> RBCalibrationMap;     
 
   private:  
+    #ifdef BUILD_CXXDB
+    TofPaddleMap     paddles_          ; 
+    #endif 
     bool             exhausted_        ;
     usize            n_packets_read_   ;
     Vec<std::string> filenames_        ;
     std::ifstream    stream_file_      ;
     usize            fileindex_        ;
-    void             prime_next_file_();
-
+    auto             prime_next_file_() -> void;
   };
 }
 #endif

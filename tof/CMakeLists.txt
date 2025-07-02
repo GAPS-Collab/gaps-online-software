@@ -374,6 +374,67 @@ if (BUILD_EXAMPLES)
           DESTINATION ${INSTALL_EXAMPLES_DIR}
 
   )
+  if (BUILD_CXXDB)
+    # no longer just a paddle example, but also has tracker strips now
+    set(paddle-example "print-database")
+    add_executable(${paddle-example}
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/${paddle-example}.cxx
+    )
+    set_property(TARGET ${paddle-example} PROPERTY CXX_STANDARD 20)
+    target_include_directories(${paddle-example} 
+                              PUBLIC
+                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
+                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+                              ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+                              )
+    target_link_libraries(${paddle-example}
+                          PRIVATE
+                          ${GAPSTOF_LIBRARY_SHARED})
+    install(TARGETS ${paddle-example}
+            DESTINATION ${INSTALL_EXAMPLES_DIR}
+
+    )
+    
+    # how to calculate TOF values
+    set(calculate-tof-example "calculate-tof")
+    add_executable(${calculate-tof-example}
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/${calculate-tof-example}.cxx
+    )
+    set_property(TARGET ${calculate-tof-example} PROPERTY CXX_STANDARD 20)
+    target_include_directories(${calculate-tof-example} 
+                              PUBLIC
+                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
+                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+                              ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+                              )
+    target_link_libraries(${calculate-tof-example}
+                          PRIVATE
+                          ${GAPSTOF_LIBRARY_SHARED})
+    install(TARGETS ${calculate-tof-example}
+            DESTINATION ${INSTALL_EXAMPLES_DIR}
+
+    )
+  endif (BUILD_CXXDB)
+  if (BUILD_CARASPACE)
+    set(caraspace-example "read-caraspace")
+    add_executable(${caraspace-example}
+      ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/read-caraspace.cxx
+    )
+    set_property(TARGET ${caraspace-example} PROPERTY CXX_STANDARD 20)
+    target_include_directories(${caraspace-example} 
+                              PUBLIC
+                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
+                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+                              ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+                              )
+    target_link_libraries(${caraspace-example}
+                          PRIVATE
+                          ${GAPSTOF_LIBRARY_SHARED})
+    install(TARGETS ${caraspace-example}
+            DESTINATION ${INSTALL_EXAMPLES_DIR}
+
+    )
+  endif (BUILD_CARASPACE)
   if (BUILD_ROOTCOMPONENTS)
     set(display-example "displayTofpackets")
     add_executable(${display-example}

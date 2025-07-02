@@ -9,6 +9,7 @@
 //!
 
 use std::fmt;
+use std::env;
 use std::collections::HashMap;
 
 use glob::glob;
@@ -35,8 +36,46 @@ pub type DsiJChPidMapping = DsiLtbRBMapping;
 
 /// Universal function to connect to the database
 pub fn connect_to_db(database_url : String) -> Result<diesel::SqliteConnection, ConnectionError>  {
-    //let database_url = "database.sqlite3";
-    SqliteConnection::establish(&database_url)
+  //let database_url = "database.sqlite3";
+  SqliteConnection::establish(&database_url)
+}
+
+/// Get all tof paddles in the database
+pub fn get_tofpaddles() -> Result<HashMap<u8,Paddle>, ConnectionError> {
+  let db_path  = env::var("DATABASE_URL").unwrap_or_else(|_| "".to_string());
+  let mut conn = connect_to_db(db_path)?;
+  let mut paddles = HashMap::<u8, Paddle>::new();
+  match Paddle::all(&mut conn) {
+    None => {
+      error!("We can't find any paddles in the database!");
+      return Ok(paddles);
+    }
+    Some(pdls) => {
+      for p in pdls {
+        paddles.insert(p.paddle_id as u8, p.clone());
+      }
+    }
+  }
+  return Ok(paddles);
+}
+
+/// Get all trackerstrips from the database
+pub fn get_trackerstrips() -> Result<HashMap<u32,TrackerStrip>, ConnectionError> {
+  let db_path  = env::var("DATABASE_URL").unwrap_or_else(|_| "".to_string());
+  let mut conn = connect_to_db(db_path)?;
+  let mut strips = HashMap::<u32, TrackerStrip>::new();
+  match TrackerStrip::all(&mut conn) {
+    None => {
+      error!("We can't find any tracker strips in the database!");
+      return Ok(strips);
+    }
+    Some(ts) => {
+      for s in ts {
+        strips.insert(s.get_stripid() as u32, s.clone());
+      }
+    }
+  }
+  return Ok(strips);
 }
 
 /// Create a mapping of mtb link ids to rb ids
@@ -75,8 +114,8 @@ pub fn get_dsi_j_ch_pid_map(paddles : &Vec<Paddle>) -> DsiJChPidMapping {
   for pdl in paddles {
     let dsi  = pdl.dsi as u8;
     let   j  = pdl.j_ltb   as u8;
-    let ch_b = pdl.ltb_chA as u8;
-    let ch_a = pdl.ltb_chB as u8;
+    let ch_a = pdl.ltb_chA as u8;
+    let ch_b = pdl.ltb_chB as u8;
     let pid  = pdl.paddle_id as u8;
     let panel_id = pdl.panel_id as u8;
     mapping.get_mut(&dsi).unwrap().get_mut(&j).unwrap().insert(ch_a,(pid, panel_id));
@@ -466,6 +505,90 @@ impl fmt::Display for DSICard {
   }
 }
 
+/// A single Tracker strip
+#[derive(Debug,PartialEq, Clone,Queryable, Selectable, serde::Serialize, serde::Deserialize)]
+#[diesel(table_name = schema::tof_db_trackerstrip)]
+#[diesel(primary_key(strip_id))]
+#[allow(non_snake_case)]
+pub struct TrackerStrip {
+    pub strip_id            : i32,
+    pub layer               : i32, 
+    pub row                 : i32, 
+    pub module              : i32, 
+    pub channel             : i32,  
+    pub global_pos_x_l0     : f32,
+    pub global_pos_y_l0     : f32,
+    pub global_pos_z_l0     : f32,
+    pub global_pos_x_det_l0 : f32,
+    pub global_pos_y_det_l0 : f32,
+    pub global_pos_z_det_l0 : f32,
+    pub principal_x         : f32,
+    pub principal_y         : f32,
+    pub principal_z         : f32,
+    pub volume_id           : i64,
+}
+
+impl TrackerStrip {
+  pub fn new() -> Self {
+    Self {
+      strip_id            : 0,
+      layer               : 0, 
+      row                 : 0, 
+      module              : 0, 
+      channel             : 0,  
+      global_pos_x_l0     : 0.0,
+      global_pos_y_l0     : 0.0,
+      global_pos_z_l0     : 0.0,
+      global_pos_x_det_l0 : 0.0,
+      global_pos_y_det_l0 : 0.0,
+      global_pos_z_det_l0 : 0.0,
+      principal_x         : 0.0,
+      principal_y         : 0.0,
+      principal_z         : 0.0,
+      volume_id           : 0,
+    }
+  }
+
+  /// FIXME - why use this at all and not just get the one from the db??
+  pub fn get_stripid(&self) -> u32 {
+    self.channel as u32 + (self.module as u32)*100 + (self.row as u32)*10000 + (self.layer as u32)*100000
+  }
+
+  pub fn all(conn: &mut SqliteConnection) -> Option<Vec<Self>> {
+    use schema::tof_db_trackerstrip::dsl::*;
+    match tof_db_trackerstrip.load::<Self>(conn) {
+      Err(err) => {
+        error!("Unable to load tracker strips from db! {err}");
+        return None;
+      }
+      Ok(pdls) => {
+        return Some(pdls);
+      }
+    }
+  }
+}
+
+impl fmt::Display for TrackerStrip {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<TrackerStrip:");
+    repr += &(format!("\n   strip id           : {}", self.strip_id));     
+    repr += &(format!("\n   vid                : {}", self.volume_id));
+    repr += &(format!("\n   layer              : {}", self.layer));
+    repr += &(format!("\n   row                : {}", self.row));
+    repr += &(format!("\n   module             : {}", self.module));
+    repr += &(format!("\n   channel            : {}", self.channel));
+    repr += "\n   strip center [mm]:";
+    repr += &(format!("\n    \u{21B3} [{:.2}, {:.2}, {:.2}]", self.global_pos_x_l0, self.global_pos_y_l0, self.global_pos_z_l0));
+    repr += "\n   detector (disk) center [mm]:";
+    repr += &(format!("\n    \u{21B3} [{:.2}, {:.2}, {:.2}]", self.global_pos_x_det_l0, self.global_pos_y_det_l0, self.global_pos_z_det_l0));
+    repr += "\n   strip principal direction:";
+    repr += &(format!("\n    \u{21B3} [{:.2}, {:.2}, {:.2}]", self.principal_x, self.principal_y, self.principal_z));
+    write!(f, "{}", repr)
+  }
+}
+
+
+
 /// A single TOF paddle with 2 ends 
 /// comnected
 #[derive(Debug,PartialEq, Clone,Queryable, Selectable, serde::Serialize, serde::Deserialize)]
@@ -505,6 +628,8 @@ pub struct Paddle {
   pub global_pos_x_l0_B : f32, 
   pub global_pos_y_l0_B : f32, 
   pub global_pos_z_l0_B : f32, 
+  pub coax_cable_time   : f32,
+  pub harting_cable_time: f32,
 }
 
 impl Paddle {
@@ -541,7 +666,9 @@ impl Paddle {
       global_pos_z_l0_A : 0.0, 
       global_pos_x_l0_B : 0.0, 
       global_pos_y_l0_B : 0.0, 
-      global_pos_z_l0_B : 0.0, 
+      global_pos_z_l0_B : 0.0,
+      coax_cable_time   : 0.0, 
+      harting_cable_time: 0.0
     }
   }
 
@@ -593,6 +720,8 @@ impl fmt::Display for Paddle {
     repr += "\n   cable len [cm] :";
     repr += &(format!("\n    \u{21B3} {:.2}", self.cable_len));
     repr += "\n    (Harting -> RB)";
+    repr += "\n   cable times [ns] (JAZ) :";
+    repr += &(format!("\n    \u{21B3} {:.2} {:.2}", self.coax_cable_time, self.harting_cable_time));
     repr += "\n  ** Coordinates (L0) & dimensions **";
     repr += "\n   length, width, height [mm]";
     repr += &(format!("\n    \u{21B3} [{:.2}, {:.2}, {:.2}]", self.length, self.width, self.height));

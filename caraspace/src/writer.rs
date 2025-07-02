@@ -26,13 +26,23 @@ pub static HUMAN_TIMESTAMP_FORMAT : &str = "%y%m%d_%H%M%S%Z";
 ///
 /// # Arguments
 ///
-/// * run    : run id (identifier)
-/// * subrun : subrun id (identifier of file # within
-///            the run
-/// * rb_id  : in case this should be used on the rb, 
-///            a rb id can be specified as well
-pub fn get_runfilename(run : u32, subrun : u64, rb_id : Option<u8>) -> String {
-  let ts = get_utc_timestamp();
+/// * run       : run id (identifier)
+/// * subrun    :  subrun id (identifier of file # within
+///                the run
+/// * rb_id     :  in case this should be used on the rb, 
+///                a rb id can be specified as well
+/// * timestamp :  substitute the current time with this timestamp
+///                (or basically any other string) instead.
+pub fn get_runfilename(run : u32, subrun : u64, rb_id : Option<u8>, timestamp : Option<String>) -> String {
+  let ts : String;
+  match timestamp {
+    Some(_ts) => {
+      ts = _ts;
+    }
+    None => {
+      ts = get_utc_timestamp();
+    }
+  }
   let fname : String;
   match rb_id {
     None => {
@@ -81,6 +91,10 @@ pub struct CRWriter {
   /// internal counter for bytes written in 
   /// this file
   file_nbytes_wr      : usize,
+  /// it can also take a timestamp, in case we 
+  /// don't want to use the current time when the 
+  /// file is written
+  pub file_timestamp  : Option<String>,
 }
 
 impl CRWriter {
@@ -89,16 +103,26 @@ impl CRWriter {
   ///
   /// # Arguments
   ///
-  /// * file_prefix     : Prefix file with this string. A continuous number will get 
-  ///                     appended to control the file size.
-  pub fn new(mut file_path : String, run_id : u32) -> Self {
+  /// * file_path       : Path to store the file under
+  /// * run_id          : Run ID for this file (will be written in filename)
+  /// * subrun_id       : Sub-Run ID for this file (will be written in filename. 
+  ///                     If None, a generic "0" will be used
+  /// * timestamp       : The writer will add an automatic timestamp to the current file
+  ///                     based on the current time. This option allows to overwrite 
+  ///                     that behaviour
+  pub fn new(mut file_path : String, run_id : u32, subrun_id : Option<u64>, timestamp : Option<String>) -> Self {
     //let filename = file_prefix.clone() + "_0.tof.gaps";
     let file : File;
     let file_name : String;
     if !file_path.ends_with("/") {
       file_path += "/";
     }
-    let filename = format!("{}{}", file_path, get_runfilename(run_id, 0, None));
+    let filename : String;
+    if let Some(subrun) = subrun_id {
+      filename = format!("{}{}", file_path, get_runfilename(run_id, subrun, None, timestamp));
+    } else {
+      filename = format!("{}{}", file_path, get_runfilename(run_id, 0, None, timestamp));
+    }
     let path     = Path::new(&filename); 
     println!("Writing to file {filename}");
     file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
@@ -113,12 +137,13 @@ impl CRWriter {
       file_id          : 1,
       n_packets        : 0,
       file_name        : file_name,
+      file_timestamp   : None,
     }
   }
 
-  pub fn get_file(&self) -> File { 
+  pub fn get_file(&self, timestamp : Option<String>) -> File { 
     let file : File;
-    let filename = format!("{}{}", self.file_path, get_runfilename(self.run_id, self.file_id as u64, None));
+    let filename = format!("{}{}", self.file_path, get_runfilename(self.run_id, self.file_id as u64, None, timestamp));
     //let filename = self.file_path.clone() + &get_runfilename(runid,self.file_id as u64, None);
     let path     = Path::new(&filename); 
     info!("Writing to file {filename}");
@@ -158,7 +183,7 @@ impl CRWriter {
           },
           Ok(_) => ()
         }
-        self.file = self.get_file();
+        self.file = self.get_file(self.file_timestamp.clone());
         self.file_id += 1;
         //let path  = Path::new(&filename);
         //println!("==> [TOFPACKETWRITER] Will start a new file {}", path.display());
@@ -172,7 +197,7 @@ impl CRWriter {
 
 impl Default for CRWriter {
   fn default() -> Self {
-    CRWriter::new(String::from(""),0)
+    CRWriter::new(String::from(""),0,None, None)
   }
 }
 

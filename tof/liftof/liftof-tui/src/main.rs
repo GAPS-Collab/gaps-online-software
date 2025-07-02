@@ -145,16 +145,10 @@ use liftof_tui::*;// {
 //  socket_wrap_tofstream
 //};
 
-
-//extern crate clap;
 use clap::{arg,
            command,
-           //value_parser,
-           //ArgAction,
-           //Command,
            Parser
 };
-
 
 #[derive(Parser, Debug)]
 #[command(author = "J.A.Stoessl", version, about, long_about = None)]
@@ -985,7 +979,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let config          : LiftofSettings;
   match args.config {
     None => {
-      match LiftofSettings::from_toml("liftof-config.toml") {
+      match LiftofSettings::from_toml(&args.config.unwrap()) {
         Err(err) => {
           error!("CRITICAL! Unable to parse .toml settings file! {}", err);
           panic!("Unable to parse config file!");
@@ -1041,8 +1035,10 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let rbcalibrations : Arc<Mutex<HashMap<u8, RBCalibrations>>> = Arc::new(Mutex::new(HashMap::<u8, RBCalibrations>::new()));
   // prepare calibrations
   let mut readoutboards = HashMap::<u8, ReadoutBoard>::new();
-  let mut rb_conn = connect_to_db(String::from("gaps_flight2.db")).expect("Will need database access. Make sure gaps_flight2.db is installed!");
-  let rbs     = ReadoutBoard::all(&mut rb_conn).expect("Will need database access. Make sure gaps_flight2.db is installed!");
+  let db_path     = config.db_path;
+  info!("Reading database from {}", db_path);
+  let mut rb_conn = connect_to_db(db_path).expect("Unable to read database! Are you sure it can be found at the expected location?");
+  let rbs     = ReadoutBoard::all(&mut rb_conn).expect("Unable to read ReadoutBoard table from the database!");
   let mtlink_rb_map = get_linkid_rbid_map(&rbs);
   for mut rb in rbs {
     rb.calib_file_path = String::from("calibrations");
@@ -1114,11 +1110,12 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   //if args.from_telemetry {
   if !args.from_telemetry {
     let _tp_to_distrib = tp_to_distrib.clone();
-    let tofcpu_address : &str = "tcp://192.168.37.20:42000";
+    //let tofcpu_address : &str = "tcp://192.168.37.20:42000";
+    let tofcpu_address   = config.data_publisher_settings.fc_pub_address;
     let _packet_recv_thread = thread::Builder::new()
       .name("socket-wrap-tofstream".into())
       .spawn(move || {
-        socket_wrap_tofstream(tofcpu_address,
+        socket_wrap_tofstream(&tofcpu_address,
                               _tp_to_distrib);
       }).expect("Unable to spawn socket-wrap-tofstream thread!");
   }

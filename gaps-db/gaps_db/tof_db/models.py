@@ -243,6 +243,17 @@ class Paddle(models.Model):
                                      null=False,
                                      default=0.0,
                                      help_text="Global X (L0) position of the B side")
+    
+
+    coax_cable_time           = models.FloatField(
+                                     null=False,
+                                     default=0.0,
+                                     help_text="Time the signal lingers in the cox cable as calculated by Jeff")
+    harting_cable_time        = models.FloatField(
+                                     null=False,
+                                     default=0.0,
+                                     help_text="Time the signal lingers in the harting cable as calculated by Jeff")
+
     @property 
     def principal(self):
         """
@@ -269,7 +280,7 @@ class Paddle(models.Model):
 
         # we can kind of cheat and do a cheap transform
         # the principal is either x, y or z axis, no mix-ins
-        pr = self.principal
+        pr   = self.principal
         norm = self.normal
         cube = vtk.vtkCubeSource()
         edgepaddle = False
@@ -482,8 +493,49 @@ class Paddle(models.Model):
         """
         self._cache_box_points()
         xy_points = self.points[:, :2]
-        xy_patch  = Rectangle(xy_points.min(axis=0), *(xy_points.max(axis=0) - xy_points.min(axis=0)),
-                              fill=fill, edgecolor=edgecolor, facecolor=facecolor, lw=lw, alpha=alpha)
+        #if self.paddle_id in [57]:
+        if (self.principal == np.array([0,0,1])).all() or (self.principal == np.array([0,0,-1])).all():
+            xy_patch  = Rectangle(xy_points.min(axis=0), *(xy_points.max(axis=0) - xy_points.min(axis=0)),
+                                  fill=fill, edgecolor=edgecolor, facecolor=facecolor, lw=lw, alpha=alpha)
+            # this is an edge paddle. For drawing use the angle feature of the Rectangle patch
+            #xy_anchor0 = (self.global_pos_x_l0_A - self.width/np.sqrt(2), self.global_pos_y_l0_A - self.width/np.sqrt(2))
+            corners = xy_patch.get_corners()
+            # +x +y
+            if self.paddle_id in [57,149,150,151]:
+                anchor  = (corners[1][0], corners[1][1])
+                rotation_point = (corners[1][0], corners[1][1])
+                angle = 135
+                xy_patch  = Rectangle(anchor, self.width, self.height,
+                                      rotation_point = rotation_point, angle = angle,
+                                      fill=fill, edgecolor=edgecolor, facecolor=facecolor, lw=lw, alpha=alpha)
+            # -x -y
+            if self.paddle_id in [58,152,153,154]:
+                anchor  = (corners[0][0], corners[0][1])
+                rotation_point = (corners[0][0], corners[0][1])
+                angle = 45
+                xy_patch  = Rectangle(anchor, self.width, self.height,
+                                      rotation_point = rotation_point, angle = angle,
+                                      fill=fill, edgecolor=edgecolor, facecolor=facecolor, lw=lw, alpha=alpha)
+            # corner -x -y
+            if self.paddle_id in [59,155,156,157]:
+                anchor  = (corners[3][0], corners[3][1])
+                rotation_point = (corners[3][0], corners[3][1])
+                angle = -45
+                xy_patch  = Rectangle(anchor, self.width, self.height,
+                                      rotation_point = rotation_point, angle = angle,
+                                      fill=fill, edgecolor=edgecolor, facecolor=facecolor, lw=lw, alpha=alpha)
+            # corner +x -y
+            if self.paddle_id in [60,158,159,160]:
+                anchor  = (corners[3][0], corners[3][1])
+                rotation_point = (corners[2][0], corners[2][1])
+                angle = 45
+                xy_patch  = Rectangle(anchor, self.width, self.height,
+                                      rotation_point = rotation_point, angle = angle,
+                                      fill=fill, edgecolor=edgecolor, facecolor=facecolor, lw=lw, alpha=alpha)
+
+        else:
+            xy_patch  = Rectangle(xy_points.min(axis=0), *(xy_points.max(axis=0) - xy_points.min(axis=0)),
+                                  fill=fill, edgecolor=edgecolor, facecolor=facecolor, lw=lw, alpha=alpha)
         return xy_patch
     
     def draw_xz(self, fill=False, lw=0.8, edgecolor='b', facecolor='b', alpha=0.7) -> Rectangle:
@@ -552,6 +604,8 @@ class Paddle(models.Model):
         _repr += f'\n   cable len [cm] :'
         _repr += f'\n    \u21B3 {self.cable_len}'
         _repr += f'\n    (Harting -> RB)'
+        _repr += f'\n   cable times [ns] (JAZ) :'
+        _repr += f'\n    \u21B3 Coax: {self.coax_cable_time} Harting: {self.harting_cable_time}'
         _repr += f'\n  ** Coordinates (L0) & dimensions **'
         _repr += f'\n   length, width, height [cm]'
         _repr += f'\n    \u21B3 [{self.length:.2f}, {self.width:.2f}, {self.height:.2f}]'
@@ -1055,14 +1109,147 @@ class MTBChannel(models.Model):
 
 ##########################################################################
 
+# Eventually we don't want to have this within "tof_db"
 
-#class RBCalibration(models.Model):
-#    """
-#    Readoutboard timing + voltage calibration
-#    """
-#    pass
+class TrackerStrip(models.Model):
+    """
+    Geometry information about each tracker strip
+    """
+    strip_id            = models.PositiveIntegerField(
+                            primary_key=True,
+                            null=False,
+                            default=0,
+                            unique=True,
+                            help_text="The unique identifier for this strip, which is Layer-Row-Module-Channel (5 digit number)")
+    layer               = models.IntegerField(null=False, default=0) 
+    row                 = models.IntegerField(null=False, default=0) 
+    module              = models.IntegerField(null=False, default=0) 
+    channel             = models.IntegerField(null=False, default=0)  
+    global_pos_x_l0     = models.FloatField(null=False, default=0)
+    global_pos_y_l0     = models.FloatField(null=False, default=0)
+    global_pos_z_l0     = models.FloatField(null=False, default=0)
+    global_pos_x_det_l0 = models.FloatField(null=False, default=0)
+    global_pos_y_det_l0 = models.FloatField(null=False, default=0)
+    global_pos_z_det_l0 = models.FloatField(null=False, default=0)
+    principal_x         = models.FloatField(null=False, default=0)
+    principal_y         = models.FloatField(null=False, default=0)
+    principal_z         = models.FloatField(null=False, default=0)
+    volume_id           = models.PositiveBigIntegerField(
+                                default=0,
+                                null=False,
+                                unique=True,
+                                help_text="The VolumeId as used in the GAPS simulation code")
+
+    @staticmethod
+    def create_id(layer, row, module, channel):
+        return channel + module*100 + row*10000 + layer*100000
+
+    # FIXME - include in save hook!
+    def get_id(self):
+        return self.create_id(self.layer, self.row, self.module, self.channel)
+
+    def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
+        _repr = f'<TrackerStrip [{self.strip_id}]:'
+        _repr += f'\n  Layer     : {self.layer}'                   
+        _repr += f'\n  Row       : {self.row} '                    
+        _repr += f'\n  Module    : {self.module}'                   
+        _repr += f'\n  Channel   : {self.channel}'                   
+        _repr += f'\n  Volume ID : {self.volume_id}'  
+        _repr += f'\n  -- str pos. (from sim) --'
+        _repr += f'\n  X: {self.global_pos_x_l0:.1f} Y: {self.global_pos_y_l0:.1f} Z: {self.global_pos_z_l0:.1f}'                 
+        _repr += f'\n  -- det pos. (from sim) --'
+        _repr += f'\n  X: {self.global_pos_x_det_l0:.1f} Y: {self.global_pos_y_det_l0:.1f} Z: {self.global_pos_z_det_l0:.1f}'                 
+        _repr += f'\n  -- principal dir (from sim) --'
+        _repr += f'\n  X: {self.principal_x:.1f} Y: {self.principal_y:.1f} Z: {self.principal_z:.1f}>'                 
+        return _repr
+
+class TrackerStripPedestal(models.Model):
+    """
+    The pedestal of each strip as retreived from the 
+    text file
+    """
+    strip_id      = models.PositiveIntegerField(
+                        primary_key=True,
+                        null=False,
+                        default=0,
+                        unique=True,
+                        help_text="The unique identifier for this strip, which is Layer-Row-Module-Channel (5 digit number)")
+    volume_id     = models.PositiveBigIntegerField(
+                        default=0,
+                        null=False,
+                        unique=True,
+                        help_text="The VolumeId as used in the GAPS simulation code")
+    utc_timestamp  = models.PositiveBigIntegerField(null=False, default=0,
+                                                    help_text="UTC Timestamp in YYMMDDHHMMSS format")
+    pedestal_mean = models.FloatField(
+                        default=0,
+                        null=False,
+                        help_text="Mean value of the pedestal distribution")
+    pedestal_sigma = models.FloatField(
+                        default=0,
+                        null=False,
+                        help_text="Width of the pedestal distribution")
+    is_mean_value  = models.BooleanField(
+                        default=True,
+                        null=False,
+                        help_text="If no pedestal is set from a file, it defaults to a mean value. If none is available, this is 0")
+    
+    def __str__(self):
+        return self.__repr__()
+    
+    def __repr__(self):
+        _repr = f'<TrackerStripPedestal [{self.strip_id}]:'
+        if self.is_mean_value:
+            _repr += '\n !! -- Mean value for all strips !!'
+            _repr += '\n !! -- values not for this individual strip !!'
+        _repr += f'\n  Volume ID : {self.volume_id}'  
+        _repr += f'\n  ped mean  : {self.pedestal_mean}'
+        _repr += f'\n  ped sigma : {self.pedestal_sigma}>'
+
+        return _repr
+
+##########################################################################
+
+class TrackerStripMask(models.Model):
+    strip_id      = models.PositiveIntegerField(
+                        primary_key=True,
+                        null=False,
+                        default=0,
+                        unique=True,
+                        help_text="The unique identifier for this strip, which is Layer-Row-Module-Channel (5 digit number)")
+
+    volume_id     = models.PositiveBigIntegerField(
+                        default=0,
+                        null=False,
+                        unique=True,
+                        help_text="The VolumeId as used in the GAPS simulation code")
+    utc_timestamp  = models.PositiveBigIntegerField(null=False, default=0,
+                                                    help_text="UTC Timestamp in YYMMDDHHMMSS format")
+    mask_name    = models.CharField(max_length=1024,
+                                    null=True,
+                                    default="",
+                                    help_text="A name for this strip mask. There might be serveral per same day, so having only a timestamp might be confusing")
+    active = models.BooleanField(
+                        default=True,
+                        null=False,
+                        help_text="The strip is in working condition or not")
+    
+    def __str__(self):
+        return self.__repr__()
+    
+    def __repr__(self):
+        _repr = f'<TrackerStripMask [{self.strip_id}]:'
+        _repr += f'\n  Volume ID : {self.volume_id}'  
+        _repr += f'\n  Timestamp : {self.utc_timestamp}'  
+        _repr += f'\n  Name      : {self.mask_name}'  
+        _repr += f'\n  Mask      : {self.active}>'  
+        return _repr
 
 
+##########################################################################
 
 
 class Run(models.Model):
@@ -1101,256 +1288,6 @@ class Run(models.Model):
 
 
 
-######################################
-
-# Specters of the past...
-
-
-
-#class RB(models.Model):
-#    """
-#    Representation of a readoutboard
-#
-#    """
-#    
-#    rb_id            = models.PositiveSmallIntegerField(unique=True, primary_key=True)
-#    dna              = models.PositiveBigIntegerField(unique=True, null=True)
-#    ch1_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
-#    ch2_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
-#    ch3_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
-#    ch4_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
-#    ch5_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
-#    ch6_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
-#    ch7_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
-#    ch8_paddle       = models.ForeignKey(PaddleEnd, models.SET_NULL, blank=True, null=True,related_name='+' )
-#    mtb_link_id      = models.PositiveSmallIntegerField(unique=True, null=True)
-#
-#    def get_pid_for_channel(self, ch):
-#        return get_channel(ch).paddle_id
-#
-#    def get_ploc_for_channel(self, ch):
-#        panel = get_channel(ch).panel_id
-#        panel = Panel.objects.filter(id=panel)[0]
-#        print(panel)
-#
-#    def set_channel(self, ch, pend):
-#        match ch:
-#            case 1:
-#                self.ch1_paddle = pend
-#            case 2:
-#                self.ch2_paddle = pend
-#            case 3:
-#                self.ch3_paddle = pend
-#            case 4:
-#                self.ch4_paddle = pend
-#            case 5:
-#                self.ch5_paddle = pend
-#            case 6:
-#                self.ch6_paddle = pend
-#            case 7:
-#                self.ch7_paddle = pend
-#            case 8:
-#                self.ch8_paddle = pend
-#            case _:
-#                raise ValueError(f"Can't set paddle for channel {ch}")
-#
-#    def get_channel(self, ch):
-#        match ch:
-#            case 1:
-#                return self.ch1_paddle
-#            case 2:
-#                return self.ch2_paddle
-#            case 3:
-#                return self.ch3_paddle
-#            case 4:
-#                return self.ch4_paddle
-#            case 5:
-#                return self.ch5_paddle
-#            case 6:
-#                return self.ch6_paddle
-#            case 7:
-#                return self.ch7_paddle
-#            case 8:
-#                return self.ch8_paddle
-#            case _:
-#                raise ValueError(f"Don't have paddle for channel {ch}")
-#
-#
-#
-#
-#####################################################
-#
-#def get_dsi_j_for_ltb(ltb, rats, dsi_cards, dry_run = False):
-#    try:
-#        rat = [k for k in rats if k.ltb_id == ltb.ltb_id][0]
-#    except Exception as e:
-#        print (f'Can not get rat for ltb with id {ltb.ltb_id}')
-#        return
-#    dsi, j = 0,0
-#    for k in dsi_cards:
-#        if k.j1_rat_id == rat.rat_id:
-#            dsi = k.dsi_id
-#            j   = 1
-#            break
-#
-#        if k.j2_rat_id == rat.rat_id:
-#            dsi = k.dsi_id
-#            j   = 2
-#            break
-#        
-#        if k.j3_rat_id == rat.rat_id:
-#            dsi = k.dsi_id
-#            j   = 3
-#            break
-#        
-#        if k.j4_rat_id == rat.rat_id:
-#            dsi = k.dsi_id
-#            j   = 4
-#            break
-#        
-#        if k.j5_rat_id == rat.rat_id:
-#            dsi = k.dsi_id
-#            j   = 5
-#            break
-#
-#    ltb.ltb_dsi = dsi
-#    ltb.ltb_j   = j
-#    print(f" Will write dsi {dsi} and j {j}")
-#    if not dry_run:
-#        ltb.save()
-#class PaddleEnd(models.Model):
-#    """
-#    One end of a paddle with SiPM array
-#    """
-#    PADDLE_END    = [('A', 'A'), ('B', 'B')]
-#    paddle_end_id = models.PositiveSmallIntegerField(
-#                        primary_key=True,
-#                        unique=True,
-#                        help_text="PaddleID + 1000 for A and PaddleID + 2000 for B")
-#    paddle_id     = models.PositiveSmallIntegerField()
-#
-#    end           = models.CharField(max_length=1, choices=PADDLE_END)
-#    end_location  = models.CharField(max_length=2,\
-#                                    help_text="Location of the paddle end relative to the paddle center")
-#    panel_id      = models.PositiveSmallIntegerField()
-#    pos_in_panel  = models.CharField(max_length=4,\
-#                                     help_text="Identifier in global coordinates about the location in the panel",\
-#                                     null=True,\
-#                                     default="")
-#    cable_length  = models.FloatField(help_text="Cable length in cm")
-#    rat           = models.PositiveSmallIntegerField()
-#    ltb_id        = models.PositiveSmallIntegerField()
-#    rb_id         = models.PositiveSmallIntegerField()
-#    pb_id         = models.PositiveSmallIntegerField()
-#    ltb_ch        = models.PositiveSmallIntegerField()
-#    pb_ch         = models.PositiveSmallIntegerField()
-#    #FIXME - is this starting from 0 or 1?
-#    rb_ch         = models.PositiveSmallIntegerField()
-#    dsi           = models.PositiveSmallIntegerField()
-#    rb_harting_j  = models.PositiveSmallIntegerField()
-#    ltb_harting_j = models.PositiveSmallIntegerField()
-#    mtb_link_id   = models.PositiveSmallIntegerField(unique=False)
-#
-#    def setup_unique_paddle_end_id(self):
-#        """
-#        Introduce a uuid. We have 160 paddles with 2 ends. Make the uuid the following
-#        paddle_end_id(end :<A || B>): return 1000 if end == A else 2000
-#        uuid = paddle_end_id(end) + paddle_id (so the paddle id is preceeded by 1 or 2 and the 
-#        2nd and 3rd digits are filled up with 0s if necessary
-#        """
-#        if self.end == 'A':
-#            self.paddle_end_id = 1000 + self.paddle_id
-#        elif self.end == 'B':
-#            self.paddle_end_id = 2000 + self.paddle_id
-#        else:
-#            raise ValueError(f'PaddleEnd unique identifier can not be created for paddle end {self.end} with paddle id {self.paddle_id}')
-#
-#    def fill_from_spreadsheet(self, data):
-#        self.paddle_id     = int(data['Paddle Number']) 
-#        self.end           = data['Paddle End (A/B)'] 
-#        self.end_location  = data['Paddle End Location']           
-#        print ("-- -- keys --")
-#        print (data)
-#        self.mtb_link_id   = data['MTB Link ID']
-#        panel_id           = str(data['Panel Number'])
-#        if panel_id.startswith('E'):
-#            # this are these individual edge paddles
-#            # we replace them with 1000 + the number 
-#            # after E-X
-#            panel_id = panel_id.replace("E-X","")
-#            self.panel_id = int(panel_id) + 1000
-#        else:
-#            self.panel_id = int(panel_id)
-#        self.cable_length  = int(data['Cable length (cm)'] )
-#        self.rat           = int(data['RAT Number'] )
-#        ltb_info           = data['LTB Number-Channel'].split('-')
-#        rb_info            = data['RB Number-Channel'].split('-')
-#        pb_info            = data['PB Number-Channel'].split('-')
-#        self.ltb_id        = int(ltb_info[0]) 
-#        self.rb_id         = int(rb_info[0])
-#        self.pb_id         = int(pb_info[0])
-#        self.ltb_ch        = int(ltb_info[1])
-#        self.pb_ch         = int(pb_info[1] )
-#        self.rb_ch         = int(rb_info[1] )
-#        
-#        # in some spreadsheets, the label differs,
-#        # so we are just looking for some variant
-#        good = False
-#        for label in 'DSI card slot', 'DSI Card Slot', 'DSI card slot ', 'DSI Card Slot ':
-#            try:
-#                self.dsi           = int(data[label])
-#                good               = True
-#                #print("Found good key!")
-#                break
-#            except KeyError:
-#                #print(f".. can't find key {label}, trying next variant..")
-#                continue
-#        if not good:
-#            raise ValueError("Could not get DSI assignment!")
-#        rb_h_j             = data['RB Harting Connection'].replace('J','')
-#        ltb_h_j            = data['LTB Harting Connection'].replace('J','')
-#        #rb_h_j             = data['RB Harting Connection'].split('_')
-#        #ltb_h_j            = data['LTB Harting Connection'].split('_')
-#        self.rb_harting_j  = int(rb_h_j)
-#        self.ltb_harting_j = int(ltb_h_j)
-#
-#    def __str__(self):
-#        return self.__repr__()
-#
-#    def __repr__(self):
-#        try:
-#            panel  = Panel.objects.filter(panel_id=self.panel_id)[0]
-#        except Exception as e:
-#            panel  = 'UNKNOWN'
-#        try:
-#            paddle = Paddle.objects.filter(paddle_id=self.paddle_id)[0] 
-#        except:
-#            paddle = 'UNKNOWN'
-#        _repr = '<PaddleEnd:'
-#        _repr += f'\n  ** identifiers **'
-#        _repr += f'\n   id             : {self.paddle_end_id}'     
-#        _repr += f'\n   pid            : {self.paddle_id}'     
-#        _repr += f'\n   end (A|B)      : {self.end}' 
-#        _repr += f'\n   MTB Link ID    : {self.mtb_link_id}'
-#        _repr += f'\n  ** connedtions **'
-#        _repr += f'\n   DSI/J/CH (LG)  :  {self.dsi} | {self.ltb_harting_j} | {self.ltb_ch:02}'
-#        _repr += f'\n   DSI/J/CH (HG)  :  {self.dsi} | {self.rb_harting_j} | {self.rb_ch:02}'
-#        _repr += f'\n   RB/CH          : {self.rb_id:02} | {self.rb_ch:02}'
-#        _repr += f'\n   PB/CH          : {self.pb_id:02} | {self.pb_ch:02}'
-#        _repr += f'\n   RAT id         : {self.rat:02}'
-#        _repr += f'\n   LTB id         : {self.ltb_id:02}'
-#        _repr += f'\n   cable len [cm] :'
-#        _repr += f'\n    \u21B3 {self.cable_length}'
-#        _repr += f'\n    (Harting -> RB)'
-#        _repr += f'\n  ** panel & location **'
-#        _repr += f'\n   end ->         : {self.end_location}' 
-#        #_repr += f'\n   panel id       : {self.panel_id}'     
-#        _repr += f'\n   loc. in panel  : {self.pos_in_panel}'
-#        _repr += f'\n   {panel}'
-#        _repr += f'\n   {paddle}>'
-#        return _repr
-#
-#
 #class LiftofSettings(models.Model):
 #    """
 #    Run settings to be used with liftof-cc

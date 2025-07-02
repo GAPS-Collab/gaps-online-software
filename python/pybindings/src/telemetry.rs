@@ -20,8 +20,6 @@ use crate::dataclasses::{
 // or maybe we want to revive the dataclasses pybindings
 // in tof-dataclasses?
 use tof_dataclasses::events as tof_api;
-use tof_dataclasses::packets::TofPacket;
-use tof_dataclasses::serialization::Serialization;
 
 #[pyclass]
 #[pyo3(name="TelemetryHeader")]
@@ -66,7 +64,7 @@ impl PyTelemetryHeader {
 
   /// GCU time of packet creation
   #[getter]
-  fn timestamnp(&self) -> u32 {
+  fn timestamp(&self) -> u32 {
     self.header.timestamp
   }
 
@@ -84,19 +82,13 @@ impl PyTelemetryHeader {
 #[pyclass]
 #[pyo3(name="MergedEvent")]
 pub struct PyMergedEvent {
-  event : tel_api::MergedEvent,
-}
-
-impl PyMergedEvent {
-  pub fn set_event(&mut self, event : tel_api::MergedEvent) {
-    self.event = event;
-  }
+  pub event : tel_api::MergedEvent,
 }
 
 #[pymethods]
 impl PyMergedEvent {
   #[new]
-  fn new() -> Self {
+  pub fn new() -> Self {
     Self {
       event : tel_api::MergedEvent::new(),
     }
@@ -113,6 +105,7 @@ impl PyMergedEvent {
     for h in &self.event.tracker_hitsv2 {
       let mut pyhit = PyTrackerHitV2::new();
       pyhit.set_hit(h.clone());
+      //pyhit.hit = h.clone();
       hits.push(pyhit);
     }
     Ok(hits)
@@ -129,53 +122,45 @@ impl PyMergedEvent {
     Ok(events)
   }
 
-
-
-  /// Check if TOF/tracker data can be unpacked an no errors are thrown
+  // FIXME - do this with bound
   #[getter]
-  fn broken(&self) -> bool {
-    // since the tracker part is already deserialized, the check
-    // is only relevant for the tof part
-    match TofPacket::from_bytestream(&self.event.tof_data, &mut 0) {
-      Err(_) => {
-        //error!("Unable to parse TofPacket! {err}");
-        return true;
-      }
-      Ok(pack) => {
-        match pack.unpack::<tof_api::TofEventSummary>() {
-          Err(_) => {
-            return true;
-            //error!("Unable to parse TofEventSummary! {err}");
-          }
-          Ok(_)    => {
-            return false;
-          }
-        }
-      }
-    }
+  fn get_tof(&self) -> PyResult<PyTofEventSummary> {
+  //fn get_tof<'_py>(&self, py: Python<'_py>) -> PyResult<Bound<'_py, PyTofEventSummary>> {
+    let mut pyts = PyTofEventSummary::new();
+    pyts.event   = self.event.tof_event.clone();
+    Ok(pyts)
   }
+    //match TofPacket::from_bytestream(&self.event.tof_data, &mut 0) {
+    //  Err(err) => {
+    //    //error!("Unable to parse TofPacket! {err}");
+    //    return Err(PyValueError::new_err(err.to_string()));
+    //  }
+    //  Ok(pack) => {
+    //    match pack.unpack::<tof_api::TofEventSummary>() {
+    //      Err(err) => {
+    //        return Err(PyValueError::new_err(err.to_string()));
+    //        //error!("Unable to parse TofEventSummary! {err}");
+    //      }
+    //      Ok(ts)    => {
+    //        let mut pyts = PyTofEventSummary::new();
+    //        pyts.event = ts;
+    //        return Ok(pyts);
+    //      }
+    //    }
+    //  }
+    //}
+    //}
 
   #[getter]
-  fn tof(&self) -> PyResult<PyTofEventSummary> {
-    match TofPacket::from_bytestream(&self.event.tof_data, &mut 0) {
-      Err(err) => {
-        //error!("Unable to parse TofPacket! {err}");
-        return Err(PyValueError::new_err(err.to_string()));
-      }
-      Ok(pack) => {
-        match pack.unpack::<tof_api::TofEventSummary>() {
-          Err(err) => {
-            return Err(PyValueError::new_err(err.to_string()));
-            //error!("Unable to parse TofEventSummary! {err}");
-          }
-          Ok(ts)    => {
-            let mut pyts = PyTofEventSummary::new();
-            pyts.event = ts;
-            return Ok(pyts);
-          }
-        }
-      }
+  fn tracker_pointcloud(&self) -> Vec<(f32, f32, f32, f32, f32)> {
+    let mut pts = Vec::<(f32,f32,f32,f32,f32)>::new();
+    for h in &self.event.tracker_hitsv2 {
+      // uses adc
+      // FIXME - factor 10!
+      let pt = (10.0*h.x, 10.0*h.y, 10.0*h.z, f32::NAN, h.adc as f32);
+      pts.push(pt);
     }
+    pts
   }
 
   /// Populate a merged event from a TelemetryPacket.
@@ -184,7 +169,7 @@ impl PyMergedEvent {
   fn from_telemetrypacket(&mut self, packet : PyTelemetryPacket) -> PyResult<()> {
     match tel_api::MergedEvent::from_bytestream(&packet.packet.payload, &mut 0) {
       Ok(event) => {
-        self.set_event(event);
+        self.event = event;
         self.event.header = packet.packet.header.clone();
       }
       Err(err) => {
@@ -435,6 +420,18 @@ impl PyTelemetryPacketReader {
     Ok(())
   }
 
+  #[getter]
+  fn get_filenames(&self) -> Vec<String> {
+    self.reader.filenames.clone()
+  }
+
+  #[getter]
+  fn get_current_file(&self) -> String {
+    if self.reader.file_index >= self.reader.filenames.len() {
+      return String::from("");
+    }
+    self.reader.filenames[self.reader.file_index].clone()
+  }
   /// Return an inventory of packets in this file, where TelemetryPacketType is
   /// represented by its associtated integer
   ///
@@ -610,11 +607,17 @@ impl PyTrackerHit {
     self.adc
   }
 
+  /// Change the ADC value, e.g. if the 
+  /// pedestal should be subtracted
+  fn subtract_pedestal(&mut self, pedestal : u16) {
+    self.adc -= pedestal;
+  }
+
   #[getter]
   fn asic_event_code(&self) -> u8 {
     self.asic_event_code
   }
-  
+
   fn __repr__(&self) -> PyResult<String> {
     Ok(format!("{}", self))
   }
@@ -652,6 +655,7 @@ pub struct PyTrackerHitV2 {
   pub channel         : u16,
   pub adc             : u16,
   pub oscillator      : u64,
+  pub energy          : f64,
 }
 
 impl PyTrackerHitV2 {
@@ -677,7 +681,25 @@ impl PyTrackerHitV2 {
       channel         : 0,
       adc             : 0,
       oscillator      : 0,
+      energy          : 0.0,
     }
+  }
+  
+  /// Set the energy field with the given energy, 
+  /// as calculated from a transfer function
+  fn set_energy(&mut self, energy : f64) {
+    self.energy = energy;
+  }
+
+  /// Change the ADC value, e.g. if the 
+  /// pedestal should be subtracted
+  fn subtract_pedestal(&mut self, pedestal : u16) {
+    self.adc -= pedestal;
+  }
+
+  #[getter]
+  pub fn get_stripid(&self) -> u32 {
+    self.channel as u32 + (self.module as u32)*100 + (self.row as u32)*10000 + (self.layer as u32)*100000
   }
 
   #[getter]
@@ -718,12 +740,10 @@ impl PyTrackerHitV2 {
 impl fmt::Display for PyTrackerHitV2 {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut repr = String::from("<PyTrackerHitV2:");
-    repr += &(format!("\n  Layer         : {}" ,self.layer));
-    repr += &(format!("\n  Row           : {}" ,self.row));
-    repr += &(format!("\n  Module        : {}" ,self.module));
-    repr += &(format!("\n  Channel       : {}" ,self.channel));
+    repr += &(format!("\n  Layer, Row, Module, Channel : {} {} {} {}" ,self.layer, self.row, self.module, self.channel));
     repr += &(format!("\n  ADC           : {}" ,self.adc));
-    repr += &(format!("\n  Oscillator    : {}>",self.oscillator));
+    repr += &(format!("\n  Oscillator    : {}" ,self.oscillator));
+    repr += &(format!("\n  Calib energy  : {}>",self.energy));
     write!(f, "{}", repr)
   }
 }

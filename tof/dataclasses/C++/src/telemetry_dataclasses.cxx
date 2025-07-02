@@ -48,6 +48,8 @@ std::string gtl::bfsw_ptype_to_str(gtl::BfswPacketType pt) {
       return "NoGapsTriggerEvent";
     case gtl::BfswPacketType::NoTofDataEvent:
       return "NoTofDataEvent";
+    case gtl::BfswPacketType::CoolingHK:
+      return "CoolingHK";
     default:
       return std::format("Unknown/NotImplemented ({})", (int)pt) ;
   }
@@ -63,16 +65,16 @@ auto  gtl::PacketHeader::from_bytestream(Vec<u8> const &stream, usize &pos)
   -> Result<PacketHeader, g::IOError> {
   gtl::PacketHeader ph;
   if (stream.size() < pos + gtl::PacketHeader::SIZE) {
-    log_error("The telemetry header is too short! (" << stream.size() << " bytes when " << gtl::PacketHeader::SIZE << " are expected");
+    spdlog::error("The telemetry header is too short! ({} bytes when {} are expected!", stream.size(), gtl::PacketHeader::SIZE);
     pos += gtl::PacketHeader::SIZE;
     return Ok(ph);
   }
   if (parse_u16(stream, pos) != gtl::PacketHeader::HEAD) {
-    log_error("The given position " << pos-2 << " does not point to a valid header signature of " << gtl::PacketHeader::HEAD);
+    spdlog::error("The given position {} does not point to a valid header signature of {}", pos-2 ,gtl::PacketHeader::HEAD);
     pos += gtl::PacketHeader::SIZE - 2;
     return Ok(ph);
   }
-  ph.sync  = PacketHeader::HEAD;
+  ph.sync      = PacketHeader::HEAD;
   ph.ptype     = static_cast<gtl::BfswPacketType>(parse_u8 (stream, pos));
   ph.timestamp = parse_u32(stream, pos);
   ph.counter   = parse_u16(stream, pos);
@@ -81,7 +83,7 @@ auto  gtl::PacketHeader::from_bytestream(Vec<u8> const &stream, usize &pos)
   return Ok(ph);
 }
 
-auto gtl::PacketHeader::to_string() -> std::string {
+auto gtl::PacketHeader::to_string() const -> std::string {
   std::string repr = "<PacketHeader:";
   repr += std::format("\n  Header      : {}" ,sync);
   repr += std::format("\n  Packet Type : {}" ,bfsw_ptype_to_str(ptype));
@@ -94,8 +96,8 @@ auto gtl::PacketHeader::to_string() -> std::string {
 
 //----------------------------------------
 
-gtl::Packet gtl::Packet::from_bytestream(Vec<u8> const &stream,
-                                         usize &pos) {
+auto  gtl::Packet::from_bytestream(Vec<u8> const &stream,
+                                   usize &pos) -> gtl::Packet {
   gtl::Packet packet;
   auto header = gtl::PacketHeader::from_bytestream(stream, pos).unwrap();
   // FIXME
@@ -105,7 +107,7 @@ gtl::Packet gtl::Packet::from_bytestream(Vec<u8> const &stream,
   return packet;
 }
 
-std::string gtl::Packet::to_string() {
+auto gtl::Packet::to_string() const -> std::string {
   std::string repr = "<TelemetryPacket:";
   repr += std::format("{}", header.to_string());
   repr += "\n --------";
@@ -115,7 +117,7 @@ std::string gtl::Packet::to_string() {
 
 //----------------------------------------
 
-std::string gtl::TrkHit::to_string() {
+auto gtl::TrkHit::to_string() const -> std::string {
   std::string repr = "<TrackerHit:";
   repr += std::format("\n  Layer      : {}", layer);
   repr += std::format("\n  Row        : {}", row);
@@ -129,7 +131,7 @@ std::string gtl::TrkHit::to_string() {
 
 //----------------------------------------
 
-std::string gtl::TrkEvent::to_string() {
+auto gtl::TrkEvent::to_string() const -> std::string {
   std::string repr = "<TrackerEvent:";
   repr += std::format("\n  layer         : {}" ,layer);
   repr += std::format("\n  flags1        : {}" ,flags1);
@@ -167,7 +169,7 @@ gtl::TofMetaData gtl::TofMetaData::from_bytestream(Vec<u8> const &bytes, usize &
   return tm;
 }
 
-std::string gtl::TofMetaData::to_string() {
+auto gtl::TofMetaData::to_string() const -> std::string {
   std::string repr = "<TofMetaData";
   repr += std::format("\n  EventID      : {}" ,event_id);
   repr += std::format("\n  Version      : {}" ,status_version);
@@ -184,15 +186,15 @@ std::string gtl::TofMetaData::to_string() {
 
 //----------------------------------------
 
-auto gtl::MergedEvent::to_string() -> std::string {
+auto gtl::MergedEvent::to_string() const -> std::string {
   std::string repr = "<MergedEvent";
   repr += std::format("\n  Header : {}", header.to_string());
-  repr += std::format("\n  Creation Time : {}" ,creation_time);
-  repr += std::format("\n  EventID       : {}" ,event_id);
-  repr += std::format("\n  Flags0        : {}" ,flags0);
-  repr += std::format("\n  Flags1        : {}" ,flags1);
-  repr += std::format("\n  N Tof hits    : {}" ,n_tof_hits);
-  repr += std::format("\n  Tof bytes     : {}" ,tof_data.size());
+  repr += std::format("\n  Creation Time : {}" , creation_time);
+  repr += std::format("\n  EventID       : {}" , event_id);
+  repr += std::format("\n  Flags0        : {}" , flags0);
+  repr += std::format("\n  Flags1        : {}" , flags1);
+  repr += std::format("\n  N Tof hits    : {}" , n_tof_hits);
+  repr += std::format("\n  Tof hits      : {}" , tof_event.hits.size());
   repr += std::format("\n  Trk hits      : {}>" ,trk_hits.size());
   //    PacketHeader header;
   //    u64 creation_time;
@@ -230,41 +232,48 @@ auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
   //  return evt;
   //}
   u16 num_tof_bytes = parse_u16(stream, pos);
-  evt.tof_data.clear();
   if (stream.size() < pos + num_tof_bytes) {
     std::string message = std::format("Stream does not contain enough TOF bytes!");
-    log_error("" << message);
+    spdlog::error("{}",message);
     auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
     return Err(err);
   }
-  evt.tof_data = Gaps::slice(stream, pos, pos + num_tof_bytes);
+  auto tof_data = Gaps::slice(stream, pos, pos + num_tof_bytes);
+  if (tof_data.size() > 0) {
+    usize tpos = 0;
+    auto tof_packet = TofPacket::from_bytestream(tof_data, tpos);
+    if (tof_packet.is_ok()) {
+      auto tof_event = TofEventSummary::from_tofpacket(tof_packet.unwrap());
+      if (tof_event.is_ok()) {
+        evt.tof_event = tof_event.unwrap();
+      }
+    }
+  }
   pos += num_tof_bytes;
   u8 tracker_delim = parse_u8(stream, pos);
 
   if(tracker_delim != 0xbb) {
     std::string message = std::format("Incorrect tracker delmiter flag ({})!", tracker_delim);
-    log_error("" << message);
+    spdlog::error("{}",message);
     auto err = g::IOError(g::IOError::ErrorKind::WrongDelimiter, message);
     return Err(err);
   }
   evt.n_trk_hits = parse_u16(stream, pos); 
-
-
   for(u16 j = 0; j < evt.n_trk_hits; ++j) {
-     u16 strip_id = parse_u16(stream, pos);
-     u16 adc      = parse_u16(stream, pos);
-     TrkHit hit;
-     hit.channel = strip_id & 0b11111;
-     hit.module  = (strip_id >> 5) & 0b111;
-     hit.row     = (strip_id >> 8) & 0b111;
-     hit.layer   = (strip_id >> 11) & 0b1111;
-     hit.adc     = adc;
-     evt.trk_hits.push_back(hit);
+    u16 strip_id = parse_u16(stream, pos);
+    u16 adc      = parse_u16(stream, pos);
+    TrkHit hit;
+    hit.channel = strip_id & 0b11111;
+    hit.module  = (strip_id >> 5) & 0b111;
+    hit.row     = (strip_id >> 8) & 0b111;
+    hit.layer   = (strip_id >> 11) & 0b1111;
+    hit.adc     = adc;
+    evt.trk_hits.push_back(hit);
   }
   u8 osci_delim = parse_u8(stream, pos);
   if(osci_delim != 0xcc) {
     std::string message = std::format("Incorrect osci delmiter flag ({})!", osci_delim);
-    log_error("" << message);
+    spdlog::error("{}",message);
     auto err = g::IOError(g::IOError::ErrorKind::WrongDelimiter, message);
     return Err(err);
   }
@@ -277,7 +286,7 @@ auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
   }
   if (pos + 6*oscillator_idx.size() > stream.size()) {
     std::string message = std::format("Stream does not contain enough bytes for {} trk oscillators!! Only {} bytes left!", oscillator_idx.size(), stream.size() - pos);
-    log_error("" << message);
+    spdlog::error("{}",message);
     auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
     return Err(err);
   }
@@ -290,6 +299,84 @@ auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
   }
   return Ok(evt);
 }  
+
+auto gtl::Cooling::to_string() const -> std::string {
+  std::string repr = "<Cooling";
+  repr += std::format("\n  frame_counter : {}", frame_counter);
+  repr += std::format("\n  status_1      : {}", status_1);
+  repr += std::format("\n  status_2      : {}", status_2);
+  repr += std::format("\n  rx_byte_num   : {}", rx_byte_num);
+  repr += std::format("\n  rx_cmd_num    : {}", rx_cmd_num);
+  repr += std::format("\n  last_cmd      : {}", last_cmd);
+  repr += std::format("\n  rsv_t         : {}", rsv_t);
+  repr += std::format("\n  rh_don        : {}", rh_on);
+  repr += std::format("\n  rh_off        : {}", rh_off);
+  repr += std::format("\n  fpga_board_v_i: {}", fpga_board_v_in);
+  repr += std::format("\n  fpga_board_i_i: {}", fpga_board_i_in);
+  repr += std::format("\n  fpga_board_t  : {}", fpga_board_t);
+  repr += std::format("\n  fpga_board_p  : {}", fpga_board_p);
+  //repr += std::format(:array<u16, 64);
+  repr += std::format("\n  sh_current    : {}", sh_current);
+  repr += std::format("\n  rh_current    : {}", rh_current);
+  repr += std::format("\n  pw_board1_t   : {}", pw_board1_t);
+  repr += std::format("\n  pw_board2_t   : {}", pw_board2_t);
+  repr += std::format("\n  sh1_time_left : {}", sh1_time_left);
+  repr += std::format("\n  sh2_time_left : {}", sh2_time_left);
+  repr += std::format("\n  sh3_time_left : {}", sh3_time_left);
+  return repr;
+}
+
+auto gtl::Cooling::from_bytestream(Vec<u8> const &stream, usize &pos) -> r::Result<Cooling, g::IOError> {
+  auto cln = Cooling();
+  if (stream.size() - pos < gtl::Cooling::SIZE) {
+    std::string message = std::format("Stream is too short for a cooling packet. We got a streamof size {} when expectinog {} bytes!", stream.size() - pos, gtl::Cooling::SIZE);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongDelimiter, message);
+    return Err(err);
+  }
+  auto start_byte = parse_u8(stream, pos);
+  if (start_byte != 0x1e) {
+    std::string message = std::format("Start byte for cooling packet incorrect! Got {} instead of 0x1e", start_byte);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongDelimiter, message);
+    return Err(err);
+  } 
+  cln.rtd.fill(0xffff);
+  cln.frame_counter   = 0xffffff & parse_u32(stream, pos);
+  pos -= 1;
+  cln.status_1        = parse_u8(stream, pos);  
+  cln.status_2        = parse_u8(stream, pos);  
+  cln.rx_byte_num     = parse_u8(stream, pos);  
+  cln.rx_cmd_num      = parse_u8(stream, pos);  
+  cln.last_cmd        = 0xffffffffffffff & parse_u64(stream, pos); 
+  pos -= 1;
+  cln.rsv_t           = parse_u16(stream, pos);
+  cln.rh_on           = parse_u16(stream, pos);
+  cln.rh_off          = parse_u16(stream, pos);
+  cln.fpga_board_v_in = parse_u16(stream, pos);
+  cln.fpga_board_i_in = parse_u16(stream, pos);
+  pos += 2;
+  cln.fpga_board_t        = parse_u16(stream, pos);
+  cln.fpga_board_p        = parse_u16(stream, pos);
+  pos += 6;
+  //std::cout << cln.rtd.size() << std::endl;
+  for(usize k=0; k < cln.rtd.size(); k++) {
+    cln.rtd[k] = parse_u16(stream, pos); 
+  }
+  cln.sh_current      = parse_u16(stream, pos);
+  cln.rh_current      = parse_u16(stream, pos);
+  cln.pw_board1_t     = parse_u16(stream, pos);
+  cln.pw_board2_t     = parse_u16(stream, pos);
+  cln.sh1_time_left   = parse_u16(stream, pos);
+  cln.sh2_time_left   = parse_u16(stream, pos);
+  cln.sh3_time_left   = parse_u16(stream, pos);
+  pos += 2; //spare
+  auto stop_byte = parse_u8(stream,pos);
+  if (stop_byte != 0x0a) {
+    std::string message = std::format("Stop byte for cooling packet incorrect! Got {} instead of 0x0a", stop_byte);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongDelimiter, message);
+    return Err(err);
+  } 
+  return Ok(cln);
+}
 
 //template <typename T> int unpack(const T& bytes, size_t i) {
 //

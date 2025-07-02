@@ -18,11 +18,11 @@
  */
 struct LTBMoniData {
   /// struct begin marker bytes
-  static const u16 HEAD = 0xAAAA;
+  static constexpr u16 HEAD = 0xAAAA;
   /// struct end marker bytes
-  static const u16 TAIL = 0x5555;
+  static constexpr u16 TAIL = 0x5555;
   /// byte size with HEAD + TAIL
-  static const u8  SIZE = 25; 
+  static constexpr u8  SIZE = 25; 
   
   /// FIXME - this might be the RB id
   u8                 board_id  ; 
@@ -36,11 +36,11 @@ struct LTBMoniData {
 
   /// Factory function - recreate LTBMoniData from 
   /// byte representation
-  static LTBMoniData from_bytestream(const Vec<u8> &stream,
-                                     usize &pos);
+  static auto from_bytestream(const Vec<u8> &stream, usize &pos)
+    -> LTBMoniData;
   
   /// String representatioin for printing
-  std::string to_string() const;
+  auto to_string() const -> std::string;
 };
 
 std::ostream& operator<<(std::ostream& os, const LTBMoniData& moni);
@@ -51,9 +51,9 @@ std::ostream& operator<<(std::ostream& os, const LTBMoniData& moni);
  *
  */ 
 struct RBMoniData {
-  static const u16 HEAD = 0xAAAA;
-  static const u16 TAIL = 0x5555;
-  static const u8  SIZE = 151;
+  static constexpr u16 HEAD = 0xAAAA;
+  static constexpr u16 TAIL = 0x5555;
+  static constexpr u8  SIZE = 151;
 
   u8  board_id           ;  
   /// Rate as recorded by the board itself
@@ -101,11 +101,11 @@ struct RBMoniData {
 
   RBMoniData();
 
-  static RBMoniData from_bytestream(const Vec<u8> &stream,
-                                    usize &pos);
+  static auto from_bytestream(const Vec<u8> &stream, usize &pos)
+    -> RBMoniData;
   
   /// String representatioin for printing
-  std::string to_string() const;
+  auto to_string() const -> std::string;
 };
 
 std::ostream& operator<<(std::ostream& os, const RBMoniData& moni);
@@ -114,9 +114,9 @@ std::ostream& operator<<(std::ostream& os, const RBMoniData& moni);
  * Sensors on the Power Board
  */ 
 struct PBMoniData {
-  static const u16 HEAD = 0xAAAA;
-  static const u16 TAIL = 0x5555;
-  static const u8  SIZE = 89;
+  static constexpr u16 HEAD = 0xAAAA;
+  static constexpr u16 TAIL = 0x5555;
+  static constexpr u8  SIZE = 89;
 
   u8 board_id;
   std::array<f32, 3> p3v6_preamp_vcp;
@@ -133,11 +133,11 @@ struct PBMoniData {
   PBMoniData();
 
   /// Factor function - restore PAMoniData from byte-representation
-  static PBMoniData from_bytestream(const Vec<u8> &stream,
-                                    usize &pos);
+  static auto from_bytestream(const Vec<u8> &stream, usize &pos)
+     -> PBMoniData;
   
   /// String representation for pretty printing
-  std::string to_string() const;
+  auto to_string() const -> std::string;
 };
 
 std::ostream& operator<<(std::ostream& os, const PBMoniData& moni);
@@ -146,9 +146,9 @@ std::ostream& operator<<(std::ostream& os, const PBMoniData& moni);
  * Preamp sensors
  */
 struct PAMoniData {
-  static const u16 HEAD = 0xAAAA;
-  static const u16 TAIL = 0x5555;
-  static const u8  SIZE = 89;
+  static constexpr u16 HEAD = 0xAAAA;
+  static constexpr u16 TAIL = 0x5555;
+  static constexpr u8  SIZE = 89;
 
   u8 board_id;
   std::array<f32, 16> temps;
@@ -156,11 +156,11 @@ struct PAMoniData {
   PAMoniData();
 
   /// Factory function - restore PAMoniData from byte-representation
-  static PAMoniData from_bytestream(const Vec<u8> &stream,
-                                    usize &pos);
+  static auto from_bytestream(const Vec<u8> &stream, usize &pos)
+    -> PAMoniData;
   
   /// String representation for pretty printing
-  std::string to_string() const;
+  auto to_string() const -> std::string;
 };
   
 std::ostream& operator<<(std::ostream& os, const PAMoniData& moni);
@@ -170,9 +170,9 @@ std::ostream& operator<<(std::ostream& os, const PAMoniData& moni);
  *
  */
 struct MtbMoniData : FromTofPacket<MtbMoniData> {
-  static const u16 HEAD = 0xAAAA;
-  static const u16 TAIL = 0x5555;
-  static const u8  SIZE = 6;
+  static constexpr u16 HEAD = 0xAAAA;
+  static constexpr u16 TAIL = 0x5555;
+  static constexpr u8  SIZE = 6;
   
   f32 fpga_temp    ;
   f32 fpga_vccint  ;
@@ -187,24 +187,18 @@ struct MtbMoniData : FromTofPacket<MtbMoniData> {
  
   MtbMoniData();
 
-  std::string to_string()  const;
+  auto to_string()  const -> std::string;
   
-  bool get_tiu_emulation_mode() const;
-  
-  bool get_tiu_use_aux_link()   const;
-
-  bool get_tiu_bad()            const;
-
-  bool get_tiu_busy_stuck()     const;
-
-  bool get_tiu_ignore_busy()    const;
-  
+  auto get_tiu_emulation_mode() const -> bool;
+  auto get_tiu_use_aux_link()   const -> bool;
+  auto get_tiu_bad()            const -> bool;
+  auto get_tiu_busy_stuck()     const -> bool;
+  auto get_tiu_ignore_busy()    const -> bool;
   /// Convert ADC temp from adc values to Celsius
-  f32 get_fpga_temp() const;
-
+  auto get_fpga_temp() const -> f32;
   /// extract moni data from payload
-  static MtbMoniData from_bytestream(const Vec<u8>& payload,
-                                     usize& pos);
+  static auto from_bytestream(const Vec<u8>& payload, usize& pos)
+    -> MtbMoniData;
 };
 
 std::ostream& operator<<(std::ostream& os, const MtbMoniData& moni);
@@ -214,9 +208,9 @@ std::ostream& operator<<(std::ostream& os, const MtbMoniData& moni);
  * of the central tof computer
  */
 struct CPUMoniData {
-  static const u16 HEAD = 0xAAAA;
-  static const u16 TAIL = 0x5555;
-  static const u8  SIZE = 41;
+  static constexpr u16 HEAD = 0xAAAA;
+  static constexpr u16 TAIL = 0x5555;
+  static constexpr u8  SIZE = 41;
 
   u32                uptime     ; 
   u8                 disk_usage ; 
@@ -228,10 +222,10 @@ struct CPUMoniData {
   
   CPUMoniData(); 
   /// extract moni data from payload
-  static CPUMoniData from_bytestream(const Vec<u8>& payload,
-                                     usize &pos);
+  static auto from_bytestream(const Vec<u8>& payload, usize &pos)
+    -> CPUMoniData;
 
-  std::string to_string() const;
+  auto to_string() const -> std::string;
 };
 
 std::ostream& operator<<(std::ostream& os, const CPUMoniData& moni);
