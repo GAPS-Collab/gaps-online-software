@@ -296,7 +296,7 @@ impl TofEvent {
   /// Warning, this might be a bit slow
   #[cfg(feature="database")]
   pub fn get_triggered_paddles(&self, pid_map :   DsiJChPidMapping) -> Vec<u8> {
-    let mut paddles = Vec::<u8>::new();
+    let mut paddles = Vec::<u8>::with_capacity(3);
     for th in self.mt_event.get_trigger_hits() {
       let pid = pid_map.get(&th.0).unwrap().get(&th.1).unwrap().get(&th.2.0).unwrap().0;
       paddles.push(pid);
@@ -490,6 +490,26 @@ impl TofEvent {
     let mut nhit = 0;
     for h in &self.get_hits() {
       if h.paddle_id > 60 && h.paddle_id < 109 {
+        nhit += 1;
+      }
+    }
+    nhit
+  }
+  
+  pub fn get_nhits_cbe(&self) -> usize {
+    let mut nhit = 0;
+    for h in &self.get_hits() {
+      if h.paddle_id < 61 {
+        nhit += 1;
+      }
+    }
+    nhit
+  }
+
+  pub fn get_nhits_cor(&self) -> usize {
+    let mut nhit = 0;
+    for h in &self.get_hits() {
+      if h.paddle_id > 108 {
         nhit += 1;
       }
     }
@@ -877,12 +897,123 @@ impl TofEventSummary {
       paddles_set        : false,
     }
   }
+
+  /// Set timing offsets to the event's hits
+  ///
+  /// # Arguments:
+  ///   * offsets : a hashmap paddle id -> timing offset
+  #[cfg(feature="database")]
+  pub fn set_timing_offsets(&mut self, offsets : &HashMap<u8, f32>) {
+    for h in self.hits.iter_mut() {
+      if offsets.contains_key(&h.paddle_id) {
+        h.timing_offset = offsets[&h.paddle_id]; 
+      }
+    }
+  }
+
+  /// Remove hits from the hitseries which can not 
+  /// be caused by the same particle, which means 
+  /// that for these two specific hits beta with 
+  /// respect to the first hit in the event is 
+  /// larger than one
+  /// That this works, first hits need to be 
+  /// "normalized" by calling normalize_hit_times
+  ///
+  /// # Return:
+  ///
+  ///   * removed paddle ids, twindows
+  pub fn lightspeed_cleaning(&mut self, t_err : f32) -> (Vec<u8>, Vec<f32>) {
+    // first sort the hits in time
+    if self.hits.len() == 0 {
+      return (Vec::<u8>::new(), Vec::<f32>::new());
+    }
+    let mut twindows = Vec::<f32>::new();
+
+    self.hits.sort_by(|a,b| (a.event_t0).partial_cmp(&b.event_t0).unwrap());
+    let first_hit = self.hits[0].clone(); // the clone here is a bit unfortunate, 
+                                           // this can be done better with walking 
+                                           // over the list and updating references
+    let mut clean_hits = Vec::<TofHit>::new(); 
+    let mut rm_hits    = Vec::<u8>::new();
+    // per definition, we can't remove the first hit, ever
+    clean_hits.push(first_hit.clone());
+    //error!("-----");
+    let mut prior_hit = first_hit;
+    //println!("TO FIRST {}",first_hit.event_t0);
+    for h in self.hits.iter().skip(1) {
+      let mut min_tdiff_cvac = 1e9*1e-3*prior_hit.distance(h)/299792458.0;
+      let twindow            = prior_hit.event_t0 + min_tdiff_cvac;
+      
+
+      // FIXME - implement different strategies
+      // this is the "default" strategy
+      //if h.event_t0 < twindow {
+      //  rm_hits.push(h.paddle_id);
+      //  twindows.push(twindow);
+      //  continue;
+      //}
+      // this is the "lenient" strategy
+      if h.event_t0 + 2.0*t_err < twindow {
+        rm_hits.push(h.paddle_id);
+        twindows.push(twindow);
+        continue;
+      }
+      // this is the "aggressive" strategy
+      //if h.event_t0 - 2.0*t_err < twindow {
+      //  rm_hits.push(h.paddle_id);
+      //  continue;
+      //}
+      
+      // should we remove negative beta hits?
+      //if beta < 0.0 {
+      //  rm_hits.push(h.paddle_id);
+      //  continue;
+      //}
+      // update the prior hit only 
+      // when it is a good one. If it 
+      // is bad we continue to compare
+      // to the first hit
+      prior_hit = h.clone();
+      clean_hits.push(*h);
+    }
+    self.hits = clean_hits;
+    (rm_hits, twindows)
+  }
+
+
+  /// Non causal hits have hit times in ends A and be which 
+  /// are not compatible with the speed of light in the paddle, 
+  /// that is, the hit gets registered too early. If we look 
+  /// at a plot of the reconstructed position, these hits would 
+  /// correspond to positions outside of the paddle.
+  ///
+  /// #Returns:
+  ///   A vector of paddle ids with removed hits
+  ///
+  pub fn remove_non_causal_hits(&mut self) -> Vec<u8> {
+    let mut clean_hits = Vec::<TofHit>::new();
+    let mut removed_pids = Vec::<u8>::new();
+    for h in &self.hits {
+      if h.obeys_causality() {
+        clean_hits.push(*h);
+      } else {
+        removed_pids.push(h.paddle_id);
+      }
+    }
+    self.hits = clean_hits;
+    removed_pids
+  }
   
   #[cfg(feature="database")]
   pub fn normalize_hit_times(&mut self) {
     if self.hits.len() == 0 {
       return;
     }
+    // check if hit times have already been normalized
+    if self.hits[0].event_t0 == 0.0 {
+      return;
+    }
+
     let phase0 = self.hits[0].phase.to_f32();
     for h in &mut self.hits {
       let t0 = h.get_t0_uncorrected() + h.get_cable_delay();
@@ -895,6 +1026,12 @@ impl TofEventSummary {
       }
       let t_shift = 50.0*phase_diff/(2.0*PI);
       h.event_t0 = t0 + t_shift;
+    }
+    // start the first hit at 0
+    self.hits.sort_by(|a,b| (a.event_t0).partial_cmp(&b.event_t0).unwrap());
+    let t0_first_hit = self.hits[0].event_t0;
+    for h in self.hits.iter_mut() {
+      h.event_t0 -= t0_first_hit
     }
   }
  
@@ -966,9 +1103,9 @@ impl TofEventSummary {
   ///
   /// Warning, this might be a bit slow
   #[cfg(feature="database")]
-  pub fn get_triggered_paddles(&self, pid_map :   DsiJChPidMapping) -> Vec<u8> {
-    let mut paddles = Vec::<u8>::new();
-    for th in self.get_trigger_hits() {
+  pub fn get_triggered_paddles(&self, pid_map :   &DsiJChPidMapping) -> Vec<u8> {
+    let mut paddles = Vec::<u8>::with_capacity(3);
+    for th in &self.get_trigger_hits() {
       let pid = pid_map.get(&th.0).unwrap().get(&th.1).unwrap().get(&th.2.0).unwrap().0;
       paddles.push(pid);
     }
@@ -1126,6 +1263,26 @@ impl TofEventSummary {
     let mut nhit = 0;
     for h in &self.hits {
       if h.paddle_id > 60 && h.paddle_id < 109 {
+        nhit += 1;
+      }
+    }
+    nhit
+  }
+  
+  pub fn get_nhits_cbe(&self) -> usize {
+    let mut nhit = 0;
+    for h in &self.hits {
+      if h.paddle_id < 61  {
+        nhit += 1;
+      }
+    }
+    nhit
+  }
+  
+  pub fn get_nhits_cor(&self) -> usize {
+    let mut nhit = 0;
+    for h in &self.hits {
+      if h.paddle_id > 108  {
         nhit += 1;
       }
     }

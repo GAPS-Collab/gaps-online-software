@@ -548,9 +548,10 @@ impl TrackerStrip {
       volume_id           : 0,
     }
   }
- 
+
+  /// FIXME - why use this at all and not just get the one from the db??
   pub fn get_stripid(&self) -> u32 {
-    self.channel as u32 + (self.module as u32)*100 + (self.row as u32)*10000 + (self.layer as u32)*10000
+    self.channel as u32 + (self.module as u32)*100 + (self.row as u32)*10000 + (self.layer as u32)*100000
   }
 
   pub fn all(conn: &mut SqliteConnection) -> Option<Vec<Self>> {

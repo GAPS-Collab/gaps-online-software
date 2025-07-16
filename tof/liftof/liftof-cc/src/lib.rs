@@ -525,7 +525,7 @@ pub fn manage_liftof_cc_service(mode : &str) -> TofReturnCode {
 ///
 ///   * rb_list : The list of ReadoutBoard ids the commands
 ///               will get executed
-///   * cmd     : The actual command without 'ssh <ip>'
+///   * cmd     : The actual command without 'ssh \<ip\>'
 ///
 /// # Returns:
 ///

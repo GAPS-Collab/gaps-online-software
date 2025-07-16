@@ -20,7 +20,8 @@ pub enum CRSerializationError {
   JsonDecodingError,
   TomlDecodingError,
   Disconnected,
-  UnknownError
+  UnknownError,
+  ObjectNotFound
 }
 
 impl CRSerializationError {
@@ -42,6 +43,7 @@ impl CRSerializationError {
       CRSerializationError::TomlDecodingError        => {return String::from("TomlDecodingError");},  
       CRSerializationError::Disconnected             => {return String::from("Disconnected");}
       CRSerializationError::UnknownError             => {return String::from("UnknownError");}
+      CRSerializationError::ObjectNotFound           => {return String::from("ObjectNotFound");}
     }
   }
 }

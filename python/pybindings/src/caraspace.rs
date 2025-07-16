@@ -21,7 +21,10 @@ use tof_dataclasses::database::{
 };
 use tof_dataclasses::packets::TofPacket;
 //use tof_dataclasses::events::TofEventSummary;
-use tof_dataclasses::events::TofEvent;
+use tof_dataclasses::events::{
+  TofEvent,
+  TofEventSummary
+};
 use telemetry_dataclasses::packets::{
   TelemetryPacket,
   MergedEvent
@@ -30,6 +33,7 @@ use telemetry_dataclasses::packets::{
 use crate::dataclasses::{
   PyTofPacket,
   PyTofEvent,
+  PyTofEventSummary,
 };
 
 use crate::telemetry::{
@@ -139,6 +143,16 @@ pub struct PyCRFrame{
   strips  : HashMap<u32, TrackerStrip>
 }
 
+//impl Default for PyCRFrame {
+//  fn default() -> Self {
+//    Self {
+//      frame   : CRFrame::new(),
+//      paddles : HashMap::<u8, Paddle>::new(),
+//      strips  : HashMap::<u32, TrackerStrip>::new(),
+//    }
+//  }
+//}
+
 #[pymethods]
 impl PyCRFrame {
   #[new]
@@ -149,16 +163,56 @@ impl PyCRFrame {
       strips  : HashMap::<u32, TrackerStrip>::new(),
     }
   }
- 
+
+  /// Delete a CRFrameObject by this name from the frame
+  ///
+  /// To delete multiple objects, delete calls can be 
+  /// chained
+  /// 
+  /// # Arguments:
+  ///   * name : The name of the FrameObject to delte 
+  ///            (must be in index)
+  ///
+  /// # Returns:
+  ///   A complete copy of self, without the given object.
+  pub fn delete(&self, name : &str) -> PyResult<PyCRFrame> {
+    match self.frame.delete(name) {
+      Ok(new_frame) => {
+        let mut new_pyframe = PyCRFrame::new();
+        new_pyframe.frame   = new_frame;
+        new_pyframe.paddles = self.paddles.clone();
+        new_pyframe.strips  = self.strips.clone();
+        Ok(new_pyframe)
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
   fn put_telemetrypacket(&mut self, packet : PyTelemetryPacket, name : String) {
     let packet = packet.packet;
     self.frame.put(packet, name)
       //let packet = packet.p;
   }
 
-  fn put_tofpacket(&mut self, packet : PyTofPacket, name : String) {
+  /// Add a TofPacket to the frame. 
+  ///
+  /// # Arguments:
+  ///   name : The name under which we store the TofPacket within the index.
+  ///          If None given, use the default name, which is
+  ///          "PacketType.<ValueOf(TofPacketType)". This should be used in 
+  ///          all cases for which there is only a single TofPacket within 
+  ///          the frame.
+  #[pyo3(signature = (packet, name = None))]
+  fn put_tofpacket(&mut self, packet : PyTofPacket, name : Option<String>) -> PyResult<()> {
     let packet = packet.packet;
-    self.frame.put(packet, name);
+    if let Some(p_name) = name {
+      self.frame.put(packet, p_name);
+      Ok(())
+    } else {
+      return Err(PyValueError::new_err("Currently this is not yet implemented. Please specify a name for the TofPacket to be registered within the frame's index!"));
+    }
   }
 
   fn get_telemetrypacket(&mut self, name : String) -> PyResult<PyTelemetryPacket> {
@@ -172,7 +226,9 @@ impl PyCRFrame {
     let mut py_event    = PyMergedEvent::new();
     let packet        = self.frame.get::<TelemetryPacket>(name).map_err(|_| pyo3::exceptions::PyValueError::new_err("Merged Event not found"))?;
     match MergedEvent::from_bytestream(&packet.payload, &mut 0) {
-      Ok(event) => {
+      Ok(mut event) => {
+        event.tof_event.set_paddles(&self.paddles);
+        event.tof_event.normalize_hit_times();
         py_event.event        = event;
         py_event.event.header = packet.header.clone();
       }
@@ -195,6 +251,16 @@ impl PyCRFrame {
     py_event.event  = event;
     Ok(py_event)
   }
+  
+  fn get_tofeventsummary(&mut self, name : String) -> PyResult<PyTofEventSummary> {
+    let mut py_event  = PyTofEventSummary::new();
+    // FIXME
+    let packet    = self.frame.get::<TofPacket>(name).unwrap();
+    let mut event = packet.unpack::<TofEventSummary>().unwrap();
+    event.set_paddles(&self.paddles);
+    py_event.event  = event;
+    Ok(py_event)
+  }
 
   fn get_tofpacket(&mut self, name : String) -> PyResult<PyTofPacket> {
     let mut py_packet = PyTofPacket::new();
@@ -207,6 +273,14 @@ impl PyCRFrame {
   //  let mut bs = stream.clone();
   //  self.frame.put_stream(&mut bs, name);
   //}
+
+  /// Check if the frame contains an object with the given name
+  ///
+  /// # Arguments:
+  ///   * name : The name of the object as it appears in the index
+  fn has(&self, name : &str) -> bool {
+    self.frame.has(name)
+  }
 
   #[getter]
   fn index(&self) -> HashMap<String, (u64, CRFrameObjectType)> {
@@ -375,13 +449,17 @@ pub struct PyCRWriter {
 #[pymethods]
 impl PyCRWriter {
   #[new]
-  #[pyo3(signature = (filename, run_id, timestamp = None))]
-  fn new(filename : String, run_id : u32, timestamp : Option<String>) -> Self {
+  #[pyo3(signature = (filename, run_id, subrun_id = None, timestamp = None))]
+  fn new(filename : String, run_id : u32, subrun_id : Option<u64>, timestamp : Option<String>) -> Self {
     Self {
-      writer : CRWriter::new(filename, run_id, timestamp ),
+      writer : CRWriter::new(filename, run_id, subrun_id, timestamp ),
     }
   }
-  
+ 
+  fn set_mbytes_per_file(&mut self, fsize : usize) {
+    self.writer.mbytes_per_file = fsize;
+  }
+
   fn set_file_timestamp(&mut self, timestamp : String) {
     self.writer.file_timestamp = Some(timestamp);
   }

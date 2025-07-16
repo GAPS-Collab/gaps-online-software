@@ -103,19 +103,26 @@ impl CRWriter {
   ///
   /// # Arguments
   ///
-  /// * file_prefix     : Prefix file with this string. A continuous number will get 
-  ///                     appended to control the file size.
+  /// * file_path       : Path to store the file under
+  /// * run_id          : Run ID for this file (will be written in filename)
+  /// * subrun_id       : Sub-Run ID for this file (will be written in filename. 
+  ///                     If None, a generic "0" will be used
   /// * timestamp       : The writer will add an automatic timestamp to the current file
   ///                     based on the current time. This option allows to overwrite 
   ///                     that behaviour
-  pub fn new(mut file_path : String, run_id : u32, timestamp : Option<String>) -> Self {
+  pub fn new(mut file_path : String, run_id : u32, subrun_id : Option<u64>, timestamp : Option<String>) -> Self {
     //let filename = file_prefix.clone() + "_0.tof.gaps";
     let file : File;
     let file_name : String;
     if !file_path.ends_with("/") {
       file_path += "/";
     }
-    let filename = format!("{}{}", file_path, get_runfilename(run_id, 0, None, timestamp));
+    let filename : String;
+    if let Some(subrun) = subrun_id {
+      filename = format!("{}{}", file_path, get_runfilename(run_id, subrun, None, timestamp));
+    } else {
+      filename = format!("{}{}", file_path, get_runfilename(run_id, 0, None, timestamp));
+    }
     let path     = Path::new(&filename); 
     println!("Writing to file {filename}");
     file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
@@ -190,7 +197,7 @@ impl CRWriter {
 
 impl Default for CRWriter {
   fn default() -> Self {
-    CRWriter::new(String::from(""),0,None)
+    CRWriter::new(String::from(""),0,None, None)
   }
 }
 

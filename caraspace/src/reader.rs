@@ -327,7 +327,7 @@ impl CRReader {
           // read the the size of the packet
           let mut buffer_psize = [0,0,0,0,0,0,0,0];
           match self.file_reader.read_exact(&mut buffer_psize) {
-            Err(err) => {
+            Err(_err) => {
               match self.progress_file() {
                 None    => break,
                 Some(_) => {

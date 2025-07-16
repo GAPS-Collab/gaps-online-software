@@ -287,6 +287,7 @@ pub trait Frameable {
 pub struct CRFrame {
   // the index holds name, position in frame as well as the type of 
   // object stored in the frame
+  // FIXME - this needs to be HashMap<&str, (u64, CRFrameObjectType)>
   pub index       : HashMap<String, (u64, CRFrameObjectType)>,
   pub bytestorage : Vec<u8>,
 }
@@ -340,6 +341,34 @@ impl CRFrame {
     index
   }
 
+  /// Delete a CRFrameObject by this name from the frame
+  ///
+  /// To delete multiple objects, delete calls can be 
+  /// chained
+  /// 
+  /// # Arguments:
+  ///   * name : The name of the FrameObject to delte 
+  ///            (must be in index)
+  ///
+  /// # Returns:
+  ///   A complete copy of self, without the given object.
+  pub fn delete(&self, name : &str) -> Result<CRFrame, CRSerializationError> {
+    if !self.has(name) {
+      error!("There is no object with name {} in this frame!", name);
+      return Err(CRSerializationError::ObjectNotFound);
+    }
+    let mut new_frame = CRFrame::new();
+    for objname in self.index.keys() {
+      if objname == name {
+        continue;
+      }
+      let obj = self.get_fobject(&objname)?;
+      new_frame.put_fobject(obj, objname.clone());
+    }
+    Ok(new_frame)
+  }
+
+
   /// Store any eligible object in the frame
   ///
   /// Eligible object must implement the "Frameable" trait
@@ -358,11 +387,34 @@ impl CRFrame {
     self.bytestorage.append(&mut stream);
   }
 
+  /// Check if the frame contains an object with the given name
+  ///
+  /// # Arguments:
+  ///   * name : The name of the object as it appears in the index
+  pub fn has(&self, name : &str) -> bool {
+    self.index.contains_key(name)
+  }
   //pub fn put_stream(&mut self, stream : &mut Vec<u8>, name : String) {
   //  let pos    = self.bytestorage.len();
   //  self.index.insert(name, pos);
   //  self.bytestorage.append(stream);
   //}
+
+  pub fn get_fobject(&self, name : &str) -> Result<CRFrameObject, CRSerializationError> {
+    let mut pos    : usize;
+    match self.index.get(name) {
+      None => {
+        error!("There is no object with name {} in this frame!", name);
+        return Err(CRSerializationError::ObjectNotFound);
+      }
+      Some(meta)  => {
+        //lookup = meta;
+        pos   = meta.0 as usize;
+      }
+    }
+    let cr_object = CRFrameObject::deserialize(&self.bytestorage, &mut pos)?;
+    Ok(cr_object)
+  }
 
   pub fn get<T : CRSerializeable + Frameable>(&self, name : String) -> Result<T, CRSerializationError> {
     

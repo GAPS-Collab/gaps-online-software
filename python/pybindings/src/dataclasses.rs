@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use numpy::{
   PyArray,
   PyArray1,
@@ -13,6 +15,8 @@ use pyo3::Python;
 
 use tof_dataclasses::ProtocolVersion;
 use tof_dataclasses::io::TofPacketReader;
+#[cfg(feature = "caraspace-serial")]
+use caraspace::reader::CRReader;
 use tof_dataclasses::packets::{
   TofPacket,
   PacketType
@@ -22,6 +26,8 @@ use tof_dataclasses::database::DsiJChPidMapping;
 use tof_dataclasses::heartbeats::HeartBeatDataSink;
 use tof_dataclasses::heartbeats::MTBHeartbeat;
 use tof_dataclasses::heartbeats::EVTBLDRHeartbeat;
+
+use crate::tel_api::TelemetryPacket;
 
 use tof_dataclasses::monitoring::{
   MoniData,
@@ -2339,6 +2345,77 @@ impl PyMtbMoniSeries {
     }
   }
 
+  /// If data has been acquired from Telemetry, 
+  /// a timestamp is available
+  #[getter]
+  fn timestamps(&self) -> Vec<u64> {
+    self.mtbmoniseries.timestamps.clone()
+  }
+
+  #[cfg(feature = "caraspace-serial")]
+  /// Add an additional (Caraspace) file to the series 
+  ///
+  /// # Arguments:
+  ///   * filename : The name of the (caraspace) file to add
+  ///   * soruce   : The address in the index of the individual
+  ///                frame the MtbMoniPacket can be found. 
+  ///                Currently this can either be 'PacketType.MtbMoniData'
+  ///                or 'TelemetryPacketType.AnyTofHK' 
+  fn add_crfile(&mut self, filename : String, source : String) {
+    let mut reader = CRReader::new(filename).expect("Unable to open file!");
+    // now we have a problem - from which frame should we get it?
+    // if we get it from the dedicated TOF stream it will be much 
+    // faster (if that is available) since it will be it's own 
+    // presence in the frame
+    let address = &source.clone();
+    for frame in reader {
+      if frame.has(address) {
+        // FIXME - String argument
+        if source == "PacketType.MtbMoniData" {
+          let moni_res = frame.get::<TofPacket>(source.clone()).unwrap().unpack::<MtbMoniData>();
+          match moni_res {
+            Err(err) => {
+              println!("Error unpacking MtbMoniData! {err}")
+            }
+            Ok(moni) => {
+              self.mtbmoniseries.add(moni);
+            }
+          }
+        }
+        if source == "TelemetryPacketType.AnyTofHK" {
+          let hk_res = frame.get::<TelemetryPacket>(source.clone());
+          match hk_res {
+            Err(err) => {
+              println!("Error unpacking MtbMoniData! {err}");
+            }
+            Ok(hk) => {
+              let mut pos = 0;
+              let gcutime = hk.header.get_gcutime() as u64;
+              match TofPacket::from_bytestream(&hk.payload, &mut pos) {
+                Err(err) => {
+                  println!("Error unpacking MtbMoniData! {err}");
+                }
+                Ok(tp) => {
+                  if tp.packet_type == PacketType::MonitorMtb {
+                    match tp.unpack::<MtbMoniData>() {
+                      Err(err) => {
+                        println!("Error unpacking MtbMoniData! {err}");
+                      }
+                      Ok(moni) => {
+                        self.mtbmoniseries.add(moni);
+                        self.mtbmoniseries.timestamps.push(gcutime);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
   /// Add an additional file to the series
   fn add_file(&mut self, filename : String) {
     let mut reader = TofPacketReader::new(filename);
@@ -2350,6 +2427,8 @@ impl PyMtbMoniSeries {
     }
   }
 
+  /// Reduces the whole structure to
+  /// a single polars data frame
   fn get_dataframe(&mut self) -> PyResult<PyDataFrame> {
     match self.mtbmoniseries.get_dataframe() {
       Ok(df) => {
@@ -2362,6 +2441,7 @@ impl PyMtbMoniSeries {
     }
   }
 
+  /// Create a moni series from a file with TofPackets in it
   fn from_file(&mut self, filename : String) -> PyResult<PyDataFrame> {
     let mut reader = TofPacketReader::new(filename);
     reader.filter = PacketType::MonitorMtb;
@@ -2604,6 +2684,10 @@ impl PyMasterTriggerEvent {
 
 }
 
+//--------------------------------------------------
+
+
+
 #[pyclass]
 #[pyo3(name="RBEventHeader")]
 pub struct PyRBEventHeader {
@@ -2746,7 +2830,56 @@ impl PyTofEventSummary {
       event : TofEventSummary::new(),
     }
   }
+  
+  /// Emit a copy of self
+  fn copy(&self) -> Self {
+    let mut copy_event = PyTofEventSummary::new();
+    copy_event.event = self.event.clone();
+    copy_event
+  }
 
+
+  pub fn set_timing_offsets(&mut self, timing_offsets : HashMap<u8, f32>) {
+    self.event.set_timing_offsets(&timing_offsets);
+  }
+
+  pub fn normalize_hit_times(&mut self) {
+    self.event.normalize_hit_times();
+  }
+
+  /// Remove hits from the hitseries which can not 
+  /// be caused by the same particle, which means 
+  /// that for these two specific hits beta with 
+  /// respect to the first hit in the event is 
+  /// larger than one
+  /// That this works, first hits need to be 
+  /// "normalized" by calling normalize_hit_times
+  pub fn lightspeed_cleaning(&mut self, t_err : f32) -> (Vec<u16>, Vec<f32>) {
+    // return Vec<u16> here so that python does not 
+    // interpret it as a byte
+    let mut pids = Vec::<u16>::new();
+    let (pids_rm, twindows) = self.event.lightspeed_cleaning(t_err);
+    for pid in pids_rm {
+      pids.push(pid as u16);
+    }
+    (pids, twindows)
+  }
+ 
+
+  /// Remove all hits from the event's hit series which 
+  /// do NOT obey causality. that is where the timings
+  /// measured at ends A and B can not be correlated
+  /// by the assumed speed of light in the paddle
+  fn remove_non_causal_hits(&mut self) -> Vec<u16> {
+    // return Vec<u16> here so that python does not 
+    // interpret it as a byte
+    let mut pids = Vec::<u16>::new();
+    for pid in self.event.remove_non_causal_hits() {
+      pids.push(pid as u16);
+    }
+    pids
+  }
+  
   #[getter]
   fn pointcloud(&self) -> Option<Vec<(f32,f32,f32,f32,f32)>> {
     self.event.get_pointcloud()
@@ -2770,7 +2903,7 @@ impl PyTofEventSummary {
 
   /// Get all the paddle ids which have been triggered
   fn get_triggered_paddles(&self, mapping : DsiJChPidMapping) -> Vec<u8> {
-    self.event.get_triggered_paddles(mapping)
+    self.event.get_triggered_paddles(&mapping)
   }
 
   /// The hits we were not able to read out because the DRS4 chip
@@ -2838,7 +2971,7 @@ impl PyTofEventSummary {
     self.event.get_edep_cortina()
   }
 
-  /// Ttotal energy depostion in the complete TOF
+  /// Total energy depostion in the complete TOF
   ///
   /// Utilizes Philip's formula based on 
   /// peak height
@@ -2856,10 +2989,16 @@ impl PyTofEventSummary {
   pub fn nhits_umb(&self) -> usize {
     self.event.get_nhits_umb()
   }
-  //#[getter]
-  //fn beta(&self) -> f32 {
-  //  self.event.get_beta()
-  //}
+
+  #[getter]
+  fn get_nhits_cbe(&self) -> usize {
+    self.event.get_nhits_cbe()
+  }
+  
+  #[getter]
+  fn get_nhits_cor(&self) -> usize {
+    self.event.get_nhits_cor()
+  }
 
   #[getter]
   fn timestamp16(&self) -> u16 {
@@ -2913,6 +3052,14 @@ impl PyTofEventSummary {
     }
   }
 
+  /// Pack a TofEventSummary into its corresponding TofPacket
+  fn pack(&self) -> PyTofPacket {
+    let mut py_packet = PyTofPacket::new();
+    py_packet.packet  = self.event.pack();
+    py_packet
+  }
+
+
   fn __repr__(&self) -> PyResult<String> {
     Ok(format!("<PyO3Wrapper: {}>", self.event)) 
   }
@@ -2952,6 +3099,13 @@ impl PyTofEvent {
     Self {
       event : TofEvent::new(),
     }
+  }
+  
+  /// Emit a copy of self
+  fn copy(&self) -> Self {
+    let mut copy_event = PyTofEvent::new();
+    copy_event.event = self.event.clone();
+    copy_event
   }
   
   #[getter]
@@ -3190,7 +3344,6 @@ impl PyRBEvent {
     wfs
   }
   
-
   fn __repr__(&self) -> PyResult<String> {
     Ok(format!("<PyO3Wrapper: {}>", self.event)) 
   }
@@ -3209,6 +3362,20 @@ impl PyTofHit {
     Self {
       hit : TofHit::new(),
     }
+  }
+
+  pub fn set_timing_offset(&mut self, offset : f32) {
+    self.hit.timing_offset = offset;
+  }
+
+  /// Calculate the distance to another hit. For this 
+  /// to work, the hit coordinates have had to be 
+  /// determined, so this will only return a 
+  /// propper result after the paddle information 
+  /// is added
+  pub fn distance(&self, other : &PyTofHit) -> f32 {
+    //((self.x - other.x).powi(2) + (self.y - other.y).powi(2) + (self.z - other.z).powi(2)).sqrt()
+    self.hit.distance(&other.hit)
   }
  
   /// Set the length and cable length for the paddle
@@ -3238,6 +3405,22 @@ impl PyTofHit {
   #[getter]
   fn get_t0_uncorrected(&self) -> f32 {
     self.hit.get_t0_uncorrected()
+  }
+  
+  /// Event t0 is the calculated interaction time based on 
+  /// the RELATIVE phase shifts consdering ALL hits in this
+  /// event. This might be of importance to catch rollovers
+  /// in the phase of channel9. 
+  /// In total, we are restricting ourselves to a time of 
+  /// 50ns per events and adjust the phase in such a way that 
+  /// everything fits into this interval. This will 
+  /// significantly import the beta reconstruction for particles
+  /// which hit the TOF within this timing window.
+  ///
+  /// If a timing offset is set, this will be added
+  #[getter]
+  fn get_event_t0(&self) -> f32 {
+    self.hit.get_t0()
   }
 
   #[getter]
@@ -3354,6 +3537,11 @@ impl PyTofHit {
   #[getter]
   fn edep(&self) -> f32 {
     self.hit.get_edep()
+  }
+
+  #[getter]
+  fn get_paddle_len(&self) -> f32 {
+    self.hit.paddle_len
   }
 
   fn __repr__(&self) -> PyResult<String> {

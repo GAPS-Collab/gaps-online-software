@@ -4,9 +4,10 @@ pybdindings for the C++ and Rust API.
 
 - tof-dataclasses
 - plotting
-
-
 """
+
+__version__ = "0.10"
+
 try:
     import django
     django.setup()
@@ -30,9 +31,11 @@ except ImportError as e:
 
 # FIXME
 from . import tof
+from . import tracker
 from . import io
 from . import events
 from . import run
 from . import commands
+from . import monitoring
+from . import reconstruction
 
-__version__ = "0.10"
