@@ -5,6 +5,10 @@ pub mod pa_moni_data;
 pub use pa_moni_data::PAMoniData;
 pub mod pb_moni_data;
 pub use pb_moni_data::PBMoniData;
+pub mod mtb_moni_data;
+pub use mtb_moni_data::MtbMoniData;
+pub mod ltb_moni_data;
+pub use ltb_moni_data::LTBMoniData;
 
 pub mod heartbeats;
 pub use heartbeats::{
