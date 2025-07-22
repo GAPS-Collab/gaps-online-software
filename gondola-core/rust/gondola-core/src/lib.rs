@@ -109,6 +109,8 @@ fn monitoring_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<EventBuilderHB>()?;
   m.add_class::<DataSinkHB>()?;
   m.add_class::<MasterTriggerHB>()?;
+  m.add_class::<PAMoniData>()?;
+  m.add_class::<PBMoniData>()?;
   Ok(())
 }
 

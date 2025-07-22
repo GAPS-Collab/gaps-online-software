@@ -1,6 +1,11 @@
 //! The following file is part of gaps-online-software and published 
 //! under the GPLv3 license
 
+pub mod pa_moni_data;
+pub use pa_moni_data::PAMoniData;
+pub mod pb_moni_data;
+pub use pb_moni_data::PBMoniData;
+
 pub mod heartbeats;
 pub use heartbeats::{
   DataSinkHB,
