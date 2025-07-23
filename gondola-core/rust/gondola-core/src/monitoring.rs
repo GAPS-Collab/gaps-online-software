@@ -9,6 +9,10 @@ pub mod mtb_moni_data;
 pub use mtb_moni_data::MtbMoniData;
 pub mod ltb_moni_data;
 pub use ltb_moni_data::LTBMoniData;
+pub mod rb_moni_data;
+pub use rb_moni_data::RBMoniData;
+pub mod cpu_moni_data;
+pub use cpu_moni_data::CPUMoniData;
 
 pub mod heartbeats;
 pub use heartbeats::{
