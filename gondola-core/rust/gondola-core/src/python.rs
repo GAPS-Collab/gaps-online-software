@@ -44,6 +44,43 @@ macro_rules! pythonize {
   };
 }
 
+#[macro_export]
+macro_rules! pythonize_monidata {
+  ($pyclass:ty) => {
+
+    #[pymethods]
+    impl $pyclass {
+    
+      #[getter]
+      #[pyo3(name="board_id")]
+      fn board_id_py(&self) -> u8 {
+        self.get_board_id()
+      }
+
+
+      #[staticmethod]
+      #[pyo3(name="keys")]
+      fn keys_py() -> Vec<&'static str> {
+        Self::keys()
+      }
+
+      /// Access the (data) members by name
+      #[pyo3(name="get")]
+      fn get_py(&self, varname : &str) -> PyResult<f32> {
+        match self.get(varname) {
+          None => {
+            let err_msg = format!("{} does not have a key with name {}! See {}.keys() for a list of available keys!",stringify!($pyclass), stringify!($pyclass), varname);
+            return Err(PyKeyError::new_err(err_msg));
+          }
+          Some(val) => {
+            return Ok(val)
+          }
+        }
+      }
+    }
+  }
+}
+
 /// Adds common features any class exposed 
 /// obeying the TofPackable trait should 
 /// have
