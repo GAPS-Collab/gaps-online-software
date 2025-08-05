@@ -34,10 +34,17 @@ use pyo3::exceptions::{
 #[cfg(feature="pybindings")]
 use crate::packets::TofPacket;
 
+use crate::moniseries;
+
 #[cfg(feature="pybindings")]
-use crate::{
-  impl_pythonize_display,
-  pythonize_packable
+use crate::pythonize_packable;
+#[cfg(feature="pybindings")]
+use crate::pythonize_monidata;
+
+#[cfg(feature="tofcontrol")]
+use tof_control::helper::pb_type::{
+  PBTemp,
+  PBVcp
 };
 
 /// Sensors on the power boards (PB)
@@ -76,32 +83,28 @@ impl PBMoniData {
     }
   }
   
-  //#[cfg(feature = "tofcontrol")]
-  //pub fn add_temps(&mut self, pbtmp : &PBTemp) {
-  //  self.pds_temp = pbtmp.pds_temp; 
-  //  self.pas_temp = pbtmp.pas_temp; 
-  //  self.nas_temp = pbtmp.nas_temp; 
-  //  self.shv_temp = pbtmp.shv_temp; 
-  //}
-  //
-  //#[cfg(feature = "tofcontrol")]
-  //pub fn add_vcp(&mut self, pbvcp : &PBVcp) {
-  //  self.p3v6_preamp_vcp = pbvcp.p3v6_pa_vcp; 
-  //  self.n1v6_preamp_vcp = pbvcp.n1v6_pa_vcp;  
-  //  self.p3v4f_ltb_vcp   = pbvcp.p3v4f_ltb_vcp;
-  //  self.p3v4d_ltb_vcp   = pbvcp.p3v4d_ltb_vcp;
-  //  self.p3v6_ltb_vcp    = pbvcp.p3v6_ltb_vcp;
-  //  self.n1v6_ltb_vcp    = pbvcp.n1v6_ltb_vcp;
-  //}
+  #[cfg(feature = "tofcontrol")]
+  pub fn add_temps(&mut self, pbtmp : &PBTemp) {
+    self.pds_temp = pbtmp.pds_temp; 
+    self.pas_temp = pbtmp.pas_temp; 
+    self.nas_temp = pbtmp.nas_temp; 
+    self.shv_temp = pbtmp.shv_temp; 
+  }
+  
+  #[cfg(feature = "tofcontrol")]
+  pub fn add_vcp(&mut self, pbvcp : &PBVcp) {
+    self.p3v6_preamp_vcp = pbvcp.p3v6_pa_vcp; 
+    self.n1v6_preamp_vcp = pbvcp.n1v6_pa_vcp;  
+    self.p3v4f_ltb_vcp   = pbvcp.p3v4f_ltb_vcp;
+    self.p3v4d_ltb_vcp   = pbvcp.p3v4d_ltb_vcp;
+    self.p3v6_ltb_vcp    = pbvcp.p3v6_ltb_vcp;
+    self.n1v6_ltb_vcp    = pbvcp.n1v6_ltb_vcp;
+  }
 }
 
 #[cfg(feature="pybindings")]
 #[pymethods]
 impl PBMoniData {
-  //#[new]
-  //fn new_py() -> Self {
-  //  Self::new()
-  //}
 
   #[getter]
   fn get_board_id(&self) -> u8 {
@@ -154,40 +157,6 @@ impl PBMoniData {
   #[getter]
   fn get_shv_temp(&self) -> f32 {
     self.shv_temp
-  }
-  
-  //#[staticmethod]
-  //#[pyo3(name="from_tofpacket")]
-  //fn from_tofpacket_py(packet : &TofPacket) -> PyResult<Self> {
-  //  match packet.unpack::<Self>() {
-  //    Ok(status) => {
-  //      return Ok(status);
-  //    }
-  //    Err(err) => {
-  //      let err_msg = format!("Unable to unpack TofPacket! {err}");
-  //      return Err(PyIOError::new_err(err_msg));
-  //    }
-  //  }
-  //}
-  
-  #[staticmethod]
-  #[pyo3(name="keys")]
-  fn keys_py() -> Vec<&'static str> {
-    Self::keys()
-  }
-
-  /// Access the (data) members by name
-  #[pyo3(name="get")]
-  fn get_py(&self, varname : &str) -> PyResult<f32> {
-    match self.get(varname) {
-      None => {
-        let err_msg = format!("PBMoniData does not have a key with name {}! See PBmoniData.keys() for a list of available keys!", varname);
-        return Err(PyKeyError::new_err(err_msg));
-      }
-      Some(val) => {
-        return Ok(val)
-      }
-    }
   }
 }
 
@@ -368,7 +337,7 @@ impl FromRandom for PBMoniData {
     
   fn from_random() -> PBMoniData {
     let mut moni = Self::new();
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     moni.board_id           = rng.random::<u8>(); 
     for k in 0..3 {
       let foo = rng.random::<f32>();
@@ -402,12 +371,25 @@ impl FromRandom for PBMoniData {
   }
 }
 
+//----------------------------------------
 
+moniseries!(PBMoniDataSeries, PBMoniData);
 
 #[cfg(feature="pybindings")]
 pythonize_packable!(PBMoniData);
 
+#[cfg(feature="pybindings")]
+pythonize_monidata!(PBMoniData);
 
-//#[cfg(feature="pybindings")]
-//impl_pythonize_display!(PBMoniData, |s: &PBMoniData | s.to_string());
+//----------------------------------------
+
+#[test]
+#[cfg(feature = "random")]
+fn pack_pbmonidata() {
+  for _ in 0..100 {
+    let data = PBMoniData::from_random();
+    let test : PBMoniData = data.pack().unpack().unwrap();
+    assert_eq!(data, test);
+  }
+}
 

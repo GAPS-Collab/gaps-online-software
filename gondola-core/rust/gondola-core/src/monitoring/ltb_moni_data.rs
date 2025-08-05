@@ -16,8 +16,6 @@ use crate::packets::TofPackable;
 
 use crate::io::parsers::{
   parse_u8,
-  parse_u16,
-  parse_u32,
   parse_f32
 };
 
@@ -36,8 +34,18 @@ use pyo3::exceptions::{
 #[cfg(feature="pybindings")]
 use crate::packets::TofPacket;
 
+use crate::moniseries;
+
 #[cfg(feature="pybindings")]
 use crate::pythonize_packable;
+#[cfg(feature="pybindings")]
+use crate::pythonize_monidata;
+
+#[cfg(feature="tofcontrol")]
+use tof_control::helper::ltb_type::{
+  LTBThreshold,
+  LTBTemp
+};
 
 /// Sensors on the LTB
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -59,16 +67,16 @@ impl LTBMoniData {
     }
   }
 
-  //#[cfg(feature = "tofcontrol")]
-  //pub fn add_temps(&mut self, lt : &LTBTemp) {
-  //  self.trenz_temp = lt.trenz_temp;
-  //  self.ltb_temp   = lt.board_temp;
-  //}
+  #[cfg(feature = "tofcontrol")]
+  pub fn add_temps(&mut self, lt : &LTBTemp) {
+    self.trenz_temp = lt.trenz_temp;
+    self.ltb_temp   = lt.board_temp;
+  }
 
-  //#[cfg(feature = "tofcontrol")]
-  //pub fn add_thresh(&mut self, lt : &LTBThreshold) {
-  //  self.thresh = [lt.thresh_0, lt.thresh_1, lt.thresh_2];
-  //}
+  #[cfg(feature = "tofcontrol")]
+  pub fn add_thresh(&mut self, lt : &LTBThreshold) {
+    self.thresh = [lt.thresh_0, lt.thresh_1, lt.thresh_2];
+  }
 }
 
 impl Default for LTBMoniData {
@@ -143,7 +151,7 @@ impl FromRandom for LTBMoniData {
     
   fn from_random() -> LTBMoniData {
     let mut moni  = Self::new();
-    let mut rng   = rand::thread_rng();
+    let mut rng   = rand::rng();
     moni.board_id = rng.random::<u8>(); 
     moni.trenz_temp = rng.random::<f32>();
     moni.ltb_temp   = rng.random::<f32>();
@@ -183,31 +191,6 @@ impl MoniData for LTBMoniData {
 #[pymethods]
 impl LTBMoniData {
   
-  #[staticmethod]
-  #[pyo3(name="keys")]
-  fn keys_py() -> Vec<&'static str> {
-    Self::keys()
-  }
-
-  /// Access the (data) members by name
-  #[pyo3(name="get")]
-  fn get_py(&self, varname : &str) -> PyResult<f32> {
-    match self.get(varname) {
-      None => {
-        let err_msg = format!("LTBMoniData does not have a key with name {}! See RBmoniData.keys() for a list of available keys!", varname);
-        return Err(PyKeyError::new_err(err_msg));
-      }
-      Some(val) => {
-        return Ok(val)
-      }
-    }
-  }
-
-  #[getter]
-  fn get_board_id      (&self)  -> u8  {
-    self.board_id
-  }
-
   #[getter]
   fn get_trenz_temp    (&self)  -> f32  {
     self.trenz_temp
@@ -231,6 +214,17 @@ impl LTBMoniData {
   }
 }
 
+//----------------------------------------
+
+moniseries!(LTBMoniDataSeries, LTBMoniData);
+
+#[cfg(feature="pybindings")]
+pythonize_packable!(LTBMoniData);
+
+#[cfg(feature="pybindings")]
+pythonize_monidata!(LTBMoniData);
+
+//----------------------------------------
 
 #[test]
 #[cfg(feature = "random")]

@@ -12,7 +12,7 @@ pub trait FromRandom {
 
 pub fn rand_vec<T>(size : usize) -> Vec<T> 
   where StandardUniform: Distribution<T> {
-  let mut rng = rand::thread_rng();
+  let mut rng = rand::rng();
 
   let mut random_vector: Vec<T> = Vec::new();
   for _ in 0..size {

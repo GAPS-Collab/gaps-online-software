@@ -130,8 +130,8 @@ impl FromRandom for TelemetryPacketType {
       TelemetryPacketType::TmP96             ,
       TelemetryPacketType::TmP214            
     ];
-    let mut rng  = rand::thread_rng();
-    let idx = rng.gen_range(0..choices.len());
+    let mut rng  = rand::rng();
+    let idx = rng.random_range(0..choices.len());
     choices[idx]
   }
 }

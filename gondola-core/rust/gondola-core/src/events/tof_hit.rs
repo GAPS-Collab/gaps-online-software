@@ -799,7 +799,7 @@ impl Serialization for TofHit {
 impl FromRandom for TofHit {
   fn from_random() -> TofHit {
     let mut pp  = TofHit::new();
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
     pp.paddle_id      = rng.random::<u8> ();
     pp.time_a         = f16::from_f32(rng.random::<f32>());

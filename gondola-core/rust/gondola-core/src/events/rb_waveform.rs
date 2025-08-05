@@ -319,7 +319,7 @@ impl FromRandom for RBWaveform {
     
   fn from_random() -> Self {
     let mut wf      = Self::new();
-    let mut rng     = rand::thread_rng();
+    let mut rng     = rand::rng();
     wf.event_id     = rng.random::<u32>();
     wf.rb_id        = rng.random::<u8>();
     wf.rb_channel_a = rng.random::<u8>();

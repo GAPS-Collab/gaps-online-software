@@ -256,7 +256,7 @@ impl FromRandom for RBPaddleID {
     
   fn from_random() -> Self {
     let mut rb_pid  = Self::new();
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     rb_pid.paddle_12   = rng.random::<u8>();
     rb_pid.paddle_34   = rng.random::<u8>();
     rb_pid.paddle_56   = rng.random::<u8>();

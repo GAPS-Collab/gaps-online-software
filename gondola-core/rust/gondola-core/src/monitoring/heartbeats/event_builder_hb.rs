@@ -364,7 +364,7 @@ impl Serialization for EventBuilderHB {
 #[cfg(feature="random")]
 impl FromRandom for EventBuilderHB {
   fn from_random() -> Self {
-    let mut rng               = rand::thread_rng();
+    let mut rng              = rand::rng();
     Self {
       met_seconds            : rng.random::<u64>(),
       n_rbe_received_tot     : rng.random::<u64>(),

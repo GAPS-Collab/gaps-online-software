@@ -110,11 +110,17 @@ fn monitoring_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<DataSinkHB>()?;
   m.add_class::<MasterTriggerHB>()?;
   m.add_class::<PAMoniData>()?;
+  m.add_class::<PAMoniDataSeries>()?;
   m.add_class::<PBMoniData>()?;
+  m.add_class::<PBMoniDataSeries>()?;
   m.add_class::<MtbMoniData>()?;
+  m.add_class::<MtbMoniDataSeries>()?;
   m.add_class::<LTBMoniData>()?;
+  m.add_class::<LTBMoniDataSeries>()?;
   m.add_class::<RBMoniData>()?;
+  m.add_class::<RBMoniDataSeries>()?;
   m.add_class::<CPUMoniData>()?;
+  m.add_class::<CPUMoniDataSeries>()?;
   Ok(())
 }
 

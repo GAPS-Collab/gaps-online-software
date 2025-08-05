@@ -2,17 +2,35 @@
 //! under the GPLv3 license
 
 pub mod pa_moni_data;
-pub use pa_moni_data::PAMoniData;
+pub use pa_moni_data::{
+  PAMoniData,
+  PAMoniDataSeries
+};
 pub mod pb_moni_data;
-pub use pb_moni_data::PBMoniData;
+pub use pb_moni_data::{
+  PBMoniData,
+  PBMoniDataSeries
+};
 pub mod mtb_moni_data;
-pub use mtb_moni_data::MtbMoniData;
+pub use mtb_moni_data::{
+  MtbMoniData,
+  MtbMoniDataSeries
+};
 pub mod ltb_moni_data;
-pub use ltb_moni_data::LTBMoniData;
+pub use ltb_moni_data::{
+  LTBMoniData,
+  LTBMoniDataSeries
+};
 pub mod rb_moni_data;
-pub use rb_moni_data::RBMoniData;
+pub use rb_moni_data::{
+  RBMoniData,
+  RBMoniDataSeries
+};
 pub mod cpu_moni_data;
-pub use cpu_moni_data::CPUMoniData;
+pub use cpu_moni_data::{
+  CPUMoniData,
+  CPUMoniDataSeries
+};
 
 pub mod heartbeats;
 pub use heartbeats::{
@@ -181,6 +199,64 @@ pub trait MoniSeries<T>
   fn get_last_moni(&self, board_id : u8) -> Option<T> {
     let size = self.get_data().get(&board_id)?.len();
     Some(self.get_data().get(&board_id).unwrap()[size - 1])
+  }
+}
+
+//--------------------------------------------------
+
+/// Implements the moniseries trait for a MoniData 
+/// type of class
+#[macro_export]
+macro_rules! moniseries {
+  ($name : ident, $class:ty) => {
+    
+    use std::collections::VecDeque;
+    use std::collections::HashMap;
+
+    use crate::monitoring::MoniSeries;
+
+    #[cfg_attr(feature="pybindings",pyclass)]
+    #[derive(Debug, Clone, PartialEq)]
+    pub struct $name {
+      data        : HashMap<u8, VecDeque<$class>>,
+      max_size    : usize,
+    }
+    
+    impl $name {
+      pub fn new() -> Self {
+        Self {
+          data     : HashMap::<u8, VecDeque<$class>>::new(),
+          max_size : 10000,
+        }
+      }
+    } 
+    
+    impl Default for $name {
+      fn default() -> Self {
+        Self::new()
+      }
+    }
+    
+    impl fmt::Display for $name {
+      fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "<{} : {} boards>", stringify!($name), self.data.len())
+      }
+    }
+    
+    impl MoniSeries<$class> for $name {
+    
+      fn get_data(&self) -> &HashMap<u8,VecDeque<$class>> {
+        return &self.data;
+      }
+    
+      fn get_data_mut(&mut self) -> &mut HashMap<u8,VecDeque<$class>> {
+        return &mut self.data;
+      }
+     
+      fn get_max_size(&self) -> usize {
+        return self.max_size;
+      }
+    }
   }
 }
 

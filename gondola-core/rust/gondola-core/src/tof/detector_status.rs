@@ -366,7 +366,7 @@ impl_pythonize_display!(TofDetectorStatus, |s: &TofDetectorStatus | s.to_string(
 impl FromRandom for TofDetectorStatus {
   fn from_random() -> Self {
     let mut status  = TofDetectorStatus::new();
-    let mut rng     = rand::thread_rng();
+    let mut rng     = rand::rng();
     status.channels000_031 = rng.random::<u32>();
     status.channels032_063 = rng.random::<u32>();
     status.channels064_095 = rng.random::<u32>();

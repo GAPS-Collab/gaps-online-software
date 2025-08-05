@@ -271,7 +271,7 @@ impl Serialization for MasterTriggerHB {
 impl FromRandom for MasterTriggerHB {
   fn from_random() -> Self {
     let mut hb = Self::new();
-    let mut rng             = rand::thread_rng();
+    let mut rng            = rand::rng();
     hb.total_elapsed       = rng.random::<u64>();
     hb.n_events            = rng.random::<u64>();
     hb.evq_num_events_last = rng.random::<u64>();

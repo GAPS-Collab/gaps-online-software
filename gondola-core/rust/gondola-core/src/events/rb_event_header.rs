@@ -407,7 +407,7 @@ impl FromRandom for RBEventHeader {
     
   fn from_random() -> Self {
     let mut header = RBEventHeader::new();
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
     header.rb_id                 = rng.random::<u8>();    
     header.event_id              = rng.random::<u32>();   

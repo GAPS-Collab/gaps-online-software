@@ -34,8 +34,12 @@ use pyo3::exceptions::{
 #[cfg(feature="pybindings")]
 use crate::packets::TofPacket;
 
+use crate::moniseries;
+
 #[cfg(feature="pybindings")]
-use crate::impl_pythonize_display;
+use crate::pythonize_packable;
+#[cfg(feature="pybindings")]
+use crate::pythonize_monidata;
 
 /// Preamp temperature and bias data
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -70,18 +74,7 @@ impl PAMoniData {
 #[cfg(feature="pybindings")]
 #[pymethods]
 impl PAMoniData {
-  #[new]
-  fn new_py() -> Self {
-    Self::new()
-  }
   
-  /// The board id of the ReadoutBoard
-  /// which acquired this data
-  #[getter]
-  fn get_board_id(&self) ->  u8 {
-    self.board_id
-  }
-
   /// The temperature for the 16 preamp channels 
   #[getter]
   fn get_temps(&self) -> [f32;16] {
@@ -92,40 +85,6 @@ impl PAMoniData {
   #[getter]
   fn get_biases(&self) -> [f32;16] {
     self.biases
-  }
- 
-  #[staticmethod]
-  #[pyo3(name="keys")]
-  fn keys_py() -> Vec<&'static str> {
-    Self::keys()
-  }
-
-  /// Access the (data) members by name
-  #[pyo3(name="get")]
-  fn get_py(&self, varname : &str) -> PyResult<f32> {
-    match self.get(varname) {
-      None => {
-        let err_msg = format!("PAMoniData does not have a key with name {}! See PAMoniData.keys() for a list of available keys!", varname);
-        return Err(PyKeyError::new_err(err_msg));
-      }
-      Some(val) => {
-        return Ok(val)
-      }
-    }
-  }
-  
-  #[staticmethod]
-  #[pyo3(name="from_tofpacket")]
-  fn from_tofpacket_py(packet : &TofPacket) -> PyResult<Self> {
-    match packet.unpack::<Self>() {
-      Ok(status) => {
-        return Ok(status);
-      }
-      Err(err) => {
-        let err_msg = format!("Unable to unpack TofPacket! {err}");
-        return Err(PyIOError::new_err(err_msg));
-      }
-    }
   }
 }
 
@@ -308,16 +267,16 @@ impl MoniData for PAMoniData {
       "biases16" =>  Some(self.biases[15]),
       _          =>  None
     }
-  }
-  
+  }  
 }
+
 
 #[cfg(feature = "random")]
 impl FromRandom for PAMoniData {
     
   fn from_random() -> Self {
     let mut moni = Self::new();
-    let mut rng = rand::thread_rng();
+    let mut rng  = rand::rng();
     moni.board_id     = rng.random::<u8>(); 
     for k in 0..16 {
       moni.temps[k]   = rng.random::<f32>(); 
@@ -329,9 +288,17 @@ impl FromRandom for PAMoniData {
   }
 }
 
-#[cfg(feature="pybindings")]
-impl_pythonize_display!(PAMoniData, |s: &PAMoniData | s.to_string());
+//----------------------------------------
 
+moniseries!(PAMoniDataSeries, PAMoniData);
+
+#[cfg(feature="pybindings")]
+pythonize_packable!(PAMoniData);
+
+#[cfg(feature="pybindings")]
+pythonize_monidata!(PAMoniData);
+
+//----------------------------------------
 
 #[test]
 #[cfg(feature = "random")]

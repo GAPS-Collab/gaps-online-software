@@ -3,6 +3,8 @@
 
 use std::fmt;
 
+use crate::moniseries;
+
 use crate::monitoring::MoniData;
 
 #[cfg(feature = "random")]
@@ -16,7 +18,6 @@ use crate::packets::TofPackable;
 
 use crate::io::parsers::{
   parse_u8,
-  parse_u16,
   parse_u32,
   parse_f32
 };
@@ -38,6 +39,14 @@ use crate::packets::TofPacket;
 
 #[cfg(feature="pybindings")]
 use crate::pythonize_packable;
+#[cfg(feature="pybindings")]
+use crate::pythonize_monidata;
+
+#[cfg(feature="tofcontrol")]
+use tof_control::helper::cpu_type::{
+  CPUInfoDebug,
+  CPUTempDebug
+};
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[cfg_attr(feature="pybindings", pyclass)]
@@ -68,20 +77,20 @@ impl CPUMoniData {
     vec![self.cpu0_temp, self.cpu1_temp, self.cpu_temp, self.mb_temp]
   }
 
-  //#[cfg(feature = "tofcontrol")]
-  //pub fn add_temps(&mut self, cpu_temps : &CPUTempDebug) {
-  //  self.cpu_temp   = cpu_temps.cpu_temp;
-  //  self.cpu0_temp  = cpu_temps.cpu0_temp;
-  //  self.cpu1_temp  = cpu_temps.cpu1_temp;
-  //  self.mb_temp    = cpu_temps.mb_temp;
-  //}
+  #[cfg(feature = "tofcontrol")]
+  pub fn add_temps(&mut self, cpu_temps : &CPUTempDebug) {
+    self.cpu_temp   = cpu_temps.cpu_temp;
+    self.cpu0_temp  = cpu_temps.cpu0_temp;
+    self.cpu1_temp  = cpu_temps.cpu1_temp;
+    self.mb_temp    = cpu_temps.mb_temp;
+  }
 
-  //#[cfg(feature = "tofcontrol")]
-  //pub fn add_info(&mut self, cpu_info : &CPUInfoDebug) {
-  //  self.uptime = cpu_info.uptime;
-  //  self.disk_usage = cpu_info.disk_usage;
-  //  self.cpu_freq   = cpu_info.cpu_freq;
-  //}
+  #[cfg(feature = "tofcontrol")]
+  pub fn add_info(&mut self, cpu_info : &CPUInfoDebug) {
+    self.uptime = cpu_info.uptime;
+    self.disk_usage = cpu_info.disk_usage;
+    self.cpu_freq   = cpu_info.cpu_freq;
+  }
 }
 
 impl Default for CPUMoniData {
@@ -199,7 +208,7 @@ impl FromRandom for CPUMoniData {
     
   fn from_random() -> Self {
     let mut moni    = Self::new();
-    let mut rng     = rand::thread_rng();
+    let mut rng     = rand::rng();
     moni.uptime     = rng.random::<u32>();
     moni.disk_usage = rng.random::<u8>();
     for k in 0..4 {
@@ -216,11 +225,6 @@ impl FromRandom for CPUMoniData {
 #[cfg(feature="pybindings")]
 #[pymethods]
 impl CPUMoniData {
-
-  #[new]
-  fn new_py() -> Self {
-    Self::new()
-  }
 
   #[getter]
   fn get_uptime(&self) -> u32 {
@@ -255,37 +259,19 @@ impl CPUMoniData {
   #[getter]
   fn get_mb_temp(&self) -> f32 {
     self.mb_temp
-  }
-  
-  #[staticmethod]
-  #[pyo3(name="keys")]
-  fn keys_py() -> Vec<&'static str> {
-    Self::keys()
-  }
-
-  /// Access the (data) members by name
-  #[pyo3(name="get")]
-  fn get_py(&self, varname : &str) -> PyResult<f32> {
-    match self.get(varname) {
-      None => {
-        let err_msg = format!("CPUMoniData does not have a key with name {}! See CPUmoniData.keys() for a list of available keys!", varname);
-        return Err(PyKeyError::new_err(err_msg));
-      }
-      Some(val) => {
-        return Ok(val)
-      }
-    }
-  }
-
-  #[getter]
-  fn board_id      (&self)  -> u8  {
-    self.get_board_id()
-  }
+  }  
 }
 
+//----------------------------------------
 
-#[cfg(attr="pybindings")]
+// make it available as a monidata series
+moniseries!(CPUMoniDataSeries, CPUMoniData);
+
+#[cfg(feature="pybindings")]
 pythonize_packable!(CPUMoniData);
+
+#[cfg(feature="pybindings")]
+pythonize_monidata!(CPUMoniData);
 
 //----------------------------------------
 

@@ -18,7 +18,6 @@ use crate::io::parsers::{
   parse_u8,
   parse_u16,
   parse_u32,
-  parse_f32
 };
 
 use crate::packets::TofPacketType;
@@ -36,8 +35,13 @@ use pyo3::exceptions::{
 #[cfg(feature="pybindings")]
 use crate::packets::TofPacket;
 
+// macros
+use crate::moniseries;
+
 #[cfg(feature="pybindings")]
 use crate::pythonize_packable;
+#[cfg(feature="pybindings")]
+use crate::pythonize_monidata;
 
 /// Monitoring the MTB
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -268,7 +272,7 @@ impl MoniData for MtbMoniData {
 impl FromRandom for MtbMoniData {
   fn from_random() -> Self {
     let mut moni      = Self::new();
-    let mut rng       = rand::thread_rng();
+    let mut rng       = rand::rng();
     moni.tiu_busy_len = rng.random::<u32>();
     moni.tiu_status   = rng.random::<u8>();
     //moni.prescale     = f16::from_f32(rng.random::<f32>());
@@ -361,30 +365,20 @@ impl MtbMoniData {
   pub fn get_fpga_temp_py(&self) -> f32 {
     self.get_fpga_temp()
   }
-
-  #[staticmethod]
-  #[pyo3(name="keys")]
-  fn keys_py() -> Vec<&'static str> {
-    Self::keys()
-  }
-
-  /// Access the (data) members by name
-  #[pyo3(name="get")]
-  fn get_py(&self, varname : &str) -> PyResult<f32> {
-    match self.get(varname) {
-      None => {
-        let err_msg = format!("MtbMoniData does not have a key with name {}! See MtbmoniData.keys() for a list of available keys!", varname);
-        return Err(PyKeyError::new_err(err_msg));
-      }
-      Some(val) => {
-        return Ok(val)
-      }
-    }
-  }
 }
+
+//----------------------------------------
+
+// make it available as a monidata series
+moniseries!(MtbMoniDataSeries, MtbMoniData);
 
 #[cfg(feature="pybindings")]
 pythonize_packable!(MtbMoniData);
+
+#[cfg(feature="pybindings")]
+pythonize_monidata!(MtbMoniData);
+
+//----------------------------------------
 
 #[test]
 #[cfg(feature = "random")]

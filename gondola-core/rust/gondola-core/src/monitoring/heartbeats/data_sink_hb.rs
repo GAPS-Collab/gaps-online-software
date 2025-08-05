@@ -209,7 +209,7 @@ impl Serialization for DataSinkHB {
 #[cfg(feature = "random")]
 impl FromRandom for DataSinkHB {
   fn from_random() -> Self {
-    let mut rng            = rand::thread_rng();
+    let mut rng            = rand::rng();
     Self {
       met                : rng.random::<u64>(),
       n_packets_sent     : rng.random::<u64>(),
