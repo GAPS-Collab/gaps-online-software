@@ -211,16 +211,16 @@ impl FromRandom for DataSinkHB {
   fn from_random() -> Self {
     let mut rng            = rand::thread_rng();
     Self {
-      met                : rng.gen::<u64>(),
-      n_packets_sent     : rng.gen::<u64>(),
-      n_packets_incoming : rng.gen::<u64>(),
-      n_bytes_written    : rng.gen::<u64>(),
-      n_evid_missing     : rng.gen::<u64>(),
-      n_evid_chunksize   : rng.gen::<u64>(),
-      evid_missing       : rng.gen::<u64>(),
-      evid_check_len     : rng.gen::<u64>(),
-      n_pack_write_disk  : rng.gen::<u64>(),
-      incoming_ch_len    : rng.gen::<u64>()
+      met                : rng.random::<u64>(),
+      n_packets_sent     : rng.random::<u64>(),
+      n_packets_incoming : rng.random::<u64>(),
+      n_bytes_written    : rng.random::<u64>(),
+      n_evid_missing     : rng.random::<u64>(),
+      n_evid_chunksize   : rng.random::<u64>(),
+      evid_missing       : rng.random::<u64>(),
+      evid_check_len     : rng.random::<u64>(),
+      n_pack_write_disk  : rng.random::<u64>(),
+      incoming_ch_len    : rng.random::<u64>()
     }
   }
 }

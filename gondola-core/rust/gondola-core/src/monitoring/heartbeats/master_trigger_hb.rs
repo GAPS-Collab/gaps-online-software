@@ -272,18 +272,18 @@ impl FromRandom for MasterTriggerHB {
   fn from_random() -> Self {
     let mut hb = Self::new();
     let mut rng             = rand::thread_rng();
-    hb.total_elapsed       = rng.gen::<u64>();
-    hb.n_events            = rng.gen::<u64>();
-    hb.evq_num_events_last = rng.gen::<u64>();
-    hb.evq_num_events_avg  = rng.gen::<u64>();
-    hb.n_ev_unsent         = rng.gen::<u64>();
-    hb.n_ev_missed         = rng.gen::<u64>();
-    hb.trate               = rng.gen::<u16>() as u64;
-    hb.lost_trate          = rng.gen::<u16>() as u64;
+    hb.total_elapsed       = rng.random::<u64>();
+    hb.n_events            = rng.random::<u64>();
+    hb.evq_num_events_last = rng.random::<u64>();
+    hb.evq_num_events_avg  = rng.random::<u64>();
+    hb.n_ev_unsent         = rng.random::<u64>();
+    hb.n_ev_missed         = rng.random::<u64>();
+    hb.trate               = rng.random::<u16>() as u64;
+    hb.lost_trate          = rng.random::<u16>() as u64;
     hb.version             = ProtocolVersion::from_random();
     if hb.version != ProtocolVersion::Unknown {
-      hb.prescale_gaps       = rng.gen::<f32>();
-      hb.prescale_track      = rng.gen::<f32>();
+      hb.prescale_gaps       = rng.random::<f32>();
+      hb.prescale_track      = rng.random::<f32>();
     }
     hb
   }

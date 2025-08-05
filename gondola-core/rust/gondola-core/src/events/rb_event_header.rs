@@ -409,29 +409,29 @@ impl FromRandom for RBEventHeader {
     let mut header = RBEventHeader::new();
     let mut rng = rand::thread_rng();
 
-    header.rb_id                 = rng.gen::<u8>();    
-    header.event_id              = rng.gen::<u32>();   
-    header.status_byte           = rng.gen::<u8>();    
-    header.stop_cell             = rng.gen::<u16>();   
-    header.pid_ch12              = rng.gen::<u8>();
-    header.pid_ch34              = rng.gen::<u8>();
-    header.pid_ch56              = rng.gen::<u8>();
-    header.pid_ch78              = rng.gen::<u8>();
-    header.pid_ch_order          = rng.gen::<u8>();
-    header.rsvd1                 = rng.gen::<u8>();
-    header.rsvd2                 = rng.gen::<u8>();
-    header.rsvd3                 = rng.gen::<u8>();
-    header.deadtime_instead_temp = rng.gen::<bool>();
+    header.rb_id                 = rng.random::<u8>();    
+    header.event_id              = rng.random::<u32>();   
+    header.status_byte           = rng.random::<u8>();    
+    header.stop_cell             = rng.random::<u16>();   
+    header.pid_ch12              = rng.random::<u8>();
+    header.pid_ch34              = rng.random::<u8>();
+    header.pid_ch56              = rng.random::<u8>();
+    header.pid_ch78              = rng.random::<u8>();
+    header.pid_ch_order          = rng.random::<u8>();
+    header.rsvd1                 = rng.random::<u8>();
+    header.rsvd2                 = rng.random::<u8>();
+    header.rsvd3                 = rng.random::<u8>();
+    header.deadtime_instead_temp = rng.random::<bool>();
     if header.deadtime_instead_temp {
-      header.drs_deadtime          = rng.gen::<u16>();
+      header.drs_deadtime          = rng.random::<u16>();
     } else {
-      header.fpga_temp             = rng.gen::<u16>();  
+      header.fpga_temp             = rng.random::<u16>();  
     }
     // make sure the generated channel mask is valid!
-    let ch_mask                  = rng.gen::<u16>() & 0x1ff;
+    let ch_mask                  = rng.random::<u16>() & 0x1ff;
     header.set_channel_mask(ch_mask);
-    header.timestamp32           = rng.gen::<u32>();
-    header.timestamp16           = rng.gen::<u16>();
+    header.timestamp32           = rng.random::<u32>();
+    header.timestamp16           = rng.random::<u16>();
     header
   }
 }

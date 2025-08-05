@@ -801,19 +801,19 @@ impl FromRandom for TofHit {
     let mut pp  = TofHit::new();
     let mut rng = rand::thread_rng();
 
-    pp.paddle_id      = rng.gen::<u8> ();
-    pp.time_a         = f16::from_f32(rng.gen::<f32>());
-    pp.time_b         = f16::from_f32(rng.gen::<f32>());
-    pp.peak_a         = f16::from_f32(rng.gen::<f32>());
-    pp.peak_b         = f16::from_f32(rng.gen::<f32>());
-    pp.charge_a       = f16::from_f32(rng.gen::<f32>());
-    pp.charge_b       = f16::from_f32(rng.gen::<f32>());
-    pp.version        = ProtocolVersion::from(rng.gen::<u8>());
-    pp.baseline_a     = f16::from_f32(rng.gen::<f32>());
-    pp.baseline_a_rms = f16::from_f32(rng.gen::<f32>());
-    pp.baseline_b     = f16::from_f32(rng.gen::<f32>());
-    pp.baseline_b_rms = f16::from_f32(rng.gen::<f32>());
-    pp.phase          = f16::from_f32(rng.gen::<f32>());
+    pp.paddle_id      = rng.random::<u8> ();
+    pp.time_a         = f16::from_f32(rng.random::<f32>());
+    pp.time_b         = f16::from_f32(rng.random::<f32>());
+    pp.peak_a         = f16::from_f32(rng.random::<f32>());
+    pp.peak_b         = f16::from_f32(rng.random::<f32>());
+    pp.charge_a       = f16::from_f32(rng.random::<f32>());
+    pp.charge_b       = f16::from_f32(rng.random::<f32>());
+    pp.version        = ProtocolVersion::from(rng.random::<u8>());
+    pp.baseline_a     = f16::from_f32(rng.random::<f32>());
+    pp.baseline_a_rms = f16::from_f32(rng.random::<f32>());
+    pp.baseline_b     = f16::from_f32(rng.random::<f32>());
+    pp.baseline_b_rms = f16::from_f32(rng.random::<f32>());
+    pp.phase          = f16::from_f32(rng.random::<f32>());
     
     pp.paddle_len       = 0.0; 
     pp.coax_cable_time  = 0.0; 

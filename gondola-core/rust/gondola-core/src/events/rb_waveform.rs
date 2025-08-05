@@ -320,15 +320,15 @@ impl FromRandom for RBWaveform {
   fn from_random() -> Self {
     let mut wf      = Self::new();
     let mut rng     = rand::thread_rng();
-    wf.event_id     = rng.gen::<u32>();
-    wf.rb_id        = rng.gen::<u8>();
-    wf.rb_channel_a = rng.gen::<u8>();
-    wf.rb_channel_b = rng.gen::<u8>();
-    wf.stop_cell    = rng.gen::<u16>();
-    wf.paddle_id    = rng.gen::<u8>();
-    let random_numbers_a: Vec<u16> = (0..NWORDS).map(|_| rng.gen()).collect();
+    wf.event_id     = rng.random::<u32>();
+    wf.rb_id        = rng.random::<u8>();
+    wf.rb_channel_a = rng.random::<u8>();
+    wf.rb_channel_b = rng.random::<u8>();
+    wf.stop_cell    = rng.random::<u16>();
+    wf.paddle_id    = rng.random::<u8>();
+    let random_numbers_a: Vec<u16> = (0..NWORDS).map(|_| rng.random()).collect();
     wf.adc_a        = random_numbers_a;
-    let random_numbers_b: Vec<u16> = (0..NWORDS).map(|_| rng.gen()).collect();
+    let random_numbers_b: Vec<u16> = (0..NWORDS).map(|_| rng.random()).collect();
     wf.adc_b        = random_numbers_b;
     wf
   }

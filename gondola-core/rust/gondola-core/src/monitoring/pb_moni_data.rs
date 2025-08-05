@@ -369,35 +369,35 @@ impl FromRandom for PBMoniData {
   fn from_random() -> PBMoniData {
     let mut moni = Self::new();
     let mut rng = rand::thread_rng();
-    moni.board_id           = rng.gen::<u8>(); 
+    moni.board_id           = rng.random::<u8>(); 
     for k in 0..3 {
-      let foo = rng.gen::<f32>();
+      let foo = rng.random::<f32>();
       moni.p3v6_preamp_vcp[k] = foo;
     }
     for k in 0..3 {
-      let foo = rng.gen::<f32>();
+      let foo = rng.random::<f32>();
       moni.n1v6_preamp_vcp[k] = foo;
     }
     for k in 0..3 {
-      let foo = rng.gen::<f32>();
+      let foo = rng.random::<f32>();
       moni.p3v4f_ltb_vcp[k] = foo;
     }
     for k in 0..3 {
-      let foo = rng.gen::<f32>();
+      let foo = rng.random::<f32>();
       moni.p3v4d_ltb_vcp[k] = foo;
     }
     for k in 0..3 {
-      let foo = rng.gen::<f32>();
+      let foo = rng.random::<f32>();
       moni.p3v6_ltb_vcp[k] = foo;
     }
     for k in 0..3 {
-      let foo = rng.gen::<f32>();
+      let foo = rng.random::<f32>();
       moni.n1v6_ltb_vcp[k] = foo;
     }
-    moni.pds_temp = rng.gen::<f32>(); 
-    moni.pas_temp = rng.gen::<f32>(); 
-    moni.nas_temp = rng.gen::<f32>(); 
-    moni.shv_temp = rng.gen::<f32>(); 
+    moni.pds_temp = rng.random::<f32>(); 
+    moni.pas_temp = rng.random::<f32>(); 
+    moni.nas_temp = rng.random::<f32>(); 
+    moni.shv_temp = rng.random::<f32>(); 
     moni
   }
 }

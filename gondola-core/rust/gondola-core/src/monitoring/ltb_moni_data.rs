@@ -144,11 +144,11 @@ impl FromRandom for LTBMoniData {
   fn from_random() -> LTBMoniData {
     let mut moni  = Self::new();
     let mut rng   = rand::thread_rng();
-    moni.board_id = rng.gen::<u8>(); 
-    moni.trenz_temp = rng.gen::<f32>();
-    moni.ltb_temp   = rng.gen::<f32>();
+    moni.board_id = rng.random::<u8>(); 
+    moni.trenz_temp = rng.random::<f32>();
+    moni.ltb_temp   = rng.random::<f32>();
     for k in 0..3 {
-      moni.thresh[k] = rng.gen::<f32>();
+      moni.thresh[k] = rng.random::<f32>();
     }
     moni
   }

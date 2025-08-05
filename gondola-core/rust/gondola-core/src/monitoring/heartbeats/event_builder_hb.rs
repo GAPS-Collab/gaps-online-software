@@ -366,28 +366,28 @@ impl FromRandom for EventBuilderHB {
   fn from_random() -> Self {
     let mut rng               = rand::thread_rng();
     Self {
-      met_seconds            : rng.gen::<u64>(),
-      n_rbe_received_tot     : rng.gen::<u64>(),
-      n_rbe_per_te           : rng.gen::<u64>(),
-      n_rbe_discarded_tot    : rng.gen::<u64>(),
-      n_mte_skipped          : rng.gen::<u64>(),
-      n_timed_out            : rng.gen::<u64>(),
-      n_sent                 : rng.gen::<u64>(),
-      delta_mte_rbe          : rng.gen::<u64>(),
-      event_cache_size       : rng.gen::<u64>(),
+      met_seconds            : rng.random::<u64>(),
+      n_rbe_received_tot     : rng.random::<u64>(),
+      n_rbe_per_te           : rng.random::<u64>(),
+      n_rbe_discarded_tot    : rng.random::<u64>(),
+      n_mte_skipped          : rng.random::<u64>(),
+      n_timed_out            : rng.random::<u64>(),
+      n_sent                 : rng.random::<u64>(),
+      delta_mte_rbe          : rng.random::<u64>(),
+      event_cache_size       : rng.random::<u64>(),
       // don't randomize this, since it 
       // won't get serialized
       event_id_cache_size    :                0,
-      drs_bsy_lost_hg_hits   : rng.gen::<u64>(),
-      rbe_wo_mte             : rng.gen::<u64>(),
-      mte_receiver_cbc_len   : rng.gen::<u64>(),
-      rbe_receiver_cbc_len   : rng.gen::<u64>(),
-      tp_sender_cbc_len      : rng.gen::<u64>(),
-      n_mte_received_tot     : rng.gen::<u64>(),
-      n_rbe_per_loop         : rng.gen::<u64>(),
-      n_rbe_from_past        : rng.gen::<u64>(),
-      n_rbe_orphan           : rng.gen::<u64>(),
-      data_mangled_ev        : rng.gen::<u64>()
+      drs_bsy_lost_hg_hits   : rng.random::<u64>(),
+      rbe_wo_mte             : rng.random::<u64>(),
+      mte_receiver_cbc_len   : rng.random::<u64>(),
+      rbe_receiver_cbc_len   : rng.random::<u64>(),
+      tp_sender_cbc_len      : rng.random::<u64>(),
+      n_mte_received_tot     : rng.random::<u64>(),
+      n_rbe_per_loop         : rng.random::<u64>(),
+      n_rbe_from_past        : rng.random::<u64>(),
+      n_rbe_orphan           : rng.random::<u64>(),
+      data_mangled_ev        : rng.random::<u64>()
     }
   }
 } 

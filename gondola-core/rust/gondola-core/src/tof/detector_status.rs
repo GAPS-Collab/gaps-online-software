@@ -367,16 +367,16 @@ impl FromRandom for TofDetectorStatus {
   fn from_random() -> Self {
     let mut status  = TofDetectorStatus::new();
     let mut rng     = rand::thread_rng();
-    status.channels000_031 = rng.gen::<u32>();
-    status.channels032_063 = rng.gen::<u32>();
-    status.channels064_095 = rng.gen::<u32>();
-    status.channels096_127 = rng.gen::<u32>();
-    status.channels128_159 = rng.gen::<u32>();
-    status.channels160_191 = rng.gen::<u32>();
-    status.channels192_223 = rng.gen::<u32>();
-    status.channels224_255 = rng.gen::<u32>();
-    status.channels256_297 = rng.gen::<u32>();
-    status.channels298_319 = rng.gen::<u32>();
+    status.channels000_031 = rng.random::<u32>();
+    status.channels032_063 = rng.random::<u32>();
+    status.channels064_095 = rng.random::<u32>();
+    status.channels096_127 = rng.random::<u32>();
+    status.channels128_159 = rng.random::<u32>();
+    status.channels160_191 = rng.random::<u32>();
+    status.channels192_223 = rng.random::<u32>();
+    status.channels224_255 = rng.random::<u32>();
+    status.channels256_297 = rng.random::<u32>();
+    status.channels298_319 = rng.random::<u32>();
     status
   }
 }

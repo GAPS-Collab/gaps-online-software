@@ -249,7 +249,7 @@ fn test_parse_bool() {
   let mut stream = Vec::<u8>::new();
   let mut data   = Vec::<bool>::new();
   for _ in 0..100 {
-    let test_byte  = rng.gen::<bool>();
+    let test_byte  = rng.random::<bool>();
     stream.push(test_byte as u8);
     data.push(test_byte);
   }
@@ -269,7 +269,7 @@ fn test_parse_u8() {
   let mut stream = Vec::<u8>::new();
   let mut data   = Vec::<u8>::new();
   for _ in 0..100 {
-    let test_byte  = rng.gen::<u8>();
+    let test_byte  = rng.random::<u8>();
     stream.push(test_byte);
     data.push(test_byte);
   }
@@ -289,7 +289,7 @@ fn test_parse_u8_deque() {
   let mut stream = VecDeque::<u8>::new();
   let mut data   = VecDeque::<u8>::new();
   for _ in 0..100 {
-    let test_byte  = rng.gen::<u8>();
+    let test_byte  = rng.random::<u8>();
     stream.push_back(test_byte);
     data.push_back(test_byte);
   }
@@ -309,7 +309,7 @@ fn test_parse_u16() {
   let mut stream = Vec::<u8>::new();
   let mut data   = Vec::<u16>::new();
   for _ in 0..100 {
-    let test_data  = rng.gen::<u16>();
+    let test_data  = rng.random::<u16>();
     for k in test_data.to_le_bytes() {
       stream.push(k);
     }
@@ -330,7 +330,7 @@ fn test_parse_u16_be() {
   let mut stream = Vec::<u8>::new();
   let mut data   = Vec::<u16>::new();
   for _ in 0..100 {
-    let test_data  = rng.gen::<u16>();
+    let test_data  = rng.random::<u16>();
     for k in test_data.to_be_bytes() {
       stream.push(k);
     }
@@ -351,7 +351,7 @@ fn test_parse_u16_deque() {
   let mut stream = VecDeque::<u8>::new();
   let mut data   = Vec::<u16>::new();
   for _ in 0..100 {
-    let test_data  = rng.gen::<u16>();
+    let test_data  = rng.random::<u16>();
     for k in test_data.to_le_bytes() {
       stream.push_back(k);
     }
@@ -373,7 +373,7 @@ fn test_parse_u32() {
   let mut stream = Vec::<u8>::new();
   let mut data   = Vec::<u32>::new();
   for _ in 0..100 {
-    let test_data  = rng.gen::<u32>();
+    let test_data  = rng.random::<u32>();
     for k in test_data.to_le_bytes() {
       stream.push(k);
     }
@@ -394,7 +394,7 @@ fn test_parse_u32_be() {
   let mut stream = Vec::<u8>::new();
   let mut data   = Vec::<u32>::new();
   for _ in 0..100 {
-    let test_data  = rng.gen::<u32>();
+    let test_data  = rng.random::<u32>();
     for k in test_data.to_be_bytes() {
       stream.push(k);
     }
@@ -416,7 +416,7 @@ fn test_parse_u64() {
   let mut stream = Vec::<u8>::new();
   let mut data   = Vec::<u64>::new();
   for _ in 0..100 {
-    let test_data  = rng.gen::<u64>();
+    let test_data  = rng.random::<u64>();
     for k in test_data.to_le_bytes() {
       stream.push(k);
     }
@@ -438,7 +438,7 @@ fn test_parse_f32() {
   let mut stream = Vec::<u8>::new();
   let mut data   = Vec::<f32>::new();
   for _ in 0..100 {
-    let test_data  = rng.gen::<f32>();
+    let test_data  = rng.random::<f32>();
     for k in test_data.to_le_bytes() {
       stream.push(k);
     }
@@ -460,7 +460,7 @@ fn test_parse_f64() {
   let mut stream = Vec::<u8>::new();
   let mut data   = Vec::<f64>::new();
   for _ in 0..100 {
-    let test_data  = rng.gen::<f64>();
+    let test_data  = rng.random::<f64>();
     for k in test_data.to_le_bytes() {
       stream.push(k);
     }

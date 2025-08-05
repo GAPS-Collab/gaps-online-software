@@ -200,15 +200,15 @@ impl FromRandom for CPUMoniData {
   fn from_random() -> Self {
     let mut moni    = Self::new();
     let mut rng     = rand::thread_rng();
-    moni.uptime     = rng.gen::<u32>();
-    moni.disk_usage = rng.gen::<u8>();
+    moni.uptime     = rng.random::<u32>();
+    moni.disk_usage = rng.random::<u8>();
     for k in 0..4 {
-      moni.cpu_freq[k] = rng.gen::<u32>();
+      moni.cpu_freq[k] = rng.random::<u32>();
     }
-    moni.cpu_temp   = rng.gen::<f32>();
-    moni.cpu0_temp  = rng.gen::<f32>();
-    moni.cpu1_temp  = rng.gen::<f32>();
-    moni.mb_temp    = rng.gen::<f32>();
+    moni.cpu_temp   = rng.random::<f32>();
+    moni.cpu0_temp  = rng.random::<f32>();
+    moni.cpu1_temp  = rng.random::<f32>();
+    moni.mb_temp    = rng.random::<f32>();
     moni
   }
 }

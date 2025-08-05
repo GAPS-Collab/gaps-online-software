@@ -189,7 +189,7 @@ impl FromRandom for TofPacketType {
       TofPacketType::RBCalibrationFlightT,
     ];
     let mut rng  = rand::thread_rng();
-    let idx = rng.gen_range(0..choices.len());
+    let idx = rng.random_range(0..choices.len());
     choices[idx]
   }
 }

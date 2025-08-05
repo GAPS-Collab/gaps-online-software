@@ -269,17 +269,17 @@ impl FromRandom for MtbMoniData {
   fn from_random() -> Self {
     let mut moni      = Self::new();
     let mut rng       = rand::thread_rng();
-    moni.tiu_busy_len = rng.gen::<u32>();
-    moni.tiu_status   = rng.gen::<u8>();
-    //moni.prescale     = f16::from_f32(rng.gen::<f32>());
-    moni.daq_queue_len= rng.gen::<u16>();
-    moni.temp         = rng.gen::<u16>();
-    moni.vccint       = rng.gen::<u16>();
-    moni.vccaux       = rng.gen::<u16>();
-    moni.vccbram      = rng.gen::<u16>();
-    moni.rb_lost_rate = rng.gen::<u8>();
-    moni.rate         = rng.gen::<u16>();
-    moni.lost_rate    = rng.gen::<u16>();
+    moni.tiu_busy_len = rng.random::<u32>();
+    moni.tiu_status   = rng.random::<u8>();
+    //moni.prescale     = f16::from_f32(rng.random::<f32>());
+    moni.daq_queue_len= rng.random::<u16>();
+    moni.temp         = rng.random::<u16>();
+    moni.vccint       = rng.random::<u16>();
+    moni.vccaux       = rng.random::<u16>();
+    moni.vccbram      = rng.random::<u16>();
+    moni.rb_lost_rate = rng.random::<u8>();
+    moni.rate         = rng.random::<u16>();
+    moni.lost_rate    = rng.random::<u16>();
     moni
   }
 }

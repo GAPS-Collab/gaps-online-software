@@ -318,12 +318,12 @@ impl FromRandom for PAMoniData {
   fn from_random() -> Self {
     let mut moni = Self::new();
     let mut rng = rand::thread_rng();
-    moni.board_id     = rng.gen::<u8>(); 
+    moni.board_id     = rng.random::<u8>(); 
     for k in 0..16 {
-      moni.temps[k]   = rng.gen::<f32>(); 
+      moni.temps[k]   = rng.random::<f32>(); 
     }
     for k in 0..16 {
-      moni.biases[k]  = rng.gen::<f32>(); 
+      moni.biases[k]  = rng.random::<f32>(); 
     }
     moni
   }
