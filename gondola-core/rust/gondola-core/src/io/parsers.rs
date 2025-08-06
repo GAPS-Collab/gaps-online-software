@@ -245,7 +245,7 @@ fn test_parse_bool() {
   #[cfg(feature="random")]
   use rand::Rng;
 
-  let mut rng    = rand::thread_rng();
+  let mut rng    = rand::rng();
   let mut stream = Vec::<u8>::new();
   let mut data   = Vec::<bool>::new();
   for _ in 0..100 {
@@ -265,7 +265,7 @@ fn test_parse_u8() {
   #[cfg(feature="random")]
   use rand::Rng;
 
-  let mut rng    = rand::thread_rng();
+  let mut rng    = rand::rng();
   let mut stream = Vec::<u8>::new();
   let mut data   = Vec::<u8>::new();
   for _ in 0..100 {
@@ -285,7 +285,7 @@ fn test_parse_u8_deque() {
   #[cfg(feature="random")]
   use rand::Rng;
 
-  let mut rng    = rand::thread_rng();
+  let mut rng    = rand::rng();
   let mut stream = VecDeque::<u8>::new();
   let mut data   = VecDeque::<u8>::new();
   for _ in 0..100 {
@@ -305,7 +305,7 @@ fn test_parse_u16() {
   #[cfg(feature="random")]
   use rand::Rng;
 
-  let mut rng    = rand::thread_rng();
+  let mut rng    = rand::rng();
   let mut stream = Vec::<u8>::new();
   let mut data   = Vec::<u16>::new();
   for _ in 0..100 {
@@ -326,7 +326,7 @@ fn test_parse_u16_be() {
   #[cfg(feature="random")]
   use rand::Rng;
 
-  let mut rng    = rand::thread_rng();
+  let mut rng    = rand::rng();
   let mut stream = Vec::<u8>::new();
   let mut data   = Vec::<u16>::new();
   for _ in 0..100 {
@@ -347,7 +347,7 @@ fn test_parse_u16_deque() {
   #[cfg(feature="random")]
   use rand::Rng;
 
-  let mut rng    = rand::thread_rng();
+  let mut rng    = rand::rng();
   let mut stream = VecDeque::<u8>::new();
   let mut data   = Vec::<u16>::new();
   for _ in 0..100 {
@@ -369,7 +369,7 @@ fn test_parse_u32() {
   #[cfg(feature="random")]
   use rand::Rng;
 
-  let mut rng    = rand::thread_rng();
+  let mut rng    = rand::rng();
   let mut stream = Vec::<u8>::new();
   let mut data   = Vec::<u32>::new();
   for _ in 0..100 {
@@ -390,7 +390,7 @@ fn test_parse_u32_be() {
   #[cfg(feature="random")]
   use rand::Rng;
 
-  let mut rng    = rand::thread_rng();
+  let mut rng    = rand::rng();
   let mut stream = Vec::<u8>::new();
   let mut data   = Vec::<u32>::new();
   for _ in 0..100 {
@@ -412,7 +412,7 @@ fn test_parse_u64() {
   #[cfg(feature="random")]
   use rand::Rng;
 
-  let mut rng    = rand::thread_rng();
+  let mut rng    = rand::rng();
   let mut stream = Vec::<u8>::new();
   let mut data   = Vec::<u64>::new();
   for _ in 0..100 {
@@ -434,7 +434,7 @@ fn test_parse_f32() {
   #[cfg(feature="random")]
   use rand::Rng;
 
-  let mut rng    = rand::thread_rng();
+  let mut rng    = rand::rng();
   let mut stream = Vec::<u8>::new();
   let mut data   = Vec::<f32>::new();
   for _ in 0..100 {
@@ -456,7 +456,7 @@ fn test_parse_f64() {
   #[cfg(feature="random")]
   use rand::Rng;
 
-  let mut rng    = rand::thread_rng();
+  let mut rng    = rand::rng();
   let mut stream = Vec::<u8>::new();
   let mut data   = Vec::<f64>::new();
   for _ in 0..100 {

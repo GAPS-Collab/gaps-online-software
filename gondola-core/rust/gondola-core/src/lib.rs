@@ -71,10 +71,13 @@ fn tof_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
 #[pymodule]
 #[pyo3(name = "events")]
 fn events_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
-  use crate::events::TofHit;
-  use crate::events::RBWaveform;
+  use crate::events::*;
   m.add_class::<TofHit>()?;
+  m.add_class::<RBEventHeader>()?;
+  m.add_class::<RBEvent>()?;
   m.add_class::<RBWaveform>()?;
+  m.add_class::<EventStatus>()?;
+  m.add_class::<DataType>()?;
   Ok(())
 }
 

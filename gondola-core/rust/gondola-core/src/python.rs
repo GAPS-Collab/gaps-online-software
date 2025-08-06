@@ -23,7 +23,7 @@ use pyo3::Bound;
 /// a pybindings wrapped class
 #[macro_export]
 macro_rules! pythonize {
-  ($pyclass:ty, $getter:expr) => {
+  ($pyclass:ty) => {
     //use pyo3::prelude::*;
 
     #[pymethods]
@@ -35,10 +35,10 @@ macro_rules! pythonize {
       }
 
       fn __repr__(&self) -> PyResult<String> {
-          Ok(format!("<{}: {}>", stringify!($pyclass), $getter(self)))
+          Ok(format!("<{}: {}>", stringify!($pyclass), self.to_string()))
       }
       fn __str__(&self) -> PyResult<String> {
-          Ok(format!("<{}: {}>", stringify!($pyclass), $getter(self)))
+          Ok(format!("<{}: {}>", stringify!($pyclass), self.to_string()))
       }
     }
   };
@@ -142,13 +142,13 @@ macro_rules! impl_pythonize_display {
 
 //--------------------------------------------------
 
-fn convert_pyarray1<'_py>(arr : Bound<'_py, PyArray1<f32>>) -> Vec<f32> {
-  let mut vec = Vec::<f32>::new();
-  unsafe {
-    vec.extend_from_slice(arr.as_slice().unwrap());
-  }
-  return vec;
-}
+//fn convert_pyarray1<'_py>(arr : Bound<'_py, PyArray1<f32>>) -> Vec<f32> {
+//  let mut vec = Vec::<f32>::new();
+//  unsafe {
+//    vec.extend_from_slice(arr.as_slice().unwrap());
+//  }
+//  return vec;
+//}
 
 //--------------------------------------------------
 

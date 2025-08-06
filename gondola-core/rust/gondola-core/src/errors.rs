@@ -159,3 +159,58 @@ impl fmt::Display for CalibrationError {
 impl Error for CalibrationError {
 }
 
+//------------------------------------------------------------------------
+
+#[derive(Debug,Copy,Clone)]
+#[repr(u8)]
+pub enum UserError {
+  IneligibleChannelLabel,
+  NoChannel9Data,
+}
+
+impl fmt::Display for UserError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp : &str;
+    match self {
+      UserError::IneligibleChannelLabel => {
+        disp = "IneligibleChannelLabel";
+      },
+      UserError::NoChannel9Data => {
+        disp = "NoChannel9Data";
+      },
+    }
+    write!(f, "<UserError : {}>", disp)
+  }
+}
+
+impl Error for UserError {
+
+//------------------------------------------------------------------------
+}
+
+#[derive(Debug,Copy,Clone)]
+#[repr(u8)]
+pub enum AnalysisError {
+  MissingChannel,
+  NoChannel9,
+  InputBroken,
+  DataMangling
+}
+
+impl fmt::Display for AnalysisError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp : &str;
+    match self {
+      AnalysisError::MissingChannel => {disp = "MissingChannel"},
+      AnalysisError::NoChannel9     => {disp = "NoChannel9"},
+      AnalysisError::InputBroken    => {disp = "InputBroken"},
+      AnalysisError::DataMangling   => {disp = "DataMangling"}
+    
+    }
+    write!(f, "<AnalysisError : {}>", disp)
+  }
+}
+
+impl Error for AnalysisError {
+}
+

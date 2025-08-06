@@ -17,7 +17,6 @@ use crate::packets::TofPackable;
 use crate::io::parsers::{
   parse_u8,
   parse_u16,
-  parse_u32,
   parse_f32
 };
 
