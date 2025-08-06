@@ -19,7 +19,13 @@ pub mod data_sink_hb;
 pub mod event_builder_hb;
 pub mod master_trigger_hb;
 
-pub use data_sink_hb::DataSinkHB;
-pub use event_builder_hb::EventBuilderHB;
-pub use master_trigger_hb::MasterTriggerHB;
-
+pub use data_sink_hb::{
+  DataSinkHB,
+  DataSinkHBSeries};
+pub use event_builder_hb::{
+  EventBuilderHB,
+  EventBuilderHBSeries};
+pub use master_trigger_hb::{
+  MasterTriggerHB,
+  MasterTriggerHBSeries,
+};

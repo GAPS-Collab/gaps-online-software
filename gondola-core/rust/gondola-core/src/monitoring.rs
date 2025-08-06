@@ -35,8 +35,11 @@ pub use cpu_moni_data::{
 pub mod heartbeats;
 pub use heartbeats::{
   DataSinkHB,
+  DataSinkHBSeries,
   MasterTriggerHB,
+  MasterTriggerHBSeries,
   EventBuilderHB,
+  EventBuilderHBSeries,
 };
 
 use std::collections::VecDeque;

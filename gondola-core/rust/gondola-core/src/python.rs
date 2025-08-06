@@ -13,11 +13,11 @@
 //  }
 //}
 
-use numpy::{
-  PyArray1,
-  PyArrayMethods
-};
-use pyo3::Bound;
+//use numpy::{
+//  PyArray1,
+//  PyArrayMethods
+//};
+//use pyo3::Bound;
 
 /// Adds the __repr__  and __str__ functions to 
 /// a pybindings wrapped class

@@ -25,17 +25,26 @@ use crate::packets::{
   TofPacketType,
 };
 
+use crate::monitoring::MoniData;
+use crate::moniseries;
+
 #[cfg(feature="pybindings")]
 use pyo3::prelude::*;
 
 #[cfg(feature="pybindings")]
-use pyo3::exceptions::PyIOError;
+use pyo3::exceptions::{
+  PyIOError,
+  PyKeyError
+};
 
 #[cfg(feature="pybindings")]
 use crate::packets::TofPacket;
 
 #[cfg(feature="pybindings")]
-use crate::impl_pythonize_display;
+use crate::pythonize_packable;
+
+#[cfg(feature="pybindings")]
+use crate::pythonize_monidata;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[cfg_attr(feature="pybindings", pyclass)]
@@ -123,66 +132,6 @@ impl MasterTriggerHB {
   }
 }
   
-#[cfg(feature="pybindings")]
-#[pymethods]
-impl MasterTriggerHB {
-
-  #[new]
-  fn new_py() -> Self {
-    Self::new()
-  }
-  
-  //    version             
-
-  #[getter]
-  fn get_total_elapsed(&self) -> u64 {
-    self.total_elapsed
-  }
-
-  #[getter]
-  fn get_evq_mum_events_last(&self) -> u64 {
-    self.evq_num_events_last
-  }
-
-  #[getter]
-  fn get_evq_num_events_avg(&self) -> u64 {
-    self.evq_num_events_avg
-  }
-  
-  #[getter]
-  fn get_n_ev_unsent(&self) -> u64 {
-    self.n_ev_unsent
-  }
-
-  #[getter]
-  fn get_n_ev_missed(&self) -> u64 {
-    self.n_ev_missed
-  }
-  
-  #[getter]
-  fn get_trate(&self) -> u64 {
-    self.trate
-  }
-
-  #[getter]
-  fn get_lost_trate(&self) -> u64 {
-    self.lost_trate
-  }
-
-  #[getter]
-  #[pyo3(name="get_prescale_track")]
-  fn get_prescale_track_py(&self) -> f32 {
-    self.prescale_track
-  }
-
-  #[getter]
-  #[pyo3(name="get_prescale_gaps")]
-  fn get_prescale_gaps_py(&self) -> f32 {
-    self.prescale_gaps
-  }
-}
-
-
 impl Default for MasterTriggerHB {
   fn default () -> Self {
     Self::new()
@@ -295,6 +244,99 @@ impl fmt::Display for MasterTriggerHB {
     write!(f, "{}", repr)
   }
 } 
+
+impl MoniData for MasterTriggerHB {
+  fn get_board_id(&self) -> u8 {
+    0
+  }
+  
+  /// Access the (data) members by name 
+  fn get(&self, varname : &str) -> Option<f32> {
+    match varname {
+      "total_elapsed"       => Some(self.total_elapsed as f32),
+      "n_events"            => Some(self.n_events as f32),
+      "evq_num_events_last" => Some(self.evq_num_events_last as f32),
+      "evq_num_events_avg"  => Some(self.evq_num_events_avg as f32),
+      "n_ev_unsent"         => Some(self.n_ev_unsent as f32),
+      "n_ev_missed"         => Some(self.n_ev_missed as f32),
+      "trate"               => Some(self.trate as f32), 
+      "lost_trate"          => Some(self.lost_trate as f32),
+      "prescale_track"      => Some(self.prescale_track as f32),
+      "prescale_gaps"       => Some(self.prescale_gaps as f32),
+      _                     => None
+    }
+  }
+
+  /// A list of the variables in this MoniData
+  fn keys() -> Vec<&'static str> {
+    vec!["board_id", "total_elapsed", "n_events",
+         "evq_num_events_last", "evq_num_events_avg", "n_ev_unsent",
+         "n_ev_missed", "trate", "lost_trate", "prescale_track",
+         "prescale_gaps"]
+  }
+}
+
+moniseries!(MasterTriggerHBSeries, MasterTriggerHB);
+
+//-----------------------------------------------------
+
+#[cfg(feature="pybindings")]
+#[pymethods]
+impl MasterTriggerHB {
+
+  //    version             
+  #[getter]
+  fn get_total_elapsed(&self) -> u64 {
+    self.total_elapsed
+  }
+
+  #[getter]
+  fn get_evq_mum_events_last(&self) -> u64 {
+    self.evq_num_events_last
+  }
+
+  #[getter]
+  fn get_evq_num_events_avg(&self) -> u64 {
+    self.evq_num_events_avg
+  }
+  
+  #[getter]
+  fn get_n_ev_unsent(&self) -> u64 {
+    self.n_ev_unsent
+  }
+
+  #[getter]
+  fn get_n_ev_missed(&self) -> u64 {
+    self.n_ev_missed
+  }
+  
+  #[getter]
+  fn get_trate(&self) -> u64 {
+    self.trate
+  }
+
+  #[getter]
+  fn get_lost_trate(&self) -> u64 {
+    self.lost_trate
+  }
+
+  #[getter]
+  #[pyo3(name="get_prescale_track")]
+  fn get_prescale_track_py(&self) -> f32 {
+    self.prescale_track
+  }
+
+  #[getter]
+  #[pyo3(name="get_prescale_gaps")]
+  fn get_prescale_gaps_py(&self) -> f32 {
+    self.prescale_gaps
+  }
+}
+
+pythonize_packable!(MasterTriggerHB);
+pythonize_monidata!(MasterTriggerHB);
+
+//-----------------------------------------------------
 
 #[cfg(feature="random")]
 #[test]

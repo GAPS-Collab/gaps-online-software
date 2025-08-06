@@ -10,16 +10,7 @@ use crate::random::FromRandom;
 use rand::Rng;
 
 use crate::io::serialization::Serialization;
-use crate::packets::{
-  TofPackable,
-  TofPacketType
-};
-use crate::calibration::tof::clean_spikes;
-use crate::errors::{
-  SerializationError,
-  CalibrationError
-};
-use crate::constants::NWORDS;
+use crate::errors::SerializationError;
 use crate::io::parsers::{
   parse_u8,
   parse_u16,
@@ -32,22 +23,14 @@ use crate::tof::RBPaddleID;
 use pyo3::prelude::*;
 
 #[cfg(feature="pybindings")]
-use pyo3::exceptions::PyIOError;
-
-#[cfg(feature="pybindings")]
-use crate::packets::TofPacket;
-
-#[cfg(feature="pybindings")]
-use numpy::PyArray1;
-
-#[cfg(feature="pybindings")]
-use crate::impl_pythonize_display;
+use crate::pythonize;
 
 /// The RBEvent header gets generated once per event
 /// per RB. 
 /// Contains information about event id, timestamps,
 /// etc.
-#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature="pybindings",pyclass)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct RBEventHeader { 
   /// Readoutboard ID - should be in the range 1-50
   /// not consecutive, there are some missing.
@@ -88,7 +71,7 @@ pub struct RBEventHeader {
   pub deadtime_instead_temp : bool,
   /// The status byte contains information about lsos of lock
   /// and event fragments and needs to be decoded
-  status_byte               : u8,
+  pub status_byte               : u8,
   /// The channel mask is 9bit for the 9 channels.
   /// This leaves 7 bits of space so we actually 
   /// hijack that for the version information 
@@ -98,7 +81,7 @@ pub struct RBEventHeader {
   ///
   /// FIXME - make this proper and use ProtocolVersion 
   ///         instead
-  channel_mask             : u16, 
+  pub channel_mask             : u16, 
 }
 
 impl RBEventHeader {
@@ -435,6 +418,115 @@ impl FromRandom for RBEventHeader {
     header
   }
 }
+
+//------------------------------------------
+
+#[cfg(feature="pybindings")]
+#[pymethods]
+impl RBEventHeader {
+  
+  #[getter]
+  #[pyo3(name="rb_id")]
+  fn rb_id_py(&self) -> u8 {
+    self.rb_id
+  }
+  
+  #[getter]
+  #[pyo3(name="event_id")]
+  fn event_id_py(&self) -> u32 {
+    self.event_id
+  }
+  
+  //#[getter]
+  //fn status_byte(&self) -> u8 {
+  //  self.status_byte
+  //}
+  
+  #[getter]
+  #[pyo3(name="channel_mask")]
+  fn channel_mask_py(&self) -> u16 {
+    self.get_channel_mask()
+  }
+  
+  #[getter]
+  #[pyo3(name="stop_cell")]
+  fn stop_cell_py(&self) -> u16 {
+    self.stop_cell
+  }
+  
+  #[getter]
+  #[pyo3(name="fpga_temp")]
+  fn fpga_temp_py(&self) -> f32 {
+    self.get_fpga_temp()
+  }
+  
+  #[getter]
+  #[pyo3(name="drs_deadtime")]
+  fn drs_deadtime_py(&self) -> u16 {
+    self.drs_deadtime 
+  }
+
+  #[getter]
+  #[pyo3(name="timestamp32")]
+  fn timestamp32_py(&self) -> u32 {
+    self.timestamp32
+  }
+  
+  #[getter]
+  #[pyo3(name="timestamp16")]
+  fn timestamp16_py(&self) -> u16 {
+    self.timestamp16
+  }
+
+  //  pub ch9_amp: u16,
+  //  pub ch9_freq: u16,
+  //  pub ch9_phase: u32,
+  #[pyo3(name="get_channels")]
+  fn get_channels_py(&self) -> Vec<u8> {
+    self.get_channels()
+  }
+
+  #[getter]
+  #[pyo3(name="is_event_fragment")]
+  pub fn is_event_fragment_py(&self) -> bool {
+    self.is_event_fragment()
+  }
+
+  #[getter]
+  #[pyo3(name="drs_lost_trigger")]
+  pub fn drs_lost_trigger_py(&self) -> bool {
+    self.drs_lost_trigger()
+  }
+
+  #[getter]
+  #[pyo3(name="lost_lock")]
+  fn lost_lock_py(&self) -> bool {
+    self.lost_lock()
+  }
+
+  #[getter]
+  #[pyo3(name="lost_lock_last_sec")]
+  fn lost_lock_last_sec_py(&self) -> bool {
+    self.lost_lock_last_sec()
+  }
+
+  #[getter]
+  #[pyo3(name="is_locked")]
+  fn is_locked_py(&self) -> bool {
+    self.is_locked()
+  }
+
+  #[getter]
+  #[pyo3(name="is_locked_last_sec")]
+  fn is_locked_last_sec_py(&self) -> bool {
+    self.is_locked_last_sec()
+  }
+}
+
+#[cfg(feature="pybindings")]
+pythonize!(RBEventHeader);
+
+//------------------------------------------
 
 #[test]
 fn serialization_rbeventheader() {

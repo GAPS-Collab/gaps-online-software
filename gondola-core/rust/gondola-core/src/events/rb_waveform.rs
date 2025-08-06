@@ -36,10 +36,13 @@ use pyo3::exceptions::PyIOError;
 use crate::packets::TofPacket;
 
 #[cfg(feature="pybindings")]
-use numpy::PyArray1;
+use numpy::{
+  ToPyArray,
+  PyArray1
+};
 
 #[cfg(feature="pybindings")]
-use crate::impl_pythonize_display;
+use crate::pythonize_packable;
 
 /// Waveform container for Tof waveforms
 /// This holds the waveforms for both 
@@ -209,11 +212,6 @@ impl fmt::Display for RBWaveform {
 #[pymethods]
 impl RBWaveform {
   
-  #[new]
-  fn new_py() -> Self {
-    Self::new()
-  }
-
   /// Paddle ID of this wveform (1-160)
   #[getter]
   fn get_paddle_id(&self) -> u8 {
@@ -244,11 +242,13 @@ impl RBWaveform {
   fn get_stop_cell(&self) -> u16 {
     self.stop_cell
   }
-  
+ 
+  // FIXME - make this consistent 
   #[getter]
-  fn get_adc_a<'_py>(&self, py: Python<'_py>) ->  PyResult<Bound<'_py, PyArray1<u16>>> {
-    let arr = PyArray1::<u16>::from_slice(py, self.adc_a.as_slice());
-    Ok(arr)
+  fn get_adc_a<'_py>(&self, py: Python<'_py>) ->  Bound<'_py, PyArray1<u16>> {
+    //let arr = PyArray1::<u16>::from_slice(py, self.adc_a.as_slice());
+    self.adc_a.to_pyarray(py)
+    //Ok(arr)
   }
   
   #[getter]
@@ -265,8 +265,7 @@ impl RBWaveform {
 
   #[getter]
   fn get_times_a<'_py>(&self, py: Python<'_py>) ->  PyResult<Bound<'_py, PyArray1<f32>>> {
-    let times  = self.nanoseconds_a.clone();
-    let arr    = PyArray1::<f32>::from_vec(py, times);
+    let arr    = PyArray1::<f32>::from_slice(py, self.nanoseconds_a.as_slice());
     Ok(arr)
   }
 
@@ -287,20 +286,6 @@ impl RBWaveform {
     self.apply_spike_filter();
   }
   
-  #[staticmethod]
-  #[pyo3(name="from_tofpacket")]
-  fn from_tofpacket(packet : &TofPacket) -> PyResult<Self> {
-    match packet.unpack::<Self>() {
-      Ok(wf) => {
-        return Ok(wf);
-      }
-      Err(err) => {
-        let err_msg = format!("Unable to unpack TofPacket of type {}! Is this really a RBWaveform? {err}", packet.packet_type);
-        return Err(PyIOError::new_err(err_msg));
-      }
-    }
-  }
-
   #[cfg(feature="random")]
   #[staticmethod]
   #[pyo3(name="from_random")]
@@ -310,7 +295,7 @@ impl RBWaveform {
 }
 
 #[cfg(feature="pybindings")]
-impl_pythonize_display!(RBWaveform, |s: &RBWaveform | s.to_string());
+pythonize_packable!(RBWaveform);
 
 //---------------------------------------------------
 
@@ -333,6 +318,8 @@ impl FromRandom for RBWaveform {
     wf
   }
 }
+
+//---------------------------------------------------
 
 #[test]
 #[cfg(feature = "random")]

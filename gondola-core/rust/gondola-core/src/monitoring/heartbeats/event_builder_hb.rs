@@ -14,6 +14,8 @@ use crate::io::parsers::{
   parse_u64,
 };
 
+use crate::monitoring::MoniData;
+
 use crate::errors::SerializationError;
 
 use crate::packets::{
@@ -25,13 +27,21 @@ use crate::packets::{
 use pyo3::prelude::*;
 
 #[cfg(feature="pybindings")]
-use pyo3::exceptions::PyIOError;
+use pyo3::exceptions::{
+  PyIOError,
+  PyKeyError
+};
 
 #[cfg(feature="pybindings")]
 use crate::packets::TofPacket;
 
+use crate::moniseries;
+
 #[cfg(feature="pybindings")]
-use crate::impl_pythonize_display;
+use crate::{
+  pythonize_packable,
+  pythonize_monidata
+};
 
 
 
@@ -223,14 +233,57 @@ impl EventBuilderHB {
   }
 }
 
+
+impl MoniData for EventBuilderHB {
+  fn get_board_id(&self) -> u8 {
+    0
+  }
+  
+  /// Access the (data) members by name 
+  fn get(&self, varname : &str) -> Option<f32> {
+    match varname {
+      "board_id"             => Some(0.0),
+      "met_seconds"          => Some(self.met_seconds as f32),
+      "n_mte_received_tot"   => Some(self.n_mte_received_tot as f32),
+      "n_rbe_received_tot"   => Some(self.n_rbe_received_tot as f32),
+      "n_rbe_per_te"         => Some(self.n_rbe_per_te as f32),
+      "n_rbe_discarded_tot"  => Some(self.n_rbe_discarded_tot as f32),
+      "n_mte_skipped"        => Some(self.n_mte_skipped as f32),
+      "n_timed_out"          => Some(self.n_timed_out as f32),
+      "n_sent"               => Some(self.n_sent as f32),
+      "delta_mte_rbe"        => Some(self.delta_mte_rbe as f32),
+      "event_cache_size"     => Some(self.event_cache_size as f32),
+      "event_id_cache_size"  => Some(self.event_id_cache_size as f32),
+      "drs_bsy_lost_hg_hits" => Some(self.drs_bsy_lost_hg_hits as f32),
+      "rbe_wo_mte"           => Some(self.rbe_wo_mte as f32),
+      "mte_receiver_cbc_len" => Some(self.mte_receiver_cbc_len as f32),
+      "rbe_receiver_cbc_len" => Some(self.rbe_receiver_cbc_len as f32),
+      "tp_sender_cbc_len"    => Some(self.tp_sender_cbc_len as f32),
+      "n_rbe_per_loop"       => Some(self.n_rbe_per_loop as f32),
+      "n_rbe_orphan"         => Some(self.n_rbe_orphan as f32),
+      "n_rbe_from_past"      => Some(self.n_rbe_from_past as f32),
+      "data_mangled_ev"      => Some(self.data_mangled_ev as f32),
+      _                      => None
+    }
+  }
+
+  /// A list of the variables in this MoniData
+  fn keys() -> Vec<&'static str> {
+    vec!["board_id", "met_seconds", "n_mte_received_tot",
+         "n_rbe_received_tot", "n_rbe_per_te", "n_rbe_discarded_tot",
+         "n_mte_skipped", "n_timed_out", "n_sent", "delta_mte_rbe",
+         "event_cache_size", "event_id_cache_size","drs_bsy_lost_hg_hits",
+         "rbe_wo_mte", "mte_receiver_cbc_len", "rbe_receiver_cbc_len",
+         "tp_sender_cbc_len", "n_rbe_per_loop", "n_rbe_orphan", "n_rbe_from_past",
+         "data_mangled_ev"]
+  }
+}
+
+moniseries!(EventBuilderHBSeries,EventBuilderHB);
+
 #[cfg(feature="pybindings")]
 #[pymethods]
 impl EventBuilderHB {
-  #[new]
-  fn new_py() -> Self {
-    Self::new()
-  }
-
   /// The average number of RBEvents per
   /// TofEvent, tis is the average number
   /// of active ReadoutBoards per TofEvent
@@ -269,23 +322,13 @@ impl EventBuilderHB {
   #[pyo3(name="drs_lost_frac")]
   pub fn get_drs_lost_frac_py(&self) -> f64 {
     self.get_drs_lost_frac()
-  }
-  
-  #[staticmethod]
-  #[pyo3(name="from_tofpacket")]
-  fn from_tofpacket_py(packet : &TofPacket) -> PyResult<Self> {
-    match packet.unpack::<Self>() {
-      Ok(hb) => {
-        return Ok(hb);
-      }
-      Err(err) => {
-        let err_msg = format!("Unable to unpack TofPacket! {err}");
-        return Err(PyIOError::new_err(err_msg));
-      }
-    }
-  }
+  }  
 }
 
+pythonize_monidata!(EventBuilderHB);
+pythonize_packable!(EventBuilderHB);
+
+//-----------------------------------------------------
 
 impl Default for EventBuilderHB {
   fn default () -> Self {

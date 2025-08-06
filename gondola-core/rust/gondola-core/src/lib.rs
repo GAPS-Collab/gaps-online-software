@@ -110,8 +110,11 @@ fn io_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
 fn monitoring_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   use crate::monitoring::*;
   m.add_class::<EventBuilderHB>()?;
+  m.add_class::<EventBuilderHBSeries>()?;
   m.add_class::<DataSinkHB>()?;
+  m.add_class::<DataSinkHBSeries>()?;
   m.add_class::<MasterTriggerHB>()?;
+  m.add_class::<MasterTriggerHBSeries>()?;
   m.add_class::<PAMoniData>()?;
   m.add_class::<PAMoniDataSeries>()?;
   m.add_class::<PBMoniData>()?;
