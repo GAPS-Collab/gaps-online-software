@@ -111,6 +111,13 @@ macro_rules! pythonize_packable {
         }
       }
 
+      #[cfg(feature="random")]
+      #[staticmethod]
+      #[pyo3(name="from_random")]
+      fn from_random_py() -> Self {
+        Self::from_random()
+      }
+
       fn __repr__(&self) -> PyResult<String> {
         Ok(format!("<PyO3Wrapper: {}>", self.to_string()))
       }

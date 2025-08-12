@@ -12,7 +12,10 @@ use crate::packets::{
   TofPackable,
   TofPacketType
 };
-use crate::calibration::tof::clean_spikes;
+use crate::calibration::tof::{
+  clean_spikes,
+  RBCalibrations
+};
 use crate::errors::{
   SerializationError,
   CalibrationError
@@ -87,33 +90,33 @@ impl RBWaveform {
     }
   }
 
-  //pub fn calibrate(&mut self, cali : &RBCalibrations) -> Result<(), CalibrationError>  {
-  //  if cali.rb_id != self.rb_id {
-  //    error!("Calibration is for board {}, but wf is for {}", cali.rb_id, self.rb_id);
-  //    return Err(CalibrationError::WrongBoardId);
-  //  }
-  //  let mut voltages = vec![0.0f32;1024];
-  //  let mut nanosecs = vec![0.0f32;1024];
-  //  cali.voltages(self.rb_channel_a as usize + 1,
-  //                self.stop_cell as usize,
-  //                &self.adc_a,
-  //                &mut voltages);
-  //  self.voltages_a = voltages.clone();
-  //  cali.nanoseconds(self.rb_channel_a as usize + 1,
-  //                   self.stop_cell as usize,
-  //                   &mut nanosecs);
-  //  self.nanoseconds_a = nanosecs.clone();
-  //  cali.voltages(self.rb_channel_b as usize + 1,
-  //                self.stop_cell as usize,
-  //                &self.adc_b,
-  //                &mut voltages);
-  //  self.voltages_b = voltages;
-  //  cali.nanoseconds(self.rb_channel_b as usize + 1,
-  //                   self.stop_cell as usize,
-  //                   &mut nanosecs);
-  //  self.nanoseconds_b = nanosecs;
-  //  Ok(())
-  //}
+  pub fn calibrate(&mut self, cali : &RBCalibrations) -> Result<(), CalibrationError>  {
+    if cali.rb_id != self.rb_id {
+      error!("Calibration is for board {}, but wf is for {}", cali.rb_id, self.rb_id);
+      return Err(CalibrationError::WrongBoardId);
+    }
+    let mut voltages = vec![0.0f32;1024];
+    let mut nanosecs = vec![0.0f32;1024];
+    cali.voltages(self.rb_channel_a as usize + 1,
+                  self.stop_cell as usize,
+                  &self.adc_a,
+                  &mut voltages);
+    self.voltages_a = voltages.clone();
+    cali.nanoseconds(self.rb_channel_a as usize + 1,
+                     self.stop_cell as usize,
+                     &mut nanosecs);
+    self.nanoseconds_a = nanosecs.clone();
+    cali.voltages(self.rb_channel_b as usize + 1,
+                  self.stop_cell as usize,
+                  &self.adc_b,
+                  &mut voltages);
+    self.voltages_b = voltages;
+    cali.nanoseconds(self.rb_channel_b as usize + 1,
+                     self.stop_cell as usize,
+                     &mut nanosecs);
+    self.nanoseconds_b = nanosecs;
+    Ok(())
+  }
 
   /// Apply Jamie's simple spike filter to the calibrated voltages
   pub fn apply_spike_filter(&mut self) {
@@ -284,13 +287,6 @@ impl RBWaveform {
   #[pyo3(name="apply_spike_filter")]
   fn apply_spike_filter_py(&mut self) {
     self.apply_spike_filter();
-  }
-  
-  #[cfg(feature="random")]
-  #[staticmethod]
-  #[pyo3(name="from_random")]
-  fn from_random_py() -> Self {
-    Self::from_random()
   }
 }
 

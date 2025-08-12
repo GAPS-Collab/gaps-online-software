@@ -325,7 +325,9 @@ impl EventBuilderHB {
   }  
 }
 
+#[cfg(feature="pybindings")]
 pythonize_monidata!(EventBuilderHB);
+#[cfg(feature="pybindings")]
 pythonize_packable!(EventBuilderHB);
 
 //-----------------------------------------------------

@@ -11,7 +11,10 @@ pub mod rb_event_header;
 pub use rb_event_header::RBEventHeader;
 
 pub mod rb_event;
-pub use rb_event::RBEvent;
+pub use rb_event::{
+  RBEvent,
+  unpack_traces
+};
 
 pub mod tracker_hit;
 pub use tracker_hit::TrackerHit;

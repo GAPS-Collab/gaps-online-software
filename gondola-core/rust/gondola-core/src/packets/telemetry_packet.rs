@@ -96,6 +96,11 @@ impl Serialization for TelemetryPacket {
   }
 }
 
+impl Default for TelemetryPacket { 
+  fn default() -> Self {
+    Self::new()
+  }
+}
 
 impl fmt::Display for TelemetryPacket {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

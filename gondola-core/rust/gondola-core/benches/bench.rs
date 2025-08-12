@@ -62,13 +62,14 @@ fn bench_clean_spikes(c: &mut Criterion) {
   
 //---------------------------------------
 
-fn bench_rb_waveform_adc_py(c: &mut Criterion) {
-  use gondola_core::events::RBWaveform;
-  use gondola_core::random::FromRandom;
-  let wf = RBWaveform::from_random();
-  c.bench_function("rb_waveform_adc_py", |b|
-                    b.iter(|| wf.adc_a_py()));
-}
+//fn bench_rb_waveform_adc_py(c: &mut Criterion) {
+//  use gondola_core::events::RBWaveform;
+//  use gondola_core::random::FromRandom;
+//  let wf = RBWaveform::from_random();
+//  c.bench_function("rb_waveform_adc_py", |b|
+//                    b.iter(|| wf.adc_a_py()));
+//}
+
 //---------------------------------------
 
 criterion_group!(benches,

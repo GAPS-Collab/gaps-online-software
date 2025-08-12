@@ -7,6 +7,12 @@
 
 use std::fmt;
 
+use num_traits::{
+  Float,
+  NumAssign,
+  NumCast
+};
+
 use crate::events::{
   RBEventHeader,
   RBWaveform,
@@ -67,6 +73,49 @@ use numpy::{
 #[cfg(feature="pybindings")]
 use crate::pythonize_packable;
 
+/// Get the traces for a set of RBEvents
+///
+/// This will return a cube of 
+/// The sice of this cube will be fixed
+/// in two dimensions, but not the third
+///
+/// The rationale of this is to be able 
+/// to quickly calculate means over all
+/// channels.
+///
+/// Shape
+/// \[ch:9\]\[nevents\]\[adc_bin:1024\]
+///
+/// # Args:
+///   events - events to get the traces from
+pub fn unpack_traces<T>(events : &Vec<RBEvent>)
+  -> Vec<Vec<Vec<T>>> 
+  where T: Float + NumAssign + NumCast + Copy {
+  let nevents          = events.len();
+  let mut traces       = Vec::<Vec::<Vec::<T>>>::new();
+  let mut trace        = Vec::<T>::with_capacity(NWORDS);
+  let mut stop_cells   = Vec::<isize>::new();
+  let mut empty_events = Vec::<Vec::<T>>::new();
+  for _ in 0..nevents {
+    empty_events.push(trace.clone());
+  }
+  for ch in 0..NCHN {
+    traces.push(empty_events.clone());
+    for (k,ev) in events.iter().enumerate() {
+      trace.clear();
+      stop_cells.push(ev.header.stop_cell as isize);
+      for k in 0..NWORDS {
+        // the unwrap here can be debated. Technically it does 
+        // only ensure that the cast can be possible
+        trace.push(T::from(ev.adc[ch][k]).unwrap());
+      }
+      traces[ch][k] = trace.clone();
+    }
+  }
+  traces
+}
+
+
 /// Event data for each individual ReadoutBoard (RB)
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature="pybindings", pyclass)]
@@ -92,6 +141,33 @@ impl RBEvent {
       adc          : adc,
       hits         : Vec::<TofHit>::new(),
     }
+  }
+
+  #[deprecated(since="0.11", note="check seems meaningnless")] 
+  pub fn trace_check(&self) -> bool {
+    let mut check  = true;
+    let mut nchan  = 0usize;
+    let mut failed = true;
+    for ch in self.header.get_channels() {
+      if self.adc[ch as usize].len() != NWORDS {
+        check = false;
+      }
+      for k in &self.adc[ch as usize] {
+        if *k != u16::MAX {
+          // just check that not all bins are 
+          // u16::MAX. They get set to that
+          // value in case of an error
+          // also if that happens to any of 
+          // the channels, throw the whole 
+          // event away.
+          failed = false;
+        }
+      }
+      nchan += 1;
+    }
+    // for the calibration we want to have all 
+    // channels!
+    check && nchan == NCHN && !failed
   }
 
   pub fn has_any_mangling_flag(&self) -> bool {
@@ -631,13 +707,6 @@ impl FromRandom for RBEvent {
 #[cfg(feature="pybindings")]
 #[pymethods]
 impl RBEvent {
-
-  #[cfg(feature="random")]
-  #[staticmethod]
-  #[pyo3(name="from_random")]
-  fn from_random_py() -> Self {
-    Self::from_random()
-  }
 
   #[getter]
   fn get_status(&self) -> EventStatus {

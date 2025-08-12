@@ -37,8 +37,8 @@ use crate::moniseries;
 
 #[cfg(feature="pybindings")]
 use crate::{
-  pythonize_packable,
-  pythonize_monidata
+  pythonize_monidata,
+  pythonize_packable
 };
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -186,7 +186,9 @@ impl DataSinkHB {
   }  
 }
 
+#[cfg(feature="pybindings")]
 pythonize_monidata!(DataSinkHB);
+#[cfg(feature="pybindings")]
 pythonize_packable!(DataSinkHB);
 
 //--------------------------------------------------------------

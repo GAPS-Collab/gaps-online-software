@@ -333,7 +333,9 @@ impl MasterTriggerHB {
   }
 }
 
+#[cfg(feature="pybindings")]
 pythonize_packable!(MasterTriggerHB);
+#[cfg(feature="pybindings")]
 pythonize_monidata!(MasterTriggerHB);
 
 //-----------------------------------------------------
