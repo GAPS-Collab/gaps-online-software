@@ -19,7 +19,10 @@ use crate::io::serialization::Serialization;
 /// Can be wrapped within a TofPacket. To do, we just have
 /// to define a packet type
 pub trait TofPackable {
-  const TOF_PACKET_TYPE : TofPacketType;
+  const TOF_PACKET_TYPE     : TofPacketType;
+  // provide an alternative TofPacketType to retrieve the 
+  // packet from without failing
+  const TOF_PACKET_TYPE_ALT : TofPacketType = TofPacketType::Unknown;
 
   /// Wrap myself in a TofPacket
   fn pack(&self) -> TofPacket 

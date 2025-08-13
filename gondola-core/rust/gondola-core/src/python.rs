@@ -110,6 +110,13 @@ macro_rules! pythonize_packable {
           }
         }
       }
+      
+      /// Pack self into a TofPacket to be written on disk
+      /// or sent over network
+      #[pyo3(name="pack")]
+      fn pack_py(&self) -> TofPacket {
+        self.pack()
+      }
 
       #[cfg(feature="random")]
       #[staticmethod]

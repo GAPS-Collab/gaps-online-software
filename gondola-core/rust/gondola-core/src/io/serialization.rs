@@ -51,6 +51,22 @@ pub trait Serialization {
                      pos        : &mut usize)
     -> Result<Self, SerializationError>
     where Self : Sized;
+  
+  /// Decode a serializable from a bytestream. This provides 
+  /// an alternative method to get the packet. If not implemented,
+  /// it will be the same as from_bytestream.
+  ///
+  /// # Arguments:
+  ///   * bytestream : bytes including the ones which should 
+  ///                  be decoded
+  ///   * pos        : first byte in the bytestream which is 
+  ///                  part of the expected payload
+  fn from_bytestream_alt(bytestream : &Vec<u8>, 
+                         pos        : &mut usize)
+    -> Result<Self, SerializationError>
+    where Self : Sized {
+    Self::from_bytestream(bytestream, pos)
+  }
 
   ///// Decode a serializable directly from a TofPacket
   //fn from_tofpacket(packet : &TofPacket)

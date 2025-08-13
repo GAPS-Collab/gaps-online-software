@@ -126,9 +126,25 @@ impl TofPacket {
   /// Unpack the TofPacket and return its content
   pub fn unpack<T>(&self) -> Result<T, SerializationError>
     where T: TofPackable + Serialization {
-    if T::TOF_PACKET_TYPE != self.packet_type {
-      error!("This bytestream is not for a {} packet!", self.packet_type);
-      return Err(SerializationError::IncorrectPacketType);
+    // if the alternative tof packet type is unknown, it must 
+    // be of type TOF_PACKET_TYPE, alternatively either one 
+    // of Both
+    if T::TOF_PACKET_TYPE_ALT != TofPacketType::Unknown {
+      if T::TOF_PACKET_TYPE_ALT == self.packet_type {
+        let unpacked : T = T::from_bytestream_alt(&self.payload, &mut 0)?;
+        return Ok(unpacked); 
+      } else if T::TOF_PACKET_TYPE == self.packet_type{
+        let unpacked : T = T::from_bytestream(&self.payload, &mut 0)?;
+        return Ok(unpacked); 
+      } else {
+        error!("This packet of type {} is neither for a {} nor a {}  packet!", self.packet_type, T::TOF_PACKET_TYPE, T::TOF_PACKET_TYPE_ALT);
+        return Err(SerializationError::IncorrectPacketType); 
+      }
+    } else {
+      if T::TOF_PACKET_TYPE != self.packet_type {
+        error!("This bytestream is not for a {} packet!", self.packet_type);
+        return Err(SerializationError::IncorrectPacketType);
+      }
     }
     let unpacked : T = T::from_bytestream(&self.payload, &mut 0)?;
     Ok(unpacked)

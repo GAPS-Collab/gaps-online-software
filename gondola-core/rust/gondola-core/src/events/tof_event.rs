@@ -134,7 +134,6 @@ pub struct TofEvent {
   // this is new (v0.11) -> We are expanding TofEvent(Summary) 
   // so that it is the same as TofEvent in v0.10 and is able 
   // to carry waveforms. These then can be stripped off
-  pub n_rb_events        : u8,
   pub rb_events          : Vec<RBEvent>,
 }
 
@@ -163,14 +162,12 @@ impl TofEvent {
       mtb_link_mask      : 0,
       hits               : Vec::<TofHit>::new(),
       paddles_set        : false,
-      n_rb_events        : 0,
       rb_events          : Vec::<RBEvent>::new(),
     }
   }
   
   /// Remove any RBEvents from the event 
   pub fn strip_rbevents(&mut self) {
-    self.n_rb_events = 0;
     self.rb_events.clear();
   }
 
@@ -617,83 +614,12 @@ impl TofEvent {
     }
     false
   }
-
-  /// Allows to get TofEvent from a packet 
-  /// of the deprecate packet type TofEventDeprecated.
-  /// This packet type was formerly known as TofEvent
-  /// This will dismiss all the 
-  /// waveforms and RBEvents
-  pub fn from_olftofeventpacket(pack : &TofPacket)
-    -> Result<Self, SerializationError> {
-    if pack.packet_type != TofPacketType::TofEventDeprecated {
-      return Err(SerializationError::IncorrectPacketType);
-    }
-    let mut pos = 0usize;
-    let stream  = &pack.payload;
-    let head    = parse_u16(stream, &mut pos);
-    if head != TofEvent::HEAD {
-      return Err(SerializationError::HeadInvalid);
-    }
-    let mut te            = Self::new();
-    // the compression level will always be 0 for old data
-    let _compression_level = parse_u8(stream, &mut pos);
-
-    te.quality            = EventQuality::from(parse_u8(stream, &mut pos));
-    // at this position is the serialized TofEventHeader. We don't have that anymore (>v0.11). 
-    // However, the only information we need from it is the run id, the other fields are anyway
-    // empty
-    pos += 2; // for TofEventHeader::HEAD
-    // FIXME - potentially dangerous for u16 overflow!
-    te.run_id             = parse_u32(stream, &mut pos) as u16;
-    pos += 43 - 6;// rest of TofEventHeader 
-    //let header         = TofEventHeader::from_bytestream(stream, &mut pos)?;
-    // now parse the "old" MasterTriggerEvent
-    pos += 2; // MasterTriggerEvent::HEAD
-    let event_status   = parse_u8 (stream, &mut pos);
-    te.status              = EventStatus::from(event_status);
-    if te.has_any_mangling() {
-      te.status = EventStatus::AnyDataMangling;
-    }
-    te.event_id           = parse_u32(stream, &mut pos);
-    let mtb_timestamp      = parse_u32(stream, &mut pos);
-    let tiu_timestamp      = parse_u32(stream, &mut pos);
-    let tiu_gps32          = parse_u32(stream, &mut pos);
-    let _tiu_gps16          = parse_u16(stream, &mut pos);
-    let _crc           = parse_u32(stream, &mut pos);
-    let mt_timestamp  = (mt_event_get_timestamp_abs48(mtb_timestamp, tiu_gps32, tiu_timestamp ) as f64/1000.0).floor()  as u64; 
-    te.timestamp32         = (mt_timestamp  & 0x00000000ffffffff ) as u32;
-    te.timestamp16         = ((mt_timestamp & 0x0000ffff00000000 ) >> 32) as u16;
-    te.trigger_sources     = parse_u16(stream, &mut pos);
-    te.dsi_j_mask          = parse_u32(stream, &mut pos);
-    let n_channel_masks   = parse_u8(stream, &mut pos);
-    for _ in 0..n_channel_masks {
-      te.channel_mask.push(parse_u16(stream, &mut pos));
-    }
-
-    te.mtb_link_mask      = parse_u64(stream, &mut pos);
-    //let mt_event      = MasterTriggerEvent::from_bytestream(stream, &mut pos)?;
-    
-    let v_sizes              = Self::decode_depr_tofevent_size_header(&parse_u32(stream, &mut pos));
-    for k in 0..v_sizes.0 {
-      match RBEvent::from_bytestream_nowaveforms(stream, &mut pos) {
-        Err(err) => error!("Expected RBEvent {} of {}, but got serialization error {}!", k,  v_sizes.0, err),
-        Ok(ev) => {
-          te.rb_events.push(ev);
-        }
-      }
-    }
-    let tail = parse_u16(stream, &mut pos);
-    if tail != Self::TAIL {
-      error!("Decoding of TAIL failed! Got {} instead!", tail);
-      return Err(SerializationError::TailInvalid);
-    }
-    return Ok(te);
-  }
 }
 
 impl TofPackable for TofEvent {
   // v0.11 TofPacketType::TofEventSummary -> TofPacketType::TofEvent
   const TOF_PACKET_TYPE        : TofPacketType = TofPacketType::TofEvent;
+  const TOF_PACKET_TYPE_ALT    : TofPacketType = TofPacketType::TofEventDeprecated;
 }
 
 impl Serialization for TofEvent {
@@ -738,12 +664,12 @@ impl Serialization for TofEvent {
     // for the new (>=v0.11) event, we will always write 
     // the rb events
     if self.version == ProtocolVersion::V2 {
-      stream.push(self.n_rb_events);
+      stream.push(self.rb_events.len() as u8);
       for rbev in &self.rb_events {
         stream.extend_from_slice(&rbev.to_bytestream());
       }
-      stream.extend_from_slice(&Self::TAIL.to_le_bytes());
     }
+    stream.extend_from_slice(&Self::TAIL.to_le_bytes());
     stream
   }
   
@@ -789,9 +715,9 @@ impl Serialization for TofEvent {
     }
     if event.version == ProtocolVersion::V2 {
       // for this version, we can have rb events 
-      event.n_rb_events = parse_u8(stream, pos);
-      if event.n_rb_events > 0 {
-        for _ in 0..event.n_rb_events {
+      let n_rb_events = parse_u8(stream, pos);
+      if n_rb_events > 0 {
+        for _ in 0..n_rb_events {
           event.rb_events.push(RBEvent::from_bytestream(stream, pos)?);
         }
       }
@@ -803,6 +729,74 @@ impl Serialization for TofEvent {
       return Err(SerializationError::TailInvalid);
     }
     Ok(event)
+  }
+  
+  /// Allows to get TofEvent from a packet 
+  /// of the deprecate packet type TofEventDeprecated.
+  /// This packet type was formerly known as TofEvent
+  /// This will dismiss all the 
+  /// waveforms and RBEvents
+  fn from_bytestream_alt(stream    : &Vec<u8>, 
+                         pos       : &mut usize) 
+    -> Result<Self, SerializationError> {
+    let head    = parse_u16(stream, pos);
+    if head != TofEvent::HEAD {
+      return Err(SerializationError::HeadInvalid);
+    }
+    let mut te            = Self::new();
+    // the compression level will always be 0 for old data
+    let _compression_level = parse_u8(stream, pos);
+
+    te.quality            = EventQuality::from(parse_u8(stream, pos));
+    // at this position is the serialized TofEventHeader. We don't have that anymore (>v0.11). 
+    // However, the only information we need from it is the run id, the other fields are anyway
+    // empty
+    *pos += 2; // for TofEventHeader::HEAD
+    // FIXME - potentially dangerous for u16 overflow!
+    te.run_id             = parse_u32(stream, pos) as u16;
+    *pos += 43 - 6;// rest of TofEventHeader 
+    //let header         = TofEventHeader::from_bytestream(stream, &mut pos)?;
+    // now parse the "old" MasterTriggerEvent
+    *pos += 2; // MasterTriggerEvent::HEAD
+    let event_status   = parse_u8 (stream, pos);
+    te.status              = EventStatus::from(event_status);
+    if te.has_any_mangling() {
+      te.status = EventStatus::AnyDataMangling;
+    }
+    te.event_id           = parse_u32(stream, pos);
+    let mtb_timestamp      = parse_u32(stream, pos);
+    let tiu_timestamp      = parse_u32(stream, pos);
+    let tiu_gps32          = parse_u32(stream, pos);
+    let _tiu_gps16          = parse_u16(stream,pos);
+    let _crc           = parse_u32(stream, pos);
+    let mt_timestamp  = (mt_event_get_timestamp_abs48(mtb_timestamp, tiu_gps32, tiu_timestamp ) as f64/1000.0).floor()  as u64; 
+    te.timestamp32         = (mt_timestamp  & 0x00000000ffffffff ) as u32;
+    te.timestamp16         = ((mt_timestamp & 0x0000ffff00000000 ) >> 32) as u16;
+    te.trigger_sources     = parse_u16(stream, pos);
+    te.dsi_j_mask          = parse_u32(stream, pos);
+    let n_channel_masks   = parse_u8(stream, pos);
+    for _ in 0..n_channel_masks {
+      te.channel_mask.push(parse_u16(stream, pos));
+    }
+
+    te.mtb_link_mask      = parse_u64(stream, pos);
+    //let mt_event      = MasterTriggerEvent::from_bytestream(stream, &mut pos)?;
+    
+    let v_sizes              = Self::decode_depr_tofevent_size_header(&parse_u32(stream, pos));
+    for k in 0..v_sizes.0 {
+      match RBEvent::from_bytestream_nowaveforms(stream, pos) {
+        Err(err) => error!("Expected RBEvent {} of {}, but got serialization error {}!", k,  v_sizes.0, err),
+        Ok(ev) => {
+          te.rb_events.push(ev);
+        }
+      }
+    }
+    let tail = parse_u16(stream, pos);
+    if tail != Self::TAIL {
+      error!("Decoding of TAIL failed! Got {} instead!", tail);
+      return Err(SerializationError::TailInvalid);
+    }
+    return Ok(te);
   }
 }
     
@@ -880,12 +874,13 @@ impl FromRandom for TofEvent {
     }
     event.mtb_link_mask      = rng.random::<u64>();
     //let nhits                  = rng.random::<u8>();
-    let nhits = 5;
+    let nhits: u16 = rng.random_range(0..5);
     for _ in 0..nhits {
       event.hits.push(TofHit::from_random());
     }
     if event.version == ProtocolVersion::V2 {
-      for _ in 0..event.n_rb_events {
+      let n_rb_events = rng.random_range(0..4);
+      for _ in 0..n_rb_events {
         event.rb_events.push(RBEvent::from_random());
       }
     }
@@ -893,11 +888,274 @@ impl FromRandom for TofEvent {
   }
 }
 
+//---------------------------------------------------
+
+#[cfg(feature="pybindings")]
+#[pymethods]
+impl TofEvent {
+  
+  /// Emit a copy of self
+  fn copy(&self) -> Self {
+    self.clone()
+  }
+
+
+  #[pyo3(name="set_timing_offsets")]
+  pub fn set_timing_offsets_py(&mut self, timing_offsets : HashMap<u8, f32>) {
+    self.set_timing_offsets(&timing_offsets);
+  }
+  
+  #[pyo3(name="normalize_hit_times")]
+  pub fn normalize_hit_times_py(&mut self) {
+    self.normalize_hit_times();
+  }
+
+  /// Remove hits from the hitseries which can not 
+  /// be caused by the same particle, which means 
+  /// that for these two specific hits beta with 
+  /// respect to the first hit in the event is 
+  /// larger than one
+  /// That this works, first hits need to be 
+  /// "normalized" by calling normalize_hit_times
+  #[pyo3(name="lightspeed_cleaning")]
+  pub fn lightspeed_cleaning_py(&mut self, t_err : f32) -> (Vec<u16>, Vec<f32>) {
+    // return Vec<u16> here so that python does not 
+    // interpret it as a byte
+    let mut pids = Vec::<u16>::new();
+    let (pids_rm, twindows) = self.lightspeed_cleaning(t_err);
+    for pid in pids_rm {
+      pids.push(pid as u16);
+    }
+    (pids, twindows)
+  }
+ 
+
+  /// Remove all hits from the event's hit series which 
+  /// do NOT obey causality. that is where the timings
+  /// measured at ends A and B can not be correlated
+  /// by the assumed speed of light in the paddle
+  #[pyo3(name="remove_non_causal_hits")]
+  fn remove_non_causal_hits_py(&mut self) -> Vec<u16> {
+    // return Vec<u16> here so that python does not 
+    // interpret it as a byte
+    let mut pids = Vec::<u16>::new();
+    for pid in self.remove_non_causal_hits() {
+      pids.push(pid as u16);
+    }
+    pids
+  }
+  
+  #[getter]
+  fn pointcloud(&self) -> Option<Vec<(f32,f32,f32,f32,f32)>> {
+    self.get_pointcloud()
+  }
+
+  #[getter]
+  fn get_event_id(&self) -> u32 {
+    self.event_id
+  }
+  
+  #[getter]
+  fn get_event_status(&self) -> EventStatus {
+    self.status
+  }
+  
+  /// Compare the hg hits of the event with the triggered paddles and 
+  /// return the paddles which have at least a missing HG hit
+  #[pyo3(name="get_missing_paddles_hg")]
+  fn get_missing_paddles_hg_py(&self, mapping : DsiJChPidMapping) -> Vec<u8> {
+    self.get_missing_paddles_hg(&mapping)
+  }
+
+  /// Get all the paddle ids which have been triggered
+  #[pyo3(name="get_triggered_paddles")]
+  fn get_triggered_paddles_py(&self, mapping : DsiJChPidMapping) -> Vec<u8> {
+    self.get_triggered_paddles(&mapping)
+  }
+
+  /// The hits we were not able to read out because the DRS4 chip
+  /// on the RBs was busy
+  #[getter]
+  fn lost_hits(&self) -> u16 {
+    self.drs_dead_lost_hits
+  }
+
+  /// RB Link IDS (not RB ids) which fall into the 
+  /// trigger window
+  #[getter]
+  fn rb_link_ids(&self) -> Vec<u8> {
+    self.get_rb_link_ids()
+  }
+
+  /// Hits which formed a trigger
+  #[getter]
+  pub fn trigger_hits(&self) -> PyResult<Vec<(u8, u8, (u8, u8), LTBThreshold)>> {
+    Ok(self.get_trigger_hits())
+  }
+  
+  /// The active triggers in this event. This can be more than one, 
+  /// if multiple trigger conditions are satisfied.
+  #[getter]
+  pub fn trigger_sources(&self) -> Vec<TriggerType> {
+    self.get_trigger_sources()
+  } 
+
+  #[getter]
+  #[pyo3(name="hits")]
+  pub fn hits_py(&self) -> Vec<TofHit> {
+    //FIXMEFIXMEFIXME
+    self.hits.clone()
+  }
+  
+  /// Total energy depostion in the Umbrella
+  ///
+  /// Utilizes Philip's formula based on 
+  /// peak height
+  #[getter]
+  #[pyo3(name="get_edep_umbrella")]
+  pub fn get_edep_umbrella_py(&self) -> f32 {
+    self.get_edep_umbrella()
+  }
+  
+  /// Total energy depostion in the Cube
+  ///
+  /// Utilizes Philip's formula based on 
+  /// peak height
+  #[getter]
+  #[pyo3(name="get_edep_cube")]
+  pub fn get_edep_cube_py(&self) -> f32 {
+    self.get_edep_cube()
+  }
+  
+  /// Total energy depostion in the Cortina
+  ///
+  /// Utilizes Philip's formula based on 
+  /// peak height
+  #[getter]
+  #[pyo3(name="get_edep_cortina")]
+  pub fn get_edep_cortina_py(&self) -> f32 {
+    self.get_edep_cortina()
+  }
+
+  /// Total energy depostion in the complete TOF
+  ///
+  /// Utilizes Philip's formula based on 
+  /// peak height
+  #[getter]
+  #[pyo3(name="get_edep")]
+  pub fn get_edep_py(&self) -> f32 {
+    self.get_edep()
+  }
+
+  #[getter]
+  #[pyo3(name="nhits")]
+  pub fn nhits_py(&self) -> usize {
+    self.get_nhits()
+  }
+
+  #[getter]
+  #[pyo3(name="nhits_umb")]
+  pub fn nhits_umb_py(&self) -> usize {
+    self.get_nhits_umb()
+  }
+
+  #[getter]
+  #[pyo3(name="nhits_cbe")]
+  fn get_nhits_cbe_py(&self) -> usize {
+    self.get_nhits_cbe()
+  }
+  
+  #[getter]
+  #[pyo3(name="nhits_cor")]
+  fn get_nhits_cor_py(&self) -> usize {
+    self.get_nhits_cor()
+  }
+
+  #[getter]
+  fn get_timestamp16(&self) -> u16 {
+    self.timestamp16
+  }
+  
+  #[getter]
+  fn get_timestamp32(&self) -> u32 {
+    self.timestamp32
+  }
+  
+  #[getter]
+  fn timestamp48(&self) -> u64 {
+    self.get_timestamp48()
+  }
+  
+  #[getter]
+  fn get_status(&self) -> EventStatus {
+    self.status
+  }
+}
+
+#[cfg(feature="pybindigns")]
+pythonize_packable!(TofEvent);
+
+//---------------------------------------------------
 
 #[test]
-fn packable_tofevent() {
-  for _ in 0..100 {
+fn packable_tofeventv0() {
+  for _ in 0..500 {
     let data = TofEvent::from_random();
+    if data.version != ProtocolVersion::Unknown {
+      continue;
+    }
+    let mut test : TofEvent = data.pack().unpack().unwrap();
+    //println!("{}", data.hits[0]);
+    //println!("{}", test.hits[0]);
+    // Manually zero these fields, since comparison with nan will fail and 
+    // from_random did not touch these
+    //println!("{}", data);
+    //println!("{}", test);
+    for h in &mut test.hits {
+      h.paddle_len       = 0.0; 
+      h.coax_cable_time  = 0.0; 
+      h.hart_cable_time  = 0.0; 
+      h.x                = 0.0; 
+      h.y                = 0.0; 
+      h.z                = 0.0; 
+      h.event_t0         = 0.0;
+    }
+    assert_eq!(data, test);
+  }
+}  
+
+#[test]
+fn packable_tofeventv1() {
+  for _ in 0..500 {
+    let data = TofEvent::from_random();
+    if data.version != ProtocolVersion::V1 {
+      continue;
+    }
+    let mut test : TofEvent = data.pack().unpack().unwrap();
+    //println!("{}", data.hits[0]);
+    //println!("{}", test.hits[0]);
+    // Manually zero these fields, since comparison with nan will fail and 
+    // from_random did not touch these
+    for h in &mut test.hits {
+      h.paddle_len       = 0.0; 
+      h.coax_cable_time  = 0.0; 
+      h.hart_cable_time  = 0.0; 
+      h.x                = 0.0; 
+      h.y                = 0.0; 
+      h.z                = 0.0; 
+      h.event_t0         = 0.0;
+    }
+    assert_eq!(data, test);
+  }
+}  
+
+#[test]
+fn packable_tofeventv2() {
+  for _ in 0..500 {
+    let data = TofEvent::from_random();
+    if data.version != ProtocolVersion::V2 {
+      continue;
+    }
     let mut test : TofEvent = data.pack().unpack().unwrap();
     //println!("{}", data.hits[0]);
     //println!("{}", test.hits[0]);

@@ -78,6 +78,12 @@ fn events_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<RBWaveform>()?;
   m.add_class::<EventStatus>()?;
   m.add_class::<DataType>()?;
+  m.add_class::<TofEvent>()?;
+  m.add_function(wrap_pyfunction!(strip_id, m)?)?;
+  m.add_class::<EventQuality>()?;
+  m.add_class::<TriggerType>()?;
+  m.add_class::<LTBThreshold>()?;
+  m.add_function(wrap_pyfunction!(mt_event_get_timestamp_abs48,m)?)?;
   Ok(())
 }
 
@@ -98,9 +104,11 @@ fn packets_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
 #[pymodule]
 #[pyo3(name = "io")]
 fn io_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
-  //use crate::io::*;
+  use crate::io::*;
   use crate::io::root_reader::read_example;
   m.add_function(wrap_pyfunction!(read_example, m)?)?;
+  //m.add_class::<TofPacketReader>()?;
+  //m.add_class::<TelemetryPacketReader>()?;
   Ok(())
 }
 

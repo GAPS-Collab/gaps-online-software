@@ -74,7 +74,6 @@ pub fn get_max_value_idx<T : std::cmp::PartialOrd + std::fmt::Display + Copy>(va
   Ok(maxbin)
 } // end fn
 
-
 //---------------------------------------------------
 
 #[cfg(feature="pybindings")]

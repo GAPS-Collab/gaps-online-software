@@ -54,7 +54,7 @@ pub const LTB_CHANNELS : [u16;8] = [
 use std::fmt;
 
 #[cfg(feature="pybindings")]
-use pyo3::pyclass;
+use pyo3::prelude::*;
 
 #[cfg(feature="random")]
 use crate::random::FromRandom;
@@ -71,12 +71,14 @@ use rand::Rng;
 ///   * module  : module in row (0-6)
 ///   * channel : channel in module (0-32) 
 ///
+#[cfg_attr(feature="pybindings", pyfunction)]
 pub fn strip_id(layer : u8, row :u8, module : u8, channel : u8) -> u32 {
   channel as u32 + (module as u32)*100 + (row as u32)*10000 + (layer as u32)*100000
 }
   
 /// Get absolute timestamp as sent by the GPS and 
 /// as seen by the MTB
+#[cfg_attr(feature="pybindings", pyfunction)]
 pub fn mt_event_get_timestamp_abs48(mtb_timestamp : u32, gps_timestamp : u32, tiu_timestamp : u32) -> u64 {
   let gps = gps_timestamp as u64;
   let mut timestamp = mtb_timestamp as u64;
@@ -216,8 +218,7 @@ impl TriggerType {
       t_types.push(TriggerType::TrackCentral);
     }
     t_types
-}
-
+  }
 }
 
 impl fmt::Display for TriggerType {
