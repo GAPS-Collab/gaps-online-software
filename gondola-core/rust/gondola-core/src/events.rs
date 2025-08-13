@@ -10,6 +10,9 @@ pub use rb_waveform::RBWaveform;
 pub mod rb_event_header;
 pub use rb_event_header::RBEventHeader;
 
+pub mod tof_event;
+pub use tof_event::TofEvent;
+
 pub mod rb_event;
 pub use rb_event::{
   RBEvent,
@@ -18,6 +21,35 @@ pub use rb_event::{
 
 pub mod tracker_hit;
 pub use tracker_hit::TrackerHit;
+
+/// mask to decode LTB hit masks
+pub const LTB_CH0 : u16 = 0x3   ;
+/// mask to decode LTB hit masks
+pub const LTB_CH1 : u16 = 0xc   ;
+/// mask to decode LTB hit masks
+pub const LTB_CH2 : u16 = 0x30  ; 
+/// mask to decode LTB hit masks
+pub const LTB_CH3 : u16 = 0xc0  ;
+/// mask to decode LTB hit masks
+pub const LTB_CH4 : u16 = 0x300 ;
+/// mask to decode LTB hit masks
+pub const LTB_CH5 : u16 = 0xc00 ;
+/// mask to decode LTB hit masks
+pub const LTB_CH6 : u16 = 0x3000;
+/// mask to decode LTB hit masks
+pub const LTB_CH7 : u16 = 0xc000;
+/// mask to decode LTB channels from bitmask
+pub const LTB_CHANNELS : [u16;8] = [
+  LTB_CH0,
+  LTB_CH1,
+  LTB_CH2,
+  LTB_CH3,
+  LTB_CH4,
+  LTB_CH5,
+  LTB_CH6,
+  LTB_CH7
+];
+
 
 use std::fmt;
 
@@ -42,6 +74,302 @@ use rand::Rng;
 pub fn strip_id(layer : u8, row :u8, module : u8, channel : u8) -> u32 {
   channel as u32 + (module as u32)*100 + (row as u32)*10000 + (layer as u32)*100000
 }
+  
+/// Get absolute timestamp as sent by the GPS and 
+/// as seen by the MTB
+pub fn mt_event_get_timestamp_abs48(mtb_timestamp : u32, gps_timestamp : u32, tiu_timestamp : u32) -> u64 {
+  let gps = gps_timestamp as u64;
+  let mut timestamp = mtb_timestamp as u64;
+  if timestamp < tiu_timestamp as u64 {
+    // it has wrapped
+    timestamp += u32::MAX as u64 + 1;
+  }
+  let gps_mult = match 100_000_000u64.checked_mul(gps) {
+  //let gps_mult = match 100_000u64.checked_mul(gps) {
+    Some(result) => result,
+    None => {
+        // Handle overflow case here
+        // Example: log an error, return a default value, etc.
+        0 // Example fallback value
+    }
+  };
+
+  let ts = gps_mult + (timestamp - tiu_timestamp as u64);
+  ts
+}
+
+#[derive(Debug, Copy, Clone, PartialEq)]
+#[repr(u8)]
+#[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
+pub enum EventQuality {
+  Unknown        =  0u8,
+  Silver         = 10u8,
+  Gold           = 20u8,
+  Diamond        = 30u8,
+  FourLeafClover = 40u8,
+}
+
+impl fmt::Display for EventQuality {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let r : &str;
+    match self {
+      EventQuality::Unknown        => {r = "Unknown"},
+      EventQuality::Silver         => {r = "Silver"},
+      EventQuality::Gold           => {r = "Gold"},
+      EventQuality::Diamond        => {r = "Diamond"},
+      EventQuality::FourLeafClover => {r = "FourLeafClover"},
+    }
+    write!(f, "<EventQuality: {}>", r)
+  }
+}
+
+impl From<u8> for EventQuality {
+  fn from(value: u8) -> Self {
+    match value {
+      0u8  => EventQuality::Unknown,
+      10u8 => EventQuality::Silver,
+      20u8 => EventQuality::Gold,
+      30u8 => EventQuality::Diamond,
+      40u8 => EventQuality::FourLeafClover,
+      _    => EventQuality::Unknown
+    }
+  }
+}
+
+impl FromRandom for EventQuality {
+  fn from_random() -> Self {
+    let choices = [
+      Self::Unknown,
+      Self::Silver,
+      Self::Gold,
+      Self::Diamond,
+    ];
+    let mut rng  = rand::rng();
+    let idx = rng.random_range(0..choices.len());
+    choices[idx]
+  }
+}
+
+//--------------------------------------------
+
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
+#[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
+pub enum TriggerType {
+  Unknown         = 0u8,
+  /// -> 1-10 "pysics" triggers
+  Any             = 1u8,
+  Track           = 2u8,
+  TrackCentral    = 3u8,
+  Gaps            = 4u8,
+  Gaps633         = 5u8, 
+  Gaps422         = 6u8,
+  Gaps211         = 7u8,
+  TrackUmbCentral = 8u8,
+  Gaps1044        = 9u8,
+  /// -> 20+ "Philip's triggers"
+  /// Any paddle HIT in UMB  + any paddle HIT in CUB
+  UmbCube         = 21u8,
+  /// Any paddle HIT in UMB + any paddle HIT in CUB top
+  UmbCubeZ        = 22u8,
+  /// Any paddle HIT in UMB + any paddle hit in COR + any paddle hit in CUB 
+  UmbCorCube      = 23u8,
+  /// Any paddle HIT in COR + any paddle HIT in CUB SIDES
+  CorCubeSide     = 24u8,
+  /// Any paddle hit in UMB + any three paddles HIT in CUB
+  Umb3Cube        = 25u8,
+  /// > 100 -> Debug triggers
+  Poisson         = 100u8,
+  Forced          = 101u8,
+  FixedRate       = 102u8,
+  /// > 200 -> These triggers can not be set, they are merely
+  /// the result of what we read out from the trigger mask of 
+  /// the ltb
+  ConfigurableTrigger = 200u8,
+}
+
+impl TriggerType {
+
+  /// In the serialized data, trigger sources are represented by 2bytes. 
+  /// This will regenerate a vector of trigger sources from these bytes
+  pub fn transcode_trigger_sources(trigger_sources : u16) -> Vec<Self> {
+    let mut t_types    = Vec::<Self>::new();
+    let gaps_trigger   = trigger_sources >> 5 & 0x1 == 1;
+    if gaps_trigger {
+      t_types.push(TriggerType::Gaps);
+    }
+    let any_trigger    = trigger_sources >> 6 & 0x1 == 1;
+    if any_trigger {
+      t_types.push(TriggerType::Any);
+    }
+    let forced_trigger = trigger_sources >> 7 & 0x1 == 1;
+    if forced_trigger {
+      t_types.push(TriggerType::Forced);
+    }
+    let track_trigger  = trigger_sources >> 8 & 0x1 == 1;
+    if track_trigger {
+      t_types.push(TriggerType::Track);
+    }
+    let central_track_trigger
+                       = trigger_sources >> 9 & 0x1 == 1;
+    if central_track_trigger {
+      t_types.push(TriggerType::TrackCentral);
+    }
+    t_types
+}
+
+}
+
+impl fmt::Display for TriggerType {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let r : &str;
+    match self {
+      TriggerType::Unknown             => {r = "Unknown"},
+      TriggerType::Any                 => {r = "Any"},
+      TriggerType::Track               => {r = "Track"},
+      TriggerType::TrackCentral        => {r = "TrackCentral"},
+      TriggerType::Gaps1044            => {r = "Gaps1044"},
+      TriggerType::Gaps                => {r = "Gaps"},
+      TriggerType::Gaps633             => {r = "Gaps633"}, 
+      TriggerType::Gaps422             => {r = "Gaps422"},
+      TriggerType::Gaps211             => {r = "Gaps211"},
+      TriggerType::TrackUmbCentral     => {r = "TrackUmbCentral"},
+      TriggerType::UmbCube             => {r = "UmbCube"},
+      TriggerType::UmbCubeZ            => {r = "UmbCubeZ"},
+      TriggerType::UmbCorCube          => {r = "UmbCorCube"},
+      TriggerType::CorCubeSide         => {r = "CorCubeSide"},
+      TriggerType::Umb3Cube            => {r = "Umb3Cube"},
+      TriggerType::Poisson             => {r = "Poisson"},
+      TriggerType::Forced              => {r = "Forced"},
+      TriggerType::FixedRate           => {r = "FixedRate"},
+      TriggerType::ConfigurableTrigger => {r = "ConfigurableTrigger"},
+    }
+    write!(f, "<TriggerType: {}>", r)
+  }
+}
+
+impl From<u8> for TriggerType {
+  fn from(value: u8) -> Self {
+    match value {
+      0   => TriggerType::Unknown,
+      100 => TriggerType::Poisson,
+      101 => TriggerType::Forced,
+      102 => TriggerType::FixedRate,
+      1   => TriggerType::Any,
+      2   => TriggerType::Track,
+      3   => TriggerType::TrackCentral,
+      4   => TriggerType::Gaps,
+      5   => TriggerType::Gaps633,
+      6   => TriggerType::Gaps422,
+      7   => TriggerType::Gaps211,
+      8   => TriggerType::TrackUmbCentral,
+      9   => TriggerType::Gaps1044,
+      21  => TriggerType::UmbCube,
+      22  => TriggerType::UmbCubeZ,
+      23  => TriggerType::UmbCorCube,
+      24  => TriggerType::CorCubeSide,
+      25  => TriggerType::Umb3Cube,
+      200 => TriggerType::ConfigurableTrigger,
+      _   => TriggerType::Unknown
+    }
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for TriggerType {
+  
+  fn from_random() -> Self {
+    let choices = [
+      TriggerType::Unknown,
+      TriggerType::Poisson,
+      TriggerType::Forced,
+      TriggerType::FixedRate,
+      TriggerType::Any,
+      TriggerType::Track,
+      TriggerType::TrackCentral,
+      TriggerType::Gaps,
+      TriggerType::Gaps633,
+      TriggerType::Gaps422,
+      TriggerType::Gaps211,
+      TriggerType::TrackUmbCentral,
+      TriggerType::Gaps1044,
+      TriggerType::UmbCube,
+      TriggerType::UmbCubeZ,
+      TriggerType::UmbCorCube,
+      TriggerType::CorCubeSide,
+      TriggerType::Umb3Cube,
+      TriggerType::ConfigurableTrigger,
+    ];
+    let mut rng  = rand::rng();
+    let idx = rng.random_range(0..choices.len());
+    choices[idx]
+  }
+}
+
+//--------------------------------------------
+
+/// LTB Thresholds as passed on by the MTB
+/// [See also](https://gaps1.astro.ucla.edu/wiki/gaps/images/gaps/5/52/LTB_Data_Format.pdf)
+#[derive(Debug, Copy, Clone, PartialEq)]
+#[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
+#[repr(u8)]
+pub enum LTBThreshold {
+  NoHit = 0u8,
+  /// First threshold, 40mV, about 0.75 minI
+  Hit   = 1u8,
+  /// Second threshold, 32mV (? error in doc ?, about 2.5 minI
+  Beta  = 2u8,
+  /// Third threshold, 375mV about 30 minI
+  Veto  = 3u8,
+  /// Use u8::MAX for Unknown, since 0 is pre-determined for 
+  /// "NoHit, 
+  Unknown = 255u8
+}
+
+impl fmt::Display for LTBThreshold {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let r : &str;
+    match self {
+      LTBThreshold::NoHit   => { r = "NoHit"},
+      LTBThreshold::Hit     => { r = "Hit"},
+      LTBThreshold::Beta    => { r = "Beta"},
+      LTBThreshold::Veto    => { r = "Veto"},
+      LTBThreshold::Unknown => { r = "Unknown"}
+    }
+    write!(f, "<LTBThreshold: {}>", r)
+  }
+}
+
+impl From<u8> for LTBThreshold {
+  fn from(value: u8) -> Self {
+    match value {
+      0 => LTBThreshold::NoHit,
+      1 => LTBThreshold::Hit,
+      2 => LTBThreshold::Beta,
+      3 => LTBThreshold::Veto,
+      _ => LTBThreshold::Unknown
+    }
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for LTBThreshold {
+  
+  fn from_random() -> Self {
+    let choices = [
+      LTBThreshold::NoHit,
+      LTBThreshold::Hit,
+      LTBThreshold::Beta,
+      LTBThreshold::Veto,
+      LTBThreshold::Unknown
+    ];
+    let mut rng  = rand::rng();
+    let idx = rng.random_range(0..choices.len());
+    choices[idx]
+  }
+}
+
+//--------------------------------------------
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[repr(u8)]
@@ -109,58 +437,6 @@ impl EventStatus {
       EventStatus::Perfect                => {return "Perfect"}
     }
   }
-  //pub fn to_u8(&self) -> u8 {
-  //  match self {
-  //    EventStatus::Unknown => {
-  //      return 0;
-  //    }
-  //    EventStatus::CRC32Wrong => {
-  //      return 10;
-  //    }
-  //    EventStatus::TailWrong => {
-  //      return 11;
-  //    }
-  //    EventStatus::ChannelIDWrong => {
-  //      return 12;
-  //    }
-  //    EventStatus::CellSyncErrors => {
-  //      return 13;
-  //    }
-  //    EventStatus::ChnSyncErrors => {
-  //      return 14;
-  //    }
-  //    EventStatus::CellAndChnSyncErrors => {
-  //      return 15;
-  //    }
-  //    EventStatus::AnyDataMangling => {
-  //      return 16;
-  //    }
-  //    EventStatus::IncompleteReadout => {
-  //      return 21;
-  //    }
-  //    EventStatus::IncompatibleData => {
-  //      return 22;
-  //    }
-  //    EventStatus::EventTimeOut => {
-  //      return 23;
-  //    }
-  //    EventStatus::NoChannel9 => {
-  //      return 24;
-  //    }
-  //    EventStatus::GoodNoCRCOrErrBitCheck => {
-  //      return 39;
-  //    }
-  //    EventStatus::GoodNoCRCCheck => {
-  //      return 40;
-  //    }
-  //    EventStatus::GoodNoErrBitCheck => {
-  //      return 41;
-  //    }
-  //    EventStatus::Perfect => {
-  //      return 42;
-  //    }
-  //  }
-  //}
 }
 
 impl From<u8> for EventStatus {

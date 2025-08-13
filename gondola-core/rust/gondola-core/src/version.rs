@@ -19,7 +19,7 @@ use pyo3::pyclass;
 /// It uses the 2 most significant bit of an u8,
 /// so it should be possible to basically slap 
 /// this on to anyting
-#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
 #[repr(u8)]
 #[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
 pub enum ProtocolVersion {
@@ -31,8 +31,13 @@ pub enum ProtocolVersion {
 
 impl fmt::Display for ProtocolVersion {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let r = serde_json::to_string(self).unwrap_or(
-      String::from("Error: Unknown/Incompatible verison"));
+    let r : &str;
+    match self {
+      ProtocolVersion::Unknown => {r = "Unknown"},
+      ProtocolVersion::V1      => {r = "V1"},
+      ProtocolVersion::V2      => {r = "V2"},
+      ProtocolVersion::V3      => {r = "V3"},
+    }
     write!(f, "<ProtocolVersion: {}>", r)
   }
 }

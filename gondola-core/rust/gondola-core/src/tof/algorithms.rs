@@ -6,6 +6,15 @@
 //! used to exract information from 
 //! the TOF waveforms.
 
+//use core::f32::consts::PI;
+use num_traits::{
+  Float,
+  NumAssign,
+  NumAssignOps,
+  NumOps,
+  NumCast,
+  FloatConst,
+};
 
 use crate::errors::WaveformError;
 use crate::constants::{
@@ -475,5 +484,100 @@ pub fn find_peaks_zscore(nanoseconds    : &Vec<f32>,
     peaks = find_sequence_ranges(peak_high); 
   }
   Ok(peaks)
+}
+
+//---------------------------------------------------
+
+/// Sine fit without using external libraries
+pub fn fit_sine_simple<T>(volts: &[T], times: &[T]) -> (f32, f32, f32) 
+  where T: Float + NumAssign + NumAssignOps + NumOps + Copy + NumCast + FloatConst {
+  let start_bin = 20;
+  let size_bin = 900;
+  let mut data_size = T::zero();
+
+  let mut xi_yi   = T::zero();
+  let mut xi_zi   = T::zero();
+  let mut yi_zi   = T::zero();
+  let mut xi_xi   = T::zero();
+  let mut yi_yi   = T::zero();
+  let mut xi_sum  = T::zero();
+  let mut yi_sum  = T::zero();
+  let mut zi_sum  = T::zero();
+
+  let c1 = T::from(2).unwrap();
+  let c2 = T::from(0.02f32).unwrap();
+  for i in start_bin..(start_bin + size_bin) {
+      let xi = (c1 * T::PI() * c2 * times[i]).cos();
+      let yi = (c1 * T::PI() * c2 * times[i]).sin();
+      let zi = volts[i];
+
+      xi_yi += xi * yi;
+      xi_zi += xi * zi;
+      yi_zi += yi * zi;
+      xi_xi += xi * xi;
+      yi_yi += yi * yi;
+      xi_sum += xi;
+      yi_sum += yi;
+      zi_sum += zi;
+
+      data_size += T::one();
+  }
+
+  let mut a_matrix = [[T::zero(); 3]; 3];
+  a_matrix[0][0] = xi_xi;
+  a_matrix[0][1] = xi_yi;
+  a_matrix[0][2] = xi_sum;
+  a_matrix[1][0] = xi_yi;
+  a_matrix[1][1] = yi_yi;
+  a_matrix[1][2] = yi_sum;
+  a_matrix[2][0] = xi_sum;
+  a_matrix[2][1] = yi_sum;
+  a_matrix[2][2] = data_size;
+
+  let determinant = a_matrix[0][0] * a_matrix[1][1] * a_matrix[2][2]
+      + a_matrix[0][1] * a_matrix[1][2] * a_matrix[2][0]
+      + a_matrix[0][2] * a_matrix[1][0] * a_matrix[2][1]
+      - a_matrix[0][0] * a_matrix[1][2] * a_matrix[2][1]
+      - a_matrix[0][1] * a_matrix[1][0] * a_matrix[2][2]
+      - a_matrix[0][2] * a_matrix[1][1] * a_matrix[2][0];
+
+  let inverse_factor = T::one() / determinant;
+
+  let mut cofactor_matrix = [[T::zero(); 3]; 3];
+  cofactor_matrix[0][0] = a_matrix[1][1] * a_matrix[2][2] - a_matrix[2][1] * a_matrix[1][2];
+  cofactor_matrix[0][1] = (a_matrix[1][0] * a_matrix[2][2] - a_matrix[2][0] * a_matrix[1][2]) * -T::one();
+  cofactor_matrix[0][2] = a_matrix[1][0] * a_matrix[2][1] - a_matrix[2][0] * a_matrix[1][1];
+  cofactor_matrix[1][0] = (a_matrix[0][1] * a_matrix[2][2] - a_matrix[2][1] * a_matrix[0][2]) * -T::one();
+  cofactor_matrix[1][1] = a_matrix[0][0] * a_matrix[2][2] - a_matrix[2][0] * a_matrix[0][2];
+  cofactor_matrix[1][2] = (a_matrix[0][0] * a_matrix[2][1] - a_matrix[2][0] * a_matrix[0][1]) * -T::one();
+  cofactor_matrix[2][0] = a_matrix[0][1] * a_matrix[1][2] - a_matrix[1][1] * a_matrix[0][2];
+  cofactor_matrix[2][1] = (a_matrix[0][0] * a_matrix[1][2] - a_matrix[1][0] * a_matrix[0][2]) * -T::one();
+  cofactor_matrix[2][2] = a_matrix[0][0] * a_matrix[1][1] - a_matrix[1][0] * a_matrix[0][1];
+
+  let mut inverse_matrix = [[T::zero(); 3]; 3];
+  for i in 0..3 {
+      for j in 0..3 {
+          inverse_matrix[i][j] = cofactor_matrix[j][i] * inverse_factor;
+      }
+  }
+
+  let p = [xi_zi, yi_zi, zi_sum];
+  let a = inverse_matrix[0][0] * p[0] + inverse_matrix[1][0] * p[1] + inverse_matrix[2][0] * p[2];
+  let b = inverse_matrix[0][1] * p[0] + inverse_matrix[1][1] * p[1] + inverse_matrix[2][1] * p[2];
+
+  let phi    = <f32 as NumCast>::from(a.atan2(b)).unwrap();
+  let amp    = <f32 as NumCast>::from((a*a + b*b).sqrt()).unwrap();
+  let freq   = 0.02 as f32;
+
+  (amp, freq, phi)
+}
+
+#[cfg(feature="pybindings")]
+#[pyfunction]
+#[pyo3(name="fit_sine_simple")]
+pub fn fit_sine_simple_py<'_py>(xs    : Bound<'_py,PyArray1<f32>>, ys: Bound<'_py, PyArray1<f32>>)  -> (f32,f32,f32) {
+  unsafe {
+    fit_sine_simple::<f32>(ys.as_slice().unwrap(), xs.as_slice().unwrap())
+  }
 }
 

@@ -35,8 +35,7 @@ use crate::impl_pythonize_display;
 //use crate::DsiLtbRBMapping;
 //pub use crate::RbChPidMapping;
 
-// FIXME - probably we should make this nicer
-//pub type DsiJChPidMapping = DsiLtbRBMapping; 
+pub type DsiJChPidMapping = HashMap<u8, HashMap<u8, HashMap<u8, (u8, u8)>>>;
 
 /// Universal function to connect to the database
 pub fn connect_to_db() -> Result<diesel::SqliteConnection, ConnectionError>  {
@@ -454,34 +453,41 @@ impl fmt::Display for RAT {
 //  mapping
 //}
 //
-//pub fn get_dsi_j_ch_pid_map(paddles : &Vec<Paddle>) -> DsiJChPidMapping {
-//  let mut mapping = DsiJChPidMapping::new();
-//  for dsi in 1..6 {
-//    let mut jmap = HashMap::<u8, HashMap<u8, (u8, u8)>>::new();
-//    for j in 1..6 {
-//      let mut rbidch_map : HashMap<u8, (u8,u8)> = HashMap::new();
-//      for ch in 1..17 {
-//        let rbidch = (0,0);
-//        rbidch_map.insert(ch,rbidch);
-//        //map[dsi] = 
-//      }
-//      jmap.insert(j,rbidch_map);
-//    }
-//    mapping.insert(dsi,jmap);
-//  }
-//  for pdl in paddles {
-//    let dsi  = pdl.dsi as u8;
-//    let   j  = pdl.j_ltb   as u8;
-//    let ch_a = pdl.ltb_chA as u8;
-//    let ch_b = pdl.ltb_chB as u8;
-//    let pid  = pdl.paddle_id as u8;
-//    let panel_id = pdl.panel_id as u8;
-//    mapping.get_mut(&dsi).unwrap().get_mut(&j).unwrap().insert(ch_a,(pid, panel_id));
-//    mapping.get_mut(&dsi).unwrap().get_mut(&j).unwrap().insert(ch_b,(pid, panel_id));
-//  }
-//  return mapping;
-//}
-//
+
+
+/// Create a mapping of DSI/J(LTB) -> PaddleID
+///
+/// This will basically tell you for a given LTB hit which paddle has 
+/// triggered.
+pub fn get_dsi_j_ch_pid_map(paddles : &Vec<TofPaddle>) -> DsiJChPidMapping {
+  let mut mapping = DsiJChPidMapping::new();
+  for dsi in 1..6 {
+    let mut jmap = HashMap::<u8, HashMap<u8, (u8, u8)>>::new();
+    for j in 1..6 {
+      let mut rbidch_map : HashMap<u8, (u8,u8)> = HashMap::new();
+      for ch in 1..17 {
+        let rbidch = (0,0);
+        rbidch_map.insert(ch,rbidch);
+        //map[dsi] = 
+      }
+      jmap.insert(j,rbidch_map);
+    }
+    mapping.insert(dsi,jmap);
+  }
+  for pdl in paddles {
+    let dsi  = pdl.dsi as u8;
+    let   j  = pdl.j_ltb   as u8;
+    let ch_a = pdl.ltb_chA as u8;
+    let ch_b = pdl.ltb_chB as u8;
+    let pid  = pdl.paddle_id as u8;
+    let panel_id = pdl.panel_id as u8;
+    mapping.get_mut(&dsi).unwrap().get_mut(&j).unwrap().insert(ch_a,(pid, panel_id));
+    mapping.get_mut(&dsi).unwrap().get_mut(&j).unwrap().insert(ch_b,(pid, panel_id));
+  }
+  return mapping;
+}
+
+
 ///// Create a map for rbid, ch -> paddle id. This is for both sides
 ///// and will always return a paddle id independent of A or B
 //pub fn get_rb_ch_pid_map(paddles : &Vec<Paddle>) -> RbChPidMapping {

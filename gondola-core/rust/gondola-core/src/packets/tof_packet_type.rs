@@ -13,15 +13,17 @@ use pyo3::prelude::*;
 
 /// Types of serializable data structures used
 /// throughout the TOF system. 
-#[derive(Debug, Hash, Eq, PartialEq, Clone, Copy, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Hash, Eq, PartialEq, Clone, Copy)]
 #[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
 #[repr(u8)]
 pub enum TofPacketType {
   Unknown               = 0u8, 
   RBEvent               = 20u8,
-  TofEvent              = 21u8,
+  // v0.11 TofEvent -> TofEventDeprecated
+  TofEventDeprecated    = 21u8,
   RBWaveform            = 22u8,
-  TofEventSummary       = 23u8,
+  // v0.11 TofEventSummary -> TofEvent
+  TofEvent              = 23u8,
   DataSinkHB            = 40u8,    
   MasterTrigger         = 60u8,    // needs to be renamed to either MasterTriggerEvent or MTEvent
   TriggerConfig         = 61u8,
@@ -74,8 +76,51 @@ pub enum TofPacketType {
 
 impl fmt::Display for TofPacketType {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let r = serde_json::to_string(self).unwrap_or(
-      String::from("Error - Don't understand packet type!"));
+    let r: &str;
+    match self {
+      TofPacketType::Unknown               => {r = "Unknown"} 
+      TofPacketType::RBEvent               => {r = "RBEvent"},
+      TofPacketType::TofEventDeprecated    => {r = "TofEventDeprecated"},
+      TofPacketType::RBWaveform            => {r = "RBWaveform"},
+      TofPacketType::TofEvent              => {r = "TofEvent"},
+      TofPacketType::DataSinkHB            => {r = "DataSinkHB"},    
+      TofPacketType::MasterTrigger         => {r = "MasterTrigger"},
+      TofPacketType::TriggerConfig         => {r = "TriggerConfig"},
+      TofPacketType::MasterTriggerHB       => {r = "MasterTriggerHB"}, 
+      TofPacketType::EventBuilderHB        => {r = "EventBuilderHB"},
+      TofPacketType::RBChannelMaskConfig   => {r = "RBChannelMaskConfig"},
+      TofPacketType::TofRBConfig           => {r = "TofRBConfig"},
+      TofPacketType::AnalysisEngineConfig  => {r = "AnalysisEngineConfig"},
+      TofPacketType::RBEventHeader         => {r = "RBEventHeader"},    
+      TofPacketType::TOFEventBuilderConfig => {r = "TOFEventBuilderConfig"},
+      TofPacketType::DataPublisherConfig   => {r = "DataPublisherConfig"},
+      TofPacketType::TofRunConfig          => {r = "TofRunConfig"},
+      TofPacketType::CPUMoniData           => {r = "CPUMoniData"},
+      TofPacketType::MtbMoniData           => {r = "MtbMoniData"},
+      TofPacketType::RBMoniData            => {r = "RBMoniData"},
+      TofPacketType::PBMoniData            => {r = "PBMoniData"},
+      TofPacketType::LTBMoniData           => {r = "LTBMoniData"},
+      TofPacketType::PAMoniData            => {r = "PAMoniData"},
+      TofPacketType::RBEventMemoryView     => {r = "RBEventMemoryView"},
+      TofPacketType::RBCalibration         => {r = "RBCalibration"},
+      TofPacketType::TofCommand            => {r = "TofCommand"},
+      TofPacketType::TofCommandV2          => {r = "TofCommandV2"},
+      TofPacketType::TofResponse           => {r = "TofResponse"},
+      TofPacketType::RBCommand             => {r = "RBCommand"},
+      TofPacketType::RBPing                => {r = "RBPing"},
+      TofPacketType::PreampBiasConfig      => {r = "PreampBiasConfig"},
+      TofPacketType::RunConfig                             => {r = "RunConfig"},
+      TofPacketType::LTBThresholdConfig    => {r = "LTBThresholdConfig"},
+      TofPacketType::TofDetectorStatus     => {r = "TofDetectorStatus"},
+      TofPacketType::ConfigBinary          => {r = "ConfigBinary"},
+      TofPacketType::LiftofRBBinary        => {r = "LiftofRBBinary"},
+      TofPacketType::LiftofBinaryService   => {r = "LiftofBinaryService"},
+      TofPacketType::LiftofCCBinary        => {r = "LiftofCCBinary"},
+      TofPacketType::RBCalibrationFlightV  => {r = "RBCalibrationFlightV"},
+      TofPacketType::RBCalibrationFlightT  => {r = "RBCalibrationFlightT"},
+      TofPacketType::BfswAckPacket         => {r = "BfswAckPacket"},
+      TofPacketType::MultiPacket           => {r = "MultiPacket"},
+    }
     write!(f, "<TofPacketType: {}>", r)
   }
 }
@@ -85,9 +130,9 @@ impl From<u8> for TofPacketType {
     match value {
       0   => TofPacketType::Unknown,
       20  => TofPacketType::RBEvent,
-      21  => TofPacketType::TofEvent,
+      21  => TofPacketType::TofEventDeprecated,
       22  => TofPacketType::RBWaveform,
-      23  => TofPacketType::TofEventSummary,
+      23  => TofPacketType::TofEvent,
       40  => TofPacketType::DataSinkHB,
       60  => TofPacketType::MasterTrigger,
       61  => TofPacketType::TriggerConfig,
@@ -148,9 +193,9 @@ impl FromRandom for TofPacketType {
   fn from_random() -> Self {
     let choices = [
       TofPacketType::Unknown,
-      TofPacketType::TofEvent,
+      TofPacketType::TofEventDeprecated,
       TofPacketType::RBWaveform,
-      TofPacketType::TofEventSummary,
+      TofPacketType::TofEvent,
       TofPacketType::MasterTrigger,
       TofPacketType::TriggerConfig, 
       TofPacketType::DataSinkHB,
