@@ -1,8 +1,7 @@
 //! The following file is part of gaps-online-software and published 
 //! under the GPLv3 license
 
-use std::fmt;
-use std::error::Error;
+use crate::prelude::*;
 
 /// Indicate issues with (de)serialization
 #[derive(Debug, Copy, Clone)]
@@ -22,33 +21,35 @@ pub enum SerializationError {
   WrongByteSize,
   JsonDecodingError,
   TomlDecodingError,
-  Disconnected
+  Disconnected,
+  ObjectNotFound
 }
 
 impl SerializationError { 
-  pub fn to_string(&self) -> String {
+  pub fn as_str(&self) -> &str {
     match self {
-      SerializationError::TailInvalid              => String::from("TailInvalid"), 
-      SerializationError::HeadInvalid              => String::from("HeadInvalid"),     
-      SerializationError::TrackerDelimiterInvalid  => String::from("TrackerDelimiterInvalid"),
-      SerializationError::TofDelimiterInvalid      => String::from("TofDelimiterInvalid"),
-      SerializationError::StreamTooShort           => String::from("StreamTooLong"),
-      SerializationError::StreamTooLong            => String::from("StreamTooLong"),
-      SerializationError::ValueNotFound            => String::from("ValueNotFound"),
-      SerializationError::EventFragment            => String::from("EventFragment"),
-      SerializationError::UnknownPayload           => String::from("UnknownPayload"),
-      SerializationError::IncorrectPacketType      => String::from("IncorrectPacketType"),
-      SerializationError::WrongByteSize            => String::from("WrongByteSize"),
-      SerializationError::JsonDecodingError        => String::from("JsonDecodingError"),
-      SerializationError::TomlDecodingError        => String::from("TomlDecodingError"),
-      SerializationError::Disconnected             => String::from("Disconnected"),
+      SerializationError::TailInvalid              => "TailInvalid", 
+      SerializationError::HeadInvalid              => "HeadInvalid",     
+      SerializationError::TrackerDelimiterInvalid  => "TrackerDelimiterInvalid",
+      SerializationError::TofDelimiterInvalid      => "TofDelimiterInvalid",
+      SerializationError::StreamTooShort           => "StreamTooLong",
+      SerializationError::StreamTooLong            => "StreamTooLong",
+      SerializationError::ValueNotFound            => "ValueNotFound",
+      SerializationError::EventFragment            => "EventFragment",
+      SerializationError::UnknownPayload           => "UnknownPayload",
+      SerializationError::IncorrectPacketType      => "IncorrectPacketType",
+      SerializationError::WrongByteSize            => "WrongByteSize",
+      SerializationError::JsonDecodingError        => "JsonDecodingError",
+      SerializationError::TomlDecodingError        => "TomlDecodingError",
+      SerializationError::Disconnected             => "Disconnected",
+      SerializationError::ObjectNotFound           => "ObjectNotFound",
     }
   }
 }
 
 impl fmt::Display for SerializationError {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "<Serialization Error : {}>", self.to_string())
+    write!(f, "<SerializationError : {}>", self.to_string())
   }
 }
 

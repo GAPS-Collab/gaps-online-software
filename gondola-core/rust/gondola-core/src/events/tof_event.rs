@@ -1002,7 +1002,9 @@ impl TofEvent {
 
   #[getter]
   #[pyo3(name="hits")]
-  pub fn hits_py(&self) -> Vec<TofHit> {
+  pub fn hits_py<'_py>(&self) -> Vec<TofHit> {
+  //pub fn hits_py<'_py>(&self) -> PyResult<Bound<'_,Vec<TofHit>>> {
+    //Bound::new(py, self.hits)
     //FIXMEFIXMEFIXME
     self.hits.clone()
   }
@@ -1092,7 +1094,7 @@ impl TofEvent {
   }
 }
 
-#[cfg(feature="pybindigns")]
+#[cfg(feature="pybindings")]
 pythonize_packable!(TofEvent);
 
 //---------------------------------------------------

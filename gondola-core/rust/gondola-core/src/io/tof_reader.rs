@@ -1,33 +1,11 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
-//!
-//!
 //! The TofPacketReader allows to read a (file) stream of serialized
 //! TofPackets
-use std::io::{
-  BufReader,
-  Read,
-  Seek,
-  SeekFrom,
-};
+//!
+//!
+// The following file is part of gaps-online-software and published 
+// under the GPLv3 license
 
-use crate::packets::{
-  TofPacketType,
-  TofPacket
-};
-use crate::io::list_path_contents_sorted;
-use crate::io::parsers::{
-  parse_u16,
-  parse_u32
-};
-
-use std::fs::{
-  File,
-  OpenOptions
-};
-
-use std::fmt;
-use crate::reader;
+use crate::prelude::*;
 
 /// Read serialized TofPackets from an existing file or directory
 ///

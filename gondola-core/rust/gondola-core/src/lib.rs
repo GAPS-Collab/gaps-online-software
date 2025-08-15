@@ -32,6 +32,7 @@
 
 #[macro_use] extern crate log; 
 
+pub mod prelude;
 #[cfg(feature="random")]
 pub mod random;
 pub mod constants;
@@ -49,12 +50,56 @@ pub mod database;
 #[cfg(feature="pybindings")]
 pub mod python;
 
-#[cfg(feature="pybindings")]
-use pyo3::prelude::*; 
-#[cfg(feature="pybindings")]
-use pyo3::wrap_pymodule; 
-#[cfg(feature="pybindings")]
-use pyo3::wrap_pyfunction; 
+use crate::prelude::*;
+
+/// A simple helper macro adding an as_str function 
+/// as well as the Display method to any enum.
+///
+/// Avoids writing boilerplate
+#[macro_export]
+macro_rules! expand_and_test_enum {
+  ($name:ident, $test_name:ident) => {
+    impl fmt::Display for $name {
+      fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "<{}: {}>",stringify!($name), self.as_ref())
+      }
+    }
+
+    impl From<u8> for $name {
+      fn from(value: u8) -> Self {
+        match Self::from_repr(value)  {
+          None => {
+            return Self::Unknown;
+          }
+          Some(variant) => {
+            return variant;
+          }
+        }
+      }
+    }
+
+    #[cfg(feature="random")]
+    impl FromRandom for $name {
+      fn from_random() -> Self {
+        let mut choices = Vec::<Self>::new();
+        for k in Self::iter() {
+          choices.push(k);
+        }
+        let mut rng  = rand::rng();
+        let idx = rng.random_range(0..choices.len());
+        choices[idx]
+      }
+    }
+
+    #[test]
+    fn $test_name() {
+      for _ in 0..100 {
+        let data = $name::from_random();
+        assert_eq!($name::from(data as u8), data);
+      }
+    }
+  };
+}
 
 #[cfg(feature="pybindings")]
 #[pymodule]

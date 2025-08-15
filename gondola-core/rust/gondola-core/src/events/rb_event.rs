@@ -5,73 +5,12 @@
 //! and bookkeep RB data
 //!
 
-use std::fmt;
+use crate::prelude::*;
 
-use num_traits::{
-  Float,
-  NumAssign,
-  NumCast
-};
-
-use crate::events::{
-  RBEventHeader,
-  RBWaveform,
-  EventStatus,
-  DataType,
-  TofHit,
-};
-
-use crate::packets::{
-  TofPacket,
-  TofPackable,
-  TofPacketType
-};
-use crate::io::serialization::{
-  Serialization,
-  search_for_u16
-};
-
-use crate::io::parsers::{
-  parse_u8,
-  parse_u16,
-  parse_u32,
-  u8_to_u16,
-};
-use crate::constants::{
-  NWORDS,
-  NCHN
-};
-use crate::errors::{
-  SerializationError,
-  AnalysisError,
-  UserError
-};
-
-#[cfg(feature="random")]
-use crate::events::FromRandom;
-
-#[cfg(feature="random")]
-use rand::Rng;
 
 #[cfg(feature="pybindings")]
 use pyo3::prelude::*;
 
-#[cfg(feature="pybindings")]
-use pyo3::exceptions::{
-  PyIOError,
-  PyValueError
-};
-
-#[cfg(feature="pybindings")]
-use numpy::{
-  ToPyArray,
-  PyArrayMethods,
-  PyArray1,
-  PyReadonlyArray1
-};
-
-#[cfg(feature="pybindings")]
-use crate::pythonize_packable;
 
 /// Get the traces for a set of RBEvents
 ///
@@ -404,7 +343,7 @@ impl RBEvent {
     let stream_len  = stream.len();
     if event.header.is_event_fragment() {
       debug!("Fragmented event {} found!", event.header.event_id);
-      let tail_pos = search_for_u16(Self::TAIL, stream, *pos)?;
+      let tail_pos = seek_marker(stream, Self::TAIL, *pos)?;
       * pos = tail_pos + 2 as usize;
       // the event fragment won't have channel data, so 
       // let's move on to the next TAIL marker:ta
@@ -412,7 +351,7 @@ impl RBEvent {
     }
     if event.header.drs_lost_trigger() {
       debug!("Event {} has lost trigger!", event.header.event_id);
-      let tail_pos = search_for_u16(Self::TAIL, stream, *pos)?;
+      let tail_pos = seek_marker(stream, Self::TAIL, *pos)?;
       * pos = tail_pos + 2 as usize;
       return Ok(event);
     }
@@ -423,7 +362,7 @@ impl RBEvent {
     for ch in event.header.get_channels().iter() {
       if *pos + 2*NWORDS >= stream_len {
         error!("The channel data for event {} ch {} seems corrupt! We want to get channels {:?}, but have decoded only {:?}, because the stream ends {} bytes too early!",event.header.event_id, ch, event.header.get_channels(), decoded_ch, *pos + 2*NWORDS - stream_len);
-        let tail_pos = search_for_u16(Self::TAIL, stream, *pos)?;
+        let tail_pos = seek_marker(stream, Self::TAIL, *pos)?;
         * pos = tail_pos + 2 as usize;
         return Err(SerializationError::WrongByteSize {})
       }
@@ -477,7 +416,7 @@ impl Serialization for RBEvent {
     let stream_len  = stream.len();
     if event.header.is_event_fragment() {
       debug!("Fragmented event {} found!", event.header.event_id);
-      let tail_pos = search_for_u16(Self::TAIL, stream, *pos)?;
+      let tail_pos = seek_marker(stream, Self::TAIL, *pos)?;
       * pos = tail_pos + 2 as usize;
       // the event fragment won't have channel data, so 
       // let's move on to the next TAIL marker:ta
@@ -485,7 +424,7 @@ impl Serialization for RBEvent {
     }
     if event.header.drs_lost_trigger() {
       debug!("Event {} has lost trigger!", event.header.event_id);
-      let tail_pos = search_for_u16(Self::TAIL, stream, *pos)?;
+      let tail_pos = seek_marker(stream, Self::TAIL, *pos)?;
       * pos = tail_pos + 2 as usize;
       return Ok(event);
     }
@@ -493,7 +432,7 @@ impl Serialization for RBEvent {
     for ch in event.header.get_channels().iter() {
       if *pos + 2*NWORDS >= stream_len {
         error!("The channel data for event {} ch {} seems corrupt! We want to get channels {:?}, but have decoded only {:?}, because the stream ends {} bytes too early!",event.header.event_id, ch, event.header.get_channels(), decoded_ch, *pos + 2*NWORDS - stream_len);
-        let tail_pos = search_for_u16(Self::TAIL, stream, *pos)?;
+        let tail_pos = seek_marker(stream, Self::TAIL, *pos)?;
         * pos = tail_pos + 2 as usize;
         return Err(SerializationError::WrongByteSize {})
       }

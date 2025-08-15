@@ -1,7 +1,4 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
-//! Specifically, this file is part of the i/o system, more specifically
-//! the caraspace library. Caraspace provides a system to read files 
+//! Caraspace provides a system to read files 
 //! for the GAPS experiment comprising different sources, specifically 
 //! files from the TOF system written to disk as well as telemetry file
 //!
@@ -11,27 +8,32 @@
 //!
 //! This file contains the source for CRReader, a device to read a number
 //! of "caraspace" files from a given source.
+//
+// The following file is part of gaps-online-software and published 
+// under the GPLv3 license
 
-use std::fmt;
+use crate::prelude::*;
 
-use std::fs::{
-  self,
-  File,
-  OpenOptions
-};
-
-use std::path::Path;
-use std::io::{
-  self,
-  BufReader,
-  Seek,
-  SeekFrom,
-  Read,
-  ErrorKind
-};
-use regex::Regex;
-
-use crate::io::list_path_contents_sorted;
+//use std::fmt;
+//
+//use std::fs::{
+//  self,
+//  File,
+//  OpenOptions
+//};
+//
+//use std::path::Path;
+//use std::io::{
+//  self,
+//  BufReader,
+//  Seek,
+//  SeekFrom,
+//  Read,
+//  ErrorKind
+//};
+//use regex::Regex;
+//
+//use crate::io::list_path_contents_sorted;
 
 //
 //use indicatif::{
@@ -53,7 +55,7 @@ pub struct CRReader {
   pub filenames        : Vec<String>,
   /// The position of the current worked on file 
   /// in the filenames vector
-  pub file_index       : usize,
+  pub file_idx       : usize,
   /// A simple BufReader for reading generic binary
   /// files
   file_reader          : BufReader<File>,
@@ -115,60 +117,60 @@ impl CRReader {
 //  ///   * filename_or_directory : Can be either the name of a single file, or a directory with 
 //  ///                             caraspace files in it.
 //  ///   
-//  pub fn new(filename_or_directory : String) -> Result<Self, io::Error> {
-//    //let mut paddles   = HashMap::<u8, Paddle>::new();
-//    //let db_path       = env::var("DATABASE_URL").unwrap_or_else(|_| "".to_string());
-//    //let mut db_loaded = false;
-//    //match connect_to_db(db_path) {
-//    //  Err(_err) => {
-//    //    error!("Database can not be found! Did you load the setup-env.sh shell?");
-//    //  }
-//    //  Ok(mut conn) => {
-//    //    match Paddle::all(&mut conn) {
-//    //      None => {
-//    //        error!("Unable to retrieve paddle information from DB!");
-//    //      }
-//    //      Some(pdls) => {
-//    //        db_loaded = true;
-//    //        for p in pdls {
-//    //          paddles.insert(p.paddle_id as u8, p.clone());
-//    //        }
-//    //      }
-//    //    }
-//    //  }
-//    //}
-//    // check the input argument and get the filelist
-//    let infiles   = Self::list_path_contents_sorted(&filename_or_directory, None)?;
-//    if infiles.len() == 0 {
-//      error!("Unable to read files from {filename_or_directory}. Is this a valid path?");
-//      return Err(io::Error::new(ErrorKind::NotFound, "Unable to find given path!"))
-//    }
-//    let firstfile = infiles[0].clone(); 
-//    let file = OpenOptions::new().create(false).append(false).read(true).open(&firstfile).expect("Unable to open file {filename}");
-//    let packet_reader = Self { 
-//      filenames        : infiles,
-//      file_index       : 0,
-//      file_reader      : BufReader::new(file),
-//      cursor           : 0,
-//      n_packs_read     : 0,
-//      n_errors         : 0,
-//      skip_ahead       : 0,
-//      stop_after       : 0,
-//      n_packs_skipped  : 0,
-//      //paddles         : paddles,
-//      //db_loaded       : db_loaded
-//    };
-//    Ok(packet_reader)
-//  } 
-//  
+  pub fn new(filename_or_directory : String) -> Result<Self, io::Error> {
+    //let mut paddles   = HashMap::<u8, Paddle>::new();
+    //let db_path       = env::var("DATABASE_URL").unwrap_or_else(|_| "".to_string());
+    //let mut db_loaded = false;
+    //match connect_to_db(db_path) {
+    //  Err(_err) => {
+    //    error!("Database can not be found! Did you load the setup-env.sh shell?");
+    //  }
+    //  Ok(mut conn) => {
+    //    match Paddle::all(&mut conn) {
+    //      None => {
+    //        error!("Unable to retrieve paddle information from DB!");
+    //      }
+    //      Some(pdls) => {
+    //        db_loaded = true;
+    //        for p in pdls {
+    //          paddles.insert(p.paddle_id as u8, p.clone());
+    //        }
+    //      }
+    //    }
+    //  }
+    //}
+    // check the input argument and get the filelist
+    let infiles   = list_path_contents_sorted(&filename_or_directory, None)?;
+    if infiles.len() == 0 {
+      error!("Unable to read files from {filename_or_directory}. Is this a valid path?");
+      return Err(io::Error::new(io::ErrorKind::NotFound, "Unable to find given path!"))
+    }
+    let firstfile = infiles[0].clone(); 
+    let file = OpenOptions::new().create(false).append(false).read(true).open(&firstfile).expect("Unable to open file {filename}");
+    let packet_reader = Self { 
+      filenames        : infiles,
+      file_idx       : 0,
+      file_reader      : BufReader::new(file),
+      cursor           : 0,
+      n_packs_read     : 0,
+      n_errors         : 0,
+      skip_ahead       : 0,
+      stop_after       : 0,
+      n_packs_skipped  : 0,
+      //paddles         : paddles,
+      //db_loaded       : db_loaded
+    };
+    Ok(packet_reader)
+  } 
+  //  
   /// This is the file the current cursor is located 
   /// in and frames are currently read out from 
   pub fn get_current_filename(&self) -> Option<String> {
     // should only happen when it is empty
-    if self.filenames.len() <= self.file_index {
+    if self.filenames.len() <= self.file_idx {
       return None;
     }
-    Some(self.filenames[self.file_index].clone())
+    Some(self.filenames[self.file_idx].clone())
   }
 //  
 //  
@@ -177,56 +179,6 @@ impl CRReader {
 //  //  event.set_paddles(&self.paddles);
 //  //}
 //  
-//  /// Get the very first frame in all avaialbe files
-//  pub fn first_frame(&mut self) -> Option<CRFrame> {
-//    match self.rewind() {
-//      Err(err) => {
-//        error!("Error when rewinding files! {err}");
-//      }
-//      Ok(_) => ()
-//    }
-//    let frame = self.get_next_frame();
-//    match self.rewind() {
-//      Err(err) => {
-//        error!("Error when rewinding files! {err}");
-//      }
-//      Ok(_) => ()
-//    }
-//    return frame;
-//  }
-//
-//  /// Get the very last frame of all infiles
-//  pub fn last_frame(&mut self) -> Option<CRFrame> { 
-//    self.file_index = self.filenames.len() - 1;
-//    let lastfilename = self.filenames[self.file_index].clone();
-//    let lastfile     = OpenOptions::new().create(false).append(false).read(true).open(lastfilename).expect("Unable to open file {nextfilename}");
-//    self.file_reader = BufReader::new(lastfile);
-//    self.cursor      = 0;
-//    let mut frame = CRFrame::new();
-//    let mut idx = 0;
-//    loop {
-//      match self.get_next_frame() {
-//        None => {
-//          match self.rewind() {
-//            Err(err) => {
-//              error!("Error when rewinding files! {err}");
-//            }
-//            Ok(_) => ()
-//          }
-//          if idx == 0 {
-//            return None;
-//          } else {
-//            return Some(frame);
-//          }
-//        }
-//        Some(_fr) => {
-//          idx += 1;
-//          frame = _fr;
-//          continue;
-//        }
-//      }
-//    }
-//  }
 //
 //  /// Preview the number of frames in this reader
 //  pub fn get_n_frames(&mut self) -> usize {
@@ -240,15 +192,15 @@ impl CRReader {
 //    bar.set_message (String::from("Counting frames.."));
 //    bar.set_prefix  ("\u{2728}");
 //    bar.set_style   (bar_style);
-//    bar.set_position(self.file_index as u64);
+//    bar.set_position(self.file_idx as u64);
 //    loop {
 //      match self.file_reader.read_exact(&mut buffer) {
 //        Err(err) => {
 //          debug!("Unable to read from file! {err}");
-//          match self.progress_file() {
+//          match self.prime_next_file() {
 //            None    => break,
 //            Some(_) => {
-//              bar.set_position(self.file_index as u64);
+//              bar.set_position(self.file_idx as u64);
 //              continue;
 //            }
 //          };
@@ -263,10 +215,10 @@ impl CRReader {
 //        match self.file_reader.read_exact(&mut buffer) {
 //          Err(err) => {
 //            debug!("Unable to read from file! {err}");
-//            match self.progress_file() {
+//            match self.prime_next_file() {
 //              None    => break,
 //              Some(_) => {
-//                bar.set_position(self.file_index as u64);
+//                bar.set_position(self.file_idx as u64);
 //                continue;
 //              }
 //            };
@@ -283,10 +235,10 @@ impl CRReader {
 //          let mut buffer_psize = [0,0,0,0,0,0,0,0];
 //          match self.file_reader.read_exact(&mut buffer_psize) {
 //            Err(_err) => {
-//              match self.progress_file() {
+//              match self.prime_next_file() {
 //                None    => break,
 //                Some(_) => {
-//                  bar.set_position(self.file_index as u64);
+//                  bar.set_position(self.file_idx as u64);
 //                  continue;
 //                }
 //              }
@@ -300,10 +252,10 @@ impl CRReader {
 //          match self.file_reader.seek(SeekFrom::Current(size as i64)) {
 //            Err(err) => {
 //              error!("Unable to read {size} bytes from {}! {err}", self.get_current_filename().unwrap());
-//              match self.progress_file() {
+//              match self.prime_next_file() {
 //                None    => break,
 //                Some(_) => {
-//                  bar.set_position(self.file_index as u64);
+//                  bar.set_position(self.file_idx as u64);
 //                  continue;
 //                }
 //              }
@@ -321,171 +273,136 @@ impl CRReader {
 //    nframes
 //  } // end fn
 //
-//  /// Move on to the next file, in case the current one 
-//  /// is exhausted
-//  /// 
-//  /// Return true if there are still files lef
-//  fn progress_file(&mut self) -> Option<()> {
-//    if self.file_index == self.filenames.len() -1 {
-//      return None;
-//    } else {
-//      self.file_index += 1;
-//      let nextfilename = self.filenames[self.file_index].clone();
-//      let nextfile     = OpenOptions::new().create(false).append(false).read(true).open(nextfilename).expect("Unable to open file {nextfilename}");
-//      self.file_reader = BufReader::new(nextfile);
-//      self.cursor      = 0;
-//      return Some(());
-//    }
-//  }
-//
-//
-//  /// Reset the current state of the reader and make 
-//  /// the next frame return to be the first frame
-//  pub fn rewind(&mut self) -> io::Result<()> {
-//    let firstfile = &self.filenames[0];
-//    let file      = OpenOptions::new().create(false).append(false).read(true).open(&firstfile)?; 
-//    self.file_reader  = BufReader::new(file);
-//    self.file_index = 0;
-//    self.cursor     = 0;
-//    Ok(())
-//  }
-//
-//  /// Return the next frame for the current files
-//  ///
-//  /// Will return none if the file has been exhausted.
-//  /// Use ::rewind to start reading from the beginning
-//  /// again.
-//  pub fn get_next_frame(&mut self) -> Option<CRFrame> {
-//    // filter::Unknown corresponds to allowing any
-//
-//    let mut buffer = [0];
-//    loop {
-//      match self.file_reader.read_exact(&mut buffer) {
-//        Err(err) => {
-//          debug!("Unable to read from file! {err}");
-//          // this is ok in case we are out of files
-//          self.progress_file()?;
-//          return self.get_next_frame();
-//        }
-//        Ok(_) => {
-//          self.cursor += 1;
-//        }
-//      }
-//      if buffer[0] != 0xAA {
-//        continue;
-//      } else {
-//        match self.file_reader.read_exact(&mut buffer) {
-//          Err(err) => {
-//            debug!("Unable to read from file! {err}");
-//            self.progress_file()?;
-//            return self.get_next_frame();
-//          }
-//          Ok(_) => {
-//            self.cursor += 1;
-//          }
-//        }
-//
-//        if buffer[0] != 0xAA { 
-//          continue;
-//        } else {
-//          // read the the size of the packet
-//          let mut buffer_psize = [0,0,0,0,0,0,0,0];
-//          match self.file_reader.read_exact(&mut buffer_psize) {
-//            Err(err) => {
-//              debug!("Unable to read from file! {err}");
-//              self.progress_file()?;
-//              return self.get_next_frame();
-//            }
-//            Ok(_) => {
-//              self.cursor += 8;
-//            }
-//          }
-//          
-//          let vec_data = buffer_psize.to_vec();
-//          //println!("vec_data {:?}", vec_data);
-//          let size     = parse_u64(&vec_data, &mut 0);
-//          //println!("Will read {size} bytes for payload!");
-//          // now at this point, we want the packet!
-//          // except we skip ahead or stop earlier
-//          if self.skip_ahead > 0 && self.n_packs_skipped < self.skip_ahead {
-//            // we don't want it
-//            match self.file_reader.seek(SeekFrom::Current(size as i64)) {
-//              Err(err) => {
-//                debug!("Unable to read more data! {err}");
-//                self.progress_file()?;
-//                return self.get_next_frame();
-//              }
-//              Ok(_) => {
-//                self.n_packs_skipped += 1;
-//                self.cursor += size as usize;
-//              }
-//            }
-//            continue; // this is just not the packet we want
-//          }
-//          if self.stop_after > 0 && self.n_packs_read >= self.stop_after {
-//            // we don't want it
-//            match self.file_reader.seek(SeekFrom::Current(size as i64)) {
-//              Err(err) => {
-//                debug!("Unable to read more data! {err}");
-//                self.progress_file()?;
-//                return self.get_next_frame();
-//              }
-//              Ok(_) => {
-//                self.cursor += size as usize;
-//              }
-//            }
-//            continue; // this is just not the packet we want
-//          }
-//
-//          let mut frame = CRFrame::new();
-//          let mut payload = vec![0u8;size as usize];
-//
-//          match self.file_reader.read_exact(&mut payload) {
-//            Err(err) => {
-//              debug!("Unable to read from file! {err}");
-//              self.progress_file()?;
-//              return self.get_next_frame();
-//            }
-//            Ok(_) => {
-//              self.cursor += size as usize;
-//            }
-//          }
-//          let mut in_frame_pos = 0usize;
-//          frame.index = CRFrame::parse_index(&payload, &mut in_frame_pos);
-//          frame.bytestorage = payload[in_frame_pos..].to_vec();
-//
-//          //tp.payload = payload;
-//          // we don't filter, so we like this packet
-//          let mut tail = vec![0u8; 2];
-//          match self.file_reader.read_exact(&mut tail) {
-//            Err(err) => {
-//              debug!("Unable to read from file! {err}");
-//              self.progress_file()?;
-//              return self.get_next_frame();
-//            }
-//            Ok(_) => {
-//              self.cursor += 2;
-//            }
-//          }
-//          let tail = parse_u16(&tail,&mut 0);
-//          if tail != CRFrame::CRTAIL {
-//            debug!("CRFrame TAIL signature wrong!");
-//            return None;
-//          }
-//          self.n_packs_read += 1;
-//          return Some(frame);
-//        }
-//      } // if no 0xAA found
-//    } // end loop
-//  } // end fn
+  /// Return the next frame for the current files
+  ///
+  /// Will return none if the file has been exhausted.
+  /// Use ::rewind to start reading from the beginning
+  /// again.
+  pub fn read_next_item(&mut self) -> Option<CRFrame> {
+    // filter::Unknown corresponds to allowing any
+  
+    let mut buffer = [0];
+    loop {
+      match self.file_reader.read_exact(&mut buffer) {
+        Err(err) => {
+          debug!("Unable to read from file! {err}");
+          // this is ok in case we are out of files
+          self.prime_next_file()?;
+          return self.read_next_item();
+        }
+        Ok(_) => {
+          self.cursor += 1;
+        }
+      }
+      if buffer[0] != 0xAA {
+        continue;
+      } else {
+        match self.file_reader.read_exact(&mut buffer) {
+          Err(err) => {
+            debug!("Unable to read from file! {err}");
+            self.prime_next_file()?;
+            return self.read_next_item();
+          }
+          Ok(_) => {
+            self.cursor += 1;
+          }
+        }
+  
+        if buffer[0] != 0xAA { 
+          continue;
+        } else {
+          // read the the size of the packet
+          let mut buffer_psize = [0,0,0,0,0,0,0,0];
+          match self.file_reader.read_exact(&mut buffer_psize) {
+            Err(err) => {
+              debug!("Unable to read from file! {err}");
+              self.prime_next_file()?;
+              return self.read_next_item();
+            }
+            Ok(_) => {
+              self.cursor += 8;
+            }
+          }
+          
+          let vec_data = buffer_psize.to_vec();
+          //println!("vec_data {:?}", vec_data);
+          let size     = parse_u64(&vec_data, &mut 0);
+          //println!("Will read {size} bytes for payload!");
+          // now at this point, we want the packet!
+          // except we skip ahead or stop earlier
+          if self.skip_ahead > 0 && self.n_packs_skipped < self.skip_ahead {
+            // we don't want it
+            match self.file_reader.seek(SeekFrom::Current(size as i64)) {
+              Err(err) => {
+                debug!("Unable to read more data! {err}");
+                self.prime_next_file()?;
+                return self.read_next_item();
+              }
+              Ok(_) => {
+                self.n_packs_skipped += 1;
+                self.cursor += size as usize;
+              }
+            }
+            continue; // this is just not the packet we want
+          }
+          if self.stop_after > 0 && self.n_packs_read >= self.stop_after {
+            // we don't want it
+            match self.file_reader.seek(SeekFrom::Current(size as i64)) {
+              Err(err) => {
+                debug!("Unable to read more data! {err}");
+                self.prime_next_file()?;
+                return self.read_next_item();
+              }
+              Ok(_) => {
+                self.cursor += size as usize;
+              }
+            }
+            continue; // this is just not the packet we want
+          }
+  
+          let mut frame = CRFrame::new();
+          let mut payload = vec![0u8;size as usize];
+  
+          match self.file_reader.read_exact(&mut payload) {
+            Err(err) => {
+              debug!("Unable to read from file! {err}");
+              self.prime_next_file()?;
+              return self.read_next_item();
+            }
+            Ok(_) => {
+              self.cursor += size as usize;
+            }
+          }
+          let mut in_frame_pos = 0usize;
+          frame.index = CRFrame::parse_index(&payload, &mut in_frame_pos);
+          frame.bytestorage = payload[in_frame_pos..].to_vec();
+  
+          //tp.payload = payload;
+          // we don't filter, so we like this packet
+          let mut tail = vec![0u8; 2];
+          match self.file_reader.read_exact(&mut tail) {
+            Err(err) => {
+              debug!("Unable to read from file! {err}");
+              self.prime_next_file()?;
+              return self.read_next_item();
+            }
+            Ok(_) => {
+              self.cursor += 2;
+            }
+          }
+          let tail = parse_u16(&tail,&mut 0);
+          if tail != CRFrame::TAIL {
+            debug!("CRFrame TAIL signature wrong!");
+            return None;
+          }
+          self.n_packs_read += 1;
+          return Some(frame);
+        }
+      } // if no 0xAA found
+    } // end loop
+  } // end fn
 }
-//
-//impl Iterator for CRReader {
-//  type Item = CRFrame;
-//
-//  fn next(&mut self) -> Option<Self::Item> {
-//    self.get_next_frame()
-//  }
-//}
+
+reader!(CRReader,CRFrame);
 
 

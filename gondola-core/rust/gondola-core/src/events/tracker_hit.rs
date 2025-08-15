@@ -10,9 +10,6 @@ use pyo3::prelude::*;
 use pyo3::exceptions::PyIOError;
 
 #[cfg(feature="pybindings")]
-use crate::packets::TofPacket;
-
-#[cfg(feature="pybindings")]
 use crate::impl_pythonize_display;
 
 #[derive(Debug, Copy, Clone)]

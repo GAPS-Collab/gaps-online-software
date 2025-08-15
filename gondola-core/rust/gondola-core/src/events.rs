@@ -22,6 +22,24 @@ pub use rb_event::{
 pub mod tracker_hit;
 pub use tracker_hit::TrackerHit;
 
+use std::fmt;
+
+use strum_macros::{
+  AsRefStr,
+  FromRepr,
+  EnumIter
+};
+use strum::IntoEnumIterator;
+use crate::expand_and_test_enum;
+
+#[cfg(feature="pybindings")]
+use pyo3::prelude::*;
+
+#[cfg(feature="random")]
+use crate::random::FromRandom;
+#[cfg(feature="random")]
+use rand::Rng;
+
 /// mask to decode LTB hit masks
 pub const LTB_CH0 : u16 = 0x3   ;
 /// mask to decode LTB hit masks
@@ -49,17 +67,6 @@ pub const LTB_CHANNELS : [u16;8] = [
   LTB_CH6,
   LTB_CH7
 ];
-
-
-use std::fmt;
-
-#[cfg(feature="pybindings")]
-use pyo3::prelude::*;
-
-#[cfg(feature="random")]
-use crate::random::FromRandom;
-#[cfg(feature="random")]
-use rand::Rng;
 
 /// Calculate an unique identifier for 
 /// tracker strips from the position in 
@@ -100,7 +107,7 @@ pub fn mt_event_get_timestamp_abs48(mtb_timestamp : u32, gps_timestamp : u32, ti
   ts
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq,FromRepr, AsRefStr, EnumIter)]
 #[repr(u8)]
 #[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
 pub enum EventQuality {
@@ -111,50 +118,11 @@ pub enum EventQuality {
   FourLeafClover = 40u8,
 }
 
-impl fmt::Display for EventQuality {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let r : &str;
-    match self {
-      EventQuality::Unknown        => {r = "Unknown"},
-      EventQuality::Silver         => {r = "Silver"},
-      EventQuality::Gold           => {r = "Gold"},
-      EventQuality::Diamond        => {r = "Diamond"},
-      EventQuality::FourLeafClover => {r = "FourLeafClover"},
-    }
-    write!(f, "<EventQuality: {}>", r)
-  }
-}
-
-impl From<u8> for EventQuality {
-  fn from(value: u8) -> Self {
-    match value {
-      0u8  => EventQuality::Unknown,
-      10u8 => EventQuality::Silver,
-      20u8 => EventQuality::Gold,
-      30u8 => EventQuality::Diamond,
-      40u8 => EventQuality::FourLeafClover,
-      _    => EventQuality::Unknown
-    }
-  }
-}
-
-impl FromRandom for EventQuality {
-  fn from_random() -> Self {
-    let choices = [
-      Self::Unknown,
-      Self::Silver,
-      Self::Gold,
-      Self::Diamond,
-    ];
-    let mut rng  = rand::rng();
-    let idx = rng.random_range(0..choices.len());
-    choices[idx]
-  }
-}
+expand_and_test_enum!(EventQuality, test_eventquality_repr);
 
 //--------------------------------------------
 
-#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Copy, Clone, PartialEq,FromRepr, AsRefStr, EnumIter)]
 #[repr(u8)]
 #[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
 pub enum TriggerType {
@@ -221,97 +189,23 @@ impl TriggerType {
   }
 }
 
-impl fmt::Display for TriggerType {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let r : &str;
-    match self {
-      TriggerType::Unknown             => {r = "Unknown"},
-      TriggerType::Any                 => {r = "Any"},
-      TriggerType::Track               => {r = "Track"},
-      TriggerType::TrackCentral        => {r = "TrackCentral"},
-      TriggerType::Gaps1044            => {r = "Gaps1044"},
-      TriggerType::Gaps                => {r = "Gaps"},
-      TriggerType::Gaps633             => {r = "Gaps633"}, 
-      TriggerType::Gaps422             => {r = "Gaps422"},
-      TriggerType::Gaps211             => {r = "Gaps211"},
-      TriggerType::TrackUmbCentral     => {r = "TrackUmbCentral"},
-      TriggerType::UmbCube             => {r = "UmbCube"},
-      TriggerType::UmbCubeZ            => {r = "UmbCubeZ"},
-      TriggerType::UmbCorCube          => {r = "UmbCorCube"},
-      TriggerType::CorCubeSide         => {r = "CorCubeSide"},
-      TriggerType::Umb3Cube            => {r = "Umb3Cube"},
-      TriggerType::Poisson             => {r = "Poisson"},
-      TriggerType::Forced              => {r = "Forced"},
-      TriggerType::FixedRate           => {r = "FixedRate"},
-      TriggerType::ConfigurableTrigger => {r = "ConfigurableTrigger"},
-    }
-    write!(f, "<TriggerType: {}>", r)
+#[cfg(feature="pybindings")]
+#[pymethods]
+impl TriggerType {
+  #[staticmethod]
+  #[pyo3(name="transcode_trigger_sources")]
+  fn transcode_trigger_sources_py(trigger_sources : u16) -> Vec<Self> {
+    TriggerType::transcode_trigger_sources(trigger_sources)
   }
 }
 
-impl From<u8> for TriggerType {
-  fn from(value: u8) -> Self {
-    match value {
-      0   => TriggerType::Unknown,
-      100 => TriggerType::Poisson,
-      101 => TriggerType::Forced,
-      102 => TriggerType::FixedRate,
-      1   => TriggerType::Any,
-      2   => TriggerType::Track,
-      3   => TriggerType::TrackCentral,
-      4   => TriggerType::Gaps,
-      5   => TriggerType::Gaps633,
-      6   => TriggerType::Gaps422,
-      7   => TriggerType::Gaps211,
-      8   => TriggerType::TrackUmbCentral,
-      9   => TriggerType::Gaps1044,
-      21  => TriggerType::UmbCube,
-      22  => TriggerType::UmbCubeZ,
-      23  => TriggerType::UmbCorCube,
-      24  => TriggerType::CorCubeSide,
-      25  => TriggerType::Umb3Cube,
-      200 => TriggerType::ConfigurableTrigger,
-      _   => TriggerType::Unknown
-    }
-  }
-}
-
-#[cfg(feature = "random")]
-impl FromRandom for TriggerType {
-  
-  fn from_random() -> Self {
-    let choices = [
-      TriggerType::Unknown,
-      TriggerType::Poisson,
-      TriggerType::Forced,
-      TriggerType::FixedRate,
-      TriggerType::Any,
-      TriggerType::Track,
-      TriggerType::TrackCentral,
-      TriggerType::Gaps,
-      TriggerType::Gaps633,
-      TriggerType::Gaps422,
-      TriggerType::Gaps211,
-      TriggerType::TrackUmbCentral,
-      TriggerType::Gaps1044,
-      TriggerType::UmbCube,
-      TriggerType::UmbCubeZ,
-      TriggerType::UmbCorCube,
-      TriggerType::CorCubeSide,
-      TriggerType::Umb3Cube,
-      TriggerType::ConfigurableTrigger,
-    ];
-    let mut rng  = rand::rng();
-    let idx = rng.random_range(0..choices.len());
-    choices[idx]
-  }
-}
+expand_and_test_enum!(TriggerType, test_triggertype_repr);
 
 //--------------------------------------------
 
 /// LTB Thresholds as passed on by the MTB
 /// [See also](https://gaps1.astro.ucla.edu/wiki/gaps/images/gaps/5/52/LTB_Data_Format.pdf)
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq,FromRepr, AsRefStr, EnumIter)]
 #[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
 #[repr(u8)]
 pub enum LTBThreshold {
@@ -327,52 +221,11 @@ pub enum LTBThreshold {
   Unknown = 255u8
 }
 
-impl fmt::Display for LTBThreshold {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let r : &str;
-    match self {
-      LTBThreshold::NoHit   => { r = "NoHit"},
-      LTBThreshold::Hit     => { r = "Hit"},
-      LTBThreshold::Beta    => { r = "Beta"},
-      LTBThreshold::Veto    => { r = "Veto"},
-      LTBThreshold::Unknown => { r = "Unknown"}
-    }
-    write!(f, "<LTBThreshold: {}>", r)
-  }
-}
-
-impl From<u8> for LTBThreshold {
-  fn from(value: u8) -> Self {
-    match value {
-      0 => LTBThreshold::NoHit,
-      1 => LTBThreshold::Hit,
-      2 => LTBThreshold::Beta,
-      3 => LTBThreshold::Veto,
-      _ => LTBThreshold::Unknown
-    }
-  }
-}
-
-#[cfg(feature = "random")]
-impl FromRandom for LTBThreshold {
-  
-  fn from_random() -> Self {
-    let choices = [
-      LTBThreshold::NoHit,
-      LTBThreshold::Hit,
-      LTBThreshold::Beta,
-      LTBThreshold::Veto,
-      LTBThreshold::Unknown
-    ];
-    let mut rng  = rand::rng();
-    let idx = rng.random_range(0..choices.len());
-    choices[idx]
-  }
-}
+expand_and_test_enum!(LTBThreshold, test_ltbthreshold_repr);
 
 //--------------------------------------------
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq,FromRepr, AsRefStr, EnumIter)]
 #[repr(u8)]
 #[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
 pub enum EventStatus {
@@ -410,87 +263,7 @@ pub enum EventStatus {
   Perfect                = 42u8
 }
 
-impl fmt::Display for EventStatus {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let r = self.string_repr();
-    write!(f, "<EventStatus: {}>", r)
-  }
-}
-
-impl EventStatus {
-  pub fn string_repr(&self) -> &str {
-    match self {
-      EventStatus::Unknown                => {return "Unknown"},
-      EventStatus::CRC32Wrong             => {return "CRC32Wrong"},
-      EventStatus::TailWrong              => {return "TailWrong"},
-      EventStatus::ChannelIDWrong         => {return "ChannelIDWrong"},
-      EventStatus::CellSyncErrors         => {return "CellSyncErrors"},
-      EventStatus::ChnSyncErrors          => {return "ChnSyncErrors"},
-      EventStatus::CellAndChnSyncErrors   => {return "CellAndChnSyncErrors"},
-      EventStatus::AnyDataMangling        => {return "AnyDataMangling"},
-      EventStatus::IncompleteReadout      => {return "IncompleteReadout"},
-      EventStatus::IncompatibleData       => {return "IncompatibleData"},
-      EventStatus::EventTimeOut           => {return "EventTimeOut"},
-      EventStatus::NoChannel9             => {return "NoChannel9"},
-      EventStatus::GoodNoCRCOrErrBitCheck => {return "GoodNoCRCOrErrBitCheck"},
-      EventStatus::GoodNoCRCCheck         => {return "GoodNoCRCCheck"},
-      EventStatus::GoodNoErrBitCheck      => {return "GoodNoErrBitCheck"},
-      EventStatus::Perfect                => {return "Perfect"}
-    }
-  }
-}
-
-impl From<u8> for EventStatus {
-  fn from(value: u8) -> Self {
-    match value {
-      0  => EventStatus::Unknown,
-      10 => EventStatus::CRC32Wrong,
-      11 => EventStatus::TailWrong,
-      12 => EventStatus::ChannelIDWrong,
-      13 => EventStatus::CellSyncErrors,
-      14 => EventStatus::ChnSyncErrors,
-      15 => EventStatus::CellAndChnSyncErrors,
-      16 => EventStatus::AnyDataMangling,
-      21 => EventStatus::IncompleteReadout,
-      22 => EventStatus::IncompatibleData,
-      23 => EventStatus::EventTimeOut,
-      24 => EventStatus::NoChannel9,
-      39 => EventStatus::GoodNoCRCOrErrBitCheck,
-      40 => EventStatus::GoodNoCRCCheck,
-      41 => EventStatus::GoodNoErrBitCheck,
-      42 => EventStatus::Perfect,
-      _    => EventStatus::Unknown
-    }
-  }
-}
-
-#[cfg(feature = "random")]
-impl FromRandom for EventStatus {
- 
-  fn from_random() -> Self {
-    let choices = [
-      EventStatus::Unknown,
-      EventStatus::CRC32Wrong,
-      EventStatus::TailWrong,
-      EventStatus::ChannelIDWrong,
-      EventStatus::CellSyncErrors,
-      EventStatus::ChnSyncErrors,
-      EventStatus::CellAndChnSyncErrors,
-      EventStatus::AnyDataMangling,
-      EventStatus::IncompleteReadout,
-      EventStatus::IncompatibleData,
-      EventStatus::EventTimeOut,
-      EventStatus::NoChannel9,
-      EventStatus::GoodNoCRCOrErrBitCheck,
-      EventStatus::GoodNoCRCCheck,
-      EventStatus::GoodNoErrBitCheck,
-      EventStatus::Perfect,
-    ];
-    let mut rng  = rand::rng();
-    let idx = rng.random_range(0..choices.len());
-    choices[idx]
-  }
-}
+expand_and_test_enum!(EventStatus, test_eventstatus_repr);
 
 //--------------------------------------------
 
@@ -498,7 +271,7 @@ impl FromRandom for EventStatus {
 ///
 /// Describe the purpose of the data. This
 /// is the semantics behind it.
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq,FromRepr, AsRefStr, EnumIter)]
 #[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
 #[repr(u8)]
 pub enum DataType {
@@ -513,89 +286,7 @@ pub enum DataType {
   // future extension for different trigger settings!
 }
 
-impl fmt::Display for DataType {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let r = self.string_repr();
-    write!(f, "<DataType: {}>", r)
-  }
-}
-
-impl DataType {
-  pub fn string_repr(&self) -> &str {
-    match self {
-      DataType::Unknown            => {return "Unknown"},
-      DataType::VoltageCalibration => {return "VoltageCalibration"},
-      DataType::TimingCalibration  => {return "TimingCalibration"},
-      DataType::Noi                => {return "Noi"},
-      DataType::Physics            => {return "Physics"},
-      DataType::RBTriggerPeriodic  => {return "RBTriggerPeriodic"},
-      DataType::RBTriggerPoisson   => {return "RBTriggerPoisson"},
-      DataType::MTBTriggerPoisson  => {return "MTBTriggerPoisson"},
-    }
-  }
-}
-impl From<u8> for DataType {
-  fn from(value: u8) -> Self {
-    match value {
-      0u8  => DataType::Unknown,
-      10u8 => DataType::VoltageCalibration,
-      20u8 => DataType::TimingCalibration,
-      30u8 => DataType::Noi,
-      40u8 => DataType::Physics,
-      50u8 => DataType::RBTriggerPeriodic,
-      60u8 => DataType::RBTriggerPoisson,
-      70u8 => DataType::MTBTriggerPoisson,
-      _    => DataType::Unknown
-    }
-  }
-}
-
-#[cfg(feature = "random")]
-impl FromRandom for DataType {
-  
-  fn from_random() -> Self {
-    let choices = [
-      DataType::Unknown,
-      DataType::VoltageCalibration,
-      DataType::TimingCalibration,
-      DataType::Noi,
-      DataType::Physics,
-      DataType::RBTriggerPeriodic,
-      DataType::RBTriggerPoisson,
-      DataType::MTBTriggerPoisson
-    ];
-    let mut rng  = rand::rng();
-    let idx = rng.random_range(0..choices.len());
-    choices[idx]
-  }
-}
+expand_and_test_enum!(DataType, test_datatype_repr);
 
 //--------------------------------------------
-
-#[test]
-fn test_data_type() {
-  let mut type_codes = Vec::<u8>::new();
-  type_codes.push(DataType::Unknown as u8); 
-  type_codes.push(DataType::VoltageCalibration as u8); 
-  type_codes.push(DataType::TimingCalibration as u8); 
-  type_codes.push(DataType::Noi as u8); 
-  type_codes.push(DataType::Physics as u8); 
-  type_codes.push(DataType::MTBTriggerPoisson as u8); 
-  type_codes.push(DataType::RBTriggerPeriodic as u8); 
-  type_codes.push(DataType::RBTriggerPoisson as u8); 
-  for tc in type_codes.iter() {
-    assert_eq!(*tc,DataType::try_from(*tc).unwrap() as u8);
-  }
-}
-
-#[test]
-#[cfg(feature = "random")]
-fn test_event_status() {
-  for _ in 0..100 {
-    let ev_stat    = EventStatus::from_random();
-    let ev_stat_u8 = ev_stat as u8;
-    let u8_ev_stat = EventStatus::from(ev_stat_u8);
-    assert_eq!(ev_stat, u8_ev_stat);
-  }
-}
 

@@ -6,8 +6,19 @@
 //!
 //!
 
-use half::f16;
-use std::collections::VecDeque;
+use crate::prelude::*;
+
+//// Luma's generic version - needs to be checked and benchmarked
+//pub fn parse_num<T, S>(stream: S, pos: &mut usize) -> T
+//where
+//    T: Copy + Default + Sized + FromBytes,
+//    S: AsRef<[u8]> {
+//    let bs = stream.as_ref();
+//    let mut buf = [0u8; size_of::<T>()];
+//    buf.copy_from_slice(&bs[*pos..*pos + size_of::<T>()]);
+//    *pos += size_of::<T>();
+//    T::from_le_bytes(buf)
+//}
 
 /// Get a u8 from a vector of bytes and advance 
 /// a position marker by 1
@@ -37,7 +48,10 @@ pub fn parse_u8_deque(bs : &VecDeque::<u8>, pos : &mut usize) -> u8 {
 
 /// Get a u16 from a vector of bytes and advance 
 /// a position marker by 2
-pub fn parse_u16(bs : &Vec::<u8>, pos : &mut usize) -> u16 {
+///
+/// Note: written out as a generic here, TODO benchmark
+pub fn parse_u16<T: AsRef<[u8]>>(stream : &T, pos : &mut usize) -> u16 {
+  let bs = stream.as_ref();
   let value = u16::from_le_bytes([bs[*pos], bs[*pos+1]]);
   *pos += 2;
   value
@@ -78,6 +92,17 @@ pub fn parse_u32(bs : &Vec::<u8>, pos : &mut usize) -> u32 {
 
 /// Get a u64 from a vector of bytes and advance 
 /// a position marker by 8
+pub fn parse_u64_new<T: AsRef<[u8]>>(stream : &T, pos : &mut usize) -> u64 {
+  let bs = stream.as_ref();
+  let value = u64::from_le_bytes([bs[*pos],   bs[*pos+1], bs[*pos+2], bs[*pos+3],
+                                  bs[*pos+4], bs[*pos+5], bs[*pos+6], bs[*pos+7]]);
+  *pos += 8;
+  value
+}
+
+
+/// Get a u64 from a vector of bytes and advance 
+/// a position marker by 8
 pub fn parse_u64(bs : &Vec::<u8>, pos : &mut usize) -> u64 {
   let value = u64::from_le_bytes([bs[*pos],   bs[*pos+1], bs[*pos+2], bs[*pos+3],
                                   bs[*pos+4], bs[*pos+5], bs[*pos+6], bs[*pos+7]]);
@@ -98,6 +123,25 @@ pub fn parse_usize(bs: &Vec::<u8>, pos: &mut usize) -> usize {
 #[cfg(target_arch="arm")]
 pub fn parse_usize(bs: &Vec::<u8>, pos: &mut usize) -> usize {
   parse_u32(bs, pos) as usize
+}
+
+/// Get a string from a bytestream and advance a position marker
+/// 
+/// Warning, this is unsafe and might fail. It also expects that the 
+/// string is perfixed with a u16 containing its size.
+///
+/// # Arguments 
+///
+/// * bs     : Serialized data, stream of bytes
+/// * pos    : Position marker - start postion of 
+///            the deserialization
+pub fn parse_string<T: AsRef<[u8]>>(stream : &T, pos : &mut usize) -> String {
+  let bs    = stream.as_ref();
+  let size  = parse_u16(stream, pos) as usize;
+  let s_string : Vec<u8> = bs[*pos..*pos + size].to_vec();
+  let value = String::from_utf8(s_string).unwrap();
+  *pos += size;
+  value
 }
 
 /// Get a u32 from a vector of bytes and advance
