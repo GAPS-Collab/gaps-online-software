@@ -159,8 +159,8 @@ impl TelemetryPacketReader {
             }
           }
           let mut thead = TelemetryPacketHeader::new();
-          thead.sync      = 0x90eb;
-          thead.ptype     = TelemetryPacketType::from(buffer[0]);
+          thead.sync        = 0x90eb;
+          thead.packet_type = TelemetryPacketType::from(buffer[0]);
           let ptype    = TelemetryPacketType::from(buffer[0]);
           // read the the size of the packet
           let mut buffer_ts = [0,0,0,0];

@@ -150,9 +150,10 @@ fn packets_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
 #[pyo3(name = "io")]
 fn io_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   use crate::io::*;
+  use crate::io::caraspace::*;
   use crate::io::root_reader::read_example;
   m.add_function(wrap_pyfunction!(read_example, m)?)?;
-  //m.add_class::<TofPacketReader>()?;
+  m.add_class::<CRFrameObject>()?;
   //m.add_class::<TelemetryPacketReader>()?;
   Ok(())
 }

@@ -22,7 +22,8 @@ use crate::prelude::*;
 
 /// Get a u8 from a vector of bytes and advance 
 /// a position marker by 1
-pub fn parse_bool(bs : &Vec::<u8>, pos : &mut usize) -> bool {
+pub fn parse_bool<T: AsRef<[u8]>>(stream : &T, pos : &mut usize) -> bool {
+  let bs = stream.as_ref();
   let value = u8::from_le_bytes([bs[*pos]]); 
   *pos += 1;
   value > 0
@@ -31,20 +32,12 @@ pub fn parse_bool(bs : &Vec::<u8>, pos : &mut usize) -> bool {
 
 /// Get a u8 from a vector of bytes and advance 
 /// a position marker by 1
-pub fn parse_u8(bs : &Vec::<u8>, pos : &mut usize) -> u8 {
+pub fn parse_u8<T: AsRef<[u8]>>(stream : &T, pos : &mut usize) -> u8 {
+  let bs = stream.as_ref();
   let value = u8::from_le_bytes([bs[*pos]]);
   *pos += 1;
   value
 }
-
-/// Get a u8 from a dequeu of bytes and advance 
-/// a psoition marker by one
-pub fn parse_u8_deque(bs : &VecDeque::<u8>, pos : &mut usize) -> u8 {
-  let value = u8::from_le_bytes([bs[*pos]]);
-  *pos += 1;
-  value
-}
-
 
 /// Get a u16 from a vector of bytes and advance 
 /// a position marker by 2
@@ -59,24 +52,17 @@ pub fn parse_u16<T: AsRef<[u8]>>(stream : &T, pos : &mut usize) -> u16 {
 
 /// Get a u16 from a vector of bytes in big-endian and advance 
 /// a position marker by 2
-pub fn parse_u16_be(bs : &Vec::<u8>, pos : &mut usize) -> u16 {
+pub fn parse_u16_be<T: AsRef<[u8]>>(stream : &T, pos : &mut usize) -> u16 {
+  let bs = stream.as_ref();
   let value = u16::from_be_bytes([bs[*pos], bs[*pos+1]]);
-  *pos += 2;
-  value
-}
-
-
-/// Get a u16 from a deque of bytes in big-endian and advance 
-/// a position marker by 2
-pub fn parse_u16_deque(bs : &VecDeque::<u8>, pos : &mut usize) -> u16 {
-  let value = u16::from_le_bytes([bs[*pos], bs[*pos+1]]);
   *pos += 2;
   value
 }
 
 /// Get a u32 from a vector of bytes in big-endian and advance 
 /// a position marker by 4
-pub fn parse_u32_be(bs : &Vec::<u8>, pos : &mut usize) -> u32 {
+pub fn parse_u32_be<T: AsRef<[u8]>>(stream : &T, pos : &mut usize) -> u32 {
+  let bs = stream.as_ref();
   let value = u32::from_be_bytes([bs[*pos], bs[*pos+1], bs[*pos+2], bs[*pos+3]]);
   *pos += 4;
   value
@@ -84,7 +70,8 @@ pub fn parse_u32_be(bs : &Vec::<u8>, pos : &mut usize) -> u32 {
 
 /// Get a u32 from a vector of bytes and advance 
 /// a position marker by 4
-pub fn parse_u32(bs : &Vec::<u8>, pos : &mut usize) -> u32 {
+pub fn parse_u32<T: AsRef<[u8]>>(stream : &T, pos : &mut usize) -> u32 {
+  let bs = stream.as_ref();
   let value = u32::from_le_bytes([bs[*pos], bs[*pos+1], bs[*pos+2], bs[*pos+3]]);
   *pos += 4;
   value
@@ -92,7 +79,7 @@ pub fn parse_u32(bs : &Vec::<u8>, pos : &mut usize) -> u32 {
 
 /// Get a u64 from a vector of bytes and advance 
 /// a position marker by 8
-pub fn parse_u64_new<T: AsRef<[u8]>>(stream : &T, pos : &mut usize) -> u64 {
+pub fn parse_u64<T: AsRef<[u8]>>(stream : &T, pos : &mut usize) -> u64 {
   let bs = stream.as_ref();
   let value = u64::from_le_bytes([bs[*pos],   bs[*pos+1], bs[*pos+2], bs[*pos+3],
                                   bs[*pos+4], bs[*pos+5], bs[*pos+6], bs[*pos+7]]);
@@ -103,7 +90,7 @@ pub fn parse_u64_new<T: AsRef<[u8]>>(stream : &T, pos : &mut usize) -> u64 {
 
 /// Get a u64 from a vector of bytes and advance 
 /// a position marker by 8
-pub fn parse_u64(bs : &Vec::<u8>, pos : &mut usize) -> u64 {
+pub fn parse_u64_old_for_test(bs : &Vec::<u8>, pos : &mut usize) -> u64 {
   let value = u64::from_le_bytes([bs[*pos],   bs[*pos+1], bs[*pos+2], bs[*pos+3],
                                   bs[*pos+4], bs[*pos+5], bs[*pos+6], bs[*pos+7]]);
   *pos += 8;
@@ -155,9 +142,8 @@ pub fn parse_string<T: AsRef<[u8]>>(stream : &T, pos : &mut usize) -> String {
 /// This is a non-convetional byte respresentation
 /// for a u32 and needs to be used with care
 /// </div>
-pub fn parse_u32_for_16bit_words(bs  : &Vec::<u8>,
-                                 pos : &mut usize) -> u32 {
-  
+pub fn parse_u32_for_16bit_words<T: AsRef<[u8]>>(stream : &T, pos : &mut usize) -> u32 {
+  let bs = stream.as_ref();
   let raw_bytes_4  = [bs[*pos + 2],
                       bs[*pos + 3],
                       bs[*pos    ],
@@ -175,9 +161,8 @@ pub fn parse_u32_for_16bit_words(bs  : &Vec::<u8>,
 /// This assumes an underlying representation of 
 /// an atomic unit of 16bit instead of 8.
 /// </div>
-pub fn parse_u48_for_16bit_words(bs  : &Vec::<u8>,
-                                 pos : &mut usize) -> u64 {
-  
+pub fn parse_u48_for_16bit_words<T: AsRef<[u8]>>(stream : &T, pos : &mut usize) -> u64 {
+  let bs = stream.as_ref();
   let raw_bytes_8  = [0u8,
                       0u8,
                       bs[*pos + 4],
@@ -197,7 +182,8 @@ pub fn parse_u48_for_16bit_words(bs  : &Vec::<u8>,
 /// datatype which can dependent on the implementaion.
 /// The implementation used here is from the rust "half" crate
 /// </div>
-pub fn parse_f16(bs : &Vec::<u8>, pos : &mut usize) -> f16 {
+pub fn parse_f16<T: AsRef<[u8]>>(stream : &T, pos : &mut usize) -> f16 {
+  let bs = stream.as_ref();
   let value = f16::from_le_bytes([bs[*pos], bs[*pos+1]]);
   *pos += 2;
   value
@@ -205,7 +191,8 @@ pub fn parse_f16(bs : &Vec::<u8>, pos : &mut usize) -> f16 {
 
 /// Get a f32 from a vector of bytes and advance 
 /// a position marker by 4
-pub fn parse_f32(bs : &Vec::<u8>, pos : &mut usize) -> f32 {
+pub fn parse_f32<T: AsRef<[u8]>>(stream : &T, pos : &mut usize) -> f32 {
+  let bs = stream.as_ref();
   let value = f32::from_le_bytes([bs[*pos],   bs[*pos+1],  
                                   bs[*pos+2], bs[*pos+3]]);
   *pos += 4;
@@ -214,7 +201,8 @@ pub fn parse_f32(bs : &Vec::<u8>, pos : &mut usize) -> f32 {
 
 /// Get a f64 from a vector of bytes and advance 
 /// a position marker by 8
-pub fn parse_f64(bs : &Vec::<u8>, pos : &mut usize) -> f64 {
+pub fn parse_f64<T: AsRef<[u8]>>(stream : &T, pos : &mut usize) -> f64 {
+  let bs = stream.as_ref();
   let value = f64::from_le_bytes([bs[*pos],   bs[*pos+1],  
                                   bs[*pos+2], bs[*pos+3],
                                   bs[*pos+4], bs[*pos+5],
@@ -325,26 +313,6 @@ fn test_parse_u8() {
 
 #[cfg(feature = "random")]
 #[test]
-fn test_parse_u8_deque() {
-  #[cfg(feature="random")]
-  use rand::Rng;
-
-  let mut rng    = rand::rng();
-  let mut stream = VecDeque::<u8>::new();
-  let mut data   = VecDeque::<u8>::new();
-  for _ in 0..100 {
-    let test_byte  = rng.random::<u8>();
-    stream.push_back(test_byte);
-    data.push_back(test_byte);
-  }
-  let mut pos = 0usize;
-  for k in 0..stream.len() {
-    assert_eq!(parse_u8_deque(&stream, &mut pos), data[k]);
-  }
-}
-
-#[cfg(feature = "random")]
-#[test]
 fn test_parse_u16() {
   #[cfg(feature="random")]
   use rand::Rng;
@@ -383,27 +351,6 @@ fn test_parse_u16_be() {
   let mut pos = 0usize;
   for k in data {
     assert_eq!(parse_u16_be(&stream, &mut pos), k);
-  }
-}
-
-#[test]
-fn test_parse_u16_deque() {
-  #[cfg(feature="random")]
-  use rand::Rng;
-
-  let mut rng    = rand::rng();
-  let mut stream = VecDeque::<u8>::new();
-  let mut data   = Vec::<u16>::new();
-  for _ in 0..100 {
-    let test_data  = rng.random::<u16>();
-    for k in test_data.to_le_bytes() {
-      stream.push_back(k);
-    }
-    data.push(test_data);
-  }
-  let mut pos = 0usize;
-  for k in data {
-    assert_eq!(parse_u16_deque(&stream, &mut pos), k);
   }
 }
 

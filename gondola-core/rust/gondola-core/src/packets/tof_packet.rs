@@ -1,33 +1,36 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
-//!
+//! TofPacket provides a wrapper to write objects which implement
+//! TofPackable into files
+// The following file is part of gaps-online-software and published 
+// under the GPLv3 license
 
-use std::time::Instant;
-use std::fmt;
+use crate::prelude::*;
 
-use crate::errors::SerializationError;
-use crate::packets::{
-  TofPacketType,
-  TofPackable
-};
-use crate::io::serialization::Serialization;
-use crate::io::parsers::{
- parse_u8,
- parse_u16,
- parse_u32
-};
-
-#[cfg(feature = "random")]
-use crate::random::FromRandom;
-#[cfg(feature = "random")]
-use rand::Rng;
-
-#[cfg(feature="pybindings")]
-use pyo3::prelude::*;
-#[cfg(feature="pybindings")]
-use crate::impl_pythonize_display;
-#[cfg(feature="pybindings")]
-use pyo3::exceptions::PyIOError;
+//use std::time::Instant;
+//use std::fmt;
+//
+//use crate::errors::SerializationError;
+//use crate::packets::{
+//  TofPacketType,
+//  TofPackable
+//};
+//use crate::io::serialization::Serialization;
+//use crate::io::parsers::{
+// parse_u8,
+// parse_u16,
+// parse_u32
+//};
+//
+//#[cfg(feature = "random")]
+//use crate::random::FromRandom;
+//#[cfg(feature = "random")]
+//use rand::Rng;
+//
+//#[cfg(feature="pybindings")]
+//use pyo3::prelude::*;
+//#[cfg(feature="pybindings")]
+//use pyo3::exceptions::PyIOError;
+//
+//use crate::prelude::*;
 
 /// Internal Tof communication protocol.
 /// Simple, yet powerful
@@ -155,49 +158,6 @@ impl TofPacket {
   }
 }
 
-#[cfg(feature="pybindings")]
-#[pymethods]
-impl TofPacket {
-
-  #[new]
-  fn new_py() -> Self {
-    Self::new()
-  }
-  
-  #[getter]
-  fn get_packet_type(&self) -> TofPacketType {
-    self.packet_type
-  }
- 
-  // FIXME - trust in te process that it referenceces te input vector and not clones it
-  /// Factory function for TofPackets
-  ///
-  /// # Arguments:
-  ///
-  ///   * stream    : bytes presumably representing
-  ///                 a TofPacket
-  ///   * start_pos : the assumed position of 
-  ///                 HEAD identifier in the
-  ///                 bytestream (start of 
-  ///                 TofPacket)
-  #[staticmethod]
-  #[pyo3(name = "from_bytestream")]
-  fn from_bytestream_py<'_py>(stream : Vec<u8>, start_pos : usize) -> PyResult<Self>{
-    let mut pos = start_pos;  
-    match Self::from_bytestream(&stream, &mut pos) {
-      Ok(tp) => {
-        return Ok(tp);
-      }
-      Err(err) => {
-        let err_msg = format!("Unable to TofPacket from bytestream! {err}");
-        return Err(PyIOError::new_err(err_msg));
-      }
-    }
-  }
-}
-
-#[cfg(feature="pybindings")]
-impl_pythonize_display!(TofPacket, |s: &TofPacket | s.to_string());
 
 impl Serialization for TofPacket {
   const HEAD : u16 = 0xaaaa;
@@ -260,89 +220,118 @@ impl Serialization for TofPacket {
   }
 }
 
+#[cfg(feature="random")]
+impl FromRandom for TofPacket {
 
+  fn from_random() -> Self {
+    // FIXME - this should be an actual, realistic
+    // distribution
+    let choices = [
+      TofPacketType::TofEvent,
+      TofPacketType::TofEvent,
+      TofPacketType::TofEvent,
+      TofPacketType::RBWaveform,
+      TofPacketType::RBWaveform,
+      TofPacketType::TofEvent,
+      TofPacketType::TofEvent,
+      TofPacketType::TofEvent,
+      TofPacketType::TofEvent,
+      TofPacketType::TofEvent,
+      TofPacketType::TofEvent,
+      TofPacketType::MasterTrigger,
+      TofPacketType::MasterTrigger,
+      TofPacketType::MasterTrigger,
+      TofPacketType::RBMoniData,
+      TofPacketType::PBMoniData,
+      TofPacketType::LTBMoniData,
+      TofPacketType::PAMoniData,
+      TofPacketType::CPUMoniData,
+      TofPacketType::MtbMoniData,
+    ];
+    let mut rng  = rand::rng();
+    let idx = rng.random_range(0..choices.len());
+    let packet_type = choices[idx];
+    match packet_type {
+      TofPacketType::TofEvent => {
+        let te = TofEvent::from_random();
+        return te.pack()
+      }
+      TofPacketType::RBWaveform => {
+        let te = RBWaveform::from_random();
+        return te.pack()
+      }
+      TofPacketType::RBMoniData => {
+        let te = RBMoniData::from_random();
+        return te.pack()
+      }
+      TofPacketType::PAMoniData => {
+        let te = PAMoniData::from_random();
+        return te.pack()
+      }
+      TofPacketType::LTBMoniData => {
+        let te = LTBMoniData::from_random();
+        return te.pack()
+      }
+      TofPacketType::PBMoniData => {
+        let te = PBMoniData::from_random();
+        return te.pack()
+      }
+      TofPacketType::CPUMoniData => {
+        let te = CPUMoniData::from_random();
+        return te.pack()
+      }
+      TofPacketType::MtbMoniData  => {
+        let te = MtbMoniData::from_random();
+        return te.pack()
+      }
+      _ => {
+        let te = TofEvent::from_random();
+        return te.pack()
+      }
+    }
+  }
+}
 
-//#[cfg(feature="random")]
-//impl FromRandom for TofPacket {
-//
-//  fn from_random() -> Self {
-//    // FIXME - this should be an actual, realistic
-//    // distribution
-//    let choices = [
-//      TofPacketType::TofEvent,
-//      TofPacketType::TofEvent,
-//      TofPacketType::TofEvent,
-//      TofPacketType::TofEvent,
-//      TofPacketType::TofEvent,
-//      TofPacketType::TofEvent,
-//      TofPacketType::TofEvent,
-//      TofPacketType::RBWaveform,
-//      TofPacketType::RBWaveform,
-//      TofPacketType::TofEventSummary,
-//      TofPacketType::TofEventSummary,
-//      TofPacketType::TofEventSummary,
-//      TofPacketType::TofEventSummary,
-//      TofPacketType::TofEventSummary,
-//      TofPacketType::TofEventSummary,
-//      TofPacketType::MasterTrigger,
-//      TofPacketType::MasterTrigger,
-//      TofPacketType::MasterTrigger,
-//      TofPacketType::RBMoniData,
-//      TofPacketType::PBMoniData,
-//      TofPacketType::LTBMoniData,
-//      TofPacketType::PAMoniData,
-//      TofPacketType::CPUMoniData,
-//      TofPacketType::MonitorMtb,
-//    ];
-//    let mut rng  = rand::thread_rng();
-//    let idx = rng.gen_range(0..choices.len());
-//    let packet_type = choices[idx];
-//    match packet_type {
-//      TofPacketType::TofEvent => {
-//        let te = TofEvent::from_random();
-//        return te.pack()
-//      }
-//      TofPacketType::TofEventSummary => {
-//        let te = TofEventSummary::from_random();
-//        return te.pack()
-//      }
-//      TofPacketType::RBWaveform => {
-//        let te = RBWaveform::from_random();
-//        return te.pack()
-//      }
-//      TofPacketType::MasterTrigger => {
-//        let te = MasterTriggerEvent::from_random();
-//        return te.pack()
-//      }
-//      TofPacketType::RBMoniData => {
-//        let te = RBMoniData::from_random();
-//        return te.pack()
-//      }
-//      TofPacketType::PAMoniData => {
-//        let te = PAMoniData::from_random();
-//        return te.pack()
-//      }
-//      TofPacketType::LTBMoniData => {
-//        let te = LTBMoniData::from_random();
-//        return te.pack()
-//      }
-//      TofPacketType::PBMoniData => {
-//        let te = PBMoniData::from_random();
-//        return te.pack()
-//      }
-//      TofPacketType::CPUMoniData => {
-//        let te = CPUMoniData::from_random();
-//        return te.pack()
-//      }
-//      TofPacketType::MonitorMtb  => {
-//        let te = MtbMoniData::from_random();
-//        return te.pack()
-//      }
-//      _ => {
-//        let te = TofEvent::from_random();
-//        return te.pack()
-//      }
-//    }
-//  }
-//}
+impl Frameable for TofPacket {
+  const CRFRAMEOBJECT_TYPE : CRFrameObjectType = CRFrameObjectType::TofPacket;
+}
+
+#[cfg(feature="pybindings")]
+#[pymethods]
+impl TofPacket {
+
+  #[getter]
+  fn get_packet_type(&self) -> TofPacketType {
+    self.packet_type
+  }
+ 
+  // FIXME - trust in te process that it referenceces te input vector and not clones it
+  /// Factory function for TofPackets
+  ///
+  /// # Arguments:
+  ///
+  ///   * stream    : bytes presumably representing
+  ///                 a TofPacket
+  ///   * start_pos : the assumed position of 
+  ///                 HEAD identifier in the
+  ///                 bytestream (start of 
+  ///                 TofPacket)
+  #[staticmethod]
+  #[pyo3(name = "from_bytestream")]
+  fn from_bytestream_py<'_py>(stream : Vec<u8>, start_pos : usize) -> PyResult<Self>{
+    let mut pos = start_pos;  
+    match Self::from_bytestream(&stream, &mut pos) {
+      Ok(tp) => {
+        return Ok(tp);
+      }
+      Err(err) => {
+        let err_msg = format!("Unable to TofPacket from bytestream! {err}");
+        return Err(PyIOError::new_err(err_msg));
+      }
+    }
+  }
+}
+
+#[cfg(feature="pybindings")]
+pythonize!(TofPacket);
 

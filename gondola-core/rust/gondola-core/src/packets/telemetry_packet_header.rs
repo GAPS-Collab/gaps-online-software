@@ -1,18 +1,10 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
+//! Re-implementation of the telemetry header which is attached 
+//! to each telemetry packet.
+//! Re-implemented from bfsw
+// The following file is part of gaps-online-software and published 
+// under the GPLv3 license
 
-use std::fmt;
-
-use crate::io::serialization::Serialization;
-use crate::io::parsers::*;
-use crate::errors::SerializationError;
-use crate::packets::TelemetryPacketType;
-
-#[cfg(feature="pybindings")]
-use crate::impl_pythonize_display;
-
-#[cfg(feature="pybindings")]
-use pyo3::prelude::*;
+use crate::prelude::*;
 
 /// This gets attached to each telemetry packet 
 /// "in front" of it, conveying meta information
@@ -23,7 +15,7 @@ pub struct TelemetryPacketHeader {
   pub sync      : u16,
   /// A unique identifier describing the following 
   /// packet's content
-  pub ptype     : TelemetryPacketType,
+  pub packet_type     : TelemetryPacketType,
   /// The timestap from the gcu (flight computer) (NOT GPS!)
   /// when this packet header has been created
   pub timestamp : u32,
@@ -44,7 +36,7 @@ impl TelemetryPacketHeader {
   pub fn new() -> Self {
     Self {
       sync      : 0,
-      ptype     : TelemetryPacketType::Unknown,
+      packet_type     : TelemetryPacketType::Unknown,
       timestamp : 0,
       counter   : 0,
       length    : 0,
@@ -56,7 +48,7 @@ impl TelemetryPacketHeader {
   pub fn forge(packet_type : TelemetryPacketType) -> Self {
     let mut header = Self::new();
     header.sync    = 0x90EB;
-    header.ptype   = packet_type;
+    header.packet_type   = packet_type;
     header
   }
 
@@ -72,11 +64,6 @@ impl TelemetryPacketHeader {
 #[pymethods]
 impl TelemetryPacketHeader {
   
-  #[new]
-  fn new_py() -> Self {
-    Self::new()
-  }
-
   #[getter]
   fn gcutime(&self) -> f64 {
     self.get_gcutime()
@@ -84,12 +71,9 @@ impl TelemetryPacketHeader {
 
   #[getter]
   fn get_packet_type(&self) -> TelemetryPacketType {
-    self.ptype
+    self.packet_type
   }
 }
-
-#[cfg(feature="pybindings")]
-impl_pythonize_display!(TelemetryPacketHeader, |s: &TelemetryPacketHeader| s.to_string());
 
 // Trait implementations
 
@@ -111,7 +95,7 @@ impl Serialization for TelemetryPacketHeader {
     }
     let mut thead   = TelemetryPacketHeader::new();
     thead.sync      = 0x90eb;
-    thead.ptype     = TelemetryPacketType::from(parse_u8 (stream, pos));
+    thead.packet_type     = TelemetryPacketType::from(parse_u8 (stream, pos));
     thead.timestamp = parse_u32(stream, pos);
     thead.counter   = parse_u16(stream, pos);
     thead.length    = parse_u16(stream, pos);
@@ -124,7 +108,7 @@ impl Serialization for TelemetryPacketHeader {
     //let head : u16 = 0x90eb;
     // "SYNC" is the header signature
     stream.extend_from_slice(&self.sync.to_le_bytes());
-    stream.extend_from_slice(&(self.ptype as u8).to_le_bytes());
+    stream.extend_from_slice(&(self.packet_type as u8).to_le_bytes());
     stream.extend_from_slice(&self.timestamp.to_le_bytes());
     stream.extend_from_slice(&self.counter.to_le_bytes());
     stream.extend_from_slice(&self.length.to_le_bytes());
@@ -137,7 +121,7 @@ impl fmt::Display for TelemetryPacketHeader {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut repr = String::from("<TelemetryPacketHeader:");
     repr += &(format!("\n  Header      : {}",self.sync));
-    repr += &(format!("\n  Packet Type : {}",self.ptype));
+    repr += &(format!("\n  Packet Type : {}",self.packet_type));
     repr += &(format!("\n  Timestamp   : {}",self.timestamp));
     repr += &(format!("\n  Counter     : {}",self.counter));
     repr += &(format!("\n  Length      : {}",self.length));
@@ -146,4 +130,4 @@ impl fmt::Display for TelemetryPacketHeader {
   }
 }
 
-
+pythonize!(TelemetryPacketHeader);

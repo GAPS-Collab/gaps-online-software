@@ -29,6 +29,7 @@ expand_and_test_enum!(CRFrameObjectType, test_crframeobjecttype_repr);
 ///
 ///
 #[derive(Debug, Clone)]
+#[cfg_attr(feature="pybindings", pyclass)] 
 pub struct CRFrameObject {
   pub version : u8,
   pub ftype   : CRFrameObjectType,
@@ -123,6 +124,10 @@ impl fmt::Display for CRFrameObject {
 
 //---------------------------------------------------
 
+pythonize!(CRFrameObject);
+
+//---------------------------------------------------
+
 /// The central data container of the 
 /// caraspace suite. 
 ///
@@ -130,6 +135,7 @@ impl fmt::Display for CRFrameObject {
 /// and is basically a little sclerite of 
 /// the entire skeleton.
 #[derive(Debug, Clone)]
+#[cfg_attr(feature="pybindings", pyclass)]
 pub struct CRFrame {
   // the index holds name, position in frame as well as the type of 
   // object stored in the frame
@@ -188,7 +194,7 @@ impl CRFrame {
       let obj_t   = CRFrameObjectType::from(stream[*pos]);
       *pos += 1;
       //println!("-- {} {} {}", name, obj_pos, obj_t);
-      index.insert(name, (obj_pos, obj_t));
+      index.insert(name.to_owned(), (obj_pos, obj_t));
     }
     index
   }
@@ -215,7 +221,7 @@ impl CRFrame {
         continue;
       }
       let obj = self.get_fobject(&objname)?;
-      new_frame.put_fobject(obj, objname.clone());
+      new_frame.put_fobject(obj, objname);
     }
     Ok(new_frame)
   }
@@ -224,14 +230,14 @@ impl CRFrame {
   /// Store any eligible object in the frame
   ///
   /// Eligible object must implement the "Frameable" trait
-  pub fn put<T: Serialization + Frameable>(&mut self, object : T, name : String) {
+  pub fn put<T: Serialization + Frameable>(&mut self, object : T, name : &str) {
     let f_object = object.pack();
     self.put_fobject(f_object, name);
   }
 
-  fn put_fobject(&mut self, object : CRFrameObject, name : String) {
+  fn put_fobject(&mut self, object : CRFrameObject, name : &str) {
     let pos    = self.bytestorage.len() as u64;
-    self.index.insert(name, (pos, object.ftype));
+    self.index.insert(name.to_string(), (pos, object.ftype));
     let mut stream = object.to_bytestream();
     //self.put_stream(&mut stream, name);
     //let pos    = self.bytestorage.len();
@@ -268,11 +274,11 @@ impl CRFrame {
     Ok(cr_object)
   }
 
-  pub fn get<T : Serialization + Frameable>(&self, name : String) -> Result<T, SerializationError> {
+  pub fn get<T : Serialization + Frameable>(&self, name : &str) -> Result<T, SerializationError> {
     
     //let mut lookup : (usize, CRFrameObjectType);
     let mut pos    : usize;
-    match self.index.get(&name) {
+    match self.index.get(name) {
       None => {
         return Err(SerializationError::ValueNotFound);
       }
@@ -362,3 +368,138 @@ impl fmt::Display for CRFrame {
   }
 }
 
+//---------------------------------------------------
+
+#[cfg(feature="pybindings")]
+#[pymethods]
+impl CRFrame {
+  
+  /// Delete a CRFrameObject by this name from the frame
+  ///
+  /// To delete multiple objects, delete calls can be 
+  /// chained
+  /// 
+  /// # Arguments:
+  ///   * name : The name of the FrameObject to delte 
+  ///            (must be in index)
+  ///
+  /// # Returns:
+  ///   A complete copy of self, without the given object.
+  #[pyo3(name="delete")]
+  pub fn delete_py(&self, name : &str) -> PyResult<Self> {
+    if !self.has(name) {
+      let msg = format!("Frame does not contain {}", name);
+      return Err(PyKeyError::new_err(msg));
+    }
+    match self.delete(name) {
+      Ok(new_frame) => {
+        Ok(new_frame)
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
+  /// Add a TelemetryPacket to the frame. 
+  ///
+  /// # Arguments:
+  ///   name : The name under which we store the TelemetryPacket within the index.
+  ///          If None given, use the default name, which is
+  ///          "TelemetryPacketType.<ValueOf(TelemetryPacketType)". This should be used in 
+  ///          all cases for which there is only a single TelemetryPacket within 
+  ///          the frame.
+  #[pyo3(signature = (packet, name = None))]
+  fn put_telemetrypacket(&mut self, packet : TelemetryPacket, name : Option<&str>) -> PyResult<()> {
+    if let Some(p_name) = name {
+      if self.has(p_name) {
+        let msg = format!("Frame already contains a TelemetryPacket named {}", p_name);
+        return Err(PyValueError::new_err(msg));
+      }
+      self.put(packet, p_name);
+      Ok(())
+    } else {
+      let name = format!("TelemetryPacketType.{}", packet.header.packet_type.as_ref());
+      let msg = format!("Frame already contains a TelemetryPacket named {}", name);
+      if self.has(&name) {
+        return Err(PyValueError::new_err(msg));
+      }
+      self.put(packet, name.as_str());
+      Ok(())
+    }
+  }
+  
+  /// Add a TofPacket to the frame. 
+  ///
+  /// # Arguments:
+  ///   name : The name under which we store the TofPacket within the index.
+  ///          If None given, use the default name, which is
+  ///          "TofPacketType.<ValueOf(TofPacketType)". This should be used in 
+  ///          all cases for which there is only a single TofPacket within 
+  ///          the frame.
+  #[pyo3(signature = (packet, name = None))]
+  fn put_tofpacket(&mut self, packet : TofPacket, name : Option<&str>) -> PyResult<()> {
+    if let Some(p_name) = name {
+      if self.has(p_name) {
+        let msg = format!("Frame already contains a TofPacket named {}", p_name);
+        return Err(PyValueError::new_err(msg));
+      }
+      self.put(packet, p_name);
+      Ok(())
+    } else {
+      let name = format!("TofPacketType.{}", packet.packet_type.as_ref());
+      let msg = format!("Frame already contains a TofPacket named {}", name);
+      if self.has(&name) {
+        return Err(PyValueError::new_err(msg));
+      }
+      self.put(packet, name.as_str());
+      Ok(())
+    }
+  }
+ 
+  /// Retrieve a TofPacket from a frame
+  ///
+  /// # Arguments:
+  ///   * name : The name of the packet as it is stored in the 
+  ///            index
+  fn get_tofpacket(&mut self, name : &str) -> PyResult<TofPacket> {
+    let packet    = self.get::<TofPacket>(name).unwrap();
+    Ok(packet)
+  }
+  
+  /// Retrieve a TelemetryPacket from a frame
+  ///
+  /// # Arguments:
+  ///   * name : The name of the packet as it is stored in the 
+  ///            index
+  fn get_telemetrypacket(&mut self, name : &str) -> PyResult<TelemetryPacket> {
+    let packet    = self.get::<TelemetryPacket>(name).unwrap();
+    Ok(packet)
+  }
+ 
+  /// Get a tofevent from the frame directly
+  fn get_tofevent(&mut self, name : &str) -> PyResult<TofEvent> {
+    let packet    = self.get::<TofPacket>(name).unwrap();
+    let event = packet.unpack::<TofEvent>().unwrap();
+    //event.set_paddles(&self.paddles);
+    //py_event.event  = event;
+    Ok(event)
+  }
+
+
+  /// Check if the frame contains an object with the given name
+  ///
+  /// # Arguments:
+  ///   * name : The name of the object as it appears in the index
+  #[pyo3(name="has")]
+  fn has_py(&self, name : &str) -> bool {
+    self.has(name)
+  }
+  
+  #[getter]
+  fn index(&self) -> HashMap<String, (u64, CRFrameObjectType)> {
+    self.index.clone()
+  }
+}
+
+pythonize!(CRFrame);

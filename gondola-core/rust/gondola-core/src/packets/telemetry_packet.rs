@@ -1,24 +1,9 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
+//! Wrapper for all telemetry data - original implementation in 
+//! bfsw
+// The following file is part of gaps-online-software and published 
+// under the GPLv3 license
 
-use std::fmt;
-
-use crate::io::serialization::Serialization;
-use crate::io::parsers::*;
-use crate::errors::SerializationError;
-use crate::packets::TelemetryPacketHeader;
-use crate::packets::TelemetryPacketType;
-
-#[cfg(feature="pybindings")]
-use crate::impl_pythonize_display;
-
-#[cfg(feature="pybindings")]
-use pyo3::prelude::*;
-
-#[cfg(feature="pybindings")]
-use pyo3::types::PyBytes;
-//use pyo3::types::PyMemoryView;
-
+use crate::prelude::*;
 
 /// A wrapper for packets from the telemetry stream
 ///
@@ -34,10 +19,6 @@ pub struct TelemetryPacket {
 #[cfg(feature="pybindings")]
 #[pymethods]
 impl TelemetryPacket {
-  #[new]
-  fn new_py() -> Self {
-    Self::new()
-  }
 
   /// Get a zero copy view of the payload 
   /// Might be mostly useful for debugging purposes
@@ -55,7 +36,7 @@ impl TelemetryPacket {
 
   #[getter]
   fn packet_type(&self) -> TelemetryPacketType {
-    TelemetryPacketType::from(self.header.ptype)
+    TelemetryPacketType::from(self.header.packet_type)
   }
 }
 
@@ -111,7 +92,12 @@ impl fmt::Display for TelemetryPacket {
   }
 }
 
+impl Frameable for TelemetryPacket {
+  const CRFRAMEOBJECT_TYPE : CRFrameObjectType = CRFrameObjectType::TelemetryPacket;
+}
+
+
 #[cfg(feature="pybindings")]
-impl_pythonize_display!(TelemetryPacket, |s: &TelemetryPacket| s.to_string());
+pythonize!(TelemetryPacket);
 
 

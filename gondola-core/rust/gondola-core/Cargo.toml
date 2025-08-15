@@ -61,6 +61,8 @@ criterion = "0.4"
 quickcheck = "1"
 
 [dependencies]
+strum             = "0.27"
+strum_macros      = "0.27"
 num-traits        = "0.2"
 statrs            = "0.18"
 root-io           = "0.3"

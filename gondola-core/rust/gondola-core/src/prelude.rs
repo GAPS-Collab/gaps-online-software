@@ -5,9 +5,9 @@ pub use std::collections::{
   HashMap,
   VecDeque
 };
-pub use half::f16;
 
 pub use std::error::Error;
+pub use std::time::Instant;
 pub use std::fmt;
 pub use std::io::{
   self,
@@ -31,6 +31,8 @@ pub use strum_macros::{
 };
 pub use strum::IntoEnumIterator;
 
+pub use half::f16;
+
 pub use num_traits::{
   NumAssign,
   NumCast,
@@ -53,8 +55,12 @@ pub use pyo3::wrap_pyfunction;
 #[cfg(feature="pybindings")]
 pub use pyo3::exceptions::{
   PyIOError,
-  PyValueError
+  PyValueError,
+  PyKeyError
 };
+
+#[cfg(feature="pybindings")]
+pub use pyo3::types::PyBytes;
 
 #[cfg(feature="pybindings")]
 pub use numpy::{
@@ -72,10 +78,13 @@ pub use crate::pythonize;
 #[cfg(feature="random")]
 pub use crate::random::FromRandom;
 
+
 pub use crate::io::*;
 pub use crate::io::caraspace::*;
 pub use crate::io::serialization::*;
 pub use crate::events::*;
+pub use crate::packets::*;
+#[cfg(feature="database")]
 pub use crate::database::*;
 pub use crate::calibration::tof::*;
 pub use crate::monitoring::*;
@@ -123,3 +132,4 @@ pub use crate::errors::{
 // macro to avoid boring enum boilerplate
 pub use crate::expand_and_test_enum;
 pub use crate::reader;
+

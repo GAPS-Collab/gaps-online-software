@@ -1,10 +1,7 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
+//! gaps-online-software i/o system
 //!
-//! This file provides identifier for different kinds of data which 
-//! can be used with the gaps-online-software i/o system. 
-//!
-//! Furtheron, this file sets up the io module. 
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
 
 pub mod ipbus;
 pub mod parsers;
@@ -17,9 +14,11 @@ pub mod tof_reader;
 pub use tof_reader::TofPacketReader;
 pub mod telemetry_reader;
 pub use telemetry_reader::TelemetryPacketReader;
-
+pub mod data_source;
+pub use data_source::DataSource;
 //pub mod streamers;
 //pub use streamers::RBMemoryStreamer;
+use crate::prelude::*;
 
 #[cfg(feature = "random")]
 use crate::random::FromRandom;
@@ -36,18 +35,6 @@ use pyo3::{
 };
 
 use std::path::Path;
-use std::fs::{
-    self,
-    File,
-    OpenOptions
-};
-
-use std::io::{                                                                                    
-  self,                                                                                           
-  ErrorKind,                            
-  BufReader,
-};                                     
-use regex::Regex;    
 
 //----------------------------------------------------------
 
@@ -97,7 +84,7 @@ pub fn list_path_contents_sorted(input: &str, pattern: Option<Regex>) -> Result<
         // Return only filenames
         return Ok(entries.into_iter().map(|(_, _, name)| name).collect());
       } 
-      Err(io::Error::new(ErrorKind::Other, "Path exists but is neither a file nor a directory"))
+      Err(io::Error::new(io::ErrorKind::Other, "Path exists but is neither a file nor a directory"))
     }
     Err(e) => Err(e),
   }
@@ -106,7 +93,7 @@ pub fn list_path_contents_sorted(input: &str, pattern: Option<Regex>) -> Result<
 //----------------------------------------------------------
 
 /// Identifier for different data sources
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq,FromRepr, AsRefStr, EnumIter)]
 #[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
 #[repr(u8)]
 pub enum DataSourceKind {
@@ -133,63 +120,7 @@ pub enum DataSourceKind {
   ROOTFiles          = 40,
 }
 
-impl DataSourceKind {
-  fn to_string(&self) -> String {
-    match self {
-      DataSourceKind::Unknown         => String::from("Unknown"),
-      DataSourceKind::TofFiles        => String::from("TofFiles"),
-      DataSourceKind::TofStream       => String::from("TofStream"),
-      DataSourceKind::TelemetryFiles  => String::from("TelemetryFiles"), 
-      DataSourceKind::TelemetryStream => String::from("TelemetryStream"),
-      DataSourceKind::CaraspaceFiles  => String::from("CaraspaceFiles"),
-      DataSourceKind::CaraspaceStream => String::from("CaraspaceStream"),
-      DataSourceKind::ROOTFiles       => String::from("ROOTFIles"),
-    }
-  }
-}
-
-impl From<u8> for DataSourceKind {
-  fn from(value: u8) -> Self {
-    match value {
-      0     => DataSourceKind::Unknown,
-      10    => DataSourceKind::TofFiles,
-      11    => DataSourceKind::TofStream,
-      20    => DataSourceKind::TelemetryFiles,
-      21    => DataSourceKind::TelemetryStream,
-      30    => DataSourceKind::CaraspaceFiles,
-      31    => DataSourceKind::CaraspaceStream,
-      40    => DataSourceKind::ROOTFiles,
-      // in case of any other number, we know nuthin
-      _     => DataSourceKind::Unknown, 
-    }
-  }
-}
-
-impl fmt::Display for DataSourceKind {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let r = self.to_string();
-    write!(f, "<DataSourceKind: {}>", r)
-  }
-}
-
-#[cfg(feature = "random")]
-impl FromRandom for DataSourceKind {  
-  fn from_random() -> Self {
-    let choices = [
-      DataSourceKind::Unknown           ,
-      DataSourceKind::TofFiles,
-      DataSourceKind::TofStream,
-      DataSourceKind::TelemetryFiles,
-      DataSourceKind::TelemetryStream,
-      DataSourceKind::CaraspaceFiles,
-      DataSourceKind::CaraspaceStream,
-      DataSourceKind::ROOTFiles
-    ];
-    let mut rng  = rand::rng();
-    let idx      = rng.random_range(0..choices.len());
-    choices[idx]
-  }
-}
+expand_and_test_enum!(DataSourceKind, test_datasourcekind_repr);
 
 //--------------------------------------------------------------
 
@@ -204,23 +135,6 @@ impl DataSourceKind {
   fn __hash__(&self) -> usize {
     (*self as u8) as usize
   } 
-}
-
-//--------------------------------------------------------------
-
-#[test]
-#[cfg(feature = "random")]
-fn datasourcekind_from_to_u8() {
-  let mut type_codes_u8 = Vec::<u8>::new();
-  let mut type_codes= Vec::<DataSourceKind>::new(); 
-  for _ in 0..100 {
-    let ds = DataSourceKind::from_random();
-    type_codes_u8.push(ds as u8);
-    type_codes.push(ds);
-  }
-  for idx in 0..type_codes_u8.len() {
-    assert_eq!(DataSourceKind::from(type_codes_u8[idx]),type_codes[idx]);  
-  }
 }
 
 //--------------------------------------------------------------
