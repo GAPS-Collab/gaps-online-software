@@ -1,17 +1,11 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
+//! Per-strip event information for the GAPS tracker
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
 
-use std::fmt;
 
-#[cfg(feature="pybindings")]
-use pyo3::prelude::*;
+use crate::prelude::*;
 
-#[cfg(feature="pybindings")]
-use pyo3::exceptions::PyIOError;
-
-#[cfg(feature="pybindings")]
-use crate::impl_pythonize_display;
-
+/// Hit on a tracker strip
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(feature="pybindings", pyclass)]
 pub struct TrackerHit {
@@ -89,11 +83,6 @@ impl fmt::Display for TrackerHit {
 #[pymethods]
 impl TrackerHit {
 
-  #[new]
-  fn new_py() -> Self {
-    Self::new()
-  }
-  
   /// Change the ADC value, e.g. if the 
   /// pedestal should be subtracted
   fn subtract_pedestal(&mut self, pedestal : u16) {
@@ -142,5 +131,5 @@ impl TrackerHit {
 }
 
 #[cfg(feature="pybindings")]
-impl_pythonize_display!(TrackerHit, |s: &TrackerHit | s.to_string());
+pythonize!(TrackerHit);
 

@@ -1,15 +1,10 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
-//!
 //! This files provides an event structure to pack 
 //! and bookkeep RB data
 //!
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
 
 use crate::prelude::*;
-
-
-#[cfg(feature="pybindings")]
-use pyo3::prelude::*;
 
 
 /// Get the traces for a set of RBEvents

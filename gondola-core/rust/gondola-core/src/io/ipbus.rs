@@ -9,24 +9,8 @@
 //! We are using only IPBus control packets
 //!
 
-use std::fmt;
-use std::thread;
-use std::io;
-use std::net::{
-  UdpSocket,
-  SocketAddr
-};
+use crate::prelude::*;
 
-use std::error::Error;
-use std::time::{
-  Duration,
-  Instant
-};
-
-use crate::errors::IPBusError;
-use crate::io::parsers::{
-  parse_u32_be
-};
 
 // we have some header and then the board mask (4byte)
 // + at max 20*2 byte for the individual LTBs.
@@ -46,7 +30,8 @@ pub const UDP_SOCKET_SLEEP_USEC  : u64 = 100;
 ///
 /// Technically, the IPBusPacketType is 
 /// only 1 byte!
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy, FromRepr, AsRefStr, EnumIter)]
+#[repr(u8)]
 pub enum IPBusPacketType {
   Read                 = 0,
   Write                = 1,
@@ -61,63 +46,8 @@ pub enum IPBusPacketType {
   Unknown              = 99
 }
 
-impl IPBusPacketType {
-  
-  // FIXME - do we really need this? Isn't "as" 
-  // good enough?
-  pub fn to_u8(&self) -> u8 {
-    let ret_val : u8;
-    match self {
-      IPBusPacketType::Read => {
-        ret_val = 0;
-      }
-      IPBusPacketType::Write => {
-        ret_val = 1;
-      }
-      IPBusPacketType::ReadNonIncrement => {
-        ret_val = 2;
-      }
-      IPBusPacketType::WriteNonIncrement => {
-        ret_val = 3;
-      }
-      IPBusPacketType::RMW => {
-        ret_val = 4;
-      }
-      IPBusPacketType::Unknown => {
-        ret_val = 99;
-      }
-    }
-    ret_val
-  }
+expand_and_test_enum!(IPBusPacketType, test_ipbuspackettype_repr);
 
-  pub fn from_u8(ptype : u8) -> Self {
-    let ptype_val : Self;
-    match ptype {
-      0 => {ptype_val = IPBusPacketType::Read;}
-      1 => {ptype_val = IPBusPacketType::Write;}
-      2 => {ptype_val = IPBusPacketType::ReadNonIncrement;}
-      3 => {ptype_val = IPBusPacketType::WriteNonIncrement;}
-      4 => {ptype_val = IPBusPacketType::RMW;}
-      _ => {ptype_val = IPBusPacketType::Unknown;}
-    }
-    return ptype_val;
-  }
-}
-
-impl fmt::Display for IPBusPacketType {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let repr : String;
-    match self {
-      IPBusPacketType::Read                 => {repr = String::from("Read");} 
-      IPBusPacketType::Write                => {repr = String::from("Write");} 
-      IPBusPacketType::ReadNonIncrement     => {repr = String::from("ReadNonIncrement");} 
-      IPBusPacketType::WriteNonIncrement    => {repr = String::from("WriteNonIncrement");} 
-      IPBusPacketType::RMW                  => {repr = String::from("RMW");} 
-      IPBusPacketType::Unknown              => {repr = String::from("Unknown");}
-    }
-    write!(f, "<IPBusPacketType: {}>", repr)
-  }
-}
 
 ///// Representation of a bytestream send via UDP
 ///// The IPBus protocoll implements different 
@@ -134,6 +64,7 @@ impl fmt::Display for IPBusPacketType {
 
 /// Implementation of an IPBus control packet
 #[derive(Debug)]
+#[cfg_attr(feature="pybindings", pyclass)]
 pub struct IPBus {
   pub socket         : UdpSocket,
   //pub target_address : String,
@@ -352,7 +283,7 @@ impl IPBus {
                | (0x0 << 20) as u32
                | (0x0 << 16) as u32
                | (nwords as u32) << 8
-               | ((self.packet_type.to_u8() & 0xf) << 4) as u32
+               | ((self.packet_type as u8 & 0xf) << 4) as u32
                | 0xf as u32; // 0xf is for outbound request 
     header
   }
@@ -420,7 +351,7 @@ impl IPBus {
     let pid      = ((0x00ffff00 & pheader) >> 8) as u16;
     let size     = ((0x0000ff00 & theader) >> 8) as u16;
     let ptype    = ((0x000000f0 & theader) >> 4) as u8;
-    let packet_type = IPBusPacketType::from_u8(ptype);
+    let packet_type = IPBusPacketType::from(ptype);
     trace!("[IPBus::decode_payload] => PID, SIZE, PTYPE : {} {} {}", pid, size, packet_type);
     if pid != self.expected_pid {
       if !is_status {
@@ -664,3 +595,123 @@ impl fmt::Display for IPBus {
   }
 }
 
+
+#[cfg(feature="pybindings")]
+#[pymethods]
+impl IPBus {
+  #[new]
+  fn new_py(target_address : &str) -> Self {
+    IPBus::new(target_address).expect("Unable to connect to {target_address}")
+  }
+
+  /// Make a IPBus status query
+  #[getter]
+  #[pyo3(name="status")]
+  pub fn get_status_py(&mut self) -> PyResult<()> {
+    match self.get_status() {
+      Ok(_) => {
+        return Ok(());
+      },
+      Err(err)   => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
+  #[getter]
+  #[pyo3(name="buffer")]
+  pub fn get_buffer(&self) -> [u8;MT_MAX_PACKSIZE] {
+    return self.buffer.clone();
+  }
+
+  #[pyo3(name="set_packet_id")]
+  pub fn set_packet_id_py(&mut self, pid : u16) {
+    self.pid = pid;
+  }
+ 
+  #[pyo3(name="get_packet_id")]
+  pub fn get_packet_id_py(&self) -> u16 {
+    self.pid
+  }
+
+  #[getter]
+  #[pyo3(name="expected_pid")]
+  pub fn get_expected_packet_id_py(&self) -> u16 {
+    self.expected_pid
+  }
+
+  /// Set the packet id to that what is expected from the targetr
+  #[pyo3(name="realign_packet_id")]
+  pub fn realign_packet_id_py(&mut self) -> PyResult<()> {
+    match self.realign_packet_id() {
+      Ok(_) => {
+        return Ok(());
+      },
+      Err(err)   => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+  
+  /// Get the next packet id, which is expected by the target
+  #[getter]
+  #[pyo3(name="target_next_expected_pid")]
+  pub fn get_target_next_expected_packet_id_py(&mut self) 
+    -> PyResult<u16> {
+    match self.get_target_next_expected_packet_id() {
+      Ok(result) => {
+        return Ok(result);
+      },
+      Err(err)   => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
+  #[pyo3(name="read_multiple")]
+  pub fn read_multiple_py(&mut self,
+                          addr           : u32,
+                          nwords         : usize,
+                          increment_addr : bool) 
+    -> PyResult<Vec<u32>> {
+  
+    match self.read_multiple(addr,
+                             nwords,
+                             increment_addr) {
+      Ok(result) => {
+        return Ok(result);
+      },
+      Err(err)   => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
+  #[pyo3(name="write")]
+  pub fn write_py(&mut self,
+               addr   : u32,
+               data   : u32) 
+    -> PyResult<()> {
+    
+    match self.write(addr, data) {
+      Ok(_) => Ok(()),
+      Err(err)   => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+ 
+
+  #[pyo3(name="read")]
+  pub fn read_py(&mut self, addr   : u32) 
+    -> PyResult<u32> {
+    match self.read(addr) {
+      Ok(result) => {
+        return Ok(result);
+      },
+      Err(err)   => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+}

@@ -5,33 +5,6 @@
 
 use crate::prelude::*;
 
-//use std::time::Instant;
-//use std::fmt;
-//
-//use crate::errors::SerializationError;
-//use crate::packets::{
-//  TofPacketType,
-//  TofPackable
-//};
-//use crate::io::serialization::Serialization;
-//use crate::io::parsers::{
-// parse_u8,
-// parse_u16,
-// parse_u32
-//};
-//
-//#[cfg(feature = "random")]
-//use crate::random::FromRandom;
-//#[cfg(feature = "random")]
-//use rand::Rng;
-//
-//#[cfg(feature="pybindings")]
-//use pyo3::prelude::*;
-//#[cfg(feature="pybindings")]
-//use pyo3::exceptions::PyIOError;
-//
-//use crate::prelude::*;
-
 /// Internal Tof communication protocol.
 /// Simple, yet powerful
 ///
@@ -328,6 +301,112 @@ impl TofPacket {
         let err_msg = format!("Unable to TofPacket from bytestream! {err}");
         return Err(PyIOError::new_err(err_msg));
       }
+    }
+  }
+
+  #[pyo3(name="unpack")]
+  fn unpack_py(&self,py: Python) -> PyResult<Py<PyAny>> {
+    match self.packet_type {
+      TofPacketType::Unknown               => {
+        let msg = "TofPacket is of type 'Unknown' and thus can't be unpacked!";
+        return Err(PyValueError::new_err(msg));
+      }, 
+      TofPacketType::RBEvent               => {
+        match self.unpack::<RBEvent>() {
+          Ok(data) => {
+            return Ok(Py::new(py, data)?.into_any());
+          }
+          Err(err) => {
+            return Err(PyValueError::new_err(err.to_string()));
+          }
+        }
+      }, 
+      TofPacketType::TofEventDeprecated  => {
+        match self.unpack::<TofEvent>() {
+          Ok(data) => {
+            return Ok(Py::new(py, data)?.into_any());
+          }
+          Err(err) => {
+            return Err(PyValueError::new_err(err.to_string()));
+          }
+        }
+      }, 
+      TofPacketType::RBWaveform               => {
+        match self.unpack::<RBWaveform>() {
+          Ok(data) => {
+            return Ok(Py::new(py, data)?.into_any());
+          }
+          Err(err) => {
+            return Err(PyValueError::new_err(err.to_string()));
+          }
+        }
+      }, 
+      TofPacketType::TofEvent               => {
+        match self.unpack::<TofEvent>() {
+          Ok(data) => {
+            return Ok(Py::new(py, data)?.into_any());
+          }
+          Err(err) => {
+            return Err(PyValueError::new_err(err.to_string()));
+          }
+        }
+      }, 
+      TofPacketType::DataSinkHB               => {
+        match self.unpack::<DataSinkHB>() {
+          Ok(data) => {
+            return Ok(Py::new(py, data)?.into_any());
+          }
+          Err(err) => {
+            return Err(PyValueError::new_err(err.to_string()));
+          }
+        }
+      }, 
+      //TofPacketType::MasterTrigger         => {}, 
+      //TofPacketType::TriggerConfig         => {},
+      //TofPacketType::MasterTriggerHB       => {}, 
+      //TofPacketType::EventBuilderHB        => {},
+      //TofPacketType::RBChannelMaskConfig   => {},
+      //TofPacketType::TofRBConfig           => {},
+      //TofPacketType::AnalysisEngineConfig  => {},
+      //TofPacketType::RBEventHeader         => {},    
+      //TofPacketType::TOFEventBuilderConfig => {},
+      //TofPacketType::DataPublisherConfig   => {},
+      //TofPacketType::TofRunConfig          => {},
+      //TofPacketType::CPUMoniData           => {},
+      //TofPacketType::MtbMoniData           => {},
+      //TofPacketType::RBMoniData            => {},
+      //TofPacketType::PBMoniData            => {},
+      //TofPacketType::LTBMoniData           => {},
+      //TofPacketType::PAMoniData            => {},
+      //TofPacketType::RBEventMemoryView     => {}, 
+      //TofPacketType::RBCalibration         => {},
+      //TofPacketType::TofCommand            => {},
+      //TofPacketType::TofCommandV2          => {},
+      //TofPacketType::TofResponse           => {},
+      //TofPacketType::RBCommand             => {},
+      //TofPacketType::RBPing                => {},
+      //TofPacketType::PreampBiasConfig      => {},
+      //TofPacketType::RunConfig             => {},
+      //TofPacketType::LTBThresholdConfig    => {},
+      //TofPacketType::TofDetectorStatus     => {},
+      //TofPacketType::ConfigBinary          => {},
+      //TofPacketType::LiftofRBBinary        => {},
+      //TofPacketType::LiftofBinaryService   => {},
+      //TofPacketType::LiftofCCBinary        => {},
+      //TofPacketType::RBCalibrationFlightV  => {},
+      //TofPacketType::RBCalibrationFlightT  => {},
+      //TofPacketType::BfswAckPacket         => {},
+      //TofPacketType::MultiPacket           => {},
+      _               => {
+        match self.unpack::<TofEvent>() {
+          Ok(data) => {
+            return Ok(Py::new(py, data)?.into_any());
+          }
+          Err(err) => {
+            return Err(PyValueError::new_err(err.to_string()));
+          }
+        }
+      }, 
     }
   }
 }

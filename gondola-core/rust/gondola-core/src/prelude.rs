@@ -6,8 +6,8 @@ pub use std::collections::{
   VecDeque
 };
 
+pub use std::thread;
 pub use std::error::Error;
-pub use std::time::Instant;
 pub use std::fmt;
 pub use std::io::{
   self,
@@ -15,6 +15,16 @@ pub use std::io::{
   Read,
   Seek,
   SeekFrom,
+};
+
+pub use std::net::{
+  UdpSocket,
+  SocketAddr
+};
+
+pub use std::time::{
+  Duration,
+  Instant
 };
 
 pub use std::fs::{
@@ -79,6 +89,8 @@ pub use crate::pythonize;
 pub use crate::random::FromRandom;
 
 pub use crate::version::ProtocolVersion;
+
+pub use crate::errors::*;
 pub use crate::io::*;
 pub use crate::io::parsers::*;
 pub use crate::io::caraspace::*;
