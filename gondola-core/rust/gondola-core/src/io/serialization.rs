@@ -78,8 +78,10 @@ pub trait Serialization {
   /// This shall return a representation of the struct
   /// in such a way that to_bytestream and from_bytestream
   /// are inverse operations.
-  fn to_bytestream(&self) -> Vec<u8>;
-
+  fn to_bytestream(&self) -> Vec<u8> {
+    error!("No default implementation for trait!");
+    return Vec::<u8>::new();
+  }
 }
 
 //---------------------------------------------------

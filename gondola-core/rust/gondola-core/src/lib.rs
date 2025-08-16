@@ -154,7 +154,7 @@ fn io_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   use crate::io::root_reader::read_example;
   m.add_function(wrap_pyfunction!(read_example, m)?)?;
   m.add_class::<CRFrameObject>()?;
-  //m.add_class::<TelemetryPacketReader>()?;
+  m.add_class::<DataSourceKind>()?;
   Ok(())
 }
 

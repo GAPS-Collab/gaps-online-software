@@ -22,7 +22,8 @@ pub enum SerializationError {
   JsonDecodingError,
   TomlDecodingError,
   Disconnected,
-  ObjectNotFound
+  ObjectNotFound,
+  UnsupportedVersion
 }
 
 impl SerializationError { 
@@ -43,6 +44,7 @@ impl SerializationError {
       SerializationError::TomlDecodingError        => "TomlDecodingError",
       SerializationError::Disconnected             => "Disconnected",
       SerializationError::ObjectNotFound           => "ObjectNotFound",
+      SerializationError::UnsupportedVersion       => "UnsupportedVersion",
     }
   }
 }

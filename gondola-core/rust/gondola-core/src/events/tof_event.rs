@@ -1,75 +1,10 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
+//! Basic event structure for all TOF systems
+// The following file is part of gaps-online-software and published 
+// under the GPLv3 license
 
-use std::fmt;
-use std::collections::HashMap;
+use crate::prelude::*;
+
 use std::f32::consts::PI;
-
-use crate::events::{
-  RBEvent,
-  RBWaveform,
-  EventStatus,
-  EventQuality,
-  DataType,
-  TofHit,
-  TriggerType,
-  LTBThreshold,
-  LTB_CHANNELS,
-  mt_event_get_timestamp_abs48,
-};
-
-#[cfg(feature="database")]
-use crate::database::{
-  TofPaddle,
-  DsiJChPidMapping
-};
-
-use crate::version::ProtocolVersion;
-use crate::packets::{
-  TofPacket,
-  TofPackable,
-  TofPacketType
-};
-use crate::io::serialization::{
-  Serialization,
-};
-
-use crate::io::parsers::{
-  parse_u8,
-  parse_u16,
-  parse_u32,
-  parse_u64,
-  parse_f32,
-};
-use crate::errors::{
-  SerializationError,
-};
-
-#[cfg(feature="random")]
-use crate::events::FromRandom;
-
-#[cfg(feature="random")]
-use rand::Rng;
-
-#[cfg(feature="pybindings")]
-use pyo3::prelude::*;
-
-#[cfg(feature="pybindings")]
-use pyo3::exceptions::{
-  PyIOError,
-  PyValueError
-};
-
-#[cfg(feature="pybindings")]
-use numpy::{
-  ToPyArray,
-  PyArrayMethods,
-  PyArray1,
-  PyReadonlyArray1
-};
-
-#[cfg(feature="pybindings")]
-use crate::pythonize_packable;
 
 /// Main event class for the TOF. This will be sent over telemetry and be 
 /// written to disk

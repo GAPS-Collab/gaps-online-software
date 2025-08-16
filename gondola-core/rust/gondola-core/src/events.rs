@@ -22,6 +22,9 @@ pub use rb_event::{
 pub mod tracker_hit;
 pub use tracker_hit::TrackerHit;
 
+pub mod telemetry_event;
+pub use telemetry_event::TelemetryEvent;
+
 use std::fmt;
 
 use strum_macros::{

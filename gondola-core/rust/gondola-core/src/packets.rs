@@ -6,6 +6,8 @@ pub mod tof_packet;
 pub mod telemetry_packet_type;
 pub mod telemetry_packet_header; 
 pub mod telemetry_packet;
+//pub mod tracker_header;
+//pub use tracker_header::TrackerHeader;
 
 // public exports to reduce the Matroshka effect a little
 pub use telemetry_packet_type::TelemetryPacketType;
@@ -13,7 +15,6 @@ pub use telemetry_packet::TelemetryPacket;
 pub use telemetry_packet_header::TelemetryPacketHeader;
 pub use tof_packet_type::TofPacketType;
 pub use tof_packet::TofPacket;
-
 use crate::io::serialization::Serialization;
 
 /// Can be wrapped within a TofPacket. To do, we just have

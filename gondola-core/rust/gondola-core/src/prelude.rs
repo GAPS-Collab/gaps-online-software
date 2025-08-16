@@ -78,8 +78,9 @@ pub use crate::pythonize;
 #[cfg(feature="random")]
 pub use crate::random::FromRandom;
 
-
+pub use crate::version::ProtocolVersion;
 pub use crate::io::*;
+pub use crate::io::parsers::*;
 pub use crate::io::caraspace::*;
 pub use crate::io::serialization::*;
 pub use crate::events::*;
