@@ -1,5 +1,5 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
 
 pub use std::collections::{
   HashMap,
@@ -84,6 +84,8 @@ pub use numpy::{
 pub use crate::pythonize_packable;
 #[cfg(feature="pybindings")]
 pub use crate::pythonize;
+#[cfg(feature="pybindings")]
+pub use crate::pythonize_telemetry;
 
 #[cfg(feature="random")]
 pub use crate::random::FromRandom;

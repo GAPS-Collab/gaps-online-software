@@ -13,7 +13,15 @@ pub use bfsw_ack_packet::AckBfsw;
 pub mod gps_packet;
 pub use gps_packet::GPSPacket;
 pub mod tracker;
-pub use tracker::TrackerEventIDEchoPacket;
+pub use tracker::{
+  TrackerEventIDEchoPacket,
+  TrackerTempLeakPacket,
+  TrackerDAQTempPacket,
+  TrackerDAQHSKPacket
+};
+pub mod magnetometer;
+pub use magnetometer::MagnetoMeter;
+
 
 // public exports to reduce the Matroshka effect a little
 pub use telemetry_packet_type::TelemetryPacketType;

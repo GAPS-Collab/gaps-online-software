@@ -45,6 +45,31 @@ macro_rules! pythonize {
 }
 
 #[macro_export]
+macro_rules! pythonize_telemetry {
+  ($pyclass:ty) => {
+    
+    pythonize!($pyclass);
+
+    #[pymethods]
+    impl $pyclass {
+      /// Unpack Self from a TelemetryPacket.
+      #[staticmethod]
+      fn from_telemetrypacket(packet : TelemetryPacket) -> PyResult<Self> {
+        match Self::from_bytestream(&packet.payload, &mut 0) {
+          Ok(mut tl) => {
+            tl.telemetry_header = packet.header.clone();
+            return Ok(tl);
+          }
+          Err(err) => {
+            return Err(PyValueError::new_err(err.to_string()));
+          }  
+        }
+      } 
+    }
+  }
+}
+
+#[macro_export]
 macro_rules! pythonize_monidata {
   ($pyclass:ty) => {
 
