@@ -3563,6 +3563,25 @@ impl PyRBWaveform {
       wf : RBWaveform::new(),
     }
   }
+  /// Time over threshold - waveform needs to be 
+  /// calibrated. 
+  /// Paddle end A
+  ///
+  /// # Arguments:
+  ///   * threshold : value in mV
+  fn get_tot_a(&self, threshold : f32) -> f32 {
+    self.wf.time_over_threshold_a(threshold)
+  }
+  
+  /// Time over threshold - waveform needs to be 
+  /// calibrated. 
+  /// Paddle end B
+  ///
+  /// # Arguments:
+  ///   * threshold : value in mV
+  fn get_tot_b(&self, threshold : f32) -> f32 {
+    self.wf.time_over_threshold_b(threshold)
+  }
  
   /// Apply the readoutboard calibration to convert adc/bins
   /// to millivolts and nanoseconds
