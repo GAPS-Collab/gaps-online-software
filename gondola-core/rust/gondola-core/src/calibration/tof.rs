@@ -726,6 +726,7 @@ fn prop_roll_then_unroll_gives_original() {
 //-----------------------------------------------
 
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature="pybindings", pyclass)]
 pub struct RBCalibrations {
   pub rb_id      : u8,
   pub d_v        : f32, // input voltage difference between 

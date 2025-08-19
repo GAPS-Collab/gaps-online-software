@@ -1,51 +1,8 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
 
-use std::fmt;
-#[cfg(feature="random")]
-use crate::random::FromRandom;
-#[cfg(feature="random")]
-use rand::Rng;
+use crate::prelude::*;
 
-use crate::io::serialization::Serialization;
-use crate::packets::{
-  TofPackable,
-  TofPacketType
-};
-use crate::calibration::tof::{
-  clean_spikes,
-  RBCalibrations
-};
-use crate::errors::{
-  SerializationError,
-  CalibrationError
-};
-use crate::constants::NWORDS;
-use crate::io::parsers::{
-  parse_u8,
-  parse_u16,
-  parse_u32,
-  u8_to_u16,
-};
-
-
-#[cfg(feature="pybindings")]
-use pyo3::prelude::*;
-
-#[cfg(feature="pybindings")]
-use pyo3::exceptions::PyIOError;
-
-#[cfg(feature="pybindings")]
-use crate::packets::TofPacket;
-
-#[cfg(feature="pybindings")]
-use numpy::{
-  ToPyArray,
-  PyArray1
-};
-
-#[cfg(feature="pybindings")]
-use crate::pythonize_packable;
 
 /// Waveform container for Tof waveforms
 /// This holds the waveforms for both 
@@ -90,6 +47,32 @@ impl RBWaveform {
     }
   }
 
+  /// Calculate the time in ns for which the waveform is 
+  /// above a certain threshold for paddle end A
+  pub fn time_over_threshold_a(&self, threshold : f32) -> f32 {
+    let mut tot : f32 = 0.0;
+    for k in 1..self.voltages_a.len() {
+      if self.voltages_a[k] > threshold {
+        tot += self.nanoseconds_a[k] - self.nanoseconds_a[k-1];
+      }
+    }
+    return tot;
+  }
+
+  /// Calculate the time in ns for which the waveform is 
+  /// above a certain threshold for paddle end B
+  pub fn time_over_threshold_b(&self, threshold : f32) -> f32 {
+    let mut tot : f32 = 0.0;
+    for k in 1..self.voltages_b.len() {
+      if self.voltages_b[k] > threshold {
+        tot += self.nanoseconds_b[k] - self.nanoseconds_b[k-1];
+      }
+    }
+    return tot;
+  }
+
+  /// Apply a RB calibration to the waveform, filling the voltages and 
+  /// nanoseconds fields
   pub fn calibrate(&mut self, cali : &RBCalibrations) -> Result<(), CalibrationError>  {
     if cali.rb_id != self.rb_id {
       error!("Calibration is for board {}, but wf is for {}", cali.rb_id, self.rb_id);
@@ -278,10 +261,44 @@ impl RBWaveform {
     Ok(arr)
   }
 
+  /// Time over threshold - waveform needs to be 
+  /// calibrated. 
+  /// Paddle end A
+  ///
+  /// # Arguments:
+  ///   * threshold : value in mV
+  fn get_tot_a(&self, threshold : f32) -> f32 {
+    self.time_over_threshold_a(threshold)
+  }
+  
+  /// Time over threshold - waveform needs to be 
+  /// calibrated. 
+  /// Paddle end B
+  ///
+  /// # Arguments:
+  ///   * threshold : value in mV
+  fn get_tot_b(&self, threshold : f32) -> f32 {
+    self.time_over_threshold_b(threshold)
+  }
+
   #[getter]
   fn get_times_b<'_py>(&self, py: Python<'_py>) ->  PyResult<Bound<'_py, PyArray1<f32>>> {
     let arr = PyArray1::<f32>::from_slice(py, self.nanoseconds_b.as_slice());
     Ok(arr)
+  }
+  
+  /// Apply the readoutboard calibration to convert adc/bins
+  /// to millivolts and nanoseconds
+  #[pyo3(name="calibrate")]
+  fn calibrate_py(&mut self, cali : &RBCalibrations) -> PyResult<()> {
+    match self.calibrate(&cali) {
+      Ok(_) => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
   }
   
   #[pyo3(name="apply_spike_filter")]

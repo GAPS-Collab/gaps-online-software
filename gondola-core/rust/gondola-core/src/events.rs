@@ -125,7 +125,8 @@ expand_and_test_enum!(EventQuality, test_eventquality_repr);
 
 //--------------------------------------------
 
-#[derive(Debug, Copy, Clone, PartialEq,FromRepr, AsRefStr, EnumIter)]
+// Need serde here, so that we can add it to the liftof configs
+#[derive(Debug, Copy, Clone, PartialEq,FromRepr, AsRefStr, EnumIter, serde::Serialize, serde::Deserialize)]
 #[repr(u8)]
 #[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
 pub enum TriggerType {
