@@ -120,6 +120,7 @@ pub enum TriggerType {
   Any             = 1u8,
   Track           = 2u8,
   TrackCentral    = 3u8,
+  Gaps1044        = 9u8,
   Gaps            = 4u8,
   Gaps633         = 5u8, 
   Gaps422         = 6u8,
@@ -193,6 +194,9 @@ impl TriggerType {
       TriggerType::TrackUmbCentral => {
         return 8;
       }
+      TriggerType::Gaps1044 => {
+        return 9;
+      }
       TriggerType::UmbCube => {
         return 21;
       }
@@ -230,6 +234,7 @@ impl From<u8> for TriggerType {
       6   => TriggerType::Gaps422,
       7   => TriggerType::Gaps211,
       8   => TriggerType::TrackUmbCentral,
+      9   => TriggerType::Gaps1044,
       21  => TriggerType::UmbCube,
       22  => TriggerType::UmbCubeZ,
       23  => TriggerType::UmbCorCube,
@@ -264,6 +269,7 @@ impl FromRandom for TriggerType {
       TriggerType::CorCubeSide,
       TriggerType::Umb3Cube,
       TriggerType::ConfigurableTrigger,
+      TriggerType::Gaps1044,
     ];
     let mut rng  = rand::thread_rng();
     let idx = rng.gen_range(0..choices.len());
