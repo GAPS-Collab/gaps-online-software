@@ -236,5 +236,6 @@ impl MagnetoMeter {
  //fn ndata        (&self) -> u8  { 
 }
 
+#[cfg(feature="pybindings")]
 pythonize_telemetry!(MagnetoMeter);
 

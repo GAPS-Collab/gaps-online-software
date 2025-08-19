@@ -12,6 +12,8 @@ pub mod root_reader;
 pub use root_reader::read_example;
 pub mod tof_reader;
 pub use tof_reader::TofPacketReader;
+pub mod tof_writer;
+pub use tof_writer::TofPacketWriter;
 pub mod telemetry_reader;
 pub use telemetry_reader::TelemetryPacketReader;
 pub mod data_source;
@@ -20,21 +22,20 @@ pub use data_source::DataSource;
 //pub use streamers::RBMemoryStreamer;
 use crate::prelude::*;
 
-#[cfg(feature = "random")]
-use crate::random::FromRandom;
+//----------------------------------------------------------
 
-#[cfg(feature = "random")]
-use rand::Rng;
-
-use std::fmt;
-
-#[cfg(feature = "pybindings")]
-use pyo3::{
-  pyclass,
-  pymethods
-};
-
-use std::path::Path;
+/// Types of files
+#[derive(Debug, Clone)]
+pub enum FileType {
+  Unknown,
+  /// Calibration file for specific RB with id
+  CalibrationFile(u8),
+  /// A regular run file with TofEvents
+  RunFile(u32),
+  /// A file created from a file with TofEvents which 
+  /// contains only TofEventSummary
+  SummaryFile(String),
+}
 
 //----------------------------------------------------------
 
@@ -88,6 +89,73 @@ pub fn list_path_contents_sorted(input: &str, pattern: Option<Regex>) -> Result<
     }
     Err(e) => Err(e),
   }
+}
+
+//----------------------------------------------------------
+
+/// Get a human readable timestamp
+pub fn get_utc_timestamp() -> String {
+  let now: DateTime<Utc> = Utc::now();
+  //let timestamp_str = now.format("%Y_%m_%d-%H_%M_%S").to_string();
+  let timestamp_str = now.format(HUMAN_TIMESTAMP_FORMAT).to_string();
+  timestamp_str
+}
+
+//----------------------------------------------------------
+
+/// Create date string in YYMMDD format
+pub fn get_utc_date() -> String {
+  let now: DateTime<Utc> = Utc::now();
+  //let timestamp_str = now.format("%Y_%m_%d-%H_%M_%S").to_string();
+  let timestamp_str = now.format("%y%m%d").to_string();
+  timestamp_str
+}
+
+//----------------------------------------------------------
+
+/// A standardized name for calibration files saved by 
+/// the liftof suite
+///
+/// # Arguments
+///
+/// * rb_id   : unique identfier for the 
+///             Readoutboard (1-50)
+/// * default : if default, just add 
+///             "latest" instead of 
+///             a timestamp
+pub fn get_califilename(rb_id : u8, latest : bool) -> String {
+  let ts = get_utc_timestamp();
+  if latest {
+    format!("RB{rb_id:02}_latest.cali.tof.gaps")
+  } else {
+    format!("RB{rb_id:02}_{ts}.cali.tof.gaps")
+  }
+}
+
+//----------------------------------------------------------
+
+/// A standardized name for regular run files saved by
+/// the liftof suite
+///
+/// # Arguments
+///
+/// * run    : run id (identifier)
+/// * subrun : subrun id (identifier of file # within
+///            the run
+/// * rb_id  : in case this should be used on the rb, 
+///            a rb id can be specified as well
+pub fn get_runfilename(run : u32, subrun : u64, rb_id : Option<u8>) -> String {
+  let ts = get_utc_timestamp();
+  let fname : String;
+  match rb_id {
+    None => {
+      fname = format!("Run{run}_{subrun}.{ts}.tof.gaps");
+    }
+    Some(rbid) => {
+      fname = format!("Run{run}_{subrun}.{ts}.RB{rbid:02}.tof.gaps");
+    }
+  }
+  fname
 }
 
 //----------------------------------------------------------

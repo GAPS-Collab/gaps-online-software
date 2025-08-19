@@ -72,4 +72,6 @@ impl GPSPacket {
   }
 }
 
+#[cfg(feature="pybindings")]
+pythonize_telemetry!(GPSPacket);
 

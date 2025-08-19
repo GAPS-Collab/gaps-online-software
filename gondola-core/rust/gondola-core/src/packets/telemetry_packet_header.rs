@@ -130,4 +130,5 @@ impl fmt::Display for TelemetryPacketHeader {
   }
 }
 
+#[cfg(feature="pybindings")]
 pythonize!(TelemetryPacketHeader);

@@ -225,5 +225,6 @@ impl TelemetryEvent {
   }
 }
 
+#[cfg(feature="pybindings")]
 pythonize!(TelemetryEvent);
 

@@ -210,8 +210,10 @@ fn algo_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
 #[pymodule]
 #[pyo3(name = "db")]
 fn db_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
-  use crate::database::TofPaddle;
+  use crate::database::*;
   m.add_class::<TofPaddle>()?;
+  m.add_class::<ReadoutBoard>()?;
+  m.add_function(wrap_pyfunction!(get_all_rbids_in_db, m)?)?;
   Ok(())
 }
 

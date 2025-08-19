@@ -1,39 +1,25 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
-//! 
 //! Database access & entities for gaps-online-software
 //!
 //! A local .sqlite database is shipped with gaps-online-software,
 //! pre-populated with relevant meta data for the GAPS experiment.
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
 
-use std::fmt;
-use std::env;
-use std::collections::HashMap;
+//use glob::glob;
+//use regex::Regex;
+//use chrono::{
+//  DateTime,
+//  Utc,
+//};
 
-use glob::glob;
-use regex::Regex;
-use chrono::{
-  DateTime,
-  Utc,
-};
+use crate::prelude::*;
 
-//use rusqlite::Connection;
 use diesel::prelude::*;
 mod schema;
     
 use schema::tof_db_rat::dsl::*;
-use schema::tof_db_dsicard::dsl::*;
+//use schema::tof_db_dsicard::dsl::*;
 
-#[cfg(feature="pybindings")]
-use pyo3::prelude::*;
-
-#[cfg(feature="pybindings")]
-use crate::impl_pythonize_display;
-
-//use crate::calibration::tof::RBCalibrations;
-//use crate::constants::HUMAN_TIMESTAMP_FORMAT;
-//use crate::DsiLtbRBMapping;
-//pub use crate::RbChPidMapping;
 
 pub type DsiJChPidMapping = HashMap<u8, HashMap<u8, HashMap<u8, (u8, u8)>>>;
 
@@ -44,6 +30,25 @@ pub fn connect_to_db() -> Result<diesel::SqliteConnection, ConnectionError>  {
     error!("Empty DATABASE_URL. Did you forget to load the gaps-online-software setup-env.sh shell?");
   }
   SqliteConnection::establish(&db_path)
+}
+
+//---------------------------------------------------------------------
+
+/// Get all rb ids from paddles which are stored in the 
+/// database
+#[cfg_attr(feature="pybindings", pyfunction)]
+pub fn get_all_rbids_in_db() -> Option<Vec<u8>> {
+  match TofPaddle::all() {
+    None => {
+      error!("Can not load paddles from DB! Did you load the setup-env.sh shell?");
+      return None;
+    }
+    Some(paddles) => {
+      let mut rbids : Vec<u8> = paddles.iter().map(|p| p.rb_id as u8).collect();
+      rbids.sort();
+      return Some(rbids);
+    }
+  }
 }
 
 //---------------------------------------------------------------------
@@ -92,14 +97,6 @@ pub struct TofPaddle {
   pub harting_cable_time: f32,
 }
 
-#[cfg(feature="pybindings")]
-#[pymethods]
-impl TofPaddle {
-  #[new]
-  fn new_py() -> Self {
-    Self::new() 
-  }
-}
 
 // methods without a python wrapper
 impl TofPaddle {
@@ -141,7 +138,46 @@ impl TofPaddle {
       harting_cable_time: 0.0
     }
   }
-  
+
+  /// Return the lowest channel number (either A or B)
+  /// to be able to sort the paddles into RBs
+  pub fn get_lowest_rb_ch(&self) -> u8 {
+    if self.rb_chA < self.rb_chB {
+      return self.rb_chA as u8;
+    }
+    else {
+      return self.rb_chB as u8;
+    }
+  }
+
+  /// Get all TofPaddles which are connected to a certain
+  /// Readoutboard
+  ///
+  /// # Arguments:
+  ///   * rbid : The RB id identifier (1-50)
+  pub fn by_rbid(rbid : u8) -> Option<Vec<TofPaddle>> {
+    if rbid > 50 {
+      error!("We don't have any RBs with an ID > 50!");
+      return None
+    }
+    use schema::tof_db_paddle::dsl::*;
+    let mut conn = connect_to_db().ok()?;
+    let rbid_tmp = rbid as i16;
+
+    let paddles = tof_db_paddle.filter(rb_id.eq(rbid_tmp))
+                  .load::<TofPaddle>(&mut conn);
+
+    match paddles {
+      Err(err) => {
+        error!("Unable to load paddles from db! {err}");
+        return None;
+      }
+      Ok(pdls) => {
+        return Some(pdls);
+      }
+    } 
+  }
+
   pub fn all() -> Option<Vec<TofPaddle>> {
     use schema::tof_db_paddle::dsl::*;
     let mut conn = connect_to_db().ok()?;
@@ -209,6 +245,99 @@ impl TofPaddle {
 #[cfg(feature="pybindings")]
 #[pymethods]
 impl TofPaddle {
+ 
+  #[getter]
+  fn get_lowest_rb_ch_py(&self) -> u8 {
+    self.get_lowest_rb_ch() 
+  }
+
+  #[getter]
+  fn get_paddle_id   (&self) -> i16 {  
+    self.paddle_id
+  }
+
+  #[getter]
+  fn get_volume_id   (&self) -> i64 {  
+    self.volume_id
+  }
+  #[getter]
+  fn get_panel_id    (&self) -> i16 {  
+    self.panel_id
+  }
+  #[getter]
+  fn get_mtb_link_id (&self) -> i16 {  
+    self.mtb_link_id
+  }
+  #[getter]
+  fn get_rb_id       (&self) -> i16 {  
+    self.rb_id
+  }
+  #[getter]
+  #[allow(non_snake_case)]
+  fn get_rb_chA      (&self) -> i16 {  
+    self.rb_chA
+  }
+  #[getter]
+  #[allow(non_snake_case)]
+  fn get_rb_chB      (&self) -> i16 {  
+    self.rb_chB
+  }
+  #[getter]
+  fn get_ltb_id      (&self) -> i16 {  
+    self.ltb_id
+  }
+  #[getter]
+  #[allow(non_snake_case)]
+  fn get_ltb_chA     (&self) -> i16 {  
+    self.ltb_chA
+  }
+  #[getter]
+  #[allow(non_snake_case)]
+  fn get_ltb_chB     (&self) -> i16 {  
+    self.ltb_chB
+  }
+  #[getter]
+  fn get_pb_id       (&self) -> i16 {  
+    self.pb_id
+  }
+  #[getter]
+  #[allow(non_snake_case)]
+  fn get_pb_chA      (&self) -> i16 {  
+    self.pb_chA
+  }
+  #[getter]
+  #[allow(non_snake_case)]
+  fn get_pb_chB      (&self) -> i16 {  
+    self.pb_chB
+  }
+  #[getter]
+  fn get_cable_len   (&self) -> f32 {  
+    self.cable_len
+  }
+  #[getter]
+  fn get_dsi         (&self) -> i16 {  
+    self.dsi
+  }
+  #[getter]
+  fn get_j_rb        (&self) -> i16 {  
+    self.j_rb
+  }
+  #[getter]
+  fn get_j_ltb       (&self) -> i16 {  
+    self.j_ltb
+  }
+  #[getter]
+  fn get_height      (&self) -> f32 {  
+    self.height
+  }
+  #[getter]
+  fn get_width       (&self) -> f32 {  
+    self.width
+  }
+  #[getter]
+  fn get_length      (&self) -> f32 {  
+    self.length
+  }
   
   // FIXME use PyResult
   #[staticmethod]
@@ -216,7 +345,13 @@ impl TofPaddle {
   pub fn all_py() -> Option<Vec<Self>> {
     TofPaddle::all()
   } 
- 
+
+  #[staticmethod]
+  #[pyo3(name="by_rbid")]
+  pub fn by_rbid_py(rbid : u8) -> Option<Vec<Self>> {
+    TofPaddle::by_rbid(rbid)
+  }
+
   // FIXME use PyResult
   #[staticmethod]
   #[pyo3(name="all_as_dict")]
@@ -324,9 +459,347 @@ impl fmt::Display for TofPaddle {
 //---------------------------------------------------------------------
 
 #[cfg(feature="pybindings")]
-impl_pythonize_display!(TofPaddle, |s: &TofPaddle| s.to_string());
+pythonize!(TofPaddle);
+//impl_pythonize_display!(TofPaddle, |s: &TofPaddle| s.to_string());
 
 //---------------------------------------------------------------------
+
+/// A Readoutboard with paddles connected
+#[derive(Debug, Clone)]
+#[allow(non_snake_case)]
+#[cfg_attr(feature="pybindings", pyclass)]
+pub struct ReadoutBoard {
+  pub rb_id           : u8, 
+  pub dsi             : u8, 
+  pub j               : u8, 
+  pub mtb_link_id     : u8, 
+  pub paddle12        : TofPaddle,
+  //pub paddle12_chA    : u8,
+  pub paddle34        : TofPaddle,
+  //pub paddle34_chA    : u8,
+  pub paddle56        : TofPaddle,
+  //pub paddle56_chA    : u8,
+  pub paddle78        : TofPaddle,
+  //pub paddle78_chA    : u8,
+  // extra stuff, not from the db
+  // or maybe in the future?
+  pub calib_file_path : String,
+  pub calibration     : RBCalibrations,       
+}
+  
+impl ReadoutBoard {
+  
+  pub fn new() -> Self {
+    Self {
+      rb_id           : 0, 
+      dsi             : 0, 
+      j               : 0, 
+      mtb_link_id     : 0, 
+      paddle12        : TofPaddle::new(),
+      //paddle12_chA    : 0,
+      paddle34        : TofPaddle::new(),
+      //paddle34_chA    : 0,
+      paddle56        : TofPaddle::new(),
+      //paddle56_chA    : 0,
+      paddle78        : TofPaddle::new(),
+      //paddle78_chA    : 0,
+      calib_file_path : String::from(""),
+      calibration     : RBCalibrations::new(0),
+    }
+  }
+
+  #[allow(non_snake_case)]
+  pub fn get_paddle12_chA(&self) -> u8 {
+    self.paddle12.rb_chA as u8 
+  }
+  
+  #[allow(non_snake_case)]
+  pub fn get_paddle34_chA(&self) -> u8 {
+    self.paddle34.rb_chA as u8 
+  }
+  
+  #[allow(non_snake_case)]
+  pub fn get_paddle56_chA(&self) -> u8 {
+    self.paddle56.rb_chA as u8 
+  }
+  
+  #[allow(non_snake_case)]
+  pub fn get_paddle78_chA(&self) -> u8 {
+    self.paddle78.rb_chA as u8 
+  }
+
+  pub fn by_rbid(rbid : u8) -> Option<Self> {
+    let paddles = TofPaddle::by_rbid(rbid);
+    if paddles.is_none() {
+      return None;
+    }
+    let mut rb_paddles = paddles.unwrap();   
+    if rb_paddles.len() != 4 {
+      panic!("Found more than 4 paddles for this RB! DB inconsistency! Abort!");
+    }
+    rb_paddles.sort_by_key(|paddle| paddle.get_lowest_rb_ch());
+    // we ensured earlier that the vector is of len 4
+    let paddle78 = rb_paddles.pop().unwrap();
+    let paddle56 = rb_paddles.pop().unwrap();
+    let paddle34 = rb_paddles.pop().unwrap();
+    let paddle12 = rb_paddles.pop().unwrap();
+
+    Some(ReadoutBoard {
+      rb_id           : rbid, 
+      dsi             : paddle12.dsi as u8, 
+      j               : paddle12.j_rb as u8, 
+      mtb_link_id     : paddle12.mtb_link_id as u8, 
+      paddle12        : paddle12,
+      //paddle12_chA    : paddle12,
+      paddle34        : paddle34,
+      //paddle34_chA    : 0,
+      paddle56        : paddle56,
+      //paddle56_chA    : 0,
+      paddle78        : paddle78,
+      //paddle78_chA    : 0,
+      calib_file_path : String::from(""),
+      calibration     : RBCalibrations::new(0),
+    })
+  }
+
+  /// Returns the ip address following a convention
+  ///
+  /// This does NOT GUARANTEE that the address is correct!
+  pub fn guess_address(&self) -> String {
+    format!("tcp://10.0.1.1{:02}:42000", self.rb_id)
+  }
+ 
+  pub fn get_paddle_ids(&self) -> [u8;4] {
+    let pid0 = self.paddle12.paddle_id as u8;
+    let pid1 = self.paddle34.paddle_id as u8;
+    let pid2 = self.paddle56.paddle_id as u8;
+    let pid3 = self.paddle78.paddle_id as u8;
+    [pid0, pid1, pid2, pid3]
+  }
+
+  #[allow(non_snake_case)]
+  pub fn get_A_sides(&self) -> [u8;4] {
+    let pa_0 = self.get_paddle12_chA();
+    let pa_1 = self.get_paddle34_chA();
+    let pa_2 = self.get_paddle56_chA();
+    let pa_3 = self.get_paddle78_chA();
+    [pa_0, pa_1, pa_2, pa_3]
+  }
+
+  #[allow(non_snake_case)]
+  pub fn get_pid_rbchA(&self, pid : u8) -> Option<u8> {
+    if self.paddle12.paddle_id as u8 == pid {
+      let rv = self.paddle12.rb_chA as u8;
+      return Some(rv);
+    } else if self.paddle34.paddle_id as u8 == pid {
+      let rv = self.paddle34.rb_chA as u8;
+      return Some(rv);
+    } else if self.paddle56.paddle_id as u8 == pid {
+      let rv = self.paddle56.rb_chA as u8;
+      return Some(rv);
+    } else if self.paddle78.paddle_id as u8== pid {
+      let rv = self.paddle78.rb_chA as u8;
+      return Some(rv);
+    } else {
+      return None;
+    }
+  }
+  
+  #[allow(non_snake_case)]
+  pub fn get_pid_rbchB(&self, pid : u8) -> Option<u8> {
+    if self.paddle12.paddle_id as u8 == pid {
+      let rv = self.paddle12.rb_chB as u8;
+      return Some(rv);
+    } else if self.paddle34.paddle_id as u8== pid {
+      let rv = self.paddle34.rb_chB as u8;
+      return Some(rv);
+    } else if self.paddle56.paddle_id as u8== pid {
+      let rv = self.paddle56.rb_chB as u8;
+      return Some(rv);
+    } else if self.paddle78.paddle_id as u8 == pid {
+      let rv = self.paddle78.rb_chB as u8;
+      return Some(rv);
+    } else {
+      return None;
+    }
+  }
+
+  pub fn get_paddle_length(&self, pid : u8) -> Option<f32> {
+    if self.paddle12.paddle_id as u8 == pid {
+      let rv = self.paddle12.length;
+      return Some(rv);
+    } else if self.paddle34.paddle_id as u8== pid {
+      let rv = self.paddle34.length;
+      return Some(rv);
+    } else if self.paddle56.paddle_id as u8== pid {
+      let rv = self.paddle56.length;
+      return Some(rv);
+    } else if self.paddle78.paddle_id as u8 == pid {
+      let rv = self.paddle78.length;
+      return Some(rv);
+    } else {
+      return None;
+    }
+  }
+  
+  pub fn all() -> Option<Vec<Self>> {
+    let all_rbs = get_all_rbids_in_db();
+    match all_rbs {
+      None => {
+        error!("Can not get TofPaddle information from DB, and thus can't construct ReadoutBoard instances. Did you load the setup-env.sh shell?");
+        return None;
+      }
+      Some(all_rbids) => {
+        let mut rbs = Vec::<ReadoutBoard>::new();
+        for k in all_rbids {
+          rbs.push(ReadoutBoard::by_rbid(k)?);
+        }
+        return Some(rbs);
+      }
+    }
+  }
+  
+  pub fn to_summary_str(&self) -> String {
+    let mut repr  = String::from("<ReadoutBoard:");
+    repr += &(format!("\n  Board id    : {}",self.rb_id));            
+    repr += &(format!("\n  MTB Link ID : {}",self.mtb_link_id));
+    repr += &(format!("\n  RAT         : {}",self.paddle12.ltb_id));
+    repr += &(format!("\n  DSI/J       : {}/{}",self.dsi,self.j));
+    repr += "\n **Connected paddles**";
+    repr += &(format!("\n  Channel 1/2 : {:02} (panel {:01})", self.paddle12.paddle_id, self.paddle12.panel_id));
+    repr += &(format!("\n  Channel 3/4 : {:02} (panel {:01})", self.paddle34.paddle_id, self.paddle34.panel_id));
+    repr += &(format!("\n  Channel 5/6 : {:02} (panel {:01})", self.paddle56.paddle_id, self.paddle56.panel_id));
+    repr += &(format!("\n  Channel 7/8 : {:02} (panel {:01})", self.paddle78.paddle_id, self.paddle78.panel_id));
+    repr
+  }
+
+  /// Load the newest calibration from the calibration file path
+  pub fn load_latest_calibration(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+    //  files look like RB20_2024_01_26-08_15_54.cali.tof.gaps
+    //let re = Regex::new(r"(\d{4}_\d{2}_\d{2}-\d{2}_\d{2}_\d{2})")?;
+    let re = Regex::new(r"(\d{6}_\d{6})")?;
+    // Define your file pattern (e.g., "logs/*.log" for all .log files in the logs directory)
+    let pattern = format!("{}/RB{:02}_*", self.calib_file_path, self.rb_id); // Adjust this pattern to your files' naming convention
+    let timestamp = DateTime::<Utc>::from_timestamp(0,0).unwrap(); // I am not sure what to do here
+                                                                   // otherwise than unwrap. How is
+                                                                   // this allowed to fail?
+    //let mut newest_file = (String::from(""), NaiveDateTime::from_timestamp(0, 0));
+    let mut newest_file = (String::from(""), timestamp);
+
+    // Iterate over files that match the pattern
+    let mut filename : String;
+    for entry in glob(&pattern)? {
+      if let Ok(path) = entry {
+        // Get the filename as a string
+        //let cpath = path.clone();
+        match path.file_name() {
+          None => continue,
+          Some(fname) => {
+              // the expect might be ok, since this is something done during initialization
+              filename = fname.to_os_string().into_string().expect("Unwrapping filename failed!");
+          }
+        }
+        if let Some(caps) = re.captures(&filename) {
+          if let Some(timestamp_str) = caps.get(0).map(|m| m.as_str()) {
+            //println!("timestamp_str {}, {}",timestamp_str, HUMAN_TIMESTAMP_FORMAT);
+            //let timestamp = NaiveDateTime::parse_from_str(timestamp_str, "%Y_%m_%d-%H_%M_%S")?;
+            //let timestamp = DateTime::<Utc>::parse_from_str(timestamp_str, "%Y_%m_%d-%H_%M_%S")?;
+            let footzstring = format!("{}+0000", timestamp_str);
+            let timestamp = DateTime::parse_from_str(&footzstring, "%y%m%d_%H%M%S%z")?;
+            //let timestamp = DateTime::parse_from_str(&footzstring, HUMAN_TIMESTAMP_FORMAT)?;
+            //println!("parse successful");
+            //let _timestamp = DateTime
+            if timestamp > newest_file.1 {
+              // FIXME - into might panic?
+              newest_file.1 = timestamp.into();
+              newest_file.0 = filename.clone();
+            }
+          }
+        }
+      }
+    }
+    
+    if newest_file.0.is_empty() {
+      error!("No matching calibration available for board {}!", self.rb_id);
+    } else {
+      let file_to_load = format!("{}/{}", self.calib_file_path, newest_file.0);
+      info!("Loading calibration from file: {}", file_to_load);
+      //self.calibration = RBCalibrations::from_file(file_to_load, true)?;
+      todo!("RBCalibrations::from_file needs to be implemented!");
+    }
+    Ok(())
+  }
+}
+
+impl fmt::Display for ReadoutBoard {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr  = String::from("<ReadoutBoard:");
+    repr += &(format!("\n  Board id    : {}",self.rb_id));            
+    repr += &(format!("\n  MTB Link ID : {}",self.mtb_link_id));
+    repr += &(format!("\n  DSI/J       : {}/{}",self.dsi,self.j));
+    repr += "\n **Connected paddles**";
+    repr += &(format!("\n  Ch0/1(1/2)  : {}",self.paddle12)); 
+    repr += &(format!("\n    A-side    : {}", self.get_paddle12_chA()));
+    repr += &(format!("\n  Ch1/2(2/3)  : {}",self.paddle34));         
+    repr += &(format!("\n    A-side    : {}", self.get_paddle34_chA()));
+    repr += &(format!("\n  Ch2/3(3/4)  : {}",self.paddle56));         
+    repr += &(format!("\n    A-side    : {}", self.get_paddle56_chA()));
+    repr += &(format!("\n  Ch3/4(4/5)  : {}>",self.paddle78));         
+    repr += &(format!("\n    A-side    : {}", self.get_paddle78_chA()));
+    repr += "** calibration will be loaded from this path:";
+    repr += &(format!("\n      \u{021B3} {}", self.calib_file_path));
+    repr += &(format!("\n  calibration : {}>", self.calibration));
+    write!(f, "{}", repr)
+  }
+}
+
+//---------------------------------------------------------------------
+
+#[cfg(feature="pybindings")]
+#[pymethods]
+impl ReadoutBoard {
+
+  #[getter]
+  fn get_rb_id(&self) -> u8 {
+    self.rb_id
+  }
+
+  #[getter]
+  fn get_dsi(&self) -> u8 {
+    self.dsi
+  }
+
+  #[getter]
+  fn get_j(&self) -> u8 {
+    self.j
+  }
+
+  #[getter]
+  fn get_mtb_link_id(&self) -> u8 {
+    self.mtb_link_id
+  }
+
+  #[getter]
+  fn get_paddle12(&self) -> TofPaddle { 
+    self.paddle12.clone() 
+  }
+}
+//paddle12        : TofPaddle::new(),
+////paddle12_chA    : 0,
+//paddle34        : TofPaddle::new(),
+////paddle34_chA    : 0,
+//paddle56        : TofPaddle::new(),
+////paddle56_chA    : 0,
+//paddle78        : TofPaddle::new(),
+////paddle78_chA    : 0,
+//calib_file_path : String::from(""),
+//calibration     : RBCalibrations::new(0),
+//}
+
+pythonize!(ReadoutBoard);
+
+//---------------------------------------------------------------------
+
 
 #[derive(Debug,Queryable, Selectable, serde::Serialize, serde::Deserialize)]
 #[diesel(table_name = schema::tof_db_rat)]

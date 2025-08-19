@@ -70,6 +70,7 @@ impl TrackerEventIDEchoPacket {
   }
 }
 
+#[cfg(feature="pybindings")]
 pythonize_telemetry!(TrackerEventIDEchoPacket);
 
 //---------------------------------------------------
@@ -165,6 +166,7 @@ impl TrackerTempLeakPacket {
   }
 }
 
+#[cfg(feature="pybindings")]
 pythonize_telemetry!(TrackerTempLeakPacket);
 
 //---------------------------------------------------
@@ -257,6 +259,7 @@ impl TrackerDAQTempPacket {
 
 }
 
+#[cfg(feature="pybindings")]
 pythonize_telemetry!(TrackerDAQTempPacket);
 
 //---------------------------------------------------
@@ -328,5 +331,6 @@ impl TrackerDAQHSKPacket {
   }
 }
 
+#[cfg(feature="pybindings")]
 pythonize_telemetry!(TrackerDAQHSKPacket);
 

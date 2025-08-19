@@ -124,6 +124,7 @@ impl fmt::Display for CRFrameObject {
 
 //---------------------------------------------------
 
+#[cfg(feature="pybindings")]
 pythonize!(CRFrameObject);
 
 //---------------------------------------------------
@@ -502,4 +503,5 @@ impl CRFrame {
   }
 }
 
+#[cfg(feature="pybindings")]
 pythonize!(CRFrame);

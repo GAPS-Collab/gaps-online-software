@@ -6,15 +6,18 @@ pub use std::collections::{
   VecDeque
 };
 
+pub use std::path::Path;
 pub use std::thread;
 pub use std::error::Error;
 pub use std::fmt;
+pub use std::env;
 pub use std::io::{
   self,
   BufReader,
   Read,
   Seek,
   SeekFrom,
+  Write,
 };
 
 pub use std::net::{
@@ -32,6 +35,13 @@ pub use std::fs::{
   File,
   OpenOptions,
 };
+
+pub use chrono::{
+  Utc,
+  DateTime
+};
+
+pub use glob::glob;
 
 // avoiding boilerplate for enums
 pub use strum_macros::{
@@ -91,7 +101,7 @@ pub use crate::pythonize_telemetry;
 pub use crate::random::FromRandom;
 
 pub use crate::version::ProtocolVersion;
-
+pub use crate::constants::*;
 pub use crate::errors::*;
 pub use crate::io::*;
 pub use crate::io::parsers::*;

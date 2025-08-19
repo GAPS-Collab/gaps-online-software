@@ -113,5 +113,6 @@ impl AckBfsw {
   }
 }
 
+#[cfg(feature="pybindings")]
 pythonize!(AckBfsw);
 
