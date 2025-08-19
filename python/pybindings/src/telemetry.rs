@@ -122,6 +122,11 @@ impl PyMergedEvent {
     Ok(events)
   }
 
+  #[getter]
+  fn get_event_id(&self) -> u32 {
+    self.event.event_id
+  }
+
   // FIXME - do this with bound
   #[getter]
   fn get_tof(&self) -> PyResult<PyTofEventSummary> {
