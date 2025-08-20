@@ -1,100 +1,9 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
-//!
 //! Calibration routines for the GAPS TOF system
 //!
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
 
-use std::fmt;
-use std::path::Path;
-use half::f16;
-//use num_traits::{
-//  Float,
-//  NumAssign,
-//  NumCast
-//};
-
-
-use crate::events::{
-  RBEvent,
-  unpack_traces
-};
-
-#[cfg(feature="random")]
-use crate::random::FromRandom;
-
-#[cfg(feature="random")]
-use rand::Rng;
-
-use crate::errors::{
-  WaveformError,
-  CalibrationError,
-  SerializationError
-};
-
-use crate::stats::{
-  mean,
-  calculate_column_stat
-};
-
-use statistical::median;
-
-use crate::constants::{
-  NWORDS,
-  NCHN
-};
-
-use crate::packets::{
-  TofPacketType,
-  TofPackable
-};
-
-use crate::io::parsers::{
-  parse_bool,
-  parse_f16,
-  parse_u8,
-  parse_u16,
-  parse_u32,
-  parse_f32,
-};
-
-use chrono::{
-  Utc,
-  TimeZone,
-  LocalResult
-};
-
-use crate::io::serialization::Serialization;
-
-//#[cfg(feature="random")]
-//use rand;
-#[cfg(feature="pybindings")]
-use pyo3::prelude::*;
-#[cfg(feature="pybindings")]
-use numpy::{
-  PyArray1,
-  ToPyArray
-};
-
-//#[cfg(feature="pybindings")]
-//use pyo3::exceptions::PyIOError;
-//
-//#[cfg(feature="pybindings")]
-//use crate::packets::TofPacket;
-//
-#[cfg(feature="pybindings")]
-use crate::{
-  pythonize_packable,
-  //pythonize_monidata
-};
-
-#[cfg(feature="pybindings")]
-use pyo3::exceptions::{
-  PyIOError,
-  PyValueError
-};
-
-#[cfg(feature="pybindings")]
-use crate::packets::TofPacket;
+use crate::prelude::*;
 
 /// Roll over the entries from the end of a vector 
 /// to the beginning by a given offset.
@@ -1391,34 +1300,34 @@ impl RBCalibrations {
     self.noi_data  = Vec::<RBEvent>::new();
   }
 
-  ///// Gets the calibration from a file which 
-  ///// has the RBCalibration stored in a 
-  ///// TofPacket
-  /////
-  ///// E.g. if it was written with TofPacketWriter
-  //pub fn from_file(filename : String, discard_data : bool) -> Result<Self, SerializationError> {
-  //  let mut reader = TofPacketReader::new(filename);
-  //  loop {
-  //    match reader.next() {
-  //      None => {
-  //        error!("Can't load calibration!");
-  //        break;
-  //      },
-  //      Some(pack) => {
-  //        if pack.packet_type == TofPacketType::RBCalibration { 
-  //          let mut cali = RBCalibrations::from_bytestream(&pack.payload, &mut 0)?;
-  //          if discard_data {
-  //            cali.discard_data();
-  //          }
-  //          return Ok(cali);
-  //        } else {
-  //          continue;
-  //        }
-  //      }
-  //    }
-  //  }
-  //  Err(SerializationError::StreamTooShort)
-  //}
+  /// Gets the calibration from a file which 
+  /// has the RBCalibration stored in a 
+  /// TofPacket
+  ///
+  /// E.g. if it was written with TofPacketWriter
+  pub fn from_file(filename : String, discard_data : bool) -> Result<Self, SerializationError> {
+    let mut reader = TofPacketReader::new(&filename);
+    loop {
+      match reader.next() {
+        None => {
+          error!("Can't load calibration!");
+          break;
+        },
+        Some(pack) => {
+          if pack.packet_type == TofPacketType::RBCalibration { 
+            let mut cali = RBCalibrations::from_bytestream(&pack.payload, &mut 0)?;
+            if discard_data {
+              cali.discard_data();
+            }
+            return Ok(cali);
+          } else {
+            continue;
+          }
+        }
+      }
+    }
+    Err(SerializationError::StreamTooShort)
+  }
 
 
   /// Infer the readoutboard id from the filename
@@ -1617,6 +1526,98 @@ impl fmt::Display for RBCalibrations {
       self.tbin[0][99])
   } 
 }
+
+#[cfg(feature = "pybindings")] 
+#[pymethods]
+impl RBCalibrations {
+  #[getter]
+  fn rb_id(&self) -> u8 {
+    self.rb_id
+  }
+
+  #[getter]
+  fn d_v(&self) -> f32 {
+    self.d_v
+  }
+
+  #[getter]
+  fn vcal_data(&self) -> Vec<RBEvent> {
+    self.vcal_data.clone()
+  }
+  
+  #[getter]
+  fn tcal_data(&self) -> Vec<RBEvent> {
+    self.tcal_data.clone()
+  }
+  
+  #[getter]
+  fn noi_data(&self) -> Vec<RBEvent> {
+    self.noi_data.clone()
+  }
+ 
+  #[getter]
+  fn v_offsets<'_py>(&self, py: Python<'_py>) -> PyResult<Bound<'_py, PyArray2<f32>>> {  
+    let mut data = Vec::<Vec<f32>>::with_capacity(9);
+    for ch in 0..9 {
+      data.push(self.v_offsets[ch].to_vec());
+    }
+    let pyarray = PyArray2::from_vec2(py, &data).unwrap();
+    Ok(pyarray)
+  }
+  
+  #[getter]
+  fn v_dips<'_py>(&self, py: Python<'_py>) -> PyResult<Bound<'_py, PyArray2<f32>>> {  
+    let mut data = Vec::<Vec<f32>>::with_capacity(9);
+    for ch in 0..9 {
+      data.push(self.v_dips[ch].to_vec());
+    }
+    let pyarray = PyArray2::from_vec2(py, &data).unwrap();
+    Ok(pyarray)
+  }
+  
+  #[getter]
+  fn v_inc<'_py>(&self, py: Python<'_py>) -> PyResult<Bound<'_py, PyArray2<f32>>> {  
+    let mut data = Vec::<Vec<f32>>::with_capacity(9);
+    for ch in 0..9 {
+      data.push(self.v_inc[ch].to_vec());
+    }
+    let pyarray = PyArray2::from_vec2(py, &data).unwrap();
+    Ok(pyarray)
+  }
+  
+  #[getter]
+  fn tbin<'_py>(&self, py: Python<'_py>) -> PyResult<Bound<'_py, PyArray2<f32>>> {  
+    let mut data = Vec::<Vec<f32>>::with_capacity(9);
+    for ch in 0..9 {
+      data.push(self.tbin[ch].to_vec());
+    }
+    let pyarray = PyArray2::from_vec2(py, &data).unwrap();
+    Ok(pyarray)
+  }
+
+  /// Load the calibration from a file with a 
+  /// TofPacket of type RBCalibration in it
+  ///
+  /// # Arguments:
+  ///
+  /// * filename     : File with a TofPacket of type RBCalibration in it
+  /// * discard_data : Throw away event data after loading
+  #[pyo3(name = "from_file", signature = (filename, discard_data = true))]
+  #[staticmethod]
+  fn from_file_py(filename : String, discard_data : bool) -> PyResult<Self> {
+    let cali = RBCalibrations::from_file(filename, discard_data);
+    match cali {
+      Ok(c) => {
+        return Ok(c);
+      },
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+}
+
+
 
 #[cfg(feature = "random")]
 impl FromRandom for RBCalibrations {
