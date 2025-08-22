@@ -3100,7 +3100,12 @@ impl PyTofEvent {
       event : TofEvent::new(),
     }
   }
-  
+ 
+  #[getter]
+  fn has_any_mangling(&self) -> bool {
+    self.event.has_any_mangling()
+  }
+
   /// Emit a copy of self
   fn copy(&self) -> Self {
     let mut copy_event = PyTofEvent::new();
