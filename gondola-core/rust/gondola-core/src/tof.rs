@@ -6,3 +6,5 @@ pub mod algorithms;
 pub mod detector_status;
 pub use rb_paddle_id::RBPaddleID;
 pub use detector_status::TofDetectorStatus;
+pub mod config;
+pub use config::*;

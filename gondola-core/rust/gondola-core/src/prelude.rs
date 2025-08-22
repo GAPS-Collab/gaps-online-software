@@ -38,7 +38,9 @@ pub use std::fs::{
 
 pub use chrono::{
   Utc,
-  DateTime
+  DateTime,
+  TimeZone,
+  LocalResult
 };
 
 pub use glob::glob;
@@ -61,6 +63,7 @@ pub use num_traits::{
 };
 
 pub use regex::Regex;    
+pub use statistical::median;
 
 #[cfg(feature="random")]
 pub use rand::Rng;
@@ -87,8 +90,15 @@ pub use numpy::{
   ToPyArray,
   PyArrayMethods,
   PyArray1,
-  PyReadonlyArray1
+  PyReadonlyArray1,
+  PyArray2, 
 };
+
+pub use crate::stats::{
+  mean,
+  calculate_column_stat
+};
+
 
 #[cfg(feature="pybindings")]
 pub use crate::pythonize_packable;

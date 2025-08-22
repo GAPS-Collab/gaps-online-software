@@ -1,5 +1,5 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
 
 pub mod tof_hit;
 pub use tof_hit::TofHit;
@@ -275,7 +275,7 @@ expand_and_test_enum!(EventStatus, test_eventstatus_repr);
 ///
 /// Describe the purpose of the data. This
 /// is the semantics behind it.
-#[derive(Debug, Copy, Clone, PartialEq,FromRepr, AsRefStr, EnumIter)]
+#[derive(Debug, Copy, Clone, PartialEq,FromRepr, AsRefStr, EnumIter, serde::Deserialize, serde::Serialize)]
 #[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
 #[repr(u8)]
 pub enum DataType {

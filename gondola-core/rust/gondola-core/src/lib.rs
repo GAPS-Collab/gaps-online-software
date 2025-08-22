@@ -1,6 +1,3 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
-//!
 //! Dataclasses provides structures to facilitate the work with data drom 
 //! the GAPS experiment. Most noticeably, there are
 //!
@@ -29,6 +26,8 @@
 //!              diesel
 //!
 //!
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
 
 #[macro_use] extern crate log; 
 
