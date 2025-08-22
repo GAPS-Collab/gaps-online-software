@@ -107,6 +107,7 @@ fn tof_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   use crate::tof::*;
   m.add_class::<RBPaddleID>()?;
   m.add_class::<TofDetectorStatus>()?;
+  m.add_class::<TofCommandCode>()?;
   Ok(())
 }
 
