@@ -108,6 +108,13 @@ fn tof_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<RBPaddleID>()?;
   m.add_class::<TofDetectorStatus>()?;
   m.add_class::<TofCommandCode>()?;
+  m.add_class::<TofCommand>()?;
+  m.add_class::<TofOperationMode>()?;
+  m.add_class::<BuildStrategy>()?;
+  m.add_class::<PreampBiasConfig>()?;
+  m.add_class::<RBChannelMaskConfig>()?;
+  m.add_class::<TriggerConfig>()?;
+  m.add_class::<TofRunConfig>()?;
   Ok(())
 }
 

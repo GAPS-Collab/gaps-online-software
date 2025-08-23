@@ -834,7 +834,6 @@ impl TofEvent {
     self.clone()
   }
 
-
   #[pyo3(name="set_timing_offsets")]
   pub fn set_timing_offsets_py(&mut self, timing_offsets : HashMap<u8, f32>) {
     self.set_timing_offsets(&timing_offsets);
@@ -883,6 +882,12 @@ impl TofEvent {
   #[getter]
   fn pointcloud(&self) -> Option<Vec<(f32,f32,f32,f32,f32)>> {
     self.get_pointcloud()
+  }
+
+  #[getter]
+  #[pyo3(name="has_any_mangling")]
+  fn has_any_mangling_py(&self) -> bool {
+    self.has_any_mangling() 
   }
 
   #[getter]

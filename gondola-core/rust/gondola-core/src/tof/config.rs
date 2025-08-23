@@ -12,6 +12,7 @@ use crate::prelude::*;
 /// CAVEAT: For the whole tof, this will cap the rate at 
 /// 112 Hz, because of the capacity of the switches.
 #[derive(Debug, Copy, Clone, PartialEq, FromRepr, AsRefStr, EnumIter, serde::Deserialize, serde::Serialize)]
+#[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
 #[repr(u8)]
 pub enum TofOperationMode {
   Unknown          = 0u8,
@@ -52,6 +53,7 @@ expand_and_test_enum!(BuildStrategy, test_buildstrategy_repr);
 
 /// Set preamp voltages
 #[derive(Copy, Clone, Debug, PartialEq)]
+#[cfg_attr(feature="pybindings", pyclass)]
 pub struct PreampBiasConfig {
   pub rb_id   : u8,
   pub biases  : [f32;16]
@@ -136,6 +138,7 @@ impl FromRandom for PreampBiasConfig {
 //---------------------------------------------------
 //
 #[derive(Copy, Clone, Debug, PartialEq)]
+#[cfg_attr(feature="pybindings", pyclass)]
 pub struct RBChannelMaskConfig {
   pub rb_id    : u8,
   pub channels : [bool;9],
@@ -218,6 +221,7 @@ impl FromRandom for RBChannelMaskConfig {
 
 /// Set ltb thresholds
 #[derive(Copy, Clone, Debug, PartialEq)]
+#[cfg_attr(feature="pybindings", pyclass)]
 pub struct LTBThresholdConfig {
   pub rb_id       : u8,
   pub thresholds  : [f32;3]
@@ -301,6 +305,7 @@ impl FromRandom for LTBThresholdConfig {
 
 /// Readoutboard configuration for a specific run
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
+#[cfg_attr(feature="pybindings", pyclass)]
 pub struct RunConfig {
   /// an unique identifier for this run
   pub runid                   : u32,
@@ -449,9 +454,11 @@ impl FromRandom for RunConfig {
   }
 }
 
+//-------------------------------------------------
 
 
 #[derive(Copy, Clone, Debug, PartialEq)]
+#[cfg_attr(feature="pybindings", pyclass)]
 pub struct TriggerConfig{
   /// When we create the LiftofConfig from 
   /// the TriggerConfig, this allows us to 
@@ -728,7 +735,196 @@ impl FromRandom for TriggerConfig {
   }
 }
 
+#[cfg(feature="pybindings")]
+#[pymethods]
+impl TriggerConfig {
+
+  #[getter] 
+  fn get_prescale(&self) -> Option<f32> {
+    self.prescale
+  }
+  
+  #[setter]
+  #[pyo3(name="set_prescale")]
+  fn set_prescale_py(&mut self, prescale: f32) -> PyResult<()> {
+    self.set_prescale (prescale);
+    Ok(())
+  }
+
+  #[getter] 
+  fn get_gaps_trigger_use_beta(&self) -> Option<bool> {
+    self.gaps_trigger_use_beta
+  }
+  
+  #[setter]
+  #[pyo3(name="set_gaps_trigger_use_beta")]
+  fn set_gaps_trigger_use_beta_py(&mut self, gaps_trigger_use_beta: bool) -> PyResult<()> {
+    self.set_gaps_trigger_use_beta(gaps_trigger_use_beta);
+    Ok(())
+  }
+
+  #[getter] 
+  fn get_trigger_type(&self) -> Option<TriggerType> {
+    self.trigger_type
+  }
+
+  #[setter]
+  #[pyo3(name="set_trigger_type")]
+  fn set_trigger_type_py(&mut self, trigger_type: TriggerType) -> PyResult<()> {
+    self.set_trigger_type(trigger_type);
+    Ok(())
+  }
+  
+  #[getter]
+  fn get_use_combo_trigger(&self) -> Option<bool> {
+    self.use_combo_trigger 
+  }
+  #[setter]
+  #[pyo3(name="set_use_combo_trigger")]
+  fn set_use_combo_trigger_py(&mut self, combo : bool) {
+    self.set_use_combo_trigger(combo);
+  }
+  #[getter]
+  fn get_combo_trigger_type(&self) -> Option<TriggerType> {
+    self.combo_trigger_type
+  }
+  #[setter]
+  #[pyo3(name="set_combo_trigger_type")]
+  fn set_combo_trigger_type_py(&mut self, combo_trigger_type : TriggerType) {
+    self.set_combo_trigger_type(combo_trigger_type);
+  }
+  #[getter]
+  fn get_combo_trigger_prescale(&self) -> Option<f32> {
+    self.combo_trigger_prescale
+  }
+  #[setter]
+  #[pyo3(name="set_combo_trigger_prescale")]
+  fn set_combo_trigger_prescale_py(&mut self, prescale : f32) {
+    self.set_combo_trigger_prescale(prescale);
+  }
+  #[getter]
+  fn get_trace_suppression(&self) -> Option<bool> {
+    self.trace_suppression
+  }
+  #[setter]
+  #[pyo3(name="set_trace_suppression")]
+  fn set_trace_suppression_py(&mut self, tsup : bool) {
+    self.set_trace_suppression(tsup);
+  }
+  #[getter]
+  fn get_mtb_moni_interval(&mut self) -> Option<u16> {
+    self.mtb_moni_interval
+  }
+  #[setter]
+  #[pyo3(name="set_mtb_moni_interval")]
+  fn set_mtb_moni_interval_py(&mut self, moni_int : u16) {
+    self.set_mtb_moni_interval(moni_int);
+  }
+  #[getter]
+  fn get_tiu_ignore_busy(&self) -> Option<bool> {
+    self.tiu_ignore_busy
+  }
+
+  #[setter]
+  #[pyo3(name="set_tiu_ignore_busy")]
+  fn set_tiu_ignore_busy_py(&mut self, ignore_busy : bool) {
+    self.set_tiu_ignore_busy(ignore_busy);
+  }
+  #[getter]
+  fn get_hb_send_interval(&self) -> Option<u16> {
+    self.hb_send_interval
+  }
+
+  #[pyo3(name="to_bytestream")]
+  fn to_bytestream_py(&self) -> Vec<u8> {
+    self.to_bytestream()
+  }
+
+  #[setter]
+  #[pyo3(name="set_hb_send_interval")]
+  fn set_hb_send_interval_py(&mut self, hb_int :  Option<u16>) {
+    self.hb_send_interval = hb_int;
+  }
+
+  fn __getitem__<'a>(&self, py: Python<'a>, key: &str) -> PyResult<Option<Bound<'a,PyAny>>> {  
+    match key {
+      "gaps_trigger_use_beta"  => Ok(Some(self.gaps_trigger_use_beta .into_pyobject(py).unwrap())),
+      "prescale"               => Ok(Some(self.prescale              .into_pyobject(py).unwrap())),
+      "trigger_type"           => Ok(Some(self.trigger_type          .into_pyobject(py).unwrap())),
+      "use_combo_trigger"      => Ok(Some(self.use_combo_trigger     .into_pyobject(py).unwrap())),
+      "combo_trigger_type"     => Ok(Some(self.combo_trigger_type    .into_pyobject(py).unwrap())),
+      "combo_trigger_prescale" => Ok(Some(self.combo_trigger_prescale.into_pyobject(py).unwrap())),
+      "trace_suppression"      => Ok(Some(self.trace_suppression     .into_pyobject(py).unwrap())),
+      "mtb_moni_interval"      => Ok(Some(self.mtb_moni_interval     .into_pyobject(py).unwrap())),
+      "tiu_ignore_busy"        => Ok(Some(self.tiu_ignore_busy       .into_pyobject(py).unwrap())),
+      "hb_send_interval"       => Ok(Some(self.hb_send_interval      .into_pyobject(py).unwrap())),
+      _     => Err(PyKeyError::new_err(format!("Key '{}' not found", key)))
+    }
+  }
+
+  fn __setitem__(&mut self, key: &str, value: &Bound<'_, PyAny>) -> PyResult<()> {
+    match key {
+      "gaps_trigger_use_beta" => {
+          self.active_fields |= 1;
+          self.gaps_trigger_use_beta = Some(value.extract::<bool>()?);
+          Ok(())
+      }
+      "prescale" => {
+          self.active_fields |= 2;
+          self.prescale = Some(value.extract::<f32>()?);
+          Ok(())
+      }
+      "trigger_type" => {
+          self.active_fields |= 4;
+          self.trigger_type = Some(value.extract::<TriggerType>()?);
+          Ok(())
+      }
+      "use_combo_trigger" => {
+          self.active_fields |= 8;
+          self.use_combo_trigger = Some(value.extract::<bool>()?);
+          Ok(())
+      }
+      "combo_trigger_type" => {
+          self.active_fields |= 16;
+          self.combo_trigger_type = Some(value.extract::<TriggerType>()?);
+          Ok(())
+      }
+      "combo_trigger_prescale" => {
+          self.active_fields |= 32;
+          self.combo_trigger_prescale = Some(value.extract::<f32>()?);
+          Ok(())
+      }
+      "trace_suppression" => {
+          self.active_fields |= 64;
+          self.trace_suppression = Some(value.extract::<bool>()?);
+          Ok(())
+      }
+      "mtb_moni_interval" => {
+          self.active_fields |= 128;
+          self.mtb_moni_interval = Some(value.extract::<u16>()?);
+          Ok(())
+      }
+      "tiu_ignore_busy" => {
+          self.active_fields |= 256;
+          self.tiu_ignore_busy = Some(value.extract::<bool>()?);
+          Ok(())
+      }
+      "hb_send_interval" => {
+          self.active_fields |= 512;
+          self.hb_send_interval = Some(value.extract::<u16>()?);
+          Ok(())
+      }
+      _ => Err(PyKeyError::new_err(format!("Key '{}' not found", key))),
+    }
+  }
+}
+
+pythonize_packable!(TriggerConfig);
+
+//-------------------------------------------------
+
 #[derive(Copy, Clone, Debug, PartialEq)]
+#[cfg_attr(feature="pybindings", pyclass)]
 pub struct TofRunConfig {
   pub active_fields            : u32,
   pub runtime                  : Option<u32>, 
@@ -816,9 +1012,28 @@ impl FromRandom for TofRunConfig {
   }
 }
 
-//////////////////////////////////////////
+#[cfg(feature="pybindings")]
+#[pymethods]
+impl TofRunConfig {
+
+  #[getter]
+  fn get_runtime(&self) -> Option<u32> {
+    self.runtime
+  }
+
+  #[setter]
+  #[pyo3(name="set_runtime")]
+  fn set_runtime_py(&mut self, runtime : u32) {
+    self.set_runtime(runtime);    
+  }
+}
+
+pythonize_packable!(TofRunConfig);
+
+//-------------------------------------------------
 
 #[derive(Copy, Clone, Debug, PartialEq)]
+#[cfg_attr(feature="pybindings", pyclass)]
 pub struct TofRBConfig {
   pub active_fields                  : u32,
   pub rb_moni_interval               : Option<u32>, 
@@ -985,6 +1200,7 @@ impl FromRandom for TofRBConfig {
 
 
 #[derive(Copy, Clone, Debug, PartialEq)]
+#[cfg_attr(feature="pybindings", pyclass)]
 pub struct DataPublisherConfig {
   pub active_fields            : u32,
   pub mbytes_per_file          : Option<u16>,
@@ -1220,6 +1436,7 @@ impl FromRandom for DataPublisherConfig {
 /// Settings to change the configuration of the analysis engine 
 /// (pulse extraction)
 #[derive(Copy, Clone, Debug, PartialEq)]
+#[cfg_attr(feature="pybindings", pyclass)]
 pub struct AnalysisEngineConfig{
   pub integration_start  : f32, //4
   pub integration_window : f32, //4
@@ -1351,32 +1568,25 @@ impl FromRandom for AnalysisEngineConfig {
   }
 }
 
-#[cfg(feature = "random")]
-#[test]
-fn pack_analysisengineconfig() {
-  for _ in 0..100 {
-    let cfg  = AnalysisEngineConfig::from_random();
-    let test : AnalysisEngineConfig = cfg.pack().unpack().unwrap();
-    assert_eq!(cfg, test);
-  }
-}
+
 
 /// TOF Event Builder Settings
 /// Configuring the TOF event builder during flight
 /// If a setting is set to None, it will keep the 
 /// previous setting
 #[derive(Copy, Clone, Debug, PartialEq)]
+#[cfg_attr(feature="pybindings", pyclass)]
 pub struct TOFEventBuilderConfig{
-  pub active_fields    : u32, // supports up to 32 active components
-  pub cachesize        : Option<u32>, 
-  pub n_mte_per_loop   : Option<u32>, 
-  pub n_rbe_per_loop   : Option<u32>, 
-  pub te_timeout_sec   : Option<u32>, 
-  pub sort_events      : Option<bool>,
-  pub build_strategy   : Option<BuildStrategy>, 
-  pub wait_nrb         : Option<u8>, 
-  pub greediness       : Option<u8>, 
-  pub hb_send_interval : Option<u16>,
+  pub active_fields         : u32, // supports up to 32 active components
+  pub cachesize             : Option<u32>, 
+  pub n_mte_per_loop        : Option<u32>, 
+  pub n_rbe_per_loop        : Option<u32>, 
+  pub te_timeout_sec        : Option<u32>, 
+  pub sort_events           : Option<bool>,
+  pub build_strategy        : Option<BuildStrategy>, 
+  pub wait_nrb              : Option<u8>, 
+  pub greediness            : Option<u8>, 
+  pub hb_send_interval      : Option<u16>,
   // NEW - mark events as not to be sent!
   pub only_save_interesting : Option<bool>,
   pub thr_n_hits_umb        : Option<u8>,
@@ -1385,7 +1595,6 @@ pub struct TOFEventBuilderConfig{
   pub thr_tot_edep_umb      : Option<f32>,
   pub thr_tot_edep_cbe      : Option<f32>,
   pub thr_tot_edep_cor      : Option<f32>
-
 }
 
 impl TOFEventBuilderConfig {
@@ -1726,6 +1935,19 @@ impl FromRandom for TOFEventBuilderConfig {
     cfg
   }
 }
+
+
+
+#[cfg(feature = "random")]
+#[test]
+fn pack_analysisengineconfig() {
+  for _ in 0..100 {
+    let cfg  = AnalysisEngineConfig::from_random();
+    let test : AnalysisEngineConfig = cfg.pack().unpack().unwrap();
+    assert_eq!(cfg, test);
+  }
+}
+
 
 
 //////////////////////////////////////////
