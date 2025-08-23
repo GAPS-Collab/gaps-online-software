@@ -919,6 +919,7 @@ impl TriggerConfig {
   }
 }
 
+#[cfg(feature="pybindings")]
 pythonize_packable!(TriggerConfig);
 
 //-------------------------------------------------
@@ -1028,6 +1029,7 @@ impl TofRunConfig {
   }
 }
 
+#[cfg(feature="pybindings")]
 pythonize_packable!(TofRunConfig);
 
 //-------------------------------------------------

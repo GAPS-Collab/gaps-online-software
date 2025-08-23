@@ -51,6 +51,9 @@ pub mod python;
 
 use crate::prelude::*;
 
+// python convention
+const VERSION: &str = env!("CARGO_PKG_VERSION"); 
+
 /// A simple helper macro adding an as_str function 
 /// as well as the Display method to any enum.
 ///
@@ -224,6 +227,12 @@ fn db_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   Ok(())
 }
 
+#[cfg(feature="pybindings")]
+#[pyfunction]
+fn get_version() -> &'static str {
+  return VERSION;
+}
+
 /// Python API to rust version of tof-dataclasses.
 ///
 /// Currently, this contains only the analysis 
@@ -231,11 +240,13 @@ fn db_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
 #[cfg(feature="pybindings")]
 #[pymodule]
 #[pyo3(name = "gondola_core")]
-fn gaps_py<'_py>(m : &Bound<'_py, PyModule>) -> PyResult<()> { //: Python<'_>, m: &PyModule) -> PyResult<()> {
+fn gondola_core_py<'_py>(m : &Bound<'_py, PyModule>) -> PyResult<()> { //: Python<'_>, m: &PyModule) -> PyResult<()> {
   pyo3_log::init();
+  m.add_function(wrap_pyfunction!(get_version, m)?)?;
   m.add_wrapped(wrap_pymodule!(events_py))?;
   m.add_wrapped(wrap_pymodule!(monitoring_py))?;
   m.add_wrapped(wrap_pymodule!(packets_py))?;
+  m.add_wrapped(wrap_pymodule!(tof_py))?;
   m.add_wrapped(wrap_pymodule!(io_py))?;
   m.add_wrapped(wrap_pymodule!(db_py))?;
   m.add_wrapped(wrap_pymodule!(stats_py))?;

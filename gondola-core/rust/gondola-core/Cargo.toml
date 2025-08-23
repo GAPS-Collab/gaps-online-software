@@ -35,7 +35,7 @@ experimental        = []
 
 [dependencies.pyo3]
 version  = "0.25"
-features = ["extension-module", "multiple-pymethods"]
+features = ["extension-module", "multiple-pymethods", "abi3-py311"]
 optional = true
 
 [dependencies.pyo3-log]
