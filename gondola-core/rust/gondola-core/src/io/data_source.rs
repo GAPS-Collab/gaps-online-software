@@ -25,6 +25,8 @@ pub struct DataSource<T>
   pub kind            : DataSourceKind,
   #[cfg(feature="database")]
   pub paddles         : HashMap<u8,TofPaddle>,
+  #[cfg(feature="database")]
+  pub strips          : HashMap<u32, TrackerStrip>,
   pub rb_calibrations : HashMap<u8,RBCalibrations>,
   //pub strips  : HashMap<u8,TrackerStrip>,
   pub reader  : dyn DataReader<T>,
@@ -44,7 +46,25 @@ impl<T> DataSource<T>
   //}
 }
 
+#[cfg(feature="pybindings")]
+#[pyclass]
+#[pyo3(name="DataSource")]
+struct DataSourcePy {
+}
 
+#[cfg(feature="pybindings")]
+#[pyclass]
+struct TofEventIterator {
+}
 
+#[cfg(feature="pybindings")]
+#[pyclass]
+struct TupleIterator {
+}
 
-
+// We introduce a series of iterators, which will allow fast unpacking for a dedicated 
+// data type
+#[pyfunction]
+fn create_iterator<'_py>(py: Python<'_py>, source: &DataSourcePy, tof_packet_type : Option<TofPacketType> , telemetry_packet_type : Option<TelemetryPacketType>) -> PyResult<Option<Bound<'_py,PyAny>>> {
+  return Ok(None);
+}

@@ -6,7 +6,13 @@ authors         = [{ name = "J.A.Stoessl, G.Tytus", email = "stoessl@hawaii.edu"
 readme          = "README.md"
 license         = { text = "GPLV3" }
 requires-python = ">=3.11"
-
+dependencies = [
+    "tqdm>=4.0",    
+    "numpy>=2.0",
+    "matplotlib>=3.10",
+    "charmingbeauty>=0.1",
+    "pydashi>=2.0"
+]
 
 [build-system]
 requires      = ["maturin>=1.0,<2.0"]
@@ -18,3 +24,6 @@ build-backend = "maturin"
 all-features  = true
 python-source = "python"
 module-name   = "gondola.gondola_core"
+
+
+
