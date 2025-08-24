@@ -549,6 +549,20 @@ impl TofEvent {
     }
     false
   }
+  
+  /// Get all waveforms of all RBEvents in this event
+  /// ISSUE - Performance, Memory
+  /// FIXME - reimplement this things where this
+  ///         returns only a reference
+  pub fn get_waveforms(&self) -> Vec<RBWaveform> {
+    let mut wfs = Vec::<RBWaveform>::new();
+    for ev in &self.rb_events {
+      for wf in &ev.get_rbwaveforms() {
+        wfs.push(wf.clone());
+      }
+    }
+    wfs
+  }
 }
 
 impl TofPackable for TofEvent {
@@ -715,22 +729,27 @@ impl Serialization for TofEvent {
     }
 
     te.mtb_link_mask      = parse_u64(stream, pos);
+    let mt_event_tail     = parse_u16(stream, pos);
+    if mt_event_tail != Self::TAIL {
+      // (tail for mt event was the same)
+      error!("Parsed TAIL from MT event is incorrect! Got {} instead of {} at pos {}", mt_event_tail, Self::TAIL, pos);
+    }
     //let mt_event      = MasterTriggerEvent::from_bytestream(stream, &mut pos)?;
-    
-    let v_sizes              = Self::decode_depr_tofevent_size_header(&parse_u32(stream, pos));
-    for k in 0..v_sizes.0 {
-      match RBEvent::from_bytestream_nowaveforms(stream, pos) {
-        Err(err) => error!("Expected RBEvent {} of {}, but got serialization error {}!", k,  v_sizes.0, err),
-        Ok(ev) => {
-          te.rb_events.push(ev);
-        }
-      }
+    let v_sizes           = Self::decode_depr_tofevent_size_header(&parse_u32(stream, pos));
+    //println!("{:?}", v_sizes);
+    for _ in 0..v_sizes.0 {
+      // we are getting all waveforms for now, but we can 
+      // discard them later
+      let next_rb_event = RBEvent::from_bytestream(stream, pos)?;
+      //println!("{}", next_rb_event);
+      te.rb_events.push(next_rb_event);
     }
     let tail = parse_u16(stream, pos);
     if tail != Self::TAIL {
       error!("Decoding of TAIL failed! Got {} instead!", tail);
       return Err(SerializationError::TailInvalid);
     }
+    //println!("{}",te);
     return Ok(te);
   }
 }
@@ -772,6 +791,14 @@ impl fmt::Display for TofEvent {
     for h in &self.hits {
       repr += &(format!("\n  {}", h));
     }
+    if self.rb_events.len() > 0 {
+      repr += &format!("\n -- has {} RBEvents with waveforms!", self.rb_events.len());
+      repr += "\n -- -- boards: ";
+      for b in &self.rb_events {
+        repr += &format!("{} ", b.header.rb_id);
+      }
+    }
+    repr += ">";
     write!(f, "{}", repr)
   }
 }
@@ -1031,6 +1058,12 @@ impl TofEvent {
   #[getter]
   fn get_status(&self) -> EventStatus {
     self.status
+  }
+
+  #[getter]
+  #[pyo3(name="waveforms")]
+  fn get_waveforms_py(&self) -> Vec<RBWaveform> {
+    self.get_waveforms()
   }
 }
 

@@ -121,6 +121,14 @@ fn tof_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   Ok(())
 }
 
+#[cfg(feature="pybindings")]
+#[pymodule]
+#[pyo3(name = "calibration")]
+fn calibration_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
+  use crate::calibration::tof::*;
+  m.add_class::<RBCalibrations>()?;
+  Ok(())
+}
 
 #[cfg(feature="pybindings")]
 #[pymodule]
@@ -167,6 +175,7 @@ fn io_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(read_example, m)?)?;
   m.add_class::<CRFrameObject>()?;
   m.add_class::<DataSourceKind>()?;
+  m.add_class::<CRReader>()?;
   Ok(())
 }
 
@@ -223,6 +232,7 @@ fn db_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   use crate::database::*;
   m.add_class::<TofPaddle>()?;
   m.add_class::<ReadoutBoard>()?;
+  m.add_class::<TrackerStrip>()?;
   m.add_function(wrap_pyfunction!(get_all_rbids_in_db, m)?)?;
   Ok(())
 }
@@ -251,5 +261,6 @@ fn gondola_core_py<'_py>(m : &Bound<'_py, PyModule>) -> PyResult<()> { //: Pytho
   m.add_wrapped(wrap_pymodule!(db_py))?;
   m.add_wrapped(wrap_pymodule!(stats_py))?;
   m.add_wrapped(wrap_pymodule!(algo_py))?;
+  m.add_wrapped(wrap_pymodule!(calibration_py))?;
   Ok(())
 }

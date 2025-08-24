@@ -14,42 +14,17 @@
 
 use crate::prelude::*;
 
-//use std::fmt;
-//
-//use std::fs::{
-//  self,
-//  File,
-//  OpenOptions
-//};
-//
-//use std::path::Path;
-//use std::io::{
-//  self,
-//  BufReader,
-//  Seek,
-//  SeekFrom,
-//  Read,
-//  ErrorKind
-//};
-//use regex::Regex;
-//
-//use crate::io::list_path_contents_sorted;
-
-//
 //use indicatif::{
 //  ProgressBar,
 //  ProgressStyle
 //};
-//
-//use crate::frame::CRFrame;
-//use crate::serialization::CRSerializeable;
-//use crate::parsers::*;
 //
 
 /// Read binaries written through the caraspace i/o system
 ///
 /// The file needs to contain subsequent CRFrames.
 #[derive(Debug)] // deliberatly don't have a default() method, reader should fail in that case
+#[cfg_attr(feature="pybindings", pyclass)]
 pub struct CRReader {
   /// Read from this file
   pub filenames        : Vec<String>,
@@ -403,6 +378,87 @@ impl CRReader {
   } // end fn
 }
 
+//impl Iterator for CRReader {
+//  type Item = CRFrame;
+//
+//  fn next(&mut self) -> Option<Self::Item> {
+//    self.read_next_item()
+//  }
+//}
+
 reader!(CRReader,CRFrame);
+
+//--------------------------------------
+
+#[cfg(feature="pybindings")]
+#[pymethods]
+impl CRReader {
+
+  #[new]
+  fn new_py(filename_or_directory : &Bound<'_,PyAny>) -> PyResult<Self> {
+    let mut string_value = String::from("foo");
+    if let Ok(s) = filename_or_directory.extract::<String>() {
+       string_value = s;
+    } //else if let Ok(p) = filename_or_directory.extract::<&Path>() {
+    if let Ok(fspath_method) = filename_or_directory.getattr("__fspath__") {
+      if let Ok(fspath_result) = fspath_method.call0() {
+        if let Ok(py_string) = fspath_result.extract::<String>() {
+          string_value = py_string;
+        }
+      }
+    }
+    match Self::new(string_value) {
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+      Ok(reader) => {
+        return Ok(reader);
+      }
+    }
+  }
+
+
+  /// This is the filename we are currently 
+  /// extracting frames from 
+  #[getter]
+  #[pyo3(name="current_filename")]
+  fn get_current_filename_py(&self) -> Option<String> {
+    self.get_current_filename()
+  }
+
+  /// Start the reader from the beginning
+  /// This is equivalent to a re-initialization
+  /// of that reader.
+  #[pyo3(name="rewind")]
+  fn rewind_py(&mut self) -> PyResult<()> {
+    match self.rewind() {
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+      Ok(_) => Ok(())
+    }
+  }
+
+  fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
+    slf 
+  }
+  
+  fn __next__(mut slf: PyRefMut<'_, Self>) -> Option<CRFrame> {
+    match slf.next() { 
+      Some(frame) => {
+        //let mut pyframe = PyCRFrame::new();
+        //pyframe.frame = frame;
+        ////FIXME - these are huge! This needs to be solved
+        ////by some other method
+        //pyframe.paddles = slf.paddles.clone();
+        //pyframe.strips  = slf.strips.clone();
+        return Some(frame)
+      }   
+      None => {
+        return None;
+      }   
+    }   
+  }
+}
 
 
