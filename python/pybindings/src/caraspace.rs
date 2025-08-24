@@ -6,6 +6,8 @@
 
 use std::collections::HashMap;
 
+use std::sync::Arc;
+
 use pyo3::prelude::*;
 use pyo3::types::{
   PyBytes,
@@ -139,8 +141,8 @@ impl PyCRFrameObject {
 #[derive(Clone, Debug)]
 pub struct PyCRFrame{
   frame   : CRFrame,
-  paddles : HashMap<u8, Paddle>, 
-  strips  : HashMap<u32, TrackerStrip>
+  paddles : Arc<HashMap<u8, Paddle>>, 
+  strips  : Arc<HashMap<u32, TrackerStrip>>
 }
 
 //impl Default for PyCRFrame {
@@ -159,8 +161,8 @@ impl PyCRFrame {
   fn new() -> Self {
     Self {
       frame   : CRFrame::new(),
-      paddles : HashMap::<u8, Paddle>::new(),
-      strips  : HashMap::<u32, TrackerStrip>::new(),
+      paddles : Arc::new(HashMap::<u8, Paddle>::new()),
+      strips  : Arc::new(HashMap::<u32, TrackerStrip>::new()),
     }
   }
 
@@ -180,8 +182,8 @@ impl PyCRFrame {
       Ok(new_frame) => {
         let mut new_pyframe = PyCRFrame::new();
         new_pyframe.frame   = new_frame;
-        new_pyframe.paddles = self.paddles.clone();
-        new_pyframe.strips  = self.strips.clone();
+        new_pyframe.paddles = Arc::clone(&self.paddles);
+        new_pyframe.strips  = Arc::clone(&self.strips);
         Ok(new_pyframe)
       }
       Err(err) => {
@@ -190,6 +192,7 @@ impl PyCRFrame {
     }
   }
 
+  //#[pyo3(signature = (packet, name = None))]
   fn put_telemetrypacket(&mut self, packet : PyTelemetryPacket, name : String) {
     let packet = packet.packet;
     self.frame.put(packet, name)
@@ -307,8 +310,8 @@ impl PyCRFrame {
 #[pyo3(name="CRReader")]
 pub struct PyCRReader {
   reader  : CRReader,
-  paddles : HashMap<u8,Paddle>,
-  strips  : HashMap<u32, TrackerStrip>
+  paddles : Arc<HashMap<u8,Paddle>>,
+  strips  : Arc<HashMap<u32, TrackerStrip>>
 }
 
 #[pymethods]
@@ -355,8 +358,8 @@ impl PyCRReader {
     }
     Ok(Self {
       reader  : CRReader::new(string_value)?,
-      paddles : paddles,
-      strips  : strips,
+      paddles : Arc::new(paddles),
+      strips  : Arc::new(strips),
     })
   }
 
@@ -390,8 +393,8 @@ impl PyCRReader {
         pyframe.frame = frame;
         //FIXME - these are huge! This needs to be solved
         //by some other method
-        pyframe.paddles = slf.paddles.clone();
-        pyframe.strips  = slf.strips.clone();
+        pyframe.paddles = Arc::clone(&slf.paddles);
+        pyframe.strips  = Arc::clone(&slf.strips);
         return Some(pyframe)
       }   
       None => {
