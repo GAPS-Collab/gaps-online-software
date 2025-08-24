@@ -1,6 +1,7 @@
 // This file is part of gaps-online-software and published 
 // under the GPLv3 license
 
+pub use std::sync::Arc;
 pub use std::collections::{
   HashMap,
   VecDeque
