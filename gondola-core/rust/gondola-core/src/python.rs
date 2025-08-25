@@ -22,9 +22,26 @@
 /// Adds the __repr__  and __str__ functions to 
 /// a pybindings wrapped class
 #[macro_export]
+macro_rules! pythonize_display {
+  ($pyclass:ty) => {
+    #[pymethods]
+    impl $pyclass {
+      fn __repr__(&self) -> PyResult<String> {
+          Ok(format!("<{}: {}>", stringify!($pyclass), self.to_string()))
+      }
+      fn __str__(&self) -> PyResult<String> {
+          Ok(format!("<{}: {}>", stringify!($pyclass), self.to_string()))
+      }
+    }
+  };
+}
+
+/// Adds the __repr__  and __str__ functions to 
+/// a pybindings wrapped class
+#[macro_export]
 macro_rules! pythonize {
   ($pyclass:ty) => {
-    //use pyo3::prelude::*;
+    pythonize_display!($pyclass);
 
     #[pymethods]
     impl $pyclass {
@@ -34,12 +51,6 @@ macro_rules! pythonize {
         Self::new()
       }
 
-      fn __repr__(&self) -> PyResult<String> {
-          Ok(format!("<{}: {}>", stringify!($pyclass), self.to_string()))
-      }
-      fn __str__(&self) -> PyResult<String> {
-          Ok(format!("<{}: {}>", stringify!($pyclass), self.to_string()))
-      }
     }
   };
 }
@@ -160,24 +171,6 @@ macro_rules! pythonize_packable {
   };
 }
 
-/// Adds the __repr__  and __str__ functions to 
-/// a pybindings wrapped class
-#[macro_export]
-macro_rules! impl_pythonize_display {
-  ($pyclass:ty, $getter:expr) => {
-    //use pyo3::prelude::*;
-
-    #[pymethods]
-    impl $pyclass {
-      fn __repr__(&self) -> PyResult<String> {
-          Ok(format!("<{}: {}>", stringify!($pyclass), $getter(self)))
-      }
-      fn __str__(&self) -> PyResult<String> {
-          Ok(format!("<{}: {}>", stringify!($pyclass), $getter(self)))
-      }
-    }
-  };
-}
 
 //--------------------------------------------------
 

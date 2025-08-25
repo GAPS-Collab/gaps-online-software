@@ -1,43 +1,8 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
+// The following file is part of gaps-online-software and published 
+// under the GPLv3 license
 
-use std::fmt;
+use crate::prelude::*;
 use std::f32::consts::PI;
-
-use half::f16;
-
-#[cfg(feature="pybindings")]
-use pyo3::{
-  prelude::*,
-  PyResult,
-  pyclass
-};
-
-
-#[cfg(feature="pybindings")]
-use crate::impl_pythonize_display;
-
-#[cfg(feature="random")]
-use crate::random::FromRandom;
-
-use crate::errors::SerializationError;
-use crate::io::serialization::Serialization;
-use crate::io::parsers::{
-  parse_u8,
-  //parse_u16,
-  parse_f16,
-};
-use crate::version::ProtocolVersion;
-
-use crate::constants::{
-  C_LIGHT_PADDLE,
-};
-
-#[cfg(feature="random")]
-use rand::Rng;
-
-#[cfg(feature="database")]
-use crate::database::TofPaddle;
 
 /// Waveform peak
 ///
@@ -145,9 +110,6 @@ pub struct TofHit {
   pub valid          : bool,
 }
 
-
-
-
 // methods without pybindings
 impl TofHit {
   pub fn new() -> Self {
@@ -224,16 +186,6 @@ impl TofHit {
 
   pub fn set_charge_b(&mut self, c : f32) {
     self.charge_b = f16::from_f32(c)
-  }
-}
-
-// methods only for pybindings
-#[cfg(feature="pybindings")]
-#[pymethods]
-impl TofHit {
-  #[new]
-  fn new_py() -> Self {
-    Self::new()
   }
 }
 
@@ -476,7 +428,7 @@ impl TofHit {
 }
 
 #[cfg(feature="pybindings")]
-impl_pythonize_display!(TofHit, |s: &TofHit| s.to_string());
+pythonize!(TofHit);
 
 // methods which have wrapped pybindings
 impl TofHit {
@@ -828,209 +780,206 @@ impl FromRandom for TofHit {
 
 //---------------------------------------------------------------
 
-
-
-
-#[cfg(feature="pybindings")]
-#[pyclass]
-#[pyo3(name="TofHit")]
-pub struct PyTofHit {
-  hit : TofHit,
-}
-
-#[cfg(feature="pybindings")]
-#[pymethods]
-impl PyTofHit {
-  #[new]
-  fn new() -> Self {
-    Self {
-      hit : TofHit::new(),
-    }
-  }
-
-  pub fn set_timing_offset(&mut self, offset : f32) {
-    self.hit.timing_offset = offset;
-  }
-
-  /// Calculate the distance to another hit. For this 
-  /// to work, the hit coordinates have had to be 
-  /// determined, so this will only return a 
-  /// propper result after the paddle information 
-  /// is added
-  pub fn distance(&self, other : &PyTofHit) -> f32 {
-    //((self.x - other.x).powi(2) + (self.y - other.y).powi(2) + (self.z - other.z).powi(2)).sqrt()
-    self.hit.distance(&other.hit)
-  }
- 
-  /// Set the length and cable length for the paddle
-  /// FIXME - take gaps_online.db.Paddle as argument
-  fn set_paddle(&mut self, plen : f32, coax_cbl_time : f32, hart_cbl_time : f32 ) {
-    self.hit.paddle_len = plen;
-    self.hit.coax_cable_time = coax_cbl_time;
-    self.hit.hart_cable_time = hart_cbl_time;
-  }
-
-  #[getter]
-  fn x(&self) -> f32 {
-    self.hit.x
-  }
-  
-  #[getter]
-  fn y(&self) -> f32 {
-    self.hit.y
-  }
-
-  #[getter]
-  fn z(&self) -> f32 {
-    self.hit.z
-  }
-
-  #[getter]
-  fn get_t0_uncorrected(&self) -> f32 {
-    self.hit.get_t0_uncorrected()
-  }
-  
-  /// Event t0 is the calculated interaction time based on 
-  /// the RELATIVE phase shifts consdering ALL hits in this
-  /// event. This might be of importance to catch rollovers
-  /// in the phase of channel9. 
-  /// In total, we are restricting ourselves to a time of 
-  /// 50ns per events and adjust the phase in such a way that 
-  /// everything fits into this interval. This will 
-  /// significantly import the beta reconstruction for particles
-  /// which hit the TOF within this timing window.
-  ///
-  /// If a timing offset is set, this will be added
-  #[getter]
-  fn get_event_t0(&self) -> f32 {
-    self.hit.get_t0()
-  }
-
-  #[getter]
-  fn get_obeys_causality(&self) -> bool {
-    self.hit.obeys_causality()
-  }
-
-  #[getter]
-  fn get_coax_cbl_time(&self) -> f32 {
-    self.hit.coax_cable_time
-  }
-
-  #[getter]
-  fn get_hart_cbl_time(&self) -> f32 {
-    self.hit.hart_cable_time
-  }
-
-  /// Reconstructed particle interaction time,
-  /// calculated from the waveforms of the two
-  /// different paddle ends. If the paddle has 
-  /// been set, this takes phase and cable 
-  /// length into account
-  #[getter]
-  fn t0(&self) -> f32 {
-    self.hit.get_t0()
-  }
-
-  #[getter]
-  fn get_phase_delay(&self) -> f32 {
-    self.hit.get_phase_delay()
-  }
-
-  #[getter]
-  fn get_cable_delay(&self) -> f32 {
-    self.hit.get_cable_delay()
-  }
-
-  #[getter]
-  fn version(&self) -> ProtocolVersion {
-    self.hit.version
-  }
-
-  #[getter]
-  fn phase(&self) -> f32 {
-    self.hit.phase.to_f32()
-  }
-
-  #[getter]
-  fn baseline_a(&self) -> f32 {
-    self.hit.baseline_a.to_f32()
-  }
-
-  #[getter]
-  fn baseline_a_rms(&self) -> f32 {
-    self.hit.baseline_a_rms.to_f32()
-  }
-  
-  #[getter]
-  fn baseline_b(&self) -> f32 {
-    self.hit.baseline_b.to_f32()
-  }
-
-  #[getter]
-  fn baseline_b_rms(&self) -> f32 {
-    self.hit.baseline_b_rms.to_f32()
-  }
-
-  #[getter]
-  fn peak_a(&self) -> f32 {
-    self.hit.get_peak_a()
-  }
-  
-  #[getter]
-  fn peak_b(&self) -> f32 {
-    self.hit.get_peak_b()
-  }
-  
-  #[getter]
-  fn charge_a(&self) -> f32 {
-    self.hit.get_charge_a()
-  }
-  
-  #[getter]
-  fn charge_b(&self) -> f32 {
-    self.hit.get_charge_b()
-  }
-
-  #[getter]
-  fn time_a(&self) -> f32 {
-    self.hit.get_time_a()
-  }
-  
-  #[getter]
-  fn time_b(&self) -> f32 {
-    self.hit.get_time_b()
-  }
-
-  /// Reconstructed particle interaction position
-  /// along the long axis of the paddle.
-  /// For the other dimensions, there is no information
-  /// about the position.
-  /// Reconstructed with the waveforms of both paddle ends.
-  #[getter]
-  fn pos(&self) -> f32 {
-    self.hit.get_pos()
-  }
- 
-  /// The paddle id (1-160) of the hit paddle
-  #[getter]
-  fn paddle_id(&self) -> u8 {
-    self.hit.paddle_id
-  }
-
-  #[getter]
-  fn edep(&self) -> f32 {
-    self.hit.get_edep()
-  }
-
-  #[getter]
-  fn get_paddle_len(&self) -> f32 {
-    self.hit.paddle_len
-  }
-
-}
-
-#[cfg(feature="pybindings")]
-impl_pythonize_display!(PyTofHit, |s: &PyTofHit| s.hit.to_string());
+//#[cfg(feature="pybindings")]
+//#[pyclass]
+//#[pyo3(name="TofHit")]
+//pub struct PyTofHit {
+//  hit : TofHit,
+//}
+//
+//#[cfg(feature="pybindings")]
+//#[pymethods]
+//impl PyTofHit {
+//  //#[new]
+//  //fn new() -> Self {
+//  //  Self {
+//  //    hit : TofHit::new(),
+//  //  }
+//  //}
+//
+//  pub fn set_timing_offset(&mut self, offset : f32) {
+//    self.hit.timing_offset = offset;
+//  }
+//
+//  /// Calculate the distance to another hit. For this 
+//  /// to work, the hit coordinates have had to be 
+//  /// determined, so this will only return a 
+//  /// propper result after the paddle information 
+//  /// is added
+//  pub fn distance(&self, other : &PyTofHit) -> f32 {
+//    //((self.x - other.x).powi(2) + (self.y - other.y).powi(2) + (self.z - other.z).powi(2)).sqrt()
+//    self.hit.distance(&other.hit)
+//  }
+// 
+//  /// Set the length and cable length for the paddle
+//  /// FIXME - take gaps_online.db.Paddle as argument
+//  fn set_paddle(&mut self, plen : f32, coax_cbl_time : f32, hart_cbl_time : f32 ) {
+//    self.hit.paddle_len = plen;
+//    self.hit.coax_cable_time = coax_cbl_time;
+//    self.hit.hart_cable_time = hart_cbl_time;
+//  }
+//
+//  #[getter]
+//  fn x(&self) -> f32 {
+//    self.hit.x
+//  }
+//  
+//  #[getter]
+//  fn y(&self) -> f32 {
+//    self.hit.y
+//  }
+//
+//  #[getter]
+//  fn z(&self) -> f32 {
+//    self.hit.z
+//  }
+//
+//  #[getter]
+//  fn get_t0_uncorrected(&self) -> f32 {
+//    self.hit.get_t0_uncorrected()
+//  }
+//  
+//  /// Event t0 is the calculated interaction time based on 
+//  /// the RELATIVE phase shifts consdering ALL hits in this
+//  /// event. This might be of importance to catch rollovers
+//  /// in the phase of channel9. 
+//  /// In total, we are restricting ourselves to a time of 
+//  /// 50ns per events and adjust the phase in such a way that 
+//  /// everything fits into this interval. This will 
+//  /// significantly import the beta reconstruction for particles
+//  /// which hit the TOF within this timing window.
+//  ///
+//  /// If a timing offset is set, this will be added
+//  #[getter]
+//  fn get_event_t0(&self) -> f32 {
+//    self.hit.get_t0()
+//  }
+//
+//  #[getter]
+//  fn get_obeys_causality(&self) -> bool {
+//    self.hit.obeys_causality()
+//  }
+//
+//  #[getter]
+//  fn get_coax_cbl_time(&self) -> f32 {
+//    self.hit.coax_cable_time
+//  }
+//
+//  #[getter]
+//  fn get_hart_cbl_time(&self) -> f32 {
+//    self.hit.hart_cable_time
+//  }
+//
+//  /// Reconstructed particle interaction time,
+//  /// calculated from the waveforms of the two
+//  /// different paddle ends. If the paddle has 
+//  /// been set, this takes phase and cable 
+//  /// length into account
+//  #[getter]
+//  fn t0(&self) -> f32 {
+//    self.hit.get_t0()
+//  }
+//
+//  #[getter]
+//  fn get_phase_delay(&self) -> f32 {
+//    self.hit.get_phase_delay()
+//  }
+//
+//  #[getter]
+//  fn get_cable_delay(&self) -> f32 {
+//    self.hit.get_cable_delay()
+//  }
+//
+//  #[getter]
+//  fn version(&self) -> ProtocolVersion {
+//    self.hit.version
+//  }
+//
+//  #[getter]
+//  fn phase(&self) -> f32 {
+//    self.hit.phase.to_f32()
+//  }
+//
+//  #[getter]
+//  fn baseline_a(&self) -> f32 {
+//    self.hit.baseline_a.to_f32()
+//  }
+//
+//  #[getter]
+//  fn baseline_a_rms(&self) -> f32 {
+//    self.hit.baseline_a_rms.to_f32()
+//  }
+//  
+//  #[getter]
+//  fn baseline_b(&self) -> f32 {
+//    self.hit.baseline_b.to_f32()
+//  }
+//
+//  #[getter]
+//  fn baseline_b_rms(&self) -> f32 {
+//    self.hit.baseline_b_rms.to_f32()
+//  }
+//
+//  #[getter]
+//  fn peak_a(&self) -> f32 {
+//    self.hit.get_peak_a()
+//  }
+//  
+//  #[getter]
+//  fn peak_b(&self) -> f32 {
+//    self.hit.get_peak_b()
+//  }
+//  
+//  #[getter]
+//  fn charge_a(&self) -> f32 {
+//    self.hit.get_charge_a()
+//  }
+//  
+//  #[getter]
+//  fn charge_b(&self) -> f32 {
+//    self.hit.get_charge_b()
+//  }
+//
+//  #[getter]
+//  fn time_a(&self) -> f32 {
+//    self.hit.get_time_a()
+//  }
+//  
+//  #[getter]
+//  fn time_b(&self) -> f32 {
+//    self.hit.get_time_b()
+//  }
+//
+//  /// Reconstructed particle interaction position
+//  /// along the long axis of the paddle.
+//  /// For the other dimensions, there is no information
+//  /// about the position.
+//  /// Reconstructed with the waveforms of both paddle ends.
+//  #[getter]
+//  fn pos(&self) -> f32 {
+//    self.hit.get_pos()
+//  }
+// 
+//  /// The paddle id (1-160) of the hit paddle
+//  #[getter]
+//  fn paddle_id(&self) -> u8 {
+//    self.hit.paddle_id
+//  }
+//
+//  #[getter]
+//  fn edep(&self) -> f32 {
+//    self.hit.get_edep()
+//  }
+//
+//  #[getter]
+//  fn get_paddle_len(&self) -> f32 {
+//    self.hit.paddle_len
+//  }
+//
+//}
+//
+//#[cfg(feature="pybindings")]
+//impl_pythonize_display!(PyTofHit, |s: &PyTofHit| s.hit.to_string());
 
 
 #[cfg(feature = "random")]

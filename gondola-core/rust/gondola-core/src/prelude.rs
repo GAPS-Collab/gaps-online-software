@@ -45,6 +45,10 @@ pub use chrono::{
 };
 
 pub use glob::glob;
+pub use indicatif::{
+  ProgressBar,
+  ProgressStyle
+};
 
 // avoiding boilerplate for enums
 pub use strum_macros::{
@@ -107,6 +111,8 @@ pub use crate::pythonize_packable;
 pub use crate::pythonize;
 #[cfg(feature="pybindings")]
 pub use crate::pythonize_telemetry;
+#[cfg(feature="pybindings")]
+pub use crate::pythonize_display;
 
 #[cfg(feature="random")]
 pub use crate::random::FromRandom;

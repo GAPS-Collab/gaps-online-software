@@ -125,7 +125,10 @@ impl CRReader {
     let packet_reader = Self { 
       filenames        : infiles,
       file_idx       : 0,
-      file_reader      : BufReader::new(file),
+      //file_reader      : BufReader::new(file),
+      // we exploit the fact here that a file is typically ~500Mb
+      // (tof file only is 420MB)
+      file_reader      : BufReader::with_capacity(500*1024*1024,file),
       cursor           : 0,
       n_packs_read     : 0,
       n_errors         : 0,
@@ -155,99 +158,102 @@ impl CRReader {
 //  //}
 //  
 //
-//  /// Preview the number of frames in this reader
-//  pub fn get_n_frames(&mut self) -> usize {
-//    let _ = self.rewind();
-//    let mut nframes = 0usize;
-//    let mut buffer  = [0];
-//    let bar_template : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {pos:>7}/{len:7}";
-//    let bar_style  = ProgressStyle::with_template(bar_template).expect("Unable to set progressbar style!");
-//    let bar = ProgressBar::new(self.filenames.len() as u64);
-//    bar.set_position(0);
-//    bar.set_message (String::from("Counting frames.."));
-//    bar.set_prefix  ("\u{2728}");
-//    bar.set_style   (bar_style);
-//    bar.set_position(self.file_idx as u64);
-//    loop {
-//      match self.file_reader.read_exact(&mut buffer) {
-//        Err(err) => {
-//          debug!("Unable to read from file! {err}");
-//          match self.prime_next_file() {
-//            None    => break,
-//            Some(_) => {
-//              bar.set_position(self.file_idx as u64);
-//              continue;
-//            }
-//          };
-//        }
-//        Ok(_) => {
-//          self.cursor += 1;
-//        }
-//      }
-//      if buffer[0] != 0xAA {
-//        continue;
-//      } else {
-//        match self.file_reader.read_exact(&mut buffer) {
-//          Err(err) => {
-//            debug!("Unable to read from file! {err}");
-//            match self.prime_next_file() {
-//              None    => break,
-//              Some(_) => {
-//                bar.set_position(self.file_idx as u64);
-//                continue;
-//              }
-//            };
-//          }
-//          Ok(_) => {
-//            self.cursor += 1;
-//          }
-//        }
-//        // check if the second byte of the header
-//        if buffer[0] != 0xAA { 
-//          continue;
-//        } else {
-//          // read the the size of the packet
-//          let mut buffer_psize = [0,0,0,0,0,0,0,0];
-//          match self.file_reader.read_exact(&mut buffer_psize) {
-//            Err(_err) => {
-//              match self.prime_next_file() {
-//                None    => break,
-//                Some(_) => {
-//                  bar.set_position(self.file_idx as u64);
-//                  continue;
-//                }
-//              }
-//            }
-//            Ok(_) => {
-//              self.cursor += 8;
-//            }
-//          }
-//          let vec_data = buffer_psize.to_vec();
-//          let size     = parse_u64(&vec_data, &mut 0);
-//          match self.file_reader.seek(SeekFrom::Current(size as i64)) {
-//            Err(err) => {
-//              error!("Unable to read {size} bytes from {}! {err}", self.get_current_filename().unwrap());
-//              match self.prime_next_file() {
-//                None    => break,
-//                Some(_) => {
-//                  bar.set_position(self.file_idx as u64);
-//                  continue;
-//                }
-//              }
-//            }
-//            Ok(_) => {
-//              self.cursor += size as usize;
-//              nframes += 1;
-//            }
-//          }
-//        }
-//      } // if no 0xAA found
-//    } // end loop
-//    bar.finish_with_message("Done!");
-//    let _ = self.rewind();
-//    nframes
-//  } // end fn
-//
+  /// Preview the number of frames in this reader
+  pub fn count_frames(&mut self) -> usize {
+    let _ = self.rewind();
+    let mut nframes = 0usize;
+    let mut buffer  = [0];
+    let bar_template : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {pos:>7}/{len:7}";
+    let bar_style  = ProgressStyle::with_template(bar_template).expect("Unable to set progressbar style!");
+    let bar = ProgressBar::new(self.filenames.len() as u64);
+    bar.set_position(0);
+    bar.set_message (String::from("Counting frames.."));
+    bar.set_prefix  ("\u{2728}");
+    bar.set_style   (bar_style);
+    bar.set_position(self.file_idx as u64);
+    loop {
+      match self.file_reader.read_exact(&mut buffer) {
+        Err(err) => {
+          debug!("Unable to read from file! {err}");
+          match self.prime_next_file() {
+            None    => break,
+            Some(_) => {
+              bar.set_position(self.file_idx as u64);
+              continue;
+            }
+          };
+        }
+        Ok(_) => {
+          self.cursor += 1;
+        }
+      }
+      if buffer[0] != 0xAA {
+        continue;
+      } else {
+        match self.file_reader.read_exact(&mut buffer) {
+          Err(err) => {
+            debug!("Unable to read from file! {err}");
+            match self.prime_next_file() {
+              None    => break,
+              Some(_) => {
+                bar.set_position(self.file_idx as u64);
+                continue;
+              }
+            };
+          }
+          Ok(_) => {
+            self.cursor += 1;
+          }
+        }
+        // check if the second byte of the header
+        if buffer[0] != 0xAA { 
+          continue;
+        } else {
+          // read the the size of the packet
+          let mut buffer_psize = [0,0,0,0,0,0,0,0];
+          match self.file_reader.read_exact(&mut buffer_psize) {
+            Err(_err) => {
+              match self.prime_next_file() {
+                None    => break,
+                Some(_) => {
+                  bar.set_position(self.file_idx as u64);
+                  continue;
+                }
+              }
+            }
+            Ok(_) => {
+              self.cursor += 8;
+            }
+          }
+          let vec_data = buffer_psize.to_vec();
+          let size     = parse_u64(&vec_data, &mut 0);
+          let mut temp_buffer = vec![0; size as usize];
+          match self.file_reader.read_exact(&mut temp_buffer) { 
+          //match self.file_reader.seek(SeekFrom::Current(size as i64)) {
+          //match self.file_reader.seek_relative(size as i64) {
+            Err(err) => {
+              error!("Unable to read {size} bytes from {}! {err}", self.get_current_filename().unwrap());
+              match self.prime_next_file() {
+                None    => break,
+                Some(_) => {
+                  bar.set_position(self.file_idx as u64);
+                  continue;
+                }
+              }
+            }
+            Ok(_) => {
+              self.cursor += size as usize;
+              nframes += 1;
+            }
+          }
+        }
+      } // if no 0xAA found
+    } // end loop
+    bar.finish_with_message("Done!");
+    let _ = self.rewind();
+    nframes
+  } // end fn
+
   /// Return the next frame for the current files
   ///
   /// Will return none if the file has been exhausted.
@@ -439,6 +445,11 @@ impl CRReader {
     }
   }
 
+  #[pyo3(name="count_frames")]
+  fn count_frames_py(&mut self) -> usize {
+    self.count_frames()
+  }
+
   fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
     slf 
   }
@@ -461,4 +472,4 @@ impl CRReader {
   }
 }
 
-
+pythonize_display!(CRReader);

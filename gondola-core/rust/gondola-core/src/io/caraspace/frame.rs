@@ -143,6 +143,8 @@ pub struct CRFrame {
   // FIXME - this needs to be HashMap<&str, (u64, CRFrameObjectType)>
   pub index       : HashMap<String, (u64, CRFrameObjectType)>,
   pub bytestorage : Vec<u8>,
+  pub paddles     : Arc<HashMap<u8, TofPaddle>>, 
+  pub strips      : Arc<HashMap<u32, TrackerStrip>>
 }
 
 impl CRFrame {
@@ -151,6 +153,8 @@ impl CRFrame {
     Self {
       index       : HashMap::<String, (u64, CRFrameObjectType)>::new(),
       bytestorage : Vec::<u8>::new(),
+      paddles     : Arc::new(HashMap::<u8, TofPaddle>::new()),
+      strips      : Arc::new(HashMap::<u32, TrackerStrip>::new()),
     }
   }
 
@@ -183,7 +187,6 @@ impl CRFrame {
     stream.append(&mut payload);
     stream
   }
-
 
   pub fn parse_index(stream : &Vec<u8>, pos : &mut usize) -> HashMap<String, (u64, CRFrameObjectType)> {
     let idx_size = parse_u8(stream, pos);
@@ -224,6 +227,8 @@ impl CRFrame {
       let obj = self.get_fobject(&objname)?;
       new_frame.put_fobject(obj, objname);
     }
+    new_frame.paddles = Arc::clone(&self.paddles);
+    new_frame.strips  = Arc::clone(&self.strips);
     Ok(new_frame)
   }
 
@@ -481,7 +486,7 @@ impl CRFrame {
   /// Get a tofevent from the frame directly
   fn get_tofevent(&mut self, name : &str) -> PyResult<TofEvent> {
     let packet    = self.get::<TofPacket>(name).unwrap();
-    let event = packet.unpack::<TofEvent>().unwrap();
+    let event     = packet.unpack::<TofEvent>().unwrap();
     //event.set_paddles(&self.paddles);
     //py_event.event  = event;
     Ok(event)

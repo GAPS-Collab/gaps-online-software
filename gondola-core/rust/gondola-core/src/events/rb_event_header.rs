@@ -1,29 +1,8 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
 
+use crate::prelude::*;
 use colored::Colorize;
-
-use std::fmt;
-#[cfg(feature="random")]
-use crate::random::FromRandom;
-#[cfg(feature="random")]
-use rand::Rng;
-
-use crate::io::serialization::Serialization;
-use crate::errors::SerializationError;
-use crate::io::parsers::{
-  parse_u8,
-  parse_u16,
-  parse_u32,
-};
-
-use crate::tof::RBPaddleID;
-
-#[cfg(feature="pybindings")]
-use pyo3::prelude::*;
-
-#[cfg(feature="pybindings")]
-use crate::pythonize;
 
 /// The RBEvent header gets generated once per event
 /// per RB. 

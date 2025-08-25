@@ -1,47 +1,10 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
-//!
 //! Short notation for TOF detector status
 //! 1 bit per working channel
 //!
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
 
-
-use std::fmt;
-use std::collections::HashMap;
-
-cfg_if::cfg_if! {
-  if #[cfg(feature = "random")]  {
-    use crate::random::FromRandom;
-    use rand::Rng;
-  }
-}
-
-use crate::io::serialization::{
-  Serialization,
-  //SerializationError,
-  //Packable,
-  //parse_u32
-};
-
-use crate::packets::TofPackable;
-
-use crate::io::parsers::parse_u32;
-use crate::packets::TofPacketType;
-use crate::errors::SerializationError;
-
-#[cfg(feature="pybindings")]
-use pyo3::prelude::*;
-
-#[cfg(feature="pybindings")]
-use pyo3::exceptions::PyIOError;
-
-#[cfg(feature="pybindings")]
-use crate::packets::TofPacket;
-
-#[cfg(feature="pybindings")]
-use crate::impl_pythonize_display;
-
-
+use crate::prelude::*;
 
 /// Report dead channels/non-active detectors
 /// for the TOF system
@@ -288,25 +251,6 @@ impl fmt::Display for TofDetectorStatus {
 #[pymethods]
 impl TofDetectorStatus {
   
-  #[new]
-  fn new_py() -> Self {
-    TofDetectorStatus::new()
-  }
-  
-  #[staticmethod]
-  #[pyo3(name="from_tofpacket")]
-  fn from_tofpacket_py(packet : &TofPacket) -> PyResult<Self> {
-    match packet.unpack::<TofDetectorStatus>() {
-      Ok(status) => {
-        return Ok(status);
-      }
-      Err(err) => {
-        let err_msg = format!("Unable to unpack TofPacket! Is this really a TofDetectorStatus? {err}");
-        return Err(PyIOError::new_err(err_msg));
-      }
-    }
-  }
-
   #[getter]
   fn channels000_031(&self) -> u32 {
     self.channels000_031
@@ -359,7 +303,7 @@ impl TofDetectorStatus {
 }
 
 #[cfg(feature="pybindings")]
-impl_pythonize_display!(TofDetectorStatus, |s: &TofDetectorStatus | s.to_string());
+pythonize_packable!(TofDetectorStatus);
 
 
 #[cfg(feature = "random")]
