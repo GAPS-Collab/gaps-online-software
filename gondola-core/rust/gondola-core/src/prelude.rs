@@ -65,10 +65,20 @@ pub use num_traits::{
   NumCast,
   Float,
   FromBytes,
+  FloatConst,
+  NumOps,
+  NumAssignOps,
 };
 
 pub use regex::Regex;    
 pub use statistical::median;
+
+#[cfg(feature="advanced-algorithms")]
+pub use smoothed_z_score::{
+  Peak,
+  PeaksDetector,
+  PeaksFilter
+};
 
 #[cfg(feature="random")]
 pub use rand::Rng;

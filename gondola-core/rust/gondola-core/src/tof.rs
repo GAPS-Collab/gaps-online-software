@@ -1,4 +1,4 @@
-// The following file is part of gaps-online-software and published 
+// This file is part of gaps-online-software and published 
 // under the GPLv3 license
 
 pub mod rb_paddle_id;
@@ -10,3 +10,5 @@ pub mod config;
 pub use config::*;
 pub mod commands;
 pub use commands::*;
+pub mod settings;
+pub use settings::*;

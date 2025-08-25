@@ -460,7 +460,6 @@ impl fmt::Display for TofPaddle {
 
 #[cfg(feature="pybindings")]
 pythonize!(TofPaddle);
-//impl_pythonize_display!(TofPaddle, |s: &TofPaddle| s.to_string());
 
 //---------------------------------------------------------------------
 
@@ -796,6 +795,7 @@ impl ReadoutBoard {
 //calibration     : RBCalibrations::new(0),
 //}
 
+#[cfg(feature="pybindings")]
 pythonize!(ReadoutBoard);
 
 //---------------------------------------------------------------------
@@ -1521,6 +1521,7 @@ impl TrackerStrip {
   }
 }
 
+#[cfg(feature="pybindings")]
 pythonize!(TrackerStrip);
 
 //

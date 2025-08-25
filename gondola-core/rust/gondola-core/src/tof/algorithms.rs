@@ -1,46 +1,9 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
-//!
-//!
-//! This file contains source for algorithms
-//! used to exract information from 
+//! Algorithms used to exract information from 
 //! the TOF waveforms.
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
 
-//use core::f32::consts::PI;
-use num_traits::{
-  Float,
-  NumAssign,
-  NumAssignOps,
-  NumOps,
-  NumCast,
-  FloatConst,
-};
-
-use crate::errors::WaveformError;
-use crate::constants::{
-  NWORDS,
-};
-
-#[cfg(feature="advanced-algorithms")]
-use smoothed_z_score::{
-  Peak,
-  PeaksDetector,
-  PeaksFilter
-};
-
-#[cfg(feature="pybindings")]
-use pyo3::prelude::*;
-
-#[cfg(feature="pybindings")]
-use pyo3::exceptions::PyValueError;
-
-#[cfg(feature="pybindings")]
-use numpy::{
-  PyArray1,
-  PyArrayMethods,
-};
-
-
+use crate::prelude::*;
 
 /// Return the index of the maximum value in an 
 /// array of floats. 

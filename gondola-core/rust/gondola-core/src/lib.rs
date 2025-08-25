@@ -52,7 +52,7 @@ pub mod python;
 use crate::prelude::*;
 
 // python convention
-const VERSION: &str = env!("CARGO_PKG_VERSION"); 
+pub const VERSION: &str = env!("CARGO_PKG_VERSION"); 
 
 /// A simple helper macro adding an as_str function 
 /// as well as the Display method to any enum.
@@ -226,6 +226,7 @@ fn algo_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
 }
 
 #[cfg(feature="database")]
+#[cfg(feature="pybindings")]
 #[pymodule]
 #[pyo3(name = "db")]
 fn db_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
