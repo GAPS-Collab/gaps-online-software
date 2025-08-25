@@ -800,7 +800,6 @@ pythonize!(ReadoutBoard);
 
 //---------------------------------------------------------------------
 
-
 #[derive(Debug,Queryable, Selectable, serde::Serialize, serde::Deserialize)]
 #[diesel(table_name = schema::tof_db_rat)]
 #[diesel(primary_key(rat_id))]

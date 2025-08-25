@@ -62,9 +62,9 @@ struct TofEventIterator {
 struct TupleIterator {
 }
 
-// We introduce a series of iterators, which will allow fast unpacking for a dedicated 
-// data type
-#[pyfunction]
-fn create_iterator<'_py>(py: Python<'_py>, source: &DataSourcePy, tof_packet_type : Option<TofPacketType> , telemetry_packet_type : Option<TelemetryPacketType>) -> PyResult<Option<Bound<'_py,PyAny>>> {
-  return Ok(None);
-}
+//// We introduce a series of iterators, which will allow fast unpacking for a dedicated 
+//// data type
+//#[pyfunction]
+//fn create_iterator<'_py>(py: Python<'_py>, source: &DataSourcePy, tof_packet_type : Option<TofPacketType> , telemetry_packet_type : Option<TelemetryPacketType>) -> PyResult<Option<Bound<'_py,PyAny>>> {
+//  return Ok(None);
+//}

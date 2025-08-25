@@ -12,3 +12,5 @@ pub mod commands;
 pub use commands::*;
 pub mod settings;
 pub use settings::*;
+pub mod analysis_engine;
+pub use analysis_engine::*;

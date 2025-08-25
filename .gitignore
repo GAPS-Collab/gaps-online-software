@@ -36,6 +36,11 @@ python/doc/_autosummary/
 tof/liftof/build/*
 *.so
 
+# gander rye environment
+gander/src/*
+gander/__pycache__
+gander/*.lock
+
 # other files which might be in the repository
 data/*
 dataclasses/*
@@ -119,3 +124,5 @@ doc/latex
 # for static websites
 analysis/umbrella-checkout/content/*.md
 
+#test fragments
+gondola-core/rust/gondola-core/liftof-config-test.toml

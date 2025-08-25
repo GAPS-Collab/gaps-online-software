@@ -9,7 +9,7 @@
 //! This file contains the source for CRReader, a device to read a number
 //! of "caraspace" files from a given source.
 //
-// The following file is part of gaps-online-software and published 
+// This file is part of gaps-online-software and published 
 // under the GPLv3 license
 
 use crate::prelude::*;
@@ -472,4 +472,5 @@ impl CRReader {
   }
 }
 
+#[cfg(feature="pybindings")]
 pythonize_display!(CRReader);
