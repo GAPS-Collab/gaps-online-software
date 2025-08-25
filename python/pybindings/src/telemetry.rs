@@ -98,7 +98,11 @@ impl PyMergedEvent {
   fn version(&self) -> u8 {
     self.event.version
   }
-
+  
+  #[getter]
+  fn event_id(&self) -> u32 {
+      self.event.event_id
+  }
   #[getter]
   fn tracker_v2(&self) -> PyResult<Vec<PyTrackerHitV2>> {
     let mut hits = Vec::<PyTrackerHitV2>::new();
@@ -120,6 +124,11 @@ impl PyMergedEvent {
       events.push(pytrk);
     }
     Ok(events)
+  }
+
+  #[getter]
+  fn get_event_id(&self) -> u32 {
+    self.event.event_id
   }
 
   // FIXME - do this with bound

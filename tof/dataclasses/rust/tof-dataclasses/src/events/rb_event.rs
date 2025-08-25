@@ -1359,6 +1359,30 @@ impl RBWaveform {
       nanoseconds_b  : Vec::<f32>::new()
     }
   }
+  
+  /// Calculate the time in ns for which the waveform is 
+  /// above a certain threshold for paddle end A
+  pub fn time_over_threshold_a(&self, threshold : f32) -> f32 {
+    let mut tot : f32 = 0.0;
+    for k in 1..self.voltages_a.len() {
+      if self.voltages_a[k] > threshold {
+        tot += self.nanoseconds_a[k] - self.nanoseconds_a[k-1];
+      }
+    }
+    return tot;
+  }
+
+  /// Calculate the time in ns for which the waveform is 
+  /// above a certain threshold for paddle end B
+  pub fn time_over_threshold_b(&self, threshold : f32) -> f32 {
+    let mut tot : f32 = 0.0;
+    for k in 1..self.voltages_b.len() {
+      if self.voltages_b[k] > threshold {
+        tot += self.nanoseconds_b[k] - self.nanoseconds_b[k-1];
+      }
+    }
+    return tot;
+  }
 
   pub fn calibrate(&mut self, cali : &RBCalibrations) -> Result<(), CalibrationError>  {
     if cali.rb_id != self.rb_id {

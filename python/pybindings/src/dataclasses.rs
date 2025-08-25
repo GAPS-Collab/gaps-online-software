@@ -3100,7 +3100,12 @@ impl PyTofEvent {
       event : TofEvent::new(),
     }
   }
-  
+ 
+  #[getter]
+  fn has_any_mangling(&self) -> bool {
+    self.event.has_any_mangling()
+  }
+
   /// Emit a copy of self
   fn copy(&self) -> Self {
     let mut copy_event = PyTofEvent::new();
@@ -3562,6 +3567,25 @@ impl PyRBWaveform {
     Self {
       wf : RBWaveform::new(),
     }
+  }
+  /// Time over threshold - waveform needs to be 
+  /// calibrated. 
+  /// Paddle end A
+  ///
+  /// # Arguments:
+  ///   * threshold : value in mV
+  fn get_tot_a(&self, threshold : f32) -> f32 {
+    self.wf.time_over_threshold_a(threshold)
+  }
+  
+  /// Time over threshold - waveform needs to be 
+  /// calibrated. 
+  /// Paddle end B
+  ///
+  /// # Arguments:
+  ///   * threshold : value in mV
+  fn get_tot_b(&self, threshold : f32) -> f32 {
+    self.wf.time_over_threshold_b(threshold)
   }
  
   /// Apply the readoutboard calibration to convert adc/bins
