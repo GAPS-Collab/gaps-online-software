@@ -193,6 +193,11 @@ impl TelemetryEvent {
   }
 
   #[getter]
+  fn get_header(&self) -> TelemetryPacketHeader {
+    self.header
+  }
+
+  #[getter]
   fn tracker(&self) -> PyResult<Vec<TrackerHit>> {
     Ok(self.tracker_hits.clone())
   }
