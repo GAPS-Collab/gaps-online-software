@@ -4,6 +4,8 @@
 
 ## in case of Release build, we set the NDEBUG preprocessor directive
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG=1")
+#set(gaps_DICTIONARY G__GAPSCommon CACHE INTERNAL "${LIBRARY_OUTPUT_DIRECTORY}/G__GAPSCommon" FORCE)
+set(gapstof_DICTIONARY G__GapsTof)
 
 ################
 
@@ -82,6 +84,25 @@ if(BUILD_CXXBINDINGS)
     add_definitions( -DBUILD_CARASPACE)
   endif() 
   
+  # Build root dictionary for SD Legacy compat
+  #include_directories($<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include>
+  #                    $<$<BOOL:${BUILD_CXXDB}>:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/sqlite_orm/include/sqlite_orm>
+  #                    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include>
+  #                    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/result>
+  #                    $<INSTALL_INTERFACE:include> 
+  #                    #${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
+  #                    #${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+  #                    $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_INCLUDE_DIRS}>
+  #                    ${spdlog_SOURCE_DIR}/include
+  #                    ${common_extern_INCLUDE_IDR}  
+  #                 )
+                   
+  # Build ROOT dictionary
+  ROOT_GENERATE_DICTIONARY(${gapstof_DICTIONARY}
+                           ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include/sd_legacy.hpp 
+                           LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include/sd_legacy_linkdef.hpp)
+  #set_property(DIRECTORY . PROPERTY INCLUDE_DIRECTORIES "")
+  
   set(GAPSTOF_LIBRARY_SHARED GapsTof CACHE INTERNAL "GapsTof shared library" FORCE)
   add_library(${GAPSTOF_LIBRARY_SHARED} SHARED
       dataclasses/C++/src/tof_packet.cxx
@@ -95,9 +116,11 @@ if(BUILD_CXXBINDINGS)
       dataclasses/C++/src/legacy.cxx
       dataclasses/C++/src/logging.cxx
       dataclasses/C++/src/version.cxx
+      dataclasses/C++/src/sd_legacy.cxx
       dataclasses/C++/src/telemetry_dataclasses.cxx
       $<$<BOOL:${BUILD_CARASPACE}>:dataclasses/C++/src/caraspace.cxx>
       $<$<BOOL:${BUILD_CXXDB}>:dataclasses/C++/src/database.cxx>
+      ${gapstof_DICTIONARY}.cxx
   )
   
   set_property(TARGET ${GAPSTOF_LIBRARY_SHARED} PROPERTY CXX_STANDARD 20)
@@ -118,7 +141,10 @@ if(BUILD_CXXBINDINGS)
                         PUBLIC
                            $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
                            $<$<BOOL:${BUILD_CXXDB}>:${SQLite3_LIBRARIES}>
-                      )
+                           ${ROOT_LIBRARY_SHARED}
+      		               ROOT::Core ROOT::Gui ROOT::RIO ROOT::Net ROOT::Hist
+                           ${ROOT_LIBRARIES}
+                       )
 endif()
 if (BUILD_CXXPYBINDINGS)
   if (BUILD_CXXBINDINGS)  
@@ -356,6 +382,26 @@ install(TARGETS ${pybindings}
 option(BUILD_EXAMPLES "build C++ example for data i/o" OFF)
 
 if (BUILD_EXAMPLES)
+  #set(sd-legacy-reader "sd-legacy-reader")
+  #add_executable(${sd-legacy-reader}
+  #    ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/sd-legacy-reader.cxx
+  #)
+  #set_property(TARGET ${sd-legacy-reader} PROPERTY CXX_STANDARD 20)
+  #target_include_directories(${sd-legacy-reader} 
+  #                          PUBLIC
+  #                          ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
+  #                          ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+  #                          ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+  #                          $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_INCLUDE_DIRS}>
+  #                          )
+  #target_link_libraries(${sd-legacy-reader}
+  #                      PRIVATE
+  #                      ${GAPSTOF_LIBRARY_SHARED}
+  #  		              $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
+  #  		              ROOT::Core ROOT::Gui ROOT::RIO ROOT::Net ROOT::Hist)
+  #install(TARGETS ${sd-legacy-reader}
+  #        DESTINATION ${INSTALL_EXAMPLES_DIR})
+  
   set(unpack-example "unpack-tofpackets")
   add_executable(${unpack-example}
       ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/unpack-tofpackets.cxx
@@ -436,6 +482,27 @@ if (BUILD_EXAMPLES)
     )
   endif (BUILD_CARASPACE)
   if (BUILD_ROOTCOMPONENTS)
+    set(sd-legacy-reader "sd-legacy-reader")
+    add_executable(${sd-legacy-reader}
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/sd-legacy-reader.cxx
+    )
+    set_property(TARGET ${sd-legacy-reader} PROPERTY CXX_STANDARD 20)
+    target_include_directories(${sd-legacy-reader} 
+                              PUBLIC
+                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
+                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+                              ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+                              $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_INCLUDE_DIRS}>
+                              )
+    target_link_libraries(${sd-legacy-reader}
+                          PRIVATE
+                          ${GAPSTOF_LIBRARY_SHARED}
+      		              $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
+                          )
+                          #ROOT::Core ROOT::Gui ROOT::RIO ROOT::Net ROOT::Hist)
+    install(TARGETS ${sd-legacy-reader}
+            DESTINATION ${INSTALL_EXAMPLES_DIR})
+    
     set(display-example "displayTofpackets")
     add_executable(${display-example}
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/displayTofpackets.cxx
