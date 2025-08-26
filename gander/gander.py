@@ -720,6 +720,7 @@ def file_loader(f, event_type,\
                 #    continue
                 try:
                     ev = frame.get_telemetryevent(always_exclude=exclude_event_types)
+                    m_type = ev.header.packet_type 
                 except Exception as e:
                     logger.warning(f'Merged event is corrupt! {e}')
                     continue
@@ -892,173 +893,173 @@ def load_run(event_type         = EventType.Merged,\
 
 
 
-@st.fragment
-def create_timing_distributions(infiles,
-                                load_bar,
-                                pid0=None,
-                                pid1=None,
-                                #result=ST_SESSION_PLOTS,
-                                bins=np.linspace(-100, 300, 70),
-                                beta_analysis=True):
-    """
-    Get missing HG hits from a reader 
-    as provided by the session dict
-    """
-    print ('-> create_timing_distributions')
-    # FIXME - make this better, this should not 
-    # reset other plots than the timing plots
-    result       = create_new_session_plots()
-    tofevent_key = 'PacketType.TofEvent'
-    nhits        = 0
-    infiles      = st.session_state.infiles
-    print (infiles)
-    if infiles:
-        infiles= infiles[:10]
-    nfiles = len(infiles)
-    f_cntr = 0
-    print (f'-> Picking paddles for {pid0} and {pid1}')
-    print (f'-> Will loop over {nfiles} files!')
-    for f in tqdm.tqdm(infiles, desc="Creating timing distributions...", total = len(infiles)):
-        load_bar.progress(f_cntr/nfiles, 'Creating timing distributions...')
-        f_cntr += 1
-        reader  = go.io.CRReader(str(f))
-        for frame in reader:
-            if tofevent_key in frame.index:
-                # new API :)
-                tof_ev = frame.get_tofevent(tofevent_key)
-                ev = tof_ev.get_summary()
-                #print (ev)
-                if ev.status == go.events.EventStatus.AnyDataMangling:
-                    continue
-                #missing = [k for k in ev.get_missing_paddles_hg(mapping) if not k in dead_paddles]
-                hits = ev.hits
-                # fill the paddle related histograms
-                for h in hits:
-                    #result['paddle_plots']['charge2d'] : d.histogram.hist2d((PADDLE_CHARGE_BINS, PADDLE_CHARGE_BINS)),
-                    result['paddle_plots'][h.paddle_id]['amp_a'   ].fill(np.array([h.peak_a]))  
-                    result['paddle_plots'][h.paddle_id]['amp_b'   ].fill(np.array([h.peak_b]))  
-                    result['paddle_plots'][h.paddle_id]['time_a'  ].fill(np.array([h.time_a]))  
-                    result['paddle_plots'][h.paddle_id]['time_b'  ].fill(np.array([h.time_b]))  
-                    result['paddle_plots'][h.paddle_id]['bl_a'    ].fill(np.array([h.baseline_a]))  
-                    result['paddle_plots'][h.paddle_id]['bl_b'    ].fill(np.array([h.baseline_b]))  
-                    result['paddle_plots'][h.paddle_id]['bl_a_rms'].fill(np.array([h.baseline_a_rms]))  
-                    result['paddle_plots'][h.paddle_id]['bl_b_rms'].fill(np.array([h.baseline_b_rms]))  
-
-                if not beta_analysis:
-                    continue
-                #outer_h = sorted([h for h in hits if h.paddle_id > 60 and h.paddle_id < 73], key=lambda x: x.t0)
-                #inner_h = sorted([h for h in hits if h.paddle_id < 13], key=lambda x: x.t0)
-                if pid0 is None:
-                    outer_h = sorted([h for h in hits if h.paddle_id > 60], key=lambda x: x.t0)
-                else:
-                    outer_h = sorted([h for h in hits if h.paddle_id == pid0], key=lambda x:x.t0)
-                if pid1 is None:
-                    inner_h = sorted([h for h in hits if h.paddle_id < 61], key=lambda x: x.t0)
-                else:
-                    inner_h = sorted([h for h in hits if h.paddle_id == pid1], key=lambda x: x.t0)
-
-                #outer_h = sorted([h for h in hits if h.paddle_id > 60], key=lambda x: x.t0)
-                #inner_h = sorted([h for h in hits if h.paddle_id < 61], key=lambda x: x.t0)
-                #if len(hits) > 2:
-                #    continue
-                if inner_h and outer_h:
-                    first_hit = sorted([h for h in hits], key=lambda x: x.phase_delay)
-                    last_hit  = first_hit[-1].phase_delay
-                    first_hit = first_hit[0].phase_delay
-                    diff_h  = inner_h[0].t0 - outer_h[0].t0 
-                    #if diff_h > 50:
-                    #    print (inner_h[0])
-                    #    print (outer_h[0])
-                    #    print (inner_h[0].phase_delay)
-                    #    print (outer_h[0].phase_delay)
-                    #    print (inner_h[0].phase)
-                    #    print (outer_h[0].phase)
-                    #    print (inner_h[0].phase - outer_h[0].phase)
-                    #    print (inner_h[0].phase - outer_h[0].phase < -np.pi/2)
-                    #    print (inner_h[0].phase - outer_h[0].phase > np.pi/2)
-                    #    print (diff_h)
-                    #    h0_foo = inner_h[0].t0_uncorrected + inner_h[0].cable_delay
-                    #    h1_foo = outer_h[0].t0_uncorrected + outer_h[0].cable_delay
-                    #    t_shift = 50*(inner_h[0].phase - outer_h[0].phase)/(2*np.pi)
-                    #    print (t_shift)
-                    #    print (h0_foo - h1_foo + t_shift)
-                    #    diff_h -= 50
-
-                    #    raise
-                    #if diff_h < -50:
-                    #    print (inner_h[0])
-                    #    print (outer_h[0])
-                    #    print (inner_h[0].phase_delay)
-                    #    print (outer_h[0].phase_delay)
-                    #    print (inner_h[0].phase)
-                    #    print (outer_h[0].phase)
-                    #    print (inner_h[0].phase - outer_h[0].phase < -np.pi/2)
-                    #    print (inner_h[0].phase - outer_h[0].phase > np.pi/2)
-                    #    print (diff_h)
-                    #    h0_foo = inner_h[0].t0_unocrrected + inner_h[0].cable_delay
-                    #    h1_foo = outer_h[0].t0_uncorrected + outer_h[0].cable_delay
-                    #    t_shift = 50*(inner_h[0].phase - outer_h[0].phase)/(2*np.pi)
-                    #    print (h0_foo - h1_foo + t_shift)
-                    #    diff_h += 50
-                    #    
-                    #    raise
-                    phase_0 = hits[0].phase
-                    h0_foo = inner_h[0].t0_uncorrected + inner_h[0].cable_delay
-                    h1_foo = outer_h[0].t0_uncorrected + outer_h[0].cable_delay
-                    #p_shift = inner_h[0].phase - outer_h[0].phase 
-                    #p_shift = inner_h[0].phase - outer_h[0].phase 
-                    #p0 = inner_h[0].phase - phase_0
-                    #p1 = inner_h[1].phase - phase_0
-                    #if p0 < -np.pi/2:
-                    #    p_shift += 2*np.pi
-                    #if p_shift > np.pi/2:
-                    #    p_shift -= 2*np.pi
-                    #t_shift = 50*(inner_h[0].phase - outer_h[0].phase)/(2*np.pi)
-                    #t_shift = 50*p_shift/(2*np.pi)
-                    #diff_h = h0_foo -h1_foo - t_shift
-                    beta = (inner_h[0].distance(outer_h[0])/1000)/(diff_h*1e-9)/299792458
-                    #print (beta)
-                    if beta < 0:
-                        beta = -1*beta
-                    ##if beta < 0.3:
-                    phase_delay = inner_h[0].phase_delay - outer_h[0].phase_delay
-                    #if beta < 0.3:
-                        #if last_hit - first_hit > 18:
-                        #    tof_elena(hits)
-                        #    raise
-                    if True:
-                    #if (phase_delay > 20 or phase_delay < -20):
-                        #    if inner_h[0].phase_delay - outer_h[0].phase_delay > 40:
-                        result['histo_beta'].fill(np.array([beta])) 
-                        result['last_pd_outer'] = outer_h[0].phase_delay
-                        result['last_pd_inner'] = inner_h[0].phase_delay
-                        for wf in tof_ev.waveforms:
-                            if wf.paddle_id == outer_h[0].paddle_id:
-                                rbid = wf.rb_id
-                                for rbev in tof_ev.rbevents:
-                                    if rbev.header.rb_id == rbid:
-                                        result['wf_outer'] = rbev.get_waveform(8)
-                            if wf.paddle_id == inner_h[0].paddle_id:
-                                rbid = wf.rb_id
-                                for rbev in tof_ev.rbevents:
-                                    if rbev.header.rb_id == rbid:
-                                        result['wf_inner'] = rbev.get_waveform(8)
-                        #print (ev)
-                        result['histo_t_diff_fst'].fill(np.array([last_hit - first_hit]))
-                        result['histo_nhit'].fill(np.array([len(hits)]))
-                        result['histo_t_diff'  ].fill(np.array([diff_h]))
-                        result['histo_t_inner' ].fill(np.array([inner_h[0].t0]))
-                        result['histo_t_outer' ].fill(np.array([outer_h[0].t0]))
-                        result['histo_dist'].fill(np.array([distance(inner_h[0], outer_h[0])/1000]))
-                        
-                        result['histo_pdelay'].fill(np.array([phase_delay]))
-                        result['histo_ph_out'].fill(np.array([outer_h[0].phase_delay]))
-                        result['histo_ph_in'].fill(np.array([inner_h[0].phase_delay]))
-
-                        result['histo_hit_pid'].fill(np.array([inner_h[0].paddle_id]))
-                        result['histo_hit_pid'].fill(np.array([outer_h[0].paddle_id]))
-    ST_SESSION_PLOTS = result
-    return result                
+#@st.fragment
+#def create_timing_distributions(infiles,
+#                                load_bar,
+#                                pid0=None,
+#                                pid1=None,
+#                                #result=ST_SESSION_PLOTS,
+#                                bins=np.linspace(-100, 300, 70),
+#                                beta_analysis=True):
+#    """
+#    Get missing HG hits from a reader 
+#    as provided by the session dict
+#    """
+#    print ('-> create_timing_distributions')
+#    # FIXME - make this better, this should not 
+#    # reset other plots than the timing plots
+#    result       = create_new_session_plots()
+#    tofevent_key = 'PacketType.TofEvent'
+#    nhits        = 0
+#    infiles      = st.session_state.infiles
+#    print (infiles)
+#    if infiles:
+#        infiles= infiles[:10]
+#    nfiles = len(infiles)
+#    f_cntr = 0
+#    print (f'-> Picking paddles for {pid0} and {pid1}')
+#    print (f'-> Will loop over {nfiles} files!')
+#    for f in tqdm.tqdm(infiles, desc="Creating timing distributions...", total = len(infiles)):
+#        load_bar.progress(f_cntr/nfiles, 'Creating timing distributions...')
+#        f_cntr += 1
+#        reader  = go.io.CRReader(str(f))
+#        for frame in reader:
+#            if tofevent_key in frame.index:
+#                # new API :)
+#                tof_ev = frame.get_tofevent(tofevent_key)
+#                ev = tof_ev.get_summary()
+#                #print (ev)
+#                if ev.status == go.events.EventStatus.AnyDataMangling:
+#                    continue
+#                #missing = [k for k in ev.get_missing_paddles_hg(mapping) if not k in dead_paddles]
+#                hits = ev.hits
+#                # fill the paddle related histograms
+#                for h in hits:
+#                    #result['paddle_plots']['charge2d'] : d.histogram.hist2d((PADDLE_CHARGE_BINS, PADDLE_CHARGE_BINS)),
+#                    result['paddle_plots'][h.paddle_id]['amp_a'   ].fill(np.array([h.peak_a]))  
+#                    result['paddle_plots'][h.paddle_id]['amp_b'   ].fill(np.array([h.peak_b]))  
+#                    result['paddle_plots'][h.paddle_id]['time_a'  ].fill(np.array([h.time_a]))  
+#                    result['paddle_plots'][h.paddle_id]['time_b'  ].fill(np.array([h.time_b]))  
+#                    result['paddle_plots'][h.paddle_id]['bl_a'    ].fill(np.array([h.baseline_a]))  
+#                    result['paddle_plots'][h.paddle_id]['bl_b'    ].fill(np.array([h.baseline_b]))  
+#                    result['paddle_plots'][h.paddle_id]['bl_a_rms'].fill(np.array([h.baseline_a_rms]))  
+#                    result['paddle_plots'][h.paddle_id]['bl_b_rms'].fill(np.array([h.baseline_b_rms]))  
+#
+#                if not beta_analysis:
+#                    continue
+#                #outer_h = sorted([h for h in hits if h.paddle_id > 60 and h.paddle_id < 73], key=lambda x: x.t0)
+#                #inner_h = sorted([h for h in hits if h.paddle_id < 13], key=lambda x: x.t0)
+#                if pid0 is None:
+#                    outer_h = sorted([h for h in hits if h.paddle_id > 60], key=lambda x: x.t0)
+#                else:
+#                    outer_h = sorted([h for h in hits if h.paddle_id == pid0], key=lambda x:x.t0)
+#                if pid1 is None:
+#                    inner_h = sorted([h for h in hits if h.paddle_id < 61], key=lambda x: x.t0)
+#                else:
+#                    inner_h = sorted([h for h in hits if h.paddle_id == pid1], key=lambda x: x.t0)
+#
+#                #outer_h = sorted([h for h in hits if h.paddle_id > 60], key=lambda x: x.t0)
+#                #inner_h = sorted([h for h in hits if h.paddle_id < 61], key=lambda x: x.t0)
+#                #if len(hits) > 2:
+#                #    continue
+#                if inner_h and outer_h:
+#                    first_hit = sorted([h for h in hits], key=lambda x: x.phase_delay)
+#                    last_hit  = first_hit[-1].phase_delay
+#                    first_hit = first_hit[0].phase_delay
+#                    diff_h  = inner_h[0].t0 - outer_h[0].t0 
+#                    #if diff_h > 50:
+#                    #    print (inner_h[0])
+#                    #    print (outer_h[0])
+#                    #    print (inner_h[0].phase_delay)
+#                    #    print (outer_h[0].phase_delay)
+#                    #    print (inner_h[0].phase)
+#                    #    print (outer_h[0].phase)
+#                    #    print (inner_h[0].phase - outer_h[0].phase)
+#                    #    print (inner_h[0].phase - outer_h[0].phase < -np.pi/2)
+#                    #    print (inner_h[0].phase - outer_h[0].phase > np.pi/2)
+#                    #    print (diff_h)
+#                    #    h0_foo = inner_h[0].t0_uncorrected + inner_h[0].cable_delay
+#                    #    h1_foo = outer_h[0].t0_uncorrected + outer_h[0].cable_delay
+#                    #    t_shift = 50*(inner_h[0].phase - outer_h[0].phase)/(2*np.pi)
+#                    #    print (t_shift)
+#                    #    print (h0_foo - h1_foo + t_shift)
+#                    #    diff_h -= 50
+#
+#                    #    raise
+#                    #if diff_h < -50:
+#                    #    print (inner_h[0])
+#                    #    print (outer_h[0])
+#                    #    print (inner_h[0].phase_delay)
+#                    #    print (outer_h[0].phase_delay)
+#                    #    print (inner_h[0].phase)
+#                    #    print (outer_h[0].phase)
+#                    #    print (inner_h[0].phase - outer_h[0].phase < -np.pi/2)
+#                    #    print (inner_h[0].phase - outer_h[0].phase > np.pi/2)
+#                    #    print (diff_h)
+#                    #    h0_foo = inner_h[0].t0_unocrrected + inner_h[0].cable_delay
+#                    #    h1_foo = outer_h[0].t0_uncorrected + outer_h[0].cable_delay
+#                    #    t_shift = 50*(inner_h[0].phase - outer_h[0].phase)/(2*np.pi)
+#                    #    print (h0_foo - h1_foo + t_shift)
+#                    #    diff_h += 50
+#                    #    
+#                    #    raise
+#                    phase_0 = hits[0].phase
+#                    h0_foo = inner_h[0].t0_uncorrected + inner_h[0].cable_delay
+#                    h1_foo = outer_h[0].t0_uncorrected + outer_h[0].cable_delay
+#                    #p_shift = inner_h[0].phase - outer_h[0].phase 
+#                    #p_shift = inner_h[0].phase - outer_h[0].phase 
+#                    #p0 = inner_h[0].phase - phase_0
+#                    #p1 = inner_h[1].phase - phase_0
+#                    #if p0 < -np.pi/2:
+#                    #    p_shift += 2*np.pi
+#                    #if p_shift > np.pi/2:
+#                    #    p_shift -= 2*np.pi
+#                    #t_shift = 50*(inner_h[0].phase - outer_h[0].phase)/(2*np.pi)
+#                    #t_shift = 50*p_shift/(2*np.pi)
+#                    #diff_h = h0_foo -h1_foo - t_shift
+#                    beta = (inner_h[0].distance(outer_h[0])/1000)/(diff_h*1e-9)/299792458
+#                    #print (beta)
+#                    if beta < 0:
+#                        beta = -1*beta
+#                    ##if beta < 0.3:
+#                    phase_delay = inner_h[0].phase_delay - outer_h[0].phase_delay
+#                    #if beta < 0.3:
+#                        #if last_hit - first_hit > 18:
+#                        #    tof_elena(hits)
+#                        #    raise
+#                    if True:
+#                    #if (phase_delay > 20 or phase_delay < -20):
+#                        #    if inner_h[0].phase_delay - outer_h[0].phase_delay > 40:
+#                        result['histo_beta'].fill(np.array([beta])) 
+#                        result['last_pd_outer'] = outer_h[0].phase_delay
+#                        result['last_pd_inner'] = inner_h[0].phase_delay
+#                        for wf in tof_ev.waveforms:
+#                            if wf.paddle_id == outer_h[0].paddle_id:
+#                                rbid = wf.rb_id
+#                                for rbev in tof_ev.rbevents:
+#                                    if rbev.header.rb_id == rbid:
+#                                        result['wf_outer'] = rbev.get_waveform(8)
+#                            if wf.paddle_id == inner_h[0].paddle_id:
+#                                rbid = wf.rb_id
+#                                for rbev in tof_ev.rbevents:
+#                                    if rbev.header.rb_id == rbid:
+#                                        result['wf_inner'] = rbev.get_waveform(8)
+#                        #print (ev)
+#                        result['histo_t_diff_fst'].fill(np.array([last_hit - first_hit]))
+#                        result['histo_nhit'].fill(np.array([len(hits)]))
+#                        result['histo_t_diff'  ].fill(np.array([diff_h]))
+#                        result['histo_t_inner' ].fill(np.array([inner_h[0].t0]))
+#                        result['histo_t_outer' ].fill(np.array([outer_h[0].t0]))
+#                        result['histo_dist'].fill(np.array([distance(inner_h[0], outer_h[0])/1000]))
+#                        
+#                        result['histo_pdelay'].fill(np.array([phase_delay]))
+#                        result['histo_ph_out'].fill(np.array([outer_h[0].phase_delay]))
+#                        result['histo_ph_in'].fill(np.array([inner_h[0].phase_delay]))
+#
+#                        result['histo_hit_pid'].fill(np.array([inner_h[0].paddle_id]))
+#                        result['histo_hit_pid'].fill(np.array([outer_h[0].paddle_id]))
+#    ST_SESSION_PLOTS = result
+#    return result                
 
 def tof_elena(hits):
     phase_0 = hits[0].phase
@@ -1081,7 +1082,7 @@ if check_password():
     # for now
     # steamlit app
     calibs = [k for k in reversed(sorted(Path(config['data']['tof_calib']).glob('24*')))]
-    calib = go.tof.calibrations.load_calibrations(calibs[0])
+    calib = gon.calibration.load_rb_calibrations(calibs[0])
    
     moni_data = {'mtb' : go.tof.monitoring.MtbMoniSeries()}
 
