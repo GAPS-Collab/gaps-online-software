@@ -1,4 +1,4 @@
-#ifdef BUILD_ROOTCOMPONENTS
+#ifdef BUILD_WITH_ROOT
 
 #include <iostream>
 

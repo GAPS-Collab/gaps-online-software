@@ -604,7 +604,8 @@ u32 TofEvent::get_n_rbmissinghits(u32 mask){
 u32 TofEvent::get_n_rbevents(u32 mask){
   return (mask & 0xFF);
 }
-  
+
+#ifdef BUILD_CXXDB
 auto TofEvent::normalize_hit_times() -> void {
 
   if (rb_events.size() == 0) {
@@ -632,6 +633,7 @@ auto TofEvent::normalize_hit_times() -> void {
     }
   }
 }
+#endif
 
 /**********************************************************/
 
@@ -1222,7 +1224,9 @@ std::string TofHit::to_string() const {
   if (version == Gaps::ProtocolVersion::Unknown) {
     repr += "\n  >> t_avg         : "     + std::to_string(get_t_avg()       );
   } else {
+    #ifdef BUILD_CXXDB
     repr += "\n  >> t0            : "     + std::to_string(get_t0()       );
+    #endif
   }
   repr += ">";
   return repr;
@@ -1294,10 +1298,11 @@ auto TofEventSummary::get_trigger_sources() const -> Vec<TriggerType> {
   return t_types;
 } 
 
+#ifdef BUILD_CXXDB
 auto TofEventSummary::normalize_hit_times() -> void {
   //FIXME
 }
-
+#endif
 
 
 Vec<std::tuple<u8, u8, u8, LTBThreshold>> TofEventSummary::get_trigger_hits() const {

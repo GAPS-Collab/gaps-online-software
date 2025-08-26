@@ -1,5 +1,3 @@
-#ifdef BUILD_CARASPACE
-
 #include <iostream>
 #include <filesystem>
 #include <vector>
@@ -361,6 +359,3 @@ Gaps::CRFrame Gaps::CRReader::get_next_frame() {
     } 
   }
 }
-
-
-#endif 

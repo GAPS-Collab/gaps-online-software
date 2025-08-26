@@ -1,47 +1,22 @@
 ## ================================================================
-## cmake build type
-## can be either "Release" or "Debug"
+## The core C++ library. This is a C++ re-implementation of 
+## gondola-core written in RUST
 
-## in case of Release build, we set the NDEBUG preprocessor directive
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG=1")
-#set(gaps_DICTIONARY G__GAPSCommon CACHE INTERNAL "${LIBRARY_OUTPUT_DIRECTORY}/G__GAPSCommon" FORCE)
-set(gapstof_DICTIONARY G__GapsTof)
+if(BUILD_CXX_WITH_ROOT)
+  set(GONDOLA_DICTIONARY G__GapsTof)
+endif(BUILD_CXX_WITH_ROOT)
 
-################
+##============================================
 
-option(BUILD_CXXDB "Build C++ bindings to access GAPS DB" OFF) 
-if(BUILD_CXXDB)
-  find_package(SQLite3 REQUIRED)
-   if(SQLite3_FOUND)
-    message(STATUS "-- found SQLite3 libary")
-    message(STATUS "-- -- will use sqlite library ${SQLite3_LIBRARIES}")
-    add_definitions( -DBUILD_CXXDB)
-  else()
-    message(WARNING "Can not find sqlite3 installation! Disabling DB feature")
-    set(BUILD_CXXDB OFF)
-  endif()
-endif()
-# Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
-option(BUILD_ROOTCOMPONENTS "build components of the software which require CERN ROOT" OFF)
-if(BUILD_ROOTCOMPONENTS)
-  list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
-#  find_package(ROOT 6.26.00)
-  find_package(ROOT 6.30.00)
-  
-  if(ROOT_FOUND)
-      include(${ROOT_USE_FILE})
-      message(STATUS "Found ROOT!")
-      message(STATUS "-- Will use root libraries found in ${ROOT_LIBRARY_DIR}")
-      add_definitions( -DBUILD_ROOTCOMPONENTS)
-  else(NOT ROOT_FOUND)
-      message(WARNING "ROOT has not been found! Disabling components which require ROOT")
-      set(BUILD_ROOTCOMPONENTS OFF)
-  endif(ROOT_FOUND)
-endif(BUILD_ROOTCOMPONENTS)
+## Locate the ROOT package and defines a number of variables (e.g. ROOT_INCLUDE_DIRS)
+#option(BUILD_CXX_WITH_ROOT "build components of the software which require CERN ROOT" OFF)
+if(BUILD_CXX_WITH_ROOT AND BUILD_CXX_BINDINGS)
+  message(STATUS "-- Using root for gondola-core C++ library. Will build SimpleDet compatibilty layer!")
+  set(GONDOLA_DICTIONARY G__GondolaCore CACHE INTERNAL "${LIBRARY_OUTPUT_DIRECTORY}/G__GondolaCore" FORCE)
 
-option(BUILD_LIFTOFPYBINDINGS "build pybindings for a part of liftof (flight software)" OFF)
-option(BUILD_CXXBINDINGS "build C++ language bindings for the rust project tof-dataclasses to provide an API to interface with downstream C++ written analysis" OFF)
-if(BUILD_CXXBINDINGS)
+  #option(BUILD_LIFTOFPYBINDINGS "build pybindings for a part of liftof (flight software)" OFF)
+#option(BUILD_CXXBINDINGS "build C++ language bindings for the rust project tof-dataclasses to provide an API to interface with downstream C++ written analysis" OFF)
+#if(BUILD_CXXBINDINGS)
 
     ##set(CMAKE_CXX_EXTENSIONS OFF)
     #set(CMAKE_CXX_MODULE_CACHE "${CMAKE_BINARY_DIR}/module_cache")
@@ -80,94 +55,108 @@ if(BUILD_CXXBINDINGS)
     #if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     #    target_compile_options(caraspace PRIVATE /std:c++20 /experimental:module)
     #endif()
-  if (BUILD_CARASPACE)
-    add_definitions( -DBUILD_CARASPACE)
-  endif() 
+    #if (BUILD_CARASPACE)
+    #  add_definitions( -DBUILD_CARASPACE)
+    #endif() 
   
   # Build root dictionary for SD Legacy compat
   #include_directories($<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include>
-  #                    $<$<BOOL:${BUILD_CXXDB}>:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/sqlite_orm/include/sqlite_orm>
+  #                    $<$<BOOL:${BUILD_CXX_DB}>:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/sqlite_orm/include/sqlite_orm>
   #                    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include>
   #                    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/result>
   #                    $<INSTALL_INTERFACE:include> 
   #                    #${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
   #                    #${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
-  #                    $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_INCLUDE_DIRS}>
+  #                    $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_INCLUDE_DIRS}>
   #                    ${spdlog_SOURCE_DIR}/include
   #                    ${common_extern_INCLUDE_IDR}  
   #                 )
                    
   # Build ROOT dictionary
-  ROOT_GENERATE_DICTIONARY(${gapstof_DICTIONARY}
+  ROOT_GENERATE_DICTIONARY(${GONDOLA_DICTIONARY}
                            ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include/sd_legacy.hpp 
-                           LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include/sd_legacy_linkdef.hpp)
-  #set_property(DIRECTORY . PROPERTY INCLUDE_DIRECTORIES "")
+                           LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include/sd_legacy_linkdef.hpp
+  )
+endif()  
+if (BUILD_CXX_BINDINGS)
+
+  message(STATUS "-- Building gondola-core C++ library.")
   
-  set(GAPSTOF_LIBRARY_SHARED GapsTof CACHE INTERNAL "GapsTof shared library" FORCE)
-  add_library(${GAPSTOF_LIBRARY_SHARED} SHARED
-      dataclasses/C++/src/tof_packet.cxx
-      dataclasses/C++/src/tof_event_header.cxx
-      dataclasses/C++/src/calibration.cxx
-      dataclasses/C++/src/serialization.cxx
-      dataclasses/C++/src/parsers.cxx
-      dataclasses/C++/src/events.cxx
-      dataclasses/C++/src/io.cxx
-      dataclasses/C++/src/monitoring.cxx
-      dataclasses/C++/src/legacy.cxx
-      dataclasses/C++/src/logging.cxx
-      dataclasses/C++/src/version.cxx
-      dataclasses/C++/src/sd_legacy.cxx
-      dataclasses/C++/src/telemetry_dataclasses.cxx
-      $<$<BOOL:${BUILD_CARASPACE}>:dataclasses/C++/src/caraspace.cxx>
-      $<$<BOOL:${BUILD_CXXDB}>:dataclasses/C++/src/database.cxx>
-      ${gapstof_DICTIONARY}.cxx
+  set(GONDOLA_LIBRARY_SHARED GondolaCore CACHE INTERNAL "gondola-core C++ shared library" FORCE)
+  add_library(${GONDOLA_LIBRARY_SHARED} SHARED
+              dataclasses/C++/src/tof_packet.cxx
+              dataclasses/C++/src/tof_event_header.cxx
+              dataclasses/C++/src/calibration.cxx
+              dataclasses/C++/src/serialization.cxx
+              dataclasses/C++/src/parsers.cxx
+              dataclasses/C++/src/events.cxx
+              dataclasses/C++/src/io.cxx
+              dataclasses/C++/src/monitoring.cxx
+              dataclasses/C++/src/legacy.cxx
+              dataclasses/C++/src/logging.cxx
+              dataclasses/C++/src/version.cxx
+              dataclasses/C++/src/telemetry_dataclasses.cxx
+              dataclasses/C++/src/caraspace.cxx
+              $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:dataclasses/C++/src/sd_legacy.cxx>
+              $<$<BOOL:${BUILD_CXX_DB}>:dataclasses/C++/src/database.cxx>
+              $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${GONDOLA_DICTIONARY}.cxx>
   )
   
-  set_property(TARGET ${GAPSTOF_LIBRARY_SHARED} PROPERTY CXX_STANDARD 20)
-  target_compile_options(${GAPSTOF_LIBRARY_SHARED} PRIVATE -Wall -Wextra -Wpedantic)# -Werror)
-  target_include_directories(${GAPSTOF_LIBRARY_SHARED}
-                              PUBLIC
-                              $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include>
-                              $<$<BOOL:${BUILD_CXXDB}>:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/sqlite_orm/include/sqlite_orm>
-                              $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include>
-                              $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/result>
-                              $<INSTALL_INTERFACE:include> 
-                              #${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
-                              #${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
-                              $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_INCLUDE_DIRS}>
-                            )
+  set_property(TARGET ${GONDOLA_LIBRARY_SHARED} PROPERTY CXX_STANDARD 20)
+  target_compile_options(${GONDOLA_LIBRARY_SHARED} PRIVATE -Wall -Wextra -Wpedantic)# -Werror)
+  target_include_directories(${GONDOLA_LIBRARY_SHARED}
+                               PUBLIC
+                                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include>
+                                 $<$<BOOL:${BUILD_CXX_DB}>:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/sqlite_orm/include/sqlite_orm>
+                                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include>
+                                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/result>
+                                 $<INSTALL_INTERFACE:include> 
+                                 $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_INCLUDE_DIRS}>
+  )
   
-  target_link_libraries(${GAPSTOF_LIBRARY_SHARED}
-                        PUBLIC
-                           $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
-                           $<$<BOOL:${BUILD_CXXDB}>:${SQLite3_LIBRARIES}>
-                           ${ROOT_LIBRARY_SHARED}
-      		               ROOT::Core ROOT::Gui ROOT::RIO ROOT::Net ROOT::Hist
-                           ${ROOT_LIBRARIES}
-                       )
-endif()
-if (BUILD_CXXPYBINDINGS)
-  if (BUILD_CXXBINDINGS)  
-  set(pybindings "gaps_tof")
-  pybind11_add_module(${pybindings} MODULE dataclasses/C++/pybindings/module.cxx 
-                                           dataclasses/C++/pybindings/helpers.cxx)
-  set_property(TARGET ${pybindings} PROPERTY CXX_STANDARD 20)
-  target_include_directories(${pybindings}
-                            PUBLIC
-                              $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include>
-                              $<INSTALL_INTERFACE:include> 
-                              #${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
-            			      ${Python_INCLUDE_DIRS}
-    		                )
-  target_link_libraries(${pybindings}
-                        PRIVATE
-                          ${GAPSTOF_LIBRARY_SHARED}
-                          $<$<BOOL:${BUILD_CXXDB}>:${SQLite3_LIBRARIES}>)
-  else()
-    message(WARNING "Unable to build pybindings for C++ library without building the actual library! Make sure to set BUILD_CXXBINDINGS=ON if you want to build the pybind11 pybindings interface for the C++ bindings of tof-dataclasses!")
-    set(BUILD_CXXPYBINDINGS OFF)
-  endif()
-endif(BUILD_CXXPYBINDINGS)
+  target_link_libraries(${GONDOLA_LIBRARY_SHARED}
+                          PUBLIC
+                            $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARY_SHARED}>
+                            $<$<BOOL:${BUILD_CXX_DB}>:${SQLite3_LIBRARIES}>
+                            ${ROOT_LIBRARIES}
+  )
+  # install the library in the lib directory
+  install(TARGETS ${GONDOLA_LIBRARY_SHARED}
+      EXPORT GAPSTargets         
+      LIBRARY DESTINATION ${INSTALL_LIBRARY_DIR}
+      #PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
+      #INCLUDES DESTINATION "${GAPS_HEADER_OUTPUT_DIRECTORY}/lib/include"
+  )
+  
+  install(EXPORT GAPSTargets
+      FILE GapsOnlineSoftware.cmake
+      NAMESPACE GapsOnlineSoftware::
+      DESTINATION ${CMAKE_INSTALL_PREFIX}
+  )
+endif(BUILD_CXX_BINDINGS)
+
+#if (BUILD_CXXPYBINDINGS)
+#  if (BUILD_CXXBINDINGS)  
+#  set(pybindings "gaps_tof")
+#  pybind11_add_module(${pybindings} MODULE dataclasses/C++/pybindings/module.cxx 
+#                                           dataclasses/C++/pybindings/helpers.cxx)
+#  set_property(TARGET ${pybindings} PROPERTY CXX_STANDARD 20)
+#  target_include_directories(${pybindings}
+#                            PUBLIC
+#                              $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include>
+#                              $<INSTALL_INTERFACE:include> 
+#                              #${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+#            			      ${Python_INCLUDE_DIRS}
+#    		                )
+#  target_link_libraries(${pybindings}
+#                        PRIVATE
+#                          ${GONDOLA_LIBRARY_SHARED}
+#                          $<$<BOOL:${BUILD_CXX_DB}>:${SQLite3_LIBRARIES}>)
+#  else()
+#    message(WARNING "Unable to build pybindings for C++ library without building the actual library! Make sure to set BUILD_CXXBINDINGS=ON if you want to build the pybind11 pybindings interface for the C++ bindings of tof-dataclasses!")
+#    set(BUILD_CXXPYBINDINGS OFF)
+#  endif()
+#endif(BUILD_CXXPYBINDINGS)
 
 ########################################
 # LIFTOF - GAPS TOF flight software
@@ -333,21 +322,6 @@ install(FILES ${python_example_scripts}
     PERMISSIONS OWNER_EXECUTE
 )
 
-if (BUILD_CXXBINDINGS)
-  # install the library in the lib directory
-  install(TARGETS ${GAPSTOF_LIBRARY_SHARED}
-      EXPORT GAPSTargets         
-      LIBRARY DESTINATION ${INSTALL_LIBRARY_DIR}
-      #PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
-      #INCLUDES DESTINATION "${GAPS_HEADER_OUTPUT_DIRECTORY}/lib/include"
-  )
-  
-  install(EXPORT GAPSTargets
-      FILE GapsOnlineSoftware.cmake
-      NAMESPACE GapsOnlineSoftware::
-      DESTINATION ${CMAKE_INSTALL_PREFIX}
-  )
-endif()
 
 # not sure about this
 include(CMakePackageConfigHelpers)
@@ -379,9 +353,8 @@ install(TARGETS ${pybindings}
 # Examples
 #######################################
 
-option(BUILD_EXAMPLES "build C++ example for data i/o" OFF)
 
-if (BUILD_EXAMPLES)
+if (BUILD_CXX_EXAMPLES)
   #set(sd-legacy-reader "sd-legacy-reader")
   #add_executable(${sd-legacy-reader}
   #    ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/sd-legacy-reader.cxx
@@ -392,16 +365,16 @@ if (BUILD_EXAMPLES)
   #                          ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
   #                          ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
   #                          ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
-  #                          $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_INCLUDE_DIRS}>
+  #                          $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_INCLUDE_DIRS}>
   #                          )
   #target_link_libraries(${sd-legacy-reader}
   #                      PRIVATE
-  #                      ${GAPSTOF_LIBRARY_SHARED}
-  #  		              $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
+  #                      ${GONDOLA_LIBRARY_SHARED}
+  #  		              $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARY_SHARED}>
   #  		              ROOT::Core ROOT::Gui ROOT::RIO ROOT::Net ROOT::Hist)
   #install(TARGETS ${sd-legacy-reader}
   #        DESTINATION ${INSTALL_EXAMPLES_DIR})
-  
+  message(STATUS "-- Building C++ example binaries") 
   set(unpack-example "unpack-tofpackets")
   add_executable(${unpack-example}
       ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/unpack-tofpackets.cxx
@@ -415,12 +388,13 @@ if (BUILD_EXAMPLES)
                             )
   target_link_libraries(${unpack-example}
                         PRIVATE
-                        ${GAPSTOF_LIBRARY_SHARED})
+                        ${GONDOLA_LIBRARY_SHARED}
+  )
   install(TARGETS ${unpack-example}
           DESTINATION ${INSTALL_EXAMPLES_DIR}
-
   )
-  if (BUILD_CXXDB)
+
+  if (BUILD_CXX_DB)
     # no longer just a paddle example, but also has tracker strips now
     set(paddle-example "print-database")
     add_executable(${paddle-example}
@@ -435,7 +409,7 @@ if (BUILD_EXAMPLES)
                               )
     target_link_libraries(${paddle-example}
                           PRIVATE
-                          ${GAPSTOF_LIBRARY_SHARED})
+                          ${GONDOLA_LIBRARY_SHARED})
     install(TARGETS ${paddle-example}
             DESTINATION ${INSTALL_EXAMPLES_DIR}
 
@@ -455,33 +429,33 @@ if (BUILD_EXAMPLES)
                               )
     target_link_libraries(${calculate-tof-example}
                           PRIVATE
-                          ${GAPSTOF_LIBRARY_SHARED})
+                          ${GONDOLA_LIBRARY_SHARED})
     install(TARGETS ${calculate-tof-example}
             DESTINATION ${INSTALL_EXAMPLES_DIR}
 
     )
-  endif (BUILD_CXXDB)
-  if (BUILD_CARASPACE)
-    set(caraspace-example "read-caraspace")
-    add_executable(${caraspace-example}
-      ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/read-caraspace.cxx
-    )
-    set_property(TARGET ${caraspace-example} PROPERTY CXX_STANDARD 20)
-    target_include_directories(${caraspace-example} 
-                              PUBLIC
-                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
-                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
-                              ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
-                              )
-    target_link_libraries(${caraspace-example}
-                          PRIVATE
-                          ${GAPSTOF_LIBRARY_SHARED})
-    install(TARGETS ${caraspace-example}
-            DESTINATION ${INSTALL_EXAMPLES_DIR}
+  endif (BUILD_CXX_DB)
+  
+  set(caraspace-example "read-caraspace")
+  add_executable(${caraspace-example}
+    ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/read-caraspace.cxx
+  )
+  set_property(TARGET ${caraspace-example} PROPERTY CXX_STANDARD 20)
+  target_include_directories(${caraspace-example} 
+                            PUBLIC
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+                            )
+  target_link_libraries(${caraspace-example}
+                        PRIVATE
+                        ${GONDOLA_LIBRARY_SHARED})
+  install(TARGETS ${caraspace-example}
+          DESTINATION ${INSTALL_EXAMPLES_DIR}
 
-    )
-  endif (BUILD_CARASPACE)
-  if (BUILD_ROOTCOMPONENTS)
+  )
+  
+  if (BUILD_CXX_WITH_ROOT)
     set(sd-legacy-reader "sd-legacy-reader")
     add_executable(${sd-legacy-reader}
         ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/sd-legacy-reader.cxx
@@ -492,172 +466,171 @@ if (BUILD_EXAMPLES)
                               ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
                               ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
                               ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
-                              $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_INCLUDE_DIRS}>
+                              $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_INCLUDE_DIRS}>
                               )
     target_link_libraries(${sd-legacy-reader}
                           PRIVATE
-                          ${GAPSTOF_LIBRARY_SHARED}
-      		              $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
+                          ${GONDOLA_LIBRARY_SHARED}
+      		              $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARY_SHARED}>
                           )
                           #ROOT::Core ROOT::Gui ROOT::RIO ROOT::Net ROOT::Hist)
     install(TARGETS ${sd-legacy-reader}
             DESTINATION ${INSTALL_EXAMPLES_DIR})
     
-    set(display-example "displayTofpackets")
-    add_executable(${display-example}
-        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/displayTofpackets.cxx
-        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/MainFrame.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/Waveform.cpp
-    )
-    set_property(TARGET ${display-example} PROPERTY CXX_STANDARD 20)
-    target_include_directories(${display-example} 
-                              PUBLIC
-                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
-                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
-                              ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
-                              $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_INCLUDE_DIRS}>
-      		    )
-    target_link_libraries(${display-example}
-                          PRIVATE
-                          ${GAPSTOF_LIBRARY_SHARED}
-      		$<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
-      		ROOT::Core ROOT::Gui ROOT::RIO ROOT::Net ROOT::Hist
-      		)
-    install(TARGETS ${display-example}
-            DESTINATION ${INSTALL_EXAMPLES_DIR}
-
-        )
+        #set(display-example "displayTofpackets")
+        #add_executable(${display-example}
+        #    ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/displayTofpackets.cxx
+        #    ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/MainFrame.cpp
+        #    ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/Waveform.cpp
+        #)
+        #set_property(TARGET ${display-example} PROPERTY CXX_STANDARD 20)
+        #target_include_directories(${display-example} 
+        #                          PUBLIC
+        #                          ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
+        #                          ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+        #                          ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+        #                          $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_INCLUDE_DIRS}>
+        #  		    )
+        #target_link_libraries(${display-example}
+        #                      PRIVATE
+        #                      ${GONDOLA_LIBRARY_SHARED}
+        #  		$<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARY_SHARED}>
+        #  		ROOT::Core ROOT::Gui ROOT::RIO ROOT::Net ROOT::Hist
+        #  		)
+        #install(TARGETS ${display-example}
+        #        DESTINATION ${INSTALL_EXAMPLES_DIR}
+        #)
+  endif(BUILD_CXX_WITH_ROOT)
+endif(BUILD_CXX_EXAMPLES)
       
-    set(analyze-example "analyzeTofpackets")
-    add_executable(${analyze-example}
-        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/analyzeTofpackets.cxx
-    )
-    set_property(TARGET ${analyze-example} PROPERTY CXX_STANDARD 20)
-    target_include_directories(${analyze-example} 
-                              PUBLIC
-                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/example/spdlog/include
-                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
-                              ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
-                              )
-    target_link_libraries(${analyze-example}
-                          PRIVATE
-                          ${GAPSTOF_LIBRARY_SHARED})
-    install(TARGETS ${analyze-example}
-            DESTINATION ${INSTALL_EXAMPLES_DIR}
-    )
+        #set(analyze-example "analyzeTofpackets")
+        #add_executable(${analyze-example}
+        #    ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/analyzeTofpackets.cxx
+        #)
+        #set_property(TARGET ${analyze-example} PROPERTY CXX_STANDARD 20)
+        #target_include_directories(${analyze-example} 
+        #                          PUBLIC
+        #                          ${CMAKE_CURRENT_SOURCE_DIR}/../resources/example/spdlog/include
+        #                          ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+        #                          ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+        #                          )
+        #target_link_libraries(${analyze-example}
+        #                      PRIVATE
+        #                      ${GONDOLA_LIBRARY_SHARED})
+        #install(TARGETS ${analyze-example}
+        #        DESTINATION ${INSTALL_EXAMPLES_DIR}
+        #)
 
-    set(display-sydney "displaySydney")
-    add_executable(${display-sydney}
-        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/displaySydney.cxx
-        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/MainFrame.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/Waveform.cpp
-    )
-    set_property(TARGET ${display-sydney} PROPERTY CXX_STANDARD 20)
-    target_include_directories(${display-sydney} 
-                              PUBLIC
-                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
-                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
-                              ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
-                              $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_INCLUDE_DIRS}>
-      		    )
-    target_link_libraries(${display-sydney}
-                          PRIVATE
-                          ${GAPSTOF_LIBRARY_SHARED}
-      		$<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
-      		ROOT::Core ROOT::Gui ROOT::RIO ROOT::Net ROOT::Hist
-      		)
-    install(TARGETS ${display-sydney}
-            DESTINATION ${INSTALL_EXAMPLES_DIR}
+        #set(display-sydney "displaySydney")
+        #add_executable(${display-sydney}
+        #    ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/displaySydney.cxx
+        #    ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/MainFrame.cpp
+        #    ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/Waveform.cpp
+        #)
+        #set_property(TARGET ${display-sydney} PROPERTY CXX_STANDARD 20)
+        #target_include_directories(${display-sydney} 
+        #                          PUBLIC
+        #                          ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
+        #                          ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+        #                          ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+        #                          $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_INCLUDE_DIRS}>
+        #  		    )
+        #target_link_libraries(${display-sydney}
+        #                      PRIVATE
+        #                      ${GONDOLA_LIBRARY_SHARED}
+        #  		$<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARY_SHARED}>
+        #  		ROOT::Core ROOT::Gui ROOT::RIO ROOT::Net ROOT::Hist
+        #  		)
+        #install(TARGETS ${display-sydney}
+        #        DESTINATION ${INSTALL_EXAMPLES_DIR}
 
-        )
-      
-    set(analyze-sydney "analyzeSydney")
-    add_executable(${analyze-sydney}
-        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/analyzeSydney.cxx
-        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/EventSydney.cpp
-    )
-    set_property(TARGET ${analyze-sydney} PROPERTY CXX_STANDARD 20)
-    target_include_directories(${analyze-sydney} 
-                              PUBLIC
-                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/example/spdlog/include
-                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
-                              ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
-                              )
-    target_link_libraries(${analyze-sydney}
-                          PRIVATE
-                          ${GAPSTOF_LIBRARY_SHARED}
-      			  $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
-      			  ROOT::Gui ROOT::Core ROOT::RIO ROOT::Net ROOT::Hist ROOT::Tree ROOT::Rint
-			  )
-    install(TARGETS ${analyze-sydney}
-            DESTINATION ${INSTALL_EXAMPLES_DIR}
-    )
+        #    )
+        #  
+        #set(analyze-sydney "analyzeSydney")
+        #add_executable(${analyze-sydney}
+        #    ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/analyzeSydney.cxx
+        #    ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/EventSydney.cpp
+        #)
+        #set_property(TARGET ${analyze-sydney} PROPERTY CXX_STANDARD 20)
+        #target_include_directories(${analyze-sydney} 
+        #                          PUBLIC
+        #                          ${CMAKE_CURRENT_SOURCE_DIR}/../resources/example/spdlog/include
+        #                          ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+        #                          ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+        #                          )
+        #target_link_libraries(${analyze-sydney}
+        #                      PRIVATE
+        #                      ${GONDOLA_LIBRARY_SHARED}
+        #  			  $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARY_SHARED}>
+        #  			  ROOT::Gui ROOT::Core ROOT::RIO ROOT::Net ROOT::Hist ROOT::Tree ROOT::Rint
+	    #		  )
+        #install(TARGETS ${analyze-sydney}
+        #        DESTINATION ${INSTALL_EXAMPLES_DIR}
+        #)
 
-    set(analyze-nevis "analyzeNevis")
-    add_executable(${analyze-nevis}
-        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/analyzeNevis.cxx
-        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/EventGAPS.cpp
-    )
-    set_property(TARGET ${analyze-nevis} PROPERTY CXX_STANDARD 20)
-    target_include_directories(${analyze-nevis} 
-                              PUBLIC
-                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/example/spdlog/include
-                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
-                              ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
-                              )
-    target_link_libraries(${analyze-nevis}
-                          PRIVATE
-                          ${GAPSTOF_LIBRARY_SHARED}
-      			  $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
-      			  ROOT::Gui ROOT::Core ROOT::RIO ROOT::Net ROOT::Hist ROOT::Tree ROOT::Rint
-			  )
-    install(TARGETS ${analyze-nevis}
-            DESTINATION ${INSTALL_EXAMPLES_DIR}
-    )
+        #set(analyze-nevis "analyzeNevis")
+        #add_executable(${analyze-nevis}
+        #    ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/analyzeNevis.cxx
+        #    ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/EventGAPS.cpp
+        #)
+        #set_property(TARGET ${analyze-nevis} PROPERTY CXX_STANDARD 20)
+        #target_include_directories(${analyze-nevis} 
+        #                          PUBLIC
+        #                          ${CMAKE_CURRENT_SOURCE_DIR}/../resources/example/spdlog/include
+        #                          ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+        #                          ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+        #                          )
+        #target_link_libraries(${analyze-nevis}
+        #                      PRIVATE
+        #                      ${GONDOLA_LIBRARY_SHARED}
+        #  			  $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARY_SHARED}>
+        #  			  ROOT::Gui ROOT::Core ROOT::RIO ROOT::Net ROOT::Hist ROOT::Tree ROOT::Rint
+	    #		  )
+        #install(TARGETS ${analyze-nevis}
+        #        DESTINATION ${INSTALL_EXAMPLES_DIR}
+        #)
 
-    set(analyze-rene "analyzeRene")
-    add_executable(${analyze-rene}
-        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/analyzeRene.cxx
-        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/EventRene.cpp
-    )
-    set_property(TARGET ${analyze-rene} PROPERTY CXX_STANDARD 20)
-    target_include_directories(${analyze-rene} 
-                              PUBLIC
-                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/example/spdlog/include
-                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
-                              ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
-                              )
-    target_link_libraries(${analyze-rene}
-                          PRIVATE
-                          ${GAPSTOF_LIBRARY_SHARED}
-      			  $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
-      			  ROOT::Gui ROOT::Core ROOT::RIO ROOT::Net ROOT::Hist ROOT::Tree ROOT::Rint
-			  )
-    install(TARGETS ${analyze-rene}
-            DESTINATION ${INSTALL_EXAMPLES_DIR}
-    )
-    set(analyze-padrick "analyzePadrick")
-    add_executable(${analyze-padrick}
-        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/analyzePadrick.cxx
-        ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/EventPadrick.cpp
-    )
-    set_property(TARGET ${analyze-padrick} PROPERTY CXX_STANDARD 20)
-    target_include_directories(${analyze-padrick} 
-                              PUBLIC
-                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/example/spdlog/include
-                              ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
-                              ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
-                              )
-    target_link_libraries(${analyze-padrick}
-                          PRIVATE
-                          ${GAPSTOF_LIBRARY_SHARED}
-      			  $<$<BOOL:${BUILD_ROOTCOMPONENTS}>:${ROOT_LIBRARY_SHARED}>
-      			  ROOT::Gui ROOT::Core ROOT::RIO ROOT::Net ROOT::Hist ROOT::Tree ROOT::Rint
-			  )
-    install(TARGETS ${analyze-padrick}
-            DESTINATION ${INSTALL_EXAMPLES_DIR}
-    )
+        #set(analyze-rene "analyzeRene")
+        #add_executable(${analyze-rene}
+        #    ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/analyzeRene.cxx
+        #    ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/EventRene.cpp
+        #)
+        #set_property(TARGET ${analyze-rene} PROPERTY CXX_STANDARD 20)
+        #target_include_directories(${analyze-rene} 
+        #                          PUBLIC
+        #                          ${CMAKE_CURRENT_SOURCE_DIR}/../resources/example/spdlog/include
+        #                          ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+        #                          ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+        #                          )
+        #target_link_libraries(${analyze-rene}
+        #                      PRIVATE
+        #                      ${GONDOLA_LIBRARY_SHARED}
+        #  			  $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARY_SHARED}>
+        #  			  ROOT::Gui ROOT::Core ROOT::RIO ROOT::Net ROOT::Hist ROOT::Tree ROOT::Rint
+	    #		  )
+        #install(TARGETS ${analyze-rene}
+        #        DESTINATION ${INSTALL_EXAMPLES_DIR}
+        #)
+        #set(analyze-padrick "analyzePadrick")
+        #add_executable(${analyze-padrick}
+        #    ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/analyzePadrick.cxx
+        #    ${CMAKE_CURRENT_SOURCE_DIR}/resources/examples/C++/src/EventPadrick.cpp
+        #)
+        #set_property(TARGET ${analyze-padrick} PROPERTY CXX_STANDARD 20)
+        #target_include_directories(${analyze-padrick} 
+        #                          PUBLIC
+        #                          ${CMAKE_CURRENT_SOURCE_DIR}/../resources/example/spdlog/include
+        #                          ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+        #                          ${CMAKE_CURRENT_SOURCE_DIR}/dataclasses/C++/include
+        #                          )
+        #target_link_libraries(${analyze-padrick}
+        #                      PRIVATE
+        #                      ${GONDOLA_LIBRARY_SHARED}
+        #  			  $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARY_SHARED}>
+        #  			  ROOT::Gui ROOT::Core ROOT::RIO ROOT::Net ROOT::Hist ROOT::Tree ROOT::Rint
+	    #		  )
+        #install(TARGETS ${analyze-padrick}
+        #        DESTINATION ${INSTALL_EXAMPLES_DIR}
+        #)
 
-  endif(BUILD_ROOTCOMPONENTS)
-endif()
 

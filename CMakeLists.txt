@@ -15,7 +15,7 @@ message(STATUS "-- Current release LELEWAA (Whale shark)")
 message(STATUS "-- Building software for ${CMAKE_SYSTEM_NAME}")
 if (APPLE)
   message(WARNING "-- -- will attempt build for MacOSX system. This is experimental and might not work!")
-  message(WARNING "-- -- tof-control depends on LINUX and can not work on MacOSX due to the lack of Mac's I2C support. However, tof-control is only needed for the flight software, which runs linux and thus would need to be cross-compiled on Mac anyway.")
+  message(WARNING "-- -- the liftof dependency tof-control depends on LINUX and can not work on MacOSX due to the lack of Mac's I2C support. However, tof-control is only needed for the flight software, which runs linux and thus would need to be cross-compiled on Mac anyway.")
 endif(APPLE)
 
 message(STATUS "Using build directory: ${PROJECT_BINARY_DIR}")
@@ -30,11 +30,64 @@ set(CMAKE_CXX_STANDARD 20 CACHE STRING "C++ standard has to be >= 20" FORCE)
 set(CXX_STANDARD 20 CACHE STRING "C++ standard has to be >= 20" FORCE)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 
-# -- pybindings with pybind11
-option(BUILD_CXXPYBINDINGS "build C++ pybindings with pybind11 (deprecated)" OFF)
-option(BUILD_RUSTTELEMETRY "builds Rust telemetry library and pybindings" OFF)
+## do a release build by default
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING
+      "Choose the type of build, options are: Debug Release."
+      FORCE)
+endif(NOT CMAKE_BUILD_TYPE)
+
+## in case of Release build, we set the NDEBUG preprocessor directive
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG=1")
+
+## also, set the default install path to be in user space
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install/gaps-online-sw-v${GAPS_ONLINE_SOFTWARE_VERSION}" CACHE PATH "default install path" FORCE)
+endif()
+
+message(STATUS "Installing into ${CMAKE_INSTALL_PREFIX}")
+option(BUILD_CXX_BINDINGS "build C++ implementation of gondola-core" OFF)
+option(BUILD_CXX_PYBINDINGS "build C++ pybindings with pybind11 (deprecated)" OFF)
+option(BUILD_CXX_DB "Build C++ bindings with SQLITE3 to access GAPS DB. Requires SQlite3 installed" OFF) 
+option(BUILD_CXX_EXAMPLES "build C++ examples to illustrate usage of the GondolaCore C++ library" OFF)
+option(BUILD_CXX_PERSONAL_ANALYSIS_CODE "builds personal analysis code in the analysis/ directory. This includes e.g. Jeff's TOF code. This might require the (CERN) ROOT library, so USE_ROOT needs to be switched on" OFF)
+# ROOT can be optionally used for the C++ bindings. This will allow to build the 
+# SimpleDet compatibility layer as well as personal analysis projects
+option(BUILD_CXX_WITH_ROOT "leverage the usage of CERN ROOT for the build. This will allow to build the SimpleDet compatibilitly layer as well as personal analysis projects as needed." OFF)
 option(BUILD_RUSTPYBINDINGS "build pybindings for the RUST code with py03 \\U+1F980 (better). Includes telemetry and liftof pybindings, if the respective options are selected." OFF)
-option(BUILD_CARASPACE "build the caraspace serialization library (useful)" OFF)
+option(BUILD_SIM "build simulation library to simulate events" OFF)
+
+if(BUILD_CXX_WITH_ROOT)
+  list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
+#  find_package(ROOT 6.26.00)
+  find_package(ROOT 6.30.00)
+  message(STATUS "Requested build using CERN's ROOT library") 
+  if(ROOT_FOUND)
+      include(${ROOT_USE_FILE})
+      message(STATUS "-- Found a suitable ROOT version ${ROOT_VERSION}!")
+      message(STATUS "-- Will use root libraries found in ${ROOT_LIBRARY_DIR}")
+      add_definitions( -DBUILD_WITH_ROOT)
+  else(NOT ROOT_FOUND)
+      message(WARNING "ROOT has not been found! Disabling ROOT for build. This will disable the SimpleDet compatibility layer as well as it might disable some personal analysis projects!")
+      set(BUILD_CXX_WITH_ROOT OFF)
+  endif(ROOT_FOUND)
+endif(BUILD_CXX_WITH_ROOT)
+
+# check sqlite3 availability which is needed 
+# for C++ database support
+if(BUILD_CXX_DB)
+  find_package(SQLite3 REQUIRED)
+    if(SQLite3_FOUND)
+      message(STATUS "-- Found SQLite3 libary")
+      message(STATUS "-- -- Will use sqlite library ${SQLite3_LIBRARIES}")
+      add_definitions( -DBUILD_CXXDB)
+    else()
+      message(WARNING "Can not find sqlite3 installation! Disabling DB feature")
+      set(BUILD_CXX_DB CACHE "Build C++ bindings with SQLITE3 to access GAPS DB. Requires SQlite3 installed" OFF FORCE) 
+  endif()
+endif()
+
+# -- pybindings with pybind11
 
 if (BUILD_CXXPYBINDINGS)
   message(STATUS "Checking for pyoind11....")
@@ -49,21 +102,6 @@ if (BUILD_CXXPYBINDINGS)
   endif()
 endif(BUILD_CXXPYBINDINGS)
 
-## do a release build by default
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING
-      "Choose the type of build, options are: Debug Release."
-      FORCE)
-endif(NOT CMAKE_BUILD_TYPE)
-
-## in case of Release build, we set the NDEBUG preprocessor directive
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG=1")
-
-if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install/gaps-online-sw-v${GAPS_ONLINE_SOFTWARE_VERSION}" CACHE PATH "default install path" FORCE)
-endif()
-
-message(STATUS "Installing into ${CMAKE_INSTALL_PREFIX}")
 
 set(INSTALL_LIBRARY_DIR  "${CMAKE_INSTALL_PREFIX}/lib" CACHE PATH      "installation directory for libraries" FORCE)
 set(INSTALL_INCLUDE_DIR  "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH  "installation directory for header files" FORCE)
@@ -71,9 +109,6 @@ set(INSTALL_BINARY_DIR   "${CMAKE_INSTALL_PREFIX}/bin" CACHE PATH      "installa
 set(INSTALL_PYTHON_DIR   "${CMAKE_INSTALL_PREFIX}/python" CACHE PATH   "installation directory for python code" FORCE)
 
 add_subdirectory(tof)
-#if (BUILD_RUSTTELEMETRY)
-#  add_subdirectory(telemetry)
-#endif()
 
 # finally all the rust pybindings
 if (BUILD_RUSTPYBINDINGS)
@@ -86,6 +121,14 @@ foreach(p LIBRARY BINARY INCLUDE PYTHON EXAMPLES)
     set(${var} "${CMAKE_INSTALL_PREFIX}/${${var}}")
   endif()
 endforeach()
+
+if (BUILD_SIM)
+  add_subdirectory(simulation)
+endif (BUILD_SIM)
+
+if (BUILD_PERSONAL_ANALYSIS_CODE)
+  sdd_subdirectory(analysis)
+endif(BUILD_PERSONAL_ANALYSIS_CODE)
 
 # install README
 install(FILES
@@ -152,7 +195,7 @@ install(FILES ${SETUP_SCRIPT_DEST} DESTINATION ${CMAKE_INSTALL_PREFIX})
 ## Install the python wrapper for the API
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/gaps-online/gaps_online
         DESTINATION ${INSTALL_PYTHON_DIR}
-       )
+)
 
 ## ----------------------------------=---
 ## External dependencies (header only)
@@ -163,17 +206,20 @@ install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/include/cxxopts)
 install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/include/result)
 install(DIRECTORY DESTINATION ${CMAKE_INSTALL_PREFIX}/include/sqlite_orm)
 
-
 ## install all the header-only libraries into the include directory
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/extern/cxxopts/include/cxxopts.hpp
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/include/cxxopts/)
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/include/cxxopts/
+)
 
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/extern/result/result/result.h
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/include/result)
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/include/result
+)
 
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/extern/sqlite_orm/include/sqlite_orm/sqlite_orm.h
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/include/sqlite_orm)
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/include/sqlite_orm
+)
 
 ## For spdlog, we just copy the whole thing
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/resources/extern/spdlog/include/spdlog DESTINATION ${CMAKE_INSTALL_PREFIX}/include/spdlog)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/resources/extern/spdlog/include/spdlog DESTINATION ${CMAKE_INSTALL_PREFIX}/include/spdlog
+)
 
