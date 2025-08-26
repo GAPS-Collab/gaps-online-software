@@ -11,7 +11,8 @@ dependencies = [
     "numpy>=2.0",
     "matplotlib>=3.10",
     "charmingbeauty>=0.1",
-    "pydashi>=2.0"
+    "pydashi>=2.0",
+    "cmocean>=4.0",
 ]
 
 [build-system]

@@ -21,6 +21,26 @@ expand_and_test_enum!(CRFrameObjectType, test_crframeobjecttype_repr);
 
 //---------------------------------------------------
 
+/// All possible merged event types in the context of 
+/// CRFrame. This can be used to check against if a frame 
+/// contains any kind of merged event
+pub const MERGED_EVENT_TYPES : [&'static str;4] = [
+  "TelemetryPacketType.NoGapsTriggerEvent",
+  "TelemetryPacketType.BoringEvent",
+  "TelemetryPacketType.InterestingEvent",
+  "TelemetryPacketType.NoTofDataEvent"];
+
+/// A registry of all possible names for TelemetryEvents (aka "MergedEvent") 
+/// which can be stored in CRFrames. This provides the keys they are stored 
+/// under
+#[cfg(feature="pybindings")]
+#[pyfunction]
+pub fn get_all_telemetry_event_names() -> [&'static str;4] {
+  MERGED_EVENT_TYPES
+}
+
+//---------------------------------------------------
+
 /// A Caraspace object, that can be stored
 /// within a frame.
 ///
@@ -143,8 +163,8 @@ pub struct CRFrame {
   // FIXME - this needs to be HashMap<&str, (u64, CRFrameObjectType)>
   pub index       : HashMap<String, (u64, CRFrameObjectType)>,
   pub bytestorage : Vec<u8>,
-  pub paddles     : Arc<HashMap<u8, TofPaddle>>, 
-  pub strips      : Arc<HashMap<u32, TrackerStrip>>
+  pub tof_paddles : Arc<HashMap<u8, TofPaddle>>, 
+  pub trk_strips  : Arc<HashMap<u32, TrackerStrip>>
 }
 
 impl CRFrame {
@@ -153,8 +173,8 @@ impl CRFrame {
     Self {
       index       : HashMap::<String, (u64, CRFrameObjectType)>::new(),
       bytestorage : Vec::<u8>::new(),
-      paddles     : Arc::new(HashMap::<u8, TofPaddle>::new()),
-      strips      : Arc::new(HashMap::<u32, TrackerStrip>::new()),
+      tof_paddles : Arc::new(HashMap::<u8, TofPaddle>::new()),
+      trk_strips  : Arc::new(HashMap::<u32, TrackerStrip>::new()),
     }
   }
 
@@ -227,8 +247,8 @@ impl CRFrame {
       let obj = self.get_fobject(&objname)?;
       new_frame.put_fobject(obj, objname);
     }
-    new_frame.paddles = Arc::clone(&self.paddles);
-    new_frame.strips  = Arc::clone(&self.strips);
+    new_frame.tof_paddles = Arc::clone(&self.tof_paddles);
+    new_frame.trk_strips  = Arc::clone(&self.trk_strips);
     Ok(new_frame)
   }
 
@@ -258,6 +278,18 @@ impl CRFrame {
   pub fn has(&self, name : &str) -> bool {
     self.index.contains_key(name)
   }
+  
+  /// A list of TelemetryEvents (fka MergedEvent) in the frame
+  pub fn get_telemetry_event_names(&self) -> Vec<&str> {
+    let mut tevents = Vec::<&str>::new();
+    for k in MERGED_EVENT_TYPES {
+      if self.has(k) {
+        tevents.push(k);
+      }
+    }
+    tevents
+  }
+
   //pub fn put_stream(&mut self, stream : &mut Vec<u8>, name : String) {
   //  let pos    = self.bytestorage.len();
   //  self.index.insert(name, pos);
@@ -406,6 +438,12 @@ impl CRFrame {
       }
     }
   }
+  
+  #[getter]
+  /// A list of TelemetryEvents (fka MergedEvent) in the frame
+  fn telemetry_event_names(&self) -> Vec<&str> {
+    self.get_telemetry_event_names() 
+  }
 
   /// Add a TelemetryPacket to the frame. 
   ///
@@ -478,6 +516,7 @@ impl CRFrame {
   /// # Arguments:
   ///   * name : The name of the packet as it is stored in the 
   ///            index
+  //#[pyo3(signature = (name = None))]
   fn get_telemetrypacket(&mut self, name : &str) -> PyResult<TelemetryPacket> {
     let packet    = self.get::<TelemetryPacket>(name).unwrap();
     Ok(packet)
@@ -486,12 +525,66 @@ impl CRFrame {
   /// Get a tofevent from the frame directly
   fn get_tofevent(&mut self, name : &str) -> PyResult<TofEvent> {
     let packet    = self.get::<TofPacket>(name).unwrap();
-    let event     = packet.unpack::<TofEvent>().unwrap();
+    let mut event = packet.unpack::<TofEvent>().unwrap();
+    event.set_paddles(&self.tof_paddles);
     //event.set_paddles(&self.paddles);
     //py_event.event  = event;
     Ok(event)
   }
 
+  /// Get a TelemetryEvent ("MergedEvent") from the frame
+  ///
+  /// This automatically unpacks the event 
+  ///
+  /// # Arugments:
+  ///   * name           : in case there are multiple telemetry events in the same 
+  ///                      frame, choose the one to return by name. In case there 
+  ///                      are multiple events and no name is given, a ValueError 
+  ///                      is raised. In case the one with the given name does not exist,
+  ///                      a ValueError is raised as well.
+  ///   * always_exclude : never return the name given to always_exclude. This can be useful 
+  ///                      in case there are multiple events and no name is given.
+  ///
+  /// # Returns:
+  ///   TelemetryEvent -> if a name is given and the corresponding packe
+  ///                     packet is found OR no name is given and the 
+  ///                     frame contains any TelemetryEvent
+  ///   None           -> if no name is given, but the frame does not
+  ///                     contain any TelemetryEvent
+  #[pyo3(signature = (name = None, always_exclude = None))]
+  fn get_telemetryevent(&mut self, name : Option<&str>, always_exclude : Option<Vec<String>>) -> PyResult<Option<TelemetryEvent>> {
+    let name_ : &str;
+    match name {
+      None => {
+        let mut names = self.get_telemetry_event_names();
+        if let Some(to_exclude) = always_exclude {
+          let exclusion_set: HashSet<_> = to_exclude.into_iter().collect();
+          names.retain(|&x| !exclusion_set.contains(x));
+        }
+        if names.len() != 1 {
+          let msg = format!("Frame contains multiple or no TelemetryEvents {:?}. Please specify a name!", names);
+          return Err(PyValueError::new_err(msg)); 
+        } else {
+          name_ = names[0];
+        }
+      }
+      Some(n_) => {
+        name_ = n_;
+      }
+    }
+    // FIXME - better error catching
+    let packet    = self.get::<TelemetryPacket>(name_).unwrap();
+    match packet.unpack::<TelemetryEvent>() {
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string())); 
+      }
+      Ok(mut event) => {
+        event.header  = packet.header;  
+        event.dehydrate(&self.tof_paddles, &self.trk_strips);
+        Ok(Some(event))
+      }
+    }
+  }
 
   /// Check if the frame contains an object with the given name
   ///

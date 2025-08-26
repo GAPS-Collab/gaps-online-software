@@ -140,12 +140,12 @@ impl Serialization for TofPacket {
   fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
   -> Result<Self, SerializationError> {
     if stream.len() < 2 {
-      return Err(SerializationError::HeadInvalid {});
+      return Err(SerializationError::StreamTooShort);
     }
     let head = parse_u16(stream, pos);
     if Self::HEAD != head {
-      error!("Packet does not start with HEAD signature");
-      return Err(SerializationError::HeadInvalid {});
+      error!("TofPacket does not start with HEAD signature! {}", Self::HEAD);
+      return Err(SerializationError::HeadInvalid);
     }
     let packet_type : TofPacketType;
     let packet_type_enc = parse_u8(stream, pos);
@@ -160,7 +160,7 @@ impl Serialization for TofPacket {
     let tail = parse_u16(stream, pos);
     if Self::TAIL != tail {
       error!("Packet does not end with TAIL signature");
-      return Err(SerializationError::TailInvalid {});
+      return Err(SerializationError::TailInvalid);
     }
     *pos -= 2; // for tail parsing
     *pos -= payload_size;

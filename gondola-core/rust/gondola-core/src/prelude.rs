@@ -4,7 +4,8 @@
 pub use std::sync::Arc;
 pub use std::collections::{
   HashMap,
-  VecDeque
+  VecDeque,
+  HashSet
 };
 
 pub use std::path::Path;

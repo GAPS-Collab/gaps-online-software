@@ -60,4 +60,17 @@ pub trait TofPackable {
   }
 }
 
+/// Can be wrapped within a TofPacket. To do, we just have
+/// to define a packet type
+pub trait TelemetryPackable {
+  /// packet type for any kind of telemetry packet which is NOT an 
+  /// event
+  const TEL_PACKET_TYPE : TelemetryPacketType = TelemetryPacketType::Unknown;
+  /// TelemetryEvents can "occupy" several packet types, e.g. GapsTrigger, Boring, etc
+  const TEL_PACKET_TYPES_EVENT : [TelemetryPacketType;4] = [
+    TelemetryPacketType::NoGapsTriggerEvent,
+    TelemetryPacketType::BoringEvent,
+    TelemetryPacketType::InterestingEvent,
+    TelemetryPacketType::NoTofDataEvent];
+}
 

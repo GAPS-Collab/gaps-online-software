@@ -39,6 +39,17 @@ impl TelemetryEvent {
       version             : 0, 
     }
   }
+
+  /// Restore position information from database
+  pub fn dehydrate(&mut self, tof_paddles : &HashMap<u8,TofPaddle>, trk_strips : &HashMap<u32, TrackerStrip>) {
+    self.tof_event.set_paddles(tof_paddles);
+  }
+}
+
+
+impl TelemetryPackable for TelemetryEvent {
+  // trivial for TelemetryEvent, since the default 
+  // already contains the packet types
 }
 
 impl Serialization for TelemetryEvent {
@@ -74,15 +85,16 @@ impl Serialization for TelemetryEvent {
       return Err(SerializationError::StreamTooShort); 
     }
     let pos_before = *pos;
-    let tof_pack   = TofPacket::from_bytestream(stream, pos)?;
-    let ts         = tof_pack.unpack::<TofEvent>()?;
+    if num_tof_bytes != 0 {
+      let tof_pack   = TofPacket::from_bytestream(stream, pos)?;
+      let ts         = tof_pack.unpack::<TofEvent>()?;
     // sanity check - is tofpacket as long as num_tof_bytes lets us believe?
+      me.tof_event = ts;
+    }
     if pos_before + num_tof_bytes != *pos {
-      println!("Tofpacket {}", tof_pack);
       error!("Byte misalignment. Expected {num_tof_bytes}, got {pos} - {pos_before}"); 
       return Err(SerializationError::WrongByteSize);
     }
-    me.tof_event = ts;
     let trk_delim    = parse_u8(stream, pos);
 
     //println!("TRK delim {}", trk_delim);

@@ -172,7 +172,9 @@ fn io_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   use crate::io::*;
   use crate::io::caraspace::*;
   use crate::io::root_reader::read_example;
+  use crate::io::caraspace::frame::get_all_telemetry_event_names;
   m.add_function(wrap_pyfunction!(read_example, m)?)?;
+  m.add_function(wrap_pyfunction!(get_all_telemetry_event_names, m)?)?;
   m.add_class::<CRFrameObject>()?;
   m.add_class::<DataSourceKind>()?;
   m.add_class::<CRReader>()?;

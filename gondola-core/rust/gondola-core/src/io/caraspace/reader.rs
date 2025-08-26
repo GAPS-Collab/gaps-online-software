@@ -14,12 +14,6 @@
 
 use crate::prelude::*;
 
-//use indicatif::{
-//  ProgressBar,
-//  ProgressStyle
-//};
-//
-
 /// Read binaries written through the caraspace i/o system
 ///
 /// The file needs to contain subsequent CRFrames.
@@ -48,72 +42,48 @@ pub struct CRReader {
   pub skip_ahead       : usize,
   /// Stop reading after n packets
   pub stop_after       : usize,
-  ///// Keep a record of all detector elements
-  ///// e.g. paddles 
-  //pub paddles          : HashMap<u8,Paddle>,
-  ///// And tracker strips
-  //pub tracker_strips   : HashMap<u32, TrackerStrip>
-  /////// did paddle loading work
-  ////pub db_loaded       : bool,
+  /// Geometry of each TOF paddle
+  /// e.g. paddles 
+  pub tof_paddles      : Arc<HashMap<u8,TofPaddle>>,
+  /// Geometry of each tracker strip
+  pub trk_strips       : Arc<HashMap<u32, TrackerStrip>>,
+  ///// did paddle loading work
+  pub db_loaded        : bool,
 }
 
-impl fmt::Display for CRReader {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let mut range_repr = String::from("");
-    if self.skip_ahead > 0 {
-      range_repr += &(format!("({}", self.skip_ahead));
-    } else {
-      range_repr += "(";
-    }
-    if self.stop_after > 0 {
-      range_repr += &(format!("..{})", self.stop_after));
-    } else {
-      range_repr += "..)";
-    }
-    let mut repr = String::from("<CRReader :");
-    repr += "\n -- files:";
-    for k in &self.filenames {
-      repr += &format!("\n     -- {k}");
-    }
-    if self.filenames.len() > 0 {
-      repr += &format!("\n  current : {}", self.get_current_filename().unwrap());
-    }
-    repr += &String::from("\n -- -- -- -- -- -- -- -- -- -- -- --");
-    repr += &format!("\n  read {} packets, {} errors, range {}>", self.n_packs_read, self.n_errors, range_repr);
-    write!(f, "{}", repr)
-  }
-}
 
 impl CRReader {
-// 
-//  /// Create a new CRReader
-//  ///
-//  /// # Arguments:
-//  ///   * filename_or_directory : Can be either the name of a single file, or a directory with 
-//  ///                             caraspace files in it.
-//  ///   
+
+  /// Create a new CRReader
+  ///
+  /// # Arguments:
+  ///   * filename_or_directory : Can be either the name of a single file, or a directory with 
+  ///                             caraspace files in it.
+  ///   
   pub fn new(filename_or_directory : String) -> Result<Self, io::Error> {
-    //let mut paddles   = HashMap::<u8, Paddle>::new();
+    let mut paddles   = HashMap::<u8, TofPaddle>::new();
+    let mut strips    = HashMap::<u32, TrackerStrip>::new();
     //let db_path       = env::var("DATABASE_URL").unwrap_or_else(|_| "".to_string());
-    //let mut db_loaded = false;
-    //match connect_to_db(db_path) {
-    //  Err(_err) => {
-    //    error!("Database can not be found! Did you load the setup-env.sh shell?");
-    //  }
-    //  Ok(mut conn) => {
-    //    match Paddle::all(&mut conn) {
-    //      None => {
-    //        error!("Unable to retrieve paddle information from DB!");
-    //      }
-    //      Some(pdls) => {
-    //        db_loaded = true;
-    //        for p in pdls {
-    //          paddles.insert(p.paddle_id as u8, p.clone());
-    //        }
-    //      }
-    //    }
-    //  }
-    //}
+    let mut db_loaded = false;
+    match TofPaddle::all_as_dict() {
+      Err(err) => {
+        error!("Unable to retrieve paddle information from DB! {err}");
+      }
+      Ok(pdls) => {
+        db_loaded = true;
+        paddles   = pdls;         
+      }
+    }
+    match TrackerStrip::all_as_dict() {
+      Err(err) => {
+        error!("Unable to retrieve paddle information from DB! {err}");
+        // if strips and paddles do not work, something is utterly fisy
+        db_loaded = false;
+      }
+      Ok(strips_) => {
+        strips   = strips_;         
+      }
+    }
     // check the input argument and get the filelist
     let infiles   = list_path_contents_sorted(&filename_or_directory, None)?;
     if infiles.len() == 0 {
@@ -124,7 +94,7 @@ impl CRReader {
     let file = OpenOptions::new().create(false).append(false).read(true).open(&firstfile).expect("Unable to open file {filename}");
     let packet_reader = Self { 
       filenames        : infiles,
-      file_idx       : 0,
+      file_idx         : 0,
       //file_reader      : BufReader::new(file),
       // we exploit the fact here that a file is typically ~500Mb
       // (tof file only is 420MB)
@@ -135,8 +105,9 @@ impl CRReader {
       skip_ahead       : 0,
       stop_after       : 0,
       n_packs_skipped  : 0,
-      //paddles         : paddles,
-      //db_loaded       : db_loaded
+      tof_paddles      : Arc::new(paddles),
+      trk_strips       : Arc::new(strips),
+      db_loaded        : db_loaded
     };
     Ok(packet_reader)
   } 
@@ -377,6 +348,9 @@ impl CRReader {
             return None;
           }
           self.n_packs_read += 1;
+          // hand the database poitners over to the frame 
+          frame.tof_paddles = Arc::clone(&self.tof_paddles);
+          frame.trk_strips  = Arc::clone(&self.trk_strips);
           return Some(frame);
         }
       } // if no 0xAA found
@@ -384,13 +358,32 @@ impl CRReader {
   } // end fn
 }
 
-//impl Iterator for CRReader {
-//  type Item = CRFrame;
-//
-//  fn next(&mut self) -> Option<Self::Item> {
-//    self.read_next_item()
-//  }
-//}
+impl fmt::Display for CRReader {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut range_repr = String::from("");
+    if self.skip_ahead > 0 {
+      range_repr += &(format!("({}", self.skip_ahead));
+    } else {
+      range_repr += "(";
+    }
+    if self.stop_after > 0 {
+      range_repr += &(format!("..{})", self.stop_after));
+    } else {
+      range_repr += "..)";
+    }
+    let mut repr = String::from("<CRReader :");
+    repr += "\n -- files:";
+    for k in &self.filenames {
+      repr += &format!("\n     -- {k}");
+    }
+    if self.filenames.len() > 0 {
+      repr += &format!("\n  current : {}", self.get_current_filename().unwrap());
+    }
+    repr += &String::from("\n -- -- -- -- -- -- -- -- -- -- -- --");
+    repr += &format!("\n  read {} packets, {} errors, range {}>", self.n_packs_read, self.n_errors, range_repr);
+    write!(f, "{}", repr)
+  }
+}
 
 reader!(CRReader,CRFrame);
 
@@ -457,12 +450,6 @@ impl CRReader {
   fn __next__(mut slf: PyRefMut<'_, Self>) -> Option<CRFrame> {
     match slf.next() { 
       Some(frame) => {
-        //let mut pyframe = PyCRFrame::new();
-        //pyframe.frame = frame;
-        ////FIXME - these are huge! This needs to be solved
-        ////by some other method
-        //pyframe.paddles = slf.paddles.clone();
-        //pyframe.strips  = slf.strips.clone();
         return Some(frame)
       }   
       None => {

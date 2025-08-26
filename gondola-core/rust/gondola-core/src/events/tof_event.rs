@@ -976,6 +976,19 @@ impl TofEvent {
     self.hits.clone()
   }
   
+  #[getter]
+  #[pyo3(name="hitmap")]
+  pub fn hitmap<'_py>(&self) -> HashMap<u8,TofHit> {
+  //pub fn hits_py<'_py>(&self) -> PyResult<Bound<'_,Vec<TofHit>>> {
+    //Bound::new(py, self.hits)
+    //FIXMEFIXMEFIXME
+    let mut hitmap = HashMap::<u8, TofHit>::new();
+    for h in &self.hits {
+      hitmap.insert(h.paddle_id, *h);
+    }
+    hitmap
+  }
+  
   /// Total energy depostion in the Umbrella
   ///
   /// Utilizes Philip's formula based on 

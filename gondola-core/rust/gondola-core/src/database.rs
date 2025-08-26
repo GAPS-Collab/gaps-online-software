@@ -5,13 +5,6 @@
 // This file is part of gaps-online-software and published 
 // under the GPLv3 license
 
-//use glob::glob;
-//use regex::Regex;
-//use chrono::{
-//  DateTime,
-//  Utc,
-//};
-
 use crate::prelude::*;
 
 use diesel::prelude::*;
@@ -20,8 +13,10 @@ mod schema;
 use schema::tof_db_rat::dsl::*;
 //use schema::tof_db_dsicard::dsl::*;
 
-
 pub type DsiJChPidMapping = HashMap<u8, HashMap<u8, HashMap<u8, (u8, u8)>>>;
+
+// pub fn connect_to_db_path(path : &Path) -> Result<diesel:SqliteConnection, ConnectionError> {
+// }
 
 /// Universal function to connect to the database
 pub fn connect_to_db() -> Result<diesel::SqliteConnection, ConnectionError>  {

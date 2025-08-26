@@ -48,7 +48,18 @@ impl TelemetryPacket {
       payload : Vec::<u8>::new()
     }
   }
-
+  
+  /// Unpack the TelemetryPacket and return its content
+  pub fn unpack<T>(&self) -> Result<T, SerializationError>
+    where T: TelemetryPackable + Serialization {
+    if !T::TEL_PACKET_TYPES_EVENT.contains(&self.header.packet_type) &&
+      T::TEL_PACKET_TYPE != self.header.packet_type {
+      error!("This bytestream is not for a {} packet!", self.header.packet_type);
+      return Err(SerializationError::IncorrectPacketType);
+    }
+    let unpacked : T = T::from_bytestream(&self.payload, &mut 0)?;
+    Ok(unpacked)
+  }
 } 
 
 impl Serialization for TelemetryPacket {
