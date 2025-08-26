@@ -4,7 +4,7 @@
 A viewer for any type of file.
 """
 
-from re import I
+import gondola as gon
 import re
 import sys
 import tomllib 
@@ -687,10 +687,11 @@ def file_loader(f, event_type,\
                                                              the beginning of the file
     """
     event_samples = []
-    reader  = go.io.CRReader(str(f))
+    #reader  = go.io.CRReader(str(f))
+    reader   = gon.io.CRReader(f)
     if write_to_basket:
         runid, srunid, ts = get_timestamp(str(f))
-        writer = go.io.CRWriter('/prestaging/basket',runid, subrun_id=srunid, timestamp=ts)
+        writer = gon.io.CRWriter('/prestaging/basket',runid, subrun_id=srunid, timestamp=ts)
         logger.info(f'Will use writer : {writer}')
     # FIXME - this whole 'do_tof_analysis' stuff needs to go
     #if do_tof_analysis:
@@ -708,17 +709,17 @@ def file_loader(f, event_type,\
         if reco_analysis_kwargs['active']:
             reco_analysis = go.reconstruction.Reconstruction(**reco_analysis_kwargs)
     nframes = 0
-    
+    exclude_event_types = [k for k in MERGED_EVENT_TYPES if k not in merged_event_types] 
     for frame in reader:
         match event_type:
             case EventType.Unknown:
                 raise ValueError("Unknown event type!")
             case EventType.Merged:
-                m_type = has_merged_event(frame, merged_event_types = merged_event_types)
-                if m_type is None:
-                    continue
+                #m_type = has_merged_event(frame, merged_event_types = merged_event_types)
+                #if m_type is None:
+                #    continue
                 try:
-                    ev = frame.get_mergedevent(m_type)
+                    ev = frame.get_telemetryevent(always_exclude=exclude_event_types)
                 except Exception as e:
                     logger.warning(f'Merged event is corrupt! {e}')
                     continue
