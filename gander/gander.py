@@ -1268,10 +1268,10 @@ if check_password():
                     use_event = EventType.Merged
                 merged_event_types = []
                 if use_event == EventType.Merged:
-                    boring = st.checkbox('BoringEvent', value=True)                
+                    boring = st.checkbox('BoringEvent'       , value=True)                
                     nogaps = st.checkbox('NoGapsTriggerEvent', value=True)
-                    inter  = st.checkbox('InterestingEvent', value=True)
-                    notof  = st.checkbox('NoTofDataEvent', value=True)
+                    inter  = st.checkbox('InterestingEvent'  , value=True)
+                    notof  = st.checkbox('NoTofDataEvent (recommended to be excluded)'    , value=False)
                     if boring:
                         merged_event_types.append('TelemetryPacketType.BoringEvent')
                     if nogaps:

@@ -1165,8 +1165,10 @@ class TofAnalysis:
             outer_h = []
             inner_h = []
         for h in ev.hits:
+            # for gondola, the hits should have paddle information 
+            # already
             pdl = self.paddles[h.paddle_id]
-            h.set_paddle(10*pdl.length, pdl.cable_len, pdl.coax_cable_time, pdl.harting_cable_time)
+            #h.set_paddle(10*pdl.length, pdl.cable_len, pdl.coax_cable_time, pdl.harting_cable_time)
             if pdl.panel_id < 22:
                 edep_key = f'edep_pnl{pdl.panel_id}'
                 self.edep_cache[edep_key].append(h.edep)
