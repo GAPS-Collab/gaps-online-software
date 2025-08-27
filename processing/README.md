@@ -1,8 +1,13 @@
-# merge-tcfc
+# data processing scripts
 
-Merges the separate stream from the TOF computer with the telemetry binary stream 
-utilizing the caraspace serialization libary.
+This can deal with the different source, e.g. binary files as well as the 
+TOF computer data stream and produce a number of data products.
 
+## L0 files
+
+L0 is the merge of ALL "raw" data - the telemetry files as well as the TOF stream
+from the tof-cpu disks. This contains all existing data. These files are sometimes 
+also dubbed "caraspace" files, since the library is called "caraspace".
 
 ## dependencies
 
