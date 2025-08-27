@@ -71,6 +71,14 @@ impl RBWaveform {
     return tot;
   }
 
+  pub fn charge_a(&self, lower_bin : usize, upper_bin : usize) -> PyResult<f32> {
+    Ok(0.0)
+  }
+  
+  pub fn charge_b(&self, lower_bin : usize, upper_bin : usize) -> PyResult<f32> {
+    Ok(0.0)
+  }
+
   /// Apply a RB calibration to the waveform, filling the voltages and 
   /// nanoseconds fields
   pub fn calibrate(&mut self, cali : &RBCalibrations) -> Result<(), CalibrationError>  {
