@@ -37,6 +37,44 @@ pub fn connect_to_db() -> Result<diesel::SqliteConnection, ConnectionError>  {
 
 //---------------------------------------------------------------------
 
+/// Get a map of hardware id -> volume id 
+/// (Paddle id in case of TOF paddke, strip id in case 
+///  of tracker strip)
+#[cfg_attr(feature="pybindings", pyfunction)]
+pub fn get_hid_vid_map() -> Option<HashMap<u32, u64>> {
+  // FIXME - error catching
+  let pdls   = TofPaddle::all_as_dict().unwrap(); 
+  let strips = TrackerStrip::all_as_dict().unwrap();
+  let mut hid_vid_map = HashMap::<u32, u64>::new();
+  for k in pdls.keys() {
+    hid_vid_map.insert(*k as u32, pdls[k].volume_id as u64);
+  }
+  for k in strips.keys() {
+    hid_vid_map.insert(*k as u32,strips[k].volume_id as u64);
+  }
+  Some(hid_vid_map)
+}
+
+/// Get a map of volume id -> hardware id
+/// (Paddle id in case of TOF paddke, strip id in case 
+///  of tracker strip)
+#[cfg_attr(feature="pybindings", pyfunction)]
+pub fn get_vid_hid_map() -> Option<HashMap<u64, u32>> {
+  // FIXME - error catching
+  let pdls   = TofPaddle::all_as_dict().unwrap(); 
+  let strips = TrackerStrip::all_as_dict().unwrap();
+  let mut vid_hid_map = HashMap::<u64, u32>::new();
+  for k in pdls.keys() {
+    vid_hid_map.insert(pdls[k].volume_id as u64, *k as u32);
+  }
+  for k in strips.keys() {
+    vid_hid_map.insert(strips[k].volume_id as u64, *k);
+  }
+  Some(vid_hid_map)
+}
+
+//---------------------------------------------------------------------
+
 /// Get all rb ids from paddles which are stored in the 
 /// database
 #[cfg_attr(feature="pybindings", pyfunction)]

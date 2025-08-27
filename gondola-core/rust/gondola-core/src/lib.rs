@@ -241,6 +241,8 @@ fn db_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<TrackerStripMask>()?;
   m.add_class::<TrackerStripPedestal>()?;
   m.add_function(wrap_pyfunction!(get_all_rbids_in_db, m)?)?;
+  m.add_function(wrap_pyfunction!(get_hid_vid_map, m)?)?;
+  m.add_function(wrap_pyfunction!(get_vid_hid_map, m)?)?;
   Ok(())
 }
 
