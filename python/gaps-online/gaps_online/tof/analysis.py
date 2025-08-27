@@ -209,6 +209,9 @@ class TofCuts:
         self.fho_must_panel7_acc  = 0
         self.lh_must_panel2       = False 
         self.lh_must_panel2_acc   = 0 
+        # has a large energy deposition
+        self.hit_high_edep        = False
+        self.hit_high_edep_acc    = 0
 
     def clear_stats(self):
         """
@@ -228,6 +231,7 @@ class TofCuts:
         self.fhi_not_bot_acc     = 0
         self.fho_must_panel7_acc = 0 
         self.lh_must_panel2_acc  = 0 
+        self.hit_high_edep_acc   = 0
 
     @property
     def void(self):
@@ -265,6 +269,8 @@ class TofCuts:
             return False 
         if self.lh_must_panel2:
             return False 
+        if self.hit_high_edep:
+            return False
         return True
 
         
@@ -306,6 +312,8 @@ class TofCuts:
             return False 
         if self.lh_must_panel2 != other.lh_must_panel2:
             return False 
+        if self.hit_high_edep != other.hit_high_edep:
+            return False
         return True
 
     def __iadd__(self, other):
@@ -325,6 +333,7 @@ class TofCuts:
         self.fhi_not_bot_acc     += other.fhi_not_bot_acc
         self.fho_must_panel7_acc += other.fho_must_panel7_acc 
         self.lh_must_panel2_acc  += other.lh_must_panel2_acc
+        self.hit_high_edep_acc   += other.hit_high_edep_acc
         return self
 
     def __add__(self, other):
@@ -395,6 +404,12 @@ class TofCuts:
             return 0
         return self.lh_must_panel2_acc/self.nevents 
 
+    @property
+    def acc_frac_hit_high_edep(self):
+        if self.nevents == 0:
+            return 0
+        return self.hit_high_edep_acc/self.nevents 
+
     def pretty_print_efficiency(self):
         _repr =  f'-- -- -- -- -- -- -- -- -- -- --'
         _repr +=  f'\n TOTAL EVENTS : {self.nevents}'
@@ -424,6 +439,9 @@ class TofCuts:
         if self.lh_must_panel2:
             _repr += '\n Require last hit must be on the bottom CBE panel'
             _repr += f'\n   -- Accepted {100*self.acc_frac_lh_must_panel2 : .2f} %'
+        if self.hit_high_edep:
+            _repr += '\n Require that one hit has an edep > 20MeV'
+            _repr += f'\n   -- Accepted {100*self.acc_frac_hit_high_edep : .2f} %'
 
         _repr +=  f'\n-- -- -- -- -- -- -- -- -- -- --'
         return _repr 
@@ -448,6 +466,9 @@ class TofCuts:
             _repr += f'\n -- require that the first hit on the outer TOF is on panel7'
         if self.lh_must_panel2:
             _repr += f'\n -- require that the last hit on the inner TOF is on CBE BOT'
+        if self.hit_high_edep:
+            _repr += f'\n -- require that at least one hit has an edep of > 29MeV'
+        
         _repr += f'\n  {self.min_hit_umb} <= NHit(UMB) <= {self.max_hit_umb}' 
         _repr += f'\n  {self.min_hit_cbe} <= NHit(CBE) <= {self.max_hit_cbe}' 
         _repr += f'\n  {self.min_hit_cor} <= NHit(COR) <= {self.max_hit_cor}' 
@@ -508,7 +529,8 @@ class TofCuts:
         or (self.min_cos_theta != 0) \
         or (self.max_cos_theta != 1) \
         or self.fho_must_panel7 \
-        or self.lh_must_panel2:
+        or self.lh_must_panel2 \
+        or self.hit_high_edep:
             hits_sorted = sorted(ev.hits, key=lambda x: x.event_t0)
             if len(hits_sorted) == 0:
                 # if we don't have hits, we also don't fulfill any of these conditions. simple.
@@ -564,6 +586,16 @@ class TofCuts:
                 return False 
             else:
                 self.lh_must_panel2_acc += 1
+        if self.hit_high_edep:
+            found = False 
+            for h in hits_sorted:
+                if h.edep > 20:
+                    self.lh_must_panel2_acc += 1
+                    found = True
+                    break
+            if not found:
+                return False 
+
         # if we arrive here, we passed everything
         return True
 
@@ -597,6 +629,7 @@ class TofAnalysis:
         self.NHIT_BINS          = np.arange(-0.5,25.5,1)   
         self.PID_BINS           = np.arange(0.5,160.5,1)
         self.BETA_BINS          = np.linspace(0,2  ,     nbins)
+        self.EDEP_BINS          = np.linspace(0,50,      nbins)
         self.TIMING_BINS        = np.linspace(-100, 300, nbins)
         self.PDELAY_BINS        = np.linspace(-60,60,    nbins)
         self.TDIFF_BINS         = np.linspace(-1, 10, nbins)
@@ -666,6 +699,19 @@ class TofAnalysis:
         for k in tmg_plots.keys():
             tmg_cache[k] = []
         return tmg_plots, tmg_cache
+
+    def _edep_plots(self):
+        plots = {
+          # total energy depostion
+          'edep'         : d.histogram.hist1d(self.EDEP_BINS)
+        }
+        for k in range(1,22):
+            plots[f'edep_pnl{k}'] = d.histogram.hist1d(self.EDEP_BINS)
+        cache = dict()
+        for k in plots.keys():
+            cache[k] = []
+        return plots, cache
+
 
     def _nhit_plots(self):
         nhit_plots = {
@@ -816,6 +862,9 @@ class TofAnalysis:
         tmg_plots, tmg_cache = self._timing_plots()
         self.tmg_plots     = tmg_plots
         self.tmg_cache     = tmg_cache
+        edep_plots, edep_cache = self._edep_plots()
+        self.edep_plots    = edep_plots
+        self.edep_cache    = edep_cache
         self.paddles       = get_tof_paddles()
         self.hg_mapping    = create_mtb_connection_to_pid_map()
         # hit histogram
@@ -904,6 +953,9 @@ class TofAnalysis:
         for k in self.tmg_plots:
             self.tmg_plots[k] += other.tmg_plots[k]
             self.tmg_cache[k].extend(other.tmg_cache[k])
+        for k in self.edep_plots:
+            self.edep_plots[k] += other.edep_plots[k]
+            self.edep_cache[k].extend(other.edep_cache[k])
         # hit histogram
         self.nhit          += other.nhit 
         self.no_hitmiss    += other.no_hitmiss
@@ -982,7 +1034,9 @@ class TofAnalysis:
                         continue
                     self.tmg_plots[k].fill(np.array(self.tmg_cache[k]))
                     self.tmg_cache[k].clear()
-
+                for k in self.edep_plots:
+                    self.edep_plots[k].fill(np.array(self.edep_cache[k]))
+                    self.edep_cache[k].clear()
                 #self.tmg_plots['dist']    .fill(np.array(self.c_dist))
                 #self.tmg_plots['cos_theta'].fill(np.array(self.c_cos_theta))
                 #self.tmg_plots['beta'].fill(np.array(self.c_beta))   
