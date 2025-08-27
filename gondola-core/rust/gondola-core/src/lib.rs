@@ -238,6 +238,8 @@ fn db_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<TofPaddle>()?;
   m.add_class::<ReadoutBoard>()?;
   m.add_class::<TrackerStrip>()?;
+  m.add_class::<TrackerStripMask>()?;
+  m.add_class::<TrackerStripPedestal>()?;
   m.add_function(wrap_pyfunction!(get_all_rbids_in_db, m)?)?;
   Ok(())
 }
