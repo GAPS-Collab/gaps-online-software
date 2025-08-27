@@ -5,10 +5,12 @@ Plot occupancy, spectra, projections etc.
 """
 
 import numpy as np
+import matplotlib.pyplot as plt
+import charmingbeauty.layout as lo 
 
 SILI_RADIUS = 5 # mm, with guardring and all
 
-##################################################
+#-------------------------------------------------------
 
 def strip_lines():
     """
@@ -37,7 +39,7 @@ def strip_lines():
              SILI_RADIUS*0.8]
     return zip(radii, l_pos)
 
-##################################################
+#-------------------------------------------------------
 
 def plot_strip_lines(ax,det,layer : int, color='k'):
     """
@@ -56,4 +58,31 @@ def plot_strip_lines(ax,det,layer : int, color='k'):
     else:
         for r,sw in strip_widths:
             ax.plot([det[0] - r, det[0]+ r], [det[1] + sw, det[1] + sw], color=color, alpha=0.4, lw=0.5)
+
+#-------------------------------------------------------
+
+def prepare_layer_fig(layer, projection='XY'):
+    """
+    Set up figure and axis objects for a 2d projection
+    of tracker layers
+    """
+    fig = plt.figure(figsize=lo.FIGSIZE_A4_SQUARE)
+    ax  = fig.gca()
+    ax.set_title(f'{layer}', loc='right')
+    ax.spines['top'].set_visible(True)
+    ax.spines['right'].set_visible(True)
+    ax.grid(0)
+    ax.set_aspect('equal')
+    if projection == 'XY':
+        ax.set_xlabel('X [cm]', loc='right')
+        ax.set_ylabel('Y [cm]', loc='top')
+        ax.set_xlim(-79,79)
+        ax.set_ylim(-79,79) 
+    if projection == 'XZ':
+        ax.set_xlabel('X [cm]', loc='right')
+        ax.set_ylabel('Z [cm]', loc='top')
+    if projection == 'YZ':
+        ax.set_xlabel('Y [cm]', loc='right')
+        ax.set_ylabel('Z [cm]', loc='top')
+    return fig, ax
 

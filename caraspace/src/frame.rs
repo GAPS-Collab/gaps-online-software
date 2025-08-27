@@ -316,6 +316,11 @@ impl CRFrame {
     s_index
   }
 
+  /// Get the timestamp from the actual telemetry packet in the frame
+  fn get_timestamp(&self) -> u64 {
+    return 0
+  }
+
   fn string_to_bytes(value : String) -> Vec<u8> {
     let mut stream  = Vec::<u8>::new();
     let mut payload = value.into_bytes();

@@ -34,6 +34,8 @@ if __name__ == '__main__':
             pids = [vid_hid_map[k] for k in ev if k < 200000000]
             event_pids.extend(pids)
             for pid in pids:
+                if pid in range(1,13):
+                    continue
                 occu[pid] += 1
         pid_hist.fill(np.array(event_pids))
 
@@ -45,8 +47,8 @@ if __name__ == '__main__':
     for k in occu:
         occu[k] = occu[k]/max_occu
         if occu[k] == 0:
-            occu[k] = np.nan
-
+            #occu[k] = np.nan
+            pass
     #plot paddle occupancy,
     #fig = plt.figure(figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT)
     fig = plt.figure()
