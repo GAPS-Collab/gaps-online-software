@@ -1,15 +1,9 @@
-# dataclasses - the backbone of gaps-online-software
+# gondola-core - library to access dataclasses within gondola
 
-The dataclasses project compiles everything which is needed to interface with GAPS data on a 
-low level. There are implementations in C++ and rust. For rust, the dataclasses are exposed
-through pyO3 to python and incorporated into the python package `gaps_online`.
-
-Dataclasses include structures for:
-
-* Events (TOF/Tracker, Telemetry, combined data (L0)
-
-* Monitoring 
-
-* I/O - reader/writer classes for the different file types
-
+* rust, python and C++ implementations for events, monitoring data,
+  i/o, analysis
+* Change from v0.10 - gondola-core includes: tof-dataclasses, telemetry-dataclasses,
+  pybindings and caraspace under one roof
+* the C++ library contains a SimpleDet compatibility layer: read/write SimpleDet files
+* the C++ library provides extra pybindings: gondola_cxx - build with nanobind
 

@@ -139,20 +139,31 @@ pub fn get_califilename(rb_id : u8, latest : bool) -> String {
 ///
 /// # Arguments
 ///
-/// * run    : run id (identifier)
-/// * subrun : subrun id (identifier of file # within
-///            the run
-/// * rb_id  : in case this should be used on the rb, 
-///            a rb id can be specified as well
-pub fn get_runfilename(run : u32, subrun : u64, rb_id : Option<u8>) -> String {
-  let ts = get_utc_timestamp();
+/// * run       : run id (identifier)
+/// * subrun    :  subrun id (identifier of file # within
+///                the run
+/// * rb_id     :  in case this should be used on the rb, 
+///                a rb id can be specified as well
+/// * timestamp :  substitute the current time with this timestamp
+///                (or basically any other string) instead.
+#[cfg_attr(feature="pybindings", pyfunction)]
+pub fn get_runfilename(run : u32, subrun : u64, rb_id : Option<u8>, timestamp : Option<String>) -> String {
+  let ts : String;
+  match timestamp {
+    Some(_ts) => {
+      ts = _ts;
+    }
+    None => {
+      ts = get_utc_timestamp();
+    }
+  }
   let fname : String;
   match rb_id {
     None => {
-      fname = format!("Run{run}_{subrun}.{ts}.tof.gaps");
+      fname = format!("Run{run}_{subrun}.{ts}.gaps");
     }
     Some(rbid) => {
-      fname = format!("Run{run}_{subrun}.{ts}.RB{rbid:02}.tof.gaps");
+      fname = format!("Run{run}_{subrun}.{ts}.RB{rbid:02}.gaps");
     }
   }
   fname

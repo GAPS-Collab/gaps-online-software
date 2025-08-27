@@ -6,6 +6,8 @@ export DJANGO_SETTINGS_MODULE=gaps_db.settings
 export GapsOnlineSoftware_DIR=@CMAKE_INSTALL_PREFIX@
 # this is the database for diesel
 export DATABASE_URL=@CMAKE_CURRENT_SOURCE_DIR@/gaps-db/gaps_db/gaps_flight.db
+# the database will soon be moving, probably to an asset dir
+export GONDOLA_DB_URL=@CMAKE_CURRENT_SOURCE_DIR@/gaps-db/gaps_db/gaps_flight.db
 
 echo -e "\n\n"
 echo -e "  ************************************************+++"
@@ -17,6 +19,7 @@ echo -e "   -- PATH=${PATH//:/\\n  -- }"
 echo -e "   -- LD_LIBRARY_PATH=${LD_LIBRARY_PATH//:/\\n  -- }"
 echo -e "   -- GapsOnlineSoftware_DIR=${GapsOnlineSoftware_DIR}" 
 echo -e "      (for cmake's find_package(GapsOnlineSoftware) calls)"
+echo -e "   -- GONDOLA_DB_URL=${GONDOLA_DB_URL}"
 echo -e "  ***************************************************"
 echo -e "   => software repository:"
 echo -e "      - https://github.com/GAPS-Collab/gaps-online-software"

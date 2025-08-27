@@ -3,6 +3,8 @@
 
 mod reader; 
 pub use reader::CRReader;
+pub mod writer;
+pub use writer::CRWriter;
 
 pub mod frame;
 pub use frame::{
