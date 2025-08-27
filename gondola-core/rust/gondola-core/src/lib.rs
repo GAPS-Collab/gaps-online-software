@@ -14,6 +14,9 @@
 //! 
 //! * tof          - Very specific TOF related code which does not fall under a different 
 //!                  category
+//! 
+//! * tracker      - Very specific TRK related code which does not fall under any other 
+//!                  category
 //!
 //! # features:
 //!
@@ -42,6 +45,7 @@ pub mod io;
 pub mod calibration;
 pub mod errors;
 pub mod tof;
+pub mod tracker;
 pub mod monitoring;
 pub mod stats;
 #[cfg(feature="database")]
@@ -118,6 +122,16 @@ fn tof_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<RBChannelMaskConfig>()?;
   m.add_class::<TriggerConfig>()?;
   m.add_class::<TofRunConfig>()?;
+  Ok(())
+}
+
+#[cfg(feature="pybindings")]
+#[pymodule]
+#[pyo3(name = "tracker")]
+fn tracker_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
+  use crate::tracker::*;
+  //m.add_function(wrap_pyfunction!(mt_event_get_timestamp_abs48,m)?)?;
+  m.add_function(wrap_pyfunction!(strip_lines, m)?)?;
   Ok(())
 }
 
@@ -266,6 +280,7 @@ fn gondola_core_py<'_py>(m : &Bound<'_py, PyModule>) -> PyResult<()> { //: Pytho
   m.add_wrapped(wrap_pymodule!(monitoring_py))?;
   m.add_wrapped(wrap_pymodule!(packets_py))?;
   m.add_wrapped(wrap_pymodule!(tof_py))?;
+  m.add_wrapped(wrap_pymodule!(tracker_py))?;
   m.add_wrapped(wrap_pymodule!(io_py))?;
   m.add_wrapped(wrap_pymodule!(db_py))?;
   m.add_wrapped(wrap_pymodule!(stats_py))?;

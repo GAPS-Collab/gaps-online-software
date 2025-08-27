@@ -142,6 +142,7 @@ pub use crate::database::*;
 pub use crate::calibration::tof::*;
 pub use crate::monitoring::*;
 pub use crate::tof::*;
+pub use crate::tracker::*;
 pub use crate::algorithms::*;
 
 pub use crate::packets::{
