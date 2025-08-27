@@ -173,7 +173,7 @@ impl CRReader {
   /// # Arguments:
   ///
   ///    * input   : name of the target directory
-  ///    * patterh : the regex pattern to look for. That the sorting works,
+  ///    * pattern : the regex pattern to look for. That the sorting works,
   ///                the pattern needs to return a date for the first
   ///                captured argument and a time for the second captured argument
   fn list_path_contents_sorted(input: &str, pattern: Option<Regex>) -> Result<Vec<String>, io::Error> {

@@ -175,7 +175,9 @@ def tof_projection_xy(paddle_occupancy = {},
                       paddle_style     = {'edgecolor' : 'w', 'lw' : 0.4},
                       show_cbar        = True,
                       overlay_panels   = False,
-                      indicate_empty   = 'gray'):
+                      indicate_empty   = 'gray',
+                      umbrella_only    = False,
+                      lognorm          = False):
     """
     Show the projection of all paddles which
     are facing in z-direction
@@ -200,6 +202,7 @@ def tof_projection_xy(paddle_occupancy = {},
                            indicate empty paddles with the given color instead
                            using a value from the color map. If this behavior is 
                            not desired, set this to an empty string.
+        umbrella_only    : Show only the umbrella, add the colorbar next to it
     """
     if overlay_panels:
         fig = plt.figure(figsize=lo.FIGSIZE_A4_SQUARE)
@@ -217,13 +220,35 @@ def tof_projection_xy(paddle_occupancy = {},
     if event is not None:
         ts = np.array([h.t0 for h in event.hits])
         cm_norm_pts = plt.Normalize(vmin=min(ts), vmax=max(ts))
-
+    
+    if paddle_occupancy:
+        # FIXME - this is a kludge for the ICRC approved plot!
+        umb_norm = matplotlib.colors.Normalize(vmin=min(paddle_occupancy.values()), vmax=max(paddle_occupancy.values()))
+        if umbrella_only:
+            umb_occu = {k : paddle_occupancy[k] for k in paddle_occupancy if 60 < k < 109}
+            paddle_occupancy = umb_occu
+            if lognorm:
+                umb_norm = matplotlib.colors.LogNorm(vmin=min(umb_occu.values()), vmax=max(umb_occu.values()))
+            else:
+                umb_norm = matplotlib.colors.Normalize(vmin=min(umb_occu.values()), vmax=max(umb_occu.values()))
     for pdl in umb_paddles:
         if paddle_occupancy:
-            color = cmap(paddle_occupancy[pdl.paddle_id])
+            max_occu = max(paddle_occupancy.values())
+            #color = cmap(paddle_occupancy[pdl.paddle_id]/max_occu)
+            color = cmap(umb_norm(paddle_occupancy[pdl.paddle_id]))
             if not paddle_occupancy[pdl.paddle_id] and indicate_empty:
                 color = indicate_empty
             axs[0].add_patch(pdl.draw_xy(fill=True, edgecolor=color, facecolor=color))
+            if pdl.panel_id == 7:
+                axs[0].text(pdl.global_pos_x_l0 - 4.5, 75, f'{pdl.paddle_id}', color='w', fontsize=6)
+            if pdl.panel_id == 10 or pdl.panel_id == 8:
+                axs[0].text(pdl.global_pos_x_l0 - 4.5, 160, f'{pdl.paddle_id}', color='w', fontsize=6)
+            if pdl.panel_id == 11 or pdl.panel_id == 13:
+                axs[0].text(pdl.global_pos_x_l0 - 4.5, -170, f'{pdl.paddle_id}', color='w', fontsize=6)
+            if pdl.panel_id == 9 or pdl.panel_id == 12:
+                axs[0].text(-80, pdl.global_pos_y_l0 - 4.5, f'{pdl.paddle_id}', color='w', fontsize=6)
+
+
         else:
             if event is not None:
                 axs[0].add_patch(pdl.draw_xy(fill=False,\
@@ -238,9 +263,13 @@ def tof_projection_xy(paddle_occupancy = {},
         axs[0].set_xlim(-200, 200)
         axs[0].set_ylim(-200, 200)
         if overlay_panels:
-            axs[0].set_title('XY projection', loc='right')
+            if umbrella_only:
+                # this is a bad kludge. Sorry. 
+                axs[0].set_title('TOF umbrella trigger hit occupancy', loc='right')
+            else:
+                axs[0].set_title('XY projection', loc='right')
         else:
-            axs[0].set_title('UMB', loc='right')
+            axs[0].set_title('TOF umbrella', loc='right')
     if event is not None:
         #print (hit_pids)
         umb_pids = [umbp.paddle_id for umbp in umb_paddles]
@@ -251,6 +280,23 @@ def tof_projection_xy(paddle_occupancy = {},
                 #print (f"adding scatter for {0.1*h.x}, {0.1*h.y}")
                 axs[0].scatter([0.1*h.x], [0.1*h.y], alpha = 0.8 , marker='o', s=100*h.edep,
                                lw=1.5, edgecolor=paddle_style['edgecolor'], color=cmap(cm_norm_pts(h.t0)))
+
+    if umbrella_only:
+        umb_occu = {k : paddle_occupancy[k] for k in paddle_occupancy if 60 < k < 109}
+        if paddle_occupancy and show_cbar:
+            cbar_ax = fig.add_axes([0.85, 0.0, 0.1, 1.0])
+            cbar_ax.set_axis_off()
+            sm = cm.ScalarMappable(cmap=cmap, norm=umb_norm)
+            sm.set_array([min(umb_occu.values()), max(umb_occu.values())])
+            ax = plt.sca(cbar_ax)
+            plt.colorbar(sm, ax=cbar_ax, label='triggers', shrink=10.0, aspect=20)
+        if not overlay_panels:
+            fig.suptitle(title, x=0.9)
+        axs[0].spines['top'].set_visible(True)
+        axs[0].spines['right'].set_visible(True)
+
+        return fig, axs
+        pass 
 
     axid = 1
     if overlay_panels:
