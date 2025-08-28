@@ -42,3 +42,8 @@ pub const MASK_CMD_32BIT : u32 = 0xFFFFFFFF;
 /// Padding for 32 bits commands (byte packets)
 ///
 pub const PAD_CMD_32BIT  : u32 = 0x00000000;
+
+/// Si(Li) wafer detector radius, with guardring and all
+pub const SILI_RADIUS : f32 = 5.0;
+
+

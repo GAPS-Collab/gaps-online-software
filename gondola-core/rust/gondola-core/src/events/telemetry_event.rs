@@ -43,6 +43,9 @@ impl TelemetryEvent {
   /// Restore position information from database
   pub fn dehydrate(&mut self, tof_paddles : &HashMap<u8,TofPaddle>, trk_strips : &HashMap<u32, TrackerStrip>) {
     self.tof_event.set_paddles(tof_paddles);
+    for h in &mut self.tracker_hits {  
+      h.set_coordinates(trk_strips);
+    }
   }
 }
 

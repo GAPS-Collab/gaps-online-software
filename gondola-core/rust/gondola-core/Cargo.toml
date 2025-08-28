@@ -19,8 +19,6 @@ name = "bench"
 harness = false
 required-features = ["random"]
 
-
-
 [[test]]
 name = "test"
 required-features  = ["random"]
@@ -49,8 +47,6 @@ optional = true
 [dependencies.smoothed_z_score]
 version  = "0.1"
 optional = true
-
-
 
 [dev-dependencies]
 # for testing

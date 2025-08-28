@@ -11,57 +11,6 @@
 
 use crate::prelude::*;
 
-////use std::fmt::format;
-//use std::fs::File;
-//use std::io::{
-//    Write,
-//    Read,
-//};
-//use std::fmt;
-//use std::collections::HashMap;
-//
-//use tof_dataclasses::commands::config::{
-//  BuildStrategy,
-//  TriggerConfig,
-//  TOFEventBuilderConfig, 
-//  TofRunConfig,
-//  TofRBConfig,
-//  DataPublisherConfig,
-//};
-//use tof_dataclasses::events::master_trigger::TriggerType;
-//
-////use tof_dataclasses::events::master_trigger::TriggerType;
-//use tof_dataclasses::events::DataType;
-//#[cfg(feature="database")]
-//use tof_dataclasses::packets::TofPacket;
-//use tof_dataclasses::commands::TofOperationMode;
-//#[cfg(feature="database")]
-//use tof_dataclasses::commands::TofCommandV2;
-//#[cfg(feature="database")]
-//use tof_dataclasses::commands::TofCommandCode;
-//
-//use tof_dataclasses::commands::config::RunConfig;
-//#[cfg(feature="database")]
-//use tof_dataclasses::database::RAT;
-//#[cfg(feature="database")]
-//use tof_dataclasses::commands::config::PreampBiasConfig;
-//#[cfg(feature="database")]
-//use tof_dataclasses::commands::config::LTBThresholdConfig;
-//#[cfg(feature="database")]
-//use tof_dataclasses::commands::config::RBChannelMaskConfig;
-//
-//use tof_dataclasses::serialization::{
-//  parse_u8,
-//  parse_u16,
-//  parse_u32,
-//  //parse_bool, 
-//  Serialization,
-//  SerializationError,
-//};
-//
-//#[cfg(feature="database")]
-//use tof_dataclasses::serialization::Packable;
-
 /// Define which entitiy will configure another entity
 #[derive(Debug, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
 pub enum ParameterSetStrategy {
@@ -879,6 +828,7 @@ impl Default for DataPublisherSettings {
 
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
+#[cfg_attr(feature="pybindings", pyclass)]
 pub struct LiftofSettings {
   /// read run .toml files from this directory and 
   /// automotically work through them 1by1
@@ -1122,6 +1072,33 @@ impl Default for LiftofSettings {
     Self::new()
   }
 }
+
+#[cfg(feature="pybindings")]
+#[pymethods]
+impl LiftofSettings {
+
+  /// Read settings from a .toml file
+  ///
+  /// # Arugments:
+  ///
+  /// * filename : A .toml file with settings fro the 
+  ///              liftof flight suite
+  #[staticmethod]
+  fn from_file(filename : &str) -> PyResult<Self> {
+    match LiftofSettings::from_toml(filename) {
+      Ok(settings) => {
+        return Ok(settings);
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+}
+
+pythonize!(LiftofSettings);
+
+//----------------------------------------------------
 
 /// Readoutboard configuration for a specific run
 #[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]

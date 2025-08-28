@@ -38,6 +38,8 @@ pub use std::fs::{
   OpenOptions,
 };
 
+pub use crossbeam_channel::Sender;
+
 pub use chrono::{
   Utc,
   DateTime,

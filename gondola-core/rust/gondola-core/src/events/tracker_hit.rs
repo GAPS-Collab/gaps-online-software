@@ -52,16 +52,16 @@ impl TrackerHit {
                             self.channel as u8)
   }
 
- // pub fn set_coordinates(&mut self, strip_map : &HashMap<u32, TrackerStrip>) {
- //   match strip_map.get(&self.get_stripid()) {
- //     None  => error!("Can not get strip for strip id {}" , self.get_stripid()),
- //     Some(strip) => { 
- //       self.x = strip.global_pos_x_l0;
- //       self.y = strip.global_pos_y_l0;
- //       self.z = strip.global_pos_z_l0;
- //     }
- //   }
- // }
+ pub fn set_coordinates(&mut self, strip_map : &HashMap<u32, TrackerStrip>) {
+   match strip_map.get(&self.get_stripid()) {
+     None  => error!("Can not get strip for strip id {}" , self.get_stripid()),
+     Some(strip) => { 
+       self.x = strip.global_pos_x_l0;
+       self.y = strip.global_pos_y_l0;
+       self.z = strip.global_pos_z_l0;
+     }
+   }
+ }
 }
 
 impl fmt::Display for TrackerHit {
@@ -127,6 +127,21 @@ impl TrackerHit {
   #[getter]
   fn get_energy(&self) -> f32 {
     self.energy
+  }
+
+  #[getter]
+  fn get_x(&self) -> f32 {
+    self.x
+  }
+  
+  #[getter]
+  fn get_y(&self) -> f32 {
+    self.y
+  }
+  
+  #[getter]
+  fn get_z(&self) -> f32 {
+    self.z
   }
 }
 

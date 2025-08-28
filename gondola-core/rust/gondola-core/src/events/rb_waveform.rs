@@ -70,13 +70,108 @@ impl RBWaveform {
     }
     return tot;
   }
+  
+  pub fn charge_a_below_500(&self) -> f32 {
 
-  pub fn charge_a(&self, lower_bin : usize, upper_bin : usize) -> PyResult<f32> {
-    Ok(0.0)
+    let mut total_area = 0.0f32;
+    for i in 0..(self.nanoseconds_a.len() - 1) {
+        let h = self.nanoseconds_a[i + 1] - self.nanoseconds_a[i]; // The width of the trapezoid.
+        let mut v1 = self.voltages_a[i];
+        let mut v2 = self.voltages_a[i + 1];
+        if v1 > 500.0 {
+          v1 = 500.0;
+        }
+        if v2 > 500.0 { 
+          v2 = 500.0; 
+        }
+        let area = h * (v1 + v2) / 2.0;
+        total_area += area;
+    } 
+    total_area
   }
   
-  pub fn charge_b(&self, lower_bin : usize, upper_bin : usize) -> PyResult<f32> {
-    Ok(0.0)
+  pub fn charge_b_below_500(&self) -> f32 {
+
+    let mut total_area = 0.0f32;
+    for i in 0..(self.nanoseconds_b.len() - 1) {
+        let h = self.nanoseconds_b[i + 1] - self.nanoseconds_b[i]; // The width of the trapezoid.
+        let mut v1 = self.voltages_b[i];
+        let mut v2 = self.voltages_b[i + 1];
+        if v1 > 500.0 {
+          v1 = 500.0;
+        }
+        if v2 > 500.0 { 
+          v2 = 500.0; 
+        }
+        let area = h * (v1 + v2) / 2.0;
+        total_area += area;
+    } 
+    total_area
+  }
+
+  //pub fn charge_b_trap_bottom_fwhm(&self) -> f32 {
+  //  let mut total_area = 0.0f32;
+  //  for i in 0..(self.nanoseconds_a.len() - 1) {
+  //      let h = self.nanoseconds_a[i + 1] - self.nanoseconds_a[i]; // The width of the trapezoid.
+  //      let area = h * (self.voltages_a[i] + self.voltages_a[i + 1]) / 2.0;
+  //      total_area += area;
+  //  } 
+  //  total_area
+  //}
+  
+  pub fn charge_a_trap(&self) -> f32 {
+    let mut total_area = 0.0f32;
+    for i in 0..(self.nanoseconds_a.len() - 1) {
+        let h = self.nanoseconds_a[i + 1] - self.nanoseconds_a[i]; // The width of the trapezoid.
+        let area = h * (self.voltages_a[i] + self.voltages_a[i + 1]) / 2.0;
+        total_area += area;
+    } 
+    total_area
+  }
+  
+  pub fn charge_b_trap(&self) -> f32 {
+    let mut total_area = 0.0f32;
+    for i in 0..(self.nanoseconds_b.len() - 1) {
+        let h = self.nanoseconds_b[i + 1] - self.nanoseconds_b[i]; // The width of the trapezoid.
+        let area = h * (self.voltages_b[i] + self.voltages_b[i + 1]) / 2.0;
+        total_area += area;
+    } 
+    total_area
+  }
+
+  pub fn guess_max_peak_a(&self) -> f32 {
+    let mut current_max = -1000.0f32;
+    for k in 20..self.voltages_a.len() {
+      if self.voltages_a[k] > current_max {
+        current_max = self.voltages_a[k];
+      }
+    }
+    current_max
+  }
+  
+  pub fn guess_max_peak_b(&self) -> f32 {
+    let mut current_max = -1000.0f32;
+    for k in 20..self.voltages_b.len() {
+      if self.voltages_b[k] > current_max {
+        current_max = self.voltages_b[k];
+      }
+    }
+    current_max
+  }
+
+  pub fn subtract_pedestals(&mut self) {
+    let (ped_a, _ped_a_err) = calculate_pedestal(&self.voltages_a,
+                                                 10.0,
+                                                 700,
+                                                 200);
+    let (ped_b, _ped_b_err) = calculate_pedestal(&self.voltages_b,
+                                                 10.0,
+                                                 700,
+                                                 200);
+    for k in 0..self.voltages_a.len() {
+      self.voltages_a[k] = self.voltages_a[k] - ped_a;
+      self.voltages_b[k] = self.voltages_b[k] - ped_b;
+    }
   }
 
   /// Apply a RB calibration to the waveform, filling the voltages and 
@@ -213,6 +308,16 @@ impl RBWaveform {
   }
 
   #[getter]
+  fn max_peak_a_guess(&self) -> f32 {
+    self.guess_max_peak_a()
+  }
+  
+  #[getter]
+  fn max_peak_b_guess(&self) -> f32 {
+    self.guess_max_peak_b()
+  }
+
+  #[getter]
   fn get_rb_id(&self) -> u8 {
     self.rb_id
   }
@@ -287,6 +392,32 @@ impl RBWaveform {
   ///   * threshold : value in mV
   fn get_tot_b(&self, threshold : f32) -> f32 {
     self.time_over_threshold_b(threshold)
+  }
+
+  #[pyo3(name="subtract_pedestals")]
+  fn subtract_pedestals_py(&mut self) {
+    self.subtract_pedestals()
+  }
+
+  #[getter]
+  fn get_charge_a_trap(&self) -> f32 {
+    self.charge_a_trap()
+  }
+  
+  #[getter]
+  fn get_charge_a_below_500_trap(&self) -> f32 {
+    self.charge_a_below_500() 
+  } 
+  
+  #[getter]
+  fn get_charge_b_below_500_trap(&self) -> f32 {
+    self.charge_b_below_500() 
+  } 
+
+
+  #[getter]
+  fn get_charge_b_trap(&self) -> f32 {
+    self.charge_b_trap()
   }
 
   #[getter]

@@ -750,6 +750,15 @@ impl Serialization for TofEvent {
       return Err(SerializationError::TailInvalid);
     }
     //println!("{}",te);
+    
+    // FIXME - this is slow, use Arc<> instead. However, then make 
+    // sure to copy them in case we get rid of the rb evvnts 
+    // (or does Arc take care of it) 
+    for rbev in &te.rb_events {
+      for h in &rbev.hits {
+        te.hits.push(*h);
+      }
+    }
     return Ok(te);
   }
 }
@@ -952,6 +961,12 @@ impl TofEvent {
   #[getter]
   fn rb_link_ids(&self) -> Vec<u8> {
     self.get_rb_link_ids()
+  }
+
+  /// The event might have RBEvents associated with it
+  #[getter]
+  fn get_rb_events(&self) -> Vec<RBEvent> {
+    self.rb_events.clone()
   }
 
   /// Hits which formed a trigger
