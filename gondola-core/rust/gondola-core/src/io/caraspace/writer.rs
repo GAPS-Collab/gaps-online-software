@@ -175,5 +175,6 @@ impl CRWriter {
   }
 }
 
+#[cfg(feature="pybindings")]
 pythonize_display!(CRWriter);
 

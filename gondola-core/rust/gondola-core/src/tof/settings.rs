@@ -1096,6 +1096,7 @@ impl LiftofSettings {
   }
 }
 
+#[cfg(feature="pybindings")]
 pythonize!(LiftofSettings);
 
 //----------------------------------------------------
