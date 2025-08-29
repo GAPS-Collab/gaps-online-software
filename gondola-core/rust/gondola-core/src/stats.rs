@@ -1,9 +1,7 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
-//! 
-//! Statistics tools
+//! Statistics tools 
 //!
-//!
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
 
 use statrs::distribution::{Gamma, Continuous};
 use num_traits::{

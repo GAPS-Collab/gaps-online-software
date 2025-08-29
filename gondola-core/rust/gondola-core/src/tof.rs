@@ -16,3 +16,16 @@ pub mod analysis_engine;
 pub use analysis_engine::*;
 pub mod cuts;
 pub use cuts::*;
+
+pub mod thread_control;
+pub use thread_control::ThreadControl;
+
+#[cfg(feature="pybindings")]
+use pyo3::pyfunction;
+/// Convert an int value to the board ID string.
+#[cfg_attr(feature="pybindings", pyfunction)]
+pub fn to_board_id_string(rb_id: u32) -> String {
+  format!("RB{:02}", rb_id)
+}
+
+

@@ -1,7 +1,10 @@
 // This file is part of gaps-online-software and published 
 // under the GPLv3 license
 
-pub use crate::prelude::*;
+#[cfg(feature="pybindings")]
+pub use pyo3::prelude::*; 
+
+use crate::constants::SILI_RADIUS;
 
 /// A helper to plot detector strip
 ///

@@ -32,6 +32,9 @@ use strum_macros::{
   FromRepr,
   EnumIter
 };
+// needed for enum macro
+// FIXME 
+#[cfg(feature="random")]
 use strum::IntoEnumIterator;
 use crate::expand_and_test_enum;
 

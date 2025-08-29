@@ -1,5 +1,5 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
 
 pub mod pa_moni_data;
 pub use pa_moni_data::{
@@ -41,6 +41,9 @@ pub use heartbeats::{
   EventBuilderHB,
   EventBuilderHBSeries,
 };
+
+pub mod run_statistics;
+pub use run_statistics::RunStatistics;
 
 use std::collections::VecDeque;
 use std::collections::HashMap;

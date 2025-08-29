@@ -1,16 +1,7 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
 
-#[cfg(feature="random")]
-use crate::random::FromRandom;
-
-#[cfg(feature="random")]
-use rand::Rng;
-
-use std::fmt;
-
-#[cfg(feature="pybindings")]
-use pyo3::prelude::*;
+use crate::prelude::*;
 
 /// Squeze the rb channel - paddle mapping into 5 bytes
 /// for a single RB
@@ -227,28 +218,29 @@ impl RBPaddleID {
 
 #[cfg(feature="database")]
 impl RBPaddleID {
-//  pub fn from_rb( rb : &ReadoutBoard) -> Self {
-//    let mut rb_pid = RBPaddleID::new();
-//    rb_pid.paddle_12 = rb.paddle12.paddle_id as u8;    
-//    rb_pid.paddle_34 = rb.paddle34.paddle_id as u8;    
-//    rb_pid.paddle_56 = rb.paddle56.paddle_id as u8;    
-//    rb_pid.paddle_78 = rb.paddle78.paddle_id as u8;    
-//    let mut flipped  = 0u8 ;
-//    if rb.paddle12_chA != 1 {
-//      flipped |= 1;
-//    }
-//    if rb.paddle34_chA != 3 {
-//      flipped |= 2;
-//    }
-//    if rb.paddle56_chA != 5 {
-//      flipped |= 4;
-//    }
-//    if rb.paddle78_chA != 7 {
-//      flipped |= 8;
-//    }
-//    rb_pid.channel_order = flipped;
-//    rb_pid
-//  }
+
+  pub fn from_rb( rb : &ReadoutBoard) -> Self {
+    let mut rb_pid = RBPaddleID::new();
+    rb_pid.paddle_12 = rb.paddle12.paddle_id as u8;    
+    rb_pid.paddle_34 = rb.paddle34.paddle_id as u8;    
+    rb_pid.paddle_56 = rb.paddle56.paddle_id as u8;    
+    rb_pid.paddle_78 = rb.paddle78.paddle_id as u8;    
+    let mut flipped  = 0u8 ;
+    if rb.get_paddle12_chA() != 1 {
+      flipped |= 1;
+    }
+    if rb.get_paddle34_chA() != 3 {
+      flipped |= 2;
+    }
+    if rb.get_paddle56_chA() != 5 {
+      flipped |= 4;
+    }
+    if rb.get_paddle78_chA() != 7 {
+      flipped |= 8;
+    }
+    rb_pid.channel_order = flipped;
+    rb_pid
+  }
 }
 
 #[cfg(feature = "random")]

@@ -52,6 +52,7 @@ impl TrackerHit {
                             self.channel as u8)
   }
 
+ #[cfg(feature="database")]
  pub fn set_coordinates(&mut self, strip_map : &HashMap<u32, TrackerStrip>) {
    match strip_map.get(&self.get_stripid()) {
      None  => error!("Can not get strip for strip id {}" , self.get_stripid()),

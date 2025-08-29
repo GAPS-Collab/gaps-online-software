@@ -1,45 +1,15 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
 
-use std::fmt;
+use crate::prelude::*;
 
-use crate::monitoring::MoniData;
 
-#[cfg(feature = "random")]
-use crate::random::FromRandom;
-#[cfg(feature = "random")]
-use rand::Rng;
-
-use crate::io::serialization::Serialization;
-
-use crate::packets::TofPackable;
-
-use crate::io::parsers::{
-  parse_u8,
-  parse_f32
+#[cfg(feature="tofcontrol")]
+use tof_control::helper::pa_type::{
+  PATemp,
+  PAReadBias
 };
 
-use crate::packets::TofPacketType;
-use crate::errors::SerializationError;
-
-#[cfg(feature="pybindings")]
-use pyo3::prelude::*;
-
-#[cfg(feature="pybindings")]
-use pyo3::exceptions::{
-  PyKeyError,
-  PyIOError
-};
-
-#[cfg(feature="pybindings")]
-use crate::packets::TofPacket;
-
-use crate::moniseries;
-
-#[cfg(feature="pybindings")]
-use crate::pythonize_packable;
-#[cfg(feature="pybindings")]
-use crate::pythonize_monidata;
 
 /// Preamp temperature and bias data
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -60,15 +30,15 @@ impl PAMoniData {
     }
   }
 
-  //#[cfg(feature = "tofcontrol")]
-  //pub fn add_temps(&mut self, pt : &PATemp ) {
-  //  self.temps = pt.pa_temps;
-  //}
+  #[cfg(feature = "tofcontrol")]
+  pub fn add_temps(&mut self, pt : &PATemp ) {
+    self.temps = pt.pa_temps;
+  }
 
-  //#[cfg(feature = "tofcontrol")]
-  //pub fn add_biases(&mut self, pb : &PAReadBias) {
-  //  self.biases = pb.read_biases;
-  //}
+  #[cfg(feature = "tofcontrol")]
+  pub fn add_biases(&mut self, pb : &PAReadBias) {
+    self.biases = pb.read_biases;
+  }
 }
 
 #[cfg(feature="pybindings")]

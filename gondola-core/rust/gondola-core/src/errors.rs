@@ -1,5 +1,5 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
 
 use crate::prelude::*;
 
@@ -187,9 +187,9 @@ impl fmt::Display for UserError {
 }
 
 impl Error for UserError {
+}
 
 //------------------------------------------------------------------------
-}
 
 #[derive(Debug,Copy,Clone)]
 #[repr(u8)]
@@ -215,5 +215,73 @@ impl fmt::Display for AnalysisError {
 }
 
 impl Error for AnalysisError {
+}
+
+//------------------------------------------------------------------------
+
+#[derive(Debug, Copy, Clone)]
+#[repr(u8)]
+pub enum SensorError {
+  ReadoutError,
+}
+
+impl fmt::Display for SensorError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp : &str;
+    match self {
+      SensorError::ReadoutError => {disp = "ReadoutError"},
+    }
+    write!(f, "<SensorError : {}>", disp)
+  }
+}
+
+impl Error for SensorError {
+}
+
+//------------------------------------------------------------------------
+
+//#[derive(Debug, Copy, Clone)]
+//#[repr(u8)]
+//pub enum SetError {
+//  EmptyInputData,
+//  CanNotConnectToMyOwnZMQSocket  
+//}
+//
+//impl fmt::Display for SetError {
+//  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//    let disp : &str;
+//    match self {
+//      SetError::EmptyInputData => {disp = "EmptyInputData"},
+//      SetError::CanNotConnectToMyOwnZMQSocket => {disp = "CanNotConnectToMyOwnZMQSocket"},
+//    }
+//    write!(f, "<SetError : {}>", disp)
+//  }
+//}
+//
+//impl Error for SetError {
+//}
+
+//------------------------------------------------------------------------
+
+#[derive(Debug, Copy, Clone)]
+#[repr(u8)]
+pub enum RunError {
+  EmptyInputData,
+  CanNotConnectToMyOwnZMQSocket  
+}
+
+impl fmt::Display for RunError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp : &str;
+    match self {
+      RunError::EmptyInputData => {disp = "EmptyInputData"},
+      RunError::CanNotConnectToMyOwnZMQSocket => {disp = "CanNotConnectToMyOwnZMQSocket"},
+    }
+    write!(f, "<RunError : {}>", disp)
+  }
+}
+
+
+impl Error for RunError {
 }
 

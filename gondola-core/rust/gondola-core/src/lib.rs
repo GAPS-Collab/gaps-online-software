@@ -48,12 +48,24 @@ pub mod tof;
 pub mod tracker;
 pub mod monitoring;
 pub mod stats;
-#[cfg(feature="database")]
-pub mod database;
 #[cfg(feature="pybindings")]
 pub mod python;
+#[cfg(feature="database")]
+pub mod database;
+// in case we don't have database support, 
+// define some "empty" shell for the database 
+// classes 
+#[cfg(not(feature="database"))]
+#[derive(Debug)]
+pub struct TrackerStrip {
+}
+#[cfg(not(feature="database"))]
+#[derive(Debug)]
+pub struct TofPaddle {
+}
 
-use crate::prelude::*;
+
+//use crate::prelude::*;
 
 // python convention
 pub const VERSION: &str = env!("CARGO_PKG_VERSION"); 
@@ -107,6 +119,57 @@ macro_rules! expand_and_test_enum {
   };
 }
 
+//---------------------------------------
+// helpers to init the logging system
+//
+
+use colored::{
+    Colorize,
+    ColoredString
+};
+use chrono::Utc;
+use log::Level;
+use std::io::Write;
+
+/// Make sure that the loglevel is in color, even though not using pretty_env logger
+pub fn color_log(level : &Level) -> ColoredString {
+  match level {
+    Level::Error    => String::from(" ERROR!").red(),
+    Level::Warn     => String::from(" WARN  ").yellow(),
+    Level::Info     => String::from(" Info  ").green(),
+    Level::Debug    => String::from(" debug ").blue(),
+    Level::Trace    => String::from(" trace ").cyan(),
+  }
+}
+
+/// Set up the environmental (env) logger
+/// with our format
+///
+/// Ensure that the lines and module paths
+/// are printed in the logging output
+pub fn init_env_logger() {
+  env_logger::builder()
+    .format(|buf, record| {
+    writeln!( buf, "[{ts} - {level}][{module_path}:{line}] {args}",
+      ts    = Utc::now().format("%Y/%m/%d-%H:%M:%SUTC"), 
+      level = color_log(&record.level()),
+      module_path = record.module_path().unwrap_or("<unknown>"),
+      line  = record.line().unwrap_or(0),
+      args  = record.args()
+      )
+    }).init();
+}
+
+//-------------------------------------------------
+// Build the python library
+
+#[cfg(feature="pybindings")]
+pub use pyo3::prelude::*; 
+#[cfg(feature="pybindings")]
+pub use pyo3::wrap_pymodule; 
+#[cfg(feature="pybindings")]
+pub use pyo3::wrap_pyfunction; 
+
 #[cfg(feature="pybindings")]
 #[pymodule]
 #[pyo3(name = "tof")]
@@ -122,6 +185,7 @@ fn tof_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<RBChannelMaskConfig>()?;
   m.add_class::<TriggerConfig>()?;
   m.add_class::<TofRunConfig>()?;
+  m.add_function(wrap_pyfunction!(to_board_id_string, m)?)?;
   Ok(())
 }
 
@@ -220,6 +284,7 @@ fn monitoring_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<RBMoniDataSeries>()?;
   m.add_class::<CPUMoniData>()?;
   m.add_class::<CPUMoniDataSeries>()?;
+  m.add_class::<RunStatistics>()?;
   Ok(())
 }
 

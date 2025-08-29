@@ -46,4 +46,31 @@ pub const PAD_CMD_32BIT  : u32 = 0x00000000;
 /// Si(Li) wafer detector radius, with guardring and all
 pub const SILI_RADIUS : f32 = 5.0;
 
+// These are just for fun 
+
+/// Make a nice ASCII logo for the liftof of flight code
+pub const LIFTOF_LOGO_SHOW  : &str  = "
+                                  ___                         ___           ___     
+                                 /\\__\\                       /\\  \\         /\\__\\    
+                    ___         /:/ _/_         ___         /::\\  \\       /:/ _/_   
+                   /\\__\\       /:/ /\\__\\       /\\__\\       /:/\\:\\  \\     /:/ /\\__\\  
+    ___     ___   /:/__/      /:/ /:/  /      /:/  /      /:/  \\:\\  \\   /:/ /:/  /  
+   /\\  \\   /\\__\\ /::\\  \\     /:/_/:/  /      /:/__/      /:/__/ \\:\\__\\ /:/_/:/  /   
+   \\:\\  \\ /:/  / \\/\\:\\  \\__  \\:\\/:/  /      /::\\  \\      \\:\\  \\ /:/  / \\:\\/:/  /    
+    \\:\\  /:/  /   ~~\\:\\/\\__\\  \\::/__/      /:/\\:\\  \\      \\:\\  /:/  /   \\::/__/     
+     \\:\\/:/  /       \\::/  /   \\:\\  \\      \\/__\\:\\  \\      \\:\\/:/  /     \\:\\  \\     
+      \\::/  /        /:/  /     \\:\\__\\          \\:\\__\\      \\::/  /       \\:\\__\\    
+       \\/__/         \\/__/       \\/__/           \\/__/       \\/__/         \\/__/    
+
+          (LIFTOF - liftof is for tof, Version 0.11.x 'PAKII', Aug 2025)
+          >> with undying support from the Hawaiian islands \u{1f30a}\u{1f308}\u{1f965}\u{1f334}
+
+          * Documentation
+          ==> GitHub   https://github.com/GAPS-Collab/gaps-online-software/tree/LELEWAA-0.11
+          ==> API docs https://gaps-collab.github.io/gaps-online-software/
+
+  ";
+
+
+
 

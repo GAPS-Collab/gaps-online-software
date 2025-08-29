@@ -65,6 +65,7 @@ impl CRReader {
     let mut strips    = HashMap::<u32, TrackerStrip>::new();
     //let db_path       = env::var("DATABASE_URL").unwrap_or_else(|_| "".to_string());
     let mut db_loaded = false;
+    #[cfg(feature="database")]
     match TofPaddle::all_as_dict() {
       Err(err) => {
         error!("Unable to retrieve paddle information from DB! {err}");
@@ -74,6 +75,7 @@ impl CRReader {
         paddles   = pdls;         
       }
     }
+    #[cfg(feature="database")]
     match TrackerStrip::all_as_dict() {
       Err(err) => {
         error!("Unable to retrieve paddle information from DB! {err}");

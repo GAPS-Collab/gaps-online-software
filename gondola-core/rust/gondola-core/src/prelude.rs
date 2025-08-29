@@ -57,7 +57,7 @@ pub use indicatif::{
 pub use strum_macros::{
   AsRefStr,
   FromRepr,
-  EnumIter
+  EnumIter,
 };
 pub use strum::IntoEnumIterator;
 
@@ -126,6 +126,9 @@ pub use crate::pythonize;
 pub use crate::pythonize_telemetry;
 #[cfg(feature="pybindings")]
 pub use crate::pythonize_display;
+#[cfg(feature="pybindings")]
+pub use crate::pythonize_monidata;
+pub use crate::moniseries;
 
 #[cfg(feature="random")]
 pub use crate::random::FromRandom;
@@ -141,11 +144,17 @@ pub use crate::events::*;
 pub use crate::packets::*;
 #[cfg(feature="database")]
 pub use crate::database::*;
+#[cfg(not(feature="database"))]
+pub use crate::TrackerStrip;
+#[cfg(not(feature="database"))]
+pub use crate::TofPaddle;
+
 pub use crate::calibration::tof::*;
 pub use crate::monitoring::*;
 pub use crate::tof::*;
 pub use crate::tracker::*;
-pub use crate::algorithms::*;
+pub use crate::tof::algorithms::*;
+//pub use crate::algorithms::*;
 
 pub use crate::packets::{
   TofPacket,

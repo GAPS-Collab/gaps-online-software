@@ -536,7 +536,7 @@ pub fn stop_run() -> Option<TofCommand> {
 ///   * save_events         : Save the events to the RBCalibration
 ///                           packets
 #[cfg_attr(feature="pybindings", pyfunction)]
-pub fn rb_calibration(pre_run_calibration : bool, send_packets : bool, save_events : bool) -> Option<TofCommand> {
+pub fn calibrate_rbs(pre_run_calibration : bool, send_packets : bool, save_events : bool) -> Option<TofCommand> {
   let payload = vec![pre_run_calibration as u8, send_packets as u8, save_events as u8];
   Some(TofCommand {
     command_code : TofCommandCode::RBCalibration,
