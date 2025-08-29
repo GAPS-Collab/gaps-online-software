@@ -8,7 +8,9 @@ pub mod parsers;
 pub mod serialization;
 pub use serialization::Serialization;
 pub mod caraspace;
+#[cfg(feature="root")]
 pub mod root_reader;
+#[cfg(feature="root")]
 pub use root_reader::read_example;
 pub mod tof_reader;
 pub use tof_reader::TofPacketReader;

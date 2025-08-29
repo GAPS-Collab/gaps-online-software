@@ -30,6 +30,7 @@ tofcontrol          = ["tof-control"]
 advanced-algorithms = ["smoothed_z_score"]
 pybindings          = ["pyo3","pyo3-log","numpy"]
 experimental        = []
+root                = ["oxyroot", "root-io"]
 
 [dependencies.pyo3]
 version  = "0.25"
@@ -61,8 +62,8 @@ strum             = "0.27"
 strum_macros      = "0.27"
 num-traits        = "0.2"
 statrs            = "0.18"
-root-io           = "0.3"
-oxyroot           = "0.1"
+root-io           = { version = "0.3", optional=true}
+oxyroot           = { version = "0.1", optional=true}
 half              = { version = "2.6", features=["num-traits"]}
 chrono            = "0.4"
 regex             = "1.5"
@@ -79,6 +80,7 @@ statistical       = "1.0"  # FIXME - replace this with our own implementation
 toml              = "0.8"
 ureq              = "2.12" # FIXME - make this a feature
 polars            = { version = "0.50", features = ["lazy"], optional = true }
+env_logger        = "0.10"
 #pyo3              = { version = "0.23", features = ["extension-module"], optional = true }
 # serialization library
 #caraspace         = { version = "0.10", path = "../../../../caraspace", optional = true }
