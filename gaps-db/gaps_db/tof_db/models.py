@@ -1292,10 +1292,10 @@ class TrackerStripTransferFunction(models.Model):
     pol_c3_2       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
     pol_c3_3       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
 
-    pol_c3_0       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")     
-    pol_c3_1       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
-    pol_c3_2       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
-    pol_c3_3       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+    pol_d3_0       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")     
+    pol_d3_1       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+    pol_d3_2       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+    pol_d3_3       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
     
     def poly_a(self,xs):
         ys = np.zeros(len(xs))
@@ -1345,7 +1345,7 @@ class TrackerStripTransferFunction(models.Model):
                 line =line.lstrip().rstrip()
                 if line.startswith('#'):
                     continue
-                #line = line.split(',')
+                line = line.split(',')
                 #print (line)
                 layer, row, module, channel = int(line[0]), int(line[1]), int(line[2]), int(line[3])
                 strip_id = TrackerStrip.create_id(layer, row, module, channel)
@@ -1359,7 +1359,7 @@ class TrackerStripTransferFunction(models.Model):
                 # FIXME 
                 tf.volume_id     = 0 
                 tf.name          = ''
-                tf.utc_timestamp = ''
+                tf.utc_timestamp = 0
                 tf.strip_id = strip_id 
                 tf.pol_a2_0 = pol_a2_0 
                 tf.pol_a2_1 = pol_a2_1    
