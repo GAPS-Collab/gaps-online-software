@@ -5,6 +5,7 @@ Building blocks of the TOF
 from django.db import models
 import numpy as np
 import matplotlib.pyplot as plt
+import tqdm
 
 from matplotlib.patches import Rectangle
 
@@ -1251,6 +1252,162 @@ class TrackerStripMask(models.Model):
 
 ##########################################################################
 
+class TrackerStripTransferFunction(models.Model):
+    """
+    The polynomial version of the transfer function as 
+    given in textfiles.
+    This is based on work from R.Munini.
+    """
+    strip_id       = models.PositiveIntegerField(
+                        primary_key=True,
+                        null=False,
+                        default=0,
+                        unique=True,
+                        help_text="The unique identifier for this strip, which is Layer-Row-Module-Channel (5 digit number)")
+
+    volume_id      = models.PositiveBigIntegerField(
+                        default=0,
+                        null=False,
+                        unique=True,
+                        help_text="The VolumeId as used in the GAPS simulation code")
+    utc_timestamp  = models.PositiveBigIntegerField(null=False, default=0,
+                                                    help_text="UTC Timestamp in YYMMDDHHMMSS format")
+    name           = models.CharField(max_length=1024,
+                                    null=True,
+                                    default="",
+                                    help_text="A name for this transfer fn. There might be serveral per same day, so having only a timestamp might be confusing")
+    
+    # coefficients 
+    pol_a2_0i      = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+    pol_a2_1       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")    
+    pol_a2_2       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+
+    pol_b3_0       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+    pol_b3_1       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+    pol_b3_2       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+    pol_b3_3       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+
+    pol_c3_0       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+    pol_c3_1       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+    pol_c3_2       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+    pol_c3_3       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+
+    pol_c3_0       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")     
+    pol_c3_1       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+    pol_c3_2       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+    pol_c3_3       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+    
+    def poly_a(self,xs):
+        ys = np.zeros(len(xs))
+        mask = xs <= 190 
+        ys[mask] = self.pol_a2_0 + self.pol_a2_1*xs[mask] + self.pol_a2_2*(xs[mask]**2) 
+        return ys
+    
+    def poly_b(self, s):
+        ys = np.zeros(len(xs))
+        mask = np.logical_and(190 < xs, xs <= 500)
+        ys[mask] = self.pol_b3_0 + self.pol_b3_1*xs[mask] + self.pol_b3_2*(xs[mask]**2) + self.pol_b3_3*(xs[mask]**3) 
+        return ys
+    
+    def poly_c(self, xs):
+        ys = np.zeros(len(xs))
+        mask = np.logical_and(500 <  xs, xs <= 900)
+        ys[mask] = self.pol_c3_0 + self.pol_c3_1*xs[mask] + self.pol_c3_2*(xs[mask]**2) + self.pol_c3_3*(xs[mask]**3) 
+        return ys
+    
+    def poly_d(self, xs):
+        ys = np.zeros(len(xs))
+        mask = np.logical_and(900 <  xs, xs <= 1600)
+        ys[mask] = self.pol_d3_0 + self.pol_d3_1*xs[mask] + self.pol_d3_2*(xs[mask]**2) + self.pol_d3_3*(xs[mask]**3) 
+        return ys
+    
+    def trafo(self, xs):
+        if isinstance(xs, float) or isinstance(xs, int):
+            xs = np.array(xs)
+        a = self.poly_a(xs)
+        b = self.poly_b(xs)
+        c = self.poly_c(xs)
+        d = self.poly_d(xs) 
+        ys = a + b + c + d
+        return ys
+
+    @staticmethod
+    def get_from_file(filename):
+        strip_to_tf = dict()
+        total_lines = 0
+        with open(filename) as f:
+            for line in f.readlines():
+                total_lines += 1
+        
+        with open(filename) as f:
+            for line in tqdm.tqdm(f.readlines(), total=total_lines):
+                #print (line)
+                line =line.lstrip().rstrip()
+                if line.startswith('#'):
+                    continue
+                #line = line.split(',')
+                #print (line)
+                layer, row, module, channel = int(line[0]), int(line[1]), int(line[2]), int(line[3])
+                strip_id = TrackerStrip.create_id(layer, row, module, channel)
+                pol_a2_0, pol_a2_1, pol_a2_2 = [float(k) for k in line[4:7]]
+                #print (pol_a2_0, pol_a2_1, pol_a2_2)
+                #print ('----')
+                pol_b3_0, pol_b3_1, pol_b3_2, pol_b3_3 = [float(k) for k in line[7:11]]
+                pol_c3_0, pol_c3_1, pol_c3_2, pol_c3_3 = [float(k) for k in line[11:15]]
+                pol_d3_0, pol_d3_1, pol_d3_2, pol_d3_3 = [float(k) for k in line[15:19]]
+                tf = TrackerStripTransferFunction()
+                # FIXME 
+                tf.volume_id     = 0 
+                tf.name          = ''
+                tf.utc_timestamp = ''
+                tf.strip_id = strip_id 
+                tf.pol_a2_0 = pol_a2_0 
+                tf.pol_a2_1 = pol_a2_1    
+                tf.pol_a2_2 = pol_a2_2    
+                
+                tf.pol_b3_0 = pol_b3_0    
+                tf.pol_b3_1 = pol_b3_1    
+                tf.pol_b3_2 = pol_b3_2    
+                tf.pol_b3_3 = pol_b3_3    
+                
+                tf.pol_c3_0 = pol_c3_0    
+                tf.pol_c3_1 = pol_c3_1    
+                tf.pol_c3_2 = pol_c3_2    
+                tf.pol_c3_3 = pol_c3_3    
+                
+                tf.pol_c3_0 = pol_c3_0    
+                tf.pol_c3_1 = pol_c3_1    
+                tf.pol_c3_2 = pol_c3_2    
+                tf.pol_c3_3 = pol_c3_3    
+
+                strip_to_tf[strip_id] = tf 
+        return strip_to_tf
+    
+    def __repr__(self):
+        _repr = f'<TrackerStripTransferFunction [{self.strip_id}]:'
+        _repr += f'\n  Volume ID : {self.volume_id}'  
+        _repr += f'\n  Timestamp : {self.utc_timestamp}'  
+        _repr += f'\n  Name      : {self.name}'  
+        # FIXME - make this nicer, e.g. 
+        _repr += f'\n  {self.pol_a2_0}*adc + {self.pol_a2_1}*adc + {self.pol_a2_2}*(adc**2) for adc < 190'
+        #_repr += f'\n  pol_a2_0  : {self.pol_a2_0}'  
+        #_repr += f'\n  pol_a2_1  : {self.pol_a2_1}'  
+        #_repr += f'\n  pol_a2_2  : {self.pol_a2_2}'  
+        _repr += f'\n  pol_b3_0  : {self.pol_b3_0}'  
+        _repr += f'\n  pol_b3_1  : {self.pol_b3_1}'  
+        _repr += f'\n  pol_b3_2  : {self.pol_b3_2}'  
+        _repr += f'\n  pol_b3_3  : {self.pol_b3_2}'  
+        _repr += f'\n  pol_c3_0  : {self.pol_c3_0}'  
+        _repr += f'\n  pol_c3_1  : {self.pol_c3_1}'  
+        _repr += f'\n  pol_c3_2  : {self.pol_c3_2}'  
+        _repr += f'\n  pol_c3_3  : {self.pol_c3_2}'  
+        _repr += f'\n  pol_d3_0  : {self.pol_d3_0}'  
+        _repr += f'\n  pol_d3_1  : {self.pol_d3_1}'  
+        _repr += f'\n  pol_d3_2  : {self.pol_d3_2}'  
+        _repr += f'\n  pol_d3_3  : {self.pol_d3_2}>'  
+        return _repr
+
+##########################################################################
 
 class Run(models.Model):
     """
