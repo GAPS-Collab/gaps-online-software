@@ -1278,7 +1278,7 @@ class TrackerStripTransferFunction(models.Model):
                                     help_text="A name for this transfer fn. There might be serveral per same day, so having only a timestamp might be confusing")
     
     # coefficients 
-    pol_a2_0i      = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+    pol_a2_0       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
     pol_a2_1       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")    
     pol_a2_2       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
 

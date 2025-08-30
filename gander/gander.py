@@ -257,14 +257,16 @@ def plot_tracker_2dxy(ax,\
         patch = patches.Circle(k, radius=5, fill=False, color='gray', alpha=0.1)
         # rect_patch = patches.Rectangle(k[1], width=1, height=100, color='gray', alpha=0.1)
         for layer in all_layers:
-            go.tracker.visual.plot_strip_lines(ax,k, layer, color='gray')
+            #go.tracker.visual.plot_strip_lines(ax,k, layer, color='gray')
+            gon.visual.tracker.plot_strip_lines(ax, k, layer, color='gray')
         ax.add_patch(patch)
     for k in det_coord:
         patch = patches.Circle(k, radius=5, fill=False, color=circle_color)
         # im.set_clip_path(patch)
         ax.add_patch(patch)
         for layer in all_layers:
-            go.tracker.visual.plot_strip_lines(ax,k, layer, color=circle_color)
+            #go.tracker.visual.plot_strip_lines(ax,k, layer, color=circle_color)
+            gon.visual.tracker.plot_strip_lines(ax, k, layer, color='gray')
     return ax
 
 @st.fragment
@@ -443,7 +445,8 @@ def plot_tracker(hits, strp_dict : dict, circle_color='w') -> dict:
             patch = patches.Circle(k, radius=5, fill=False, color=circle_color)
             # im.set_clip_path(patch)
             ax.add_patch(patch)
-            go.tracker.visual.plot_strip_lines(ax,k, layer, color=circle_color)
+            #go.tracker.visual.plot_strip_lines(ax,k, layer, color=circle_color)
+            gon.visual.tracker.plot_strip_lines(ax,k, layer, color=circle_color)
         for k in all_dets_xy:
             patch = patches.Circle(k, radius=5, fill=False, color='gray', alpha=0.1)
             # rect_patch = patches.Rectangle(k[1], width=1, height=100, color='gray', alpha=0.1)
@@ -595,7 +598,7 @@ def create_event_plots(no_plot_first_bins_wf=False) -> dict:
     data = _event_viewer_data()
     n_trk_hits_masked       = None 
     n_trk_hits_no_mask_info = None
-    if isinstance(ev, go.events.MergedEvent):
+    if isinstance(ev, gon.events.TelemetryEvent):
         ev_tof = ev.tof
         data['tof_event'] = ev_tof
     else:
@@ -610,14 +613,14 @@ def create_event_plots(no_plot_first_bins_wf=False) -> dict:
         data['tof_xy_all'], data['tof_xz_all'], data['tof_yz_all'] \
                 = go.tof.visual.tof_2dproj(event=ev_tof, cmap=matplotlib.colormaps['seismic'])
     data['tof_hits'] = ev.tof.hits
-    for h in ev.tracker_v2:
+    for h in ev.tracker:
         if st.session_state.trk_analysis.strip_mask:
             #print (st.session_state.trk_analysis.strip_mask)
             #print (h.stripid)
             n_trk_hits_masked = 0
             n_trk_hits_no_mask_info = 0
             try:
-                if st.session_state.trk_analysis.strip_mask[h.stripid]:
+                if st.session_state.trk_analysis.strip_mask[h.strip_id]:
                     data['trk_hits'].append(h)
                 else:
                     n_trk_hits_masked += 1
@@ -1454,6 +1457,8 @@ if check_password():
                     all_tr_fn_files = Path("").glob("*.txt")
                     tr_file_option = st.selectbox('', tuple(all_tr_fn_files))
                     transfer_fn = go.tracker.calibration.get_transfer_functions(tr_file_option)
+                    transfer_fn = gon.db.TrackerStripTransferFunction.all_as_dict() 
+                    print (transfer_fn)
                     st.session_state.trk_analysis.transfer_fn = transfer_fn
                     # this requires we change the binning and re-init the edep plots
                     # FIXME - implemente setter which does that
@@ -1740,7 +1745,7 @@ if check_password():
                     st.text(f'{h}')
             st.subheader(f"{len(ev_data['trk_hits'])} TRK hits")
             for h in ev_data['trk_hits']:
-                with st.expander(f'Strip {h.stripid}'):
+                with st.expander(f'Strip {h.strip_id}'):
                     st.text(f'{h}')
             if ev_data['n_trk_hits_masked'] is None:
                 st.text('No tracker strip mask applied!')

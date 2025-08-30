@@ -1851,6 +1851,204 @@ pythonize!(TrackerStripPedestal);
 
 //-------------------------------------------------
 
+/// Tracker transfer functions connect the tracker adc to a measurement of energy
+#[derive(Debug,PartialEq, Clone,Queryable, Selectable, serde::Serialize, serde::Deserialize)]
+#[diesel(table_name = schema::tof_db_trackerstriptransferfunction)]
+#[diesel(primary_key(strip_id))]
+#[allow(non_snake_case)]
+#[cfg_attr(feature="pybindings", pyclass)]
+pub struct TrackerStripTransferFunction {   
+    pub strip_id      : i32,    
+    pub volume_id     : i64,    
+    pub utc_timestamp : i64,    
+    pub name          : Option<String>, 
+    pub pol_a2_0      : f32, 
+    pub pol_a2_1      : f32,    
+    pub pol_a2_2      : f32, 
+    pub pol_b3_0      : f32, 
+    pub pol_b3_1      : f32, 
+    pub pol_b3_2      : f32, 
+    pub pol_b3_3      : f32, 
+    pub pol_c3_0      : f32, 
+    pub pol_c3_1      : f32, 
+    pub pol_c3_2      : f32, 
+    pub pol_c3_3      : f32, 
+    pub pol_d3_0      : f32,     
+    pub pol_d3_1      : f32, 
+    pub pol_d3_2      : f32, 
+    pub pol_d3_3      : f32, 
+} 
+
+impl TrackerStripTransferFunction {
+
+  pub fn new() -> Self {
+    Self {
+      strip_id      : 0,    
+      volume_id     : 0,    
+      utc_timestamp : 0,    
+      name          : None, 
+      pol_a2_0      : 0.0, 
+      pol_a2_1      : 0.0,    
+      pol_a2_2      : 0.0, 
+      pol_b3_0      : 0.0, 
+      pol_b3_1      : 0.0, 
+      pol_b3_2      : 0.0, 
+      pol_b3_3      : 0.0, 
+      pol_c3_0      : 0.0, 
+      pol_c3_1      : 0.0, 
+      pol_c3_2      : 0.0, 
+      pol_c3_3      : 0.0, 
+      pol_d3_0      : 0.0,     
+      pol_d3_1      : 0.0, 
+      pol_d3_2      : 0.0, 
+      pol_d3_3      : 0.0, 
+    }
+  }
+
+  /// Get all tracker strip transfer functions from the database
+  ///
+  /// # Returns:
+  ///   * HashMap<u32 [strip id], TrackeStripTransferFunction> 
+  pub fn all_as_dict() -> Result<HashMap<u32,Self>, ConnectionError> {
+    let mut strips = HashMap::<u32, Self>::new();
+    match Self::all() {
+      None => {
+        error!("We can't find any tracker strip transfer functions in the database!");
+        return Ok(strips);
+      }
+      Some(masks_) => {
+        for s in masks_ {
+          strips.insert(s.strip_id as u32, s );
+        }
+      }
+    }
+    return Ok(strips);
+  }
+
+  /// Get all tracker strip transfer functions from the database
+  ///
+  /// # Returns:
+  ///   * HashMap<u32 [strip id], TrackeStripTransferFunction> 
+  pub fn all() -> Option<Vec<Self>> {
+    use schema::tof_db_trackerstriptransferfunction::dsl::*;
+    let mut conn = connect_to_db().ok()?;
+    match tof_db_trackerstriptransferfunction.load::<Self>(&mut conn) {
+      Err(err) => {
+        error!("Unable to load tracker transfer functions from db! {err}");
+        return None;
+      }
+      Ok(strips) => {
+        return Some(strips);
+      }
+    }
+  }
+
+  /// The actual transfer function for this 
+  /// strip. Calculate energy from adc values
+  pub fn transfer_fn(&self, adc : u32) -> f32 {
+    let adc_f = adc as f32;
+    if adc <= 190 {
+      return self.pol_a2_0 + self.pol_a2_1*adc_f + self.pol_a2_2*(adc_f.powi(2));
+    }
+    if 190 < adc && adc <= 500 {
+      return self.pol_b3_0 + self.pol_b3_1*adc_f + self.pol_b3_2*(adc_f.powi(2)) + self.pol_b3_3*(adc_f.powi(3));
+    }
+    if 500 < adc && adc <= 901 {
+      return self.pol_c3_0 + self.pol_c3_1*adc_f + self.pol_c3_2*(adc_f.powi(2)) + self.pol_c3_3*(adc_f.powi(3));
+    }
+    if 901 < adc && adc <= 1600 {
+      return self.pol_d3_0 + self.pol_d3_1*adc_f + self.pol_d3_2*(adc_f.powi(2)) + self.pol_d3_3*(adc_f.powi(3));
+    }
+    0.0
+  }
+}
+
+impl fmt::Display for TrackerStripTransferFunction {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<TrackerStripMask:");
+    repr += &(format!("\n   strip id      : {}", self.strip_id));     
+    repr += &(format!("\n   vid           : {}", self.volume_id));
+    repr += &(format!("\n   utc_timestamp : {}", self.utc_timestamp));    
+    if self.name.is_some() {
+      repr += &(format!("\n   name     : {}", self.name.clone().unwrap())); 
+    }
+    repr += &(format!("\n  {}*adc + {}*adc + {}*(adc**2) for adc < 190", self.pol_a2_0, self.pol_a2_1, self.pol_a2_2));
+    repr += &(format!("\n   pol_b3_0      : {}", self.pol_b3_0)); 
+    repr += &(format!("\n   pol_b3_1      : {}", self.pol_b3_1)); 
+    repr += &(format!("\n   pol_b3_2      : {}", self.pol_b3_2)); 
+    repr += &(format!("\n   pol_b3_3      : {}", self.pol_b3_3)); 
+    repr += &(format!("\n   pol_c3_0      : {}", self.pol_c3_0)); 
+    repr += &(format!("\n   pol_c3_1      : {}", self.pol_c3_1)); 
+    repr += &(format!("\n   pol_c3_2      : {}", self.pol_c3_2)); 
+    repr += &(format!("\n   pol_c3_3      : {}", self.pol_c3_3)); 
+    repr += &(format!("\n   pol_d3_0      : {}", self.pol_d3_0)); 
+    repr += &(format!("\n   pol_d3_1      : {}", self.pol_d3_1)); 
+    repr += &(format!("\n   pol_d3_2      : {}", self.pol_d3_2)); 
+    repr += &(format!("\n   pol_d3_3      : {}>", self.pol_d3_3)); 
+    write!(f, "{}", repr)
+  }
+}
+
+#[cfg(feature="pybindings")]
+#[pymethods]
+impl TrackerStripTransferFunction {
+  
+  #[staticmethod]
+  #[pyo3(name="all")]
+  pub fn all_py() -> Option<Vec<Self>> {
+    Self::all()
+  } 
+  
+  #[staticmethod]
+  #[pyo3(name="all_as_dict")]
+  pub fn all_as_dict_py() -> Option<HashMap<u32,Self>> {
+    match Self::all_as_dict() {
+      Err(err) => {
+        error!("Unable to retrieve tracker strip pedestal dictionary. {err}. Did you laod the setup-env.sh shell?");
+        return None;
+      }
+      Ok(_data) => {
+        return Some(_data);
+      }
+    }
+  } 
+  
+  #[getter]
+  fn get_strip_id     (&self) -> i32 {    
+    self.strip_id
+  }
+  
+  #[getter]
+  fn get_volume_id    (&self) -> i64 {    
+    self.volume_id
+  }
+  
+  #[getter]
+  fn get_utc_timestamp(&self) -> i64 {
+    self.utc_timestamp
+  }
+
+  #[getter]
+  fn get_name(&self) -> Option<String> {
+    self.name.clone()
+  }
+
+  #[pyo3(name="transfer_fn")]
+  fn transfer_fn_py(&self, adc : u32) -> f32 {
+    if adc > 1600 {
+      warn!("ADC value larger than 1600! {}. Transfer fn not defined beyond 1600.", adc);
+    }
+    return self.transfer_fn(adc);
+  }
+
+}
+
+pythonize!(TrackerStripTransferFunction);
+
+//-------------------------------------------------
+
+
+
 //
 //
 //

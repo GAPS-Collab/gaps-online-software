@@ -214,6 +214,7 @@ fn calibration_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
 fn events_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   use crate::events::*;
   m.add_class::<TofHit>()?;
+  m.add_class::<TrackerHit>()?;
   m.add_class::<RBEventHeader>()?;
   m.add_class::<RBEvent>()?;
   m.add_class::<RBWaveform>()?;
@@ -319,6 +320,7 @@ fn db_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<TrackerStrip>()?;
   m.add_class::<TrackerStripMask>()?;
   m.add_class::<TrackerStripPedestal>()?;
+  m.add_class::<TrackerStripTransferFunction>()?;
   m.add_function(wrap_pyfunction!(get_all_rbids_in_db, m)?)?;
   m.add_function(wrap_pyfunction!(get_hid_vid_map, m)?)?;
   m.add_function(wrap_pyfunction!(get_vid_hid_map, m)?)?;

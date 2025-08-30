@@ -158,6 +158,34 @@ diesel::table! {
   }
 }
 
+diesel::table! { 
+  tof_db_trackerstriptransferfunction ( strip_id ) {
+    strip_id       -> Integer,
+    volume_id      -> BigInt,
+    utc_timestamp  -> BigInt,
+    name           -> Nullable<Text>, 
+    // poly a (square)
+    pol_a2_0       -> Float, 
+    pol_a2_1       -> Float,    
+    pol_a2_2       -> Float, 
+    // poly b (cube)
+    pol_b3_0       -> Float, 
+    pol_b3_1       -> Float, 
+    pol_b3_2       -> Float, 
+    pol_b3_3       -> Float, 
+    // poly c (cube)
+    pol_c3_0       -> Float, 
+    pol_c3_1       -> Float, 
+    pol_c3_2       -> Float, 
+    pol_c3_3       -> Float, 
+    // poly d (cube)
+    pol_d3_0       -> Float,     
+    pol_d3_1       -> Float, 
+    pol_d3_2       -> Float, 
+    pol_d3_3       -> Float, 
+  }
+}
+
 diesel::table! {
   tof_db_localtriggerboard (board_id) {
       board_id -> SmallInt,
