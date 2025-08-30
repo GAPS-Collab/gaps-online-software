@@ -58,6 +58,7 @@ criterion = "0.4"
 quickcheck = "1"
 
 [dependencies]
+zmq               = "0.10"
 strum             = "0.27"
 strum_macros      = "0.27"
 num-traits        = "0.2"

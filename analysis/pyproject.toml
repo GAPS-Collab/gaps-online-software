@@ -1,7 +1,7 @@
 [project]
-name = "notebooks"
+name = "analysis"
 version = "0.1.0"
-description = "Add your description here"
+description = "Various (personal) analysis code which leverages the code in this repository"
 authors = [
     { name = "Achim Stoessl", email = "achim.stoessl@gmail.com" }
 ]
@@ -19,9 +19,13 @@ dependencies = [
     "jinja2>=3.1.4",
     "pdfkit>=1.0.0",
     "nbstripout>=0.7.1",
+    "gondola @ file:///srv/gaps/gaps-online-software/gondola-core/rust/gondola-core/target/wheels/gondola-0.11.0-cp311-abi3-manylinux_2_34_x86_64.whl"
 ]
 readme = "README.md"
-requires-python = ">= 3.8"
+requires-python = ">= 3.11"
+
+[tool.rye.scripts]
+jupy-lab = "jupyter lab --port 9876"
 
 [build-system]
 requires = ["hatchling"]
@@ -35,4 +39,4 @@ dev-dependencies = []
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/notebooks"]
+packages = ["src/analysis"]
