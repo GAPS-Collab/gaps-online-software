@@ -59,6 +59,7 @@ if __name__ == '__main__':
             if not args.dry_run:
                 strip.save()
             print (f'-> We processed {nstrips} strips!')
+
     if args.pedestals:
         pedf = open(args.pedestals, 'r')
         # HACK - file not properly named
@@ -76,15 +77,18 @@ if __name__ == '__main__':
         all_pedestal_mean  = 0
         all_pedestal_sigma = 0
         n_pedestal         = 0
+        nstrips            = 0 
         for line in pedf.readlines():
+            nstrips += 1
             data = [float(k) for k in line.split()]
             layer = int(data[0])
             row   = int(data[1])
             mod   = int(data[2])
             chn   = int(data[3])
             strip_id = m.TrackerStrip.create_id(layer, row, mod, chn)
-            print (f'-> Layer {layer}, row {row}, mod {mod}, chn {chn}')
-            print (f'-> Getting pedestal for strip {strip_id}')
+            if nstrips % 100 == 0:
+                print (f'-> Layer {layer}, row {row}, mod {mod}, chn {chn}')
+                print (f'-> Getting pedestal for strip {strip_id}')
             try:
                 pedestal = m.TrackerStripPedestal.objects.filter(strip_id=strip_id)[0]
             except:
@@ -113,11 +117,13 @@ if __name__ == '__main__':
         print (f'--> We set mean pedestal values for {len(mean_peds)}')   
     if args.tracker_mask:
         maskmap = dict()
+        nstrip = 0
         with open(args.tracker_mask, 'r') as maskf:
             for line in maskf.readlines():
+                nstrip += 1
                 module_id, mask = line.split()
                 mask = int(mask, base=16)
-                print (module_id, mask)
+                #print (module_id, mask)
                 layer  = int(module_id[0])
                 row    = int(module_id[1])
                 module = int(module_id[2])
@@ -125,20 +131,26 @@ if __name__ == '__main__':
                     strip_mask = mask >> k & 0x1
                     tsmask = m.TrackerStripMask()
                     tsmask.strip_id = m.TrackerStrip.create_id(layer, row, module, k)
-                    print(f'-> Getting tracker strip for id {tsmask.strip_id}') 
                     vid = m.TrackerStrip.objects.filter(strip_id=tsmask.strip_id)[0].volume_id
                     tsmask.active = bool(strip_mask)
                     tsmask.volume_id = vid
                     tsmask.mask_name = str(Path(args.tracker_mask).stem)
-                    print (tsmask)
+                    if nstrip % 100 == 0:
+                        print(f'-> Getting tracker strip for id {tsmask.strip_id}') 
+                        print (tsmask)
                     if not args.dry_run:
                         tsmask.save()
 
     if args.transfer_fns:
         transfer_fns = m.TrackerStripTransferFunction.get_from_file(args.transfer_fns)
+        nstrip = 0
         if not args.dry_run:
             for k in transfer_fns:
-                print (transfer_fns[k])
+                nstrip += 1
+                if nstrip % 100 == 0:
+                    print (transfer_fns[k])
+                vid = m.TrackerStrip.objects.filter(strip_id=transfer_fns[k].strip_id)[0].volume_id
+                transfer_fns[k].volume_id = vid
                 transfer_fns[k].save()
 
         
