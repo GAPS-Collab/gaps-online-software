@@ -26,6 +26,9 @@ if __name__ == '__main__':
                         help="Filename for a file with tracker masks (1 mask per strip)")
     parser.add_argument('--dry-run', action='store_true', default=False,\
                         help="Don't do anything, just print.")
+    parser.add_argument('--transfer-fns', type=str, default='',\
+                        help="Filename with the polynomial fit versions of the transfer functions from e.g. Riccardo")
+    
 
     args = parser.parse_args()
     if args.coordinates:
@@ -130,3 +133,12 @@ if __name__ == '__main__':
                     print (tsmask)
                     if not args.dry_run:
                         tsmask.save()
+
+    if args.transfer_fns:
+        transfer_fns = m.TrackerStripTransferFunction.get_from_file(args.transfer_fns)
+        if not args.dry_run:
+            for k in transfer_fns:
+                print (transfer_fns[k])
+                transfer_fns[k].save()
+
+        
