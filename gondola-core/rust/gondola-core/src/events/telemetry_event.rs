@@ -48,6 +48,91 @@ impl TelemetryEvent {
       h.set_coordinates(trk_strips);
     }
   }
+ 
+  #[cfg(feature="database")]
+  pub fn mask_strips(&mut self, masks : &HashMap<u32, TrackerStripMask>) {
+    let mut clean_hits = Vec::<TrackerHit>::with_capacity(self.tracker_hits.len());
+    for h in &self.tracker_hits {
+      if !masks.contains_key(&h.get_stripid()) {
+        warn!("We don't have a mask information for strip id {}", h.get_stripid());
+        continue;
+      }
+      if masks[&h.get_stripid()].active {
+        clean_hits.push(h.clone());
+      }
+    }
+    self.tracker_hits = clean_hits;
+  }
+
+
+  /// Applies a cut based on adc values
+  #[cfg(feature="database")]
+  pub fn apply_signal_cut(&mut self, cut : f32, pedestals : &HashMap<u32, TrackerStripPedestal>) {
+    let mut clean_hits = Vec::<TrackerHit>::with_capacity(self.tracker_hits.len());
+    for h in &self.tracker_hits {
+      if !pedestals.contains_key(&h.get_stripid()) {
+        warn!("We don't have pedestal information for strip id {}", h.get_stripid());
+        continue;
+      }
+      let ped = &pedestals[&h.get_stripid()];
+      if (h.adc as f32) - ped.pedestal_mean > (cut * ped.pedestal_sigma){
+        clean_hits.push(h.clone());
+      }
+    }
+    self.tracker_hits = clean_hits;
+  }
+ 
+  /// Calculate the absolute common noise (adc)
+  #[cfg(feature="database")]
+  pub fn cmn_noise(hit       : &TrackerHit, 
+                   pedestals : &HashMap<u32, TrackerStripPedestal>,
+                   cmn_noise : &HashMap<u32, TrackerStripCmnNoise>) -> Option<f32> {
+    let stripid = hit.get_stripid();
+    if !cmn_noise.contains_key(&stripid) {
+      warn!("We don't have pedestal information for strip id {}", stripid);
+      return None;
+    }
+    if !pedestals.contains_key(&stripid) {
+      warn!("We don't have pedestal information for strip id {}", stripid);
+      return None;
+    }
+    let mut cmn_level = 0.0f32;
+    let adc_ped_sub   = hit.adc as f32 - pedestals[&stripid].pedestal_mean; 
+    if adc_ped_sub < 400.0 {
+      cmn_level = cmn_noise[&stripid].common_level(hit.adc as f32);
+    }
+    return Some(adc_ped_sub - cmn_noise[&stripid].gain * cmn_level);
+  }
+
+  #[cfg(feature="database")]
+  pub fn calibrate_tracker(&mut self, 
+                           remove_cmn_noise : bool,
+                           pedestals        : &HashMap<u32, TrackerStripPedestal>,
+                           transfer_fn      : &HashMap<u32, TrackerStripTransferFunction>,
+                           cmn_noise        : &HashMap<u32, TrackerStripCmnNoise>) {
+    for h in &mut self.tracker_hits {
+      let stripid = h.get_stripid();
+      if !pedestals.contains_key(&stripid) {
+        warn!("Pedestal map does not contain strip {}. Will not calculate energy!", stripid);
+        continue;
+      }
+      if !transfer_fn.contains_key(&stripid) {
+        warn!("Transfer fn for strip {} not available. Will not calculate energy!", stripid);
+        continue;
+      }
+      let adc_no_ped = h.adc as f32 - pedestals[&stripid].pedestal_mean;
+      if remove_cmn_noise {
+        match Self::cmn_noise(&h, pedestals, cmn_noise) { 
+          None => {
+            h.energy = transfer_fn[&stripid].transfer_fn(adc_no_ped); 
+          }
+          Some(cmn) => {
+            h.energy = transfer_fn[&stripid].transfer_fn(cmn);
+          }
+        }    
+      }
+    }
+  }
 }
 
 
@@ -244,6 +329,25 @@ impl TelemetryEvent {
       }  
     }
   }
+
+//  #[cfg(feature="database")]
+//  #[pyo3(name="mask_strips")]
+//  pub fn mask_strips_py(&mut self, masks : &HashMap<u32, TrackerStripMask>) {
+//  }
+//
+//  #[cfg(feature="database")]
+//  #[pyo3(name="remove_cmn_noise")]
+//  pub fn remove_cmn_noise_py(&mut self, cmn_noise : &HashMap<u32, TrackerStripCmnNoise>) {
+//  }
+//
+//  #[cfg(feature="database")]
+//  #[pyo3(name="calibrate_tracker")]
+//  pub fn calibrate_tracker_py(&mut self, 
+//                              pedestals   : &HashMap<u32, TrackerStripPedestal>,
+//                              transfer_fn : &HashMap<u32, TrackerStripTransferFunction>) {
+//  }
+
+
 }
 
 #[cfg(feature="pybindings")]

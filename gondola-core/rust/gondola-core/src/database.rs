@@ -96,7 +96,7 @@ pub fn get_all_rbids_in_db() -> Option<Vec<u8>> {
 
 /// A single TOF paddle with 2 ends 
 /// comnected
-#[derive(Debug,PartialEq, Clone,Queryable, Selectable, serde::Serialize, serde::Deserialize)]
+#[derive(Debug,PartialEq, Clone, Queryable, Selectable, Insertable, serde::Serialize, serde::Deserialize)]
 #[diesel(table_name = schema::tof_db_paddle)]
 #[diesel(primary_key(paddle_id))]
 #[allow(non_snake_case)]
@@ -699,6 +699,26 @@ impl ReadoutBoard {
     }
   }
   
+  /// Get all Readoutboards from the database
+  ///
+  /// # Returns:
+  ///   * dict [rbid->Readoutboard]
+  pub fn all_as_dict() -> Result<HashMap<u8,Self>, ConnectionError> {
+    let mut rbs = HashMap::<u8, Self>::new();
+    match Self::all() {
+      None => {
+        error!("We can't find any readoutboards in the database!");
+        return Ok(rbs);
+      }
+      Some(rbs_) => {
+        for rb in rbs_ {
+          rbs.insert(rb.rb_id, rb );
+        }
+      }
+    }
+    return Ok(rbs);
+  }
+  
   pub fn to_summary_str(&self) -> String {
     let mut repr  = String::from("<ReadoutBoard:");
     repr += &(format!("\n  Board id    : {}",self.rb_id));            
@@ -823,6 +843,41 @@ impl ReadoutBoard {
   fn get_paddle12(&self) -> TofPaddle { 
     self.paddle12.clone() 
   }
+  
+  #[getter]
+  fn get_paddle34(&self) -> TofPaddle { 
+    self.paddle34.clone() 
+  }
+  
+  #[getter]
+  fn get_paddle56(&self) -> TofPaddle { 
+    self.paddle56.clone() 
+  }
+  
+  #[getter]
+  fn get_paddle78(&self) -> TofPaddle { 
+    self.paddle78.clone() 
+  }
+
+  #[staticmethod]
+  #[pyo3(name="all")]
+  pub fn all_py() -> Option<Vec<Self>> {
+    Self::all()
+  } 
+  
+  #[staticmethod]
+  #[pyo3(name="all_as_dict")]
+  pub fn all_as_dict_py() -> Option<HashMap<u8,Self>> {
+    match Self::all_as_dict() {
+      Err(err) => {
+        error!("Unable to retrieve RB dictionary. {err}. Did you laod the setup-env.sh shell?");
+        return None;
+      }
+      Ok(_data) => {
+        return Some(_data);
+      }
+    }
+  } 
 }
 //paddle12        : TofPaddle::new(),
 ////paddle12_chA    : 0,
@@ -1433,7 +1488,7 @@ impl TrackerStrip {
     self.channel as u32 + (self.module as u32)*100 + (self.row as u32)*10000 + (self.layer as u32)*100000
   }
   
-  /// Get all tof paddles in the database
+  /// Get all TRK strips from the database
   pub fn all_as_dict() -> Result<HashMap<u32,Self>, ConnectionError> {
     let mut strips = HashMap::<u32, Self>::new();
     match Self::all() {
@@ -1467,8 +1522,7 @@ impl TrackerStrip {
 
 impl fmt::Display for TrackerStrip {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let mut repr = String::from("<TrackerStrip:");
-    repr += &(format!("\n   strip id           : {}", self.strip_id));     
+    let mut repr = format!("<TrackerStrip [{}]:", self.strip_id);
     repr += &(format!("\n   vid                : {}", self.volume_id));
     repr += &(format!("\n   layer              : {}", self.layer));
     repr += &(format!("\n   row                : {}", self.row));
@@ -1558,6 +1612,26 @@ impl TrackerStrip {
   fn get_volume_id          (&self) -> i64 {
     self.volume_id
   }
+
+  #[staticmethod]
+  #[pyo3(name="all")]
+  pub fn all_py() -> Option<Vec<Self>> {
+    Self::all()
+  } 
+  
+  #[staticmethod]
+  #[pyo3(name="all_as_dict")]
+  pub fn all_as_dict_py() -> Option<HashMap<u32,Self>> {
+    match Self::all_as_dict() {
+      Err(err) => {
+        error!("Unable to retrieve tracker strip dictionary. {err}. Did you laod the setup-env.sh shell?");
+        return None;
+      }
+      Ok(_data) => {
+        return Some(_data);
+      }
+    }
+  } 
 }
 
 #[cfg(feature="pybindings")]
@@ -1568,41 +1642,78 @@ pythonize!(TrackerStrip);
 /// Masking of unusable strips as curated by the tracker team 
 #[derive(Debug,PartialEq, Clone,Queryable, Selectable, serde::Serialize, serde::Deserialize)]
 #[diesel(table_name = schema::tof_db_trackerstripmask)]
-#[diesel(primary_key(strip_id))]
+#[diesel(primary_key(data_id))]
 #[allow(non_snake_case)]
 #[cfg_attr(feature="pybindings", pyclass)]
 pub struct TrackerStripMask {
-  pub strip_id      : i32,    
-  pub volume_id     : i64,    
-  pub utc_timestamp : i64,
-  pub mask_name     : Option<String>, 
-  pub active        : bool,   
+  pub data_id             : i32,
+  pub strip_id            : i32,    
+  pub volume_id           : i64,    
+  pub utc_timestamp_start : i64,
+  pub utc_timestamp_stop  : i64,
+  pub name                : Option<String>, 
+  pub active              : bool,   
 }
 
 impl TrackerStripMask {
 
   pub fn new() -> Self {
     Self {
-      strip_id      : 0,    
-      volume_id     : 0,    
-      utc_timestamp : 0,    
-      mask_name     : None, 
-      active        : true
+      data_id             : 0,
+      strip_id            : 0,    
+      volume_id           : 0,    
+      utc_timestamp_start : 0,  
+      utc_timestamp_stop  : 0,
+      name                : None, 
+      active              : true
     }
   }
-  
-  /// Get all tracker strip mask from the database
+ 
+  pub fn all_names() -> Result<Vec<String>, ConnectionError> {
+    let mut conn = connect_to_db()?;
+    let mut names = Vec::<String>::new();
+    let unique_names =
+      schema::tof_db_trackerstripmask::table.select(
+      schema::tof_db_trackerstripmask::name)
+      .distinct()
+      .load::<Option<String>>(&mut conn).expect("Error getting names from db!");
+    for k in unique_names {
+      if let Some(n) = k {
+        names.push(n);
+      }
+    }
+    Ok(names)
+  }
+
+  /// Get Tracker strip mask 
   ///
   /// # Returns:
-  ///   * HashMap<u32 [strip id], TrackeStripMask> 
-  pub fn all_as_dict() -> Result<HashMap<u32,Self>, ConnectionError> {
+  ///   * HashMap<u32 [strip id], TrackerStripMask> 
+  pub fn as_dict_by_name(fname : &str) -> Result<HashMap<u32,Self>, ConnectionError> {
+    use schema::tof_db_trackerstripmask::dsl::*;
     let mut strips = HashMap::<u32, Self>::new();
-    match Self::all() {
-      None => {
-        error!("We can't find any tracker strip masks in the database!");
+    if fname == "" {
+      match Self::all() {
+        None => {
+          error!("Unable to retrive ANY TrackerStripMask");
+          return Ok(strips);
+        }
+        Some(_strips) => {
+          for k in _strips {
+            strips.insert(k.strip_id as u32, k);
+          }
+          return Ok(strips);
+        }
+      }
+    }
+    let mut conn = connect_to_db()?;
+    match tof_db_trackerstripmask.filter(
+      schema::tof_db_trackerstripmask::name.eq(fname)).load::<Self>(&mut conn) {
+      Err(err) => {
+        error!("We can't find any tracker strip masks in the database! {err}");
         return Ok(strips);
       }
-      Some(masks_) => {
+      Ok(masks_) => {
         for s in masks_ {
           strips.insert(s.strip_id as u32, s );
         }
@@ -1638,12 +1749,12 @@ impl Default for TrackerStripMask {
 
 impl fmt::Display for TrackerStripMask {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let mut repr = String::from("<TrackerStripMask:");
-    repr += &(format!("\n   strip id      : {}", self.strip_id));     
+    let mut repr = format!("<TrackerStripMask [{}]:", self.strip_id);
     repr += &(format!("\n   vid           : {}", self.volume_id));
-    repr += &(format!("\n   utc_timestamp : {}", self.utc_timestamp));    
-    if self.mask_name.is_some() {
-      repr += &(format!("\n   mask_name     : {}", self.mask_name.clone().unwrap())); 
+    repr += "\n   UTC Timestamps (Begin/End):";
+    repr += &(format!("\n   {}/{}", self.utc_timestamp_start, self.utc_timestamp_stop));    
+    if self.name.is_some() {
+      repr += &(format!("\n   name        : {}", self.name.clone().unwrap())); 
     }
     repr += &(format!("\n   active        : {}", self.active));   
     write!(f, "{}", repr)
@@ -1661,9 +1772,25 @@ impl TrackerStripMask {
   } 
   
   #[staticmethod]
-  #[pyo3(name="all_as_dict")]
-  pub fn all_as_dict_py() -> Option<HashMap<u32,Self>> {
-    match Self::all_as_dict() {
+  #[pyo3(name="all_names")]
+  /// Get all names for registered datasets. These
+  /// can be used in .as_dict_by_name() to query 
+  /// the db for a set of values
+  pub fn all_names_py() -> Option<Vec<String>> {
+    match Self::all_names() {
+      Err(_) => {
+        return None;
+      }
+      Ok(names) => {
+        return Some(names);
+      }
+    }
+  }
+  
+  #[staticmethod]
+  #[pyo3(name="as_dict_by_name")]
+  pub fn all_as_dict_py(name : &str) -> Option<HashMap<u32,Self>> {
+    match Self::as_dict_by_name(name) {
       Err(err) => {
         error!("Unable to retrieve tracker strip mask dictionary. {err}. Did you laod the setup-env.sh shell?");
         return None;
@@ -1685,13 +1812,18 @@ impl TrackerStripMask {
   }
   
   #[getter]
-  fn get_utc_timestamp(&self) -> i64 {
-    self.utc_timestamp
+  fn get_utc_timestamp_start(&self) -> i64 {
+    self.utc_timestamp_start
   }
   
   #[getter]
-  fn get_mask_name    (&self) -> Option<String> {
-    self.mask_name.clone()
+  fn get_utc_timestamp_stop(&self) -> i64 {
+    self.utc_timestamp_stop
+  }
+  
+  #[getter]
+  fn get_name    (&self) -> Option<String> {
+    self.name.clone()
   }
   
   #[getter]
@@ -1708,51 +1840,90 @@ pythonize!(TrackerStripMask);
 /// Measurement of tracker pedestal values for each strip
 #[derive(Debug,PartialEq, Clone,Queryable, Selectable, serde::Serialize, serde::Deserialize)]
 #[diesel(table_name = schema::tof_db_trackerstrippedestal)]
-#[diesel(primary_key(strip_id))]
+#[diesel(primary_key(data_id))]
 #[allow(non_snake_case)]
 #[cfg_attr(feature="pybindings", pyclass)]
 pub struct TrackerStripPedestal {
-  pub strip_id       : i32,    
-  pub volume_id      : i64,    
-  pub utc_timestamp  : i64,
-  pub pedestal_mean  : f32, 
-  pub pedestal_sigma : f32, 
-  pub is_mean_value  : bool,
+  pub data_id             : i32,  
+  pub strip_id            : i32,    
+  pub volume_id           : i64,    
+  pub utc_timestamp_start : i64,
+  pub utc_timestamp_stop  : i64,
+  pub name                : Option<String>,
+  pub pedestal_mean       : f32, 
+  pub pedestal_sigma      : f32, 
+  pub is_mean_value       : bool,
 }
 
 impl TrackerStripPedestal {
 
   pub fn new() -> Self {
     Self {
-      strip_id       : 0,    
-      volume_id      : 0,    
-      utc_timestamp  : 0,    
-      pedestal_mean  : 0.0,
-      pedestal_sigma : 0.0,
-      is_mean_value  : false
+      data_id             : 0,
+      strip_id            : 0,    
+      volume_id           : 0,    
+      utc_timestamp_start : 0,    
+      utc_timestamp_stop  : 0,
+      name                : None,
+      pedestal_mean       : 0.0,
+      pedestal_sigma      : 0.0,
+      is_mean_value       : false
     }
   }
   
-  /// Get all tracker strip mask from the database
+  /// Get Tracker strip pedestals for a certain dataset 
   ///
   /// # Returns:
-  ///   * HashMap<u32 [strip id], TrackeStripMask> 
-  pub fn all_as_dict() -> Result<HashMap<u32,Self>, ConnectionError> {
+  ///   * HashMap<u32 [strip id], TrackerStripMask> 
+  pub fn as_dict_by_name(fname : &str) -> Result<HashMap<u32,Self>, ConnectionError> {
+    use schema::tof_db_trackerstrippedestal::dsl::*;
     let mut strips = HashMap::<u32, Self>::new();
-    match Self::all() {
-      None => {
-        error!("We can't find any tracker strip pedestals in the database!");
+    if fname == "" {
+      match Self::all() {
+        None => {
+          error!("Unable to retrive ANY TrackerStripPedestal");
+          return Ok(strips);
+        }
+        Some(_strips) => {
+          for k in _strips {
+            strips.insert(k.strip_id as u32, k);
+          }
+          return Ok(strips);
+        }
+      }
+    }
+    let mut conn = connect_to_db()?;
+    match tof_db_trackerstrippedestal.filter(
+      schema::tof_db_trackerstrippedestal::name.eq(fname)).load::<Self>(&mut conn) {
+      Err(err) => {
+        error!("We can't find any tracker strip masks in the database! {err}");
         return Ok(strips);
       }
-      Some(masks_) => {
-        for s in masks_ {
+      Ok(peds_) => {
+        for s in peds_ {
           strips.insert(s.strip_id as u32, s );
         }
       }
     }
     return Ok(strips);
   }
-
+  
+  pub fn all_names() -> Result<Vec<String>, ConnectionError> {
+    let mut conn = connect_to_db()?;
+    let mut names = Vec::<String>::new();
+    let unique_names =
+      schema::tof_db_trackerstrippedestal::table.select(
+      schema::tof_db_trackerstrippedestal::name)
+      .distinct()
+      .load::<Option<String>>(&mut conn).expect("Error getting names from db!");
+    for k in unique_names {
+      if let Some(n) = k {
+        names.push(n);
+      }
+    }
+    Ok(names)
+  }
+  
   /// Get all tracker strip mask from the database
   ///
   /// # Returns:
@@ -1780,10 +1951,13 @@ impl Default for TrackerStripPedestal {
 
 impl fmt::Display for TrackerStripPedestal {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let mut repr = String::from("<TrackerStripMask:");
-    repr += &(format!("\n   strip id       : {}", self.strip_id));     
+    let mut repr = format!("<TrackerStripPedestal [{}]:", self.strip_id);
     repr += &(format!("\n   vid            : {}", self.volume_id));
-    repr += &(format!("\n   utc_timestamp  : {}", self.utc_timestamp));    
+    repr += "\n   UTC Timestamps (Begin/End):";
+    repr += &(format!("\n   {}/{}", self.utc_timestamp_start, self.utc_timestamp_stop));    
+    if self.name.is_some() {
+      repr += &(format!("\n   name : {}", self.name.clone().unwrap()));
+    }
     repr += &(format!("\n   pedestal_mean  : {}", self.pedestal_mean));    
     repr += &(format!("\n   pedestal_sigma : {}", self.pedestal_sigma));    
     repr += &(format!("\n   is_mean_value  : {}", self.is_mean_value));    
@@ -1802,9 +1976,25 @@ impl TrackerStripPedestal {
   } 
   
   #[staticmethod]
-  #[pyo3(name="all_as_dict")]
-  pub fn all_as_dict_py() -> Option<HashMap<u32,Self>> {
-    match Self::all_as_dict() {
+  #[pyo3(name="all_names")]
+  /// Get all names for registered datasets. These
+  /// can be used in .as_dict_by_name() to query 
+  /// the db for a set of values
+  pub fn all_names_py() -> Option<Vec<String>> {
+    match Self::all_names() {
+      Err(_) => {
+        return None;
+      }
+      Ok(names) => {
+        return Some(names);
+      }
+    }
+  }
+  
+  #[staticmethod]
+  #[pyo3(name="as_dict_by_name")]
+  pub fn all_as_dict_py(name : &str) -> Option<HashMap<u32,Self>> {
+    match Self::as_dict_by_name(name) {
       Err(err) => {
         error!("Unable to retrieve tracker strip pedestal dictionary. {err}. Did you laod the setup-env.sh shell?");
         return None;
@@ -1814,6 +2004,7 @@ impl TrackerStripPedestal {
       }
     }
   } 
+  
   
   #[getter]
   fn get_strip_id     (&self) -> i32 {    
@@ -1826,8 +2017,13 @@ impl TrackerStripPedestal {
   }
   
   #[getter]
-  fn get_utc_timestamp(&self) -> i64 {
-    self.utc_timestamp
+  fn get_utc_timestamp_start(&self) -> i64 {
+    self.utc_timestamp_start
+  }
+  
+  #[getter]
+  fn get_utc_timestamp_stop(&self) -> i64 {
+    self.utc_timestamp_stop
   }
   
   #[getter]
@@ -1854,75 +2050,112 @@ pythonize!(TrackerStripPedestal);
 /// Tracker transfer functions connect the tracker adc to a measurement of energy
 #[derive(Debug,PartialEq, Clone,Queryable, Selectable, serde::Serialize, serde::Deserialize)]
 #[diesel(table_name = schema::tof_db_trackerstriptransferfunction)]
-#[diesel(primary_key(strip_id))]
+#[diesel(primary_key(data_id))]
 #[allow(non_snake_case)]
 #[cfg_attr(feature="pybindings", pyclass)]
-pub struct TrackerStripTransferFunction {   
-    pub strip_id      : i32,    
-    pub volume_id     : i64,    
-    pub utc_timestamp : i64,    
-    pub name          : Option<String>, 
-    pub pol_a2_0      : f32, 
-    pub pol_a2_1      : f32,    
-    pub pol_a2_2      : f32, 
-    pub pol_b3_0      : f32, 
-    pub pol_b3_1      : f32, 
-    pub pol_b3_2      : f32, 
-    pub pol_b3_3      : f32, 
-    pub pol_c3_0      : f32, 
-    pub pol_c3_1      : f32, 
-    pub pol_c3_2      : f32, 
-    pub pol_c3_3      : f32, 
-    pub pol_d3_0      : f32,     
-    pub pol_d3_1      : f32, 
-    pub pol_d3_2      : f32, 
-    pub pol_d3_3      : f32, 
+pub struct TrackerStripTransferFunction {  
+    pub data_id            : i32,
+    pub strip_id           : i32,    
+    pub volume_id          : i64,    
+    pub utc_timestamp_start: i64,    
+    pub utc_timestamp_stop : i64,    
+    pub name               : Option<String>, 
+    pub pol_a2_0           : f32, 
+    pub pol_a2_1           : f32,    
+    pub pol_a2_2           : f32, 
+    pub pol_b3_0           : f32, 
+    pub pol_b3_1           : f32, 
+    pub pol_b3_2           : f32, 
+    pub pol_b3_3           : f32, 
+    pub pol_c3_0           : f32, 
+    pub pol_c3_1           : f32, 
+    pub pol_c3_2           : f32, 
+    pub pol_c3_3           : f32, 
+    pub pol_d3_0           : f32,     
+    pub pol_d3_1           : f32, 
+    pub pol_d3_2           : f32, 
+    pub pol_d3_3           : f32, 
 } 
 
 impl TrackerStripTransferFunction {
 
   pub fn new() -> Self {
     Self {
-      strip_id      : 0,    
-      volume_id     : 0,    
-      utc_timestamp : 0,    
-      name          : None, 
-      pol_a2_0      : 0.0, 
-      pol_a2_1      : 0.0,    
-      pol_a2_2      : 0.0, 
-      pol_b3_0      : 0.0, 
-      pol_b3_1      : 0.0, 
-      pol_b3_2      : 0.0, 
-      pol_b3_3      : 0.0, 
-      pol_c3_0      : 0.0, 
-      pol_c3_1      : 0.0, 
-      pol_c3_2      : 0.0, 
-      pol_c3_3      : 0.0, 
-      pol_d3_0      : 0.0,     
-      pol_d3_1      : 0.0, 
-      pol_d3_2      : 0.0, 
-      pol_d3_3      : 0.0, 
+      data_id             : 0,
+      strip_id            : 0,    
+      volume_id           : 0,    
+      utc_timestamp_start : 0,    
+      utc_timestamp_stop  : 0,
+      name                : None, 
+      pol_a2_0            : 0.0, 
+      pol_a2_1            : 0.0,    
+      pol_a2_2            : 0.0, 
+      pol_b3_0            : 0.0, 
+      pol_b3_1            : 0.0, 
+      pol_b3_2            : 0.0, 
+      pol_b3_3            : 0.0, 
+      pol_c3_0            : 0.0, 
+      pol_c3_1            : 0.0, 
+      pol_c3_2            : 0.0, 
+      pol_c3_3            : 0.0, 
+      pol_d3_0            : 0.0,     
+      pol_d3_1            : 0.0, 
+      pol_d3_2            : 0.0, 
+      pol_d3_3            : 0.0, 
     }
   }
-
-  /// Get all tracker strip transfer functions from the database
+  
+  /// Get Tracker strip transfer fns for a certain dataset 
   ///
   /// # Returns:
-  ///   * HashMap<u32 [strip id], TrackeStripTransferFunction> 
-  pub fn all_as_dict() -> Result<HashMap<u32,Self>, ConnectionError> {
+  ///   * HashMap<u32 [strip id], TrackerStripTransferFn> 
+  pub fn as_dict_by_name(fname : &str) -> Result<HashMap<u32,Self>, ConnectionError> {
+    use schema::tof_db_trackerstriptransferfunction::dsl::*;
     let mut strips = HashMap::<u32, Self>::new();
-    match Self::all() {
-      None => {
-        error!("We can't find any tracker strip transfer functions in the database!");
+    if fname == "" {
+      match Self::all() {
+        None => {
+          error!("Unable to retrive ANY TrackerStripTransferFunction");
+          return Ok(strips);
+        }
+        Some(_strips) => {
+          for k in _strips {
+            strips.insert(k.strip_id as u32, k);
+          }
+          return Ok(strips);
+        }
+      }
+    }
+    let mut conn = connect_to_db()?;
+    match tof_db_trackerstriptransferfunction.filter(
+      schema::tof_db_trackerstriptransferfunction::name.eq(fname)).load::<Self>(&mut conn) {
+      Err(err) => {
+        error!("We can't find any tracker strip transferfunction in the database! {err}");
         return Ok(strips);
       }
-      Some(masks_) => {
-        for s in masks_ {
+      Ok(peds_) => {
+        for s in peds_ {
           strips.insert(s.strip_id as u32, s );
         }
       }
     }
     return Ok(strips);
+  }
+  
+  pub fn all_names() -> Result<Vec<String>, ConnectionError> {
+    let mut conn = connect_to_db()?;
+    let mut names = Vec::<String>::new();
+    let unique_names =
+      schema::tof_db_trackerstriptransferfunction::table.select(
+      schema::tof_db_trackerstriptransferfunction::name)
+      .distinct()
+      .load::<Option<String>>(&mut conn).expect("Error getting names from db!");
+    for k in unique_names {
+      if let Some(n) = k {
+        names.push(n);
+      }
+    }
+    Ok(names)
   }
 
   /// Get all tracker strip transfer functions from the database
@@ -1945,19 +2178,18 @@ impl TrackerStripTransferFunction {
 
   /// The actual transfer function for this 
   /// strip. Calculate energy from adc values
-  pub fn transfer_fn(&self, adc : u32) -> f32 {
-    let adc_f = adc as f32;
-    if adc <= 190 {
-      return self.pol_a2_0 + self.pol_a2_1*adc_f + self.pol_a2_2*(adc_f.powi(2));
+  pub fn transfer_fn(&self, adc : f32) -> f32 {
+    if adc <= 190.0 {
+      return self.pol_a2_0 + self.pol_a2_1*adc + self.pol_a2_2*(adc.powi(2));
     }
-    if 190 < adc && adc <= 500 {
-      return self.pol_b3_0 + self.pol_b3_1*adc_f + self.pol_b3_2*(adc_f.powi(2)) + self.pol_b3_3*(adc_f.powi(3));
+    if 190.0 < adc && adc <= 500.0 {
+      return self.pol_b3_0 + self.pol_b3_1*adc + self.pol_b3_2*(adc.powi(2)) + self.pol_b3_3*(adc.powi(3));
     }
-    if 500 < adc && adc <= 901 {
-      return self.pol_c3_0 + self.pol_c3_1*adc_f + self.pol_c3_2*(adc_f.powi(2)) + self.pol_c3_3*(adc_f.powi(3));
+    if 500.0 < adc && adc <= 900.0 {
+      return self.pol_c3_0 + self.pol_c3_1*adc + self.pol_c3_2*(adc.powi(2)) + self.pol_c3_3*(adc.powi(3));
     }
-    if 901 < adc && adc <= 1600 {
-      return self.pol_d3_0 + self.pol_d3_1*adc_f + self.pol_d3_2*(adc_f.powi(2)) + self.pol_d3_3*(adc_f.powi(3));
+    if 900.0 < adc && adc <= 1600.0 {
+      return self.pol_d3_0 + self.pol_d3_1*adc + self.pol_d3_2*(adc.powi(2)) + self.pol_d3_3*(adc.powi(3));
     }
     0.0
   }
@@ -1965,26 +2197,17 @@ impl TrackerStripTransferFunction {
 
 impl fmt::Display for TrackerStripTransferFunction {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let mut repr = String::from("<TrackerStripMask:");
-    repr += &(format!("\n   strip id      : {}", self.strip_id));     
+    let mut repr = format!("<TrackerStripTransferFunction [{}]:", self.strip_id);
     repr += &(format!("\n   vid           : {}", self.volume_id));
-    repr += &(format!("\n   utc_timestamp : {}", self.utc_timestamp));    
+    repr += "\n   UTC Timestamps (Begin/End):";
+    repr += &(format!("\n   {}/{}", self.utc_timestamp_start, self.utc_timestamp_stop));    
     if self.name.is_some() {
       repr += &(format!("\n   name     : {}", self.name.clone().unwrap())); 
     }
-    repr += &(format!("\n  {}*adc + {}*adc + {}*(adc**2) for adc < 190", self.pol_a2_0, self.pol_a2_1, self.pol_a2_2));
-    repr += &(format!("\n   pol_b3_0      : {}", self.pol_b3_0)); 
-    repr += &(format!("\n   pol_b3_1      : {}", self.pol_b3_1)); 
-    repr += &(format!("\n   pol_b3_2      : {}", self.pol_b3_2)); 
-    repr += &(format!("\n   pol_b3_3      : {}", self.pol_b3_3)); 
-    repr += &(format!("\n   pol_c3_0      : {}", self.pol_c3_0)); 
-    repr += &(format!("\n   pol_c3_1      : {}", self.pol_c3_1)); 
-    repr += &(format!("\n   pol_c3_2      : {}", self.pol_c3_2)); 
-    repr += &(format!("\n   pol_c3_3      : {}", self.pol_c3_3)); 
-    repr += &(format!("\n   pol_d3_0      : {}", self.pol_d3_0)); 
-    repr += &(format!("\n   pol_d3_1      : {}", self.pol_d3_1)); 
-    repr += &(format!("\n   pol_d3_2      : {}", self.pol_d3_2)); 
-    repr += &(format!("\n   pol_d3_3      : {}>", self.pol_d3_3)); 
+    repr += &(format!("\n  Poly A {}*adc + {}*adc + {}*(adc**2) for adc < 190", self.pol_a2_0, self.pol_a2_1, self.pol_a2_2));
+    repr += &(format!("\n  Poly B    :{}*adc + {}*adc + {}*(adc**2) + {}*(adc**3) for 190 < adc <= 500", self.pol_b3_0, self.pol_b3_1, self.pol_b3_2, self.pol_b3_3));
+    repr += &(format!("\n  Poly C    :{}*adc + {}*adc + {}*(adc**2) + {}*(adc**3) for 500 < adc <= 900", self.pol_c3_0, self.pol_c3_1, self.pol_c3_2, self.pol_c3_3));
+    repr += &(format!("\n  Poly D    :{}*adc + {}*adc + {}*(adc**2) + {}*(adc**3) for 900 < adc <= 1600>", self.pol_d3_0, self.pol_d3_1, self.pol_d3_2, self.pol_d3_3));
     write!(f, "{}", repr)
   }
 }
@@ -2000,11 +2223,27 @@ impl TrackerStripTransferFunction {
   } 
   
   #[staticmethod]
-  #[pyo3(name="all_as_dict")]
-  pub fn all_as_dict_py() -> Option<HashMap<u32,Self>> {
-    match Self::all_as_dict() {
+  #[pyo3(name="all_names")]
+  /// Get all names for registered datasets. These
+  /// can be used in .as_dict_by_name() to query 
+  /// the db for a set of values
+  pub fn all_names_py() -> Option<Vec<String>> {
+    match Self::all_names() {
+      Err(_) => {
+        return None;
+      }
+      Ok(names) => {
+        return Some(names);
+      }
+    }
+  } 
+  
+  #[staticmethod]
+  #[pyo3(name="as_dict_by_name")]
+  pub fn all_as_dict_py(name : &str) -> Option<HashMap<u32,Self>> {
+    match Self::as_dict_by_name(name) {
       Err(err) => {
-        error!("Unable to retrieve tracker strip pedestal dictionary. {err}. Did you laod the setup-env.sh shell?");
+        error!("Unable to retrieve tracker strip transfer fn dictionary. {err}. Did you laod the setup-env.sh shell?");
         return None;
       }
       Ok(_data) => {
@@ -2024,8 +2263,13 @@ impl TrackerStripTransferFunction {
   }
   
   #[getter]
-  fn get_utc_timestamp(&self) -> i64 {
-    self.utc_timestamp
+  fn get_utc_timestamp_start(&self) -> i64 {
+    self.utc_timestamp_start
+  }
+  
+  #[getter]
+  fn get_utc_timestamp_stop(&self) -> i64 {
+    self.utc_timestamp_stop
   }
 
   #[getter]
@@ -2034,8 +2278,8 @@ impl TrackerStripTransferFunction {
   }
 
   #[pyo3(name="transfer_fn")]
-  fn transfer_fn_py(&self, adc : u32) -> f32 {
-    if adc > 1600 {
+  fn transfer_fn_py(&self, adc : f32) -> f32 {
+    if adc > 1600.0 {
       warn!("ADC value larger than 1600! {}. Transfer fn not defined beyond 1600.", adc);
     }
     return self.transfer_fn(adc);
@@ -2047,7 +2291,243 @@ pythonize!(TrackerStripTransferFunction);
 
 //-------------------------------------------------
 
+/// Common noise subtraction - pulse channels on the wafers and get the average adc. 
+/// The gain is available as well. Data from Mengjiao's group 
+#[derive(Debug,PartialEq, Clone,Queryable, Selectable, serde::Serialize, serde::Deserialize)]
+#[diesel(table_name = schema::tof_db_trackerstripcmnnoise)]
+#[diesel(primary_key(data_id))]
+#[allow(non_snake_case)]
+#[cfg_attr(feature="pybindings", pyclass)]
+pub struct TrackerStripCmnNoise {   
+  pub data_id              : i32,
+  pub strip_id             : i32,    
+  pub volume_id            : i64,    
+  pub utc_timestamp_start  : i64,    
+  pub utc_timestamp_stop   : i64,    
+  pub name                 : Option<String>, 
+  pub gain                 : f32,
+  pub pulse_chn            : i32,
+  pub pulse_avg            : f32,
+  pub gain_is_mean         : bool,
+  pub pulse_is_mean        : bool,
+} 
 
+impl TrackerStripCmnNoise {
+
+  pub fn new() -> Self {
+    Self {
+      data_id             : 0,
+      strip_id            : 0,    
+      volume_id           : 0,    
+      utc_timestamp_start : 0,   
+      utc_timestamp_stop  : 0,
+      name                : None, 
+      gain                : 0.0, 
+      pulse_chn           : 0,
+      pulse_avg           : 0.0,
+      gain_is_mean        : false,
+      pulse_is_mean       : false
+    }
+  }
+  
+  pub fn all_names() -> Result<Vec<String>, ConnectionError> {
+    let mut conn = connect_to_db()?;
+    let mut names = Vec::<String>::new();
+    let unique_names =
+      schema::tof_db_trackerstripcmnnoise::table.select(
+      schema::tof_db_trackerstripcmnnoise::name)
+      .distinct()
+      .load::<Option<String>>(&mut conn).expect("Error getting names from db!");
+    for k in unique_names {
+      if let Some(n) = k {
+        names.push(n);
+      }
+    }
+    Ok(names)
+  }
+  
+  /// Get Tracker strip cmn noise data for a certain dataset 
+  ///
+  /// # Returns:
+  ///   * HashMap<u32 [strip id], TrackerStripTransferFn> 
+  pub fn as_dict_by_name(fname : &str) -> Result<HashMap<u32,Self>, ConnectionError> {
+    use schema::tof_db_trackerstripcmnnoise::dsl::*;
+    let mut strips = HashMap::<u32, Self>::new();
+    if fname == "" {
+      match Self::all() {
+        None => {
+          error!("Unable to retrive ANY TrackerStripCMNNoise Data (pulser)");
+          return Ok(strips);
+        }
+        Some(_strips) => {
+          for k in _strips {
+            strips.insert(k.strip_id as u32, k);
+          }
+          return Ok(strips);
+        }
+      }
+    }
+    let mut conn = connect_to_db()?;
+    match tof_db_trackerstripcmnnoise.filter(
+      schema::tof_db_trackerstripcmnnoise::name.eq(fname)).load::<Self>(&mut conn) {
+      Err(err) => {
+        error!("We can't find any tracker strip transferfunction in the database! {err}");
+        return Ok(strips);
+      }
+      Ok(peds_) => {
+        for s in peds_ {
+          strips.insert(s.strip_id as u32, s );
+        }
+      }
+    }
+    return Ok(strips);
+  }
+
+  /// Get all tracker strip transfer functions from the database
+  ///
+  /// # Returns:
+  ///   * HashMap<u32 [strip id], TrackeStripTransferFunction> 
+  pub fn all() -> Option<Vec<Self>> {
+    use schema::tof_db_trackerstripcmnnoise::dsl::*;
+    let mut conn = connect_to_db().ok()?;
+    match tof_db_trackerstripcmnnoise.load::<Self>(&mut conn) {
+      Err(err) => {
+        error!("Unable to load tracker transfer functions from db! {err}");
+        return None;
+      }
+      Ok(strips) => {
+        return Some(strips);
+      }
+    }
+  }
+
+  pub fn common_level(&self, adc : f32) -> f32 {
+    return (adc - self.pulse_avg)/self.gain; 
+  }
+
+}
+
+impl fmt::Display for TrackerStripCmnNoise {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = format!("<TrackerStripCmnNoise [{}]:", self.strip_id);
+    repr += &(format!("\n   vid              : {}", self.volume_id));
+    repr += "\n   UTC Timestamps (Begin/End):";
+    repr += &(format!("\n   {}/{}", self.utc_timestamp_start, self.utc_timestamp_stop));    
+    if self.gain_is_mean {
+      repr += &(String::from("\n -- Gain is mean value!"));
+    }
+    if self.pulse_is_mean {
+      repr += &(String::from("\n -- Pulse is mean value!"));
+    }
+    if self.name.is_some() {
+      repr += &(format!("\n   name     : {}", self.name.clone().unwrap())); 
+    }
+    repr += &(format!("\n   gain : {} pulse ch : {} pulse avg : {}>", self.gain, self.pulse_chn, self.pulse_avg));
+    write!(f, "{}", repr)
+  }
+}
+
+
+
+#[cfg(feature="pybindings")]
+#[pymethods]
+impl TrackerStripCmnNoise {
+  
+  #[staticmethod]
+  #[pyo3(name="all")]
+  pub fn all_py() -> Option<Vec<Self>> {
+    Self::all()
+  } 
+ 
+  #[staticmethod]
+  #[pyo3(name="all_names")]
+  /// Get all names for registered datasets. These
+  /// can be used in .as_dict_by_name() to query 
+  /// the db for a set of values
+  pub fn all_names_py() -> Option<Vec<String>> {
+    match Self::all_names() {
+      Err(_) => {
+        return None;
+      }
+      Ok(names) => {
+        return Some(names);
+      }
+    }
+  }
+
+  #[staticmethod]
+  #[pyo3(name="as_dict_by_name")]
+  pub fn all_as_dict_py(name : &str) -> Option<HashMap<u32,Self>> {
+    match Self::as_dict_by_name(name) {
+      Err(err) => {
+        error!("Unable to retrieve tracker strip cmn noise dictionary. {err}. Did you laod the setup-env.sh shell?");
+        return None;
+      }
+      Ok(_data) => {
+        return Some(_data);
+      }
+    }
+  } 
+  
+  #[getter]
+  fn get_strip_id     (&self) -> i32 {    
+    self.strip_id
+  }
+  
+  #[getter]
+  fn get_volume_id    (&self) -> i64 {    
+    self.volume_id
+  }
+  
+  #[getter]
+  fn get_utc_timestamp_start(&self) -> i64 {
+    self.utc_timestamp_start
+  }
+  
+  #[getter]
+  fn get_utc_timestamp_stop(&self) -> i64 {
+    self.utc_timestamp_stop
+  }
+
+  #[getter]
+  fn get_name(&self) -> Option<String> {
+    self.name.clone()
+  }
+      
+  #[getter]
+  fn get_gain(&self) -> f32 {
+    self.gain
+  }
+  
+  #[getter]
+  fn get_pulse_cn(&self) -> u32 {
+    self.pulse_chn as u32
+  }
+
+  #[getter]
+  fn get_gain_is_mean(&self) -> bool {
+    self.gain_is_mean
+  }
+  
+  #[getter]
+  fn get_pulse_is_mean(&self) -> bool {
+    self.pulse_is_mean
+  }
+
+  #[getter]
+  fn get_pulse_avg(&self) -> f32 {
+    self.pulse_avg
+  }
+
+  fn get_common_level(&self, adc : f32) -> f32 {
+    self.common_level(adc)
+  }
+
+}
+
+pythonize!(TrackerStripCmnNoise);
+
+//-------------------------------------------------
 
 //
 //

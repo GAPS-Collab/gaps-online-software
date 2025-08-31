@@ -138,32 +138,39 @@ diesel::table! {
 }
 
 diesel::table! {
-  tof_db_trackerstripmask (strip_id) {
-    strip_id       -> Integer,
-    volume_id      -> BigInt, 
-    utc_timestamp  -> BigInt,
-    mask_name      -> Nullable<Text>,
-    active         -> Bool
+  tof_db_trackerstripmask (data_id) {
+    data_id             -> Integer,
+    strip_id            -> Integer,
+    volume_id           -> BigInt, 
+    utc_timestamp_start -> BigInt,
+    utc_timestamp_stop  -> BigInt,
+    name                -> Nullable<Text>,
+    active              -> Bool
   }
 }
 
 diesel::table! { 
-  tof_db_trackerstrippedestal ( strip_id ) {
-    strip_id       -> Integer,
-    volume_id      -> BigInt,
-    utc_timestamp  -> BigInt,
-    pedestal_mean  -> Float,
-    pedestal_sigma -> Float,
-    is_mean_value  -> Bool,
+  tof_db_trackerstrippedestal ( data_id ) {
+    data_id             -> Integer,
+    strip_id            -> Integer,
+    volume_id           -> BigInt,
+    utc_timestamp_start -> BigInt,
+    utc_timestamp_stop  -> BigInt,
+    name                -> Nullable<Text>,
+    pedestal_mean       -> Float,
+    pedestal_sigma      -> Float,
+    is_mean_value       -> Bool,
   }
 }
 
 diesel::table! { 
-  tof_db_trackerstriptransferfunction ( strip_id ) {
-    strip_id       -> Integer,
-    volume_id      -> BigInt,
-    utc_timestamp  -> BigInt,
-    name           -> Nullable<Text>, 
+  tof_db_trackerstriptransferfunction ( data_id ) {
+    data_id             -> Integer,
+    strip_id            -> Integer,
+    volume_id           -> BigInt,
+    utc_timestamp_start -> BigInt,
+    utc_timestamp_stop  -> BigInt,
+    name                -> Nullable<Text>, 
     // poly a (square)
     pol_a2_0       -> Float, 
     pol_a2_1       -> Float,    
@@ -183,6 +190,22 @@ diesel::table! {
     pol_d3_1       -> Float, 
     pol_d3_2       -> Float, 
     pol_d3_3       -> Float, 
+  }
+}
+
+diesel::table! { 
+  tof_db_trackerstripcmnnoise ( data_id ) {
+    data_id             -> Integer,
+    strip_id             -> Integer,
+    volume_id            -> BigInt,
+    utc_timestamp_start  -> BigInt,
+    utc_timestamp_stop   -> BigInt,
+    name                 -> Nullable<Text>, 
+    gain                 -> Float,
+    pulse_chn            -> Integer,
+    pulse_avg            -> Float,
+    gain_is_mean         -> Bool,
+    pulse_is_mean        -> Bool
   }
 }
 

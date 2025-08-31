@@ -163,8 +163,12 @@ pub struct CRFrame {
   // FIXME - this needs to be HashMap<&str, (u64, CRFrameObjectType)>
   pub index       : HashMap<String, (u64, CRFrameObjectType)>,
   pub bytestorage : Vec<u8>,
-  pub tof_paddles : Arc<HashMap<u8, TofPaddle>>, 
-  pub trk_strips  : Arc<HashMap<u32, TrackerStrip>>
+  pub tof_paddles : Arc<HashMap<u8,  TofPaddle>>, 
+  pub trk_strips  : Arc<HashMap<u32, TrackerStrip>>,
+  pub trk_masks   : Arc<HashMap<u32, TrackerStripMask>>,
+  pub trk_ped     : Arc<HashMap<u32, TrackerStripPedestal>>,
+  pub trk_tf      : Arc<HashMap<u32, TrackerStripTransferFunction>>,
+  pub trk_cmn     : Arc<HashMap<u32, TrackerStripCmnNoise>> 
 }
 
 impl CRFrame {
@@ -175,6 +179,10 @@ impl CRFrame {
       bytestorage : Vec::<u8>::new(),
       tof_paddles : Arc::new(HashMap::<u8, TofPaddle>::new()),
       trk_strips  : Arc::new(HashMap::<u32, TrackerStrip>::new()),
+      trk_masks   : Arc::new(HashMap::<u32, TrackerStripMask>::new()),
+      trk_ped     : Arc::new(HashMap::<u32, TrackerStripPedestal>::new()),
+      trk_tf      : Arc::new(HashMap::<u32, TrackerStripTransferFunction>::new()),
+      trk_cmn     : Arc::new(HashMap::<u32, TrackerStripCmnNoise>::new()) 
     }
   }
 

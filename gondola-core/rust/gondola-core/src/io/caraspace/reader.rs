@@ -47,6 +47,14 @@ pub struct CRReader {
   pub tof_paddles      : Arc<HashMap<u8,TofPaddle>>,
   /// Geometry of each tracker strip
   pub trk_strips       : Arc<HashMap<u32, TrackerStrip>>,
+  /// Mask tracker strips 
+  pub trk_masks        : Arc<HashMap<u32, TrackerStripMask>>,
+  /// Tracker pedestal values
+  pub trk_ped          : Arc<HashMap<u32, TrackerStripPedestal>>,
+  /// Transfer functions for tracker (adc -> energy)
+  pub trk_tf           : Arc<HashMap<u32, TrackerStripTransferFunction>>,
+  /// Common noise data for tracker
+  pub trk_cmn          : Arc<HashMap<u32, TrackerStripCmnNoise>>, 
   ///// did paddle loading work
   pub db_loaded        : bool,
 }
@@ -61,8 +69,12 @@ impl CRReader {
   ///                             caraspace files in it.
   ///   
   pub fn new(filename_or_directory : String) -> Result<Self, io::Error> {
-    let mut paddles   = HashMap::<u8, TofPaddle>::new();
-    let mut strips    = HashMap::<u32, TrackerStrip>::new();
+    let mut paddles = HashMap::<u8, TofPaddle>::new();
+    let mut strips  = HashMap::<u32, TrackerStrip>::with_capacity(11520);
+    let trk_mask    = HashMap::<u32, TrackerStripMask>::with_capacity(11520);
+    let trk_ped     = HashMap::<u32, TrackerStripPedestal>::with_capacity(11520);
+    let trk_tf      = HashMap::<u32, TrackerStripTransferFunction>::with_capacity(11520);
+    let trk_cmn     = HashMap::<u32, TrackerStripCmnNoise>::with_capacity(11520);
     //let db_path       = env::var("DATABASE_URL").unwrap_or_else(|_| "".to_string());
     let mut db_loaded = false;
     #[cfg(feature="database")]
@@ -78,7 +90,7 @@ impl CRReader {
     #[cfg(feature="database")]
     match TrackerStrip::all_as_dict() {
       Err(err) => {
-        error!("Unable to retrieve paddle information from DB! {err}");
+        error!("Unable to retrieve tracker strip information from DB! {err}");
         // if strips and paddles do not work, something is utterly fisy
         db_loaded = false;
       }
@@ -109,10 +121,72 @@ impl CRReader {
       n_packs_skipped  : 0,
       tof_paddles      : Arc::new(paddles),
       trk_strips       : Arc::new(strips),
+      trk_masks        : Arc::new(trk_mask),
+      trk_ped          : Arc::new(trk_ped),
+      trk_tf           : Arc::new(trk_tf),
+      trk_cmn          : Arc::new(trk_cmn),
       db_loaded        : db_loaded
     };
     Ok(packet_reader)
   } 
+    
+  #[cfg(feature="database")]
+  pub fn set_tracker_calibrations_from_fnames(&mut self,
+                                              mask        : Option<String>,
+                                              pedestal    : Option<String>,
+                                              transfer_fn : Option<String>,
+                                              cmn_noise   : Option<String>) {
+    // Tracker calibration parameters
+    if let Some(maskname) = mask {
+      match TrackerStripMask::as_dict_by_name(&maskname) {
+        Err(err) => {
+          error!("Unable to retrieve Trk strip mask information from DB! {err}");
+          // if strips and paddles do not work, something is utterly fisy
+          self.db_loaded = false;
+        }
+        Ok(strips_) => {
+          self.trk_masks = Arc::new(strips_);
+        }
+      }
+    }
+    if let Some(pedname) = pedestal {
+      match TrackerStripPedestal::as_dict_by_name(&pedname) {
+        Err(err) => {
+          error!("Unable to retrieve TRK pedestal information from DB! {err}");
+          // if strips and paddles do not work, something is utterly fisy
+          self.db_loaded = false;
+        }
+        Ok(strips_) => {
+          self.trk_ped = Arc::new(strips_);
+        }
+      }
+    }
+    if let Some(trafoname) = transfer_fn { 
+      match TrackerStripTransferFunction::as_dict_by_name(&trafoname) {
+        Err(err) => {
+          error!("Unable to retrieve TRK Transfer fn information from DB! {err}");
+          // if strips and paddles do not work, something is utterly fisy
+          self.db_loaded = false;
+        }
+        Ok(strips_) => {
+          self.trk_tf = Arc::new(strips_);
+        }
+      }
+    }
+    if let Some(cmnname) = cmn_noise { 
+      match TrackerStripCmnNoise::as_dict_by_name(&cmnname) {
+        Err(err) => {
+          error!("Unable to retrieve TRK common noise from DB! {err}");
+          // if strips and paddles do not work, something is utterly fisy
+          self.db_loaded = false;
+        }
+        Ok(strips_) => {
+          self.trk_cmn = Arc::new(strips_);
+        }
+      }
+    }
+  }
+
   //  
   /// This is the file the current cursor is located 
   /// in and frames are currently read out from 
@@ -418,6 +492,15 @@ impl CRReader {
     }
   }
 
+  #[pyo3(name="set_tracker_calibration_from_fnames")]
+  #[pyo3(signature = (mask = None, pedestal = None, transfer_fn = None, cmn_noise = None))]
+  fn set_tracker_calibrations_from_fnames_py(&mut self,
+                                              mask        : Option<String>,
+                                              pedestal    : Option<String>,
+                                              transfer_fn : Option<String>,
+                                              cmn_noise   : Option<String>) {
+    self.set_tracker_calibrations_from_fnames(mask, pedestal, transfer_fn, cmn_noise);
+  }
 
   /// This is the filename we are currently 
   /// extracting frames from 

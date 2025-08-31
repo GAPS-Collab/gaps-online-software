@@ -23,6 +23,7 @@ pub struct TrackerHit {
   pub y               : f32,
   pub z               : f32,
   pub has_coordinates : bool,
+  pub adc_pedestal    : u16,
 }
 
 impl TrackerHit {
@@ -41,6 +42,7 @@ impl TrackerHit {
       y               : 0.0,
       z               : 0.0,
       has_coordinates : false,
+      adc_pedestal    : 0,
     }
   }
  
