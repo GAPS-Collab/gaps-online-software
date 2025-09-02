@@ -104,14 +104,39 @@ impl TelemetryEvent {
     return Some(adc_ped_sub - cmn_noise[&stripid].gain * cmn_level);
   }
 
+  /// Calculate the energy deposition
+  #[cfg(feature="database")]
+  pub fn get_trk_energy(adc : f32, tf : &TrackerStripTransferFunction) -> f32 {
+    let mut energy = 0.0f32;
+    let mut adc_m  = adc; 
+    if adc_m <= 0.0 {
+      return energy;
+    }
+    if adc_m > 1600.0 {
+      adc_m = 1600.0;
+    }
+    #[allow(non_snake_case)]
+    let mV2keV  = 0.841f32;
+    // the max and min range are basically defined by the 
+    // polynominal [0-1600]
+    let voltage = tf.transfer_fn(adc_m);
+    println!("voltage {}", voltage);
+    energy  = voltage*mV2keV;
+    energy /= 1000.0;
+    println!("adc : {} , energy {}", adc_m, energy);
+    return energy;
+  }
+
   #[cfg(feature="database")]
   pub fn calibrate_tracker(&mut self, 
                            remove_cmn_noise : bool,
                            pedestals        : &HashMap<u32, TrackerStripPedestal>,
                            transfer_fn      : &HashMap<u32, TrackerStripTransferFunction>,
                            cmn_noise        : &HashMap<u32, TrackerStripCmnNoise>) {
+    //println!("Will remove CMN noise {}", remove_cmn_noise);
     for h in &mut self.tracker_hits {
       let stripid = h.get_stripid();
+      //println!("Running TRK calibration for strip {}", stripid);
       if !pedestals.contains_key(&stripid) {
         warn!("Pedestal map does not contain strip {}. Will not calculate energy!", stripid);
         continue;
@@ -121,15 +146,18 @@ impl TelemetryEvent {
         continue;
       }
       let adc_no_ped = h.adc as f32 - pedestals[&stripid].pedestal_mean;
+      //println!("ADC NO PED {}", adc_no_ped);
       if remove_cmn_noise {
         match Self::cmn_noise(&h, pedestals, cmn_noise) { 
           None => {
-            h.energy = transfer_fn[&stripid].transfer_fn(adc_no_ped); 
+            h.energy = Self::get_trk_energy(adc_no_ped, &transfer_fn[&stripid]); 
           }
           Some(cmn) => {
-            h.energy = transfer_fn[&stripid].transfer_fn(cmn);
+            h.energy = Self::get_trk_energy(cmn, &transfer_fn[&stripid]);
           }
         }    
+      } else {
+        h.energy = Self::get_trk_energy(adc_no_ped, &transfer_fn[&stripid]);
       }
     }
   }
@@ -279,6 +307,12 @@ impl TelemetryEvent {
   #[pyo3(name="version")]
   fn version_py(&self) -> u8 {
     self.version
+  }
+  
+  #[staticmethod]
+  #[pyo3(name = "get_trk_energy")]
+  fn get_trk_energy_py(adc : f32, tf : &TrackerStripTransferFunction) -> f32 {
+    Self::get_trk_energy(adc, tf)
   }
 
   #[getter]

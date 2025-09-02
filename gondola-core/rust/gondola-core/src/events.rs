@@ -270,6 +270,20 @@ pub enum EventStatus {
   Perfect                = 42u8
 }
 
+// in case we have pybindings for this type, 
+// expand it so that it can be used as keys
+// in dictionaries
+#[cfg(feature = "pybindings")]
+#[pymethods]
+impl EventStatus {
+
+  #[getter]
+  fn __hash__(&self) -> usize {
+    (*self as u8) as usize
+  } 
+}
+
+
 expand_and_test_enum!(EventStatus, test_eventstatus_repr);
 
 //--------------------------------------------

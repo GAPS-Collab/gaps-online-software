@@ -62,6 +62,7 @@ impl TrackerHit {
        self.x = strip.global_pos_x_l0;
        self.y = strip.global_pos_y_l0;
        self.z = strip.global_pos_z_l0;
+       self.has_coordinates = true
      }
    }
  }
@@ -74,10 +75,11 @@ impl fmt::Display for TrackerHit {
     repr += &(format!("\n  ADC           : {}" ,self.adc));
     repr += &(format!("\n  Oscillator    : {}",self.oscillator));
     if self.has_coordinates {
-      repr += &(format!("\n -- coordinates x : {} , y : {} , z {}>", self.x, self.y, self.z));
+      repr += &(format!("\n -- coordinates x : {} , y : {} , z {}", self.x, self.y, self.z));
     } else {
-      repr += "\n -- [no coordinates set]>";
+      repr += "\n -- [no coordinates set]";
     }
+    repr += &(format!("\n  Cali. energy  : {}>", self.energy));
     write!(f, "{}", repr)
   }
 }

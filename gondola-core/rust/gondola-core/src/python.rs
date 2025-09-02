@@ -172,7 +172,6 @@ macro_rules! pythonize_packable {
 }
 
 
-//--------------------------------------------------
 
 //fn convert_pyarray1<'_py>(arr : Bound<'_py, PyArray1<f32>>) -> Vec<f32> {
 //  let mut vec = Vec::<f32>::new();

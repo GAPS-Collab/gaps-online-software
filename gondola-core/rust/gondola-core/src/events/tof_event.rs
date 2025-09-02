@@ -4,7 +4,9 @@
 
 use crate::prelude::*;
 
+#[cfg(feature="database")]
 use std::f32::consts::PI;
+use std::cmp::Ordering;
 
 /// Main event class for the TOF. This will be sent over telemetry and be 
 /// written to disk
@@ -100,7 +102,7 @@ impl TofEvent {
       rb_events          : Vec::<RBEvent>::new(),
     }
   }
-  
+ 
   /// Remove any RBEvents from the event 
   pub fn strip_rbevents(&mut self) {
     self.rb_events.clear();
@@ -173,8 +175,7 @@ impl TofEvent {
       return (Vec::<u8>::new(), Vec::<f32>::new());
     }
     let mut twindows = Vec::<f32>::new();
-
-    self.hits.sort_by(|a,b| (a.event_t0).partial_cmp(&b.event_t0).unwrap());
+    self.hits.sort_by(|a,b| (a.event_t0).partial_cmp(&b.event_t0).unwrap_or(Ordering::Greater));
     let first_hit = self.hits[0].clone(); // the clone here is a bit unfortunate, 
                                            // this can be done better with walking 
                                            // over the list and updating references
@@ -959,8 +960,8 @@ impl TofEvent {
   /// RB Link IDS (not RB ids) which fall into the 
   /// trigger window
   #[getter]
-  fn rb_link_ids(&self) -> Vec<u8> {
-    self.get_rb_link_ids()
+  fn rb_link_ids(&self) -> Vec<u32> {
+    self.get_rb_link_ids().into_iter().map(|byte| byte as u32).collect()
   }
 
   /// The event might have RBEvents associated with it
