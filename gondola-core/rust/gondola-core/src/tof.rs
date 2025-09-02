@@ -18,6 +18,8 @@ pub mod analysis_engine;
 pub use analysis_engine::*;
 pub mod cuts;
 pub use cuts::*;
+pub mod alerts;
+pub use alerts::*;
 
 pub mod thread_control;
 pub use thread_control::ThreadControl;
