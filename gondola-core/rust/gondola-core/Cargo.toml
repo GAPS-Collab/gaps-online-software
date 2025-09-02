@@ -28,13 +28,13 @@ random              = ["rand"]
 database            = ["diesel"]
 tofcontrol          = ["tof-control"]
 advanced-algorithms = ["smoothed_z_score"]
-pybindings          = ["pyo3","pyo3-log","numpy"]
+pybindings          = ["pyo3","pyo3-log","numpy", "serde-pickle"]
 experimental        = []
 root                = ["oxyroot", "root-io"]
 
 [dependencies.pyo3]
 version  = "0.25"
-features = ["extension-module", "multiple-pymethods", "abi3-py311"]
+features = ["extension-module", "multiple-pymethods", "abi3-py311", "chrono"]
 optional = true
 
 [dependencies.pyo3-log]
@@ -43,6 +43,10 @@ optional = true
 
 [dependencies.numpy]
 version = "0.25"
+optional = true
+
+[dependencies.serde-pickle]
+version = "1.1"
 optional = true
 
 [dependencies.smoothed_z_score]

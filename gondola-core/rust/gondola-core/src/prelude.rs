@@ -43,6 +43,7 @@ pub use crossbeam_channel::Sender;
 pub use chrono::{
   Utc,
   DateTime,
+  NaiveDateTime,
   TimeZone,
   LocalResult
 };
@@ -117,6 +118,26 @@ pub use crate::stats::{
   calculate_column_stat
 };
 
+#[cfg(not(feature="database"))]
+#[derive(Debug, Default, Clone)]
+pub struct TofPaddle {}
+#[cfg(not(feature="database"))]
+#[derive(Debug, Default, Clone)]
+pub struct TrackerStrip {}
+#[cfg(not(feature="database"))]
+#[derive(Debug, Default, Clone)]
+pub struct TrackerStripMask {}
+#[cfg(not(feature="database"))]
+#[derive(Debug, Default, Clone)]
+pub struct TrackerStripPedestal {}
+#[cfg(not(feature="database"))]
+#[derive(Debug, Default, Clone)]
+pub struct TrackerStripTransferFunction {}
+#[cfg(not(feature="database"))]
+#[derive(Debug, Default, Clone)]
+pub struct TrackerStripCmnNoise {}
+
+
 
 #[cfg(feature="pybindings")]
 pub use crate::pythonize_packable;
@@ -144,10 +165,10 @@ pub use crate::events::*;
 pub use crate::packets::*;
 #[cfg(feature="database")]
 pub use crate::database::*;
-#[cfg(not(feature="database"))]
-pub use crate::TrackerStrip;
-#[cfg(not(feature="database"))]
-pub use crate::TofPaddle;
+//#[cfg(not(feature="database"))]
+//pub use crate::TrackerStrip;
+//#[cfg(not(feature="database"))]
+//pub use crate::TofPaddle;
 
 pub use crate::calibration::tof::*;
 pub use crate::monitoring::*;

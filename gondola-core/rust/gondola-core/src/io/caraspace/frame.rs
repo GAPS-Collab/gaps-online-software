@@ -5,6 +5,9 @@
 
 use crate::prelude::*;
 
+
+
+
 /// The Caraspace object type determines the 
 /// kind of object we are able to put in 
 /// a frame and ultimate (de)serialize
@@ -61,9 +64,9 @@ pub struct CRFrameObject {
 impl CRFrameObject {
   pub fn new() -> Self {
     Self {
-      version : 0,
-      ftype   : CRFrameObjectType::Unknown,
-      payload : Vec::<u8>::new(),
+      version          : 0,
+      ftype            : CRFrameObjectType::Unknown,
+      payload          : Vec::<u8>::new(),
     }
   }
 
@@ -161,28 +164,34 @@ pub struct CRFrame {
   // the index holds name, position in frame as well as the type of 
   // object stored in the frame
   // FIXME - this needs to be HashMap<&str, (u64, CRFrameObjectType)>
-  pub index       : HashMap<String, (u64, CRFrameObjectType)>,
-  pub bytestorage : Vec<u8>,
-  pub tof_paddles : Arc<HashMap<u8,  TofPaddle>>, 
-  pub trk_strips  : Arc<HashMap<u32, TrackerStrip>>,
-  pub trk_masks   : Arc<HashMap<u32, TrackerStripMask>>,
-  pub trk_ped     : Arc<HashMap<u32, TrackerStripPedestal>>,
-  pub trk_tf      : Arc<HashMap<u32, TrackerStripTransferFunction>>,
-  pub trk_cmn     : Arc<HashMap<u32, TrackerStripCmnNoise>> 
+  pub index            : HashMap<String, (u64, CRFrameObjectType)>,
+  pub bytestorage      : Vec<u8>,
+  pub tof_paddles      : Arc<HashMap<u8,  TofPaddle>>, 
+  pub trk_strips       : Arc<HashMap<u32, TrackerStrip>>,
+  pub trk_masks        : Arc<HashMap<u32, TrackerStripMask>>,
+  pub trk_ped          : Arc<HashMap<u32, TrackerStripPedestal>>,
+  pub trk_tf           : Arc<HashMap<u32, TrackerStripTransferFunction>>,
+  pub trk_cmn          : Arc<HashMap<u32, TrackerStripCmnNoise>>, 
+  /// TRK calibration - convert to energy
+  pub do_trk_calib     : bool,
+  /// TRK subtract CMN 
+  pub subtract_trk_cmn : bool,
 }
 
 impl CRFrame {
   
   pub fn new() -> Self {
     Self {
-      index       : HashMap::<String, (u64, CRFrameObjectType)>::new(),
-      bytestorage : Vec::<u8>::new(),
-      tof_paddles : Arc::new(HashMap::<u8, TofPaddle>::new()),
-      trk_strips  : Arc::new(HashMap::<u32, TrackerStrip>::new()),
-      trk_masks   : Arc::new(HashMap::<u32, TrackerStripMask>::new()),
-      trk_ped     : Arc::new(HashMap::<u32, TrackerStripPedestal>::new()),
-      trk_tf      : Arc::new(HashMap::<u32, TrackerStripTransferFunction>::new()),
-      trk_cmn     : Arc::new(HashMap::<u32, TrackerStripCmnNoise>::new()) 
+      index            : HashMap::<String, (u64, CRFrameObjectType)>::new(),
+      bytestorage      : Vec::<u8>::new(),
+      tof_paddles      : Arc::new(HashMap::<u8, TofPaddle>::new()),
+      trk_strips       : Arc::new(HashMap::<u32, TrackerStrip>::new()),
+      trk_masks        : Arc::new(HashMap::<u32, TrackerStripMask>::new()),
+      trk_ped          : Arc::new(HashMap::<u32, TrackerStripPedestal>::new()),
+      trk_tf           : Arc::new(HashMap::<u32, TrackerStripTransferFunction>::new()),
+      trk_cmn          : Arc::new(HashMap::<u32, TrackerStripCmnNoise>::new()), 
+      do_trk_calib     : false,
+      subtract_trk_cmn : false,
     }
   }
 
@@ -589,6 +598,13 @@ impl CRFrame {
       Ok(mut event) => {
         event.header  = packet.header;  
         event.dehydrate(&self.tof_paddles, &self.trk_strips);
+        if self.do_trk_calib {
+          event.mask_strips(&self.trk_masks);
+          event.calibrate_tracker(self.subtract_trk_cmn, 
+                                  &self.trk_ped,
+                                  &self.trk_tf,
+                                  &self.trk_cmn);
+        }
         Ok(Some(event))
       }
     }
@@ -606,6 +622,12 @@ impl CRFrame {
   #[getter]
   fn index(&self) -> HashMap<String, (u64, CRFrameObjectType)> {
     self.index.clone()
+  }
+
+  #[getter]
+  #[pyo3(name="do_trk_calib")]
+  fn do_trk_calib_py(&self) -> bool {
+    self.do_trk_calib
   }
 }
 

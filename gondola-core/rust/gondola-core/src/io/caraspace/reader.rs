@@ -57,6 +57,10 @@ pub struct CRReader {
   pub trk_cmn          : Arc<HashMap<u32, TrackerStripCmnNoise>>, 
   ///// did paddle loading work
   pub db_loaded        : bool,
+  /// TRK calibration - convert to energy
+  pub do_trk_calib     : bool,
+  /// TRK subtract CMN 
+  pub do_trk_cmn_noise : bool,
 }
 
 
@@ -69,14 +73,23 @@ impl CRReader {
   ///                             caraspace files in it.
   ///   
   pub fn new(filename_or_directory : String) -> Result<Self, io::Error> {
+    #[cfg(feature="database")]
     let mut paddles = HashMap::<u8, TofPaddle>::new();
+    #[cfg(not(feature="database"))]
+    let paddles = HashMap::<u8, TofPaddle>::new();
+    #[cfg(feature="database")]
     let mut strips  = HashMap::<u32, TrackerStrip>::with_capacity(11520);
+    #[cfg(not(feature="database"))]
+    let strips  = HashMap::<u32, TrackerStrip>::with_capacity(11520);
     let trk_mask    = HashMap::<u32, TrackerStripMask>::with_capacity(11520);
     let trk_ped     = HashMap::<u32, TrackerStripPedestal>::with_capacity(11520);
     let trk_tf      = HashMap::<u32, TrackerStripTransferFunction>::with_capacity(11520);
     let trk_cmn     = HashMap::<u32, TrackerStripCmnNoise>::with_capacity(11520);
     //let db_path       = env::var("DATABASE_URL").unwrap_or_else(|_| "".to_string());
+    #[cfg(feature="database")]
     let mut db_loaded = false;
+    #[cfg(not(feature="database"))]
+    let db_loaded = false;
     #[cfg(feature="database")]
     match TofPaddle::all_as_dict() {
       Err(err) => {
@@ -125,7 +138,9 @@ impl CRReader {
       trk_ped          : Arc::new(trk_ped),
       trk_tf           : Arc::new(trk_tf),
       trk_cmn          : Arc::new(trk_cmn),
-      db_loaded        : db_loaded
+      db_loaded        : db_loaded,
+      do_trk_calib     : false,
+      do_trk_cmn_noise : false,
     };
     Ok(packet_reader)
   } 
@@ -168,8 +183,9 @@ impl CRReader {
           // if strips and paddles do not work, something is utterly fisy
           self.db_loaded = false;
         }
-        Ok(strips_) => {
-          self.trk_tf = Arc::new(strips_);
+        Ok(trafo_fns_) => {
+          self.trk_tf = Arc::new(trafo_fns_);
+          self.do_trk_calib = true;
         }
       }
     }
@@ -180,8 +196,9 @@ impl CRReader {
           // if strips and paddles do not work, something is utterly fisy
           self.db_loaded = false;
         }
-        Ok(strips_) => {
-          self.trk_cmn = Arc::new(strips_);
+        Ok(cmn_) => {
+          self.trk_cmn = Arc::new(cmn_);
+          self.do_trk_cmn_noise = true;
         }
       }
     }
@@ -425,8 +442,14 @@ impl CRReader {
           }
           self.n_packs_read += 1;
           // hand the database poitners over to the frame 
-          frame.tof_paddles = Arc::clone(&self.tof_paddles);
-          frame.trk_strips  = Arc::clone(&self.trk_strips);
+          frame.tof_paddles  = Arc::clone(&self.tof_paddles);
+          frame.trk_strips   = Arc::clone(&self.trk_strips);
+          frame.trk_masks    = Arc::clone(&self.trk_masks);
+          frame.trk_ped      = Arc::clone(&self.trk_ped);
+          frame.trk_tf       = Arc::clone(&self.trk_tf);
+          frame.trk_cmn      = Arc::clone(&self.trk_cmn);
+          frame.do_trk_calib = self.do_trk_calib;
+          frame.subtract_trk_cmn = self.do_trk_cmn_noise;
           return Some(frame);
         }
       } // if no 0xAA found
@@ -492,7 +515,7 @@ impl CRReader {
     }
   }
 
-  #[pyo3(name="set_tracker_calibration_from_fnames")]
+  #[pyo3(name="set_tracker_calibrations_from_fnames")]
   #[pyo3(signature = (mask = None, pedestal = None, transfer_fn = None, cmn_noise = None))]
   fn set_tracker_calibrations_from_fnames_py(&mut self,
                                               mask        : Option<String>,

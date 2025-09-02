@@ -46,21 +46,46 @@ impl<T> DataSource<T>
   //}
 }
 
+/// A generic data source which can read all data 
+/// used within gaps and is also able to connect 
+/// to any network socket streaming packets
+///
+/// See also the DataSourceKind enum for types of 
+/// data the source is compatible with
 #[cfg(feature="pybindings")]
 #[pyclass]
 #[pyo3(name="DataSource")]
-struct DataSourcePy {
+pub struct DataSourcePy {
+  // the idea here is to have a reader for everything
+  // and then select the right one base on context
+  // This is admittedly a bit of a kludge, but python 
+  // does not support templating, so that's what we are going with 
+  //tofreader : Arc<DataSource<TofPacket>>,
+  //telreader : Arc<DataSource<TelemetryPacket>>,
+  //crreader  : Arc<DataSource<CRFrame>>,
+  pub tof_paddles      : Arc<HashMap<u8,TofPaddle>>,
+  /// Geometry of each tracker strip
+  pub trk_strips       : Arc<HashMap<u32, TrackerStrip>>,
+  /// Mask tracker strips 
+  pub trk_masks        : Arc<HashMap<u32, TrackerStripMask>>,
+  /// Tracker pedestal values
+  pub trk_ped          : Arc<HashMap<u32, TrackerStripPedestal>>,
+  /// Transfer functions for tracker (adc -> energy)
+  pub trk_tf           : Arc<HashMap<u32, TrackerStripTransferFunction>>,
+  /// Common noise data for tracker
+  pub trk_cmn          : Arc<HashMap<u32, TrackerStripCmnNoise>>, 
 }
+ 
 
-#[cfg(feature="pybindings")]
-#[pyclass]
-struct TofEventIterator {
-}
-
-#[cfg(feature="pybindings")]
-#[pyclass]
-struct TupleIterator {
-}
+//#[cfg(feature="pybindings")]
+//#[pyclass]
+//struct TofEventIterator {
+//}
+//
+//#[cfg(feature="pybindings")]
+//#[pyclass]
+//struct TupleIterator {
+//}
 
 //// We introduce a series of iterators, which will allow fast unpacking for a dedicated 
 //// data type

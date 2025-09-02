@@ -64,7 +64,8 @@ pub fn list_path_contents_sorted(input: &str, pattern: Option<Regex>) -> Result<
         match pattern {
           None => {
             // use a default pattern which matches mmost cases  
-            re = Regex::new(r"Run\d+_\d+\.(\d{6})_(\d{6})UTC(\.tof)?\.gaps$").unwrap();
+            //re = Regex::new(r"Run\d+_\d+\.(\d{6})_(\d{6})UTC(\.tof)?\.gaps$").unwrap();
+            re = Regex::new(GENERIC_ONLINE_FILE_PATTERH).unwrap();
           }
           Some(_re) => {
             re = _re;
@@ -95,7 +96,48 @@ pub fn list_path_contents_sorted(input: &str, pattern: Option<Regex>) -> Result<
 
 //----------------------------------------------------------
 
-/// Get a human readable timestamp
+/// Get all filenames in the current path sorted by timestamp if available
+/// If the given path is a file and not a directory, return only that 
+/// file instead
+///
+/// # Arguments:
+///
+///    * input   : name of the target directory
+///    * pattern : the regex pattern to look for. That the sorting works,
+///                the pattern needs to return a date for the first
+///                captured argument and a time for the second captured argument
+#[cfg(feature="pybindings")]
+#[pyfunction]
+#[pyo3(name="list_path_contents_sorted")]
+#[pyo3(signature = ( input, pattern = None ))]
+pub fn list_path_contents_sorted_py(input: &str, pattern: Option<String>) -> PyResult<Option<Vec<String>>> {
+  let mut regex_pattern : Option<Regex> = None;
+  if let Some(pat_str) = pattern {
+    match Regex::new(&pat_str) {
+      Err(err) => {
+        let msg = format!("Unable to compile regex {}! {}. Check your regex syntax! Also try a raw string.", &pat_str, err); 
+        return Err(PyValueError::new_err(msg));
+      }
+      Ok(re) => {
+        regex_pattern = Some(re);
+      }
+    }
+  }
+  match list_path_contents_sorted(input, regex_pattern) {
+    Err(err) => {  
+      error!("Unable to get files! {err}");
+      return Err(PyValueError::new_err(err.to_string()));
+    }
+    Ok(files) => {
+      return Ok(Some(files));
+    }
+  }
+}
+
+//----------------------------------------------------------
+
+/// Get a human readable timestamp for NOW
+#[cfg_attr(feature="pybindings", pyfunction)]
 pub fn get_utc_timestamp() -> String {
   let now: DateTime<Utc> = Utc::now();
   //let timestamp_str = now.format("%Y_%m_%d-%H_%M_%S").to_string();
@@ -106,6 +148,7 @@ pub fn get_utc_timestamp() -> String {
 //----------------------------------------------------------
 
 /// Create date string in YYMMDD format
+#[cfg_attr(feature="pybindings", pyfunction)]
 pub fn get_utc_date() -> String {
   let now: DateTime<Utc> = Utc::now();
   //let timestamp_str = now.format("%Y_%m_%d-%H_%M_%S").to_string();
@@ -125,6 +168,7 @@ pub fn get_utc_date() -> String {
 /// * default : if default, just add 
 ///             "latest" instead of 
 ///             a timestamp
+#[cfg_attr(feature="pybindings", pyfunction)]
 pub fn get_califilename(rb_id : u8, latest : bool) -> String {
   let ts = get_utc_timestamp();
   if latest {
@@ -172,6 +216,104 @@ pub fn get_runfilename(run : u32, subrun : u64, rb_id : Option<u8>, timestamp : 
 }
 
 //----------------------------------------------------------
+    
+///Get the timestamp from a .tof.gaps file
+///
+///# Arguments:
+///    fname : Filename of .tof.gaps file
+#[cfg_attr(feature="pybindings", pyfunction)]
+#[cfg_attr(feature="pybindings", pyo3(signature = (fname , pattern = None)))]
+pub fn get_rundata_from_file(fname : &str, pattern : Option<String>) -> Option<HashMap<String,String>> {
+  let regex_pattern : Regex;
+  if let Some(pat_str) = pattern {
+    match Regex::new(&pat_str) {
+      Err(err) => {
+        let msg = format!("Unable to compile regex {}! {}. Check your regex syntax! Also try a raw string.", &pat_str, err); 
+        //return Err(PyValueError::new_err(msg));
+        //return Err(err);
+        error!("{}",msg);
+        return None;
+      }
+      Ok(re) => {
+        regex_pattern = re;
+      }
+    }
+  } else {
+    regex_pattern = Regex::new(GENERIC_ONLINE_FILE_PATTERH_CAPTURE).unwrap();
+  }
+  let res : Option<HashMap<String,String>>;
+  res = regex_pattern.captures(fname).and_then(|caps| {
+    let map : HashMap<String, String> = regex_pattern.capture_names()
+      .filter_map(|name| name)
+      .filter_map(|name| { 
+        //caps.name(name).map(|m| (m.as_str().to_string(), m.as_str().to_string()))
+        caps.name(name).map(|m| (name.to_string(), m.as_str().to_string()))
+      })
+      .collect();
+    Some(map)
+  });
+  //ts = pattern.search(str(fname)).groupdict()['tdate']
+  //#print (ts)
+  //ts = datetime.strptime(ts, '%y%m%d_%H%M%S')
+  //ts = ts.replace(tzinfo=timezone.utc)
+  //return ts
+  res
+}
+
+//----------------------------------------------------------
+
+/// Retrieve the DateTime object from a string as used in 
+/// the names of the run files
+///
+/// # Arguments:
+///
+///   * input  : The input string the datetime shall be extracted
+///              from 
+///   * format : The format of the date string. Something like 
+///              %y%m%d_%H%M%S
+#[cfg_attr(feature="pybindings", pyfunction)]
+#[cfg_attr(feature="pybindings", pyo3(signature = (input , tformat = None )))]
+pub fn get_datetime(input : &str, tformat : Option<String>) -> Option<DateTime<Utc>> {
+  // this is the default format 
+  let mut date_time_format = String::from("%y%m%d_%H%M%S");
+  if let Some(tform) = tformat {
+    date_time_format = tform.to_string(); 
+  }
+  if let Ok(ndtime) = NaiveDateTime::parse_from_str(input, &date_time_format) {
+    //let dt_utc : DateTime<Utc> = DateTime::<Utc>::from_utc(ndtime, Utc); 
+    let dt_utc : DateTime<Utc> = DateTime::<Utc>::from_naive_utc_and_offset(ndtime, Utc); 
+    return Some(dt_utc);
+  } else { 
+    error!("Unable to parse {} for format {}! You can specify formats trhough the tformat keyword", input, date_time_format);
+    return None;
+  }
+}
+
+//--------------------------------------------------------------
+
+/// Retrieve the UNIX timestamp from a string as used in 
+/// the names of the run files
+///
+/// # Arguments:
+///
+///   * input  : The input string the datetime shall be extracted
+///              from 
+///   * format : The format of the date string. Something like 
+///              %y%m%d_%H%M%S
+#[cfg_attr(feature="pybindings", pyfunction)]
+#[cfg_attr(feature="pybindings", pyo3(signature = (input , tformat = None )))]
+pub fn get_unix_timestamp(input : &str, tformat : Option<String>) -> Option<u64> {
+  let dt = get_datetime(input, tformat);
+  if let Some(dt_) = dt {
+    // FIXME - we are only supporting times later than 
+    //         the UNIX epoch!
+    return Some(dt_.timestamp() as u64);
+  } else {
+    return None;
+  }
+}
+
+//--------------------------------------------------------------
 
 /// Identifier for different data sources
 #[derive(Debug, Copy, Clone, PartialEq,FromRepr, AsRefStr, EnumIter)]
@@ -217,6 +359,9 @@ impl DataSourceKind {
     (*self as u8) as usize
   } 
 }
+
+#[cfg(feature="pybindings")]
+pythonize_display!(DataSourceKind);
 
 //--------------------------------------------------------------
 

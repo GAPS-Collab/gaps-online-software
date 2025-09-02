@@ -12,7 +12,9 @@ pub mod commands;
 pub use commands::*;
 pub mod settings;
 pub use settings::*;
+#[cfg(feature="database")]
 pub mod analysis_engine;
+#[cfg(feature="database")]
 pub use analysis_engine::*;
 pub mod cuts;
 pub use cuts::*;

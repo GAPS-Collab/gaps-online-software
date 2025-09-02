@@ -8,6 +8,10 @@
 //!   now. There is an active issue #18
 //!
 
+/// A generic pattern for online files, matching most types 
+pub static GENERIC_ONLINE_FILE_PATTERH : &str = r"Run\d+_\d+\.(\d{6})_(\d{6})UTC(\.tofsum|\.tof)?\.gaps$";
+pub static GENERIC_ONLINE_FILE_PATTERH_CAPTURE : &str = r"Run(?P<run>\d+)_(?P<subrun>\d+)\.(?P<utctime>\d{6}_\d{6})UTC(\.tofsum|\.tof)?\.gaps$";
+
 /// The TimeStamp format for Human readable timestamps
 pub static HUMAN_TIMESTAMP_FORMAT : &str = "%y%m%d_%H%M%S%Z"; 
 

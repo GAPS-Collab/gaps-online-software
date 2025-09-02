@@ -52,20 +52,6 @@ pub mod stats;
 pub mod python;
 #[cfg(feature="database")]
 pub mod database;
-// in case we don't have database support, 
-// define some "empty" shell for the database 
-// classes 
-#[cfg(not(feature="database"))]
-#[derive(Debug)]
-pub struct TrackerStrip {
-}
-#[cfg(not(feature="database"))]
-#[derive(Debug)]
-pub struct TofPaddle {
-}
-
-
-//use crate::prelude::*;
 
 // python convention
 pub const VERSION: &str = env!("CARGO_PKG_VERSION"); 
@@ -185,6 +171,7 @@ fn tof_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<RBChannelMaskConfig>()?;
   m.add_class::<TriggerConfig>()?;
   m.add_class::<TofRunConfig>()?;
+  m.add_class::<TofCuts>()?;
   m.add_function(wrap_pyfunction!(to_board_id_string, m)?)?;
   Ok(())
 }
@@ -256,9 +243,17 @@ fn io_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(read_example, m)?)?;
   m.add_function(wrap_pyfunction!(get_all_telemetry_event_names, m)?)?;
   m.add_function(wrap_pyfunction!(get_runfilename, m)?)?;
+  m.add_function(wrap_pyfunction!(get_califilename, m)?)?;
+  m.add_function(wrap_pyfunction!(list_path_contents_sorted_py, m)?)?;
+  m.add_function(wrap_pyfunction!(get_utc_timestamp, m)?)?;
+  m.add_function(wrap_pyfunction!(get_utc_date, m)?)?;
+  m.add_function(wrap_pyfunction!(get_rundata_from_file, m)?)?;
+  m.add_function(wrap_pyfunction!(get_datetime, m)?)?;
+  m.add_function(wrap_pyfunction!(get_unix_timestamp, m)?)?;
   m.add_class::<CRFrameObject>()?;
   m.add_class::<DataSourceKind>()?;
   m.add_class::<CRReader>()?;
+  //m.add_class::<PyDataSource>()?;
   Ok(())
 }
 
@@ -325,6 +320,7 @@ fn db_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(get_all_rbids_in_db, m)?)?;
   m.add_function(wrap_pyfunction!(get_hid_vid_map, m)?)?;
   m.add_function(wrap_pyfunction!(get_vid_hid_map, m)?)?;
+  m.add_function(wrap_pyfunction!(get_dsi_j_ch_pid_map_py, m)?)?;
   Ok(())
 }
 
