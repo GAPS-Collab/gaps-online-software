@@ -21,7 +21,7 @@ pub use telemetry_reader::TelemetryPacketReader;
 pub mod data_source;
 pub use data_source::DataSource;
 pub mod streamers;
-pub use streamers::RBEventMemoryStreamer;
+pub use streamers::*;
 use crate::prelude::*;
 
 //----------------------------------------------------------

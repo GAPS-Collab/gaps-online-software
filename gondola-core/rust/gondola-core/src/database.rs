@@ -126,6 +126,18 @@ pub fn get_vid_hid_map() -> Option<HashMap<u64, u32>> {
 
 //---------------------------------------------------------------------
 
+/// Create a mapping of mtb link ids to rb ids
+//#[cfg_attr(feature="pybindings", pyfunction)]
+pub fn get_linkid_rbid_map(rbs : &Vec<ReadoutBoard>) -> HashMap<u8, u8>{
+  let mut mapping = HashMap::<u8, u8>::new();
+  for rb in rbs {
+    mapping.insert(rb.mtb_link_id, rb.rb_id);
+  }
+  mapping
+}
+
+//---------------------------------------------------------------------
+
 /// Get all rb ids from paddles which are stored in the 
 /// database
 #[cfg_attr(feature="pybindings", pyfunction)]
