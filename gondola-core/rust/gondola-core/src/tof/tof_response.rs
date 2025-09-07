@@ -15,6 +15,61 @@ use crate::random::FromRandom;
 #[cfg(feature="random")]
 use rand::Rng;
 
+#[cfg(feature="pybindings")]
+use pyo3::prelude::*; 
+
+//use crate::prelude::*;
+
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
+#[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
+#[repr(u8)]
+pub enum TofReturnCode {
+  Unknown        = 0,
+  GeneralFail    = 1,
+  GarbledCommand = 2,
+  Success        = 200,
+}
+
+impl fmt::Display for TofReturnCode {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let r = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this TofCommandCode"));
+    write!(f, "<TofReturnCode: {}>", r)
+  }
+}
+
+impl From<u8> for TofReturnCode {
+  fn from(value: u8) -> Self {
+    match value {
+      0   => TofReturnCode::Unknown,
+      1   => TofReturnCode::GeneralFail,
+      2   => TofReturnCode::GarbledCommand,
+      200 => TofReturnCode::Success,
+      _   => {
+        error!("Can not understand {}", value);
+        TofReturnCode::Unknown
+      }
+    }
+  }
+}
+
+#[cfg(feature = "random")]
+impl FromRandom for TofReturnCode {
+  fn from_random() -> Self {
+    let choices = [
+      TofReturnCode::Unknown,
+      TofReturnCode::GarbledCommand,
+      TofReturnCode::Success,
+      TofReturnCode::GeneralFail,
+    ];
+    let mut rng  = rand::rng();
+    let idx = rng.random_range(0..choices.len());
+    choices[idx]
+  }
+}
+
+
+
 /// Each `TofCommand` triggers a `TofResponse` in reply
 ///
 /// The responses are general classes, which carry a more

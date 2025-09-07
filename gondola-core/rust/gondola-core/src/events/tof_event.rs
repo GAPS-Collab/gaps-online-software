@@ -58,6 +58,15 @@ pub struct TofEvent {
   pub channel_mask       : Vec<u16>,
   pub mtb_link_mask      : u64,
   pub hits               : Vec<TofHit>,
+  // a number of variables which are directly 
+  // read out from the MTB packet and won't get 
+  // serialized in this form but then used
+  // later to calculate other variables
+  pub mt_trigger_sources : u16,
+  pub mt_tiu_gps16       : u16,
+  pub mt_tiu_gps32       : u32, 
+  pub mt_timestamp       : u32,
+  pub mt_tiu_timestamp   : u32,
   // a bunch of calculated variablels, used 
   // for online interesting event search
   // these will be only available in ProtocolVersion 1
@@ -72,6 +81,9 @@ pub struct TofEvent {
   // so that it is the same as TofEvent in v0.10 and is able 
   // to carry waveforms. These then can be stripped off
   pub rb_events          : Vec<RBEvent>,
+  /// Start time for a time to wait for incoming RBEvents
+  pub creation_time     : Instant,
+  pub write_to_disk     : bool, 
 }
 
 impl TofEvent {
@@ -98,8 +110,15 @@ impl TofEvent {
       channel_mask       : Vec::<u16>::new(),
       mtb_link_mask      : 0,
       hits               : Vec::<TofHit>::new(),
+      mt_trigger_sources : 0,
+      mt_tiu_gps16       : 0,
+      mt_tiu_gps32       : 0, 
+      mt_timestamp       : 0,
+      mt_tiu_timestamp   : 0,
       paddles_set        : false,
       rb_events          : Vec::<RBEvent>::new(),
+      creation_time      : Instant::now(),
+      write_to_disk      : true,
     }
   }
  
@@ -107,6 +126,33 @@ impl TofEvent {
   pub fn strip_rbevents(&mut self) {
     self.rb_events.clear();
   }
+  
+  pub fn age(&self) -> u64 {
+    self.creation_time.elapsed().as_secs()
+  }
+  
+  /// Simple check if the event contains as much RBEvents 
+  /// as expected from the provided boards masks by the MTB
+  pub fn is_complete(&self) -> bool {
+    self.get_rb_link_ids().len() == self.rb_events.len()
+  }
+  
+  /// The number of hits we did not get 
+  /// becaue of the DRS busy
+  pub fn get_lost_hits(&self) -> u16 {
+    let mut lost_hits = 0u16;
+    for rbev in &self.rb_events {
+      if rbev.header.drs_lost_trigger() {
+        let mut nhits = rbev.header.get_nchan() as u16;
+        if nhits > 0 {
+          nhits -= 1;
+        }
+        lost_hits += nhits;
+      }
+    }
+    lost_hits
+  }
+
 
   /// Calculate extra variables for the GCU, 
   /// set the protocol version to V1 and 
@@ -1104,7 +1150,7 @@ pythonize_packable!(TofEvent);
 #[test]
 fn packable_tofeventv0() {
   for _ in 0..500 {
-    let data = TofEvent::from_random();
+    let mut data = TofEvent::from_random();
     if data.version != ProtocolVersion::Unknown {
       continue;
     }
@@ -1115,6 +1161,9 @@ fn packable_tofeventv0() {
     // from_random did not touch these
     //println!("{}", data);
     //println!("{}", test);
+    let fix_time = Instant::now();
+    test.creation_time = fix_time;
+    data.creation_time = fix_time;
     for h in &mut test.hits {
       h.paddle_len       = 0.0; 
       h.coax_cable_time  = 0.0; 
@@ -1131,7 +1180,7 @@ fn packable_tofeventv0() {
 #[test]
 fn packable_tofeventv1() {
   for _ in 0..500 {
-    let data = TofEvent::from_random();
+    let mut data = TofEvent::from_random();
     if data.version != ProtocolVersion::V1 {
       continue;
     }
@@ -1140,6 +1189,9 @@ fn packable_tofeventv1() {
     //println!("{}", test.hits[0]);
     // Manually zero these fields, since comparison with nan will fail and 
     // from_random did not touch these
+    let fix_time = Instant::now();
+    test.creation_time = fix_time;
+    data.creation_time = fix_time;
     for h in &mut test.hits {
       h.paddle_len       = 0.0; 
       h.coax_cable_time  = 0.0; 
@@ -1156,7 +1208,7 @@ fn packable_tofeventv1() {
 #[test]
 fn packable_tofeventv2() {
   for _ in 0..500 {
-    let data = TofEvent::from_random();
+    let mut data = TofEvent::from_random();
     if data.version != ProtocolVersion::V2 {
       continue;
     }
@@ -1165,6 +1217,9 @@ fn packable_tofeventv2() {
     //println!("{}", test.hits[0]);
     // Manually zero these fields, since comparison with nan will fail and 
     // from_random did not touch these
+    let fix_time = Instant::now();
+    test.creation_time = fix_time;
+    data.creation_time = fix_time;
     for h in &mut test.hits {
       h.paddle_len       = 0.0; 
       h.coax_cable_time  = 0.0; 

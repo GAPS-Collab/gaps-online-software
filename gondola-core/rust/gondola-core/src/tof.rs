@@ -22,8 +22,21 @@ pub mod alerts;
 pub use alerts::*;
 pub mod tof_response;
 pub use tof_response::*;
+#[cfg(feature="tof-liftof")]
 pub mod thread_control;
+#[cfg(feature="tof-liftof")]
 pub use thread_control::ThreadControl;
+#[cfg(feature="tof-liftof")]
+pub mod master_trigger;
+pub use master_trigger::*;
+#[cfg(feature="tof-liftof")]
+pub use master_trigger::control::*;
+#[cfg(feature="tof-liftof")]
+pub use master_trigger::registers::*;
+#[cfg(feature="tof-liftof")]
+pub mod signal_handler;
+#[cfg(feature="tof-liftof")]
+pub use signal_handler::*;
 
 #[cfg(feature="pybindings")]
 use pyo3::pyfunction;

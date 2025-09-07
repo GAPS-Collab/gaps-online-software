@@ -7,7 +7,6 @@ edition = "2024"
 # The name of the native library. This is the name which will be used in Python to import the
 # library (i.e. `import string_sum`). If you change this, you must also change the name of the
 # `#[pymodule]` in `src/lib.rs`.
-#name = "dataclasses"
 name = "gondola_core"
 path = "src/lib.rs"
 # FIXME - make this conditional?
@@ -24,13 +23,25 @@ name = "test"
 required-features  = ["random"]
 
 [features]
+# create structures with random data for testing
 random              = ["rand"]
+# requires sqlite, but allows to get geometry information 
+# as well as calibration for the tracker
 database            = ["diesel"]
+# requres i2c and thus might be difficult to be built on 
+# Mac which does not support it. Extended features for 
+# RB/LTB/PB monitoring
 tofcontrol          = ["tof-control"]
+# experimental features
 advanced-algorithms = ["smoothed_z_score"]
+# build a python library 
 pybindings          = ["pyo3","pyo3-log","numpy", "serde-pickle"]
 experimental        = []
+# experimental, might go away. Attempt to include SimpleDet data
 root                = ["oxyroot", "root-io"]
+# extra features to access TOF components directly, e.g. MTB. THis 
+# will be required for the build of liftof
+tof-liftof          = ["signal-hook"]
 
 [dependencies.pyo3]
 version  = "0.25"
@@ -54,15 +65,13 @@ version  = "0.1"
 optional = true
 
 [dev-dependencies]
-# for testing
-# used for the random number generation
-#rand = "0.8"
 criterion = "0.4"
 #tempfile  = "3.10"
 quickcheck = "1"
 
 [dependencies]
 zmq               = "0.10"
+signal-hook       = { version = "0.3", optional=true}
 strum             = "0.27"
 strum_macros      = "0.27"
 num-traits        = "0.2"
@@ -86,9 +95,6 @@ toml              = "0.8"
 ureq              = "2.12" # FIXME - make this a feature
 polars            = { version = "0.50", features = ["lazy"], optional = true }
 env_logger        = "0.10"
-#pyo3              = { version = "0.23", features = ["extension-module"], optional = true }
-# serialization library
-#caraspace         = { version = "0.10", path = "../../../../caraspace", optional = true }
 
 # for the database - in case we want to use postgres, 
 # the feature needs to be added here, however, this would
@@ -101,5 +107,3 @@ libsqlite3-sys = { version = "0.28", features = ["bundled"] }
 rand   = { version = "0.9", optional = true}
 # Takeru's tof-control
 tof-control = {path = "../../../tof/extern/tof-control", optional = true, version = "0.9", features=[] }
-#smoothed_z_score = {version = "0.1", optional = true}
-#sqlite = {version = "0.30", optional = true}

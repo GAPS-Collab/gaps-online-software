@@ -240,6 +240,48 @@ impl Error for SensorError {
 
 //------------------------------------------------------------------------
 
+#[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
+pub enum StagingError {
+  NoCurrentConfig,
+  QueueEmpty,
+}
+
+impl fmt::Display for StagingError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp : &str;
+    match self {
+      StagingError::NoCurrentConfig => {disp = "NoCurrentConfig"}
+      StagingError::QueueEmpty      => {disp = "QueueEmpty"}
+    }
+    write!(f, "<StagingError : {}>", disp)
+  }
+}
+
+impl Error for StagingError {
+}
+
+//------------------------------------------------------------------------
+
+#[derive(Debug, Copy, Clone, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
+pub enum TofError {
+  CanNotConnect,
+}
+
+impl fmt::Display for TofError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp : &str;
+    match self {
+      TofError::CanNotConnect => {disp = "CanNotConnect";}
+    }
+    write!(f, "<TofError : {}>", disp)
+  }
+}
+
+impl Error for TofError {
+}
+
 //#[derive(Debug, Copy, Clone)]
 //#[repr(u8)]
 //pub enum SetError {
@@ -284,4 +326,43 @@ impl fmt::Display for RunError {
 
 impl Error for RunError {
 }
+
+/// Error to be used for issues with 
+/// the communication to the MTB.
+#[derive(Debug, Copy, Clone, PartialEq, serde::Deserialize, serde::Serialize)]
+#[repr(u8)]
+pub enum MasterTriggerError {
+  Unknown,
+  EventQueueEmpty,
+  MaskTooLarge,
+  BrokenPackage,
+  DAQNotAvailable,
+  PackageFormatIncorrect,
+  PackageHeaderIncorrect,
+  PackageFooterIncorrect,
+  FailedOperation,
+  UdpTimeOut,
+  DataTooShort
+}
+
+impl fmt::Display for MasterTriggerError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let disp = serde_json::to_string(self).unwrap_or(
+      String::from("Error: cannot unwrap this MasterTriggerError"));
+    write!(f, "<MasterTriggerError : {}>", disp)
+  }
+}
+
+impl Error for MasterTriggerError {
+}
+
+// Implement the From trait to convert from Box<dyn StdError>
+impl From<Box<dyn std::error::Error>> for MasterTriggerError {
+  fn from(err: Box<dyn std::error::Error>) -> Self {
+    error!("Converting {err} to MasterTriggerError! Exact error type might be incorrect!");
+    MasterTriggerError::FailedOperation
+  }
+}
+
+//------------------------------------------------------------------------
 
