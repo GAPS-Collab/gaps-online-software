@@ -150,6 +150,7 @@ pub fn get_all_rbids_in_db() -> Option<Vec<u8>> {
     Some(paddles) => {
       let mut rbids : Vec<u8> = paddles.iter().map(|p| p.rb_id as u8).collect();
       rbids.sort();
+      rbids.dedup();
       return Some(rbids);
     }
   }
@@ -753,7 +754,7 @@ impl ReadoutBoard {
         return None;
       }
       Some(all_rbids) => {
-        let mut rbs = Vec::<ReadoutBoard>::new();
+        let mut rbs = Vec::<Self>::new();
         for k in all_rbids {
           rbs.push(ReadoutBoard::by_rbid(k)?);
         }
@@ -847,8 +848,7 @@ impl ReadoutBoard {
     } else {
       let file_to_load = format!("{}/{}", self.calib_file_path, newest_file.0);
       info!("Loading calibration from file: {}", file_to_load);
-      //self.calibration = RBCalibrations::from_file(file_to_load, true)?;
-      todo!("RBCalibrations::from_file needs to be implemented!");
+      self.calibration = RBCalibrations::from_file(file_to_load, true)?;
     }
     Ok(())
   }

@@ -34,16 +34,18 @@ impl TofDetectorStatus {
  
   pub fn new() -> Self {
     Self {
-      channels000_031 : 0xFFFFFFFF,
-      channels032_063 : 0xFFFFFFFF,
-      channels064_095 : 0xFFFFFFFF,
-      channels096_127 : 0xFFFFFFFF,
-      channels128_159 : 0xFFFFFFFF,
-      channels160_191 : 0xFFFFFFFF,
-      channels192_223 : 0xFFFFFFFF,
-      channels224_255 : 0xFFFFFFFF,
-      channels256_297 : 0xFFFFFFFF,
-      channels298_319 : 0xFFFFFFFF,
+      // full hex notation to remind us what 
+      // these numbers represent
+      channels000_031 : 0x00000000,
+      channels032_063 : 0x00000000,
+      channels064_095 : 0x00000000,
+      channels096_127 : 0x00000000,
+      channels128_159 : 0x00000000,
+      channels160_191 : 0x00000000,
+      channels192_223 : 0x00000000,
+      channels224_255 : 0x00000000,
+      channels256_297 : 0x00000000,
+      channels298_319 : 0x00000000,
     }
   }
 

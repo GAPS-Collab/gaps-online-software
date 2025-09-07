@@ -3,6 +3,7 @@
 // This file is part of gaps-online-software and published 
 // under the GPLv3 license
 
+#[cfg(feature="tof-liftof")]
 pub mod ipbus;
 pub mod parsers;
 pub mod serialization;
@@ -217,10 +218,10 @@ pub fn get_runfilename(run : u32, subrun : u64, rb_id : Option<u8>, timestamp : 
 
 //----------------------------------------------------------
     
-///Get the timestamp from a .tof.gaps file
+/// Get the timestamp from a .tof.gaps file
 ///
-///# Arguments:
-///    fname : Filename of .tof.gaps file
+/// # Arguments:
+///   * fname : Filename of .tof.gaps file
 #[cfg_attr(feature="pybindings", pyfunction)]
 #[cfg_attr(feature="pybindings", pyo3(signature = (fname , pattern = None)))]
 pub fn get_rundata_from_file(fname : &str, pattern : Option<String>) -> Option<HashMap<String,String>> {

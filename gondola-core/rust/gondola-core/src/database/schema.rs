@@ -321,18 +321,18 @@ diesel::table! {
 
 diesel::table! {
   tof_db_readoutboard (rb_id) {
-      rb_id -> SmallInt,
-      dsi -> SmallInt,
-      j -> SmallInt,
-      mtb_link_id -> SmallInt,
+      rb_id        -> SmallInt,
+      dsi          -> SmallInt,
+      j            -> SmallInt,
+      mtb_link_id  -> SmallInt,
       paddle12_chA -> Nullable<SmallInt>,
       paddle34_chA -> Nullable<SmallInt>,
       paddle56_chA -> Nullable<SmallInt>,
       paddle78_chA -> Nullable<SmallInt>,
-      paddle12_id -> Nullable<SmallInt>,
-      paddle34_id -> Nullable<SmallInt>,
-      paddle56_id -> Nullable<SmallInt>,
-      paddle78_id -> Nullable<SmallInt>,
+      paddle12_id  -> Nullable<SmallInt>,
+      paddle34_id  -> Nullable<SmallInt>,
+      paddle56_id  -> Nullable<SmallInt>,
+      paddle78_id  -> Nullable<SmallInt>,
   }
 }
 
