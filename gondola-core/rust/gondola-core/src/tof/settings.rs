@@ -578,7 +578,9 @@ pub struct AnalysisEngineSettings {
   /// Max allowed peaks
   pub max_peaks              : usize,
   /// Timing CFG fraction
-  pub cfd_fraction           : f32
+  pub cfd_fraction           : f32,
+  /// Time over threshold threshold in mV
+  pub tot_threshold          : Option<f32>
 }
 
 impl AnalysisEngineSettings {
@@ -595,7 +597,8 @@ impl AnalysisEngineSettings {
       min_peak_size             : 3,
       find_pks_thresh           : 10.0,
       max_peaks                 : 5,
-      cfd_fraction              : 0.2
+      cfd_fraction              : 0.2,
+      tot_threshold             : Some(500.0),
     }
   }
 }
@@ -852,6 +855,8 @@ pub struct LiftofSettings {
   pub rb_ignorelist_run          : Vec<u8>,
   /// Should TofHits be generated?
   pub run_analysis_engine        : bool,
+  /// RB contols both, LTB and PB
+  pub rb_controls_pb_and_ltb     : Option<Vec<u8>>,
   /// Run a full RB calibration before run 
   /// start?
   pub pre_run_calibration        : bool,
@@ -896,6 +901,7 @@ impl LiftofSettings {
       cpu_moni_interval_sec     : 60,
       rb_ignorelist_always      : Vec::<u8>::new(),
       rb_ignorelist_run         : Vec::<u8>::new(),
+      rb_controls_pb_and_ltb    : None,
       run_analysis_engine       : true,
       pre_run_calibration       : false,
       save_cali_wf              : false,
