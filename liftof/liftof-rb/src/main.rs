@@ -47,15 +47,6 @@ use colored::Colorize;
 // TOF specific crates
 use tof_control::helper::rb_type::RBInfo;
 
-//use tof_dataclasses::packets::TofPacket;
-//use tof_dataclasses::commands::{
-//  TofOperationMode
-//};
-//
-//use tof_dataclasses::events::DataType;
-//use tof_dataclasses::commands::config::RunConfig;
-//use tof_dataclasses::events::rb_event::RBPaddleID;
-
 #[cfg(feature="database")]
 use tof_control::helper::pa_type::PASetBias;
 
@@ -71,21 +62,6 @@ use gondola_core::init_env_logger;
 //  connect_to_db,
 //  RAT
 //};
-
-
-//use liftof_lib::{
-//  LIFTOF_LOGO_SHOW,
-//  DATAPORT,
-//  //color_log,
-//  RunStatistics,
-//  LiftofSettings,
-//  init_env_logger,
-//};
-//
-//use liftof_lib::thread_control::ThreadControl;
-//
-//#[cfg(feature="database")]
-//use liftof_lib::settings::ParameterSetStrategy;
 
 use liftof_rb::threads::{
   runner,
@@ -169,13 +145,40 @@ fn main() {
   let rb_id = rb_info.board_id;
   let ip_address = format!("tcp://10.0.1.1{:02}:{}", rb_id, DATAPORT);
 
-  let ltb_connected = rb_info.sub_board == 1;
-  let pb_connected  = rb_info.sub_board == 2;
+  let mut ltb_connected = rb_info.sub_board == 1;
+  let mut pb_connected  = rb_info.sub_board == 2;
   // General parameters, readout board id,, 
   // ip to tof computer
   let rb_id         = rb_info.board_id;
-  let dna           = get_device_dna().expect("Unable to obtain device DNA!"); 
+  let dna           = get_device_dna().unwrap_or(0); 
   
+  let config                   : LiftofSettings;
+  match args.config {
+    None => panic!("No config file provided! Please provide a config file with --config or -c flag!"),
+    Some(cfg_file) => {
+      match LiftofSettings::from_toml(&cfg_file) {
+        Err(err) => {
+          error!("CRITICAL! Unable to parse .toml settings file! {}", err);
+          panic!("Unable to parse config file!");
+        }
+        Ok(_cfg) => {
+          config = _cfg;
+        }
+      }
+    } // end Some
+  }
+  // Some boards have now both ltb and pb connected and they need to be entered 
+  // into the config file
+  match config.rb_controls_pb_and_ltb {
+    None => (),
+    Some(ref pb_ltb_rbs) => {
+      if pb_ltb_rbs.contains(&rb_id) {
+        println!("Found this rb {} in the list of RBs which control both, PB and LTB!", rb_id);        ltb_connected = true;
+        pb_connected  = true;
+      }
+    }
+  }
+
   println!(" .. RBInfo:");
   println!(" .. .. ReadoutBoard  ID {}", rb_id);
   println!(" .. .. ReadoutBoard DNA {}", dna);
@@ -192,7 +195,6 @@ fn main() {
     println!("..     PB (including preamps) - {}", String::from("NO").red());
   }
   
-  let config                   : LiftofSettings;
   let mut listen               = false;
   // this will hold the result of "run start"
   // and trigger to immediatly start a run
@@ -205,20 +207,6 @@ fn main() {
 
   let verbose                  = args.verbose;
   let show_progress            = args.show_progress;
-  match args.config {
-    None => panic!("No config file provided! Please provide a config file with --config or -c flag!"),
-    Some(cfg_file) => {
-      match LiftofSettings::from_toml(&cfg_file) {
-        Err(err) => {
-          error!("CRITICAL! Unable to parse .toml settings file! {}", err);
-          panic!("Unable to parse config file!");
-        }
-        Ok(_cfg) => {
-          config = _cfg;
-        }
-      }
-    } // end Some
-  }
   if config.rb_settings.only_perfect_events {
     error!("Currently we are not supporting the only_perfect_events setting. See issue #57");
   }

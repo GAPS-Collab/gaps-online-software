@@ -12,7 +12,8 @@ use crate::memory::*;
 use std::time::Duration;
 use std::thread;
 
-use gondola_core::prelude::*;
+//use gondola_core::prelude::*;
+use gondola_core::tof::to_board_id_string;
 
 /// Read the link ID from the MTB 
 ///
