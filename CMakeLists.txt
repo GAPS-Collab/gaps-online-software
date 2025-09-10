@@ -1,17 +1,16 @@
 ##=========================================
-# GAPS ONLINE SOFTWARE
+# GAPS ONLINE SOFTWARE/GONDOLA
 # CMAKE BUILD SYSTEM
 #
-#  - dataclasses (rust/C++)
-#  - flight software (liftof)
-#
+# - use to build C++ library for private 
+#   builds
 #==========================================
 
 cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
-project(GAPS_ONLINE_SOFTWARE VERSION 0.10 LANGUAGES C CXX)
+project(GAPS_ONLINE_SOFTWARE VERSION 0.11 LANGUAGES C CXX)
 
 message(STATUS "Running cmake for ${CMAKE_PROJECT_NAME} softwere version ${GAPS_ONLINE_SOFTWARE_VERSION}")
-message(STATUS "-- Current release LELEWAA (Whale shark)")
+message(STATUS "-- Current release PAKI'I (Flounder)")
 message(STATUS "-- Building software for ${CMAKE_SYSTEM_NAME}")
 if (APPLE)
   message(WARNING "-- -- will attempt build for MacOSX system. This is experimental and might not work!")
@@ -54,7 +53,6 @@ option(BUILD_CXX_PERSONAL_ANALYSIS_CODE "builds personal analysis code in the an
 # ROOT can be optionally used for the C++ bindings. This will allow to build the 
 # SimpleDet compatibility layer as well as personal analysis projects
 option(BUILD_CXX_WITH_ROOT "leverage the usage of CERN ROOT for the build. This will allow to build the SimpleDet compatibilitly layer as well as personal analysis projects as needed." OFF)
-option(BUILD_RUSTPYBINDINGS "build pybindings for the RUST code with py03 \\U+1F980 (better). Includes telemetry and liftof pybindings, if the respective options are selected." OFF)
 option(BUILD_SIM "build simulation library to simulate events" OFF)
 
 if(BUILD_CXX_WITH_ROOT)
@@ -82,7 +80,7 @@ if(BUILD_CXX_DB)
       message(STATUS "-- -- Will use sqlite library ${SQLite3_LIBRARIES}")
       add_definitions( -DBUILD_CXXDB)
     else()
-      message(WARNING "Can not find sqlite3 installation! Disabling DB feature")
+      message(WARNING "Can not find sqlite3 installation! Disabling DB feature for C++ library")
       set(BUILD_CXX_DB CACHE "Build C++ bindings with SQLITE3 to access GAPS DB. Requires SQlite3 installed" OFF FORCE) 
   endif()
 endif()
@@ -108,7 +106,7 @@ set(INSTALL_INCLUDE_DIR  "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH  "installa
 set(INSTALL_BINARY_DIR   "${CMAKE_INSTALL_PREFIX}/bin" CACHE PATH      "installation directory for executables" FORCE)
 set(INSTALL_PYTHON_DIR   "${CMAKE_INSTALL_PREFIX}/python" CACHE PATH   "installation directory for python code" FORCE)
 
-add_subdirectory(tof)
+add_subdirectory(gondola-core)
 
 # finally all the rust pybindings
 if (BUILD_RUSTPYBINDINGS)
