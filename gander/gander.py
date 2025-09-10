@@ -42,23 +42,6 @@ from gander_session import *
 
 #------------------------------------------------
 
-get_energy = go.tracker.calibration.get_energy
-
-#------------------------------------------------
-
-PATTERN = re.compile('Run(?P<runid>[0-9]*)_(?P<subrunid>[0-9]*).(?P<timestamp>([0-9_]*UTC)).(tofsum.gaps|tof.gaps|gaps)')
-
-def get_timestamp(filename):
-    ts = PATTERN.search(filename)
-    if ts is None:
-        raise  ValueError(f'Unable to extract timestamp from {filename}!')
-    runid    = ts.groupdict()['runid']
-    subrunid = ts.groupdict()['subrunid']
-    ts       = ts.groupdict()['timestamp']
-    return int(runid), int(subrunid), ts
-
-#################################################
-
 # Retrieve the password from secrets
 try:
     stored_password = st.secrets["password"]
@@ -137,16 +120,6 @@ def check_password():
         # Password correct.
         return True
 
-#################################################
-
-def has_merged_event(frame, merged_event_types = MERGED_EVENT_TYPES):
-    for k in frame.index:
-        # there can be only a single merged event in a frame. In therory, 
-        # acutally multiple are possible, but that is currently not how it 
-        # is handled. A merged event can not be multiple packet types
-        if k in merged_event_types:
-            return k
-
 #------------------------------------------------
 
 def add_preliminary(fig):
@@ -208,158 +181,158 @@ for k in strips:
 
 #------------------------------------------------
 
-@st.fragment
-def plot_tracker_2dxy(ax,\
-                      hits         = None,\
-                      cmap         = matplotlib.colormaps['seismic'],\
-                      circle_color ='w',\
-                      color_energy = False,\
-                      cnorm_max    = None,\
-                      transfer_fn  = dict(),\
-                      hitstyle     = {'edgecolor': 'w', 'alpha' : 0.5 , 'marker' : 'o'} ):
-    """
-    Add the 2d xy projection to a given axies. If tracker_hits
-    are given, add these to the plot as well
-
-    # Keyword Arguments:
-        * color_energy : color the circles for the hits with the energy deposition
-                         FIXME - color scale needs to be normalized together with the 
-                         TOF
-    """
-    all_dets = [(k.global_pos_x_det_l0, k.global_pos_y_det_l0, k.global_pos_z_det_l0) for k in go.db.TrackerStrip.objects.all()]
-    all_layers = list(set([k.layer for k in hits]))
-    #all_dets_xz = set([(k[0],k[2]) for k in all_dets])
-    #all_dets_yz = set([(k[1],k[2]) for k in all_dets])
-    all_dets_xy = set([(k[0],k[1]) for k in all_dets])
-    strip_coord = [get_stripcoordinates(k, strip_dict) for k in hits]
-    det_coord   = [get_detcoordinates(k, strip_dict) for k in hits]
-    adc = [k.adc for k in hits]
-    if transfer_fn:
-        strip_id  = [k.stripid for k in hits]
-        adc_strip = zip(strip_id, adc)
-        adc = np.array([get_energy(k[1],transfer_fn[0]) for k in adc_strip])
-    else:
-        adc = np.array(adc) / 12
-
-    if color_energy:
-        if cnorm_max != None:
-            cm_norm_pts = plt.Normalize(vmin=0, vmax=cnorm_max)
-        else:
-            cm_norm_pts = plt.Normalize(vmin=min(adc), vmax=max(adc))
-    xs = [k[0] for k in strip_coord]
-    ys = [k[1] for k in strip_coord]
-    if color_energy:
-        ax.scatter(xs, ys, marker=hitstyle['marker'], s=100*adc,\
-                   edgecolor=hitstyle['edgecolor'], color=cmap(cm_norm_pts(adc)))
-    else:
-        ax.scatter(xs, ys, marker=hitstyle['marker'], s=adc, facecolor='none', edgecolor=hitstyle['edgecolor'])
-    for k in all_dets_xy:
-        patch = patches.Circle(k, radius=5, fill=False, color='gray', alpha=0.1)
-        # rect_patch = patches.Rectangle(k[1], width=1, height=100, color='gray', alpha=0.1)
-        for layer in all_layers:
-            #go.tracker.visual.plot_strip_lines(ax,k, layer, color='gray')
-            gon.visual.tracker.plot_strip_lines(ax, k, layer, color='gray')
-        ax.add_patch(patch)
-    for k in det_coord:
-        patch = patches.Circle(k, radius=5, fill=False, color=circle_color)
-        # im.set_clip_path(patch)
-        ax.add_patch(patch)
-        for layer in all_layers:
-            #go.tracker.visual.plot_strip_lines(ax,k, layer, color=circle_color)
-            gon.visual.tracker.plot_strip_lines(ax, k, layer, color='gray')
-    return ax
-
-@st.fragment
-def plot_tracker_2dyz(ax,\
-                      hits = None,\
-                      cmap         = matplotlib.colormaps['seismic'],\
-                      circle_color='w',\
-                      color_energy = False,\
-                      cnorm_max    = None,\
-                      transfer_fn  = dict(),\
-                      hitstyle={ 'edgecolor' : 'w', 'alpha' : 0.5 , 'marker' : 'o'} ):
-    all_dets = [(k.global_pos_x_det_l0, k.global_pos_y_det_l0, k.global_pos_z_det_l0) for k in go.db.TrackerStrip.objects.all()]
-    all_dets_yz = set([(k[1],k[2]) for k in all_dets])
-    
-    strip_coord = [get_stripcoordinates(k, strip_dict) for k in hits]
-    det_coord   = [get_detcoordinates(k, strip_dict) for k in hits]
-    adc = [k.adc for k in hits]
-    adc = [k.adc for k in hits]
-    if transfer_fn:
-        strip_id  = [k.stripid for k in hits]
-        adc_strip = zip(strip_id, adc)
-        adc = np.array([get_energy(k[1],transfer_fn[0]) for k in adc_strip])
-    else:
-        adc = np.array(adc) / 12
-    if color_energy:
-        if cnorm_max != None:
-            cm_norm_pts = plt.Normalize(vmin=0, vmax=cnorm_max)
-        else:
-            cm_norm_pts = plt.Normalize(vmin=min(adc), vmax=max(adc))
-    else:
-        adc = np.array(adc) / 12
-    ys = [k[1] for k in strip_coord]
-    zs = [k[2] for k in strip_coord]
-    if color_energy:
-        ax.scatter(ys, zs, marker=hitstyle['marker'], s=100*adc,\
-                   edgecolor=hitstyle['edgecolor'], color=cmap(cm_norm_pts(adc)))
-    else:
-        ax.scatter(ys, zs, marker=hitstyle['marker'], s=adc, facecolor='none', edgecolor=hitstyle['edgecolor'])
-    # strips
-    for k in all_dets_yz:
-        det = [k[0] - 5, k[1]]
-        rect_patch = patches.Rectangle(det, width=10, height=0.25, color='gray', alpha=0.8)
-        ax.add_patch(rect_patch)
-    for k in det_coord:
-        det = [k[1] - 5, k[2]]
-        rect_patch = patches.Rectangle(det, width=10, height=0.25, color=circle_color, alpha=0.5)
-        ax.add_patch(rect_patch)
-    return ax
-
-
-@st.fragment
-def plot_tracker_2dxz(ax,\
-                      hits = None,\
-                      cmap         = matplotlib.colormaps['seismic'],\
-                      circle_color = 'w',\
-                      color_energy = False,\
-                      cnorm_max    = None,\
-                      transfer_fn  = dict(),
-                      hitstyle={ 'edgecolor' : 'w', 'alpha' : 0.5 , 'marker' : 'o'} ):
-    all_dets = [(k.global_pos_x_det_l0, k.global_pos_y_det_l0, k.global_pos_z_det_l0) for k in go.db.TrackerStrip.objects.all()]
-    all_dets_xz = set([(k[0],k[2]) for k in all_dets])
-    strip_coord = [get_stripcoordinates(k, strip_dict) for k in hits]
-    det_coord   = [get_detcoordinates(k, strip_dict) for k in hits]
-    adc = [k.adc for k in hits]
-    adc = [k.adc for k in hits]
-    if transfer_fn:
-        strip_id  = [k.stripid for k in hits]
-        adc_strip = zip(strip_id, adc)
-        adc = np.array([get_energy(k[1],transfer_fn[0]) for k in adc_strip])
-    else:
-        adc = np.array(adc) / 12
-    if color_energy:
-        if cnorm_max != None:
-            cm_norm_pts = plt.Normalize(vmin=0, vmax=cnorm_max)
-        else:
-            cm_norm_pts = plt.Normalize(vmin=min(adc), vmax=max(adc))
-    xs = [k[0] for k in strip_coord]
-    zs = [k[2] for k in strip_coord]
-    if color_energy:
-        ax.scatter(xs, zs, marker=hitstyle['marker'], s=100*adc,\
-                   edgecolor=hitstyle['edgecolor'], color=cmap(cm_norm_pts(adc)))
-    else:
-        ax.scatter(xs, zs, marker=hitstyle['marker'], s=adc, facecolor='none', edgecolor=hitstyle['edgecolor'])
-    # strips
-    for k in all_dets_xz:
-        det = [k[0] - 5, k[1]]
-        rect_patch = patches.Rectangle(det, width=10, height=0.25, color='gray', alpha=0.8)
-        ax.add_patch(rect_patch)
-    for k in det_coord:
-        det = [k[0] - 5, k[2]]
-        rect_patch = patches.Rectangle(det, width=10, height=0.25, color=circle_color, alpha=0.5)
-        ax.add_patch(rect_patch)
-    return ax
+#@st.fragment
+#def plot_tracker_2dxy(ax,\
+#                      hits         = None,\
+#                      cmap         = matplotlib.colormaps['seismic'],\
+#                      circle_color ='w',\
+#                      color_energy = False,\
+#                      cnorm_max    = None,\
+#                      transfer_fn  = dict(),\
+#                      hitstyle     = {'edgecolor': 'w', 'alpha' : 0.5 , 'marker' : 'o'} ):
+#    """
+#    Add the 2d xy projection to a given axies. If tracker_hits
+#    are given, add these to the plot as well
+#
+#    # Keyword Arguments:
+#        * color_energy : color the circles for the hits with the energy deposition
+#                         FIXME - color scale needs to be normalized together with the 
+#                         TOF
+#    """
+#    all_dets = [(k.global_pos_x_det_l0, k.global_pos_y_det_l0, k.global_pos_z_det_l0) for k in go.db.TrackerStrip.objects.all()]
+#    all_layers = list(set([k.layer for k in hits]))
+#    #all_dets_xz = set([(k[0],k[2]) for k in all_dets])
+#    #all_dets_yz = set([(k[1],k[2]) for k in all_dets])
+#    all_dets_xy = set([(k[0],k[1]) for k in all_dets])
+#    strip_coord = [get_stripcoordinates(k, strip_dict) for k in hits]
+#    det_coord   = [get_detcoordinates(k, strip_dict) for k in hits]
+#    adc = [k.adc for k in hits]
+#    if transfer_fn:
+#        strip_id  = [k.stripid for k in hits]
+#        adc_strip = zip(strip_id, adc)
+#        adc = np.array([get_energy(k[1],transfer_fn[0]) for k in adc_strip])
+#    else:
+#        adc = np.array(adc) / 12
+#
+#    if color_energy:
+#        if cnorm_max != None:
+#            cm_norm_pts = plt.Normalize(vmin=0, vmax=cnorm_max)
+#        else:
+#            cm_norm_pts = plt.Normalize(vmin=min(adc), vmax=max(adc))
+#    xs = [k[0] for k in strip_coord]
+#    ys = [k[1] for k in strip_coord]
+#    if color_energy:
+#        ax.scatter(xs, ys, marker=hitstyle['marker'], s=100*adc,\
+#                   edgecolor=hitstyle['edgecolor'], color=cmap(cm_norm_pts(adc)))
+#    else:
+#        ax.scatter(xs, ys, marker=hitstyle['marker'], s=adc, facecolor='none', edgecolor=hitstyle['edgecolor'])
+#    for k in all_dets_xy:
+#        patch = patches.Circle(k, radius=5, fill=False, color='gray', alpha=0.1)
+#        # rect_patch = patches.Rectangle(k[1], width=1, height=100, color='gray', alpha=0.1)
+#        for layer in all_layers:
+#            #go.tracker.visual.plot_strip_lines(ax,k, layer, color='gray')
+#            gon.visual.tracker.plot_strip_lines(ax, k, layer, color='gray')
+#        ax.add_patch(patch)
+#    for k in det_coord:
+#        patch = patches.Circle(k, radius=5, fill=False, color=circle_color)
+#        # im.set_clip_path(patch)
+#        ax.add_patch(patch)
+#        for layer in all_layers:
+#            #go.tracker.visual.plot_strip_lines(ax,k, layer, color=circle_color)
+#            gon.visual.tracker.plot_strip_lines(ax, k, layer, color='gray')
+#    return ax
+#
+#@st.fragment
+#def plot_tracker_2dyz(ax,\
+#                      hits = None,\
+#                      cmap         = matplotlib.colormaps['seismic'],\
+#                      circle_color='w',\
+#                      color_energy = False,\
+#                      cnorm_max    = None,\
+#                      transfer_fn  = dict(),\
+#                      hitstyle={ 'edgecolor' : 'w', 'alpha' : 0.5 , 'marker' : 'o'} ):
+#    all_dets = [(k.global_pos_x_det_l0, k.global_pos_y_det_l0, k.global_pos_z_det_l0) for k in go.db.TrackerStrip.objects.all()]
+#    all_dets_yz = set([(k[1],k[2]) for k in all_dets])
+#    
+#    strip_coord = [get_stripcoordinates(k, strip_dict) for k in hits]
+#    det_coord   = [get_detcoordinates(k, strip_dict) for k in hits]
+#    adc = [k.adc for k in hits]
+#    adc = [k.adc for k in hits]
+#    if transfer_fn:
+#        strip_id  = [k.stripid for k in hits]
+#        adc_strip = zip(strip_id, adc)
+#        adc = np.array([get_energy(k[1],transfer_fn[0]) for k in adc_strip])
+#    else:
+#        adc = np.array(adc) / 12
+#    if color_energy:
+#        if cnorm_max != None:
+#            cm_norm_pts = plt.Normalize(vmin=0, vmax=cnorm_max)
+#        else:
+#            cm_norm_pts = plt.Normalize(vmin=min(adc), vmax=max(adc))
+#    else:
+#        adc = np.array(adc) / 12
+#    ys = [k[1] for k in strip_coord]
+#    zs = [k[2] for k in strip_coord]
+#    if color_energy:
+#        ax.scatter(ys, zs, marker=hitstyle['marker'], s=100*adc,\
+#                   edgecolor=hitstyle['edgecolor'], color=cmap(cm_norm_pts(adc)))
+#    else:
+#        ax.scatter(ys, zs, marker=hitstyle['marker'], s=adc, facecolor='none', edgecolor=hitstyle['edgecolor'])
+#    # strips
+#    for k in all_dets_yz:
+#        det = [k[0] - 5, k[1]]
+#        rect_patch = patches.Rectangle(det, width=10, height=0.25, color='gray', alpha=0.8)
+#        ax.add_patch(rect_patch)
+#    for k in det_coord:
+#        det = [k[1] - 5, k[2]]
+#        rect_patch = patches.Rectangle(det, width=10, height=0.25, color=circle_color, alpha=0.5)
+#        ax.add_patch(rect_patch)
+#    return ax
+#
+#
+#@st.fragment
+#def plot_tracker_2dxz(ax,\
+#                      hits = None,\
+#                      cmap         = matplotlib.colormaps['seismic'],\
+#                      circle_color = 'w',\
+#                      color_energy = False,\
+#                      cnorm_max    = None,\
+#                      transfer_fn  = dict(),
+#                      hitstyle={ 'edgecolor' : 'w', 'alpha' : 0.5 , 'marker' : 'o'} ):
+#    all_dets = [(k.global_pos_x_det_l0, k.global_pos_y_det_l0, k.global_pos_z_det_l0) for k in go.db.TrackerStrip.objects.all()]
+#    all_dets_xz = set([(k[0],k[2]) for k in all_dets])
+#    strip_coord = [get_stripcoordinates(k, strip_dict) for k in hits]
+#    det_coord   = [get_detcoordinates(k, strip_dict) for k in hits]
+#    adc = [k.adc for k in hits]
+#    adc = [k.adc for k in hits]
+#    if transfer_fn:
+#        strip_id  = [k.stripid for k in hits]
+#        adc_strip = zip(strip_id, adc)
+#        adc = np.array([get_energy(k[1],transfer_fn[0]) for k in adc_strip])
+#    else:
+#        adc = np.array(adc) / 12
+#    if color_energy:
+#        if cnorm_max != None:
+#            cm_norm_pts = plt.Normalize(vmin=0, vmax=cnorm_max)
+#        else:
+#            cm_norm_pts = plt.Normalize(vmin=min(adc), vmax=max(adc))
+#    xs = [k[0] for k in strip_coord]
+#    zs = [k[2] for k in strip_coord]
+#    if color_energy:
+#        ax.scatter(xs, zs, marker=hitstyle['marker'], s=100*adc,\
+#                   edgecolor=hitstyle['edgecolor'], color=cmap(cm_norm_pts(adc)))
+#    else:
+#        ax.scatter(xs, zs, marker=hitstyle['marker'], s=adc, facecolor='none', edgecolor=hitstyle['edgecolor'])
+#    # strips
+#    for k in all_dets_xz:
+#        det = [k[0] - 5, k[1]]
+#        rect_patch = patches.Rectangle(det, width=10, height=0.25, color='gray', alpha=0.8)
+#        ax.add_patch(rect_patch)
+#    for k in det_coord:
+#        det = [k[0] - 5, k[2]]
+#        rect_patch = patches.Rectangle(det, width=10, height=0.25, color=circle_color, alpha=0.5)
+#        ax.add_patch(rect_patch)
+#    return ax
 
 @st.fragment
 def plot_tracker(hits, strp_dict : dict, circle_color='w') -> dict:
@@ -386,7 +359,8 @@ def plot_tracker(hits, strp_dict : dict, circle_color='w') -> dict:
 
     # have one plot for the xy projection
     fig, ax     = go.tracker.visual.prepare_layer_fig(layer='XY hit projection')
-    plot_tracker_2dxz(ax, hits = hits)
+    #plot_tracker_2dxz(ax, hits = hits)
+    gon.visual.tracker.plot_tracker_proj(ax, hits=hits, projection='xz')
     figures['trk_proj_xy'] = copy(fig)
     
     # another plot for the xz projection
@@ -605,8 +579,8 @@ def create_event_plots(no_plot_first_bins_wf=False) -> dict:
         st.write(f'{type(ev)}')
         raise ValueError('Right now, event view works only with MergedEvents')
     if ev.tof.hits:
-        paddle_style = {'edgecolor' : 'w', 'lw' : 1.0}
-        data['packet_type'] = ptype
+        paddle_style            = {'edgecolor' : 'w', 'lw' : 1.0}
+        data['packet_type']     = ptype
         data['tof_xy']    , ax  = go.tof.visual.tof_projection_xy(event=ev_tof, cmap=matplotlib.colormaps['seismic'])
         data['tof_cbe']   , ax2 = go.tof.visual.unroll_cbe_sides  (event=ev_tof, cmap=matplotlib.colormaps['seismic'], paddle_style = paddle_style)
         data['tof_cor']   , ax3 = go.tof.visual.unroll_cor        (event=ev_tof, cmap=matplotlib.colormaps['seismic'], paddle_style = paddle_style)
@@ -614,25 +588,12 @@ def create_event_plots(no_plot_first_bins_wf=False) -> dict:
                 = go.tof.visual.tof_2dproj(event=ev_tof, cmap=matplotlib.colormaps['seismic'])
     data['tof_hits'] = ev.tof.hits
     for h in ev.tracker:
-        if st.session_state.trk_analysis.strip_mask:
-            #print (st.session_state.trk_analysis.strip_mask)
-            #print (h.stripid)
-            n_trk_hits_masked = 0
-            n_trk_hits_no_mask_info = 0
-            try:
-                if st.session_state.trk_analysis.strip_mask[h.strip_id]:
-                    data['trk_hits'].append(h)
-                else:
-                    n_trk_hits_masked += 1
-            except KeyError:
-                n_trk_hits_no_mask_info += 1
-        else:
-            data['trk_hits'].append(h)
+        data['trk_hits'].append(h)
     ## FIXME - the pointcloud needs masking
     data['trk_pointcloud'] = ev.tracker_pointcloud 
     data['n_trk_hits_masked'] = n_trk_hits_masked
     data['n_trk_hits_no_mask_info'] = n_trk_hits_no_mask_info
-    data['trk_plots'] = plot_tracker(data['trk_hits'], strip_dict)
+    #data['trk_plots'] = plot_tracker(data['trk_hits'], strip_dict)
     if wf_ev is not None:
         calib = st.session_state.tof_calib 
         if no_plot_first_bins_wf:
@@ -674,7 +635,7 @@ def file_loader(f, event_type,\
                 search_event_id      = 0,
                 tof_analysis_kwargs  = {},
                 trk_analysis_kwargs  = {},
-                reco_analysis_kwargs = {}) -> (go.tof.analysis.TofAnalysis, go.tracker.analysis.TrackerAnalysis, list):
+                reco_analysis_kwargs = {}) -> (gon.tof.TofAnalysis, go.tracker.analysis.TrackerAnalysis, list):
     """
     Run over a file and extract variables to fill the histograms
     in the assigned analyisises
@@ -690,10 +651,15 @@ def file_loader(f, event_type,\
                                                              the beginning of the file
     """
     event_samples = []
-    #reader  = go.io.CRReader(str(f))
     reader   = gon.io.CRReader(f)
+    # set the calibration files 
+    reader.set_tracker_calibrations_from_fnames(mask        = st.session_state.trk_calibration['mask'],
+                                                pedestal    = st.session_state.trk_calibration['pedestal'],
+                                                transfer_fn = st.session_state.trk_calibration['tf'],
+                                                cmn_noise   = st.session_state.trk_calibration['cmn_noise'])
     if write_to_basket:
-        runid, srunid, ts = get_timestamp(str(f))
+        f_rundata = gon.io.get_rundata_from_file(str(f)) 
+        runid, srunid, ts = f_rundata['run'], f_rundata['subrun'], f_rundata['utctime']
         writer = gon.io.CRWriter('/prestaging/basket',runid, subrun_id=srunid, timestamp=ts)
         logger.info(f'Will use writer : {writer}')
     # FIXME - this whole 'do_tof_analysis' stuff needs to go
@@ -701,7 +667,7 @@ def file_loader(f, event_type,\
     tof_analysis = None
     if tof_analysis_kwargs:
         if tof_analysis_kwargs['active']:
-            tof_analysis = go.tof.analysis.TofAnalysis(**tof_analysis_kwargs) 
+            tof_analysis = gon.tof.TofAnalysis(**tof_analysis_kwargs) 
             tof_analysis.cuts.clear_stats()
     trk_analysis = None
     if trk_analysis_kwargs:
@@ -718,9 +684,6 @@ def file_loader(f, event_type,\
             case EventType.Unknown:
                 raise ValueError("Unknown event type!")
             case EventType.Merged:
-                #m_type = has_merged_event(frame, merged_event_types = merged_event_types)
-                #if m_type is None:
-                #    continue
                 try:
                     ev = frame.get_telemetryevent(always_exclude=exclude_event_types)
                     m_type = ev.header.packet_type 
@@ -728,7 +691,6 @@ def file_loader(f, event_type,\
                     logger.warning(f'Merged event is corrupt! {e}')
                     continue
                 ev_tof = ev.tof
-                ##print(ev)
             case EventType.Tof:
                 m_type = 'TofEvent'
 
@@ -776,8 +738,8 @@ def file_loader(f, event_type,\
         else:
             tof_passed = True
         if trk_analysis is not None:
-            masked_hits = trk_analysis.mask_hits(ev)
-            if trk_analysis.cuts.accept(masked_hits):
+            #masked_hits = trk_analysis.mask_hits(ev)
+            if trk_analysis.cuts.accept(ev.tracker):
                 trk_passed = True
         else:
             trk_passed = True
@@ -812,7 +774,7 @@ def clear_analysis():
     """
     Reset the low level tof analysis
     """
-    st.session_state.tof_analysis          = go.tof.analysis.TofAnalysis()
+    st.session_state.tof_analysis          = gon.tof.TofAnalysis()
     st.session_state.tof_analysis.finished = False
     st.session_state.trk_analysis          = go.tracker.analysis.TrackerAnalysis()
     st.session_state.trk_analysis.finished = False
@@ -843,7 +805,7 @@ def load_run(event_type         = EventType.Merged,\
                            'beta_analysis' : True,
                            'nbins'         : nbins,
                            'use_offsets'   : copy(st.session_state.tof_analysis.use_offsets),
-                           'cuts'          : copy(st.session_state.tof_analysis.cuts),
+                           'cuts'          : st.session_state.tof_analysis.cuts.copy(),
                            'active'        : copy(st.session_state.tof_analysis.active),
                            'pid_outer'     : copy(st.session_state.tof_analysis.pid_outer),
                            'pid_inner'     : copy(st.session_state.tof_analysis.pid_inner)}
@@ -1122,10 +1084,12 @@ if check_password():
         'apply_tracker_mask'    : False,
         'search_event_id'       : 0,
         # TOF analysis part
-        'tof_analysis'          : go.tof.analysis.TofAnalysis(),
+        'tof_analysis'          : gon.tof.TofAnalysis(),
         # TRK analysis part
         'trk_analysis'          : go.tracker.analysis.TrackerAnalysis(),
         'reco'                  : go.reconstruction.Reconstruction(),
+        'trk_calibration'       : { 'mask' : None, 'pedestal'  : None,\
+                                    'tf'   : None, 'cmn_noise' : None}
     }
 
 
@@ -1431,33 +1395,42 @@ if check_password():
                 st.divider()
                 apply_stripmask = st.checkbox("Apply a strip mask", value=st.session_state.apply_tracker_mask)
                 if apply_stripmask:
-                    all_masks = go.db.TrackerStripMask.objects.all()
-                    all_masks = set([k.mask_name for k in all_masks])
+                    all_masks = gon.db.TrackerStripMask.all_names()
                     st.subheader('Available masks')
                     mask_option = st.selectbox('', tuple(all_masks))
-                    strip_mask = go.db.get_tracker_strip_mask(mask_option)
+                    strip_mask = gon.db.TrackerStripMask.as_dict_by_name(mask_option)
                     n_all_strips    = len(strip_mask.keys())
-                    n_masked_strips = len([k for k in strip_mask if not strip_mask[k]])
+                    n_masked_strips = len([k for k in strip_mask if not strip_mask[k].active])
                     st.text(f'Masking {n_masked_strips}/{n_all_strips} ({100*n_masked_strips/n_all_strips:.2f}%) of the strips!')
-                    st.session_state.trk_analysis.strip_mask = strip_mask
+                    #st.session_state.trk_analysis.strip_mask = strip_mask
                     st.divider()
+                    st.session_state.trk_calibration['mask'] = mask_option
+                else:
+                    st.session_state.trk_calibration['mask'] = None
+                
                 st.session_state.trk_analysis.subtract_pedestals = st.checkbox("Subtract pedestal ADC", value=st.session_state.trk_analysis.subtract_pedestals)
                 if st.session_state.trk_analysis.subtract_pedestals:
-                    pedestals = go.db.get_tracker_strip_pedestals()
-                    h = d.factory.hist1d([pd.pedestal_mean for pd in pedestals], np.linspace(0,500,70))
+                    all_peds   = gon.db.TrackerStripPedestal.all_names()
+                    ped_option = st.selectbox('', tuple(all_peds))
+                    pedestals  = gon.db.TrackerStripPedestal.as_dict_by_name(ped_option)
+
+                    h = d.factory.hist1d([pd.pedestal_mean for pd in pedestals.values()], np.linspace(0,500,70))
                     fig = gander_plot(h,\
                                                xlabel = 'ADC',
                                                title  = 'Tracker pedestals')
                     st.pyplot(fig)
                     st.divider()
-                    pedestals= {k.strip_id : k for k in pedestals}
+                    #pedestals= {k.strip_id : k for k in pedestals}
                     st.session_state.trk_analysis.pedestals = pedestals
+                    st.session_state.trk_calibration['pedestal'] = ped_option
+                else:
+                    st.session_state.trk_calibration['pedestal'] = None 
+
                 st.session_state.trk_analysis.apply_transfer_fn = st.checkbox("Apply transfer functions. This will convert ADC in energy", value=st.session_state.trk_analysis.apply_transfer_fn)
                 if st.session_state.trk_analysis.apply_transfer_fn:
-                    all_tr_fn_files = Path("").glob("*.txt")
+                    all_tr_fn_files = gon.db.TrackerStripTransferFunction.all_names()
                     tr_file_option = st.selectbox('', tuple(all_tr_fn_files))
-                    transfer_fn = go.tracker.calibration.get_transfer_functions(tr_file_option)
-                    transfer_fn = gon.db.TrackerStripTransferFunction.all_as_dict() 
+                    transfer_fn = gon.db.TrackerStripTransferFunction.as_dict_by_name(tr_file_option) 
                     print (transfer_fn)
                     st.session_state.trk_analysis.transfer_fn = transfer_fn
                     # this requires we change the binning and re-init the edep plots
@@ -1466,24 +1439,76 @@ if check_password():
                         st.session_state.trk_analysis._init_edep_plots()
                     l_col, m_col, __ = st.columns(3, vertical_alignment="top")
                     stripid = l_col.number_input(
-                      f"Plot a transfer function by specifying the strip id (LRMSS)",
-                      #value=st.session_state.trk_analysis.cuts.min_hits_layer[layer],
-                      min_value=0,
-                      max_value=max(transfer_fn.keys()),
-                      step=1,
-                      placeholder="Plot a transfer fn")
+                                   f"Plot a transfer function by specifying the strip id (LRMSS)",
+                                   #value=st.session_state.trk_analysis.cuts.min_hits_layer[layer],
+                                   min_value=0,
+                                   max_value=max(transfer_fn.keys()),
+                                   step=1,
+                                   placeholder="Plot a transfer fn")
                     if stripid in transfer_fn:   
                         xs = np.arange(0,1600,1)
-                        ys = transfer_fn[stripid](xs)
-                        fig = gander_line_plot(xs,ys, title='Transfer Fn strip {stripid}', xlabel='ADC', ylabel='mV')
+                        ys = np.array([transfer_fn[stripid].transfer_fn(x) for x in xs])
+                        fig = gander_line_plot(xs,ys, title=f'Transfer Fn strip {stripid}', xlabel='ADC', ylabel='mV')
                         st.pyplot(fig)
                     else:
                        st.write(f'No transfer fn available for stripid {stripid}')
+                    st.session_state.trk_analysis.is_calibrated = True
+                    st.session_state.trk_calibration['tf'] = tr_file_option 
                 else:
-                    st.session_state.trk_analysis.transfer_fn = dict()
+                    st.session_state.trk_calibration['tf'] = None
+
+                    #st.session_state.trk_analysis.transfer_fn = dict()
                     if not st.session_state.trk_analysis.finished:
                         st.session_state.trk_analysis._init_edep_plots()
+                
+                # Remove hits with ADC
                 st.checkbox("Remove hits with ADC = 0", value=st.session_state.trk_analysis.exclude_empty_hits)
+                st.divider()
+
+                #--------------------------------
+
+                # the new common noise data
+                st.write("Common noise subtraction")
+                st.session_state.trk_analysis.subtract_cmnnoise = st.checkbox("Subtract CMN noise", value=st.session_state.trk_analysis.subtract_cmnnoise)
+                if st.session_state.trk_analysis.subtract_cmnnoise:
+                    all_cmn_files   = gon.db.TrackerStripCmnNoise.all_names()
+                    cmn_file_option = st.selectbox('', tuple(all_cmn_files))
+                    cmn_data        = gon.db.TrackerStripCmnNoise.as_dict_by_name(cmn_file_option) 
+                    h = d.factory.hist1d([cmn.gain for cmn in cmn_data.values()], np.linspace(0,3,70))
+                    fig = gander_plot(h,\
+                                      xlabel = 'Gain',
+                                      title  = 'Tracker CMN noise/Gain',
+                                      log    = True)
+                    st.pyplot(fig)
+                    h = d.factory.hist1d([cmn.pulse_avg for cmn in cmn_data.values()], np.linspace(0,500,70))
+                    fig = gander_plot(h,\
+                                      xlabel = 'Pulse AVG (ADC)',
+                                      title  = 'Tracker CMN noise/Gain',
+                                      log    = True)
+                    st.pyplot(fig)
+                    st.write("Common Noise LVL for strip")
+                    xs = np.array([k for k in range(1600)])
+                    l_col, m_col, __ = st.columns(3, vertical_alignment="top")
+                    stripid = l_col.number_input(
+                      f"Plot the cmn noise level for a given strip id (LRMSS)",
+                      #value=st.session_state.trk_analysis.cuts.min_hits_layer[layer],
+                      min_value=0,
+                      max_value=max(cmn_data.keys()),
+                      step=1,
+                      placeholder="Plot a transfer fn")
+                    if stripid in cmn_data:   
+                        xs = np.arange(0,1600,1)
+                        ys = np.array([cmn_data[stripid].get_common_level(x) for x in xs])
+                        fig = gander_line_plot(xs,ys, title=f'CMN noise level for strip {stripid}', xlabel='ADC', ylabel='cmn level')
+                        st.pyplot(fig)
+                    else:
+                       st.write(f'No cmn noise data available for stripid {stripid}')
+                    st.session_state.trk_calibration['cmn_noise'] = cmn_file_option
+                else:
+                    st.session_state.trk_calibration['cmn_noise'] = None
+
+                st.divider()
+                
 
         with tab_tof_cali:
             st.subheader('Select TOF calibrations')
@@ -1599,6 +1624,11 @@ if check_password():
                                         xlabel = 'A [pC]',
                                         ylabel = 'B [pC]',
                                         title  = f'paddle {k} charge')
+                    st.pyplot(fig)
+                    fig = gander_2dplot(r[k]['amp2d'],
+                                        xlabel = 'A [mV]',
+                                        ylabel = 'B [mV]',
+                                        title  = f'paddle {k} amplitude')
                     st.pyplot(fig)
                     logscale = st.checkbox('Log scale!', value=True,key=f'logscale_paddle_edep{k}')
                     fig = gander_plot(r[k]['edep'],
@@ -1721,7 +1751,7 @@ if check_password():
         tab_event, tab_tof_panels, tab_tof_waveforms, tab_tracker_layers, tab_2d, tab_3d = st.tabs(["Event", "Tof panels", "Tof waveforms", "Trk layers", "2d projections", "3d view"])
         with tab_event:
             if ev_data['packet_type'] is not None:
-                st.badge(ev_data['packet_type'], color='blue')
+                st.badge(f"{ev_data['packet_type']}", color='blue')
             if ev_data['tof_event'].status == go.events.EventStatus.AnyDataMangling:
                 st.badge("AnyDataMangling", color='red')
             if ev_data['tof_event'].status == go.events.EventStatus.EventTimeOut:
@@ -1784,10 +1814,11 @@ if check_password():
                     st.pyplot(wf_plot)
 
         with tab_tracker_layers:
-            if ev_data['trk_plots']:
-                for k in ev_data['trk_plots'].keys():
-                    fig = ev_data['trk_plots'][k]
-                    st.pyplot(fig, use_container_width=False)
+            pass
+            #if ev_data['trk_plots']:
+            #    for k in ev_data['trk_plots'].keys():
+            #        fig = ev_data['trk_plots'][k]
+            #        st.pyplot(fig, use_container_width=False)
 
         with tab_2d:
             hitstyle={ 'edgecolor' : 'w', 'alpha' : 0.5 , 'marker' : 'o'} 
@@ -1850,6 +1881,9 @@ if check_password():
             cmap  = matplotlib.colormaps[selected_cmap]
             no_ax = st.checkbox("Don't show axes", value=True)
             show_cbar = st.checkbox("Show a colorbar", value=True)
+            print (ev_data['tof_event'])
+            print (ev_data['tof_event'].rb_events)
+            
             tof_xy_all, tof_xz_all, tof_yz_all \
                 = go.tof.visual.tof_2dproj(event=ev_data['tof_event'],\
                                            cmap=cmap,
@@ -1866,11 +1900,16 @@ if check_password():
                     ax.text(p0[0]+5,p0[1]-4, '$\chi^2$ = ' + f'{chi2:.2f}', fontsize=5)
                     add_arrow(ax, p_arrow_h, p_arrow_t, fc=paddle_style['edgecolor'], ec=paddle_style['edgecolor'])
                 if plot_tracker2d:    
-                    plot_tracker_2dxy(ax, ev_data['trk_hits'],\
-                                      circle_color=circle_color, hitstyle = hitstyle,\
-                                      transfer_fn = st.session_state.trk_analysis.transfer_fn,\
-                                      cnorm_max     = 2,
-                                      color_energy=cs_is_energy, cmap = cmap)
+                    gon.visual.tracker.plot_tracker_proj(
+                        ax,\
+                        ev_data['trk_hits'],\
+                        projection='xy',\
+                        use_energy=cs_is_energy,\
+                        circle_color = circle_color,\
+                        hitstyle = hitstyle,\
+                        cmap = cmap,\
+                        color_energy=cs_is_energy
+                    )
                 
                 ax = tof_xz_all.gca()
                 if show_linefit:
@@ -1878,13 +1917,16 @@ if check_password():
                     ax.text(p0[0]+5,p0[2]+5,'$\mu$')
                     add_arrow(ax, p_arrow_h, p_arrow_t,c0=0,c1=2, fc=paddle_style['edgecolor'], ec=paddle_style['edgecolor'])
                 if plot_tracker2d:
-                    plot_tracker_2dxz(ax, ev_data['trk_hits'],\
-                                      circle_color = circle_color,\
-                                      hitstyle = hitstyle ,\
-                                      cmap     = cmap,\
-                                      cnorm_max     = 2,
-                                      transfer_fn = st.session_state.trk_analysis.transfer_fn,\
-                                      color_energy=cs_is_energy)
+                    gon.visual.tracker.plot_tracker_proj(
+                        ax,\
+                        ev_data['trk_hits'],\
+                        projection='xz',\
+                        use_energy=cs_is_energy,\
+                        circle_color = circle_color,\
+                        hitstyle = hitstyle,\
+                        cmap = cmap,\
+                        color_energy=cs_is_energy
+                    )
                 
                 ax = tof_yz_all.gca()
                 if show_linefit:
@@ -1892,13 +1934,16 @@ if check_password():
                     ax.text(p0[1]+5,p0[2]+5,'$\mu$')
                     add_arrow(ax, p_arrow_h, p_arrow_t, c0=1,c1=2, fc=paddle_style['edgecolor'], ec=paddle_style['edgecolor'])
                 if plot_tracker2d:
-                    plot_tracker_2dyz(ax, ev_data['trk_hits'],\
-                            circle_color  = circle_color,\
-                            hitstyle      = hitstyle,\
-                            cmap          = cmap,\
-                            cnorm_max     = 2,
-                            transfer_fn   = st.session_state.trk_analysis.transfer_fn,\
-                            color_energy=cs_is_energy)
+                    gon.visual.tracker.plot_tracker_proj(
+                        ax,\
+                        ev_data['trk_hits'],\
+                        projection='yz',\
+                        use_energy=cs_is_energy,\
+                        circle_color = circle_color,\
+                        hitstyle = hitstyle,\
+                        cmap = cmap,\
+                        color_energy=cs_is_energy
+                    )
             
             st.pyplot(tof_xy_all)
             st.pyplot(tof_xz_all)
@@ -1918,15 +1963,13 @@ if check_password():
             st.divider()
         else: 
             r = st.session_state.tof_analysis
-            fig, __ = go.tof.visual.plot_hg_lg_hits(h_nhits          = r.nhit_plots['hit'],\
-                                                    h_nthits         = r.nhit_plots['thit'],\
-                                                    h_nrblnk         = r.nhit_plots['rblink'],\
-                                                    n_events         = r.n_events,\
-                                                    no_hitmissing    = r.no_hitmiss,\
-                                                    one_hitmissing   = r.one_hitmiss,\
-                                                    lttwo_hitmissing = r.two_hitmiss,\
-                                                    extra_hits       = r.extra_hits)
-                                                    
+            fig = gon.visual.tof.plot_hg_lg_hits(r.nhit_plots['hit'],\
+                                                 r.nhit_plots['thit'],\
+                                                 n_events         = r.n_events,\
+                                                 no_hitmissing    = r.no_hitmiss,\
+                                                 one_hitmissing   = r.one_hitmiss,\
+                                                 lttwo_hitmissing = r.two_hitmiss,\
+                                                 extra_hits       = r.extra_hits)
             st.pyplot(fig)
             fig = gander_plot(r.nhit_plots['miss_hit'],\
                               xlabel=r'PID',\
@@ -1990,7 +2033,7 @@ if check_password():
     def page_energy():
         st.subheader("Energy deposition analysis")
         if st.session_state.use_dark_theme:
-            kwargs = {'color'  : '2',\
+            kwargs = {'color'  : 'w',\
                       'filled' : True,\
                       'alpha'  : 0.4,\
                       'lw'     : 0.9}
@@ -2048,13 +2091,15 @@ if check_password():
                     if st.session_state.mark_perliminary:
                         add_preliminary(fig)
                     st.pyplot(fig)
-            
+        
+        #---------------------------------------
+
         st.divider()
         if not st.session_state.trk_analysis.finished:
             st.write('-> Please go to Run -> Load Run/Tracker analysis to load some events for the tracker anlaysis!')
         else:
             xlabel = 'ADC'
-            if st.session_state.trk_analysis.apply_transfer_fn:
+            if st.session_state.trk_analysis.is_calibrated:
                 xlabel = 'MeV'
             r = st.session_state.trk_analysis.edep_plots
             l_col, m_col, r_col = st.columns(3, vertical_alignment="top")
