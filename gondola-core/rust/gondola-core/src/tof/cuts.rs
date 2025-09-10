@@ -400,6 +400,10 @@ impl TofCuts {
     let nhits        = ev.get_nhits() as u64;
     self.hits_total += nhits;
     self.nevents    += 1;
+    // we need to make sure the times are 
+    // calculated.properly. If they are, 
+    // this won't do anything
+    ev.normalize_hit_times();
     if self.only_causal_hits {
       let rm_pids = ev.remove_non_causal_hits();
       self.hits_rmvd_csl  += rm_pids.len() as u64;
@@ -495,12 +499,13 @@ impl TofCuts {
       } 
       if self.min_cos_theta != 0.0 || self.max_cos_theta != 1.0 {
         let dist = hits_inner[0].distance(hits_outer[0])/1000.0;
-        let cos_theta = f32::abs(hits_inner[0].z - hits_outer[0].z)/(1000.0*dist);  
-        if !((self.min_cos_theta <= cos_theta) && (cos_theta <= self.max_cos_theta)) {
-          return false;
-        } else {
-          self.cos_theta_acc += 1;
-        }
+        //let cos_theta = f32::abs(hits_inner[0].z - hits_outer[0].z)/(1000.0*dist);  
+        //if !((self.min_cos_theta <= cos_theta) && (cos_theta <= self.max_cos_theta)) {
+        //  return false;
+        //} else {
+        //  self.cos_theta_acc += 1;
+        //}
+        self.cos_theta_acc += 1;
       }
       if self.fho_must_panel7 {
         //if first_pid not in range(61, 73):
