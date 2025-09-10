@@ -1,0 +1,465 @@
+#[macro_use] extern crate log;
+
+pub mod menu;
+pub mod colors;
+pub mod widgets;
+pub mod tabs;
+pub mod layout;
+
+use std::sync::Mutex;
+use std::sync::Arc;
+
+use std::collections::HashMap;
+use std::collections::VecDeque;
+
+use tui_logger::TuiLoggerWidget;
+use ratatui::{
+  style::{
+    Color,
+    Style,
+  },
+  widgets::{
+    Block,
+    Borders,
+  },
+};
+
+pub use crate::tabs::*;
+pub use crate::layout::*;
+
+use crate::colors::ColorTheme;
+use gondola_core::prelude::*;
+
+//use tof_dataclasses::packets::TofPacket;
+//use tof_dataclasses::packets::PacketType;
+//use tof_dataclasses::events::MasterTriggerEvent;
+//use tof_dataclasses::events::TofEventSummary;
+//use tof_dataclasses::events::TofHit;
+//use tof_dataclasses::serialization::Packable;
+//use tof_dataclasses::serialization::Serialization;
+//use tof_dataclasses::io::TofPacketWriter;
+
+use crossbeam_channel::{
+  Sender,
+  Receiver
+};
+
+/// A map which keeps track of the types of telemetry packets 
+/// received
+pub fn telly_packet_counter(pack_map : &mut HashMap<&str, usize>, packet_type : &TelemetryPacketType) {
+  let pack_key : &str;
+  match packet_type {
+    TelemetryPacketType::Unknown            => pack_key = "Unknown",
+    TelemetryPacketType::CardHKP            => pack_key = "CardHKP",
+    TelemetryPacketType::CoolingHK          => pack_key = "CoolingHKP",
+    TelemetryPacketType::PDUHK              => pack_key = "PDUHK",
+    TelemetryPacketType::Tracker            => pack_key = "Tracker",
+    TelemetryPacketType::TrackerDAQCntr     => pack_key = "TrakcerDAQCntr",
+    TelemetryPacketType::GPS                => pack_key = "GPS",
+    TelemetryPacketType::TrkTempLeak        => pack_key = "TrkTempLeak",
+    TelemetryPacketType::BoringEvent        => pack_key = "BoringEvent",
+    TelemetryPacketType::RBWaveform         => pack_key = "RBWaveform",
+    TelemetryPacketType::AnyTofHK           => pack_key = "AnyTofHK",
+    TelemetryPacketType::GcuEvtBldSettings  => pack_key = "GcuEvtBldSettings",
+    TelemetryPacketType::LabJackHK          => pack_key = "LabJackHK",
+    TelemetryPacketType::MagHK              => pack_key = "MagHK",
+    TelemetryPacketType::GcuMon             => pack_key = "GcuMon",
+    TelemetryPacketType::InterestingEvent   => pack_key = "InterestingEvent",
+    TelemetryPacketType::NoGapsTriggerEvent => pack_key = "NoGapsTriggerEvent",
+    TelemetryPacketType::NoTofDataEvent     => pack_key = "NoTofDataEvent",
+    TelemetryPacketType::Ack                => pack_key = "Ack",     
+    TelemetryPacketType::AnyTrackerHK       => pack_key = "AnyTrackerHK",
+    TelemetryPacketType::TmP33              => pack_key = "TmP33",
+    TelemetryPacketType::TmP34              => pack_key = "TmP34",
+    TelemetryPacketType::TmP37              => pack_key = "TmP37",
+    TelemetryPacketType::TmP38              => pack_key = "TmP38",
+    TelemetryPacketType::TmP55              => pack_key = "TmP55",
+    TelemetryPacketType::TmP64              => pack_key = "TmP64",
+    TelemetryPacketType::TmP96              => pack_key = "TmP96",
+    TelemetryPacketType::TmP214             => pack_key = "TmP214",
+  //_                              => pack_key = "Unknown",
+  }
+  if pack_map.get(pack_key).is_some() {
+    *pack_map.get_mut(pack_key).unwrap() += 1;
+  } else {
+    pack_map.insert(pack_key, 0);
+  }
+}
+
+/// Use the TuiLoggerWidget to display 
+/// the most recent log messages
+///
+///
+pub fn render_logs<'a>(theme : ColorTheme) -> TuiLoggerWidget<'a> {
+  TuiLoggerWidget::default()
+    .style_error(Style::default().fg(Color::Red))
+    .style_debug(Style::default().fg(Color::Green))
+    .style_warn(Style::default().fg(Color::Yellow))
+    .style_trace(Style::default().fg(Color::Gray))
+    .style_info(Style::default().fg(Color::Blue))
+    .block(
+      Block::default()
+        .title("Logs")
+        .border_style(theme.style())
+        .borders(Borders::ALL),
+    )   
+    .style(theme.style())
+}
+
+/// Count the different types of tofpackets and store the result 
+/// in a HashMap
+///
+/// # Arguments:
+///
+///   * packet_type : TofPacket type to llokup it's position in 
+///                   the map
+///   * packet_map  : An arc/mutex to the HashMap we use to store
+///                   the counted values in.
+fn packet_sorter(packet_type : &TofPacketType,
+                 packet_map  : &Arc<Mutex<HashMap<&str,usize>>>) {
+  match packet_map.lock() {
+    Ok(mut pm) => {
+      let pack_key : &str;
+      //let pt = packet_type.cl
+      //let pt = packet_type.clone();
+      //let pack_key = pt.as_ref();
+      match packet_type {
+        TofPacketType::Unknown               => pack_key = "Unknown", 
+        TofPacketType::RBEvent               => pack_key = "RBEvent",
+        TofPacketType::TofEvent              => pack_key = "TofEvent",
+        TofPacketType::RBWaveform            => pack_key = "RBWaveform",
+        TofPacketType::TofEventDeprecated    => pack_key = "TofEventDeprecated",
+        TofPacketType::DataSinkHB            => pack_key = "DataSinkHB",    
+        TofPacketType::MasterTrigger         => pack_key = "MasterTrigger",
+        TofPacketType::TriggerConfig         => pack_key = "TriggerConfig",
+        TofPacketType::MasterTriggerHB       => pack_key = "MasterTriggerHHB", 
+        TofPacketType::EventBuilderHB        => pack_key = "EventBuilderHB",
+        TofPacketType::RBChannelMaskConfig   => pack_key = "RBChannelMaskConfig",
+        TofPacketType::TofRBConfig           => pack_key = "TofRBConfig",
+        TofPacketType::AnalysisEngineConfig  => pack_key = "AnalysisEngineConfig",
+        TofPacketType::RBEventHeader         => pack_key = "RBEventHeader",    // needs to go away
+        TofPacketType::TOFEventBuilderConfig => pack_key = "TOFEventBuilderConfig",
+        TofPacketType::DataPublisherConfig   => pack_key = "DataPublisherConfig",
+        TofPacketType::TofRunConfig          => pack_key = "TofRunConfig",
+        TofPacketType::CPUMoniData           => pack_key = "CPUMoniData",
+        TofPacketType::MtbMoniData           => pack_key = "MtbMoniData",
+        TofPacketType::RBMoniData            => pack_key = "RBMoniData",
+        TofPacketType::PBMoniData            => pack_key = "PBMoniData",
+        TofPacketType::LTBMoniData           => pack_key = "LTBMoniData",
+        TofPacketType::PAMoniData            => pack_key = "PAMoniData",
+        TofPacketType::RBEventMemoryView     => pack_key = "RBEventMemoryView", // We'll keep it for now - indicates that the event
+        TofPacketType::RBCalibration         => pack_key = "RBCalibration",
+        TofPacketType::TofCommand            => pack_key = "TofCommand",
+        TofPacketType::TofCommandV2          => pack_key = "TofCommandV2",
+        TofPacketType::TofResponse           => pack_key = "TofResponse",
+        TofPacketType::RBCommand             => pack_key = "RBCommand",
+        TofPacketType::RBPing                => pack_key = "RBPing",
+        TofPacketType::PreampBiasConfig      => pack_key = "PreampBiasConfig",
+        TofPacketType::RunConfig             => pack_key = "RunConfig",
+        TofPacketType::LTBThresholdConfig    => pack_key = "LTBThresholdConfig",
+        TofPacketType::TofDetectorStatus     => pack_key = "TofDetectorStatus",
+        TofPacketType::ConfigBinary          => pack_key = "ConfigBinary",
+        TofPacketType::LiftofRBBinary        => pack_key = "LiftofRBBinary",
+        TofPacketType::LiftofBinaryService   => pack_key = "LiftofBinaryService",
+        TofPacketType::LiftofCCBinary        => pack_key = "LiftofCCBinary",
+        TofPacketType::RBCalibrationFlightV  => pack_key = "RBCalibrationFlightV",
+        TofPacketType::RBCalibrationFlightT  => pack_key = "RBCalibrationFlightT",
+        TofPacketType::BfswAckPacket         => pack_key = "BfswAckPacket",
+        TofPacketType::MultiPacket           => pack_key = "MultiPacket",
+      }
+      if pm.get(pack_key).is_some() {
+        *pm.get_mut(pack_key).unwrap() += 1;
+      } else {
+        pm.insert(pack_key, 0);
+      }
+    }
+    Err(err) => {
+      error!("Can't lock shared memory! {err}");
+    }
+  }
+}
+
+/// Receive packets from an incoming stream
+/// and distrubute them to their receivers
+/// while taking notes of everything
+///
+/// This is a Pablo Pubsub kind of persona
+/// (see a fantastic talk at RustConf 2023)
+pub fn packet_distributor(tp_from_sock : Receiver<TofPacket>,
+                          tp_sender_mt : Sender<TofPacket>,
+                          tp_sender_rb : Sender<TofPacket>,
+                          tp_sender_ev : Sender<TofPacket>,
+                          tp_sender_cp : Sender<TofPacket>,
+                          tp_sender_tr : Sender<TofPacket>,
+                          rbwf_sender  : Sender<TofPacket>,
+                          ts_send      : Sender<TofEvent>,
+                          th_send      : Sender<TofHit>,
+                          tp_sender_hb : Sender<TofPacket>,
+                          str_list     : Arc<Mutex<VecDeque<String>>>,
+                          pck_map      : Arc<Mutex<HashMap<&str, usize>>>,
+                          mut writer   : Option<TofPacketWriter>) {
+  let mut n_pack = 0usize;
+  // per default, we create master trigger packets from TofEventSummary, 
+  // except we have "real" mtb packets
+  let craft_mte_packets = true;
+
+  loop {
+    //match data_socket.recv_bytes(0) {
+    match tp_from_sock.recv() {
+      Err(err) => error!("Can't receive TofPacket! {err}"),
+      Ok(tp) => {
+        //println!("{:?}", pck_map);
+        packet_sorter(&tp.packet_type, &pck_map);
+        n_pack += 1;
+        //println!("Got TP {}", tp);
+        match str_list.lock() {
+          Err(err) => error!("Can't lock shared memory! {err}"),
+          Ok(mut _list)    => {
+            //let prefix  = String::from_utf8(payload[0..4].to_vec()).expect("Can't get prefix!");
+            //let message = format!("{}-{} {}", n_pack,prefix, tp.to_string());
+            let message = format!("{} : {}", n_pack, tp);
+            _list.push_back(message);
+          }
+        }
+        // if captured, write file
+        if writer.is_some() {
+          writer.as_mut().unwrap().add_tof_packet(&tp);
+        }
+        match tp.packet_type {
+          TofPacketType::TofResponse => { 
+            match tp_sender_tr.send(tp) {
+              Err(err) => error!("Can't send TP! {err}"),
+              Ok(_)    => (),
+            }
+          }
+          TofPacketType::MtbMoniData |
+          //TofPacketType::MasterTrigger => {
+          //  // apparently, we are getting MasterTriggerEvents, 
+          //  // sow we won't be needing to craft them from 
+          //  // TofEventSummary packets
+          //  if tp.packet_type == TofPacketType::MasterTrigger {
+          //    craft_mte_packets = false;
+          //  }
+          //  match tp_sender_mt.send(tp) {
+          //    Err(err) => error!("Can't send TP! {err}"),
+          //    Ok(_)    => (),
+          //  }
+          //},
+          TofPacketType::RBWaveform => {
+            match rbwf_sender.send(tp) {
+              Err(err) => error!("Can't send TP! {err}"),
+              Ok(_)    => (),
+            }
+          }
+          TofPacketType::TofEvent => {
+            //match TofEvent::from_tofpacket(&tp) {
+            match tp.unpack::<TofEvent>() {
+              Err(err) => {
+                error!("Unable to unpack TofEvent! {err}");
+              }
+              Ok(ts) => {
+                // FIXME - this is not needed anymore
+                if craft_mte_packets {
+                  //let mte    = MasterTriggerEvent::from(&ts);
+                  //let mte_tp = mte.pack();
+                  //error!("We are sending the following tp {}", mte_tp);
+                  match tp_sender_mt.send(tp.clone()) { 
+                  //match tp_sender_mt.send(mte_tp) {
+                    Err(err) => error!("Can't send MTE TP! {err}"),
+                    Ok(_)    => ()
+                  }
+                }
+                for h in &ts.hits {
+                  match th_send.send(*h) {
+                    Err(err) => error!("Can't send TP! {err}"),
+                    Ok(_)    => (),
+                  }
+                }
+                match ts_send.send(ts) {
+                  Err(err) => error!("Can't send TP! {err}"),
+                  Ok(_)    => (),
+                }
+                match tp_sender_ev.send(tp.clone()) {
+                  Err(err) => error!("Can't send TP! {err}"),
+                  Ok(_)    => (),
+                }
+              }
+            }
+          }
+          //TofPacketType::TofEvent => {
+          //  // since the tof event contains MTEs, we don't need
+          //  // to craft them
+          //  craft_mte_packets = false;
+          //  match tp_sender_ev.send(tp) {
+          //    Err(err) => error!("Can't send TP! {err}"),
+          //    Ok(_)    => (),
+          //  }
+          //  // Disasemble the packets
+          //  //match TofEvent::from_bytestream(tp.payload, &mut 0) {
+          //  //  Err(err) => {
+          //  //    error!("Can't decode TofEvent");
+          //  //  },
+          //  //  Ok(ev) => {
+          //  //    //for rbev in ev.rb_events {
+          //  //    //  let 
+          //  //    //  match tp_sender_rb.send
+          //  //    //}
+          //  //  }
+          //  //}
+          //}
+          TofPacketType::RBEvent |
+          TofPacketType::RBEventMemoryView | 
+          TofPacketType::LTBMoniData |
+          TofPacketType::PAMoniData  |
+          TofPacketType::PBMoniData  |
+          TofPacketType::RBMoniData => {
+            match tp_sender_rb.send(tp) {
+              Err(err) => error!("Can't send TP! {err}"),
+              Ok(_)    => (),
+            }
+          }
+          TofPacketType::CPUMoniData => {
+            match tp_sender_cp.send(tp) {
+              Err(err) => error!("Can't send TP! {err}"),
+              Ok(_)    => (),
+            }
+          }
+          TofPacketType::DataSinkHB      |
+          TofPacketType::EventBuilderHB  | 
+          TofPacketType::MasterTriggerHB => {
+            match tp_sender_hb.send(tp) {
+              Err(err) => error!("Can't send TP! {err}"),
+              Ok(_)    => {
+              },
+            }
+          }
+          _ => () 
+        }
+      }
+    } 
+  }
+}
+
+///// ZMQ socket wrapper for the zmq socket which is 
+///// supposed to receive data from the TOF system.
+//pub fn socket_wrap_tofstream(address   : &str,
+//                             tp_sender : Sender<TofPacket>) {
+//  let ctx = zmq::Context::new();
+//  // FIXME - don't hardcode this IP
+//  let socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
+//  socket.connect(address).expect("Unable to connect to data (PUB) socket {adress}");
+//  socket.set_subscribe(b"").expect("Can't subscribe to any message on 0MQ socket!");
+//  //let mut n_pack = 0usize;
+//  info!("0MQ SUB socket connected to address {address}");
+//  // per default, we create master trigger packets from TofEventSummary, 
+//  // except we have "real" mtb packets
+//  //let mut craft_mte_packets = true;
+//  loop {
+//    match socket.recv_bytes(0) {
+//      Err(err) => error!("Can't receive TofPacket! {err}"),
+//      Ok(payload)    => {
+//        match TofPacket::from_bytestream(&payload, &mut 0) {
+//          Ok(tp) => {
+//            match tp_sender.send(tp) {
+//              Ok(_) => (),
+//              Err(err) => error!("Can't send TofPacket over channel! {err}")
+//            }
+//          }
+//          Err(err) => {
+//            debug!("Can't decode payload! {err}");
+//            // that might have an RB prefix, forward 
+//            // it 
+//            match TofPacket::from_bytestream(&payload, &mut 4) {
+//              Err(err) => {
+//                error!("Don't understand bytestream! {err}"); 
+//              },
+//              Ok(tp) => {
+//                match tp_sender.send(tp) {
+//                  Ok(_) => (),
+//                  Err(err) => error!("Can't send TofPacket over channel! {err}")
+//                }
+//              }
+//            }
+//          }  
+//        }
+//      }
+//    }
+//  }
+//}
+//
+////use telemetry_dataclasses::packets::{
+////  TelemetryPacketHeader,
+////  TelemetryPacket,
+////};
+//
+///// Get the GAPS merged event telemetry stream and 
+///// broadcast it to the relevant tab
+/////
+///// # Arguments
+/////
+///// * address     : Address to susbscribe to for telemetry 
+/////                 stream (must be zmq.PUB) on the Sender
+/////                 side
+///// * cachesize   : Getting the packets from the funneled stream leads
+/////                 to duplicates. To eliminate these, we store the 
+/////                 packet counter variable in a Dequee of a given 
+/////                 size
+///// * tele_sender : Channel to forward the received telemetry
+/////                 packets
+//pub fn socket_wrap_telemetry(address     : &str,
+//                             cachesize   : usize,
+//                             tele_sender : Sender<TelemetryPacket>) {
+//  let ctx = zmq::Context::new();
+//  // FIXME - don't hardcode this IP
+//  // typically how it is done is that this program runs either on a gse
+//  // or there is a local forwarding of the port thrugh ssh
+//  //let address : &str = "tcp://127.0.0.1:55555";
+//  let socket = ctx.socket(zmq::SUB).expect("Unable to create 0MQ SUB socket!");
+//  match socket.connect(&address) {
+//    Err(err) => {
+//      error!("Unable to connect to data (PUB) socket {address}! {err}");
+//      panic!("Can not connect to zmq PUB socket!");
+//    }
+//    Ok(_) => ()
+//  }
+//  let mut cache = VecDeque::<u16>::with_capacity(cachesize);
+//  socket.set_subscribe(b"") .expect("Can't subscribe to any message on 0MQ socket! {err}");
+//  loop {
+//    match socket.recv_bytes(0) {
+//      Err(err)    => error!("Can't receive TofPacket! {err}"),
+//      Ok(mut payload) => {
+//        match TelemetryPacketHeader::from_bytestream(&payload, &mut 0) {
+//          Err(err) => {
+//            error!("Can not decode telemtry header! {err}");
+//            //for k in pos - 5 .. pos + 5 {
+//            //  println!("{}",stream[k]);
+//            //}
+//          }
+//          Ok(header) => {
+//            let mut packet = TelemetryPacket::new();
+//            if payload.len() > TelemetryPacketHeader::SIZE {
+//              payload.drain(0..TelemetryPacketHeader::SIZE);
+//            }
+//            if cache.contains(&header.counter) {
+//              // drop this packet
+//              continue;
+//            } else {
+//              cache.push_back(header.counter); 
+//            }
+//            if cache.len() == cachesize {
+//              cache.pop_front();
+//            }
+//
+//            packet.header  = header;
+//            packet.payload = payload;
+//            match tele_sender.send(packet) {
+//              Err(err) => error!("Can not send telemetry packet to downstream! {err}"),
+//              Ok(_)    => ()
+//            }
+//          }
+//        }
+//      }
+//    }
+//  }
+//}
+
