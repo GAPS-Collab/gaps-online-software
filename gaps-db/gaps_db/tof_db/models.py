@@ -1601,7 +1601,9 @@ class TrackerStripCmnNoise(models.Model):
                 cmnnoise.strip_id            = strip_id 
                 cmnnoise.gain                = 0
                 cmnnoise.pulse_chn           = int(mean_pls)     
-                cmnnoise.pulse_avg           = mean_avg    
+                # no mean val
+                cmnnoise.pulse_avg           = 0
+                #cmnnoise.pulse_avg           = mean_avg    
                 cmnnoise.pulse_is_mean       = True
                 strip_to_tf[strip_id]        = cmnnoise 
                 
@@ -1640,7 +1642,9 @@ class TrackerStripCmnNoise(models.Model):
         mean_gain /= n_entries
         for k in cmnnoise_dict:
             if cmnnoise_dict[k].gain == 0:
-                cmnnoise_dict[k].gain = mean_gain 
+                # no mean gain!
+                cmnnoise_dict[k].gain = 1
+                #cmnnoise_dict[k].gain = mean_gain 
                 cmnnoise_dict[k].gain_is_mean = True 
 
     def __repr__(self):
