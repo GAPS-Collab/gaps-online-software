@@ -1,0 +1,41 @@
+[workspace]
+resolver = "2"
+edition  = "2024"
+members = [
+  "liftof-rb",
+  "liftof-cc", 
+  "liftof-tui",  
+]
+
+[workspace.dependencies]
+
+cfg-if           = "1.0"
+
+# serialization
+serde      = {version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# thread and network communication
+crossbeam-channel = "0.5"
+zmq               = "0.10.0"
+signal-hook       = "0.3"
+
+# logging and command line parsing
+log =   "0.4"
+clap   = { version = "4.5", features = ["derive"] }
+chrono = { version = "0.4", features =["serde"] }
+
+# own projects
+#gondola-core          = { path = "../gondola-core/rust/gondola-core", features = ["database", "tofcontrol", "advanced-algorithms"], version = "0.11" } 
+[workspace.dependencies.gondola-core]
+path     = "../gondola-core/rust/gondola-core"
+# deliberatly exclude pybindings feature here
+features = ["database", "tofcontrol", "advanced-algorithms", "tof-liftof"]
+version  = "0.11"
+
+[profile.release]
+opt-level = 3
+
+[workspace.metadata]
+authors     = ["J.A. Stoessl <stoessl@hawaii.edu>", "Paolo Lazzaroni <paolo.lazzaroni@unibg.it>", "Jeff Zweerink <zweering@astro.ucla.edu>", "G. Tytus <gtytus@hawaii.edu>"]
+description = "The liftof suite includes the flight code (liftof-cc & liftof-rb) as well as a tui program to monitor the event stream"
