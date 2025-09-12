@@ -1,0 +1,30 @@
+# GAPS online/offline software core suite for python
+
+from . import gondola_core as _gondola_core
+
+__version__ = _gondola_core.get_version()
+
+events     = _gondola_core.events 
+packets    = _gondola_core.packets 
+#io         = _gondola_core.io 
+monitoring = _gondola_core.monitoring 
+stats      = _gondola_core.stats 
+algo       = _gondola_core.algo 
+db         = _gondola_core.db 
+#tracker    = _gondola_core.tracker 
+
+# set up the python submodules
+from . import calibration 
+from . import visual
+from . import io
+from . import tof
+
+#calibration.RBCalibrations = _gondola_core.calibration.RBCalibrations
+
+__all__ = ['events', 'packets', 'io', 'monitoring', 'stats', 'algo', 'db',
+           'calibration', 'visual']
+
+# clean up the namespace, module still available as hidden through _gondola_core
+del gondola_core
+
+print (f'Welcome to gondola v{__version__}, a software suite for the \U0001F388 GAPS experiment! Bulld for \U0001F40D with the power of \U0001F980! \u2728')
