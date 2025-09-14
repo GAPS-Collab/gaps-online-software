@@ -253,6 +253,7 @@ fn io_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<CRFrameObject>()?;
   m.add_class::<DataSourceKind>()?;
   m.add_class::<CRReader>()?;
+  m.add_class::<TofPacketReader>()?;
   //m.add_class::<PyDataSource>()?;
   Ok(())
 }

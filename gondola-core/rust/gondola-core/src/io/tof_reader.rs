@@ -13,6 +13,7 @@ use crate::prelude::*;
 /// These files are typically written by a TofPacketReader instance, e.g. as 
 /// on the TOF flight computer
 #[derive(Debug)]
+#[cfg_attr(feature="pybindings", pyclass)]
 pub struct TofPacketReader {
   /// Read from this file
   pub filenames       : Vec<String>,
@@ -37,6 +38,7 @@ impl TofPacketReader {
   
   /// Setup a new Reader, allowing the argument to be either the name of a single file or 
   /// the name of a directory
+  /// FIXME - make this return Result, like the Caraspace reader
   pub fn new(filename_or_directory : &str) -> Self {
     let firstfile : String;
     match list_path_contents_sorted(&filename_or_directory, None) {
@@ -220,6 +222,131 @@ impl TofPacketReader {
       } // if no 0xAA found
     } // end loop
   } // end fn
+
+  /// This is the file the current cursor is located 
+  /// in and frames are currently read out from 
+  pub fn get_current_filename(&self) -> Option<String> {
+    // should only happen when it is empty
+    if self.filenames.len() <= self.file_idx {
+      return None;
+    }
+    Some(self.filenames[self.file_idx].clone())
+  }
+  
+  /// Preview the number of frames in this reader
+  pub fn count_packets(&mut self) -> usize {
+    let _ = self.rewind();
+    let mut nframes = 0usize;
+    let mut buffer  = [0];
+    let bar_template : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {pos:>7}/{len:7}";
+    let bar_style  = ProgressStyle::with_template(bar_template).expect("Unable to set progressbar style!");
+    let bar = ProgressBar::new(self.filenames.len() as u64);
+    bar.set_position(0);
+    bar.set_message (String::from("Counting packets.."));
+    bar.set_prefix  ("\u{2728}");
+    bar.set_style   (bar_style);
+    bar.set_position(self.file_idx as u64);
+    loop {
+      match self.file_reader.read_exact(&mut buffer) {
+        Err(err) => {
+          debug!("Unable to read from file! {err}");
+          match self.prime_next_file() {
+            None    => break,
+            Some(_) => {
+              bar.set_position(self.file_idx as u64);
+              continue;
+            }
+          };
+        }
+        Ok(_) => {
+          self.cursor += 1;
+        }
+      }
+      if buffer[0] != 0xAA {
+        continue;
+      } else {
+        match self.file_reader.read_exact(&mut buffer) {
+          Err(err) => {
+            debug!("Unable to read from file! {err}");
+            match self.prime_next_file() {
+              None    => break,
+              Some(_) => {
+                bar.set_position(self.file_idx as u64);
+                continue;
+              }
+            };
+          }
+          Ok(_) => {
+            self.cursor += 1;
+          }
+        }
+        // check if the second byte of the header
+        if buffer[0] != 0xAA { 
+          continue;
+        } else {
+          // read the the size of the packet
+          // first we have to skip one byte for the packet type
+          match self.file_reader.read_exact(&mut buffer) {
+            Err(err) => {
+              debug!("Unable to read from file! {err}");
+              match self.prime_next_file() {
+                None    => break,
+                Some(_) => {
+                  bar.set_position(self.file_idx as u64);
+                  continue;
+                }
+              };
+            }
+            Ok(_) => {
+              self.cursor += 1;
+            }
+          }
+          let mut buffer_psize = [0,0,0,0];
+          match self.file_reader.read_exact(&mut buffer_psize) {
+            Err(_err) => {
+              match self.prime_next_file() {
+                None    => break,
+                Some(_) => {
+                  bar.set_position(self.file_idx as u64);
+                  continue;
+                }
+              }
+            }
+            Ok(_) => {
+              self.cursor += 8;
+            }
+          }
+          let vec_data = buffer_psize.to_vec();
+          let size     = parse_u64(&vec_data, &mut 0);
+          let mut temp_buffer = vec![0; size as usize];
+          match self.file_reader.read_exact(&mut temp_buffer) { 
+          //match self.file_reader.seek(SeekFrom::Current(size as i64)) {
+          //match self.file_reader.seek_relative(size as i64) {
+            Err(err) => {
+              error!("Unable to read {size} bytes from {}! {err}", self.get_current_filename().unwrap());
+              match self.prime_next_file() {
+                None    => break,
+                Some(_) => {
+                  bar.set_position(self.file_idx as u64);
+                  continue;
+                }
+              }
+            }
+            Ok(_) => {
+              self.cursor += size as usize;
+              nframes += 1;
+            }
+          }
+        }
+      } // if no 0xAA found
+    } // end loop
+    bar.finish_with_message("Done!");
+    let _ = self.rewind();
+    nframes
+  } // end fn
+
+
+
 }
 
 impl fmt::Display for TofPacketReader {
@@ -241,3 +368,97 @@ impl fmt::Display for TofPacketReader {
 }
 
 reader!(TofPacketReader,TofPacket);
+
+#[cfg(feature="pybindings")]
+#[pymethods]
+impl TofPacketReader {
+
+  #[new]
+  #[pyo3(signature = (filename_or_directory, filter = None))] 
+  fn new_py(filename_or_directory : &Bound<'_,PyAny>, filter : Option<TofPacketType>) -> PyResult<Self> {
+    let mut string_value = String::from("foo");
+    if let Ok(s) = filename_or_directory.extract::<String>() {
+       string_value = s;
+    } //else if let Ok(p) = filename_or_directory.extract::<&Path>() {
+    if let Ok(fspath_method) = filename_or_directory.getattr("__fspath__") {
+      if let Ok(fspath_result) = fspath_method.call0() {
+        if let Ok(py_string) = fspath_result.extract::<String>() {
+          string_value = py_string;
+        }
+      }
+    }
+    let mut reader = Self::new(&string_value);
+    match filter {
+      None => (),
+      Some(ftr) => {
+        reader.filter = ftr;
+      }
+    }
+    Ok(reader)
+    //match Self::new(&string_value) {
+    //  Err(err) => {
+    //    return Err(PyValueError::new_err(err.to_string()));
+    //  }
+    //  Ok(reader) => {
+    //    return Ok(reader);
+    //  }
+    //}
+  }
+
+  //#[pyo3(name="set_tracker_calibrations_from_fnames")]
+  //#[pyo3(signature = (mask = None, pedestal = None, transfer_fn = None, cmn_noise = None))]
+  //fn set_tracker_calibrations_from_fnames_py(&mut self,
+  //                                            mask        : Option<String>,
+  //                                            pedestal    : Option<String>,
+  //                                            transfer_fn : Option<String>,
+  //                                            cmn_noise   : Option<String>) {
+  //  self.set_tracker_calibrations_from_fnames(mask, pedestal, transfer_fn, cmn_noise);
+  //}
+
+  /// This is the filename we are currently 
+  /// extracting frames from 
+  #[getter]
+  #[pyo3(name="current_filename")]
+  fn get_current_filename_py(&self) -> Option<String> {
+    self.get_current_filename()
+  }
+
+  /// Start the reader from the beginning
+  /// This is equivalent to a re-initialization
+  /// of that reader.
+  #[pyo3(name="rewind")]
+  fn rewind_py(&mut self) -> PyResult<()> {
+    match self.rewind() {
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+      Ok(_) => Ok(())
+    }
+  }
+
+  #[pyo3(name="count_packets")]
+  fn count_packets_py(&mut self) -> usize {
+    self.count_packets()
+  }
+
+  fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
+    slf 
+  }
+  
+  fn __next__(mut slf: PyRefMut<'_, Self>) -> Option<TofPacket> {
+    slf.next()
+    //match slf.next() { 
+    //  Some(packet) => {
+    //    return Some(packet)
+    //  }   
+    //  None => {
+    //    return None;
+    //  }   
+    //}   
+  }
+}
+
+#[cfg(feature="pybindings")]
+pythonize_display!(TofPacketReader);
+
+
