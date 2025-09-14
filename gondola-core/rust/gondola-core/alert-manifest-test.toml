@@ -1,0 +1,1595 @@
+[data_mangling]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[miss_tofevid]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[tofev_vs_merge]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[notof_vs_merge]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[frac_interest]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[mtb_lost_rate]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[mtb_fpga_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[mtb_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[mtb_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[cpu_core0_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[cpu_core1_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[cpu_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[cpu_disk]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb01_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb02_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb03_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb04_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb05_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb06_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb07_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb08_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb09_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb11_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb13_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb14_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb15_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb16_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb17_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb18_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb19_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb20_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb21_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb22_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb23_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb24_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb25_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb26_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb27_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb28_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb29_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb30_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb31_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb32_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb33_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb34_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb35_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb36_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb39_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb40_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb41_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb42_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb44_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb46_temp]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb01_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb02_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb03_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb04_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb05_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb06_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb07_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb08_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb09_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb11_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb13_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb14_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb15_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb16_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb17_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb18_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb19_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb20_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb21_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb22_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb23_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb24_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb25_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb26_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb27_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb28_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb29_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb30_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb31_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb32_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb33_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb34_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb35_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb36_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb39_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb40_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb41_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb42_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb44_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb46_rate_zero]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb01_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb02_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb03_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb04_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb05_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb06_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb07_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb08_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb09_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb11_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb13_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb14_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb15_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb16_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb17_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb18_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb19_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb20_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb21_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb22_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb23_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb24_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb25_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb26_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb27_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb28_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb29_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb30_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb31_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb32_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb33_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb34_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb35_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb36_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb39_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb40_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb41_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb42_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb44_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
+
+[rb46_hk_too_old]
+subscribers = [
+    "Grace",
+    "Kazu",
+    "Achim",
+    "TofBot",
+]
+armed = false
+min_allowed = -40.0
+max_allowed = 80.0
+non_zero = false
