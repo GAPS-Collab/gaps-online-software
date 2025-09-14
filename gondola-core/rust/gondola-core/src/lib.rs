@@ -299,8 +299,10 @@ fn stats_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
 #[pyo3(name = "algo")]
 fn algo_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   //use crate::io::*;
-  use crate::tof::algorithms::py_get_max_value_idx;
-  m.add_function(wrap_pyfunction!(py_get_max_value_idx, m)?)?;
+  use crate::tof::algorithms::*;
+  m.add_function(wrap_pyfunction!(get_max_value_idx_py, m)?)?;
+  m.add_function(wrap_pyfunction!(interpolate_time_py, m)?)?;
+  m.add_function(wrap_pyfunction!(fit_sine_simple_py, m)?)?;
   Ok(())
 }
 

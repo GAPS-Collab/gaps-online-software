@@ -10,7 +10,7 @@ packets    = _gondola_core.packets
 monitoring = _gondola_core.monitoring 
 stats      = _gondola_core.stats 
 algo       = _gondola_core.algo 
-db         = _gondola_core.db 
+#db         = _gondola_core.db 
 #tracker    = _gondola_core.tracker 
 
 # set up the python submodules
@@ -18,6 +18,7 @@ from . import calibration
 from . import visual
 from . import io
 from . import tof
+from . import db 
 
 #calibration.RBCalibrations = _gondola_core.calibration.RBCalibrations
 

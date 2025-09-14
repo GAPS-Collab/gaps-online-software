@@ -244,6 +244,14 @@ impl TofPaddle {
     }
   }
 
+  /// Save myself to the database
+  pub fn save(&self) {
+    use schema::tof_db_paddle::dsl::*;
+    let mut conn = connect_to_db().unwrap();
+    diesel::insert_into(tof_db_paddle)
+      .values(self);
+  }
+
   /// Return the lowest channel number (either A or B)
   /// to be able to sort the paddles into RBs
   pub fn get_lowest_rb_ch(&self) -> u8 {
@@ -323,6 +331,11 @@ impl TofPaddle {
     let length = f32::sqrt(pr.0.powf(2.0) + pr.1.powf(2.0) + pr.2.powf(2.0)); 
     pr = (pr.0/length, pr.1/length, pr.2/length);
     return pr;
+  }
+
+  /// Normal vector of the paddle 
+  pub fn normal(&self) -> (f32, f32, f32) {
+    (self.normal_x, self.normal_y, self.normal_z)
   }
 
   pub fn center_pos(&self) -> (f32,f32,f32) {
@@ -486,6 +499,12 @@ impl TofPaddle {
   }
 
   #[getter]
+  #[pyo3(name="normal")]
+  pub fn normal_py(&self) -> (f32, f32, f32) {
+    self.normal()
+  }
+
+  #[getter]
   #[pyo3(name="center_pos")]
   pub fn center_pos_py(&self) -> (f32,f32,f32) {
     (self.global_pos_x_l0, self.global_pos_y_l0, self.global_pos_z_l0)
@@ -512,6 +531,24 @@ impl TofPaddle {
   #[pyo3(name="lt_slot")]
   pub fn lt_slot_py(&self) -> i16 {
     self.lt_slot()
+  }
+  
+  #[getter]
+  #[pyo3(name="global_pos_x_l0")]
+  fn get_global_pos_x_l0(&self) -> f32 {
+    self.global_pos_x_l0 
+  }
+  
+  #[getter]
+  #[pyo3(name="global_pos_y_l0")]
+  fn get_global_pos_y_l0(&self) -> f32 {
+    self.global_pos_y_l0
+  }
+  
+  #[getter]
+  #[pyo3(name="global_pos_z_l0")]
+  fn get_global_pos_z_l0(&self) -> f32 {
+    self.global_pos_z_l0
   }
 }
 
@@ -1550,6 +1587,14 @@ impl TrackerStrip {
       }
     }
   }
+
+  pub fn get_coordinates(&self) -> (f32, f32, f32) {
+    (self.global_pos_x_l0, self.global_pos_y_l0, self.global_pos_z_l0)
+  }
+
+  pub fn get_detcoordinates(&self) -> (f32, f32, f32) {
+    (self.global_pos_x_det_l0, self.global_pos_y_det_l0, self.global_pos_z_det_l0)
+  }
 }
 
 impl fmt::Display for TrackerStrip {
@@ -1626,8 +1671,18 @@ impl TrackerStrip {
   #[getter]
   fn get_global_pos_z_det_l0(&self) -> f32 {
     self.global_pos_z_det_l0
-
   }
+
+  #[getter]
+  fn coordinates(&self) -> (f32, f32, f32) {
+    self.get_coordinates()
+  }
+
+  #[getter]
+  fn detector_coordinates(&self) -> (f32, f32, f32) {
+    self.get_detcoordinates() 
+  }
+
   #[getter]
   fn get_principal_x        (&self) -> f32 {
     self.principal_x

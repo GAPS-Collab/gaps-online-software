@@ -32,7 +32,7 @@ class TofAnalysis:
         self.PADDLE_BLRMS_BINS  = np.linspace(0,2  ,     nbins)
         self.PADDLE_X0_BINS     = np.linspace(-0.1, 1.1, nbins)
         self.PADDLE_T0_BINS     = np.linspace(0,500,     nbins)
-        self.PADDLE_EDEP_BINS   = np.linspace(0,100 ,     nbins)
+        self.PADDLE_EDEP_BINS   = np.linspace(0,30 ,     nbins)
         self.NHIT_BINS          = np.arange(-0.5,25.5,1)   
         self.PID_BINS           = np.arange(0.5,160.5,1)
         self.BETA_BINS          = np.linspace(0,2  ,     nbins)
@@ -65,7 +65,12 @@ class TofAnalysis:
             _repr += f'\n  -- nevents                  : {self.n_events}'
         _repr += f'\n  -- runtime (s)              : {self.run_time:1f} s'
         _repr += f'\n  -- rate    (Hz (nocut))     : {self.rate_nocut:.2f} Hz'
-        _repr += f'\n  -- events with extra hits   : {100*self.extra_hits/self.cuts.nevents:.2f} %'
+        if self.cuts.void:
+            if self.n_events != 0:
+                _repr += f'\n  -- events with extra hits   : {100*self.extra_hits/self.n_events:.2f} %'
+        else:
+            _repr += f'\n  -- events with extra hits   : {100*self.extra_hits/self.cuts.nevents:.2f} %'
+        
         if not self.cuts.void:
             _repr += '\n  -- -- applied cut:'
             _repr += f'\n\t -- -- {self.cuts}'
@@ -74,8 +79,12 @@ class TofAnalysis:
                 _repr += f'\n\t  -- -- efficiency          : {100*self.n_events/self.cuts.nevents : .2f} %'
             _repr += f'\n\t  -- -- rate    (Hz)        : {self.rate: .2f} Hz'
         _repr += '\n  -- Event status statistics'
+        nevents = self.n_events
+        if not self.cuts.void:
+            nevents = self.cuts.nevents 
         for k in self.event_stati:
-            _repr += f'\n\t -- -- {k} : {self.event_stati[k]} ({100*self.event_stati[k]/self.cuts.nevents:.2f} (%)'
+            if nevents != 0:
+                _repr += f'\n\t -- -- {k} : {self.event_stati[k]} ({100*self.event_stati[k]/nevents:.2f} (%)'
         
         return _repr
 
@@ -200,14 +209,14 @@ class TofAnalysis:
                       nbins         = nbins)
 
     def __init__(self, skip_mangled = True,\
-                 skip_timeout    = True,\
-                 beta_analysis   = True,\
-                 nbins           = 90,
-                 cuts            = _gc.tof.TofCuts(),
-                 use_offsets     = False,
-                 pid_inner       = None,
-                 pid_outer       = None,
-                 active          = False):
+                 skip_timeout       = True,\
+                 beta_analysis      = True,\
+                 nbins              = 90,
+                 cuts               = _gc.tof.TofCuts(),
+                 use_offsets        = False,
+                 pid_inner          = None,
+                 pid_outer          = None,
+                 active             = False):
         """
         Start a new TofAnalysis. This will add create histograms for 
         'interesting' variables and count mangled and timed out 
@@ -603,7 +612,10 @@ class TofAnalysis:
             diff_h  = inner_h[0].event_t0 - outer_h[0].event_t0 
             dist = inner_h[0].distance(outer_h[0])/1000
             cos_theta = abs(outer_h[0].z - inner_h[0].z)/(1000*dist)  
-            beta = dist/(diff_h*1e-9)/299792458
+            if diff_h == 0:
+                beta = 0
+            else:
+                beta = dist/(diff_h*1e-9)/299792458
             self.tmg_cache['dist']   .append(dist)
             self.tmg_cache['x_outer'].append(outer_h[0].x)
             self.tmg_cache['y_outer'].append(outer_h[0].y)

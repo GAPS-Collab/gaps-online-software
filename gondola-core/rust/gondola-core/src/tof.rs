@@ -37,6 +37,8 @@ pub use master_trigger::registers::*;
 pub mod signal_handler;
 #[cfg(feature="tof-liftof")]
 pub use signal_handler::*;
+pub mod analysis;
+pub use analysis::*;
 
 #[cfg(feature="pybindings")]
 use pyo3::pyfunction;

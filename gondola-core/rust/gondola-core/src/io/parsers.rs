@@ -1,10 +1,8 @@
-//! The following file is part of gaps-online-software and published 
-//! under the GPLv3 license
-//!
 //! This file contains generic parsers to read data from a stream of 
 //! bytes and interpret them as various types.
 //!
-//!
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
 
 use crate::prelude::*;
 

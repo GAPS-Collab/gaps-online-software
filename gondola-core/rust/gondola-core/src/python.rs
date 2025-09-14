@@ -119,20 +119,15 @@ macro_rules! pythonize_monidata {
 
 /// Adds common features any class exposed 
 /// obeying the TofPackable trait should 
-/// have
+/// have, but don't set a constructor
 #[macro_export]
-macro_rules! pythonize_packable {
+macro_rules! pythonize_packable_no_new {
   ($pyclass:ty) => {
     //use pyo3::prelude::*;
 
     #[pymethods]
     impl $pyclass {
 
-      #[new]
-      fn new_py() -> Self {
-        Self::new()
-      }
-      
       #[staticmethod]
       #[pyo3(name="from_tofpacket")]
       fn from_tofpacket_py(packet : &TofPacket) -> PyResult<Self> {
@@ -168,6 +163,27 @@ macro_rules! pythonize_packable {
         Ok(format!("<PyO3Wrapper: {}>", self.to_string()))
       }
     }
+  };
+}
+
+/// Adds common features any class exposed 
+/// obeying the TofPackable trait should 
+/// have
+#[macro_export]
+macro_rules! pythonize_packable {
+  ($pyclass:ty) => {
+    //use pyo3::prelude::*;
+
+    #[pymethods]
+    impl $pyclass {
+
+      #[new]
+      fn new_py() -> Self {
+        Self::new()
+      }
+    }
+
+    pythonize_packable_no_new!($pyclass);
   };
 }
 

@@ -395,6 +395,9 @@ impl TofCuts {
   /// If cleanings are enabled, this will 
   /// change the event in-place!
   pub fn accept(&mut self, ev : &mut TofEvent) -> bool {
+    if self.is_void() {
+      return true;
+    }
     // The order of events is important. Hit cleaning 
     // comes before the application of cuts.
     let nhits        = ev.get_nhits() as u64;

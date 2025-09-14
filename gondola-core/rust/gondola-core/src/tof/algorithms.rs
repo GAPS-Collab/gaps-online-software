@@ -42,7 +42,7 @@ pub fn get_max_value_idx<T : std::cmp::PartialOrd + std::fmt::Display + Copy>(va
 #[cfg(feature="pybindings")]
 #[pyfunction]
 #[pyo3(name="get_max_value_idx")]
-pub fn py_get_max_value_idx<'_py>(value : Bound<'_py,PyArray1<f32>>,
+pub fn get_max_value_idx_py<'_py>(value : Bound<'_py,PyArray1<f32>>,
                                   start_idx :usize,
                                   n_idx : usize) -> PyResult<usize> {
   unsafe {
@@ -57,16 +57,26 @@ pub fn py_get_max_value_idx<'_py>(value : Bound<'_py,PyArray1<f32>>,
   }
 }
 
-/// Linear interpolation of the time
-/// between two bins
+/// Linear interpolation of the time within a single bin of a TOF waveform
 ///
-///
-///
-pub fn interpolate_time (voltages      : &Vec<f32>,
-                         nanoseconds   : &Vec<f32>, 
-                         mut threshold : f32,
-                         mut idx       : usize,
-                         size          : usize) -> Result<f32, WaveformError> {
+/// # Arguments:
+///   * voltages    : Waveform in mV 
+///   * nanoseconds : Calibrated time for the waveform bins in ns 
+///   * threshold   : Threshold in mV which is supposed to be crossed 
+///                   within the bin 
+///   * idx         : Together with size define a range for the search for 
+///                   the bin which should have the implementation applied 
+///                   to [voltages[idx], voltages[idx + size]]
+///   * size        : Together with idx define a range for the search for 
+///                   the bin which should have the implementation applied 
+///                   to [voltages[idx], voltages[idx + size]]
+pub fn interpolate_time<T : AsRef<[f32]>> (volts         : &T,
+                                           times         : &T, 
+                                           mut threshold : f32,
+                                           mut idx       : usize,
+                                           size          : usize) -> Result<f32, WaveformError> {
+  let voltages    = volts.as_ref();
+  let nanoseconds = times.as_ref();
   if idx + 1 > nanoseconds.len() {
     return Err(WaveformError::OutOfRangeUpperBound);
   }
@@ -94,6 +104,41 @@ pub fn interpolate_time (voltages      : &Vec<f32>,
   }
 }
 
+
+#[pyfunction]
+#[pyo3(name="interpolate_time")]
+/// Linear interpolation of the time within a single bin of a TOF waveform
+///
+/// # Arguments:
+///   * voltages    : Waveform in mV 
+///   * nanoseconds : Calibrated time for the waveform bins in ns 
+///   * threshold   : Threshold in mV which is supposed to be crossed 
+///                   within the bin 
+///   * idx         : Together with size define a range for the search for 
+///                   the bin which should have the implementation applied 
+///                   to [voltages[idx], voltages[idx + size]]
+///   * size        : Together with idx define a range for the search for 
+///                   the bin which should have the implementation applied 
+///                   to [voltages[idx], voltages[idx + size]]
+pub fn interpolate_time_py<'py>(py          : Python<'py>,
+                                voltages    : PyReadonlyArray1<f32>,
+                                nanoseconds : PyReadonlyArray1<f32>,
+                                threshold   : f32,
+                                idx         : usize,
+                                size        : usize) -> PyResult<f32> {
+  let mut thr = threshold;
+  let mut i   = idx;
+  match interpolate_time(&voltages.readonly().as_slice().unwrap(),
+                         &nanoseconds.readonly().as_slice().unwrap(),
+                         threshold, i, size) {
+    Ok(time) => {
+      return Ok(time);
+    }
+    Err(err) => {
+      return Err(PyValueError::new_err(err.to_string()));
+    }
+  }
+}
 
 
 /// Integrate a waveform

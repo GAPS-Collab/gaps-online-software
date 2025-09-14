@@ -115,7 +115,8 @@ pub use numpy::{
 
 pub use crate::stats::{
   mean,
-  calculate_column_stat
+  calculate_column_stat,
+  standard_deviation
 };
 
 #[cfg(not(feature="database"))]
@@ -141,6 +142,8 @@ pub struct TrackerStripCmnNoise {}
 
 #[cfg(feature="pybindings")]
 pub use crate::pythonize_packable;
+#[cfg(feature="pybindings")]
+pub use crate::pythonize_packable_no_new;
 #[cfg(feature="pybindings")]
 pub use crate::pythonize;
 #[cfg(feature="pybindings")]

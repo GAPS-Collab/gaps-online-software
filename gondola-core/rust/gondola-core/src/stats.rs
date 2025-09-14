@@ -18,6 +18,36 @@ use numpy::{
   PyArrayMethods,
 };
 
+/// Calculates the standard deviation of a vector.
+///
+/// This function returns an Option<f32> because the standard deviation is
+/// undefined for an empty vector or a vector with a single element.
+pub fn standard_deviation(data: &Vec<f32>) -> Option<f32> {
+  // The standard deviation is not defined for vectors with less than 2 elements.
+  if data.len() < 2 {
+    return None;
+  }
+
+  // First, calculate the mean of the data.
+  let mean = mean(data);
+
+  // Then, calculate the sum of the squared differences from the mean.
+  // This is the variance.
+  let variance_sum: f32 = data.iter()
+  .map(|x| (x - mean).powi(2))
+  .sum();
+
+  // The sample standard deviation is the square root of the variance
+  // divided by (n-1), where n is the number of data points.
+  let variance = variance_sum / ((data.len() - 1) as f32);
+
+  // Take the square root to get the standard deviation.
+  Some(variance.sqrt())
+}
+
+
+
+
 /// Calculate the provided statistic over the columns of the given matrix 
 /// representation, respecting nans 
 ///
@@ -37,8 +67,8 @@ pub fn calculate_column_stat<T, F>(data: &Vec<Vec<T>>, func: F) -> Vec<T>
   let num_rows    = data.len();
   // Initialize a Vec to store the column-wise medians
   let mut column_stats: Vec<T> = vec![T::zero(); num_columns];
-  debug!("Calculating medians for {} columns!", num_columns);
-  debug!("Calculating medians for {} rows!", num_rows);
+  debug!("Calculating stat for {} columns!", num_columns);
+  debug!("Calculating stat for {} rows!", num_rows);
   // Calculate the median for each column across all sub-vectors, ignoring NaN values
   for col in 0..num_columns  {
     let mut col_vals: Vec<T> = vec![T::zero(); num_rows];

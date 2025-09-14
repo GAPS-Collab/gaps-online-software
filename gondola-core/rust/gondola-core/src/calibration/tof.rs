@@ -1354,6 +1354,103 @@ impl RBCalibrations {
   self.rb_id = rb_id;
   rb_id
   }
+  
+  /// Self check if the timing constants are sane 
+  pub fn passes_timing_checks(&self) -> bool {
+    for ch in 0..8 {
+      let mut mean = 0.0;
+      for k in 0..NWORDS {
+        mean += self.tbin[ch][k];
+      }
+      mean /= NWORDS as f32;
+      if mean < 0.48824 || mean > 0.48834 {
+        error!("Timing calibration for ch {} / RB {} failed. Got mean of {}", ch + 1, self.rb_id, mean);
+        return false;
+      }
+      let tbin_ch = self.tbin[ch].to_vec();
+      let var = standard_deviation(&tbin_ch).unwrap_or(0.0);
+      if var < 0.08 || var > 0.15 {
+        error!("Timing calibration for ch {}/ RB {} failed. Got st dev of {}", ch + 1, self.rb_id, var);
+        return false;
+      }
+    }
+    debug!("Passed timing calibration sanity checks for RB {}!", self.rb_id);
+    true
+  }
+
+  /// Self check if the voltage constants are sane
+  pub fn passes_voltage_checks(&self) -> bool {
+    for ch in 0..8 {
+      let mut mean = 0.0;
+      for k in 0..NWORDS {
+        mean += self.v_offsets[ch][k];
+      }
+      mean /= NWORDS as f32;
+      if mean < 4200.0 || mean > 5200.0 {
+        error!("Voltage offset calibration for ch {} / RB {} failed. Got mean of {}", ch + 1, self.rb_id, mean);
+        return false;
+      }
+      let v_off = self.tbin[ch].to_vec();
+      let var = standard_deviation(&v_off).unwrap_or(0.0);
+      if var > 150.0 {
+        error!("Voltage offset calibration for ch {} / RB {} failed. Got st dev of {}", ch + 1, self.rb_id, var);
+        return false;
+      }
+      mean = 0.0;
+      for k in 0..NWORDS {
+        mean += self.v_dips[ch][k];
+      }
+      mean /= NWORDS as f32;
+      if mean < -0.5 || mean > 0.5 {
+        error!("Voltage droop calibration for ch {} / RB {} failed. Got mean of {}", ch + 1, self.rb_id, mean);
+        return false;
+      }
+      mean = 0.0;
+      for k in 0..NWORDS {
+        mean += self.v_inc[ch][k];
+      }
+      mean /= NWORDS as f32;
+      if mean < 0.06 || mean > 0.07 {
+        error!("Voltage gain calibration for ch {} / RB {} failed. Got mean of {}", ch + 1, self.rb_id, mean);
+        return false;
+      }
+      let v_inc = self.v_inc[ch].to_vec();
+      let var = standard_deviation(&v_inc).unwrap_or(0.0);
+      if var > 0.00025 {
+        error!("Voltage gain calibration for ch {} / RB {} failed. Got st dev of {}", ch + 1, self.rb_id, var);
+        //return false;
+      }
+    }
+    debug!("Passed voltage calibration sanity checks for RB {}!", self.rb_id);
+    true 
+  }
+
+
+  /// Check voltage and timing constants for sanity 
+  ///
+  /// for each RB channel
+  /// take distribution of 1024 calibration constants and confirm
+  /// 
+  /// Tcal:
+  ///     average value between 0.48824 and 0.48834
+  ///     standard deviation between 0.08 and 0.15.
+  ///     Most common problem: avg of tcal distribution is < 0.48824
+  /// 
+  /// Vcal1 (offsets):
+  ///     average value between 4200 and 5200
+  ///     standard deviation less than 150
+  /// 
+  /// Vcal2 (droop):
+  ///     average value between -0.5 and 0.5
+  ///     print out a warning if the standard deviation for any channel is > 5.0
+  ///     Note that ch1 on any particular board has a more dramatic droop so if ch1 droop is the only channel on the board with this warning, it can be ignored
+  /// 
+  /// Vcal3 (gain):
+  ///     average value between 0.06 and 0.07
+  ///     standard deviation less than 0.00025
+  pub fn check(&self) -> bool {
+    self.passes_timing_checks() && self.passes_voltage_checks() 
+  }
 }
 
 impl TofPackable for RBCalibrations {
@@ -1501,8 +1598,13 @@ impl fmt::Display for RBCalibrations {
     }
 
     //let datetime_utc: DateTime<Utc> = Utc.timestamp_opt(self.timestamp as i64, 0).earliest().unwrap_or(DateTime::<Utc>::from_timestamp_millis(0).unwrap());
+    if !self.check() {
+      return write!(f, "<RBCalibrations [{} UTC] for board {}:
+   -- fails self checks!>", timestamp_str, self.rb_id);
+    }  
     write!(f, 
   "<RBCalibrations [{} UTC]:
+      ** all self checks passed! ** 
       RB             : {}
       VCalData       : {} (events)
       TCalData       : {} (events)
@@ -1594,6 +1696,54 @@ impl RBCalibrations {
     let pyarray = PyArray2::from_vec2(py, &data).unwrap();
     Ok(pyarray)
   }
+  
+  /// Apply the voltage calibration to a single channel 
+  /// FIXME - mixing of naming conventions for the channels
+  ///
+  /// FIXME - make it return Result<(), CalibrationError>
+  ///
+  /// # Arguments
+  ///
+  /// * channel   : Channel id 1-9
+  /// * stop_cell : This channels stop cell 
+  /// * adc       : Uncalibrated channel data
+  /// * waveform  : Pre-allocated array to hold 
+  ///               calibrated waveform data.
+  #[pyo3(name="voltages")]
+  pub fn voltages_py<'_py>(&self,
+                           py        : Python<'_py>,
+                           channel   : usize,
+                           stop_cell : usize,
+                           adc       : Bound<'_py, PyArray1<u16>>)
+      -> PyResult<Bound<'_py, PyArray1<f32>>>{
+                  //waveform  : &mut [f32;NWORDS]) {
+    let mut voltages = vec![0.0f32; 1024];
+    let adc_data = adc.to_vec().unwrap();
+    self.voltages(channel, stop_cell, &adc_data, &mut voltages); 
+    let pyarray = PyArray1::from_vec(py, voltages);
+    Ok(pyarray)
+  }
+  
+  /// Apply the timing calibration to a single channel 
+  /// 
+  /// This will allocate the array for the waveform 
+  /// time bins (unit is ns)
+  ///
+  /// # Arguments
+  ///
+  /// * channel   : Channel id 1-9
+  /// * stop_cell : This channels stop cell 
+  #[pyo3(name="nanoseconds")]
+  pub fn nanoseconds_py<'_py>(&self,
+                              py        : Python<'_py>,                           
+                              channel   : usize,
+                              stop_cell : usize) 
+      -> PyResult<Bound<'_py, PyArray1<f32>>> {
+    let mut times = vec![0.0f32; 1024];
+    self.nanoseconds(channel, stop_cell, &mut times); 
+    let pyarray = PyArray1::from_vec(py, times);
+    Ok(pyarray)
+  }
 
   /// Load the calibration from a file with a 
   /// TofPacket of type RBCalibration in it
@@ -1615,9 +1765,24 @@ impl RBCalibrations {
       }
     }
   }
+
+  #[pyo3(name="passes_voltage_checks")]
+  fn passes_voltage_checks_py(&self) -> bool {
+    self.passes_voltage_checks() 
+  }
+
+  #[pyo3(name="passes_timing_checks")]
+  fn passes_timing_checks_py(&self) -> bool {
+    self.passes_timing_checks()
+  }
+
+  #[pyo3(name="check")]
+  fn check_py(&self) -> bool {
+    self.check()
+  }
 }
 
-
+pythonize_packable_no_new!(RBCalibrations);
 
 #[cfg(feature = "random")]
 impl FromRandom for RBCalibrations {
