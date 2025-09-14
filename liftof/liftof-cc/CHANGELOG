@@ -1,3 +1,27 @@
+# PAKII series 
+
+# v0.11.0
+* implementation of new features from the 
+  MTB fw 
+  - Individual lost rates:
+  - - TIU_LOST_TRIGGER_RATE 
+  - - TRG_LOST_TRIGGER_RATE 
+  - - GAPS_TRIGGER_BLOCKED_RATE 
+  - - TRACK_TRIGGER_BLOCKED_RATE 
+  - - ANY_TRIGGER_BLOCKED_RATE 
+  - - TRACK_CENTRAL_BLOCKED_RATE 
+  - - TRACK_UMB_CENTRAL_BLOCKED_RATE 
+  - - TIU_BUSY_RATE 
+  - Control features for ethernet
+  - - ETH_RX_BAD_FRAME_CNT 
+  - - ETH_RX_BAD_FCS_CNT 
+  - Deadtime related
+  - - MIN_DEADTIME_MODE 
+* uses revised tof_dataclasses (rebranded to 
+  _gondola-core_), this unifies TofEvent, 
+  TofEventSummary & MasterTriggerEvent 
+ 
+
 # LELEWAA series
 
 # v0.10.9
