@@ -17,6 +17,10 @@ analysis/notebooks/.ipynb_checkpoints/
 analysis/notebooks/.python-version
 analysis/notebooks/README.md
 analysis/notebooks/achim_notebooks/.ipynb_checkpoints/*
+analysis/notebooks/src/*
+analysis/notebooks/achim_notebooks/src/*
+analysis/notebooks/achim_notebooks/README.md
+analysis/notebooks/general/.ipynb_checkpoints/*
 
 gaps-db/gaps_db/.gitignore
 gaps-db/gaps_db/.python-version
@@ -126,6 +130,7 @@ doc/latex
 # ingore automatically generated files
 # for static websites
 analysis/umbrella-checkout/content/*.md
+analysis/umbrella-checkout/content/images/*
 
 #test fragments
 gondola-core/rust/gondola-core/liftof-config-test.toml
