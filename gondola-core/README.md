@@ -1,4 +1,4 @@
-# gondola-core - library to access dataclasses within gondola
+# gondola-core - gondola/gaps-online-system core library 
 
 * rust, python and C++ implementations for events, monitoring data,
   i/o, analysis

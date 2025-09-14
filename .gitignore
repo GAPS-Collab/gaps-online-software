@@ -1,6 +1,10 @@
 # specific rye and jupyter notebook artefacts
 *.python-version
 
+ 
+liftof/releases/*
+liftof/target/*
+
 analysis/merge_tcfc/.gitignore
 analysis/merge_tcfc/.python-version
 analysis/mergew_tcfc/src/
@@ -69,11 +73,10 @@ tof/dataclasses/rust/tof-dataclasses/Cargo.lock
 tof/dataclasses/rust/pybindings/target/*
 tof/dataclasses/rust/pybindings/Cargo.lock
 tof/dataclasses/rust/pybindings/rust_dataclasses.so
-tof/liftof/Cargo.lock
-tof/liftof/liftof-tui/Cargo.lock
-tof/liftof/liftof-cc/Cargo.lock
-tof/liftof/liftof-rb/Cargo.lock
-tof/liftof/liftof-python/Cargo.lock
+liftof/Cargo.lock
+liftof/liftof-tui/Cargo.lock
+liftof/liftof-cc/Cargo.lock
+liftof/liftof-rb/Cargo.lock
 
 # pycache
 gaps-db/gaps_db/gaps_db/__pycache__/
