@@ -144,14 +144,14 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
       let mut cali_still_active = false;
       match thread_control.try_lock() {
         Ok(mut tc) => {
-          if tc.thread_event_bldr_active {
-            println!("= => [evt_builder] shutting down...");
+          if !tc.thread_event_bldr_active {
+            println!("= => [evt_builder] (thread_event_bldr_active == false) shutting down...");
             break; 
           }
           //println!("= => [evt_builder] {}", tc);
           if tc.stop_flag {
             // end myself
-            println!("= => [evt_builder] shutting down...");
+            println!("= => [evt_builder] (stop_flag == true) shutting down...");
             retire = true;
           }
           //println!("== ==> [evt_builder] tc lock acquired!");

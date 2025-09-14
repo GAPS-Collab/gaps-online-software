@@ -405,7 +405,15 @@ fn main() {
   println!("-----------------------------------------------\n\n");
   println!("\n\n");
   println!("=> Commencing run start/init procedure...!");
-  println!("=> Will use {} readoutboards! Ignoring {:?} sicne they are mareked as 'ignore' in the config file!", rb_list.len(), rb_ignorelist );
+  println!("=> Will use {} readoutboards!", rb_list.len()); 
+  for k in &rb_list {
+    println!(" -- -- {}", k.rb_id);
+  }
+  if rb_ignorelist_tmp.len() > 0 {
+    println!("==> For this run, the following RB have been explicitly excluded in the config file");
+    println!("{:?}", rb_ignorelist_tmp );
+  }
+  //println!("==> The rest has been marked as to ignore in the config file!");
 
   // log testing
   //error!("error");
@@ -716,7 +724,7 @@ fn main() {
         restart_liftof_rb(&rb_id_list);
         let tc_verification = thread_control.clone();
         let tp_sender_veri  = tp_to_sink.clone();
-        verification_run(verification_rt_sec, tp_sender_veri, tc_verification);
+        verification_run(verification_rt_sec, tp_sender_veri, tc_verification, true);
         println!("=> Verification run finished!");
       }
       // in this scenario, we want to end

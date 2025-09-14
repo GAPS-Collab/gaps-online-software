@@ -21,24 +21,6 @@ use crossbeam_channel::Receiver;
 
 use gondola_core::prelude::*;
 
-//use tof_dataclasses::packets::{
-//  TofPacket,
-//  TofPacketType
-//};
-//
-//use tof_dataclasses::serialization::{
-//  Serialization,
-//  Packable,
-//};
-//
-//use tof_dataclasses::io::{
-//  TofPacketWriter,
-//  FileType,
-//};
-//
-//use tof_dataclasses::heartbeats::HeartBeatDataSink;
-//use liftof_lib::thread_control::ThreadControl;
-
 /// Manages "outgoing" 0MQ PUB socket and writing
 /// data to disk
 ///

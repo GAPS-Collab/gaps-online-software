@@ -17,30 +17,6 @@ use crossbeam_channel::Sender;
 
 use gondola_core::prelude::*;
 
-//use tof_dataclasses::database::ReadoutBoard;
-//use tof_dataclasses::events::RBEvent;
-//use tof_dataclasses::packets::{
-//  TofPacket,
-//  TofPacketType,
-//};
-//
-//use tof_dataclasses::serialization::{
-//  Serialization,
-//  Packable
-//};
-//use tof_dataclasses::calibrations::{
-//  RBCalibrations,
-//  RBCalibrationsFlightT,
-//  RBCalibrationsFlightV,
-//  };
-//
-//use liftof_lib::{
-//  waveform_analysis,
-//};
-//
-//use liftof_lib::thread_control::ThreadControl;
-//use liftof_lib::settings::AnalysisEngineSettings;
-
 /*************************************/
 
 /// Receive data from a readoutboard
@@ -127,9 +103,11 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
   // start continuous thread activity, read data from RB sockets,
   // do analysis and pass them on.
   loop {
+    //println!("tc_timer {}", tc_timer.elapsed().as_secs_f32());
     if tc_timer.elapsed().as_secs_f32() > 2.1 {
       match thread_control.try_lock() {
         Ok(mut tc) => {
+          debug!(" lock on thread control acquired!");
           //println!("== ==> [rbcomm] tc lock acquired!");
           if tc.end_all_rb_threads {
             //println!("= => [rbcomm] initiate ending thread for RB {}!", board_id);
@@ -148,6 +126,7 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
           }
           verification_active = tc.verification_active;
           if verification_active {
+            debug!("Found verification flag active!");
             tc.detector_status.update_from_map(this_status.clone());
           }
         },
@@ -202,6 +181,8 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
                   }
                 }
                 if verification_active {
+                  debug!("Found active verification run, will update hit map!");
+                  debug!("{}", event);
                   for h in &event.hits {
                     // average charge/peak hit
                     let verification_charge_threshhold = 10.0f32;
@@ -220,8 +201,7 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
                       }
                     }
                   }
-                }
-                if !verification_active {
+                } else {
                   match ev_to_builder.send(event) {
                     Ok(_) => (),
                     Err(err) => {
@@ -284,7 +264,7 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
         } // end match from_bytestream
       } // end ok buffer 
     } // end match 
-    debug!("Digested {n_chunk} chunks!");
+    trace!("Digested {n_chunk} chunks!");
     debug!("Noticed {n_errors} errors!");
   } // end loop
   println!("= => [rbcomm] thread for RB {} finished! (not recoverable)", board_id);

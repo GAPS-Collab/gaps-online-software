@@ -45,42 +45,6 @@ use comfy_table::presets::UTF8_FULL;
 use comfy_table::*;
 
 use gondola_core::prelude::*;
-//use liftof_lib::constants::{
-//  DEFAULT_CALIB_VOLTAGE,
-//  DEFAULT_RB_ID,
-//  DEFAULT_CALIB_EXTRA,
-//};
-//
-//use tof_dataclasses::constants::PAD_CMD_32BIT;
-//use tof_dataclasses::serialization::{
-//  Serialization,
-//  Packable
-//};
-//
-//use tof_dataclasses::errors::{
-//  StagingError,
-//  TofError
-//};
-//
-//use tof_dataclasses::commands::{
-//  TofCommand,
-//  TofCommandV2,
-//  TofReturnCode,
-//  TofCommandCode,
-//};
-//
-//use tof_dataclasses::status::TofDetectorStatus;
-//use tof_dataclasses::packets::TofPacket;
-//use tof_dataclasses::database::ReadoutBoard;
-//
-//use tof_dataclasses::io::{
-//    TofPacketWriter,
-//    FileType,
-//    get_utc_timestamp
-//};
-//
-//use liftof_lib::settings::LiftofSettings;
-//use liftof_lib::thread_control::ThreadControl;
 
 /// communicaton between liftof-scheduler and 
 /// liftof-cc
@@ -628,9 +592,15 @@ pub fn restart_liftof_rb(rb_list : &Vec<u8>) {
 /// A verification run will not safe data to disk, but instead 
 /// run it through a small analysis engine and count the active 
 /// channels
+///
+/// # Arguments:
+///   * show_progress  : if true, it will show a progressbar with 
+///                      indicatif
+///
 pub fn verification_run(timeout        : u32,
                         tp_to_sink     : Sender<TofPacket>,
-                        thread_control : Arc<Mutex<ThreadControl>>) {
+                        thread_control : Arc<Mutex<ThreadControl>>,
+                        show_progress  : bool) {
   let mut write_state : bool = true; // when in doubt, write data to disk
   let mut config      = LiftofSettings::new();
   match thread_control.lock() {
@@ -681,12 +651,27 @@ pub fn verification_run(timeout        : u32,
   }
   
   println!("=> Verification run initialized!");
+  let bar_template : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {pos:>7}/{len:7}";
+  let bar_style  = ProgressStyle::with_template(bar_template).expect("Unable to set progressbar style!");
+  let mut bar    = ProgressBar::hidden();
   // just wait until the run is finisehd
+  if show_progress {
+    bar = ProgressBar::new(timeout as u64); 
+    bar.set_position(0);
+    let bar_label  = String::from("Performing verification run");
+    bar.set_message (bar_label);
+    bar.set_prefix  ("\u{2699}\u{1F4D0}");
+    bar.set_style   (bar_style);
+  }
   loop {
-    if runtime.elapsed().as_secs() > timeout as u64 {
+    if runtime.elapsed().as_secs() >= timeout as u64 {
       break;
     }
-    thread::sleep(5*one_second);
+    thread::sleep(1*one_second);
+    bar.set_position(runtime.elapsed().as_secs());
+  }
+  if show_progress {
+    bar.finish_with_message("Done");
   }
   
   println!("=> Ending verification run!");
@@ -829,11 +814,10 @@ pub fn calibrate_tof(thread_control : Arc<Mutex<ThreadControl>>,
     },
   }
 
+  println!("=> .. now we need to wait until the calibration is finished!");
   let bar_template : &str = "[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {pos:>7}/{len:7}";
   let bar_style  = ProgressStyle::with_template(bar_template).expect("Unable to set progressbar style!");
   let mut bar    = ProgressBar::hidden();
-  
-  println!("=> .. now we need to wait until the calibration is finished!");
   if show_progress {
     bar = ProgressBar::new(rb_list.len() as u64); 
     bar.set_position(0);
