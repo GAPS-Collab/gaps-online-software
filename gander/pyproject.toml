@@ -19,7 +19,9 @@ dependencies = [
     "polars>=1.31.0",
     "cmocean>=4.0.3",
     "tomli-w>=1.2.0",
-    "gondola @ file:///srv/gaps/gaps-online-software/gondola-core/rust/gondola-core/target/wheels/gondola-0.11.0-cp311-abi3-manylinux_2_34_x86_64.whl"
+    "gondola @ file:///srv/gaps/gaps-online-software/gondola-core/rust/gondola-core/target/wheels/gondola-0.11.0-cp311-abi3-manylinux_2_34_x86_64.whl",
+    "pyvista>=0.46.3",
+    "stpyvista>=0.1.4",
 ]
 
 

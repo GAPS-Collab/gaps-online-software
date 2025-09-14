@@ -14,6 +14,8 @@ from enum import Enum
 from copy import deepcopy as copy
 from pathlib import Path
 from loguru import logger
+import pyvista as pv
+from stpyvista import stpyvista
 logger.add(sys.stdout, level="INFO")
 
 import gaps_online as go
@@ -48,6 +50,60 @@ try:
 except KeyError:
     st.error("Password not found in secrets.toml. Please configure the secrets file.")
     st.stop()
+
+#################################################
+
+def emit_empty_session_state():
+    session_state = {
+        # app control 
+        'use_dark_theme'        : True,
+        'plot_theme_gaps'       : False,
+        'mark_preliminary'      : False,
+        'mplib_rcprams'         : copy(plt.rcParams),
+        'write_to_disk'         : False,
+        # plots and event data
+        'waveform_figs'         : None,
+        'strip_dict'            : strip_dict,
+        'no_plot_first_bins_wf' : False,
+        'no_plot_first_bins_wf2': False,
+        'no_plot_last_bins_wf'  : False,
+        # input 
+        'infiles'               : [],
+        'files_loaded'          : [],
+        'run_id'                : None, 
+        'event_id'              : [],
+        'load_moni_data'        : False,
+        'moni_data'             : moni_data,
+        'load_waveforms'        : False,
+        #'reader'                : go.io.CRReader(DEFAULT_FILE),
+        'current_event_in_file' : 0,
+        #'current_run_path'      : DEFAULT_FILE,
+        'tof_calib'             : calib,
+        # event viewer          
+        'ev_viewer_cache'       : [],
+        'ev_viewer_cache_size'  : 1000,
+        'ev_viewer_idx'         : 0,
+        # cuts
+        'apply_tracker_mask'    : False,
+        'search_event_id'       : 0,
+        # TOF analysis part
+        'tof_analysis'          : gon.tof.TofAnalysis(),
+        # TRK analysis part
+        'trk_analysis'          : go.tracker.analysis.TrackerAnalysis(),
+        'reco'                  : go.reconstruction.Reconstruction(),
+        'trk_calibration'       : { 'mask' : None, 'pedestal'  : None,\
+                                    'tf'   : None, 'cmn_noise' : None},
+        'vtk_plotter'           : pv.Plotter(window_size=[800, 600], off_screen=True)
+
+    }
+    return session_state
+
+#################################################
+
+def reset_session_state():
+    session_state = emit_empty_session_state()
+    for k in session_state:
+        st.session_state[k] = session_state[k]
 
 #################################################
 
@@ -334,170 +390,76 @@ for k in strips:
 #        ax.add_patch(rect_patch)
 #    return ax
 
-@st.fragment
-def plot_tracker(hits, strp_dict : dict, circle_color='w') -> dict:
-    """
-    Plot tracker layers in xy view as well as a combined projection 
-    in xy, xz and yz. 
-    """
-    if not hits:
-        logger.warning(f'No hits available for tracker layer plots!')
-        return dict()
-    #n_layers   = len(set([k.layer for k in hits]))
-    all_layers = list(set([k.layer for k in hits]))
+#@st.fragment
 
-    all_dets = []
-    #all_strips = []
-
-    all_dets = [(k.global_pos_x_det_l0, k.global_pos_y_det_l0, k.global_pos_z_det_l0) for k in go.db.TrackerStrip.objects.all()]
-
-    all_dets_xz = set([(k[0],k[2]) for k in all_dets])
-    all_dets_yz = set([(k[1],k[2]) for k in all_dets])
-    all_dets_xy = set([(k[0],k[1]) for k in all_dets])
-
-    figures = dict()
-
-    # have one plot for the xy projection
-    fig, ax     = go.tracker.visual.prepare_layer_fig(layer='XY hit projection')
-    #plot_tracker_2dxz(ax, hits = hits)
-    gon.visual.tracker.plot_tracker_proj(ax, hits=hits, projection='xz')
-    figures['trk_proj_xy'] = copy(fig)
-    
-    # another plot for the xz projection
-    fig, ax     = go.tracker.visual.prepare_layer_fig(layer='XZ hit projection', projection='XZ')
-    strip_coord = [get_stripcoordinates(k, strip_dict) for k in hits]
-    det_coord   = [get_detcoordinates(k, strip_dict) for k in hits]
-    adc = [k.adc for k in hits]
-    adc = np.array(adc) / 12
-    xs = [k[0] for k in strip_coord]
-    zs = [k[2] for k in strip_coord]
-    ax.scatter(xs, zs, marker='o', s=adc, facecolor='none', edgecolor='r')
-    # strips
-    for k in all_dets_xz:
-        det = [k[0] - 5, k[1]]
-        rect_patch = patches.Rectangle(det, width=10, height=0.25, color='gray', alpha=0.1)
-        ax.add_patch(rect_patch)
-    figures['trk_proj_xz'] = copy(fig)
-
-    # another plot for the yz projection
-    fig, ax     = go.tracker.visual.prepare_layer_fig(layer='YZ hit projection', projection='YZ')
-    strip_coord = [get_stripcoordinates(k, strip_dict) for k in hits]
-    det_coord   = [get_detcoordinates(k, strip_dict) for k in hits]
-    adc = [k.adc for k in hits]
-    adc = np.array(adc) / 12
-    ys = [k[1] for k in strip_coord]
-    zs = [k[2] for k in strip_coord]
-    dets_ys = [k[0] for k in all_dets_yz]
-    dets_zs = [k[1] for k in all_dets_yz]
-    # strips
-    for k in all_dets_yz:
-        det = [k[0] - 5, k[1]]
-        rect_patch = patches.Rectangle(det, width=10, height=0.25, color='gray', alpha=0.1)
-        ax.add_patch(rect_patch)
-    #ax.scatter(dets_ys, dets_zs, marker='+', color='gray')
-    ax.scatter(ys, zs, marker='o', s=adc, facecolor='none', edgecolor='r')
-    #for k in det_coord:
-    #    patch = patches.Circle(k, radius=5, fill=False, color='k')
-    #    # im.set_clip_path(patch)
-    #    ax.add_patch(patch)
-    figures['trk_proj_xz'] = copy(fig)
-
-    # one plot per layer
-    for i, layer in enumerate(all_layers):
-        strip_coord = [get_stripcoordinates(k, strip_dict) for k in hits if k.layer == layer]
-        det_coord   = [get_detcoordinates(k, strip_dict) for k in hits if k.layer == layer]
-        adc = [k.adc for k in hits if k.layer == layer]
-        # why is this devided by 12?
-        adc = np.array(adc) / 12
-        xs = [k[0] for k in strip_coord]
-        ys = [k[1] for k in strip_coord]
-        fig, ax = go.tracker.visual.prepare_layer_fig(layer=f'Layer {layer}') 
-        ax.scatter(xs, ys, marker='o', s=adc, facecolor='none', edgecolor='r')
-        ax.scatter(xs, ys, marker='.', color='k', alpha=0.1)
-        ax.set_title(f'Layer {layer}', loc='right')
-        for k in det_coord:
-            patch = patches.Circle(k, radius=5, fill=False, color=circle_color)
-            # im.set_clip_path(patch)
-            ax.add_patch(patch)
-            #go.tracker.visual.plot_strip_lines(ax,k, layer, color=circle_color)
-            gon.visual.tracker.plot_strip_lines(ax,k, layer, color=circle_color)
-        for k in all_dets_xy:
-            patch = patches.Circle(k, radius=5, fill=False, color='gray', alpha=0.1)
-            # rect_patch = patches.Rectangle(k[1], width=1, height=100, color='gray', alpha=0.1)
-            ax.add_patch(patch)
-            # ax.add_patch(rect_patch)
-
-        figures[f'trk_layer{layer}'] = copy(fig)
-    return figures
-
-@st.fragment
-def get_event(session, next_ev=False, prev_ev=False, event_id = None):
-    """
-    Get an event from a file.
-
-    #Arguemtns:
-        event_id        : Get a specific event id
-    """
-    tofevent_key       = 'PacketType.TofEvent'
-    tel_ev_key_nogaps  = "TelemetryPacketType.NoGapsTriggerEvent";
-    tel_ev_key_boring  = "TelemetryPacketType.BoringEvent";
-    tel_ev_key_intrst  = "TelemetryPacketType.InterestingEvent";
-    session['tel_ev_type']  = None
-
-    event_id = None
-
-    print (f'-> Get event! Last event {session["current_event_in_file"]}')
-    n_frames = 0
-    if next_ev:
-        n_frames = session['current_event_in_file']
-    if prev_ev:
-        session.reader.rewind()
-        for frame in session.reader:
-            if tofevent_key in frame.index:
-                n_frames += 1
-                if n_frames == session['current_event_in_file'] - 2:
-                    next_ev = True
-                    break
-
-    for frame in session.reader:
-        #print (frame)
-        if tofevent_key in frame.index:
-            # new API :)
-            
-            session['tof_ev'] = frame.get_tofevent(tofevent_key)
-            # apply cuts
-            print ('mintofhits', session.min_tof_hits)
-            if session.min_tof_hits > 0:
-                if session.tof_ev.nhits < session.min_tof_hits:
-                    continue
-            if session.min_umb_hits > 0:
-                if session.tof_ev.nhits_umb < session.min_umb_hits:
-                    continue
-            tel_ev = None
-            session['event_id'] = session['tof_ev'].event_id 
-            if tel_ev_key_nogaps in frame.index:
-                session['tel_ev']      = frame.get_mergedevent(tel_ev_key_nogaps)
-                session['tel_ev_type'] = tel_ev_key_nogaps.replace('TelemetryPacketType.', '') 
-            if tel_ev_key_boring in frame.index:
-                session['tel_ev'] = frame.get_mergedevent(tel_ev_key_boring)
-                session['tel_ev_type'] = tel_ev_key_boring.replace('TelemetryPacketType.', '') 
-            if tel_ev_key_intrst in frame.index:
-                session['tel_ev'] = frame.get_mergedevent(tel_ev_key_intrst)
-                session['tel_ev_type'] = tel_ev_key_intrst.replace('TelemetryPacketType.', '') 
-            #if len(session['tof_ev'].pointcloud) < 20:
-            #    continue
-            n_frames += 1
-        if next_ev:
-            session['current_event_in_file'] = n_frames
-            break
-    print ('-> get_event finished')
+#@st.fragment
+#def get_event(session, next_ev=False, prev_ev=False, event_id = None):
+#    """
+#    Get an event from a file.
+#
+#    #Arguemtns:
+#        event_id        : Get a specific event id
+#    """
+#    tofevent_key       = 'PacketType.TofEvent'
+#    tel_ev_key_nogaps  = "TelemetryPacketType.NoGapsTriggerEvent";
+#    tel_ev_key_boring  = "TelemetryPacketType.BoringEvent";
+#    tel_ev_key_intrst  = "TelemetryPacketType.InterestingEvent";
+#    session['tel_ev_type']  = None
+#
+#    event_id = None
+#
+#    print (f'-> Get event! Last event {session["current_event_in_file"]}')
+#    n_frames = 0
+#    if next_ev:
+#        n_frames = session['current_event_in_file']
+#    if prev_ev:
+#        session.reader.rewind()
+#        for frame in session.reader:
+#            if tofevent_key in frame.index:
+#                n_frames += 1
+#                if n_frames == session['current_event_in_file'] - 2:
+#                    next_ev = True
+#                    break
+#
+#    for frame in session.reader:
+#        #print (frame)
+#        if tofevent_key in frame.index:
+#            # new API :)
+#            
+#            session['tof_ev'] = frame.get_tofevent(tofevent_key)
+#            # apply cuts
+#            print ('mintofhits', session.min_tof_hits)
+#            if session.min_tof_hits > 0:
+#                if session.tof_ev.nhits < session.min_tof_hits:
+#                    continue
+#            if session.min_umb_hits > 0:
+#                if session.tof_ev.nhits_umb < session.min_umb_hits:
+#                    continue
+#            tel_ev = None
+#            session['event_id'] = session['tof_ev'].event_id 
+#            if tel_ev_key_nogaps in frame.index:
+#                session['tel_ev']      = frame.get_mergedevent(tel_ev_key_nogaps)
+#                session['tel_ev_type'] = tel_ev_key_nogaps.replace('TelemetryPacketType.', '') 
+#            if tel_ev_key_boring in frame.index:
+#                session['tel_ev'] = frame.get_mergedevent(tel_ev_key_boring)
+#                session['tel_ev_type'] = tel_ev_key_boring.replace('TelemetryPacketType.', '') 
+#            if tel_ev_key_intrst in frame.index:
+#                session['tel_ev'] = frame.get_mergedevent(tel_ev_key_intrst)
+#                session['tel_ev_type'] = tel_ev_key_intrst.replace('TelemetryPacketType.', '') 
+#            #if len(session['tof_ev'].pointcloud) < 20:
+#            #    continue
+#            n_frames += 1
+#        if next_ev:
+#            session['current_event_in_file'] = n_frames
+#            break
+#    print ('-> get_event finished')
 
 ##################################################
 # Event viewer 
 
 def _event_viewer_data() -> dict:
     return {
-            #'event'                   : None,
+            'merged_event'            : None,
             'packet_type'             : None,
             'tof_xy'                  : None,
             'gaps_xy'                 : None,
@@ -575,23 +537,24 @@ def create_event_plots(no_plot_first_bins_wf=False) -> dict:
     if isinstance(ev, gon.events.TelemetryEvent):
         ev_tof = ev.tof
         data['tof_event'] = ev_tof
+        data['merged_event'] = ev
     else:
         st.write(f'{type(ev)}')
         raise ValueError('Right now, event view works only with MergedEvents')
+    data['packet_type']     = ptype
     if ev.tof.hits:
         paddle_style            = {'edgecolor' : 'w', 'lw' : 1.0}
-        data['packet_type']     = ptype
         data['tof_xy']    , ax  = go.tof.visual.tof_projection_xy(event=ev_tof, cmap=matplotlib.colormaps['seismic'])
         data['tof_cbe']   , ax2 = go.tof.visual.unroll_cbe_sides  (event=ev_tof, cmap=matplotlib.colormaps['seismic'], paddle_style = paddle_style)
         data['tof_cor']   , ax3 = go.tof.visual.unroll_cor        (event=ev_tof, cmap=matplotlib.colormaps['seismic'], paddle_style = paddle_style)
         data['tof_xy_all'], data['tof_xz_all'], data['tof_yz_all'] \
-                = go.tof.visual.tof_2dproj(event=ev_tof, cmap=matplotlib.colormaps['seismic'])
+                = gon.visual.tof.tof_2dproj(event=ev_tof, cmap=matplotlib.colormaps['seismic'])
     data['tof_hits'] = ev.tof.hits
     for h in ev.tracker:
         data['trk_hits'].append(h)
     ## FIXME - the pointcloud needs masking
-    data['trk_pointcloud'] = ev.tracker_pointcloud 
-    data['n_trk_hits_masked'] = n_trk_hits_masked
+    data['trk_pointcloud']          = ev.tracker_pointcloud 
+    data['n_trk_hits_masked']       = n_trk_hits_masked
     data['n_trk_hits_no_mask_info'] = n_trk_hits_no_mask_info
     #data['trk_plots'] = plot_tracker(data['trk_hits'], strip_dict)
     if wf_ev is not None:
@@ -602,32 +565,27 @@ def create_event_plots(no_plot_first_bins_wf=False) -> dict:
             data['waveform_figs'], __ = go.tof.visual.plot_waveforms(wf_ev, calib=calib, with_hits=True)  
     return data
 
-    skip_bins = 0
-    if session['no_plot_first_bins_wf']:
-        session['waveform_figs'], waveform_axs = go.tof.visual.plot_waveforms(session['tof_ev'], calib=calib, with_hits=True, skip_bins=10)  
-    else:
-        session['waveform_figs'], waveform_axs = go.tof.visual.plot_waveforms(session['tof_ev'], calib=calib, with_hits=True)  
-   
-    session['trk_hits'] = []
-    for h in session['tel_ev'].tracker_v2:
-        session['trk_hits'].append(h)
-    tracker_hits = session['tel_ev'].tracker_v2
-    if session['apply_tracker_mask']:
-        tracker_hits = []
-        for h in session['tel_ev'].tracker_v2:
-            mask = go.db.TrackerStripMask.filter(strip_id=h.strip_id, mask_name=session['tracker_mask'])
-            if len(mask) == 0:
-                print (f'!WARN - no mask for strip {h.strip_id} found!')
-                tracker_hits.append(h)
-            elif len(mask) == 1:
-                if mask.active:
-                    tracker_hits.append(h)
-            else:
-                print (f'!WARN - ambiguos mask for strip {h.strip_id} found!')
-                tracker_hits.append(h)
+#    session['trk_hits'] = []
+#    for h in session['tel_ev'].tracker_v2:
+#        session['trk_hits'].append(h)
+#    tracker_hits = session['tel_ev'].tracker_v2
+#    if session['apply_tracker_mask']:
+#        tracker_hits = []
+#        for h in session['tel_ev'].tracker_v2:
+#            mask = go.db.TrackerStripMask.filter(strip_id=h.strip_id, mask_name=session['tracker_mask'])
+#            if len(mask) == 0:
+#                print (f'!WARN - no mask for strip {h.strip_id} found!')
+#                tracker_hits.append(h)
+#            elif len(mask) == 1:
+#                if mask.active:
+#                    tracker_hits.append(h)
+#            else:
+#                print (f'!WARN - ambiguos mask for strip {h.strip_id} found!')
+#                tracker_hits.append(h)
 
 ##################################################
 
+@st.fragment
 def file_loader(f, event_type,\
                 merged_event_types   = MERGED_EVENT_TYPES,
                 write_to_basket      = False,
@@ -679,6 +637,7 @@ def file_loader(f, event_type,\
             reco_analysis = go.reconstruction.Reconstruction(**reco_analysis_kwargs)
     nframes = 0
     exclude_event_types = [k for k in MERGED_EVENT_TYPES if k not in merged_event_types] 
+    
     for frame in reader:
         match event_type:
             case EventType.Unknown:
@@ -769,6 +728,14 @@ def file_loader(f, event_type,\
                 print (nframes)
     return (tof_analysis, trk_analysis,reco_analysis, event_samples)
 
+#-----------------------------------------
+
+@st.fragment 
+def clear_loaded_runs():
+    st.session_state.event_cache = []
+
+#-----------------------------------------
+
 @st.fragment
 def clear_analysis():
     """
@@ -783,10 +750,14 @@ def clear_analysis():
     st.session_state.ev_viewer_cache       = []
     st.session_state.moni_data             = moni_data
 
+#-----------------------------------------
+
 @st.fragment
 def clear_cuts():
     st.session_state.tof_analysis.cuts = go.tof.analysis.TofCuts()
     st.session_state.trk_analysis.cuts = go.tracker.analysis.TrackerCuts()
+
+#-----------------------------------------
 
 @st.fragment
 def load_run(event_type         = EventType.Merged,\
@@ -800,8 +771,8 @@ def load_run(event_type         = EventType.Merged,\
     # load the files!
     write_to_basket = st.session_state.write_to_disk
     st.session_state.files_loaded = copy(st.session_state.infiles)
-    tof_analysis_kwargs = {'skip_mangled'  : True,
-                           'skip_timeout'  : True,
+    tof_analysis_kwargs = {'skip_mangled'  : copy(st.session_state.tof_analysis.skip_mangled),
+                           'skip_timeout'  : copy(st.session_state.tof_analysis.skip_timeout),
                            'beta_analysis' : True,
                            'nbins'         : nbins,
                            'use_offsets'   : copy(st.session_state.tof_analysis.use_offsets),
@@ -836,6 +807,7 @@ def load_run(event_type         = EventType.Merged,\
         for f in stqdm(st.session_state.infiles, desc="Loading run data, this might take a while...", total = len(st.session_state.infiles)):
             st.session_state.moni_data['mtb'].add_crfile(str(f), 'TelemetryPacketType.AnyTofHK')
             result = file_loader(f, event_type,
+                                 merged_event_types = merged_event_types,
                                  search_event_id = search_event_id,
                                  tof_analysis_kwargs = tof_analysis_kwargs,\
                                  trk_analysis_kwargs = trk_analysis_kwargs,
@@ -1050,47 +1022,48 @@ if check_password():
     calib = gon.calibration.load_rb_calibrations(calibs[0])
    
     moni_data = {'mtb' : go.tof.monitoring.MtbMoniSeries()}
-
-    session_state = {
-        # app control 
-        'use_dark_theme'        : True,
-        'plot_theme_gaps'       : False,
-        'mark_preliminary'      : True,
-        'mplib_rcprams'         : copy(plt.rcParams),
-        'write_to_disk'         : False,
-        # plots and event data
-        'waveform_figs'         : None,
-        'strip_dict'            : strip_dict,
-        'no_plot_first_bins_wf' : False,
-        'no_plot_first_bins_wf2': False,
-        'no_plot_last_bins_wf'  : False,
-        # input 
-        'infiles'               : [],
-        'files_loaded'          : [],
-        'run_id'                : None, 
-        'event_id'              : [],
-        'load_moni_data'        : False,
-        'moni_data'             : moni_data,
-        'load_waveforms'        : False,
-        #'reader'                : go.io.CRReader(DEFAULT_FILE),
-        'current_event_in_file' : 0,
-        #'current_run_path'      : DEFAULT_FILE,
-        'tof_calib'             : calib,
-        # event viewer          
-        'ev_viewer_cache'       : [],
-        'ev_viewer_cache_size'  : 1000,
-        'ev_viewer_idx'         : 0,
-        # cuts
-        'apply_tracker_mask'    : False,
-        'search_event_id'       : 0,
-        # TOF analysis part
-        'tof_analysis'          : gon.tof.TofAnalysis(),
-        # TRK analysis part
-        'trk_analysis'          : go.tracker.analysis.TrackerAnalysis(),
-        'reco'                  : go.reconstruction.Reconstruction(),
-        'trk_calibration'       : { 'mask' : None, 'pedestal'  : None,\
-                                    'tf'   : None, 'cmn_noise' : None}
-    }
+    
+    session_state = emit_empty_session_state()
+    #session_state = {
+    #    # app control 
+    #    'use_dark_theme'        : True,
+    #    'plot_theme_gaps'       : False,
+    #    'mark_preliminary'      : False,
+    #    'mplib_rcprams'         : copy(plt.rcParams),
+    #    'write_to_disk'         : False,
+    #    # plots and event data
+    #    'waveform_figs'         : None,
+    #    'strip_dict'            : strip_dict,
+    #    'no_plot_first_bins_wf' : False,
+    #    'no_plot_first_bins_wf2': False,
+    #    'no_plot_last_bins_wf'  : False,
+    #    # input 
+    #    'infiles'               : [],
+    #    'files_loaded'          : [],
+    #    'run_id'                : None, 
+    #    'event_id'              : [],
+    #    'load_moni_data'        : False,
+    #    'moni_data'             : moni_data,
+    #    'load_waveforms'        : False,
+    #    #'reader'                : go.io.CRReader(DEFAULT_FILE),
+    #    'current_event_in_file' : 0,
+    #    #'current_run_path'      : DEFAULT_FILE,
+    #    'tof_calib'             : calib,
+    #    # event viewer          
+    #    'ev_viewer_cache'       : [],
+    #    'ev_viewer_cache_size'  : 1000,
+    #    'ev_viewer_idx'         : 0,
+    #    # cuts
+    #    'apply_tracker_mask'    : False,
+    #    'search_event_id'       : 0,
+    #    # TOF analysis part
+    #    'tof_analysis'          : gon.tof.TofAnalysis(),
+    #    # TRK analysis part
+    #    'trk_analysis'          : go.tracker.analysis.TrackerAnalysis(),
+    #    'reco'                  : go.reconstruction.Reconstruction(),
+    #    'trk_calibration'       : { 'mask' : None, 'pedestal'  : None,\
+    #                                'tf'   : None, 'cmn_noise' : None}
+    #}
 
 
     def configure_app():
@@ -1116,11 +1089,12 @@ if check_password():
         """
         st.header('Run overview (L0)')
         st.divider()
-        st.subheader('Run statistic')
-        if st.session_state.tof_analysis.finished and st.session_state.tof_analysis.active:
+        if st.session_state.files_loaded:
+            st.subheader('Run statistic')
             with st.expander(f"Loaded {len(st.session_state.files_loaded)} files!"):
                 for k in st.session_state.files_loaded:
                     st.write(f'-- {k}')
+        if st.session_state.tof_analysis.finished and st.session_state.tof_analysis.active:
             
             st.text(f'{st.session_state.tof_analysis.pretty_print_statistics()}')
             if not st.session_state.tof_analysis.cuts.void:
@@ -1133,80 +1107,116 @@ if check_password():
             st.text(f'TRK analysis {st.session_state.trk_analysis.pretty_print_statistics()}')
         # universal kwargs for run loading
         load_run_kwargs = dict()
-        
+          
         # create tabbed interface
         tab_run, tab_reco, tab_tofanalysis, tab_trkanalysis, tab_tof_cali, tab_settings, = st.tabs(["Run", "Reconstruction", "TOF analysis", "TRK analysis", "TOF cali", "Other settings"])
         
         with tab_run:
-            #st.subheader('Available runs without waveforms')
-            st.session_state.load_waveforms = st.checkbox('Load runs with waveforms (might be slower)', value=st.session_state.load_waveforms)
-            
-            l_col, m_col, r_col = st.columns(3, vertical_alignment="top")
-            # sort by subrun
-            # FIXME - ultimatly, we want to sort by time
-            if st.session_state.load_waveforms:
-                all_runs     = [k for k in Path(config['data']['waveform']).glob('*')]
-                runids       = [k.name for k in all_runs]
-                selected_run = l_col.selectbox('Select a run (with wf)', tuple(runids))
-                selected_run = all_runs[0].parent / selected_run 
-                sr_infiles   = selected_run.glob('*.gaps')
+            if len(st.session_state.files_loaded) > 0:
+                st.button("Clear loaded run!", on_click=reset_session_state) 
+            else:
+                #st.subheader('Available runs without waveforms')
+                st.session_state.load_waveforms = st.checkbox('Load runs with waveforms (might be slower)', value=st.session_state.load_waveforms)
+                
+                l_col, m_col, r_col = st.columns(3, vertical_alignment="top")
                 # sort by subrun
                 # FIXME - ultimatly, we want to sort by time
-                sr_infiles = [k for k in sorted(sr_infiles, key=lambda x : go.io.get_fileinfo(str(x))[1])]
-                load_n_files = m_col.number_input(
-                  "Number of files to load (with wf)",
-                  value=len(sr_infiles),
-                  min_value=0,
-                  step=1,
-                  placeholder="Load only a subset of files")
-                load_run_kwargs['event_type'] = EventType.Tof
-            else:
-                all_runs     = [k for k in Path(config['data']['no_waveform']).glob('*')]
-                runids       = [k.name for k in all_runs]
-                selected_run = l_col.selectbox('Select a run (no wf)', tuple(runids))
-                selected_run = all_runs[0].parent / selected_run 
-                sr_infiles   = selected_run.glob('*.gaps')
-                sr_infiles   = [k for k in sorted(sr_infiles, key=lambda x : go.io.get_fileinfo(str(x))[1])]
-                load_n_files = m_col.number_input(
-                  "Number of files to load",
-                  value=len(sr_infiles),
-                  min_value=0,
-                  step=1,
-                  placeholder="Load only a subset of files")
+                if st.session_state.load_waveforms:
+                    all_runs     = [k for k in Path(config['data']['waveform']).glob('*')]
+                    runids       = [k.name for k in all_runs]
+                    selected_run = l_col.selectbox('Select a run (with wf)', tuple(runids))
+                    selected_run = all_runs[0].parent / selected_run 
+                    sr_infiles   = selected_run.glob('*.gaps')
+                    # sort by subrun
+                    # FIXME - ultimatly, we want to sort by time
+                    sr_infiles = [k for k in sorted(sr_infiles, key=lambda x : go.io.get_fileinfo(str(x))[1])]
+                    load_n_files = m_col.number_input(
+                      "Number of files to load (with wf)",
+                      value=len(sr_infiles),
+                      min_value=0,
+                      step=1,
+                      placeholder="Load only a subset of files")
+                    load_run_kwargs['event_type'] = EventType.Tof
+                else:
+                    all_runs     = [k for k in Path(config['data']['no_waveform']).glob('*')]
+                    runids       = [k.name for k in all_runs]
+                    selected_run = l_col.selectbox('Select a run (no wf)', tuple(runids))
+                    selected_run = all_runs[0].parent / selected_run 
+                    sr_infiles   = selected_run.glob('*.gaps')
+                    sr_infiles   = [k for k in sorted(sr_infiles, key=lambda x : go.io.get_fileinfo(str(x))[1])]
+                    load_n_files = m_col.number_input(
+                      "Number of files to load",
+                      value=len(sr_infiles),
+                      min_value=0,
+                      step=1,
+                      placeholder="Load only a subset of files")
 
-            st.session_state.infiles = sr_infiles[:load_n_files]
-            st.divider()
-            ncpus = r_col.number_input(
-                  "Use number of CPUs (experimental, does not support monitoring right now)",
-                  min_value=1,
-                  max_value=config['system']['ncpu'],
-                  step=1,
-                  placeholder="Select number of CPUs to use for reading out the data. (experimental)")
-            load_run_kwargs['ncpus'] = ncpus
-            st.session_state.search_event_id = m_col.number_input(
-                  "Search for a specific event id (0 for all events)",
-                  value=st.session_state.search_event_id,
-                  min_value=0,
-                  step=1,
-                  placeholder="Select a specific event id")
-            st.session_state.load_moni_data = st.checkbox('Load all available monitoring data', value=st.session_state.load_moni_data)
-            # show a mini overview of run information
-            # the index should have - number of packets, number of events
-            print (load_run_kwargs)
-            l_col.button("Load run!", on_click=load_run, kwargs=load_run_kwargs) 
-            m_col.button("Clear analysis!", on_click=clear_analysis) 
-            #r_col.button('Abort!', on_click=abort_run_loader)    
-            if config['data']['allow_write']:
-                st.session_state.write_to_disk = l_col.checkbox('Write selected data to disk', value=st.session_state.write_to_disk)
-                #load_run_kwargs['write_to_basket'] = st.session_state.write_to_disk 
+                st.session_state.infiles = sr_infiles[:load_n_files]
+                st.divider()
+                ncpus = r_col.number_input(
+                      "Use number of CPUs (experimental, does not support monitoring right now)",
+                      min_value=1,
+                      max_value=config['system']['ncpu'],
+                      step=1,
+                      placeholder="Select number of CPUs to use for reading out the data. (experimental)")
+                load_run_kwargs['ncpus'] = ncpus
+                st.session_state.search_event_id = m_col.number_input(
+                      "Search for a specific event id (0 for all events)",
+                      value=st.session_state.search_event_id,
+                      min_value=0,
+                      step=1,
+                      placeholder="Select a specific event id")
+                st.session_state.load_moni_data = st.checkbox('Load all available monitoring data', value=st.session_state.load_moni_data)
+                # show a mini overview of run information
+                # the index should have - number of packets, number of events
+                print (load_run_kwargs)
+                #r_col.button('Abort!', on_click=abort_run_loader)    
+                if config['data']['allow_write']:
+                    st.session_state.write_to_disk = l_col.checkbox('Write selected data to disk', value=st.session_state.write_to_disk)
+                    #load_run_kwargs['write_to_basket'] = st.session_state.write_to_disk 
+                st.divider()
+                st.write("Pick merged event types to load! All others will be dismissed!")
+                merged_event_types = []
+                # default is to use the MergedEvents 
+                use_event = EventType.Merged 
+                if not st.session_state.load_waveforms:
+                    all_event_types = [EventType.Merged, EventType.Tof]
+                    use_event = st.selectbox('Pick the event packet to use', 
+                                                 all_event_types,
+                                                 index=all_event_types.index(EventType.Merged))
+                else:
+                    use_event = EventType.Tof
+                if use_event == EventType.Merged:
+                    boring = st.checkbox('BoringEvent'       , value=True)                
+                    nogaps = st.checkbox('NoGapsTriggerEvent', value=True)
+                    inter  = st.checkbox('InterestingEvent'  , value=True)
+                    notof  = st.checkbox('NoTofDataEvent (recommended to be excluded)'    , value=False)
+                    if boring:
+                        merged_event_types.append('TelemetryPacketType.BoringEvent')
+                    if nogaps:
+                        merged_event_types.append('TelemetryPacketType.NoGapsTriggerEvent')
+                    if inter:
+                        merged_event_types.append('TelemetryPacketType.InterestingEvent')
+                    if notof:
+                        merged_event_types.append('TelemetryPacketType.NoTofDataEvent')
+                load_run_kwargs.update({
+                        'event_type'         : use_event,
+                        'merged_event_types' : merged_event_types})
+                st.divider()
+                l_col, m_col, r_col = st.columns(3, vertical_alignment="top")
+               
+                print (load_run_kwargs)
+                l_col.button("Load run!", on_click=load_run, kwargs=load_run_kwargs) 
+                m_col.button("Clear analysis!", on_click=clear_analysis) 
+        
         with tab_reco:
             st.session_state.reco.active = st.checkbox('run linefit reconstruction')
             st.divider()
 
         with tab_tofanalysis:
-            tof_analysis = st.checkbox("run low level TOF analysis", value=st.session_state.tof_analysis.active) 
+            tof_analysis_active = st.checkbox("run low level TOF analysis", value=st.session_state.tof_analysis.active) 
             
-            if tof_analysis:
+            if tof_analysis_active:
                 l_col, m_col, r_col = st.columns(3, vertical_alignment="bottom")
                 cachesize = l_col.number_input(
                   "cache size",
@@ -1224,32 +1234,35 @@ if check_password():
                   placeholder="Set the number of bins for the histograms")
                 if nbins != st.session_state.tof_analysis.nbins:
                     st.session_state.tof_analysis.reinit(nbins = nbins)
-                if not st.session_state.load_waveforms:
-                    all_event_types = [EventType.Merged, EventType.Tof]
-                    use_event = l_col.selectbox('Pick the event packet to use', 
-                                                 all_event_types,
-                                                 index=all_event_types.index(EventType.Merged))
-                    if not isinstance(use_event, EventType):
-                        raise ValueError('boo!')
-                else:
-                    use_event = EventType.Merged
-                merged_event_types = []
-                if use_event == EventType.Merged:
-                    boring = st.checkbox('BoringEvent'       , value=True)                
-                    nogaps = st.checkbox('NoGapsTriggerEvent', value=True)
-                    inter  = st.checkbox('InterestingEvent'  , value=True)
-                    notof  = st.checkbox('NoTofDataEvent (recommended to be excluded)'    , value=False)
-                    if boring:
-                        merged_event_types.append('TelemetryPacketType.BoringEvent')
-                    if nogaps:
-                        merged_event_types.append('TelemetryPacketType.NoGapsTriggerEvent')
-                    if inter:
-                        merged_event_types.append('TelemetryPacketType.InterestingEvent')
-                    if notof:
-                        merged_event_types.append('TelemetryPacketType.NoTofDataEvent')
+                #if not st.session_state.load_waveforms:
+                #    all_event_types = [EventType.Merged, EventType.Tof]
+                #    use_event = l_col.selectbox('Pick the event packet to use', 
+                #                                 all_event_types,
+                #                                 index=all_event_types.index(EventType.Merged))
+                #    if not isinstance(use_event, EventType):
+                #        raise ValueError('boo!')
+                #else:
+                #    use_event = EventType.Merged
+                #merged_event_types = []
+                #if use_event == EventType.Merged:
+                #    boring = st.checkbox('BoringEvent'       , value=True)                
+                #    nogaps = st.checkbox('NoGapsTriggerEvent', value=True)
+                #    inter  = st.checkbox('InterestingEvent'  , value=True)
+                #    notof  = st.checkbox('NoTofDataEvent (recommended to be excluded)'    , value=False)
+                #    if boring:
+                #        merged_event_types.append('TelemetryPacketType.BoringEvent')
+                #    if nogaps:
+                #        merged_event_types.append('TelemetryPacketType.NoGapsTriggerEvent')
+                #    if inter:
+                #        merged_event_types.append('TelemetryPacketType.InterestingEvent')
+                #    if notof:
+                #        merged_event_types.append('TelemetryPacketType.NoTofDataEvent')
 
-                st.session_state.tof_analysis.active = tof_analysis
+                st.session_state.tof_analysis.active = tof_analysis_active
+                st.session_state.tof_analysis.nbins  = nbins
                 st.session_state.tof_analysis.use_offsets = st.checkbox('Use timing offsets from .json')
+                # FIXME - this needs to be specific to the TofAnalysis 
+                load_run_kwargs['nbins'] = nbins
                 st.divider()
                 l_col_cuts, m_col_cuts, r_col_cuts = st.columns(3, vertical_alignment="top")
                 st.text("Cuts on TOF hits in CBE, UMB, COR are combined with AND")
@@ -1326,8 +1339,8 @@ if check_password():
                       min_value=0.0,
                       step=0.05,
                       placeholder="Perform lightspeed cleaning for TOF hits`")
-                else:
-                    st.session_state.tof_analysis.cuts.ls_cleaning_t_err = np.inf
+                #else:
+                #    st.session_state.tof_analysis.cuts.ls_cleaning_t_err = np.inf
                 st.divider()
                 st.text('Select specific paddles for the beta calculation. If none are selected, then the first outer hit and the first inner hit will be used to calculate beta')
                 l_col_pair, m_col_pair, __ = st.columns(3, vertical_alignment="top")
@@ -1355,11 +1368,13 @@ if check_password():
                 if not st.session_state.tof_analysis.cuts.void:
                     st.write(f'Will apply this cut')
                     st.text(f'{st.session_state.tof_analysis.cuts}')
+                st.divider()
+                st.text("Skip events with doubtful quality!")
+                l_col_ev_stat, m_col_ev_stat, __ = st.columns(3, vertical_alignment="top")
+                st.session_state.tof_analysis.skip_mangled = l_col_ev_stat.checkbox("Skip mangled events!", value=st.session_state.tof_analysis.skip_mangled)
+                st.session_state.tof_analysis.skip_timeout = m_col_ev_stat.checkbox("Skip timed out events!", value=st.session_state.tof_analysis.skip_timeout)
+                st.divider() 
                 r_col_cuts.button('Reset cuts!', on_click=clear_cuts)
-                load_run_kwargs.update({
-                        'event_type'         : use_event,
-                        'merged_event_types' : merged_event_types,
-                        'nbins'              : nbins})
         
         with tab_trkanalysis:
             st.session_state.trk_analysis.active = st.checkbox("run low level TRK analysis", value=st.session_state.trk_analysis.active) 
@@ -1683,7 +1698,7 @@ if check_password():
             #ax.set_title('umbrella trigger hit occupancy', loc='right')
             #ax.spines['top'].set_visible(True)
             #ax.spines['right'].set_visible(True)
-            fig.savefig('tof-umb-occ.pdf')
+            #fig.savefig('tof-umb-occ.pdf')
             st.pyplot(fig)
 
             fig, __ = go.tof.visual.unroll_cbe_sides(paddle_occupancy=occu_t, cmap = cmap)
@@ -1703,11 +1718,20 @@ if check_password():
         occu    = copy(st.session_state.tof_analysis.occupancy)
         occu_t  = copy(st.session_state.tof_analysis.occupancy_t)
         occu_t_non_normalized = copy(st.session_state.tof_analysis.occupancy_t)
-        max_occu   = max([occu[k] for k in occu])
-        max_occu_t = max([occu_t[k] for k in occu_t])
+        if len(occu) > 0:
+            max_occu   = max([occu[k] for k in occu])
+        else:
+            max_occu   = 1 
+        if len(occu_t) > 0:
+            max_occu_t = max([occu_t[k] for k in occu_t])
+        else:
+            max_occu_t = 1
+
         for k  in occu:
-            occu[k]   /= max_occu
-            occu_t[k] /= max_occu_t
+            if max_occu != 0:
+                occu[k]   /= max_occu 
+            if max_occu_t != 0:
+                occu_t[k] /= max_occu_t
         # show page
         st.subheader('Relative TOF occupancey')
         st.write(f'{st.session_state.tof_analysis.n_events} events loaded!')
@@ -1742,10 +1766,10 @@ if check_password():
             st.write('-> Please go to Run -> Load Run to load some events for this analysis!')
             return
         
-        tracker_plots = plot_tracker(ev_data['trk_hits'], strip_dict)
+        #tracker_plots = plot_tracker(ev_data['trk_hits'], strip_dict)
 
         st.subheader(f"Event {ev_data['tof_event'].event_id}")
-        l_col, r_col,__,__,__,__,__,__,__,__,__,__ = st.columns(12, vertical_alignment="bottom")
+        l_col, r_col, __, __, __, __, __, __  = st.columns(8, vertical_alignment="bottom")
         l_col.button("PrevEvent", on_click=prev_event, args=[st.session_state]) 
         r_col.button("NextEvent", on_click=next_event, args=[st.session_state]) 
         tab_event, tab_tof_panels, tab_tof_waveforms, tab_tracker_layers, tab_2d, tab_3d = st.tabs(["Event", "Tof panels", "Tof waveforms", "Trk layers", "2d projections", "3d view"])
@@ -1757,23 +1781,27 @@ if check_password():
             if ev_data['tof_event'].status == go.events.EventStatus.EventTimeOut:
                 st.badge("EventTimedOut", color='red')
             st.subheader('Event properties : ')
-            ## the formatting here looks weird, but apperas nicely in the app
-            st.text(f'''           Trigger sources : {ev_data["tof_event"].trigger_sources}
-            Status                  : {ev_data["tof_event"].status}
-            Event ID              : {ev_data["tof_event"].event_id}
-            Timestamp        : {ev_data["tof_event"].timestamp48}''')
-            mapping = go.io.dsi_j_pid_map
-            st.divider()
-            st.text(f'TRIGGER HITS : {[h for h in ev_data['tof_event'].trigger_hits]}')
-            st.text(f'RB LINK IDs : {[int(h) for h in ev_data["tof_event"].rb_link_ids]}')
-            if ev_data['tof_event'].get_missing_paddles_hg(mapping):
-                st.text(f'MISSING HG HITS: {[int(h) for h in ev_data['tof_event'].get_missing_paddles_hg(mapping)]}')
-            
-            st.subheader(f"{len(ev_data['tof_hits'])} TOF hits")
-            for h in ev_data['tof_hits']:
-                with st.expander(f"Paddle {h.paddle_id}"):
-                    st.text(f'{h}')
-            st.subheader(f"{len(ev_data['trk_hits'])} TRK hits")
+            if ev_data['merged_event'] is not None:
+                st.text(f'{ev_data["merged_event"]}')
+                st.divider()
+            if not ev_data['tof_event'].event_id == 0: 
+                ## the formatting here looks weird, but apperas nicely in the app
+                st.text(f'''           Trigger sources : {ev_data["tof_event"].trigger_sources}
+                Status                  : {ev_data["tof_event"].status}
+                Event ID              : {ev_data["tof_event"].event_id}
+                Timestamp        : {ev_data["tof_event"].timestamp48}''')
+                mapping = go.io.dsi_j_pid_map
+                st.divider()
+                st.text(f'TRIGGER HITS : {[h for h in ev_data['tof_event'].trigger_hits]}')
+                st.text(f'RB LINK IDs : {[int(h) for h in ev_data["tof_event"].rb_link_ids]}')
+                if ev_data['tof_event'].get_missing_paddles_hg(mapping):
+                    st.text(f'MISSING HG HITS: {[int(h) for h in ev_data['tof_event'].get_missing_paddles_hg(mapping)]}')
+                
+                st.subheader(f"{len(ev_data['tof_hits'])} TOF hits")
+                for h in ev_data['tof_hits']:
+                    with st.expander(f"Paddle {h.paddle_id}"):
+                        st.text(f'{h}')
+                st.subheader(f"{len(ev_data['trk_hits'])} TRK hits")
             for h in ev_data['trk_hits']:
                 with st.expander(f'Strip {h.strip_id}'):
                     st.text(f'{h}')
@@ -1814,7 +1842,17 @@ if check_password():
                     st.pyplot(wf_plot)
 
         with tab_tracker_layers:
-            pass
+            ev_filename , ptype, (ev, wf_ev) = st.session_state.ev_viewer_cache[st.session_state.ev_viewer_idx]
+            trk_plots = gon.visual.tracker.plot_tracker(hits = ev.tracker) 
+            if trk_plots:
+                st.pyplot(trk_plots['trk_proj_xy'], use_container_width=False)
+                st.pyplot(trk_plots['trk_proj_xz'], use_container_width=False)
+                st.pyplot(trk_plots['trk_proj_yz'], use_container_width=False)
+                layer_keys = [k for k in trk_plots.keys() if k not in ('trk_proj_xy', 'trk_proj_xz', 'trk_proj_yz')]
+                for k in layer_keys:
+                    layer = int(k[10:])
+                    with st.expander(f"Layer {layer}"):
+                        st.pyplot(trk_plots[k], use_container_width=False) 
             #if ev_data['trk_plots']:
             #    for k in ev_data['trk_plots'].keys():
             #        fig = ev_data['trk_plots'][k]
@@ -1858,7 +1896,7 @@ if check_password():
 
                 zs = [k[2] for k in ev_data['trk_pointcloud']]
                 zs.extend([h.z for h in ev_data['tof_event'].hits])
-
+                
                 xs = np.array(xs)
                 ys = np.array(ys)
                 zs = np.array(zs)
@@ -1885,13 +1923,13 @@ if check_password():
             print (ev_data['tof_event'].rb_events)
             
             tof_xy_all, tof_xz_all, tof_yz_all \
-                = go.tof.visual.tof_2dproj(event=ev_data['tof_event'],\
-                                           cmap=cmap,
-                                           paddle_style   = paddle_style,
-                                           no_ax_no_ticks = no_ax,
-                                           show_cbar      = show_cbar,
-                                           cnorm_max      = 2,
-                                           cs_is_energy   = cs_is_energy)
+                = gon.visual.tof.tof_2dproj(event=ev_data['tof_event'],\
+                                            cmap=cmap,
+                                            paddle_style   = paddle_style,
+                                            no_ax_no_ticks = no_ax,
+                                            show_cbar      = show_cbar,
+                                            cnorm_max      = 2,
+                                            cs_is_energy   = cs_is_energy)
             if plot_tracker2d or show_linefit:
                 ax = tof_xy_all.gca()
                 if show_linefit:
@@ -1949,11 +1987,132 @@ if check_password():
             st.pyplot(tof_xz_all)
             st.pyplot(tof_yz_all)
             st.subheader('TOF Noise identification - "lightspeed cleaning"') 
-            time_evolution = go.tof.visual.tof_hits_time_evolution(ev_data['tof_event'],line_color='w', t_err = cleaning_tolerance)
+            time_evolution = gon.visual.tof.tof_hits_time_evolution(ev_data['tof_event'],line_color='w', t_err = cleaning_tolerance)
             st.pyplot(time_evolution)
 
         with tab_3d:
-            pass
+            # Load mesh
+            show_3dplot = st.checkbox('Show 3d plot! (experimental, might take a while)')
+            show_linefit   = st.checkbox('Show a simple linefit', key='lf_for_3d')
+            xs = [k[0] for k in ev_data['trk_pointcloud']]
+            xs.extend([h.x for h in ev_data['tof_event'].hits])
+
+            ys = [k[1] for k in ev_data['trk_pointcloud']]
+            ys.extend([h.y for h in ev_data['tof_event'].hits])
+
+            zs = [k[2] for k in ev_data['trk_pointcloud']]
+            zs.extend([h.z for h in ev_data['tof_event'].hits])
+            sizes = [k[3] for k in ev_data['trk_pointcloud']]
+            sizes.extend([h.edep for h in ev_data['tof_event'].hits])
+
+            xs = np.array(xs)
+            ys = np.array(ys)
+            zs = np.array(zs)
+            sizes = 5*np.array(sizes) 
+            
+            plotter = st.session_state.vtk_plotter
+            if st.button("Reset"):
+                del st.session_state.vtk_plotter 
+                st.session_state.vtk_plotter = pv.Plotter(window_size=[800, 600], off_screen=True)
+            
+            if show_linefit:
+                
+                reco = go.reconstruction.line_fit(xs, ys, zs, search_anchor = False)
+                if reco is not None:
+                    # plot in z from -25 to 250
+                    p0, chi2 = reco[0](2200),reco[1]
+                    #chi2/(len(xs) - 6)
+                    p1 = reco[0](-200)
+                    print ('RCONSTRUCTION!',p0, p1, chi2)
+                    p0 = np.array(p0)
+                    p1 = np.array(p1)
+                    p_arrow_h = reco[0](500) # somewhat close to the end
+                    p_arrow_t = reco[0](300) # somewhat close to the end
+                else:
+                    show_linefit = False
+
+            if show_3dplot:
+                
+                mesh = pv.read("/srv/gaps/gaps-online-software/event-viewer/sample.ply")
+                print ("Mesh loaded!") 
+                # Create a PyVista plotter
+                plotter.set_background("#0E1117")
+                print ("Plotter created")
+                # Example: point cloud
+                #points = np.random.rand(100, 3) * 10  # 100 random points in space
+                points = np.array([k for k in zip(xs,ys,zs)])/10
+                print (points)
+                #sizes = np.linspace(5, 20, len(points))       # point sizes
+                colors = np.random.rand(len(points), 3)       # RGB colors in [0,1]
+                
+                point_cloud = pv.PolyData(points)
+                point_cloud["colors"] = (colors * 255).astype(np.uint8)
+                #point_cloud["sizes"] = sizes
+                point_cloud["scales"] = sizes 
+                # Create sphere source for glyphs
+                sphere = pv.Sphere(radius=1.0)
+                
+                # Glyph each point with its own size
+                glyphs = point_cloud.glyph(
+                    geom=sphere,
+                    scale="scales",   # use per-point scaling
+                    orient=False
+                )
+
+                
+                # Create PyVista plotter
+                plotter = pv.Plotter(window_size=[800, 600], off_screen=True)
+                plotter.set_background("#0E1117")
+                #plotter.set_background("#000000")
+
+                ## Add point cloud (with custom sizes & colors)
+                plotter.add_mesh(glyphs, scalars="colors", rgb=True)
+                #plotter.add_points(
+                #    point_cloud,
+                #    scalars="colors",
+                #    rgb=True,
+                #    render_points_as_spheres=True,
+                #    point_size=10,  # global scale, sizes will modulate this
+                #)
+                #
+                ## Add line
+                # Example: line between two points
+                if show_linefit:
+                    line_points = (p0/10,p1/10)
+                #line_points = np.array([[0, 0, 0], [5, 5, 5]])
+                    line = pv.Line(line_points[0], line_points[1])
+                    plotter.add_mesh(line, color="#F0F0F0", line_width=5)
+                # Add wireframe mesh
+                #plotter.add_mesh(mesh, color="#F0F0F0", style="wireframe", line_width=1)
+                paddles = gon.db.TofPaddle.all()
+                for pdl in paddles:
+                    box = pv.wrap(pdl._create_box())
+                #box = pv.Box(bounds=(0, 1, 0, 2, 0, 0.5)) 
+                # Add mesh as wireframe
+                #plotter.add_mesh(mesh, color="#F0F0F0", style="wireframe", line_width=1)
+                    plotter.add_mesh(box, color="#F0F0F0", style="wireframe", line_width=1)
+                print ("mesh added")
+
+                # Render inside Streamlit
+                plotter.reset_camera()
+                #col1, col2, col3, col4, __, __, __, __, __, __, __, __ = st.columns(12)
+                #with col1:
+                #    if st.button("🔄 Reset"):
+                #        plotter.reset_camera()    
+                #with col2:
+                #    if st.button("X-Axis"):
+                #        plotter.view_xz()
+                #        plotter.reset_camera()
+                #with col3:
+                #    if st.button("Y-Axis"):
+                #        plotter.view_yz()
+                #        plotter.reset_camera() 
+                #with col4:
+                #    if st.button("Z-Axis"):
+                #        plotter.view_xy()
+                #        plotter.reset_camera()
+                stpyvista(plotter, key="ply_viewer")
+                print ("stpvista done")
 
     @st.fragment
     def page_nhit():
@@ -1963,14 +2122,22 @@ if check_password():
             st.divider()
         else: 
             r = st.session_state.tof_analysis
-            fig = gon.visual.tof.plot_hg_lg_hits(r.nhit_plots['hit'],\
-                                                 r.nhit_plots['thit'],\
-                                                 n_events         = r.n_events,\
-                                                 no_hitmissing    = r.no_hitmiss,\
-                                                 one_hitmissing   = r.one_hitmiss,\
-                                                 lttwo_hitmissing = r.two_hitmiss,\
-                                                 extra_hits       = r.extra_hits)
+            st.write(f"{r.n_events} were loaded in the analysis!")
+            st.write(f"-- {r.no_hitmiss} [{100*r.no_hitmiss/r.n_events:.3f}%] events had no hit missing")
+            st.write(f"-- {r.one_hitmiss} [{100*r.one_hitmiss/r.n_events:.3f}%] events had one hits missing")
+            st.write(f"-- {r.two_hitmiss} [{100*r.two_hitmiss/r.n_events:.3f}%] events had two or more hits missing")
+            print (r.nhit_plots['hit'].bincontent) 
+            print (r.nhit_plots['thit'].bincontent) 
+
+            fig, fig_ratio  = gon.visual.tof.plot_hg_lg_hits(r.nhit_plots['hit'],\
+                                                             r.nhit_plots['thit'],\
+                                                             n_events         = r.n_events,\
+                                                             no_hitmissing    = r.no_hitmiss,\
+                                                             one_hitmissing   = r.one_hitmiss,\
+                                                             lttwo_hitmissing = r.two_hitmiss,\
+                                                             extra_hits       = r.extra_hits)
             st.pyplot(fig)
+            st.pyplot(fig_ratio)
             fig = gander_plot(r.nhit_plots['miss_hit'],\
                               xlabel=r'PID',\
                               title='Missing hits on paddle',
