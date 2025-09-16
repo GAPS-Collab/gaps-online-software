@@ -345,6 +345,56 @@ impl TofPacketReader {
     nframes
   } // end fn
 
+  /// The very first TofPacket for a reader
+  pub fn first_packet(&mut self) -> Option<TofPacket> {
+    match self.rewind() {
+      Err(err) => {
+        error!("Error when rewinding files! {err}");
+      }
+      Ok(_) => ()
+    }
+    let pack = self.read_next_item();
+    match self.rewind() {
+      Err(err) => {
+        error!("Error when rewinding files! {err}");
+      }
+      Ok(_) => ()
+    }
+    return pack;
+  }
+
+  /// The very last TofPacket for a reader
+  pub fn last_packet(&mut self) -> Option<TofPacket> { 
+    self.file_idx    = self.filenames.len() - 1;
+    let lastfilename = self.filenames[self.file_idx].clone();
+    let lastfile     = OpenOptions::new().create(false).append(false).read(true).open(lastfilename).expect("Unable to open file {nextfilename}");
+    self.file_reader = BufReader::new(lastfile);
+    self.cursor      = 0;
+    let mut tp = TofPacket::new();
+    let mut idx = 0;
+    loop {
+      match self.read_next_item() {
+        None => {
+          match self.rewind() {
+            Err(err) => {
+              error!("Error when rewinding files! {err}");
+            }
+            Ok(_) => ()
+          }
+          if idx == 0 {
+            return None;
+          } else {
+            return Some(tp);
+          }
+        }
+        Some(pack) => {
+          idx += 1;
+          tp = pack;
+          continue;
+        }
+      }
+    }
+  }
 
 
 }
@@ -405,6 +455,20 @@ impl TofPacketReader {
     //}
   }
 
+  #[getter]
+  fn first(&mut self) -> Option<TofPacket> {
+    self.first_packet()
+  }
+
+  #[getter]
+  fn last(&mut self) -> Option<TofPacket> {
+    self.last_packet()
+  }
+ 
+  #[getter]
+  fn filenames(&self) -> Vec<String> {
+    self.filenames.clone()
+  }
   //#[pyo3(name="set_tracker_calibrations_from_fnames")]
   //#[pyo3(signature = (mask = None, pedestal = None, transfer_fn = None, cmn_noise = None))]
   //fn set_tracker_calibrations_from_fnames_py(&mut self,

@@ -5,9 +5,6 @@
 
 use crate::prelude::*;
 
-
-
-
 /// The Caraspace object type determines the 
 /// kind of object we are able to put in 
 /// a frame and ultimate (de)serialize
