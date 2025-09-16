@@ -73,6 +73,26 @@ impl TelemetryPacketHeader {
   fn get_packet_type(&self) -> TelemetryPacketType {
     self.packet_type
   }
+
+  #[getter]
+  fn get_timestamp(&self) -> u32 {
+    self.timestamp 
+  }
+
+  #[getter]
+  fn get_counter(&self) -> u16 {
+    self.counter 
+  }
+
+  #[getter]
+  fn get_length(&self) -> u16 {
+    self.length
+  } 
+
+  #[getter] 
+  fn get_checksum(&self) -> u16 {
+    self.checksum 
+  }
 }
 
 // Trait implementations

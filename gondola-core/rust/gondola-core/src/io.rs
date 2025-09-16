@@ -146,6 +146,23 @@ pub fn get_utc_timestamp() -> String {
   timestamp_str
 }
 
+/// Retrieve the utc timestamp from any telemetry (binary) file 
+#[cfg_attr(feature="pybindings", pyfunction)]
+pub fn get_unix_timestamp_from_telemetry(fname : &str) -> Option<u64> { 
+  let mut tformat_re = Regex::new(GENERIC_TELEMETRY_FILE_PATTERN_CAPUTRE).unwrap();
+  let res = tformat_re.captures(fname).and_then(|caps| {
+    let map : HashMap<String, String> = tformat_re.capture_names()
+      .filter_map(|name| name)
+      .filter_map(|name| { 
+        //caps.name(name).map(|m| (m.as_str().to_string(), m.as_str().to_string()))
+        caps.name(name).map(|m| (name.to_string(), m.as_str().to_string()))
+      })
+      .collect();
+    Some(map)
+  });
+  return get_unix_timestamp(&res.unwrap()["utctime"], None); 
+}
+
 //----------------------------------------------------------
 
 /// Create date string in YYMMDD format

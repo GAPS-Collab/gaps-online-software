@@ -1,9 +1,12 @@
 # specific rye and jupyter notebook artefacts
 *.python-version
-
+# in each folder where we used rye, and created 
+# its own virtual environment an src folder gets 
+# created
  
 liftof/releases/*
 liftof/target/*
+liftof/src/*
 
 analysis/merge_tcfc/.gitignore
 analysis/merge_tcfc/.python-version

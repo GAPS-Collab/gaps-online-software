@@ -155,7 +155,7 @@ impl fmt::Display for CRWriter {
 #[pymethods]
 impl CRWriter {
   
-    #[new]
+  #[new]
   #[pyo3(signature = (filename, run_id, subrun_id = None, timestamp = None))]
   fn new_py(filename : String, run_id : u32, subrun_id : Option<u64>, timestamp : Option<String>) -> Self {
     Self::new(filename, run_id, subrun_id, timestamp)

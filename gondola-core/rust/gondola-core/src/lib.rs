@@ -250,10 +250,14 @@ fn io_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(get_rundata_from_file, m)?)?;
   m.add_function(wrap_pyfunction!(get_datetime, m)?)?;
   m.add_function(wrap_pyfunction!(get_unix_timestamp, m)?)?;
+  m.add_function(wrap_pyfunction!(get_unix_timestamp_from_telemetry, m)?)?;
   m.add_class::<CRFrameObject>()?;
+  m.add_class::<CRFrame>()?;
   m.add_class::<DataSourceKind>()?;
   m.add_class::<CRReader>()?;
+  m.add_class::<CRWriter>()?;
   m.add_class::<TofPacketReader>()?;
+  m.add_class::<TelemetryPacketReader>()?;
   //m.add_class::<PyDataSource>()?;
   Ok(())
 }

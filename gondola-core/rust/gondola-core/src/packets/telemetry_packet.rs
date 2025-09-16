@@ -38,6 +38,13 @@ impl TelemetryPacket {
   fn packet_type(&self) -> TelemetryPacketType {
     TelemetryPacketType::from(self.header.packet_type)
   }
+
+  /// Check if this is either any of the different merged event 
+  /// types 
+  #[pyo3(name="is_event_packet")]
+  fn is_event_packet_py(&self) -> bool {
+    self.is_event_packet()
+  }
 }
 
 impl TelemetryPacket {
@@ -48,7 +55,18 @@ impl TelemetryPacket {
       payload : Vec::<u8>::new()
     }
   }
-  
+ 
+  pub fn is_event_packet(&self) -> bool {
+    if self.header.packet_type == TelemetryPacketType::NoTofDataEvent
+      || self.header.packet_type == TelemetryPacketType::NoGapsTriggerEvent 
+      || self.header.packet_type == TelemetryPacketType::InterestingEvent 
+      || self.header.packet_type == TelemetryPacketType::BoringEvent {
+      true 
+    } else {
+      false
+    }
+  }
+
   /// Unpack the TelemetryPacket and return its content
   pub fn unpack<T>(&self) -> Result<T, SerializationError>
     where T: TelemetryPackable + Serialization {
