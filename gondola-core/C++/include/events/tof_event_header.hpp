@@ -7,7 +7,7 @@
 #include "tof_typedefs.h"
 
 namespace r = result;
-namespace g = Gaps;
+//namespace g = Gaps;
 
 struct TofEventHeader {
   static constexpr u16 HEAD   = 0xAAAA;
@@ -57,7 +57,7 @@ struct TofEventHeader {
   auto get_timestamp48() const -> f64;
 
   static auto from_bytestream(const Vec<u8> &stream, u64 &pos)
-    -> r::Result<TofEventHeader, g::IOError>;
+    -> r::Result<TofEventHeader, Gaps::IOError>;
 
 }; // end TofEventHeader
 

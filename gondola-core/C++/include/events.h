@@ -34,7 +34,7 @@
 #endif
 
 namespace r = result;
-namespace g = Gaps;
+//namespace g = Gaps;
 
 class RBCalibration;
 
@@ -196,7 +196,7 @@ struct RBEventHeader {
   RBEventHeader();
  
   static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos)
-    -> r::Result<RBEventHeader, g::IOError>;
+    -> r::Result<RBEventHeader, Gaps::IOError>;
 
   auto get_channels()             const -> Vec<u8>;
   auto get_nchan()                const -> u8;
@@ -555,7 +555,7 @@ struct TofEvent {
    *
    */
   static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos)
-    -> r::Result<TofEvent, g::IOError>;
+    -> r::Result<TofEvent, Gaps::IOError>;
 
   /**
    * Factory function for TofEvents.
@@ -678,8 +678,8 @@ struct TofEventSummary {
   f32         tot_edep_cor      ;
   
   static auto from_tofpacket(const TofPacket &packet)          
-    -> r::Result<TofEventSummary, g::IOError>;
-  static auto from_bytestream(const Vec<u8> &stream, u64 &pos) -> r::Result<TofEventSummary, g::IOError> ;
+    -> r::Result<TofEventSummary, Gaps::IOError>;
+  static auto from_bytestream(const Vec<u8> &stream, u64 &pos) -> r::Result<TofEventSummary, Gaps::IOError> ;
   
   #ifdef BUILD_CXXDB
   /// set a TofPaddle, that is enrich every tofhit with information

@@ -16,3 +16,6 @@
 [submodule "resources/extern/result"]
 	path = resources/extern/result
 	url = https://github.com/tylerreisinger/result
+[submodule "resources/extern/nanobind"]
+	path = resources/extern/nanobind
+	url = https://github.com/wjakob/nanobind

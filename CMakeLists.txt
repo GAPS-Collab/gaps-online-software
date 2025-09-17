@@ -87,19 +87,11 @@ endif()
 
 # -- pybindings with pybind11
 
-if (BUILD_CXXPYBINDINGS)
-  message(STATUS "Checking for pyoind11....")
-  # populates Python_INCLUDE_DIRS
-  find_package (Python 3.10 COMPONENTS Interpreter Development)
-  find_package(pybind11 )
-  if(NOT ${pybind11_FOUND})
-    message(WARNING "-- Can not find pybind11! Please install with sudo apt install pybind11-dev on a linux system!")
-    set(BUILD_PYBINDINGS OFF CACHE BOOL "build pybindings with pybind11" FORCE)
-  else()
-    message(STATUS "-- found pybind11, building pybindings.")
-  endif()
-endif(BUILD_CXXPYBINDINGS)
-
+#if (BUILD_CXXPYBINDINGS)
+if (BUILD_CXX_PYBINDINGS) 
+  find_package(Python 3.8 COMPONENTS Interpreter Development.Module REQUIRED)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/resources/extern/nanobind)
+endif() 
 
 set(INSTALL_LIBRARY_DIR  "${CMAKE_INSTALL_PREFIX}/lib" CACHE PATH      "installation directory for libraries" FORCE)
 set(INSTALL_INCLUDE_DIR  "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH  "installation directory for header files" FORCE)

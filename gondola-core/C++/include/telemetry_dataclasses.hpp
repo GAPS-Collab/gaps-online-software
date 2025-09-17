@@ -10,7 +10,6 @@
 #include "events.h"
 #include "errors.hpp"
 
-namespace g = Gaps;
 namespace r = result;
 
 namespace Gaps {
@@ -66,7 +65,7 @@ namespace Gaps {
       auto get_gcutime() -> f64;
       auto to_string() const -> std::string;
       static auto from_bytestream(Vec<u8> const &stream, usize &pos)
-        -> r::Result<PacketHeader, g::IOError>;
+        -> r::Result<PacketHeader, Gaps::IOError>;
     };
 
     struct Packet {
@@ -160,7 +159,7 @@ namespace Gaps {
        auto to_string() const -> std::string;
        
        static auto from_bytestream(Vec<u8> const &stream, usize &pos)
-        -> r::Result<Cooling, g::IOError>;
+        -> r::Result<Cooling, Gaps::IOError>;
     };
 
     /// The actual merged event sent over telemetry 
@@ -193,7 +192,7 @@ namespace Gaps {
     
       auto to_string() const -> std::string;
       static auto from_bytestream(Vec<u8> const &stream, usize &pos)
-        -> r::Result<MergedEvent, g::IOError>;
+        -> r::Result<MergedEvent, Gaps::IOError>;
     };
   }
 }

@@ -14,10 +14,7 @@
 #include "database.h"
 #endif
 
-namespace r  = result;
-namespace go = gondola;
-
-namespace Gaps {
+namespace gondola {
   /// Get all files in a certain directory in case it is a directory, for 
   /// a single file just get the file <3 ChatGPT
   std::vector<std::string> list_path_contents_sorted(const std::string& input);
@@ -58,7 +55,7 @@ namespace Gaps {
     static auto parse_index(Vec<u8> stream, usize &pos) -> std::map<std::string, std::tuple<u64, CRFrameObjectType>>;
 
     /// extract a tofpacket if this frame object is of the correct type
-    auto get_tofpacket(std::string name) -> r::Result<TofPacket,Gaps::IOError>;
+    auto get_tofpacket(std::string name) -> result::Result<TofPacket,Gaps::IOError>;
     auto get_telemetrypacket(std::string name) -> Gaps::Telemetry::Packet;
   };
 
@@ -86,18 +83,18 @@ namespace Gaps {
     auto n_packets_read() const -> bool;
     /// get the RBCalibration map
     /// the paramter is the number of RBs we expect in this run
-    auto get_rbcalibrations(u8 n_rb) -> go::RBCalibrationMap;     
+    auto get_rbcalibrations(u8 n_rb) -> RBCalibrationMap;     
 
   private:  
     #ifdef BUILD_CXXDB
-    TofPaddleMap     paddles_          ; 
+    Gaps::TofPaddleMap paddles_          ; 
     #endif 
-    bool             exhausted_        ;
-    usize            n_packets_read_   ;
-    Vec<std::string> filenames_        ;
-    std::ifstream    stream_file_      ;
-    usize            fileindex_        ;
-    auto             prime_next_file_() -> void;
+    bool               exhausted_        ;
+    usize              n_packets_read_   ;
+    Vec<std::string>   filenames_        ;
+    std::ifstream      stream_file_      ;
+    usize              fileindex_        ;
+    auto               prime_next_file_() -> void;
   };
 }
 #endif

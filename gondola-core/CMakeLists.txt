@@ -3,7 +3,7 @@
 ## gondola-core written in RUST
 
 if(BUILD_CXX_WITH_ROOT)
-  set(GONDOLA_DICTIONARY G__GapsTof)
+  set(GONDOLA_DICTIONARY G__GondolaCore)
 endif(BUILD_CXX_WITH_ROOT)
 
 ##============================================
@@ -20,6 +20,8 @@ if(BUILD_CXX_WITH_ROOT AND BUILD_CXX_BINDINGS)
   )
 endif()  
 
+##============================================
+
 if (BUILD_CXX_BINDINGS)
   message(STATUS "-- Building gondola-core C++ library.")
   set(GONDOLA_LIBRARY_SHARED GondolaCore CACHE INTERNAL "gondola-core C++ shared library" FORCE)
@@ -31,6 +33,7 @@ if (BUILD_CXX_BINDINGS)
               C++/src/parsers.cxx
               C++/src/events.cxx
               C++/src/io.cxx
+              C++/src/telemetry_reader.cxx
               C++/src/monitoring.cxx
               C++/src/legacy.cxx
               C++/src/logging.cxx
@@ -71,4 +74,12 @@ if (BUILD_CXX_BINDINGS)
       DESTINATION ${CMAKE_INSTALL_PREFIX}
   )
 endif(BUILD_CXX_BINDINGS)
+
+##============================================
+
+if(BUILD_CXX_PYBINDINGS)
+  message(STATUS "-- Building gondola-core C++ pybindings with nanobind.")
+  nanobind_add_module(gondola_cxx NOMINSIZE C++/python/gondola_core.cxx)
+endif(BUILD_CXX_PYBINDINGS) 
+
 
