@@ -71,7 +71,7 @@ if (BUILD_CXX_BINDINGS)
 
   include(CMakePackageConfigHelpers)
   write_basic_package_version_file(
-      ${CMAKE_INSTALL_PREFIX}/GapsOnlineSoftwareConfigVersion.cmake
+      ${CMAKE_CURRENT_BINARY_DIR}/GapsOnlineSoftwareConfigVersion.cmake
       VERSION ${GAPS_ONLINE_SOFTWARE_VERSION}
       COMPATIBILITY AnyNewerVersion
   )
@@ -80,6 +80,11 @@ if (BUILD_CXX_BINDINGS)
     "${CMAKE_CURRENT_BINARY_DIR}/GapsOnlineSoftwareConfig.cmake"
     INSTALL_DESTINATION ${CMAKE_INSTALL_PREFIX} 
   )
+
+  install(FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/GapsOnlineSoftwareConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/GapsOnlineSoftwareConfigVersion.cmake"
+        DESTINATION ${CMAKE_INSTALL_PREFIX})
 
   install(EXPORT GAPSTargets
       FILE GapsOnlineSoftware.cmake
