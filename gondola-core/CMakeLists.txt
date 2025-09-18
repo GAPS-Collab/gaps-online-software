@@ -76,6 +76,11 @@ if (BUILD_CXX_BINDINGS)
       COMPATIBILITY AnyNewerVersion
   )
 
+  configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/../GapsOnlineSoftwareConfig.cmake.in
+    "${CMAKE_CURRENT_BINARY_DIR}/GapsOnlineSoftwareConfig.cmake"
+    INSTALL_DESTINATION ${CMAKE_INSTALL_PREFIX} 
+  )
+
   install(EXPORT GAPSTargets
       FILE GapsOnlineSoftware.cmake
       NAMESPACE GapsOnlineSoftware::
