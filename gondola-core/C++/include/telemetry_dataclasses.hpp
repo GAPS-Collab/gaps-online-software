@@ -74,22 +74,47 @@ namespace Gaps {
       auto to_string() const -> std::string;
       static auto from_bytestream(Vec<u8> const &stream, usize &pos) -> Packet;
     };
+   
+
+    struct TrkHeader {
+       static constexpr u16 SIZE = 17; 
+       static constexpr u16 HEAD = 0x90eb;
+       
+       u16   sync;
+       u16   crc;
+       u8    sys_id;
+       u8    packet_id;
+       u16   length;
+       u16   daq_count;
+       u64   sys_time;
+       u8    version;
+      
+       auto to_string() const -> std::string;
+       
+       static auto from_bytestream(Vec<u8> const &stream, usize &pos)
+         -> r::Result<TrkHeader, Gaps::IOError>;
+    };
 
     struct TrkHit {
       // using i32 here makes no sense in my eyes, but I defer to 
-      // bfsw
-      i32 layer          {-1};
-      i32 row            {-1};
-      i32 module         {-1};
-      i32 channel        {-1};
-      i32 adc            {-1};
-      i64 oscillator     {-1};
-      f64 energy         {0};
-    
+      // bfsw ( I assume it is because of sqlite which does not know
+      // unsigned) 
+      // FIXME - change this
+      i32 layer           {-1};
+      i32 row             {-1};
+      i32 module          {-1};
+      i32 channel         {-1};
+      i32 adc             {-1};
+      i64 oscillator      {-1};
+      f64 energy          {0};
+      /// In BFSW, there are two versions of the tracker hit, 
+      /// tracker_hit and tracker::hit. The latter has 
+      /// an extra ASIC event code field. Let's unify those here
+      u8  asic_event_code {0};
       auto to_string() const -> std::string;
     };
    
-   struct TrkEvent {
+    struct TrkEvent {
       u8          layer;
       u8          flags1;
       u32         event_id; 
@@ -97,7 +122,19 @@ namespace Gaps {
       Vec<TrkHit> hits;
 
       auto to_string() const -> std::string;
-   };
+    };
+    
+    struct TrkEventPacket {
+      PacketHeader  header;
+      TrkHeader     daq_header;
+      Vec<TrkEvent> events;
+      u16           run_id;
+      u8            run_id_old;
+      
+      auto to_string() const -> std::string;
+      static auto from_bytestream(Vec<u8> const &stream, usize &pos)
+        -> r::Result<TrkEventPacket, Gaps::IOError>;
+    };
      
     struct TofMetaData {
       u32  event_id {0xffffffff};

@@ -117,6 +117,44 @@ auto gtl::Packet::to_string() const -> std::string {
 
 //----------------------------------------
 
+auto gtl::TrkHeader::to_string() const -> std::string {
+  std::string repr = "<TrkHeader:";
+  repr += std::format("  sync     : {}", sync);
+  repr += std::format("  crc      : {}", crc);
+  repr += std::format("  sys_id   : {}", sys_id);
+  repr += std::format("  pkt_id   : {}", packet_id);
+  repr += std::format("  length   : {}", length);
+  repr += std::format("  daq_cnt  : {}", daq_count);
+  repr += std::format("  sys_time : {}", sys_time);
+  repr += std::format("  version  : {}", version);
+  return repr;
+}
+
+auto gtl::TrkHeader::from_bytestream(Vec<u8> const &stream, usize &pos) 
+  -> r::Result<TrkHeader, Gaps::IOError> {
+  auto header = TrkHeader();
+  if (stream.size() - pos < gtl::TrkHeader::SIZE) {
+    std::string message = std::format("Stream is too short for a trkheader packet. We got a stream of size {} when expectinog {} bytes!", stream.size() - pos, gtl::Cooling::SIZE);
+    auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
+    return Err(err);
+  } 
+  
+  header.sync   = parse_u16(stream, pos);
+  header.crc    = parse_u16(stream, pos);
+  header.sys_id = parse_u8(stream, pos);
+  header.packet_id = parse_u8(stream, pos); 
+  header.length    = parse_u16(stream, pos);
+  header.daq_count = parse_u16(stream, pos);
+  u32 lower        = parse_u32(stream, pos);
+  u16 upper        = parse_u16(stream, pos);
+  u64 sys_time     = (static_cast<u64>(upper) << 32) | static_cast<u64>(lower);
+  header.sys_time  = sys_time;
+  header.version   = parse_u8(stream, pos);
+  return Ok(header);
+} 
+
+//----------------------------------------
+
 auto gtl::TrkHit::to_string() const -> std::string {
   std::string repr = "<TrackerHit:";
   repr += std::format("\n  Layer      : {}", layer);
@@ -141,6 +179,40 @@ auto gtl::TrkEvent::to_string() const -> std::string {
     repr += std::format("\n \t {}", h.to_string());
   }
   return repr;
+}
+
+//----------------------------------------
+
+auto gtl::TrkEventPacket::to_string() const -> std::string {
+  auto repr = std::string("<TrkEventPacket:");
+  repr     += std::format("\n  pkt header {}", header.to_string());
+  repr     += std::format("\n  trk header {}", daq_header.to_string());
+  repr     += "\n ----- TRK EVENTS -----";
+  for (auto const &ev : events) {
+    repr     += std::format("\n {}", ev.to_string());
+  }
+  repr     += std::format("\n run id     {}", run_id);
+  repr     += std::format("\n run id old {}", run_id_old);
+  return repr;
+}
+
+auto gtl::TrkEventPacket::from_bytestream(Vec<u8> const &stream, usize &pos)
+  -> r::Result<TrkEventPacket, Gaps::IOError> {
+  TrkEventPacket packet;
+  auto packet_header = PacketHeader::from_bytestream(stream, pos);
+  if (packet_header.is_ok()) {
+    packet.header = packet_header.unwrap();
+  } else {
+    return Err(packet_header.unwrap_err());
+  }
+  auto trk_header = TrkHeader::from_bytestream(stream, pos);
+  if (trk_header.is_ok()) {
+    packet.daq_header = trk_header.unwrap();
+  } else {
+    return Err(trk_header.unwrap_err());
+  }
+  // FIXME 
+  return Ok(packet);
 }
 
 //----------------------------------------
