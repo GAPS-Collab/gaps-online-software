@@ -19,6 +19,8 @@ from . import visual
 from . import io
 from . import tof
 from . import db 
+from . import reconstruction 
+from . import tracker
 
 #calibration.RBCalibrations = _gondola_core.calibration.RBCalibrations
 

@@ -89,8 +89,8 @@ def emit_empty_session_state():
         # TOF analysis part
         'tof_analysis'          : gon.tof.TofAnalysis(),
         # TRK analysis part
-        'trk_analysis'          : go.tracker.analysis.TrackerAnalysis(),
-        'reco'                  : go.reconstruction.Reconstruction(),
+        'trk_analysis'          : gon.tracker.analysis.TrackerAnalysis(),
+        'reco'                  : gon.reconstruction.Reconstruction(),
         'trk_calibration'       : { 'mask' : None, 'pedestal'  : None,\
                                     'tf'   : None, 'cmn_noise' : None},
         'vtk_plotter'           : pv.Plotter(window_size=[800, 600], off_screen=True)
@@ -593,7 +593,7 @@ def file_loader(f, event_type,\
                 search_event_id      = 0,
                 tof_analysis_kwargs  = {},
                 trk_analysis_kwargs  = {},
-                reco_analysis_kwargs = {}) -> (gon.tof.TofAnalysis, go.tracker.analysis.TrackerAnalysis, list):
+                reco_analysis_kwargs = {}) -> (gon.tof.TofAnalysis, gon.tracker.analysis.TrackerAnalysis, list):
     """
     Run over a file and extract variables to fill the histograms
     in the assigned analyisises
@@ -630,11 +630,11 @@ def file_loader(f, event_type,\
     trk_analysis = None
     if trk_analysis_kwargs:
         if trk_analysis_kwargs['active']:
-            trk_analysis = go.tracker.analysis.TrackerAnalysis(**trk_analysis_kwargs)     
+            trk_analysis = gon.tracker.analysis.TrackerAnalysis(**trk_analysis_kwargs)     
     reco_analysis = None
     if reco_analysis_kwargs:
         if reco_analysis_kwargs['active']:
-            reco_analysis = go.reconstruction.Reconstruction(**reco_analysis_kwargs)
+            reco_analysis = gon.reconstruction.Reconstruction(**reco_analysis_kwargs)
     nframes = 0
     exclude_event_types = [k for k in MERGED_EVENT_TYPES if k not in merged_event_types] 
     
@@ -743,9 +743,9 @@ def clear_analysis():
     """
     st.session_state.tof_analysis          = gon.tof.TofAnalysis()
     st.session_state.tof_analysis.finished = False
-    st.session_state.trk_analysis          = go.tracker.analysis.TrackerAnalysis()
+    st.session_state.trk_analysis          = gon.tracker.analysis.TrackerAnalysis()
     st.session_state.trk_analysis.finished = False
-    st.session_state.reco                  = go.reconstruction.Reconstruction()
+    st.session_state.reco                  = gon.reconstruction.Reconstruction()
     st.session_state.reco.finished         = False
     st.session_state.ev_viewer_cache       = []
     st.session_state.moni_data             = moni_data
@@ -1901,7 +1901,7 @@ if check_password():
                 ys = np.array(ys)
                 zs = np.array(zs)
                 
-                reco = go.reconstruction.line_fit(xs, ys, zs, search_anchor = search_anchor)
+                reco = gon.reconstruction.line_fit(xs, ys, zs, search_anchor = search_anchor)
                 # plot in z from -25 to 250
                 p0, chi2 = reco[0](2200),reco[1]
                 #chi2/(len(xs) - 6)
@@ -2017,7 +2017,7 @@ if check_password():
             
             if show_linefit:
                 
-                reco = go.reconstruction.line_fit(xs, ys, zs, search_anchor = False)
+                reco = gon.reconstruction.line_fit(xs, ys, zs, search_anchor = False)
                 if reco is not None:
                     # plot in z from -25 to 250
                     p0, chi2 = reco[0](2200),reco[1]
