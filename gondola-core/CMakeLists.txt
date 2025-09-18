@@ -65,13 +65,25 @@ if (BUILD_CXX_BINDINGS)
   install(TARGETS ${GONDOLA_LIBRARY_SHARED}
       EXPORT GAPSTargets         
       LIBRARY DESTINATION ${INSTALL_LIBRARY_DIR}
-      #PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
-      #INCLUDES DESTINATION "${GAPS_HEADER_OUTPUT_DIRECTORY}/lib/include"
+      PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
+      INCLUDES DESTINATION ${INSTALL_INCLUDE_DIR}
   )
+
+  include(CMakePackageConfigHelpers)
+  write_basic_package_version_file(
+      ${CMAKE_INSTALL_PREFIX}/GapsOnlineSoftwareConfigVersion.cmake
+      VERSION ${GAPS_ONLINE_SOFTWARE_VERSION}
+      COMPATIBILITY AnyNewerVersion
+  )
+
   install(EXPORT GAPSTargets
       FILE GapsOnlineSoftware.cmake
       NAMESPACE GapsOnlineSoftware::
       DESTINATION ${CMAKE_INSTALL_PREFIX}
+  )
+  install(DIRECTORY C++/include/
+    DESTINATION ${INSTALL_INCLUDE_DIR}
+    FILES_MATCHING PATTERN "*.hxx" PATTERN "*.hpp" PATTERN "*.h"
   )
 endif(BUILD_CXX_BINDINGS)
 
