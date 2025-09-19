@@ -88,7 +88,7 @@ auto g::TelemetryPacketReader::get_next_packet() -> Gaps::Telemetry::Packet {
         Vec<u8> buffer = bytestream(11);
         stream_file_.read(reinterpret_cast<char*>(buffer.data()), 11);
         // because bytestream does not contain header, size is at 5 
-        usize pos = 5;
+        usize pos = 7;
         //u64 p_size;
         u16 p_size       = Gaps::parse_u16(buffer, pos);
         payload.insert(payload.end(), buffer.begin(), buffer.end());

@@ -85,7 +85,7 @@ std::string g::CRFrameObject::to_string() {
        payload[p_len - 2],
        payload[p_len - 1]);     
   } else {
-    repr += std::format("\n payload ({} bytes)", p_len);
+    repr += std::format("\n payload ({} bytes)>", p_len);
   }
   return repr;
 }
@@ -269,6 +269,7 @@ void g::CRReader::set_path(std::string pathname) {
       spdlog::info("Found {} telemetry files at {}!", files.size(), pathname);
       is_from_telemetry_ = true;
       telly_reader_ = std::unique_ptr<TelemetryPacketReader>(new TelemetryPacketReader(pathname));
+      filenames_ = files;
     } 
   }
   if (files.size() > 0 && !is_from_telemetry_) {
@@ -324,6 +325,7 @@ g::CRFrame g::CRReader::get_next_frame() {
     f_obj.ftype   = CRFrameObjectType::TelemetryPacket; 
     auto payload  = packet.header.to_bytestream();
     payload.insert(payload.end(), packet.payload.begin(), packet.payload.end());
+    f_obj.payload = payload;
     std::string obj_name = "TelemetryPacketType::Unknown";
     switch (packet.header.ptype) {
       case Gaps::Telemetry::BfswPacketType::BoringEvent : {
@@ -351,45 +353,46 @@ g::CRFrame g::CRReader::get_next_frame() {
     }
     frame.put_fobject(f_obj, obj_name);
     return frame;
-  }
-  while (true) { // the infite loop gets broken by the 
-                 // throw in prima_next_file 
-    if (stream_file_.eof()) {
-      //std::cout << "ex 1" << std::endl;
-      prime_next_file_();
-      return get_next_frame();
-    } 
-    u8 byte = stream_file_.get();
-    if (byte == 0xAA) {
-      byte = stream_file_.get();
+  } else {
+    while (true) { // the infite loop gets broken by the 
+                   // throw in prima_next_file 
       if (stream_file_.eof()) {
-        //std::cout << "ex 2" << std::endl;
-        exhausted_ = true;
+        //std::cout << "ex 1" << std::endl;
         prime_next_file_();
         return get_next_frame();
       } 
+      u8 byte = stream_file_.get();
       if (byte == 0xAA) {
-        Vec<u8> payload = {0xAA, 0xAA};
-        //u8 packet_type = stream_file_.get();
-        Vec<u8> buffer = bytestream(8);
-        stream_file_.read(reinterpret_cast<char*>(buffer.data()), 8);
-        usize pos = 0;
-        //u64 p_size;
-        u64 p_size       = Gaps::parse_u64(buffer, pos);
-        payload.insert(payload.end(), buffer.begin(), buffer.end());
-        buffer = bytestream(p_size);
-        stream_file_.read(reinterpret_cast<char*>(buffer.data()), p_size);
-        payload.insert(payload.end(), buffer.begin(), buffer.end());
-        u64 pos_in_frame = 0;
-        // from_bytestream is broken
-        //auto frame = g::CRFrame::from_bytestream(payload, pos_in_frame);
-        auto frame = CRFrame();
-        frame.index = CRFrame::parse_index(buffer, pos_in_frame);
-        buffer = Gaps::slice(buffer, pos_in_frame, p_size); 
-        frame.bytestorage = std::move(buffer);
-        n_packets_read_++;
-        return frame;
-      }
-    } 
+        byte = stream_file_.get();
+        if (stream_file_.eof()) {
+          //std::cout << "ex 2" << std::endl;
+          exhausted_ = true;
+          prime_next_file_();
+          return get_next_frame();
+        } 
+        if (byte == 0xAA) {
+          Vec<u8> payload = {0xAA, 0xAA};
+          //u8 packet_type = stream_file_.get();
+          Vec<u8> buffer = bytestream(8);
+          stream_file_.read(reinterpret_cast<char*>(buffer.data()), 8);
+          usize pos = 0;
+          //u64 p_size;
+          u64 p_size       = Gaps::parse_u64(buffer, pos);
+          payload.insert(payload.end(), buffer.begin(), buffer.end());
+          buffer = bytestream(p_size);
+          stream_file_.read(reinterpret_cast<char*>(buffer.data()), p_size);
+          payload.insert(payload.end(), buffer.begin(), buffer.end());
+          u64 pos_in_frame = 0;
+          // from_bytestream is broken
+          //auto frame = g::CRFrame::from_bytestream(payload, pos_in_frame);
+          auto frame = CRFrame();
+          frame.index = CRFrame::parse_index(buffer, pos_in_frame);
+          buffer = Gaps::slice(buffer, pos_in_frame, p_size); 
+          frame.bytestorage = std::move(buffer);
+          n_packets_read_++;
+          return frame;
+        }
+      } 
+    }
   }
 }

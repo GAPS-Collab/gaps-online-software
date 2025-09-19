@@ -46,20 +46,20 @@ namespace gondola {
       /// there might be duplicates, because we get them
       /// over different streams. 
       /// Suppress these multiple packets
-      bool dedup                ;
+      bool dedup                  ;
       /// Ignore packets that have a gcu time earlier than start_time 
-      f64 start_time            ; 
+      f64 start_time              ; 
       /// Ignore packets that have a gcu time later than end_time
-      f64 end_time              ; 
+      f64 end_time                ; 
       /// The current file the reader is actually reading from 
-      std::ifstream  stream_file_ ;     ;
+      std::ifstream  stream_file_ ;     
       //file_reader         : BufReader<File>,
       /// Current (byte) position in the file
-      usize cursor              ;
+      usize cursor                ;
       /// Read only packets of type == PacketType
       //pub filter          : TelemetryPacketType,
       /// Number of read packets
-      usize n_packs_read_       ;
+      usize n_packs_read_         ;
       /// Number of skipped packets
       usize n_packs_skipped     ;
       /// Skip the first n packets
