@@ -26,11 +26,16 @@ namespace r = result;
 //  return data;
 //}
 
-/**
- * Extract tof dataclasses from files
- */
-
-
+namespace gondola {
+  /// Get all files in a certain directory in case it is a directory, for 
+  /// a single file just get the file <3 ChatGPT
+  ///
+  /// # Arguments 
+  ///   * input            : path or filename 
+  ///   * use_telemetry_re : use the regex for telemetry files to find the files.
+  ///                        Default is set to false, which will find L0 or TOF files
+  auto list_path_contents_sorted(const std::string& input, bool use_telemetry_re = false) -> Vec<std::string>;
+} 
 
 /**
  * Extract only event ids from a bytestream with raw readoutboard binary data

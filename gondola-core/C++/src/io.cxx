@@ -1,5 +1,6 @@
 #include <filesystem>
 #include <algorithm>
+#include <regex>
 #include "spdlog/spdlog.h"
 #include "spdlog/cfg/env.h"
 
@@ -10,6 +11,58 @@
 
 using namespace result;
 namespace fs = std::filesystem;
+
+/***************************************************/
+
+auto gondola::list_path_contents_sorted(const std::string& input, bool use_telemetry_re) -> Vec<std::string> {
+  fs::path path(input);
+  std::vector<std::string> result;
+
+  if (!fs::exists(path)) {
+    std::cerr << "Error: Path does not exist." << std::endl;
+    return result;
+  }
+
+  if (fs::is_regular_file(path)) {
+    result.push_back(path.string());
+    return result;
+  }
+
+  if (fs::is_directory(path)) {
+    std::regex re(R"(Run\d+_\d+\.(\d{6})_(\d{6})UTC\.gaps$)");
+    if (use_telemetry_re) {
+      spdlog::info("Using regular expression to match telemetry files!");
+      re = std::regex(R"(RAW(\d{6})_(\d{6}).bin$)");
+    }
+    std::vector<std::tuple<uint32_t, uint32_t, std::string>> entries;
+    for (const auto& entry : fs::directory_iterator(path)) {
+      if (entry.is_regular_file()) {
+        std::string filename = entry.path().string();
+        std::smatch match;
+        if (std::regex_search(filename, match, re) && match.size() > 2) {
+          try {
+            u32 date = std::stoul(match[1].str());
+            u32 time = std::stoul(match[2].str());
+            entries.emplace_back(date, time, filename);
+          } catch (const std::exception&) {
+            continue;
+          }
+        }
+      }
+    }
+
+    std::sort(entries.begin(), entries.end(), [](const auto& a, const auto& b) {
+      return std::tie(std::get<0>(a), std::get<1>(a)) < std::tie(std::get<0>(b), std::get<1>(b));
+    });
+
+    for (const auto& entry : entries) {
+      result.push_back(std::get<2>(entry));
+    }
+  } else {
+    std::cerr << "Error: Path is neither a file nor a directory." << std::endl;
+  }
+  return result;
+}
 
 /***************************************************/
 

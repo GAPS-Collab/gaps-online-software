@@ -8,6 +8,7 @@
 
 #include "tof_typedefs.h"
 #include "telemetry_dataclasses.hpp"
+#include "io.hpp"
 
 namespace gondola {
   /// Read serialized TelemetryPackets from an existing file
@@ -24,6 +25,11 @@ namespace gondola {
     auto get_filenames() const -> Vec<std::string>; 
     
     auto get_next_packet() -> Gaps::Telemetry::Packet; 
+    
+    /// All packets have been read from the file. 
+    /// If they should be read again, the reader 
+    /// has to be created again
+    auto is_exhausted()   const -> bool;
     private:
       /// Indicate if the reader has run out of 
       /// packets 

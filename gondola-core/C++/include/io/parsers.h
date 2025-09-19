@@ -3,6 +3,16 @@
 
 #include "tof_typedefs.h"
 
+namespace gondola {
+  /// Reverse-parse a u16 a la rust's built in 
+  /// u16::to_le_bytes
+  auto to_le_bytes(u16 number) -> Vec<u8>;
+
+  /// Reverse-parse a u32 a la rust's built in 
+  /// u32::to_le_bytes
+  auto to_le_bytes(u32 number) -> Vec<u8>;
+}
+
 namespace Gaps {
 
   template<typename T>

@@ -1,7 +1,6 @@
 #include <iostream>
 #include <filesystem>
 #include <vector>
-#include <regex>
 #include <string>
 #include <algorithm>
 
@@ -11,6 +10,8 @@
 #include "logging.hpp"
 #include "io/parsers.h"
 #include "caraspace.hpp"
+#include "io.hpp"
+//#include "io/telemetry_reader.hpp"
 
 namespace g    = gondola;
 namespace fs   = std::filesystem;
@@ -18,51 +19,21 @@ namespace gtel = Gaps::Telemetry;
 
 using namespace result;
 
-std::vector<std::string> g::list_path_contents_sorted(const std::string& input) {
-  fs::path path(input);
-  std::vector<std::string> result;
+//--------------------------------------------------
 
-  if (!fs::exists(path)) {
-    std::cerr << "Error: Path does not exist." << std::endl;
-    return result;
-  }
-
-  if (fs::is_regular_file(path)) {
-    result.push_back(path.string());
-    return result;
-  }
-
-  if (fs::is_directory(path)) {
-    std::regex re(R"(Run\d+_\d+\.(\d{6})_(\d{6})UTC\.gaps$)");
-    std::vector<std::tuple<uint32_t, uint32_t, std::string>> entries;
-
-    for (const auto& entry : fs::directory_iterator(path)) {
-      if (entry.is_regular_file()) {
-        std::string filename = entry.path().string();
-        std::smatch match;
-        if (std::regex_search(filename, match, re) && match.size() > 2) {
-          try {
-            u32 date = std::stoul(match[1].str());
-            u32 time = std::stoul(match[2].str());
-            entries.emplace_back(date, time, filename);
-          } catch (const std::exception&) {
-            continue;
-          }
-        }
-      }
-    }
-
-    std::sort(entries.begin(), entries.end(), [](const auto& a, const auto& b) {
-      return std::tie(std::get<0>(a), std::get<1>(a)) < std::tie(std::get<0>(b), std::get<1>(b));
-    });
-
-    for (const auto& entry : entries) {
-      result.push_back(std::get<2>(entry));
-    }
-  } else {
-    std::cerr << "Error: Path is neither a file nor a directory." << std::endl;
-  }
-  return result;
+auto g::CRFrameObject::to_bytestream() const -> Vec<u8> { 
+  Vec<u8> stream;
+  // remember to be compatible with rust!
+  stream.push_back(0xAA);
+  stream.push_back(0xAA);
+  stream.push_back((u8)version);
+  stream.push_back((u8)ftype);
+  auto size = g::to_le_bytes((u32)payload.size());
+  stream.insert(stream.end(), size.begin(), size.end());
+  stream.insert(stream.end(),payload.begin(), payload.end());
+  stream.push_back(0x55);
+  stream.push_back(0x55);
+  return stream;
 }
 
 //--------------------------------------------------
@@ -145,9 +116,15 @@ auto g::CRFrame::to_string() const -> std::string {
   return repr;
 };
 
+auto g::CRFrame::put_fobject(g::CRFrameObject const &fobj, std::string name) -> void {
+  u64 pos = bytestorage.size();
+  index[name] = std::tuple<u64, CRFrameObjectType>(pos, fobj.ftype);
+  auto bytes = fobj.to_bytestream();
+  bytestorage.insert(bytestorage.end(), bytes.begin(), bytes.end());
+}
 
-g::CRFrame g::CRFrame::from_bytestream(Vec<u8> stream, 
-                                       usize &pos) {
+auto g::CRFrame::from_bytestream(Vec<u8> stream, usize &pos)
+   -> g::CRFrame {
   CRFrame frame;
   // FIXME - error checking
   u16 head  = Gaps::parse_u16(stream, pos);
@@ -284,7 +261,17 @@ auto g::CRReader::get_rbcalibrations(u8 n_rb) -> g::RBCalibrationMap {
 
 void g::CRReader::set_path(std::string pathname) {
   auto files = list_path_contents_sorted(pathname);
-  if (files.size() > 0) {
+  if (files.size() == 0) {
+    spdlog::warn("We did not see any files matching the filenames for L0!");
+    spdlog::warn("Trying to look for telemetry ('.bin') files instead...");
+    files = list_path_contents_sorted(pathname, true);
+    if (files.size() > 0) {
+      spdlog::info("Found {} telemetry files at {}!", files.size(), pathname);
+      is_from_telemetry_ = true;
+      telly_reader_ = std::unique_ptr<TelemetryPacketReader>(new TelemetryPacketReader(pathname));
+    } 
+  }
+  if (files.size() > 0 && !is_from_telemetry_) {
     filenames_   = files;
     exhausted_   = false;
     fileindex_   = 0;
@@ -298,6 +285,9 @@ void g::CRReader::set_path(std::string pathname) {
 }
 
 bool g::CRReader::is_exhausted() const {
+  if (is_from_telemetry_) {
+    return telly_reader_->is_exhausted();
+  }
   return exhausted_;
 }
 
@@ -319,7 +309,51 @@ auto g::CRReader::prime_next_file_() -> void {
 }
 
 g::CRFrame g::CRReader::get_next_frame() {
-  while (true) { 
+  // there are 2 "modes" - this is either from 
+  // telemetry files or not. If it is from 
+  // telemetry, we do the following
+  // 1) unpack the telemetry 
+  // 2) create a new frame with a TelemetryPacket  
+  //    (and an upsampled TofEvent in it in case 
+  //     it is a MergedEvent) 
+  if (is_from_telemetry_) {
+    auto packet = telly_reader_->get_next_packet(); 
+    auto frame  = CRFrame();
+    auto f_obj  = CRFrameObject();
+    f_obj.version = 0;
+    f_obj.ftype   = CRFrameObjectType::TelemetryPacket; 
+    auto payload  = packet.header.to_bytestream();
+    payload.insert(payload.end(), packet.payload.begin(), packet.payload.end());
+    std::string obj_name = "TelemetryPacketType::Unknown";
+    switch (packet.header.ptype) {
+      case Gaps::Telemetry::BfswPacketType::BoringEvent : {
+        obj_name = "TelemetryPacketType.BoringEvent";
+        break;
+      } 
+      case Gaps::Telemetry::BfswPacketType::InterestingEvent : {
+        obj_name = "TelemetryPacketType.InterestingEvent";
+        break;
+      } 
+      case Gaps::Telemetry::BfswPacketType::NoGapsTriggerEvent : {
+        obj_name = "TelemetryPacketType.NoGapsTriggerEvent";
+        break;
+      } 
+      case Gaps::Telemetry::BfswPacketType::NoTofDataEvent : {
+        obj_name = "TelemetryPacketType.NoTofDataEvent";
+        break;
+      }
+      case Gaps::Telemetry::BfswPacketType::Tracker : {
+        obj_name = "TelemetryPacketType.Tracker";
+      }
+      default : {
+        // deal with monitoring etc
+      } 
+    }
+    frame.put_fobject(f_obj, obj_name);
+    return frame;
+  }
+  while (true) { // the infite loop gets broken by the 
+                 // throw in prima_next_file 
     if (stream_file_.eof()) {
       //std::cout << "ex 1" << std::endl;
       prime_next_file_();

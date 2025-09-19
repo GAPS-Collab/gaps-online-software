@@ -2,6 +2,23 @@
 #include <iostream>
 #include "io/parsers.h"
 
+auto gondola::to_le_bytes(u16 number) -> Vec<u8> {
+  Vec<u8> bytes;
+  bytes.push_back(static_cast<u8>(number & 0xFF));        // Low byte
+  bytes.push_back(static_cast<u8>((number >> 8) & 0xFF)); // High byte
+  return bytes;
+}
+
+auto gondola::to_le_bytes(u32 number) -> Vec<u8> {
+  Vec<u8> bytes;
+  bytes.push_back(static_cast<u8>((number >> 0) & 0xFF));
+  bytes.push_back(static_cast<u8>((number >> 8) & 0xFF));
+  bytes.push_back(static_cast<u8>((number >> 16) & 0xFF));
+  bytes.push_back(static_cast<u8>((number >> 24) & 0xFF));
+  return bytes;
+}
+
+
 bool Gaps::parse_bool(const Vec<u8> &bytestream,
                       usize &pos) {
   u8 value = bytestream[pos];

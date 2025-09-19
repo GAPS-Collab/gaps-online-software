@@ -4,9 +4,11 @@
 #include <fstream>
 #include <cmath>
 
+#include <memory>
 #include "tof_typedefs.h"
 #include "packets/tof_packet.h"
 #include "telemetry_dataclasses.hpp"
+#include "io/telemetry_reader.hpp"
 #include "calibration.h"
 #include "errors.hpp"
 #include "result/result.h"
@@ -14,10 +16,8 @@
 #include "database.h"
 #endif
 
+
 namespace gondola {
-  /// Get all files in a certain directory in case it is a directory, for 
-  /// a single file just get the file <3 ChatGPT
-  std::vector<std::string> list_path_contents_sorted(const std::string& input);
 
   /// These are objects which can be stored in a caraspace frame  
   enum class CRFrameObjectType : u8 {
@@ -33,7 +33,9 @@ namespace gondola {
     u8 version;
     CRFrameObjectType ftype;
     Vec<u8> payload;
-  
+ 
+    auto to_bytestream() const -> Vec<u8>;
+
     /// Decode a serializable from a bytestream  
     static auto from_bytestream(Vec<u8> stream, usize &pos) -> CRFrameObject;
      
@@ -54,6 +56,8 @@ namespace gondola {
     
     static auto parse_index(Vec<u8> stream, usize &pos) -> std::map<std::string, std::tuple<u64, CRFrameObjectType>>;
 
+    auto put_fobject(CRFrameObject const &fobj, std::string) -> void; 
+
     /// extract a tofpacket if this frame object is of the correct type
     auto get_tofpacket(std::string name) -> result::Result<TofPacket,Gaps::IOError>;
     auto get_telemetrypacket(std::string name) -> Gaps::Telemetry::Packet;
@@ -63,7 +67,11 @@ namespace gondola {
     CRReader();
     CRReader(std::string pathname);
     CRReader(const CRReader&) = delete;
-    
+   
+    /// Read files from a given pathname, this can be 
+    /// a single file as well. If the files are 
+    /// telemetry files, we will automatically switch 
+    /// to using TelemetryPacketReader under the hood 
     auto set_path(std:: string pathname) -> void;
     /// Walk over the file, and return the next frame
     /// as saved in the file. 
@@ -95,6 +103,12 @@ namespace gondola {
     std::ifstream      stream_file_      ;
     usize              fileindex_        ;
     auto               prime_next_file_() -> void;
+    /// A "cheat". We can internally rewire CRReader 
+    /// to use TelemetryPacketReader instead. This 
+    /// will then emit frames with only TelemetryPackets
+    /// inside 
+    bool             is_from_telemetry_;
+    std::unique_ptr<TelemetryPacketReader> telly_reader_;
   };
 }
 #endif

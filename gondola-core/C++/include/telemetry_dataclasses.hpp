@@ -64,6 +64,7 @@ namespace Gaps {
     
       auto get_gcutime() -> f64;
       auto to_string() const -> std::string;
+      auto to_bytestream() const -> Vec<u8>;
       static auto from_bytestream(Vec<u8> const &stream, usize &pos)
         -> r::Result<PacketHeader, Gaps::IOError>;
     };

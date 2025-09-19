@@ -13,7 +13,7 @@ namespace g = gondola;
 
 
 auto g::TelemetryPacketReader::set_path(std::string pathname) -> void {
-  auto files = g::list_path_contents_sorted(pathname);
+  auto files = g::list_path_contents_sorted(pathname, true);
   if (files.size() > 0) {
     filenames_   = files;
     exhausted_   = false;
@@ -105,3 +105,9 @@ auto g::TelemetryPacketReader::get_next_packet() -> Gaps::Telemetry::Packet {
   }
   return packet;
 }
+
+bool g::TelemetryPacketReader::is_exhausted() const {
+  return exhausted_;
+}
+
+

@@ -60,7 +60,22 @@ std::string gtl::bfsw_ptype_to_str(gtl::BfswPacketType pt) {
 f64 gtl::PacketHeader::get_gcutime(){
   return timestamp * 0.064 + 1631030675.0;
 };
+
+auto gtl::PacketHeader::to_bytestream() const -> Vec<u8> {
+  Vec<u8> bytes{0xeb, 0x90};
+  bytes.push_back((u8)ptype);
+  auto ts_byt = gondola::to_le_bytes(timestamp);
+  auto co_byt = gondola::to_le_bytes(counter);
+  auto le_byt = gondola::to_le_bytes(length);
+  auto ch_byt = gondola::to_le_bytes(checksum);
+  bytes.insert(bytes.end(),ts_byt.begin(), ts_byt.end());
+  bytes.insert(bytes.end(),co_byt.begin(), co_byt.end());
+  bytes.insert(bytes.end(),le_byt.begin(), le_byt.end());
+  bytes.insert(bytes.end(),ch_byt.begin(), ch_byt.end()); 
   
+  return bytes;
+}
+
 auto  gtl::PacketHeader::from_bytestream(Vec<u8> const &stream, usize &pos)
   -> Result<PacketHeader, g::IOError> {
   gtl::PacketHeader ph;
