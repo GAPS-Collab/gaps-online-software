@@ -305,7 +305,7 @@ bool g::CRReader::n_packets_read() const {
   return n_packets_read_;
 }
 
-void g::CRReader::prime_next_file_() {
+auto g::CRReader::prime_next_file_() -> void {
   if (fileindex_ > filenames_.size() - 2) { // -2 because -1 is the last index
     fileindex_ += 1;
     // we simply open the next file

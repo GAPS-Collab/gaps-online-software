@@ -46,10 +46,13 @@ if (BUILD_CXX_BINDINGS)
   )
   set_property(TARGET ${GONDOLA_LIBRARY_SHARED} PROPERTY CXX_STANDARD 20)
   target_compile_options(${GONDOLA_LIBRARY_SHARED} PRIVATE -Wall -Wextra -Wpedantic)# -Werror)
-  target_include_directories(${GONDOLA_LIBRARY_SHARED}
-                               PUBLIC
+  target_include_directories(${GONDOLA_LIBRARY_SHARED} 
+                               SYSTEM PUBLIC
                                  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include>
                                  $<$<BOOL:${BUILD_CXX_DB}>:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/sqlite_orm/include/sqlite_orm>
+  )
+  target_include_directories(${GONDOLA_LIBRARY_SHARED}
+                               PUBLIC
                                  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/C++/include>
                                  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/result>
                                  $<INSTALL_INTERFACE:include> 

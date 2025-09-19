@@ -7,6 +7,7 @@
 #include <fstream>
 
 #include "tof_typedefs.h"
+#include "telemetry_dataclasses.hpp"
 
 namespace gondola {
   /// Read serialized TelemetryPackets from an existing file
@@ -17,8 +18,12 @@ namespace gondola {
     TelemetryPacketReader();
     TelemetryPacketReader(std::string pathname);
     TelemetryPacketReader(const TelemetryPacketReader&) = delete;
+    
     auto set_path(std::string pathname) -> void;
+    
     auto get_filenames() const -> Vec<std::string>; 
+    
+    auto get_next_packet() -> Gaps::Telemetry::Packet; 
     private:
       /// Indicate if the reader has run out of 
       /// packets 
@@ -48,7 +53,7 @@ namespace gondola {
       /// Read only packets of type == PacketType
       //pub filter          : TelemetryPacketType,
       /// Number of read packets
-      usize n_packs_read        ;
+      usize n_packs_read_       ;
       /// Number of skipped packets
       usize n_packs_skipped     ;
       /// Skip the first n packets
@@ -60,6 +65,7 @@ namespace gondola {
       /// A cache to allow to quench duplicates 
       /// pkt counter -> pkt checksum
       //dedup_cache         : HashMap<u16, VecDeque<u16>>
+      auto prime_next_file_() -> void;
   };
 }
 

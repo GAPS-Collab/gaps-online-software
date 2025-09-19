@@ -34,7 +34,7 @@
  */        
 
 
-#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE // Don't forget define SPDLOG_ACTIVE_LEVEL macro.
+//#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE // Don't forget define SPDLOG_ACTIVE_LEVEL macro.
 
 #include <iostream>
 #include <sstream>
