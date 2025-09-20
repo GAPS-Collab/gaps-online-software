@@ -298,6 +298,14 @@ auto gtl::MergedEvent::to_string() const -> std::string {
 
 auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos) 
     -> r::Result<MergedEvent, g::IOError> {
+  // check if it has at least the fix part
+  if (stream.size() < pos + 18) {
+    std::string message = std::format("Stream does not contain enough bytes to parse MergedEvent event id and basic information! Packet might be broken(?)");
+    spdlog::error("{}",message);
+    auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
+    return Err(err);
+  }
+  
   auto evt     = MergedEvent();
   //evt.header   = PacketHeader::from_bytestream(stream, pos);
   evt.version   = parse_u8(stream, pos);

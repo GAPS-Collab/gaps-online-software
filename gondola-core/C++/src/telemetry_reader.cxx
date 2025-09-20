@@ -11,7 +11,6 @@ namespace g = gondola;
 #include "caraspace.hpp"
 #include "io/parsers.h"
 
-
 auto g::TelemetryPacketReader::set_path(std::string pathname) -> void {
   auto files = g::list_path_contents_sorted(pathname, true);
   if (files.size() > 0) {
