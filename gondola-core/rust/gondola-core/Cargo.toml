@@ -106,4 +106,4 @@ libsqlite3-sys = { version = "0.28", features = ["bundled"] }
 # for testing / features
 rand   = { version = "0.9", optional = true}
 # Takeru's tof-control
-tof-control = {path = "../../../tof/extern/tof-control", optional = true, version = "0.9", features=[] }
+tof-control = {path = "../../../resources/extern/tof-control", optional = true, version = "0.9", features=[] }

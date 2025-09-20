@@ -340,6 +340,13 @@ impl TofHit {
   fn get_edep_py(&self) -> f32 {
     self.get_edep()
   }
+  
+  /// Elena's energy deposition based on peak height
+  #[getter]
+  #[pyo3(name="edep")]
+  fn get_edep_att_py(&self) -> f32 {
+    self.get_edep_att()
+  }
 
   /// Arrival time of the photons at side A
   #[getter]
@@ -494,6 +501,15 @@ impl TofHit {
   pub fn get_edep(&self) -> f32 {
     (1.29/34.3)*(self.peak_a.to_f32() + self.peak_b.to_f32()) / 2.0
   }
+  
+  /// Elena's energy deposition including attenuation
+  pub fn get_edep_att(&self) -> f32 {
+    let x0    = self.get_pos();
+    let att_a = ((3.9-0.00126*( x0+self.paddle_len/2.))+22.15).exp() / ((3.9)+22.15).exp();
+    let att_b = ((3.9-0.00126*(-x0+self.paddle_len/2.))+22.15).exp() / ((3.9)+22.15).exp();
+    let edep  = 0.0159 * (self.get_peak_a()/att_a + self.get_peak_b()/att_b) / 2.; // vertical muon peak @ 0.97 MeV
+    return edep; 
+  }
 
   /// Arrival time of the photons at side A
   pub fn get_time_a(&self) -> f32 {
@@ -627,6 +643,7 @@ impl fmt::Display for TofHit {
     Hart cbl time {:.2}
   ** reconstructed interaction
     energy_dep    {:.2}   
+    edep_att      {:.2}
     pos_across    {:.2}   
     t0            {:.2}  
     x, y, z       {:.2} {:.2} {:.2}
@@ -649,6 +666,7 @@ impl fmt::Display for TofHit {
             self.coax_cable_time,
             self.hart_cable_time,
             self.get_edep(),
+            self.get_edep_att(),
             self.get_pos(),
             self.get_t0(),
             self.x,
