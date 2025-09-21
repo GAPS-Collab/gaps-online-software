@@ -16,6 +16,9 @@ def load_rb_calibrations(cali_dir : Path, load_event_data = False):
     return a dictionary rbid -> RBCalibration
 
     # Arguments:
+        * cali_dir        : Path with calibration files, one per RB
+
+    # Keyword Arguments: 
 
         * load_event_data : if True, also load the associated events
                             which went into the calculation of the

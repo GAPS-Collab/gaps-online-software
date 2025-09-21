@@ -1,6 +1,7 @@
 [project]
 name            = 'gondola'
-version         = "0.11.0"
+#version         = "0.11.1"
+dynamic         = ['version']
 description     = "GAPS Online and Offline Analysis software"
 authors         = [{ name = "J.A.Stoessl, G.Tytus", email = "stoessl@hawaii.edu" }]
 readme          = "README.md"

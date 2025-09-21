@@ -1,3 +1,7 @@
+"""
+gondola - GAPS online software core suite for python.
+"""
+
 # GAPS online/offline software core suite for python
 
 from . import gondola_core as _gondola_core

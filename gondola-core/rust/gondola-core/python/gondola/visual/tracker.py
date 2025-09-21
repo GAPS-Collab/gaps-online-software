@@ -25,6 +25,9 @@ def plot_strip_lines(ax, det, layer : int, color='k'):
         ax    : axis instance to plot on 
         det   : iterable providing x,y coordinates
         layer : tracker layer (0-9)
+
+    # Keyword Arguments:
+        color : the color of the lines
     """
     strip_widths = strip_lines()
     if layer % 2 == 0: # even layer
@@ -57,9 +60,16 @@ def plot_tracker_proj(ax,\
     # Keyword Arguments:
       * projection   : The projection to plot. Can be either "xy", "xz" or "yz" 
       * cmap         : A matplotlib compatible colormap to color the hits
+      * circle_color : The color with the circle showing the detector outlines 
+                       are indicated 
+      
       * color_energy : Color the circles for the hits with the energy deposition
                        FIXME - color scale needs to be normalized together with the 
                        TOF
+      * cnorm_max    : The colors can be normalized. Specify a maximum for the normalization
+                       (min will be 0)
+      * hitstyle     : Specify the style of the plotted hits by a dictionary which will be 
+                       passed on to plt.scatter
     """
     if not projection in ["xy", "xz", "yz"]:
         raise ValueError("projection argument needs to be either 'xy', 'xy' or 'xz'!")

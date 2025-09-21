@@ -35,9 +35,21 @@ get_rundata_from_file         = _gc.io.get_rundata_from_file
 get_unix_timestamp            = _gc.io.get_unix_timestamp 
 
 def get_ts_from_binfile(fname):
+    """ 
+    Get a timestamp from a '.bin' file as written 
+    by telemetry
+
+    # Arguments:
+        * fname  : name of the file 
+    
+    # Returns:
+        datetime.datetime (UTC) 
+    """
     ts = str(fname)[-17:-4]
     ts = get_unix_timestamp(ts)
     return datetime.fromtimestamp(ts, UTC)
+
+#---------------------------------------------------
 
 def get_telemetry_binaries(unix_time_start, unix_time_stop,\
                            data_dir='/gaps_binaries/live/raw/ethernet'):
