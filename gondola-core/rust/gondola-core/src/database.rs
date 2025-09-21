@@ -17,10 +17,10 @@ pub type DsiJChPidMapping = HashMap<u8, HashMap<u8, HashMap<u8, (u8, u8)>>>;
 
 /// Connect to a database at a given location
 pub fn connect_to_db_path(db_path : &str) -> Result<diesel::SqliteConnection, ConnectionError> {
-  info!("Will set DATABASE_URL and GONDOLA_DB_URL to {}", db_path);
+  info!("Will set GONDOLA_DB_URL to {}", db_path);
   warn!("Setting environment variables is not thread safe!");
   unsafe {
-    env::set_var("DATABASE_URL", db_path);
+    //env::set_var("GONDOLA_DB_URL", db_path);
     env::set_var("GONDOLA_DB_URL", db_path);
   }
   SqliteConnection::establish(db_path)
@@ -28,9 +28,9 @@ pub fn connect_to_db_path(db_path : &str) -> Result<diesel::SqliteConnection, Co
 
 /// Connect to the default database at the standard location
 pub fn connect_to_db() -> Result<diesel::SqliteConnection, ConnectionError>  {
-  let db_path  = env::var("DATABASE_URL").unwrap_or_else(|_| "".to_string());
+  let db_path  = env::var("GONDOLA_DB_URL").unwrap_or_else(|_| "".to_string());
   if db_path == "" {
-    error!("Empty DATABASE_URL. Did you forget to load the gaps-online-software setup-env.sh shell?");
+    error!("Empty GONDOLA_DB_URL. Did you forget to load the gaps-online-software setup-env.sh shell?");
   }
   SqliteConnection::establish(&db_path)
 }
@@ -1086,7 +1086,7 @@ impl fmt::Display for RAT {
 
 ///// Get all trackerstrips from the database
 //pub fn get_trackerstrips() -> Result<HashMap<u32,TrackerStrip>, ConnectionError> {
-//  let db_path  = env::var("DATABASE_URL").unwrap_or_else(|_| "".to_string());
+//  let db_path  = env::var("GONDOLA_DB_URL").unwrap_or_else(|_| "".to_string());
 //  let mut conn = connect_to_db(db_path)?;
 //  let mut strips = HashMap::<u32, TrackerStrip>::new();
 //  match TrackerStrip::all(&mut conn) {

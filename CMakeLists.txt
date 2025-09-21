@@ -132,19 +132,19 @@ install(FILES
 
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-  set(DOXYGEN_INPUT "${CMAKE_SOURCE_DIR}/tof/dataclasses/C++/include")
-  set(DOXYGEN_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/doc")
+  set(DOXYGEN_INPUT "${CMAKE_SOURCE_DIR}/gondola-core/C++")
+  set(DOXYGEN_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/doc/C++")
   set(DOXYGEN_GENERATE_HTML YES)
   set(DOXYGEN_GENERATE_MAN NO) # You can enable this if you want man pages
-  configure_file(${CMAKE_SOURCE_DIR}/Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile @ONLY)
+  configure_file(${CMAKE_SOURCE_DIR}/doc/C++/Doxyfile.in ${CMAKE_BINARY_DIR}/doc/Doxyfile @ONLY)
   add_custom_target(doc
     ALL
-    COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/doc/Doxyfile
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc
     COMMENT "Generating C++ API documentation with Doxygen"
     VERBATIM
   )
-  install(DIRECTORY ${CMAKE_BINARY_DIR}/doc/html DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/C++API/)
+  install(DIRECTORY ${CMAKE_BINARY_DIR}/C++/html DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/C++API/)
 endif()
 
 if (BUILD_LIFTOF)
@@ -155,18 +155,6 @@ if (BUILD_LIFTOF)
   endif()
   install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tof/liftof/target/doc/ DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/RustAPI/)
 endif()
-
-# this is done by our github runner
-#if (BUILD_RUSTPYBINDINGS)
-#  if (DOXYGEN_FOUND)
-#    add_dependencies(doc go-sphinx-doc)
-#  endif()
-#  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/doc/ DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/PythonAPI/)
-#endif()
-
-# don't install it. Django get's confused when copied/symlinked. Let's just use it from source 
-# and set the PYTHONPATH in the setup-env accordingly
-#install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/gaps-db/gaps_db/ DESTINATION ${INSTALL_PYTHON_DIR})
 
 ###################################
 # Write setup-env.sh shell script
