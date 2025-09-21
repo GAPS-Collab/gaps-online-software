@@ -8,12 +8,13 @@
 
 import sys
 import os
-sys.path.insert(0, os.path.abspath('/home/achim/mcmurdo/gaps-online-software/build/install/gaps-online-sw-v0.10/python'))
 
-project = 'gaps_online'
+import gondola
+
+project = 'gondola'
 copyright = '2024, J.A.Stoessl'
 author = 'J.A.Stoessl'
-release = '0.10'
+release = gondola.__version__[:-1] + 'x'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

@@ -1144,7 +1144,7 @@ f64 TofHit::get_timestamp48() const {
 #ifdef BUILD_CXXDB
 /// simple calculation based on Philip's 
 /// attenuation function as used in pgaps
-f32 TofHit::get_edep() const {
+auto TofHit::get_edep() const -> f32 {
   f32 x0    = get_x_pos();
   f32 att_a = (std::exp(3.9-0.00126*( x0+paddle_len/2.))+22.15)/ (std::exp(3.9)+22.15);
   f32 att_b = (std::exp(3.9-0.00126*(-x0+paddle_len/2.))+22.15)/ (std::exp(3.9)+22.15);

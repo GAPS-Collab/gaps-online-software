@@ -6,14 +6,34 @@
 GAPS Online Software documentation
 ======================================
 
-The python API of gaps-online-software wraps the rust API with pyO3. 
-It is based mainly on `tof-dataclasses` as well as `telemetry-dataclasses`. 
+GAPS Online Software ("gondola") compriseses several components.
+
+* liftof system - flight software for the TOF computer, data acquisition
+                  GAPS run scheduling, RB communication, calibration,
+                  MTB interaction.
+                  It contains several binaries to be run on various 
+                  components of the TOF system. 
+
+* gondola-core  - core library with dataclasses to read data structures. 
+                  This included TOF only structures, data sent over telemetry,
+                  TOF data from disk, etc. 
+                  Gondola core allows to calibrate the event data as well 
+
+* gander        - a streamlit app which allows to have a quick look into 
+                  recorded data on disk or hook up to a telemetry stream
+
+The code is mainly written in RUST and exposed to python through pyo3. There is 
+additional C++ code which implements the same API, and can be used for compatiblity
+with C++ applications.
+
+The python API of gaps-online-software wraps the gondoala-core rust API with pyO3. 
+The python module is called `gondola`.
 
 .. autosummary::
    :toctree: _autosummary
    :recursive:
 
-   gaps_online
+   gondola
 
 .. toctree::
    :maxdepth: 2

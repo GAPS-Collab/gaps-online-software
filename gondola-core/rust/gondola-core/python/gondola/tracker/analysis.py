@@ -9,17 +9,6 @@ import dashi as d
 
 from copy import deepcopy as copy
 
-from .calibration import get_energy
-
-try:
-    import django
-    django.setup()
-    from .. import db
-    import os
-    os.environ['DJANGO_ALLOW_ASYNC_UNSAFE'] = '1'
-except Exception as e:
-    print(f"Can't load django environment, gaps_db will not be available. {e}")
-
 #------------------------------------------------------------------------------
 
 class TrackerCuts:
