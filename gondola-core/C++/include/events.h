@@ -536,10 +536,6 @@ struct TofEvent {
   /// A container holding the individual events from all RBs with 
   /// triggers in this event  
   Vec<RBEvent>      rb_events;
-  /// A container holding information about missing rbevents. That 
-  /// is events where we know the board triggered, but we did not
-  /// get an associated RBEvent within a timeout
-  Vec<RBMissingHit> missing_hits;
 
   TofEvent();
 

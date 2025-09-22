@@ -595,15 +595,11 @@ std::ostream& operator<<(std::ostream& os, const LTBThreshold& thresh) {
 
 /**********************************************************/
 
-u32 TofEvent::get_n_rbmissinghits(u32 mask){
-  return ((mask & 0xFF00)     >> 8);
-}
-
-/**********************************************************/
-
 u32 TofEvent::get_n_rbevents(u32 mask){
   return (mask & 0xFF);
 }
+
+/**********************************************************/
 
 #ifdef BUILD_CXXDB
 auto TofEvent::normalize_hit_times() -> void {
@@ -642,7 +638,6 @@ TofEvent::TofEvent() {
   header       = TofEventHeader();
   mt_event     = MasterTriggerEvent();
   rb_events    = Vec<RBEvent>();
-  missing_hits = Vec<RBMissingHit>();
 }
 
 /**********************************************************/
@@ -701,7 +696,6 @@ auto TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
   //pos += 45; // for now skip master trigger event
   u32 mask          = Gaps::parse_u32(stream, pos);
   u32 n_rbevents    = get_n_rbevents(mask);
-  u32 n_missing     = get_n_rbmissinghits(mask);
   for (u32 k=0; k< n_rbevents; k++) {
     RBEvent rb_event = RBEvent::from_bytestream(stream, pos);
     event.rb_events.push_back(rb_event);
@@ -710,10 +704,6 @@ auto TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
     }
   }
 
-  for (u32 k=0; k< n_missing; k++) {
-    RBMissingHit missy = RBMissingHit::from_bytestream(stream, pos);
-    event.missing_hits.push_back(missy);
-  }
   //  event.compression_level = CompressionLevel::from_u8(&parse_u8(stream, pos));
   //  event.quality           = EventQuality::from_u8(&parse_u8(stream, pos));
   return Ok(event);
@@ -1011,7 +1001,6 @@ std::string TofEvent::to_string() const {
   repr += "  " + mt_event.to_string() + "\n";
   repr += ".. .. ..\n";
   repr += "  n RBEvents    : " + std::to_string(rb_events.size() )     ;
-  repr += "  missing hits  : " + std::to_string(missing_hits.size() ) + ">" ;
   return repr;
 }
 
@@ -1368,13 +1357,13 @@ Vec<u8> TofEventSummary::get_rb_link_ids() const {
 
 auto TofEventSummary::from_bytestream(const Vec<u8> &stream, u64 &pos) 
   -> Result<TofEventSummary, Gaps::IOError> {
-  TofEventSummary tes;
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != TofEventSummary::HEAD) {
     auto message = std::format("Decoding of HEAD failed! Got {} instead!", head);
     auto err = g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, message);
     return Err(err);
   }
+  TofEventSummary tes;
   u8 status_version_u8  = Gaps::parse_u8(stream, pos);
   tes.status            = static_cast<EventStatus>(status_version_u8 & 0x3f);
   tes.version           = (Gaps::ProtocolVersion)(status_version_u8 & 0xc0);
