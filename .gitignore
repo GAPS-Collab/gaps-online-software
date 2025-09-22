@@ -3,6 +3,11 @@
 # in each folder where we used rye, and created 
 # its own virtual environment an src folder gets 
 # created
+
+# gondola_cxx python bindings for C++ lib 
+gondola-core/C++/dist/*
+gondola-core/C++/gondola_cxx/*
+gondola-core/C++/wheelhouse/*
  
 liftof/releases/*
 liftof/target/*

@@ -1,6 +1,6 @@
 [package]
 name = "gondola-core"
-version = "0.11.3"
+version = "0.11.4"
 edition = "2024"
 
 [lib]
@@ -70,6 +70,7 @@ criterion = "0.4"
 quickcheck = "1"
 
 [dependencies]
+comfy-table       = "7.1"
 zmq               = "0.10"
 signal-hook       = { version = "0.3", optional=true}
 strum             = "0.27"
@@ -101,7 +102,8 @@ env_logger        = "0.10"
 # also require libpq to be installed.
 diesel = { version = "2.2", features = ["sqlite", "64-column-tables"], optional=true }
 # this fixes all compiling issues for the musl target with libsqlite
-libsqlite3-sys = { version = "0.28", features = ["bundled"] }
+#libsqlite3-sys = { version = "0.28", features = ["bundled"] }
+libsqlite3-sys = { version = "0.35", features = ["bundled"] }
 
 # for testing / features
 rand   = { version = "0.9", optional = true}
