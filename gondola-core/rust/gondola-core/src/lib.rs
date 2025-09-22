@@ -172,6 +172,7 @@ fn tof_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<TriggerConfig>()?;
   m.add_class::<TofRunConfig>()?;
   m.add_class::<TofCuts>()?;
+  m.add_class::<PyMasterTrigger>()?;
   m.add_function(wrap_pyfunction!(to_board_id_string, m)?)?;
   Ok(())
 }
@@ -238,8 +239,10 @@ fn packets_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
 fn io_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   use crate::io::*;
   use crate::io::caraspace::*;
+  #[cfg(feature="root")]
   use crate::io::root_reader::read_example;
   use crate::io::caraspace::frame::get_all_telemetry_event_names;
+  #[cfg(feature="root")]
   m.add_function(wrap_pyfunction!(read_example, m)?)?;
   m.add_function(wrap_pyfunction!(get_all_telemetry_event_names, m)?)?;
   m.add_function(wrap_pyfunction!(get_runfilename, m)?)?;
