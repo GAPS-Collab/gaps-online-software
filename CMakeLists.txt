@@ -136,15 +136,15 @@ if(DOXYGEN_FOUND)
   set(DOXYGEN_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/doc/C++")
   set(DOXYGEN_GENERATE_HTML YES)
   set(DOXYGEN_GENERATE_MAN NO) # You can enable this if you want man pages
-  configure_file(${CMAKE_SOURCE_DIR}/doc/C++/Doxyfile.in ${CMAKE_BINARY_DIR}/doc/Doxyfile @ONLY)
+  configure_file(${CMAKE_SOURCE_DIR}/doc/C++/Doxyfile.in ${CMAKE_BINARY_DIR}/doc/C++/Doxyfile @ONLY)
   add_custom_target(doc
     ALL
-    COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/doc/Doxyfile
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc
+    COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/doc/C++/Doxyfile
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc/C++ 
     COMMENT "Generating C++ API documentation with Doxygen"
     VERBATIM
   )
-  install(DIRECTORY ${CMAKE_BINARY_DIR}/C++/html DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/C++API/)
+  install(DIRECTORY ${CMAKE_BINARY_DIR}/doc/C++/html DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/C++API/)
 endif()
 
 if (BUILD_LIFTOF)

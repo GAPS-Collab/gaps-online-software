@@ -14,7 +14,7 @@ import gondola
 project = 'gondola'
 copyright = '2024, J.A.Stoessl'
 author = 'J.A.Stoessl'
-release = gondola.__version__[:-1] + 'x'
+release = gondola.__version__
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
