@@ -105,7 +105,7 @@ endif(BUILD_CXX_BINDINGS)
 if(BUILD_CXX_PYBINDINGS)
   set(CXX_PYBINDINGS gondola_cxx)
   message(STATUS "-- Building gondola-core C++ pybindings with nanobind.")
-  nanobind_add_module(${CXX_PYBINDINGS} NOMINSIZE C++/python/gondola_core.cxx)
+  nanobind_add_module(${CXX_PYBINDINGS} STABLE_ABI NOMINSIZE C++/python/gondola_core.cxx)
   target_include_directories(${CXX_PYBINDINGS} 
                                SYSTEM PUBLIC
                                  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include>
