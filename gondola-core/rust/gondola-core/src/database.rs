@@ -158,8 +158,7 @@ pub fn get_all_rbids_in_db() -> Option<Vec<u8>> {
 
 //---------------------------------------------------------------------
 
-/// A single TOF paddle with 2 ends 
-/// comnected
+/// A single TOF paddle with 2 ends comnected
 #[derive(Debug,PartialEq, Clone, Queryable, Selectable, Insertable, serde::Serialize, serde::Deserialize)]
 #[diesel(table_name = schema::tof_db_paddle)]
 #[diesel(primary_key(paddle_id))]
@@ -202,8 +201,6 @@ pub struct TofPaddle {
   pub harting_cable_time: f32,
 }
 
-
-// methods without a python wrapper
 impl TofPaddle {
   pub fn new() -> Self {
     Self {
@@ -291,6 +288,7 @@ impl TofPaddle {
     } 
   }
 
+  /// Retrieve all 160 paddles from the database 
   pub fn all() -> Option<Vec<TofPaddle>> {
     use schema::tof_db_paddle::dsl::*;
     let mut conn = connect_to_db().ok()?;
@@ -305,7 +303,8 @@ impl TofPaddle {
     }
   }
   
-  /// Get all tof paddles in the database
+  /// Retrive all paddles from the database, but return a 
+  /// HashMap <paddle_id, TofPaddle>
   pub fn all_as_dict() -> Result<HashMap<u8,Self>, ConnectionError> {
     let mut paddles = HashMap::<u8, Self>::new();
     match Self::all() {
@@ -364,112 +363,183 @@ impl TofPaddle {
 #[pymethods]
 impl TofPaddle {
  
+  /// Get the (numerically) lower of the two 
+  /// RB channels the TOF paddle is connected with 
+  /// to its associate ReadoutBoard 
   #[getter]
   fn get_lowest_rb_ch_py(&self) -> u8 {
     self.get_lowest_rb_ch() 
   }
 
+  /// The paddle id of the paddle in range [1,160]
   #[getter]
   fn get_paddle_id   (&self) -> i16 {  
     self.paddle_id
   }
 
+  /// Retrieve the volume id. The volume id is 
+  /// assigned by the simulation 
   #[getter]
   fn get_volume_id   (&self) -> i64 {  
     self.volume_id
   }
+
+  /// Retrieve the panel id.
+  ///
+  /// Panel 1-6  : Cube 
+  /// Panel 7-14 : Umbrella 
+  /// Panel > 14 : Cortina 
   #[getter]
   fn get_panel_id    (&self) -> i16 {  
     self.panel_id
   }
+
+  /// The MTB link id is an internal number
+  /// used by the MTB to identify ReadoutBoards 
   #[getter]
   fn get_mtb_link_id (&self) -> i16 {  
     self.mtb_link_id
   }
+
+  /// Retrieve the Readoutboard id for the 
+  /// Readoutboard the paddle is connected to 
   #[getter]
   fn get_rb_id       (&self) -> i16 {  
     self.rb_id
-  }
+  } 
+
+  /// Get the ReadoutBoard channel to which 
+  /// the A-side of the Paddle is connected 
   #[getter]
   #[allow(non_snake_case)]
   fn get_rb_chA      (&self) -> i16 {  
     self.rb_chA
   }
+  
+  /// Get the ReadoutBoard channel to which 
+  /// the b-side of the Paddle is connected 
   #[getter]
   #[allow(non_snake_case)]
   fn get_rb_chB      (&self) -> i16 {  
     self.rb_chB
   }
+
+  /// Get the LTB id the low-gain channels 
+  /// of this paddle are connected to
   #[getter]
   fn get_ltb_id      (&self) -> i16 {  
     self.ltb_id
   }
+
+  /// Get the LTB channel the A-side of this 
+  /// paddle is connected to 
   #[getter]
   #[allow(non_snake_case)]
   fn get_ltb_chA     (&self) -> i16 {  
     self.ltb_chA
   }
+  
+  /// Get the LTB channel the B-side of this 
+  /// paddle is connected to 
   #[getter]
   #[allow(non_snake_case)]
   fn get_ltb_chB     (&self) -> i16 {  
     self.ltb_chB
   }
+
+  /// Get the powerboard id for the respective
+  /// powerboard which provides the driving 
+  /// voltage for this paddle
   #[getter]
   fn get_pb_id       (&self) -> i16 {  
     self.pb_id
   }
+
+  /// Get the channel on the powerboard 
+  /// the paddle A-side is connected to 
   #[getter]
   #[allow(non_snake_case)]
   fn get_pb_chA      (&self) -> i16 {  
     self.pb_chA
   }
+  
+  /// Get the channel on the powerboard 
+  /// the paddle b-side is connected to 
   #[getter]
   #[allow(non_snake_case)]
   fn get_pb_chB      (&self) -> i16 {  
     self.pb_chB
   }
+
+  /// DEPRECATED - the length of the Harting
+  /// cable connected to this paddle 
   #[getter]
   fn get_cable_len   (&self) -> f32 {  
     self.cable_len
   }
+
+  /// Retrive the DSI connector this paddle
+  /// is connected through the RB/LTB to 
+  /// the MTB 
   #[getter]
   fn get_dsi         (&self) -> i16 {  
     self.dsi
   }
+
+  /// Retrieve the j address of the DSI connector 
+  /// this paddle is connected through the RB
+  /// to the MTB 
   #[getter]
   fn get_j_rb        (&self) -> i16 {  
     self.j_rb
   }
+  
+  /// Retrieve the j address of the DSI connector 
+  /// this paddle is connected through the LTB
+  /// to the MTB 
   #[getter]
   fn get_j_ltb       (&self) -> i16 {  
     self.j_ltb
   }
+
+  /// Get the (local) height of the paddle 
   #[getter]
   fn get_height      (&self) -> f32 {  
     self.height
   }
+
+  /// Get the (local) width of the paddle 
   #[getter]
   fn get_width       (&self) -> f32 {  
     self.width
   }
+
+  /// Get the (local) length of the paddle 
   #[getter]
   fn get_length      (&self) -> f32 {  
     self.length
   }
   
-  // FIXME use PyResult
+  /// Retrieve all 160 paddles from the database 
   #[staticmethod]
   #[pyo3(name="all")]
   pub fn all_py() -> Option<Vec<Self>> {
     TofPaddle::all()
   } 
 
+  /// Retrieve all paddles connected to a certain 
+  /// ReadoutBoard from the database 
+  ///
+  /// # Arguments 
+  ///   * rbid   : RB id of the desired ReadoutBoard (typically < 50) 
   #[staticmethod]
   #[pyo3(name="by_rbid")]
   pub fn by_rbid_py(rbid : u8) -> Option<Vec<Self>> {
     TofPaddle::by_rbid(rbid)
   }
 
+  /// Retrieve all paddles from the database and return 
+  /// a dictionary as dict([rbid, TofPaddle]) 
   // FIXME use PyResult
   #[staticmethod]
   #[pyo3(name="all_as_dict")]
@@ -498,18 +568,22 @@ impl TofPaddle {
     return pr;
   }
 
+  /// Return normal axis - that is orthogonal to the principal ans 
+  /// paralel to the axis of "width" 
   #[getter]
   #[pyo3(name="normal")]
   pub fn normal_py(&self) -> (f32, f32, f32) {
     self.normal()
   }
 
+  /// The center position of the paddle (middle of all 3 local dimensions)
   #[getter]
   #[pyo3(name="center_pos")]
   pub fn center_pos_py(&self) -> (f32,f32,f32) {
     (self.global_pos_x_l0, self.global_pos_y_l0, self.global_pos_z_l0)
   }
 
+  /// The position of the SiPm at the A-side 
   #[getter]
   #[pyo3(name="sideA_pos")]
   #[allow(non_snake_case)]
@@ -533,18 +607,21 @@ impl TofPaddle {
     self.lt_slot()
   }
   
+  /// The x-coordinate of the center position of the paddle  
   #[getter]
   #[pyo3(name="global_pos_x_l0")]
   fn get_global_pos_x_l0(&self) -> f32 {
     self.global_pos_x_l0 
   }
   
+  /// The y-coordinate of the center position of the paddle  
   #[getter]
   #[pyo3(name="global_pos_y_l0")]
   fn get_global_pos_y_l0(&self) -> f32 {
     self.global_pos_y_l0
   }
   
+  /// The z-coordinate of the center position of the paddle  
   #[getter]
   #[pyo3(name="global_pos_z_l0")]
   fn get_global_pos_z_l0(&self) -> f32 {

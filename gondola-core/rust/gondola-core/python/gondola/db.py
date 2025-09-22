@@ -11,6 +11,9 @@ import numpy as np
 
 
 TofPaddle                    = _gc.db.TofPaddle
+TofPaddle.__module__         = __name__
+TofPaddle.__name__           = "TofPaddle"
+TofPaddle.__doc__            = _gc.db.TofPaddle.__doc__
 ReadoutBoard                 = _gc.db.ReadoutBoard
 TrackerStrip                 = _gc.db.TrackerStrip
 TrackerStripMask             = _gc.db.TrackerStripMask 
@@ -21,6 +24,8 @@ get_all_rbids_in_db          = _gc.db.get_all_rbids_in_db
 get_hid_vid_map              = _gc.db.get_hid_vid_map
 get_vid_hid_map              = _gc.db.get_vid_hid_map
 get_dsi_j_ch_pid_map         = _gc.db.get_dsi_j_ch_pid_map
+
+__all__ = ['TofPaddle']
 
 #----------------------------------------
 # extend the TofPaddles with a few methods
@@ -112,7 +117,7 @@ TofPaddle._create_box_points = _create_box_points
 #
 #TofPaddle._cache_box_points = _cache_box_points 
 
-def draw_xy(self, fill=False, lw=0.8, edgecolor='b', facecolor='b', alpha=0.7) -> Rectangle:
+def _draw_xy(self, fill=False, lw=0.8, edgecolor='b', facecolor='b', alpha=0.7) -> Rectangle:
     """
     Draw a matplotlib patch for xy projection
     """
@@ -164,10 +169,10 @@ def draw_xy(self, fill=False, lw=0.8, edgecolor='b', facecolor='b', alpha=0.7) -
                               fill=fill, edgecolor=edgecolor, facecolor=facecolor, lw=lw, alpha=alpha)
     return xy_patch
 
-TofPaddle.draw_xy = draw_xy
+TofPaddle.draw_xy = _draw_xy
 
 
-def draw_xz(self, fill=False, lw=0.8, edgecolor='b', facecolor='b', alpha=0.7) -> Rectangle:
+def _draw_xz(self, fill=False, lw=0.8, edgecolor='b', facecolor='b', alpha=0.7) -> Rectangle:
     """
     Draw a matplotlib patch for xy projection
     """
@@ -177,9 +182,9 @@ def draw_xz(self, fill=False, lw=0.8, edgecolor='b', facecolor='b', alpha=0.7) -
                           fill=fill, edgecolor=edgecolor, facecolor=facecolor, alpha=alpha, lw=lw)
     return xz_patch
 
-TofPaddle.draw_xz = draw_xz
+TofPaddle.draw_xz = _draw_xz
 
-def draw_yz(self, fill=False, lw=0.8, edgecolor='b',facecolor='b', alpha=0.7) -> Rectangle:
+def _draw_yz(self, fill=False, lw=0.8, edgecolor='b',facecolor='b', alpha=0.7) -> Rectangle:
     """
     Draw a matplotlib patch for xy projection
     """
@@ -189,5 +194,5 @@ def draw_yz(self, fill=False, lw=0.8, edgecolor='b',facecolor='b', alpha=0.7) ->
                           fill=fill, edgecolor=edgecolor, facecolor=facecolor, alpha=alpha, lw=lw)
     return yz_patch
 
-TofPaddle.draw_yz = draw_yz
+TofPaddle.draw_yz = _draw_yz
 
