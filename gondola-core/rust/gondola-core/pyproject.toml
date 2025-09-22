@@ -26,7 +26,8 @@ build-backend = "maturin"
 [tool.maturin]
 # "extension-module" tells pyo3 we want to build an extension module (skips linking against libpython.so)
 #features     = ["pyo3/extension-module"]
-all-features  = true
+#all-features  = true
+features      = ["random","database","advanced-algorithms","pybindings","tof-liftof"]
 python-source = "python"
 module-name   = "gondola.gondola_core"
 
