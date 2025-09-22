@@ -17,7 +17,7 @@ import numpy as np
 
 # shortcut for import
 get_all_telemetry_event_names = _gc.io.get_all_telemetry_event_names
-read_example                  = _gc.io.read_example
+#read_example                  = _gc.io.read_example
 get_runfilename               = _gc.io.get_runfilename 
 get_califilename              = _gc.io.get_califilename
 CRFrameObject                 = _gc.io.CRFrameObject 
