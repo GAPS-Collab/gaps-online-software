@@ -1,32 +1,16 @@
-# Events
+# GONDOLA - python wrapper for gaps-online-software 
 
-* MergedEvent     - TofEventSummary + Tracker
-* TofEvent        - TofEventSummary + RB meta information + waveforms
-* TofEventSummary - No waveforms
-* CaliEvent       - Only hits and minimal information TOF and tracker, 
-                    tracker hits masked and transfer function applied
+This allows to easily access various dataclasses used throughout 
+the [GAPS experiment](https://gaps1.astro.ucla.edu/gaps/)
 
-# I/O system
+# CHANGELOG 
 
-* TelemetryPacketReader   -> Reads .bin files from gse
-* TofPacketReader/Writer  -> Reads/writes .tof.gaps files
-* CaraspcaeReader/Writer  -> Reads/writes .gaps files
+* v0.11 is the first version to be published through pypi
+* Database system: switch from django to pure-rust implementation with diesel + pyo3
+    This gives a performance boost by 3x for `get_tofpaddles()`:
+    Rust : 500mic sec, django 1.5 milli sec
+* The caraspace reader is now optimized to not copy paddle information every time 
+  it is emiiting a CRFrame, thus increasing performance by a huge amount  
 
 
-# New calibrated event
 
-Event
-* event status
-* event time
-* trigger type
-* interesting
-* ntrigger hits
-Hit 
-* x,y,z,t,hardware id, energy
-
-# Performance improvements
-
--> Database system: switch from django to pure-rust implementation with diesel + pyo3
-   This gives a performance boost by 3x for get_tofpaddles():
-   Rust : 500mic sec, django 1.5 milli sec
- 
