@@ -35,7 +35,7 @@ tofcontrol          = ["tof-control"]
 # experimental features
 advanced-algorithms = ["smoothed_z_score"]
 # build a python library 
-pybindings          = ["pyo3","pyo3-log","numpy", "serde-pickle"]
+pybindings          = ["pyo3","pyo3-log","numpy", "serde-pickle", "polars", "pyo3-polars"]
 experimental        = []
 # experimental, might go away. Attempt to include SimpleDet data
 root                = ["oxyroot", "root-io"]
@@ -94,7 +94,8 @@ crossbeam-channel = "0.5"
 statistical       = "1.0"  # FIXME - replace this with our own implementation
 toml              = "0.8"
 ureq              = "2.12" # FIXME - make this a feature
-polars            = { version = "0.50", features = ["lazy"], optional = true }
+polars            = { version = "0.51", features = ["lazy"], optional = true }
+pyo3-polars       = { version = "0.24", optional = true }
 env_logger        = "0.10"
 
 # for the database - in case we want to use postgres, 

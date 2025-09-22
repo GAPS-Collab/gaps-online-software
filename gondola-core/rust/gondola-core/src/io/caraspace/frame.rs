@@ -207,11 +207,11 @@ impl CRFrame {
     s_index
   }
 
-  /// Get the timestamp from the actual telemetry packet in the frame
-  pub fn get_timestamp(&self) -> u64 {
-    todo!("Needs to be implemented!");
-    return 0
-  }
+  ///// Get the timestamp from the actual telemetry packet in the frame
+  //pub fn get_timestamp(&self) -> u64 {
+  //  todo!("Needs to be implemented!");
+  //  return 0
+  //}
 
   fn string_to_bytes(value : String) -> Vec<u8> {
     let mut stream  = Vec::<u8>::new();

@@ -19,7 +19,7 @@
 pub mod control;
 pub mod registers;
 
-use crate::prelude::*;
+//use crate::prelude::*;
 use std::sync::{
   Arc,
   Mutex,
@@ -2137,11 +2137,12 @@ fn set_track_trigger_is_global(&mut self) -> PyResult<()> {
     -> PyResult<TofEvent> {
     let use_dbg_version = debug;
     if !use_dbg_version {
-      let mut event = TofEvent::new();
+      //let mut event = TofEvent::new();
       match get_event(&mut self.ipbus) {
         None => {
           // we just return an empty event!
-          //warn!("Did not get an event, returning empty event!");
+          warn!("Did not get an event, returning empty event!");
+          let event = TofEvent::new();
           Ok(event)
         }
         Some(Err(err)) => {
@@ -2324,7 +2325,7 @@ fn set_track_trigger_is_global(&mut self) -> PyResult<()> {
       if verbose {
         println!("[MasterTrigger::get_event] => Got MTE \n{}", mte);
       }
-      let mut event = TofEvent::new();
+      let event = TofEvent::new();
       Ok(event)
     }
   }

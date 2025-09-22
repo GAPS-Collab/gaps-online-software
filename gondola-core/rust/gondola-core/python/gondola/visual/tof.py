@@ -283,3 +283,70 @@ def tof_hits_time_evolution(ev, line_color='k', t_err=0.35) -> plt.Figure: #, tw
     cb.visual.adjust_minor_ticks(ax, which='both')
     return fig
 
+#---------------------------------------------------------------------------------
+
+def plot_waveforms(tof_ev, calib : dict = None, with_hits = False, skip_bins=0):
+    """
+    Return a list of figures with all the waveforms from a 
+    specific tof event
+    
+    # Arguments:
+        tof_ev    : TofEvent with waveforms
+        calib     : A dictionary with RB calibrations
+        with_hits : Indicate extracted hit time in the plots
+        skip_bins : Zero the first [skip_bins]. This might be a 
+                    helpful option in case there is a big spike 
+                    in the beginning
+    """
+    wfs = tof_ev.waveforms
+    figures, axes = [],[]
+    hits = dict()
+    for h in tof_ev.hits:
+        hits[h.paddle_id] = h
+
+    for wf in wfs:
+        fig = plt.figure(figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT)
+        ax  = fig.gca()
+        if calib is None:
+            adc_a = wf.adc_a
+            adc_b = wf.adc_b
+            if skip_bins:
+                for k in range(skip_bins):
+                    adc_a[k] = 0
+                    adc_b[k] = 0
+            ax.plot(adc_a, color='tab:blue', lw=1.2, label=f'{wf.paddle_id} A')
+            ax.plot(adc_b, color='tab:red', lw=1.2, label=f'{wf.paddle_id} B')
+            ax.set_xlabel('bin', loc='right')
+            ax.set_ylabel('ADC', loc='top')
+            ax.legend(frameon=False, loc='upper right')
+        else:
+            wf.calibrate(calib[wf.rb_id])
+            voltages_a = wf.voltages_a
+            voltages_b = wf.voltages_b
+            if skip_bins:
+                for k in range(skip_bins):
+                    voltages_a[k] = 0
+                    voltages_b[k] = 0
+            ax.plot(wf.times_a, voltages_a, lw=0.9, color='tab:blue', label=f'{wf.paddle_id} A')
+            ax.plot(wf.times_b, voltages_b, lw=0.9, color='tab:red', label=f'{wf.paddle_id} B')
+            ax.set_xlabel('ns', loc='right')
+            ax.set_ylabel('mV', loc='top')
+            ax.legend(frameon=False, loc='upper right')
+        if with_hits:
+            try:
+                ax.vlines(hits[wf.paddle_id].time_a, 0, max(voltages_a), lw=0.75, color='tab:blue')
+            except KeyError:
+                textbox = 'Hit extr. failed!'
+                ax.text(0.2, 0.8, textbox, transform=fig.transFigure, fontsize=8)
+                print ('No hit for waveform!')
+            try:
+                ax.vlines(hits[wf.paddle_id].time_b, 0, max(voltages_b), lw=0.75, color='tab:red')
+            except KeyError:
+                textbox = 'Hit extr. failed!'
+                ax.text(0.2, 0.8, textbox, transform=fig.transFigure, fontsize=8)
+                print ('No hit for waveform!')
+        figures.append(fig)
+        axes.append(ax)
+
+    return figures, axes
+

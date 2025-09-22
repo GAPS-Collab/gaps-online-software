@@ -13,23 +13,23 @@ use crate::tof::cuts::TofCuts;
 /// FIXME - typically these monolithic structures are 
 ///         not a good idea
 ///
-struct TofAnalysis {
-  skip_mangled  : bool,
-  skip_timeout  : bool,
-  beta_analysis : bool,
-  nbins         : u64,
-  cuts          : TofCuts,
-  use_offsets   : bool,
-  pid_inner     : Option<u8>,
-  pid_outer     : Option<u8>,
-  active        : bool,
-  nhit          : u64, 
-  no_hitmiss    : u64, 
-  one_hitmiss   : u64, 
-  two_hitmiss   : u64, 
-  extra_hits    : u64, 
-  occupancy     : HashMap<u8,u64>,
-  occupancy_t   : HashMap<u8,u64>
+pub struct TofAnalysis {
+  pub skip_mangled  : bool,
+  pub skip_timeout  : bool,
+  pub beta_analysis : bool,
+  pub nbins         : u64,
+  pub cuts          : TofCuts,
+  pub use_offsets   : bool,
+  pub pid_inner     : Option<u8>,
+  pub pid_outer     : Option<u8>,
+  pub active        : bool,
+  pub nhit          : u64, 
+  pub no_hitmiss    : u64, 
+  pub one_hitmiss   : u64, 
+  pub two_hitmiss   : u64, 
+  pub extra_hits    : u64, 
+  pub occupancy     : HashMap<u8,u64>,
+  pub occupancy_t   : HashMap<u8,u64>
 }
 
 impl TofAnalysis {

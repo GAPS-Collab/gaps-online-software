@@ -48,9 +48,12 @@ pub use run_statistics::RunStatistics;
 use std::collections::VecDeque;
 use std::collections::HashMap;
 
-#[cfg(feature = "polars")]
-use polars::prelude::*;
+use crate::prelude::*;
 
+#[cfg(feature="pybindings")]
+use polars::frame::column::Column;
+#[cfg(feature="pybindings")]
+use polars::prelude::NamedFrom; 
 
 /// Monitoring data shall share the same kind 
 /// of interface. 
@@ -133,7 +136,7 @@ pub trait MoniSeries<T>
     Some(values)
   }
 
-  #[cfg(feature = "polars")]
+  #[cfg(feature = "pybindings")]
   fn get_dataframe(&self) -> PolarsResult<DataFrame> {
     let mut series = Vec::<Column>::new();
     for k in Self::keys() {
@@ -150,7 +153,7 @@ pub trait MoniSeries<T>
     Ok(df)
   }
 
-  #[cfg(feature = "polars")]
+  #[cfg(feature = "pybindings")]
   /// Get the variable for all boards. This keeps the order of the 
   /// underlying VecDeque. Values of all boards intermixed.
   /// To get a more useful version, use the Dataframe instead.
@@ -263,6 +266,62 @@ macro_rules! moniseries {
         return self.max_size;
       }
     }
+  
+    #[cfg(feature="pybindings")]
+    #[pymethods]
+    impl $name {
+      #[new]
+      fn new_py() -> Self {
+        Self::new() 
+      }
+   
+      #[getter]
+      fn get_max_size_py(&self) -> usize {
+        self.get_max_size()
+      }
+
+      fn from_tof_file(&mut self, filename : String) -> PyResult<PyDataFrame> {
+        let mut reader = TofPacketReader::new(&filename);
+
+        // it would be nice to set the filter here, but I 
+        // don't know how that can be done in the macro
+        reader.filter  = <$class>::TOF_PACKET_TYPE;
+        for tp in reader {
+          if let Ok(moni) =  tp.unpack::<$class>() {
+            self.add(moni);
+          }
+          // other packets will get thrown away 
+        }
+        match self.get_dataframe() {
+          Ok(df) => {
+            let pydf = PyDataFrame(df);
+            return Ok(pydf);
+          },
+          Err(err) => {
+            return Err(PyValueError::new_err(err.to_string()));
+          }
+        }
+      }
+
+
+
+      //fn get_data(&self) -> &HashMap<u8,VecDeque<$class>> {
+      //  return &self.data;
+      //}
+    
+      //fn get_data_mut(&mut self) -> &mut HashMap<u8,VecDeque<$class>> {
+      //  return &mut self.data;
+      //}
+     
+      //fn get_max_size(&self) -> usize {
+      //  return self.max_size;
+      //}
+
+    }
+
+
+
+    pythonize_display!($name);
   }
 }
 

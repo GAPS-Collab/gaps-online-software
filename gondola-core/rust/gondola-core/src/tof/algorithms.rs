@@ -120,14 +120,12 @@ pub fn interpolate_time<T : AsRef<[f32]>> (volts         : &T,
 ///   * size        : Together with idx define a range for the search for 
 ///                   the bin which should have the implementation applied 
 ///                   to [voltages[idx], voltages[idx + size]]
-pub fn interpolate_time_py<'py>(py          : Python<'py>,
-                                voltages    : PyReadonlyArray1<f32>,
-                                nanoseconds : PyReadonlyArray1<f32>,
-                                threshold   : f32,
-                                idx         : usize,
-                                size        : usize) -> PyResult<f32> {
-  let mut thr = threshold;
-  let mut i   = idx;
+pub fn interpolate_time_py(voltages    : PyReadonlyArray1<f32>,
+                           nanoseconds : PyReadonlyArray1<f32>,
+                           threshold   : f32,
+                           idx         : usize,
+                           size        : usize) -> PyResult<f32> {
+  let i   = idx;
   match interpolate_time(&voltages.readonly().as_slice().unwrap(),
                          &nanoseconds.readonly().as_slice().unwrap(),
                          threshold, i, size) {

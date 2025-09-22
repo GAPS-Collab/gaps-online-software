@@ -244,8 +244,8 @@ impl TofPaddle {
   /// Save myself to the database
   pub fn save(&self) {
     use schema::tof_db_paddle::dsl::*;
-    let mut conn = connect_to_db().unwrap();
-    diesel::insert_into(tof_db_paddle)
+    //let conn = connect_to_db().unwrap();
+    let _ = diesel::insert_into(tof_db_paddle)
       .values(self);
   }
 

@@ -18,7 +18,6 @@ import pyvista as pv
 from stpyvista import stpyvista
 logger.add(sys.stdout, level="INFO")
 
-import gaps_online as go
 import charmingbeauty as cb
 import charmingbeauty.layout as lo
 cb.set_style_default()
@@ -63,7 +62,6 @@ def emit_empty_session_state():
         'write_to_disk'         : False,
         # plots and event data
         'waveform_figs'         : None,
-        'strip_dict'            : strip_dict,
         'no_plot_first_bins_wf' : False,
         'no_plot_first_bins_wf2': False,
         'no_plot_last_bins_wf'  : False,
@@ -185,19 +183,6 @@ def add_preliminary(fig):
     ax = fig.gca()
     ax.text(0.25, 0.25, 'Preliminary', fontsize=36, color='tab:red',  alpha=0.5, rotation=34, transform=fig.transFigure)
     
-#------------------------------------------------
-
-def get_stripcoordinates(hit, strip_dict):
-    strip = strip_dict[go.db.TrackerStrip.create_id(hit.layer, hit.row, hit.module, hit.channel)]
-    return strip.global_pos_x_l0, strip.global_pos_y_l0, strip.global_pos_z_l0
-
-#------------------------------------------------
-
-def get_detcoordinates(hit, strip_dict):
-    strip = strip_dict[go.db.TrackerStrip.create_id(hit.layer, hit.row, hit.module, hit.channel)]
-    return strip.global_pos_x_det_l0, strip.global_pos_y_det_l0, strip.global_pos_z_det_l0
-
-#------------------------------------------------
 
 def set_plot_theme_gaps():
     if st.session_state.plot_theme_gaps:
@@ -230,229 +215,7 @@ def set_plot_theme_streamlit_dark():
     else:
         plt.rcParams.update(st.session_state.mplib_rcprams)
 
-strips = go.db.TrackerStrip.objects.all()
-strip_dict = dict()
-for k in strips:
-    strip_dict[k.create_id(k.layer, k.row, k.module, k.channel)] = k
-
 #------------------------------------------------
-
-#@st.fragment
-#def plot_tracker_2dxy(ax,\
-#                      hits         = None,\
-#                      cmap         = matplotlib.colormaps['seismic'],\
-#                      circle_color ='w',\
-#                      color_energy = False,\
-#                      cnorm_max    = None,\
-#                      transfer_fn  = dict(),\
-#                      hitstyle     = {'edgecolor': 'w', 'alpha' : 0.5 , 'marker' : 'o'} ):
-#    """
-#    Add the 2d xy projection to a given axies. If tracker_hits
-#    are given, add these to the plot as well
-#
-#    # Keyword Arguments:
-#        * color_energy : color the circles for the hits with the energy deposition
-#                         FIXME - color scale needs to be normalized together with the 
-#                         TOF
-#    """
-#    all_dets = [(k.global_pos_x_det_l0, k.global_pos_y_det_l0, k.global_pos_z_det_l0) for k in go.db.TrackerStrip.objects.all()]
-#    all_layers = list(set([k.layer for k in hits]))
-#    #all_dets_xz = set([(k[0],k[2]) for k in all_dets])
-#    #all_dets_yz = set([(k[1],k[2]) for k in all_dets])
-#    all_dets_xy = set([(k[0],k[1]) for k in all_dets])
-#    strip_coord = [get_stripcoordinates(k, strip_dict) for k in hits]
-#    det_coord   = [get_detcoordinates(k, strip_dict) for k in hits]
-#    adc = [k.adc for k in hits]
-#    if transfer_fn:
-#        strip_id  = [k.stripid for k in hits]
-#        adc_strip = zip(strip_id, adc)
-#        adc = np.array([get_energy(k[1],transfer_fn[0]) for k in adc_strip])
-#    else:
-#        adc = np.array(adc) / 12
-#
-#    if color_energy:
-#        if cnorm_max != None:
-#            cm_norm_pts = plt.Normalize(vmin=0, vmax=cnorm_max)
-#        else:
-#            cm_norm_pts = plt.Normalize(vmin=min(adc), vmax=max(adc))
-#    xs = [k[0] for k in strip_coord]
-#    ys = [k[1] for k in strip_coord]
-#    if color_energy:
-#        ax.scatter(xs, ys, marker=hitstyle['marker'], s=100*adc,\
-#                   edgecolor=hitstyle['edgecolor'], color=cmap(cm_norm_pts(adc)))
-#    else:
-#        ax.scatter(xs, ys, marker=hitstyle['marker'], s=adc, facecolor='none', edgecolor=hitstyle['edgecolor'])
-#    for k in all_dets_xy:
-#        patch = patches.Circle(k, radius=5, fill=False, color='gray', alpha=0.1)
-#        # rect_patch = patches.Rectangle(k[1], width=1, height=100, color='gray', alpha=0.1)
-#        for layer in all_layers:
-#            #go.tracker.visual.plot_strip_lines(ax,k, layer, color='gray')
-#            gon.visual.tracker.plot_strip_lines(ax, k, layer, color='gray')
-#        ax.add_patch(patch)
-#    for k in det_coord:
-#        patch = patches.Circle(k, radius=5, fill=False, color=circle_color)
-#        # im.set_clip_path(patch)
-#        ax.add_patch(patch)
-#        for layer in all_layers:
-#            #go.tracker.visual.plot_strip_lines(ax,k, layer, color=circle_color)
-#            gon.visual.tracker.plot_strip_lines(ax, k, layer, color='gray')
-#    return ax
-#
-#@st.fragment
-#def plot_tracker_2dyz(ax,\
-#                      hits = None,\
-#                      cmap         = matplotlib.colormaps['seismic'],\
-#                      circle_color='w',\
-#                      color_energy = False,\
-#                      cnorm_max    = None,\
-#                      transfer_fn  = dict(),\
-#                      hitstyle={ 'edgecolor' : 'w', 'alpha' : 0.5 , 'marker' : 'o'} ):
-#    all_dets = [(k.global_pos_x_det_l0, k.global_pos_y_det_l0, k.global_pos_z_det_l0) for k in go.db.TrackerStrip.objects.all()]
-#    all_dets_yz = set([(k[1],k[2]) for k in all_dets])
-#    
-#    strip_coord = [get_stripcoordinates(k, strip_dict) for k in hits]
-#    det_coord   = [get_detcoordinates(k, strip_dict) for k in hits]
-#    adc = [k.adc for k in hits]
-#    adc = [k.adc for k in hits]
-#    if transfer_fn:
-#        strip_id  = [k.stripid for k in hits]
-#        adc_strip = zip(strip_id, adc)
-#        adc = np.array([get_energy(k[1],transfer_fn[0]) for k in adc_strip])
-#    else:
-#        adc = np.array(adc) / 12
-#    if color_energy:
-#        if cnorm_max != None:
-#            cm_norm_pts = plt.Normalize(vmin=0, vmax=cnorm_max)
-#        else:
-#            cm_norm_pts = plt.Normalize(vmin=min(adc), vmax=max(adc))
-#    else:
-#        adc = np.array(adc) / 12
-#    ys = [k[1] for k in strip_coord]
-#    zs = [k[2] for k in strip_coord]
-#    if color_energy:
-#        ax.scatter(ys, zs, marker=hitstyle['marker'], s=100*adc,\
-#                   edgecolor=hitstyle['edgecolor'], color=cmap(cm_norm_pts(adc)))
-#    else:
-#        ax.scatter(ys, zs, marker=hitstyle['marker'], s=adc, facecolor='none', edgecolor=hitstyle['edgecolor'])
-#    # strips
-#    for k in all_dets_yz:
-#        det = [k[0] - 5, k[1]]
-#        rect_patch = patches.Rectangle(det, width=10, height=0.25, color='gray', alpha=0.8)
-#        ax.add_patch(rect_patch)
-#    for k in det_coord:
-#        det = [k[1] - 5, k[2]]
-#        rect_patch = patches.Rectangle(det, width=10, height=0.25, color=circle_color, alpha=0.5)
-#        ax.add_patch(rect_patch)
-#    return ax
-#
-#
-#@st.fragment
-#def plot_tracker_2dxz(ax,\
-#                      hits = None,\
-#                      cmap         = matplotlib.colormaps['seismic'],\
-#                      circle_color = 'w',\
-#                      color_energy = False,\
-#                      cnorm_max    = None,\
-#                      transfer_fn  = dict(),
-#                      hitstyle={ 'edgecolor' : 'w', 'alpha' : 0.5 , 'marker' : 'o'} ):
-#    all_dets = [(k.global_pos_x_det_l0, k.global_pos_y_det_l0, k.global_pos_z_det_l0) for k in go.db.TrackerStrip.objects.all()]
-#    all_dets_xz = set([(k[0],k[2]) for k in all_dets])
-#    strip_coord = [get_stripcoordinates(k, strip_dict) for k in hits]
-#    det_coord   = [get_detcoordinates(k, strip_dict) for k in hits]
-#    adc = [k.adc for k in hits]
-#    adc = [k.adc for k in hits]
-#    if transfer_fn:
-#        strip_id  = [k.stripid for k in hits]
-#        adc_strip = zip(strip_id, adc)
-#        adc = np.array([get_energy(k[1],transfer_fn[0]) for k in adc_strip])
-#    else:
-#        adc = np.array(adc) / 12
-#    if color_energy:
-#        if cnorm_max != None:
-#            cm_norm_pts = plt.Normalize(vmin=0, vmax=cnorm_max)
-#        else:
-#            cm_norm_pts = plt.Normalize(vmin=min(adc), vmax=max(adc))
-#    xs = [k[0] for k in strip_coord]
-#    zs = [k[2] for k in strip_coord]
-#    if color_energy:
-#        ax.scatter(xs, zs, marker=hitstyle['marker'], s=100*adc,\
-#                   edgecolor=hitstyle['edgecolor'], color=cmap(cm_norm_pts(adc)))
-#    else:
-#        ax.scatter(xs, zs, marker=hitstyle['marker'], s=adc, facecolor='none', edgecolor=hitstyle['edgecolor'])
-#    # strips
-#    for k in all_dets_xz:
-#        det = [k[0] - 5, k[1]]
-#        rect_patch = patches.Rectangle(det, width=10, height=0.25, color='gray', alpha=0.8)
-#        ax.add_patch(rect_patch)
-#    for k in det_coord:
-#        det = [k[0] - 5, k[2]]
-#        rect_patch = patches.Rectangle(det, width=10, height=0.25, color=circle_color, alpha=0.5)
-#        ax.add_patch(rect_patch)
-#    return ax
-
-#@st.fragment
-
-#@st.fragment
-#def get_event(session, next_ev=False, prev_ev=False, event_id = None):
-#    """
-#    Get an event from a file.
-#
-#    #Arguemtns:
-#        event_id        : Get a specific event id
-#    """
-#    tofevent_key       = 'PacketType.TofEvent'
-#    tel_ev_key_nogaps  = "TelemetryPacketType.NoGapsTriggerEvent";
-#    tel_ev_key_boring  = "TelemetryPacketType.BoringEvent";
-#    tel_ev_key_intrst  = "TelemetryPacketType.InterestingEvent";
-#    session['tel_ev_type']  = None
-#
-#    event_id = None
-#
-#    print (f'-> Get event! Last event {session["current_event_in_file"]}')
-#    n_frames = 0
-#    if next_ev:
-#        n_frames = session['current_event_in_file']
-#    if prev_ev:
-#        session.reader.rewind()
-#        for frame in session.reader:
-#            if tofevent_key in frame.index:
-#                n_frames += 1
-#                if n_frames == session['current_event_in_file'] - 2:
-#                    next_ev = True
-#                    break
-#
-#    for frame in session.reader:
-#        #print (frame)
-#        if tofevent_key in frame.index:
-#            # new API :)
-#            
-#            session['tof_ev'] = frame.get_tofevent(tofevent_key)
-#            # apply cuts
-#            print ('mintofhits', session.min_tof_hits)
-#            if session.min_tof_hits > 0:
-#                if session.tof_ev.nhits < session.min_tof_hits:
-#                    continue
-#            if session.min_umb_hits > 0:
-#                if session.tof_ev.nhits_umb < session.min_umb_hits:
-#                    continue
-#            tel_ev = None
-#            session['event_id'] = session['tof_ev'].event_id 
-#            if tel_ev_key_nogaps in frame.index:
-#                session['tel_ev']      = frame.get_mergedevent(tel_ev_key_nogaps)
-#                session['tel_ev_type'] = tel_ev_key_nogaps.replace('TelemetryPacketType.', '') 
-#            if tel_ev_key_boring in frame.index:
-#                session['tel_ev'] = frame.get_mergedevent(tel_ev_key_boring)
-#                session['tel_ev_type'] = tel_ev_key_boring.replace('TelemetryPacketType.', '') 
-#            if tel_ev_key_intrst in frame.index:
-#                session['tel_ev'] = frame.get_mergedevent(tel_ev_key_intrst)
-#                session['tel_ev_type'] = tel_ev_key_intrst.replace('TelemetryPacketType.', '') 
-#            #if len(session['tof_ev'].pointcloud) < 20:
-#            #    continue
-#            n_frames += 1
-#        if next_ev:
-#            session['current_event_in_file'] = n_frames
-#            break
-#    print ('-> get_event finished')
 
 ##################################################
 # Event viewer 
@@ -544,9 +307,9 @@ def create_event_plots(no_plot_first_bins_wf=False) -> dict:
     data['packet_type']     = ptype
     if ev.tof.hits:
         paddle_style            = {'edgecolor' : 'w', 'lw' : 1.0}
-        data['tof_xy']    , ax  = go.tof.visual.tof_projection_xy(event=ev_tof, cmap=matplotlib.colormaps['seismic'])
-        data['tof_cbe']   , ax2 = go.tof.visual.unroll_cbe_sides  (event=ev_tof, cmap=matplotlib.colormaps['seismic'], paddle_style = paddle_style)
-        data['tof_cor']   , ax3 = go.tof.visual.unroll_cor        (event=ev_tof, cmap=matplotlib.colormaps['seismic'], paddle_style = paddle_style)
+        data['tof_xy']    , ax  = gon.visual.tof.tof_projection_xy(event=ev_tof, cmap=matplotlib.colormaps['seismic'])
+        data['tof_cbe']   , ax2 = gon.visual.tof.unroll_cbe_sides  (event=ev_tof, cmap=matplotlib.colormaps['seismic'], paddle_style = paddle_style)
+        data['tof_cor']   , ax3 = gon.visual.tof.unroll_cor        (event=ev_tof, cmap=matplotlib.colormaps['seismic'], paddle_style = paddle_style)
         data['tof_xy_all'], data['tof_xz_all'], data['tof_yz_all'] \
                 = gon.visual.tof.tof_2dproj(event=ev_tof, cmap=matplotlib.colormaps['seismic'])
     data['tof_hits'] = ev.tof.hits
@@ -560,9 +323,9 @@ def create_event_plots(no_plot_first_bins_wf=False) -> dict:
     if wf_ev is not None:
         calib = st.session_state.tof_calib 
         if no_plot_first_bins_wf:
-            data['waveform_figs'], __ = go.tof.visual.plot_waveforms(wf_ev, calib=calib, with_hits=True, skip_bins=10)  
+            data['waveform_figs'], __ = gon.visual.tof.plot_waveforms(wf_ev, calib=calib, with_hits=True, skip_bins=10)  
         else:
-            data['waveform_figs'], __ = go.tof.visual.plot_waveforms(wf_ev, calib=calib, with_hits=True)  
+            data['waveform_figs'], __ = gon.visual.tof.plot_waveforms(wf_ev, calib=calib, with_hits=True)  
     return data
 
 #    session['trk_hits'] = []
@@ -688,10 +451,10 @@ def file_loader(f, event_type,\
             if tof_analysis.cuts.accept(ev_tof):
                 #tof_analysis.add_event(ev_tof)
                 tof_passed = True
-            if tof_analysis.skip_mangled and ev_tof.status == go.events.EventStatus.AnyDataMangling:
+            if tof_analysis.skip_mangled and ev_tof.status == gon.events.EventStatus.AnyDataMangling:
                 tof_analysis.n_mangled += 1
                 tof_passed = False
-            if tof_analysis.skip_timeout and ev_tof.status == go.events.EventStatus.EventTimeOut:
+            if tof_analysis.skip_timeout and ev_tof.status == gon.events.EventStatus.EventTimeOut:
                 tof_analysis.n_timed_out += 1
                 tof_passed = False
         else:
@@ -754,8 +517,8 @@ def clear_analysis():
 
 @st.fragment
 def clear_cuts():
-    st.session_state.tof_analysis.cuts = go.tof.analysis.TofCuts()
-    st.session_state.trk_analysis.cuts = go.tracker.analysis.TrackerCuts()
+    st.session_state.tof_analysis.cuts = gon.tof.analysis.TofCuts()
+    st.session_state.trk_analysis.cuts = gon.tracker.analysis.TrackerCuts()
 
 #-----------------------------------------
 
@@ -1021,7 +784,7 @@ if check_password():
     calibs = [k for k in reversed(sorted(Path(config['data']['tof_calib']).glob('24*')))]
     calib = gon.calibration.load_rb_calibrations(calibs[0])
    
-    moni_data = {'mtb' : go.tof.monitoring.MtbMoniSeries()}
+    moni_data = {'mtb' : gon.tof.monitoring.MtbMoniDataSeries()}
     
     session_state = emit_empty_session_state()
     #session_state = {

@@ -149,7 +149,7 @@ pub fn get_utc_timestamp() -> String {
 /// Retrieve the utc timestamp from any telemetry (binary) file 
 #[cfg_attr(feature="pybindings", pyfunction)]
 pub fn get_unix_timestamp_from_telemetry(fname : &str) -> Option<u64> { 
-  let mut tformat_re = Regex::new(GENERIC_TELEMETRY_FILE_PATTERN_CAPUTRE).unwrap();
+  let tformat_re = Regex::new(GENERIC_TELEMETRY_FILE_PATTERN_CAPUTRE).unwrap();
   let res = tformat_re.captures(fname).and_then(|caps| {
     let map : HashMap<String, String> = tformat_re.capture_names()
       .filter_map(|name| name)

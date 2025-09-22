@@ -119,6 +119,22 @@ pub use crate::stats::{
   standard_deviation
 };
 
+//#[cfg(feature = "pybindings")]
+//pub use polars::prelude::*;
+
+#[cfg(feature = "pybindings")]
+pub use pyo3_polars::{
+  PyDataFrame,
+  //PySeries
+};
+
+#[cfg(feature = "pybindings")] 
+pub use polars::frame::DataFrame;
+#[cfg(feature = "pybindings")]
+pub use polars::series::Series; 
+#[cfg(feature = "pybindings")]
+pub use polars::error::PolarsResult;
+
 #[cfg(not(feature="database"))]
 #[derive(Debug, Default, Clone)]
 pub struct TofPaddle {}
