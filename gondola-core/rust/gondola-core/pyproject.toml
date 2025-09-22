@@ -16,7 +16,8 @@ dependencies = [
     "cmocean>=4",
     "loguru>=0.7",
     "vtk>=9",
-    "iminuit>=2"
+    "iminuit>=2",
+    "polars>=1.33"
 ]
 
 [build-system]
