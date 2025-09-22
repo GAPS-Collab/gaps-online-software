@@ -103,8 +103,28 @@ endif(BUILD_CXX_BINDINGS)
 ##============================================
 
 if(BUILD_CXX_PYBINDINGS)
+  set(CXX_PYBINDINGS gondola_cxx)
   message(STATUS "-- Building gondola-core C++ pybindings with nanobind.")
-  nanobind_add_module(gondola_cxx NOMINSIZE C++/python/gondola_core.cxx)
+  nanobind_add_module(${CXX_PYBINDINGS} NOMINSIZE C++/python/gondola_core.cxx)
+  target_include_directories(${CXX_PYBINDINGS} 
+                               SYSTEM PUBLIC
+                                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include>
+                                 $<$<BOOL:${BUILD_CXX_DB}>:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/sqlite_orm/include/sqlite_orm>
+  )
+  target_include_directories(${CXX_PYBINDINGS}
+                               PUBLIC
+                                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/C++/include>
+                                 $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/result>
+                                 $<INSTALL_INTERFACE:include> 
+                                 $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_INCLUDE_DIRS}>
+  )
+  target_link_libraries(${CXX_PYBINDINGS}
+                          PUBLIC
+                            $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARY_SHARED}>
+                            $<$<BOOL:${BUILD_CXX_DB}>:${SQLite3_LIBRARIES}>
+                            ${GONDOLA_LIBRARY_SHARED}
+                            ${ROOT_LIBRARIES}
+  )
 endif(BUILD_CXX_PYBINDINGS) 
 
 

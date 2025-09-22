@@ -6,6 +6,7 @@
 
 #include "sd_legacy.hpp"
 #include "telemetry_dataclasses.hpp"
+#include "events.h"
 
 namespace cb = Crane::Calibration;
 namespace tf = Crane::Reconstruction::TrackFit;
@@ -26,9 +27,12 @@ ClassImp(cb::CRawTof);
 //ClassImp(tr::Plane);
 ClassImp(tr::GDataEvent);
 
+
 void gondola::read_sd_legacy_example() {
   TChain * input_tree = new TChain("TreeRec");
   input_tree->Add("/srv/gaps/gaps-online-software/example-data/Run9125.gse5_241213_151813UTC_rec.root");
+  //input_tree->Add("/srv/gaps/gaps-online-software/example-date/Run9125.gse5_241213_125815UTC_rec.root");
+  //input_tree->Add("/srv/gaps/gaps-online-software/example-data/ethernet241213_1347_rec.root");
   //input_tree->Add(fName.c_str());
   auto input_event = new CEventRec();
   input_tree->SetBranchAddress("Rec", &input_event);
@@ -38,9 +42,34 @@ void gondola::read_sd_legacy_example() {
     std::cout << input_event->runNumber_ << std::endl; 
     //std::cout << input_event->run_number << std::endl; 
     std::cout << input_event->eventId_ << std::endl; 
+    std::cout << input_event->to_telemetry().to_string() << std::endl;
     break;
   }
 }
+
+//------------------------------------------------------------------------
+
+auto GRecoHit::GetVolId() const -> u32 {
+  return volume_id_;
+}
+
+auto GRecoHit::GetEDep()  const -> f64 {
+  return energydep_;
+}
+
+auto GRecoHit::GetPos()   const -> TVector3 {
+  return hit_position_;
+}
+
+auto GRecoHit::GetTime()  const -> f64 {
+  return hit_time_;
+}
+
+auto GRecoHit::GetIdx()   const -> i32 {
+  return index_;
+}
+
+//------------------------------------------------------------------------
 
 auto CEventRec::from_telemetry(gt::MergedEvent const &event) -> CEventRec {
   auto sd_event = CEventRec();
@@ -49,6 +78,27 @@ auto CEventRec::from_telemetry(gt::MergedEvent const &event) -> CEventRec {
 
 auto CEventRec::to_telemetry() -> gt::MergedEvent {
   auto event = gt::MergedEvent();
+  event.event_id = eventId_;
+  for (auto const &hit : hitseries_) {
+    // check if tracker or tof hit 
+    if (hit.GetVolId() > 200000000) {
+      Gaps::Telemetry::TrkHit trk_hit;
+      // some fields are just lost
+      //trk_hit.layer           {-1};
+      //trk_hit.row             {-1};
+      //trk_hit.module          {-1};
+      //trk_hit.channel         {-1};
+      //trk_hit.adc             {-1};
+      //trk_hit.oscillator      {-1};
+      trk_hit.energy = hit.GetEDep();
+      //trk_hit.asic_event_code {0};
+      event.trk_hits.push_back(trk_hit);
+    } else {
+      TofHit tofhit;
+      tofhit.event_t0 = hit.GetTime();  
+      event.tof_event.hits.push_back(tofhit);
+    }
+  }  
   return event;
 }
 

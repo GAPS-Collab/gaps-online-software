@@ -15,6 +15,13 @@ namespace Gaps {
 
 namespace gondola {
   auto read_sd_legacy_example() -> void; 
+  
+  /// Read SimpleDet Root files and emit 
+  /// MergedEvents
+  struct SDRootReader {
+  
+  };
+
 }
 
 typedef i32 CFitStatusType;
@@ -79,6 +86,14 @@ class CTrackRec : public CTrackBase {
 class GRecoHit : public TObject { 
   public: 
     GRecoHit() {}
+    // getters for compatibility - not sure if 
+    // changing the private members to public 
+    // will cause any issues
+    auto GetVolId() const -> u32;
+    auto GetEDep()  const -> f64;
+    auto GetPos()   const -> TVector3;
+    auto GetTime()  const -> f64;
+    auto GetIdx()   const -> i32;
   private:  
     u32 volume_id_;
     f64 energydep_;
