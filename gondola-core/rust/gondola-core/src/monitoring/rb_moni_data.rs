@@ -3,48 +3,6 @@
 
 use crate::prelude::*;
 
-//use std::fmt;
-//
-//use crate::monitoring::MoniData;
-//
-//#[cfg(feature = "random")]
-//use crate::random::FromRandom;
-//#[cfg(feature = "random")]
-//use rand::Rng;
-//
-//use crate::io::serialization::Serialization;
-//
-//use crate::packets::TofPackable;
-//
-//use crate::io::parsers::{
-//  parse_u8,
-//  parse_u16,
-//  parse_f32
-//};
-//
-//use crate::packets::TofPacketType;
-//use crate::errors::SerializationError;
-//
-//#[cfg(feature="pybindings")]
-//use pyo3::prelude::*;
-//
-//#[cfg(feature="pybindings")]
-//use pyo3::exceptions::{
-//  PyKeyError,
-//  PyIOError
-//};
-//
-//#[cfg(feature="pybindings")]
-//use crate::packets::TofPacket;
-//
-//
-//use crate::moniseries;
-//
-//#[cfg(feature="pybindings")]
-//use crate::pythonize_packable;
-//#[cfg(feature="pybindings")]
-//use crate::pythonize_monidata;
-
 #[cfg(feature="tofcontrol")]
 use tof_control::helper::rb_type::{
   RBMag,
@@ -98,6 +56,10 @@ pub struct RBMoniData {
   pub n1v5_voltage       : f32,
   pub n1v5_current       : f32,
   pub n1v5_power         : f32,
+  // new - we add the t
+  // Won't get serialized, but can be filled 
+  // with the gcutime down the road for plotting
+  pub timestamp          : u64
 }
 
 impl RBMoniData {
@@ -141,6 +103,7 @@ impl RBMoniData {
       n1v5_voltage       : f32::MAX,
       n1v5_current       : f32::MAX,
       n1v5_power         : f32::MAX,
+      timestamp          : 0,
     }
   }
 
@@ -274,6 +237,14 @@ impl fmt::Display for RBMoniData {
 
 impl MoniData for RBMoniData {
 
+  fn get_timestamp(&self) -> u64 {
+    self.timestamp
+  }
+
+  fn set_timestamp(&mut self, ts : u64) {
+    self.timestamp = ts 
+  }
+
   fn get_board_id(&self) -> u8 {
     self.board_id
   }
@@ -318,7 +289,8 @@ impl MoniData for RBMoniData {
       "drs_avdd_power"   => Some(self.drs_avdd_power   ), 
       "n1v5_voltage"     => Some(self.n1v5_voltage     ), 
       "n1v5_current"     => Some(self.n1v5_current     ), 
-      "n1v5_power"       => Some(self.n1v5_power       ), 
+      "n1v5_power"       => Some(self.n1v5_power       ),
+      "timestamp"        => Some(self.timestamp  as f32),
       _             => None
     }
   }
@@ -362,6 +334,7 @@ impl MoniData for RBMoniData {
       "drs_avdd_power"  , 
       "n1v5_voltage"    , 
       "n1v5_current"    , 
+      "timestamp"       ,
       "n1v5_power"      ] 
   }
 }
@@ -518,6 +491,8 @@ impl FromRandom for RBMoniData {
     moni.n1v5_voltage       = rng.random::<f32>();
     moni.n1v5_current       = rng.random::<f32>();
     moni.n1v5_power         = rng.random::<f32>();
+    // don't do the tiemstamp 
+    moni.timestamp          = 0;
     moni
   }
 }
@@ -711,6 +686,11 @@ impl RBMoniData {
   #[getter]
   fn get_n1v5_power       (&self) -> f32 {
     self.n1v5_power
+  }
+
+  #[getter]
+  fn get_timestamp        (&self) -> u64 {
+    self.timestamp
   }
 }
 

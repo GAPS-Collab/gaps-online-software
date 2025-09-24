@@ -30,6 +30,8 @@ pub struct MtbMoniData {
   pub vccint       : u16, 
   pub vccbram      : u16, 
   pub vccaux       : u16, 
+  // will not get serialized
+  pub timestamp    : u64,
 }
 
 impl MtbMoniData {
@@ -47,7 +49,8 @@ impl MtbMoniData {
       vccbram       : u16::MAX,
       rate          : u16::MAX,
       lost_rate     : u16::MAX,
-      rb_lost_rate  : u8::MAX
+      rb_lost_rate  : u8::MAX,
+      timestamp     : 0,
     }
   }
 
@@ -190,6 +193,14 @@ impl Serialization for MtbMoniData {
 
 impl MoniData for MtbMoniData {
 
+  fn get_timestamp(&self) -> u64 {
+    self.timestamp
+  }
+
+  fn set_timestamp(&mut self, ts : u64) {
+    self.timestamp = ts;
+  }
+
   fn get_board_id(&self) -> u8 {
     return 0;
   }
@@ -208,6 +219,7 @@ impl MoniData for MtbMoniData {
       "rate"         => Some(self.rate as f32), 
       "lost_rate"    => Some(self.lost_rate as f32), 
       "rb_lost_rate" => Some(self.rb_lost_rate as f32), 
+      "timestamp"    => Some(self.timestamp as f32),
       _              => None
     }
   }
@@ -224,7 +236,8 @@ impl MoniData for MtbMoniData {
       "vccbram"       , 
       "rb_lost_rate"  ,
       "rate"          , 
-      "lost_rate"] 
+      "lost_rate",
+      "timestamp"] 
   }
 }
 
@@ -244,6 +257,7 @@ impl FromRandom for MtbMoniData {
     moni.rb_lost_rate = rng.random::<u8>();
     moni.rate         = rng.random::<u16>();
     moni.lost_rate    = rng.random::<u16>();
+    moni.timestamp    = 0;
     moni
   }
 }
@@ -324,6 +338,11 @@ impl MtbMoniData {
   #[pyo3(name="fpga_temp")]
   pub fn get_fpga_temp_py(&self) -> f32 {
     self.get_fpga_temp()
+  }
+  
+  #[getter]
+  pub fn get_timestamp(&self) -> u64 {
+    self.timestamp
   }
 }
 

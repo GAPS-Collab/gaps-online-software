@@ -18,6 +18,7 @@ pub struct PAMoniData {
   pub board_id           : u8,
   pub temps              : [f32;16],
   pub biases             : [f32;16],
+  pub timestamp          : u64,
 }
 
 impl PAMoniData {
@@ -27,6 +28,7 @@ impl PAMoniData {
       board_id  : 0,
       temps     : [f32::MAX;16],
       biases    : [f32::MAX;16],
+      timestamp : 0,
     }
   }
 
@@ -188,6 +190,14 @@ impl MoniData for PAMoniData {
     return self.board_id;
   }
 
+  fn get_timestamp(&self) -> u64 {
+    self.timestamp 
+  }
+
+  fn set_timestamp(&mut self, ts: u64) {
+    self.timestamp = ts;
+  }
+
   fn keys() -> Vec<&'static str> {
     vec!["board_id",
          "temps1"  , "temps2"  , "temps3"  , "temps4"  ,
@@ -197,7 +207,8 @@ impl MoniData for PAMoniData {
          "biases1" , "biases2" , "biases3" , "biases4" , 
          "biases5" , "biases6" , "biases7" , "biases8" ,
          "biases9" , "biases10", "biases11", "biases12",
-         "biases13", "biases14", "biases15", "biases16" ]
+         "biases13", "biases14", "biases15", "biases16",
+         "timestamp"]
   }
 
   fn get(&self, varname : &str) -> Option<f32> {
@@ -235,6 +246,7 @@ impl MoniData for PAMoniData {
       "biases14" =>  Some(self.biases[13]),
       "biases15" =>  Some(self.biases[14]),
       "biases16" =>  Some(self.biases[15]),
+      "timestamp" => Some(self.timestamp as f32),
       _          =>  None
     }
   }  

@@ -4,48 +4,6 @@
 use crate::prelude::*;
 use colored::Colorize;
 
-//use std::fmt;
-//#[cfg(feature = "random")]  
-//use crate::random::FromRandom;
-//#[cfg(feature = "random")]  
-//use rand::Rng;
-//
-//
-//use crate::io::serialization::Serialization;
-//use crate::io::parsers::{
-//  parse_u64,
-//};
-//
-//use crate::monitoring::MoniData;
-//
-//use crate::errors::SerializationError;
-//
-//use crate::packets::{
-//  TofPackable,
-//  TofPacketType,
-//};
-//
-//#[cfg(feature="pybindings")]
-//use pyo3::prelude::*;
-//
-//#[cfg(feature="pybindings")]
-//use pyo3::exceptions::{
-//  PyIOError,
-//  PyKeyError
-//};
-//
-//#[cfg(feature="pybindings")]
-//use crate::packets::TofPacket;
-//
-//use crate::moniseries;
-//
-//#[cfg(feature="pybindings")]
-//use crate::{
-//  pythonize_packable,
-//  pythonize_monidata
-//};
-
-
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[cfg_attr(feature="pybindings", pyclass)]
@@ -100,18 +58,12 @@ pub struct EventBuilderHB {
   /// The totabl number of events with the "AnyDataMangling" flag set
   pub data_mangled_ev         : u64,
   // pub seen_rbevents         : HashMap<u8, usize>,
+  // this will not get serialized - can be filled by 
+  // gcu timestamp 
+  pub timestamp               : u64,
 }
 
 impl EventBuilderHB {
-  // pub fn new() -> Self {
-  //   let mut seen_rbevents = HashMap::<u8, usize>::new();
-  //   for k in 1..47 {
-  //     if k == 10 || k ==12 || k == 37 || k == 38 || k == 43 || k == 45 {
-  //       continue;
-  //     } else {
-  //       seen_rbevents.insert(k as u8, 0);
-  //     }
-  //   }
   pub fn new() -> Self {
     Self {
       met_seconds          : 0,
@@ -135,9 +87,9 @@ impl EventBuilderHB {
       n_rbe_from_past      : 0,
       data_mangled_ev      : 0,
       // seen_rbevents        : seen_rbevents, 
+      timestamp            : 0,
     }
   }
-
 
   /// The average number of RBEvents per
   /// TofEvent, tis is the average number
@@ -240,7 +192,15 @@ impl MoniData for EventBuilderHB {
   fn get_board_id(&self) -> u8 {
     0
   }
-  
+ 
+  fn get_timestamp(&self) -> u64 { 
+    self.timestamp 
+  }
+
+  fn set_timestamp(&mut self, ts : u64) {
+    self.timestamp = ts;
+  }
+
   /// Access the (data) members by name 
   fn get(&self, varname : &str) -> Option<f32> {
     match varname {
@@ -265,6 +225,7 @@ impl MoniData for EventBuilderHB {
       "n_rbe_orphan"         => Some(self.n_rbe_orphan as f32),
       "n_rbe_from_past"      => Some(self.n_rbe_from_past as f32),
       "data_mangled_ev"      => Some(self.data_mangled_ev as f32),
+      "timestamp"            => Some(self.timestamp as f32),
       _                      => None
     }
   }
@@ -277,7 +238,7 @@ impl MoniData for EventBuilderHB {
          "event_cache_size", "event_id_cache_size","drs_bsy_lost_hg_hits",
          "rbe_wo_mte", "mte_receiver_cbc_len", "rbe_receiver_cbc_len",
          "tp_sender_cbc_len", "n_rbe_per_loop", "n_rbe_orphan", "n_rbe_from_past",
-         "data_mangled_ev"]
+         "data_mangled_ev", "timestamp"]
   }
 }
 
@@ -294,7 +255,6 @@ impl EventBuilderHB {
   fn get_average_rbe_te_py(&self) -> f64 {
     self.get_average_rbe_te()
   }
-
 
   #[getter]
   #[pyo3(name="timed_out_frac")]
@@ -434,7 +394,8 @@ impl FromRandom for EventBuilderHB {
       n_rbe_per_loop         : rng.random::<u64>(),
       n_rbe_from_past        : rng.random::<u64>(),
       n_rbe_orphan           : rng.random::<u64>(),
-      data_mangled_ev        : rng.random::<u64>()
+      data_mangled_ev        : rng.random::<u64>(),
+      timestamp              : 0
     }
   }
 } 

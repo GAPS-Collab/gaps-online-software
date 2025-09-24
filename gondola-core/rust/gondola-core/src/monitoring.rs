@@ -70,6 +70,20 @@ pub trait MoniData {
 
   /// A list of the variables in this MoniData
   fn keys() -> Vec<&'static str>;
+
+  fn get_timestamp(&self) -> u64 {
+    0
+  }
+
+  fn set_timestamp(&mut self, ts : u64) {
+  
+  }
+  ///// access the internal timestamps as obtained from 
+  ///// MoniDat 
+  //fn get_timestamps_mut(&mut self) -> &Vec<u64> {
+  //}   
+
+
 }
 
 /// A MoniSeries is a collection of (primarily) monitoring
@@ -84,6 +98,8 @@ pub trait MoniSeries<T>
   fn get_data_mut(&mut self) -> &mut HashMap<u8,VecDeque<T>>;
  
   fn get_max_size(&self) -> usize;
+
+  fn get_timestamps(&self) -> &Vec<u64>;
 
   /// A HashMap of -> rbid, Vec\<var\> 
   fn get_var(&self, varname : &str) -> HashMap<u8, Vec<f32>> {
@@ -149,6 +165,12 @@ pub trait MoniSeries<T>
         }
       }
     }
+    //if self.get_timestamps().len() > 0 {
+    //  let timestamps  = Series::new("timestamps".into(), self.get_timestamps());
+    //  series.push(timestamps.into());
+    //}
+    // each column is now the specific variable but in terms for 
+    // all rbs
     let df = DataFrame::new(series)?;
     Ok(df)
   }
@@ -164,7 +186,8 @@ pub trait MoniSeries<T>
   ///             moni structure
   fn get_series(&self, varname : &str) -> Option<Series> {
     let mut data = Vec::<f32>::with_capacity(self.get_data().len());
-    for rbid in self.get_data().keys() {
+    let sorted_keys: Vec<u8> = self.get_data().keys().cloned().collect();
+    for rbid in sorted_keys.iter() {
       let dqe = self.get_data().get(rbid).unwrap(); //uwrap is fine, bc we checked earlier
       for moni in dqe {
         match moni.get(varname) {
@@ -229,13 +252,15 @@ macro_rules! moniseries {
     pub struct $name {
       data        : HashMap<u8, VecDeque<$class>>,
       max_size    : usize,
+      timestamps  : Vec<u64>,
     }
     
     impl $name {
       pub fn new() -> Self {
         Self {
-          data     : HashMap::<u8, VecDeque<$class>>::new(),
-          max_size : 10000,
+          data       : HashMap::<u8, VecDeque<$class>>::new(),
+          max_size   : 10000,
+          timestamps : Vec::<u64>::new()
         }
       }
     } 
@@ -265,6 +290,10 @@ macro_rules! moniseries {
       fn get_max_size(&self) -> usize {
         return self.max_size;
       }
+    
+      fn get_timestamps(&self) -> &Vec<u64> {
+        return &self.timestamps;
+      }
     }
   
     #[cfg(feature="pybindings")]
@@ -275,23 +304,153 @@ macro_rules! moniseries {
         Self::new() 
       }
    
+      /// The maximum size of the series. If more data 
+      /// are added, data from the front will be removed 
       #[getter]
+      #[pyo3(name="max_size")]
       fn get_max_size_py(&self) -> usize {
         self.get_max_size()
       }
 
-      fn from_tof_file(&mut self, filename : String) -> PyResult<PyDataFrame> {
-        let mut reader = TofPacketReader::new(&filename);
+      /// If monitoring is retrieved from telemetry, we 
+      /// save the gcu timestamp of the packet, wich 
+      /// herein can be accessed.
+      #[getter] 
+      #[pyo3(name="timestamps")] 
+      fn get_timestamps_py(&self) -> Vec<u64> {
+        warn!("This returns a full copy and is a performance bottleneck!");
+        return self.timestamps.clone();
+      }
 
+      /// Add an additional (Caraspace) file to the series 
+      ///
+      /// # Arguments:
+      ///   * filename    : The name of the (caraspace) file to add
+      ///   * from_object : Since this adds caraspace files, it is possible 
+      ///                   to choose from where to get the information.
+      ///                   Either the telemetry packet, or the tofpacket, if 
+      ///                   either is present in the frame. When 
+      ///                   CRFrameObjectType = Unknown, it will figure it out 
+      ///                   automatically, preferring the telemetry since it has
+      ///                   the gcu timestamp
+      #[pyo3(signature = (filename, from_object = CRFrameObjectType::TelemetryPacket))]
+      fn add_crfile(&mut self, filename : String, from_object : CRFrameObjectType) {
+        let reader = CRReader::new(filename).expect("Unable to open file!");
+        // now we have a problem - from which frame should we get it?
+        // if we get it from the dedicated TOF stream it will be much 
+        // faster (if that is available) since it will be it's own 
+        // presence in the frame
+        //let address = &source.clone();
+        //let mut try_from_telly = false;
+        let tp_source     = String::from("TofPacketType.") + stringify!($class);
+        let tp_source_alt = String::from("PacketType.") + stringify!($class);
+        let tel_source    = "TelemetryPacketType.AnyTofHK";
+        for frame in reader {
+          match from_object { 
+            CRFrameObjectType::TofPacket =>  {
+              if frame.has(&tp_source) || frame.has(&tp_source_alt) {
+                if frame.has(&tp_source) {
+                  let moni_res = frame.get::<TofPacket>(&tp_source).unwrap().unpack::<$class>();
+                  match moni_res {
+                    Err(err) => {
+                      println!("Error unpacking! {err}");
+                    }
+                    Ok(moni) => {
+                      self.add(moni);
+                    }
+                  }
+                }
+                if frame.has(&tp_source_alt) {
+                  let moni_res = frame.get::<TofPacket>(&tp_source_alt).unwrap().unpack::<$class>();
+                  match moni_res { 
+                    Err(err) => {
+                      println!("Error unpacking! {err}");
+                    }
+                    Ok(moni) => {
+                      self.add(moni);
+                    }
+                  }
+                }
+              } 
+            }
+            CRFrameObjectType::TelemetryPacket | CRFrameObjectType::Unknown => {
+              if frame.has(tel_source) {
+                let hk_res = frame.get::<TelemetryPacket>(tel_source);
+                match hk_res {
+                  Err(err) => {
+                    println!("Error unpacking! {err}");
+                  }
+                  Ok(hk) => {
+                    let mut pos = 0;
+                    let gcutime = hk.header.get_gcutime() as u64;
+                    match TofPacket::from_bytestream(&hk.payload, &mut pos) {
+                      Err(err) => {
+                        println!("Error unpackin! {err}");
+                      }
+                      Ok(tp) => {
+                        if tp.packet_type == <$class>::TOF_PACKET_TYPE  {
+                          match tp.unpack::<$class>() {
+                            Err(err) => {
+                              println!("Error unpacking! {err}");
+                            }
+                            Ok(mut moni) => {
+                              moni.set_timestamp(gcutime); 
+                              self.add(moni);
+                              //self.timestamps.push(gcutime);
+                            }
+                          }
+                        }
+                      }
+                    } 
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      /// Generate a polars dataframe with monitoring data from the 
+      /// given TOF file.
+      /// This will load ONLY data of the specific type of the 
+      /// MoniSeries itself
+      ///
+      /// # Arguments:
+      ///   * filename : A single .tof.gaps file with monitoring 
+      ///                information 
+      #[staticmethod]
+      fn from_tof_file(filename : String) -> PyResult<PyDataFrame> {
+        let mut reader = TofPacketReader::new(&filename);
+        let mut series = Self::new();
         // it would be nice to set the filter here, but I 
         // don't know how that can be done in the macro
         reader.filter  = <$class>::TOF_PACKET_TYPE;
         for tp in reader {
           if let Ok(moni) =  tp.unpack::<$class>() {
-            self.add(moni);
+            series.add(moni);
           }
           // other packets will get thrown away 
         }
+        match series.get_dataframe() {
+          Ok(df) => {
+            let pydf = PyDataFrame(df);
+            return Ok(pydf);
+          },
+          Err(err) => {
+            return Err(PyValueError::new_err(err.to_string()));
+          }
+        }
+      }
+      
+      #[pyo3(name="get_var_for_board")]
+      fn get_var_for_board_py(&self, varname : &str, rb_id : u8) -> Option<Vec<f32>> {
+        self.get_var_for_board(varname, &rb_id)
+      }
+
+      /// Reduces the MoniSeries to a single polars data frame
+      /// The structure itself will not be changed
+      #[pyo3(name="get_dataframe")]
+      fn get_dataframe_py(&self) -> PyResult<PyDataFrame> {
         match self.get_dataframe() {
           Ok(df) => {
             let pydf = PyDataFrame(df);
@@ -303,8 +462,7 @@ macro_rules! moniseries {
         }
       }
 
-
-
+      //fn get_pl_series_py(&self) -> PyResult<PyS
       //fn get_data(&self) -> &HashMap<u8,VecDeque<$class>> {
       //  return &self.data;
       //}
@@ -316,10 +474,7 @@ macro_rules! moniseries {
       //fn get_max_size(&self) -> usize {
       //  return self.max_size;
       //}
-
     }
-
-
 
     pythonize_display!($name);
   }

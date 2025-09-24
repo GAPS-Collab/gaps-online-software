@@ -3,46 +3,6 @@
 
 use crate::prelude::*;
 
-//use std::fmt;
-//
-//use crate::monitoring::MoniData;
-//
-//#[cfg(feature = "random")]
-//use crate::random::FromRandom;
-//#[cfg(feature = "random")]
-//use rand::Rng;
-//
-//use crate::io::serialization::Serialization;
-//
-//use crate::packets::TofPackable;
-//
-//use crate::io::parsers::{
-//  parse_u8,
-//  parse_f32
-//};
-//
-//use crate::packets::TofPacketType;
-//use crate::errors::SerializationError;
-//
-//#[cfg(feature="pybindings")]
-//use pyo3::prelude::*;
-//
-//#[cfg(feature="pybindings")]
-//use pyo3::exceptions::{
-//  PyKeyError,
-//  PyIOError
-//};
-//
-//#[cfg(feature="pybindings")]
-//use crate::packets::TofPacket;
-//
-//use crate::moniseries;
-//
-//#[cfg(feature="pybindings")]
-//use crate::pythonize_packable;
-//#[cfg(feature="pybindings")]
-//use crate::pythonize_monidata;
-
 #[cfg(feature="tofcontrol")]
 use tof_control::helper::ltb_type::{
   LTBThreshold,
@@ -57,6 +17,8 @@ pub struct LTBMoniData {
   pub trenz_temp : f32,
   pub ltb_temp   : f32,
   pub thresh     : [f32;3],
+  // not serialzied 
+  pub timestamp  : u64, 
 }
 
 impl LTBMoniData {
@@ -66,6 +28,7 @@ impl LTBMoniData {
       trenz_temp : f32::MAX,
       ltb_temp   : f32::MAX,
       thresh     : [f32::MAX,f32::MAX,f32::MAX],
+      timestamp  : 0,
     }
   }
 
@@ -160,6 +123,7 @@ impl FromRandom for LTBMoniData {
     for k in 0..3 {
       moni.thresh[k] = rng.random::<f32>();
     }
+    moni.timestamp = 0;
     moni
   }
 }
@@ -169,6 +133,10 @@ impl MoniData for LTBMoniData {
     self.board_id
   }
   
+  fn get_timestamp(&self) -> u64 {
+    self.timestamp
+  }
+
   /// Access the (data) members by name 
   fn get(&self, varname : &str) -> Option<f32> {
     match varname {
@@ -178,6 +146,7 @@ impl MoniData for LTBMoniData {
     "thresh0"     => Some(self.thresh[0]),
     "thresh1"     => Some(self.thresh[1]),
     "thresh2"     => Some(self.thresh[2]),
+    "timestamp"   => Some(self.timestamp as f32),
     _             => None
     }
   }
@@ -185,7 +154,7 @@ impl MoniData for LTBMoniData {
   /// A list of the variables in this MoniData
   fn keys() -> Vec<&'static str> {
     vec!["board_id", "trenz_temp", "ltb_temp",
-         "thresh0", "thresh1", "thresh2"]
+         "thresh0", "thresh1", "thresh2", "timestamp"]
   }
 }
 
@@ -213,6 +182,12 @@ impl LTBMoniData {
   #[getter]
   fn get_thresh2       (&self)  -> f32  {
     self.thresh[2]
+  }
+
+  #[getter]
+  #[pyo3(name = "timestamp")]
+  fn get_timestamp_py(&self)  -> u64 {
+    self.timestamp 
   }
 }
 
