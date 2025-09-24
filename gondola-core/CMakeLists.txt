@@ -60,9 +60,8 @@ if (BUILD_CXX_BINDINGS)
   )
   target_link_libraries(${GONDOLA_LIBRARY_SHARED}
                           PUBLIC
-                            $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARY_SHARED}>
                             $<$<BOOL:${BUILD_CXX_DB}>:${SQLite3_LIBRARIES}>
-                            ${ROOT_LIBRARIES}
+                            $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARIES}>
   )
   # install the library in the lib directory
   install(TARGETS ${GONDOLA_LIBRARY_SHARED}

@@ -21,6 +21,8 @@
 #include "io.hpp"
 #include "calibration.h"
 
+namespace g = gondola;
+
 int main(int argc, char *argv[]){
   spdlog::cfg::load_env_levels();
     
@@ -47,13 +49,13 @@ int main(int argc, char *argv[]){
   // -> Gaps relevant code starts here
  
   auto calname = result["calibration"].as<std::string>();
-  std::map<u8,RBCalibration> cali;
+  std::map<u8,g::RBCalibration> cali;
   if (calname != "") {
     // obviously here we have to get all the calibration files, 
     // but for the sake of the example let's use only one
     // Ultimatly, they will be stored in the stream.
     spdlog::info("Will use calibrations from {}", calname);
-    cali = Gaps::load_tof_calibrations(calname);
+    cali = g::load_tof_calibrations(calname);
   }
 
   // Setup a "TofPacketReader", 

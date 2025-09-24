@@ -90,10 +90,10 @@ int main(int argc, char *argv[]){
   u64 n_evt_no_trk_hits = 0;
   for (auto const &f : filenames) {
     auto start = std::chrono::high_resolution_clock::now();
-    auto reader = Gaps::CRReader(f);
+    auto reader = gondola::CRReader(f);
     u64 n_frames_processed_file = 0;
     while (!reader.is_exhausted()) {
-      auto frame = Gaps::CRFrame();
+      auto frame = gondola::CRFrame();
       try {
         frame = reader.get_next_frame();
       } catch (const std::exception& e) {

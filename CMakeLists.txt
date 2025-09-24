@@ -55,6 +55,9 @@ option(BUILD_CXX_PERSONAL_ANALYSIS_CODE "builds personal analysis code in the an
 option(BUILD_CXX_WITH_ROOT "leverage the usage of CERN ROOT for the build. This will allow to build the SimpleDet compatibilitly layer as well as personal analysis projects as needed." OFF)
 option(BUILD_SIM "build simulation library to simulate events" OFF)
 
+# set a few paths for the installation, e.g. for exanokes
+set(INSTALL_EXAMPLES_DIR "${CMAKE_INSTALL_PREFIX}/examples" CACHE PATH "installation directory for examples" FORCE)
+
 if(BUILD_CXX_WITH_ROOT)
   list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
 #  find_package(ROOT 6.26.00)
@@ -100,17 +103,17 @@ set(INSTALL_PYTHON_DIR   "${CMAKE_INSTALL_PREFIX}/python" CACHE PATH   "installa
 
 add_subdirectory(gondola-core)
 
-# finally all the rust pybindings
-if (BUILD_RUSTPYBINDINGS)
-  add_subdirectory(python)
-endif (BUILD_RUSTPYBINDINGS)
-# Make relative paths absolute (needed later on)
-foreach(p LIBRARY BINARY INCLUDE PYTHON EXAMPLES)
-  set(var INSTALL_${p}_DIR)
-  if(NOT IS_ABSOLUTE "${${var}}")
-    set(${var} "${CMAKE_INSTALL_PREFIX}/${${var}}")
-  endif()
-endforeach()
+if (BUILD_CXX_EXAMPLES)
+  add_subdirectory(examples)
+endif(BUILD_CXX_EXAMPLES)
+
+## Make relative paths absolute (needed later on)
+#foreach(p LIBRARY BINARY INCLUDE PYTHON EXAMPLES)
+#  set(var INSTALL_${p}_DIR)
+#  if(NOT IS_ABSOLUTE "${${var}}")
+#    set(${var} "${CMAKE_INSTALL_PREFIX}/${${var}}")
+#  endif()
+#endforeach()
 
 if (BUILD_SIM)
   add_subdirectory(simulation)
