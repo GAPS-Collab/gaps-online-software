@@ -770,8 +770,8 @@ impl FromRandom for TofHit {
   fn from_random() -> TofHit {
     let mut pp  = TofHit::new();
     let mut rng = rand::rng();
-
-    pp.paddle_id      = rng.random::<u8> ();
+    
+    pp.paddle_id      = rng.random_range(0..161);
     pp.time_a         = f16::from_f32(rng.random::<f32>());
     pp.time_b         = f16::from_f32(rng.random::<f32>());
     pp.peak_a         = f16::from_f32(rng.random::<f32>());

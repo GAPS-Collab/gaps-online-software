@@ -428,8 +428,6 @@ impl TofEvent {
   ///   Vec<(hit)> where hit is (DSI, J, CH) 
   pub fn get_trigger_hits(&self) -> Vec<(u8, u8, (u8, u8), LTBThreshold)> {
     let mut hits = Vec::<(u8,u8,(u8,u8),LTBThreshold)>::with_capacity(5); 
-    let physical_channels = [(1u8,  2u8), (3u8,4u8), (5u8, 6u8), (7u8, 8u8),
-                             (9u8, 10u8), (11u8,12u8), (13u8, 14u8), (15u8, 16u8)];
     //let n_masks_needed = self.dsi_j_mask.count_ones() / 2 + self.dsi_j_mask.count_ones() % 2;
     let n_masks_needed = self.dsi_j_mask.count_ones();
     if self.channel_mask.len() < n_masks_needed as usize {
@@ -469,7 +467,7 @@ impl TofEvent {
         let channels = self.channel_mask[n_mask]; 
         for (i,ch) in LTB_CHANNELS.iter().enumerate() {
           //let chn = *ch as u8 + 1;
-          let ph_chn = physical_channels[i];
+          let ph_chn = PHYSICAL_CHANNELS[i];
           //let chn = i as u8 + 1;
           //println!("i,ch {}, {}", i, ch);
           let thresh_bits = ((channels & ch) >> (i*2)) as u8;
