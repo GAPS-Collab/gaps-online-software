@@ -2,46 +2,6 @@
 // under the GPLv3 license
 
 use crate::prelude::*;
-//use std::fmt;
-//
-//use crate::moniseries;
-//
-//use crate::monitoring::MoniData;
-//
-//#[cfg(feature = "random")]
-//use crate::random::FromRandom;
-//#[cfg(feature = "random")]
-//use rand::Rng;
-//
-//use crate::io::serialization::Serialization;
-//
-//use crate::packets::TofPackable;
-//
-//use crate::io::parsers::{
-//  parse_u8,
-//  parse_u32,
-//  parse_f32
-//};
-//
-//use crate::packets::TofPacketType;
-//use crate::errors::SerializationError;
-//
-//#[cfg(feature="pybindings")]
-//use pyo3::prelude::*;
-//
-//#[cfg(feature="pybindings")]
-//use pyo3::exceptions::{
-//  PyKeyError,
-//  PyIOError
-//};
-//
-//#[cfg(feature="pybindings")]
-//use crate::packets::TofPacket;
-//
-//#[cfg(feature="pybindings")]
-//use crate::pythonize_packable;
-//#[cfg(feature="pybindings")]
-//use crate::pythonize_monidata;
 
 #[cfg(feature="tofcontrol")]
 use tof_control::helper::cpu_type::{
@@ -59,6 +19,8 @@ pub struct CPUMoniData {
   pub cpu0_temp  : f32,
   pub cpu1_temp  : f32,
   pub mb_temp    : f32,
+  // will not get serialized 
+  pub timestamp  : u64,
 }
 
 impl CPUMoniData {
@@ -71,6 +33,7 @@ impl CPUMoniData {
       cpu0_temp  : f32::MAX,
       cpu1_temp  : f32::MAX,
       mb_temp    : f32::MAX,
+      timestamp  : 0,
     }
   }
 
@@ -172,7 +135,15 @@ impl MoniData for CPUMoniData {
   fn get_board_id(&self) -> u8 {
     return 0;
   }
-  
+ 
+  fn get_timestamp(&self) -> u64 { 
+    return self.timestamp
+  }
+
+  fn set_timestamp(&mut self, ts : u64) {
+    self.timestamp = ts;
+  }
+
   fn get(&self, varname : &str) -> Option<f32> {
     match varname {
       "uptime"     =>    Some(self.uptime as f32),
@@ -185,6 +156,7 @@ impl MoniData for CPUMoniData {
       "cpu0_temp"  =>    Some(self.cpu0_temp),
       "cpu1_temp"  =>    Some(self.cpu1_temp),
       "mb_temp"    =>    Some(self.mb_temp),
+      "timestamp"  =>    Some(self.timestamp as f32),
       _            =>    None
     }
   }
@@ -200,7 +172,8 @@ impl MoniData for CPUMoniData {
       "cpu_temp"   ,
       "cpu0_temp"  ,
       "cpu1_temp"  ,
-      "mb_temp"]
+      "mb_temp"    ,
+      "timestamp"]
   }
 }
 
@@ -261,6 +234,11 @@ impl CPUMoniData {
   fn get_mb_temp(&self) -> f32 {
     self.mb_temp
   }  
+ 
+  #[getter]
+  fn get_timestamp_py(&self) -> u64 {
+    self.timestamp
+  }
 }
 
 //----------------------------------------

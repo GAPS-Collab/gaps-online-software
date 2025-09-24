@@ -1,47 +1,7 @@
-// This following file is part of gaps-online-software and published 
+// This file is part of gaps-online-software and published 
 // under the GPLv3 license
 
 use crate::prelude::*;
-
-//use std::fmt;
-//#[cfg(feature = "random")]  
-//use crate::random::FromRandom;
-//#[cfg(feature = "random")]  
-//use rand::Rng;
-//
-//use crate::io::serialization::Serialization;
-//use crate::io::parsers::{
-//  parse_u64,
-//};
-//
-//use crate::errors::SerializationError;
-//
-//use crate::packets::{
-//  TofPackable,
-//  TofPacketType,
-//};
-//
-//#[cfg(feature="pybindings")]
-//use pyo3::prelude::*;
-//
-//#[cfg(feature="pybindings")]
-//use pyo3::exceptions::{
-//  PyIOError,
-//  PyKeyError
-//};
-//
-//use crate::monitoring::MoniData;
-//
-//#[cfg(feature="pybindings")]
-//use crate::packets::TofPacket;
-//
-//use crate::moniseries;
-//
-//#[cfg(feature="pybindings")]
-//use crate::{
-//  pythonize_monidata,
-//  pythonize_packable
-//};
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[cfg_attr(feature="pybindings", pyclass)]
@@ -68,6 +28,8 @@ pub struct DataSinkHB {
   /// length of the incoming channel, which 
   /// is basically packets queued to be sent
   pub incoming_ch_len    : u64,
+  // not seriealized 
+  pub timestamp          : u64,
 }
 
 impl DataSinkHB {
@@ -84,6 +46,7 @@ impl DataSinkHB {
       evid_check_len     : 0,
       n_pack_write_disk  : 0,
       incoming_ch_len    : 0,
+      timestamp          : 0,
     }
   }
 
@@ -113,6 +76,14 @@ impl MoniData for DataSinkHB {
     0
   }
   
+  fn get_timestamp(&self) -> u64 {
+    self.timestamp 
+  }
+
+  fn set_timestamp(&mut self, ts : u64) {
+    self.timestamp = ts;
+  }
+
   /// Access the (data) members by name 
   fn get(&self, varname : &str) -> Option<f32> {
     match varname {
@@ -127,6 +98,7 @@ impl MoniData for DataSinkHB {
     "evid_check_len"     => Some(self.evid_check_len as f32),
     "n_pack_write_disk"  => Some(self.n_pack_write_disk as f32),
     "incoming_ch_len"    => Some(self.incoming_ch_len as f32),
+    "timestamp"          => Some(self.timestamp as f32),
     _                    => None
     }
   }
@@ -136,7 +108,7 @@ impl MoniData for DataSinkHB {
     vec!["board_id", "met", "n_packets_sent",
          "n_packets_incoming", "n_bytes_written", "n_evid_missing",
          "n_evid_chunksize", "evid_missing", "evid_check_len", 
-         "n_pack_write_disk", "incoming_ch_len"]
+         "n_pack_write_disk", "incoming_ch_len", "timestamp"]
   }
 }
 
@@ -186,6 +158,12 @@ impl DataSinkHB {
   fn get_n_pack_write_disk(&self) -> PyResult<u64> {
     Ok(self.n_pack_write_disk)
   }  
+
+  #[getter]
+  #[pyo3(name="timestamp")]
+  fn get_timestamp_py(&self) -> PyResult<u64> {
+    Ok(self.timestamp) 
+  }
 }
 
 #[cfg(feature="pybindings")]
@@ -256,7 +234,8 @@ impl FromRandom for DataSinkHB {
       evid_missing       : rng.random::<u64>(),
       evid_check_len     : rng.random::<u64>(),
       n_pack_write_disk  : rng.random::<u64>(),
-      incoming_ch_len    : rng.random::<u64>()
+      incoming_ch_len    : rng.random::<u64>(),
+      timestamp          : 0
     }
   }
 }

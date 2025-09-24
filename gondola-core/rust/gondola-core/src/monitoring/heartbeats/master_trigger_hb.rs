@@ -4,50 +4,6 @@
 use crate::prelude::*;
 use colored::Colorize;
 
-//use std::fmt;
-//#[cfg(feature = "random")]  
-//use crate::random::FromRandom;
-//#[cfg(feature = "random")]  
-//use rand::Rng;
-//
-//
-//use crate::version::ProtocolVersion;
-//use crate::io::serialization::Serialization;
-//use crate::io::parsers::{
-//  parse_u8,
-//  parse_u16,
-//  parse_u64,
-//  parse_f32,
-//};
-//
-//use crate::errors::SerializationError;
-//
-//use crate::packets::{
-//  TofPackable,
-//  TofPacketType,
-//};
-//
-//use crate::monitoring::MoniData;
-//use crate::moniseries;
-//
-//#[cfg(feature="pybindings")]
-//use pyo3::prelude::*;
-//
-//#[cfg(feature="pybindings")]
-//use pyo3::exceptions::{
-//  PyIOError,
-//  PyKeyError
-//};
-//
-//#[cfg(feature="pybindings")]
-//use crate::packets::TofPacket;
-//
-//#[cfg(feature="pybindings")]
-//use crate::pythonize_packable;
-//
-//#[cfg(feature="pybindings")]
-//use crate::pythonize_monidata;
-
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[cfg_attr(feature="pybindings", pyclass)]
 pub struct MasterTriggerHB {
@@ -63,6 +19,8 @@ pub struct MasterTriggerHB {
   // these will be available for ProtocolVersion::V1
   pub prescale_track      : f32,
   pub prescale_gaps       : f32,
+  // will not be serialized 
+  pub timestamp           : u64,
 }
 
 impl MasterTriggerHB {
@@ -80,6 +38,7 @@ impl MasterTriggerHB {
       // available for protocol version V1 and larger
       prescale_track      : 0.0,
       prescale_gaps       : 0.0,
+      timestamp           : 0, 
     }
   }
 
@@ -251,7 +210,15 @@ impl MoniData for MasterTriggerHB {
   fn get_board_id(&self) -> u8 {
     0
   }
-  
+ 
+  fn get_timestamp(&self) -> u64 {
+    self.timestamp 
+  }
+
+  fn set_timestamp(&mut self, ts : u64) { 
+    self.timestamp = ts;
+  }
+
   /// Access the (data) members by name 
   fn get(&self, varname : &str) -> Option<f32> {
     match varname {
@@ -265,6 +232,7 @@ impl MoniData for MasterTriggerHB {
       "lost_trate"          => Some(self.lost_trate as f32),
       "prescale_track"      => Some(self.prescale_track as f32),
       "prescale_gaps"       => Some(self.prescale_gaps as f32),
+      "timestamp"           => Some(self.timestamp as f32),
       _                     => None
     }
   }
@@ -274,7 +242,7 @@ impl MoniData for MasterTriggerHB {
     vec!["board_id", "total_elapsed", "n_events",
          "evq_num_events_last", "evq_num_events_avg", "n_ev_unsent",
          "n_ev_missed", "trate", "lost_trate", "prescale_track",
-         "prescale_gaps"]
+         "prescale_gaps","timestamp"]
   }
 }
 
@@ -332,6 +300,12 @@ impl MasterTriggerHB {
   #[pyo3(name="get_prescale_gaps")]
   fn get_prescale_gaps_py(&self) -> f32 {
     self.prescale_gaps
+  }
+
+  #[getter]
+  #[pyo3(name="timestamp")]
+  fn get_timestamp_py(&self) -> u64 {
+    self.timestamp
   }
 }
 

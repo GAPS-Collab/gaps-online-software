@@ -3,46 +3,6 @@
 
 use crate::prelude::*;
 
-//use std::fmt;
-//
-//use crate::monitoring::MoniData;
-//
-//#[cfg(feature = "random")]
-//use crate::random::FromRandom;
-//#[cfg(feature = "random")]
-//use rand::Rng;
-//
-//use crate::io::serialization::Serialization;
-//
-//use crate::packets::TofPackable;
-//
-//use crate::io::parsers::{
-//  parse_u8,
-//  parse_f32
-//};
-//
-//use crate::packets::TofPacketType;
-//use crate::errors::SerializationError;
-//
-//#[cfg(feature="pybindings")]
-//use pyo3::prelude::*;
-//
-//#[cfg(feature="pybindings")]
-//use pyo3::exceptions::{
-//  PyKeyError,
-//  PyIOError
-//};
-//
-//#[cfg(feature="pybindings")]
-//use crate::packets::TofPacket;
-//
-//use crate::moniseries;
-//
-//#[cfg(feature="pybindings")]
-//use crate::pythonize_packable;
-//#[cfg(feature="pybindings")]
-//use crate::pythonize_monidata;
-
 #[cfg(feature="tofcontrol")]
 use tof_control::helper::pb_type::{
   PBTemp,
@@ -66,6 +26,8 @@ pub struct PBMoniData {
   pub pas_temp       : f32,
   pub nas_temp       : f32,
   pub shv_temp       : f32,
+  // will not get serialized 
+  pub timestamp      : u64,
 }
 
 impl PBMoniData {
@@ -82,6 +44,7 @@ impl PBMoniData {
       pas_temp       : f32::MAX,
       nas_temp       : f32::MAX,
       shv_temp       : f32::MAX,
+      timestamp      : 0,
     }
   }
   
@@ -111,6 +74,12 @@ impl PBMoniData {
   #[getter]
   fn get_board_id(&self) -> u8 {
     self.board_id
+  }
+
+  #[getter]
+  #[pyo3(name="timestamp")]
+  fn get_timestamp_py(&self) -> u64 {
+    self.timestamp
   }
 
   #[getter]
@@ -220,6 +189,14 @@ impl MoniData for PBMoniData {
     self.board_id 
   }
   
+  fn get_timestamp(&self) -> u64 {
+    self.timestamp 
+  }
+
+  fn set_timestamp(&mut self, ts : u64) {
+    self.timestamp = ts;
+  }
+
   fn get(&self, varname : &str) -> Option<f32> {
     match varname {
       "board_id"      => Some(0.0f32),
@@ -245,6 +222,7 @@ impl MoniData for PBMoniData {
       "pas_temp"      => Some(self.pas_temp),
       "nas_temp"      => Some(self.nas_temp),
       "shv_temp"      => Some(self.shv_temp),
+      "timestamp"     => Some(self.timestamp as f32),
       _               => None, 
     }
   }
@@ -257,7 +235,7 @@ impl MoniData for PBMoniData {
          "p3v4d_ltb_v", "p3v4d_ltb_c", "p3v4d_ltb_p",
          "p3v6_ltb_v", "p3v6_ltb_c", "p3v6_ltb_p",
          "n1v6_ltb_v", "n1v6_ltb_c", "n1v6_ltb_p",
-         "pds_temp", "pas_temp", "nas_temp", "shv_temp"]
+         "pds_temp", "pas_temp", "nas_temp", "shv_temp","timestamp"]
   }
 }
 
