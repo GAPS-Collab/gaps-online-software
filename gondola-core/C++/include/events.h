@@ -657,8 +657,9 @@ struct TofEventSummary {
   u32         timestamp32       ; 
   u16         timestamp16       ; 
   // deprecated, won't get serialized
-  u16         primary_beta      ; 
-  u16         primary_charge    ;
+  //u16         primary_beta      ; 
+  //u16         primary_charge    ;
+  
   u16         drs_dead_lost_hits; 
   u32         dsi_j_mask        ;
   Vec<u16>    channel_mask      ;
