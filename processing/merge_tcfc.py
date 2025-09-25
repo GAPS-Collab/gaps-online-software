@@ -2,21 +2,11 @@
 
 import os
 import tqdm
-import gaps_online as go
+import gondola as go
 import time
 import re
 from pathlib import Path
 from glob import glob
-
-PATTERN = re.compile('Run([0-9]*)_([0-9]*).(?P<timestamp>([0-9_]*UTC)).(tof.gaps|gaps)')
-def get_timestamp(filename):
-    ts = PATTERN.search(filename)
-    if ts is None:
-        print (filename)
-        raise  ValueError(f'Unable to extract timestamp from {filename}!')
-    ts = ts.groupdict()['timestamp']
-    return ts
-
 
 if __name__ == '__main__':
 
@@ -71,13 +61,13 @@ if __name__ == '__main__':
 
     # get the start/stop times from the tof_stream using GPS time. If that is not possible, 
     # then we get them from the files
-    tof_times_reader = go.io.TofPacketReader(f'{args.tof_dir}/{args.run_id}', filter=go.io.TofPacketType.TofEvent)
+    tof_times_reader = go.io.TofPacketReader(f'{args.tof_dir}/{args.run_id}', filter=go.packets.TofPacketType.TofEvent)
     ev               = go.events.TofEvent()
     if args.no_gps:
-        first_file = tof_times_reader.filenames[0]
-        last_file  = tof_times_reader.filenames[-1]
-        tof_start_time = go.io.get_ts_from_toffile(first_file).timestamp()
-        tof_end_time   = go.io.get_ts_from_toffile(last_file).timestamp()
+        first_file       = tof_times_reader.filenames[0]
+        last_file        = tof_times_reader.filenames[-1]
+        tof_start_time   = go.io.get_unix_timestamp(go.io.get_rundata_from_file(first_file)['utctime'])
+        tof_end_time     = go.io.get_unix_timestamp(go.io.get_rundata_from_file(last_file) ['utctime'])
         tof_duration     = tof_end_time - tof_start_time
         tof_times_reader.rewind()
         
@@ -146,7 +136,7 @@ if __name__ == '__main__':
     # fix the timestamp with the timestamp from the 
     # tof file
     current_filename = tof_reader.current_filename
-    file_timestamp   = get_timestamp(current_filename)
+    file_timestamp   = go.io.get_rundata_from_file(current_filename)['utctime']
     # now we have the telemetry and tof readers primed!
     writer = go.io.CRWriter(cr_outdir, args.run_id, timestamp = file_timestamp)
  
@@ -175,6 +165,7 @@ if __name__ == '__main__':
     n_toffy_errors   = 0
 
     done = False
+    raise
     for tofpack in tof_reader:
         if done:
             break

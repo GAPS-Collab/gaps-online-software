@@ -2,10 +2,13 @@
 Building blocks of the TOF
 """
 
+from re import I
 from django.db import models
 import numpy as np
 import matplotlib.pyplot as plt
+import tqdm
 
+from pathlib import Path
 from matplotlib.patches import Rectangle
 
 vtk_import_success = False
@@ -1148,6 +1151,17 @@ class TrackerStrip(models.Model):
     def get_id(self):
         return self.create_id(self.layer, self.row, self.module, self.channel)
 
+    @staticmethod
+    def get_hid_vid_map() -> dict:
+        """
+        Get the map of hardware id (strip id) to volume id
+        """
+        hid_vid_map    = dict()
+        all_trk_strips = TrackerStrip.objects.all() 
+        for k in all_trk_strips:
+            hid_vid_map[k.strip_id] = k.volume_id
+        return hid_vid_map
+
     def __str__(self):
         return self.__repr__()
 
@@ -1171,19 +1185,27 @@ class TrackerStripPedestal(models.Model):
     The pedestal of each strip as retreived from the 
     text file
     """
-    strip_id      = models.PositiveIntegerField(
-                        primary_key=True,
-                        null=False,
-                        default=0,
-                        unique=True,
-                        help_text="The unique identifier for this strip, which is Layer-Row-Module-Channel (5 digit number)")
-    volume_id     = models.PositiveBigIntegerField(
-                        default=0,
-                        null=False,
-                        unique=True,
-                        help_text="The VolumeId as used in the GAPS simulation code")
-    utc_timestamp  = models.PositiveBigIntegerField(null=False, default=0,
-                                                    help_text="UTC Timestamp in YYMMDDHHMMSS format")
+    data_id              = models.AutoField(
+                               primary_key=True,
+                               help_text="Identify this specific dataset")
+    strip_id             = models.PositiveIntegerField(
+                               null=False,
+                               default=0,
+                               unique=False,
+                               help_text="The unique identifier for this strip, which is Layer-Row-Module-Channel (5 digit number)")
+    volume_id            = models.PositiveBigIntegerField(
+                               default=0,
+                               null=False,
+                               unique=False,
+                               help_text="The VolumeId as used in the GAPS simulation code")
+    utc_timestamp_start  = models.PositiveBigIntegerField(null=False, default=0,
+                                                    help_text="UTC Timestamp in UNIX format")
+    utc_timestamp_stop   = models.PositiveBigIntegerField(null=False, default=0,
+                                                    help_text="UTC Timestamp in UNIX format")
+    name                 = models.CharField(max_length=1024,
+                                            null=True,
+                                            default="",
+                                            help_text="A name for this strip pedestals")
     pedestal_mean = models.FloatField(
                         default=0,
                         null=False,
@@ -1197,6 +1219,44 @@ class TrackerStripPedestal(models.Model):
                         null=False,
                         help_text="If no pedestal is set from a file, it defaults to a mean value. If none is available, this is 0")
     
+    @staticmethod
+    def get_from_file(filename, utc_start = 0, utc_stop = 0):
+        """
+        Create database compatible objects from a regular text file
+        """
+        strip_to_ped = dict()
+        total_lines = 0
+        with open(filename) as f:
+            for line in f.readlines():
+                total_lines += 1
+        hid_vid_map = TrackerStrip.get_hid_vid_map()  
+        if not isinstance(filename, Path):
+            filename = Path(filename)
+        with open(filename) as f:
+            for line in tqdm.tqdm(f.readlines(), total=total_lines):
+                #print (line)
+                line = line.lstrip().rstrip()
+                if line.startswith('#'):
+                    continue
+                #line = line.split(',')
+                line = line.split()
+                #print (line)
+                layer, row, module, channel = int(line[0]), int(line[1]), int(line[2]), int(line[3])
+                ped_mean, ped_sigma         = float(line[4]), float(line[5])
+                strip_id = TrackerStrip.create_id(layer, row, module, channel)
+                #print (pol_a2_0, pol_a2_1, pol_a2_2)
+                #print ('----')
+                ped                     = TrackerStripPedestal()
+                ped.volume_id           = hid_vid_map[strip_id] 
+                ped.utc_timestamp_start = utc_start 
+                ped.utc_timestamp_stop  = utc_stop 
+                ped.name                = filename.name
+                ped.strip_id            = strip_id 
+                ped.pedestal_mean       = ped_mean   
+                ped.pedestal_sigma      = ped_sigma    
+                strip_to_ped[strip_id]  = ped
+        return strip_to_ped
+
     def __str__(self):
         return self.__repr__()
     
@@ -1205,6 +1265,8 @@ class TrackerStripPedestal(models.Model):
         if self.is_mean_value:
             _repr += '\n !! -- Mean value for all strips !!'
             _repr += '\n !! -- values not for this individual strip !!'
+        _repr += f'\n  UTC Timestmamps begin/end'
+        _repr += f'\n    {self.utc_timestamp_start} //{self.utc_timestamp_stop} '  
         _repr += f'\n  Volume ID : {self.volume_id}'  
         _repr += f'\n  ped mean  : {self.pedestal_mean}'
         _repr += f'\n  ped sigma : {self.pedestal_sigma}>'
@@ -1214,21 +1276,29 @@ class TrackerStripPedestal(models.Model):
 ##########################################################################
 
 class TrackerStripMask(models.Model):
-    strip_id      = models.PositiveIntegerField(
+    """
+    A simple "on/off" switch for tracker strips. If they are not marked 
+    as "active", then they should be removed from the calibrated events.
+    """
+    data_id       = models.AutoField(
                         primary_key=True,
+                        help_text="Identify this specific dataset")
+    strip_id      = models.PositiveIntegerField(
                         null=False,
                         default=0,
-                        unique=True,
+                        unique=False,
                         help_text="The unique identifier for this strip, which is Layer-Row-Module-Channel (5 digit number)")
 
     volume_id     = models.PositiveBigIntegerField(
                         default=0,
                         null=False,
-                        unique=True,
+                        unique=False,
                         help_text="The VolumeId as used in the GAPS simulation code")
-    utc_timestamp  = models.PositiveBigIntegerField(null=False, default=0,
+    utc_timestamp_start  = models.PositiveBigIntegerField(null=False, default=0,
                                                     help_text="UTC Timestamp in YYMMDDHHMMSS format")
-    mask_name    = models.CharField(max_length=1024,
+    utc_timestamp_stop   = models.PositiveBigIntegerField(null=False, default=0,
+                                                    help_text="UTC Timestamp in YYMMDDHHMMSS format")
+    name                 = models.CharField(max_length=1024,
                                     null=True,
                                     default="",
                                     help_text="A name for this strip mask. There might be serveral per same day, so having only a timestamp might be confusing")
@@ -1243,14 +1313,355 @@ class TrackerStripMask(models.Model):
     def __repr__(self):
         _repr = f'<TrackerStripMask [{self.strip_id}]:'
         _repr += f'\n  Volume ID : {self.volume_id}'  
-        _repr += f'\n  Timestamp : {self.utc_timestamp}'  
-        _repr += f'\n  Name      : {self.mask_name}'  
+        _repr += f'\n  UTC Timestmamps begin/end'
+        _repr += f'\n    {self.utc_timestamp_start} // {self.utc_timestamp_stop} '  
+        _repr += f'\n  Name      : {self.name}'  
         _repr += f'\n  Mask      : {self.active}>'  
         return _repr
 
+    @staticmethod
+    def get_from_file(filename, utc_start = 0, utc_stop = 0):
+        strip_to_mask = dict()
+        total_lines   = 0
+        n_entries     = 0
+        with open(filename) as f:
+            for line in f.readlines():
+                total_lines += 1
+        hid_vid_map = TrackerStrip.get_hid_vid_map() 
+        n_entries   = 0
+        if not isinstance(filename, Path):
+            name = Path(filename).name 
+        else:
+            name = filename.name
+        with open(filename) as f:
+            for line in tqdm.tqdm(f.readlines(), total=total_lines):
+                n_entries += 1
+                module_id, mask = line.split()
+                mask = int(mask, base=16)
+                #print (module_id, mask)
+                layer  = int(module_id[0])
+                row    = int(module_id[1])
+                module = int(module_id[2])
+                for k in range(32):
+                    strip_mask = mask >> k & 0x1
+                    tsmask   = TrackerStripMask()
+                    strip_id = TrackerStrip.create_id(layer, row, module, k)
+                    vid      = hid_vid_map[strip_id]
+                    tsmask.strip_id  = strip_id
+                    tsmask.active    = bool(strip_mask)
+                    tsmask.volume_id = vid
+                    tsmask.name      = name
+                    strip_to_mask[strip_id] = tsmask
+       
+        return strip_to_mask
 
 ##########################################################################
 
+class TrackerStripTransferFunction(models.Model):
+    """
+    The polynomial version of the transfer function as 
+    given in textfiles.
+    This is based on work from R.Munini.
+    """
+    data_id       = models.AutoField(
+                        primary_key=True,
+                        help_text="Identify this specific dataset")
+    strip_id      = models.PositiveIntegerField(
+                        null=False,
+                        default=0,
+                        unique=False,
+                        help_text="The unique identifier for this strip, which is Layer-Row-Module-Channel (5 digit number)")
+
+    volume_id      = models.PositiveBigIntegerField(
+                        default=0,
+                        null=False,
+                        unique=False,
+                        help_text="The VolumeId as used in the GAPS simulation code")
+    utc_timestamp_start  = models.PositiveBigIntegerField(null=False, default=0,
+                                                    help_text="UTC Timestamp in YYMMDDHHMMSS format")
+    utc_timestamp_stop   = models.PositiveBigIntegerField(null=False, default=0,
+                                                    help_text="UTC Timestamp in YYMMDDHHMMSS format")
+    name           = models.CharField(max_length=1024,
+                                    null=True,
+                                    default="",
+                                    help_text="A name for this transfer fn. There might be serveral per same day, so having only a timestamp might be confusing")
+    
+    # coefficients 
+    pol_a2_0       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+    pol_a2_1       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")    
+    pol_a2_2       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+
+    pol_b3_0       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+    pol_b3_1       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+    pol_b3_2       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+    pol_b3_3       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+
+    pol_c3_0       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+    pol_c3_1       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+    pol_c3_2       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+    pol_c3_3       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+
+    pol_d3_0       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")     
+    pol_d3_1       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+    pol_d3_2       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+    pol_d3_3       = models.FloatField(default=0, null=False, help_text = "coefficient for transfer function")
+    
+    def poly_a(self,xs):
+        ys = np.zeros(len(xs))
+        mask = xs <= 190 
+        ys[mask] = self.pol_a2_0 + self.pol_a2_1*xs[mask] + self.pol_a2_2*(xs[mask]**2) 
+        return ys
+    
+    def poly_b(self, s):
+        ys = np.zeros(len(xs))
+        mask = np.logical_and(190 < xs, xs <= 500)
+        ys[mask] = self.pol_b3_0 + self.pol_b3_1*xs[mask] + self.pol_b3_2*(xs[mask]**2) + self.pol_b3_3*(xs[mask]**3) 
+        return ys
+    
+    def poly_c(self, xs):
+        ys = np.zeros(len(xs))
+        mask = np.logical_and(500 <  xs, xs <= 900)
+        ys[mask] = self.pol_c3_0 + self.pol_c3_1*xs[mask] + self.pol_c3_2*(xs[mask]**2) + self.pol_c3_3*(xs[mask]**3) 
+        return ys
+    
+    def poly_d(self, xs):
+        ys = np.zeros(len(xs))
+        mask = np.logical_and(900 <  xs, xs <= 1600)
+        ys[mask] = self.pol_d3_0 + self.pol_d3_1*xs[mask] + self.pol_d3_2*(xs[mask]**2) + self.pol_d3_3*(xs[mask]**3) 
+        return ys
+    
+    def trafo(self, xs):
+        if isinstance(xs, float) or isinstance(xs, int):
+            xs = np.array(xs)
+        a = self.poly_a(xs)
+        b = self.poly_b(xs)
+        c = self.poly_c(xs)
+        d = self.poly_d(xs) 
+        ys = a + b + c + d
+        return ys
+
+    @staticmethod
+    def get_from_file(filename):
+        strip_to_tf = dict()
+        total_lines = 0
+        with open(filename) as f:
+            for line in f.readlines():
+                total_lines += 1
+        
+        hid_vid_map = TrackerStrip.get_hid_vid_map()  
+        if not isinstance(filename, Path):
+            filename = Path(filename)
+        with open(filename) as f:
+            for line in tqdm.tqdm(f.readlines(), total=total_lines):
+                #print (line)
+                line =line.lstrip().rstrip()
+                if line.startswith('#'):
+                    continue
+                line = line.split(',')
+                #print (line)
+                layer, row, module, channel = int(line[0]), int(line[1]), int(line[2]), int(line[3])
+                strip_id = TrackerStrip.create_id(layer, row, module, channel)
+                pol_a2_0, pol_a2_1, pol_a2_2 = [float(k) for k in line[4:7]]
+                #print (pol_a2_0, pol_a2_1, pol_a2_2)
+                #print ('----')
+                pol_b3_0, pol_b3_1, pol_b3_2, pol_b3_3 = [float(k) for k in line[7:11]]
+                pol_c3_0, pol_c3_1, pol_c3_2, pol_c3_3 = [float(k) for k in line[11:15]]
+                pol_d3_0, pol_d3_1, pol_d3_2, pol_d3_3 = [float(k) for k in line[15:19]]
+                tf = TrackerStripTransferFunction()
+                tf.volume_id     = hid_vid_map[strip_id] 
+                tf.name          = filename.name
+                tf.utc_timestamp = 0
+                tf.strip_id = strip_id 
+                tf.pol_a2_0 = pol_a2_0 
+                tf.pol_a2_1 = pol_a2_1    
+                tf.pol_a2_2 = pol_a2_2    
+                
+                tf.pol_b3_0 = pol_b3_0    
+                tf.pol_b3_1 = pol_b3_1    
+                tf.pol_b3_2 = pol_b3_2    
+                tf.pol_b3_3 = pol_b3_3    
+                
+                tf.pol_c3_0 = pol_c3_0    
+                tf.pol_c3_1 = pol_c3_1    
+                tf.pol_c3_2 = pol_c3_2    
+                tf.pol_c3_3 = pol_c3_3    
+                
+                tf.pol_d3_0 = pol_d3_0    
+                tf.pol_d3_1 = pol_d3_1    
+                tf.pol_d3_2 = pol_d3_2    
+                tf.pol_d3_3 = pol_d3_3    
+
+                strip_to_tf[strip_id] = tf 
+        return strip_to_tf
+    
+    def __repr__(self):
+        _repr = f'<TrackerStripTransferFunction [{self.strip_id}]:'
+        _repr += f'\n  Volume ID : {self.volume_id}'  
+        _repr += f'\n  Name      : {self.name}'  
+        _repr += f'\n  UTC Timestmamps begin/end'
+        _repr += f'\n    {self.utc_timestamp_start} //{self.utc_timestamp_stop} '  
+        # FIXME - make this nicer, e.g. 
+        _repr += f'\n  Poly A    :{self.pol_a2_0}*adc + {self.pol_a2_1}*adc + {self.pol_a2_2}*(adc**2) for adc < 190'
+        _repr += f'\n  Poly B    :{self.pol_b3_0}*adc + {self.pol_b3_1}*adc + {self.pol_b3_2}*(adc**2) + {self.pol_b3_3}*(adc**3) for 190 < adc <= 500'
+        _repr += f'\n  Poly C    :{self.pol_c3_0}*adc + {self.pol_c3_1}*adc + {self.pol_c3_2}*(adc**2) + {self.pol_c3_3}*(adc**3) for 500 < adc <= 900'
+        _repr += f'\n  Poly D    :{self.pol_d3_0}*adc + {self.pol_d3_1}*adc + {self.pol_d3_2}*(adc**2) + {self.pol_d3_3}*(adc**3) for 900 < adc <= 1600>'
+        return _repr
+    
+    def __str__(self):
+        return self.__repr__()
+
+##########################################################################
+
+class TrackerStripCmnNoise(models.Model):
+    """
+    Pulser measurement to get common noise in the tracker 
+    under control
+    """
+    data_id              = models.AutoField(
+                               primary_key=True,
+                               help_text="Identify this specific dataset")
+    strip_id             = models.PositiveIntegerField(
+                               null=False,
+                               default=0,
+                               unique=False,
+                               help_text="The unique identifier for this strip, which is Layer-Row-Module-Channel (5 digit number)")
+    volume_id            = models.PositiveBigIntegerField(
+                              default=0,
+                              null=False,
+                              unique=False,
+                              help_text="The VolumeId as used in the GAPS simulation code")
+    utc_timestamp_start  = models.PositiveBigIntegerField(null=False, default=0,
+                                                    help_text="UTC Timestamp in YYMMDDHHMMSS format")
+    utc_timestamp_stop   = models.PositiveBigIntegerField(null=False, default=0,
+                                                    help_text="UTC Timestamp in YYMMDDHHMMSS format")
+    name                 = models.CharField(max_length=1024,
+                                          null=True,
+                                          default="",
+                                          help_text="A name for this transfer fn. There might be serveral per same day, so having only a timestamp might be confusing")
+    
+    gain                 = models.FloatField(default=0, null=False, help_text = "Gain from pulser (?)")
+    pulse_chn            = models.FloatField(default=0, null=False, help_text = "Pulsed channel")    
+    pulse_avg            = models.FloatField(default=0, null=False, help_text = "Avg pulse")
+    gain_is_mean         = models.BooleanField(default=False, null=False, help_text = "Is the value for the gain a mean value?")
+    pulse_is_mean        = models.BooleanField(default=False, null=False, help_text = "Is the value for the pulse avg and chn a mean value?")
+
+    @staticmethod
+    def get_from_file(filename, utc_start = 0, utc_stop = 0):
+        strip_to_tf = dict()
+        total_lines = 0
+        with open(filename) as f:
+            for line in f.readlines():
+                total_lines += 1
+        hid_vid_map = TrackerStrip.get_hid_vid_map() 
+        n_entries   = 0
+        mean_pls    = 0
+        mean_avg    = 0
+        if not isinstance(filename, Path):
+            filename = Path(filename)
+        with open(filename) as f:
+            for line in tqdm.tqdm(f.readlines(), total=total_lines):
+                #print (line)
+                line =line.lstrip().rstrip()
+                if line.startswith('#'):
+                    continue
+                n_entries += 1
+                line = line.split()
+                #print (line)
+                layer, row, module, channel = int(line[0]), int(line[1]), int(line[2]), int(line[3])
+                strip_id = TrackerStrip.create_id(layer, row, module, channel)
+                pulse_chn, pulse_avg = [float(k) for k in line[4:6]]
+                #print (pol_a2_0, pol_a2_1, pol_a2_2)
+                #print ('----')
+                cmnnoise = TrackerStripCmnNoise()
+                # FIXME 
+                cmnnoise.volume_id           = hid_vid_map[strip_id] 
+                cmnnoise.name                = filename.name
+                cmnnoise.utc_timestamp_start = utc_start 
+                cmnnoise.utc_timestamp_stop  = utc_stop 
+                cmnnoise.strip_id            = strip_id 
+                cmnnoise.gain                = 0
+                cmnnoise.pulse_chn           = pulse_chn    
+                cmnnoise.pulse_avg           = pulse_avg    
+                mean_pls                    += pulse_chn 
+                mean_avg                    += pulse_avg
+                strip_to_tf[strip_id]        = cmnnoise 
+       
+        mean_pls /= n_entries 
+        mean_avg /= n_entries 
+
+        # make sure we have one entry per strip even if we don't have the data
+        for strip_id in hid_vid_map:
+            if not strip_id in strip_to_tf:
+                cmnnoise = TrackerStripCmnNoise()
+                # FIXME 
+                cmnnoise.volume_id           = hid_vid_map[strip_id] 
+                cmnnoise.name                = filename.name
+                cmnnoise.utc_timestamp_start = utc_start 
+                cmnnoise.utc_timestamp_stop  = utc_stop 
+                cmnnoise.strip_id            = strip_id 
+                cmnnoise.gain                = 0
+                cmnnoise.pulse_chn           = int(mean_pls)     
+                # no mean val
+                cmnnoise.pulse_avg           = 0
+                #cmnnoise.pulse_avg           = mean_avg    
+                cmnnoise.pulse_is_mean       = True
+                strip_to_tf[strip_id]        = cmnnoise 
+                
+        return strip_to_tf
+  
+    @staticmethod 
+    def add_gains(filename, cmnnoise_dict):
+        """
+        Take a previously created dictionary of common
+        noise data and add the gains from a different 
+        file
+        """
+        #ngains      = 0
+        total_lines = 0
+        n_entries   = 0
+        mean_gain   = 0
+        with open(filename) as f:
+            for line in f.readlines():
+                total_lines += 1
+        with open(filename) as f:
+            for line in tqdm.tqdm(f.readlines(), total=total_lines):
+                #print (line)
+                line =line.lstrip().rstrip()
+                if line.startswith('#'):
+                    continue
+                #line = line.split(',')
+                n_entries += 1 
+                line = line.split()
+                layer, row, module, channel = int(line[0]), int(line[1]), int(line[2]), int(line[3])
+                strip_id = TrackerStrip.create_id(layer, row, module, channel)
+                gain     = float(line[4])
+                mean_gain += gain 
+                #print (line)
+                cmnnoise_dict[strip_id].gain = gain 
+        # calculate mean gain
+        mean_gain /= n_entries
+        for k in cmnnoise_dict:
+            if cmnnoise_dict[k].gain == 0:
+                # no mean gain!
+                cmnnoise_dict[k].gain = 1
+                #cmnnoise_dict[k].gain = mean_gain 
+                cmnnoise_dict[k].gain_is_mean = True 
+
+    def __repr__(self):
+        _repr = f'<TrackerStripCmnNoise [{self.strip_id}]:'
+        _repr += f'\n  Volume ID     : {self.volume_id}'  
+        _repr += f'\n  UTC Timestmamps begin/end:'
+        _repr += f'\n    {self.utc_timestamp_start} // {self.utc_timestamp_stop} '  
+        _repr += f'\n  Name          : {self.name}'  
+        _repr += f'\n  Gain is mean  : {self.gain_is_mean}'
+        _repr += f'\n  Pulse is mean : {self.pulse_is_mean}'
+        _repr += f'\n  Pulse Chn     : {self.pulse_chn}, Gain : {self.gain:.2f}, Pulse Avg : {self.pulse_avg:.2f}>'
+        return _repr
+    
+    def __str__(self):
+        return self.__repr__()
+
+##########################################################################
 
 class Run(models.Model):
     """

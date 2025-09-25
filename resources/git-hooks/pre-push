@@ -1,0 +1,40 @@
+#!/bin/sh
+#
+# This pre-push hook clears the output cells from Jupyter notebooks (.ipynb)
+# that are part of the current commit before the push is executed.
+# This prevents large, non-code data from being committed to the repository.
+
+echo "Running pre-push hook: Clearing Jupyter notebook outputs..."
+
+# Find all .ipynb files that have been staged for the push.
+# --cached: checks the staging area
+# --name-only: shows only the file names
+FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '.ipynb$')
+
+# Check if there are any .ipynb files to process.
+if [ -z "$FILES" ]; then
+  echo "No Jupyter notebooks found in the staged changes. Exiting hook."
+  exit 0
+fi
+
+# Use a loop to process each notebook file.
+for file in $FILES
+do
+  echo "  - Clearing outputs from $file"
+  # Run jupyter nbconvert with the ClearOutputPreprocessor.
+  # --inplace: saves the changes back to the same file.
+  # This command requires the 'nbconvert' package to be installed.
+  if jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace "$file"; then
+    # After clearing the output, re-stage the modified file so the changes are included in the push.
+    git add "$file"
+    echo "  - Outputs cleared and file re-staged: $file"
+  else
+    echo "  - ERROR: Failed to clear outputs for $file. Check if 'jupyter nbconvert' is installed."
+    # The hook will continue to the next file even if one fails.
+    # To fail the push, you could add 'exit 1' here.
+  fi
+done
+
+echo "Pre-push hook finished successfully."
+
+exit 0

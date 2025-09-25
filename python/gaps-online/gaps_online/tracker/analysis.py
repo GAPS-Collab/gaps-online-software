@@ -270,6 +270,7 @@ class TrackerAnalysis:
         self.subtract_pedestals  = len(self.pedestals.keys()) > 0
         self.transfer_fn         = transfer_fn
         self.apply_transfer_fn   = len(self.transfer_fn.keys()) > 0
+        self.subtract_cmnnoise   = False
         # a switch to indicate if we currently 
         # want to use this or not. 
         # (as for use in gander)

@@ -1,5 +1,17 @@
 # specific rye and jupyter notebook artefacts
 *.python-version
+# in each folder where we used rye, and created 
+# its own virtual environment an src folder gets 
+# created
+
+# gondola_cxx python bindings for C++ lib 
+gondola-core/C++/dist/*
+gondola-core/C++/gondola_cxx/*
+gondola-core/C++/wheelhouse/*
+ 
+liftof/releases/*
+liftof/target/*
+liftof/src/*
 
 analysis/merge_tcfc/.gitignore
 analysis/merge_tcfc/.python-version
@@ -13,6 +25,10 @@ analysis/notebooks/.ipynb_checkpoints/
 analysis/notebooks/.python-version
 analysis/notebooks/README.md
 analysis/notebooks/achim_notebooks/.ipynb_checkpoints/*
+analysis/notebooks/src/*
+analysis/notebooks/achim_notebooks/src/*
+analysis/notebooks/achim_notebooks/README.md
+analysis/notebooks/general/.ipynb_checkpoints/*
 
 gaps-db/gaps_db/.gitignore
 gaps-db/gaps_db/.python-version
@@ -35,6 +51,11 @@ python/doc/_autosummary/
 # build artifacts
 tof/liftof/build/*
 *.so
+
+# gander rye environment
+gander/src/*
+gander/__pycache__
+gander/*.lock
 
 # other files which might be in the repository
 data/*
@@ -64,11 +85,10 @@ tof/dataclasses/rust/tof-dataclasses/Cargo.lock
 tof/dataclasses/rust/pybindings/target/*
 tof/dataclasses/rust/pybindings/Cargo.lock
 tof/dataclasses/rust/pybindings/rust_dataclasses.so
-tof/liftof/Cargo.lock
-tof/liftof/liftof-tui/Cargo.lock
-tof/liftof/liftof-cc/Cargo.lock
-tof/liftof/liftof-rb/Cargo.lock
-tof/liftof/liftof-python/Cargo.lock
+liftof/Cargo.lock
+liftof/liftof-tui/Cargo.lock
+liftof/liftof-cc/Cargo.lock
+liftof/liftof-rb/Cargo.lock
 
 # pycache
 gaps-db/gaps_db/gaps_db/__pycache__/
@@ -118,4 +138,7 @@ doc/latex
 # ingore automatically generated files
 # for static websites
 analysis/umbrella-checkout/content/*.md
+analysis/umbrella-checkout/content/images/*
 
+#test fragments
+gondola-core/rust/gondola-core/liftof-config-test.toml
