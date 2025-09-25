@@ -51,7 +51,7 @@ int main(int argc, char *argv[]){
   // -> Gaps relevant code starts here
  
   auto calname = result["calibration"].as<std::string>();
-  RBCalibration cali[NRB]; // "cali" stores values for one RB
+  gondola::RBCalibration cali[NRB]; // "cali" stores values for one RB
 
   // To read calibration data from individual binary files, when -c is
   // given with the directory of the calibration files. Since the
@@ -99,7 +99,7 @@ int main(int argc, char *argv[]){
 	    if (p.packet_type == PacketType::RBCalibration) {
 	      // Should have the one calibration tofpacket stored in "packet".
 	      usize pos = 0;
-	      cali[i] = RBCalibration::from_bytestream(p.payload, pos); 
+	      cali[i] = gondola::RBCalibration::from_bytestream(p.payload, pos); 
 	      RB_Calibrated[i] = true;
 	    }
 	  }
@@ -141,7 +141,7 @@ int main(int argc, char *argv[]){
 	// to make the rust and C++ code look more similar, so that 
 	// is easier to compare them.
 	usize pos = 0;
-	auto cali = RBCalibration::from_bytestream(p.payload, pos);
+	auto cali = gondola::RBCalibration::from_bytestream(p.payload, pos);
 	if (verbose) {
 	  std::cout << cali << std::endl;
 	}
@@ -180,7 +180,12 @@ int main(int argc, char *argv[]){
 	int NPadUmb  = 0;
 	int NPadCort = 0;
 	
-        auto ev = TofEvent::from_bytestream(p.payload, pos);
+    auto ev_res = TofEvent::from_bytestream(p.payload, pos);
+    if (!ev_res.is_ok()) {
+      spdlog::error("Deserialization issues when unpacking TofEvent!");
+      continue;
+    }
+    auto ev = ev_res.unwrap();
 	unsigned long int evt_ctr = ev.mt_event.event_id;
 	//printf("Event %ld: RBs -", evt_ctr);
 	//printf("Event %ld\n", evt_ctr);

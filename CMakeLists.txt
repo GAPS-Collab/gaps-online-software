@@ -57,6 +57,7 @@ option(BUILD_SIM "build simulation library to simulate events" OFF)
 
 # set a few paths for the installation, e.g. for exanokes
 set(INSTALL_EXAMPLES_DIR "${CMAKE_INSTALL_PREFIX}/examples" CACHE PATH "installation directory for examples" FORCE)
+set(INSTALL_ANALYSIS_DIR "${CMAKE_INSTALL_PREFIX}/analysis" CACHE PATH "installation direcotry for personal analysis code" FORCE)
 
 if(BUILD_CXX_WITH_ROOT)
   list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
@@ -119,9 +120,9 @@ if (BUILD_SIM)
   add_subdirectory(simulation)
 endif (BUILD_SIM)
 
-if (BUILD_PERSONAL_ANALYSIS_CODE)
-  sdd_subdirectory(analysis)
-endif(BUILD_PERSONAL_ANALYSIS_CODE)
+if (BUILD_CXX_PERSONAL_ANALYSIS_CODE)
+  add_subdirectory(analysis)
+endif(BUILD_CXX_PERSONAL_ANALYSIS_CODE)
 
 # install README
 install(FILES
