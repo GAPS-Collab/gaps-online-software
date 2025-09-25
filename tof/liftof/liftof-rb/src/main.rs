@@ -351,7 +351,7 @@ fn main() {
   // just offer it through a mutex
   //let mut global_run_config = Arc::new(Mutex::new(run_config));
   
-  // monitoring settigns
+  // monitoring settings
   // these are only relevant if the 
   // board features these connections
   let mut pb_moni_every_x   = f32::MAX;
@@ -382,6 +382,9 @@ fn main() {
         Ok(link_id) => {
           if link_id as u8 == rb_expected_link_id {
             println!("=> We received the correct link id from the MTB!");
+          } else if link_id as u8 == 0 {
+            error!("The register for the mtb link id has not been set! We read out 0, which is not a valid MTB Link ID.");
+            warn!("We continue without being able to perform the MTB link ID check!");
           } else {
             error!("Received unexpected MTB link ID {} for this board {}! We expected MTB LINK ID {}", link_id, rb_id, rb_expected_link_id);
             error!("Incorrect link ID. This might hint to issues with the MTB mapping!");

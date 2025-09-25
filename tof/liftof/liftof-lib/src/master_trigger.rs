@@ -393,6 +393,12 @@ pub fn configure_mtb(bus : &mut IPBus,
         Ok(_)    => ()
       }
     }
+    TriggerType::Gaps1044   => {
+      match set_gaps1044_trigger(bus, settings.gaps_trigger_use_beta) {
+        Err(err) => error!("Unable to set the GAPS trigger! {err}"),
+        Ok(_)    => ()
+      }
+    }
     TriggerType::UmbCube => {
       match set_umbcube_trigger(bus) {
         Err(err) => error!("Unable to set UmbCube trigger! {err}"),
