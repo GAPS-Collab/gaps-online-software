@@ -2,19 +2,15 @@
 
 ![build-docs-badge](https://github.com/GAPS-Collab/gaps-online-software/workflows/BuildBot/badge.svg)
 
-This is branch LELEWAA-0.10. [Lelewaa is a whale shark](https://dlnr.hawaii.gov/dar/sharks-and-rays/).
-![Manta ray](resources/assets/lelewaa.png)
+This is version AULEPE-0.12. [Aulepe are sailfish!](https://en.wikipedia.org/wiki/Sailfish).
+![Aulepe](resources/assets/aulepe_luma.png)
 
->[!TIP] 
->Whale sharks are the largest fish on our planet, and despite their size they are not aggressive towards humans. Whale sharks can be spotted in the Hawaiian waters, however, sightings are rare so if you see one enjoy your encounter and please be respectful. 
+>[!NOTE] 
+>You think you're fast? You think your pet cheetah is fast? A sailfish clock in at 68MpH and and actually another member of the billfish, the Black Marlin is considered the [fastest non-airborne animal on the planet and can go up to 80MpH](https://en.wikipedia.org/wiki/Fastest_animals) and thus faster than a Cheetah. On top of that Marlin are actually pretty tasty!
+>Marlin can be found around the Hawaiian islands
 
 >[!NOTE]
->Apparently the Hawai'ian name Lelewa'a stems from the tale that the whale sharks like to approach and lean on canoe outriggers. 
-
-In contrast to what we claimed in the last pre-release branch, HAHALUA-0.9, this branch is NOT the flight version. Creating another pre-release version had been become necessary, because a breaking change in the way we communicate with the MTB has 
-been introduce, see also [MTB fw v3.0.0](https://gitlab.com/ucla-gaps-tof/firmware/-/tree/v3.0.0) . This affects the size of the MasterTriggerEvent. The purpose of this branch is to align the MasterTriggerEvent closer to the actual representation 
-on the MTB, which will boost performance and reduce data size, while increasing clarity and readibility of the code.
-**All previous data will be readable with this code, however, data taken with this version (or a later version of the code will not be able to be read by earlier versions of this code (or there is no guarantee that it works))** 
+>This release of gaps-online plugs in the Turbo. This is the Supra with extra turbocharger which goes "nnnnnnnnn.... shtutututu...". The focus of this release is to keep bascially the API of v0.11 but Speed.It.Up. 
 
 ## API docs 
 
@@ -35,7 +31,7 @@ for the python API will follow soon.
 
 ### software repository
 
-The code is organized in a (private) github repository at 
+The code is organized in a public github repository at 
 * [github](https://github.com/GAPS-Collab/gaps-online-software)
 
 ## installation
@@ -85,10 +81,7 @@ It will greet you with a banner.
 After that, you can either write your own C++ code, linking to the gaps-online-software
 C++ API, or use the include pybindings (if `pybind11` was available at compile time)
 
-To use the pybindings, simply fire up an (i)python shell and type:
-`import gaps_tof as gt`
-
-Then the bindings should be ready. Example code on how to use them can be found in 
+Example code on how to use them can be found in 
 `<install_dir>/examples/`
 
 [More detailed installation instructions can be found in INSTALL.MD](INSTALL.md)
