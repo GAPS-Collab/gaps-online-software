@@ -4,6 +4,7 @@
 use std::time::Instant;
 use std::fmt;
 use std::f32::consts::PI;
+use std::cmp::Ordering;
 
 cfg_if::cfg_if! {
   if #[cfg(feature = "random")]  {
@@ -1028,7 +1029,8 @@ impl TofEventSummary {
       h.event_t0 = t0 + t_shift;
     }
     // start the first hit at 0
-    self.hits.sort_by(|a,b| (a.event_t0).partial_cmp(&b.event_t0).unwrap());
+    // if a hit is NAN, assume it has a "larger" time
+    self.hits.sort_by(|a,b| (a.event_t0).partial_cmp(&b.event_t0).unwrap_or(Ordering::Greater));
     let t0_first_hit = self.hits[0].event_t0;
     for h in self.hits.iter_mut() {
       h.event_t0 -= t0_first_hit
