@@ -35,7 +35,6 @@ int main(int argc, char *argv[]){
   ("h,help", "Print help")
   //("c,calibration", "Folder with binary calibration files for each RB", cxxopts::value<std::string>()->default_value(""))
   ("file", "A Caraspace file", cxxopts::value<std::string>())
-  ("directory", "A directory containing .gaps (caraspace) files, e.g. L0 Gaps files", cxxopts::value<std::string>())
   ("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
   ;
   options.parse_positional({"file"});
@@ -66,7 +65,10 @@ int main(int argc, char *argv[]){
         filenames.push_back(filename);
       }
     }
+  } else {
+    filenames.push_back(path.string());
   }
+  
   std::cout << "Will read " << filenames.size() << " files!" << std::endl; 
   std::string tp_name        = "PacketType.TofEvent";
   std::string tel_ev_nogaps  = "TelemetryPacketType.NoGapsTriggerEvent";
@@ -81,8 +83,8 @@ int main(int argc, char *argv[]){
         
   auto start = std::chrono::high_resolution_clock::now();
 
-  auto trk_mask = Gaps::get_trackerstripmasks();
-  auto trk_ped  = Gaps::get_trackerstrippedestals();
+  //auto trk_mask = Gaps::get_trackerstripmasks();
+  //auto trk_ped  = Gaps::get_trackerstrippedestals();
 
   // as an example, count tracker hits
   u64 n_trk_hits        = 0;
@@ -117,18 +119,18 @@ int main(int argc, char *argv[]){
         continue;
       }
 
-      if (frame.index.contains(cooling_name)) {
-        pack = frame.get_telemetrypacket(cooling_name);
-        std::cout << pack.to_string() << std::endl;
-        usize pos = 0;
-        auto cooling = gt::Cooling::from_bytestream(pack.payload, pos);
-        if (cooling.is_ok()) {
-          std::cout << cooling.unwrap().to_string() << std::endl;
-        } else {
-          std::cout << cooling.unwrap_err().reason << std::endl;
-        }
-        //std::exit(1);
-      }
+      //if (frame.index.contains(cooling_name)) {
+      //  pack = frame.get_telemetrypacket(cooling_name);
+      //  std::cout << pack.to_string() << std::endl;
+      //  usize pos = 0;
+      //  auto cooling = gt::Cooling::from_bytestream(pack.payload, pos);
+      //  if (cooling.is_ok()) {
+      //    std::cout << cooling.unwrap().to_string() << std::endl;
+      //  } else {
+      //    std::cout << cooling.unwrap_err().reason << std::endl;
+      //  }
+      //  //std::exit(1);
+      //}
 
       if (verbose) {
         std::cout << "---- TELEMETRY -----" << std::endl;
@@ -144,18 +146,21 @@ int main(int argc, char *argv[]){
         ++n_telemetry_errors;
         continue;
       }
+      
+
       auto m_ev = result.unwrap();
+      std::cout << m_ev.tof_event.to_string() << std::endl;
       for (gt::TrkHit const &h : m_ev.trk_hits) {
         auto strip_id = Gaps::TrackerStrip::create_id(h.layer, h.row, h.module, h.channel);
-        if (trk_mask[strip_id]) {
-          // only count active strips
-          ++n_trk_hits;
-          // just as an example - subtract a pedestal
-          auto adc_no_pedestal = h.adc - trk_ped[strip_id].pedestal_mean;
-          //adc_no_pedestal;
-        } else {
-          ++n_trk_hits_masked;
-        }
+        //if (trk_mask[strip_id]) {
+        //  // only count active strips
+        //  ++n_trk_hits;
+        //  // just as an example - subtract a pedestal
+        //  auto adc_no_pedestal = h.adc - trk_ped[strip_id].pedestal_mean;
+        //  //adc_no_pedestal;
+        //} else {
+        //  ++n_trk_hits_masked;
+        //}
           //std::cout << h.to_string() << std::endl;
       }
       if (m_ev.trk_hits.size() == 0) {
@@ -165,7 +170,18 @@ int main(int argc, char *argv[]){
         // do someting with h
         //std::cout << h.to_string() << std::endl;
       }
-
+      auto tof_ev_res = frame.get_tofpacket(tp_name);
+      if (!tof_ev_res.is_ok()) {
+        continue;
+      }
+      auto tof_pack  = tof_ev_res.unwrap();
+      pos = 0;
+      auto tof_event_res = TofEvent::from_bytestream(tof_pack.payload, pos);
+      if (!tof_event_res.is_ok()) {
+        continue;
+      } 
+      auto tof_event = tof_event_res.unwrap();
+      std::cout << tof_event.to_string() << std::endl;
       if (n_frames_processed % 1000 == 0) {
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = end - start;
