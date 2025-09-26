@@ -277,7 +277,12 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="gaps_online.events.MergedEvent">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gaps_online.events.</span></span><span class="sig-name descname"><span class="pre">MergedEvent</span></span><a class="headerlink" href="#gaps_online.events.MergedEvent" title="Link to this definition">#</a></dt>
-<dd><dl class="py method">
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.events.MergedEvent.event_id">
+<span class="sig-name descname"><span class="pre">event_id</span></span><a class="headerlink" href="#gaps_online.events.MergedEvent.event_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="gaps_online.events.MergedEvent.from_telemetrypacket">
 <span class="sig-name descname"><span class="pre">from_telemetrypacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.events.MergedEvent.from_telemetrypacket" title="Link to this definition">#</a></dt>
 <dd><p>Populate a merged event from a TelemetryPacket.</p>
@@ -314,7 +319,13 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="gaps_online.events.TofEvent">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gaps_online.events.</span></span><span class="sig-name descname"><span class="pre">TofEvent</span></span><a class="headerlink" href="#gaps_online.events.TofEvent" title="Link to this definition">#</a></dt>
-<dd><dl class="py attribute">
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="gaps_online.events.TofEvent.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.events.TofEvent.copy" title="Link to this definition">#</a></dt>
+<dd><p>Emit a copy of self</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="gaps_online.events.TofEvent.event_id">
 <span class="sig-name descname"><span class="pre">event_id</span></span><a class="headerlink" href="#gaps_online.events.TofEvent.event_id" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -342,6 +353,11 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="gaps_online.events.TofEvent.get_summary">
 <span class="sig-name descname"><span class="pre">get_summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.events.TofEvent.get_summary" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.events.TofEvent.has_any_mangling">
+<span class="sig-name descname"><span class="pre">has_any_mangling</span></span><a class="headerlink" href="#gaps_online.events.TofEvent.has_any_mangling" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -412,7 +428,13 @@ look up LTB ids in the db.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="gaps_online.events.TofEventSummary">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gaps_online.events.</span></span><span class="sig-name descname"><span class="pre">TofEventSummary</span></span><a class="headerlink" href="#gaps_online.events.TofEventSummary" title="Link to this definition">#</a></dt>
-<dd><dl class="py attribute">
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="gaps_online.events.TofEventSummary.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.events.TofEventSummary.copy" title="Link to this definition">#</a></dt>
+<dd><p>Emit a copy of self</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="gaps_online.events.TofEventSummary.edep">
 <span class="sig-name descname"><span class="pre">edep</span></span><a class="headerlink" href="#gaps_online.events.TofEventSummary.edep" title="Link to this definition">#</a></dt>
 <dd><p>Total energy depostion in the complete TOF</p>
@@ -876,6 +898,11 @@ TofPacket of type RBCalibration in it</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="gaps_online.events.TriggerType.Gaps1044">
+<span class="sig-name descname"><span class="pre">Gaps1044</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Gaps1044</span></em><a class="headerlink" href="#gaps_online.events.TriggerType.Gaps1044" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="gaps_online.events.TriggerType.Gaps211">
 <span class="sig-name descname"><span class="pre">Gaps211</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Gaps211</span></em><a class="headerlink" href="#gaps_online.events.TriggerType.Gaps211" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -971,6 +998,34 @@ to millivolts and nanoseconds</p>
 <dt class="sig sig-object py" id="gaps_online.events.RBWaveform.from_tofpacket">
 <span class="sig-name descname"><span class="pre">from_tofpacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.events.RBWaveform.from_tofpacket" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gaps_online.events.RBWaveform.get_tot_a">
+<span class="sig-name descname"><span class="pre">get_tot_a</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.events.RBWaveform.get_tot_a" title="Link to this definition">#</a></dt>
+<dd><p>Time over threshold - waveform needs to be 
+calibrated. 
+Paddle end A</p>
+<dl class="simple">
+<dt># Arguments:</dt><dd><ul class="simple">
+<li><p>threshold : value in mV</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gaps_online.events.RBWaveform.get_tot_b">
+<span class="sig-name descname"><span class="pre">get_tot_b</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.events.RBWaveform.get_tot_b" title="Link to this definition">#</a></dt>
+<dd><p>Time over threshold - waveform needs to be 
+calibrated. 
+Paddle end B</p>
+<dl class="simple">
+<dt># Arguments:</dt><dd><ul class="simple">
+<li><p>threshold : value in mV</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gaps_online.events.RBWaveform.paddle_id">
@@ -1139,6 +1194,7 @@ to millivolts and nanoseconds</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#event-classes">Event classes</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.MergedEvent"><code class="docutils literal notranslate"><span class="pre">MergedEvent</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.MergedEvent.event_id"><code class="docutils literal notranslate"><span class="pre">MergedEvent.event_id</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.MergedEvent.from_telemetrypacket"><code class="docutils literal notranslate"><span class="pre">MergedEvent.from_telemetrypacket()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.MergedEvent.tof"><code class="docutils literal notranslate"><span class="pre">MergedEvent.tof</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.MergedEvent.tracker_pointcloud"><code class="docutils literal notranslate"><span class="pre">MergedEvent.tracker_pointcloud</span></code></a></li>
@@ -1148,12 +1204,14 @@ to millivolts and nanoseconds</p>
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.TofEvent"><code class="docutils literal notranslate"><span class="pre">TofEvent</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.TofEvent.copy"><code class="docutils literal notranslate"><span class="pre">TofEvent.copy()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.TofEvent.event_id"><code class="docutils literal notranslate"><span class="pre">TofEvent.event_id</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.TofEvent.from_file"><code class="docutils literal notranslate"><span class="pre">TofEvent.from_file()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.TofEvent.from_tofpacket"><code class="docutils literal notranslate"><span class="pre">TofEvent.from_tofpacket()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.TofEvent.get_missing_paddles_hg"><code class="docutils literal notranslate"><span class="pre">TofEvent.get_missing_paddles_hg()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.TofEvent.get_missing_paddles_wf"><code class="docutils literal notranslate"><span class="pre">TofEvent.get_missing_paddles_wf()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.TofEvent.get_summary"><code class="docutils literal notranslate"><span class="pre">TofEvent.get_summary()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.TofEvent.has_any_mangling"><code class="docutils literal notranslate"><span class="pre">TofEvent.has_any_mangling</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.TofEvent.hits"><code class="docutils literal notranslate"><span class="pre">TofEvent.hits</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.TofEvent.mastertriggerevent"><code class="docutils literal notranslate"><span class="pre">TofEvent.mastertriggerevent</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.TofEvent.nhits"><code class="docutils literal notranslate"><span class="pre">TofEvent.nhits</span></code></a></li>
@@ -1167,6 +1225,7 @@ to millivolts and nanoseconds</p>
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.TofEventSummary"><code class="docutils literal notranslate"><span class="pre">TofEventSummary</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.TofEventSummary.copy"><code class="docutils literal notranslate"><span class="pre">TofEventSummary.copy()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.TofEventSummary.edep"><code class="docutils literal notranslate"><span class="pre">TofEventSummary.edep</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.TofEventSummary.edep_cortina"><code class="docutils literal notranslate"><span class="pre">TofEventSummary.edep_cortina</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.TofEventSummary.edep_cube"><code class="docutils literal notranslate"><span class="pre">TofEventSummary.edep_cube</span></code></a></li>
@@ -1251,6 +1310,7 @@ to millivolts and nanoseconds</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.TriggerType.FixedRate"><code class="docutils literal notranslate"><span class="pre">TriggerType.FixedRate</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.TriggerType.Forced"><code class="docutils literal notranslate"><span class="pre">TriggerType.Forced</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.TriggerType.Gaps"><code class="docutils literal notranslate"><span class="pre">TriggerType.Gaps</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.TriggerType.Gaps1044"><code class="docutils literal notranslate"><span class="pre">TriggerType.Gaps1044</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.TriggerType.Gaps211"><code class="docutils literal notranslate"><span class="pre">TriggerType.Gaps211</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.TriggerType.Gaps422"><code class="docutils literal notranslate"><span class="pre">TriggerType.Gaps422</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.TriggerType.Gaps633"><code class="docutils literal notranslate"><span class="pre">TriggerType.Gaps633</span></code></a></li>
@@ -1272,6 +1332,8 @@ to millivolts and nanoseconds</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.RBWaveform.calibrate"><code class="docutils literal notranslate"><span class="pre">RBWaveform.calibrate()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.RBWaveform.event_id"><code class="docutils literal notranslate"><span class="pre">RBWaveform.event_id</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.RBWaveform.from_tofpacket"><code class="docutils literal notranslate"><span class="pre">RBWaveform.from_tofpacket()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.RBWaveform.get_tot_a"><code class="docutils literal notranslate"><span class="pre">RBWaveform.get_tot_a()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.RBWaveform.get_tot_b"><code class="docutils literal notranslate"><span class="pre">RBWaveform.get_tot_b()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.RBWaveform.paddle_id"><code class="docutils literal notranslate"><span class="pre">RBWaveform.paddle_id</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.RBWaveform.rb_channel_a"><code class="docutils literal notranslate"><span class="pre">RBWaveform.rb_channel_a</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.events.RBWaveform.rb_channel_b"><code class="docutils literal notranslate"><span class="pre">RBWaveform.rb_channel_b</span></code></a></li>

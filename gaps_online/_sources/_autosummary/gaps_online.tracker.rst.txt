@@ -11,4 +11,5 @@ gaps\_online.tracker
    :recursive:
 
    analysis
+   calibration
    visual

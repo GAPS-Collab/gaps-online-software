@@ -44,7 +44,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gaps_online.tracker.analysis';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="gaps_online.tracker.visual" href="gaps_online.tracker.visual.html" />
+    <link rel="next" title="gaps_online.tracker.calibration" href="gaps_online.tracker.calibration.html" />
     <link rel="prev" title="gaps_online.tracker" href="gaps_online.tracker.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="python"/>
@@ -223,7 +223,10 @@
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.db.html">gaps_online.db</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.events.html">gaps_online.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.io.html">gaps_online.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gaps_online.monitoring.html">gaps_online.monitoring</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="gaps_online.monitoring.html">gaps_online.monitoring</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="gaps_online.monitoring.analysis.html">gaps_online.monitoring.analysis</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.reconstruction.html">gaps_online.reconstruction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.run.html">gaps_online.run</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.telemetry.html">gaps_online.telemetry</a></li>
@@ -237,6 +240,7 @@
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="gaps_online.tracker.html">gaps_online.tracker</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">gaps_online.tracker.analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gaps_online.tracker.calibration.html">gaps_online.tracker.calibration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gaps_online.tracker.visual.html">gaps_online.tracker.visual</a></li>
 </ul>
 </details></li>
@@ -310,7 +314,7 @@ the GAPS tracker system</p>
 <p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.tracker.analysis.TrackerAnalysis" title="gaps_online.tracker.analysis.TrackerAnalysis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerAnalysis</span></code></a>([nbins, active, strip_mask])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.tracker.analysis.TrackerAnalysis" title="gaps_online.tracker.analysis.TrackerAnalysis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerAnalysis</span></code></a>([nbins, active, strip_mask, ...])</p></td>
 <td><p>Yet another container holding plots for tracker specific analysis</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.tracker.analysis.TrackerCuts" title="gaps_online.tracker.analysis.TrackerCuts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerCuts</span></code></a>()</p></td>
@@ -329,6 +333,30 @@ the GAPS tracker system</p>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="gaps_online.tracker.analysis.TrackerCuts.is_compatible">
+<span class="sig-name descname"><span class="pre">is_compatible</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tracker.analysis.TrackerCuts.is_compatible" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gaps_online.tracker.analysis.TrackerCuts.acc_hit">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">acc_hit</span></span><a class="headerlink" href="#gaps_online.tracker.analysis.TrackerCuts.acc_hit" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gaps_online.tracker.analysis.TrackerCuts.acc_hit_layer">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">acc_hit_layer</span></span><a class="headerlink" href="#gaps_online.tracker.analysis.TrackerCuts.acc_hit_layer" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gaps_online.tracker.analysis.TrackerCuts.accept">
+<span class="sig-name descname"><span class="pre">accept</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tracker_hits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tracker.analysis.TrackerCuts.accept" title="Link to this definition">#</a></dt>
+<dd><dl class="simple">
+<dt># Arguments: </dt><dd><p>tracker_hits :  A list of tracker hits (v2)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="gaps_online.tracker.analysis.TrackerCuts.pretty_print_efficiency">
 <span class="sig-name descname"><span class="pre">pretty_print_efficiency</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tracker.analysis.TrackerCuts.pretty_print_efficiency" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -337,7 +365,7 @@ the GAPS tracker system</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gaps_online.tracker.analysis.TrackerAnalysis">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gaps_online.tracker.analysis.</span></span><span class="sig-name descname"><span class="pre">TrackerAnalysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">90</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strip_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tracker.analysis.TrackerAnalysis" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gaps_online.tracker.analysis.</span></span><span class="sig-name descname"><span class="pre">TrackerAnalysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbins=90</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strip_mask={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cuts=&lt;TrackerCuts:</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHIT</span> <span class="pre">&lt;=</span> <span class="pre">12960</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHIT(LAYER0)</span> <span class="pre">&lt;=</span> <span class="pre">1296</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHIT(LAYER1)</span> <span class="pre">&lt;=</span> <span class="pre">1296</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHIT(LAYER2)</span> <span class="pre">&lt;=</span> <span class="pre">1296</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHIT(LAYER3)</span> <span class="pre">&lt;=</span> <span class="pre">1296</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHIT(LAYER4)</span> <span class="pre">&lt;=</span> <span class="pre">1296</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHIT(LAYER5)</span> <span class="pre">&lt;=</span> <span class="pre">1296</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHIT(LAYER6)</span> <span class="pre">&lt;=</span> <span class="pre">1296</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHIT(LAYER7)</span> <span class="pre">&lt;=</span> <span class="pre">1296</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHIT(LAYER8)</span> <span class="pre">&lt;=</span> <span class="pre">1296</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHIT(LAYER9)</span> <span class="pre">&lt;=</span> <span class="pre">1296&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pedestals={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transfer_fn={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_empty_hits=False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tracker.analysis.TrackerAnalysis" title="Link to this definition">#</a></dt>
 <dd><p>Yet another container holding plots for tracker specific analysis</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="gaps_online.tracker.analysis.TrackerAnalysis.pretty_print_statistics">
@@ -354,7 +382,8 @@ the cache data</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="gaps_online.tracker.analysis.TrackerAnalysis.finish">
 <span class="sig-name descname"><span class="pre">finish</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tracker.analysis.TrackerAnalysis.finish" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Flush the caches to the histograms</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gaps_online.tracker.analysis.TrackerAnalysis.define_bins">
@@ -362,9 +391,29 @@ the cache data</p>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="gaps_online.tracker.analysis.TrackerAnalysis.emit_kwargs">
+<span class="sig-name descname"><span class="pre">emit_kwargs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#gaps_online.tracker.analysis.TrackerAnalysis.emit_kwargs" title="Link to this definition">#</a></dt>
+<dd><p>Provide the kwargs which were used to 
+create this instance</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="gaps_online.tracker.analysis.TrackerAnalysis.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">90</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strip_mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tracker.analysis.TrackerAnalysis.__init__" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbins=90</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strip_mask={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cuts=&lt;TrackerCuts:</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHIT</span> <span class="pre">&lt;=</span> <span class="pre">12960</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHIT(LAYER0)</span> <span class="pre">&lt;=</span> <span class="pre">1296</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHIT(LAYER1)</span> <span class="pre">&lt;=</span> <span class="pre">1296</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHIT(LAYER2)</span> <span class="pre">&lt;=</span> <span class="pre">1296</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHIT(LAYER3)</span> <span class="pre">&lt;=</span> <span class="pre">1296</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHIT(LAYER4)</span> <span class="pre">&lt;=</span> <span class="pre">1296</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHIT(LAYER5)</span> <span class="pre">&lt;=</span> <span class="pre">1296</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHIT(LAYER6)</span> <span class="pre">&lt;=</span> <span class="pre">1296</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHIT(LAYER7)</span> <span class="pre">&lt;=</span> <span class="pre">1296</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHIT(LAYER8)</span> <span class="pre">&lt;=</span> <span class="pre">1296</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHIT(LAYER9)</span> <span class="pre">&lt;=</span> <span class="pre">1296&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pedestals={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transfer_fn={}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_empty_hits=False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tracker.analysis.TrackerAnalysis.__init__" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gaps_online.tracker.analysis.TrackerAnalysis.mask_hits">
+<span class="sig-name descname"><span class="pre">mask_hits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ev</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#gaps_online.tracker.analysis.TrackerAnalysis.mask_hits" title="Link to this definition">#</a></dt>
+<dd><p>Remove hits from the tracker hitseries which are masked by the 
+given stripmaks</p>
+<dl class="simple">
+<dt># Arguments:</dt><dd><ul class="simple">
+<li><p>ev : Some kind of merged event</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gaps_online.tracker.analysis.TrackerAnalysis.add_event">
@@ -401,11 +450,11 @@ the cache data</p>
       </div>
     </a>
     <a class="right-next"
-       href="gaps_online.tracker.visual.html"
+       href="gaps_online.tracker.calibration.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">gaps_online.tracker.visual</p>
+        <p class="prev-next-title">gaps_online.tracker.calibration</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -430,6 +479,10 @@ the cache data</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tracker.analysis.TrackerCuts"><code class="docutils literal notranslate"><span class="pre">TrackerCuts</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tracker.analysis.TrackerCuts.__init__"><code class="docutils literal notranslate"><span class="pre">TrackerCuts.__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tracker.analysis.TrackerCuts.is_compatible"><code class="docutils literal notranslate"><span class="pre">TrackerCuts.is_compatible()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tracker.analysis.TrackerCuts.acc_hit"><code class="docutils literal notranslate"><span class="pre">TrackerCuts.acc_hit</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tracker.analysis.TrackerCuts.acc_hit_layer"><code class="docutils literal notranslate"><span class="pre">TrackerCuts.acc_hit_layer</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tracker.analysis.TrackerCuts.accept"><code class="docutils literal notranslate"><span class="pre">TrackerCuts.accept()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tracker.analysis.TrackerCuts.pretty_print_efficiency"><code class="docutils literal notranslate"><span class="pre">TrackerCuts.pretty_print_efficiency()</span></code></a></li>
 </ul>
 </li>
@@ -438,7 +491,9 @@ the cache data</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tracker.analysis.TrackerAnalysis.fill_histograms"><code class="docutils literal notranslate"><span class="pre">TrackerAnalysis.fill_histograms()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tracker.analysis.TrackerAnalysis.finish"><code class="docutils literal notranslate"><span class="pre">TrackerAnalysis.finish()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tracker.analysis.TrackerAnalysis.define_bins"><code class="docutils literal notranslate"><span class="pre">TrackerAnalysis.define_bins()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tracker.analysis.TrackerAnalysis.emit_kwargs"><code class="docutils literal notranslate"><span class="pre">TrackerAnalysis.emit_kwargs()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tracker.analysis.TrackerAnalysis.__init__"><code class="docutils literal notranslate"><span class="pre">TrackerAnalysis.__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tracker.analysis.TrackerAnalysis.mask_hits"><code class="docutils literal notranslate"><span class="pre">TrackerAnalysis.mask_hits()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tracker.analysis.TrackerAnalysis.add_event"><code class="docutils literal notranslate"><span class="pre">TrackerAnalysis.add_event()</span></code></a></li>
 </ul>
 </li>

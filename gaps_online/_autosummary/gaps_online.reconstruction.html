@@ -45,7 +45,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="gaps_online.run" href="gaps_online.run.html" />
-    <link rel="prev" title="gaps_online.monitoring" href="gaps_online.monitoring.html" />
+    <link rel="prev" title="gaps_online.monitoring.analysis" href="gaps_online.monitoring.analysis.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="python"/>
   <meta name="docsearch:version" content="" />
@@ -223,7 +223,10 @@
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.db.html">gaps_online.db</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.events.html">gaps_online.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.io.html">gaps_online.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gaps_online.monitoring.html">gaps_online.monitoring</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="gaps_online.monitoring.html">gaps_online.monitoring</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="gaps_online.monitoring.analysis.html">gaps_online.monitoring.analysis</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">gaps_online.reconstruction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.run.html">gaps_online.run</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.telemetry.html">gaps_online.telemetry</a></li>
@@ -237,6 +240,7 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="gaps_online.tracker.html">gaps_online.tracker</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="gaps_online.tracker.analysis.html">gaps_online.tracker.analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gaps_online.tracker.calibration.html">gaps_online.tracker.calibration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gaps_online.tracker.visual.html">gaps_online.tracker.visual</a></li>
 </ul>
 </details></li>
@@ -312,8 +316,8 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.reconstruction.line3d_2pts" title="gaps_online.reconstruction.line3d_2pts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">line3d_2pts</span></code></a>(z, tu_x, tu_y, tu_z, tl_x, tl_y, ...)</p></td>
 <td><p>describe line depending on z since that is our best constrained value.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.reconstruction.line_fit" title="gaps_online.reconstruction.line_fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">line_fit</span></code></a>(xs, ys, zs[, errs_x, errs_y])</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.reconstruction.line_fit" title="gaps_online.reconstruction.line_fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">line_fit</span></code></a>(xs, ys, zs[, errs_x, errs_y, ...])</p></td>
+<td><p># Arguments:</p></td>
 </tr>
 </tbody>
 </table>
@@ -327,7 +331,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.reconstruction.LeastSquares" title="gaps_online.reconstruction.LeastSquares"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LeastSquares</span></code></a>(model, x, y, z, x_err, y_err)</p></td>
 <td><p>Generic least-squares cost function with error.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.reconstruction.Reconstruction" title="gaps_online.reconstruction.Reconstruction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Reconstruction</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.reconstruction.Reconstruction" title="gaps_online.reconstruction.Reconstruction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Reconstruction</span></code></a>([nbins, active])</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -354,21 +358,21 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="gaps_online.reconstruction.line3d">
-<span class="sig-prename descclassname"><span class="pre">gaps_online.reconstruction.</span></span><span class="sig-name descname"><span class="pre">line3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.reconstruction.line3d" title="Link to this definition">#</a></dt>
-<dd><p>describe line depending on z since that is our
-best constrained value</p>
-<p>This model has 6 free parameters, 3 for 
-the anchor point and 3 for the direction</p>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="gaps_online.reconstruction.line3d_2pts">
 <span class="sig-prename descclassname"><span class="pre">gaps_online.reconstruction.</span></span><span class="sig-name descname"><span class="pre">line3d_2pts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tu_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tu_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tu_z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tl_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tl_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tl_z</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.reconstruction.line3d_2pts" title="Link to this definition">#</a></dt>
 <dd><p>describe line depending on z since that is our
 best constrained value. Version with 2 points 
 instead of direction vector, so we can constrain
 the point on the tof better</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gaps_online.reconstruction.line3d">
+<span class="sig-prename descclassname"><span class="pre">gaps_online.reconstruction.</span></span><span class="sig-name descname"><span class="pre">line3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dz</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.reconstruction.line3d" title="Link to this definition">#</a></dt>
+<dd><p>describe line depending on z since that is our
+best constrained value</p>
+<p>This model has 6 free parameters, 3 for 
+the anchor point and 3 for the direction</p>
 </dd></dl>
 
 <dl class="py class">
@@ -384,15 +388,36 @@ the point on the tof better</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="gaps_online.reconstruction.line_fit">
-<span class="sig-prename descclassname"><span class="pre">gaps_online.reconstruction.</span></span><span class="sig-name descname"><span class="pre">line_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errs_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errs_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.reconstruction.line_fit" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">gaps_online.reconstruction.</span></span><span class="sig-name descname"><span class="pre">line_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errs_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errs_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errs_z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_anchor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.reconstruction.line_fit" title="Link to this definition">#</a></dt>
+<dd><p># Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>search anchor<span class="classifier">perform the fit multiple times, once per point. Select a different </span></dt><dd><p>anchor point for the line each time (one of the hits) until all hits
+have been used. Return the line with the best chi2.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gaps_online.reconstruction.Reconstruction">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gaps_online.reconstruction.</span></span><span class="sig-name descname"><span class="pre">Reconstruction</span></span><a class="headerlink" href="#gaps_online.reconstruction.Reconstruction" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gaps_online.reconstruction.</span></span><span class="sig-name descname"><span class="pre">Reconstruction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.reconstruction.Reconstruction" title="Link to this definition">#</a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="gaps_online.reconstruction.Reconstruction.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.reconstruction.Reconstruction.__init__" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.reconstruction.Reconstruction.__init__" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gaps_online.reconstruction.Reconstruction.fill_histograms">
+<span class="sig-name descname"><span class="pre">fill_histograms</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.reconstruction.Reconstruction.fill_histograms" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gaps_online.reconstruction.Reconstruction.finish">
+<span class="sig-name descname"><span class="pre">finish</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.reconstruction.Reconstruction.finish" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -415,12 +440,12 @@ the point on the tof better</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="gaps_online.monitoring.html"
+       href="gaps_online.monitoring.analysis.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">gaps_online.monitoring</p>
+        <p class="prev-next-title">gaps_online.monitoring.analysis</p>
       </div>
     </a>
     <a class="right-next"
@@ -457,8 +482,8 @@ the point on the tof better</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.reconstruction.FitStatus.Success"><code class="docutils literal notranslate"><span class="pre">FitStatus.Success</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.reconstruction.line3d"><code class="docutils literal notranslate"><span class="pre">line3d()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.reconstruction.line3d_2pts"><code class="docutils literal notranslate"><span class="pre">line3d_2pts()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.reconstruction.line3d"><code class="docutils literal notranslate"><span class="pre">line3d()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.reconstruction.LeastSquares"><code class="docutils literal notranslate"><span class="pre">LeastSquares</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.reconstruction.LeastSquares.__init__"><code class="docutils literal notranslate"><span class="pre">LeastSquares.__init__()</span></code></a></li>
 </ul>
@@ -466,6 +491,8 @@ the point on the tof better</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.reconstruction.line_fit"><code class="docutils literal notranslate"><span class="pre">line_fit()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.reconstruction.Reconstruction"><code class="docutils literal notranslate"><span class="pre">Reconstruction</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.reconstruction.Reconstruction.__init__"><code class="docutils literal notranslate"><span class="pre">Reconstruction.__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.reconstruction.Reconstruction.fill_histograms"><code class="docutils literal notranslate"><span class="pre">Reconstruction.fill_histograms()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.reconstruction.Reconstruction.finish"><code class="docutils literal notranslate"><span class="pre">Reconstruction.finish()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.reconstruction.Reconstruction.reco"><code class="docutils literal notranslate"><span class="pre">Reconstruction.reco()</span></code></a></li>
 </ul>
 </li>

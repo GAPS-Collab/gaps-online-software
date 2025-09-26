@@ -12,6 +12,7 @@ gaps\_online.db
       get_cube_paddles
       get_tof_paddles
       get_tracker_strip_mask
+      get_tracker_strip_pedestals
       get_tracker_strips
       get_umbrella_paddles
       get_vid_hid_map

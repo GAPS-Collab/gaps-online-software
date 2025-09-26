@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/term-0.7.0/src/terminfo/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-916cea96.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="term" data-themes="" data-resource-suffix="" data-rustdoc-version="1.87.0 (17067e9ac 2025-05-09)" data-channel="1.87.0" data-search-js="search-e7298875.js" data-settings-js="settings-d72f25bb.js" ><script src="../../../static.files/storage-82c7156e.js"></script><script defer src="../../../static.files/src-script-63605ae7.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-fb8c74a8.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-893ab5e7.css"></noscript><link rel="icon" href="https://doc.rust-lang.org/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">term/terminfo/</div>mod.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="comment">// Copyright 2012-2014 The Rust Project Developers. See the COPYRIGHT
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/term-1.2.0/src/terminfo/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-84e720fa.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="term" data-themes="" data-resource-suffix="" data-rustdoc-version="1.89.0 (29483883e 2025-08-04)" data-channel="1.89.0" data-search-js="search-92309212.js" data-settings-js="settings-5514c975.js" ><script src="../../../static.files/storage-4e99c027.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-fd3af306.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-32bb7600.css"></noscript><link rel="icon" href="https://doc.rust-lang.org/favicon.ico"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">term/terminfo/</div>mod.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="comment">// Copyright 2012-2014 The Rust Project Developers. See the COPYRIGHT
 <a href=#2 id=2 data-nosnippet>2</a>// file at the top-level directory of this distribution and at
 <a href=#3 id=3 data-nosnippet>3</a>// http://rust-lang.org/COPYRIGHT.
 <a href=#4 id=4 data-nosnippet>4</a>//
@@ -61,7 +61,7 @@
 <a href=#61 id=61 data-nosnippet>61</a>    <span class="doccomment">/// Create a `TermInfo` based on current environment.
 <a href=#62 id=62 data-nosnippet>62</a>    </span><span class="kw">pub fn </span>from_env() -&gt; <span class="prelude-ty">Result</span>&lt;TermInfo&gt; {
 <a href=#63 id=63 data-nosnippet>63</a>        <span class="kw">let </span>term_var = env::var(<span class="string">"TERM"</span>).ok();
-<a href=#64 id=64 data-nosnippet>64</a>        <span class="kw">let </span>term_name = term_var.as_ref().map(|s| <span class="kw-2">&amp;**</span>s).or_else(|| {
+<a href=#64 id=64 data-nosnippet>64</a>        <span class="kw">let </span>term_name = term_var.as_deref().or_else(|| {
 <a href=#65 id=65 data-nosnippet>65</a>            env::var(<span class="string">"MSYSCON"</span>).ok().and_then(|s| {
 <a href=#66 id=66 data-nosnippet>66</a>                <span class="kw">if </span>s == <span class="string">"mintty.exe" </span>{
 <a href=#67 id=67 data-nosnippet>67</a>                    <span class="prelude-val">Some</span>(<span class="string">"msyscon"</span>)
@@ -91,7 +91,7 @@
 <a href=#91 id=91 data-nosnippet>91</a>    <span class="doccomment">/// Create a `TermInfo` for the named terminal.
 <a href=#92 id=92 data-nosnippet>92</a>    </span><span class="kw">pub fn </span>from_name(name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;TermInfo&gt; {
 <a href=#93 id=93 data-nosnippet>93</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>(path) = get_dbpath_for_term(name) {
-<a href=#94 id=94 data-nosnippet>94</a>            <span class="kw">match </span>TermInfo::from_path(<span class="kw-2">&amp;</span>path) {
+<a href=#94 id=94 data-nosnippet>94</a>            <span class="kw">match </span>TermInfo::from_path(path) {
 <a href=#95 id=95 data-nosnippet>95</a>                <span class="prelude-val">Ok</span>(term) =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(term),
 <a href=#96 id=96 data-nosnippet>96</a>                <span class="comment">// Skip IO Errors (e.g., permission denied).
 <a href=#97 id=97 data-nosnippet>97</a>                </span><span class="prelude-val">Err</span>(<span class="kw">crate</span>::Error::Io(<span class="kw">_</span>)) =&gt; {}
@@ -113,8 +113,8 @@
 <a href=#113 id=113 data-nosnippet>113</a>            <span class="prelude-val">Ok</span>(TermInfo {
 <a href=#114 id=114 data-nosnippet>114</a>                names: <span class="macro">vec!</span>[name.to_owned()],
 <a href=#115 id=115 data-nosnippet>115</a>                bools: HashMap::new(),
-<a href=#116 id=116 data-nosnippet>116</a>                numbers: numbers,
-<a href=#117 id=117 data-nosnippet>117</a>                strings: strings,
+<a href=#116 id=116 data-nosnippet>116</a>                numbers,
+<a href=#117 id=117 data-nosnippet>117</a>                strings,
 <a href=#118 id=118 data-nosnippet>118</a>            })
 <a href=#119 id=119 data-nosnippet>119</a>        } <span class="kw">else </span>{
 <a href=#120 id=120 data-nosnippet>120</a>            <span class="prelude-val">Err</span>(<span class="kw">crate</span>::Error::TerminfoEntryNotFound)
@@ -206,14 +206,14 @@
 <a href=#206 id=206 data-nosnippet>206</a>
 <a href=#207 id=207 data-nosnippet>207</a><span class="kw">impl </span>::std::fmt::Display <span class="kw">for </span>Error {
 <a href=#208 id=208 data-nosnippet>208</a>    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>::std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; ::std::fmt::Result {
-<a href=#209 id=209 data-nosnippet>209</a>        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
-<a href=#210 id=210 data-nosnippet>210</a>            BadMagic(v) =&gt; <span class="macro">write!</span>(f, <span class="string">"bad magic number {:x} in terminfo header"</span>, v),
+<a href=#209 id=209 data-nosnippet>209</a>        <span class="kw">match </span><span class="self">self </span>{
+<a href=#210 id=210 data-nosnippet>210</a>            BadMagic(v) =&gt; <span class="macro">write!</span>(f, <span class="string">"bad magic number {v:x} in terminfo header"</span>),
 <a href=#211 id=211 data-nosnippet>211</a>            ShortNames =&gt; f.write_str(<span class="string">"no names exposed, need at least one"</span>),
 <a href=#212 id=212 data-nosnippet>212</a>            TooManyBools =&gt; f.write_str(<span class="string">"more boolean properties than libterm knows about"</span>),
 <a href=#213 id=213 data-nosnippet>213</a>            TooManyNumbers =&gt; f.write_str(<span class="string">"more number properties than libterm knows about"</span>),
 <a href=#214 id=214 data-nosnippet>214</a>            TooManyStrings =&gt; f.write_str(<span class="string">"more string properties than libterm knows about"</span>),
 <a href=#215 id=215 data-nosnippet>215</a>            InvalidLength =&gt; f.write_str(<span class="string">"invalid length field value, must be &gt;= -1"</span>),
-<a href=#216 id=216 data-nosnippet>216</a>            NotUtf8(<span class="kw-2">ref </span>e) =&gt; e.fmt(f),
+<a href=#216 id=216 data-nosnippet>216</a>            NotUtf8(e) =&gt; e.fmt(f),
 <a href=#217 id=217 data-nosnippet>217</a>            NamesMissingNull =&gt; f.write_str(<span class="string">"names table missing NUL terminator"</span>),
 <a href=#218 id=218 data-nosnippet>218</a>            StringsMissingNull =&gt; f.write_str(<span class="string">"string table missing NUL terminator"</span>),
 <a href=#219 id=219 data-nosnippet>219</a>        }
@@ -228,8 +228,8 @@
 <a href=#228 id=228 data-nosnippet>228</a>
 <a href=#229 id=229 data-nosnippet>229</a><span class="kw">impl </span>::std::error::Error <span class="kw">for </span>Error {
 <a href=#230 id=230 data-nosnippet>230</a>    <span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>std::error::Error + <span class="lifetime">'static</span>)&gt; {
-<a href=#231 id=231 data-nosnippet>231</a>        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
-<a href=#232 id=232 data-nosnippet>232</a>            NotUtf8(<span class="kw-2">ref </span>e) =&gt; <span class="prelude-val">Some</span>(e),
+<a href=#231 id=231 data-nosnippet>231</a>        <span class="kw">match </span><span class="self">self </span>{
+<a href=#232 id=232 data-nosnippet>232</a>            NotUtf8(e) =&gt; <span class="prelude-val">Some</span>(e),
 <a href=#233 id=233 data-nosnippet>233</a>            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
 <a href=#234 id=234 data-nosnippet>234</a>        }
 <a href=#235 id=235 data-nosnippet>235</a>    }
@@ -239,7 +239,7 @@
 <a href=#239 id=239 data-nosnippet>239</a>
 <a href=#240 id=240 data-nosnippet>240</a><span class="doccomment">/// `TermInfo` format parsing.
 <a href=#241 id=241 data-nosnippet>241</a></span><span class="kw">pub mod </span>parser {
-<a href=#242 id=242 data-nosnippet>242</a>    <span class="doccomment">//! ncurses-compatible compiled terminfo format parsing (term(5))
+<a href=#242 id=242 data-nosnippet>242</a>    <span class="doccomment">/// ncurses-compatible compiled terminfo format parsing (term(5))
 <a href=#243 id=243 data-nosnippet>243</a>    </span><span class="kw">pub mod </span>compiled;
 <a href=#244 id=244 data-nosnippet>244</a>    <span class="kw">mod </span>names;
 <a href=#245 id=245 data-nosnippet>245</a>}
@@ -307,7 +307,7 @@
 <a href=#307 id=307 data-nosnippet>307</a>            Attr::ForegroundColor(<span class="kw">_</span>) | Attr::BackgroundColor(<span class="kw">_</span>) =&gt; <span class="self">self</span>.num_colors &gt; <span class="number">0</span>,
 <a href=#308 id=308 data-nosnippet>308</a>            <span class="kw">_ </span>=&gt; {
 <a href=#309 id=309 data-nosnippet>309</a>                <span class="kw">let </span>cap = cap_for_attr(attr);
-<a href=#310 id=310 data-nosnippet>310</a>                <span class="self">self</span>.ti.strings.get(cap).is_some()
+<a href=#310 id=310 data-nosnippet>310</a>                <span class="self">self</span>.ti.strings.contains_key(cap)
 <a href=#311 id=311 data-nosnippet>311</a>            }
 <a href=#312 id=312 data-nosnippet>312</a>        }
 <a href=#313 id=313 data-nosnippet>313</a>    }
@@ -319,7 +319,7 @@
 <a href=#319 id=319 data-nosnippet>319</a>    <span class="kw">fn </span>supports_reset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
 <a href=#320 id=320 data-nosnippet>320</a>        [<span class="string">"sgr0"</span>, <span class="string">"sgr"</span>, <span class="string">"op"</span>]
 <a href=#321 id=321 data-nosnippet>321</a>            .iter()
-<a href=#322 id=322 data-nosnippet>322</a>            .any(|<span class="kw-2">&amp;</span>cap| <span class="self">self</span>.ti.strings.get(cap).is_some())
+<a href=#322 id=322 data-nosnippet>322</a>            .any(|<span class="kw-2">&amp;</span>cap| <span class="self">self</span>.ti.strings.contains_key(cap))
 <a href=#323 id=323 data-nosnippet>323</a>    }
 <a href=#324 id=324 data-nosnippet>324</a>
 <a href=#325 id=325 data-nosnippet>325</a>    <span class="kw">fn </span>supports_color(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
@@ -356,45 +356,44 @@
 <a href=#356 id=356 data-nosnippet>356</a>
 <a href=#357 id=357 data-nosnippet>357</a><span class="kw">impl</span>&lt;T: Write&gt; TerminfoTerminal&lt;T&gt; {
 <a href=#358 id=358 data-nosnippet>358</a>    <span class="doccomment">/// Create a new TerminfoTerminal with the given TermInfo and Write.
-<a href=#359 id=359 data-nosnippet>359</a>    </span><span class="kw">pub fn </span>new_with_terminfo(out: T, terminfo: TermInfo) -&gt; TerminfoTerminal&lt;T&gt; {
-<a href=#360 id=360 data-nosnippet>360</a>        <span class="kw">let </span>nc = <span class="kw">if </span>terminfo.strings.contains_key(<span class="string">"setaf"</span>) &amp;&amp; terminfo.strings.contains_key(<span class="string">"setab"</span>)
-<a href=#361 id=361 data-nosnippet>361</a>        {
-<a href=#362 id=362 data-nosnippet>362</a>            terminfo.numbers.get(<span class="string">"colors"</span>).map_or(<span class="number">0</span>, |<span class="kw-2">&amp;</span>n| n)
-<a href=#363 id=363 data-nosnippet>363</a>        } <span class="kw">else </span>{
-<a href=#364 id=364 data-nosnippet>364</a>            <span class="number">0
-<a href=#365 id=365 data-nosnippet>365</a>        </span>};
-<a href=#366 id=366 data-nosnippet>366</a>
-<a href=#367 id=367 data-nosnippet>367</a>        TerminfoTerminal {
-<a href=#368 id=368 data-nosnippet>368</a>            out: out,
-<a href=#369 id=369 data-nosnippet>369</a>            ti: terminfo,
-<a href=#370 id=370 data-nosnippet>370</a>            num_colors: nc <span class="kw">as </span>u32,
-<a href=#371 id=371 data-nosnippet>371</a>        }
-<a href=#372 id=372 data-nosnippet>372</a>    }
-<a href=#373 id=373 data-nosnippet>373</a>
-<a href=#374 id=374 data-nosnippet>374</a>    <span class="doccomment">/// Create a new TerminfoTerminal for the current environment with the given Write.
-<a href=#375 id=375 data-nosnippet>375</a>    ///
-<a href=#376 id=376 data-nosnippet>376</a>    /// Returns `None` when the terminfo cannot be found or parsed.
-<a href=#377 id=377 data-nosnippet>377</a>    </span><span class="kw">pub fn </span>new(out: T) -&gt; <span class="prelude-ty">Option</span>&lt;TerminfoTerminal&lt;T&gt;&gt; {
-<a href=#378 id=378 data-nosnippet>378</a>        TermInfo::from_env()
-<a href=#379 id=379 data-nosnippet>379</a>            .map(<span class="kw">move </span>|ti| TerminfoTerminal::new_with_terminfo(out, ti))
-<a href=#380 id=380 data-nosnippet>380</a>            .ok()
-<a href=#381 id=381 data-nosnippet>381</a>    }
-<a href=#382 id=382 data-nosnippet>382</a>
-<a href=#383 id=383 data-nosnippet>383</a>    <span class="kw">fn </span>dim_if_necessary(<span class="kw-2">&amp;</span><span class="self">self</span>, color: color::Color) -&gt; color::Color {
-<a href=#384 id=384 data-nosnippet>384</a>        <span class="kw">if </span>color &gt;= <span class="self">self</span>.num_colors &amp;&amp; color &gt;= <span class="number">8 </span>&amp;&amp; color &lt; <span class="number">16 </span>{
-<a href=#385 id=385 data-nosnippet>385</a>            color - <span class="number">8
-<a href=#386 id=386 data-nosnippet>386</a>        </span>} <span class="kw">else </span>{
-<a href=#387 id=387 data-nosnippet>387</a>            color
-<a href=#388 id=388 data-nosnippet>388</a>        }
-<a href=#389 id=389 data-nosnippet>389</a>    }
-<a href=#390 id=390 data-nosnippet>390</a>}
-<a href=#391 id=391 data-nosnippet>391</a>
-<a href=#392 id=392 data-nosnippet>392</a><span class="kw">impl</span>&lt;T: Write&gt; Write <span class="kw">for </span>TerminfoTerminal&lt;T&gt; {
-<a href=#393 id=393 data-nosnippet>393</a>    <span class="kw">fn </span>write(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: <span class="kw-2">&amp;</span>[u8]) -&gt; io::Result&lt;usize&gt; {
-<a href=#394 id=394 data-nosnippet>394</a>        <span class="self">self</span>.out.write(buf)
-<a href=#395 id=395 data-nosnippet>395</a>    }
-<a href=#396 id=396 data-nosnippet>396</a>
-<a href=#397 id=397 data-nosnippet>397</a>    <span class="kw">fn </span>flush(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;()&gt; {
-<a href=#398 id=398 data-nosnippet>398</a>        <span class="self">self</span>.out.flush()
-<a href=#399 id=399 data-nosnippet>399</a>    }
-<a href=#400 id=400 data-nosnippet>400</a>}</code></pre></div></section></main></body></html>
+<a href=#359 id=359 data-nosnippet>359</a>    </span><span class="kw">pub fn </span>new_with_terminfo(out: T, ti: TermInfo) -&gt; TerminfoTerminal&lt;T&gt; {
+<a href=#360 id=360 data-nosnippet>360</a>        <span class="kw">let </span>num_colors = <span class="kw">if </span>ti.strings.contains_key(<span class="string">"setaf"</span>) &amp;&amp; ti.strings.contains_key(<span class="string">"setab"</span>) {
+<a href=#361 id=361 data-nosnippet>361</a>            ti.numbers.get(<span class="string">"colors"</span>).map_or(<span class="number">0</span>, |<span class="kw-2">&amp;</span>n| n)
+<a href=#362 id=362 data-nosnippet>362</a>        } <span class="kw">else </span>{
+<a href=#363 id=363 data-nosnippet>363</a>            <span class="number">0
+<a href=#364 id=364 data-nosnippet>364</a>        </span>};
+<a href=#365 id=365 data-nosnippet>365</a>
+<a href=#366 id=366 data-nosnippet>366</a>        TerminfoTerminal {
+<a href=#367 id=367 data-nosnippet>367</a>            out,
+<a href=#368 id=368 data-nosnippet>368</a>            ti,
+<a href=#369 id=369 data-nosnippet>369</a>            num_colors,
+<a href=#370 id=370 data-nosnippet>370</a>        }
+<a href=#371 id=371 data-nosnippet>371</a>    }
+<a href=#372 id=372 data-nosnippet>372</a>
+<a href=#373 id=373 data-nosnippet>373</a>    <span class="doccomment">/// Create a new TerminfoTerminal for the current environment with the given Write.
+<a href=#374 id=374 data-nosnippet>374</a>    ///
+<a href=#375 id=375 data-nosnippet>375</a>    /// Returns `None` when the terminfo cannot be found or parsed.
+<a href=#376 id=376 data-nosnippet>376</a>    </span><span class="kw">pub fn </span>new(out: T) -&gt; <span class="prelude-ty">Option</span>&lt;TerminfoTerminal&lt;T&gt;&gt; {
+<a href=#377 id=377 data-nosnippet>377</a>        TermInfo::from_env()
+<a href=#378 id=378 data-nosnippet>378</a>            .map(<span class="kw">move </span>|ti| TerminfoTerminal::new_with_terminfo(out, ti))
+<a href=#379 id=379 data-nosnippet>379</a>            .ok()
+<a href=#380 id=380 data-nosnippet>380</a>    }
+<a href=#381 id=381 data-nosnippet>381</a>
+<a href=#382 id=382 data-nosnippet>382</a>    <span class="kw">fn </span>dim_if_necessary(<span class="kw-2">&amp;</span><span class="self">self</span>, color: color::Color) -&gt; color::Color {
+<a href=#383 id=383 data-nosnippet>383</a>        <span class="kw">if </span>color &gt;= <span class="self">self</span>.num_colors &amp;&amp; (<span class="number">8</span>..<span class="number">16</span>).contains(<span class="kw-2">&amp;</span>color) {
+<a href=#384 id=384 data-nosnippet>384</a>            color - <span class="number">8
+<a href=#385 id=385 data-nosnippet>385</a>        </span>} <span class="kw">else </span>{
+<a href=#386 id=386 data-nosnippet>386</a>            color
+<a href=#387 id=387 data-nosnippet>387</a>        }
+<a href=#388 id=388 data-nosnippet>388</a>    }
+<a href=#389 id=389 data-nosnippet>389</a>}
+<a href=#390 id=390 data-nosnippet>390</a>
+<a href=#391 id=391 data-nosnippet>391</a><span class="kw">impl</span>&lt;T: Write&gt; Write <span class="kw">for </span>TerminfoTerminal&lt;T&gt; {
+<a href=#392 id=392 data-nosnippet>392</a>    <span class="kw">fn </span>write(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: <span class="kw-2">&amp;</span>[u8]) -&gt; io::Result&lt;usize&gt; {
+<a href=#393 id=393 data-nosnippet>393</a>        <span class="self">self</span>.out.write(buf)
+<a href=#394 id=394 data-nosnippet>394</a>    }
+<a href=#395 id=395 data-nosnippet>395</a>
+<a href=#396 id=396 data-nosnippet>396</a>    <span class="kw">fn </span>flush(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;()&gt; {
+<a href=#397 id=397 data-nosnippet>397</a>        <span class="self">self</span>.out.flush()
+<a href=#398 id=398 data-nosnippet>398</a>    }
+<a href=#399 id=399 data-nosnippet>399</a>}</code></pre></div></section></main></body></html>

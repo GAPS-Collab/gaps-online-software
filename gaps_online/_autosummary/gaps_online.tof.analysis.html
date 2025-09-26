@@ -223,7 +223,10 @@
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.db.html">gaps_online.db</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.events.html">gaps_online.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.io.html">gaps_online.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gaps_online.monitoring.html">gaps_online.monitoring</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="gaps_online.monitoring.html">gaps_online.monitoring</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="gaps_online.monitoring.analysis.html">gaps_online.monitoring.analysis</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.reconstruction.html">gaps_online.reconstruction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.run.html">gaps_online.run</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.telemetry.html">gaps_online.telemetry</a></li>
@@ -237,6 +240,7 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="gaps_online.tracker.html">gaps_online.tracker</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="gaps_online.tracker.analysis.html">gaps_online.tracker.analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gaps_online.tracker.calibration.html">gaps_online.tracker.calibration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gaps_online.tracker.visual.html">gaps_online.tracker.visual</a></li>
 </ul>
 </details></li>
@@ -431,16 +435,53 @@ values</p>
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">acc_frac_fh_is_umb</span></span><a class="headerlink" href="#gaps_online.tof.analysis.TofCuts.acc_frac_fh_is_umb" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="gaps_online.tof.analysis.TofCuts.acc_frac_thru_going">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">acc_frac_thru_going</span></span><a class="headerlink" href="#gaps_online.tof.analysis.TofCuts.acc_frac_thru_going" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gaps_online.tof.analysis.TofCuts.acc_frac_fhi_not_bot">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">acc_frac_fhi_not_bot</span></span><a class="headerlink" href="#gaps_online.tof.analysis.TofCuts.acc_frac_fhi_not_bot" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gaps_online.tof.analysis.TofCuts.acc_frac_hit_all">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">acc_frac_hit_all</span></span><a class="headerlink" href="#gaps_online.tof.analysis.TofCuts.acc_frac_hit_all" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gaps_online.tof.analysis.TofCuts.acc_frac_cos_theta">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">acc_frac_cos_theta</span></span><a class="headerlink" href="#gaps_online.tof.analysis.TofCuts.acc_frac_cos_theta" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gaps_online.tof.analysis.TofCuts.acc_frac_fho_must_panel7">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">acc_frac_fho_must_panel7</span></span><a class="headerlink" href="#gaps_online.tof.analysis.TofCuts.acc_frac_fho_must_panel7" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gaps_online.tof.analysis.TofCuts.acc_frac_lh_must_panel2">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">acc_frac_lh_must_panel2</span></span><a class="headerlink" href="#gaps_online.tof.analysis.TofCuts.acc_frac_lh_must_panel2" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="gaps_online.tof.analysis.TofCuts.pretty_print_efficiency">
 <span class="sig-name descname"><span class="pre">pretty_print_efficiency</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.analysis.TofCuts.pretty_print_efficiency" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="gaps_online.tof.analysis.TofCuts.accept">
+<span class="sig-name descname"><span class="pre">accept</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ev</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.analysis.TofCuts.accept" title="Link to this definition">#</a></dt>
+<dd><p>Check if an event passes the selection
+and update the counters</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gaps_online.tof.analysis.TofAnalysis">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gaps_online.tof.analysis.</span></span><span class="sig-name descname"><span class="pre">TofAnalysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">skip_mangled=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_timeout=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_analysis=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbins=90</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cuts:</span> <span class="pre">~gaps_online.tof.analysis.TofCuts</span> <span class="pre">=</span> <span class="pre">&lt;TofCuts:</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHit(UMB)</span> <span class="pre">&lt;=</span> <span class="pre">161</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHit(CBE)</span> <span class="pre">&lt;=</span> <span class="pre">161</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHit(COR)</span> <span class="pre">&lt;=</span> <span class="pre">161&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_offsets=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active=False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.analysis.TofAnalysis" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gaps_online.tof.analysis.</span></span><span class="sig-name descname"><span class="pre">TofAnalysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">skip_mangled=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_timeout=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_analysis=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbins=90</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cuts:</span> <span class="pre">~gaps_online.tof.analysis.TofCuts</span> <span class="pre">=</span> <span class="pre">&lt;TofCuts:</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHit(UMB)</span> <span class="pre">&lt;=</span> <span class="pre">161</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHit(CBE)</span> <span class="pre">&lt;=</span> <span class="pre">161</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHit(COR)</span> <span class="pre">&lt;=</span> <span class="pre">161</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHit(TOF)</span> <span class="pre">&lt;=</span> <span class="pre">161</span>&#160;&#160; <span class="pre">0.0</span> <span class="pre">&lt;=</span> <span class="pre">COS(THET)</span> <span class="pre">&lt;=</span> <span class="pre">1.0&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_offsets=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pid_inner=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pid_outer=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active=False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.analysis.TofAnalysis" title="Link to this definition">#</a></dt>
 <dd><p>A container (yeah I know, don't like it either) to keep a 
 bunch of plots together.</p>
 <p>This does have some use as a pre-compiled analysis for 
@@ -487,7 +528,7 @@ been changed</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gaps_online.tof.analysis.TofAnalysis.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">skip_mangled=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_timeout=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_analysis=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbins=90</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cuts:</span> <span class="pre">~gaps_online.tof.analysis.TofCuts</span> <span class="pre">=</span> <span class="pre">&lt;TofCuts:</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHit(UMB)</span> <span class="pre">&lt;=</span> <span class="pre">161</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHit(CBE)</span> <span class="pre">&lt;=</span> <span class="pre">161</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHit(COR)</span> <span class="pre">&lt;=</span> <span class="pre">161&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_offsets=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active=False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.analysis.TofAnalysis.__init__" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">skip_mangled=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_timeout=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_analysis=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbins=90</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cuts:</span> <span class="pre">~gaps_online.tof.analysis.TofCuts</span> <span class="pre">=</span> <span class="pre">&lt;TofCuts:</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHit(UMB)</span> <span class="pre">&lt;=</span> <span class="pre">161</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHit(CBE)</span> <span class="pre">&lt;=</span> <span class="pre">161</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHit(COR)</span> <span class="pre">&lt;=</span> <span class="pre">161</span>&#160;&#160; <span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">NHit(TOF)</span> <span class="pre">&lt;=</span> <span class="pre">161</span>&#160;&#160; <span class="pre">0.0</span> <span class="pre">&lt;=</span> <span class="pre">COS(THET)</span> <span class="pre">&lt;=</span> <span class="pre">1.0&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_offsets=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pid_inner=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pid_outer=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active=False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tof.analysis.TofAnalysis.__init__" title="Link to this definition">#</a></dt>
 <dd><p>Start a new TofAnalysis. This will add create histograms for 
 'interesting' variables and count mangled and timed out 
 events. While not complete, this can provide a conciese, 
@@ -511,6 +552,10 @@ instead.</p>
 <dt>nbins<span class="classifier">The number of bins for the histograms getting</span></dt><dd><p>created</p>
 </dd>
 <dt>cuts<span class="classifier">Give a cut instance to reject events &amp; hits.</span></dt><dd><p>Default: None (no cuts)</p>
+</dd>
+<dt>pid_outer<span class="classifier">Select a specific paddle instead of the first on the outer TOF </span></dt><dd><p>for the beta/timing analysis</p>
+</dd>
+<dt>pid_inner<span class="classifier">Select a specific paddle instead of the first on the inner TOF</span></dt><dd><p>for the beta/timing analysis</p>
 </dd>
 <dt>active<span class="classifier">if True, this analysis will actually &quot;do something&quot;</span></dt><dd><p>and acquire events</p>
 </dd>
@@ -616,7 +661,14 @@ instead.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tof.analysis.TofCuts.acc_frac_hit_cor"><code class="docutils literal notranslate"><span class="pre">TofCuts.acc_frac_hit_cor</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tof.analysis.TofCuts.acc_frac_hit_umb"><code class="docutils literal notranslate"><span class="pre">TofCuts.acc_frac_hit_umb</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tof.analysis.TofCuts.acc_frac_fh_is_umb"><code class="docutils literal notranslate"><span class="pre">TofCuts.acc_frac_fh_is_umb</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tof.analysis.TofCuts.acc_frac_thru_going"><code class="docutils literal notranslate"><span class="pre">TofCuts.acc_frac_thru_going</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tof.analysis.TofCuts.acc_frac_fhi_not_bot"><code class="docutils literal notranslate"><span class="pre">TofCuts.acc_frac_fhi_not_bot</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tof.analysis.TofCuts.acc_frac_hit_all"><code class="docutils literal notranslate"><span class="pre">TofCuts.acc_frac_hit_all</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tof.analysis.TofCuts.acc_frac_cos_theta"><code class="docutils literal notranslate"><span class="pre">TofCuts.acc_frac_cos_theta</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tof.analysis.TofCuts.acc_frac_fho_must_panel7"><code class="docutils literal notranslate"><span class="pre">TofCuts.acc_frac_fho_must_panel7</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tof.analysis.TofCuts.acc_frac_lh_must_panel2"><code class="docutils literal notranslate"><span class="pre">TofCuts.acc_frac_lh_must_panel2</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tof.analysis.TofCuts.pretty_print_efficiency"><code class="docutils literal notranslate"><span class="pre">TofCuts.pretty_print_efficiency()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tof.analysis.TofCuts.accept"><code class="docutils literal notranslate"><span class="pre">TofCuts.accept()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tof.analysis.TofAnalysis"><code class="docutils literal notranslate"><span class="pre">TofAnalysis</span></code></a><ul class="nav section-nav flex-column">

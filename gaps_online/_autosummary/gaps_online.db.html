@@ -223,7 +223,10 @@
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">gaps_online.db</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.events.html">gaps_online.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.io.html">gaps_online.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gaps_online.monitoring.html">gaps_online.monitoring</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="gaps_online.monitoring.html">gaps_online.monitoring</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="gaps_online.monitoring.analysis.html">gaps_online.monitoring.analysis</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.reconstruction.html">gaps_online.reconstruction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.run.html">gaps_online.run</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gaps_online.telemetry.html">gaps_online.telemetry</a></li>
@@ -237,6 +240,7 @@
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="gaps_online.tracker.html">gaps_online.tracker</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="gaps_online.tracker.analysis.html">gaps_online.tracker.analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gaps_online.tracker.calibration.html">gaps_online.tracker.calibration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gaps_online.tracker.visual.html">gaps_online.tracker.visual</a></li>
 </ul>
 </details></li>
@@ -319,13 +323,16 @@ shipped with this project.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.db.get_tracker_strip_mask" title="gaps_online.db.get_tracker_strip_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_tracker_strip_mask</span></code></a>(name)</p></td>
 <td><p>Get a tracker mask from the db and  return a dictionary strip_id -&gt; bool</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.db.get_tracker_strips" title="gaps_online.db.get_tracker_strips"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_tracker_strips</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.db.get_tracker_strip_pedestals" title="gaps_online.db.get_tracker_strip_pedestals"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_tracker_strip_pedestals</span></code></a>()</p></td>
+<td><p>Get a list of all tracker strips pedestals</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.db.get_tracker_strips" title="gaps_online.db.get_tracker_strips"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_tracker_strips</span></code></a>()</p></td>
 <td><p>Get a list of all tracker strips</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.db.get_umbrella_paddles" title="gaps_online.db.get_umbrella_paddles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_umbrella_paddles</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.db.get_umbrella_paddles" title="gaps_online.db.get_umbrella_paddles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_umbrella_paddles</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.db.get_vid_hid_map" title="gaps_online.db.get_vid_hid_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_vid_hid_map</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.db.get_vid_hid_map" title="gaps_online.db.get_vid_hid_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_vid_hid_map</span></code></a>()</p></td>
 <td><p>Return a map of volume id to hardware id.</p></td>
 </tr>
 </tbody>
@@ -395,6 +402,13 @@ the db</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="gaps_online.db.get_tracker_strip_pedestals">
+<span class="sig-prename descclassname"><span class="pre">gaps_online.db.</span></span><span class="sig-name descname"><span class="pre">get_tracker_strip_pedestals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">TrackerStripPedestal</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#gaps_online.db.get_tracker_strip_pedestals" title="Link to this definition">#</a></dt>
+<dd><p>Get a list of all tracker strips pedestals</p>
+<p>FIXME - mark them with a name as well</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="gaps_online.db.get_vid_hid_map">
 <span class="sig-prename descclassname"><span class="pre">gaps_online.db.</span></span><span class="sig-name descname"><span class="pre">get_vid_hid_map</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#gaps_online.db.get_vid_hid_map" title="Link to this definition">#</a></dt>
 <dd><p>Return a map of volume id to hardware id. This is in case of tof paddles a number 
@@ -457,6 +471,7 @@ module, strip</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.db.get_umbrella_paddles"><code class="docutils literal notranslate"><span class="pre">get_umbrella_paddles()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.db.get_tracker_strips"><code class="docutils literal notranslate"><span class="pre">get_tracker_strips()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.db.get_tracker_strip_mask"><code class="docutils literal notranslate"><span class="pre">get_tracker_strip_mask()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.db.get_tracker_strip_pedestals"><code class="docutils literal notranslate"><span class="pre">get_tracker_strip_pedestals()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.db.get_vid_hid_map"><code class="docutils literal notranslate"><span class="pre">get_vid_hid_map()</span></code></a></li>
 </ul>
   </nav></div>

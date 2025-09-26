@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/series.rs`."><title>series.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-916cea96.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.87.0 (17067e9ac 2025-05-09)" data-channel="1.87.0" data-search-js="search-e7298875.js" data-settings-js="settings-d72f25bb.js" ><script src="../../static.files/storage-82c7156e.js"></script><script defer src="../../static.files/src-script-63605ae7.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-fb8c74a8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">tof_dataclasses/</div>series.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! Compact data structures for analysis. Won't get serialized. 
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/tof/dataclasses/rust/tof-dataclasses/src/series.rs`."><title>series.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-84e720fa.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.89.0 (29483883e 2025-08-04)" data-channel="1.89.0" data-search-js="search-92309212.js" data-settings-js="settings-5514c975.js" ><script src="../../static.files/storage-4e99c027.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-fd3af306.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">tof_dataclasses/</div>series.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! Compact data structures for analysis. Won't get serialized. 
 <a href=#2 id=2 data-nosnippet>2</a>//! Summarize data of all boards and provide a more consice
 <a href=#3 id=3 data-nosnippet>3</a>//! table-like structure for analysis.
 <a href=#4 id=4 data-nosnippet>4</a>//! Currently under a lot of development. The goal is to get
@@ -7,18 +7,18 @@
 <a href=#7 id=7 data-nosnippet>7</a></span><span class="kw">use </span>std::fmt;
 <a href=#8 id=8 data-nosnippet>8</a>
 <a href=#9 id=9 data-nosnippet>9</a><span class="kw">use </span>std::collections::{
-<a href=#10 id=10 data-nosnippet>10</a>    HashMap,
-<a href=#11 id=11 data-nosnippet>11</a>    VecDeque,
+<a href=#10 id=10 data-nosnippet>10</a>  HashMap,
+<a href=#11 id=11 data-nosnippet>11</a>  VecDeque,
 <a href=#12 id=12 data-nosnippet>12</a>};
 <a href=#13 id=13 data-nosnippet>13</a>
 <a href=#14 id=14 data-nosnippet>14</a><span class="kw">use </span><span class="kw">crate</span>::monitoring::{
-<a href=#15 id=15 data-nosnippet>15</a>    MoniData,
-<a href=#16 id=16 data-nosnippet>16</a>    RBMoniData,
-<a href=#17 id=17 data-nosnippet>17</a>    LTBMoniData,
-<a href=#18 id=18 data-nosnippet>18</a>    PAMoniData,
-<a href=#19 id=19 data-nosnippet>19</a>    PBMoniData,
-<a href=#20 id=20 data-nosnippet>20</a>    MtbMoniData, 
-<a href=#21 id=21 data-nosnippet>21</a>    CPUMoniData,
+<a href=#15 id=15 data-nosnippet>15</a>  MoniData,
+<a href=#16 id=16 data-nosnippet>16</a>  RBMoniData,
+<a href=#17 id=17 data-nosnippet>17</a>  LTBMoniData,
+<a href=#18 id=18 data-nosnippet>18</a>  PAMoniData,
+<a href=#19 id=19 data-nosnippet>19</a>  PBMoniData,
+<a href=#20 id=20 data-nosnippet>20</a>  MtbMoniData, 
+<a href=#21 id=21 data-nosnippet>21</a>  CPUMoniData,
 <a href=#22 id=22 data-nosnippet>22</a>};
 <a href=#23 id=23 data-nosnippet>23</a>
 <a href=#24 id=24 data-nosnippet>24</a><span class="attr">#[cfg(feature = <span class="string">"polars"</span>)]
@@ -188,7 +188,7 @@
 <a href=#188 id=188 data-nosnippet>188</a>
 <a href=#189 id=189 data-nosnippet>189</a><span class="kw">impl </span>fmt::Display <span class="kw">for </span>RBMoniDataSeries {
 <a href=#190 id=190 data-nosnippet>190</a>  <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-<a href=#191 id=191 data-nosnippet>191</a>    <span class="macro">write!</span>(f, <span class="string">"&gt;RBMoniDataSeries : {} boards&gt;"</span>, <span class="self">self</span>.data.len())
+<a href=#191 id=191 data-nosnippet>191</a>    <span class="macro">write!</span>(f, <span class="string">"&lt;RBMoniDataSeries : {} boards&gt;"</span>, <span class="self">self</span>.data.len())
 <a href=#192 id=192 data-nosnippet>192</a>  }
 <a href=#193 id=193 data-nosnippet>193</a>}
 <a href=#194 id=194 data-nosnippet>194</a>
@@ -341,88 +341,90 @@
 <a href=#341 id=341 data-nosnippet>341</a>
 <a href=#342 id=342 data-nosnippet>342</a></span><span class="attr">#[derive(Debug, Clone, PartialEq)]
 <a href=#343 id=343 data-nosnippet>343</a></span><span class="kw">pub struct </span>MtbMoniDataSeries {
-<a href=#344 id=344 data-nosnippet>344</a>  data        : HashMap&lt;u8, VecDeque&lt;MtbMoniData&gt;&gt;,
-<a href=#345 id=345 data-nosnippet>345</a>  max_size    : usize,
-<a href=#346 id=346 data-nosnippet>346</a>}
-<a href=#347 id=347 data-nosnippet>347</a>
-<a href=#348 id=348 data-nosnippet>348</a><span class="kw">impl </span>MtbMoniDataSeries {
-<a href=#349 id=349 data-nosnippet>349</a>  <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-<a href=#350 id=350 data-nosnippet>350</a>    <span class="self">Self </span>{
-<a href=#351 id=351 data-nosnippet>351</a>      data     : HashMap::&lt;u8, VecDeque&lt;MtbMoniData&gt;&gt;::new(),
-<a href=#352 id=352 data-nosnippet>352</a>      max_size : <span class="number">10000</span>,
-<a href=#353 id=353 data-nosnippet>353</a>    }
-<a href=#354 id=354 data-nosnippet>354</a>  }
-<a href=#355 id=355 data-nosnippet>355</a>} 
-<a href=#356 id=356 data-nosnippet>356</a>
-<a href=#357 id=357 data-nosnippet>357</a><span class="kw">impl </span>Default <span class="kw">for </span>MtbMoniDataSeries {
-<a href=#358 id=358 data-nosnippet>358</a>  <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-<a href=#359 id=359 data-nosnippet>359</a>    <span class="self">Self</span>::new()
-<a href=#360 id=360 data-nosnippet>360</a>  }
-<a href=#361 id=361 data-nosnippet>361</a>}
-<a href=#362 id=362 data-nosnippet>362</a>
-<a href=#363 id=363 data-nosnippet>363</a><span class="kw">impl </span>fmt::Display <span class="kw">for </span>MtbMoniDataSeries {
-<a href=#364 id=364 data-nosnippet>364</a>  <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-<a href=#365 id=365 data-nosnippet>365</a>    <span class="macro">write!</span>(f, <span class="string">"&lt;MtbMoniDataSeries : {} boards&gt;"</span>, <span class="self">self</span>.data.len())
-<a href=#366 id=366 data-nosnippet>366</a>  }
-<a href=#367 id=367 data-nosnippet>367</a>}
-<a href=#368 id=368 data-nosnippet>368</a>
-<a href=#369 id=369 data-nosnippet>369</a><span class="kw">impl </span>MoniSeries&lt;MtbMoniData&gt; <span class="kw">for </span>MtbMoniDataSeries {
+<a href=#344 id=344 data-nosnippet>344</a>  data            : HashMap&lt;u8, VecDeque&lt;MtbMoniData&gt;&gt;,
+<a href=#345 id=345 data-nosnippet>345</a>  max_size        : usize,
+<a href=#346 id=346 data-nosnippet>346</a>  <span class="kw">pub </span>timestamps  : Vec&lt;u64&gt;,
+<a href=#347 id=347 data-nosnippet>347</a>}
+<a href=#348 id=348 data-nosnippet>348</a>
+<a href=#349 id=349 data-nosnippet>349</a><span class="kw">impl </span>MtbMoniDataSeries {
+<a href=#350 id=350 data-nosnippet>350</a>  <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+<a href=#351 id=351 data-nosnippet>351</a>    <span class="self">Self </span>{
+<a href=#352 id=352 data-nosnippet>352</a>      data       : HashMap::&lt;u8, VecDeque&lt;MtbMoniData&gt;&gt;::new(),
+<a href=#353 id=353 data-nosnippet>353</a>      timestamps : Vec::&lt;u64&gt;::new(),
+<a href=#354 id=354 data-nosnippet>354</a>      max_size   : <span class="number">10000</span>,
+<a href=#355 id=355 data-nosnippet>355</a>    }
+<a href=#356 id=356 data-nosnippet>356</a>  }
+<a href=#357 id=357 data-nosnippet>357</a>} 
+<a href=#358 id=358 data-nosnippet>358</a>
+<a href=#359 id=359 data-nosnippet>359</a><span class="kw">impl </span>Default <span class="kw">for </span>MtbMoniDataSeries {
+<a href=#360 id=360 data-nosnippet>360</a>  <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+<a href=#361 id=361 data-nosnippet>361</a>    <span class="self">Self</span>::new()
+<a href=#362 id=362 data-nosnippet>362</a>  }
+<a href=#363 id=363 data-nosnippet>363</a>}
+<a href=#364 id=364 data-nosnippet>364</a>
+<a href=#365 id=365 data-nosnippet>365</a><span class="kw">impl </span>fmt::Display <span class="kw">for </span>MtbMoniDataSeries {
+<a href=#366 id=366 data-nosnippet>366</a>  <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+<a href=#367 id=367 data-nosnippet>367</a>    <span class="macro">write!</span>(f, <span class="string">"&lt;MtbMoniDataSeries : {} boards&gt;"</span>, <span class="self">self</span>.data.len())
+<a href=#368 id=368 data-nosnippet>368</a>  }
+<a href=#369 id=369 data-nosnippet>369</a>}
 <a href=#370 id=370 data-nosnippet>370</a>
-<a href=#371 id=371 data-nosnippet>371</a>  <span class="kw">fn </span>get_data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>HashMap&lt;u8,VecDeque&lt;MtbMoniData&gt;&gt; {
-<a href=#372 id=372 data-nosnippet>372</a>    <span class="kw">return </span><span class="kw-2">&amp;</span><span class="self">self</span>.data;
-<a href=#373 id=373 data-nosnippet>373</a>  }
-<a href=#374 id=374 data-nosnippet>374</a>
-<a href=#375 id=375 data-nosnippet>375</a>  <span class="kw">fn </span>get_data_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>HashMap&lt;u8,VecDeque&lt;MtbMoniData&gt;&gt; {
-<a href=#376 id=376 data-nosnippet>376</a>    <span class="kw">return </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.data;
-<a href=#377 id=377 data-nosnippet>377</a>  }
-<a href=#378 id=378 data-nosnippet>378</a> 
-<a href=#379 id=379 data-nosnippet>379</a>  <span class="kw">fn </span>get_max_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
-<a href=#380 id=380 data-nosnippet>380</a>    <span class="kw">return </span><span class="self">self</span>.max_size;
-<a href=#381 id=381 data-nosnippet>381</a>  }
-<a href=#382 id=382 data-nosnippet>382</a>}
-<a href=#383 id=383 data-nosnippet>383</a>
-<a href=#384 id=384 data-nosnippet>384</a><span class="comment">////////////////////////////////////////////////////////////////////
+<a href=#371 id=371 data-nosnippet>371</a><span class="kw">impl </span>MoniSeries&lt;MtbMoniData&gt; <span class="kw">for </span>MtbMoniDataSeries {
+<a href=#372 id=372 data-nosnippet>372</a>
+<a href=#373 id=373 data-nosnippet>373</a>  <span class="kw">fn </span>get_data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>HashMap&lt;u8,VecDeque&lt;MtbMoniData&gt;&gt; {
+<a href=#374 id=374 data-nosnippet>374</a>    <span class="kw">return </span><span class="kw-2">&amp;</span><span class="self">self</span>.data;
+<a href=#375 id=375 data-nosnippet>375</a>  }
+<a href=#376 id=376 data-nosnippet>376</a>
+<a href=#377 id=377 data-nosnippet>377</a>  <span class="kw">fn </span>get_data_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>HashMap&lt;u8,VecDeque&lt;MtbMoniData&gt;&gt; {
+<a href=#378 id=378 data-nosnippet>378</a>    <span class="kw">return </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.data;
+<a href=#379 id=379 data-nosnippet>379</a>  }
+<a href=#380 id=380 data-nosnippet>380</a> 
+<a href=#381 id=381 data-nosnippet>381</a>  <span class="kw">fn </span>get_max_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+<a href=#382 id=382 data-nosnippet>382</a>    <span class="kw">return </span><span class="self">self</span>.max_size;
+<a href=#383 id=383 data-nosnippet>383</a>  }
+<a href=#384 id=384 data-nosnippet>384</a>}
 <a href=#385 id=385 data-nosnippet>385</a>
-<a href=#386 id=386 data-nosnippet>386</a></span><span class="attr">#[derive(Debug, Clone, PartialEq)]
-<a href=#387 id=387 data-nosnippet>387</a></span><span class="kw">pub struct </span>CPUMoniDataSeries {
-<a href=#388 id=388 data-nosnippet>388</a>  data        : HashMap&lt;u8, VecDeque&lt;CPUMoniData&gt;&gt;,
-<a href=#389 id=389 data-nosnippet>389</a>  max_size    : usize,
-<a href=#390 id=390 data-nosnippet>390</a>}
-<a href=#391 id=391 data-nosnippet>391</a>
-<a href=#392 id=392 data-nosnippet>392</a><span class="kw">impl </span>CPUMoniDataSeries {
-<a href=#393 id=393 data-nosnippet>393</a>  <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-<a href=#394 id=394 data-nosnippet>394</a>    <span class="self">Self </span>{
-<a href=#395 id=395 data-nosnippet>395</a>      data     : HashMap::&lt;u8, VecDeque&lt;CPUMoniData&gt;&gt;::new(),
-<a href=#396 id=396 data-nosnippet>396</a>      max_size : <span class="number">10000</span>,
-<a href=#397 id=397 data-nosnippet>397</a>    }
-<a href=#398 id=398 data-nosnippet>398</a>  }
-<a href=#399 id=399 data-nosnippet>399</a>} 
-<a href=#400 id=400 data-nosnippet>400</a>
-<a href=#401 id=401 data-nosnippet>401</a><span class="kw">impl </span>Default <span class="kw">for </span>CPUMoniDataSeries {
-<a href=#402 id=402 data-nosnippet>402</a>  <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-<a href=#403 id=403 data-nosnippet>403</a>    <span class="self">Self</span>::new()
-<a href=#404 id=404 data-nosnippet>404</a>  }
-<a href=#405 id=405 data-nosnippet>405</a>}
-<a href=#406 id=406 data-nosnippet>406</a>
-<a href=#407 id=407 data-nosnippet>407</a><span class="kw">impl </span>fmt::Display <span class="kw">for </span>CPUMoniDataSeries {
-<a href=#408 id=408 data-nosnippet>408</a>  <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-<a href=#409 id=409 data-nosnippet>409</a>    <span class="macro">write!</span>(f, <span class="string">"&lt;CPUMoniDataSeries : {} boards&gt;"</span>, <span class="self">self</span>.data.len())
-<a href=#410 id=410 data-nosnippet>410</a>  }
-<a href=#411 id=411 data-nosnippet>411</a>}
-<a href=#412 id=412 data-nosnippet>412</a>
-<a href=#413 id=413 data-nosnippet>413</a><span class="kw">impl </span>MoniSeries&lt;CPUMoniData&gt; <span class="kw">for </span>CPUMoniDataSeries {
+<a href=#386 id=386 data-nosnippet>386</a><span class="comment">////////////////////////////////////////////////////////////////////
+<a href=#387 id=387 data-nosnippet>387</a>
+<a href=#388 id=388 data-nosnippet>388</a></span><span class="attr">#[derive(Debug, Clone, PartialEq)]
+<a href=#389 id=389 data-nosnippet>389</a></span><span class="kw">pub struct </span>CPUMoniDataSeries {
+<a href=#390 id=390 data-nosnippet>390</a>  data        : HashMap&lt;u8, VecDeque&lt;CPUMoniData&gt;&gt;,
+<a href=#391 id=391 data-nosnippet>391</a>  max_size    : usize,
+<a href=#392 id=392 data-nosnippet>392</a>}
+<a href=#393 id=393 data-nosnippet>393</a>
+<a href=#394 id=394 data-nosnippet>394</a><span class="kw">impl </span>CPUMoniDataSeries {
+<a href=#395 id=395 data-nosnippet>395</a>  <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+<a href=#396 id=396 data-nosnippet>396</a>    <span class="self">Self </span>{
+<a href=#397 id=397 data-nosnippet>397</a>      data     : HashMap::&lt;u8, VecDeque&lt;CPUMoniData&gt;&gt;::new(),
+<a href=#398 id=398 data-nosnippet>398</a>      max_size : <span class="number">10000</span>,
+<a href=#399 id=399 data-nosnippet>399</a>    }
+<a href=#400 id=400 data-nosnippet>400</a>  }
+<a href=#401 id=401 data-nosnippet>401</a>} 
+<a href=#402 id=402 data-nosnippet>402</a>
+<a href=#403 id=403 data-nosnippet>403</a><span class="kw">impl </span>Default <span class="kw">for </span>CPUMoniDataSeries {
+<a href=#404 id=404 data-nosnippet>404</a>  <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+<a href=#405 id=405 data-nosnippet>405</a>    <span class="self">Self</span>::new()
+<a href=#406 id=406 data-nosnippet>406</a>  }
+<a href=#407 id=407 data-nosnippet>407</a>}
+<a href=#408 id=408 data-nosnippet>408</a>
+<a href=#409 id=409 data-nosnippet>409</a><span class="kw">impl </span>fmt::Display <span class="kw">for </span>CPUMoniDataSeries {
+<a href=#410 id=410 data-nosnippet>410</a>  <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+<a href=#411 id=411 data-nosnippet>411</a>    <span class="macro">write!</span>(f, <span class="string">"&lt;CPUMoniDataSeries : {} boards&gt;"</span>, <span class="self">self</span>.data.len())
+<a href=#412 id=412 data-nosnippet>412</a>  }
+<a href=#413 id=413 data-nosnippet>413</a>}
 <a href=#414 id=414 data-nosnippet>414</a>
-<a href=#415 id=415 data-nosnippet>415</a>  <span class="kw">fn </span>get_data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>HashMap&lt;u8,VecDeque&lt;CPUMoniData&gt;&gt; {
-<a href=#416 id=416 data-nosnippet>416</a>    <span class="kw">return </span><span class="kw-2">&amp;</span><span class="self">self</span>.data;
-<a href=#417 id=417 data-nosnippet>417</a>  }
-<a href=#418 id=418 data-nosnippet>418</a>
-<a href=#419 id=419 data-nosnippet>419</a>  <span class="kw">fn </span>get_data_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>HashMap&lt;u8,VecDeque&lt;CPUMoniData&gt;&gt; {
-<a href=#420 id=420 data-nosnippet>420</a>    <span class="kw">return </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.data;
-<a href=#421 id=421 data-nosnippet>421</a>  }
-<a href=#422 id=422 data-nosnippet>422</a> 
-<a href=#423 id=423 data-nosnippet>423</a>  <span class="kw">fn </span>get_max_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
-<a href=#424 id=424 data-nosnippet>424</a>    <span class="kw">return </span><span class="self">self</span>.max_size;
-<a href=#425 id=425 data-nosnippet>425</a>  }
-<a href=#426 id=426 data-nosnippet>426</a>}
-<a href=#427 id=427 data-nosnippet>427</a>
-<a href=#428 id=428 data-nosnippet>428</a></code></pre></div></section></main></body></html>
+<a href=#415 id=415 data-nosnippet>415</a><span class="kw">impl </span>MoniSeries&lt;CPUMoniData&gt; <span class="kw">for </span>CPUMoniDataSeries {
+<a href=#416 id=416 data-nosnippet>416</a>
+<a href=#417 id=417 data-nosnippet>417</a>  <span class="kw">fn </span>get_data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>HashMap&lt;u8,VecDeque&lt;CPUMoniData&gt;&gt; {
+<a href=#418 id=418 data-nosnippet>418</a>    <span class="kw">return </span><span class="kw-2">&amp;</span><span class="self">self</span>.data;
+<a href=#419 id=419 data-nosnippet>419</a>  }
+<a href=#420 id=420 data-nosnippet>420</a>
+<a href=#421 id=421 data-nosnippet>421</a>  <span class="kw">fn </span>get_data_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>HashMap&lt;u8,VecDeque&lt;CPUMoniData&gt;&gt; {
+<a href=#422 id=422 data-nosnippet>422</a>    <span class="kw">return </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.data;
+<a href=#423 id=423 data-nosnippet>423</a>  }
+<a href=#424 id=424 data-nosnippet>424</a> 
+<a href=#425 id=425 data-nosnippet>425</a>  <span class="kw">fn </span>get_max_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+<a href=#426 id=426 data-nosnippet>426</a>    <span class="kw">return </span><span class="self">self</span>.max_size;
+<a href=#427 id=427 data-nosnippet>427</a>  }
+<a href=#428 id=428 data-nosnippet>428</a>}
+<a href=#429 id=429 data-nosnippet>429</a>
+<a href=#430 id=430 data-nosnippet>430</a></code></pre></div></section></main></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zerocopy-0.8.25/src/ref.rs`."><title>ref.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-916cea96.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="zerocopy" data-themes="" data-resource-suffix="" data-rustdoc-version="1.87.0 (17067e9ac 2025-05-09)" data-channel="1.87.0" data-search-js="search-e7298875.js" data-settings-js="settings-d72f25bb.js" ><script src="../../static.files/storage-82c7156e.js"></script><script defer src="../../static.files/src-script-63605ae7.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-fb8c74a8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">zerocopy/</div>ref.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-4"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="comment">// Copyright 2024 The Fuchsia Authors
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zerocopy-0.8.27/src/ref.rs`."><title>ref.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-84e720fa.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="zerocopy" data-themes="" data-resource-suffix="" data-rustdoc-version="1.89.0 (29483883e 2025-08-04)" data-channel="1.89.0" data-search-js="search-92309212.js" data-settings-js="settings-5514c975.js" ><script src="../../static.files/storage-4e99c027.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-fd3af306.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">zerocopy/</div>ref.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-4"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="comment">// Copyright 2024 The Fuchsia Authors
 <a href=#2 id=2 data-nosnippet>2</a>//
 <a href=#3 id=3 data-nosnippet>3</a>// Licensed under the 2-Clause BSD License &lt;LICENSE-BSD or
 <a href=#4 id=4 data-nosnippet>4</a>// https://opensource.org/license/bsd-2-clause&gt;, Apache License, Version 2.0
@@ -479,7 +479,7 @@
 <a href=#479 id=479 data-nosnippet>479</a>    </span><span class="attr">#[inline]
 <a href=#480 id=480 data-nosnippet>480</a>    </span><span class="kw">pub fn </span>from_bytes_with_elems(source: B, count: usize) -&gt; <span class="prelude-ty">Result</span>&lt;Ref&lt;B, T&gt;, CastError&lt;B, T&gt;&gt; {
 <a href=#481 id=481 data-nosnippet>481</a>        <span class="macro">static_assert_dst_is_not_zst!</span>(T);
-<a href=#482 id=482 data-nosnippet>482</a>        <span class="kw">let </span>expected_len = <span class="kw">match </span>count.size_for_metadata(T::LAYOUT) {
+<a href=#482 id=482 data-nosnippet>482</a>        <span class="kw">let </span>expected_len = <span class="kw">match </span>T::size_for_metadata(count) {
 <a href=#483 id=483 data-nosnippet>483</a>            <span class="prelude-val">Some</span>(len) =&gt; len,
 <a href=#484 id=484 data-nosnippet>484</a>            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(SizeError::new(source).into()),
 <a href=#485 id=485 data-nosnippet>485</a>        };
@@ -533,7 +533,7 @@
 <a href=#533 id=533 data-nosnippet>533</a>        count: usize,
 <a href=#534 id=534 data-nosnippet>534</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;(Ref&lt;B, T&gt;, B), CastError&lt;B, T&gt;&gt; {
 <a href=#535 id=535 data-nosnippet>535</a>        <span class="macro">static_assert_dst_is_not_zst!</span>(T);
-<a href=#536 id=536 data-nosnippet>536</a>        <span class="kw">let </span>expected_len = <span class="kw">match </span>count.size_for_metadata(T::LAYOUT) {
+<a href=#536 id=536 data-nosnippet>536</a>        <span class="kw">let </span>expected_len = <span class="kw">match </span>T::size_for_metadata(count) {
 <a href=#537 id=537 data-nosnippet>537</a>            <span class="prelude-val">Some</span>(len) =&gt; len,
 <a href=#538 id=538 data-nosnippet>538</a>            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(SizeError::new(source).into()),
 <a href=#539 id=539 data-nosnippet>539</a>        };
@@ -579,7 +579,7 @@
 <a href=#579 id=579 data-nosnippet>579</a>        count: usize,
 <a href=#580 id=580 data-nosnippet>580</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;(B, Ref&lt;B, T&gt;), CastError&lt;B, T&gt;&gt; {
 <a href=#581 id=581 data-nosnippet>581</a>        <span class="macro">static_assert_dst_is_not_zst!</span>(T);
-<a href=#582 id=582 data-nosnippet>582</a>        <span class="kw">let </span>expected_len = <span class="kw">match </span>count.size_for_metadata(T::LAYOUT) {
+<a href=#582 id=582 data-nosnippet>582</a>        <span class="kw">let </span>expected_len = <span class="kw">match </span>T::size_for_metadata(count) {
 <a href=#583 id=583 data-nosnippet>583</a>            <span class="prelude-val">Some</span>(len) =&gt; len,
 <a href=#584 id=584 data-nosnippet>584</a>            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(SizeError::new(source).into()),
 <a href=#585 id=585 data-nosnippet>585</a>        };
@@ -588,7 +588,7 @@
 <a href=#588 id=588 data-nosnippet>588</a>        } <span class="kw">else </span>{
 <a href=#589 id=589 data-nosnippet>589</a>            <span class="kw">return </span><span class="prelude-val">Err</span>(SizeError::new(source).into());
 <a href=#590 id=590 data-nosnippet>590</a>        };
-<a href=#591 id=591 data-nosnippet>591</a>        <span class="comment">// SAFETY: The preceeding `source.len().checked_sub(expected_len)`
+<a href=#591 id=591 data-nosnippet>591</a>        <span class="comment">// SAFETY: The preceding `source.len().checked_sub(expected_len)`
 <a href=#592 id=592 data-nosnippet>592</a>        // guarantees that `split_at` is in-bounds.
 <a href=#593 id=593 data-nosnippet>593</a>        </span><span class="kw">let </span>(bytes, suffix) = <span class="kw">unsafe </span>{ source.split_at_unchecked(split_at) };
 <a href=#594 id=594 data-nosnippet>594</a>        <span class="self">Self</span>::from_bytes(suffix).map(<span class="kw">move </span>|l| (bytes, l))
@@ -658,7 +658,7 @@
 <a href=#658 id=658 data-nosnippet>658</a>        </span><span class="kw">let </span>ptr = Ptr::from_mut(b.into_byte_slice_mut())
 <a href=#659 id=659 data-nosnippet>659</a>            .try_cast_into_no_leftover::&lt;T, BecauseExclusive&gt;(<span class="prelude-val">None</span>)
 <a href=#660 id=660 data-nosnippet>660</a>            .expect(<span class="string">"zerocopy internal error: into_ref should be infallible"</span>);
-<a href=#661 id=661 data-nosnippet>661</a>        <span class="kw">let </span>ptr = ptr.recall_validity();
+<a href=#661 id=661 data-nosnippet>661</a>        <span class="kw">let </span>ptr = ptr.recall_validity::&lt;<span class="kw">_</span>, (<span class="kw">_</span>, (<span class="kw">_</span>, <span class="kw">_</span>))&gt;();
 <a href=#662 id=662 data-nosnippet>662</a>        ptr.as_mut()
 <a href=#663 id=663 data-nosnippet>663</a>    }
 <a href=#664 id=664 data-nosnippet>664</a>}
@@ -883,7 +883,7 @@
 <a href=#883 id=883 data-nosnippet>883</a>    <span class="attr">#[test]
 <a href=#884 id=884 data-nosnippet>884</a>    </span><span class="kw">fn </span>test_mut_slice_into_ref() {
 <a href=#885 id=885 data-nosnippet>885</a>        <span class="comment">// Prior to #1260/#1299, calling `into_ref` on a `&amp;mut [u8]`-backed
-<a href=#886 id=886 data-nosnippet>886</a>        // `Ref` was not supportd.
+<a href=#886 id=886 data-nosnippet>886</a>        // `Ref` was not supported.
 <a href=#887 id=887 data-nosnippet>887</a>        </span><span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0u8</span>];
 <a href=#888 id=888 data-nosnippet>888</a>        <span class="kw">let </span>r = Ref::&lt;<span class="kw-2">&amp;mut </span>[u8], u8&gt;::from_bytes(<span class="kw-2">&amp;mut </span>buf).unwrap();
 <a href=#889 id=889 data-nosnippet>889</a>        <span class="macro">assert_eq!</span>(Ref::into_ref(r), <span class="kw-2">&amp;</span><span class="number">0</span>);

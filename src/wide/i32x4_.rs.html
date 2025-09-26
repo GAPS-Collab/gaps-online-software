@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wide-0.7.32/src/i32x4_.rs`."><title>i32x4_.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-916cea96.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wide" data-themes="" data-resource-suffix="" data-rustdoc-version="1.87.0 (17067e9ac 2025-05-09)" data-channel="1.87.0" data-search-js="search-e7298875.js" data-settings-js="settings-d72f25bb.js" ><script src="../../static.files/storage-82c7156e.js"></script><script defer src="../../static.files/src-script-63605ae7.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-fb8c74a8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">wide/</div>i32x4_.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wide-0.7.33/src/i32x4_.rs`."><title>i32x4_.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-84e720fa.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="wide" data-themes="" data-resource-suffix="" data-rustdoc-version="1.89.0 (29483883e 2025-08-04)" data-channel="1.89.0" data-search-js="search-92309212.js" data-settings-js="settings-5514c975.js" ><script src="../../static.files/storage-4e99c027.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-fd3af306.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">wide/</div>i32x4_.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#2 id=2 data-nosnippet>2</a>
 <a href=#3 id=3 data-nosnippet>3</a><span class="macro">pick!</span> {
 <a href=#4 id=4 data-nosnippet>4</a>  <span class="kw">if </span><span class="attr">#[cfg(target_feature=<span class="string">"sse2"</span>)] </span>{
@@ -473,7 +473,7 @@
 <a href=#473 id=473 data-nosnippet>473</a>  <span class="attr">#[inline]
 <a href=#474 id=474 data-nosnippet>474</a>  #[must_use]
 <a href=#475 id=475 data-nosnippet>475</a>  </span><span class="kw">pub const fn </span>new(array: [i32; <span class="number">4</span>]) -&gt; <span class="self">Self </span>{
-<a href=#476 id=476 data-nosnippet>476</a>    <span class="kw">unsafe </span>{ core::intrinsics::transmute(array) }
+<a href=#476 id=476 data-nosnippet>476</a>    <span class="kw">unsafe </span>{ core::mem::transmute(array) }
 <a href=#477 id=477 data-nosnippet>477</a>  }
 <a href=#478 id=478 data-nosnippet>478</a>  <span class="attr">#[inline]
 <a href=#479 id=479 data-nosnippet>479</a>  #[must_use]
@@ -683,7 +683,7 @@
 <a href=#683 id=683 data-nosnippet>683</a>          </span><span class="kw">let </span>masked = vcltq_s32(<span class="self">self</span>.neon, vdupq_n_s32(<span class="number">0</span>));
 <a href=#684 id=684 data-nosnippet>684</a>
 <a href=#685 id=685 data-nosnippet>685</a>          <span class="comment">// select the right bit out of each lane
-<a href=#686 id=686 data-nosnippet>686</a>          </span><span class="kw">let </span>selectbit : uint32x4_t = core::intrinsics::transmute([<span class="number">1u32</span>, <span class="number">2</span>, <span class="number">4</span>, <span class="number">8</span>]);
+<a href=#686 id=686 data-nosnippet>686</a>          </span><span class="kw">let </span>selectbit : uint32x4_t = core::mem::transmute([<span class="number">1u32</span>, <span class="number">2</span>, <span class="number">4</span>, <span class="number">8</span>]);
 <a href=#687 id=687 data-nosnippet>687</a>          <span class="kw">let </span>r = vandq_u32(masked, selectbit);
 <a href=#688 id=688 data-nosnippet>688</a>
 <a href=#689 id=689 data-nosnippet>689</a>          <span class="comment">// horizontally add the 32-bit lanes
@@ -746,18 +746,58 @@
 <a href=#746 id=746 data-nosnippet>746</a>    !<span class="self">self</span>.any()
 <a href=#747 id=747 data-nosnippet>747</a>  }
 <a href=#748 id=748 data-nosnippet>748</a>
-<a href=#749 id=749 data-nosnippet>749</a>  <span class="attr">#[inline]
-<a href=#750 id=750 data-nosnippet>750</a>  </span><span class="kw">pub fn </span>to_array(<span class="self">self</span>) -&gt; [i32; <span class="number">4</span>] {
-<a href=#751 id=751 data-nosnippet>751</a>    cast(<span class="self">self</span>)
-<a href=#752 id=752 data-nosnippet>752</a>  }
-<a href=#753 id=753 data-nosnippet>753</a>
-<a href=#754 id=754 data-nosnippet>754</a>  <span class="attr">#[inline]
-<a href=#755 id=755 data-nosnippet>755</a>  </span><span class="kw">pub fn </span>as_array_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[i32; <span class="number">4</span>] {
-<a href=#756 id=756 data-nosnippet>756</a>    cast_ref(<span class="self">self</span>)
-<a href=#757 id=757 data-nosnippet>757</a>  }
-<a href=#758 id=758 data-nosnippet>758</a>
-<a href=#759 id=759 data-nosnippet>759</a>  <span class="attr">#[inline]
-<a href=#760 id=760 data-nosnippet>760</a>  </span><span class="kw">pub fn </span>as_array_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[i32; <span class="number">4</span>] {
-<a href=#761 id=761 data-nosnippet>761</a>    cast_mut(<span class="self">self</span>)
-<a href=#762 id=762 data-nosnippet>762</a>  }
-<a href=#763 id=763 data-nosnippet>763</a>}</code></pre></div></section></main></body></html>
+<a href=#749 id=749 data-nosnippet>749</a>  <span class="doccomment">/// Transpose matrix of 4x4 `i32` matrix. Currently only accelerated on SSE.
+<a href=#750 id=750 data-nosnippet>750</a>  </span><span class="attr">#[must_use]
+<a href=#751 id=751 data-nosnippet>751</a>  #[inline]
+<a href=#752 id=752 data-nosnippet>752</a>  </span><span class="kw">pub fn </span>transpose(data: [i32x4; <span class="number">4</span>]) -&gt; [i32x4; <span class="number">4</span>] {
+<a href=#753 id=753 data-nosnippet>753</a>    <span class="macro">pick!</span> {
+<a href=#754 id=754 data-nosnippet>754</a>      <span class="kw">if </span><span class="attr">#[cfg(target_feature=<span class="string">"sse"</span>)] </span>{
+<a href=#755 id=755 data-nosnippet>755</a>        <span class="kw">let </span><span class="kw-2">mut </span>e0 = data[<span class="number">0</span>];
+<a href=#756 id=756 data-nosnippet>756</a>        <span class="kw">let </span><span class="kw-2">mut </span>e1 = data[<span class="number">1</span>];
+<a href=#757 id=757 data-nosnippet>757</a>        <span class="kw">let </span><span class="kw-2">mut </span>e2 = data[<span class="number">2</span>];
+<a href=#758 id=758 data-nosnippet>758</a>        <span class="kw">let </span><span class="kw-2">mut </span>e3 = data[<span class="number">3</span>];
+<a href=#759 id=759 data-nosnippet>759</a>
+<a href=#760 id=760 data-nosnippet>760</a>        transpose_four_m128(
+<a href=#761 id=761 data-nosnippet>761</a>          cast_mut(<span class="kw-2">&amp;mut </span>e0.sse),
+<a href=#762 id=762 data-nosnippet>762</a>          cast_mut(<span class="kw-2">&amp;mut </span>e1.sse),
+<a href=#763 id=763 data-nosnippet>763</a>          cast_mut(<span class="kw-2">&amp;mut </span>e2.sse),
+<a href=#764 id=764 data-nosnippet>764</a>          cast_mut(<span class="kw-2">&amp;mut </span>e3.sse),
+<a href=#765 id=765 data-nosnippet>765</a>        );
+<a href=#766 id=766 data-nosnippet>766</a>
+<a href=#767 id=767 data-nosnippet>767</a>        [e0, e1, e2, e3]
+<a href=#768 id=768 data-nosnippet>768</a>      } <span class="kw">else </span>{
+<a href=#769 id=769 data-nosnippet>769</a>        <span class="attr">#[inline(always)]
+<a href=#770 id=770 data-nosnippet>770</a>        </span><span class="kw">fn </span>transpose_column(data: <span class="kw-2">&amp;</span>[i32x4; <span class="number">4</span>], index: usize) -&gt; i32x4 {
+<a href=#771 id=771 data-nosnippet>771</a>          i32x4::new([
+<a href=#772 id=772 data-nosnippet>772</a>            data[<span class="number">0</span>].as_array_ref()[index],
+<a href=#773 id=773 data-nosnippet>773</a>            data[<span class="number">1</span>].as_array_ref()[index],
+<a href=#774 id=774 data-nosnippet>774</a>            data[<span class="number">2</span>].as_array_ref()[index],
+<a href=#775 id=775 data-nosnippet>775</a>            data[<span class="number">3</span>].as_array_ref()[index],
+<a href=#776 id=776 data-nosnippet>776</a>          ])
+<a href=#777 id=777 data-nosnippet>777</a>        }
+<a href=#778 id=778 data-nosnippet>778</a>
+<a href=#779 id=779 data-nosnippet>779</a>        [
+<a href=#780 id=780 data-nosnippet>780</a>          transpose_column(<span class="kw-2">&amp;</span>data, <span class="number">0</span>),
+<a href=#781 id=781 data-nosnippet>781</a>          transpose_column(<span class="kw-2">&amp;</span>data, <span class="number">1</span>),
+<a href=#782 id=782 data-nosnippet>782</a>          transpose_column(<span class="kw-2">&amp;</span>data, <span class="number">2</span>),
+<a href=#783 id=783 data-nosnippet>783</a>          transpose_column(<span class="kw-2">&amp;</span>data, <span class="number">3</span>),
+<a href=#784 id=784 data-nosnippet>784</a>        ]
+<a href=#785 id=785 data-nosnippet>785</a>      }
+<a href=#786 id=786 data-nosnippet>786</a>    }
+<a href=#787 id=787 data-nosnippet>787</a>  }
+<a href=#788 id=788 data-nosnippet>788</a>
+<a href=#789 id=789 data-nosnippet>789</a>  <span class="attr">#[inline]
+<a href=#790 id=790 data-nosnippet>790</a>  </span><span class="kw">pub fn </span>to_array(<span class="self">self</span>) -&gt; [i32; <span class="number">4</span>] {
+<a href=#791 id=791 data-nosnippet>791</a>    cast(<span class="self">self</span>)
+<a href=#792 id=792 data-nosnippet>792</a>  }
+<a href=#793 id=793 data-nosnippet>793</a>
+<a href=#794 id=794 data-nosnippet>794</a>  <span class="attr">#[inline]
+<a href=#795 id=795 data-nosnippet>795</a>  </span><span class="kw">pub fn </span>as_array_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[i32; <span class="number">4</span>] {
+<a href=#796 id=796 data-nosnippet>796</a>    cast_ref(<span class="self">self</span>)
+<a href=#797 id=797 data-nosnippet>797</a>  }
+<a href=#798 id=798 data-nosnippet>798</a>
+<a href=#799 id=799 data-nosnippet>799</a>  <span class="attr">#[inline]
+<a href=#800 id=800 data-nosnippet>800</a>  </span><span class="kw">pub fn </span>as_array_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[i32; <span class="number">4</span>] {
+<a href=#801 id=801 data-nosnippet>801</a>    cast_mut(<span class="self">self</span>)
+<a href=#802 id=802 data-nosnippet>802</a>  }
+<a href=#803 id=803 data-nosnippet>803</a>}</code></pre></div></section></main></body></html>
