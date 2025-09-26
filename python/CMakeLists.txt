@@ -67,7 +67,7 @@ if(BUILD_RUSTPYBINDINGS)
   # documentation
   add_custom_target(
     go-pybindings-rust-doc
-      COMMAND cargo doc 
+      COMMAND cargo doc --all-features 
       WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python/pybindings
   )
 
