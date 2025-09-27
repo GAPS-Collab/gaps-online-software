@@ -27,6 +27,7 @@ use tof_dataclasses::heartbeats::HeartBeatDataSink;
 use tof_dataclasses::heartbeats::MTBHeartbeat;
 use tof_dataclasses::heartbeats::EVTBLDRHeartbeat;
 
+#[cfg(feature="telemetry")]
 use crate::tel_api::TelemetryPacket;
 
 use tof_dataclasses::monitoring::{

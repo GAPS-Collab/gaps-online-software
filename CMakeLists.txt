@@ -99,8 +99,9 @@ install(FILES
 
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/doc/apidocs-v${PROJECT_VERSION}")
   set(DOXYGEN_INPUT "${CMAKE_SOURCE_DIR}/tof/dataclasses/C++/include")
-  set(DOXYGEN_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/doc")
+  set(DOXYGEN_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/doc/apidocs-v${PROJECT_VERSION}")
   set(DOXYGEN_GENERATE_HTML YES)
   set(DOXYGEN_GENERATE_MAN NO) # You can enable this if you want man pages
   configure_file(${CMAKE_SOURCE_DIR}/Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile @ONLY)
