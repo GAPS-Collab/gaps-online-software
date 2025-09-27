@@ -66,9 +66,9 @@ macro_rules! pythonize_telemetry {
       /// Unpack Self from a TelemetryPacket.
       #[staticmethod]
       fn from_telemetrypacket(packet : TelemetryPacket) -> PyResult<Self> {
+        //if packet.telemetry_header.packet_type !=
         match Self::from_bytestream(&packet.payload, &mut 0) {
           Ok(mut tl) => {
-            tl.telemetry_header = packet.header.clone();
             return Ok(tl);
           }
           Err(err) => {
@@ -141,7 +141,21 @@ macro_rules! pythonize_packable_no_new {
           }
         }
       }
-      
+     
+      #[staticmethod]
+      #[pyo3(name="from_bytestream")]
+      fn from_bytestream_py(bytestream : Vec<u8>, pos : usize) -> PyResult<Self> {
+        let mut py_pos = pos;
+        match Self::from_bytestream(&bytestream, &mut py_pos) { 
+          Ok(slf) => {
+            return Ok(slf);
+          }
+          Err(err) => {
+            return Err(PyValueError::new_err(err.to_string()));
+          }  
+        }
+      }
+
       /// Pack self into a TofPacket to be written on disk
       /// or sent over network
       #[pyo3(name="pack")]

@@ -623,11 +623,13 @@ struct RBWaveform {
   static constexpr u16 HEAD = 0xAAAA;
   static constexpr u16 TAIL = 0x5555;
 
-  u32       event_id  ; 
-  u8        rb_id     ; 
-  u8        rb_channel; 
-  u16       stop_cell ;
-  Vec<u16>  adc       ; 
+  u32       event_id     ; 
+  u8        rb_id        ; 
+  u8        rb_channel_a ; 
+  u8        rb_channel_b ;
+  u16       stop_cell    ;
+  Vec<u16>  adc_a        ; 
+  Vec<u16>  adc_b        ;
   
   static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos) -> RBWaveform;
   auto to_string() const -> std::string;

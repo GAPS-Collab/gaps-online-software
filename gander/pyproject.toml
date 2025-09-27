@@ -19,12 +19,11 @@ dependencies = [
     "polars>=1.31.0",
     "cmocean>=4.0.3",
     "tomli-w>=1.2.0",
-    "gondola @ file:///srv/gaps/gaps-online-software/gondola-core/rust/gondola-core/target/wheels/gondola-0.11.0-cp311-abi3-manylinux_2_34_x86_64.whl",
     "pyvista>=0.46.3",
     "stpyvista>=0.1.4",
+    "gondola @ file:///home/achim/gaps-online-software/gander/gondola-0.11.7-cp311-abi3-manylinux_2_39_x86_64.whl", 
 ]
-
-
+    ##"gondola>=0.11.4",
 readme = "README.md"
 requires-python = ">= 3.8"
 
@@ -37,7 +36,7 @@ managed = true
 dev-dependencies = []
 
 [tool.rye.scripts]
-gander = "streamlit run gander.py --server.headless true --server.port 8502"
+gander = "streamlit run gander.py --server.headless true --server.port 8080"
 
 [tool.hatch.metadata]
 allow-direct-references = true

@@ -16,19 +16,17 @@ This is version AULEPE-0.12. [Aulepe are sailfish!](https://en.wikipedia.org/wik
 [Since v0.12 we are keeping a global CHANELOG.MD](CHANGELOG.md)
 
 * Antarctic RBWaveform data from telemetry can not be read with this version, use v0.11 instead 
-
-
 ## API docs 
 
-The API docs for Rust as well as for the C++ API are hosted on github-pages. Documentation
-for the python API will follow soon.
+The API docs for Rust/C++/Python are hosted on github-pages. However, the current documentation is
+always referring to the the main branch, so it might or might not be accurate.
 
 [API-docs](https://gaps-collab.github.io/gaps-online-software/)
 
 ## prerequisites
 
 * rust toolchain - to compile `liftof` flight software suite as well as
-  `tof-dataclasses` which are the backbone of `liftof`
+  `tof-dataclasses` and `telemetry-dataclasses` 
 * `cmake` is used as a build system
 *  a number of C++ libraries are pulled from github during installation.
 * The C++ API uses the C++20 standard and thus wants gcc-13 or later.
@@ -52,9 +50,9 @@ The branches/releases are named after fish in Hawaii. A fish
 identification card can be found [here](https://www.honolulu.gov/rep/site/dpr/dpr_docs/hbep_fish_id_card.pdf).
 You can switch branches with `git checkout <branch>`. To get updates, use `git pull`
 
-Usually, each branch has a specific purpose, everything with version numbers < 1.0.0 or will be unstable, meaning there is no guarantee for code to work even after a pull.
+Usually, each branch has a specific purpose, everything with version numbers < 1.0.0 will be unstable, meaning there is no guarantee for code to work even after a pull.
 The branches following the naming scheme "FISHNAME-X.X" are dedicated to specific tasks, 
-e.g. the NTS campaign. Please see the dedicated README for this branch.
+e.g. the NTS campaign. Please see the dedicated README for the specific branch.
 
 We are following a git-flow model, which is e.g. described [here](https://www.gitkraken.com/learn/git/git-flow). This means that `main` should point to the latest release, however, it has to be considered that until
 we are at version < 1.0.0, there are no "official" releases. Instead, the main branch will point to the 
@@ -95,6 +93,7 @@ The software includes (<src> is the original source directory of `gaps-online-so
 
 - dataclasses for the time-of-flight system (`<src>/tof/dataclasses`) available for rust 
   and C++/PYTHON
+- dataclasses to read the telemetry stream (`<src>/telemetry/dataclasses`) available for rust/Python
 - software for the tof flight computer as well as the readoutboards in 
   `<src>/tof/liftof` written in rust. This has several components:
   - `liftof-rb` - code to be run on the readoutboards. This has to be cross-compiled for 

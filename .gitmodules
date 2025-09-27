@@ -20,3 +20,6 @@
 [submodule "resources/extern/nanobind"]
 	path = resources/extern/nanobind
 	url = https://github.com/wjakob/nanobind
+[submodule "resources/extern/blue-penguin-dark"]
+	path = resources/extern/blue-penguin-dark
+	url = https://github.com/tcarwash/blue-penguin-dark.git

@@ -849,7 +849,7 @@ pub fn master_trigger(mt_address     : &str,
   }
 }
 
-
+#[cfg(feature = "pybindings")]
 #[pyfunction]
 #[pyo3(name="prescale_to_u32")]
 /// Convert a prescale value in range from 0-1.0 to 
@@ -863,12 +863,14 @@ pub fn wrap_prescale_to_u32(prescale : f32) -> u32 {
 //---------------------------------------
 // PORT from pybidings/master_trigger.rs 
 
+#[cfg(feature="pybindings")]
 #[pyclass]
 #[pyo3(name = "MasterTrigger")]
 pub struct PyMasterTrigger {
   ipbus : IPBus,
 }
 
+#[cfg(feature="pybindings")]
 #[pymethods]
 impl PyMasterTrigger {
   #[new]
