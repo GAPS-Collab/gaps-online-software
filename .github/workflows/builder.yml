@@ -49,10 +49,7 @@ jobs:
       # Build your program with the given configuration
       #run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
       run: cd ${{github.workspace}}/build && make -j 4 && make doc && make install
-
-    - name: Docs
-      run: cd ${{github.workspace}}/build && make doc && make liftof-doc && make go-pybindings-rust-doc
-      
+ 
     - name: Test-Dataclasses
       working-directory: ${{github.workspace}}/build
       # Execute tests defined by the CMake configuration.
@@ -66,6 +63,9 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       #run: ctest -C ${{env.BUILD_TYPE}}
       run: cd ${{github.workspace}}/tof/liftof/liftof-lib && cargo test --all-features && cargo test 
+    
+    - name: Rust Docs
+      run: cd ${{github.workspace}}/build && make doc && make liftof-doc && make go-pybindings-rust-doc
 
     - name: Create .nojekyll
       run: touch ${{ github.workspace }}/build/doc/html/.nojekyll
