@@ -133,10 +133,6 @@ class TrackerAnalysis:
     """
 
     def _is_compatible(self, other):
-        if self.strip_mask != other.strip_mask:
-            return False
-        if self.subtract_pedestals != other.subtract_pedestals:
-            return False
         return True
 
     def pretty_print_statistics(self):
@@ -144,10 +140,6 @@ class TrackerAnalysis:
         _repr += '\n TRK analysis statistics'
         _repr += f'\n  -- events                    : {self.n_events}'
         _repr += f'\n  -- nhits                     : {self.n_hits}'
-        if self.strip_mask:
-            _repr += '\n -- --  a strip mask has been applied!'
-        if self.subtract_pedestals:
-            _repr += '\n -- --  pedestals will be subtracted'
         #_repr += f'\n  -- runtime (s)              : {self.run_time:1f} s'
         #_repr += f'\n  -- rate    (Hz (nocut))     : {self.rate_nocut:.2f} Hz'
         #_repr += f'\n  -- frac. of mangled events  : {100*self.n_mangled_frac : .2f} %'
@@ -181,7 +173,7 @@ class TrackerAnalysis:
         self.edep_cache   = dict()
         # energy bins can either be adc or energy
         e_bins = self.ADC_BINS
-        if self.apply_transfer_fn:
+        if self.is_calibrated:
             e_bins = self.EDEP_BINS
         self.edep_plots['edep'] = d.histogram.hist1d(e_bins)
         self.edep_cache['edep'] = []
@@ -245,20 +237,16 @@ class TrackerAnalysis:
         kwargs = dict()
         kwargs['nbins']              = copy(self.nbins)
         kwargs['active']             = copy(self.active)
-        kwargs['strip_mask']         = copy(self.strip_mask)
         kwargs['cuts']               = copy(self.cuts)
-        kwargs['pedestals']          = copy(self.pedestals)
-        kwargs['transfer_fn']        = copy(self.transfer_fn)
+        kwargs['is_calibrated']      = copy(self.is_calibrated)
         kwargs['exclude_empty_hits'] = copy(self.exclude_empty_hits)
         return kwargs
 
     def __init__(self,\
                  nbins              = 90,\
                  active             = False,\
-                 strip_mask         = dict(),\
                  cuts               = TrackerCuts(),
-                 pedestals          = dict(),
-                 transfer_fn        = dict(),
+                 is_calibrated      = False,
                  exclude_empty_hits = False):
 
         self.nbins               = nbins
@@ -266,11 +254,10 @@ class TrackerAnalysis:
         self.n_hits              = 0
         self.cuts                = cuts
         self.exclude_empty_hits  = exclude_empty_hits
-        self.pedestals           = pedestals
-        self.subtract_pedestals  = len(self.pedestals.keys()) > 0
-        self.transfer_fn         = transfer_fn
-        self.apply_transfer_fn   = len(self.transfer_fn.keys()) > 0
         self.subtract_cmnnoise   = False
+        self.apply_transfer_fn   = False
+        self.subtract_pedestals  = False
+        self.is_calibrated       = is_calibrated
         # a switch to indicate if we currently 
         # want to use this or not. 
         # (as for use in gander)
@@ -283,35 +270,9 @@ class TrackerAnalysis:
         self._init_edep_plots()
         # strip mask indicates active strips
         # by default we don't set any
-        self.strip_mask = strip_mask
         self.total_masked_strips = 0
         self.n_hits_not_in_mask  = 0
         self.finished = False
-
-    def mask_hits(self, ev) -> list:
-        """
-        Remove hits from the tracker hitseries which are masked by the 
-        given stripmaks
-
-        # Arguments:
-            * ev : Some kind of merged event
-        """
-        nhits = len(ev.tracker_v2)
-        masked_hits = []
-        if self.strip_mask:
-            masked_hits = []
-            for h in ev.tracker_v2:
-                try:
-                    if self.strip_mask[h.stripid]:
-                        masked_hits.append(h)
-                except KeyError:
-                    masked_hits.append(h)
-                    self.n_hits_not_in_mask += 1
-            #masked_hits = [h for h in hits if self.strip_mask[h.strip_id]]
-        else:
-            masked_hits = ev.tracker_v2
-        self.total_masked_strips += nhits - len(masked_hits)
-        return masked_hits
 
     def add_event(self,ev):
         """
@@ -322,33 +283,15 @@ class TrackerAnalysis:
             return
 
         self.n_events += 1
-        hits           = ev.tracker_v2
-        masked_hits    = self.mask_hits(ev)
-        hits           = masked_hits
+        hits           = ev.tracker
         clean_hits     = []
         if self.exclude_empty_hits:
             for h in hits:
-                if self.subtract_pedestals:
-                    pedestal = int(self.pedestals[h.stripid].pedestal_mean)
-                    if h.adc - pedestal > 0:
-                        h.subtract_pedestal(pedestal)
-                        clean_hits.append(h)
-                else:
-                    if h.adc > 0:
-                        clean_hits.append(h)
+                if h.adc > 0:
+                    clean_hits.append(h)
         else:
             for h in hits:
-                if self.subtract_pedestals:
-                    pedestal = int(self.pedestals[h.stripid].pedestal_mean)
-                    if h.adc + pedestal > 0:
-                        h.subtract_pedestal(pedestal)
-                    # h.adc is u16, avoid overflow
-                    else:
-                        # set adc to zero
-                        h.subtract_pedestal(h.adc)
-                    clean_hits.append(h)
-                else:
-                    clean_hits.append(h)
+                clean_hits.append(h)
         hits = clean_hits
         nhits = len(hits)
         self.n_hits   += nhits
@@ -356,9 +299,8 @@ class TrackerAnalysis:
         # count hits in individual layers    
         for h in hits:
             energy = h.adc 
-            if self.apply_transfer_fn:
-                energy = get_energy(h.adc,self.transfer_fn[h.stripid])
-                #energy = energy[0]
+            if self.is_calibrated:
+                energy = h.energy
             self.nhit_counter[f'nhit_counter{h.layer}'] += 1
             self.edep_cache['edep'].append(energy)
             self.edep_cache[f'edep_layer{h.layer}'].append(energy)

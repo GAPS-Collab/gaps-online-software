@@ -705,8 +705,7 @@ class TofAnalysis:
             _repr += f'\n  -- nevents                  : {self.n_events}'
         _repr += f'\n  -- runtime (s)              : {self.run_time:1f} s'
         _repr += f'\n  -- rate    (Hz (nocut))     : {self.rate_nocut:.2f} Hz'
-        _repr += f'\n  -- frac. of mangled events  : {100*self.n_mangled_frac : .2f} %'
-        _repr += f'\n  -- frac. of timedout events : {100*self.n_timed_out_frac : .2f} %' 
+        _repr += f'\n  -- events with extra hits   : {100*self.extra_hits/self.cuts.nevents:.2f} %'
         if not self.cuts.void:
             _repr += '\n  -- -- applied cut:'
             _repr += f'\n\t -- -- {self.cuts}'
@@ -714,7 +713,10 @@ class TofAnalysis:
             if self.cuts.nevents > 0:
                 _repr += f'\n\t  -- -- efficiency          : {100*self.n_events/self.cuts.nevents : .2f} %'
             _repr += f'\n\t  -- -- rate    (Hz)        : {self.rate: .2f} Hz'
-            
+        _repr += '\n  -- Event status statistics'
+        for k in self.event_stati:
+            _repr += f'\n\t -- -- {k} : {self.event_stati[k]} ({100*self.event_stati[k]/self.cuts.nevents:.2f} (%)'
+        
         return _repr
 
     def _timing_plots(self):
@@ -878,14 +880,15 @@ class TofAnalysis:
                                      and acquire events
         """
         # process kwargs
-        self.skip_mangled              = skip_mangled
-        self.skip_timeout              = skip_timeout
-        self.beta_analysis             = beta_analysis
-        self.use_offsets               = use_offsets
-        self.nbins                     = nbins
-        self.cuts                      = cuts
-        self.active                    = active 
-        self.offsets     = None
+        self.skip_mangled    = skip_mangled
+        self.skip_timeout    = skip_timeout
+        self.beta_analysis   = beta_analysis
+        self.use_offsets     = use_offsets
+        self.nbins           = nbins
+        self.cuts            = cuts
+        self.active          = active 
+        self.offsets         = None
+        self.event_stati     = dict() 
         if self.use_offsets:
             self.offsets = dict()
             offsets = json.load(open('offsets.json'))
@@ -1029,6 +1032,11 @@ class TofAnalysis:
             for k in self.paddle_plots[pid]:
                 self.paddle_plots[pid][k] += other.paddle_plots[pid][k]
                 self.paddle_cache[pid][k].extend(other.paddle_cache[pid][k])
+        for k in other.event_stati:
+            if not k in self.event_stati:
+                self.event_stati[k] = other.event_stati[k] 
+            else:
+                self.event_stati[k] += other.event_stati[k]
         return self
 
     def __add__(self, other):
@@ -1110,6 +1118,14 @@ class TofAnalysis:
         if self.first_ev_time == np.inf:
             self.first_ev_time = ev.timestamp48
         self.last_ev_time = ev.timestamp48
+        try:
+            self.event_stati[ev.status]
+            self.event_stati[ev.status] += 1
+        except KeyError:
+            self.event_stati[ev.event_status] = 1 
+        except Exception as e:
+            print (e)
+            raise
         if ev.status == EventStatus.AnyDataMangling:
             #logger.debug(f'Found mangled event with id {ev.event_id}')
             self.n_mangled += 1

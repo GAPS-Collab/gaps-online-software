@@ -1,10 +1,14 @@
 #! /bin/sh
 
-# Run 9097
-rye run merge -o /data2/gaps/L0/ -r 9097 --telemetry-dir /data2/gaps/gcu --tof-dir /data1/gaps/mcmurdo/tof
+#rye run merge -o /data2/gaps/L0/foo -r 9125 --telemetry-dir /data2/gaps/gcu --tof-dir /data1/gaps/mcmurdo/tof --no-gps
 
+## Run 9097
+rye run merge  -o /data2/gaps/L0/ -r 9097 --telemetry-dir /data2/gaps/gcu --tof-dir /data1/gaps/mcmurdo/tof --no-gps
+sleep 100000
 # Run 9125
-#rye run python merge_tcfc.py -o /data/stoessl/mcmurdo-campaign-processing/L0/ -r 9125 --telemetry-dir /data1/nextcloud/cra_data/data/2024/gse5/ethernet/ --tof-dir /data1/nextcloud/cra_data/data/2024/tof/ 
+#rye run merge -o /data/stoessl/mcmurdo-campaign-processing/L0/ -r 9125 --telemetry-dir /data1/nextcloud/cra_data/data/2024/gse5/ethernet/ --tof-dir /data1/nextcloud/cra_data/data/2024/tof/ 
+
+# Run 9111
 #rye run python merge_tcfc.py --no-gps -o /data2/gaps/L0/ -r 9111 --telemetry-dir /data2/gaps/gcu --tof-dir /data1/gaps/mcmurdo/tof 
 
 # Run 134
