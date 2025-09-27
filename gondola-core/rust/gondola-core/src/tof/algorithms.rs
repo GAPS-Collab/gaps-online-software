@@ -105,6 +105,7 @@ pub fn interpolate_time<T : AsRef<[f32]>> (volts         : &T,
 }
 
 
+#[cfg(feature = "pybindings")]
 #[pyfunction]
 #[pyo3(name="interpolate_time")]
 /// Linear interpolation of the time within a single bin of a TOF waveform

@@ -475,7 +475,8 @@ macro_rules! moniseries {
       //  return self.max_size;
       //}
     }
-
+    
+    #[cfg(feature="pybindings")]
     pythonize_display!($name);
   }
 }

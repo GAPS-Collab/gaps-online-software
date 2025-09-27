@@ -1782,6 +1782,7 @@ impl RBCalibrations {
   }
 }
 
+#[cfg(feature = "pybindings")]
 pythonize_packable_no_new!(RBCalibrations);
 
 #[cfg(feature = "random")]
