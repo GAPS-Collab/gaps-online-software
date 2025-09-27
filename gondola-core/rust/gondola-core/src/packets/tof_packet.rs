@@ -304,6 +304,12 @@ impl TofPacket {
     }
   }
 
+  #[getter]
+  #[pyo3(name="payload")]
+  fn get_payload_py(&self) -> Vec<u8> {
+    self.payload.clone()
+  }
+
   #[pyo3(name="unpack")]
   fn unpack_py(&self,py: Python) -> PyResult<Py<PyAny>> {
     match self.packet_type {
