@@ -1229,15 +1229,20 @@ RBWaveform RBWaveform::from_bytestream(const Vec<u8> &stream,
     //log_error("[RBEvent::from_bytestream] Header signature invalid!");  
     return wf;
   }
-  wf.event_id   = Gaps::parse_u32(stream, pos);
-  wf.rb_id      = Gaps::parse_u8(stream, pos);
-  wf.rb_channel = Gaps::parse_u8(stream, pos); 
-  wf.stop_cell  = Gaps::parse_u16(stream, pos);
+  wf.event_id     = Gaps::parse_u32(stream, pos);
+  wf.rb_id        = Gaps::parse_u8(stream, pos);
+  wf.rb_channel_a = Gaps::parse_u8(stream, pos); 
+  wf.rb_channel_b = Gaps::parse_u8(stream, pos);
+  wf.stop_cell    = Gaps::parse_u16(stream, pos);
   Vec<u8>::const_iterator start = stream.begin() + pos;
   Vec<u8>::const_iterator end   = stream.begin() + pos + 2*NWORDS;    // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
-  Vec<u8> data(start, end);
-  wf.adc = u8_to_u16(data);
+  Vec<u8> data_a(start, end);
+  wf.adc_a = u8_to_u16(data_a);
   pos += 2*NWORDS;
+  start = stream.begin() + pos;
+  end   = stream.begin() + pos + 2*NWORDS;
+  Vec<u8> data_b(start, end);
+  wf.adc_b = u8_to_u16(data_b);
   u16 tail   = Gaps::parse_u16(stream, pos);
   if (tail != RBWaveform::TAIL) {
     log_error("After parsing, we found an invalid tail signature " << tail);
@@ -1250,12 +1255,18 @@ auto RBWaveform::to_string() const -> std::string {
   //repr += std::format("\n  format test {:.2f}", get_time_a() );
   repr += std::format("\n  Event ID  : {}", event_id);
   repr += std::format("\n  RB        : {}", rb_id);
-  repr += std::format("\n  Channel   : {}", rb_channel);
+  repr += std::format("\n  Channel A : {}", rb_channel_a);
+  repr += std::format("\n  Channel B : {}", rb_channel_b);
   repr += std::format("\n  Stop cell : {}", stop_cell);
-  if (adc.size() >= 273) {
-    repr += std::format("\n  adc[{}]    : .. {} {} {} ..", adc.size(), adc[270], adc[271], adc[272]);
+  if (adc_a.size() >= 273) {
+    repr += std::format("\n  adc[{}]    : .. {} {} {} ..", adc_a.size(), adc_a[270], adc_a[271], adc_a[272]);
   } else {
-    repr += std::format("\n  adc [{}/corrupt?]", adc.size());
+    repr += std::format("\n  adc [{}/corrupt?]", adc_a.size());
+  }
+  if (adc_b.size() >= 273) {
+    repr += std::format("\n  adc[{}]    : .. {} {} {} ..", adc_b.size(), adc_b[270], adc_b[271], adc_b[272]);
+  } else {
+    repr += std::format("\n  adc [{}/corrupt?]", adc_b.size());
   }
   repr += ">";
   return repr;

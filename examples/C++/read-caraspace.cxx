@@ -76,6 +76,7 @@ int main(int argc, char *argv[]){
   std::string tel_ev_intrst  = "TelemetryPacketType.InterestingEvent";
 
   std::string cooling_name   = "TelemetryPacketType.CoolingHK";
+  std::string rbwf_name      = "TelemetryPacketType.RBWaveform";
 
   u64 n_frames_processed  = 0;
   u64 n_telemetry_errors  = 0;
@@ -109,6 +110,23 @@ int main(int argc, char *argv[]){
       ++n_frames_processed_file;
 
       gt::Packet pack;
+      // check for RBWaveform 
+      if (frame.index.contains(rbwf_name)) {
+        auto pack = frame.get_telemetrypacket(rbwf_name);
+        usize pos = 0;
+        auto tp_res   = TofPacket::from_bytestream(pack.payload, pos); 
+        if (!tp_res.is_ok()) {
+          spdlog::error("Can't get tofpacket for rbwaveform from telemetrypacket!");
+          continue;
+        }
+        auto tp   = tp_res.unwrap();
+        pos       = 0;
+        auto rbwf = RBWaveform::from_bytestream(tp.payload, pos);
+        std::cout << rbwf.to_string() << std::endl;
+        // just for now 
+        exit(0);
+      }
+
       if (frame.index.contains(tel_ev_nogaps)) {
         pack = frame.get_telemetrypacket(tel_ev_nogaps);
       } else if (frame.index.contains(tel_ev_boring)) {
