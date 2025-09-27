@@ -3,7 +3,6 @@
 
 use crate::prelude::*;
 
-
 /// Waveform container for Tof waveforms
 /// This holds the waveforms for both 
 /// paddle ends. Fields are available to 
@@ -21,6 +20,9 @@ pub struct RBWaveform {
   pub stop_cell     : u16,
   pub adc_a         : Vec<u16>,
   pub adc_b         : Vec<u16>,
+  // FIXME - to be compatible with Antarctica data from 
+  // 2024/25, we do not serialize the paddle id in this version
+  // HOWEVER, let's change that in v0.12
   pub paddle_id     : u8,
   pub voltages_a    : Vec<f32>,
   pub nanoseconds_a : Vec<f32>,
@@ -231,13 +233,16 @@ impl Serialization for RBWaveform {
     wf.rb_channel_a      = parse_u8 (stream, pos);
     wf.rb_channel_b      = parse_u8 (stream, pos);
     wf.stop_cell         = parse_u16(stream, pos);
-    wf.paddle_id         = parse_u8 (stream, pos);
+    //wf.paddle_id         = parse_u8 (stream, pos);
     if stream.len() < *pos+2*NWORDS {
       return Err(SerializationError::StreamTooShort);
     }
     let data_a           = &stream[*pos..*pos+2*NWORDS];
     wf.adc_a             = u8_to_u16(data_a);
     *pos += 2*NWORDS;
+    if stream.len() < *pos+2*NWORDS {
+      return Err(SerializationError::StreamTooShort);
+    }
     let data_b           = &stream[*pos..*pos+2*NWORDS];
     wf.adc_b             = u8_to_u16(data_b);
     *pos += 2*NWORDS;
@@ -256,7 +261,7 @@ impl Serialization for RBWaveform {
     stream.extend_from_slice(&self.rb_channel_a.to_le_bytes());
     stream.extend_from_slice(&self.rb_channel_b.to_le_bytes());
     stream.extend_from_slice(&self.stop_cell.to_le_bytes());
-    stream.push(self.paddle_id);
+    //stream.push(self.paddle_id);
     if self.adc_a.len() != 0 {
       for k in 0..NWORDS {
         stream.extend_from_slice(&self.adc_a[k].to_le_bytes());  
@@ -448,6 +453,10 @@ impl RBWaveform {
 
 #[cfg(feature="pybindings")]
 pythonize_packable!(RBWaveform);
+
+// needs to fix something up
+//#[cfg(feature="pybindings")]
+//pythonize_telemetry!(RBWaveform);
 
 //---------------------------------------------------
 
