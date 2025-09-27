@@ -112,7 +112,7 @@ if(DOXYGEN_FOUND)
     COMMENT "Generating C++ API documentation with Doxygen"
     VERBATIM
   )
-  install(DIRECTORY ${CMAKE_BINARY_DIR}/doc/html/gondola-core/C++/src/events.cxx DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/C++API/)
+  #install(DIRECTORY ${CMAKE_BINARY_DIR}/doc/apidocs-v${PROJECT_VERSION}/html DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/C++API/)
 endif()
 
 if (BUILD_LIFTOF)
