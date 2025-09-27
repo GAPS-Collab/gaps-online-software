@@ -16,3 +16,6 @@
 [submodule "resources/extern/result"]
 	path = resources/extern/result
 	url = https://github.com/tylerreisinger/result
+[submodule "resources/extern/blue-penguin-dark"]
+	path = resources/extern/blue-penguin-dark
+	url = https://github.com/tcarwash/blue-penguin-dark.git
