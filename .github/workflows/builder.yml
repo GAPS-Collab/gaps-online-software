@@ -26,6 +26,15 @@ jobs:
         submodules: 'true'
         show-progress: 'true'
         token: ${{ secrets.PAT_TOKEN }}
+    - name: Get Version
+        id: sw_version
+        run: |
+          # The shell automatically converts ${{ github.ref_name }} to a string.
+          BRANCH_NAME="${{ github.ref_name }}"
+          GOS_VERSION=$(echo "$BRANCH_NAME" | cut -d'-' -f2-)
+          echo "version=$GOS_VERSION" >> $GITHUB_OUTPUT
+
+
     - name: Set up GCC
       uses: egor-tensin/setup-gcc@v1
       with:
@@ -49,10 +58,7 @@ jobs:
       # Build your program with the given configuration
       #run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
       run: cd ${{github.workspace}}/build && make -j 4 && make doc && make install
-
-    - name: Docs
-      run: cd ${{github.workspace}}/build && make doc && make liftof-doc && make go-pybindings-rust-doc
-      
+ 
     - name: Test-Dataclasses
       working-directory: ${{github.workspace}}/build
       # Execute tests defined by the CMake configuration.
@@ -66,7 +72,10 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       #run: ctest -C ${{env.BUILD_TYPE}}
       run: cd ${{github.workspace}}/tof/liftof/liftof-lib && cargo test --all-features && cargo test 
-
+    
+    - name: Rust Docs
+      run: cd ${{github.workspace}}/build && make doc && make liftof-doc && make go-pybindings-rust-doc
+    
     - name: Create .nojekyll
       run: touch ${{ github.workspace }}/build/doc/html/.nojekyll
       shell: bash
@@ -75,11 +84,15 @@ jobs:
       run: source ${{github.workspace }}/install/setup-env.sh && cd ${{ github.workspace }}/python/doc/ && ${{ github.workspace }}/python/doc/build-sphinx.sh
 
     - name: Consolidate docs
-      run: cp -r ${{ github.workspace }}/tof/liftof/target/doc/* ${{ github.workspace }}/build/doc/html/
+      run: cp -r ${{ github.workspace }}/tof/liftof/target/doc/* ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/html/
+      shell: bash
+    
+    - name: Consolidate docs for pybindings 
+      run: cp -r ${{ github.workspace }}/python/pybindings/target/doc/* ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/html/
       shell: bash
       
     - name: Consolidate pydocs
-      run: cp -r ${{ github.workspace }}/python/doc/build/html ${{ github.workspace }}/build/doc/html/gaps_online
+      run: cp -r ${{ github.workspace }}/python/doc/build/html ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/html/gaps_online
       shell: bash
       
     - name: Deploy to GitHub Pages
