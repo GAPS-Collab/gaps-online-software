@@ -27,8 +27,8 @@ jobs:
         show-progress: 'true'
         token: ${{ secrets.PAT_TOKEN }}
     - name: Get Version
-        id: sw_version
-        run: |
+      id: sw_version
+      run: |
           # The shell automatically converts ${{ github.ref_name }} to a string.
           BRANCH_NAME="${{ github.ref_name }}"
           GOS_VERSION=$(echo "$BRANCH_NAME" | cut -d'-' -f2-)
