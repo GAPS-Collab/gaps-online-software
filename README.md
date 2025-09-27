@@ -6,11 +6,17 @@ This is version AULEPE-0.12. [Aulepe are sailfish!](https://en.wikipedia.org/wik
 ![Aulepe](resources/assets/aulepe_luma.png)
 
 >[!NOTE] 
->You think you're fast? You think your pet cheetah is fast? A sailfish clock in at 68MpH and and actually another member of the billfish, the Black Marlin is considered the [fastest non-airborne animal on the planet and can go up to 80MpH](https://en.wikipedia.org/wiki/Fastest_animals) and thus faster than a Cheetah. On top of that Marlin are actually pretty tasty!
+>You think you're fast? You think your pet cheetah is fast? A sailfish clocks in at 68MpH and and another member of the billfish family, the Black Marlin is considered the [fastest non-airborne animal on the planet and can go up to 80MpH](https://en.wikipedia.org/wiki/Fastest_animals) and thus faster than a Cheetah. On top of that Marlin are actually pretty tasty!
 >Marlin can be found around the Hawaiian islands
 
 >[!NOTE]
->This release of gaps-online plugs in the Turbo. This is the Supra with extra turbocharger which goes "nnnnnnnnn.... shtutututu...". The focus of this release is to keep bascially the API of v0.11 but Speed.It.Up. 
+>This release of gaps-online plugs in the Turbo. This is the Supra which goes "nnnnnnnnn.... shtutututu...". The focus of this release is to keep bascially the API of v0.11 but Speed.It.Up. 
+
+## CHANGELOG/Migration guide  
+[Since v0.12 we are keeping a global CHANELOG.MD](CHANGELOG.md)
+
+* Antarctic RBWaveform data from telemetry can not be read with this version, use v0.11 instead 
+
 
 ## API docs 
 
@@ -24,8 +30,6 @@ for the python API will follow soon.
 * rust toolchain - to compile `liftof` flight software suite as well as
   `tof-dataclasses` which are the backbone of `liftof`
 * `cmake` is used as a build system
-* `pybind11` is used to build the pybindings for the C++ API. It also 
-   requires a minimum of `gcc-13` and python `3.10`
 *  a number of C++ libraries are pulled from github during installation.
 * The C++ API uses the C++20 standard and thus wants gcc-13 or later.
 
@@ -48,14 +52,13 @@ The branches/releases are named after fish in Hawaii. A fish
 identification card can be found [here](https://www.honolulu.gov/rep/site/dpr/dpr_docs/hbep_fish_id_card.pdf).
 You can switch branches with `git checkout <branch>`. To get updates, use `git pull`
 
-Usually, each branch has a specific purpose, everything with version numbers < 1.0.0 or 
-named `develop` or `<name>_dev` will be unstable.
+Usually, each branch has a specific purpose, everything with version numbers < 1.0.0 or will be unstable, meaning there is no guarantee for code to work even after a pull.
 The branches following the naming scheme "FISHNAME-X.X" are dedicated to specific tasks, 
 e.g. the NTS campaign. Please see the dedicated README for this branch.
 
 We are following a git-flow model, which is e.g. described [here](https://www.gitkraken.com/learn/git/git-flow). This means that `main` should point to the latest release, however, it has to be considered that until
 we are at version < 1.0.0, there are no "official" releases. Instead, the main branch will point to the 
-most stable and useful version at the time.
+most stable and useful version at the time for the sake of convenience.
 
 ### Build system
 
