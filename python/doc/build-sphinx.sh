@@ -1,5 +1,5 @@
 #! /bin/sh
-
+rye init 
 # setup rye
 rye sync
 
