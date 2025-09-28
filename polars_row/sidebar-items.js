@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["RowEncodingContext"],"macro":["with_match_arrow_primitive_type"],"mod":["decode","encode"],"struct":["RowEncodingCategoricalContext","RowEncodingOptions","RowsEncoded"],"type":["ArrayRef"]};

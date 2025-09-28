@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["io","packets"]};
+window.SIDEBAR_ITEMS = {"mod":["caraspace","io","packets"]};

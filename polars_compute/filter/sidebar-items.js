@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["filter","filter_boolean_kernel","filter_with_bitmap"]};

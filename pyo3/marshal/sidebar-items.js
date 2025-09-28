@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["VERSION"],"fn":["dumps","dumps_bound","loads","loads_bound"]};

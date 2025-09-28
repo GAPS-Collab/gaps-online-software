@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["py_calc_edep_simple","py_cfd_simple","py_find_peaks","py_find_peaks_zscore","py_find_zero_crossings","py_get_periods","py_integrate","py_interpolate_time","py_time2bin"]};

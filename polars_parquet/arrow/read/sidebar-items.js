@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Filter","InitNested"],"fn":["column_iter_to_arrays","create_list","create_map","get_field_pages","get_page_iterator","init_nested","n_columns","read_metadata"],"mod":["schema","statistics"],"struct":["NestedState"],"trait":["FallibleStreamingIterator"]};

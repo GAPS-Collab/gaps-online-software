@@ -1,0 +1,1 @@
+searchState.loadedDescShard("recursive_proc_macro_impl", 0, "This is a helper crate for the <code>recursive</code> crate, containing …")

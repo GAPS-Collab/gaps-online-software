@@ -1,0 +1,9 @@
+(function() {
+    var implementors = Object.fromEntries([["polars_parquet",[["impl <a class=\"trait\" href=\"streaming_decompression/trait.Decompressed.html\" title=\"trait streaming_decompression::Decompressed\">Decompressed</a> for <a class=\"enum\" href=\"polars_parquet/parquet/page/enum.Page.html\" title=\"enum polars_parquet::parquet::page::Page\">Page</a>"]]]]);
+    if (window.register_implementors) {
+        window.register_implementors(implementors);
+    } else {
+        window.pending_implementors = implementors;
+    }
+})()
+//{"start":57,"fragment_lengths":[310]}

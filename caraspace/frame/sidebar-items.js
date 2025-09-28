@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["CRFrameObjectType"],"struct":["CRFrame","CRFrameObject"],"trait":["Frameable"]};

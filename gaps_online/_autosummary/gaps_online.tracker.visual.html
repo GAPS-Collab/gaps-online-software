@@ -315,7 +315,10 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.tracker.visual.plot_strip_lines" title="gaps_online.tracker.visual.plot_strip_lines"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_strip_lines</span></code></a>(ax, det, layer[, color])</p></td>
 <td><p>Use lines to indicate detector strips.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.tracker.visual.strip_lines" title="gaps_online.tracker.visual.strip_lines"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strip_lines</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gaps_online.tracker.visual.prepare_layer_fig" title="gaps_online.tracker.visual.prepare_layer_fig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prepare_layer_fig</span></code></a>(layer[, projection])</p></td>
+<td><p>Set up figure and axis objects for a 2d projection of tracker layers</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gaps_online.tracker.visual.strip_lines" title="gaps_online.tracker.visual.strip_lines"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strip_lines</span></code></a>()</p></td>
 <td><p>Assuming there ia a single SiLi-waver at 0,0, return positions and  line lengths to indicate the grooves which separate the strips with  lines.</p></td>
 </tr>
 </tbody>
@@ -341,6 +344,13 @@ det   : iterable providing x,y coordinates
 layer : tracker layer (0-9)</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gaps_online.tracker.visual.prepare_layer_fig">
+<span class="sig-prename descclassname"><span class="pre">gaps_online.tracker.visual.</span></span><span class="sig-name descname"><span class="pre">prepare_layer_fig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'XY'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gaps_online.tracker.visual.prepare_layer_fig" title="Link to this definition">#</a></dt>
+<dd><p>Set up figure and axis objects for a 2d projection
+of tracker layers</p>
 </dd></dl>
 
 </section>
@@ -385,6 +395,7 @@ layer : tracker layer (0-9)</p>
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tracker.visual.strip_lines"><code class="docutils literal notranslate"><span class="pre">strip_lines()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tracker.visual.plot_strip_lines"><code class="docutils literal notranslate"><span class="pre">plot_strip_lines()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps_online.tracker.visual.prepare_layer_fig"><code class="docutils literal notranslate"><span class="pre">prepare_layer_fig()</span></code></a></li>
 </ul>
   </nav></div>
 

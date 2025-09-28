@@ -9,5 +9,6 @@ gaps\_online.tracker.visual
    .. autosummary::
    
       plot_strip_lines
+      prepare_layer_fig
       strip_lines
    
