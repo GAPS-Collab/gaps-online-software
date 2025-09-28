@@ -23,7 +23,7 @@ zmq               = { workspace = true }
 cfg-if            = { workspace = true }
 gondola-core      = { workspace = true } 
 #gondola-core = { path = "../../dataclasses/rust/tof-dataclasses" , features = ["tofcontrol","smoothed_z_score"], version = "0.10"} 
-tof-control     = { path = "../../tof/extern/tof-control", optional = false, version = "0.9", features=[] }
+tof-control     = { path = "../../resources/extern/tof-control", optional = false, version = "0.9", features=[] }
 
 colored = "2.0"
 env_logger = "0.10"

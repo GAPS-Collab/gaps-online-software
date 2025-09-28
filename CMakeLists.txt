@@ -137,19 +137,20 @@ install(FILES
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/doc/apidocs-v${PROJECT_VERSION}")
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/doc/apidocs-v${PROJECT_VERSION}/C++")
   set(DOXYGEN_INPUT "${CMAKE_SOURCE_DIR}/gondola-core/C++")
-  set(DOXYGEN_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/doc/C++")
+  set(DOXYGEN_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/doc/apidocs-v${PROJECT_VERSION}/C++")
   set(DOXYGEN_GENERATE_HTML YES)
   set(DOXYGEN_GENERATE_MAN NO) # You can enable this if you want man pages
-  configure_file(${CMAKE_SOURCE_DIR}/doc/C++/Doxyfile.in ${CMAKE_BINARY_DIR}/doc/C++/Doxyfile @ONLY)
+  configure_file(${CMAKE_SOURCE_DIR}/doc/C++/Doxyfile.in ${CMAKE_BINARY_DIR}/doc/apidocs-v${PROJECT_VERSION}/C++/Doxyfile @ONLY)
   add_custom_target(doc
     ALL
-    COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/doc/C++/Doxyfile
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc/C++ 
+    COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/doc/apidocs-v${PROJECT_VERSION}/C++/Doxyfile
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc/apidocs-v${PROJECT_VERSION}/C++ 
     COMMENT "Generating C++ API documentation with Doxygen"
     VERBATIM
   )
-  install(DIRECTORY ${CMAKE_BINARY_DIR}/doc/C++/html DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/C++API/)
+  install(DIRECTORY ${CMAKE_BINARY_DIR}/doc/apidocs-v${PROJECT_VERSION}/C++/html DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/C++API/)
 endif()
 
 if (BUILD_LIFTOF)
