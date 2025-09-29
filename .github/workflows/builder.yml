@@ -50,6 +50,9 @@ jobs:
         enable-cache: true
         version: 0.44 
 
+    - name: Set up sphinx for python docs 
+      run : cd ${{github.workspace}}/python/doc && rye sync
+
     - name: Install dependencies
       run : sudo apt update && DEBIAN_FRONTEND=noninteractive sudo apt install -y cmake doxygen pybind11-dev graphviz lm-sensors libsqlite3-dev rsync
     
@@ -94,7 +97,7 @@ jobs:
       shell: bash
 
     - name: Create python API docs
-      run: source $HOME/.rye/env && source ${{github.workspace }}/install/setup-env.sh && cd ${{ github.workspace }}/python/doc/ && ${{ github.workspace }}/python/doc/build-sphinx.sh
+      run: source ${{github.workspace }}/install/setup-env.sh && cd ${{ github.workspace }}/python/doc/ && rye run sphinx-build -M html . build
 
     - name: Consolidate docs
       run: cp -r ${{ github.workspace }}/tof/liftof/target/doc/* ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/html/
