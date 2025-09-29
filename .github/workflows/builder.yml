@@ -48,7 +48,7 @@ jobs:
       uses: eifinger/setup-rye@v4
       with:
         enable-cache: true
-        version: 0.44 
+        version: 'latest' 
 
     - name: Set up sphinx for python docs 
       run : cd ${{github.workspace}}/python/doc && rye sync
