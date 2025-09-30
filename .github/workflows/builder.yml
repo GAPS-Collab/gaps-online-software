@@ -110,12 +110,16 @@ jobs:
     - name: Consolidate pydocs
       run: cp -r ${{ github.workspace }}/python/doc/build/html ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/html/gaps_online
       shell: bash
-      
+
+    - name: Resort docs 
+      run: mv ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version}}/html/* ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/ 
+
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@3.7.1
       with:
         github_token: ${{ secrets.PAT_TOKEN }}
         #branch: ${{ inputs.branch }}
-        folder: ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/html/
+        #folder: ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/html/
+        folder: ${{ github.workspace }}/build/doc/
         branch: gh-pages
 
