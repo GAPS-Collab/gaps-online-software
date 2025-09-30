@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"trait":["EigValsh","EigValshInplace","EigValshInto","Eigh","EighInplace","EighInto","SymmetricSqrt","SymmetricSqrtInto"]};

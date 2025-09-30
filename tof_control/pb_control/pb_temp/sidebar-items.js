@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["config_temp","read_pds_temp"]};

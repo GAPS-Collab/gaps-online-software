@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["debug_ensure_matching_schema_names"],"struct":["Schema"]};

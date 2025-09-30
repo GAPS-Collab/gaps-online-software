@@ -1,6 +1,0 @@
-gaps\_online.events
-===================
-
-.. automodule:: gaps_online.events
-
-   

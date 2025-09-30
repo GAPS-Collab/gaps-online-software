@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["float_arg_max_sorted_ascending","float_arg_max_sorted_descending"]};

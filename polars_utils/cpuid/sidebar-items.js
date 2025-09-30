@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["has_fast_bmi2","is_avx512_enabled"]};

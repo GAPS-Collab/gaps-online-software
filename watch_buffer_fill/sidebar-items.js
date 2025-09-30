@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["TEMPLATE_BAR_A","TEMPLATE_BAR_B","TEMPLATE_BAR_EV","UIO1_TRIP","UIO2_TRIP"],"fn":["buff_handler","get_buff_size","main","setup_progress_bar"]};

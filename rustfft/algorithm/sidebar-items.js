@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["butterflies"],"struct":["BluesteinsAlgorithm","Dft","GoodThomasAlgorithm","GoodThomasAlgorithmSmall","MixedRadix","MixedRadixSmall","RadersAlgorithm","Radix3","Radix4"]};

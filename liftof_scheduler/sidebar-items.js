@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["main","send_ack_packet"],"struct":["LiftofSchedArgs"]};

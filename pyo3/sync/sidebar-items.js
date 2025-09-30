@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["with_critical_section"],"struct":["GILOnceCell","GILProtected"],"trait":["OnceExt","OnceLockExt"]};

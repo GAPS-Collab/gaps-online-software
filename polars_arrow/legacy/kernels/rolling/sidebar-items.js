@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["RollingFnParams"],"mod":["no_nulls","nulls","quantile_filter"],"struct":["RollingQuantileParams","RollingVarParams"]};

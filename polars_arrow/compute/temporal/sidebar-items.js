@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["day","hour","iso_week","minute","month","nanosecond","second","weekday","year"]};

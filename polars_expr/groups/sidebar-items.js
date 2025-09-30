@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["new_hash_grouper"],"trait":["Grouper"]};

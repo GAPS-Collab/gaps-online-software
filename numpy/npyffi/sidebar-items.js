@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["API_VERSION_2_0"],"fn":["is_numpy_2"],"mod":["array","flags","objects","types","ufunc"]};

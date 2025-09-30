@@ -1,7 +1,0 @@
-var searchData=
-[
-  ['d_5fv_0',['d_v',['../structRBCalibration.html#a4ee866a3e9b149e803653c33989acf53',1,'RBCalibration']]],
-  ['disable_5feventdata_1',['disable_eventdata',['../structRBCalibration.html#a6b7713557f7ff9223f3c2dc5b598adb6',1,'RBCalibration']]],
-  ['documentation_2',['gaps-online-software documentation',['../index.html',1,'']]],
-  ['dsijchnpaddleidmap_3',['DsiJChnPaddleIdMap',['../namespaceGaps.html#ac562c67ce894d03edeecb6332caa86ac',1,'Gaps']]]
-];

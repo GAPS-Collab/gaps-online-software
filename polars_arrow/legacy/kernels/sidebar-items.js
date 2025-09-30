@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["Ambiguous","NonExistent"],"mod":["concatenate","ewm","rolling","set","sort_partition","take_agg"]};

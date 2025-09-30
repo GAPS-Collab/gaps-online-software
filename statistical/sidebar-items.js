@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["Degree"],"fn":["mean","median","population_standard_deviation","population_variance","standard_deviation","standard_scores","variance"],"mod":["univariate"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["pl_num"],"trait":["ArithmeticKernel","HasPrimitiveArithmeticKernel"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["take_unchecked"],"mod":["binary","binview","bitmap","boolean","fixed_size_list","generic_binary","list","primitive","structure","sublist"]};

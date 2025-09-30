@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["erf","erf_inv","erfc","erfc_inv"]};

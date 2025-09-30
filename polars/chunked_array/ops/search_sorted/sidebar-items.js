@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["SearchSortedSide"],"fn":["binary_search_ca","lower_bound_chunks"]};

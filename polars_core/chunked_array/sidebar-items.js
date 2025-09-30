@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["ChunkedArrayLayout"],"mod":["arithmetic","builder","cast","collect","comparison","flags","float","from_iterator_par","iterator","ops","temporal"],"struct":["ChunkedArray","RevMapping"],"type":["ChunkLenIter"]};

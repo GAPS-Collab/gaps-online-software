@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["hive_partitions_from_paths"],"struct":["HivePartitions"]};

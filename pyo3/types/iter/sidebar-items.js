@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["BorrowedTupleIterator","BoundDictIterator","BoundFrozenSetIterator","BoundListIterator","BoundSetIterator","BoundTupleIterator"]};

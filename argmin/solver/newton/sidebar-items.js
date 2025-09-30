@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["newton_cg","newton_method"]};

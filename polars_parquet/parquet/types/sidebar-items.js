@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["decode","decode_unchecked","int96_to_i64_ns","ord_binary"],"trait":["NativeType"]};

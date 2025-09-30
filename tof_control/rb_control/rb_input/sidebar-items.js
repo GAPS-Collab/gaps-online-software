@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["disable_rf_input","enable_sma_input","enable_tca_input"]};

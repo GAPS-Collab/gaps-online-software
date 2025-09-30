@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["if_then_else_validity"],"trait":["IfThenElseKernel"]};

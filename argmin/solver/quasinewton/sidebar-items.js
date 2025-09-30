@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["bfgs","dfp","lbfgs","sr1","sr1_trustregion"]};

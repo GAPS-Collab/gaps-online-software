@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["InProcessQuery","JoinBuilder","LazyCsvReader","LazyFrame","LazyGroupBy","OptFlags","ScanArgsAnonymous"],"trait":["IntoLazy","LazyFileListReader"],"type":["AllowedOptimizations"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["Compression"],"fn":["default_ipc_fields","dictionaries_to_encode","encode_dictionary","encode_new_dictionaries","encode_record_batch","schema_to_bytes","write"],"struct":["DictionaryTracker","EncodedData","FileWriter","Record","StreamWriter","WriteOptions"]};

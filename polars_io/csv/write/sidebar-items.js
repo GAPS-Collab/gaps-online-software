@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["QuoteStyle"],"struct":["BatchedWriter","CsvWriter","CsvWriterOptions","SerializeOptions"]};

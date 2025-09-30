@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"macro":["expr","item","item_with_macros"]};

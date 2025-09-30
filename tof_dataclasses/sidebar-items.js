@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["alerts","analysis","calibrations","caraspace","commands","constants","database","errors","events","heartbeats","io","ipbus","monitoring","packets","serialization","series","status","threading","version"],"type":["DsiLtbRBMapping","RBChannelPaddleEndIDMap","RbChPidMapping"]};

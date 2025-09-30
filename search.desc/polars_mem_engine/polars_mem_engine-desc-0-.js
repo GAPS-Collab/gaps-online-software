@@ -1,1 +1,0 @@
-searchState.loadedDescShard("polars_mem_engine", 0, "Executors will evaluate physical expressions and collect …")

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["LeastSquaresResult"],"trait":["LeastSquaresSvd","LeastSquaresSvdInPlace","LeastSquaresSvdInto"]};

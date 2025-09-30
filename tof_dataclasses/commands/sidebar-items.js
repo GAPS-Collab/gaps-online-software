@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["TofCommand","TofCommandCode","TofOperationMode","TofResponse","TofResponseCode","TofReturnCode"],"mod":["config","factory"],"struct":["TofCommandV2"]};

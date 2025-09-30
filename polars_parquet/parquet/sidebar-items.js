@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["FOOTER_SIZE","HEADER_SIZE","PARQUET_MAGIC"],"enum":["CowBuffer"],"mod":["compression","encoding","error","metadata","page","read","schema","statistics","types","write"],"trait":["FallibleStreamingIterator"]};

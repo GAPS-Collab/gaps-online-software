@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["NpyTypes"],"fn":["PyArray_Check","PyArray_CheckExact"],"static":["PY_ARRAY_API"],"struct":["PyArrayAPI"]};
