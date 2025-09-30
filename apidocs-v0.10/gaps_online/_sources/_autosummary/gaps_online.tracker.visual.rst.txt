@@ -1,0 +1,14 @@
+gaps\_online.tracker.visual
+===========================
+
+.. automodule:: gaps_online.tracker.visual
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      plot_strip_lines
+      prepare_layer_fig
+      strip_lines
+   

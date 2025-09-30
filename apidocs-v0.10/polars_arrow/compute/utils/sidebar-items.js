@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["check_same_len","combine_validities_and","combine_validities_and3","combine_validities_and_many","combine_validities_and_not","combine_validities_or"]};

@@ -1,0 +1,101 @@
+\doxysection{tof\+\_\+packet.\+h}
+\hypertarget{tof__packet_8h_source}{}\label{tof__packet_8h_source}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/tof/dataclasses/C++/include/packets/tof\_packet.h@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/tof/dataclasses/C++/include/packets/tof\_packet.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ TOFPACKET\_H\_INCLUDED}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ TOFPACKET\_H\_INCLUDED}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ "{}result/result.h"{}}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ "{}tof\_typedefs.h"{}}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ "{}errors.hpp"{}}}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \textcolor{keyword}{namespace\ }r\ =\ result;}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ UNKNOWN\ \ \ \ \ \ \ \ \ \ \ \ =\ \ 0;}
+\DoxyCodeLine{00014\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ COMMAND\ \ \ \ \ \ \ \ \ \ \ \ =\ 10;}
+\DoxyCodeLine{00015\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ RBEVENT\ \ \ \ \ \ \ \ \ \ \ \ =\ 20;}
+\DoxyCodeLine{00016\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ TOFEVENT\ \ \ \ \ \ \ \ \ \ \ =\ 21;}
+\DoxyCodeLine{00017\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ RBWAVEFORM\ \ \ \ \ \ \ \ \ =\ 22;}
+\DoxyCodeLine{00018\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ TOFEVENTSUMMARY\ \ \ \ =\ 23;}
+\DoxyCodeLine{00019\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ HEARTBEAT\ \ \ \ \ \ \ \ \ \ =\ 40;}
+\DoxyCodeLine{00020\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ SCALAR\ \ \ \ \ \ \ \ \ \ \ \ \ =\ 50;}
+\DoxyCodeLine{00021\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ MT\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 60;}
+\DoxyCodeLine{00022\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ RBHEADER\ \ \ \ \ \ \ \ \ \ \ =\ 70;}
+\DoxyCodeLine{00023\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ CPUMONIDATA\ \ \ \ \ \ \ \ =\ 80;}
+\DoxyCodeLine{00024\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ MTB\_MONI\ \ \ \ \ \ \ \ \ \ \ =\ 90;}
+\DoxyCodeLine{00025\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ RB\_MONI\ \ \ \ \ \ \ \ \ \ \ \ =\ 100;}
+\DoxyCodeLine{00026\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ PBMONIDATA\ \ \ \ \ \ \ \ \ =\ 101;}
+\DoxyCodeLine{00027\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ LTBMONIDATA\ \ \ \ \ \ \ \ =\ 102;}
+\DoxyCodeLine{00028\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ PAMONIDATA\ \ \ \ \ \ \ \ \ =\ 103;}
+\DoxyCodeLine{00029\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ RBEVENTPAYLOAD\ \ \ \ \ =\ 110;}
+\DoxyCodeLine{00030\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ RBEVENTMEMORYVIEW\ \ =\ 120;}
+\DoxyCodeLine{00031\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ RBCALIBRATION\ \ \ \ \ \ =\ 130;}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00036\ \textcolor{keyword}{enum\ class}\ PacketType\ :\ u8\ \{}
+\DoxyCodeLine{00037\ \ \ Unknown\ \ \ \ \ \ \ \ \ \ \ =\ UNKNOWN\ \ \ \ \ \ \ \ \ \ \ \ ,}
+\DoxyCodeLine{00038\ \ \ Command\ \ \ \ \ \ \ \ \ \ \ =\ COMMAND\ \ \ \ \ \ \ \ \ \ \ \ ,}
+\DoxyCodeLine{00039\ \ \ \mbox{\hyperlink{structRBEvent}{RBEvent}}\ \ \ \ \ \ \ \ \ \ \ =\ RBEVENT\ \ \ \ \ \ \ \ \ \ \ \ ,}
+\DoxyCodeLine{00040\ \ \ \mbox{\hyperlink{structTofEvent}{TofEvent}}\ \ \ \ \ \ \ \ \ \ =\ TOFEVENT\ \ \ \ \ \ \ \ \ \ \ ,}
+\DoxyCodeLine{00041\ \ \ \mbox{\hyperlink{structRBWaveform}{RBWaveform}}\ \ \ \ \ \ \ \ =\ RBWAVEFORM\ \ \ \ \ \ \ \ \ ,}
+\DoxyCodeLine{00042\ \ \ \mbox{\hyperlink{structTofEventSummary}{TofEventSummary}}\ \ \ =\ TOFEVENTSUMMARY\ \ \ \ ,}
+\DoxyCodeLine{00043\ \ \ HeartBeat\ \ \ \ \ \ \ \ \ =\ HEARTBEAT\ \ \ \ \ \ \ \ \ \ ,}
+\DoxyCodeLine{00044\ \ \ Scalar\ \ \ \ \ \ \ \ \ \ \ \ =\ SCALAR\ \ \ \ \ \ \ \ \ \ \ \ \ ,}
+\DoxyCodeLine{00045\ \ \ MasterTrigger\ \ \ \ \ =\ MT\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ,}
+\DoxyCodeLine{00046\ \ \ RBHeader\ \ \ \ \ \ \ \ \ \ =\ RBHEADER\ \ \ \ \ \ \ \ \ \ \ ,}
+\DoxyCodeLine{00047\ \ \ \mbox{\hyperlink{structCPUMoniData}{CPUMoniData}}\ \ \ \ \ \ \ =\ CPUMONIDATA\ \ \ \ \ \ \ \ ,}
+\DoxyCodeLine{00048\ \ \ MTBMoni\ \ \ \ \ \ \ \ \ \ \ =\ MTB\_MONI\ \ \ \ \ \ \ \ \ \ \ ,}
+\DoxyCodeLine{00049\ \ \ RBMoni\ \ \ \ \ \ \ \ \ \ \ \ =\ RB\_MONI\ \ \ \ \ \ \ \ \ \ \ \ ,}
+\DoxyCodeLine{00050\ \ \ \mbox{\hyperlink{structPBMoniData}{PBMoniData}}\ \ \ \ \ \ \ \ =\ PBMONIDATA\ \ \ \ \ \ \ \ \ ,\ }
+\DoxyCodeLine{00051\ \ \ \mbox{\hyperlink{structLTBMoniData}{LTBMoniData}}\ \ \ \ \ \ \ =\ LTBMONIDATA\ \ \ \ \ \ \ \ ,}
+\DoxyCodeLine{00052\ \ \ \mbox{\hyperlink{structPAMoniData}{PAMoniData}}\ \ \ \ \ \ \ \ =\ PAMONIDATA\ \ \ \ \ \ \ \ \ ,\ }
+\DoxyCodeLine{00053\ \ \ RBEventPayload\ \ \ \ =\ RBEVENTPAYLOAD\ \ \ \ \ ,}
+\DoxyCodeLine{00054\ \ \ RBEventMemoryView\ =\ RBEVENTMEMORYVIEW\ \ ,}
+\DoxyCodeLine{00055\ \ \ \mbox{\hyperlink{structRBCalibration}{RBCalibration}}\ \ \ \ \ =\ RBCALIBRATION\ \ \ \ \ \ ,}
+\DoxyCodeLine{00056\ \};}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00059\ \textcolor{keyword}{auto}\ packet\_type\_to\_string(PacketType\ pt)\ -\/>\ std::string;}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ std::ostream\&\ operator<<(std::ostream\&\ os,\ \textcolor{keyword}{const}\ PacketType\&\ pck);}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00064\ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00065\ \textcolor{keyword}{concept\ }\mbox{\hyperlink{conceptHasFromByteStream}{HasFromByteStream}}\ =\ \textcolor{keyword}{requires}(\textcolor{keyword}{const}\ Vec<u8>\&\ stream,\ usize\ \&pos)\ \{}
+\DoxyCodeLine{00066\ \ \ \{\ T::from\_bytestream(stream,\ pos)\ \}\ -\/>\ std::same\_as<T>;}
+\DoxyCodeLine{00067\ \};}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00083\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structTofPacket}{TofPacket}}\ \{}
+\DoxyCodeLine{00084\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ HEAD\ =\ 0xAAAA;}
+\DoxyCodeLine{00085\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ TAIL\ =\ 0x5555;}
+\DoxyCodeLine{00086\ \ \ }
+\DoxyCodeLine{00087\ \ \ u16\ head\ =\ 0xAAAA;}
+\DoxyCodeLine{00088\ \ \ u16\ tail\ =\ 0x5555;}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \ \ \textcolor{comment}{//\ head\ (2)\ +\ tail\ (2)\ +\ type\ (1)\ +\ payload\ size\ (4)}}
+\DoxyCodeLine{00091\ \ \ PacketType\ \ packet\_type;\ }
+\DoxyCodeLine{00092\ \ \ \textcolor{comment}{//\ just\ the\ size\ of\ the\ payload,\ }}
+\DoxyCodeLine{00093\ \ \ \textcolor{comment}{//\ not\ including\ type,\ header\ or\ tail}}
+\DoxyCodeLine{00094\ \ \ u32\ payload\_size;}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \ \ Vec<u8>\ payload;}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \ \ \mbox{\hyperlink{structTofPacket}{TofPacket}}();}
+\DoxyCodeLine{00099\ \ \ }
+\DoxyCodeLine{00102\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structTofPacket_a6a8ff47b2872470f6386c860f7ab3182}{from\_bytestream}}(\textcolor{keyword}{const}\ Vec<u8>\ \&bytestream,\ u64\ \&pos)\ }
+\DoxyCodeLine{00103\ \ \ \ \ -\/>\ r::Result<TofPacket,\ Gaps::IOError>;}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00107\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structTofPacket_aff67f57ea880e444cd3e96079eb5432e}{to\_string}}()\ const\ -\/>\ std::\textcolor{keywordtype}{string};}
+\DoxyCodeLine{00108\ \ \ }
+\DoxyCodeLine{00114\ \ \ template\ <\mbox{\hyperlink{conceptHasFromByteStream}{HasFromByteStream}}\ T>}
+\DoxyCodeLine{00115\ \ \ T\ \mbox{\hyperlink{structTofPacket_a7a348ad4e49dc8667f72d12d02b97653}{unpack}}()\ \{}
+\DoxyCodeLine{00116\ \ \ \ \ usize\ pos\ =\ 0;}
+\DoxyCodeLine{00117\ \ \ \ \ \textcolor{keywordflow}{return}\ T::from\_bytestream(payload,\ pos);}
+\DoxyCodeLine{00118\ \ \ \}}
+\DoxyCodeLine{00119\ \};\ \textcolor{comment}{//\ end\ TofPacket}}
+\DoxyCodeLine{00120\ }
+\DoxyCodeLine{00121\ std::ostream\&\ operator<<(std::ostream\&\ os,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structTofPacket}{TofPacket}}\&\ pck);}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00123\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

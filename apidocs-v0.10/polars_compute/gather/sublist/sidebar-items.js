@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["fixed_size_list","list"]};

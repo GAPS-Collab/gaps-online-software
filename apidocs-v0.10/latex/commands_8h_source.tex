@@ -1,0 +1,44 @@
+\doxysection{commands.\+h}
+\hypertarget{commands_8h_source}{}\label{commands_8h_source}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/tof/dataclasses/C++/include/commands.h@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/tof/dataclasses/C++/include/commands.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ COMMANDS\_H\_INCLUDED}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ COMMANDS\_H\_INCLUDED}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{keyword}{enum\ class}\ TofCommandCode\ \{}
+\DoxyCodeLine{00005\ \ \ \textcolor{comment}{//\ power\ class\ -\/\ 1}}
+\DoxyCodeLine{00006\ \ \ PowerOn\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 11,}
+\DoxyCodeLine{00007\ \ \ PowerOff\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 10,}
+\DoxyCodeLine{00008\ \ \ PowerCycle\ \ \ \ \ \ \ \ \ \ \ \ =\ 12,}
+\DoxyCodeLine{00009\ \ \ \textcolor{comment}{//\ setup\ class\ -\/\ 2}}
+\DoxyCodeLine{00010\ \ \ RBSetup\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 20,}
+\DoxyCodeLine{00011\ \ \ SetThresholds\ \ \ \ \ \ \ \ \ =\ 21,}
+\DoxyCodeLine{00012\ \ \ SetMtConfig\ \ \ \ \ \ \ \ \ \ \ =\ 22,}
+\DoxyCodeLine{00013\ \ \ \textcolor{comment}{//\ run\ class\ -\/\ 3}}
+\DoxyCodeLine{00014\ \ \ StartValidationRun\ \ \ \ =\ 32,}
+\DoxyCodeLine{00015\ \ \ DataRunStart\ \ \ \ \ \ \ \ \ \ =\ 31,}
+\DoxyCodeLine{00016\ \ \ DataRunEnd\ \ \ \ \ \ \ \ \ \ \ \ =\ 30,}
+\DoxyCodeLine{00017\ \ \ \textcolor{comment}{//\ request\ class\ -\/4}}
+\DoxyCodeLine{00018\ \ \ RequestWaveforms\ \ \ \ \ \ =\ 41,}
+\DoxyCodeLine{00019\ \ \ RequestEvent\ \ \ \ \ \ \ \ \ \ =\ 42,}
+\DoxyCodeLine{00020\ \ \ RequestMoni\ \ \ \ \ \ \ \ \ \ \ =\ 43,}
+\DoxyCodeLine{00021\ \ \ UnspoolEventCache\ \ \ \ \ =\ 44,}
+\DoxyCodeLine{00022\ \ \ StreamAnyEvent\ \ \ \ \ \ \ \ =\ 45,\ }
+\DoxyCodeLine{00023\ \ \ \textcolor{comment}{//\ calibration\ class\ 5}}
+\DoxyCodeLine{00024\ \ \ VoltageCalibration\ \ \ \ =\ 51,}
+\DoxyCodeLine{00025\ \ \ TimingCalibration\ \ \ \ \ =\ 52,}
+\DoxyCodeLine{00026\ \ \ CreateCalibrationFile\ =\ 53,}
+\DoxyCodeLine{00027\ \ \ Unknown}
+\DoxyCodeLine{00028\ \};}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \textcolor{keyword}{enum\ class}\ TofResponse\ \{}
+\DoxyCodeLine{00031\ \ \ Success\ \ \ \ \ \ \ \ \ \ \ \ =\ 1,}
+\DoxyCodeLine{00032\ \ \ GeneralFailure\ \ \ \ \ =\ 2,}
+\DoxyCodeLine{00033\ \ \ EventNotReady\ \ \ \ \ \ =\ 3,}
+\DoxyCodeLine{00034\ \ \ SerializationIssue\ =\ 4,}
+\DoxyCodeLine{00035\ \ \ Unknown}
+\DoxyCodeLine{00036\ \};}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

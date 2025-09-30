@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["into_reduction"],"struct":["VecGroupedReduction","VecMaskGroupedReduction"],"trait":["GroupedReduction","NumericReduction","Reducer"]};

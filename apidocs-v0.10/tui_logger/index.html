@@ -1,0 +1,165 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Logger with smart widget for the `tui` and `ratatui` crate"><title>tui_logger - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../static.files/rustdoc-84e720fa.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="tui_logger" data-themes="" data-resource-suffix="" data-rustdoc-version="1.89.0 (29483883e 2025-08-04)" data-channel="1.89.0" data-search-js="search-92309212.js" data-settings-js="settings-5514c975.js" ><script src="../static.files/storage-4e99c027.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-fd3af306.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-044be391.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../tui_logger/index.html">tui_<wbr>logger</a><span class="version">0.14.5</span></h2></div><div class="sidebar-elems"><ul class="block"><li><a id="all-types" href="all.html">All Items</a></li></ul><section id="rustdoc-toc"><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#logger-with-smart-widget-for-the-tui-and-ratatui-crate" title="Logger with smart widget for the `tui` and `ratatui` crate">Logger with smart widget for the <code>tui</code> and <code>ratatui</code> crate</a><ul><li><a href="#demo-of-the-widget" title="Demo of the widget">Demo of the widget</a></li><li><a href="#documentation" title="Documentation">Documentation</a></li><li><a href="#important-note-for-tui" title="Important note for `tui`">Important note for <code>tui</code></a></li><li><a href="#features" title="Features">Features</a></li><li><a href="#smart-widget" title="Smart Widget">Smart Widget</a></li><li><a href="#smart-widget-key-commands" title="Smart Widget Key Commands">Smart Widget Key Commands</a></li><li><a href="#basic-usage-to-initialize-logger-system" title="Basic usage to initialize logger-system:">Basic usage to initialize logger-system:</a></li><li><a href="#demo" title="Demo">Demo</a></li><li><a href="#slog-support" title="`slog` support"><code>slog</code> support</a></li><li><a href="#tracing-subscriber-support" title="`tracing-subscriber` support"><code>tracing-subscriber</code> support</a></li><li><a href="#custom-filtering" title="Custom filtering">Custom filtering</a></li><li><a href="#custom-formatting" title="Custom formatting">Custom formatting</a></li></ul></li></ul><h3><a href="#reexports">Crate Items</a></h3><ul class="block"><li><a href="#reexports" title="Re-exports">Re-exports</a></li><li><a href="#modules" title="Modules">Modules</a></li><li><a href="#structs" title="Structs">Structs</a></li><li><a href="#enums" title="Enums">Enums</a></li><li><a href="#functions" title="Functions">Functions</a></li></ul></section><div id="rustdoc-modnav"></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1>Crate <span>tui_logger</span><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../src/tui_logger/lib.rs.html#1-874">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="logger-with-smart-widget-for-the-tui-and-ratatui-crate"><a class="doc-anchor" href="#logger-with-smart-widget-for-the-tui-and-ratatui-crate">§</a>Logger with smart widget for the <code>tui</code> and <code>ratatui</code> crate</h2>
+<p><a href="https://deps.rs/repo/github/gin66/tui-logger"><img src="https://deps.rs/repo/github/gin66/tui-logger/status.svg?service=github&amp;nocache=0_9_1" alt="dependency status" /></a>
+<img src="https://github.com/gin66/tui-logger/workflows/Build%20examples/badge.svg?service=github" alt="Build examples" /></p>
+<h3 id="demo-of-the-widget"><a class="doc-anchor" href="#demo-of-the-widget">§</a>Demo of the widget</h3>
+<p><img src="https://github.com/gin66/tui-logger/blob/master/doc/demo_v0.14.4.gif?raw=true" alt="Demo" /></p>
+<h3 id="documentation"><a class="doc-anchor" href="#documentation">§</a>Documentation</h3>
+<p><a href="https://docs.rs/tui-logger/latest/tui_logger/">Documentation</a></p>
+<h3 id="important-note-for-tui"><a class="doc-anchor" href="#important-note-for-tui">§</a>Important note for <code>tui</code></h3>
+<p>The <code>tui</code> crate has been archived and <code>ratatui</code> has taken over.
+In order to avoid supporting compatibility for an inactive crate,
+the v0.9.x releases are the last to support <code>tui</code>. In case future bug fixes
+are needed, the branch <code>tui_legacy</code> has been created to track changes to 0.9.x releases.</p>
+<p>Starting with v0.10 <code>tui-logger</code> is <code>ratatui</code> only.</p>
+<h3 id="features"><a class="doc-anchor" href="#features">§</a>Features</h3>
+<ul>
+<li><input disabled="" type="checkbox" checked=""/>
+Logger implementation for the <code>log</code> crate</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Logger enable/disable detection via hash table (avoid string compare)</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Hot logger code only copies enabled log messages with timestamp into a circular buffer</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Widgets/move_message() retrieve captured log messages from hot circular buffer</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Lost message detection due to circular buffer</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Log filtering performed on log record target</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Simple Widgets to view logs and configure debuglevel per target</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Logging of enabled logs to file</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Scrollback in log history</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Title of target and log pane can be configured</li>
+<li><input disabled="" type="checkbox" checked=""/>
+<code>slog</code> support, providing a Drain to integrate into your <code>slog</code> infrastructure</li>
+<li><input disabled="" type="checkbox" checked=""/>
+<code>tracing</code> support</li>
+<li><input disabled="" type="checkbox" checked=""/>
+Support to use custom formatter for log events</li>
+<li><input disabled="" type="checkbox"/>
+Allow configuration of target dependent loglevel specifically for file logging</li>
+<li><input disabled="" type="checkbox"/>
+Avoid duplicating of target, module and filename in every log record</li>
+<li><input disabled="" type="checkbox"/>
+Simultaneous modification of all targets’ display/hot logging loglevel by key command</li>
+</ul>
+<h3 id="smart-widget"><a class="doc-anchor" href="#smart-widget">§</a>Smart Widget</h3>
+<p>Smart widget consists of two widgets. Left is the target selector widget and
+on the right side the logging messages view scrolling up. The target selector widget
+can be hidden/shown during runtime via key command.
+The key command to be provided to the TuiLoggerWidget via transition() function.</p>
+<p>The target selector widget looks like this:</p>
+<p><img src="https://github.com/gin66/tui-logger/blob/master/doc/example.png?raw=true" alt="widget" /></p>
+<p>It controls:</p>
+<ul>
+<li>Capturing of log messages by the logger</li>
+<li>Selection of levels for display in the logging message view</li>
+</ul>
+<p>The two columns have the following meaning:</p>
+<ul>
+<li>Code EWIDT: E stands for Error, W for Warn, Info, Debug and Trace.
+<ul>
+<li>Inverted characters (EWIDT) are enabled log levels in the view</li>
+<li>Normal characters show enabled capturing of a log level per target</li>
+<li>If any of EWIDT are not shown, then the respective log level is not captured</li>
+</ul>
+</li>
+<li>Target of the log events can be defined in the log e.g. <code>warn!(target: "demo", "Log message");</code></li>
+</ul>
+<h3 id="smart-widget-key-commands"><a class="doc-anchor" href="#smart-widget-key-commands">§</a>Smart Widget Key Commands</h3>
+<div class="example-wrap ignore"><a href="#" class="tooltip" title="This example is not tested">ⓘ</a><pre class="rust rust-example-rendered"><code>|  KEY     | ACTION
+|----------|-----------------------------------------------------------|
+| h        | Toggles target selector widget hidden/visible
+| f        | Toggle focus on the selected target only
+| UP       | Select previous target <span class="kw">in </span>target selector widget
+| DOWN     | Select next target <span class="kw">in </span>target selector widget
+| LEFT     | Reduce SHOWN (!) log messages by one level
+| RIGHT    | Increase SHOWN (!) log messages by one level
+| -        | Reduce CAPTURED (!) log messages by one level
+| +        | Increase CAPTURED (!) log messages by one level
+| PAGEUP   | Enter Page Mode and scroll approx. half page up <span class="kw">in </span>log history.
+| PAGEDOWN | Only <span class="kw">in </span>page mode: scroll <span class="number">10 </span>events down <span class="kw">in </span>log history.
+| ESCAPE   | Exit page mode and go back to scrolling mode
+| SPACE    | Toggles hiding of targets, which have logfilter set to off</code></pre></div>
+<p>The mapping of key to action has to be done in the application. The respective TuiWidgetEvent
+has to be provided to TuiWidgetState::transition().</p>
+<p>Remark to the page mode: The timestamp of the event at event history’s bottom line is used as
+reference. This means, changing the filters in the EWIDT/focus from the target selector window
+should work as expected without jumps in the history. The page next/forward advances as
+per visibility of the events.</p>
+<h3 id="basic-usage-to-initialize-logger-system"><a class="doc-anchor" href="#basic-usage-to-initialize-logger-system">§</a>Basic usage to initialize logger-system:</h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attr">#[macro_use]
+</span><span class="kw">extern crate </span>log;
+<span class="comment">//use tui_logger;
+
+</span><span class="kw">fn </span>main() {
+    <span class="comment">// Early initialization of the logger
+
+    // Set max_log_level to Trace
+    </span>tui_logger::init_logger(log::LevelFilter::Trace).unwrap();
+
+    <span class="comment">// Set default level for unknown targets to Trace
+    </span>tui_logger::set_default_level(log::LevelFilter::Trace);
+
+    <span class="comment">// code....
+</span>}</code></pre></div>
+<p>For use of the widget please check examples/demo.rs</p>
+<h3 id="demo"><a class="doc-anchor" href="#demo">§</a>Demo</h3>
+<p>Run demo using termion:</p>
+
+<div class="example-wrap ignore"><a href="#" class="tooltip" title="This example is not tested">ⓘ</a><pre class="rust rust-example-rendered"><code>cargo run --example demo --features termion</code></pre></div>
+<p>Run demo with crossterm:</p>
+
+<div class="example-wrap ignore"><a href="#" class="tooltip" title="This example is not tested">ⓘ</a><pre class="rust rust-example-rendered"><code>cargo run --example demo --features crossterm</code></pre></div>
+<p>Run demo using termion and simple custom formatter in bottom right log widget:</p>
+
+<div class="example-wrap ignore"><a href="#" class="tooltip" title="This example is not tested">ⓘ</a><pre class="rust rust-example-rendered"><code>cargo run --example demo --features termion,formatter</code></pre></div>
+<h3 id="slog-support"><a class="doc-anchor" href="#slog-support">§</a><code>slog</code> support</h3>
+<p><code>tui-logger</code> provides a [<code>TuiSlogDrain</code>] which implements <code>slog::Drain</code> and will route all records
+it receives to the <code>tui-logger</code> widget.</p>
+<p>Enabled by feature “slog-support”</p>
+<h3 id="tracing-subscriber-support"><a class="doc-anchor" href="#tracing-subscriber-support">§</a><code>tracing-subscriber</code> support</h3>
+<p><code>tui-logger</code> provides a [<code>TuiTracingSubscriberLayer</code>] which implements
+<code>tracing_subscriber::Layer</code> and will collect all events
+it receives to the <code>tui-logger</code> widget</p>
+<p>Enabled by feature “tracing-support”</p>
+<h3 id="custom-filtering"><a class="doc-anchor" href="#custom-filtering">§</a>Custom filtering</h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attr">#[macro_use]
+</span><span class="kw">extern crate </span>log;
+<span class="comment">//use tui_logger;
+</span><span class="kw">use </span>env_logger;
+
+<span class="kw">fn </span>main() {
+    <span class="comment">// Early initialization of the logger
+    </span><span class="kw">let </span>drain = tui_logger::Drain::new();
+    <span class="comment">// instead of tui_logger::init_logger, we use `env_logger`
+    </span>env_logger::Builder::default()
+        .format(<span class="kw">move </span>|buf, record|
+            <span class="comment">// patch the env-logger entry through our drain to the tui-logger
+            </span><span class="prelude-val">Ok</span>(drain.log(record))
+        ).init(); <span class="comment">// make this the global logger
+    // code....
+</span>}</code></pre></div>
+<h3 id="custom-formatting"><a class="doc-anchor" href="#custom-formatting">§</a>Custom formatting</h3>
+<p>For experts only ! Configure along the lines:</p>
+
+<div class="example-wrap ignore"><a href="#" class="tooltip" title="This example is not tested">ⓘ</a><pre class="rust rust-example-rendered"><code><span class="kw">use </span>tui_logger::LogFormatter;
+
+<span class="kw">let </span>formatter = MyLogFormatter();
+
+TuiLoggerWidget::default()
+.block(Block::bordered().title(<span class="string">"Filtered TuiLoggerWidget"</span>))
+.formatter(formatter)
+.state(<span class="kw-2">&amp;</span>filter_state)
+.render(left, buf);</code></pre></div>
+<p>The example demo can be invoked to use a custom formatter as example for the bottom right widget.</p>
+</div></details><h2 id="reexports" class="section-header">Re-exports<a href="#reexports" class="anchor">§</a></h2><dl class="item-table reexports"><dt id="reexport.LevelFilter"><code>pub use log::<a class="enum" href="../log/enum.LevelFilter.html" title="enum log::LevelFilter">LevelFilter</a>;</code></dt><dt id="reexport.TuiWidgetState"><code>pub use widget::inner::<a class="struct" href="widget/inner/struct.TuiWidgetState.html" title="struct tui_logger::widget::inner::TuiWidgetState">TuiWidgetState</a>;</code></dt><dt id="reexport.LogFormatter"><code>pub use widget::logformatter::<a class="trait" href="widget/logformatter/trait.LogFormatter.html" title="trait tui_logger::widget::logformatter::LogFormatter">LogFormatter</a>;</code></dt><dt id="reexport.TuiLoggerSmartWidget"><code>pub use widget::smart::<a class="struct" href="widget/smart/struct.TuiLoggerSmartWidget.html" title="struct tui_logger::widget::smart::TuiLoggerSmartWidget">TuiLoggerSmartWidget</a>;</code></dt><dt id="reexport.TuiLoggerWidget"><code>pub use widget::standard::<a class="struct" href="widget/standard/struct.TuiLoggerWidget.html" title="struct tui_logger::widget::standard::TuiLoggerWidget">TuiLoggerWidget</a>;</code></dt><dt id="reexport.TuiLoggerFile"><code>pub use file::<a class="struct" href="file/struct.TuiLoggerFile.html" title="struct tui_logger::file::TuiLoggerFile">TuiLoggerFile</a>;</code></dt></dl><h2 id="modules" class="section-header">Modules<a href="#modules" class="anchor">§</a></h2><dl class="item-table"><dt><a class="mod" href="file/index.html" title="mod tui_logger::file">file</a></dt><dt><a class="mod" href="widget/index.html" title="mod tui_logger::widget">widget</a></dt></dl><h2 id="structs" class="section-header">Structs<a href="#structs" class="anchor">§</a></h2><dl class="item-table"><dt><a class="struct" href="struct.CircularBuffer.html" title="struct tui_logger::CircularBuffer">Circular<wbr>Buffer</a></dt><dd>CircularBuffer is used to store the last elements of an endless sequence.
+Oldest elements will be overwritten. The implementation focus on
+speed. So memory allocations are avoided.</dd><dt><a class="struct" href="struct.Drain.html" title="struct tui_logger::Drain">Drain</a></dt><dd>A simple <code>Drain</code> to log any event directly.</dd><dt><a class="struct" href="struct.ExtLogRecord.html" title="struct tui_logger::ExtLogRecord">ExtLog<wbr>Record</a></dt><dt><a class="struct" href="struct.LevelConfig.html" title="struct tui_logger::LevelConfig">Level<wbr>Config</a></dt><dd>LevelConfig stores the relation target-&gt;LevelFilter in a hash table.</dd><dt><a class="struct" href="struct.TuiLoggerTargetWidget.html" title="struct tui_logger::TuiLoggerTargetWidget">TuiLogger<wbr>Target<wbr>Widget</a></dt><dd>This is the definition for the TuiLoggerTargetWidget,
+which allows configuration of the logger system and selection of log messages.</dd></dl><h2 id="enums" class="section-header">Enums<a href="#enums" class="anchor">§</a></h2><dl class="item-table"><dt><a class="enum" href="enum.TuiLoggerError.html" title="enum tui_logger::TuiLoggerError">TuiLogger<wbr>Error</a></dt><dt><a class="enum" href="enum.TuiLoggerLevelOutput.html" title="enum tui_logger::TuiLoggerLevelOutput">TuiLogger<wbr>Level<wbr>Output</a></dt><dd>The TuiLoggerWidget shows the logging messages in an endless scrolling view.
+It is controlled by a TuiWidgetState for selected events.</dd><dt><a class="enum" href="enum.TuiWidgetEvent.html" title="enum tui_logger::TuiWidgetEvent">TuiWidget<wbr>Event</a></dt></dl><h2 id="functions" class="section-header">Functions<a href="#functions" class="anchor">§</a></h2><dl class="item-table"><dt><a class="fn" href="fn.init_logger.html" title="fn tui_logger::init_logger">init_<wbr>logger</a></dt><dd>Init the logger.</dd><dt><a class="fn" href="fn.set_buffer_depth.html" title="fn tui_logger::set_buffer_depth">set_<wbr>buffer_<wbr>depth</a></dt><dd>Set the depth of the circular buffer in order to avoid message loss.
+This will delete all existing messages in the circular buffer.</dd><dt><a class="fn" href="fn.set_default_level.html" title="fn tui_logger::set_default_level">set_<wbr>default_<wbr>level</a></dt><dd>Set default levelfilter for unknown targets of the logger</dd><dt><a class="fn" href="fn.set_hot_buffer_depth.html" title="fn tui_logger::set_hot_buffer_depth">set_<wbr>hot_<wbr>buffer_<wbr>depth</a></dt><dd>Set the depth of the hot buffer in order to avoid message loss.
+This is effective only after a call to move_events()</dd><dt><a class="fn" href="fn.set_level_for_target.html" title="fn tui_logger::set_level_for_target">set_<wbr>level_<wbr>for_<wbr>target</a></dt><dd>Set levelfilter for a specific target in the logger</dd><dt><a class="fn" href="fn.set_log_file.html" title="fn tui_logger::set_log_file">set_<wbr>log_<wbr>file</a></dt><dd>Define filename and log formmating options for file dumping.</dd></dl></section></div></main></body></html>

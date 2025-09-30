@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["ZipValidity"],"fn":["bytes_for","count_zeros","fmt","get_bit_unchecked","is_set","leading_ones","leading_zeros","set_bit_in_byte","set_bit_unchecked","trailing_ones","trailing_zeros"],"struct":["BitChunks","BitChunksExact","BitChunksExactMut","BitmapIter","SlicesIterator","ZipValidityIter"],"trait":["BitChunk","BitChunkIterExact"]};

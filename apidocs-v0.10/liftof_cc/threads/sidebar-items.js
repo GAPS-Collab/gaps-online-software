@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["command_dispatcher","event_builder","global_data_sink","readoutboard_comm"]};

@@ -1,0 +1,118 @@
+\doxysection{RBEvent\+Header Struct Reference}
+\hypertarget{structRBEventHeader}{}\label{structRBEventHeader}\index{RBEventHeader@{RBEventHeader}}
+
+
+{\ttfamily \#include $<$events.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structRBEventHeader_af5a61a5d3326a63294e5cea76aa67bcd}\label{structRBEventHeader_af5a61a5d3326a63294e5cea76aa67bcd} 
+auto {\bfseries get\+\_\+channels} () const -\/$>$ Vec$<$ u8 $>$
+\item 
+\Hypertarget{structRBEventHeader_ad878b7c3e47222e631a0fa6751013857}\label{structRBEventHeader_ad878b7c3e47222e631a0fa6751013857} 
+auto {\bfseries get\+\_\+nchan} () const -\/$>$ u8
+\item 
+\Hypertarget{structRBEventHeader_a2e63868c677514033d1fb5f94c1624a4}\label{structRBEventHeader_a2e63868c677514033d1fb5f94c1624a4} 
+auto {\bfseries get\+\_\+active\+\_\+data\+\_\+channels} () const -\/$>$ Vec$<$ u8 $>$
+\item 
+\Hypertarget{structRBEventHeader_a94add0aeba6a7c2c9dc2891b9b40a6fc}\label{structRBEventHeader_a94add0aeba6a7c2c9dc2891b9b40a6fc} 
+auto {\bfseries has\+\_\+ch9} () const -\/$>$ bool
+\item 
+\Hypertarget{structRBEventHeader_a0923556e0afcd5c37f867a831b796b92}\label{structRBEventHeader_a0923556e0afcd5c37f867a831b796b92} 
+auto {\bfseries get\+\_\+n\+\_\+datachan} () const -\/$>$ u8
+\item 
+\Hypertarget{structRBEventHeader_a4963cab01eac77b155b203a94a13bd15}\label{structRBEventHeader_a4963cab01eac77b155b203a94a13bd15} 
+auto {\bfseries get\+\_\+fpga\+\_\+temp} () const -\/$>$ f32
+\item 
+\Hypertarget{structRBEventHeader_ae351a8aad227656a019f3feda843b574}\label{structRBEventHeader_ae351a8aad227656a019f3feda843b574} 
+auto {\bfseries is\+\_\+event\+\_\+fragment} () const -\/$>$ bool
+\item 
+\Hypertarget{structRBEventHeader_a936427b3423004ffd32a22380ef9373e}\label{structRBEventHeader_a936427b3423004ffd32a22380ef9373e} 
+auto {\bfseries drs\+\_\+lost\+\_\+trigger} () const -\/$>$ bool
+\item 
+\Hypertarget{structRBEventHeader_a308d0447fa3a370201aa7dbb5a42bf22}\label{structRBEventHeader_a308d0447fa3a370201aa7dbb5a42bf22} 
+auto {\bfseries lost\+\_\+lock} () const -\/$>$ bool
+\item 
+\Hypertarget{structRBEventHeader_ae5bd7eb2bd7f79d8fd10c7d44d55f0e0}\label{structRBEventHeader_ae5bd7eb2bd7f79d8fd10c7d44d55f0e0} 
+auto {\bfseries lost\+\_\+lock\+\_\+last\+\_\+sec} () const -\/$>$ bool
+\item 
+\Hypertarget{structRBEventHeader_a78f8f8fbb38400047d26ceef3b6dd240}\label{structRBEventHeader_a78f8f8fbb38400047d26ceef3b6dd240} 
+auto {\bfseries is\+\_\+locked} () const -\/$>$ bool
+\item 
+\Hypertarget{structRBEventHeader_a12843b457968527d3478a508e4518aab}\label{structRBEventHeader_a12843b457968527d3478a508e4518aab} 
+auto {\bfseries is\+\_\+locked\+\_\+last\+\_\+sec} () const -\/$>$ bool
+\item 
+\Hypertarget{structRBEventHeader_afe0f7bdd563ff17753c9466bd2de31e0}\label{structRBEventHeader_afe0f7bdd563ff17753c9466bd2de31e0} 
+auto {\bfseries get\+\_\+sine\+\_\+fit} () const -\/$>$ std\+::array$<$ f32, 3 $>$
+\item 
+\Hypertarget{structRBEventHeader_ab247d41e2b61e379ebd37f86e5d19f1a}\label{structRBEventHeader_ab247d41e2b61e379ebd37f86e5d19f1a} 
+auto {\bfseries get\+\_\+timestamp48} () const -\/$>$ u64
+\begin{DoxyCompactList}\small\item\em the combined timestamp \end{DoxyCompactList}\item 
+\Hypertarget{structRBEventHeader_a98a6f696adfe82d113d7493885878dd2}\label{structRBEventHeader_a98a6f696adfe82d113d7493885878dd2} 
+auto {\bfseries to\+\_\+string} () const -\/$>$ std\+::string
+\begin{DoxyCompactList}\small\item\em string representation for printing \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structRBEventHeader_a94bc25ae3a1072d9d9f99602291aa82d}\label{structRBEventHeader_a94bc25ae3a1072d9d9f99602291aa82d} 
+static auto {\bfseries from\+\_\+bytestream} (const Vec$<$ u8 $>$ \&bytestream, u64 \&pos) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{structRBEventHeader}{RBEvent\+Header}}, \mbox{\hyperlink{classGaps_1_1IOError}{g\+::\+IOError}} $>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structRBEventHeader_a4ba286cc966b0c56632c3f2e81e46a21}\label{structRBEventHeader_a4ba286cc966b0c56632c3f2e81e46a21} 
+u8 {\bfseries rb\+\_\+id} = 0
+\item 
+\Hypertarget{structRBEventHeader_a3f4c4685a787bed5b72a9ddb663d7779}\label{structRBEventHeader_a3f4c4685a787bed5b72a9ddb663d7779} 
+u32 {\bfseries event\+\_\+id} = 0
+\item 
+\Hypertarget{structRBEventHeader_abe06c794b8188dd17caab15c03a853bc}\label{structRBEventHeader_abe06c794b8188dd17caab15c03a853bc} 
+u8 {\bfseries status\+\_\+byte} = 0
+\item 
+\Hypertarget{structRBEventHeader_aeee5dbdd9077bcb7a0056924b274f611}\label{structRBEventHeader_aeee5dbdd9077bcb7a0056924b274f611} 
+u16 {\bfseries channel\+\_\+mask} = 0
+\item 
+\Hypertarget{structRBEventHeader_a8ed52a1f69611dc57a9cb831ba6becb8}\label{structRBEventHeader_a8ed52a1f69611dc57a9cb831ba6becb8} 
+u16 {\bfseries stop\+\_\+cell} = 0
+\item 
+\Hypertarget{structRBEventHeader_a926db438fb32917b80b17485d7f0f011}\label{structRBEventHeader_a926db438fb32917b80b17485d7f0f011} 
+u16 {\bfseries ch9\+\_\+amp} = 0
+\item 
+\Hypertarget{structRBEventHeader_a83dfb3ab40a6ca3fca361300cb2c13b6}\label{structRBEventHeader_a83dfb3ab40a6ca3fca361300cb2c13b6} 
+u16 {\bfseries ch9\+\_\+freq} = 0
+\item 
+\Hypertarget{structRBEventHeader_af10f670a68b26bac8a455324b91c78b8}\label{structRBEventHeader_af10f670a68b26bac8a455324b91c78b8} 
+u16 {\bfseries ch9\+\_\+phase} = 0
+\item 
+\Hypertarget{structRBEventHeader_adaf1e5200a47fa73f7dd351876a85f32}\label{structRBEventHeader_adaf1e5200a47fa73f7dd351876a85f32} 
+u16 {\bfseries fpga\+\_\+temp} = 0
+\item 
+\Hypertarget{structRBEventHeader_a10f2a3c01f4212a313f61a7ed5ced744}\label{structRBEventHeader_a10f2a3c01f4212a313f61a7ed5ced744} 
+u32 {\bfseries timestamp32} = 0
+\item 
+\Hypertarget{structRBEventHeader_a19cfa3eea3f5f2676037237a08fe662b}\label{structRBEventHeader_a19cfa3eea3f5f2676037237a08fe662b} 
+u16 {\bfseries timestamp16} = 0
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structRBEventHeader_a113d47a97847484008ab01476f145e73}\label{structRBEventHeader_a113d47a97847484008ab01476f145e73} 
+static constexpr u16 {\bfseries HEAD} = 0x\+AAAA
+\item 
+\Hypertarget{structRBEventHeader_a453120a380eafd9514470ff6d3f046f6}\label{structRBEventHeader_a453120a380eafd9514470ff6d3f046f6} 
+static constexpr u16 {\bfseries TAIL} = 0x5555
+\item 
+\Hypertarget{structRBEventHeader_a3af19819ebf907ac15a93f240100b635}\label{structRBEventHeader_a3af19819ebf907ac15a93f240100b635} 
+static constexpr u16 {\bfseries SIZE} = 30
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+RB binary data header information
+
+This does not include the channel data! The header contains rb id, event id, event status and timestamps. 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/tof/dataclasses/\+C++/include/events.\+h\end{DoxyCompactItemize}

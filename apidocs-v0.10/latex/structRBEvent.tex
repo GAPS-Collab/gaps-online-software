@@ -1,0 +1,74 @@
+\doxysection{RBEvent Struct Reference}
+\hypertarget{structRBEvent}{}\label{structRBEvent}\index{RBEvent@{RBEvent}}
+
+
+{\ttfamily \#include $<$events.\+h$>$}
+
+
+
+Collaboration diagram for RBEvent\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=173pt]{structRBEvent__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structRBEvent_a8dad584043fcf04d1bd63d55ed9427b2}\label{structRBEvent_a8dad584043fcf04d1bd63d55ed9427b2} 
+auto {\bfseries get\+\_\+channel\+\_\+by\+\_\+label} (u8 channel) const -\/$>$ const Vec$<$ u16 $>$ \&
+\item 
+\Hypertarget{structRBEvent_ae63f1ed3c3544a83c2fdb3343a913790}\label{structRBEvent_ae63f1ed3c3544a83c2fdb3343a913790} 
+auto {\bfseries get\+\_\+channel\+\_\+by\+\_\+id} (u8 channel) const -\/$>$ const Vec$<$ u16 $>$ \&
+\item 
+\Hypertarget{structRBEvent_a7e8ff581fc46afa60a040bf1fee838f3}\label{structRBEvent_a7e8ff581fc46afa60a040bf1fee838f3} 
+auto {\bfseries get\+\_\+channel\+\_\+adc} (u8 channel) const -\/$>$ const Vec$<$ u16 $>$ \&
+\item 
+\Hypertarget{structRBEvent_a406db7474933794318d78ba2776f99f9}\label{structRBEvent_a406db7474933794318d78ba2776f99f9} 
+auto {\bfseries to\+\_\+string} () const -\/$>$ std\+::string
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structRBEvent_a070ba8fdcafbd4f9c12a9a4f7df7f51a}\label{structRBEvent_a070ba8fdcafbd4f9c12a9a4f7df7f51a} 
+static auto {\bfseries calc\+\_\+baseline} (const Vec$<$ f32 $>$ \&volts, usize min\+\_\+bin, usize max\+\_\+bin) -\/$>$ f32
+\begin{DoxyCompactList}\small\item\em Get the baseline for a single channel. \end{DoxyCompactList}\item 
+\Hypertarget{structRBEvent_ad4612364c7bffb8831c0174745815f12}\label{structRBEvent_ad4612364c7bffb8831c0174745815f12} 
+static auto {\bfseries from\+\_\+bytestream} (const Vec$<$ u8 $>$ \&bytestream, u64 \&pos) -\/$>$ \mbox{\hyperlink{structRBEvent}{RBEvent}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structRBEvent_aabd7b0be3bf8bb0f282919f598a5e8b1}\label{structRBEvent_aabd7b0be3bf8bb0f282919f598a5e8b1} 
+u8 {\bfseries data\+\_\+type} = 0
+\item 
+\Hypertarget{structRBEvent_aa14d698611932312daaa83322d43b0b0}\label{structRBEvent_aa14d698611932312daaa83322d43b0b0} 
+Event\+Status {\bfseries status} = Event\+Status\+::\+Unknown
+\item 
+\Hypertarget{structRBEvent_a968bb4d3a9f08b6c7d3308e974d5b774}\label{structRBEvent_a968bb4d3a9f08b6c7d3308e974d5b774} 
+\mbox{\hyperlink{structRBEventHeader}{RBEvent\+Header}} {\bfseries header} = \mbox{\hyperlink{structRBEventHeader}{RBEvent\+Header}}()
+\item 
+\Hypertarget{structRBEvent_adf62961449f222af9f394e4d0f342279}\label{structRBEvent_adf62961449f222af9f394e4d0f342279} 
+Vec$<$ Vec$<$ u16 $>$ $>$ {\bfseries adc} = Vec$<$Vec$<$u16$>$$>$()
+\item 
+\Hypertarget{structRBEvent_ad64827ac0afd730ffaa26d93a793be94}\label{structRBEvent_ad64827ac0afd730ffaa26d93a793be94} 
+Vec$<$ \mbox{\hyperlink{structTofHit}{Tof\+Hit}} $>$ {\bfseries hits} = Vec$<$\mbox{\hyperlink{structTofHit}{Tof\+Hit}}$>$()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structRBEvent_a25bfe9837c3a8f8bd03709837f51a004}\label{structRBEvent_a25bfe9837c3a8f8bd03709837f51a004} 
+static constexpr u16 {\bfseries HEAD} = 0x\+AAAA
+\item 
+\Hypertarget{structRBEvent_a86fc17996359ac81f0ae9fa10b8125b8}\label{structRBEvent_a86fc17996359ac81f0ae9fa10b8125b8} 
+static constexpr u16 {\bfseries TAIL} = 0x5555
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A complete event for a single readout board with header and channel data. The size is flexible, only active datachannels are recorded. 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/tof/dataclasses/\+C++/include/events.\+h\end{DoxyCompactItemize}

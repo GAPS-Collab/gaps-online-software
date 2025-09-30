@@ -1,0 +1,88 @@
+\doxysection{caraspace.\+hpp}
+\hypertarget{caraspace_8hpp_source}{}\label{caraspace_8hpp_source}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/tof/dataclasses/C++/include/caraspace.hpp@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/tof/dataclasses/C++/include/caraspace.hpp}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ CARASPACE\_H\_INCLUDED}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ CARASPACE\_H\_INCLUDED}}
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <cmath>}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ "{}tof\_typedefs.h"{}}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ "{}packets/tof\_packet.h"{}}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ "{}telemetry\_dataclasses.hpp"{}}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ "{}calibration.h"{}}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ "{}errors.hpp"{}}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#include\ "{}result/result.h"{}}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#ifdef\ BUILD\_CXXDB}}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\#include\ "{}database.h"{}}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \textcolor{keyword}{namespace\ }r\ =\ result;}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceGaps}{Gaps}}\ \{}
+\DoxyCodeLine{00022\ \ \ std::vector<std::string>\ \mbox{\hyperlink{namespaceGaps_ad558dd12865183c97b66820bbb392ee9}{list\_path\_contents\_sorted}}(\textcolor{keyword}{const}\ std::string\&\ input);}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00025\ \ \ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{namespaceGaps_a8e2924b21458e93bc83a6ae981d47b57}{CRFrameObjectType}}\ :\ u8\ \{}
+\DoxyCodeLine{00026\ \ \ \ \ Unknown\ \ \ \ \ \ \ \ \ \ \ =\ 0,}
+\DoxyCodeLine{00027\ \ \ \ \ \mbox{\hyperlink{structTofPacket}{TofPacket}}\ \ \ \ \ \ \ \ \ =\ 10,}
+\DoxyCodeLine{00028\ \ \ \ \ TelemetryPacket\ \ \ =\ 20,}
+\DoxyCodeLine{00029\ \ \ \};}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structGaps_1_1CRFrameObject}{CRFrameObject}}\ \{}
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ HEAD\ =\ 0xAAAA;}
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ TAIL\ =\ 0x5555;}
+\DoxyCodeLine{00034\ \ \ \ \ }
+\DoxyCodeLine{00035\ \ \ \ \ u8\ version;}
+\DoxyCodeLine{00036\ \ \ \ \ \mbox{\hyperlink{namespaceGaps_a8e2924b21458e93bc83a6ae981d47b57}{CRFrameObjectType}}\ ftype;}
+\DoxyCodeLine{00037\ \ \ \ \ Vec<u8>\ payload;}
+\DoxyCodeLine{00038\ \ \ }
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structGaps_1_1CRFrameObject_a968893f5528e9efcfa24f1daf9aeff38}{from\_bytestream}}(Vec<u8>\ stream,\ usize\ \&pos)\ -\/>\ \mbox{\hyperlink{structGaps_1_1CRFrameObject}{CRFrameObject}};}
+\DoxyCodeLine{00041\ \ \ \ \ \ }
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structGaps_1_1CRFrameObject_a595b1bd5f108d809453dd27c4727d887}{to\_string}}()\ -\/>\ std::string;}
+\DoxyCodeLine{00044\ \ \ \};}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structGaps_1_1CRFrame}{CRFrame}}\ \{}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ HEAD\ =\ 0xAAAA;}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ TAIL\ =\ 0x5555;}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ }
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ from\_bytestream(Vec<u8>\ stream,\ usize\ \&pos)\ -\/>\ \mbox{\hyperlink{structGaps_1_1CRFrame}{CRFrame}};}
+\DoxyCodeLine{00052\ \ \ \ \ }
+\DoxyCodeLine{00053\ \ \ \ \ std::map<std::string,\ std::tuple<u64,\ CRFrameObjectType>>\ index;}
+\DoxyCodeLine{00054\ \ \ \ \ Vec<u8>\ bytestorage;}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keyword}{auto}\ to\_string()\ \textcolor{keyword}{const}\ -\/>\ std::string;}
+\DoxyCodeLine{00056\ \ \ \ \ }
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ parse\_index(Vec<u8>\ stream,\ usize\ \&pos)\ -\/>\ std::map<std::string,\ std::tuple<u64,\ CRFrameObjectType>>;}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structGaps_1_1CRFrame_abe416c06826852520516ea3fe1f8f067}{get\_tofpacket}}(std::string\ name)\ -\/>\ r::Result<TofPacket,Gaps::IOError>;}
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keyword}{auto}\ get\_telemetrypacket(std::string\ name)\ -\/>\ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Packet}{Gaps::Telemetry::Packet}};}
+\DoxyCodeLine{00062\ \ \ \};}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structGaps_1_1CRReader}{CRReader}}\ \{}
+\DoxyCodeLine{00065\ \ \ \ \ \mbox{\hyperlink{structGaps_1_1CRReader}{CRReader}}();}
+\DoxyCodeLine{00066\ \ \ \ \ \mbox{\hyperlink{structGaps_1_1CRReader}{CRReader}}(std::string\ pathname);}
+\DoxyCodeLine{00067\ \ \ \ \ \mbox{\hyperlink{structGaps_1_1CRReader}{CRReader}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structGaps_1_1CRReader}{CRReader}}\&)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{00068\ \ \ \ \ }
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keyword}{auto}\ set\_path(std::\ string\ pathname)\ -\/>\ void;}
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structGaps_1_1CRReader_ad87ca9ebd20e590832418ca7f013b4d0}{get\_next\_frame}}()\ \ \ \ \ \ \ -\/>\ \mbox{\hyperlink{structGaps_1_1CRFrame}{CRFrame}};}
+\DoxyCodeLine{00078\ \ \ \ \ \textcolor{keyword}{auto}\ get\_filenames()\ \ const\ -\/>\ Vec<std::\textcolor{keywordtype}{string}>;}
+\DoxyCodeLine{00082\ \ \ \ \ auto\ \mbox{\hyperlink{structGaps_1_1CRReader_a6021efc266d1fe854a5cea466204b4ab}{is\_exhausted}}()\ \ \ const\ -\/>\ \textcolor{keywordtype}{bool};}
+\DoxyCodeLine{00085\ \ \ \ \ auto\ \mbox{\hyperlink{structGaps_1_1CRReader_aecf4c85b1df2aec1b012bf2712866464}{n\_packets\_read}}()\ const\ -\/>\ \textcolor{keywordtype}{bool};}
+\DoxyCodeLine{00088\ \ \ \ \ auto\ \mbox{\hyperlink{structGaps_1_1CRReader_aea1c7edb8d8f7dcfeeffaa1185ad66f6}{get\_rbcalibrations}}(u8\ n\_rb)\ -\/>\ RBCalibrationMap;\ \ \ \ \ }
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00090\ \ \ private:\ \ }
+\DoxyCodeLine{00091\ \ \ \ \ \textcolor{preprocessor}{\#ifdef\ BUILD\_CXXDB}}
+\DoxyCodeLine{00092\ \ \ \ \ \mbox{\hyperlink{namespaceGaps_a84fb383b1df4955afc6ea35a9b15ff44}{TofPaddleMap}}\ \ \ \ \ paddles\_\ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00093\ \textcolor{preprocessor}{\ \ \ \ \#endif\ }}
+\DoxyCodeLine{00094\ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \ \ \ \ \ exhausted\_\ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00095\ \ \ \ \ usize\ \ \ \ \ \ \ \ \ \ \ \ n\_packets\_read\_\ \ \ ;}
+\DoxyCodeLine{00096\ \ \ \ \ Vec<std::string>\ filenames\_\ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00097\ \ \ \ \ std::ifstream\ \ \ \ stream\_file\_\ \ \ \ \ \ ;}
+\DoxyCodeLine{00098\ \ \ \ \ usize\ \ \ \ \ \ \ \ \ \ \ \ fileindex\_\ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keyword}{auto}\ \ \ \ \ \ \ \ \ \ \ \ \ prime\_next\_file\_()\ -\/>\ void;}
+\DoxyCodeLine{00100\ \ \ \};}
+\DoxyCodeLine{00101\ \}}
+\DoxyCodeLine{00102\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

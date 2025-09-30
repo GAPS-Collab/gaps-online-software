@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["arnoldi_householder","arnoldi_mgs"],"struct":["Arnoldi"]};

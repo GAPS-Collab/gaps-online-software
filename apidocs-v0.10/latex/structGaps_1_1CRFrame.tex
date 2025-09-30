@@ -1,0 +1,46 @@
+\doxysection{Gaps\+::CRFrame Struct Reference}
+\hypertarget{structGaps_1_1CRFrame}{}\label{structGaps_1_1CRFrame}\index{Gaps::CRFrame@{Gaps::CRFrame}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structGaps_1_1CRFrame_a2ec089637cb495a0ef9c47c4f3780af2}\label{structGaps_1_1CRFrame_a2ec089637cb495a0ef9c47c4f3780af2} 
+auto {\bfseries to\+\_\+string} () const -\/$>$ std\+::string
+\item 
+\Hypertarget{structGaps_1_1CRFrame_abe416c06826852520516ea3fe1f8f067}\label{structGaps_1_1CRFrame_abe416c06826852520516ea3fe1f8f067} 
+auto {\bfseries get\+\_\+tofpacket} (std\+::string name) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{structTofPacket}{Tof\+Packet}}, \mbox{\hyperlink{classGaps_1_1IOError}{Gaps\+::\+IOError}} $>$
+\begin{DoxyCompactList}\small\item\em extract a tofpacket if this frame object is of the correct type \end{DoxyCompactList}\item 
+\Hypertarget{structGaps_1_1CRFrame_aaccd98b65f32ed033fec0ea3b1485034}\label{structGaps_1_1CRFrame_aaccd98b65f32ed033fec0ea3b1485034} 
+auto {\bfseries get\+\_\+telemetrypacket} (std\+::string name) -\/$>$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Packet}{Gaps\+::\+Telemetry\+::\+Packet}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structGaps_1_1CRFrame_ac582db004524f92f42c7f95f0a28f3d6}\label{structGaps_1_1CRFrame_ac582db004524f92f42c7f95f0a28f3d6} 
+static auto {\bfseries from\+\_\+bytestream} (Vec$<$ u8 $>$ stream, usize \&pos) -\/$>$ \mbox{\hyperlink{structGaps_1_1CRFrame}{CRFrame}}
+\item 
+\Hypertarget{structGaps_1_1CRFrame_ada781a3bf498857b233d6d7e94cb27c5}\label{structGaps_1_1CRFrame_ada781a3bf498857b233d6d7e94cb27c5} 
+static auto {\bfseries parse\+\_\+index} (Vec$<$ u8 $>$ stream, usize \&pos) -\/$>$ std\+::map$<$ std\+::string, std\+::tuple$<$ u64, \mbox{\hyperlink{namespaceGaps_a8e2924b21458e93bc83a6ae981d47b57}{CRFrame\+Object\+Type}} $>$ $>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structGaps_1_1CRFrame_ad5a8eaac1a6c7362f37d61987269d92c}\label{structGaps_1_1CRFrame_ad5a8eaac1a6c7362f37d61987269d92c} 
+std\+::map$<$ std\+::string, std\+::tuple$<$ u64, \mbox{\hyperlink{namespaceGaps_a8e2924b21458e93bc83a6ae981d47b57}{CRFrame\+Object\+Type}} $>$ $>$ {\bfseries index}
+\item 
+\Hypertarget{structGaps_1_1CRFrame_a94dad7da9c3fb9a7eee7ba19c3c5ba72}\label{structGaps_1_1CRFrame_a94dad7da9c3fb9a7eee7ba19c3c5ba72} 
+Vec$<$ u8 $>$ {\bfseries bytestorage}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structGaps_1_1CRFrame_aadf3e8650d2ee4600f8c12cd6f7cec07}\label{structGaps_1_1CRFrame_aadf3e8650d2ee4600f8c12cd6f7cec07} 
+static constexpr u16 {\bfseries HEAD} = 0x\+AAAA
+\item 
+\Hypertarget{structGaps_1_1CRFrame_aeb005852684222597c63123da8aa8198}\label{structGaps_1_1CRFrame_aeb005852684222597c63123da8aa8198} 
+static constexpr u16 {\bfseries TAIL} = 0x5555
+\end{DoxyCompactItemize}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/tof/dataclasses/\+C++/include/caraspace.\+hpp\end{DoxyCompactItemize}

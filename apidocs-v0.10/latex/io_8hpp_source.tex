@@ -1,0 +1,69 @@
+\doxysection{io.\+hpp}
+\hypertarget{io_8hpp_source}{}\label{io_8hpp_source}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/tof/dataclasses/C++/include/io.hpp@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/tof/dataclasses/C++/include/io.hpp}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ TOFIO\_H\_INCLUDED}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ TOFIO\_H\_INCLUDED}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <functional>}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ "{}result/result.h"{}}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ "{}events.h"{}}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ "{}packets/tof\_packet.h"{}}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ "{}serialization.h"{}}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#include\ "{}errors.hpp"{}}}
+\DoxyCodeLine{00013\ }
+\DoxyCodeLine{00014\ \textcolor{keyword}{namespace\ }r\ =\ result;}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{comment}{//template<typename\ T>}}
+\DoxyCodeLine{00017\ \textcolor{comment}{//requires\ HasFromByteStream<T>}}
+\DoxyCodeLine{00018\ \textcolor{comment}{//Vec<T>\ unpack<T>(String\ filename)\ \{}}
+\DoxyCodeLine{00019\ \textcolor{comment}{//\ \ usize\ pos\ =\ 0;}}
+\DoxyCodeLine{00020\ \textcolor{comment}{//\ \ auto\ packets\ =\ get\_tofpackets(filename);}}
+\DoxyCodeLine{00021\ \textcolor{comment}{//\ \ for\ (const\ auto\ \&p\ :\ packets)\ \{}}
+\DoxyCodeLine{00022\ \textcolor{comment}{//\ \ \ \ T\ data\ =\ T::from\_bytestream(p.payload,\ 0);}}
+\DoxyCodeLine{00023\ \textcolor{comment}{//\ }}
+\DoxyCodeLine{00024\ \textcolor{comment}{//}}
+\DoxyCodeLine{00025\ \textcolor{comment}{//\ \ Vec<T>\ data;}}
+\DoxyCodeLine{00026\ \textcolor{comment}{//\ \ return\ data;}}
+\DoxyCodeLine{00027\ \textcolor{comment}{//\}}}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00041\ [[deprecated(\textcolor{stringliteral}{"{}This\ might\ not\ even\ be\ correct!"{}})]]}
+\DoxyCodeLine{00042\ Vec<u32>\ get\_event\_ids\_from\_raw\_stream(\textcolor{keyword}{const}\ Vec<u8>\ \&bytestream,\ u64\ \&start\_pos);}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00052\ Vec<TofPacket>\ get\_tofpackets(\textcolor{keyword}{const}\ Vec<u8>\ \&bytestream,\ u64\ start\_pos,\ PacketType\ filter=PacketType::Unknown);}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00062\ Vec<TofPacket>\ get\_tofpackets(\textcolor{keyword}{const}\ String\ filename,\ PacketType\ filter\ =\ PacketType::Unknown);}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00071\ Vec<TofEvent>\ unpack\_tofevents\_from\_tofpackets(\textcolor{keyword}{const}\ Vec<u8>\ \&bytestream,\ u64\ start\_pos);}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00079\ Vec<TofEvent>\ unpack\_tofevents\_from\_tofpackets(\textcolor{keyword}{const}\ String\ filename);}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceGaps}{Gaps}}\ \{}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00085\ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classGaps_1_1TofPacketReader}{TofPacketReader}}\ \{}
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{keyword}{public}:\ }
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \mbox{\hyperlink{classGaps_1_1TofPacketReader}{TofPacketReader}}();}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \mbox{\hyperlink{classGaps_1_1TofPacketReader}{TofPacketReader}}(String\ filename);}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \mbox{\hyperlink{classGaps_1_1TofPacketReader}{TofPacketReader}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classGaps_1_1TofPacketReader}{TofPacketReader}}\&)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \textcolor{comment}{//TofPacketReader\&\ operator=(const\ TofPacketReader\&)\ =\ delete;}}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classGaps_1_1TofPacketReader_ae8a207f64bbe9c6f4abe9327eb04631c}{set\_filename}}(String\ filename);}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classGaps_1_1TofPacketReader_a1d66d4c024d5062e836ed162dbc41691}{get\_next\_packet}}()\ -\/>\ r::Result<TofPacket,\ Gaps::IOError>;}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classGaps_1_1TofPacketReader_ae03428748e024faf7a55ebc7d0a6a331}{get\_filename}}()\ const\ -\/>\ std::\textcolor{keywordtype}{string};}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ auto\ \mbox{\hyperlink{classGaps_1_1TofPacketReader_a8aca7f3a4a9658a11040279899e5db6f}{is\_exhausted}}()\ const\ -\/>\ \textcolor{keywordtype}{bool};}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ auto\ \mbox{\hyperlink{classGaps_1_1TofPacketReader_a2776634d72f8212b8f628c7f35d5327d}{n\_packets\_read}}()\ const\ -\/>\ usize;}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \ \ \ \ private:}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ std::ifstream\ \ stream\_file\_;}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \ \ \ exhausted\_;}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ usize\ \ \ \ \ \ \ \ \ \ n\_packets\_read\_;}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ String\ \ \ \ \ \ \ \ \ filename\_;}
+\DoxyCodeLine{00111\ \ \ \};}
+\DoxyCodeLine{00112\ \}}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

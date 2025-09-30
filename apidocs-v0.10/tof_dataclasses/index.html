@@ -1,0 +1,54 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Tof dataclasses"><title>tof_dataclasses - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../static.files/rustdoc-84e720fa.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="tof_dataclasses" data-themes="" data-resource-suffix="" data-rustdoc-version="1.89.0 (29483883e 2025-08-04)" data-channel="1.89.0" data-search-js="search-92309212.js" data-settings-js="settings-5514c975.js" ><script src="../static.files/storage-4e99c027.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-fd3af306.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-044be391.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../tof_dataclasses/index.html">tof_<wbr>dataclasses</a><span class="version">0.10.9</span></h2></div><div class="sidebar-elems"><ul class="block"><li><a id="all-types" href="all.html">All Items</a></li></ul><section id="rustdoc-toc"><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#features" title="features:">features:</a></li></ul><h3><a href="#reexports">Crate Items</a></h3><ul class="block"><li><a href="#reexports" title="Re-exports">Re-exports</a></li><li><a href="#modules" title="Modules">Modules</a></li><li><a href="#types" title="Type Aliases">Type Aliases</a></li></ul></section><div id="rustdoc-modnav"></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1>Crate <span>tof_dataclasses</span><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../src/tof_dataclasses/lib.rs.html#1-77">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Tof dataclasses</p>
+<p>This crate provides tof related dataclasses for</p>
+<ul>
+<li>
+<p>events</p>
+</li>
+<li>
+<p>network i/o wrappers (“packets”) for classes</p>
+</li>
+<li>
+<p>function related constants</p>
+</li>
+<li>
+<p>calibration</p>
+</li>
+<li>
+<p>commands/responses</p>
+</li>
+<li>
+<p>TODO: alerts</p>
+</li>
+</ul>
+<h2 id="features"><a class="doc-anchor" href="#features">§</a>features:</h2>
+<ul>
+<li>
+<p>random - allow random number generated data classes for
+testing</p>
+</li>
+<li>
+<p>database - access a data base for advanced paddle
+mapping, readoutboard and ltb information etc.</p>
+</li>
+<li>
+<p>caraspace - register TofPacket through the caraspace library
+This allows to write TofPackets to frames, which
+will ultimatly allow them to write them to
+caraspace files</p>
+</li>
+</ul>
+</div></details><h2 id="reexports" class="section-header">Re-exports<a href="#reexports" class="anchor">§</a></h2><dl class="item-table reexports"><dt id="reexport.ProtocolVersion"><code>pub use version::<a class="enum" href="version/enum.ProtocolVersion.html" title="enum tof_dataclasses::version::ProtocolVersion">ProtocolVersion</a>;</code></dt></dl><h2 id="modules" class="section-header">Modules<a href="#modules" class="anchor">§</a></h2><dl class="item-table"><dt><a class="mod" href="alerts/index.html" title="mod tof_dataclasses::alerts">alerts</a></dt><dd>The alerts are just clues to trigger an individual to respond to a certain situation</dd><dt><a class="mod" href="analysis/index.html" title="mod tof_dataclasses::analysis">analysis</a></dt><dd>Implementations of analysis engine
+This is based on the original code
+by J.Zweerink</dd><dt><a class="mod" href="calibrations/index.html" title="mod tof_dataclasses::calibrations">calibrations</a></dt><dd>The ReadoutBoardCalibration is
+the first stage in a 3 stage
+calibration process for the tof</dd><dt><a class="mod" href="caraspace/index.html" title="mod tof_dataclasses::caraspace">caraspace</a></dt><dd>Register TofPacket with the caraspace system</dd><dt><a class="mod" href="commands/index.html" title="mod tof_dataclasses::commands">commands</a></dt><dd>Commmands which can be issued
+to the various components of
+the tof system.</dd><dt><a class="mod" href="constants/index.html" title="mod tof_dataclasses::constants">constants</a></dt><dd>Global constants for TOF operations</dd><dt><a class="mod" href="database/index.html" title="mod tof_dataclasses::database">database</a></dt><dd>Database access &amp; entities of the TOF</dd><dt><a class="mod" href="errors/index.html" title="mod tof_dataclasses::errors">errors</a></dt><dd>Specific error types</dd><dt><a class="mod" href="events/index.html" title="mod tof_dataclasses::events">events</a></dt><dd>Events</dd><dt><a class="mod" href="heartbeats/index.html" title="mod tof_dataclasses::heartbeats">heartbeats</a></dt><dd>Heartbeats - regularly (or on demand) sent
+software monitoring data</dd><dt><a class="mod" href="io/index.html" title="mod tof_dataclasses::io">io</a></dt><dd>Dataio - readino/writing of different types</dd><dt><a class="mod" href="ipbus/index.html" title="mod tof_dataclasses::ipbus">ipbus</a></dt><dd>Implementation of the IPBus protocoll for GAPS</dd><dt><a class="mod" href="monitoring/index.html" title="mod tof_dataclasses::monitoring">monitoring</a></dt><dd>Tof housekeeping/monitoring</dd><dt><a class="mod" href="packets/index.html" title="mod tof_dataclasses::packets">packets</a></dt><dd>Packets are a way to send data over the network.</dd><dt><a class="mod" href="serialization/index.html" title="mod tof_dataclasses::serialization">serialization</a></dt><dd>Serialization/Deserialization helpers</dd><dt><a class="mod" href="series/index.html" title="mod tof_dataclasses::series">series</a></dt><dd>Compact data structures for analysis. Won’t get serialized.
+Summarize data of all boards and provide a more consice
+table-like structure for analysis.
+Currently under a lot of development. The goal is to get
+something which easily translates to a polars data frame.</dd><dt><a class="mod" href="status/index.html" title="mod tof_dataclasses::status">status</a></dt><dd>Detector status indicators</dd><dt><a class="mod" href="threading/index.html" title="mod tof_dataclasses::threading">threading</a></dt><dd>Thread control structures
+FIXME - this should go to liftof-lib</dd><dt><a class="mod" href="version/index.html" title="mod tof_dataclasses::version">version</a></dt></dl><h2 id="types" class="section-header">Type Aliases<a href="#types" class="anchor">§</a></h2><dl class="item-table"><dt><a class="type" href="type.DsiLtbRBMapping.html" title="type tof_dataclasses::DsiLtbRBMapping">DsiLtbRB<wbr>Mapping</a></dt><dd>A type for the master trigger mappings
+Dsi -&gt; J -&gt; (RBID,RBCH)</dd><dt><a class="type" href="type.RBChannelPaddleEndIDMap.html" title="type tof_dataclasses::RBChannelPaddleEndIDMap">RBChannel<wbr>Paddle<wbr>EndID<wbr>Map</a></dt><dd>A type for the mappings of RB channels - paddle edn ids
+Paddle end ids are the paddle id + 1000 for A and</dd><dt><a class="type" href="type.RbChPidMapping.html" title="type tof_dataclasses::RbChPidMapping">RbCh<wbr>PidMapping</a></dt></dl></section></div></main></body></html>

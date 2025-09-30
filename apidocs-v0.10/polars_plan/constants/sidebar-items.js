@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["LEN","UNLIMITED_CACHE"],"fn":["get_literal_name"],"static":["CSE_REPLACED","MAP_LIST_NAME","POLARS_TMP_PREFIX"]};

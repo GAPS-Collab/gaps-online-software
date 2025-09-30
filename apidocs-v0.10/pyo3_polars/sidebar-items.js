@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["error"],"struct":["PolarsAllocator","PyDataFrame","PyDataType","PyField","PySchema","PySeries","PyTimeUnit"]};
