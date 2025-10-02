@@ -1,6 +1,6 @@
 Title: gaps-online-software v0.11 
 Category: Software documentation
-Date: 2025-09-25
+Date: 2025-03-31
 
 [gaps-online-software v0.11 "PAKI'I"](https://github.com/GAPS-Collab/gaps-online-software/tree/PAKII-0.11)
 

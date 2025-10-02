@@ -58,4 +58,10 @@ API docs
    
    gondola
 
+CXX API Software documentation
+=================================
+
+`Doxygen API docs <C++/index.html>`_
+
+
 

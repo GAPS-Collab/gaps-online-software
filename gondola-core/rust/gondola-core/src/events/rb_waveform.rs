@@ -12,10 +12,10 @@ use crate::prelude::*;
 #[cfg_attr(feature="pybindings", pyclass)]
 pub struct RBWaveform {
   pub event_id      : u32,
-  //pub rb_id         : u8,
+  pub rb_id         : u8,
   ///// FIXME - this is form 0-8, but should it be from 1-9?
-  //pub rb_channel_a  : u8,
-  //pub rb_channel_b  : u8,
+  pub rb_channel_a  : u8,
+  pub rb_channel_b  : u8,
   /// DRS4 stop cell
   pub stop_cell     : u16,
   pub adc_a         : Vec<u16>,
@@ -35,9 +35,9 @@ impl RBWaveform {
   pub fn new() -> Self {
     Self {
       event_id       : 0,
-      //rb_id          : 0,
-      //rb_channel_a   : 0,
-      //rb_channel_b   : 0,
+      rb_id          : 0,
+      rb_channel_a   : 0,
+      rb_channel_b   : 0,
       stop_cell      : 0,
       paddle_id      : 0,
       adc_a          : Vec::<u16>::new(),
@@ -229,11 +229,11 @@ impl Serialization for RBWaveform {
       return Err(SerializationError::HeadInvalid {});
     }
     wf.event_id          = parse_u32(stream, pos);
-    //wf.rb_id             = parse_u8 (stream, pos);
-    //wf.rb_channel_a      = parse_u8 (stream, pos);
-    //wf.rb_channel_b      = parse_u8 (stream, pos);
+    wf.rb_id             = parse_u8 (stream, pos);
+    wf.rb_channel_a      = parse_u8 (stream, pos);
+    wf.rb_channel_b      = parse_u8 (stream, pos);
     wf.stop_cell         = parse_u16(stream, pos);
-    //wf.paddle_id         = parse_u8 (stream, pos);
+    wf.paddle_id         = parse_u8 (stream, pos);
     if stream.len() < *pos+2*NWORDS {
       return Err(SerializationError::StreamTooShort);
     }
@@ -257,11 +257,11 @@ impl Serialization for RBWaveform {
     let mut stream = Vec::<u8>::new();
     stream.extend_from_slice(&Self::HEAD.to_le_bytes());
     stream.extend_from_slice(&self.event_id.to_le_bytes());
-    //stream.extend_from_slice(&self.rb_id.to_le_bytes());
-    //stream.extend_from_slice(&self.rb_channel_a.to_le_bytes());
-    //stream.extend_from_slice(&self.rb_channel_b.to_le_bytes());
+    stream.extend_from_slice(&self.rb_id.to_le_bytes());
+    stream.extend_from_slice(&self.rb_channel_a.to_le_bytes());
+    stream.extend_from_slice(&self.rb_channel_b.to_le_bytes());
     stream.extend_from_slice(&self.stop_cell.to_le_bytes());
-    //stream.push(self.paddle_id);
+    stream.push(self.paddle_id);
     if self.adc_a.len() != 0 {
       for k in 0..NWORDS {
         stream.extend_from_slice(&self.adc_a[k].to_le_bytes());  

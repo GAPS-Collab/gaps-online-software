@@ -1,21 +1,16 @@
 [project]
-name = "doc"
+name = "pelican-docs"
 version = "0.1.0"
 description = "Add your description here"
 authors = [
-    { name = "Achim Stoessl", email = "stoessl@hawaii.edu" }
+    { name = "Achim Stoessl", email = "achim.stoessl@gmail.com" }
 ]
 dependencies = [
-    "hermes-py>=0.2.0",
-    "sphinx>=8.1.3",
-    "pydata-sphinx-theme>=0.16.1",
-    "charmingbeauty>=0.1.4",
-    "django>=5.1.4",
-    "myst-parser>=4.0.0",
-    "gondola>=0.12",
+    "pelican>=4.11.0",
+    "markdown>=3.9",
 ]
 readme = "README.md"
-requires-python = ">= 3.12"
+requires-python = ">= 3.8"
 
 [build-system]
 requires = ["hatchling"]
@@ -29,4 +24,4 @@ dev-dependencies = []
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/doc"]
+packages = ["src/pelican_docs"]

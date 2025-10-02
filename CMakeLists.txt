@@ -7,10 +7,10 @@
 #==========================================
 
 cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
-project(GAPS_ONLINE_SOFTWARE VERSION 0.11 LANGUAGES C CXX)
+project(GAPS_ONLINE_SOFTWARE VERSION 0.12 LANGUAGES C CXX)
 
 message(STATUS "Running cmake for ${CMAKE_PROJECT_NAME} softwere version ${GAPS_ONLINE_SOFTWARE_VERSION}")
-message(STATUS "-- Current release PAKI'I (Flounder)")
+message(STATUS "-- Current release A'U LEPE (Sailfish)")
 message(STATUS "-- Building software for ${CMAKE_SYSTEM_NAME}")
 if (APPLE)
   message(WARNING "-- -- will attempt build for MacOSX system. This is experimental and might not work!")

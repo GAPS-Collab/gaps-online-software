@@ -6,11 +6,9 @@ This is version AULEPE-0.12. [Aulepe are sailfish!](https://en.wikipedia.org/wik
 ![Aulepe](resources/assets/aulepe_luma.png)
 
 >[!NOTE] 
->You think you're fast? You think your pet cheetah is fast? A sailfish clocks in at 68MpH and and another member of the billfish family, the Black Marlin is considered the [fastest non-airborne animal on the planet and can go up to 80MpH](https://en.wikipedia.org/wiki/Fastest_animals) and thus faster than a Cheetah. On top of that Marlin are actually pretty tasty!
->Marlin can be found around the Hawaiian islands
-
->[!NOTE]
->This release of gaps-online plugs in the Turbo. This is the Supra which goes "nnnnnnnnn.... shtutututu...". The focus of this release is to keep bascially the API of v0.11 but Speed.It.Up. 
+>The fastest non-airborne species is actually not the Cheetah! Marine life can be even faster. While the sailfish seems to be a little less fast then the [fastest non-airborne animal on the planet (Black Marlin with speeds up to 80MpH)](https://en.wikipedia.org/wiki/Fastest_animals). Thus the Black Marlin is faster than a Cheetah.
+>Sailfish have been observed to swim up to 68 MpH, and while that's a little less fast than their world-record cousin, their displays when they leap out of the water at these speed are quite astonishing. 
+>Marlin can be found around the Hawaiian islands and are actually quite tasty!
 
 ## CHANGELOG/Migration guide  
 [Since v0.12 we are keeping a global CHANELOG.MD](CHANGELOG.md)
@@ -30,6 +28,9 @@ always referring to the the main branch, so it might or might not be accurate.
 * `cmake` is used as a build system
 *  a number of C++ libraries are pulled from github during installation.
 * The C++ API uses the C++20 standard and thus wants gcc-13 or later.
+* We highly recommend the excellent [rye](https://rye.astral.sh/) to deal with 
+  python installations, however, the developer has announced that rye is succeeded by 
+  uv, so in the future we will migrate  
 
 ### software repository
 

@@ -31,7 +31,7 @@ chrono = { version = "0.4", features =["serde"] }
 path     = "../gondola-core/rust/gondola-core"
 # deliberatly exclude pybindings feature here
 features = ["database", "tofcontrol", "advanced-algorithms", "tof-liftof"]
-version  = "0.11"
+version  = "0.12"
 
 [profile.release]
 opt-level = 3

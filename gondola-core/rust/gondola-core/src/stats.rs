@@ -20,7 +20,7 @@ use numpy::{
 
 /// Calculates the standard deviation of a vector.
 ///
-/// This function returns an Option<f32> because the standard deviation is
+/// This function returns an `Option<f32>` because the standard deviation is
 /// undefined for an empty vector or a vector with a single element.
 pub fn standard_deviation(data: &Vec<f32>) -> Option<f32> {
   // The standard deviation is not defined for vectors with less than 2 elements.

@@ -27,13 +27,12 @@ use gondola_core::prelude::*;
 /// All received packets will be either forwarded
 /// over zmq or saved to disk
 ///
-/// # Arguments
-///
-///     * incoming       : incoming connection for TofPackets
-///                        from any source
-///     * thread_control : inter-thread communications,
-///                        start/stop signals.
-///                        Keeps global settings.
+/// # Arguments:
+///   * incoming       : incoming connection for TofPackets
+///                      from any source
+///   * thread_control : inter-thread communications,
+///                      start/stop signals.
+///                      Keeps global settings.
 pub fn global_data_sink(incoming       : &Receiver<TofPacket>,
                         thread_control : Arc<Mutex<ThreadControl>>) {
   // when the thread starts, we need to wait a bit
