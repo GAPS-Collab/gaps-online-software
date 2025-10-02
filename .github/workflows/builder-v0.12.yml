@@ -61,7 +61,7 @@ jobs:
       run: cd ${{ github.workspace}}/doc/pelican-docs/ && rye pin 3.13 && rye sync && ./init-docs.sh 
     
     - name: Init cmake 
-      run: cmake -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_CXX_BINDINGS=ON -DBUILD_CXX_DB=ON -DBUILD_CXX_EXAMPLES=ON -DBUILD_CXX_PYBINDINGS=ON
+      run: cmake -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_CXX_BINDINGS=ON -DBUILD_CXX_DB=ON -DBUILD_CXX_EXAMPLES=ON -DBUILD_CXX_PYBINDINGS=OFF
     
     - name: C++ Docs 
       run: cd ${{github.workspace}}/build && make doc 
