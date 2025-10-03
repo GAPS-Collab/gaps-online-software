@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["enumerate_idx"],"trait":["Itertools"]};

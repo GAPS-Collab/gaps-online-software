@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["BooleanUniqueKernelState","DictionaryRangedUniqueState","PrimitiveRangedUniqueState"],"trait":["GenericUniqueKernel","RangedUniqueKernel","SortedUniqueKernel"]};

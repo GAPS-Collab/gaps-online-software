@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["dyn_array_max_ignore_nan","dyn_array_max_propagate_nan","dyn_array_min_ignore_nan","dyn_array_min_max_propagate_nan","dyn_array_min_propagate_nan"],"trait":["MinMaxKernel"]};

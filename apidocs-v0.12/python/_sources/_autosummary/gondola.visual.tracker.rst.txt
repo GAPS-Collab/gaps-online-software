@@ -1,0 +1,15 @@
+gondola.visual.tracker
+======================
+
+.. automodule:: gondola.visual.tracker
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      plot_strip_lines
+      plot_tracker
+      plot_tracker_proj
+      prepare_layer_fig
+   

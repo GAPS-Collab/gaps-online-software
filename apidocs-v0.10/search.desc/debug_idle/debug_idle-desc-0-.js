@@ -1,1 +1,0 @@
-searchState.loadedDescShard("debug_idle", 0, "Set the DRS4 idle register and then watch the buffers")

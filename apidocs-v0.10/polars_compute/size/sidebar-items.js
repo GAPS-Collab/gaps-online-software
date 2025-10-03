@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["binary_size_bytes"]};

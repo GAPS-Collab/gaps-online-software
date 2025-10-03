@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["merge_sorted_to_schema_order","merge_sorted_to_schema_order_impl"]};

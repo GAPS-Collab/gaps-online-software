@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["TelemetryPacketType"],"fn":["make_systime"],"mod":["magnetometer"],"struct":["AckBfsw","GPSPacket","GapsEvent","GapsTracker","MergedEvent","TelemetryHeader","TelemetryPacket","TrackerDAQHSKPacket","TrackerDAQTempPacket","TrackerEvent","TrackerEventIDEchoPacket","TrackerHeader","TrackerHit","TrackerHitV2","TrackerPacket","TrackerTempLeakPacket"]};

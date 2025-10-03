@@ -1,0 +1,46 @@
+\doxysection{gondola\+::Telemetry\+Packet\+Reader Struct Reference}
+\hypertarget{structgondola_1_1TelemetryPacketReader}{}\label{structgondola_1_1TelemetryPacketReader}\index{gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}}
+
+
+{\ttfamily \#include $<$telemetry\+\_\+reader.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structgondola_1_1TelemetryPacketReader_ab06f74e00c5c2813a0013404782384cc}\label{structgondola_1_1TelemetryPacketReader_ab06f74e00c5c2813a0013404782384cc} 
+{\bfseries Telemetry\+Packet\+Reader} (std\+::string pathname)
+\item 
+\Hypertarget{structgondola_1_1TelemetryPacketReader_a545a1ffc5d615f4d8db56bd18fde81bd}\label{structgondola_1_1TelemetryPacketReader_a545a1ffc5d615f4d8db56bd18fde81bd} 
+{\bfseries Telemetry\+Packet\+Reader} (const \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader}{Telemetry\+Packet\+Reader}} \&)=delete
+\item 
+\Hypertarget{structgondola_1_1TelemetryPacketReader_aecb4a47ffb724ec5913e15928b4e0aaa}\label{structgondola_1_1TelemetryPacketReader_aecb4a47ffb724ec5913e15928b4e0aaa} 
+auto {\bfseries set\+\_\+path} (std\+::string pathname) -\/$>$ void
+\item 
+\Hypertarget{structgondola_1_1TelemetryPacketReader_aeab4c103035559c98ade8313f5650958}\label{structgondola_1_1TelemetryPacketReader_aeab4c103035559c98ade8313f5650958} 
+auto {\bfseries get\+\_\+filenames} () const -\/$>$ Vec$<$ std\+::string $>$
+\item 
+\Hypertarget{structgondola_1_1TelemetryPacketReader_a51f8d07aa658c56d2ddd5054b7a85806}\label{structgondola_1_1TelemetryPacketReader_a51f8d07aa658c56d2ddd5054b7a85806} 
+auto {\bfseries get\+\_\+next\+\_\+packet} () -\/$>$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Packet}{Gaps\+::\+Telemetry\+::\+Packet}}
+\item 
+auto \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_a954e5dbc2e1e3b39bb854303bd8c9873}{is\+\_\+exhausted}} () const -\/$>$ bool
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Read serialized Telemetry\+Packets from an existing file
+
+Read GAPS binary files ("{}Berkeley binaries) 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structgondola_1_1TelemetryPacketReader_a954e5dbc2e1e3b39bb854303bd8c9873}\label{structgondola_1_1TelemetryPacketReader_a954e5dbc2e1e3b39bb854303bd8c9873} 
+\index{gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}!is\_exhausted@{is\_exhausted}}
+\index{is\_exhausted@{is\_exhausted}!gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}}
+\doxysubsubsection{\texorpdfstring{is\_exhausted()}{is\_exhausted()}}
+{\footnotesize\ttfamily bool gondola\+::\+Telemetry\+Packet\+Reader\+::is\+\_\+exhausted (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ bool}
+
+All packets have been read from the file. If they should be read again, the reader has to be created again 
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/io/telemetry\+\_\+reader.\+hpp\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/telemetry\+\_\+reader.\+cxx\end{DoxyCompactItemize}

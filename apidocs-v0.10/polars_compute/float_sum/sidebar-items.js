@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["sum_arr_as_f32","sum_arr_as_f64"],"trait":["FloatSum","SumBlock"]};

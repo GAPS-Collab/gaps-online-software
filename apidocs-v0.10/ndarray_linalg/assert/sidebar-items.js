@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["aclose","close_l1","close_l2","close_max","rclose"]};

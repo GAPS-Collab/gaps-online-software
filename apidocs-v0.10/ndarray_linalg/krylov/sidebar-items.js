@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["AppendResult","Strategy"],"fn":["qr"],"mod":["arnoldi","householder","mgs"],"trait":["Orthogonalizer"],"type":["Coefficients","H","Q","R"]};

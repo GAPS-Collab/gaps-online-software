@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["gaussnewton_linesearch","gaussnewton_method"]};

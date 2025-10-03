@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["inplace_zip_filtermap"],"trait":["CapacityByFactor","ConvertVec","IntoRawParts","PushUnchecked","ResizeFaster"]};

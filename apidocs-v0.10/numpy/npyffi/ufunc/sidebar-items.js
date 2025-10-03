@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"static":["PY_UFUNC_API"],"struct":["PyUFuncAPI"]};

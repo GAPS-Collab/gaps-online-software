@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["Caching"],"fn":["init","try_init"],"struct":["Logger","ResetHandle"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["ArmijoCondition","GoldsteinCondition","StrongWolfeCondition","WolfeCondition"],"trait":["LineSearchCondition"]};

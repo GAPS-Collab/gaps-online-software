@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["Buffer"],"fn":["init_buffers","validate_utf8"],"struct":["CategoricalField","DatetimeField","Utf8Field"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["reduction_ratio"],"mod":["cauchypoint","dogleg","steihaug","trustregion_method"]};

@@ -1,0 +1,175 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/resources/extern/tof-control/src/switch_control/switch_port.rs`."><title>switch_port.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-aa0817cf.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="tof_control" data-themes="" data-resource-suffix="" data-rustdoc-version="1.90.0 (1159e78c4 2025-09-14)" data-channel="1.90.0" data-search-js="search-fa3e91e5.js" data-settings-js="settings-5514c975.js" ><script src="../../../static.files/storage-68b7e25d.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-eebb9057.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">tof_control/switch_control/</div>switch_port.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>snmp::SyncSession;
+<a href=#2 id=2 data-nosnippet>2</a><span class="kw">use </span>std::time::Duration;
+<a href=#3 id=3 data-nosnippet>3</a>
+<a href=#4 id=4 data-nosnippet>4</a><span class="kw">use </span><span class="kw">crate</span>::helper::switch_type::{SwitchPort, SwitchError};
+<a href=#5 id=5 data-nosnippet>5</a><span class="kw">use </span><span class="kw">crate</span>::switch_control::switch_util::{snmp_getbulk_integer, snmp_getbulk_counter64, snmp_set_integer};
+<a href=#6 id=6 data-nosnippet>6</a>
+<a href=#7 id=7 data-nosnippet>7</a><span class="kw">impl </span>SwitchPort {
+<a href=#8 id=8 data-nosnippet>8</a>    <span class="kw">pub fn </span>new(ip_addr: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+<a href=#9 id=9 data-nosnippet>9</a>        <span class="kw">match </span><span class="self">Self</span>::read_port(ip_addr) {
+<a href=#10 id=10 data-nosnippet>10</a>            <span class="prelude-val">Ok</span>(switch_port) =&gt; {
+<a href=#11 id=11 data-nosnippet>11</a>                switch_port
+<a href=#12 id=12 data-nosnippet>12</a>            }
+<a href=#13 id=13 data-nosnippet>13</a>            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
+<a href=#14 id=14 data-nosnippet>14</a>                <span class="self">Self </span>{
+<a href=#15 id=15 data-nosnippet>15</a>                    link: [u8::MAX; <span class="number">16</span>],
+<a href=#16 id=16 data-nosnippet>16</a>                    speed: [u8::MAX; <span class="number">16</span>],
+<a href=#17 id=17 data-nosnippet>17</a>                    full_duplex: [u8::MAX; <span class="number">16</span>],
+<a href=#18 id=18 data-nosnippet>18</a>                    rx_bytes: [u64::MAX; <span class="number">16</span>],
+<a href=#19 id=19 data-nosnippet>19</a>                    rx_pkts: [u64::MAX; <span class="number">16</span>],
+<a href=#20 id=20 data-nosnippet>20</a>                    rx_drop_evts: [u64::MAX; <span class="number">16</span>],
+<a href=#21 id=21 data-nosnippet>21</a>                    rx_broadcast_pkts: [u64::MAX; <span class="number">16</span>],
+<a href=#22 id=22 data-nosnippet>22</a>                    rx_multicast_pkts: [u64::MAX; <span class="number">16</span>],
+<a href=#23 id=23 data-nosnippet>23</a>                    rx_crc_align_err_pkts: [u64::MAX; <span class="number">16</span>],
+<a href=#24 id=24 data-nosnippet>24</a>                    tx_bytes: [u64::MAX; <span class="number">16</span>],
+<a href=#25 id=25 data-nosnippet>25</a>                    tx_pkts: [u64::MAX; <span class="number">16</span>],
+<a href=#26 id=26 data-nosnippet>26</a>                    tx_drop_evts: [u64::MAX; <span class="number">16</span>],
+<a href=#27 id=27 data-nosnippet>27</a>                    tx_broadcast_pkts: [u64::MAX; <span class="number">16</span>],
+<a href=#28 id=28 data-nosnippet>28</a>                    tx_multicast_pkts: [u64::MAX; <span class="number">16</span>],
+<a href=#29 id=29 data-nosnippet>29</a>                }
+<a href=#30 id=30 data-nosnippet>30</a>            }
+<a href=#31 id=31 data-nosnippet>31</a>        }
+<a href=#32 id=32 data-nosnippet>32</a>    }
+<a href=#33 id=33 data-nosnippet>33</a>    <span class="kw">pub fn </span>read_port(ip_addr: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;SwitchPort, SwitchError&gt; {
+<a href=#34 id=34 data-nosnippet>34</a>        <span class="kw">let </span><span class="kw-2">mut </span>snmp_session = SyncSession::new(ip_addr, <span class="string">b"public"</span>, <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">1</span>)), <span class="number">0</span>)<span class="question-mark">?</span>;
+<a href=#35 id=35 data-nosnippet>35</a>
+<a href=#36 id=36 data-nosnippet>36</a>        <span class="kw">let </span>link = <span class="self">Self</span>::read_link(<span class="kw-2">&amp;mut </span>snmp_session)<span class="question-mark">?</span>;
+<a href=#37 id=37 data-nosnippet>37</a>        <span class="kw">let </span>speed = <span class="self">Self</span>::read_speed(<span class="kw-2">&amp;mut </span>snmp_session)<span class="question-mark">?</span>;
+<a href=#38 id=38 data-nosnippet>38</a>        <span class="kw">let </span>full_duplex = <span class="self">Self</span>::read_full_duplex(<span class="kw-2">&amp;mut </span>snmp_session)<span class="question-mark">?</span>;
+<a href=#39 id=39 data-nosnippet>39</a>        <span class="kw">let </span>rx_bytes = <span class="self">Self</span>::read_rx_bytes(<span class="kw-2">&amp;mut </span>snmp_session)<span class="question-mark">?</span>;
+<a href=#40 id=40 data-nosnippet>40</a>        <span class="kw">let </span>rx_pkts = <span class="self">Self</span>::read_rx_pkts(<span class="kw-2">&amp;mut </span>snmp_session)<span class="question-mark">?</span>;
+<a href=#41 id=41 data-nosnippet>41</a>        <span class="kw">let </span>rx_drop_evts = <span class="self">Self</span>::read_rx_drop_evts(<span class="kw-2">&amp;mut </span>snmp_session)<span class="question-mark">?</span>;
+<a href=#42 id=42 data-nosnippet>42</a>        <span class="kw">let </span>rx_broadcast_pkts = <span class="self">Self</span>::read_rx_broadcast_pkts(<span class="kw-2">&amp;mut </span>snmp_session)<span class="question-mark">?</span>;
+<a href=#43 id=43 data-nosnippet>43</a>        <span class="kw">let </span>rx_multicast_pkts = <span class="self">Self</span>::read_rx_multicast_pkts(<span class="kw-2">&amp;mut </span>snmp_session)<span class="question-mark">?</span>;
+<a href=#44 id=44 data-nosnippet>44</a>        <span class="kw">let </span>rx_crc_align_err_pkts = <span class="self">Self</span>::read_rx_crc_align_err_pkts(<span class="kw-2">&amp;mut </span>snmp_session)<span class="question-mark">?</span>;
+<a href=#45 id=45 data-nosnippet>45</a>        <span class="kw">let </span>tx_bytes = <span class="self">Self</span>::read_tx_bytes(<span class="kw-2">&amp;mut </span>snmp_session)<span class="question-mark">?</span>;
+<a href=#46 id=46 data-nosnippet>46</a>        <span class="kw">let </span>tx_pkts = <span class="self">Self</span>::read_tx_pkts(<span class="kw-2">&amp;mut </span>snmp_session)<span class="question-mark">?</span>;
+<a href=#47 id=47 data-nosnippet>47</a>        <span class="kw">let </span>tx_drop_evts = <span class="self">Self</span>::read_tx_drop_evts(<span class="kw-2">&amp;mut </span>snmp_session)<span class="question-mark">?</span>;
+<a href=#48 id=48 data-nosnippet>48</a>        <span class="kw">let </span>tx_broadcast_pkts = <span class="self">Self</span>::read_tx_broadcast_pkts(<span class="kw-2">&amp;mut </span>snmp_session)<span class="question-mark">?</span>;
+<a href=#49 id=49 data-nosnippet>49</a>        <span class="kw">let </span>tx_multicast_pkts = <span class="self">Self</span>::read_tx_multicast_pkts(<span class="kw-2">&amp;mut </span>snmp_session)<span class="question-mark">?</span>;
+<a href=#50 id=50 data-nosnippet>50</a>
+<a href=#51 id=51 data-nosnippet>51</a>        <span class="prelude-val">Ok</span>(
+<a href=#52 id=52 data-nosnippet>52</a>            SwitchPort {
+<a href=#53 id=53 data-nosnippet>53</a>                link,
+<a href=#54 id=54 data-nosnippet>54</a>                speed,
+<a href=#55 id=55 data-nosnippet>55</a>                full_duplex,
+<a href=#56 id=56 data-nosnippet>56</a>                rx_bytes,
+<a href=#57 id=57 data-nosnippet>57</a>                rx_pkts,
+<a href=#58 id=58 data-nosnippet>58</a>                rx_drop_evts,
+<a href=#59 id=59 data-nosnippet>59</a>                rx_broadcast_pkts,
+<a href=#60 id=60 data-nosnippet>60</a>                rx_multicast_pkts,
+<a href=#61 id=61 data-nosnippet>61</a>                rx_crc_align_err_pkts,
+<a href=#62 id=62 data-nosnippet>62</a>                tx_bytes,
+<a href=#63 id=63 data-nosnippet>63</a>                tx_pkts,
+<a href=#64 id=64 data-nosnippet>64</a>                tx_drop_evts,
+<a href=#65 id=65 data-nosnippet>65</a>                tx_broadcast_pkts,
+<a href=#66 id=66 data-nosnippet>66</a>                tx_multicast_pkts,
+<a href=#67 id=67 data-nosnippet>67</a>            }
+<a href=#68 id=68 data-nosnippet>68</a>        )
+<a href=#69 id=69 data-nosnippet>69</a>    }
+<a href=#70 id=70 data-nosnippet>70</a>    <span class="kw">pub fn </span>read_link(session: <span class="kw-2">&amp;mut </span>SyncSession) -&gt; <span class="prelude-ty">Result</span>&lt;[u8; <span class="number">16</span>], SwitchError&gt; {
+<a href=#71 id=71 data-nosnippet>71</a>        <span class="kw">let </span>oid = <span class="string">".1.3.6.1.4.1.38477.1.50.1.11.1.3.1.1.2"</span>;
+<a href=#72 id=72 data-nosnippet>72</a>        <span class="kw">let </span>link = snmp_getbulk_integer(oid, session)<span class="question-mark">?</span>;
+<a href=#73 id=73 data-nosnippet>73</a>
+<a href=#74 id=74 data-nosnippet>74</a>        <span class="prelude-val">Ok</span>(link)
+<a href=#75 id=75 data-nosnippet>75</a>    }
+<a href=#76 id=76 data-nosnippet>76</a>    <span class="kw">pub fn </span>read_speed(session: <span class="kw-2">&amp;mut </span>SyncSession) -&gt; <span class="prelude-ty">Result</span>&lt;[u8; <span class="number">16</span>], SwitchError&gt; {
+<a href=#77 id=77 data-nosnippet>77</a>        <span class="kw">let </span>oid = <span class="string">".1.3.6.1.4.1.38477.1.50.1.11.1.3.1.1.5"</span>;
+<a href=#78 id=78 data-nosnippet>78</a>        <span class="kw">let </span>speed = snmp_getbulk_integer(oid, session)<span class="question-mark">?</span>;
+<a href=#79 id=79 data-nosnippet>79</a>
+<a href=#80 id=80 data-nosnippet>80</a>        <span class="prelude-val">Ok</span>(speed)
+<a href=#81 id=81 data-nosnippet>81</a>    }
+<a href=#82 id=82 data-nosnippet>82</a>    <span class="kw">pub fn </span>read_full_duplex(session: <span class="kw-2">&amp;mut </span>SyncSession) -&gt; <span class="prelude-ty">Result</span>&lt;[u8; <span class="number">16</span>], SwitchError&gt; {
+<a href=#83 id=83 data-nosnippet>83</a>        <span class="kw">let </span>oid = <span class="string">".1.3.6.1.4.1.38477.1.50.1.11.1.3.1.1.3"</span>;
+<a href=#84 id=84 data-nosnippet>84</a>        <span class="kw">let </span>fdx = snmp_getbulk_integer(oid, session)<span class="question-mark">?</span>;
+<a href=#85 id=85 data-nosnippet>85</a>
+<a href=#86 id=86 data-nosnippet>86</a>        <span class="prelude-val">Ok</span>(fdx)
+<a href=#87 id=87 data-nosnippet>87</a>    }
+<a href=#88 id=88 data-nosnippet>88</a>    <span class="kw">pub fn </span>read_rx_bytes(session: <span class="kw-2">&amp;mut </span>SyncSession) -&gt; <span class="prelude-ty">Result</span>&lt;[u64; <span class="number">16</span>], SwitchError&gt; {
+<a href=#89 id=89 data-nosnippet>89</a>        <span class="kw">let </span>oid = <span class="string">".1.3.6.1.4.1.38477.1.50.1.11.1.5.1.1.3"</span>;
+<a href=#90 id=90 data-nosnippet>90</a>        <span class="kw">let </span>rx_bytes = snmp_getbulk_counter64(oid, session)<span class="question-mark">?</span>;
+<a href=#91 id=91 data-nosnippet>91</a>
+<a href=#92 id=92 data-nosnippet>92</a>        <span class="prelude-val">Ok</span>(rx_bytes)
+<a href=#93 id=93 data-nosnippet>93</a>    }
+<a href=#94 id=94 data-nosnippet>94</a>    <span class="kw">pub fn </span>read_rx_pkts(session: <span class="kw-2">&amp;mut </span>SyncSession) -&gt; <span class="prelude-ty">Result</span>&lt;[u64; <span class="number">16</span>], SwitchError&gt; {
+<a href=#95 id=95 data-nosnippet>95</a>        <span class="kw">let </span>oid = <span class="string">".1.3.6.1.4.1.38477.1.50.1.11.1.5.1.1.4"</span>;
+<a href=#96 id=96 data-nosnippet>96</a>        <span class="kw">let </span>rx_pkts = snmp_getbulk_counter64(oid, session)<span class="question-mark">?</span>;
+<a href=#97 id=97 data-nosnippet>97</a>
+<a href=#98 id=98 data-nosnippet>98</a>        <span class="prelude-val">Ok</span>(rx_pkts)
+<a href=#99 id=99 data-nosnippet>99</a>    }
+<a href=#100 id=100 data-nosnippet>100</a>    <span class="kw">pub fn </span>read_rx_drop_evts(session: <span class="kw-2">&amp;mut </span>SyncSession) -&gt; <span class="prelude-ty">Result</span>&lt;[u64; <span class="number">16</span>], SwitchError&gt; {
+<a href=#101 id=101 data-nosnippet>101</a>        <span class="kw">let </span>oid = <span class="string">".1.3.6.1.4.1.38477.1.50.1.11.1.5.1.1.2"</span>;
+<a href=#102 id=102 data-nosnippet>102</a>        <span class="kw">let </span>rx_drop_evts = snmp_getbulk_counter64(oid, session)<span class="question-mark">?</span>;
+<a href=#103 id=103 data-nosnippet>103</a>
+<a href=#104 id=104 data-nosnippet>104</a>        <span class="prelude-val">Ok</span>(rx_drop_evts)
+<a href=#105 id=105 data-nosnippet>105</a>    }
+<a href=#106 id=106 data-nosnippet>106</a>    <span class="kw">pub fn </span>read_rx_broadcast_pkts(session: <span class="kw-2">&amp;mut </span>SyncSession) -&gt; <span class="prelude-ty">Result</span>&lt;[u64; <span class="number">16</span>], SwitchError&gt; {
+<a href=#107 id=107 data-nosnippet>107</a>        <span class="kw">let </span>oid = <span class="string">".1.3.6.1.4.1.38477.1.50.1.11.1.5.1.1.5"</span>;
+<a href=#108 id=108 data-nosnippet>108</a>        <span class="kw">let </span>rx_broadcast_pkts = snmp_getbulk_counter64(oid, session)<span class="question-mark">?</span>;
+<a href=#109 id=109 data-nosnippet>109</a>
+<a href=#110 id=110 data-nosnippet>110</a>        <span class="prelude-val">Ok</span>(rx_broadcast_pkts)
+<a href=#111 id=111 data-nosnippet>111</a>    }
+<a href=#112 id=112 data-nosnippet>112</a>    <span class="kw">pub fn </span>read_rx_multicast_pkts(session: <span class="kw-2">&amp;mut </span>SyncSession) -&gt; <span class="prelude-ty">Result</span>&lt;[u64; <span class="number">16</span>], SwitchError&gt; {
+<a href=#113 id=113 data-nosnippet>113</a>        <span class="kw">let </span>oid = <span class="string">".1.3.6.1.4.1.38477.1.50.1.11.1.5.1.1.6"</span>;
+<a href=#114 id=114 data-nosnippet>114</a>        <span class="kw">let </span>rx_multicast_pkts = snmp_getbulk_counter64(oid, session)<span class="question-mark">?</span>;
+<a href=#115 id=115 data-nosnippet>115</a>
+<a href=#116 id=116 data-nosnippet>116</a>        <span class="prelude-val">Ok</span>(rx_multicast_pkts)
+<a href=#117 id=117 data-nosnippet>117</a>    }
+<a href=#118 id=118 data-nosnippet>118</a>    <span class="kw">pub fn </span>read_rx_crc_align_err_pkts(session: <span class="kw-2">&amp;mut </span>SyncSession) -&gt; <span class="prelude-ty">Result</span>&lt;[u64; <span class="number">16</span>], SwitchError&gt; {
+<a href=#119 id=119 data-nosnippet>119</a>        <span class="kw">let </span>oid = <span class="string">".1.3.6.1.4.1.38477.1.50.1.11.1.5.1.1.7"</span>;
+<a href=#120 id=120 data-nosnippet>120</a>        <span class="kw">let </span>rx_crc_align_err_pkts = snmp_getbulk_counter64(oid, session)<span class="question-mark">?</span>;
+<a href=#121 id=121 data-nosnippet>121</a>
+<a href=#122 id=122 data-nosnippet>122</a>        <span class="prelude-val">Ok</span>(rx_crc_align_err_pkts)
+<a href=#123 id=123 data-nosnippet>123</a>    }
+<a href=#124 id=124 data-nosnippet>124</a>    <span class="kw">pub fn </span>read_tx_bytes(session: <span class="kw-2">&amp;mut </span>SyncSession) -&gt; <span class="prelude-ty">Result</span>&lt;[u64; <span class="number">16</span>], SwitchError&gt; {
+<a href=#125 id=125 data-nosnippet>125</a>        <span class="kw">let </span>oid = <span class="string">".1.3.6.1.4.1.38477.1.50.1.11.1.5.1.1.20"</span>;
+<a href=#126 id=126 data-nosnippet>126</a>        <span class="kw">let </span>tx_bytes = snmp_getbulk_counter64(oid, session)<span class="question-mark">?</span>;
+<a href=#127 id=127 data-nosnippet>127</a>
+<a href=#128 id=128 data-nosnippet>128</a>        <span class="prelude-val">Ok</span>(tx_bytes)
+<a href=#129 id=129 data-nosnippet>129</a>    }
+<a href=#130 id=130 data-nosnippet>130</a>    <span class="kw">pub fn </span>read_tx_pkts(session: <span class="kw-2">&amp;mut </span>SyncSession) -&gt; <span class="prelude-ty">Result</span>&lt;[u64; <span class="number">16</span>], SwitchError&gt; {
+<a href=#131 id=131 data-nosnippet>131</a>        <span class="kw">let </span>oid = <span class="string">".1.3.6.1.4.1.38477.1.50.1.11.1.5.1.1.21"</span>;
+<a href=#132 id=132 data-nosnippet>132</a>        <span class="kw">let </span>tx_pkts = snmp_getbulk_counter64(oid, session)<span class="question-mark">?</span>;
+<a href=#133 id=133 data-nosnippet>133</a>
+<a href=#134 id=134 data-nosnippet>134</a>        <span class="prelude-val">Ok</span>(tx_pkts)
+<a href=#135 id=135 data-nosnippet>135</a>    }
+<a href=#136 id=136 data-nosnippet>136</a>    <span class="kw">pub fn </span>read_tx_drop_evts(session: <span class="kw-2">&amp;mut </span>SyncSession) -&gt; <span class="prelude-ty">Result</span>&lt;[u64; <span class="number">16</span>], SwitchError&gt; {
+<a href=#137 id=137 data-nosnippet>137</a>        <span class="kw">let </span>oid = <span class="string">".1.3.6.1.4.1.38477.1.50.1.11.1.5.1.1.19"</span>;
+<a href=#138 id=138 data-nosnippet>138</a>        <span class="kw">let </span>tx_drop_evts = snmp_getbulk_counter64(oid, session)<span class="question-mark">?</span>;
+<a href=#139 id=139 data-nosnippet>139</a>
+<a href=#140 id=140 data-nosnippet>140</a>        <span class="prelude-val">Ok</span>(tx_drop_evts)
+<a href=#141 id=141 data-nosnippet>141</a>    }
+<a href=#142 id=142 data-nosnippet>142</a>    <span class="kw">pub fn </span>read_tx_broadcast_pkts(session: <span class="kw-2">&amp;mut </span>SyncSession) -&gt; <span class="prelude-ty">Result</span>&lt;[u64; <span class="number">16</span>], SwitchError&gt; {
+<a href=#143 id=143 data-nosnippet>143</a>        <span class="kw">let </span>oid = <span class="string">".1.3.6.1.4.1.38477.1.50.1.11.1.5.1.1.22"</span>;
+<a href=#144 id=144 data-nosnippet>144</a>        <span class="kw">let </span>tx_broadcast_pkts = snmp_getbulk_counter64(oid, session)<span class="question-mark">?</span>;
+<a href=#145 id=145 data-nosnippet>145</a>
+<a href=#146 id=146 data-nosnippet>146</a>        <span class="prelude-val">Ok</span>(tx_broadcast_pkts)
+<a href=#147 id=147 data-nosnippet>147</a>    }
+<a href=#148 id=148 data-nosnippet>148</a>    <span class="kw">pub fn </span>read_tx_multicast_pkts(session: <span class="kw-2">&amp;mut </span>SyncSession) -&gt; <span class="prelude-ty">Result</span>&lt;[u64; <span class="number">16</span>], SwitchError&gt; {
+<a href=#149 id=149 data-nosnippet>149</a>        <span class="kw">let </span>oid = <span class="string">".1.3.6.1.4.1.38477.1.50.1.11.1.5.1.1.23"</span>;
+<a href=#150 id=150 data-nosnippet>150</a>        <span class="kw">let </span>tx_multicast_pkts = snmp_getbulk_counter64(oid, session)<span class="question-mark">?</span>;
+<a href=#151 id=151 data-nosnippet>151</a>
+<a href=#152 id=152 data-nosnippet>152</a>        <span class="prelude-val">Ok</span>(tx_multicast_pkts)
+<a href=#153 id=153 data-nosnippet>153</a>    }
+<a href=#154 id=154 data-nosnippet>154</a>
+<a href=#155 id=155 data-nosnippet>155</a>    <span class="comment">// pub fn print_switch_port(ip_addr: &amp;str) {
+<a href=#156 id=156 data-nosnippet>156</a>    //     let switch_port = Self::new(ip_addr);
+<a href=#157 id=157 data-nosnippet>157</a>
+<a href=#158 id=158 data-nosnippet>158</a>    //     println!("Switch Port");
+<a href=#159 id=159 data-nosnippet>159</a>    //     println!("\tLink:           {:?}", switch_port.link);
+<a href=#160 id=160 data-nosnippet>160</a>    //     println!("\tSpeed:          {:?}", switch_port.speed);
+<a href=#161 id=161 data-nosnippet>161</a>    //     println!("\tFull Duplex:    {:?}", switch_port.full_duplex);
+<a href=#162 id=162 data-nosnippet>162</a>    // }
+<a href=#163 id=163 data-nosnippet>163</a></span>}
+<a href=#164 id=164 data-nosnippet>164</a>
+<a href=#165 id=165 data-nosnippet>165</a><span class="kw">pub fn </span>clear_port_statistics(ip_addr: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(), SwitchError&gt; {
+<a href=#166 id=166 data-nosnippet>166</a>    <span class="kw">let </span><span class="kw-2">mut </span>snmp_session = SyncSession::new(ip_addr, <span class="string">b"private"</span>, <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">1</span>)), <span class="number">0</span>)<span class="question-mark">?</span>;
+<a href=#167 id=167 data-nosnippet>167</a>    <span class="kw">let </span>oid = <span class="string">".1.3.6.1.4.1.38477.1.50.1.11.1.4.1.1.1.2"</span>;
+<a href=#168 id=168 data-nosnippet>168</a>    <span class="kw">for </span>i <span class="kw">in </span><span class="number">1</span>..=<span class="number">16 </span>{
+<a href=#169 id=169 data-nosnippet>169</a>        <span class="kw">let </span>sub_oid = (<span class="number">1000000 </span>+ i).to_string();
+<a href=#170 id=170 data-nosnippet>170</a>        <span class="kw">let </span>oid_port = oid.to_string() + <span class="string">"." </span>+ <span class="kw-2">&amp;</span>sub_oid;
+<a href=#171 id=171 data-nosnippet>171</a>        snmp_set_integer(<span class="kw-2">&amp;</span>oid_port, <span class="number">1</span>, <span class="kw-2">&amp;mut </span>snmp_session)<span class="question-mark">?</span>;
+<a href=#172 id=172 data-nosnippet>172</a>    }
+<a href=#173 id=173 data-nosnippet>173</a>
+<a href=#174 id=174 data-nosnippet>174</a>    <span class="prelude-val">Ok</span>(())
+<a href=#175 id=175 data-nosnippet>175</a>}</code></pre></div></section></main></body></html>

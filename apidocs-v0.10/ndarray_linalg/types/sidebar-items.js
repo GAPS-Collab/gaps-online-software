@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"trait":["Lapack","Scalar"],"type":["c32","c64"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["packet_type"],"struct":["TofPacket"]};

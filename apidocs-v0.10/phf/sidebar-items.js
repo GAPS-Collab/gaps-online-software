@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["map","ordered_map","ordered_set","set"],"struct":["Map","OrderedMap","OrderedSet","Set"],"trait":["PhfHash"]};

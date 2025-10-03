@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["prim_binary_values","prim_unary_values"]};

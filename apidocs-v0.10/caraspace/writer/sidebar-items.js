@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["get_runfilename","get_utc_timestamp"],"static":["HUMAN_TIMESTAMP_FORMAT"],"struct":["CRWriter"]};

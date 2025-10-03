@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["Edge"],"fn":["clean_spikes","find_zero_crossings","get_periods"],"struct":["RBCalibrations","RBCalibrationsFlightT","RBCalibrationsFlightV"]};

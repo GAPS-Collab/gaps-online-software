@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["errors","frame","parsers","prelude","reader","serialization","writer"]};

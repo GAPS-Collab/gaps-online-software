@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["check_indexes","try_check_utf8"],"trait":["OffsetsContainer"]};

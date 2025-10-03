@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["SplitSlicePosition"],"fn":["split_slice_at_file"]};
