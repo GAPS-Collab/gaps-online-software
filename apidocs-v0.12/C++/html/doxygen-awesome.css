@@ -1,10 +1,29 @@
-/* SPDX-License-Identifier: MIT */
 /**
 
 Doxygen Awesome
 https://github.com/jothepro/doxygen-awesome-css
 
+MIT License
+
 Copyright (c) 2021 - 2023 jothepro
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 */
 
@@ -13,7 +32,6 @@ html {
     --primary-color: #1779c4;
     --primary-dark-color: #335c80;
     --primary-light-color: #70b1e9;
-    --on-primary-color: #ffffff;
 
     /* page base colors */
     --page-background-color: #ffffff;
@@ -95,7 +113,7 @@ html {
      */
     --menu-display: block;
 
-    --menu-focus-foreground: var(--on-primary-color);
+    --menu-focus-foreground: var(--page-background-color);
     --menu-focus-background: var(--primary-color);
     --menu-selected-background: rgba(0,0,0,.05);
 
@@ -295,7 +313,7 @@ body {
 body, table, div, p, dl, #nav-tree .label, .title,
 .sm-dox a, .sm-dox a:hover, .sm-dox a:focus, #projectname,
 .SelectItem, #MSearchField, .navpath li.navelem a,
-.navpath li.navelem a:hover, p.reference, p.definition, div.toc li, div.toc h3 {
+.navpath li.navelem a:hover, p.reference, p.definition {
     font-family: var(--font-family);
 }
 
@@ -316,7 +334,6 @@ p.reference, p.definition {
 a:link, a:visited, a:hover, a:focus, a:active {
     color: var(--primary-color) !important;
     font-weight: 500;
-    background: none;
 }
 
 a.anchor {
@@ -787,12 +804,6 @@ html.dark-mode iframe#MSearchResults {
 #nav-tree .item {
     height: var(--tree-item-height);
     line-height: var(--tree-item-height);
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-#nav-tree .item > a:focus {
-    outline: none;
 }
 
 #nav-sync {
@@ -807,8 +818,6 @@ html.dark-mode iframe#MSearchResults {
     background-image: none;
     background-color: transparent;
     position: relative;
-    color: var(--primary-color) !important;
-    font-weight: 500;
 }
 
 #nav-tree .selected::after {
@@ -834,7 +843,6 @@ html.dark-mode iframe#MSearchResults {
 
 #nav-tree .arrow {
     opacity: var(--side-nav-arrow-opacity);
-    background: none;
 }
 
 .arrow {
@@ -926,7 +934,6 @@ td.memSeparator {
 
 span.mlabel {
     background: var(--primary-color);
-    color: var(--on-primary-color);
     border: none;
     padding: 4px 9px;
     border-radius: 12px;
@@ -1033,7 +1040,7 @@ blockquote::after {
 blockquote p {
     margin: var(--spacing-small) 0 var(--spacing-medium) 0;
 }
-.paramname, .paramname em {
+.paramname {
     font-weight: 600;
     color: var(--primary-dark-color);
 }
@@ -1083,7 +1090,7 @@ div.contents .toc {
     border: 0;
     border-left: 1px solid var(--separator-color);
     border-radius: 0;
-    background-color: var(--page-background-color);
+    background-color: transparent;
     box-shadow: none;
     position: sticky;
     top: var(--toc-sticky-top);
@@ -1736,7 +1743,7 @@ table.fieldtable th {
     color: var(--tablehead-foreground);
 }
 
-table.fieldtable td.fieldtype, .fieldtable td.fieldname, .fieldtable td.fieldinit, .fieldtable td.fielddoc, .fieldtable th {
+table.fieldtable td.fieldtype, .fieldtable td.fieldname, .fieldtable td.fielddoc, .fieldtable th {
     border-bottom: 1px solid var(--separator-color);
     border-right: 1px solid var(--separator-color);
 }
@@ -1975,16 +1982,14 @@ hr {
 }
 
 .contents hr {
-    box-shadow: 100px 0 var(--separator-color),
-                -100px 0 var(--separator-color),
-                500px 0 var(--separator-color),
-                -500px 0 var(--separator-color),
-                900px 0 var(--separator-color),
-                -900px 0 var(--separator-color),
-                1400px 0 var(--separator-color),
-                -1400px 0 var(--separator-color),
-                1900px 0 var(--separator-color),
-                -1900px 0 var(--separator-color);       
+    box-shadow: 100px 0 0 var(--separator-color),
+                -100px 0 0 var(--separator-color),
+                500px 0 0 var(--separator-color),
+                -500px 0 0 var(--separator-color),
+                1500px 0 0 var(--separator-color),
+                -1500px 0 0 var(--separator-color),
+                2000px 0 0 var(--separator-color),
+                -2000px 0 0 var(--separator-color);
 }
 
 .contents img, .contents .center, .contents center, .contents div.image object {
@@ -2455,17 +2460,17 @@ h2:hover a.anchorlink, h1:hover a.anchorlink, h3:hover a.anchorlink, h4:hover a.
  Optional tab feature
 */
 
-.tabbed > ul {
+.tabbed ul {
     padding-inline-start: 0px;
     margin: 0;
     padding: var(--spacing-small) 0;
 }
 
-.tabbed > ul > li {
+.tabbed li {
     display: none;
 }
 
-.tabbed > ul > li.selected {
+.tabbed li.selected {
     display: block;
 }
 
