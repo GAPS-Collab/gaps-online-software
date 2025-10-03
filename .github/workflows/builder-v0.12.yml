@@ -98,7 +98,7 @@ jobs:
       shell: bash
     
     - name: Consolidate Python docs
-      run: cp -r ${{ github.workspace }}/doc/python/build/html ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/python
+      run: cp -r ${{ github.workspace }}/doc/python/build/html/* ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/
       shell: bash
     
     - name: Deploy to GitHub Pages
