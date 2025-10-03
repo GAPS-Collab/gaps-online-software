@@ -91,7 +91,11 @@ jobs:
     - name: Consolidate docs/landing page 
       run: cp -r ${{ github.workspace }}/doc/pelican-docs/output/* ${{ github.workspace }}/build/doc/
       shell: bash
-    
+   
+    - name: Copy assets for docs 
+      run: cp ${{ github.workspace }}/resources/assets/GAPSLOGO_2023_small.png ${{ github.workspace }}/build/doc/ 
+      shell: bash
+
     - name: Consolidate docs/landing page (theme)
       run: cp -r ${{ github.workspace }}/doc/pelican-docs/output/* ${{ github.workspace }}/build/doc/
       shell: bash
