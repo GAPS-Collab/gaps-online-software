@@ -1,8 +1,8 @@
 #! /bin/sh
 
-rye init 
-rye add pelican markdown
-rye sync 
+#rye init 
+#rye add pelican markdown
+#rye sync 
 
 mkdir pages/static
 cp ../../resources/assets/lelewaa.png pages/static/ 

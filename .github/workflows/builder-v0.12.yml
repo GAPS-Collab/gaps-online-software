@@ -21,7 +21,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with: 
-        submodules: 'true'
+        submodules: 'recursive'
         show-progress: 'true'
         token: ${{ secrets.PAT_TOKEN }}
 
@@ -89,6 +89,10 @@ jobs:
       shell: bash
     
     - name: Consolidate docs/landing page 
+      run: cp -r ${{ github.workspace }}/doc/pelican-docs/output/* ${{ github.workspace }}/build/doc/
+      shell: bash
+    
+    - name: Consolidate docs/landing page (theme)
       run: cp -r ${{ github.workspace }}/doc/pelican-docs/output/* ${{ github.workspace }}/build/doc/
       shell: bash
 

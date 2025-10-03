@@ -8,4 +8,4 @@ and in general speed the code up, especially for the python part where we will p
 functionality from python to rust
 
 Find the software doucmentation for version "A'u lepe (Sailfish)/v0.12":
-[gaps-online-software v0.12 docs](https://gaps-collab.github.io/gaps-online-software/apidocs-v0.12)
+[gaps-online-software v0.12 docs](https://gaps-collab.github.io/gaps-online-software/apidocs-v0.12/index.html)
