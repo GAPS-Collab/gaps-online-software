@@ -19,6 +19,14 @@ GAPS Online Software ("gondola") compriseses several components.
                   TOF data from disk, etc. 
                   Gondola core allows to calibrate the event data as well 
 
+* gondola       - The actual name of the python packet on pypi
+ 
+* gondola_cxx   - Another python packet on pypi, built from the CXX implementation 
+                  of gondola-core. This is typically not needed to be installed 
+                  or used in any way, it is designed for internal testing.
+                  However, this will expose some further functionality related to 
+                  the interplay with SimpleDet, ROOT and Geant4 in the future. 
+
 * gander        - a streamlit app which allows to have a quick look into 
                   recorded data on disk or hook up to a telemetry stream
 
@@ -60,11 +68,20 @@ API docs
 
 RUST API Software documentation
 ===============================
-`gondola-core (common library) <gondola-core/index.html>`_
-`liftof-cc <liftof-cc/index.html>`_
-`liftof-rb <liftof-rb/index.html>`_
-`liftof-scheduler <liftof-scheduler/index.html>`_
-`liftof-tui <liftof-tui/index.html>`_
+
+The "heart" of the project - implementes necessarry dataclasses
+and i/o operations
+`gondola-core (common library) <gondola_core/index.html>`_
+
+TOF flight computer code for data acquisition and control in-flight 
+`liftof-cc <liftof_cc/index.html>`_
+
+`liftof-rb <liftof_rb/index.html>`_
+
+`liftof-scheduler <liftof_scheduler/index.html>`_
+
+Terminal application to monitor TOF activity
+`liftof-tui <liftof_tui/index.html>`_
 
 
 CXX API Software documentation

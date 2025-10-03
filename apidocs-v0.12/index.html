@@ -273,6 +273,15 @@ Gondola core allows to calibrate the event data as well</p>
 </dd>
 </dl>
 </li>
+<li><p>gondola       - The actual name of the python packet on pypi</p></li>
+<li><dl class="simple">
+<dt>gondola_cxx   - Another python packet on pypi, built from the CXX implementation</dt><dd><p>of gondola-core. This is typically not needed to be installed
+or used in any way, it is designed for internal testing.
+However, this will expose some further functionality related to
+the interplay with SimpleDet, ROOT and Geant4 in the future.</p>
+</dd>
+</dl>
+</li>
 <li><dl class="simple">
 <dt>gander        - a streamlit app which allows to have a quick look into</dt><dd><p>recorded data on disk or hook up to a telemetry stream</p>
 </dd>
@@ -322,11 +331,15 @@ The python module is called <cite>gondola</cite>.</p>
 </section>
 <section id="rust-api-software-documentation">
 <h1>RUST API Software documentation<a class="headerlink" href="#rust-api-software-documentation" title="Link to this heading">#</a></h1>
-<p><a class="reference external" href="gondola-core/index.html">gondola-core (common library)</a>
-<a class="reference external" href="liftof-cc/index.html">liftof-cc</a>
-<a class="reference external" href="liftof-rb/index.html">liftof-rb</a>
-<a class="reference external" href="liftof-scheduler/index.html">liftof-scheduler</a>
-<a class="reference external" href="liftof-tui/index.html">liftof-tui</a></p>
+<p>The &quot;heart&quot; of the project - implementes necessarry dataclasses
+and i/o operations
+<a class="reference external" href="gondola_core/index.html">gondola-core (common library)</a></p>
+<p>TOF flight computer code for data acquisition and control in-flight
+<a class="reference external" href="liftof_cc/index.html">liftof-cc</a></p>
+<p><a class="reference external" href="liftof_rb/index.html">liftof-rb</a></p>
+<p><a class="reference external" href="liftof_scheduler/index.html">liftof-scheduler</a></p>
+<p>Terminal application to monitor TOF activity
+<a class="reference external" href="liftof_tui/index.html">liftof-tui</a></p>
 </section>
 <section id="cxx-api-software-documentation">
 <h1>CXX API Software documentation<a class="headerlink" href="#cxx-api-software-documentation" title="Link to this heading">#</a></h1>
