@@ -58,10 +58,19 @@ API docs
    
    gondola
 
-CXX API Software documentation
-=================================
+RUST API Software documentation
+===============================
+`gondola-core (common library) <gondola-core/index.html>`_
+`liftof-cc <liftof-cc/index.html>`_
+`liftof-rb <liftof-rb/index.html>`_
+`liftof-scheduler <liftof-scheduler/index.html>`_
+`liftof-tui <liftof-tui/index.html>`_
 
-`Doxygen API docs <C++/index.html>`_
+
+CXX API Software documentation
+==============================
+
+`Doxygen API docs <C++/html/index.html>`_
 
 
 
