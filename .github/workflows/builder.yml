@@ -5,11 +5,9 @@ on:
   push:
     branches:
     - LELEWAA-0.10
-    - main
   pull_request:
     branches: 
     - LELEWAA-0.10
-    - main
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
@@ -102,4 +100,4 @@ jobs:
         #branch: ${{ inputs.branch }}
         folder: ${{ github.workspace }}/build/doc/html/
         branch: gh-pages
-
+        clean: false
