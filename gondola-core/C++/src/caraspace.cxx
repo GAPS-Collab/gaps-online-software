@@ -211,10 +211,11 @@ gtel::Packet g::CRFrame::get_telemetrypacket(std::string name) {
 //----------------------------------------------------------
 
 g::CRReader::CRReader() : 
-  exhausted_      (0),
-  n_packets_read_ (0),
-  filenames_      (Vec<std::string>()),
-  fileindex_      (0) {
+  exhausted_         (0),
+  n_packets_read_    (0),
+  filenames_         (Vec<std::string>()),
+  fileindex_         (0)
+  is_from_telemetry_ (false) {
   #ifdef BUILD_CXXDB
   spdlog::info("Will load tofpaddles from DB for this reader!");
   paddles_ = Gaps::get_tofpaddles();
