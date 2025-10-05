@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
   push:
     branches:
-    - AULEPE-0.12
+    - PAKII-0.11
   pull_request:
     branches: 
-    - AULEPE-0.12
+    - PAKII-0.11
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
@@ -57,8 +57,6 @@ jobs:
     # ------------------------------------------------------
     # Documentation
 
-    - name: General docs/landing page 
-      run: cd ${{ github.workspace}}/doc/pelican-docs/ && rye pin 3.13 && rye sync && ./init-docs.sh 
     
     - name: Init cmake 
       run: cmake -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_CXX_BINDINGS=ON -DBUILD_CXX_DB=ON -DBUILD_CXX_EXAMPLES=ON -DBUILD_CXX_PYBINDINGS=OFF
@@ -88,10 +86,6 @@ jobs:
       run: touch ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/.nojekyll
       shell: bash
     
-    - name: Consolidate docs/landing page 
-      run: cp -r ${{ github.workspace }}/doc/pelican-docs/output/* ${{ github.workspace }}/build/doc/
-      shell: bash
-   
     - name: Copy assets for docs 
       run: cp ${{ github.workspace }}/resources/assets/GAPSLOGO_2023_small.png ${{ github.workspace }}/build/doc/ 
       shell: bash
