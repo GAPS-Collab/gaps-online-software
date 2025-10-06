@@ -1,4 +1,4 @@
-name: AulepeBuildBot
+name: PakiiBuildBot
 
 on:
   workflow_dispatch:
