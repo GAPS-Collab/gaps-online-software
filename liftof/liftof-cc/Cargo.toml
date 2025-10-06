@@ -33,7 +33,7 @@ signal-hook       = { workspace = true }
 gondola-core      = { workspace = true } 
 
 chrono 		      = { version="0.4", features =["serde"]}
-tof-control       = { path = "../../tof/extern/tof-control", optional = true, version = "0.9", features=[] }
+tof-control       = { path = "../../resources/extern/tof-control", optional = true, version = "0.9", features=[] }
 
 
 indicatif   = "0.17"
