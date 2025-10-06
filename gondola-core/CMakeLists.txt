@@ -45,6 +45,9 @@ if (BUILD_CXX_BINDINGS)
               $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${GONDOLA_DICTIONARY}.cxx>
   )
   set_property(TARGET ${GONDOLA_LIBRARY_SHARED} PROPERTY CXX_STANDARD 20)
+  if(BUILD_CXX_DB)
+    target_compile_definitions(${GONDOLA_LIBRARY_SHARED} PUBLIC BUILD_CXX_DB)
+  endif(BUILD_CXX_DB)
   target_compile_options(${GONDOLA_LIBRARY_SHARED} PRIVATE -Wall -Wextra -Wpedantic)# -Werror)
   target_include_directories(${GONDOLA_LIBRARY_SHARED} 
                                SYSTEM PUBLIC
