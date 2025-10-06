@@ -116,7 +116,7 @@ $(document).ready(function(){initNavTree('events_8h_source.html',''); initResiza
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="preprocessor">#include &quot;calibration.h&quot;</span></div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="preprocessor">#include &quot;version.h&quot;</span></div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><span class="preprocessor">#include &quot;errors.hpp&quot;</span></div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="preprocessor">#ifdef BUILD_CXXDB</span></div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="preprocessor">#ifdef BUILD_CXX_DB</span></div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="preprocessor">#include &quot;database.h&quot;</span></div>
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
@@ -333,7 +333,7 @@ $(document).ready(function(){initNavTree('events_8h_source.html',''); initResiza
 <div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span> </div>
 <div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>  <span class="keywordtype">void</span> <a class="code hl_function" href="structTofHit.html#aea570005131df3d3077d25512df181e2">set_paddle_len</a>(f32 paddle_len);</div>
 <div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span> </div>
-<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span><span class="preprocessor">  #if BUILD_CXXDB</span></div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span><span class="preprocessor">  #if BUILD_CXX_DB</span></div>
 <div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>  <span class="keyword">auto</span> set_paddle(<span class="keyword">const</span> <a class="code hl_struct" href="structGaps_1_1TofPaddle.html">Gaps::TofPaddle</a>&amp; paddle) -&gt; void;</div>
 <div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>  <span class="keyword">auto</span> get_phase_delay() <span class="keyword">const</span> -&gt; f32;</div>
 <div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>  <span class="keyword">auto</span> get_cable_delay() <span class="keyword">const</span> -&gt; f32;</div>
@@ -511,7 +511,7 @@ $(document).ready(function(){initNavTree('events_8h_source.html',''); initResiza
 <div class="line"><a id="l00555" name="l00555"></a><span class="lineno">  555</span> </div>
 <div class="line"><a id="l00567" name="l00567"></a><span class="lineno">  567</span>  <span class="keyword">static</span> <span class="keyword">auto</span> from_tofpacket(<span class="keyword">const</span> <a class="code hl_struct" href="structTofPacket.html">TofPacket</a> &amp;packet) -&gt; <a class="code hl_struct" href="structTofEvent.html">TofEvent</a>;</div>
 <div class="line"><a id="l00568" name="l00568"></a><span class="lineno">  568</span> </div>
-<div class="line"><a id="l00569" name="l00569"></a><span class="lineno">  569</span><span class="preprocessor">  #ifdef BUILD_CXXDB</span></div>
+<div class="line"><a id="l00569" name="l00569"></a><span class="lineno">  569</span><span class="preprocessor">  #ifdef BUILD_CXX_DB</span></div>
 <div class="line"><a id="l00572" name="l00572"></a><span class="lineno">  572</span>  <span class="keyword">auto</span> set_paddlemap(<span class="keyword">const</span> <a class="code hl_typedef" href="namespaceGaps.html#a84fb383b1df4955afc6ea35a9b15ff44">Gaps::TofPaddleMap</a>&amp;) -&gt; void;</div>
 <div class="line"><a id="l00573" name="l00573"></a><span class="lineno">  573</span><span class="preprocessor">  #endif</span></div>
 <div class="line"><a id="l00574" name="l00574"></a><span class="lineno">  574</span>    </div>
@@ -602,7 +602,7 @@ $(document).ready(function(){initNavTree('events_8h_source.html',''); initResiza
 <div class="line"><a id="l00680" name="l00680"></a><span class="lineno">  680</span>    -&gt; r::Result&lt;TofEventSummary, Gaps::IOError&gt;;</div>
 <div class="line"><a id="l00681" name="l00681"></a><span class="lineno">  681</span>  <span class="keyword">static</span> <span class="keyword">auto</span> from_bytestream(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;stream, u64 &amp;pos) -&gt; r::Result&lt;TofEventSummary, Gaps::IOError&gt; ;</div>
 <div class="line"><a id="l00682" name="l00682"></a><span class="lineno">  682</span>  </div>
-<div class="line"><a id="l00683" name="l00683"></a><span class="lineno">  683</span><span class="preprocessor">  #ifdef BUILD_CXXDB</span></div>
+<div class="line"><a id="l00683" name="l00683"></a><span class="lineno">  683</span><span class="preprocessor">  #ifdef BUILD_CXX_DB</span></div>
 <div class="line"><a id="l00686" name="l00686"></a><span class="lineno">  686</span>  <span class="keyword">auto</span> set_paddlemap(<span class="keyword">const</span> <a class="code hl_typedef" href="namespaceGaps.html#a84fb383b1df4955afc6ea35a9b15ff44">Gaps::TofPaddleMap</a>&amp;) -&gt; void;</div>
 <div class="line"><a id="l00689" name="l00689"></a><span class="lineno">  689</span>  <span class="keyword">auto</span> normalize_hit_times() -&gt; void;</div>
 <div class="line"><a id="l00690" name="l00690"></a><span class="lineno">  690</span><span class="preprocessor">  #endif</span></div>

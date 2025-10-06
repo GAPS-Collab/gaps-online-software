@@ -18,7 +18,7 @@
 \DoxyCodeLine{00029\ \textcolor{preprocessor}{\#include\ "{}calibration.h"{}}}
 \DoxyCodeLine{00030\ \textcolor{preprocessor}{\#include\ "{}version.h"{}}}
 \DoxyCodeLine{00031\ \textcolor{preprocessor}{\#include\ "{}errors.hpp"{}}}
-\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#ifdef\ BUILD\_CXXDB}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#ifdef\ BUILD\_CXX\_DB}}
 \DoxyCodeLine{00033\ \textcolor{preprocessor}{\#include\ "{}database.h"{}}}
 \DoxyCodeLine{00034\ \textcolor{preprocessor}{\#endif}}
 \DoxyCodeLine{00035\ }
@@ -230,7 +230,7 @@
 \DoxyCodeLine{00270\ }
 \DoxyCodeLine{00273\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structTofHit_aea570005131df3d3077d25512df181e2}{set\_paddle\_len}}(f32\ paddle\_len);}
 \DoxyCodeLine{00274\ }
-\DoxyCodeLine{00275\ \textcolor{preprocessor}{\ \ \#if\ BUILD\_CXXDB}}
+\DoxyCodeLine{00275\ \textcolor{preprocessor}{\ \ \#if\ BUILD\_CXX\_DB}}
 \DoxyCodeLine{00276\ \ \ \textcolor{keyword}{auto}\ set\_paddle(\textcolor{keyword}{const}\ \mbox{\hyperlink{structGaps_1_1TofPaddle}{Gaps::TofPaddle}}\&\ paddle)\ -\/>\ void;}
 \DoxyCodeLine{00277\ \ \ \textcolor{keyword}{auto}\ get\_phase\_delay()\ \textcolor{keyword}{const}\ -\/>\ f32;}
 \DoxyCodeLine{00278\ \ \ \textcolor{keyword}{auto}\ get\_cable\_delay()\ \textcolor{keyword}{const}\ -\/>\ f32;}
@@ -400,7 +400,7 @@
 \DoxyCodeLine{00555\ }
 \DoxyCodeLine{00567\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ from\_tofpacket(\textcolor{keyword}{const}\ \mbox{\hyperlink{structTofPacket}{TofPacket}}\ \&packet)\ -\/>\ \mbox{\hyperlink{structTofEvent}{TofEvent}};}
 \DoxyCodeLine{00568\ }
-\DoxyCodeLine{00569\ \textcolor{preprocessor}{\ \ \#ifdef\ BUILD\_CXXDB}}
+\DoxyCodeLine{00569\ \textcolor{preprocessor}{\ \ \#ifdef\ BUILD\_CXX\_DB}}
 \DoxyCodeLine{00572\ \ \ \textcolor{keyword}{auto}\ set\_paddlemap(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespaceGaps_a84fb383b1df4955afc6ea35a9b15ff44}{Gaps::TofPaddleMap}}\&)\ -\/>\ void;}
 \DoxyCodeLine{00573\ \textcolor{preprocessor}{\ \ \#endif}}
 \DoxyCodeLine{00574\ \ \ \ \ }
@@ -487,7 +487,7 @@
 \DoxyCodeLine{00680\ \ \ \ \ -\/>\ r::Result<TofEventSummary,\ Gaps::IOError>;}
 \DoxyCodeLine{00681\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ from\_bytestream(\textcolor{keyword}{const}\ Vec<u8>\ \&stream,\ u64\ \&pos)\ -\/>\ r::Result<TofEventSummary,\ Gaps::IOError>\ ;}
 \DoxyCodeLine{00682\ \ \ }
-\DoxyCodeLine{00683\ \textcolor{preprocessor}{\ \ \#ifdef\ BUILD\_CXXDB}}
+\DoxyCodeLine{00683\ \textcolor{preprocessor}{\ \ \#ifdef\ BUILD\_CXX\_DB}}
 \DoxyCodeLine{00686\ \ \ \textcolor{keyword}{auto}\ set\_paddlemap(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespaceGaps_a84fb383b1df4955afc6ea35a9b15ff44}{Gaps::TofPaddleMap}}\&)\ -\/>\ void;}
 \DoxyCodeLine{00689\ \ \ \textcolor{keyword}{auto}\ normalize\_hit\_times()\ -\/>\ void;}
 \DoxyCodeLine{00690\ \textcolor{preprocessor}{\ \ \#endif}}
