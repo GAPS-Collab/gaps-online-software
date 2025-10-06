@@ -46,6 +46,10 @@ if (BUILD_CXX_BINDINGS)
   )
   set_property(TARGET ${GONDOLA_LIBRARY_SHARED} PROPERTY CXX_STANDARD 20)
   target_compile_options(${GONDOLA_LIBRARY_SHARED} PRIVATE -Wall -Wextra -Wpedantic)# -Werror)
+  if(BUILD_CXX_DB)
+    target_compile_definitions(${GONDOLA_LIBRARY_SHARED} PUBLIC BUILD_CXX_DB)
+  endif(BUILD_CXX_DB)
+  
   target_include_directories(${GONDOLA_LIBRARY_SHARED} 
                                SYSTEM PUBLIC
                                  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include>
