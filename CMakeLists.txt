@@ -137,8 +137,9 @@ install(FILES
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/doc/apidocs-v${PROJECT_VERSION}")
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/doc/apidocs-v${PROJECT_VERSION}/C++")
   set(DOXYGEN_INPUT "${CMAKE_SOURCE_DIR}/gondola-core/C++")
-  set(DOXYGEN_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/doc/C++")
+  set(DOXYGEN_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/doc/apidocs-v${PROJECT_VERSION}/C++")
   set(DOXYGEN_GENERATE_HTML YES)
   set(DOXYGEN_GENERATE_MAN NO) # You can enable this if you want man pages
   configure_file(${CMAKE_SOURCE_DIR}/doc/C++/Doxyfile.in ${CMAKE_BINARY_DIR}/doc/C++/Doxyfile @ONLY)
