@@ -29,7 +29,7 @@
 #include "calibration.h"
 #include "version.h"
 #include "errors.hpp"
-#ifdef BUILD_CXXDB
+#ifdef BUILD_CXX_DB
 #include "database.h"
 #endif
 
@@ -272,7 +272,7 @@ struct TofHit  {
   /// but has to be added after the fact
   void set_paddle_len(f32 paddle_len);
 
-  #if BUILD_CXXDB
+  #if BUILD_CXX_DB
   auto set_paddle(const Gaps::TofPaddle& paddle) -> void;
   auto get_phase_delay() const -> f32;
   auto get_cable_delay() const -> f32;
@@ -566,7 +566,7 @@ struct TofEvent {
    */
   static auto from_tofpacket(const TofPacket &packet) -> TofEvent;
 
-  #ifdef BUILD_CXXDB
+  #ifdef BUILD_CXX_DB
   /// set a TofPaddle, that is enrich every tofhit with information
   /// about the corresponding paddle
   auto set_paddlemap(const Gaps::TofPaddleMap&) -> void;
@@ -680,7 +680,7 @@ struct TofEventSummary {
     -> r::Result<TofEventSummary, Gaps::IOError>;
   static auto from_bytestream(const Vec<u8> &stream, u64 &pos) -> r::Result<TofEventSummary, Gaps::IOError> ;
   
-  #ifdef BUILD_CXXDB
+  #ifdef BUILD_CXX_DB
   /// set a TofPaddle, that is enrich every tofhit with information
   /// about the corresponding paddle
   auto set_paddlemap(const Gaps::TofPaddleMap&) -> void;

@@ -4,15 +4,8 @@ project(gondola_cxx VERSION 0.11 LANGUAGES C CXX)
 
 
 find_package(Python 3.8 COMPONENTS Interpreter Development.Module REQUIRED)
-#include(FetchContent)
-#FetchContent_Declare(
-#  nanobind
-#  URL https://github.com/wjakob/nanobind/archive/refs/tags/v1.7.0.zip
-#  GIT_TAG        v1.7.0
-#  POST_UPDATE
-#    git submodule update --init --recursive
-#)
-#FetchContent_MakeAvailable(nanobind)
+
+find_package(GapsOnlineSoftware 0.11 EXACT REQUIRED)
 
 set (ABS_PATH /srv/gaps/gaps-online-software) 
 # this is stupid!
@@ -23,6 +16,9 @@ add_subdirectory(${ABS_PATH}/resources/extern/nanobind
 
 set(CXX_PYBINDINGS gondola_cxx)
 nanobind_add_module(${CXX_PYBINDINGS} STABLE_ABI NOMINSIZE ${ABS_PATH}/gondola-core/C++/python/gondola_core.cxx)
+set_property(TARGET ${CXX_PYBINDINGS} PROPERTY CXX_STANDARD 20)
+#target_compile_definitions(${CXX_PYBINDINGS} PUBLIC BUILD_CXX_DB=1)
+
 target_include_directories(${CXX_PYBINDINGS} 
                              SYSTEM PUBLIC
                              $<BUILD_INTERFACE:${ABS_PATH}//resources/extern/spdlog/include>
@@ -39,7 +35,7 @@ target_link_libraries(${CXX_PYBINDINGS}
                         PUBLIC
                           $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARY_SHARED}>
                           $<$<BOOL:${BUILD_CXX_DB}>:${SQLite3_LIBRARIES}>
-                          ${GONDOLA_LIBRARY_SHARED}
+                          GapsOnlineSoftware::GondolaCore
                           ${ROOT_LIBRARIES}
 )
 install(TARGETS ${CXX_PYBINDINGS} LIBRARY DESTINATION gondola_cxx)

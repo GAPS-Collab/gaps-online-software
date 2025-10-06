@@ -214,9 +214,10 @@ g::CRReader::CRReader() :
   exhausted_         (0),
   n_packets_read_    (0),
   filenames_         (Vec<std::string>()),
-  fileindex_         (0)
+  fileindex_         (0),
   is_from_telemetry_ (false) {
-  #ifdef BUILD_CXXDB
+  telly_reader_ = std::unique_ptr<TelemetryPacketReader>(new TelemetryPacketReader());
+  #ifdef BUILD_CXX_DB
   spdlog::info("Will load tofpaddles from DB for this reader!");
   paddles_ = Gaps::get_tofpaddles();
   #endif 
