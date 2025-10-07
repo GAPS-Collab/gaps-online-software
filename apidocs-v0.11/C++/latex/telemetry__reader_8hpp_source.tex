@@ -1,0 +1,55 @@
+\doxysection{telemetry\+\_\+reader.\+hpp}
+\hypertarget{telemetry__reader_8hpp_source}{}\label{telemetry__reader_8hpp_source}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/io/telemetry\_reader.hpp@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/io/telemetry\_reader.hpp}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ TELEMETRY\_READER\_H\_INCLUDED}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ TELEMETRY\_READER\_H\_INCLUDED}}
+\DoxyCodeLine{00003\ \textcolor{comment}{//\ This\ file\ is\ part\ of\ gaps-\/online-\/software\ and\ published\ }}
+\DoxyCodeLine{00004\ \textcolor{comment}{//\ under\ the\ GPLv3\ license}}
+\DoxyCodeLine{00005\ }
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ <iostream>}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <fstream>}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ "{}tof\_typedefs.h"{}}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ "{}telemetry\_dataclasses.hpp"{}}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ "{}io.hpp"{}}}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \textcolor{keyword}{namespace\ }gondola\ \{}
+\DoxyCodeLine{00017\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structgondola_1_1TelemetryPacketReader}{TelemetryPacketReader}}\ \{}
+\DoxyCodeLine{00018\ \ \ \ \ }
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader}{TelemetryPacketReader}}();}
+\DoxyCodeLine{00020\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader}{TelemetryPacketReader}}(std::string\ pathname);}
+\DoxyCodeLine{00021\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader}{TelemetryPacketReader}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader}{TelemetryPacketReader}}\&)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{00022\ \ \ \ \ }
+\DoxyCodeLine{00023\ \ \ \ \ \textcolor{keyword}{auto}\ set\_path(std::string\ pathname)\ -\/>\ void;}
+\DoxyCodeLine{00024\ \ \ \ \ }
+\DoxyCodeLine{00025\ \ \ \ \ \textcolor{keyword}{auto}\ get\_filenames()\ \textcolor{keyword}{const}\ -\/>\ Vec<std::string>;\ }
+\DoxyCodeLine{00026\ \ \ \ \ }
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{keyword}{auto}\ get\_next\_packet()\ -\/>\ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Packet}{Gaps::Telemetry::Packet}};\ }
+\DoxyCodeLine{00028\ \ \ \ \ }
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_a954e5dbc2e1e3b39bb854303bd8c9873}{is\_exhausted}}()\ \ \ \textcolor{keyword}{const}\ -\/>\ bool;}
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ exhausted\_\ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ }
+\DoxyCodeLine{00041\ \ \ \ \ \ \ Vec<std::string>\ filenames\_;\ \ \ \ \ \ \ }
+\DoxyCodeLine{00044\ \ \ \ \ \ \ usize\ file\_idx\_\ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ dedup\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ f64\ start\_time\ \ \ \ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00053\ \ \ \ \ \ \ f64\ end\_time\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00055\ \ \ \ \ \ \ std::ifstream\ \ stream\_file\_\ ;\ \ \ \ \ }
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \textcolor{comment}{//file\_reader\ \ \ \ \ \ \ \ \ :\ BufReader<File>,}}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ usize\ cursor\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \textcolor{comment}{//pub\ filter\ \ \ \ \ \ \ \ \ \ :\ TelemetryPacketType,}}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ usize\ n\_packs\_read\_\ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ usize\ n\_packs\_skipped\ \ \ \ \ ;}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ usize\ skip\_ahead\ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ usize\ stop\_after\ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ usize\ n\_duplicates\ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \textcolor{comment}{//dedup\_cache\ \ \ \ \ \ \ \ \ :\ HashMap<u16,\ VecDeque<u16>>}}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ prime\_next\_file\_()\ -\/>\ void;}
+\DoxyCodeLine{00075\ \ \ \};}
+\DoxyCodeLine{00076\ \}}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\#endif\ }}
+
+\end{DoxyCode}

@@ -1,0 +1,48 @@
+\doxysection{Gaps\+::Telemetry\+::Trk\+Event\+Packet Struct Reference}
+\hypertarget{structGaps_1_1Telemetry_1_1TrkEventPacket}{}\label{structGaps_1_1Telemetry_1_1TrkEventPacket}\index{Gaps::Telemetry::TrkEventPacket@{Gaps::Telemetry::TrkEventPacket}}
+
+
+Collaboration diagram for Gaps\+::Telemetry\+::Trk\+Event\+Packet\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structGaps_1_1Telemetry_1_1TrkEventPacket__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkEventPacket_ab3d8e593117ea82857e7cff601af7989}\label{structGaps_1_1Telemetry_1_1TrkEventPacket_ab3d8e593117ea82857e7cff601af7989} 
+auto {\bfseries to\+\_\+string} () const -\/$>$ std\+::string
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkEventPacket_a84634f5c1b1935af02d6a39abbbf2340}\label{structGaps_1_1Telemetry_1_1TrkEventPacket_a84634f5c1b1935af02d6a39abbbf2340} 
+static auto {\bfseries from\+\_\+bytestream} (Vec$<$ u8 $>$ const \&stream, usize \&pos) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkEventPacket}{Trk\+Event\+Packet}}, \mbox{\hyperlink{classGaps_1_1IOError}{Gaps\+::\+IOError}} $>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkEventPacket_a83b723e9c21b6d7684d75a0e8efefd28}\label{structGaps_1_1Telemetry_1_1TrkEventPacket_a83b723e9c21b6d7684d75a0e8efefd28} 
+\mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader}{Packet\+Header}} {\bfseries header}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkEventPacket_aaae46f85f76cc3f58cf2128aa4e38d6a}\label{structGaps_1_1Telemetry_1_1TrkEventPacket_aaae46f85f76cc3f58cf2128aa4e38d6a} 
+\mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkHeader}{Trk\+Header}} {\bfseries daq\+\_\+header}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkEventPacket_a6c09cbffa22cf1cb5715238b5e9adb33}\label{structGaps_1_1Telemetry_1_1TrkEventPacket_a6c09cbffa22cf1cb5715238b5e9adb33} 
+Vec$<$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkEvent}{Trk\+Event}} $>$ {\bfseries events}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkEventPacket_a5032ce8cc55044d6a444ed9bae90c60f}\label{structGaps_1_1Telemetry_1_1TrkEventPacket_a5032ce8cc55044d6a444ed9bae90c60f} 
+u16 {\bfseries run\+\_\+id}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkEventPacket_a8dfc26e2bdf3eea4ad3f9883bb8e18a4}\label{structGaps_1_1Telemetry_1_1TrkEventPacket_a8dfc26e2bdf3eea4ad3f9883bb8e18a4} 
+u8 {\bfseries run\+\_\+id\+\_\+old}
+\end{DoxyCompactItemize}
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/telemetry\+\_\+dataclasses.\+hpp\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/telemetry\+\_\+dataclasses.\+cxx\end{DoxyCompactItemize}

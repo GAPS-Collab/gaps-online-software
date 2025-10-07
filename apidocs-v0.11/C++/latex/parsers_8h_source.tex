@@ -1,0 +1,60 @@
+\doxysection{parsers.\+h}
+\hypertarget{parsers_8h_source}{}\label{parsers_8h_source}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/io/parsers.h@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/io/parsers.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ GAPSPARSERS\_H\_INCLUDED}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ GAPSPARSERS\_H\_INCLUDED}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}tof\_typedefs.h"{}}}
+\DoxyCodeLine{00005\ }
+\DoxyCodeLine{00006\ \textcolor{keyword}{namespace\ }gondola\ \{}
+\DoxyCodeLine{00009\ \ \ \textcolor{keyword}{auto}\ to\_le\_bytes(u16\ number)\ -\/>\ Vec<u8>;}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00013\ \ \ \textcolor{keyword}{auto}\ to\_le\_bytes(u32\ number)\ -\/>\ Vec<u8>;}
+\DoxyCodeLine{00014\ \}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceGaps}{Gaps}}\ \{}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \ \ \textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
+\DoxyCodeLine{00019\ \ \ Vec<T>\ slice(\textcolor{keyword}{const}\ Vec<T>\&\ vec,\ usize\ start,\ usize\ end)\ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{keywordflow}{if}\ (start\ >=\ vec.size())\ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ Vec<T>();\ \ \textcolor{comment}{//\ Return\ an\ empty\ vector\ if\ start\ is\ out\ of\ range}}
+\DoxyCodeLine{00022\ \ \ \ \ \}}
+\DoxyCodeLine{00023\ \ \ \ \ end\ =\ std::min(end,\ vec.size());\ \ \textcolor{comment}{//\ Clamp\ the\ end\ index\ to\ the\ vector\ size}}
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{keywordflow}{return}\ Vec<T>(vec.begin()\ +\ start,\ vec.begin()\ +\ end);}
+\DoxyCodeLine{00025\ \ \ \}}
+\DoxyCodeLine{00026\ \ \ }
+\DoxyCodeLine{00027\ \ \ \textcolor{keywordtype}{bool}\ parse\_bool(\textcolor{keyword}{const}\ Vec<u8>\ \&bytestream,}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ usize\ \&pos);}
+\DoxyCodeLine{00029\ \ \ }
+\DoxyCodeLine{00031\ \ \ u8\ \mbox{\hyperlink{namespaceGaps_af02b80458f7649651a342344e3b103ee}{parse\_u8}}(\textcolor{keyword}{const}\ Vec<u8>\ \&bytestream,}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ usize\ \&pos);}
+\DoxyCodeLine{00033\ \ \ }
+\DoxyCodeLine{00035\ \ \ u16\ \mbox{\hyperlink{namespaceGaps_a8d5ee03930328391169c3f11a9b06e8e}{parse\_u16}}(\textcolor{keyword}{const}\ Vec<u8>\ \&bytestream,}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ usize\ \&pos);}
+\DoxyCodeLine{00037\ \ }
+\DoxyCodeLine{00042\ \ \ f32\ \mbox{\hyperlink{namespaceGaps_adbed3ea3f57b77872fd060984c65e4be}{parse\_f16}}(\textcolor{keyword}{const}\ Vec<u8>\ \&bytestream,}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ usize\ \&pos);}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00046\ \ \ u32\ \mbox{\hyperlink{namespaceGaps_ac09d7b4a66f0df27a63af339dd6d7ea8}{parse\_u32}}(\textcolor{keyword}{const}\ Vec<u8>\ \&bytestream,}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ usize\ \&pos);}
+\DoxyCodeLine{00048\ \ \ }
+\DoxyCodeLine{00050\ \ \ u64\ \mbox{\hyperlink{namespaceGaps_aa913722aa6668823951e07f44b8698d6}{parse\_u64}}(\textcolor{keyword}{const}\ Vec<u8>\ \&bytestream,}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ usize\ \&pos);}
+\DoxyCodeLine{00052\ \ \ }
+\DoxyCodeLine{00054\ \ \ i32\ \mbox{\hyperlink{namespaceGaps_a2fa35da8776bb053ebdb6f9da7ea245e}{parse\_i32}}(\textcolor{keyword}{const}\ Vec<u8>\ \&bytestream,}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ usize\ \&pos);}
+\DoxyCodeLine{00056\ \ \ }
+\DoxyCodeLine{00058\ \ \ f32\ \mbox{\hyperlink{namespaceGaps_aa324d073f3fec42714ed7f1dfa9528ce}{parse\_f32}}(\textcolor{keyword}{const}\ Vec<u8>\ \&bytestream,}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ usize\ \&pos);}
+\DoxyCodeLine{00060\ \ \ }
+\DoxyCodeLine{00062\ \ \ f64\ \mbox{\hyperlink{namespaceGaps_a75bc2048681872469a0e8164a07eb145}{parse\_f64}}(\textcolor{keyword}{const}\ Vec<u8>\ \&bytestream,}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ usize\ \&pos);}
+\DoxyCodeLine{00064\ \ \ }
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00070\ \ \ std::string\ \mbox{\hyperlink{namespaceGaps_abaf57ec43250a61eb58cc3fd3b68848a}{parse\_string}}(\textcolor{keyword}{const}\ Vec<u8>\ \&bytestream,}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ usize\ \&pos);}
+\DoxyCodeLine{00072\ \}}
+\DoxyCodeLine{00073\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}
