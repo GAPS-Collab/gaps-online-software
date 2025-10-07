@@ -1,0 +1,51 @@
+\doxysection{PAMoni\+Data Struct Reference}
+\hypertarget{structPAMoniData}{}\label{structPAMoniData}\index{PAMoniData@{PAMoniData}}
+
+
+{\ttfamily \#include $<$monitoring.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structPAMoniData_a094b1c4882b9a8aadce6623b2489681f}\label{structPAMoniData_a094b1c4882b9a8aadce6623b2489681f} 
+auto {\bfseries to\+\_\+string} () const -\/$>$ std\+::string
+\begin{DoxyCompactList}\small\item\em String representation for pretty printing. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structPAMoniData_aff98588eafa6f7f2b481df56aa991ae0}\label{structPAMoniData_aff98588eafa6f7f2b481df56aa991ae0} 
+static auto {\bfseries from\+\_\+bytestream} (const Vec$<$ u8 $>$ \&stream, usize \&pos) -\/$>$ \mbox{\hyperlink{structPAMoniData}{PAMoni\+Data}}
+\begin{DoxyCompactList}\small\item\em Factory function -\/ restore \doxylink{structPAMoniData}{PAMoni\+Data} from byte-\/representation. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structPAMoniData_a7278177aeddfcb09fb5dac5995577f67}\label{structPAMoniData_a7278177aeddfcb09fb5dac5995577f67} 
+u8 {\bfseries board\+\_\+id}
+\item 
+\Hypertarget{structPAMoniData_a531cae53627796bf35d86a2ea14bd399}\label{structPAMoniData_a531cae53627796bf35d86a2ea14bd399} 
+std\+::array$<$ f32, 16 $>$ {\bfseries temps}
+\item 
+\Hypertarget{structPAMoniData_a5ca344ab2de4f6e5317a9473863bc54d}\label{structPAMoniData_a5ca344ab2de4f6e5317a9473863bc54d} 
+std\+::array$<$ f32, 16 $>$ {\bfseries biases}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structPAMoniData_a078aaebbd1f6403fb8bda54843bd2b41}\label{structPAMoniData_a078aaebbd1f6403fb8bda54843bd2b41} 
+static constexpr u16 {\bfseries HEAD} = 0x\+AAAA
+\item 
+\Hypertarget{structPAMoniData_a61dc5200ba0db9f64d55e5fdbd189aea}\label{structPAMoniData_a61dc5200ba0db9f64d55e5fdbd189aea} 
+static constexpr u16 {\bfseries TAIL} = 0x5555
+\item 
+\Hypertarget{structPAMoniData_a6989f0dba622e95fdd9c2dde575829f4}\label{structPAMoniData_a6989f0dba622e95fdd9c2dde575829f4} 
+static constexpr u8 {\bfseries SIZE} = 89
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Preamp sensors 
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/packets/monitoring.\+h\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/monitoring.\+cxx\end{DoxyCompactItemize}

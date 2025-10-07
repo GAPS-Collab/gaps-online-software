@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["ad5675","bme280","cy8c9560a","ina219","ina226","lis3mdltr","max11615","max11617","max11645","max5815","max5825","max7320","pca9548a","si5345b","tmp1075","tmp112"]};

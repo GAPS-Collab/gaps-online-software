@@ -1,0 +1,134 @@
+\doxysection{Tof\+Event\+Summary Struct Reference}
+\hypertarget{structTofEventSummary}{}\label{structTofEventSummary}\index{TofEventSummary@{TofEventSummary}}
+
+
+{\ttfamily \#include $<$events.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structTofEventSummary_af4f48f38d2543d2bbddbf6da796627bd}\label{structTofEventSummary_af4f48f38d2543d2bbddbf6da796627bd} 
+auto {\bfseries get\+\_\+timestamp48} () const -\/$>$ u64
+\item 
+\Hypertarget{structTofEventSummary_aca6651cac67274ab6479f6bede6cbf7c}\label{structTofEventSummary_aca6651cac67274ab6479f6bede6cbf7c} 
+auto {\bfseries get\+\_\+rb\+\_\+link\+\_\+ids} () const -\/$>$ Vec$<$ u8 $>$
+\item 
+auto \mbox{\hyperlink{structTofEventSummary_aed9c24ac8859743d220a4a41b60fee22}{get\+\_\+trigger\+\_\+hits}} () const -\/$>$ Vec$<$ std\+::tuple$<$ u8, u8, u8, LTBThreshold $>$ $>$
+\item 
+\Hypertarget{structTofEventSummary_a5287a92228d07bc53e99e482be76d3d4}\label{structTofEventSummary_a5287a92228d07bc53e99e482be76d3d4} 
+auto {\bfseries get\+\_\+trigger\+\_\+sources} () const -\/$>$ Vec$<$ Trigger\+Type $>$
+\begin{DoxyCompactList}\small\item\em Get the trigger sources from trigger source byte. \end{DoxyCompactList}\item 
+\Hypertarget{structTofEventSummary_ac174529a9ec0b922adf81c05b4e28649}\label{structTofEventSummary_ac174529a9ec0b922adf81c05b4e28649} 
+auto {\bfseries to\+\_\+string} () const -\/$>$ std\+::string
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structTofEventSummary_a50e16e555624b6f27dc844ea27c508e0}\label{structTofEventSummary_a50e16e555624b6f27dc844ea27c508e0} 
+static auto {\bfseries from\+\_\+tofpacket} (const \mbox{\hyperlink{structTofPacket}{Tof\+Packet}} \&packet) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{structTofEventSummary}{Tof\+Event\+Summary}}, \mbox{\hyperlink{classGaps_1_1IOError}{Gaps\+::\+IOError}} $>$
+\item 
+\Hypertarget{structTofEventSummary_a65a700f18644f4cec97d05b369bb1111}\label{structTofEventSummary_a65a700f18644f4cec97d05b369bb1111} 
+static auto {\bfseries from\+\_\+bytestream} (const Vec$<$ u8 $>$ \&stream, u64 \&pos) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{structTofEventSummary}{Tof\+Event\+Summary}}, \mbox{\hyperlink{classGaps_1_1IOError}{Gaps\+::\+IOError}} $>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structTofEventSummary_a8e9d86a725e44c2fa3f6ca31767a0e4a}\label{structTofEventSummary_a8e9d86a725e44c2fa3f6ca31767a0e4a} 
+Gaps\+::\+Protocol\+Version {\bfseries version}
+\item 
+\Hypertarget{structTofEventSummary_a55ba9e6f8c2e00d8372a22924821b6da}\label{structTofEventSummary_a55ba9e6f8c2e00d8372a22924821b6da} 
+Event\+Status {\bfseries status}
+\item 
+\Hypertarget{structTofEventSummary_a5002ecb7dd20fe0eb01af2d5c32c28cd}\label{structTofEventSummary_a5002ecb7dd20fe0eb01af2d5c32c28cd} 
+u8 {\bfseries quality}
+\item 
+\Hypertarget{structTofEventSummary_ac9fa5dbd0d751fd8bfbc60be22bcfd35}\label{structTofEventSummary_ac9fa5dbd0d751fd8bfbc60be22bcfd35} 
+u16 {\bfseries trigger\+\_\+sources}
+\item 
+u8 \mbox{\hyperlink{structTofEventSummary_aa3587b9819d57488a264b78e0fdb630e}{n\+\_\+trigger\+\_\+paddles}}
+\item 
+\Hypertarget{structTofEventSummary_ada60deeba02f19c32df6e1e74f5edafe}\label{structTofEventSummary_ada60deeba02f19c32df6e1e74f5edafe} 
+u32 {\bfseries event\+\_\+id}
+\item 
+\Hypertarget{structTofEventSummary_ac877dbbab71347790266887334810777}\label{structTofEventSummary_ac877dbbab71347790266887334810777} 
+u16 {\bfseries run\+\_\+id}
+\item 
+\Hypertarget{structTofEventSummary_a971aaceb9e22a5a3011015f1ae0dcd33}\label{structTofEventSummary_a971aaceb9e22a5a3011015f1ae0dcd33} 
+u32 {\bfseries timestamp32}
+\item 
+\Hypertarget{structTofEventSummary_ad55fcbc96aa27e9dee781472f7c16f3c}\label{structTofEventSummary_ad55fcbc96aa27e9dee781472f7c16f3c} 
+u16 {\bfseries timestamp16}
+\item 
+\Hypertarget{structTofEventSummary_a2122d50c1680c446b571f4f421af5131}\label{structTofEventSummary_a2122d50c1680c446b571f4f421af5131} 
+u16 {\bfseries drs\+\_\+dead\+\_\+lost\+\_\+hits}
+\item 
+\Hypertarget{structTofEventSummary_a9a9b3563bf4d3d2b2f6cf2d3452f226e}\label{structTofEventSummary_a9a9b3563bf4d3d2b2f6cf2d3452f226e} 
+u32 {\bfseries dsi\+\_\+j\+\_\+mask}
+\item 
+\Hypertarget{structTofEventSummary_a670b432e27608cb174111f302ac61516}\label{structTofEventSummary_a670b432e27608cb174111f302ac61516} 
+Vec$<$ u16 $>$ {\bfseries channel\+\_\+mask}
+\item 
+\Hypertarget{structTofEventSummary_ae562daf7d3b9f9e35c1d0d9e6263902e}\label{structTofEventSummary_ae562daf7d3b9f9e35c1d0d9e6263902e} 
+u64 {\bfseries mtb\+\_\+link\+\_\+mask}
+\item 
+\Hypertarget{structTofEventSummary_aed5fe8e77ffd1ae550efbc0b8c4ef117}\label{structTofEventSummary_aed5fe8e77ffd1ae550efbc0b8c4ef117} 
+Vec$<$ \mbox{\hyperlink{structTofHit}{Tof\+Hit}} $>$ {\bfseries hits}
+\item 
+\Hypertarget{structTofEventSummary_a3532f213fbd1851120694511fe7f3a73}\label{structTofEventSummary_a3532f213fbd1851120694511fe7f3a73} 
+u8 {\bfseries n\+\_\+hits\+\_\+umb}
+\item 
+\Hypertarget{structTofEventSummary_ae8a9e3823514109ec75a62237ef3f5e9}\label{structTofEventSummary_ae8a9e3823514109ec75a62237ef3f5e9} 
+u8 {\bfseries n\+\_\+hits\+\_\+cbe}
+\item 
+\Hypertarget{structTofEventSummary_a6c08239903d1eed7c8374464f2e7b43d}\label{structTofEventSummary_a6c08239903d1eed7c8374464f2e7b43d} 
+u8 {\bfseries n\+\_\+hits\+\_\+cor}
+\item 
+\Hypertarget{structTofEventSummary_a634cd10f1fa4e83f57bc94bb72af69c1}\label{structTofEventSummary_a634cd10f1fa4e83f57bc94bb72af69c1} 
+f32 {\bfseries tot\+\_\+edep\+\_\+umb}
+\item 
+\Hypertarget{structTofEventSummary_a006d5f0754a9bce2a6e52f1189b2dcd9}\label{structTofEventSummary_a006d5f0754a9bce2a6e52f1189b2dcd9} 
+f32 {\bfseries tot\+\_\+edep\+\_\+cbe}
+\item 
+\Hypertarget{structTofEventSummary_aa18ec9edc67b83a83703055a24f554b0}\label{structTofEventSummary_aa18ec9edc67b83a83703055a24f554b0} 
+f32 {\bfseries tot\+\_\+edep\+\_\+cor}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structTofEventSummary_a35f391106470e3a9b52a5dfb776a9362}\label{structTofEventSummary_a35f391106470e3a9b52a5dfb776a9362} 
+static constexpr u16 {\bfseries HEAD} = 0x\+AAAA
+\item 
+\Hypertarget{structTofEventSummary_a613678e61d2e116143342780076d1ec7}\label{structTofEventSummary_a613678e61d2e116143342780076d1ec7} 
+static constexpr u16 {\bfseries TAIL} = 0x5555
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Concise summary for the flight computer and telemtry stream 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structTofEventSummary_aed9c24ac8859743d220a4a41b60fee22}\label{structTofEventSummary_aed9c24ac8859743d220a4a41b60fee22} 
+\index{TofEventSummary@{TofEventSummary}!get\_trigger\_hits@{get\_trigger\_hits}}
+\index{get\_trigger\_hits@{get\_trigger\_hits}!TofEventSummary@{TofEventSummary}}
+\doxysubsubsection{\texorpdfstring{get\_trigger\_hits()}{get\_trigger\_hits()}}
+{\footnotesize\ttfamily Vec$<$ std\+::tuple$<$ u8, u8, u8, LTBThreshold $>$ $>$ Tof\+Event\+Summary\+::get\+\_\+trigger\+\_\+hits (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ Vec$<$std\+::tuple$<$u8, u8, u8, LTBThreshold$>$$>$}
+
+Get the combination of triggered DSI/\+J/\+CH on the MTB which formed the trigger. This does not include further hits which fall into the integration window. For those, se rb\+\_\+link\+\_\+mask
+
+The returned values follow the TOF convention to start with 1, so that we can use them to look up LTB ids in the db.\hypertarget{structTofEventSummary_autotoc_md1}{}\doxysubsection{\texorpdfstring{Returns}{Returns}}\label{structTofEventSummary_autotoc_md1}
+Vec$<$(hit)$>$ where hit is (DSI, J, CH) ~\newline
+ 
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structTofEventSummary_aa3587b9819d57488a264b78e0fdb630e}\label{structTofEventSummary_aa3587b9819d57488a264b78e0fdb630e} 
+\index{TofEventSummary@{TofEventSummary}!n\_trigger\_paddles@{n\_trigger\_paddles}}
+\index{n\_trigger\_paddles@{n\_trigger\_paddles}!TofEventSummary@{TofEventSummary}}
+\doxysubsubsection{\texorpdfstring{n\_trigger\_paddles}{n\_trigger\_paddles}}
+{\footnotesize\ttfamily u8 Tof\+Event\+Summary\+::n\+\_\+trigger\+\_\+paddles}
+
+the number of triggered paddles coming from the MTB directly. This might NOT be the same as the number of hits! 
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/events.\+h\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/events.\+cxx\end{DoxyCompactItemize}
