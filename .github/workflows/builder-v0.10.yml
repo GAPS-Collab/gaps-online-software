@@ -107,7 +107,7 @@ jobs:
         #folder: ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/html/
         folder: ${{ github.workspace }}/build/doc/
         branch: gh-pages
-    
+        clean: false 
  
     - name: Test-Dataclasses
       working-directory: ${{github.workspace}}/build
