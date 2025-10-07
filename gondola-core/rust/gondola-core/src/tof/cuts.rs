@@ -394,6 +394,7 @@ impl TofCuts {
   /// and update the counters. 
   /// If cleanings are enabled, this will 
   /// change the event in-place!
+  #[cfg(feature="database")]
   pub fn accept(&mut self, ev : &mut TofEvent) -> bool {
     if self.is_void() {
       return true;
@@ -696,6 +697,7 @@ impl TofCuts {
     self.clear_stats();
   }
 
+  #[cfg(feature="database")]
   #[pyo3(name="accept")]
   fn accept_py(&mut self, event : &mut TofEvent) -> bool {
     self.accept(event)

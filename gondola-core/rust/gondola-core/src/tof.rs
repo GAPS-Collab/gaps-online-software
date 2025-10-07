@@ -28,6 +28,7 @@ pub mod thread_control;
 pub use thread_control::ThreadControl;
 #[cfg(feature="tof-liftof")]
 pub mod master_trigger;
+#[cfg(feature="tof-liftof")]
 pub use master_trigger::*;
 #[cfg(feature="tof-liftof")]
 pub use master_trigger::control::*;

@@ -1,6 +1,6 @@
 [package]
 name = "gondola-core"
-version = "0.12.0"
+version = "0.12.1"
 edition = "2024"
 
 [lib]
@@ -42,6 +42,12 @@ root                = ["oxyroot", "root-io"]
 # extra features to access TOF components directly, e.g. MTB. THis 
 # will be required for the build of liftof
 tof-liftof          = ["signal-hook"]
+
+[dependencies.tof-control]
+version  = "0.9"
+optional = true
+git      = "https://github.com/GAPS-Collab/tof-control.git"
+branch   = "minimal"
 
 [dependencies.pyo3]
 version  = "0.25"
@@ -108,5 +114,3 @@ libsqlite3-sys = { version = "0.35", features = ["bundled"] }
 
 # for testing / features
 rand   = { version = "0.9", optional = true}
-# Takeru's tof-control
-tof-control = {path = "../../../resources/extern/tof-control", optional = true, version = "0.9", features=[] }
