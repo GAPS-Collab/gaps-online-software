@@ -14,3 +14,5 @@ FULL_SIDEBAR = NO
 HTML_EXTRA_STYLESHEET  = @CMAKE_CURRENT_SOURCE_DIR@/resources/extern/doxygen-awesome-css/doxygen-awesome.css
 HTML_COLORSTYLE        = LIGHT # required with Doxygen >= 1.9.5
 RECURSIVE              = YES # make sure that headers in sub dirs are considered as well
+EXTRACT_ALL            = YES # show even undocumented members
+SHOW_NAMESPACES        = YES 
