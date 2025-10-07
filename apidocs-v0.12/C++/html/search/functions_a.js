@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['voltages_0',['voltages',['../structgondola_1_1RBCalibration.html#ad872f2d084979dedd3223e317d037bc8',1,'gondola::RBCalibration']]]
+  ['unpack_0',['unpack',['../structTofPacket.html#a7a348ad4e49dc8667f72d12d02b97653',1,'TofPacket']]]
 ];

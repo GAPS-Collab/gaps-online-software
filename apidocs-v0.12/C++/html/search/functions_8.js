@@ -1,4 +1,9 @@
 var searchData=
 [
-  ['to_5fstring_0',['to_string',['../structgondola_1_1RBCalibration.html#a78039b06df6de1184f7eabad904fa3d2',1,'gondola::RBCalibration::to_string()'],['../structgondola_1_1CRFrameObject.html#a3196f8667f5985f4344e6d39e51f0982',1,'gondola::CRFrameObject::to_string()'],['../structRBEventHeader.html#a2b42751257bbb30f65c11061c8ff6fd5',1,'RBEventHeader::to_string()'],['../structMasterTriggerEvent.html#ae782da4a20e32d2f928f79927d71900e',1,'MasterTriggerEvent::to_string()'],['../structTofEvent.html#afbbe0d613404a4dd3b53b99bf8a51d11',1,'TofEvent::to_string()'],['../structTofEventHeader.html#a97d53e7727599003b59aadc0d611b147',1,'TofEventHeader::to_string()'],['../structLTBMoniData.html#a58688f4c7a851e010e46aa6c272a73cf',1,'LTBMoniData::to_string()'],['../structRBMoniData.html#a54eda68207c82795cde45dacf62fe352',1,'RBMoniData::to_string()'],['../structPBMoniData.html#a2020971026eabe5f0cd9a7d750758b19',1,'PBMoniData::to_string()'],['../structPAMoniData.html#a094b1c4882b9a8aadce6623b2489681f',1,'PAMoniData::to_string()'],['../structMtbMoniData.html#a4d878484bc805f0ae0a98e156bbea1f1',1,'MtbMoniData::to_string()'],['../structTofPacket.html#aff67f57ea880e444cd3e96079eb5432e',1,'TofPacket::to_string()']]]
+  ['set_5ffilename_0',['set_filename',['../classGaps_1_1TofPacketReader.html#ae8a207f64bbe9c6f4abe9327eb04631c',1,'Gaps::TofPacketReader']]],
+  ['set_5fpaddle_5flen_1',['set_paddle_len',['../structTofHit.html#aea570005131df3d3077d25512df181e2',1,'TofHit']]],
+  ['set_5fpath_2',['set_path',['../structgondola_1_1CRReader.html#ad4ffc9e5ae011c674d4deb8464cacf72',1,'gondola::CRReader']]],
+  ['spike_5fcleaning_5fall_3',['spike_cleaning_all',['../calibration_8h.html#a56a2781343a042a385b34244fe8e4934',1,'gondola']]],
+  ['spike_5fcleaning_5fdrs4_4',['spike_cleaning_drs4',['../calibration_8h.html#a51016fc759994f7a750d933ea9dee8b5',1,'gondola']]],
+  ['spike_5fcleaning_5fsimple_5',['spike_cleaning_simple',['../calibration_8h.html#aad98e262d4567278c4414be5db426023',1,'gondola']]]
 ];

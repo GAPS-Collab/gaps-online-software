@@ -1,0 +1,17 @@
+<map id="/home/runner/work/gaps&#45;online&#45;software/gaps&#45;online&#45;software/gondola&#45;core/C++/include/calibration.h" name="/home/runner/work/gaps&#45;online&#45;software/gaps&#45;online&#45;software/gondola&#45;core/C++/include/calibration.h">
+<area shape="rect" id="Node000001" title="ReadoutBoard calibration C++ implementation for RBCalibration class." alt="" coords="26,5,253,75"/>
+<area shape="rect" id="Node000002" href="$caraspace_8hpp_source.html" title=" " alt="" coords="58,504,296,573"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="63,85,43,103,29,124,17,151,11,176,10,220,20,266,29,324,31,393,37,422,54,454,77,481,106,502,103,506,74,485,49,458,32,424,26,394,24,324,14,267,5,220,5,175,12,150,24,121,39,99,59,81"/>
+<area shape="rect" id="Node000003" href="$events_8h_source.html" title=" " alt="" coords="39,123,240,192"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="133,89,134,122,129,123,128,89"/>
+<area shape="poly" id="edge3_Node000003_Node000001" title=" " alt="" coords="146,109,145,75,151,75,151,109"/>
+<area shape="rect" id="Node000004" href="$io_8hpp_source.html" title=" " alt="" coords="39,247,224,317"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="139,206,137,247,131,247,134,205"/>
+<area shape="rect" id="Node000006" href="$telemetry__dataclasses_8hpp_source.html" title=" " alt="" coords="248,240,458,324"/>
+<area shape="poly" id="edge7_Node000003_Node000006" title=" " alt="" coords="211,196,283,238,281,242,208,201"/>
+<area shape="rect" id="Node000005" href="$telemetry__reader_8hpp_source.html" title=" " alt="" coords="64,372,290,456"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="150,329,165,371,160,373,145,331"/>
+<area shape="poly" id="edge6_Node000005_Node000002" title=" " alt="" coords="180,470,180,504,174,504,174,470"/>
+<area shape="poly" id="edge8_Node000006_Node000002" title=" " alt="" coords="349,338,333,398,320,429,303,458,278,484,248,506,245,502,274,480,299,454,316,427,328,397,344,337"/>
+<area shape="poly" id="edge9_Node000006_Node000005" title=" " alt="" coords="288,334,235,374,231,369,285,330"/>
+</map>

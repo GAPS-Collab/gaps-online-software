@@ -111,7 +111,7 @@ $(document).ready(function(){initNavTree('caraspace_8hpp_source.html',''); initR
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &quot;packets/tof_packet.h&quot;</span></div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &quot;telemetry_dataclasses.hpp&quot;</span></div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &quot;io/telemetry_reader.hpp&quot;</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;calibration.h&quot;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;<a class="code" href="calibration_8h.html">calibration.h</a>&quot;</span></div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &quot;errors.hpp&quot;</span></div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;result/result.h&quot;</span></div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#ifdef BUILD_CXXDB</span></div>
@@ -176,7 +176,7 @@ $(document).ready(function(){initNavTree('caraspace_8hpp_source.html',''); initR
 <div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    <span class="keyword">auto</span> get_filenames()  <span class="keyword">const</span> -&gt; Vec&lt;std::string&gt;;</div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    <span class="keyword">auto</span> <a class="code hl_function" href="structgondola_1_1CRReader.html#a5e3d66a953c6a1c2bec182d9613105c9">is_exhausted</a>()   <span class="keyword">const</span> -&gt; bool;</div>
 <div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    <span class="keyword">auto</span> <a class="code hl_function" href="structgondola_1_1CRReader.html#ade6008fcc019f6507a788be8ef146297">n_packets_read</a>() <span class="keyword">const</span> -&gt; bool;</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    <span class="keyword">auto</span> <a class="code hl_function" href="structgondola_1_1CRReader.html#a00f5390156f39984e867c309e7a97f35">get_rbcalibrations</a>(u8 n_rb) -&gt; RBCalibrationMap;     </div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    <span class="keyword">auto</span> <a class="code hl_function" href="structgondola_1_1CRReader.html#a00f5390156f39984e867c309e7a97f35">get_rbcalibrations</a>(u8 n_rb) -&gt; <a class="code hl_typedef" href="calibration_8h.html#ae720591de7c0e9e18619d265295f1ebe">RBCalibrationMap</a>;     </div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span> </div>
 <div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>  <span class="keyword">private</span>:  </div>
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span><span class="preprocessor">    #ifdef BUILD_CXXDB</span></div>
@@ -194,6 +194,8 @@ $(document).ready(function(){initNavTree('caraspace_8hpp_source.html',''); initR
 </div>
 <div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>}</div>
 <div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span><span class="preprocessor">#endif</span></div>
+<div class="ttc" id="acalibration_8h_html"><div class="ttname"><a href="calibration_8h.html">calibration.h</a></div><div class="ttdoc">ReadoutBoard calibration C++ implementation for RBCalibration class.</div></div>
+<div class="ttc" id="acalibration_8h_html_ae720591de7c0e9e18619d265295f1ebe"><div class="ttname"><a href="calibration_8h.html#ae720591de7c0e9e18619d265295f1ebe">gondola::RBCalibrationMap</a></div><div class="ttdeci">std::map&lt; u8, RBCalibration &gt; RBCalibrationMap</div><div class="ttdoc">shortcut for the typically used map of rb_id -&gt; calibrations</div><div class="ttdef"><b>Definition</b> calibration.h:98</div></div>
 <div class="ttc" id="anamespaceGaps_html_a84fb383b1df4955afc6ea35a9b15ff44"><div class="ttname"><a href="namespaceGaps.html#a84fb383b1df4955afc6ea35a9b15ff44">Gaps::TofPaddleMap</a></div><div class="ttdeci">std::map&lt; u8, TofPaddle &gt; TofPaddleMap</div><div class="ttdoc">A map of paddle id -&gt; TofPaddle.</div><div class="ttdef"><b>Definition</b> database.h:62</div></div>
 <div class="ttc" id="astructGaps_1_1Telemetry_1_1Packet_html"><div class="ttname"><a href="structGaps_1_1Telemetry_1_1Packet.html">Gaps::Telemetry::Packet</a></div><div class="ttdef"><b>Definition</b> telemetry_dataclasses.hpp:72</div></div>
 <div class="ttc" id="astructTofPacket_html"><div class="ttname"><a href="structTofPacket.html">TofPacket</a></div><div class="ttdef"><b>Definition</b> tof_packet.h:83</div></div>
