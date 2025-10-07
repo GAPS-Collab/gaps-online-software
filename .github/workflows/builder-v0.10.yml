@@ -72,6 +72,14 @@ jobs:
     - name: Create .nojekyll
       run: touch ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/html/.nojekyll
       shell: bash
+    
+    - name: Build
+      # Build your program with the given configuration
+      #run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      run: source $HOME/.cargo/env && cd ${{github.workspace}}/build && make -j 4 
+    
+    - name: Install 
+      run: source $HOME/.cargo/env && cd ${{github.workspace}}/build && make install
 
     - name: Create python API docs
       run: source ${{github.workspace }}/install/setup-env.sh && cd ${{ github.workspace }}/python/doc/ && rye run sphinx-build -M html . build
@@ -104,13 +112,6 @@ jobs:
         folder: ${{ github.workspace }}/build/doc/
         branch: gh-pages
     
-    - name: Build
-      # Build your program with the given configuration
-      #run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
-      run: source $HOME/.cargo/env && cd ${{github.workspace}}/build && make -j 4 
-    
-    - name: Install 
-      run: source $HOME/.cargo/env && cd ${{github.workspace}}/build && make install
  
     - name: Test-Dataclasses
       working-directory: ${{github.workspace}}/build
