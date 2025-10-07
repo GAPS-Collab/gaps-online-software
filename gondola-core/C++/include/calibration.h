@@ -1,11 +1,16 @@
+/*! \file 
+ *  \brief ReadoutBoard calibration 
+ *  C++ implementation for RBCalibration class 
+ *
+ *  For actual flight code, see the rust project 
+ *
+ *  This file is part of gaps-online-software and published 
+ *  under the GPLv3 license
+ *  
+ */
+
 #ifndef CALIBRATION_H_INCLUDED
 #define CALIBRATION_H_INCLUDED
-
-/********************************
- * ReadoutBoard calibration:
- * - convert adc, time bins in 
- *   mV and nanoseconds.
- *******************************/
 
 #include <vector>
 #include <string>
@@ -62,13 +67,7 @@ namespace gondola {
     Vec<f32> voltages   (const RBEvent &event, const u8 channel) const;
     Vec<f32> nanoseconds(const RBEvent &event, const u8 channel) const;
   
-    /**
-     * Factory function for RBCalibration
-     *
-     * @param
-     * @param
-     * @param 
-     */
+    /// Factory function for RBCalibration 
     static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos, 
                                 bool discard_events = true)
        -> RBCalibration;
@@ -100,6 +99,5 @@ namespace gondola {
 } // end namespace
 
 std::ostream& operator<<(std::ostream& os, const gondola::RBCalibration& pck);
-
 
 #endif
