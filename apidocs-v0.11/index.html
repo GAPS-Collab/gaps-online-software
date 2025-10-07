@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>GAPS Online Software documentation &#8212; gondola 0.12.1 documentation</title>
+    <title>GAPS Online Software documentation &#8212; gondola 0.11.8 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=712157b3"></script>
+    <script src="_static/documentation_options.js?v=3adbc293"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
@@ -109,7 +109,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.12.1 documentation</p>
+    <p class="title logo__title">gondola 0.11.8 documentation</p>
   
 </a></div>
     
@@ -273,6 +273,15 @@ Gondola core allows to calibrate the event data as well</p>
 </dd>
 </dl>
 </li>
+<li><p>gondola       - The actual name of the python packet on pypi</p></li>
+<li><dl class="simple">
+<dt>gondola_cxx   - Another python packet on pypi, built from the CXX implementation</dt><dd><p>of gondola-core. This is typically not needed to be installed
+or used in any way, it is designed for internal testing.
+However, this will expose some further functionality related to
+the interplay with SimpleDet, ROOT and Geant4 in the future.</p>
+</dd>
+</dl>
+</li>
 <li><dl class="simple">
 <dt>gander        - a streamlit app which allows to have a quick look into</dt><dd><p>recorded data on disk or hook up to a telemetry stream</p>
 </dd>
@@ -320,6 +329,24 @@ The python module is called <cite>gondola</cite>.</p>
 </div>
 </section>
 </section>
+<section id="rust-api-software-documentation">
+<h1>RUST API Software documentation<a class="headerlink" href="#rust-api-software-documentation" title="Link to this heading">#</a></h1>
+<p>The &quot;heart&quot; of the project - implementes necessarry dataclasses
+and i/o operations</p>
+<p><a class="reference external" href="gondola_core/index.html">gondola-core (common library)</a></p>
+<p>TOF flight computer code for data acquisition and control in-flight</p>
+<p><a class="reference external" href="liftof_cc/index.html">liftof-cc</a></p>
+<p>TOF RB data acquisition/control code to be controled by liftof-cc</p>
+<p><a class="reference external" href="liftof_rb/index.html">liftof-rb</a></p>
+<p>Run scheduler to manage settings and do bookkeeping of them</p>
+<p><a class="reference external" href="liftof_scheduler/index.html">liftof-scheduler</a></p>
+<p>Terminal application to monitor TOF activity</p>
+<p><a class="reference external" href="liftof_tui/index.html">liftof-tui</a></p>
+</section>
+<section id="cxx-api-software-documentation">
+<h1>CXX API Software documentation<a class="headerlink" href="#cxx-api-software-documentation" title="Link to this heading">#</a></h1>
+<p><a class="reference external" href="C++/html/index.html">Doxygen API docs</a></p>
+</section>
 
 
                 </article>
@@ -365,6 +392,8 @@ The python module is called <cite>gondola</cite>.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#api-docs">API docs</a></li>
 </ul>
 </li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#rust-api-software-documentation">RUST API Software documentation</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#cxx-api-software-documentation">CXX API Software documentation</a></li>
 </ul>
 
   </nav></div>
