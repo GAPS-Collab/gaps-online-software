@@ -10,65 +10,65 @@
 \DoxyCodeLine{00016\ \textcolor{preprocessor}{\#include\ <string>}}
 \DoxyCodeLine{00017\ \textcolor{preprocessor}{\#include\ <map>}}
 \DoxyCodeLine{00018\ }
-\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ "{}tof\_typedefs.h"{}}}
-\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}events.h"{}}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tof__typedefs_8h}{tof\_typedefs.h}}"{}}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{events_8h}{events.h}}"{}}}
 \DoxyCodeLine{00021\ }
 \DoxyCodeLine{00022\ \textcolor{keyword}{class\ }\mbox{\hyperlink{structRBEvent}{RBEvent}};}
 \DoxyCodeLine{00023\ }
-\DoxyCodeLine{00024\ \textcolor{keyword}{namespace\ }gondola\ \{}
+\DoxyCodeLine{00024\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacegondola}{gondola}}\ \{}
 \DoxyCodeLine{00025\ }
-\DoxyCodeLine{00028\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{calibration_8h_a51016fc759994f7a750d933ea9dee8b5}{spike\_cleaning\_drs4}}(Vec<Vec<f32>>\ \&wf,\ u16\ tCell,\ i32\ spikes[])\ -\/>\ void;}
+\DoxyCodeLine{00028\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacegondola_a51016fc759994f7a750d933ea9dee8b5}{spike\_cleaning\_drs4}}(\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}<\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<f32>}}>\ \&wf,\ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ tCell,\ \mbox{\hyperlink{tof__typedefs_8h_a48d6cd8e4135fb2ff7e7f2dac84089ec}{i32}}\ spikes[])\ -\/>\ void;}
 \DoxyCodeLine{00029\ \ \ }
-\DoxyCodeLine{00031\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{calibration_8h_aad98e262d4567278c4414be5db426023}{spike\_cleaning\_simple}}(Vec<Vec<f32>>\ \&voltages,\ \textcolor{keywordtype}{bool}\ calibrated\ =\ \textcolor{keyword}{true})\ -\/>\ void;}
+\DoxyCodeLine{00031\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacegondola_aad98e262d4567278c4414be5db426023}{spike\_cleaning\_simple}}(\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}<\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<f32>}}>\ \&voltages,\ \textcolor{keywordtype}{bool}\ calibrated\ =\ \textcolor{keyword}{true})\ -\/>\ void;}
 \DoxyCodeLine{00032\ \ \ }
-\DoxyCodeLine{00034\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{calibration_8h_a56a2781343a042a385b34244fe8e4934}{spike\_cleaning\_all}}(Vec<Vec<f32>>\ \&voltages,\ \textcolor{keywordtype}{bool}\ calibrated\ =\ \textcolor{keyword}{true})\ -\/>\ void;}
+\DoxyCodeLine{00034\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacegondola_a56a2781343a042a385b34244fe8e4934}{spike\_cleaning\_all}}(\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}<\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<f32>}}>\ \&voltages,\ \textcolor{keywordtype}{bool}\ calibrated\ =\ \textcolor{keyword}{true})\ -\/>\ void;}
 \DoxyCodeLine{00035\ }
 \DoxyCodeLine{00038\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}}\ \{}
-\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ HEAD\ =\ 0xAAAA;}
-\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ TAIL\ =\ 0x5555;}
-\DoxyCodeLine{00041\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ serialize\_event\_data;}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structgondola_1_1RBCalibration_a9e96929baa9fe1d7898b451b1df00faf}{HEAD}}\ =\ 0xAAAA;}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structgondola_1_1RBCalibration_a8cdb106adcafb09679545c9f2c9a504b}{TAIL}}\ =\ 0x5555;}
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{structgondola_1_1RBCalibration_aae4481d47f19d2ca32c398bfaebee074}{serialize\_event\_data}};}
 \DoxyCodeLine{00042\ \ \ }
-\DoxyCodeLine{00044\ \ \ \ \ u8\ \mbox{\hyperlink{structgondola_1_1RBCalibration_aef4c4a108071cf609bc2bcbb1603f876}{rb\_id}};}
-\DoxyCodeLine{00046\ \ \ \ \ f32\ \mbox{\hyperlink{structgondola_1_1RBCalibration_ae9453fdf6f109582f60f07c1b8845b6e}{d\_v}};}
-\DoxyCodeLine{00048\ \ \ \ \ u32\ \mbox{\hyperlink{structgondola_1_1RBCalibration_a5455256956208f6f606872eb5ad94834}{timestamp}};}
-\DoxyCodeLine{00049\ \ \ \ \ Vec<Vec<f32>>\ v\_offsets;}
-\DoxyCodeLine{00050\ \ \ \ \ Vec<Vec<f32>>\ v\_dips;}
-\DoxyCodeLine{00051\ \ \ \ \ Vec<Vec<f32>>\ v\_incs;}
-\DoxyCodeLine{00052\ \ \ \ \ Vec<Vec<f32>>\ t\_bin;}
+\DoxyCodeLine{00044\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \mbox{\hyperlink{structgondola_1_1RBCalibration_aef4c4a108071cf609bc2bcbb1603f876}{rb\_id}};}
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \mbox{\hyperlink{structgondola_1_1RBCalibration_ae9453fdf6f109582f60f07c1b8845b6e}{d\_v}};}
+\DoxyCodeLine{00048\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}\ \mbox{\hyperlink{structgondola_1_1RBCalibration_a5455256956208f6f606872eb5ad94834}{timestamp}};}
+\DoxyCodeLine{00049\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<Vec<f32>}}>\ \mbox{\hyperlink{structgondola_1_1RBCalibration_aa976eeee958b98466bf574557c9658ef}{v\_offsets}};}
+\DoxyCodeLine{00050\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<Vec<f32>}}>\ \mbox{\hyperlink{structgondola_1_1RBCalibration_a0ebb95b569a2dd9c89bcb68b65592ff3}{v\_dips}};}
+\DoxyCodeLine{00051\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<Vec<f32>}}>\ \mbox{\hyperlink{structgondola_1_1RBCalibration_a450bfb1005d5ddbc146ab0a4adb41e8e}{v\_incs}};}
+\DoxyCodeLine{00052\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<Vec<f32>}}>\ \mbox{\hyperlink{structgondola_1_1RBCalibration_a78a54cb280a394ca7119bd7c8b9e1a41}{t\_bin}};}
 \DoxyCodeLine{00053\ \ \ \ \ \textcolor{comment}{//\ data\ used\ to\ calculate\ calibration\ constants}}
-\DoxyCodeLine{00055\ \ \ \ \ Vec<RBEvent>\ \mbox{\hyperlink{structgondola_1_1RBCalibration_a6a1ecc8b17d1c8bb310b581649648851}{noi\_data}};}
-\DoxyCodeLine{00057\ \ \ \ \ Vec<RBEvent>\ \mbox{\hyperlink{structgondola_1_1RBCalibration_a71f6588578b29ff4d604b28fd4404e5b}{vcal\_data}};}
-\DoxyCodeLine{00059\ \ \ \ \ Vec<RBEvent>\ \mbox{\hyperlink{structgondola_1_1RBCalibration_abff782167cae7662814e3ca2c28b48c9}{tcal\_data}};}
+\DoxyCodeLine{00055\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<RBEvent>}}\ \mbox{\hyperlink{structgondola_1_1RBCalibration_a6a1ecc8b17d1c8bb310b581649648851}{noi\_data}};}
+\DoxyCodeLine{00057\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<RBEvent>}}\ \mbox{\hyperlink{structgondola_1_1RBCalibration_a71f6588578b29ff4d604b28fd4404e5b}{vcal\_data}};}
+\DoxyCodeLine{00059\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<RBEvent>}}\ \mbox{\hyperlink{structgondola_1_1RBCalibration_abff782167cae7662814e3ca2c28b48c9}{tcal\_data}};}
 \DoxyCodeLine{00060\ \ \ }
-\DoxyCodeLine{00061\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}}();}
+\DoxyCodeLine{00061\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1RBCalibration_a202cbbec7b5a116791ab89db8e9df964}{RBCalibration}}();}
 \DoxyCodeLine{00062\ \ \ }
-\DoxyCodeLine{00064\ \ \ \ \ Vec<Vec<f32>>\ \mbox{\hyperlink{structgondola_1_1RBCalibration_ad872f2d084979dedd3223e317d037bc8}{voltages}}\ \ \ \ (\textcolor{keyword}{const}\ \mbox{\hyperlink{structRBEvent}{RBEvent}}\ \&event,\ \textcolor{keywordtype}{bool}\ spike\_cleaning\ =\ \textcolor{keyword}{false})\ \textcolor{keyword}{const};}
-\DoxyCodeLine{00065\ \ \ \ \ Vec<Vec<f32>>\ nanoseconds\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{structRBEvent}{RBEvent}}\ \&event)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00064\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<Vec<f32>}}>\ \mbox{\hyperlink{structgondola_1_1RBCalibration_ad872f2d084979dedd3223e317d037bc8}{voltages}}\ \ \ \ (\textcolor{keyword}{const}\ \mbox{\hyperlink{structRBEvent}{RBEvent}}\ \&event,\ \textcolor{keywordtype}{bool}\ spike\_cleaning\ =\ \textcolor{keyword}{false})\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00065\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<Vec<f32>}}>\ \mbox{\hyperlink{structgondola_1_1RBCalibration_a207e61bc09f90bfae8f7f14f61a3066b}{nanoseconds}}\ (\textcolor{keyword}{const}\ \mbox{\hyperlink{structRBEvent}{RBEvent}}\ \&event)\ \textcolor{keyword}{const};}
 \DoxyCodeLine{00066\ \ \ \ \ }
-\DoxyCodeLine{00067\ \ \ \ \ Vec<f32>\ \mbox{\hyperlink{structgondola_1_1RBCalibration_ad872f2d084979dedd3223e317d037bc8}{voltages}}\ \ \ (\textcolor{keyword}{const}\ \mbox{\hyperlink{structRBEvent}{RBEvent}}\ \&event,\ \textcolor{keyword}{const}\ u8\ channel)\ \textcolor{keyword}{const};}
-\DoxyCodeLine{00068\ \ \ \ \ Vec<f32>\ nanoseconds(\textcolor{keyword}{const}\ \mbox{\hyperlink{structRBEvent}{RBEvent}}\ \&event,\ \textcolor{keyword}{const}\ u8\ channel)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00067\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<f32>}}\ \mbox{\hyperlink{structgondola_1_1RBCalibration_ad872f2d084979dedd3223e317d037bc8}{voltages}}\ \ \ (\textcolor{keyword}{const}\ \mbox{\hyperlink{structRBEvent}{RBEvent}}\ \&event,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ channel)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00068\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<f32>}}\ \mbox{\hyperlink{structgondola_1_1RBCalibration_a207e61bc09f90bfae8f7f14f61a3066b}{nanoseconds}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structRBEvent}{RBEvent}}\ \&event,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ channel)\ \textcolor{keyword}{const};}
 \DoxyCodeLine{00069\ \ \ }
-\DoxyCodeLine{00071\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1RBCalibration_a72d9a549df00bdb74a24934b9c500e42}{from\_bytestream}}(\textcolor{keyword}{const}\ Vec<u8>\ \&bytestream,\ u64\ \&pos,\ }
+\DoxyCodeLine{00071\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1RBCalibration_a72d9a549df00bdb74a24934b9c500e42}{from\_bytestream}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u8>}}\ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}},\ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}\ \&pos,\ }
 \DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ discard\_events\ =\ \textcolor{keyword}{true})}
-\DoxyCodeLine{00073\ \ \ \ \ \ \ \ -\/>\ \mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}};}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ -\/>\ \mbox{\hyperlink{structgondola_1_1RBCalibration_a202cbbec7b5a116791ab89db8e9df964}{RBCalibration}};}
 \DoxyCodeLine{00074\ \ \ }
-\DoxyCodeLine{00078\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1RBCalibration_ab261f3b0564ef2f34522faa718758294}{from\_file}}(\textcolor{keyword}{const}\ String\ \&filename,\ \textcolor{keywordtype}{bool}\ discard\_events\ =\ \textcolor{keyword}{true})}
-\DoxyCodeLine{00079\ \ \ \ \ \ \ -\/>\ \mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}};}
+\DoxyCodeLine{00078\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1RBCalibration_ab261f3b0564ef2f34522faa718758294}{from\_file}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{tof__typedefs_8h_afbeda3fd1bdc8c37d01bdf9f5c8274ff}{String}}\ \&filename,\ \textcolor{keywordtype}{bool}\ discard\_events\ =\ \textcolor{keyword}{true})}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ -\/>\ \mbox{\hyperlink{structgondola_1_1RBCalibration_a202cbbec7b5a116791ab89db8e9df964}{RBCalibration}};}
 \DoxyCodeLine{00081\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1RBCalibration_a78039b06df6de1184f7eabad904fa3d2}{to\_string}}()\ const\ -\/>\ std::\textcolor{keywordtype}{string};}
 \DoxyCodeLine{00082\ \ \ }
 \DoxyCodeLine{00086\ \ \ \ \ static\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structgondola_1_1RBCalibration_ac14745aee1e64dd8df1fe5a0398cd8be}{disable\_eventdata}}();}
 \DoxyCodeLine{00087\ \ \ }
 \DoxyCodeLine{00088\ \ \ \ \ private:}
 \DoxyCodeLine{00089\ \ \ }
-\DoxyCodeLine{00091\ \ \ \ \ \ \ auto\ channel\_check(u8\ channel)\ const\ -\/>\ \textcolor{keywordtype}{bool};}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ auto\ channel\_check(\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ channel)\ const\ -\/>\ \textcolor{keywordtype}{bool};}
 \DoxyCodeLine{00092\ \ \ \};}
 \DoxyCodeLine{00093\ }
-\DoxyCodeLine{00095\ \ \ auto\ load\_tof\_calibrations(std::\textcolor{keywordtype}{string}\ const\ \&pathname)\ -\/>\ std::map<u8,\ \mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}}>;}
+\DoxyCodeLine{00095\ \ \ auto\ \mbox{\hyperlink{namespacegondola_abbe7c2c301e4f6cdd581d33c97be557d}{load\_tof\_calibrations}}(std::\textcolor{keywordtype}{string}\ const\ \&pathname)\ -\/>\ std::map<\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}},\ \mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}}>;}
 \DoxyCodeLine{00096\ }
-\DoxyCodeLine{00098\ \ \ typedef\ std::map<u8,\ \mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}}>\ \mbox{\hyperlink{calibration_8h_ae720591de7c0e9e18619d265295f1ebe}{RBCalibrationMap}};}
+\DoxyCodeLine{00098\ \ \ typedef\ std::map<\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}},\ \mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}}>\ \mbox{\hyperlink{namespacegondola_ae720591de7c0e9e18619d265295f1ebe}{RBCalibrationMap}};}
 \DoxyCodeLine{00099\ \}\ \textcolor{comment}{//\ end\ namespace}}
 \DoxyCodeLine{00100\ }
-\DoxyCodeLine{00101\ std::ostream\&\ operator<<(std::ostream\&\ os,\ const\ gondola::\mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}}\&\ pck);}
+\DoxyCodeLine{00101\ std::ostream\&\ operator<<(std::ostream\&\ os,\ const\ \mbox{\hyperlink{namespacegondola}{gondola}}::\mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}}\&\ pck);}
 \DoxyCodeLine{00102\ }
 \DoxyCodeLine{00103\ \textcolor{preprocessor}{\#endif}}
 

@@ -1,12 +1,12 @@
 var searchData=
 [
-  ['tail_0',['tail',['../structMasterTriggerEvent.html#a747c17bdb302ac0a1609df7c63f52bce',1,'MasterTriggerEvent::TAIL'],['../structLTBMoniData.html#ac3b825ed7426bb7da5152afbe6563fc3',1,'LTBMoniData::TAIL']]],
-  ['tcal_5fdata_1',['tcal_data',['../structgondola_1_1RBCalibration.html#abff782167cae7662814e3ca2c28b48c9',1,'gondola::RBCalibration']]],
-  ['timestamp_2',['timestamp',['../structgondola_1_1RBCalibration.html#a5455256956208f6f606872eb5ad94834',1,'gondola::RBCalibration::timestamp'],['../structMasterTriggerEvent.html#a886a68d557a93210b86b3e2d1b96bfa9',1,'MasterTriggerEvent::timestamp']]],
-  ['timestamp32_3',['timestamp32',['../structTofEventHeader.html#a30d35e7ff4f51562a82e6797d4cc6471',1,'TofEventHeader']]],
-  ['tiu_5fgps16_4',['tiu_gps16',['../structMasterTriggerEvent.html#ab7def730b945ec5fb1da944dbd95ab25',1,'MasterTriggerEvent']]],
-  ['tiu_5fgps32_5',['tiu_gps32',['../structMasterTriggerEvent.html#aa49962e24c04ede5087ff1876feecd36',1,'MasterTriggerEvent']]],
-  ['tiu_5ftimestamp_6',['tiu_timestamp',['../structMasterTriggerEvent.html#a30d57d1dc8bd9e7fc55d1af7ad6ebc92',1,'MasterTriggerEvent']]],
-  ['tmp_5fzynq_7',['tmp_zynq',['../structRBMoniData.html#ae155d590200088364810f20cabb818cb',1,'RBMoniData']]],
-  ['trenz_5ftemp_8',['trenz_temp',['../structLTBMoniData.html#a3bcaba1b72d5f1ff59cb076b312b3d5f',1,'LTBMoniData']]]
+  ['mag_5ftot_0',['mag_tot',['../structRBMoniData.html#aceb4fef6fbabb001a8fff0744f2ae23f',1,'RBMoniData']]],
+  ['mag_5fx_1',['mag_x',['../structRBMoniData.html#ae1850028094b81c5f51d1c0d6ae84c75',1,'RBMoniData']]],
+  ['mag_5fy_2',['mag_y',['../structRBMoniData.html#ab511c4787d80be9d549322b2253f8f8a',1,'RBMoniData']]],
+  ['mag_5fz_3',['mag_z',['../structRBMoniData.html#a5f9d7cfa9aa1c162d31b7af6dcc411e9',1,'RBMoniData']]],
+  ['mask_5fname_4',['mask_name',['../structGaps_1_1TrackerStripMask.html#ae421b8be553588ee8c25d4fb09588ce1',1,'Gaps::TrackerStripMask']]],
+  ['mb_5ftemp_5',['mb_temp',['../structCPUMoniData.html#aabb18ce0d1033963eb34cddfc70f8851',1,'CPUMoniData']]],
+  ['mt_5fevent_6',['mt_event',['../structTofEvent.html#a48e8654d0430e19f81d0c1553de6d3cd',1,'TofEvent']]],
+  ['mtb_5flink_5fid_7',['mtb_link_id',['../structGaps_1_1TofPaddle.html#a3c9c2a8d525247a9c1d18f974ed6f9ce',1,'Gaps::TofPaddle']]],
+  ['mtb_5flink_5fmask_8',['mtb_link_mask',['../structMasterTriggerEvent.html#ab05c4f3b5d0f32309e8bb47c09995194',1,'MasterTriggerEvent::mtb_link_mask'],['../structTofEventSummary.html#ae562daf7d3b9f9e35c1d0d9e6263902e',1,'TofEventSummary::mtb_link_mask']]]
 ];

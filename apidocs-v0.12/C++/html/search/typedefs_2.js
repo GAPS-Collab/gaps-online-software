@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['tofpaddlemap_0',['TofPaddleMap',['../namespaceGaps.html#a84fb383b1df4955afc6ea35a9b15ff44',1,'Gaps']]],
-  ['trkstripmap_1',['TrkStripMap',['../namespaceGaps.html#aa4fc4eae2e6dcffb30da7c6d1a3e3e64',1,'Gaps']]]
+  ['f32_0',['f32',['../tof__typedefs_8h.html#a5f6906312a689f27d70e9d086649d3fd',1,'tof_typedefs.h']]],
+  ['f64_1',['f64',['../tof__typedefs_8h.html#a94dab5770726ccbef8c7d026cfbdf8e5',1,'tof_typedefs.h']]]
 ];

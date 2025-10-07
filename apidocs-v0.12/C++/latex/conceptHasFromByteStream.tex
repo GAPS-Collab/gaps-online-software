@@ -13,8 +13,8 @@ Ensures that $<$\+T$>$ has a method \+::from\+\_\+bytestream.
 
 \begin{DoxyCode}{0}
 \DoxyCodeLine{\textcolor{keyword}{template}<\textcolor{keyword}{typename}\ T>}
-\DoxyCodeLine{\textcolor{keyword}{concept\ }\mbox{\hyperlink{conceptHasFromByteStream}{HasFromByteStream}}\ =\ \ \textcolor{keyword}{requires}(\textcolor{keyword}{const}\ Vec<u8>\&\ stream,\ usize\ \&pos)\ \{}
-\DoxyCodeLine{\ \ \{\ T::from\_bytestream(stream,\ pos)\ \}\ -\/>\ std::same\_as<T>;}
+\DoxyCodeLine{\textcolor{keyword}{concept\ }\mbox{\hyperlink{conceptHasFromByteStream}{HasFromByteStream}}\ =\ \ \textcolor{keyword}{requires}(\textcolor{keyword}{const}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u8>}}\&\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{stream}},\ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}})\ \{}
+\DoxyCodeLine{\ \ \{\ T::from\_bytestream(\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{stream}},\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}})\ \}\ -\/>\ std::same\_as<T>;}
 \DoxyCodeLine{\}}
 
 \end{DoxyCode}

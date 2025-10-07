@@ -1,0 +1,26 @@
+var structGaps_1_1Telemetry_1_1Cooling =
+[
+    [ "to_string", "structGaps_1_1Telemetry_1_1Cooling.html#a4086664623ebda77e637d97f06a15907", null ],
+    [ "fpga_board_i_in", "structGaps_1_1Telemetry_1_1Cooling.html#a85b09bdcb0cea0dd7886b1ed046fc83f", null ],
+    [ "fpga_board_p", "structGaps_1_1Telemetry_1_1Cooling.html#a7c791e72b411b7283e59760a4522cd91", null ],
+    [ "fpga_board_t", "structGaps_1_1Telemetry_1_1Cooling.html#aaa63970dcae6f25d3b4d2725fe4d4508", null ],
+    [ "fpga_board_v_in", "structGaps_1_1Telemetry_1_1Cooling.html#a4df03fd13aa95f67793699c0e2a320f4", null ],
+    [ "frame_counter", "structGaps_1_1Telemetry_1_1Cooling.html#a27608113d5c758441a1dacb0d5ad2d77", null ],
+    [ "header", "structGaps_1_1Telemetry_1_1Cooling.html#a8aefb7a7d2950108f3c69493c40d2b42", null ],
+    [ "last_cmd", "structGaps_1_1Telemetry_1_1Cooling.html#a75ee0ac5a7a8e45b7cb9256379cb3bff", null ],
+    [ "pw_board1_t", "structGaps_1_1Telemetry_1_1Cooling.html#a52c8cba8b9b264a65bf0dc153bb206c6", null ],
+    [ "pw_board2_t", "structGaps_1_1Telemetry_1_1Cooling.html#ab891e633844b5232edd3dce42eaf2031", null ],
+    [ "rh_current", "structGaps_1_1Telemetry_1_1Cooling.html#a015064d51ac8adb699b4c0713da268bf", null ],
+    [ "rh_off", "structGaps_1_1Telemetry_1_1Cooling.html#a27aaf10c06e011eee6be36e9b1b28096", null ],
+    [ "rh_on", "structGaps_1_1Telemetry_1_1Cooling.html#a117c45a339ab3f61a7afc949fca7adde", null ],
+    [ "rsv_t", "structGaps_1_1Telemetry_1_1Cooling.html#afa5fe879a7c94ed357d77c8752952eda", null ],
+    [ "rtd", "structGaps_1_1Telemetry_1_1Cooling.html#a8c70c6c8035dfe26b4d4377402f4d808", null ],
+    [ "rx_byte_num", "structGaps_1_1Telemetry_1_1Cooling.html#a68ad196d3acd58fbd0d910487d79ce70", null ],
+    [ "rx_cmd_num", "structGaps_1_1Telemetry_1_1Cooling.html#ab19ff509dddfe24b14f9fe3fdd97c697", null ],
+    [ "sh1_time_left", "structGaps_1_1Telemetry_1_1Cooling.html#ae678ee505797a00d9cc41de8ea103198", null ],
+    [ "sh2_time_left", "structGaps_1_1Telemetry_1_1Cooling.html#a844c005d6e5f968fb16622c82d392ff1", null ],
+    [ "sh3_time_left", "structGaps_1_1Telemetry_1_1Cooling.html#aec28fcc2744fe03cca642e20f481123b", null ],
+    [ "sh_current", "structGaps_1_1Telemetry_1_1Cooling.html#a9753a5304e60cfa0b4e5567022382a1e", null ],
+    [ "status_1", "structGaps_1_1Telemetry_1_1Cooling.html#a79b1d372d41c52b6a9449de9aef2c39b", null ],
+    [ "status_2", "structGaps_1_1Telemetry_1_1Cooling.html#afd052e480cb002037faadbbe3bcfd476", null ]
+];

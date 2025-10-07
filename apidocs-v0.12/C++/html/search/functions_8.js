@@ -1,9 +1,8 @@
 var searchData=
 [
-  ['set_5ffilename_0',['set_filename',['../classGaps_1_1TofPacketReader.html#ae8a207f64bbe9c6f4abe9327eb04631c',1,'Gaps::TofPacketReader']]],
-  ['set_5fpaddle_5flen_1',['set_paddle_len',['../structTofHit.html#aea570005131df3d3077d25512df181e2',1,'TofHit']]],
-  ['set_5fpath_2',['set_path',['../structgondola_1_1CRReader.html#ad4ffc9e5ae011c674d4deb8464cacf72',1,'gondola::CRReader']]],
-  ['spike_5fcleaning_5fall_3',['spike_cleaning_all',['../calibration_8h.html#a56a2781343a042a385b34244fe8e4934',1,'gondola']]],
-  ['spike_5fcleaning_5fdrs4_4',['spike_cleaning_drs4',['../calibration_8h.html#a51016fc759994f7a750d933ea9dee8b5',1,'gondola']]],
-  ['spike_5fcleaning_5fsimple_5',['spike_cleaning_simple',['../calibration_8h.html#aad98e262d4567278c4414be5db426023',1,'gondola']]]
+  ['ioerror_0',['IOError',['../classGaps_1_1IOError.html#af4acdf9e0ef65cc786cfc9f9ddb96942',1,'Gaps::IOError']]],
+  ['is_5fevent_5ffragment_1',['is_event_fragment',['../structRBEventHeader.html#a80d3642f8d4dd7bfa5e6f6ebef3766d6',1,'RBEventHeader']]],
+  ['is_5fexhausted_2',['is_exhausted',['../structgondola_1_1CRReader.html#a5e3d66a953c6a1c2bec182d9613105c9',1,'gondola::CRReader::is_exhausted()'],['../classGaps_1_1TofPacketReader.html#a8aca7f3a4a9658a11040279899e5db6f',1,'Gaps::TofPacketReader::is_exhausted()'],['../structgondola_1_1TelemetryPacketReader.html#a954e5dbc2e1e3b39bb854303bd8c9873',1,'gondola::TelemetryPacketReader::is_exhausted()']]],
+  ['is_5flocked_3',['is_locked',['../structRBEventHeader.html#a7314b19600b586e001833d231f3921da',1,'RBEventHeader']]],
+  ['is_5flocked_5flast_5fsec_4',['is_locked_last_sec',['../structRBEventHeader.html#abe97e5457e0dc321d9b41bf7021b0c88',1,'RBEventHeader']]]
 ];

@@ -1,6 +1,28 @@
 var structTofEventSummary =
 [
+    [ "get_rb_link_ids", "structTofEventSummary.html#aca6651cac67274ab6479f6bede6cbf7c", null ],
+    [ "get_timestamp48", "structTofEventSummary.html#af4f48f38d2543d2bbddbf6da796627bd", null ],
     [ "get_trigger_hits", "structTofEventSummary.html#aed9c24ac8859743d220a4a41b60fee22", null ],
     [ "get_trigger_sources", "structTofEventSummary.html#a5287a92228d07bc53e99e482be76d3d4", null ],
-    [ "n_trigger_paddles", "structTofEventSummary.html#aa3587b9819d57488a264b78e0fdb630e", null ]
+    [ "to_string", "structTofEventSummary.html#ac174529a9ec0b922adf81c05b4e28649", null ],
+    [ "channel_mask", "structTofEventSummary.html#a670b432e27608cb174111f302ac61516", null ],
+    [ "drs_dead_lost_hits", "structTofEventSummary.html#a2122d50c1680c446b571f4f421af5131", null ],
+    [ "dsi_j_mask", "structTofEventSummary.html#a9a9b3563bf4d3d2b2f6cf2d3452f226e", null ],
+    [ "event_id", "structTofEventSummary.html#ada60deeba02f19c32df6e1e74f5edafe", null ],
+    [ "hits", "structTofEventSummary.html#aed5fe8e77ffd1ae550efbc0b8c4ef117", null ],
+    [ "mtb_link_mask", "structTofEventSummary.html#ae562daf7d3b9f9e35c1d0d9e6263902e", null ],
+    [ "n_hits_cbe", "structTofEventSummary.html#ae8a9e3823514109ec75a62237ef3f5e9", null ],
+    [ "n_hits_cor", "structTofEventSummary.html#a6c08239903d1eed7c8374464f2e7b43d", null ],
+    [ "n_hits_umb", "structTofEventSummary.html#a3532f213fbd1851120694511fe7f3a73", null ],
+    [ "n_trigger_paddles", "structTofEventSummary.html#aa3587b9819d57488a264b78e0fdb630e", null ],
+    [ "quality", "structTofEventSummary.html#a5002ecb7dd20fe0eb01af2d5c32c28cd", null ],
+    [ "run_id", "structTofEventSummary.html#ac877dbbab71347790266887334810777", null ],
+    [ "status", "structTofEventSummary.html#a55ba9e6f8c2e00d8372a22924821b6da", null ],
+    [ "timestamp16", "structTofEventSummary.html#ad55fcbc96aa27e9dee781472f7c16f3c", null ],
+    [ "timestamp32", "structTofEventSummary.html#a971aaceb9e22a5a3011015f1ae0dcd33", null ],
+    [ "tot_edep_cbe", "structTofEventSummary.html#a006d5f0754a9bce2a6e52f1189b2dcd9", null ],
+    [ "tot_edep_cor", "structTofEventSummary.html#aa18ec9edc67b83a83703055a24f554b0", null ],
+    [ "tot_edep_umb", "structTofEventSummary.html#a634cd10f1fa4e83f57bc94bb72af69c1", null ],
+    [ "trigger_sources", "structTofEventSummary.html#ac9fa5dbd0d751fd8bfbc60be22bcfd35", null ],
+    [ "version", "structTofEventSummary.html#a8e9d86a725e44c2fa3f6ca31767a0e4a", null ]
 ];

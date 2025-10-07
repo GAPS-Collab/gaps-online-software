@@ -1,5 +1,20 @@
 var searchData=
 [
-  ['event_5fid_0',['event_id',['../structMasterTriggerEvent.html#a2fc1e8b3d4f1e769b4bce8a58a166c78',1,'MasterTriggerEvent']]],
-  ['executable_20programs_20and_20higher_20level_20libraries_20liftof_1',['Executable programs and higher level libraries [liftof]',['../index.html#autotoc_md9',1,'']]]
+  ['energy_0',['energy',['../structGaps_1_1Telemetry_1_1TrkHit.html#a904ac2d9ee732ce629484d8267f68e9e',1,'Gaps::Telemetry::TrkHit']]],
+  ['energy_5fdepositions_5fkev_1',['energy_depositions_kev',['../structSimPrimary.html#a789d34ddecd7a67158794a0e0965646d',1,'SimPrimary']]],
+  ['errorkind_2',['ErrorKind',['../classGaps_1_1IOError.html#aef5d09096037b3efe50862e2b52a9872',1,'Gaps::IOError']]],
+  ['errors_2ehpp_3',['errors.hpp',['../errors_8hpp.html',1,'']]],
+  ['event_5fid_4',['event_id',['../structTofEventHeader.html#aadecbef8416ce5b41be418145313f4af',1,'TofEventHeader::event_id'],['../structGaps_1_1Telemetry_1_1MergedEvent.html#a7a3761922ec63d47b3db72b6a195e7dc',1,'Gaps::Telemetry::MergedEvent::event_id'],['../structGaps_1_1Telemetry_1_1TofMetaData.html#a91121d68256c76b6a3454b95e384b717',1,'Gaps::Telemetry::TofMetaData::event_id'],['../structGaps_1_1Telemetry_1_1TrkEvent.html#a2acc26df9b3a8c88519a8b97856faaab',1,'Gaps::Telemetry::TrkEvent::event_id'],['../structTofEventSummary.html#ada60deeba02f19c32df6e1e74f5edafe',1,'TofEventSummary::event_id'],['../structRBWaveform.html#ac181e3faf63b4e0675e86dad6aa55208',1,'RBWaveform::event_id'],['../structMasterTriggerEvent.html#a2fc1e8b3d4f1e769b4bce8a58a166c78',1,'MasterTriggerEvent::event_id'],['../structRBMissingHit.html#a8a66764dba3c0dd8a607e511ab61df50',1,'RBMissingHit::event_id'],['../structRBEventHeader.html#a3f4c4685a787bed5b72a9ddb663d7779',1,'RBEventHeader::event_id']]],
+  ['event_5fstatus_5',['event_status',['../structMasterTriggerEvent.html#a935b83acbec230d81d345178ae91ab1b',1,'MasterTriggerEvent']]],
+  ['event_5ft0_6',['event_t0',['../structTofHit.html#a4d6bd8fc38753b1a3001df9494651b26',1,'TofHit']]],
+  ['event_5ftime_7',['event_time',['../structGaps_1_1Telemetry_1_1TrkEvent.html#ad486bdc9cb97015d5e5825a78d6c6fc1',1,'Gaps::Telemetry::TrkEvent']]],
+  ['eventheadercorrupt_8',['EventHeaderCorrupt',['../classGaps_1_1IOError.html#aef5d09096037b3efe50862e2b52a9872aea8fdf52eb835a70c796c9105add11b9',1,'Gaps::IOError']]],
+  ['eventnotready_9',['EventNotReady',['../commands_8h.html#aee4b019262fd08438aee34c463daaad3a917990e3dd3a189696e241ee2865f99c',1,'commands.h']]],
+  ['eventquality_10',['EventQuality',['../events_8h.html#a808d9c1673ae5415c054bc8e143af749',1,'events.h']]],
+  ['events_11',['events',['../structGaps_1_1Telemetry_1_1TrkEventPacket.html#a6c09cbffa22cf1cb5715238b5e9adb33',1,'Gaps::Telemetry::TrkEventPacket']]],
+  ['events_2ecxx_12',['events.cxx',['../events_8cxx.html',1,'']]],
+  ['events_2eh_13',['events.h',['../events_8h.html',1,'']]],
+  ['eventstatus_14',['EventStatus',['../events_8h.html#a097b60adc604ef5a27f55edda6360293',1,'events.h']]],
+  ['eventtimeout_15',['EventTimeOut',['../events_8h.html#a097b60adc604ef5a27f55edda6360293a44ce38fea2e8223bad3229cd0eac17da',1,'events.h']]],
+  ['extract_5frbid_16',['extract_rbid',['../calibration_8cxx.html#a88ea988080387aa867e0151a2c602337',1,'calibration.cxx']]]
 ];

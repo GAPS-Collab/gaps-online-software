@@ -1,0 +1,104 @@
+\doxysection{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/database.h File Reference}
+\hypertarget{database_8h}{}\label{database_8h}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/database.h@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/database.h}}
+{\ttfamily \#include "{}tof\+\_\+typedefs.\+h"{}}\newline
+{\ttfamily \#include "{}sqlite\+\_\+orm.\+h"{}}\newline
+{\ttfamily \#include $<$map$>$}\newline
+Include dependency graph for database.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{database_8h__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1TofPaddle}{Gaps\+::\+Tof\+Paddle}}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1TrackerStrip}{Gaps\+::\+Tracker\+Strip}}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1TrackerStripMask}{Gaps\+::\+Tracker\+Strip\+Mask}}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1TrackerStripPedestal}{Gaps\+::\+Tracker\+Strip\+Pedestal}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespaceGaps}{Gaps}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, \mbox{\hyperlink{structGaps_1_1TofPaddle}{Tof\+Paddle}} $>$ \mbox{\hyperlink{namespaceGaps_a84fb383b1df4955afc6ea35a9b15ff44}{Gaps\+::\+Tof\+Paddle\+Map}}
+\begin{DoxyCompactList}\small\item\em A map of paddle id -\/\texorpdfstring{$>$}{>} \doxylink{structGaps_1_1TofPaddle}{Tof\+Paddle}. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, std\+::map$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, std\+::tuple$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, \mbox{\hyperlink{namespaceGaps_a900b25ea53c4b01b14e10492303daa9c}{Tof\+Paddle\+End}} $>$ $>$ $>$ \mbox{\hyperlink{namespaceGaps_a5d656056027834e42a559636af22f086}{Gaps\+::\+Rb\+Id\+Channel\+Paddle\+Id\+Map}}
+\begin{DoxyCompactList}\small\item\em A map of RBID, RBCh -\/\texorpdfstring{$>$}{>} \doxylink{structGaps_1_1TofPaddle}{Tof\+Paddle}. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, std\+::map$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, std\+::map$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ $>$ $>$ \mbox{\hyperlink{namespaceGaps_ac562c67ce894d03edeecb6332caa86ac}{Gaps\+::\+Dsi\+JChn\+Paddle\+Id\+Map}}
+\begin{DoxyCompactList}\small\item\em A map of DSI,J -\/\texorpdfstring{$>$}{>} \doxylink{structGaps_1_1TofPaddle}{Tof\+Paddle}. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{structGaps_1_1TrackerStrip}{Tracker\+Strip}} $>$ \mbox{\hyperlink{namespaceGaps_aa4fc4eae2e6dcffb30da7c6d1a3e3e64}{Gaps\+::\+Trk\+Strip\+Map}}
+\begin{DoxyCompactList}\small\item\em A map of strip identifier (layer-\/row-\/module-\/channel -\/\texorpdfstring{$>$}{>} Tracker strip. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}} $>$ \mbox{\hyperlink{namespaceGaps_ab973cc2b0495c49012fb17667010ef42}{Gaps\+::\+Trk\+Strip\+Mask\+Map}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{structGaps_1_1TrackerStripPedestal}{Tracker\+Strip\+Pedestal}} $>$ \mbox{\hyperlink{namespaceGaps_afdf1ea5d924eac5baad0144da1280503}{Gaps\+::\+Trk\+Strip\+Ped\+Map}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{namespaceGaps_a900b25ea53c4b01b14e10492303daa9c}{Gaps\+::\+Tof\+Paddle\+End}} \+: i16 \{ \mbox{\hyperlink{namespaceGaps_a900b25ea53c4b01b14e10492303daa9ca88183b946cc5f0e8c96b2e66e1c74a7e}{Gaps\+::\+Unknown}} = 0
+, \mbox{\hyperlink{namespaceGaps_a900b25ea53c4b01b14e10492303daa9ca7fc56270e7a70fa81a5935b72eacbe29}{Gaps\+::A}} = -\/1
+, \mbox{\hyperlink{namespaceGaps_a900b25ea53c4b01b14e10492303daa9ca9d5ed678fe57bcca610140957afab571}{Gaps\+::B}} = 1
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespaceGaps_a51061c6f5af624934c885081d8ac2c4c}{Gaps\+::get\+\_\+tofpaddles}} () -\/$>$ \mbox{\hyperlink{namespaceGaps_a84fb383b1df4955afc6ea35a9b15ff44}{Tof\+Paddle\+Map}}
+\begin{DoxyCompactList}\small\item\em Get a paddle from the database. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespaceGaps_a0e1e5140ee555faed2b67c3eb26f5a63}{Gaps\+::get\+\_\+rb\+\_\+id\+\_\+paddles}} () -\/$>$ \mbox{\hyperlink{namespaceGaps_a5d656056027834e42a559636af22f086}{Rb\+Id\+Channel\+Paddle\+Id\+Map}}
+\begin{DoxyCompactList}\small\item\em Get a paddle if the rb id and channel is known (HG) \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespaceGaps_a8905976c88897fdf62e1163984c5da66}{Gaps\+::get\+\_\+dsi\+\_\+j\+\_\+paddles}} () -\/$>$ \mbox{\hyperlink{namespaceGaps_ac562c67ce894d03edeecb6332caa86ac}{Dsi\+JChn\+Paddle\+Id\+Map}}
+\begin{DoxyCompactList}\small\item\em Get a paddle if the dsi,j connection of a paddle is known (LTB, LG) \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespaceGaps_a41dba3273290cc6660d33a0ee5c511b8}{Gaps\+::get\+\_\+trackerstrips}} () -\/$>$ \mbox{\hyperlink{namespaceGaps_aa4fc4eae2e6dcffb30da7c6d1a3e3e64}{Trk\+Strip\+Map}}
+\begin{DoxyCompactList}\small\item\em Retrieve all tracker strips from the database. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespaceGaps_a89c0577fa812754efd900481fef12c9c}{Gaps\+::get\+\_\+module\+\_\+position}} (\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} layer, \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} row, \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{mod}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespaceGaps_aa4fc4eae2e6dcffb30da7c6d1a3e3e64}{Trk\+Strip\+Map}} \&) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} $>$
+\begin{DoxyCompactList}\small\item\em Get the position of a module -\/ returns in cm. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespaceGaps_aa891e85254e13812609ce1e8bcbc014a}{Gaps\+::get\+\_\+trackerstripmasks}} (std\+::string mask\+\_\+name="{}"{}) -\/$>$ \mbox{\hyperlink{namespaceGaps_ab973cc2b0495c49012fb17667010ef42}{Trk\+Strip\+Mask\+Map}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespaceGaps_a9f34404b09be3f6fd69f8e09d2c045d2}{Gaps\+::get\+\_\+trackerstrippedestals}} () -\/$>$ \mbox{\hyperlink{namespaceGaps_afdf1ea5d924eac5baad0144da1280503}{Trk\+Strip\+Ped\+Map}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \& \mbox{\hyperlink{database_8h_ae04e44e535dc68284044fad81eaf1060}{operator$<$$<$}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structGaps_1_1TofPaddle}{Gaps\+::\+Tof\+Paddle}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{paddle}})
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \& \mbox{\hyperlink{database_8h_a5882271160998899c4e3dccc467f34bc}{operator$<$$<$}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structGaps_1_1TrackerStrip}{Gaps\+::\+Tracker\+Strip}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{strip}})
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \& \mbox{\hyperlink{database_8h_af6e19d6d57bc581e7c6039013951b73f}{operator$<$$<$}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structGaps_1_1TrackerStripMask}{Gaps\+::\+Tracker\+Strip\+Mask}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{strip}})
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \& \mbox{\hyperlink{database_8h_ac09989c1829be3fca2aed95daa9b5b0c}{operator$<$$<$}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structGaps_1_1TrackerStripPedestal}{Gaps\+::\+Tracker\+Strip\+Pedestal}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{strip}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{database_8h_ae04e44e535dc68284044fad81eaf1060}\label{database_8h_ae04e44e535dc68284044fad81eaf1060} 
+\index{database.h@{database.h}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!database.h@{database.h}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \& \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{operator}}$<$$<$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structGaps_1_1TofPaddle}{Gaps\+::\+Tof\+Paddle}} \&}]{paddle }\end{DoxyParamCaption})}
+
+\Hypertarget{database_8h_a5882271160998899c4e3dccc467f34bc}\label{database_8h_a5882271160998899c4e3dccc467f34bc} 
+\index{database.h@{database.h}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!database.h@{database.h}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \& \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{operator}}$<$$<$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structGaps_1_1TrackerStrip}{Gaps\+::\+Tracker\+Strip}} \&}]{strip }\end{DoxyParamCaption})}
+
+\Hypertarget{database_8h_af6e19d6d57bc581e7c6039013951b73f}\label{database_8h_af6e19d6d57bc581e7c6039013951b73f} 
+\index{database.h@{database.h}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!database.h@{database.h}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \& \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{operator}}$<$$<$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structGaps_1_1TrackerStripMask}{Gaps\+::\+Tracker\+Strip\+Mask}} \&}]{strip }\end{DoxyParamCaption})}
+
+\Hypertarget{database_8h_ac09989c1829be3fca2aed95daa9b5b0c}\label{database_8h_ac09989c1829be3fca2aed95daa9b5b0c} 
+\index{database.h@{database.h}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!database.h@{database.h}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \& \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{operator}}$<$$<$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structGaps_1_1TrackerStripPedestal}{Gaps\+::\+Tracker\+Strip\+Pedestal}} \&}]{strip }\end{DoxyParamCaption})}
+

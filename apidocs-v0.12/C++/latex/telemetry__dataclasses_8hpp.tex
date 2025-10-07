@@ -1,0 +1,101 @@
+\doxysection{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/telemetry\+\_\+dataclasses.hpp File Reference}
+\hypertarget{telemetry__dataclasses_8hpp}{}\label{telemetry__dataclasses_8hpp}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/telemetry\_dataclasses.hpp@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/telemetry\_dataclasses.hpp}}
+{\ttfamily \#include "{}tof\+\_\+typedefs.\+h"{}}\newline
+{\ttfamily \#include "{}result/result.\+h"{}}\newline
+{\ttfamily \#include "{}events.\+h"{}}\newline
+{\ttfamily \#include "{}errors.\+hpp"{}}\newline
+Include dependency graph for telemetry\+\_\+dataclasses.\+hpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{telemetry__dataclasses_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{telemetry__dataclasses_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader}{Gaps\+::\+Telemetry\+::\+Packet\+Header}}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Packet}{Gaps\+::\+Telemetry\+::\+Packet}}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkHeader}{Gaps\+::\+Telemetry\+::\+Trk\+Header}}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkHit}{Gaps\+::\+Telemetry\+::\+Trk\+Hit}}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkEvent}{Gaps\+::\+Telemetry\+::\+Trk\+Event}}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkEventPacket}{Gaps\+::\+Telemetry\+::\+Trk\+Event\+Packet}}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TofMetaData}{Gaps\+::\+Telemetry\+::\+Tof\+Meta\+Data}}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkCalibratedHit}{Gaps\+::\+Telemetry\+::\+Trk\+Calibrated\+Hit}}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkMetaData}{Gaps\+::\+Telemetry\+::\+Trk\+Meta\+Data}}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling}{Gaps\+::\+Telemetry\+::\+Cooling}}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent}{Gaps\+::\+Telemetry\+::\+Merged\+Event}}
+\begin{DoxyCompactList}\small\item\em The actual merged event sent over telemetry. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespaceGaps}{Gaps}}
+\item 
+namespace \mbox{\hyperlink{namespaceGaps_1_1Telemetry}{Gaps\+::\+Telemetry}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7}{Gaps\+::\+Telemetry\+::\+Bfsw\+Packet\+Type}} \+: u8 \{ \newline
+\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a88183b946cc5f0e8c96b2e66e1c74a7e}{Gaps\+::\+Telemetry\+::\+Unknown}} = 0
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a03b147d4e815a1141e70c967b84c7078}{Gaps\+::\+Telemetry\+::\+Card\+HKP}} = 30
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7abe6258f33139d3f656ed32777e3be064}{Gaps\+::\+Telemetry\+::\+Cooling\+HK}} = 40
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a6f44f3023587714a8b55153eab21c599}{Gaps\+::\+Telemetry\+::\+PDUHK}} = 50
+, \newline
+\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a26b8a5f8cbb692e906c8eed4b88cc0bd}{Gaps\+::\+Telemetry\+::\+Tracker}} = 80
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ac673eb57c4b7d3d8227f8b7e0f844b08}{Gaps\+::\+Telemetry\+::\+Tracker\+DAQCntr}} = 81
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a8c578de37278ada488d763ea86c5cf20}{Gaps\+::\+Telemetry\+::\+GPS}} = 82
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a809a59ac536e0b86400daa219166044d}{Gaps\+::\+Telemetry\+::\+Trk\+Temp\+Leak}} = 83
+, \newline
+\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ad0954fab889c8ba1bde629f48ca65579}{Gaps\+::\+Telemetry\+::\+Boring\+Event}} = 90
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a3f21342e6e827fe801c4cc55a3d0176d}{Gaps\+::\+Telemetry\+::\+RBWaveform}} = 91
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a1d633e18b49ad6ab196ff08b21e0a052}{Gaps\+::\+Telemetry\+::\+Any\+Tof\+HK}} = 92
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7acea8f127836a6605812b4be35b4f0f98}{Gaps\+::\+Telemetry\+::\+Gcu\+Evt\+Bld\+Settings}} = 93
+, \newline
+\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a4710fd064a284cc5804517e941c8e52b}{Gaps\+::\+Telemetry\+::\+Lab\+Jack\+HK}} = 100
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a86fcb2eddd83abe6f2766d955905d8e7}{Gaps\+::\+Telemetry\+::\+Mag\+HK}} = 108
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ab786f26bcf3a3e7b4924849ee2fc8629}{Gaps\+::\+Telemetry\+::\+Gcu\+Mon}} = 110
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a2b585905be50d3772320efb7466bd3dc}{Gaps\+::\+Telemetry\+::\+Interesting\+Event}} = 190
+, \newline
+\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ad7fa164f74f80c6b1fec72ce6d863316}{Gaps\+::\+Telemetry\+::\+No\+Gaps\+Trigger\+Event}} = 191
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a853ccc9f2032abb9d46425b422483e41}{Gaps\+::\+Telemetry\+::\+No\+Tof\+Data\+Event}} = 192
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ab25d8b2099e52bb9300aca6661601b8b}{Gaps\+::\+Telemetry\+::\+Ack}} = 200
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ac44f8f7d9b9f501fe9278cd56521f28a}{Gaps\+::\+Telemetry\+::\+Any\+Tracker\+HK}} = 255
+, \newline
+\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a3af1c2347947b15a909f18ce619e24b0}{Gaps\+::\+Telemetry\+::\+Tm\+P33}} = 33
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a59bc9db36d18bc4f966588c15f838ceb}{Gaps\+::\+Telemetry\+::\+Tm\+P34}} = 34
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ae88686fb9569ff38ca663d7efdda90ed}{Gaps\+::\+Telemetry\+::\+Tm\+P37}} = 37
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a0d56068e768f5962d797c5670478468e}{Gaps\+::\+Telemetry\+::\+Tm\+P38}} = 38
+, \newline
+\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a87150ebdcc6874870c92ae7ccc6a0f6e}{Gaps\+::\+Telemetry\+::\+Tm\+P55}} = 55
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ac9dda4e6d942ab37fc1729d5ed8e73f4}{Gaps\+::\+Telemetry\+::\+Tm\+P64}} = 64
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a05066a6687f88e8a23c6a2f86066bbb4}{Gaps\+::\+Telemetry\+::\+Tm\+P96}} = 96
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a0eb669abecb3b34dadc793ec5e098d8b}{Gaps\+::\+Telemetry\+::\+Tm\+P214}} = 214
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a77bbbb6b3cce9cad492971b5a0cd96d2}{Gaps\+::\+Telemetry\+::bfsw\+\_\+ptype\+\_\+to\+\_\+u8}} (\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7}{Bfsw\+Packet\+Type}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pt}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}
+\begin{DoxyCompactList}\small\item\em FIXME -\/ this is obviously incomplete. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespaceGaps_1_1Telemetry_ac903eef887c284115fb188cc72bf287f}{Gaps\+::\+Telemetry\+::bfsw\+\_\+ptype\+\_\+to\+\_\+str}} (\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7}{Bfsw\+Packet\+Type}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pt}}) -\/$>$ std\+::string
+\end{DoxyCompactItemize}

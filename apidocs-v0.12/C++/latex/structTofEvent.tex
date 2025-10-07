@@ -17,53 +17,46 @@ Collaboration diagram for Tof\+Event\+:
 \doxysubsubsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\Hypertarget{structTofEvent_a8e536d009511c598a3093a34a0723fea}\label{structTofEvent_a8e536d009511c598a3093a34a0723fea} 
-auto {\bfseries get\+\_\+hits} () const -\/$>$ Vec$<$ \mbox{\hyperlink{structTofHit}{Tof\+Hit}} $>$
+\mbox{\hyperlink{structTofEvent_a281fe48d017652ef3bd21938aa906c85}{Tof\+Event}} ()
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structTofEvent_a8e536d009511c598a3093a34a0723fea}{get\+\_\+hits}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{structTofHit}{Tof\+Hit}} $>$
 \begin{DoxyCompactList}\small\item\em Get all hits from all rb\+\_\+events. \end{DoxyCompactList}\item 
-auto \mbox{\hyperlink{structTofEvent_ada77401a8d3aa94e1efc41adf5dea431}{normalize\+\_\+hit\+\_\+times}} () -\/$>$ void
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structTofEvent_ada77401a8d3aa94e1efc41adf5dea431}{normalize\+\_\+hit\+\_\+times}} () -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}
 \item 
-\Hypertarget{structTofEvent_afbbe0d613404a4dd3b53b99bf8a51d11}\label{structTofEvent_afbbe0d613404a4dd3b53b99bf8a51d11} 
-auto {\bfseries to\+\_\+string} () const -\/$>$ std\+::string
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structTofEvent_afbbe0d613404a4dd3b53b99bf8a51d11}{to\+\_\+string}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ std\+::string
 \begin{DoxyCompactList}\small\item\em string representation for printing \end{DoxyCompactList}\item 
-auto \mbox{\hyperlink{structTofEvent_a784b63eba2ba857b959f1a551df3c18c}{get\+\_\+rbevent}} (u8 board\+\_\+id) const -\/$>$ const \mbox{\hyperlink{structRBEvent}{RBEvent}} \&
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structTofEvent_a784b63eba2ba857b959f1a551df3c18c}{get\+\_\+rbevent}} (\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} board\+\_\+id) \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structRBEvent}{RBEvent}} \&
 \item 
-auto \mbox{\hyperlink{structTofEvent_a3c9e87e032c8be8d733964957c68d623}{get\+\_\+rbids}} () const -\/$>$ Vec$<$ u8 $>$
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structTofEvent_a3c9e87e032c8be8d733964957c68d623}{get\+\_\+rbids}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$
 \end{DoxyCompactItemize}
 \doxysubsubsection*{Static Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-static auto \mbox{\hyperlink{structTofEvent_a44b4365d152f7dbf678ecfda2670e7a6}{from\+\_\+bytestream}} (const Vec$<$ u8 $>$ \&bytestream, u64 \&pos) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{structTofEvent}{Tof\+Event}}, \mbox{\hyperlink{classGaps_1_1IOError}{Gaps\+::\+IOError}} $>$
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structTofEvent_a44b4365d152f7dbf678ecfda2670e7a6}{from\+\_\+bytestream}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}}, \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}}) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{structTofEvent}{Tof\+Event}}, \mbox{\hyperlink{classGaps_1_1IOError}{Gaps\+::\+IOError}} $>$
 \item 
-static auto \mbox{\hyperlink{structTofEvent_aaa26837bf754af944efd5827d5ed5c5f}{from\+\_\+tofpacket}} (const \mbox{\hyperlink{structTofPacket}{Tof\+Packet}} \&packet) -\/$>$ \mbox{\hyperlink{structTofEvent}{Tof\+Event}}
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structTofEvent_aaa26837bf754af944efd5827d5ed5c5f}{from\+\_\+tofpacket}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structTofPacket}{Tof\+Packet}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{packet}}) -\/$>$ \mbox{\hyperlink{structTofEvent}{Tof\+Event}}
 \item 
-\Hypertarget{structTofEvent_a1e939a5161bf8c0ed41f1127fc6042d2}\label{structTofEvent_a1e939a5161bf8c0ed41f1127fc6042d2} 
-static auto {\bfseries get\+\_\+n\+\_\+rbmissinghits} (u32 mask) -\/$>$ u32
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structTofEvent_a1e939a5161bf8c0ed41f1127fc6042d2}{get\+\_\+n\+\_\+rbmissinghits}} (\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{mask}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}
 \item 
-\Hypertarget{structTofEvent_aa9625e818c8bcd0e4190c38be2d58ee4}\label{structTofEvent_aa9625e818c8bcd0e4190c38be2d58ee4} 
-static auto {\bfseries get\+\_\+n\+\_\+rbevents} (u32 mask) -\/$>$ u32
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structTofEvent_aa9625e818c8bcd0e4190c38be2d58ee4}{get\+\_\+n\+\_\+rbevents}} (\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{mask}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}
 \end{DoxyCompactItemize}
 \doxysubsubsection*{Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\Hypertarget{structTofEvent_aa8c91b83d5d41aa29711cf65240614b0}\label{structTofEvent_aa8c91b83d5d41aa29711cf65240614b0} 
-Event\+Status {\bfseries status}
+\mbox{\hyperlink{events_8h_a097b60adc604ef5a27f55edda6360293}{Event\+Status}} \mbox{\hyperlink{structTofEvent_aa8c91b83d5d41aa29711cf65240614b0}{status}}
 \item 
-\Hypertarget{structTofEvent_ab20b5b48686e44372fd292a704f2c19a}\label{structTofEvent_ab20b5b48686e44372fd292a704f2c19a} 
-\mbox{\hyperlink{structTofEventHeader}{Tof\+Event\+Header}} {\bfseries header}
+\mbox{\hyperlink{structTofEventHeader}{Tof\+Event\+Header}} \mbox{\hyperlink{structTofEvent_ab20b5b48686e44372fd292a704f2c19a}{header}}
 \item 
-\Hypertarget{structTofEvent_a48e8654d0430e19f81d0c1553de6d3cd}\label{structTofEvent_a48e8654d0430e19f81d0c1553de6d3cd} 
-\mbox{\hyperlink{structMasterTriggerEvent}{Master\+Trigger\+Event}} {\bfseries mt\+\_\+event}
+\mbox{\hyperlink{structMasterTriggerEvent}{Master\+Trigger\+Event}} \mbox{\hyperlink{structTofEvent_a48e8654d0430e19f81d0c1553de6d3cd}{mt\+\_\+event}}
 \item 
-Vec$<$ \mbox{\hyperlink{structRBEvent}{RBEvent}} $>$ \mbox{\hyperlink{structTofEvent_a577628b0f2d6beacc40f6bad1adc135a}{rb\+\_\+events}}
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{structRBEvent}{RBEvent}} $>$ \mbox{\hyperlink{structTofEvent_a577628b0f2d6beacc40f6bad1adc135a}{rb\+\_\+events}}
 \end{DoxyCompactItemize}
 \doxysubsubsection*{Static Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\Hypertarget{structTofEvent_a6761856655fb9d74ed6962d09e839275}\label{structTofEvent_a6761856655fb9d74ed6962d09e839275} 
-static constexpr u16 {\bfseries HEAD} = 0x\+AAAA
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structTofEvent_a6761856655fb9d74ed6962d09e839275}{HEAD}} = 0x\+AAAA
 \item 
-\Hypertarget{structTofEvent_a3618284d71a09636b825678c34780a82}\label{structTofEvent_a3618284d71a09636b825678c34780a82} 
-static constexpr u16 {\bfseries TAIL} = 0x5555
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structTofEvent_a3618284d71a09636b825678c34780a82}{TAIL}} = 0x5555
 \end{DoxyCompactItemize}
 
 
@@ -76,12 +69,21 @@ A container accounting for a "{}complete"{} event of the Tof including\+:
 \item A number of Missing\+Hits. These are such where the MTB claims we should see data in one of the RBs, but we do not have any. 
 \end{DoxyItemize}
 
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structTofEvent_a281fe48d017652ef3bd21938aa906c85}\label{structTofEvent_a281fe48d017652ef3bd21938aa906c85} 
+\index{TofEvent@{TofEvent}!TofEvent@{TofEvent}}
+\index{TofEvent@{TofEvent}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{TofEvent()}{TofEvent()}}
+{\footnotesize\ttfamily Tof\+Event\+::\+Tof\+Event (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
 \doxysubsection{Member Function Documentation}
 \Hypertarget{structTofEvent_a44b4365d152f7dbf678ecfda2670e7a6}\label{structTofEvent_a44b4365d152f7dbf678ecfda2670e7a6} 
 \index{TofEvent@{TofEvent}!from\_bytestream@{from\_bytestream}}
 \index{from\_bytestream@{from\_bytestream}!TofEvent@{TofEvent}}
 \doxysubsubsection{\texorpdfstring{from\_bytestream()}{from\_bytestream()}}
-{\footnotesize\ttfamily auto Tof\+Event\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{const Vec$<$ u8 $>$ \&}]{bytestream,  }\item[{u64 \&}]{pos }\end{DoxyParamCaption}) -\/$>$ r\+::\+Result$<$\mbox{\hyperlink{structTofEvent}{Tof\+Event}}, \mbox{\hyperlink{classGaps_1_1IOError}{Gaps\+::\+IOError}}$>$\hspace{0.3cm}{\ttfamily [static]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} Tof\+Event\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{bytestream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \&}]{pos }\end{DoxyParamCaption}) -\/$>$ r\+::\+Result$<$\mbox{\hyperlink{structTofEvent}{Tof\+Event}}, \mbox{\hyperlink{classGaps_1_1IOError}{Gaps\+::\+IOError}}$>$\hspace{0.3cm}{\ttfamily [static]}}
 
 Factory function for Tof\+Events.
 
@@ -91,14 +93,14 @@ Deserialize a Tof\+Evetn from a vector of of bytes
 \begin{DoxyParams}{Parameters}
 {\em bytestream} & Byte representation of a \doxylink{structTofEvent}{Tof\+Event}, or including such a representation at pos \\
 \hline
-{\em pos} & \+: Expected position of Tof\+Event\+::\+HEAD in the stream \\
+{\em pos} & \+: Expected position of \doxylink{structTofEvent_a6761856655fb9d74ed6962d09e839275}{Tof\+Event\+::\+HEAD} in the stream \\
 \hline
 \end{DoxyParams}
 \Hypertarget{structTofEvent_aaa26837bf754af944efd5827d5ed5c5f}\label{structTofEvent_aaa26837bf754af944efd5827d5ed5c5f} 
 \index{TofEvent@{TofEvent}!from\_tofpacket@{from\_tofpacket}}
 \index{from\_tofpacket@{from\_tofpacket}!TofEvent@{TofEvent}}
 \doxysubsubsection{\texorpdfstring{from\_tofpacket()}{from\_tofpacket()}}
-{\footnotesize\ttfamily \mbox{\hyperlink{structTofEvent}{Tof\+Event}} Tof\+Event\+::from\+\_\+tofpacket (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structTofPacket}{Tof\+Packet}} \&}]{packet }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{structTofEvent}{Tof\+Event}}\hspace{0.3cm}{\ttfamily [static]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structTofEvent}{Tof\+Event}} Tof\+Event\+::from\+\_\+tofpacket (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structTofPacket}{Tof\+Packet}} \&}]{packet }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{structTofEvent}{Tof\+Event}}\hspace{0.3cm}{\ttfamily [static]}}
 
 Factory function for Tof\+Events.
 
@@ -109,37 +111,99 @@ Unpack the \doxylink{structTofPacket}{Tof\+Packet}, return an empty event in cas
 {\em packet} & \doxylink{structTofPacket}{Tof\+Packet} with Packet\+Type\+::\+Tof\+Packet \\
 \hline
 \end{DoxyParams}
+\Hypertarget{structTofEvent_a8e536d009511c598a3093a34a0723fea}\label{structTofEvent_a8e536d009511c598a3093a34a0723fea} 
+\index{TofEvent@{TofEvent}!get\_hits@{get\_hits}}
+\index{get\_hits@{get\_hits}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{get\_hits()}{get\_hits()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{structTofHit}{Tof\+Hit}} $>$ Tof\+Event\+::get\+\_\+hits (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{structTofHit}{Tof\+Hit}}$>$}
+
+
+
+Get all hits from all rb\+\_\+events. 
+
+\Hypertarget{structTofEvent_aa9625e818c8bcd0e4190c38be2d58ee4}\label{structTofEvent_aa9625e818c8bcd0e4190c38be2d58ee4} 
+\index{TofEvent@{TofEvent}!get\_n\_rbevents@{get\_n\_rbevents}}
+\index{get\_n\_rbevents@{get\_n\_rbevents}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{get\_n\_rbevents()}{get\_n\_rbevents()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} Tof\+Event\+::get\+\_\+n\+\_\+rbevents (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}}]{mask }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{structTofEvent_a1e939a5161bf8c0ed41f1127fc6042d2}\label{structTofEvent_a1e939a5161bf8c0ed41f1127fc6042d2} 
+\index{TofEvent@{TofEvent}!get\_n\_rbmissinghits@{get\_n\_rbmissinghits}}
+\index{get\_n\_rbmissinghits@{get\_n\_rbmissinghits}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{get\_n\_rbmissinghits()}{get\_n\_rbmissinghits()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} Tof\+Event\+::get\+\_\+n\+\_\+rbmissinghits (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}}]{mask }\end{DoxyParamCaption}) -\/$>$  \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}\hspace{0.3cm}{\ttfamily [static]}}
+
 \Hypertarget{structTofEvent_a784b63eba2ba857b959f1a551df3c18c}\label{structTofEvent_a784b63eba2ba857b959f1a551df3c18c} 
 \index{TofEvent@{TofEvent}!get\_rbevent@{get\_rbevent}}
 \index{get\_rbevent@{get\_rbevent}!TofEvent@{TofEvent}}
 \doxysubsubsection{\texorpdfstring{get\_rbevent()}{get\_rbevent()}}
-{\footnotesize\ttfamily const \mbox{\hyperlink{structRBEvent}{RBEvent}} \& Tof\+Event\+::get\+\_\+rbevent (\begin{DoxyParamCaption}\item[{u8}]{board\+\_\+id }\end{DoxyParamCaption}) const -\/$>$ const \mbox{\hyperlink{structRBEvent}{RBEvent}}\&}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structRBEvent}{RBEvent}} \& Tof\+Event\+::get\+\_\+rbevent (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}}]{board\+\_\+id }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structRBEvent}{RBEvent}}\&}
 
 Get the rb event for a specific board id. \Hypertarget{structTofEvent_a3c9e87e032c8be8d733964957c68d623}\label{structTofEvent_a3c9e87e032c8be8d733964957c68d623} 
 \index{TofEvent@{TofEvent}!get\_rbids@{get\_rbids}}
 \index{get\_rbids@{get\_rbids}!TofEvent@{TofEvent}}
 \doxysubsubsection{\texorpdfstring{get\_rbids()}{get\_rbids()}}
-{\footnotesize\ttfamily Vec$<$ u8 $>$ Tof\+Event\+::get\+\_\+rbids (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ Vec$<$u8$>$}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ Tof\+Event\+::get\+\_\+rbids (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}$>$}
 
 Get the rb event for a specific board id. \Hypertarget{structTofEvent_ada77401a8d3aa94e1efc41adf5dea431}\label{structTofEvent_ada77401a8d3aa94e1efc41adf5dea431} 
 \index{TofEvent@{TofEvent}!normalize\_hit\_times@{normalize\_hit\_times}}
 \index{normalize\_hit\_times@{normalize\_hit\_times}!TofEvent@{TofEvent}}
 \doxysubsubsection{\texorpdfstring{normalize\_hit\_times()}{normalize\_hit\_times()}}
-{\footnotesize\ttfamily auto Tof\+Event\+::normalize\+\_\+hit\+\_\+times (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) -\/$>$  void}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} Tof\+Event\+::normalize\+\_\+hit\+\_\+times (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) -\/$>$  \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}}
 
-normalize all the hit times, taking the global ch9 phase into account 
+normalize all the hit times, taking the global ch9 phase into account \Hypertarget{structTofEvent_afbbe0d613404a4dd3b53b99bf8a51d11}\label{structTofEvent_afbbe0d613404a4dd3b53b99bf8a51d11} 
+\index{TofEvent@{TofEvent}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily std\+::string Tof\+Event\+::to\+\_\+string (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ std\+::string}
+
+
+
+string representation for printing 
+
+
 
 \doxysubsection{Member Data Documentation}
+\Hypertarget{structTofEvent_a6761856655fb9d74ed6962d09e839275}\label{structTofEvent_a6761856655fb9d74ed6962d09e839275} 
+\index{TofEvent@{TofEvent}!HEAD@{HEAD}}
+\index{HEAD@{HEAD}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{HEAD}{HEAD}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Tof\+Event\+::\+HEAD = 0x\+AAAA\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+\Hypertarget{structTofEvent_ab20b5b48686e44372fd292a704f2c19a}\label{structTofEvent_ab20b5b48686e44372fd292a704f2c19a} 
+\index{TofEvent@{TofEvent}!header@{header}}
+\index{header@{header}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{header}{header}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structTofEventHeader}{Tof\+Event\+Header}} Tof\+Event\+::header}
+
+\Hypertarget{structTofEvent_a48e8654d0430e19f81d0c1553de6d3cd}\label{structTofEvent_a48e8654d0430e19f81d0c1553de6d3cd} 
+\index{TofEvent@{TofEvent}!mt\_event@{mt\_event}}
+\index{mt\_event@{mt\_event}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{mt\_event}{mt\_event}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structMasterTriggerEvent}{Master\+Trigger\+Event}} Tof\+Event\+::mt\+\_\+event}
+
 \Hypertarget{structTofEvent_a577628b0f2d6beacc40f6bad1adc135a}\label{structTofEvent_a577628b0f2d6beacc40f6bad1adc135a} 
 \index{TofEvent@{TofEvent}!rb\_events@{rb\_events}}
 \index{rb\_events@{rb\_events}!TofEvent@{TofEvent}}
 \doxysubsubsection{\texorpdfstring{rb\_events}{rb\_events}}
-{\footnotesize\ttfamily Vec$<$\mbox{\hyperlink{structRBEvent}{RBEvent}}$>$ Tof\+Event\+::rb\+\_\+events}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{structRBEvent}{RBEvent}}$>$ Tof\+Event\+::rb\+\_\+events}
 
 A container holding the individual events from all RBs with triggers in this event ~\newline
- 
+ \Hypertarget{structTofEvent_aa8c91b83d5d41aa29711cf65240614b0}\label{structTofEvent_aa8c91b83d5d41aa29711cf65240614b0} 
+\index{TofEvent@{TofEvent}!status@{status}}
+\index{status@{status}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{status}{status}}
+{\footnotesize\ttfamily \mbox{\hyperlink{events_8h_a097b60adc604ef5a27f55edda6360293}{Event\+Status}} Tof\+Event\+::status}
+
+\Hypertarget{structTofEvent_a3618284d71a09636b825678c34780a82}\label{structTofEvent_a3618284d71a09636b825678c34780a82} 
+\index{TofEvent@{TofEvent}!TAIL@{TAIL}}
+\index{TAIL@{TAIL}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{TAIL}{TAIL}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Tof\+Event\+::\+TAIL = 0x5555\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
 
 The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/events.\+h\item 
-/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/events.\+cxx\end{DoxyCompactItemize}
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/\mbox{\hyperlink{events_8h}{events.\+h}}\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/\mbox{\hyperlink{events_8cxx}{events.\+cxx}}\end{DoxyCompactItemize}

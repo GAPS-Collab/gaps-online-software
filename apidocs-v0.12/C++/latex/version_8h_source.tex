@@ -1,31 +1,31 @@
 \doxysection{version.\+h}
 \hypertarget{version_8h_source}{}\label{version_8h_source}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/version.h@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/version.h}}
-
+\mbox{\hyperlink{version_8h}{Go to the documentation of this file.}}
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ VERSION\_H\_INCLUDED}}
 \DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ VERSION\_H\_INCLUDED}}
 \DoxyCodeLine{00003\ }
-\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}tof\_typedefs.h"{}}}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tof__typedefs_8h}{tof\_typedefs.h}}"{}}}
 \DoxyCodeLine{00005\ }
 \DoxyCodeLine{00006\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceGaps}{Gaps}}\ \{}
 \DoxyCodeLine{00007\ }
-\DoxyCodeLine{00008\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ PROTOCOLVERSION\_UNKNOWN\ =\ 0;}
-\DoxyCodeLine{00009\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ PROTOCOLVERSION\_V1\ \ \ \ \ \ =\ 64;}
-\DoxyCodeLine{00010\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ PROTOCOLVERSION\_V2\ \ \ \ \ \ =\ 128;}
-\DoxyCodeLine{00011\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ PROTOCOLVERSION\_V3\ \ \ \ \ \ =\ 192;}
+\DoxyCodeLine{00008\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ PROTOCOLVERSION\_UNKNOWN\ =\ 0;}
+\DoxyCodeLine{00009\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ PROTOCOLVERSION\_V1\ \ \ \ \ \ =\ 64;}
+\DoxyCodeLine{00010\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ PROTOCOLVERSION\_V2\ \ \ \ \ \ =\ 128;}
+\DoxyCodeLine{00011\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ PROTOCOLVERSION\_V3\ \ \ \ \ \ =\ 192;}
 \DoxyCodeLine{00012\ \ \ }
-\DoxyCodeLine{00013\ \ \ \textcolor{keyword}{enum\ class}\ ProtocolVersion\ :\ u8\ \{}
-\DoxyCodeLine{00014\ \ \ \ \ Unknown\ =\ PROTOCOLVERSION\_UNKNOWN,}
-\DoxyCodeLine{00015\ \ \ \ \ V1\ \ \ \ \ \ =\ PROTOCOLVERSION\_V1,}
-\DoxyCodeLine{00016\ \ \ \ \ V2\ \ \ \ \ \ =\ PROTOCOLVERSION\_V2,}
-\DoxyCodeLine{00017\ \ \ \ \ V3\ \ \ \ \ \ =\ PROTOCOLVERSION\_V3}
+\DoxyCodeLine{00013\ \ \ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{namespaceGaps_af99376041829a6c93b2b635455d73910}{ProtocolVersion}}\ :\ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \{}
+\DoxyCodeLine{00014\ \ \ \ \ \mbox{\hyperlink{namespaceGaps_a900b25ea53c4b01b14e10492303daa9ca88183b946cc5f0e8c96b2e66e1c74a7e}{Unknown}}\ =\ PROTOCOLVERSION\_UNKNOWN,}
+\DoxyCodeLine{00015\ \ \ \ \ \mbox{\hyperlink{namespaceGaps_af99376041829a6c93b2b635455d73910ab4daca084ad9eabfc8de231929477ed6}{V1}}\ \ \ \ \ \ =\ PROTOCOLVERSION\_V1,}
+\DoxyCodeLine{00016\ \ \ \ \ \mbox{\hyperlink{namespaceGaps_af99376041829a6c93b2b635455d73910aec765f1adc3b4253f2d3b131a4a8618f}{V2}}\ \ \ \ \ \ =\ PROTOCOLVERSION\_V2,}
+\DoxyCodeLine{00017\ \ \ \ \ \mbox{\hyperlink{namespaceGaps_af99376041829a6c93b2b635455d73910ad5b50b8cf96bcc8aba90f306f5e6189c}{V3}}\ \ \ \ \ \ =\ PROTOCOLVERSION\_V3}
 \DoxyCodeLine{00018\ \ \ \};\ }
 \DoxyCodeLine{00019\ }
-\DoxyCodeLine{00020\ \ \ std::string\ pversion\_to\_string(ProtocolVersion\ version);}
+\DoxyCodeLine{00020\ \ \ std::string\ \mbox{\hyperlink{namespaceGaps_a0b7fccda874dd2f4275f12622fb6b3f1}{pversion\_to\_string}}(\mbox{\hyperlink{namespaceGaps_af99376041829a6c93b2b635455d73910}{ProtocolVersion}}\ version);}
 \DoxyCodeLine{00021\ \}}
 \DoxyCodeLine{00022\ }
 \DoxyCodeLine{00023\ }
-\DoxyCodeLine{00024\ std::ostream\&\ operator<<(std::ostream\&\ os,\ \textcolor{keyword}{const}\ Gaps::ProtocolVersion\&\ version);}
+\DoxyCodeLine{00024\ std::ostream\&\ \mbox{\hyperlink{version_8h_a1aac34f60184ca29a1ee36e183ea65fa}{operator<<}}(std::ostream\&\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespaceGaps_af99376041829a6c93b2b635455d73910}{Gaps::ProtocolVersion}}\&\ version);}
 \DoxyCodeLine{00025\ }
 \DoxyCodeLine{00026\ \textcolor{preprocessor}{\#endif}}
 

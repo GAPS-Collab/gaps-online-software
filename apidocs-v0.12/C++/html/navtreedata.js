@@ -25,14 +25,15 @@
 var NAVTREE =
 [
   [ "gaps-online-software", "index.html", [
-    [ "gaps-online-software documentation", "index.html", "index" ],
+    [ "gaps-online-software C++ API software documentation", "index.html", null ],
     [ "gondola_cxx - C++ compatibility layer for gondola", "md__2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2README.html", null ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ],
       [ "Namespace Members", "namespacemembers.html", [
         [ "All", "namespacemembers.html", null ],
         [ "Functions", "namespacemembers_func.html", null ],
-        [ "Typedefs", "namespacemembers_type.html", null ]
+        [ "Typedefs", "namespacemembers_type.html", null ],
+        [ "Enumerations", "namespacemembers_enum.html", null ]
       ] ]
     ] ],
     [ "Concepts", "concepts.html", "concepts" ],
@@ -41,20 +42,34 @@ var NAVTREE =
       [ "Class Index", "classes.html", null ],
       [ "Class Hierarchy", "hierarchy.html", "hierarchy" ],
       [ "Class Members", "functions.html", [
-        [ "All", "functions.html", null ],
+        [ "All", "functions.html", "functions_dup" ],
         [ "Functions", "functions_func.html", null ],
-        [ "Variables", "functions_vars.html", null ]
+        [ "Variables", "functions_vars.html", "functions_vars" ],
+        [ "Enumerations", "functions_enum.html", null ]
       ] ]
     ] ],
     [ "Files", "files.html", [
-      [ "File List", "files.html", "files_dup" ]
+      [ "File List", "files.html", "files_dup" ],
+      [ "File Members", "globals.html", [
+        [ "All", "globals.html", null ],
+        [ "Functions", "globals_func.html", null ],
+        [ "Variables", "globals_vars.html", null ],
+        [ "Typedefs", "globals_type.html", null ],
+        [ "Enumerations", "globals_enum.html", null ],
+        [ "Macros", "globals_defs.html", null ]
+      ] ]
     ] ]
   ] ]
 ];
 
 var NAVTREEINDEX =
 [
-"annotated.html"
+"annotated.html",
+"functions_vars_q.html",
+"structGaps_1_1Telemetry_1_1MergedEvent.html#a7a3761922ec63d47b3db72b6a195e7dc",
+"structGaps_1_1TrackerStrip.html#ab4036006009e3eaf409c944dda1c2c9e",
+"structTofEventHeader.html#a7a48152dc548f3acf633a0c425ea8622",
+"tof__typedefs_8h.html#a5148c9c1252e19e12def2814f71690e3"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

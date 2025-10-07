@@ -1,0 +1,150 @@
+\doxysection{gondola Namespace Reference}
+\hypertarget{namespacegondola}{}\label{namespacegondola}\index{gondola@{gondola}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structgondola_1_1CRFrame}{CRFrame}}
+\item 
+struct \mbox{\hyperlink{structgondola_1_1CRFrameObject}{CRFrame\+Object}}
+\item 
+struct \mbox{\hyperlink{structgondola_1_1CRReader}{CRReader}}
+\item 
+struct \mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}}
+\item 
+struct \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader}{Telemetry\+Packet\+Reader}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, \mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}} $>$ \mbox{\hyperlink{namespacegondola_ae720591de7c0e9e18619d265295f1ebe}{RBCalibration\+Map}}
+\begin{DoxyCompactList}\small\item\em shortcut for the typically used map of rb\+\_\+id -\/\texorpdfstring{$>$}{>} calibrations \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68}{CRFrame\+Object\+Type}} \+: u8 \{ \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a88183b946cc5f0e8c96b2e66e1c74a7e}{Unknown}} = 0
+, \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a0a5f7d79c74b92d33255fc332e25b536}{Tof\+Packet}} = 10
+, \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68aac967e66068a7e25b02b4b2e6bcc4504}{Telemetry\+Packet}} = 20
+ \}
+\begin{DoxyCompactList}\small\item\em These are objects which can be stored in a caraspace frame ~\newline
+ \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a51016fc759994f7a750d933ea9dee8b5}{spike\+\_\+cleaning\+\_\+drs4}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} $>$ $>$ \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{wf}}, \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{t\+Cell}}, \mbox{\hyperlink{tof__typedefs_8h_a48d6cd8e4135fb2ff7e7f2dac84089ec}{i32}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{spikes}}\mbox{[}$\,$\mbox{]}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_aad98e262d4567278c4414be5db426023}{spike\+\_\+cleaning\+\_\+simple}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} $>$ $>$ \&voltages, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{calibrated}}=\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{true}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}
+\begin{DoxyCompactList}\small\item\em An adjusted, simpler version of the spike cleaing written by Jamie. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a56a2781343a042a385b34244fe8e4934}{spike\+\_\+cleaning\+\_\+all}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} $>$ $>$ \&voltages, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{calibrated}}=\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{true}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}
+\begin{DoxyCompactList}\small\item\em Jamie\textquotesingle{}s simpler version with single-\/width spike correction. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_abbe7c2c301e4f6cdd581d33c97be557d}{load\+\_\+tof\+\_\+calibrations}} (std\+::string \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pathname}}) -\/$>$ std\+::map$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, \mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}} $>$
+\begin{DoxyCompactList}\small\item\em convenience function to load all the calibration files from a certain directory \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_ae1a0adbbbcd177ece4e936813e8ab262}{list\+\_\+path\+\_\+contents\+\_\+sorted}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} std\+::string \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{input}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{use\+\_\+telemetry\+\_\+re}}=\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{false}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ std\+::string $>$
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_ad6d0e546d1e3ff1ce3af42dae3177d29}{to\+\_\+le\+\_\+bytes}} (\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{number}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a1499bf957374cccee09cd7e71c6b23f4}{to\+\_\+le\+\_\+bytes}} (\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{number}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Typedef Documentation}
+\Hypertarget{namespacegondola_ae720591de7c0e9e18619d265295f1ebe}\label{namespacegondola_ae720591de7c0e9e18619d265295f1ebe} 
+\index{gondola@{gondola}!RBCalibrationMap@{RBCalibrationMap}}
+\index{RBCalibrationMap@{RBCalibrationMap}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{RBCalibrationMap}{RBCalibrationMap}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, \mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}}$>$ \mbox{\hyperlink{namespacegondola_ae720591de7c0e9e18619d265295f1ebe}{gondola\+::\+RBCalibration\+Map}}}
+
+
+
+shortcut for the typically used map of rb\+\_\+id -\/\texorpdfstring{$>$}{>} calibrations 
+
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68}\label{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68} 
+\index{gondola@{gondola}!CRFrameObjectType@{CRFrameObjectType}}
+\index{CRFrameObjectType@{CRFrameObjectType}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{CRFrameObjectType}{CRFrameObjectType}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{enum}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{class}} \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68}{gondola\+::\+CRFrame\+Object\+Type}} \+: \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\hspace{0.3cm}{\ttfamily [strong]}}
+
+
+
+These are objects which can be stored in a caraspace frame ~\newline
+ 
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Unknown@{Unknown}!gondola@{gondola}}\index{gondola@{gondola}!Unknown@{Unknown}}}\Hypertarget{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a88183b946cc5f0e8c96b2e66e1c74a7e}\label{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a88183b946cc5f0e8c96b2e66e1c74a7e} 
+Unknown&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TofPacket@{TofPacket}!gondola@{gondola}}\index{gondola@{gondola}!TofPacket@{TofPacket}}}\Hypertarget{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a0a5f7d79c74b92d33255fc332e25b536}\label{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a0a5f7d79c74b92d33255fc332e25b536} 
+Tof\+Packet&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TelemetryPacket@{TelemetryPacket}!gondola@{gondola}}\index{gondola@{gondola}!TelemetryPacket@{TelemetryPacket}}}\Hypertarget{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68aac967e66068a7e25b02b4b2e6bcc4504}\label{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68aac967e66068a7e25b02b4b2e6bcc4504} 
+Telemetry\+Packet&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespacegondola_ae1a0adbbbcd177ece4e936813e8ab262}\label{namespacegondola_ae1a0adbbbcd177ece4e936813e8ab262} 
+\index{gondola@{gondola}!list\_path\_contents\_sorted@{list\_path\_contents\_sorted}}
+\index{list\_path\_contents\_sorted@{list\_path\_contents\_sorted}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{list\_path\_contents\_sorted()}{list\_path\_contents\_sorted()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::list\+\_\+path\+\_\+contents\+\_\+sorted (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} std\+::string \&}]{input,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}}}]{use\+\_\+telemetry\+\_\+re = {\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{false}}} }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$std\+::string$>$}
+
+Get all files in a certain directory in case it is a directory, for a single file just get the file \texorpdfstring{$<$}{<}3 Chat\+GPT\hypertarget{namespacegondola_autotoc_md2}{}\doxysubsection{\texorpdfstring{Arguments}{Arguments}}\label{namespacegondola_autotoc_md2}
+
+\begin{DoxyItemize}
+\item input \+: path or filename
+\item use\+\_\+telemetry\+\_\+re \+: use the regex for telemetry files to find the files. Default is set to false, which will find L0 or TOF files 
+\end{DoxyItemize}\Hypertarget{namespacegondola_abbe7c2c301e4f6cdd581d33c97be557d}\label{namespacegondola_abbe7c2c301e4f6cdd581d33c97be557d} 
+\index{gondola@{gondola}!load\_tof\_calibrations@{load\_tof\_calibrations}}
+\index{load\_tof\_calibrations@{load\_tof\_calibrations}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{load\_tof\_calibrations()}{load\_tof\_calibrations()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{namespacegondola_ae720591de7c0e9e18619d265295f1ebe}{go\+::\+RBCalibration\+Map}} gondola\+::load\+\_\+tof\+\_\+calibrations (\begin{DoxyParamCaption}\item[{std\+::string \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&}]{pathname }\end{DoxyParamCaption}) -\/$>$ std\+::map$<$\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, \mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}}$>$}
+
+
+
+convenience function to load all the calibration files from a certain directory 
+
+\Hypertarget{namespacegondola_a56a2781343a042a385b34244fe8e4934}\label{namespacegondola_a56a2781343a042a385b34244fe8e4934} 
+\index{gondola@{gondola}!spike\_cleaning\_all@{spike\_cleaning\_all}}
+\index{spike\_cleaning\_all@{spike\_cleaning\_all}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{spike\_cleaning\_all()}{spike\_cleaning\_all()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::spike\+\_\+cleaning\+\_\+all (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} $>$ $>$ \&}]{wf,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}}}]{calibrated = {\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{true}}} }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}}
+
+
+
+Jamie\textquotesingle{}s simpler version with single-\/width spike correction. 
+
+A simple version of the spike cleaning, which does not rely on all channels being present and can work independently on each channel \Hypertarget{namespacegondola_a51016fc759994f7a750d933ea9dee8b5}\label{namespacegondola_a51016fc759994f7a750d933ea9dee8b5} 
+\index{gondola@{gondola}!spike\_cleaning\_drs4@{spike\_cleaning\_drs4}}
+\index{spike\_cleaning\_drs4@{spike\_cleaning\_drs4}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{spike\_cleaning\_drs4()}{spike\_cleaning\_drs4()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::spike\+\_\+cleaning\+\_\+drs4 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} $>$ $>$ \&}]{wf,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}}]{t\+Cell,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a48d6cd8e4135fb2ff7e7f2dac84089ec}{i32}}}]{spikes\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption}) -\/$>$  \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}}
+
+The original "{}\+Remove\+Spikes"{} from the DRS4 manual \Hypertarget{namespacegondola_aad98e262d4567278c4414be5db426023}\label{namespacegondola_aad98e262d4567278c4414be5db426023} 
+\index{gondola@{gondola}!spike\_cleaning\_simple@{spike\_cleaning\_simple}}
+\index{spike\_cleaning\_simple@{spike\_cleaning\_simple}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{spike\_cleaning\_simple()}{spike\_cleaning\_simple()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}} gondola\+::spike\+\_\+cleaning\+\_\+simple (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} $>$ $>$ \&}]{wf,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}}}]{calibrated = {\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{true}}} }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}}
+
+
+
+An adjusted, simpler version of the spike cleaing written by Jamie. 
+
+A simple version of the spike cleaning, which does not rely on all channels being present and can work independently on each channel \Hypertarget{namespacegondola_ad6d0e546d1e3ff1ce3af42dae3177d29}\label{namespacegondola_ad6d0e546d1e3ff1ce3af42dae3177d29} 
+\index{gondola@{gondola}!to\_le\_bytes@{to\_le\_bytes}}
+\index{to\_le\_bytes@{to\_le\_bytes}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{to\_le\_bytes()}{to\_le\_bytes()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::to\+\_\+le\+\_\+bytes (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}}]{number }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}$>$}
+
+Reverse-\/parse a u16 a la rust\textquotesingle{}s built in u16\+::to\+\_\+le\+\_\+bytes \Hypertarget{namespacegondola_a1499bf957374cccee09cd7e71c6b23f4}\label{namespacegondola_a1499bf957374cccee09cd7e71c6b23f4} 
+\index{gondola@{gondola}!to\_le\_bytes@{to\_le\_bytes}}
+\index{to\_le\_bytes@{to\_le\_bytes}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{to\_le\_bytes()}{to\_le\_bytes()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::to\+\_\+le\+\_\+bytes (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}}]{number }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}$>$}
+
+Reverse-\/parse a u32 a la rust\textquotesingle{}s built in u32\+::to\+\_\+le\+\_\+bytes 

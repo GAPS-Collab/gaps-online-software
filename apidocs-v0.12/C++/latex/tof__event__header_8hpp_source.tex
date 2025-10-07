@@ -1,66 +1,66 @@
 \doxysection{tof\+\_\+event\+\_\+header.\+hpp}
 \hypertarget{tof__event__header_8hpp_source}{}\label{tof__event__header_8hpp_source}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/events/tof\_event\_header.hpp@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/events/tof\_event\_header.hpp}}
-
+\mbox{\hyperlink{tof__event__header_8hpp}{Go to the documentation of this file.}}
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ TOFHEADER\_H\_DEFINED}}
 \DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ TOFHEADER\_H\_DEFINED}}
 \DoxyCodeLine{00003\ }
 \DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}result/result.h"{}}}
 \DoxyCodeLine{00005\ }
-\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ "{}errors.hpp"{}}}
-\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ "{}tof\_typedefs.h"{}}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{errors_8hpp}{errors.hpp}}"{}}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tof__typedefs_8h}{tof\_typedefs.h}}"{}}}
 \DoxyCodeLine{00008\ }
-\DoxyCodeLine{00009\ \textcolor{keyword}{namespace\ }r\ =\ result;}
+\DoxyCodeLine{00009\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{r}}\ =\ result;}
 \DoxyCodeLine{00010\ \textcolor{comment}{//namespace\ g\ =\ Gaps;}}
 \DoxyCodeLine{00011\ }
 \DoxyCodeLine{00012\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structTofEventHeader}{TofEventHeader}}\ \{}
-\DoxyCodeLine{00013\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ HEAD\ \ \ =\ 0xAAAA;}
-\DoxyCodeLine{00014\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ TAIL\ \ \ =\ 0x5555;}
-\DoxyCodeLine{00016\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ usize\ \mbox{\hyperlink{structTofEventHeader_ac04deaa816c673898949934f3b0551d4}{SIZE}}\ =\ 47;\ }
+\DoxyCodeLine{00013\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structTofEventHeader_aa95ed917e133f54d10324caa9948630e}{HEAD}}\ \ \ =\ 0xAAAA;}
+\DoxyCodeLine{00014\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structTofEventHeader_a375102e402d700d56dcc1f4ee58f454f}{TAIL}}\ \ \ =\ 0x5555;}
+\DoxyCodeLine{00016\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \mbox{\hyperlink{structTofEventHeader_ac04deaa816c673898949934f3b0551d4}{SIZE}}\ =\ 47;\ }
 \DoxyCodeLine{00017\ \ \ }
-\DoxyCodeLine{00018\ \ \ u32\ run\_id\ \ \ \ \ \ =\ 0;\ }
-\DoxyCodeLine{00019\ \ \ u32\ event\_id\ \ \ \ =\ 0;\ }
-\DoxyCodeLine{00022\ \ \ u32\ \mbox{\hyperlink{structTofEventHeader_a30d35e7ff4f51562a82e6797d4cc6471}{timestamp32}}\ =\ 0;\ }
-\DoxyCodeLine{00023\ \ \ u16\ timestamp16\ =\ 0;\ \ \textcolor{comment}{//\ -\/>\ 14\ byres}}
+\DoxyCodeLine{00018\ \ \ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}\ \mbox{\hyperlink{structTofEventHeader_a0344aabc7855587b6588b76095bfc16f}{run\_id}}\ \ \ \ \ \ =\ 0;\ }
+\DoxyCodeLine{00019\ \ \ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}\ \mbox{\hyperlink{structTofEventHeader_aadecbef8416ce5b41be418145313f4af}{event\_id}}\ \ \ \ =\ 0;\ }
+\DoxyCodeLine{00022\ \ \ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}\ \mbox{\hyperlink{structTofEventHeader_a30d35e7ff4f51562a82e6797d4cc6471}{timestamp32}}\ =\ 0;\ }
+\DoxyCodeLine{00023\ \ \ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structTofEventHeader_a1ae1a568c2e86b1117d29ebac2b4e5c4}{timestamp16}}\ =\ 0;\ \ \textcolor{comment}{//\ -\/>\ 14\ byres}}
 \DoxyCodeLine{00024\ \ \ }
 \DoxyCodeLine{00025\ \ \ \textcolor{comment}{//\ reconstructed\ quantities}}
-\DoxyCodeLine{00026\ \ \ u16\ primary\_beta\ \ \ \ \ \ \ \ =\ 0;\ }
-\DoxyCodeLine{00027\ \ \ u16\ primary\_beta\_unc\ \ \ \ =\ 0;\ }
-\DoxyCodeLine{00028\ \ \ u16\ primary\_charge\ \ \ \ \ \ =\ 0;\ }
-\DoxyCodeLine{00029\ \ \ u16\ primary\_charge\_unc\ \ =\ 0;\ }
-\DoxyCodeLine{00030\ \ \ u16\ primary\_outer\_tof\_x\ =\ 0;\ }
-\DoxyCodeLine{00031\ \ \ u16\ primary\_outer\_tof\_y\ =\ 0;\ }
-\DoxyCodeLine{00032\ \ \ u16\ primary\_outer\_tof\_z\ =\ 0;\ }
-\DoxyCodeLine{00033\ \ \ u16\ primary\_inner\_tof\_x\ =\ 0;\ }
-\DoxyCodeLine{00034\ \ \ u16\ primary\_inner\_tof\_y\ =\ 0;\ }
-\DoxyCodeLine{00035\ \ \ u16\ primary\_inner\_tof\_z\ =\ 0;\ \textcolor{comment}{//-\/>\ 20bytes\ primary\ }}
+\DoxyCodeLine{00026\ \ \ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structTofEventHeader_a453add1435c6688c05eb5be39f0c8579}{primary\_beta}}\ \ \ \ \ \ \ \ =\ 0;\ }
+\DoxyCodeLine{00027\ \ \ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structTofEventHeader_a3f4d8ead72c25cedc6f0438e461b63f7}{primary\_beta\_unc}}\ \ \ \ =\ 0;\ }
+\DoxyCodeLine{00028\ \ \ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structTofEventHeader_adb212c8ee206b54cbcc5e86187a8e7ed}{primary\_charge}}\ \ \ \ \ \ =\ 0;\ }
+\DoxyCodeLine{00029\ \ \ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structTofEventHeader_af0de9f52529aba44312888204a8fcd10}{primary\_charge\_unc}}\ \ =\ 0;\ }
+\DoxyCodeLine{00030\ \ \ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structTofEventHeader_a7a48152dc548f3acf633a0c425ea8622}{primary\_outer\_tof\_x}}\ =\ 0;\ }
+\DoxyCodeLine{00031\ \ \ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structTofEventHeader_a04d7e9c425e32b4245ca48023b4bc40a}{primary\_outer\_tof\_y}}\ =\ 0;\ }
+\DoxyCodeLine{00032\ \ \ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structTofEventHeader_aa8386fc320feb595f6313cb7895e6a0c}{primary\_outer\_tof\_z}}\ =\ 0;\ }
+\DoxyCodeLine{00033\ \ \ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structTofEventHeader_a522d485f799e42d25447f51e3ce980a5}{primary\_inner\_tof\_x}}\ =\ 0;\ }
+\DoxyCodeLine{00034\ \ \ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structTofEventHeader_a0c0c44c084d86fbc1dcf3e9dfddaa67d}{primary\_inner\_tof\_y}}\ =\ 0;\ }
+\DoxyCodeLine{00035\ \ \ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structTofEventHeader_a4c9ae00f5e59dcf913e6d6465a924072}{primary\_inner\_tof\_z}}\ =\ 0;\ \textcolor{comment}{//-\/>\ 20bytes\ primary\ }}
 \DoxyCodeLine{00036\ }
-\DoxyCodeLine{00037\ \ \ u8\ nhit\_outer\_tof\ \ \ \ \ \ \ =\ 0;\ \ }
+\DoxyCodeLine{00037\ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \mbox{\hyperlink{structTofEventHeader_a916d2d4278fe845eabea50e83b77a7ad}{nhit\_outer\_tof}}\ \ \ \ \ \ \ =\ 0;\ \ }
 \DoxyCodeLine{00038\ \ \ \textcolor{comment}{//\ no\ need\ to\ save\ this,\ can\ be\ }}
 \DoxyCodeLine{00039\ \ \ \textcolor{comment}{//\ rereated\ from\ paddle\_info.size()\ -\/\ nhit\_outer\_tof}}
-\DoxyCodeLine{00040\ \ \ u8\ nhit\_inner\_tof\ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00040\ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \mbox{\hyperlink{structTofEventHeader_a65f64a5e6479abe0cf00241ef124ed2f}{nhit\_inner\_tof}}\ \ \ \ \ \ \ =\ 0;}
 \DoxyCodeLine{00041\ }
-\DoxyCodeLine{00042\ \ \ u8\ trigger\_info\ \ \ \ \ \ \ \ \ =\ 0;\ }
-\DoxyCodeLine{00043\ \ \ u8\ ctr\_etx\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00042\ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \mbox{\hyperlink{structTofEventHeader_a7b9ec5bdfce61ac7378c743ecbd72b46}{trigger\_info}}\ \ \ \ \ \ \ \ \ =\ 0;\ }
+\DoxyCodeLine{00043\ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \mbox{\hyperlink{structTofEventHeader_a6aef4415b91200c7127bdf155093cb66}{ctr\_etx}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 0;}
 \DoxyCodeLine{00044\ }
 \DoxyCodeLine{00045\ \ \ \textcolor{comment}{//\ this\ field\ can\ be\ debated}}
 \DoxyCodeLine{00046\ \ \ \textcolor{comment}{//\ the\ reason\ we\ have\ it\ is\ }}
 \DoxyCodeLine{00047\ \ \ \textcolor{comment}{//\ that\ for\ de/serialization,\ }}
 \DoxyCodeLine{00048\ \ \ \textcolor{comment}{//\ we\ need\ to\ know\ the\ length\ }}
 \DoxyCodeLine{00049\ \ \ \textcolor{comment}{//\ of\ the\ expected\ bytestream.}}
-\DoxyCodeLine{00050\ \ \ u8\ n\_paddles\ \ \ \ \ \ \ \ \ \ \ \ =\ 0;\ \textcolor{comment}{//\ we\ don't\ have\ more\ than\ }}
+\DoxyCodeLine{00050\ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \mbox{\hyperlink{structTofEventHeader_a91216712f915a0be5f206f53c75720a2}{n\_paddles}}\ \ \ \ \ \ \ \ \ \ \ \ =\ 0;\ \textcolor{comment}{//\ we\ don't\ have\ more\ than\ }}
 \DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ 256\ paddles.}}
 \DoxyCodeLine{00052\ }
-\DoxyCodeLine{00054\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structTofEventHeader_a97d53e7727599003b59aadc0d611b147}{to\_string}}()\ const\ -\/>\ std::\textcolor{keywordtype}{string};}
+\DoxyCodeLine{00054\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structTofEventHeader_a97d53e7727599003b59aadc0d611b147}{to\_string}}()\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ -\/>\ std::\textcolor{keywordtype}{string};}
 \DoxyCodeLine{00055\ }
-\DoxyCodeLine{00057\ \ \ auto\ \mbox{\hyperlink{structTofEventHeader_adef70aa23673c0d3718dab3b0b333760}{get\_timestamp48}}()\ const\ -\/>\ f64;}
+\DoxyCodeLine{00057\ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}}\ \mbox{\hyperlink{structTofEventHeader_adef70aa23673c0d3718dab3b0b333760}{get\_timestamp48}}()\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a94dab5770726ccbef8c7d026cfbdf8e5}{f64}};}
 \DoxyCodeLine{00058\ }
-\DoxyCodeLine{00059\ \ \ static\ auto\ from\_bytestream(const\ Vec<u8>\ \&stream,\ u64\ \&pos)}
-\DoxyCodeLine{00060\ \ \ \ \ -\/>\ r::Result<\mbox{\hyperlink{structTofEventHeader}{TofEventHeader}},\ \mbox{\hyperlink{namespaceGaps}{Gaps}}::IOError>;}
+\DoxyCodeLine{00059\ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}}\ \mbox{\hyperlink{structTofEventHeader_a62b418f3a95400deed52f411a09267cd}{from\_bytestream}}(\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}<\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}>\ \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{stream}},\ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}\ \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}})}
+\DoxyCodeLine{00060\ \ \ \ \ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{r}}::\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Result}}<\mbox{\hyperlink{structTofEventHeader}{TofEventHeader}},\ \mbox{\hyperlink{namespaceGaps}{Gaps}}::IOError>;}
 \DoxyCodeLine{00061\ }
 \DoxyCodeLine{00062\ \};\ \textcolor{comment}{//\ end\ TofEventHeader}}
 \DoxyCodeLine{00063\ }
-\DoxyCodeLine{00064\ std::ostream\&\ operator<<(std::ostream\&\ os,\ const\ \mbox{\hyperlink{structTofEventHeader}{TofEventHeader}}\&\ h);}
+\DoxyCodeLine{00064\ std::\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{ostream}}\&\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{operator}}<<(std::\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{ostream}}\&\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}},\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ \mbox{\hyperlink{structTofEventHeader}{TofEventHeader}}\&\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{h}});}
 \DoxyCodeLine{00065\ }
 \DoxyCodeLine{00066\ \textcolor{preprocessor}{\#endif}}
 

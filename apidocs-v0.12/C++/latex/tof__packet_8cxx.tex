@@ -1,0 +1,49 @@
+\doxysection{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/tof\+\_\+packet.cxx File Reference}
+\hypertarget{tof__packet_8cxx}{}\label{tof__packet_8cxx}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/src/tof\_packet.cxx@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/src/tof\_packet.cxx}}
+{\ttfamily \#include $<$format$>$}\newline
+{\ttfamily \#include "{}spdlog/cfg/env.\+h"{}}\newline
+{\ttfamily \#include "{}packets/tof\+\_\+packet.\+h"{}}\newline
+{\ttfamily \#include "{}serialization.\+h"{}}\newline
+{\ttfamily \#include "{}io/parsers.\+h"{}}\newline
+Include dependency graph for tof\+\_\+packet.\+cxx\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{tof__packet_8cxx__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{tof__packet_8cxx_a5cf9a28c1ab69b9ddc2232f60477c28c}{packet\+\_\+type\+\_\+to\+\_\+string}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565}{Packet\+Type}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pt}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::string}}
+\begin{DoxyCompactList}\small\item\em String representation of enum "{}\+Packet\+Type"{}. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \& \mbox{\hyperlink{tof__packet_8cxx_a4d0cbe08cca67dbd54b989e4bdaa1d0c}{operator$<$$<$}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565}{Packet\+Type}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pck}})
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \& \mbox{\hyperlink{tof__packet_8cxx_a04668bcc1d70be6d7cd7e78f35a57131}{operator$<$$<$}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structTofPacket}{Tof\+Packet}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pck}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{tof__packet_8cxx_a4d0cbe08cca67dbd54b989e4bdaa1d0c}\label{tof__packet_8cxx_a4d0cbe08cca67dbd54b989e4bdaa1d0c} 
+\index{tof\_packet.cxx@{tof\_packet.cxx}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!tof\_packet.cxx@{tof\_packet.cxx}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \& \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{operator}}$<$$<$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565}{Packet\+Type}} \&}]{pck }\end{DoxyParamCaption})}
+
+\Hypertarget{tof__packet_8cxx_a04668bcc1d70be6d7cd7e78f35a57131}\label{tof__packet_8cxx_a04668bcc1d70be6d7cd7e78f35a57131} 
+\index{tof\_packet.cxx@{tof\_packet.cxx}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!tof\_packet.cxx@{tof\_packet.cxx}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \& \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{operator}}$<$$<$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structTofPacket}{Tof\+Packet}} \&}]{pck }\end{DoxyParamCaption})}
+
+\Hypertarget{tof__packet_8cxx_a5cf9a28c1ab69b9ddc2232f60477c28c}\label{tof__packet_8cxx_a5cf9a28c1ab69b9ddc2232f60477c28c} 
+\index{tof\_packet.cxx@{tof\_packet.cxx}!packet\_type\_to\_string@{packet\_type\_to\_string}}
+\index{packet\_type\_to\_string@{packet\_type\_to\_string}!tof\_packet.cxx@{tof\_packet.cxx}}
+\doxysubsubsection{\texorpdfstring{packet\_type\_to\_string()}{packet\_type\_to\_string()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} packet\+\_\+type\+\_\+to\+\_\+string (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565}{Packet\+Type}}}]{pt }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::string}} }
+
+
+
+String representation of enum "{}\+Packet\+Type"{}. 
+

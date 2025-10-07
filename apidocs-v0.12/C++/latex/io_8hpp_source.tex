@@ -1,6 +1,6 @@
 \doxysection{io.\+hpp}
 \hypertarget{io_8hpp_source}{}\label{io_8hpp_source}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/io.hpp@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/io.hpp}}
-
+\mbox{\hyperlink{io_8hpp}{Go to the documentation of this file.}}
 \begin{DoxyCode}{0}
 \DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ TOFIO\_H\_INCLUDED}}
 \DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ TOFIO\_H\_INCLUDED}}
@@ -10,12 +10,12 @@
 \DoxyCodeLine{00006\ }
 \DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ "{}result/result.h"{}}}
 \DoxyCodeLine{00008\ }
-\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ "{}events.h"{}}}
-\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ "{}packets/tof\_packet.h"{}}}
-\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ "{}serialization.h"{}}}
-\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#include\ "{}errors.hpp"{}}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{events_8h}{events.h}}"{}}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tof__packet_8h}{packets/tof\_packet.h}}"{}}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{serialization_8h}{serialization.h}}"{}}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{errors_8hpp}{errors.hpp}}"{}}}
 \DoxyCodeLine{00013\ }
-\DoxyCodeLine{00014\ \textcolor{keyword}{namespace\ }r\ =\ result;}
+\DoxyCodeLine{00014\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{r}}\ =\ result;}
 \DoxyCodeLine{00015\ }
 \DoxyCodeLine{00016\ \textcolor{comment}{//template<typename\ T>}}
 \DoxyCodeLine{00017\ \textcolor{comment}{//requires\ HasFromByteStream<T>}}
@@ -30,40 +30,40 @@
 \DoxyCodeLine{00026\ \textcolor{comment}{//\ \ return\ data;}}
 \DoxyCodeLine{00027\ \textcolor{comment}{//\}}}
 \DoxyCodeLine{00028\ }
-\DoxyCodeLine{00029\ \textcolor{keyword}{namespace\ }gondola\ \{}
-\DoxyCodeLine{00037\ \ \ \textcolor{keyword}{auto}\ list\_path\_contents\_sorted(\textcolor{keyword}{const}\ std::string\&\ input,\ \textcolor{keywordtype}{bool}\ use\_telemetry\_re\ =\ \textcolor{keyword}{false})\ -\/>\ Vec<std::string>;}
+\DoxyCodeLine{00029\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacegondola}{gondola}}\ \{}
+\DoxyCodeLine{00037\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacegondola_ae1a0adbbbcd177ece4e936813e8ab262}{list\_path\_contents\_sorted}}(\textcolor{keyword}{const}\ std::string\&\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{input}},\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{use\_telemetry\_re}}\ =\ \textcolor{keyword}{false})\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<std::string>}};}
 \DoxyCodeLine{00038\ \}\ }
 \DoxyCodeLine{00039\ }
-\DoxyCodeLine{00046\ [[deprecated(\textcolor{stringliteral}{"{}This\ might\ not\ even\ be\ correct!"{}})]]}
-\DoxyCodeLine{00047\ Vec<u32>\ get\_event\_ids\_from\_raw\_stream(\textcolor{keyword}{const}\ Vec<u8>\ \&bytestream,\ u64\ \&start\_pos);}
+\DoxyCodeLine{00046\ [[\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{deprecated}}(\textcolor{stringliteral}{"{}This\ might\ not\ even\ be\ correct!"{}})]]}
+\DoxyCodeLine{00047\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u32>}}\ \mbox{\hyperlink{io_8hpp_a003ad42e00df4eae24f56204ce964e52}{get\_event\_ids\_from\_raw\_stream}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u8>}}\ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}},\ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}\ \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{start\_pos}});}
 \DoxyCodeLine{00048\ }
-\DoxyCodeLine{00057\ Vec<TofPacket>\ get\_tofpackets(\textcolor{keyword}{const}\ Vec<u8>\ \&bytestream,\ u64\ start\_pos,\ PacketType\ filter=PacketType::Unknown);}
+\DoxyCodeLine{00057\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<TofPacket>}}\ \mbox{\hyperlink{io_8hpp_a65f4e014cdc353e0eb351a99258b282f}{get\_tofpackets}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u8>}}\ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}},\ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{start\_pos}},\ \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565}{PacketType}}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{filter}}=\mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a88183b946cc5f0e8c96b2e66e1c74a7e}{PacketType::Unknown}});}
 \DoxyCodeLine{00058\ }
-\DoxyCodeLine{00067\ Vec<TofPacket>\ get\_tofpackets(\textcolor{keyword}{const}\ String\ filename,\ PacketType\ filter\ =\ PacketType::Unknown);}
+\DoxyCodeLine{00067\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<TofPacket>}}\ \mbox{\hyperlink{io_8hpp_a65f4e014cdc353e0eb351a99258b282f}{get\_tofpackets}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{tof__typedefs_8h_afbeda3fd1bdc8c37d01bdf9f5c8274ff}{String}}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{filename}},\ \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565}{PacketType}}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{filter}}\ =\ \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a88183b946cc5f0e8c96b2e66e1c74a7e}{PacketType::Unknown}});}
 \DoxyCodeLine{00068\ }
-\DoxyCodeLine{00076\ Vec<TofEvent>\ unpack\_tofevents\_from\_tofpackets(\textcolor{keyword}{const}\ Vec<u8>\ \&bytestream,\ u64\ start\_pos);}
+\DoxyCodeLine{00076\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<TofEvent>}}\ \mbox{\hyperlink{io_8hpp_a1feab37165fbe9a2c1a045c415786fa6}{unpack\_tofevents\_from\_tofpackets}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u8>}}\ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}},\ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{start\_pos}});}
 \DoxyCodeLine{00077\ }
-\DoxyCodeLine{00084\ Vec<TofEvent>\ unpack\_tofevents\_from\_tofpackets(\textcolor{keyword}{const}\ String\ filename);}
+\DoxyCodeLine{00084\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<TofEvent>}}\ \mbox{\hyperlink{io_8hpp_a1feab37165fbe9a2c1a045c415786fa6}{unpack\_tofevents\_from\_tofpackets}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{tof__typedefs_8h_afbeda3fd1bdc8c37d01bdf9f5c8274ff}{String}}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{filename}});}
 \DoxyCodeLine{00085\ }
 \DoxyCodeLine{00086\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceGaps}{Gaps}}\ \{}
 \DoxyCodeLine{00087\ }
 \DoxyCodeLine{00090\ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classGaps_1_1TofPacketReader}{TofPacketReader}}\ \{}
 \DoxyCodeLine{00091\ \ \ \ \ \textcolor{keyword}{public}:\ }
-\DoxyCodeLine{00092\ \ \ \ \ \ \ \mbox{\hyperlink{classGaps_1_1TofPacketReader}{TofPacketReader}}();}
-\DoxyCodeLine{00093\ \ \ \ \ \ \ \mbox{\hyperlink{classGaps_1_1TofPacketReader}{TofPacketReader}}(String\ filename);}
-\DoxyCodeLine{00094\ \ \ \ \ \ \ \mbox{\hyperlink{classGaps_1_1TofPacketReader}{TofPacketReader}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classGaps_1_1TofPacketReader}{TofPacketReader}}\&)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \mbox{\hyperlink{classGaps_1_1TofPacketReader_a0af83b31cb2e4b01d72cd9bffbe40464}{TofPacketReader}}();}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \mbox{\hyperlink{classGaps_1_1TofPacketReader_a0af83b31cb2e4b01d72cd9bffbe40464}{TofPacketReader}}(\mbox{\hyperlink{tof__typedefs_8h_afbeda3fd1bdc8c37d01bdf9f5c8274ff}{String}}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{filename}});}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \mbox{\hyperlink{classGaps_1_1TofPacketReader_a5848861461ddb746c6e6b74c3b12a3d7}{TofPacketReader}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classGaps_1_1TofPacketReader}{TofPacketReader}}\&)\ =\ \textcolor{keyword}{delete};}
 \DoxyCodeLine{00095\ \ \ \ \ \ \ \textcolor{comment}{//TofPacketReader\&\ operator=(const\ TofPacketReader\&)\ =\ delete;}}
-\DoxyCodeLine{00098\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classGaps_1_1TofPacketReader_ae8a207f64bbe9c6f4abe9327eb04631c}{set\_filename}}(String\ filename);}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classGaps_1_1TofPacketReader_ae8a207f64bbe9c6f4abe9327eb04631c}{set\_filename}}(\mbox{\hyperlink{tof__typedefs_8h_afbeda3fd1bdc8c37d01bdf9f5c8274ff}{String}}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{filename}});}
 \DoxyCodeLine{00100\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classGaps_1_1TofPacketReader_a1d66d4c024d5062e836ed162dbc41691}{get\_next\_packet}}()\ -\/>\ r::Result<TofPacket,\ Gaps::IOError>;}
-\DoxyCodeLine{00102\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classGaps_1_1TofPacketReader_af523fd86b02409d60d89283f6f68524b}{get\_filename}}()\ \textcolor{keyword}{const}\ -\/>\ std::string;}
-\DoxyCodeLine{00106\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classGaps_1_1TofPacketReader_a8aca7f3a4a9658a11040279899e5db6f}{is\_exhausted}}()\ \textcolor{keyword}{const}\ -\/>\ bool;}
-\DoxyCodeLine{00109\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classGaps_1_1TofPacketReader_a2776634d72f8212b8f628c7f35d5327d}{n\_packets\_read}}()\ \textcolor{keyword}{const}\ -\/>\ usize;}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{classGaps_1_1TofPacketReader_af523fd86b02409d60d89283f6f68524b}{get\_filename}}()\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ -\/>\ std::\textcolor{keywordtype}{string};}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}}\ \mbox{\hyperlink{classGaps_1_1TofPacketReader_a8aca7f3a4a9658a11040279899e5db6f}{is\_exhausted}}()\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ -\/>\ \textcolor{keywordtype}{bool};}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}}\ \mbox{\hyperlink{classGaps_1_1TofPacketReader_a2776634d72f8212b8f628c7f35d5327d}{n\_packets\_read}}()\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}};}
 \DoxyCodeLine{00110\ }
-\DoxyCodeLine{00111\ \ \ \ \ \textcolor{keyword}{private}:}
-\DoxyCodeLine{00112\ \ \ \ \ \ \ std::ifstream\ \ stream\_file\_;}
+\DoxyCodeLine{00111\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{private}}:}
+\DoxyCodeLine{00112\ \ \ \ \ \ \ std::\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{ifstream}}\ \ stream\_file\_;}
 \DoxyCodeLine{00113\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \ \ \ exhausted\_;}
-\DoxyCodeLine{00114\ \ \ \ \ \ \ usize\ \ \ \ \ \ \ \ \ \ n\_packets\_read\_;}
-\DoxyCodeLine{00115\ \ \ \ \ \ \ String\ \ \ \ \ \ \ \ \ filename\_;}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \ \ \ \ \ \ \ \ \ n\_packets\_read\_;}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_afbeda3fd1bdc8c37d01bdf9f5c8274ff}{String}}\ \ \ \ \ \ \ \ \ filename\_;}
 \DoxyCodeLine{00116\ \ \ \};}
 \DoxyCodeLine{00117\ \}}
 \DoxyCodeLine{00118\ }

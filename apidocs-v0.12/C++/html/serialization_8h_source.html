@@ -100,7 +100,7 @@ $(document).ready(function(){initNavTree('serialization_8h_source.html',''); ini
   <div class="headertitle"><div class="title">serialization.h</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#ifndef SERIALIZATION_H_INCLUDED</span></div>
+<a href="serialization_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#ifndef SERIALIZATION_H_INCLUDED</span></div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#define SERIALIZATION_H_INCLUDED</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;iostream&gt;</span></div>
@@ -111,50 +111,64 @@ $(document).ready(function(){initNavTree('serialization_8h_source.html',''); ini
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;assert.h&gt;</span></div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;concepts&gt;</span></div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;tof_typedefs.h&quot;</span></div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &quot;packets/tof_packet.h&quot;</span></div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;serialization.h&quot;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &quot;<a class="code" href="tof__typedefs_8h.html">tof_typedefs.h</a>&quot;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#include &quot;<a class="code" href="tof__packet_8h.html">packets/tof_packet.h</a>&quot;</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;<a class="code" href="serialization_8h.html">serialization.h</a>&quot;</span></div>
 <div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Derived&gt;</div>
 <div class="foldopen" id="foldopen00018" data-start="{" data-end="};">
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="structFromTofPacket.html">   18</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structFromTofPacket.html">FromTofPacket</a> {</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>  <span class="keyword">static</span> Derived from_tofpacket(<span class="keyword">const</span> <a class="code hl_struct" href="structTofPacket.html">TofPacket</a> &amp;p) {</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>      usize pos = 0;</div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>      <span class="keywordflow">return</span> Derived::from_bytestream(p.payload, pos);</div>
+<div class="foldopen" id="foldopen00019" data-start="{" data-end="}">
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno"><a class="line" href="structFromTofPacket.html#aeb6e86c125c33e06a54337cb573b168c">   19</a></span>  <span class="keyword">static</span> <a class="code hl_typedef" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">Derived</a> <a class="code hl_function" href="structFromTofPacket.html#aeb6e86c125c33e06a54337cb573b168c">from_tofpacket</a>(<span class="keyword">const</span> <a class="code hl_struct" href="structTofPacket.html">TofPacket</a> &amp;<a class="code hl_typedef" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">p</a>) {</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>      <a class="code hl_typedef" href="tof__typedefs_8h.html#a5148c9c1252e19e12def2814f71690e3">usize</a> <a class="code hl_typedef" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">pos</a> = 0;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>      <span class="keywordflow">return</span> Derived::from_bytestream(<a class="code hl_typedef" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">p</a>.payload, <a class="code hl_typedef" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">pos</a>);</div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>  }</div>
+</div>
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>};</div>
 </div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> </div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="comment">/***********************************************/</span></div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="keyword">auto</span> search_for_2byte_marker(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream,</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>                            u8 marker,</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>                            <span class="keywordtype">bool</span> &amp;has_ended,</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>                            u64 start_pos=0,</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>                            u64 end_pos=0)</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>  -&gt; u64;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="keyword">auto</span> <a class="code hl_function" href="serialization_8h.html#a290d89031e6e17707975ed5decaf905f">search_for_2byte_marker</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">Vec&lt;u8&gt;</a> &amp;<a class="code hl_typedef" href="tof__typedefs_8h.html#ae4d34abafdf1602428db318ca44dfb84">bytestream</a>,</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>                            <a class="code hl_typedef" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a> <a class="code hl_typedef" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">marker</a>,</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>                            <span class="keywordtype">bool</span> &amp;<a class="code hl_typedef" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">has_ended</a>,</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>                            <a class="code hl_typedef" href="tof__typedefs_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> <a class="code hl_typedef" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">start_pos</a>=0,</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>                            <a class="code hl_typedef" href="tof__typedefs_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> <a class="code hl_typedef" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">end_pos</a>=0)</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>  -&gt; <a class="code hl_typedef" href="tof__typedefs_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>;</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="comment">/***********************************************/</span></div>
 <div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="keyword">auto</span> get_2byte_markers_indices(<span class="keyword">const</span> Vec&lt;u8&gt; &amp;bytestream, u8 marker)</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>  -&gt; Vec&lt;u32&gt;;</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="keyword">auto</span> <a class="code hl_function" href="serialization_8h.html#ab69c12acb482a78616b2daf411621b16">get_2byte_markers_indices</a>(<span class="keyword">const</span> <a class="code hl_typedef" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">Vec&lt;u8&gt;</a> &amp;<a class="code hl_typedef" href="tof__typedefs_8h.html#ae4d34abafdf1602428db318ca44dfb84">bytestream</a>, <a class="code hl_typedef" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a> <a class="code hl_typedef" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">marker</a>)</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>  -&gt; <a class="code hl_typedef" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">Vec&lt;u32&gt;</a>;</div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
 <div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="comment">// file i/o</span></div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="comment">/***********************************************/</span></div>
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>[[deprecated(<span class="stringliteral">&quot;Unused/not useful deemed feature&quot;</span>)]]</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>Vec&lt;u8&gt; get_bytestream_from_file(<span class="keyword">const</span> std::string &amp;filename);</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>[[<a class="code hl_typedef" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">deprecated</a>(<span class="stringliteral">&quot;Unused/not useful deemed feature&quot;</span>)]]</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><a class="code hl_typedef" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">Vec&lt;u8&gt;</a> <a class="code hl_function" href="serialization_8h.html#a418729628f5742c30ae2aa01ee19d7c2">get_bytestream_from_file</a>(<span class="keyword">const</span> std::string &amp;<a class="code hl_typedef" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">filename</a>);</div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
 <div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="preprocessor">#endif</span></div>
+<div class="ttc" id="aserialization_8h_html"><div class="ttname"><a href="serialization_8h.html">serialization.h</a></div></div>
+<div class="ttc" id="aserialization_8h_html_a290d89031e6e17707975ed5decaf905f"><div class="ttname"><a href="serialization_8h.html#a290d89031e6e17707975ed5decaf905f">search_for_2byte_marker</a></div><div class="ttdeci">auto search_for_2byte_marker(const Vec&lt; u8 &gt; &amp;bytestream, u8 marker, bool &amp;has_ended, u64 start_pos=0, u64 end_pos=0) -&gt; u64</div><div class="ttdef"><b>Definition</b> serialization.cxx:26</div></div>
+<div class="ttc" id="aserialization_8h_html_a418729628f5742c30ae2aa01ee19d7c2"><div class="ttname"><a href="serialization_8h.html#a418729628f5742c30ae2aa01ee19d7c2">get_bytestream_from_file</a></div><div class="ttdeci">Vec&lt; u8 &gt; get_bytestream_from_file(const std::string &amp;filename)</div><div class="ttdef"><b>Definition</b> serialization.cxx:10</div></div>
+<div class="ttc" id="aserialization_8h_html_ab69c12acb482a78616b2daf411621b16"><div class="ttname"><a href="serialization_8h.html#ab69c12acb482a78616b2daf411621b16">get_2byte_markers_indices</a></div><div class="ttdeci">auto get_2byte_markers_indices(const Vec&lt; u8 &gt; &amp;bytestream, u8 marker) -&gt; Vec&lt; u32 &gt;</div><div class="ttdef"><b>Definition</b> serialization.cxx:51</div></div>
 <div class="ttc" id="astructFromTofPacket_html"><div class="ttname"><a href="structFromTofPacket.html">FromTofPacket</a></div><div class="ttdoc">Allow to extend all classes with a from_tofpacket method.</div><div class="ttdef"><b>Definition</b> serialization.h:18</div></div>
+<div class="ttc" id="astructFromTofPacket_html_aeb6e86c125c33e06a54337cb573b168c"><div class="ttname"><a href="structFromTofPacket.html#aeb6e86c125c33e06a54337cb573b168c">FromTofPacket::from_tofpacket</a></div><div class="ttdeci">static Derived from_tofpacket(const TofPacket &amp;p)</div><div class="ttdef"><b>Definition</b> serialization.h:19</div></div>
 <div class="ttc" id="astructTofPacket_html"><div class="ttname"><a href="structTofPacket.html">TofPacket</a></div><div class="ttdef"><b>Definition</b> tof_packet.h:83</div></div>
+<div class="ttc" id="atof__packet_8h_html"><div class="ttname"><a href="tof__packet_8h.html">tof_packet.h</a></div></div>
+<div class="ttc" id="atof__typedefs_8h_html"><div class="ttname"><a href="tof__typedefs_8h.html">tof_typedefs.h</a></div></div>
+<div class="ttc" id="atof__typedefs_8h_html_a1b01c504448c96cd2191a5184dd31acf"><div class="ttname"><a href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">Vec</a></div><div class="ttdeci">std::vector&lt; T &gt; Vec</div><div class="ttdoc">Define vectors the same as in Rust.</div><div class="ttdef"><b>Definition</b> tof_typedefs.h:43</div></div>
+<div class="ttc" id="atof__typedefs_8h_html_a3f7e2bcbb0b4c338f3c4f6c937cd4234"><div class="ttname"><a href="tof__typedefs_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a></div><div class="ttdeci">uint64_t u64</div><div class="ttdef"><b>Definition</b> tof_typedefs.h:29</div></div>
+<div class="ttc" id="atof__typedefs_8h_html_a5148c9c1252e19e12def2814f71690e3"><div class="ttname"><a href="tof__typedefs_8h.html#a5148c9c1252e19e12def2814f71690e3">usize</a></div><div class="ttdeci">size_t usize</div><div class="ttdef"><b>Definition</b> tof_typedefs.h:34</div></div>
+<div class="ttc" id="atof__typedefs_8h_html_a92c50087ca0e64fa93fc59402c55f8ca"><div class="ttname"><a href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a></div><div class="ttdeci">uint8_t u8</div><div class="ttdef"><b>Definition</b> tof_typedefs.h:26</div></div>
+<div class="ttc" id="atof__typedefs_8h_html_ae4d34abafdf1602428db318ca44dfb84"><div class="ttname"><a href="tof__typedefs_8h.html#ae4d34abafdf1602428db318ca44dfb84">bytestream</a></div><div class="ttdeci">Vec&lt; u8 &gt; bytestream</div><div class="ttdef"><b>Definition</b> tof_typedefs.h:51</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_2de81f95f83558216c0a68cc62e2ea5b.html">gondola-core</a></li><li class="navelem"><a class="el" href="dir_6921e8bad8d2cfadaab4aa9bf524ec91.html">C++</a></li><li class="navelem"><a class="el" href="dir_6be0aa079c7b06c4f1eaface273db885.html">include</a></li><li class="navelem"><b>serialization.h</b></li>
+    <li class="navelem"><a class="el" href="dir_2de81f95f83558216c0a68cc62e2ea5b.html">gondola-core</a></li><li class="navelem"><a class="el" href="dir_6921e8bad8d2cfadaab4aa9bf524ec91.html">C++</a></li><li class="navelem"><a class="el" href="dir_6be0aa079c7b06c4f1eaface273db885.html">include</a></li><li class="navelem"><a class="el" href="serialization_8h.html">serialization.h</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>

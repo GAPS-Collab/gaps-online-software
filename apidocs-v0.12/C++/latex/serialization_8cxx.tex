@@ -1,0 +1,64 @@
+\doxysection{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/serialization.cxx File Reference}
+\hypertarget{serialization_8cxx}{}\label{serialization_8cxx}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/src/serialization.cxx@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/src/serialization.cxx}}
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include "{}spdlog/spdlog.\+h"{}}\newline
+{\ttfamily \#include "{}spdlog/cfg/env.\+h"{}}\newline
+{\ttfamily \#include "{}tof\+\_\+typedefs.\+h"{}}\newline
+{\ttfamily \#include "{}io/parsers.\+h"{}}\newline
+{\ttfamily \#include "{}serialization.\+h"{}}\newline
+Include dependency graph for serialization.\+cxx\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{serialization_8cxx__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}} \mbox{\hyperlink{serialization_8cxx_a6ec24b72b5348677acd90433c37ba46f}{get\+\_\+bytestream\+\_\+from\+\_\+file}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_afbeda3fd1bdc8c37d01bdf9f5c8274ff}{String}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{filename}})
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \mbox{\hyperlink{serialization_8cxx_ac3f19bd80ce3201df674d2b44ae5e58a}{search\+\_\+for\+\_\+2byte\+\_\+marker}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}}, \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{marker}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{has\+\_\+ended}}, \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{start\+\_\+pos}}, \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{end\+\_\+pos}})
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$ \mbox{\hyperlink{serialization_8cxx_a161589e260d7887722decb470b42f95c}{get\+\_\+2byte\+\_\+markers\+\_\+indices}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{uint8\+\_\+t}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{marker}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{serialization_8cxx_a161589e260d7887722decb470b42f95c}\label{serialization_8cxx_a161589e260d7887722decb470b42f95c} 
+\index{serialization.cxx@{serialization.cxx}!get\_2byte\_markers\_indices@{get\_2byte\_markers\_indices}}
+\index{get\_2byte\_markers\_indices@{get\_2byte\_markers\_indices}!serialization.cxx@{serialization.cxx}}
+\doxysubsubsection{\texorpdfstring{get\_2byte\_markers\_indices()}{get\_2byte\_markers\_indices()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$ get\+\_\+2byte\+\_\+markers\+\_\+indices (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{bytestream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{uint8\+\_\+t}}}]{marker }\end{DoxyParamCaption})}
+
+\Hypertarget{serialization_8cxx_a6ec24b72b5348677acd90433c37ba46f}\label{serialization_8cxx_a6ec24b72b5348677acd90433c37ba46f} 
+\index{serialization.cxx@{serialization.cxx}!get\_bytestream\_from\_file@{get\_bytestream\_from\_file}}
+\index{get\_bytestream\_from\_file@{get\_bytestream\_from\_file}!serialization.cxx@{serialization.cxx}}
+\doxysubsubsection{\texorpdfstring{get\_bytestream\_from\_file()}{get\_bytestream\_from\_file()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}} get\+\_\+bytestream\+\_\+from\+\_\+file (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_afbeda3fd1bdc8c37d01bdf9f5c8274ff}{String}} \&}]{filename }\end{DoxyParamCaption})}
+
+\Hypertarget{serialization_8cxx_ac3f19bd80ce3201df674d2b44ae5e58a}\label{serialization_8cxx_ac3f19bd80ce3201df674d2b44ae5e58a} 
+\index{serialization.cxx@{serialization.cxx}!search\_for\_2byte\_marker@{search\_for\_2byte\_marker}}
+\index{search\_for\_2byte\_marker@{search\_for\_2byte\_marker}!serialization.cxx@{serialization.cxx}}
+\doxysubsubsection{\texorpdfstring{search\_for\_2byte\_marker()}{search\_for\_2byte\_marker()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} search\+\_\+for\+\_\+2byte\+\_\+marker (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{bytestream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}}]{marker,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}} \&}]{has\+\_\+ended,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}}]{start\+\_\+pos = {\ttfamily 0},  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}}]{end\+\_\+pos = {\ttfamily 0} }\end{DoxyParamCaption}) -\/$>$  \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}}
+
+Idnentify the postion of a byte marker in a stream
+
+The bytemarker has to be the 2 same bytes (otherwise it would not be a good marker anyway)
+
+
+\begin{DoxyParams}{Parameters}
+{\em bytestrem} & \+: stream with raw binary data \\
+\hline
+{\em marker} & \+: 1 byte of the two byte pattern to search for, eg. 0x\+AA \\
+\hline
+{\em has\+\_\+ended} & \+: Indicate if the bytestream has been traversed without finding the marker \\
+\hline
+{\em start\+\_\+pos} & \+: Start searching only after this position in the bytestream \\
+\hline
+{\em end\+\_\+pos} & \+: Restrict searching only until this position in the bytestream ~\newline
+ \\
+\hline
+\end{DoxyParams}

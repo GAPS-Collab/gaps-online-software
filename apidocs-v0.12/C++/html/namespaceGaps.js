@@ -1,20 +1,37 @@
 var namespaceGaps =
 [
-    [ "IOError", "classGaps_1_1IOError.html", null ],
+    [ "Telemetry", "namespaceGaps_1_1Telemetry.html", "namespaceGaps_1_1Telemetry" ],
+    [ "IOError", "classGaps_1_1IOError.html", "classGaps_1_1IOError" ],
     [ "TofPacketReader", "classGaps_1_1TofPacketReader.html", "classGaps_1_1TofPacketReader" ],
     [ "TofPaddle", "structGaps_1_1TofPaddle.html", "structGaps_1_1TofPaddle" ],
     [ "TrackerStrip", "structGaps_1_1TrackerStrip.html", "structGaps_1_1TrackerStrip" ],
-    [ "TrackerStripMask", "structGaps_1_1TrackerStripMask.html", null ],
-    [ "TrackerStripPedestal", "structGaps_1_1TrackerStripPedestal.html", null ],
+    [ "TrackerStripMask", "structGaps_1_1TrackerStripMask.html", "structGaps_1_1TrackerStripMask" ],
+    [ "TrackerStripPedestal", "structGaps_1_1TrackerStripPedestal.html", "structGaps_1_1TrackerStripPedestal" ],
     [ "DsiJChnPaddleIdMap", "namespaceGaps.html#ac562c67ce894d03edeecb6332caa86ac", null ],
     [ "RbIdChannelPaddleIdMap", "namespaceGaps.html#a5d656056027834e42a559636af22f086", null ],
     [ "TofPaddleMap", "namespaceGaps.html#a84fb383b1df4955afc6ea35a9b15ff44", null ],
     [ "TrkStripMap", "namespaceGaps.html#aa4fc4eae2e6dcffb30da7c6d1a3e3e64", null ],
+    [ "TrkStripMaskMap", "namespaceGaps.html#ab973cc2b0495c49012fb17667010ef42", null ],
+    [ "TrkStripPedMap", "namespaceGaps.html#afdf1ea5d924eac5baad0144da1280503", null ],
+    [ "ProtocolVersion", "namespaceGaps.html#af99376041829a6c93b2b635455d73910", [
+      [ "Unknown", "namespaceGaps.html#af99376041829a6c93b2b635455d73910a88183b946cc5f0e8c96b2e66e1c74a7e", null ],
+      [ "V1", "namespaceGaps.html#af99376041829a6c93b2b635455d73910ab4daca084ad9eabfc8de231929477ed6", null ],
+      [ "V2", "namespaceGaps.html#af99376041829a6c93b2b635455d73910aec765f1adc3b4253f2d3b131a4a8618f", null ],
+      [ "V3", "namespaceGaps.html#af99376041829a6c93b2b635455d73910ad5b50b8cf96bcc8aba90f306f5e6189c", null ]
+    ] ],
+    [ "TofPaddleEnd", "namespaceGaps.html#a900b25ea53c4b01b14e10492303daa9c", [
+      [ "Unknown", "namespaceGaps.html#a900b25ea53c4b01b14e10492303daa9ca88183b946cc5f0e8c96b2e66e1c74a7e", null ],
+      [ "A", "namespaceGaps.html#a900b25ea53c4b01b14e10492303daa9ca7fc56270e7a70fa81a5935b72eacbe29", null ],
+      [ "B", "namespaceGaps.html#a900b25ea53c4b01b14e10492303daa9ca9d5ed678fe57bcca610140957afab571", null ]
+    ] ],
     [ "get_dsi_j_paddles", "namespaceGaps.html#a8905976c88897fdf62e1163984c5da66", null ],
     [ "get_module_position", "namespaceGaps.html#a89c0577fa812754efd900481fef12c9c", null ],
     [ "get_rb_id_paddles", "namespaceGaps.html#a0e1e5140ee555faed2b67c3eb26f5a63", null ],
     [ "get_tofpaddles", "namespaceGaps.html#a51061c6f5af624934c885081d8ac2c4c", null ],
+    [ "get_trackerstripmasks", "namespaceGaps.html#aa891e85254e13812609ce1e8bcbc014a", null ],
+    [ "get_trackerstrippedestals", "namespaceGaps.html#a9f34404b09be3f6fd69f8e09d2c045d2", null ],
     [ "get_trackerstrips", "namespaceGaps.html#a41dba3273290cc6660d33a0ee5c511b8", null ],
+    [ "parse_bool", "namespaceGaps.html#a13cb72078c0645adb57076cc5697b9a1", null ],
     [ "parse_f16", "namespaceGaps.html#adbed3ea3f57b77872fd060984c65e4be", null ],
     [ "parse_f32", "namespaceGaps.html#aa324d073f3fec42714ed7f1dfa9528ce", null ],
     [ "parse_f64", "namespaceGaps.html#a75bc2048681872469a0e8164a07eb145", null ],
@@ -23,5 +40,7 @@ var namespaceGaps =
     [ "parse_u16", "namespaceGaps.html#a8d5ee03930328391169c3f11a9b06e8e", null ],
     [ "parse_u32", "namespaceGaps.html#ac09d7b4a66f0df27a63af339dd6d7ea8", null ],
     [ "parse_u64", "namespaceGaps.html#aa913722aa6668823951e07f44b8698d6", null ],
-    [ "parse_u8", "namespaceGaps.html#af02b80458f7649651a342344e3b103ee", null ]
+    [ "parse_u8", "namespaceGaps.html#af02b80458f7649651a342344e3b103ee", null ],
+    [ "pversion_to_string", "namespaceGaps.html#a0b7fccda874dd2f4275f12622fb6b3f1", null ],
+    [ "slice", "namespaceGaps.html#a1abc8354f5db84adaa571b27c783a38f", null ]
 ];
