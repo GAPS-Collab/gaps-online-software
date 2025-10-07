@@ -71,16 +71,24 @@ RUST API Software documentation
 
 The "heart" of the project - implementes necessarry dataclasses
 and i/o operations
+
 `gondola-core (common library) <gondola_core/index.html>`_
 
 TOF flight computer code for data acquisition and control in-flight 
+
 `liftof-cc <liftof_cc/index.html>`_
 
+
+TOF RB data acquisition/control code to be controled by liftof-cc 
+
 `liftof-rb <liftof_rb/index.html>`_
+
+Run scheduler to manage settings and do bookkeeping of them
 
 `liftof-scheduler <liftof_scheduler/index.html>`_
 
 Terminal application to monitor TOF activity
+
 `liftof-tui <liftof_tui/index.html>`_
 
 

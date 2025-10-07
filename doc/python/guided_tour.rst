@@ -31,6 +31,9 @@ GAPS employs a various number of data formats. There are
 How to read the data
 --------------------
 
+L0 data - binary merger of telemetry and TOF disk data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 For reading the L0 data, you can do the following :: 
 
   import gondola 
@@ -61,4 +64,8 @@ For reading the L0 data, you can do the following ::
 
           ... 
 
+Telemetry data (".bin") files 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+lorem ipsum 
 
