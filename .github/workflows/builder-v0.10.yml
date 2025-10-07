@@ -85,7 +85,7 @@ jobs:
       run: source ${{github.workspace }}/install/setup-env.sh && cd ${{ github.workspace }}/python/doc/ && rye run sphinx-build -M html . build
 
     - name: Consolidate Python docs
-      run: cp -r ${{ github.workspace }}/python/doc/build/html/* ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/
+      run: cp -r ${{ github.workspace }}/python/doc/build/html ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/gaps_online
       shell: bash
 
     - name: Consolidate Rust docs
@@ -96,10 +96,6 @@ jobs:
       run: cp -r ${{ github.workspace }}/python/pybindings/target/doc/* ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/html/
       shell: bash
       
-    #- name: Consolidate pydocs
-    #  run: cp -r ${{ github.workspace }}/python/doc/build/html ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/html/gaps_online
-    #  shell: bash
-
     - name: Resort docs 
       run: mv ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version}}/html/* ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/ 
 
