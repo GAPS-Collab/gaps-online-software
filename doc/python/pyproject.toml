@@ -12,7 +12,7 @@ dependencies = [
     "charmingbeauty>=0.1.4",
     "django>=5.1.4",
     "myst-parser>=4.0.0",
-    "gondola>=0.11.1",
+    "gondola>=0.11.1, <0.12.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.12"
