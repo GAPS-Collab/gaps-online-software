@@ -1,0 +1,66 @@
+\doxysection{gondola\+::CRReader Struct Reference}
+\hypertarget{structgondola_1_1CRReader}{}\label{structgondola_1_1CRReader}\index{gondola::CRReader@{gondola::CRReader}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structgondola_1_1CRReader_ab6099ef66f4d227ff4130819db00c114}\label{structgondola_1_1CRReader_ab6099ef66f4d227ff4130819db00c114} 
+{\bfseries CRReader} (std\+::string pathname)
+\item 
+\Hypertarget{structgondola_1_1CRReader_a6f419b6f567f7f9d65d4389c91c523b2}\label{structgondola_1_1CRReader_a6f419b6f567f7f9d65d4389c91c523b2} 
+{\bfseries CRReader} (const \mbox{\hyperlink{structgondola_1_1CRReader}{CRReader}} \&)=delete
+\item 
+auto \mbox{\hyperlink{structgondola_1_1CRReader_ad4ffc9e5ae011c674d4deb8464cacf72}{set\+\_\+path}} (std\+::string pathname) -\/$>$ void
+\item 
+auto \mbox{\hyperlink{structgondola_1_1CRReader_a16bfcb8407e5802f3a5dc415e7d86b92}{get\+\_\+next\+\_\+frame}} () -\/$>$ \mbox{\hyperlink{structgondola_1_1CRFrame}{CRFrame}}
+\item 
+\Hypertarget{structgondola_1_1CRReader_a0af32dda124c24149c4a11887b1c7df0}\label{structgondola_1_1CRReader_a0af32dda124c24149c4a11887b1c7df0} 
+auto {\bfseries get\+\_\+filenames} () const -\/$>$ Vec$<$ std\+::string $>$
+\item 
+auto \mbox{\hyperlink{structgondola_1_1CRReader_a5e3d66a953c6a1c2bec182d9613105c9}{is\+\_\+exhausted}} () const -\/$>$ bool
+\item 
+auto \mbox{\hyperlink{structgondola_1_1CRReader_ade6008fcc019f6507a788be8ef146297}{n\+\_\+packets\+\_\+read}} () const -\/$>$ bool
+\item 
+auto \mbox{\hyperlink{structgondola_1_1CRReader_a00f5390156f39984e867c309e7a97f35}{get\+\_\+rbcalibrations}} (u8 n\+\_\+rb) -\/$>$ RBCalibration\+Map
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structgondola_1_1CRReader_a16bfcb8407e5802f3a5dc415e7d86b92}\label{structgondola_1_1CRReader_a16bfcb8407e5802f3a5dc415e7d86b92} 
+\index{gondola::CRReader@{gondola::CRReader}!get\_next\_frame@{get\_next\_frame}}
+\index{get\_next\_frame@{get\_next\_frame}!gondola::CRReader@{gondola::CRReader}}
+\doxysubsubsection{\texorpdfstring{get\_next\_frame()}{get\_next\_frame()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structgondola_1_1CRFrame}{g\+::\+CRFrame}} gondola\+::\+CRReader\+::get\+\_\+next\+\_\+frame (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{structgondola_1_1CRFrame}{CRFrame}}}
+
+Walk over the file, and return the next frame as saved in the file.
+
+Advaces all internal position markers. If the last frame is reached, an exception will be risen. After the reader is exhausted, is has to be re-\/initialized \Hypertarget{structgondola_1_1CRReader_a00f5390156f39984e867c309e7a97f35}\label{structgondola_1_1CRReader_a00f5390156f39984e867c309e7a97f35} 
+\index{gondola::CRReader@{gondola::CRReader}!get\_rbcalibrations@{get\_rbcalibrations}}
+\index{get\_rbcalibrations@{get\_rbcalibrations}!gondola::CRReader@{gondola::CRReader}}
+\doxysubsubsection{\texorpdfstring{get\_rbcalibrations()}{get\_rbcalibrations()}}
+{\footnotesize\ttfamily auto gondola\+::\+CRReader\+::get\+\_\+rbcalibrations (\begin{DoxyParamCaption}\item[{u8}]{n\+\_\+rb }\end{DoxyParamCaption}) -\/$>$ RBCalibration\+Map}
+
+get the \doxylink{structgondola_1_1RBCalibration}{RBCalibration} map the paramter is the number of RBs we expect in this run \Hypertarget{structgondola_1_1CRReader_a5e3d66a953c6a1c2bec182d9613105c9}\label{structgondola_1_1CRReader_a5e3d66a953c6a1c2bec182d9613105c9} 
+\index{gondola::CRReader@{gondola::CRReader}!is\_exhausted@{is\_exhausted}}
+\index{is\_exhausted@{is\_exhausted}!gondola::CRReader@{gondola::CRReader}}
+\doxysubsubsection{\texorpdfstring{is\_exhausted()}{is\_exhausted()}}
+{\footnotesize\ttfamily bool gondola\+::\+CRReader\+::is\+\_\+exhausted (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ bool}
+
+All packets have been read from the file. If they should be read again, the reader has to be created again \Hypertarget{structgondola_1_1CRReader_ade6008fcc019f6507a788be8ef146297}\label{structgondola_1_1CRReader_ade6008fcc019f6507a788be8ef146297} 
+\index{gondola::CRReader@{gondola::CRReader}!n\_packets\_read@{n\_packets\_read}}
+\index{n\_packets\_read@{n\_packets\_read}!gondola::CRReader@{gondola::CRReader}}
+\doxysubsubsection{\texorpdfstring{n\_packets\_read()}{n\_packets\_read()}}
+{\footnotesize\ttfamily bool gondola\+::\+CRReader\+::n\+\_\+packets\+\_\+read (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ bool}
+
+The number of files this reader has read from the file \Hypertarget{structgondola_1_1CRReader_ad4ffc9e5ae011c674d4deb8464cacf72}\label{structgondola_1_1CRReader_ad4ffc9e5ae011c674d4deb8464cacf72} 
+\index{gondola::CRReader@{gondola::CRReader}!set\_path@{set\_path}}
+\index{set\_path@{set\_path}!gondola::CRReader@{gondola::CRReader}}
+\doxysubsubsection{\texorpdfstring{set\_path()}{set\_path()}}
+{\footnotesize\ttfamily void gondola\+::\+CRReader\+::set\+\_\+path (\begin{DoxyParamCaption}\item[{std\+::string}]{pathname }\end{DoxyParamCaption}) -\/$>$ void}
+
+Read files from a given pathname, this can be a single file as well. If the files are telemetry files, we will automatically switch to using \doxylink{structgondola_1_1TelemetryPacketReader}{Telemetry\+Packet\+Reader} under the hood ~\newline
+ 
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/caraspace.\+hpp\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/caraspace.\+cxx\end{DoxyCompactItemize}

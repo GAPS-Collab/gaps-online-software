@@ -1,0 +1,133 @@
+\doxysection{Master\+Trigger\+Event Struct Reference}
+\hypertarget{structMasterTriggerEvent}{}\label{structMasterTriggerEvent}\index{MasterTriggerEvent@{MasterTriggerEvent}}
+
+
+{\ttfamily \#include $<$events.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+auto \mbox{\hyperlink{structMasterTriggerEvent_ad3c4ac7bb6281b653e0acbc6b12d08cb}{get\+\_\+timestamp\+\_\+gps48}} () const -\/$>$ u64
+\item 
+\Hypertarget{structMasterTriggerEvent_a7d8ab2286a38201ff595780f7fdaebdd}\label{structMasterTriggerEvent_a7d8ab2286a38201ff595780f7fdaebdd} 
+auto {\bfseries get\+\_\+timestamp\+\_\+gps} () const -\/$>$ u32
+\begin{DoxyCompactList}\small\item\em Get the timestamp as sent by the GPS. \end{DoxyCompactList}\item 
+auto \mbox{\hyperlink{structMasterTriggerEvent_a4e5f49e1159baa964c9e0ae92022e32d}{get\+\_\+timestamp\+\_\+abs48}} () const -\/$>$ u64
+\item 
+\Hypertarget{structMasterTriggerEvent_ae882f16beca20d879ac5e82a58019c71}\label{structMasterTriggerEvent_ae882f16beca20d879ac5e82a58019c71} 
+auto {\bfseries get\+\_\+rb\+\_\+link\+\_\+ids} () const -\/$>$ Vec$<$ u8 $>$
+\item 
+auto \mbox{\hyperlink{structMasterTriggerEvent_ade4e97a28b5e4fbf813a0a76f4697f04}{get\+\_\+trigger\+\_\+hits}} () const -\/$>$ Vec$<$ std\+::tuple$<$ u8, u8, u8, LTBThreshold $>$ $>$
+\item 
+\Hypertarget{structMasterTriggerEvent_a5c3ff428d20e4ccf4482e97f52a88371}\label{structMasterTriggerEvent_a5c3ff428d20e4ccf4482e97f52a88371} 
+auto {\bfseries get\+\_\+trigger\+\_\+sources} () const -\/$>$ Vec$<$ Trigger\+Type $>$
+\begin{DoxyCompactList}\small\item\em Get the trigger sources from trigger source byte. \end{DoxyCompactList}\item 
+\Hypertarget{structMasterTriggerEvent_ae782da4a20e32d2f928f79927d71900e}\label{structMasterTriggerEvent_ae782da4a20e32d2f928f79927d71900e} 
+auto {\bfseries to\+\_\+string} () const -\/$>$ std\+::string
+\begin{DoxyCompactList}\small\item\em String representation of the struct. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static auto \mbox{\hyperlink{structMasterTriggerEvent_a315575319015cffa18d2637e942222bb}{from\+\_\+bytestream}} (const Vec$<$ u8 $>$ \&bytestream, u64 \&pos) -\/$>$ \mbox{\hyperlink{structMasterTriggerEvent}{Master\+Trigger\+Event}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structMasterTriggerEvent_a935b83acbec230d81d345178ae91ab1b}\label{structMasterTriggerEvent_a935b83acbec230d81d345178ae91ab1b} 
+Event\+Status {\bfseries event\+\_\+status} = Event\+Status\+::\+Unknown
+\item 
+\Hypertarget{structMasterTriggerEvent_a2fc1e8b3d4f1e769b4bce8a58a166c78}\label{structMasterTriggerEvent_a2fc1e8b3d4f1e769b4bce8a58a166c78} 
+u32 {\bfseries event\+\_\+id} = 0
+\begin{DoxyCompactList}\small\item\em event\+\_\+id as assigned by the Master\+Trigger\+Board \end{DoxyCompactList}\item 
+\Hypertarget{structMasterTriggerEvent_a886a68d557a93210b86b3e2d1b96bfa9}\label{structMasterTriggerEvent_a886a68d557a93210b86b3e2d1b96bfa9} 
+u32 {\bfseries timestamp} = 0
+\begin{DoxyCompactList}\small\item\em MTB timestamp. \end{DoxyCompactList}\item 
+\Hypertarget{structMasterTriggerEvent_a30d57d1dc8bd9e7fc55d1af7ad6ebc92}\label{structMasterTriggerEvent_a30d57d1dc8bd9e7fc55d1af7ad6ebc92} 
+u32 {\bfseries tiu\+\_\+timestamp} = 0
+\begin{DoxyCompactList}\small\item\em Tracker (?) timestamp. \end{DoxyCompactList}\item 
+\Hypertarget{structMasterTriggerEvent_aa49962e24c04ede5087ff1876feecd36}\label{structMasterTriggerEvent_aa49962e24c04ede5087ff1876feecd36} 
+u32 {\bfseries tiu\+\_\+gps32} = 0
+\begin{DoxyCompactList}\small\item\em GAPS GPS clock value (slow) \end{DoxyCompactList}\item 
+\Hypertarget{structMasterTriggerEvent_ab7def730b945ec5fb1da944dbd95ab25}\label{structMasterTriggerEvent_ab7def730b945ec5fb1da944dbd95ab25} 
+u32 {\bfseries tiu\+\_\+gps16} = 0
+\begin{DoxyCompactList}\small\item\em GAPS GPS clock value (fast) \end{DoxyCompactList}\item 
+\Hypertarget{structMasterTriggerEvent_ab438df14fccd804df45411f51a85719b}\label{structMasterTriggerEvent_ab438df14fccd804df45411f51a85719b} 
+u32 {\bfseries crc} = 0
+\begin{DoxyCompactList}\small\item\em triggered paddles as seen by the MTB \end{DoxyCompactList}\item 
+\Hypertarget{structMasterTriggerEvent_a3edd142130fbdd973d8e63a15166d6df}\label{structMasterTriggerEvent_a3edd142130fbdd973d8e63a15166d6df} 
+u16 {\bfseries trigger\+\_\+source} = 0
+\item 
+\Hypertarget{structMasterTriggerEvent_acc050262f6d08b8b2a2c80ca59a0a849}\label{structMasterTriggerEvent_acc050262f6d08b8b2a2c80ca59a0a849} 
+u32 {\bfseries dsi\+\_\+j\+\_\+mask} = 0
+\item 
+\Hypertarget{structMasterTriggerEvent_a1093aa4c8ebdec7e23d60579fd8fd5c0}\label{structMasterTriggerEvent_a1093aa4c8ebdec7e23d60579fd8fd5c0} 
+Vec$<$ u16 $>$ {\bfseries channel\+\_\+mask} = Vec$<$u16$>$()
+\item 
+\Hypertarget{structMasterTriggerEvent_ab05c4f3b5d0f32309e8bb47c09995194}\label{structMasterTriggerEvent_ab05c4f3b5d0f32309e8bb47c09995194} 
+u64 {\bfseries mtb\+\_\+link\+\_\+mask} = 0
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structMasterTriggerEvent_ab0ef9b6a29d44f1771cedc15e077a16f}\label{structMasterTriggerEvent_ab0ef9b6a29d44f1771cedc15e077a16f} 
+static constexpr u16 {\bfseries HEAD} = 0x\+AAAA
+\begin{DoxyCompactList}\small\item\em begin struct marker \end{DoxyCompactList}\item 
+\Hypertarget{structMasterTriggerEvent_a747c17bdb302ac0a1609df7c63f52bce}\label{structMasterTriggerEvent_a747c17bdb302ac0a1609df7c63f52bce} 
+static constexpr u16 {\bfseries TAIL} = 0x5555
+\begin{DoxyCompactList}\small\item\em end struct marker \end{DoxyCompactList}\item 
+\Hypertarget{structMasterTriggerEvent_a9e1848db7aa8353345ce582d0ee5b688}\label{structMasterTriggerEvent_a9e1848db7aa8353345ce582d0ee5b688} 
+static constexpr usize {\bfseries SIZE} = 0
+\begin{DoxyCompactList}\small\item\em Variable size for \doxylink{structMasterTriggerEvent}{Master\+Trigger\+Event}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The \doxylink{structMasterTriggerEvent}{Master\+Trigger\+Event} represesnts the information provided by the MTB for this one specific event. Most notably, it includes a board mask, which is the DSI/J connections which triggered, and a hit mask. The hit mask gives hit channels per DSI/J, which correspond to hit channels on a LTB.
+
+FIXME -\/compatibiltiy. Reading older data, we have 2 scenarios -\/ either 113 bytes of fixed size for 20 LTBs, or 133 bytes for 25 LTBs. We can modify from\+\_\+bytestream to at least not throw an error when reading older data, but this would currently be a todo of lower priority 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structMasterTriggerEvent_a315575319015cffa18d2637e942222bb}\label{structMasterTriggerEvent_a315575319015cffa18d2637e942222bb} 
+\index{MasterTriggerEvent@{MasterTriggerEvent}!from\_bytestream@{from\_bytestream}}
+\index{from\_bytestream@{from\_bytestream}!MasterTriggerEvent@{MasterTriggerEvent}}
+\doxysubsubsection{\texorpdfstring{from\_bytestream()}{from\_bytestream()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structMasterTriggerEvent}{Master\+Trigger\+Event}} Master\+Trigger\+Event\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{const Vec$<$ u8 $>$ \&}]{bytestream,  }\item[{u64 \&}]{pos }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{structMasterTriggerEvent}{Master\+Trigger\+Event}}\hspace{0.3cm}{\ttfamily [static]}}
+
+Factory function for \doxylink{structMasterTriggerEvent}{Master\+Trigger\+Event}
+
+Deserialize a \doxylink{structMasterTriggerEvent}{Master\+Trigger\+Event} from a vector of of bytes
+
+
+\begin{DoxyParams}{Parameters}
+{\em bytestream} & Byte representation of a \doxylink{structMasterTriggerEvent}{Master\+Trigger\+Event}, or including one at pos \\
+\hline
+{\em pos} & \+: Expected position of \doxylink{structMasterTriggerEvent_ab0ef9b6a29d44f1771cedc15e077a16f}{Master\+Trigger\+Event\+::\+HEAD} in the stream \\
+\hline
+\end{DoxyParams}
+\Hypertarget{structMasterTriggerEvent_a4e5f49e1159baa964c9e0ae92022e32d}\label{structMasterTriggerEvent_a4e5f49e1159baa964c9e0ae92022e32d} 
+\index{MasterTriggerEvent@{MasterTriggerEvent}!get\_timestamp\_abs48@{get\_timestamp\_abs48}}
+\index{get\_timestamp\_abs48@{get\_timestamp\_abs48}!MasterTriggerEvent@{MasterTriggerEvent}}
+\doxysubsubsection{\texorpdfstring{get\_timestamp\_abs48()}{get\_timestamp\_abs48()}}
+{\footnotesize\ttfamily u64 Master\+Trigger\+Event\+::get\+\_\+timestamp\+\_\+abs48 (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ u64}
+
+Get absolute timestamp which is calculated with the help of the 1pps pulse from the GPS \Hypertarget{structMasterTriggerEvent_ad3c4ac7bb6281b653e0acbc6b12d08cb}\label{structMasterTriggerEvent_ad3c4ac7bb6281b653e0acbc6b12d08cb} 
+\index{MasterTriggerEvent@{MasterTriggerEvent}!get\_timestamp\_gps48@{get\_timestamp\_gps48}}
+\index{get\_timestamp\_gps48@{get\_timestamp\_gps48}!MasterTriggerEvent@{MasterTriggerEvent}}
+\doxysubsubsection{\texorpdfstring{get\_timestamp\_gps48()}{get\_timestamp\_gps48()}}
+{\footnotesize\ttfamily u64 Master\+Trigger\+Event\+::get\+\_\+timestamp\+\_\+gps48 (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ u64}
+
+The combined GPS 48bit timestamp into a 48bit timestamp \Hypertarget{structMasterTriggerEvent_ade4e97a28b5e4fbf813a0a76f4697f04}\label{structMasterTriggerEvent_ade4e97a28b5e4fbf813a0a76f4697f04} 
+\index{MasterTriggerEvent@{MasterTriggerEvent}!get\_trigger\_hits@{get\_trigger\_hits}}
+\index{get\_trigger\_hits@{get\_trigger\_hits}!MasterTriggerEvent@{MasterTriggerEvent}}
+\doxysubsubsection{\texorpdfstring{get\_trigger\_hits()}{get\_trigger\_hits()}}
+{\footnotesize\ttfamily Vec$<$ std\+::tuple$<$ u8, u8, u8, LTBThreshold $>$ $>$ Master\+Trigger\+Event\+::get\+\_\+trigger\+\_\+hits (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ Vec$<$std\+::tuple$<$u8, u8, u8, LTBThreshold$>$$>$}
+
+Get the combination of triggered DSI/\+J/\+CH on the MTB which formed the trigger. This does not include further hits which fall into the integration window. For those, se rb\+\_\+link\+\_\+mask
+
+The returned values follow the TOF convention to start with 1, so that we can use them to look up LTB ids in the db.\hypertarget{structMasterTriggerEvent_autotoc_md0}{}\doxysubsection{\texorpdfstring{Returns}{Returns}}\label{structMasterTriggerEvent_autotoc_md0}
+Vec$<$(hit)$>$ where hit is (DSI, J, CH) ~\newline
+ 
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/events.\+h\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/events.\+cxx\end{DoxyCompactItemize}

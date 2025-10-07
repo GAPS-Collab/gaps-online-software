@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["configure_clk_synth","program_nvm_clk_synth","reset_clk_synth"]};

@@ -1,0 +1,45 @@
+\doxysection{gondola\+::CRFrame\+Object Struct Reference}
+\hypertarget{structgondola_1_1CRFrameObject}{}\label{structgondola_1_1CRFrameObject}\index{gondola::CRFrameObject@{gondola::CRFrameObject}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structgondola_1_1CRFrameObject_a9db436e8a3f36f8f8862ca3d95466e44}\label{structgondola_1_1CRFrameObject_a9db436e8a3f36f8f8862ca3d95466e44} 
+auto {\bfseries to\+\_\+bytestream} () const -\/$>$ Vec$<$ u8 $>$
+\item 
+\Hypertarget{structgondola_1_1CRFrameObject_a3196f8667f5985f4344e6d39e51f0982}\label{structgondola_1_1CRFrameObject_a3196f8667f5985f4344e6d39e51f0982} 
+auto {\bfseries to\+\_\+string} () -\/$>$ std\+::string
+\begin{DoxyCompactList}\small\item\em string representation for printing \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structgondola_1_1CRFrameObject_ae9b6b4da5a35210f616f1663aebcfb9b}\label{structgondola_1_1CRFrameObject_ae9b6b4da5a35210f616f1663aebcfb9b} 
+static auto {\bfseries from\+\_\+bytestream} (Vec$<$ u8 $>$ stream, usize \&pos) -\/$>$ \mbox{\hyperlink{structgondola_1_1CRFrameObject}{CRFrame\+Object}}
+\begin{DoxyCompactList}\small\item\em Decode a serializable from a bytestream ~\newline
+ \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structgondola_1_1CRFrameObject_a2edf45499451f94355d7fd686898e78e}\label{structgondola_1_1CRFrameObject_a2edf45499451f94355d7fd686898e78e} 
+u8 {\bfseries version}
+\item 
+\Hypertarget{structgondola_1_1CRFrameObject_a2e3d538a8bf72ab32dbe7f9665d04628}\label{structgondola_1_1CRFrameObject_a2e3d538a8bf72ab32dbe7f9665d04628} 
+CRFrame\+Object\+Type {\bfseries ftype}
+\item 
+\Hypertarget{structgondola_1_1CRFrameObject_ab79776d9e2a7370a2b4986d207001963}\label{structgondola_1_1CRFrameObject_ab79776d9e2a7370a2b4986d207001963} 
+Vec$<$ u8 $>$ {\bfseries payload}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structgondola_1_1CRFrameObject_a93d8e4d5e30cd59ba83416b2e3ebcee4}\label{structgondola_1_1CRFrameObject_a93d8e4d5e30cd59ba83416b2e3ebcee4} 
+static constexpr u16 {\bfseries HEAD} = 0x\+AAAA
+\item 
+\Hypertarget{structgondola_1_1CRFrameObject_a530c2c307cd4e221c15cc3e24195c8c7}\label{structgondola_1_1CRFrameObject_a530c2c307cd4e221c15cc3e24195c8c7} 
+static constexpr u16 {\bfseries TAIL} = 0x5555
+\end{DoxyCompactItemize}
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/caraspace.\+hpp\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/caraspace.\+cxx\end{DoxyCompactItemize}

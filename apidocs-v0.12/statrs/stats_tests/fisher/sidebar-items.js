@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["FishersExactTestError"],"fn":["fishers_exact","fishers_exact_with_odds_ratio"]};

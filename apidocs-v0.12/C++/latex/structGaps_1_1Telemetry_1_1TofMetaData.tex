@@ -1,0 +1,62 @@
+\doxysection{Gaps\+::Telemetry\+::Tof\+Meta\+Data Struct Reference}
+\hypertarget{structGaps_1_1Telemetry_1_1TofMetaData}{}\label{structGaps_1_1Telemetry_1_1TofMetaData}\index{Gaps::Telemetry::TofMetaData@{Gaps::Telemetry::TofMetaData}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TofMetaData_a6c2c43afaf60d10cb3a040c9e5d09a1c}\label{structGaps_1_1Telemetry_1_1TofMetaData_a6c2c43afaf60d10cb3a040c9e5d09a1c} 
+auto {\bfseries to\+\_\+string} () const -\/$>$ std\+::string
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static auto \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TofMetaData_ad8b46ab8f76494b9f6784f3bae131cf9}{from\+\_\+bytestream}} (Vec$<$ u8 $>$ const \&stream, usize \&pos) -\/$>$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TofMetaData}{Tof\+Meta\+Data}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TofMetaData_a91121d68256c76b6a3454b95e384b717}\label{structGaps_1_1Telemetry_1_1TofMetaData_a91121d68256c76b6a3454b95e384b717} 
+u32 {\bfseries event\+\_\+id} \{0xffffffff\}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TofMetaData_afe0fb7a588c76739d7b895c3efca9ea7}\label{structGaps_1_1Telemetry_1_1TofMetaData_afe0fb7a588c76739d7b895c3efca9ea7} 
+u8 {\bfseries status\+\_\+version} \{0xff\}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TofMetaData_aee93041902dc38c7f4d218d36468e9b3}\label{structGaps_1_1Telemetry_1_1TofMetaData_aee93041902dc38c7f4d218d36468e9b3} 
+bool {\bfseries stats\+\_\+valid} \{false\}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TofMetaData_a18683af27287debaa150d9d5ca785dd1}\label{structGaps_1_1Telemetry_1_1TofMetaData_a18683af27287debaa150d9d5ca785dd1} 
+u16 {\bfseries trigger\+\_\+sources} \{0\}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TofMetaData_aedb48f609b08d278803ff39761cfd08a}\label{structGaps_1_1Telemetry_1_1TofMetaData_aedb48f609b08d278803ff39761cfd08a} 
+u8 {\bfseries n\+\_\+hits\+\_\+umb} \{0xff\}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TofMetaData_af10217565364c7897abe3fddcaac87f8}\label{structGaps_1_1Telemetry_1_1TofMetaData_af10217565364c7897abe3fddcaac87f8} 
+u8 {\bfseries n\+\_\+hits\+\_\+cbe} \{0xff\}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TofMetaData_aa60378e66e27ca48b42022ff070ced7d}\label{structGaps_1_1Telemetry_1_1TofMetaData_aa60378e66e27ca48b42022ff070ced7d} 
+u8 {\bfseries n\+\_\+hits\+\_\+cor} \{0xff\}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TofMetaData_a1161672e6700a50a502dc99fdd39dba2}\label{structGaps_1_1Telemetry_1_1TofMetaData_a1161672e6700a50a502dc99fdd39dba2} 
+f32 {\bfseries tot\+\_\+edep\+\_\+umb} \{0\}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TofMetaData_a6a954a2b192ff589e19ace5dfec93e1c}\label{structGaps_1_1Telemetry_1_1TofMetaData_a6a954a2b192ff589e19ace5dfec93e1c} 
+f32 {\bfseries tot\+\_\+edep\+\_\+cbe} \{0\}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TofMetaData_a28bed7b5e25009e122a0d5bbc6a78f57}\label{structGaps_1_1Telemetry_1_1TofMetaData_a28bed7b5e25009e122a0d5bbc6a78f57} 
+f32 {\bfseries tot\+\_\+edep\+\_\+cor} \{0\}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structGaps_1_1Telemetry_1_1TofMetaData_ad8b46ab8f76494b9f6784f3bae131cf9}\label{structGaps_1_1Telemetry_1_1TofMetaData_ad8b46ab8f76494b9f6784f3bae131cf9} 
+\index{Gaps::Telemetry::TofMetaData@{Gaps::Telemetry::TofMetaData}!from\_bytestream@{from\_bytestream}}
+\index{from\_bytestream@{from\_bytestream}!Gaps::Telemetry::TofMetaData@{Gaps::Telemetry::TofMetaData}}
+\doxysubsubsection{\texorpdfstring{from\_bytestream()}{from\_bytestream()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TofMetaData}{gtl\+::\+Tof\+Meta\+Data}} Gaps\+::\+Telemetry\+::\+Tof\+Meta\+Data\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{Vec$<$ u8 $>$ const \&}]{bytes,  }\item[{usize \&}]{pos }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TofMetaData}{Tof\+Meta\+Data}}\hspace{0.3cm}{\ttfamily [static]}}
+
+FIXME -\/ direct copy from bfsw, don\textquotesingle{}t like it. Replace with parse\+\_\+u16 etc methods. ~\newline
+ 
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/telemetry\+\_\+dataclasses.\+hpp\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/telemetry\+\_\+dataclasses.\+cxx\end{DoxyCompactItemize}

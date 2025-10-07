@@ -1,0 +1,236 @@
+\doxysection{telemetry\+\_\+dataclasses.\+hpp}
+\hypertarget{telemetry__dataclasses_8hpp_source}{}\label{telemetry__dataclasses_8hpp_source}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/telemetry\_dataclasses.hpp@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/telemetry\_dataclasses.hpp}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ GO\_TELEMETRY\_DATACLASSES\_H\_INLCUDED}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ GO\_TELEMETRY\_DATACLASSES\_H\_INLCUDED}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ "{}tof\_typedefs.h"{}}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ "{}result/result.h"{}}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ "{}events.h"{}}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ "{}errors.hpp"{}}}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \textcolor{keyword}{namespace\ }r\ =\ result;}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceGaps}{Gaps}}\ \{}
+\DoxyCodeLine{00016\ \ \ \textcolor{keyword}{namespace\ }Telemetry\ \{}
+\DoxyCodeLine{00017\ \ \ \ \ }
+\DoxyCodeLine{00018\ \ \ \ \ \textcolor{keyword}{enum\ class}\ BfswPacketType\ :\ u8\ \{}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ Unknown\ \ \ \ \ \ \ \ \ \ \ \ =\ 0,}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ CardHKP\ \ \ \ \ \ \ \ \ \ \ \ =\ 30,}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ CoolingHK\ \ \ \ \ \ \ \ \ \ =\ 40,}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ PDUHK\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 50,}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ Tracker\ \ \ \ \ \ \ \ \ \ \ \ =\ 80,}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ TrackerDAQCntr\ \ \ \ \ =\ 81,}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ GPS\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 82,}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ TrkTempLeak\ \ \ \ \ \ \ \ =\ 83,}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ BoringEvent\ \ \ \ \ \ \ \ =\ 90,}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \mbox{\hyperlink{structRBWaveform}{RBWaveform}}\ \ \ \ \ \ \ \ \ =\ 91,}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ AnyTofHK\ \ \ \ \ \ \ \ \ \ \ =\ 92,}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ GcuEvtBldSettings\ \ =\ 93,}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ LabJackHK\ \ \ \ \ \ \ \ \ \ =\ 100,}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ MagHK\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 108,}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ GcuMon\ \ \ \ \ \ \ \ \ \ \ \ \ =\ 110,}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ InterestingEvent\ \ \ =\ 190,}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ NoGapsTriggerEvent\ =\ 191,}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ NoTofDataEvent\ \ \ \ \ =\ 192,}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ Ack\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 200,\ \ \ \ \ }
+\DoxyCodeLine{00038\ \ \ \ \ \ \ AnyTrackerHK\ \ \ \ \ \ \ =\ 255,}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \textcolor{comment}{//\ unknown/unused\ stuff}}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ TmP33\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 33,}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ TmP34\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 34,}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ TmP37\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 37,}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ TmP38\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 38,}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ TmP55\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 55,}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ TmP64\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 64,}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \textcolor{comment}{//TmP92\ \ \ \ \ \ \ \ \ \ \ \ =\ 92,}}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ TmP96\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 96,}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ TmP214\ \ \ \ \ \ \ \ \ \ \ \ \ =\ 214,}
+\DoxyCodeLine{00049\ \ \ \ \ \};}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keyword}{auto}\ bfsw\_ptype\_to\_u8(BfswPacketType\ pt)\ -\/>\ u8;}
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keyword}{auto}\ bfsw\_ptype\_to\_str(BfswPacketType\ pt)\ -\/>\ std::string;}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader}{PacketHeader}}\ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ SIZE\ =\ 13;\ }
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ HEAD\ =\ 0x90eb;}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \ \ \ \ u16\ \ \ \ \ \ \ \ \ \ \ \ \ sync\ \ \ \ \ \{0\};}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ BfswPacketType\ \ ptype\ \ \ \ \{BfswPacketType::Unknown\};}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ u32\ \ \ \ \ \ \ \ \ \ \ \ \ timestamp\{0\};}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ u16\ \ \ \ \ \ \ \ \ \ \ \ \ counter\ \ \{0\};}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ u16\ \ \ \ \ \ \ \ \ \ \ \ \ length\ \ \ \{0\};}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ u16\ \ \ \ \ \ \ \ \ \ \ \ \ checksum\ \{0\};}
+\DoxyCodeLine{00064\ \ \ \ \ }
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ get\_gcutime()\ -\/>\ f64;}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ to\_string()\ \textcolor{keyword}{const}\ -\/>\ std::string;}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ to\_bytestream()\ \textcolor{keyword}{const}\ -\/>\ Vec<u8>;}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ from\_bytestream(Vec<u8>\ \textcolor{keyword}{const}\ \&stream,\ usize\ \&pos)}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ -\/>\ r::Result<PacketHeader,\ Gaps::IOError>;}
+\DoxyCodeLine{00070\ \ \ \ \ \};}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structGaps_1_1Telemetry_1_1Packet}{Packet}}\ \{}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader}{PacketHeader}}\ header;}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ Vec<u8>\ payload;}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ to\_string()\ \textcolor{keyword}{const}\ -\/>\ std::string;}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ from\_bytestream(Vec<u8>\ \textcolor{keyword}{const}\ \&stream,\ usize\ \&pos)\ -\/>\ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Packet}{Packet}};}
+\DoxyCodeLine{00077\ \ \ \ \ \};}
+\DoxyCodeLine{00078\ \ \ \ }
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkHeader}{TrkHeader}}\ \{}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ SIZE\ =\ 17;\ }
+\DoxyCodeLine{00082\ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ HEAD\ =\ 0x90eb;}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ u16\ \ \ sync;}
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ u16\ \ \ crc;}
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ u8\ \ \ \ sys\_id;}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ u8\ \ \ \ packet\_id;}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \ u16\ \ \ length;}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ u16\ \ \ daq\_count;}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ u64\ \ \ sys\_time;}
+\DoxyCodeLine{00091\ \ \ \ \ \ \ \ u8\ \ \ \ version;}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ }
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ to\_string()\ \textcolor{keyword}{const}\ -\/>\ std::string;}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ from\_bytestream(Vec<u8>\ \textcolor{keyword}{const}\ \&stream,\ usize\ \&pos)}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ -\/>\ r::Result<TrkHeader,\ Gaps::IOError>;}
+\DoxyCodeLine{00097\ \ \ \ \ \};}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkHit}{TrkHit}}\ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \textcolor{comment}{//\ using\ i32\ here\ makes\ no\ sense\ in\ my\ eyes,\ but\ I\ defer\ to\ }}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \textcolor{comment}{//\ bfsw\ (\ I\ assume\ it\ is\ because\ of\ sqlite\ which\ does\ not\ know}}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \textcolor{comment}{//\ unsigned)\ }}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \textcolor{comment}{//\ FIXME\ -\/\ change\ this}}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ i32\ layer\ \ \ \ \ \ \ \ \ \ \ \{-\/1\};}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ i32\ row\ \ \ \ \ \ \ \ \ \ \ \ \ \{-\/1\};}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ i32\ \textcolor{keyword}{module}\ \ \ \ \ \ \ \ \ \ \{-\/1\};}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ i32\ channel\ \ \ \ \ \ \ \ \ \{-\/1\};}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ i32\ adc\ \ \ \ \ \ \ \ \ \ \ \ \ \{-\/1\};}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ i64\ oscillator\ \ \ \ \ \ \{-\/1\};}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ f64\ energy\ \ \ \ \ \ \ \ \ \ \{0\};}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ u8\ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkHit_a180d4a0a852c376b0646d4de4d7a9298}{asic\_event\_code}}\ \{0\};}
+\DoxyCodeLine{00115\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ to\_string()\ const\ -\/>\ std::\textcolor{keywordtype}{string};}
+\DoxyCodeLine{00116\ \ \ \ \ \};}
+\DoxyCodeLine{00117\ \ \ \ }
+\DoxyCodeLine{00118\ \ \ \ \ struct\ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkEvent}{TrkEvent}}\ \{}
+\DoxyCodeLine{00119\ \ \ \ \ \ \ u8\ \ \ \ \ \ \ \ \ \ layer;}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ u8\ \ \ \ \ \ \ \ \ \ flags1;}
+\DoxyCodeLine{00121\ \ \ \ \ \ \ u32\ \ \ \ \ \ \ \ \ event\_id;\ }
+\DoxyCodeLine{00122\ \ \ \ \ \ \ u32\ \ \ \ \ \ \ \ \ event\_time;}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ Vec<TrkHit>\ hits;}
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ to\_string()\ \textcolor{keyword}{const}\ -\/>\ std::string;}
+\DoxyCodeLine{00126\ \ \ \ \ \};}
+\DoxyCodeLine{00127\ \ \ \ \ }
+\DoxyCodeLine{00128\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkEventPacket}{TrkEventPacket}}\ \{}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader}{PacketHeader}}\ \ header;}
+\DoxyCodeLine{00130\ \ \ \ \ \ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkHeader}{TrkHeader}}\ \ \ \ \ daq\_header;}
+\DoxyCodeLine{00131\ \ \ \ \ \ \ Vec<TrkEvent>\ events;}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ u16\ \ \ \ \ \ \ \ \ \ \ run\_id;}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ u8\ \ \ \ \ \ \ \ \ \ \ \ run\_id\_old;}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ }
+\DoxyCodeLine{00135\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ to\_string()\ \textcolor{keyword}{const}\ -\/>\ std::string;}
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ from\_bytestream(Vec<u8>\ \textcolor{keyword}{const}\ \&stream,\ usize\ \&pos)}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ -\/>\ r::Result<TrkEventPacket,\ Gaps::IOError>;}
+\DoxyCodeLine{00138\ \ \ \ \ \};}
+\DoxyCodeLine{00139\ \ \ \ \ \ }
+\DoxyCodeLine{00140\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structGaps_1_1Telemetry_1_1TofMetaData}{TofMetaData}}\ \{}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ u32\ \ event\_id\ \{0xffffffff\};}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ u8\ \ \ status\_version\ \{0xff\};}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ stats\_valid\ \{\textcolor{keyword}{false}\};}
+\DoxyCodeLine{00144\ \ \ \ \ \ \ u16\ \ trigger\_sources\ \{0\};}
+\DoxyCodeLine{00145\ \ \ \ \ \ \ u8\ \ \ n\_hits\_umb\ \{0xff\};}
+\DoxyCodeLine{00146\ \ \ \ \ \ \ u8\ \ \ n\_hits\_cbe\ \{0xff\};}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ u8\ \ \ n\_hits\_cor\ \{0xff\};}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ f32\ \ tot\_edep\_umb\ \{0\};}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ f32\ \ tot\_edep\_cbe\ \{0\};}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ f32\ \ tot\_edep\_cor\ \{0\};}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ }
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ from\_bytestream(Vec<u8>\ \textcolor{keyword}{const}\ \&stream,\ usize\ \&pos)\ -\/>\ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TofMetaData}{TofMetaData}};}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ to\_string()\ \textcolor{keyword}{const}\ -\/>\ std::string;}
+\DoxyCodeLine{00154\ \ \ \ \ \};}
+\DoxyCodeLine{00155\ \ \ \ \ \ }
+\DoxyCodeLine{00156\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkCalibratedHit}{TrkCalibratedHit}}\ \{}
+\DoxyCodeLine{00157\ \ \ \ \ \ \ u16\ strip\_id;}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ u16\ adc;}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \textcolor{comment}{//calibrated\_hit(uint16\_t\ strip\_id,\ uint16\_t\ adc)\ :\ strip\_id(strip\_id),\ adc(adc)\ \{\}}}
+\DoxyCodeLine{00160\ \ \ \ \ \ \};}
+\DoxyCodeLine{00161\ \ \ \ \ \ }
+\DoxyCodeLine{00162\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkMetaData}{TrkMetaData}}\ \{}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ u64\ num\_hits\ \{0\};}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ u64\ row\_flags\ \{0\};}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ f64\ total\_energy\ \{0\};}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ Vec<TrkCalibratedHit>\ calibrated\_hits;}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \textcolor{comment}{//std::array<uint64\_t,8>\ oscillators\ =\ \{0,0,0,0,0,0,0,0\};}}
+\DoxyCodeLine{00168\ \ \ \ \ \ \};}
+\DoxyCodeLine{00169\ \ \ \ \ \ }
+\DoxyCodeLine{00170\ \ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling}{Cooling}}\ \{}
+\DoxyCodeLine{00172\ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ SIZE\ =\ 105;\ }
+\DoxyCodeLine{00173\ \ \ }
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader}{PacketHeader}}\ header;}
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ u32\ frame\_counter\ \ \ \{0xffffffff\};}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ u8\ \ status\_1\ \ \ \ \ \ \ \ \{0xff\};}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ u8\ \ status\_2\ \ \ \ \ \ \ \ \{0xff\};}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ u8\ \ rx\_byte\_num\ \ \ \ \ \{0xff\};}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ u8\ \ rx\_cmd\_num\ \ \ \ \ \ \{0xff\};}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ u64\ last\_cmd\ \ \ \ \ \ \ \ \{0xffffffffffffffff\};}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ u16\ rsv\_t\ \ \ \ \ \ \ \ \ \ \ \{0xffff\};}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ u16\ rh\_on\ \ \ \ \ \ \ \ \ \ \ \{0xffff\};}
+\DoxyCodeLine{00183\ \ \ \ \ \ \ \ u16\ rh\_off\ \ \ \ \ \ \ \ \ \ \{0xffff\};}
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ u16\ fpga\_board\_v\_in\ \{0xffff\};}
+\DoxyCodeLine{00185\ \ \ \ \ \ \ \ u16\ fpga\_board\_i\_in\ \{0xffff\};}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ u16\ fpga\_board\_t\ \ \ \ \{0xffff\};}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ u16\ fpga\_board\_p\ \ \ \ \{0xffff\};}
+\DoxyCodeLine{00188\ \ \ \ \ \ \ \ std::array<u16,\ 64>\ rtd;}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \ u16\ sh\_current\ \ \ \ \ \ \{0xffff\};}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \ u16\ rh\_current\ \ \ \ \ \ \{0xffff\};}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ u16\ pw\_board1\_t\ \ \ \ \ \{0xffff\};}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ u16\ pw\_board2\_t\ \ \ \ \ \{0xffff\};}
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ u16\ sh1\_time\_left\ \ \ \{0xffff\};}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ u16\ sh2\_time\_left\ \ \ \{0xffff\};}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ u16\ sh3\_time\_left\ \ \ \{0xffff\};}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \textcolor{keyword}{auto}\ to\_string()\ const\ -\/>\ std::\textcolor{keywordtype}{string};}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ static\ auto\ from\_bytestream(Vec<u8>\ const\ \&stream,\ usize\ \&pos)}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ -\/>\ r::Result<Cooling,\ \mbox{\hyperlink{namespaceGaps}{Gaps}}::IOError>;}
+\DoxyCodeLine{00201\ \ \ \ \ \};}
+\DoxyCodeLine{00202\ }
+\DoxyCodeLine{00204\ \ \ \ \ struct\ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent}{MergedEvent}}\ \{}
+\DoxyCodeLine{00205\ \ \ \ \ \ \textcolor{comment}{//\ bfsw::header\ header;}}
+\DoxyCodeLine{00206\ \ \ \ \ \ \textcolor{comment}{//\ uint8\_t\ flags0\ \{0\};}}
+\DoxyCodeLine{00207\ \ \ \ \ \ \textcolor{comment}{//\ uint64\_t\ row\_flags\ \{0\};}}
+\DoxyCodeLine{00208\ \ \ \ \ \ \textcolor{comment}{//\ uint32\_t\ event\_id\ \{0xffffffff\};}}
+\DoxyCodeLine{00209\ \ \ \ \ \ \textcolor{comment}{//\ uint8\_t\ num\_tof\_hits\ \{0\};}}
+\DoxyCodeLine{00210\ \ \ \ \ \ \textcolor{comment}{//\ std::vector<uint8\_t>\ tof\_data;}}
+\DoxyCodeLine{00211\ \ \ \ \ \ \textcolor{comment}{//\ std::vector<tracker\_hit>\ tracker\_hits;}}
+\DoxyCodeLine{00212\ \ \ \ \ \ \textcolor{comment}{//\ std::vector<uint64\_t>\ tracker\_oscillators;}}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ }
+\DoxyCodeLine{00214\ \ \ \ \ \ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader}{PacketHeader}}\ \ \ \ header;}
+\DoxyCodeLine{00215\ \ \ \ \ \ \ u8\ \ \ \ \ \ \ \ \ \ \ \ \ \ version\ =\ 0;}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ u8\ \ \ \ \ \ \ \ \ \ \ \ \ \ flags0\ \ =\ 0;}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ u8\ \ \ \ \ \ \ \ \ \ \ \ \ \ flags1\ \ =\ 0;}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ Vec<u8>\ \ \ \ \ \ \ \ \ row\_flags;}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ u64\ \ \ \ \ \ \ \ \ \ \ \ \ creation\_time\ =\ 0;}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ u32\ \ \ \ \ \ \ \ \ \ \ \ \ event\_id\ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ u8\ \ \ \ \ \ \ \ \ \ \ \ \ \ n\_tof\_hits\ \ \ \ =\ 0;}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ u16\ \ \ \ \ \ \ \ \ \ \ \ \ n\_trk\_hits\ \ \ \ =\ 0;}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ Vec<TrkEvent>\ \ \ tracker\_events;\ \ }
+\DoxyCodeLine{00224\ \ \ \ \ \ \ Vec<TrkHit>\ \ \ \ \ trk\_hits;}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \mbox{\hyperlink{structTofEventSummary}{TofEventSummary}}\ tof\_event;}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ Vec<u8>\ \ \ \ \ \ \ \ \ raw\_data;}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TofMetaData}{TofMetaData}}\ \ \ \ \ tof\_meta;}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkMetaData}{TrkMetaData}}\ \ \ \ \ tracker\_meta;}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ Vec<u64>\ \ \ \ \ \ \ \ tracker\_oscillators\ =\ Vec<u64>(10,0)\ ;}
+\DoxyCodeLine{00230\ \ \ \ \ }
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ to\_string()\ \textcolor{keyword}{const}\ -\/>\ std::string;}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ from\_bytestream(Vec<u8>\ \textcolor{keyword}{const}\ \&stream,\ usize\ \&pos)}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \ \ -\/>\ r::Result<MergedEvent,\ Gaps::IOError>;}
+\DoxyCodeLine{00234\ \ \ \ \ \};}
+\DoxyCodeLine{00235\ \ \ \}}
+\DoxyCodeLine{00236\ \}}
+\DoxyCodeLine{00237\ }
+\DoxyCodeLine{00238\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

@@ -1,0 +1,120 @@
+\doxysection{gondola\+::RBCalibration Struct Reference}
+\hypertarget{structgondola_1_1RBCalibration}{}\label{structgondola_1_1RBCalibration}\index{gondola::RBCalibration@{gondola::RBCalibration}}
+
+
+{\ttfamily \#include $<$calibration.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structgondola_1_1RBCalibration_ad872f2d084979dedd3223e317d037bc8}\label{structgondola_1_1RBCalibration_ad872f2d084979dedd3223e317d037bc8} 
+Vec$<$ Vec$<$ f32 $>$ $>$ {\bfseries voltages} (const \mbox{\hyperlink{structRBEvent}{RBEvent}} \&event, bool spike\+\_\+cleaning=false) const
+\begin{DoxyCompactList}\small\item\em get the voltage values for the traces of the event \end{DoxyCompactList}\item 
+\Hypertarget{structgondola_1_1RBCalibration_a207e61bc09f90bfae8f7f14f61a3066b}\label{structgondola_1_1RBCalibration_a207e61bc09f90bfae8f7f14f61a3066b} 
+Vec$<$ Vec$<$ f32 $>$ $>$ {\bfseries nanoseconds} (const \mbox{\hyperlink{structRBEvent}{RBEvent}} \&event) const
+\item 
+\Hypertarget{structgondola_1_1RBCalibration_aa814163cde832ec92d2ca9dec0f1d8b4}\label{structgondola_1_1RBCalibration_aa814163cde832ec92d2ca9dec0f1d8b4} 
+Vec$<$ f32 $>$ {\bfseries voltages} (const \mbox{\hyperlink{structRBEvent}{RBEvent}} \&event, const u8 channel) const
+\item 
+\Hypertarget{structgondola_1_1RBCalibration_ae040e341099dc47539a89791e3b95abd}\label{structgondola_1_1RBCalibration_ae040e341099dc47539a89791e3b95abd} 
+Vec$<$ f32 $>$ {\bfseries nanoseconds} (const \mbox{\hyperlink{structRBEvent}{RBEvent}} \&event, const u8 channel) const
+\item 
+\Hypertarget{structgondola_1_1RBCalibration_a78039b06df6de1184f7eabad904fa3d2}\label{structgondola_1_1RBCalibration_a78039b06df6de1184f7eabad904fa3d2} 
+auto {\bfseries to\+\_\+string} () const -\/$>$ std\+::string
+\begin{DoxyCompactList}\small\item\em String representation for printing. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static auto \mbox{\hyperlink{structgondola_1_1RBCalibration_a72d9a549df00bdb74a24934b9c500e42}{from\+\_\+bytestream}} (const Vec$<$ u8 $>$ \&bytestream, u64 \&pos, bool discard\+\_\+events=true) -\/$>$ \mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}}
+\item 
+static auto \mbox{\hyperlink{structgondola_1_1RBCalibration_ab261f3b0564ef2f34522faa718758294}{from\+\_\+file}} (const String \&filename, bool discard\+\_\+events=true) -\/$>$ \mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}}
+\item 
+static void \mbox{\hyperlink{structgondola_1_1RBCalibration_ac14745aee1e64dd8df1fe5a0398cd8be}{disable\+\_\+eventdata}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structgondola_1_1RBCalibration_aef4c4a108071cf609bc2bcbb1603f876}\label{structgondola_1_1RBCalibration_aef4c4a108071cf609bc2bcbb1603f876} 
+u8 {\bfseries rb\+\_\+id}
+\begin{DoxyCompactList}\small\item\em id of the RB this calibration belongs to \end{DoxyCompactList}\item 
+\Hypertarget{structgondola_1_1RBCalibration_ae9453fdf6f109582f60f07c1b8845b6e}\label{structgondola_1_1RBCalibration_ae9453fdf6f109582f60f07c1b8845b6e} 
+f32 {\bfseries d\+\_\+v}
+\begin{DoxyCompactList}\small\item\em voltage difference between noi and voltage data \end{DoxyCompactList}\item 
+\Hypertarget{structgondola_1_1RBCalibration_a5455256956208f6f606872eb5ad94834}\label{structgondola_1_1RBCalibration_a5455256956208f6f606872eb5ad94834} 
+u32 {\bfseries timestamp}
+\begin{DoxyCompactList}\small\item\em timestamp when the calibration has been taken \end{DoxyCompactList}\item 
+\Hypertarget{structgondola_1_1RBCalibration_aa976eeee958b98466bf574557c9658ef}\label{structgondola_1_1RBCalibration_aa976eeee958b98466bf574557c9658ef} 
+Vec$<$ Vec$<$ f32 $>$ $>$ {\bfseries v\+\_\+offsets}
+\item 
+\Hypertarget{structgondola_1_1RBCalibration_a0ebb95b569a2dd9c89bcb68b65592ff3}\label{structgondola_1_1RBCalibration_a0ebb95b569a2dd9c89bcb68b65592ff3} 
+Vec$<$ Vec$<$ f32 $>$ $>$ {\bfseries v\+\_\+dips}
+\item 
+\Hypertarget{structgondola_1_1RBCalibration_a450bfb1005d5ddbc146ab0a4adb41e8e}\label{structgondola_1_1RBCalibration_a450bfb1005d5ddbc146ab0a4adb41e8e} 
+Vec$<$ Vec$<$ f32 $>$ $>$ {\bfseries v\+\_\+incs}
+\item 
+\Hypertarget{structgondola_1_1RBCalibration_a78a54cb280a394ca7119bd7c8b9e1a41}\label{structgondola_1_1RBCalibration_a78a54cb280a394ca7119bd7c8b9e1a41} 
+Vec$<$ Vec$<$ f32 $>$ $>$ {\bfseries t\+\_\+bin}
+\item 
+\Hypertarget{structgondola_1_1RBCalibration_a6a1ecc8b17d1c8bb310b581649648851}\label{structgondola_1_1RBCalibration_a6a1ecc8b17d1c8bb310b581649648851} 
+Vec$<$ \mbox{\hyperlink{structRBEvent}{RBEvent}} $>$ {\bfseries noi\+\_\+data}
+\begin{DoxyCompactList}\small\item\em The no-\/input data used to calculate the constants. \end{DoxyCompactList}\item 
+\Hypertarget{structgondola_1_1RBCalibration_a71f6588578b29ff4d604b28fd4404e5b}\label{structgondola_1_1RBCalibration_a71f6588578b29ff4d604b28fd4404e5b} 
+Vec$<$ \mbox{\hyperlink{structRBEvent}{RBEvent}} $>$ {\bfseries vcal\+\_\+data}
+\begin{DoxyCompactList}\small\item\em The constant voltage data used to calculate the constants. \end{DoxyCompactList}\item 
+\Hypertarget{structgondola_1_1RBCalibration_abff782167cae7662814e3ca2c28b48c9}\label{structgondola_1_1RBCalibration_abff782167cae7662814e3ca2c28b48c9} 
+Vec$<$ \mbox{\hyperlink{structRBEvent}{RBEvent}} $>$ {\bfseries tcal\+\_\+data}
+\begin{DoxyCompactList}\small\item\em The timing calibration data used to calculate the constants. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structgondola_1_1RBCalibration_a9e96929baa9fe1d7898b451b1df00faf}\label{structgondola_1_1RBCalibration_a9e96929baa9fe1d7898b451b1df00faf} 
+static constexpr u16 {\bfseries HEAD} = 0x\+AAAA
+\item 
+\Hypertarget{structgondola_1_1RBCalibration_a8cdb106adcafb09679545c9f2c9a504b}\label{structgondola_1_1RBCalibration_a8cdb106adcafb09679545c9f2c9a504b} 
+static constexpr u16 {\bfseries TAIL} = 0x5555
+\item 
+\Hypertarget{structgondola_1_1RBCalibration_aae4481d47f19d2ca32c398bfaebee074}\label{structgondola_1_1RBCalibration_aae4481d47f19d2ca32c398bfaebee074} 
+static bool {\bfseries serialize\+\_\+event\+\_\+data}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Readoutboard constants for timing and voltage calibration for a single board 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structgondola_1_1RBCalibration_ac14745aee1e64dd8df1fe5a0398cd8be}\label{structgondola_1_1RBCalibration_ac14745aee1e64dd8df1fe5a0398cd8be} 
+\index{gondola::RBCalibration@{gondola::RBCalibration}!disable\_eventdata@{disable\_eventdata}}
+\index{disable\_eventdata@{disable\_eventdata}!gondola::RBCalibration@{gondola::RBCalibration}}
+\doxysubsubsection{\texorpdfstring{disable\_eventdata()}{disable\_eventdata()}}
+{\footnotesize\ttfamily auto gondola\+::\+RBCalibration\+::disable\+\_\+eventdata (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+Should the associated data be loaded in case it is available when from\+\_\+bytestream is called? \Hypertarget{structgondola_1_1RBCalibration_a72d9a549df00bdb74a24934b9c500e42}\label{structgondola_1_1RBCalibration_a72d9a549df00bdb74a24934b9c500e42} 
+\index{gondola::RBCalibration@{gondola::RBCalibration}!from\_bytestream@{from\_bytestream}}
+\index{from\_bytestream@{from\_bytestream}!gondola::RBCalibration@{gondola::RBCalibration}}
+\doxysubsubsection{\texorpdfstring{from\_bytestream()}{from\_bytestream()}}
+{\footnotesize\ttfamily auto gondola\+::\+RBCalibration\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{const Vec$<$ u8 $>$ \&}]{bytestream,  }\item[{u64 \&}]{pos,  }\item[{bool}]{discard\+\_\+events = {\ttfamily true} }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}}\hspace{0.3cm}{\ttfamily [static]}}
+
+Factory function for \doxylink{structgondola_1_1RBCalibration}{RBCalibration}
+
+
+\begin{DoxyParams}{Parameters}
+{\em } & \\
+\hline
+\end{DoxyParams}
+param 
+\begin{DoxyParams}{Parameters}
+{\em } & \\
+\hline
+\end{DoxyParams}
+\Hypertarget{structgondola_1_1RBCalibration_ab261f3b0564ef2f34522faa718758294}\label{structgondola_1_1RBCalibration_ab261f3b0564ef2f34522faa718758294} 
+\index{gondola::RBCalibration@{gondola::RBCalibration}!from\_file@{from\_file}}
+\index{from\_file@{from\_file}!gondola::RBCalibration@{gondola::RBCalibration}}
+\doxysubsubsection{\texorpdfstring{from\_file()}{from\_file()}}
+{\footnotesize\ttfamily auto gondola\+::\+RBCalibration\+::from\+\_\+file (\begin{DoxyParamCaption}\item[{const String \&}]{filename,  }\item[{bool}]{discard\+\_\+events = {\ttfamily true} }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}}\hspace{0.3cm}{\ttfamily [static]}}
+
+Load a calibration from a file with a \doxylink{structTofPacket}{Tof\+Packet} of type \doxylink{structgondola_1_1RBCalibration}{RBCalibration} in it. This should be the default way to load a calibration file 
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/calibration.\+h\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/calibration.\+cxx\end{DoxyCompactItemize}

@@ -1,0 +1,56 @@
+\doxysection{Gaps\+::Telemetry\+::Trk\+Header Struct Reference}
+\hypertarget{structGaps_1_1Telemetry_1_1TrkHeader}{}\label{structGaps_1_1Telemetry_1_1TrkHeader}\index{Gaps::Telemetry::TrkHeader@{Gaps::Telemetry::TrkHeader}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkHeader_a5fc980570f6c0703ac3b2921443057b7}\label{structGaps_1_1Telemetry_1_1TrkHeader_a5fc980570f6c0703ac3b2921443057b7} 
+auto {\bfseries to\+\_\+string} () const -\/$>$ std\+::string
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkHeader_ab88b83d97c33f2b6584b68867174246c}\label{structGaps_1_1Telemetry_1_1TrkHeader_ab88b83d97c33f2b6584b68867174246c} 
+static auto {\bfseries from\+\_\+bytestream} (Vec$<$ u8 $>$ const \&stream, usize \&pos) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkHeader}{Trk\+Header}}, \mbox{\hyperlink{classGaps_1_1IOError}{Gaps\+::\+IOError}} $>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkHeader_aec86f70dc83552644ed1a90653863157}\label{structGaps_1_1Telemetry_1_1TrkHeader_aec86f70dc83552644ed1a90653863157} 
+u16 {\bfseries sync}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkHeader_a9a56cce46720ad1f10fa2d66ec9d3e06}\label{structGaps_1_1Telemetry_1_1TrkHeader_a9a56cce46720ad1f10fa2d66ec9d3e06} 
+u16 {\bfseries crc}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkHeader_a761e8eabe4c6b6655ecc4a515ca71678}\label{structGaps_1_1Telemetry_1_1TrkHeader_a761e8eabe4c6b6655ecc4a515ca71678} 
+u8 {\bfseries sys\+\_\+id}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkHeader_a45bf920e42267751e9d3f13878dfea08}\label{structGaps_1_1Telemetry_1_1TrkHeader_a45bf920e42267751e9d3f13878dfea08} 
+u8 {\bfseries packet\+\_\+id}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkHeader_a5a7f15a7c6b148de6beda3be508e7fca}\label{structGaps_1_1Telemetry_1_1TrkHeader_a5a7f15a7c6b148de6beda3be508e7fca} 
+u16 {\bfseries length}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkHeader_acb3ec4e4bd7cfb4f8ef6f928a91b6a08}\label{structGaps_1_1Telemetry_1_1TrkHeader_acb3ec4e4bd7cfb4f8ef6f928a91b6a08} 
+u16 {\bfseries daq\+\_\+count}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkHeader_ac1157e0c2a03d8a75920184f5e29dcf6}\label{structGaps_1_1Telemetry_1_1TrkHeader_ac1157e0c2a03d8a75920184f5e29dcf6} 
+u64 {\bfseries sys\+\_\+time}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkHeader_a1263fd2082d518924d28d2bf33e0c29a}\label{structGaps_1_1Telemetry_1_1TrkHeader_a1263fd2082d518924d28d2bf33e0c29a} 
+u8 {\bfseries version}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkHeader_a7276c1b49ac054b400bda8e19bd61269}\label{structGaps_1_1Telemetry_1_1TrkHeader_a7276c1b49ac054b400bda8e19bd61269} 
+static constexpr u16 {\bfseries SIZE} = 17
+\item 
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkHeader_a706facc2012e415ba6e5c9ad3ae6b8db}\label{structGaps_1_1Telemetry_1_1TrkHeader_a706facc2012e415ba6e5c9ad3ae6b8db} 
+static constexpr u16 {\bfseries HEAD} = 0x90eb
+\end{DoxyCompactItemize}
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/telemetry\+\_\+dataclasses.\+hpp\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/telemetry\+\_\+dataclasses.\+cxx\end{DoxyCompactItemize}

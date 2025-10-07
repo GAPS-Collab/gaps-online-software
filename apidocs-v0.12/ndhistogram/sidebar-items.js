@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"macro":["ndhistogram","sparsehistogram"],"mod":["axis","error","value"],"struct":["AxesTuple","HashHistogram","Item","VecHistogram"],"trait":["Axes","Fill","FillWith","FillWithWeighted","Histogram"],"type":["Hist1D","Hist2D","Hist3D","HistND","SparseHist1D","SparseHist2D","SparseHist3D","SparseHistND"]};

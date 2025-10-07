@@ -1,0 +1,522 @@
+\doxysection{events.\+h}
+\hypertarget{events_8h_source}{}\label{events_8h_source}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/events.h@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/events.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ TOFEVENTS\_H\_INCLUDED}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ TOFEVENTS\_H\_INCLUDED}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ <tuple>}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ <array>}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#include\ <format>}}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#include\ "{}result/result.h"{}}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#include\ "{}tof\_typedefs.h"{}}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ "{}packets/monitoring.h"{}}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ "{}packets/tof\_packet.h"{}}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#include\ "{}events/tof\_event\_header.hpp"{}}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#include\ "{}calibration.h"{}}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#include\ "{}version.h"{}}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#include\ "{}errors.hpp"{}}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#ifdef\ BUILD\_CXX\_DB}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#include\ "{}database.h"{}}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \textcolor{keyword}{namespace\ }r\ =\ result;}
+\DoxyCodeLine{00037\ \textcolor{comment}{//namespace\ g\ =\ Gaps;}}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \textcolor{keyword}{class\ }RBCalibration;}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#define\ NCHN\ 9}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#define\ NWORDS\ 1024}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#define\ N\_LTBS\ 25}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\#define\ N\_CHN\_PER\_LTB\ 16}}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \textcolor{comment}{/*********************************************************/}}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00050\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ f32\ C\_LIGHT\_PADDLE\ =\ 15.4;\ }
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \textcolor{comment}{/*********************************************************/}}
+\DoxyCodeLine{00053\ \ \ }
+\DoxyCodeLine{00054\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ EVENTSTATUS\_UNKNOWN\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \ \ 0;}
+\DoxyCodeLine{00055\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ EVENTSTATUS\_CRC32WRONG\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \ 10;}
+\DoxyCodeLine{00056\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ EVENTSTATUS\_TAILWRONG\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \ 11;}
+\DoxyCodeLine{00057\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ EVENTSTATUS\_CHIDWRONG\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \ 12;}
+\DoxyCodeLine{00058\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ EVENTSTATUS\_CELLSYNCERR\ \ \ \ \ \ \ \ \ \ \ \ \ =\ \ 13;}
+\DoxyCodeLine{00059\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ EVENTSTATUS\_CHNSYNCERR\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \ 14;}
+\DoxyCodeLine{00060\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ EVENTSTATUS\_CELLANDCHNSYNCERR\ \ \ \ \ \ \ =\ \ 15;}
+\DoxyCodeLine{00061\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ EVENTSTATUS\_ANYDATAMANGLING\ \ \ \ \ \ \ \ \ =\ \ 16;}
+\DoxyCodeLine{00062\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ EVENTSTATUS\_INCOMPLETEREADOUT\ \ \ \ \ \ \ =\ \ 21;}
+\DoxyCodeLine{00063\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ EVENTSTATUS\_INCOMPATIBLEDATA\ \ \ \ \ \ \ \ =\ \ 22;}
+\DoxyCodeLine{00064\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ EVENTSTATUS\_EVENTTIMEOUT\ \ \ \ \ \ \ \ \ \ \ \ =\ \ 23;}
+\DoxyCodeLine{00065\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ EVENTSTATUS\_GOODNOCRCORERRBITCHECK\ \ =\ \ 39;}
+\DoxyCodeLine{00066\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ EVENTSTATUS\_GOODNOCRCCHECK\ \ \ \ \ \ \ \ \ \ =\ \ 40;}
+\DoxyCodeLine{00067\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ EVENTSTATUS\_GOODNOERRBITCHECK\ \ \ \ \ \ \ =\ \ 41;}
+\DoxyCodeLine{00068\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ EVENTSTATUS\_PERFECT\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \ 42;}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00076\ \textcolor{keyword}{enum\ class}\ EventStatus\ :\ u8\ \{}
+\DoxyCodeLine{00077\ \ \ Unknown\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ EVENTSTATUS\_UNKNOWN,}
+\DoxyCodeLine{00078\ \ \ Crc32Wrong\ \ \ \ \ \ \ \ \ \ \ \ \ =\ EVENTSTATUS\_CRC32WRONG,}
+\DoxyCodeLine{00079\ \ \ TailWrong\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ EVENTSTATUS\_TAILWRONG,}
+\DoxyCodeLine{00080\ \ \ ChannelIDWrong\ \ \ \ \ \ \ \ \ =\ EVENTSTATUS\_CHIDWRONG,\ }
+\DoxyCodeLine{00081\ \ \ CellSyncErrors\ \ \ \ \ \ \ \ \ =\ EVENTSTATUS\_CELLSYNCERR,}
+\DoxyCodeLine{00082\ \ \ ChnSyncErrors\ \ \ \ \ \ \ \ \ \ =\ EVENTSTATUS\_CHNSYNCERR,}
+\DoxyCodeLine{00083\ \ \ CellAndChnSyncErrors\ \ \ =\ EVENTSTATUS\_CELLANDCHNSYNCERR,}
+\DoxyCodeLine{00084\ \ \ AnyDataMangling\ \ \ \ \ \ \ \ =\ EVENTSTATUS\_ANYDATAMANGLING,}
+\DoxyCodeLine{00085\ \ \ IncompatibleData\ \ \ \ \ \ \ =\ EVENTSTATUS\_INCOMPATIBLEDATA,}
+\DoxyCodeLine{00086\ \ \ EventTimeOut\ \ \ \ \ \ \ \ \ \ \ =\ EVENTSTATUS\_EVENTTIMEOUT,}
+\DoxyCodeLine{00087\ \ \ GoodNoCRCOrErrBitCheck\ =\ EVENTSTATUS\_GOODNOCRCORERRBITCHECK,}
+\DoxyCodeLine{00090\ \ \ GoodNoCRCCheck\ \ \ \ \ \ \ \ \ =\ EVENTSTATUS\_GOODNOCRCCHECK,}
+\DoxyCodeLine{00093\ \ \ GoodNoErrBitCheck\ \ \ \ \ \ =\ EVENTSTATUS\_GOODNOERRBITCHECK,}
+\DoxyCodeLine{00094\ \ \ IncompleteReadout\ \ \ \ \ \ =\ EVENTSTATUS\_INCOMPLETEREADOUT,}
+\DoxyCodeLine{00095\ \ \ Perfect\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ EVENTSTATUS\_PERFECT,}
+\DoxyCodeLine{00096\ \ \ }
+\DoxyCodeLine{00097\ \};}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ std::ostream\&\ operator<<(std::ostream\&\ os,\ \textcolor{keyword}{const}\ EventStatus\&\ status);}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00102\ \textcolor{keyword}{struct\ }std::formatter<EventStatus>\ :\ std::formatter<std::string>\ \{}
+\DoxyCodeLine{00103\ \ \ \textcolor{comment}{//\ Parse\ format\ specifiers\ (default\ implementation)}}
+\DoxyCodeLine{00104\ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{auto}\ parse(std::format\_parse\_context\&\ ctx)\ \{}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ctx.begin();}
+\DoxyCodeLine{00106\ \ \ \}}
+\DoxyCodeLine{00107\ \ \ }
+\DoxyCodeLine{00108\ \ \ \textcolor{keyword}{auto}\ format(\textcolor{keyword}{const}\ EventStatus\&\ status,\ \textcolor{keyword}{auto}\&\ ctx)\ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ std::ostringstream\ oss;}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ oss\ <<\ status;\ \ \textcolor{comment}{//\ Use\ the\ <<\ operator\ to\ convert\ enum\ to\ string}}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::format\_to(ctx.out(),\ \textcolor{stringliteral}{"{}\{\}"{}},\ oss.str());}
+\DoxyCodeLine{00112\ \ \ \}}
+\DoxyCodeLine{00113\ \};}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \textcolor{comment}{/*********************************************************/}}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ TRIGGERTYPE\_UNKNOWN\ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00118\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ TRIGGERTYPE\_ANY\ \ \ \ \ \ \ \ \ \ =\ 1;}
+\DoxyCodeLine{00119\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ TRIGGERTYPE\_TRACK\ \ \ \ \ \ \ \ =\ 2;}
+\DoxyCodeLine{00120\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ TRIGGERTYPE\_TRACKCENTRAL\ =\ 3;}
+\DoxyCodeLine{00121\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ TRIGGERTYPE\_GAPS\ \ \ \ \ \ \ \ \ =\ 4;}
+\DoxyCodeLine{00122\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ TRIGGERTYPE\_POISSON\ \ \ \ \ \ =\ 100;}
+\DoxyCodeLine{00123\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ TRIGGERTYPE\_FORCED\ \ \ \ \ \ \ =\ 101;}
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00126\ \textcolor{comment}{/************************************}}
+\DoxyCodeLine{00127\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00128\ \textcolor{comment}{\ *\ GAPS\ Trigger\ types/sources.\ Description}}
+\DoxyCodeLine{00129\ \textcolor{comment}{\ *\ can\ be\ found\ elsewhere.\ More\ than\ oen}}
+\DoxyCodeLine{00130\ \textcolor{comment}{\ *\ of\ them\ can\ be\ active\ at\ the\ same\ time}}
+\DoxyCodeLine{00131\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00132\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00133\ \textcolor{keyword}{enum\ class}\ TriggerType\ :\ u8\ \{}
+\DoxyCodeLine{00134\ \ \ Unknown\ \ \ \ \ \ =\ TRIGGERTYPE\_UNKNOWN,}
+\DoxyCodeLine{00136\ \ \ \mbox{\hyperlink{namespaceGaps}{Gaps}}\ \ \ \ \ \ \ \ \ =\ TRIGGERTYPE\_GAPS,}
+\DoxyCodeLine{00137\ \ \ Any\ \ \ \ \ \ \ \ \ \ =\ TRIGGERTYPE\_ANY,}
+\DoxyCodeLine{00138\ \ \ Track\ \ \ \ \ \ \ \ =\ TRIGGERTYPE\_TRACK,}
+\DoxyCodeLine{00139\ \ \ TrackCentral\ =\ TRIGGERTYPE\_TRACKCENTRAL,}
+\DoxyCodeLine{00141\ \ \ Poisson\ \ \ \ \ \ =\ TRIGGERTYPE\_POISSON,}
+\DoxyCodeLine{00142\ \ \ Forced\ \ \ \ \ \ \ =\ TRIGGERTYPE\_FORCED,\ }
+\DoxyCodeLine{00143\ \};}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ std::ostream\&\ operator<<(std::ostream\&\ os,\ \textcolor{keyword}{const}\ TriggerType\&\ t\_type);}
+\DoxyCodeLine{00146\ }
+\DoxyCodeLine{00147\ \textcolor{comment}{/*********************************************************/}}
+\DoxyCodeLine{00148\ }
+\DoxyCodeLine{00149\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ LTBTHRESHOLD\_NOHIT\ \ \ =\ 0;}
+\DoxyCodeLine{00150\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ LTBTHRESHOLD\_HIT\ \ \ \ \ =\ 1;}
+\DoxyCodeLine{00151\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ LTBTHRESHOLD\_BETA\ \ \ \ =\ 2;}
+\DoxyCodeLine{00152\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ LTBTHRESHOLD\_VETO\ \ \ \ =\ 3;}
+\DoxyCodeLine{00153\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ LTBTHRESHOLD\_UNKNOWN\ =\ 255;}
+\DoxyCodeLine{00154\ }
+\DoxyCodeLine{00155\ \textcolor{keyword}{enum\ class}\ LTBThreshold\ :\ u8\ \{}
+\DoxyCodeLine{00156\ \ \ NoHit\ \ \ =\ LTBTHRESHOLD\_NOHIT,}
+\DoxyCodeLine{00158\ \ \ Hit\ \ \ \ \ =\ LTBTHRESHOLD\_HIT,}
+\DoxyCodeLine{00160\ \ \ Beta\ \ \ \ =\ LTBTHRESHOLD\_BETA,}
+\DoxyCodeLine{00162\ \ \ Veto\ \ \ \ =\ LTBTHRESHOLD\_VETO,}
+\DoxyCodeLine{00165\ \ \ Unknown\ =\ LTBTHRESHOLD\_UNKNOWN,}
+\DoxyCodeLine{00166\ \};}
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ std::ostream\&\ operator<<(std::ostream\&\ os,\ \textcolor{keyword}{const}\ LTBThreshold\&\ thresh);}
+\DoxyCodeLine{00169\ }
+\DoxyCodeLine{00170\ \textcolor{comment}{/*********************************************************/}}
+\DoxyCodeLine{00171\ }
+\DoxyCodeLine{00179\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structRBEventHeader}{RBEventHeader}}\ \{}
+\DoxyCodeLine{00180\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ HEAD\ =\ 0xAAAA;}
+\DoxyCodeLine{00181\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ TAIL\ =\ 0x5555;}
+\DoxyCodeLine{00182\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ SIZE\ =\ 30;\ \textcolor{comment}{//\ size\ in\ bytes\ with\ HEAD\ and\ TAIL}}
+\DoxyCodeLine{00183\ }
+\DoxyCodeLine{00184\ \ \ u8\ \ \ rb\_id\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00185\ \ \ u32\ \ event\_id\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00186\ \ \ u8\ \ \ status\_byte\ \ \ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00187\ \ \ u16\ \ channel\_mask\ \ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00188\ \ \ u16\ \ stop\_cell\ \ \ \ \ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00189\ \ \ u16\ \ ch9\_amp\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00190\ \ \ u16\ \ ch9\_freq\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00191\ \ \ u16\ \ ch9\_phase\ \ \ \ \ \ \ \ \ \ \ \ \ =\ 0;\ }
+\DoxyCodeLine{00192\ \ \ u16\ \ fpga\_temp\ \ \ \ \ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00193\ \ \ u32\ \ timestamp32\ \ \ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00194\ \ \ u16\ \ timestamp16\ \ \ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00195\ \ \ }
+\DoxyCodeLine{00196\ \ \ \mbox{\hyperlink{structRBEventHeader}{RBEventHeader}}();}
+\DoxyCodeLine{00197\ \ }
+\DoxyCodeLine{00198\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ from\_bytestream(\textcolor{keyword}{const}\ Vec<u8>\ \&bytestream,\ u64\ \&pos)}
+\DoxyCodeLine{00199\ \ \ \ \ -\/>\ r::Result<RBEventHeader,\ Gaps::IOError>;}
+\DoxyCodeLine{00200\ }
+\DoxyCodeLine{00201\ \ \ \textcolor{keyword}{auto}\ get\_channels()\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ -\/>\ Vec<u8>;}
+\DoxyCodeLine{00202\ \ \ \textcolor{keyword}{auto}\ get\_nchan()\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ -\/>\ u8;}
+\DoxyCodeLine{00203\ \ \ \textcolor{keyword}{auto}\ get\_active\_data\_channels()\ \textcolor{keyword}{const}\ -\/>\ Vec<u8>;}
+\DoxyCodeLine{00204\ \ \ \textcolor{keyword}{auto}\ has\_ch9()\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ -\/>\ bool;}
+\DoxyCodeLine{00205\ \ \ \textcolor{keyword}{auto}\ get\_n\_datachan()\ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ -\/>\ u8;}
+\DoxyCodeLine{00206\ \ \ \textcolor{keyword}{auto}\ get\_fpga\_temp()\ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ -\/>\ f32;}
+\DoxyCodeLine{00207\ \ \ \textcolor{keyword}{auto}\ is\_event\_fragment()\ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ -\/>\ bool;}
+\DoxyCodeLine{00208\ \ \ \textcolor{keyword}{auto}\ drs\_lost\_trigger()\ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ -\/>\ bool;}
+\DoxyCodeLine{00209\ \ \ \textcolor{keyword}{auto}\ lost\_lock()\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ -\/>\ bool;}
+\DoxyCodeLine{00210\ \ \ \textcolor{keyword}{auto}\ lost\_lock\_last\_sec()\ \ \ \ \ \ \ \textcolor{keyword}{const}\ -\/>\ bool;}
+\DoxyCodeLine{00211\ \ \ \textcolor{keyword}{auto}\ is\_locked()\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ -\/>\ bool;}
+\DoxyCodeLine{00212\ \ \ \textcolor{keyword}{auto}\ is\_locked\_last\_sec()\ \ \ \ \ \ \ \textcolor{keyword}{const}\ -\/>\ bool;}
+\DoxyCodeLine{00213\ \ \ \textcolor{keyword}{auto}\ get\_sine\_fit()\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ -\/>\ std::array<f32,3>;}
+\DoxyCodeLine{00215\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structRBEventHeader_a6cae56a64c0233af2c2fa54855ec782c}{get\_timestamp48}}()\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ -\/>\ u64;}
+\DoxyCodeLine{00217\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structRBEventHeader_a2b42751257bbb30f65c11061c8ff6fd5}{to\_string}}()\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ -\/>\ std::string;}
+\DoxyCodeLine{00218\ \};}
+\DoxyCodeLine{00219\ }
+\DoxyCodeLine{00220\ \textcolor{comment}{/***********************************************}}
+\DoxyCodeLine{00221\ \textcolor{comment}{\ *\ Reconstructed\ waveform\ peak\ information}}
+\DoxyCodeLine{00222\ \textcolor{comment}{\ *\ }}
+\DoxyCodeLine{00223\ \textcolor{comment}{\ *\ There\ should\ be\ one\ TofHit\ per\ reconstructed}}
+\DoxyCodeLine{00224\ \textcolor{comment}{\ *\ peak}}
+\DoxyCodeLine{00225\ \textcolor{comment}{\ *\ }}
+\DoxyCodeLine{00226\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00227\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00228\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structTofHit}{TofHit}}\ \ \{}
+\DoxyCodeLine{00229\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ HEAD\ =\ 0xF0F0;}
+\DoxyCodeLine{00230\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ TAIL\ =\ 0xF0F;}
+\DoxyCodeLine{00231\ }
+\DoxyCodeLine{00232\ \ \ u8\ \ \ paddle\_id;}
+\DoxyCodeLine{00233\ \ \ \textcolor{comment}{//\ deprecated}}
+\DoxyCodeLine{00234\ \ \ \textcolor{keywordtype}{bool}\ broken;}
+\DoxyCodeLine{00235\ }
+\DoxyCodeLine{00236\ \ \ \textcolor{comment}{//\ new\ variables\ for\ V1}}
+\DoxyCodeLine{00237\ \ \ Gaps::ProtocolVersion\ version;}
+\DoxyCodeLine{00238\ \ \ f32\ baseline\_a;}
+\DoxyCodeLine{00239\ \ \ f32\ baseline\_a\_rms;}
+\DoxyCodeLine{00240\ \ \ f32\ baseline\_b;}
+\DoxyCodeLine{00241\ \ \ f32\ baseline\_b\_rms;}
+\DoxyCodeLine{00242\ \ \ f32\ phase;}
+\DoxyCodeLine{00243\ }
+\DoxyCodeLine{00244\ \ \ \textcolor{comment}{//\ event\ wide\ calculated\ time}}
+\DoxyCodeLine{00245\ \ \ f32\ event\_t0\ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00246\ }
+\DoxyCodeLine{00247\ \ \ u32\ timestamp32;}
+\DoxyCodeLine{00248\ \ \ u16\ timestamp16;}
+\DoxyCodeLine{00249\ \ \ \textcolor{comment}{//\ don't\ serialize}}
+\DoxyCodeLine{00250\ \ \ f32\ paddle\_len\ \ \ \ =\ 0;\ \ }
+\DoxyCodeLine{00251\ \ \ f32\ coax\_cbl\_time\ =\ 0;}
+\DoxyCodeLine{00252\ \ \ f32\ hart\_cbl\_time\ =\ 0;}
+\DoxyCodeLine{00253\ }
+\DoxyCodeLine{00254\ \ \ u8\ ctr\_etx;}
+\DoxyCodeLine{00255\ \ \ u16\ tail\ =\ 0xF0F;\ }
+\DoxyCodeLine{00256\ }
+\DoxyCodeLine{00257\ \ \ \textcolor{keyword}{auto}\ get\_time\_a()\ \ \ \ \ \ \ \textcolor{keyword}{const}\ -\/>\ f32;}
+\DoxyCodeLine{00258\ \ \ \textcolor{keyword}{auto}\ get\_time\_b()\ \ \ \ \ \ \ \textcolor{keyword}{const}\ -\/>\ f32;}
+\DoxyCodeLine{00259\ \ \ \textcolor{keyword}{auto}\ get\_peak\_a()\ \ \ \ \ \ \ \textcolor{keyword}{const}\ -\/>\ f32;}
+\DoxyCodeLine{00260\ \ \ \textcolor{keyword}{auto}\ get\_peak\_b()\ \ \ \ \ \ \ \textcolor{keyword}{const}\ -\/>\ f32;}
+\DoxyCodeLine{00261\ \ \ \textcolor{keyword}{auto}\ get\_charge\_a()\ \ \ \ \ \textcolor{keyword}{const}\ -\/>\ f32;}
+\DoxyCodeLine{00262\ \ \ \textcolor{keyword}{auto}\ get\_charge\_b()\ \ \ \ \ \textcolor{keyword}{const}\ -\/>\ f32;}
+\DoxyCodeLine{00263\ \ \ \textcolor{keyword}{auto}\ get\_charge\_min\_i()\ \textcolor{keyword}{const}\ -\/>\ f32;}
+\DoxyCodeLine{00264\ \ \ \textcolor{keyword}{auto}\ get\_x\_pos()\ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ -\/>\ f32;}
+\DoxyCodeLine{00265\ \ \ \textcolor{keyword}{auto}\ get\_t\_avg()\ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ -\/>\ f32;}
+\DoxyCodeLine{00268\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structTofHit_a72216541b1b4e1a929e758656a94bd3b}{get\_t0\_relative}}()\ \ \textcolor{keyword}{const}\ -\/>\ f32;}
+\DoxyCodeLine{00269\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structTofHit_a0e754d21dd5f47f7e9c3196099b3b229}{get\_timestamp48}}()\ \ \textcolor{keyword}{const}\ -\/>\ f64;}
+\DoxyCodeLine{00270\ }
+\DoxyCodeLine{00273\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{structTofHit_aea570005131df3d3077d25512df181e2}{set\_paddle\_len}}(f32\ paddle\_len);}
+\DoxyCodeLine{00274\ }
+\DoxyCodeLine{00275\ \textcolor{preprocessor}{\ \ \#if\ BUILD\_CXX\_DB}}
+\DoxyCodeLine{00276\ \ \ \textcolor{keyword}{auto}\ set\_paddle(\textcolor{keyword}{const}\ \mbox{\hyperlink{structGaps_1_1TofPaddle}{Gaps::TofPaddle}}\&\ paddle)\ -\/>\ void;}
+\DoxyCodeLine{00277\ \ \ \textcolor{keyword}{auto}\ get\_phase\_delay()\ \textcolor{keyword}{const}\ -\/>\ f32;}
+\DoxyCodeLine{00278\ \ \ \textcolor{keyword}{auto}\ get\_cable\_delay()\ \textcolor{keyword}{const}\ -\/>\ f32;}
+\DoxyCodeLine{00279\ \ \ \textcolor{keyword}{auto}\ get\_t0()\ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ -\/>\ f32;}
+\DoxyCodeLine{00280\ \ \ \textcolor{keyword}{auto}\ get\_edep()\ \ \ \ \ \ \ \ \textcolor{keyword}{const}\ -\/>\ f32;}
+\DoxyCodeLine{00281\ \textcolor{preprocessor}{\ \ \#endif}}
+\DoxyCodeLine{00282\ }
+\DoxyCodeLine{00283\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ from\_bytestream(\textcolor{keyword}{const}\ Vec<u8>\ \&bytestream,\ u64\ \&pos)}
+\DoxyCodeLine{00284\ \ \ \ \ -\/>\ \mbox{\hyperlink{structTofHit}{TofHit}};}
+\DoxyCodeLine{00285\ \ }
+\DoxyCodeLine{00286\ \ \ \textcolor{comment}{//\ easier\ print\ out}}
+\DoxyCodeLine{00287\ \ \ \textcolor{keyword}{auto}\ to\_string()\ \textcolor{keyword}{const}\ -\/>\ std::string;}
+\DoxyCodeLine{00288\ \ \ }
+\DoxyCodeLine{00289\ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00290\ \ \ \ \ \textcolor{comment}{//\ we\ keep\ this\ private,\ since\ }}
+\DoxyCodeLine{00291\ \ \ \ \ \textcolor{comment}{//\ the\ user\ should\ use\ the\ getters}}
+\DoxyCodeLine{00292\ \ \ \ \ \textcolor{comment}{//\ to\ get\ the\ values\ converted\ }}
+\DoxyCodeLine{00293\ \ \ \ \ \textcolor{comment}{//\ back\ to\ f32}}
+\DoxyCodeLine{00294\ \ \ \ \ \textcolor{comment}{//\ deprecated,\ but\ kept\ for\ compatibility}}
+\DoxyCodeLine{00295\ \ \ \ \ u16\ time\_a;}
+\DoxyCodeLine{00296\ \ \ \ \ u16\ time\_b;}
+\DoxyCodeLine{00297\ \ \ \ \ u16\ peak\_a;}
+\DoxyCodeLine{00298\ \ \ \ \ u16\ peak\_b;}
+\DoxyCodeLine{00299\ \ \ \ \ u16\ charge\_a;}
+\DoxyCodeLine{00300\ \ \ \ \ u16\ charge\_b;}
+\DoxyCodeLine{00301\ \ \ \ \ u16\ charge\_min\_i;}
+\DoxyCodeLine{00302\ \ \ \ \ u16\ x\_pos;}
+\DoxyCodeLine{00303\ \ \ \ \ u16\ t\_average;}
+\DoxyCodeLine{00304\ \ \ \ \ }
+\DoxyCodeLine{00305\ \ \ \ \ f32\ time\_a\_f32\ \ \ =\ 0;}
+\DoxyCodeLine{00306\ \ \ \ \ f32\ time\_b\_f32\ \ \ =\ 0;}
+\DoxyCodeLine{00307\ \ \ \ \ f32\ peak\_a\_f32\ \ \ =\ 0;}
+\DoxyCodeLine{00308\ \ \ \ \ f32\ peak\_b\_f32\ \ \ =\ 0;}
+\DoxyCodeLine{00309\ \ \ \ \ f32\ charge\_a\_f32\ =\ 0;}
+\DoxyCodeLine{00310\ \ \ \ \ f32\ charge\_b\_f32\ =\ 0;}
+\DoxyCodeLine{00311\ \};}
+\DoxyCodeLine{00312\ }
+\DoxyCodeLine{00321\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structRBEvent}{RBEvent}}\ \{}
+\DoxyCodeLine{00322\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ HEAD\ =\ 0xAAAA;}
+\DoxyCodeLine{00323\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ TAIL\ =\ 0x5555;}
+\DoxyCodeLine{00324\ }
+\DoxyCodeLine{00325\ \ \ \textcolor{comment}{//\ data\ type\ will\ be\ an\ enum}}
+\DoxyCodeLine{00326\ \ \ u8\ \ \ \ \ \ \ \ \ \ \ \ data\_type\ =\ 0;}
+\DoxyCodeLine{00327\ \ \ EventStatus\ \ \ status\ \ \ \ =\ EventStatus::Unknown;}
+\DoxyCodeLine{00328\ \ \ \mbox{\hyperlink{structRBEventHeader}{RBEventHeader}}\ header\ \ \ \ =\ \mbox{\hyperlink{structRBEventHeader}{RBEventHeader}}();}
+\DoxyCodeLine{00329\ \ \ Vec<Vec<u16>>\ adc\ \ \ \ \ \ \ =\ Vec<Vec<u16>>();\ }
+\DoxyCodeLine{00330\ \ \ Vec<TofHit>\ \ \ hits\ \ \ \ \ \ =\ Vec<TofHit>();\ \ }
+\DoxyCodeLine{00331\ \ }
+\DoxyCodeLine{00332\ \ \ \mbox{\hyperlink{structRBEvent}{RBEvent}}();}
+\DoxyCodeLine{00333\ }
+\DoxyCodeLine{00334\ \ \ \textcolor{keyword}{auto}\ get\_channel\_by\_label(u8\ channel)\ \textcolor{keyword}{const}\ -\/>\ \textcolor{keyword}{const}\ Vec<u16>\&;}
+\DoxyCodeLine{00335\ \ \ \textcolor{keyword}{auto}\ get\_channel\_by\_id(u8\ channel)\ \ \ \ \textcolor{keyword}{const}\ -\/>\ \textcolor{keyword}{const}\ Vec<u16>\&;}
+\DoxyCodeLine{00336\ }
+\DoxyCodeLine{00337\ \ \ \textcolor{keyword}{auto}\ get\_channel\_adc(u8\ channel)\ \textcolor{keyword}{const}\ -\/>\ \textcolor{keyword}{const}\ Vec<u16>\&;\ }
+\DoxyCodeLine{00338\ \ }
+\DoxyCodeLine{00340\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structRBEvent_a4ea69d298fb6dba54f44e9b77c4698ac}{calc\_baseline}}(\textcolor{keyword}{const}\ Vec<f32>\ \&volts,\ usize\ min\_bin,\ usize\ max\_bin)\ -\/>\ f32;\ }
+\DoxyCodeLine{00341\ }
+\DoxyCodeLine{00342\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ from\_bytestream(\textcolor{keyword}{const}\ Vec<u8>\ \&bytestream,\ u64\ \&pos)}
+\DoxyCodeLine{00343\ \ \ \ \ -\/>\ \mbox{\hyperlink{structRBEvent}{RBEvent}};}
+\DoxyCodeLine{00344\ }
+\DoxyCodeLine{00345\ \ \ \textcolor{keyword}{auto}\ to\_string()\ \textcolor{keyword}{const}\ -\/>\ std::string;}
+\DoxyCodeLine{00346\ }
+\DoxyCodeLine{00347\ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00348\ }
+\DoxyCodeLine{00353\ \ \ \ \ \textcolor{keyword}{auto}\ channel\_check(u8\ channel)\ \textcolor{keyword}{const}\ -\/>\ bool;}
+\DoxyCodeLine{00354\ \ \ \ \ Vec<u16>\ \_empty\_channel\ =\ Vec<u16>();}
+\DoxyCodeLine{00355\ \};}
+\DoxyCodeLine{00356\ }
+\DoxyCodeLine{00363\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structRBMissingHit}{RBMissingHit}}\ \{}
+\DoxyCodeLine{00364\ \ \ [[deprecated(\textcolor{stringliteral}{"{}Unused/not\ useful\ deemed\ feature"{}})]]}
+\DoxyCodeLine{00365\ \ \ }
+\DoxyCodeLine{00366\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ HEAD\ =\ 0xAAAA;}
+\DoxyCodeLine{00367\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ TAIL\ =\ 0x5555;}
+\DoxyCodeLine{00368\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ usize\ SIZE\ =\ 15;\ \textcolor{comment}{//\ bytes}}
+\DoxyCodeLine{00369\ \ \ }
+\DoxyCodeLine{00370\ \ \ u32\ event\_id\ \ \ \ \ ;\ \ }
+\DoxyCodeLine{00371\ \ \ u8\ \ ltb\_hit\_index;\ \ }
+\DoxyCodeLine{00372\ \ \ u8\ \ ltb\_id\ \ \ \ \ \ \ ;\ \ }
+\DoxyCodeLine{00373\ \ \ u8\ \ ltb\_dsi\ \ \ \ \ \ ;\ \ }
+\DoxyCodeLine{00374\ \ \ u8\ \ ltb\_j\ \ \ \ \ \ \ \ ;\ \ }
+\DoxyCodeLine{00375\ \ \ u8\ \ ltb\_ch\ \ \ \ \ \ \ ;\ \ }
+\DoxyCodeLine{00376\ \ \ u8\ \ rb\_id\ \ \ \ \ \ \ \ ;\ \ }
+\DoxyCodeLine{00377\ \ \ u8\ \ rb\_ch\ \ \ \ \ \ \ \ ;\ \ }
+\DoxyCodeLine{00378\ }
+\DoxyCodeLine{00379\ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{structRBMissingHit}{RBMissingHit}}\ from\_bytestream(\textcolor{keyword}{const}\ Vec<u8>\ \&bytestream,}
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ u64\ \&pos);}
+\DoxyCodeLine{00381\ \};}
+\DoxyCodeLine{00382\ }
+\DoxyCodeLine{00383\ \textcolor{comment}{/*********************************************************/}}
+\DoxyCodeLine{00384\ }
+\DoxyCodeLine{00385\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ EVENT\_QUALITY\_UNKNOWN\ \ \ \ \ \ \ \ \ =\ \ 0;}
+\DoxyCodeLine{00386\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ EVENT\_QUALITY\_SILVER\ \ \ \ \ \ \ \ \ \ =\ \ 10;}
+\DoxyCodeLine{00387\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ EVENT\_QUALITY\_GOLD\ \ \ \ \ \ \ \ \ \ \ \ =\ \ 20;}
+\DoxyCodeLine{00388\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ EVENT\_QUALITY\_DIAMOND\ \ \ \ \ \ \ \ \ =\ \ 30;}
+\DoxyCodeLine{00389\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ EVENT\_QUALITY\_FOURLEAFCLOVER\ \ =\ \ 40;}
+\DoxyCodeLine{00390\ }
+\DoxyCodeLine{00391\ }
+\DoxyCodeLine{00398\ \textcolor{keyword}{enum\ class}\ EventQuality\ :\ u8\ \{}
+\DoxyCodeLine{00399\ \ \ Unknown\ \ \ \ \ \ \ \ =\ EVENT\_QUALITY\_UNKNOWN,}
+\DoxyCodeLine{00400\ \ \ Silver\ \ \ \ \ \ \ \ \ =\ EVENT\_QUALITY\_SILVER,}
+\DoxyCodeLine{00401\ \ \ Gold\ \ \ \ \ \ \ \ \ \ \ =\ EVENT\_QUALITY\_GOLD,}
+\DoxyCodeLine{00402\ \ \ Diamond\ \ \ \ \ \ \ \ =\ EVENT\_QUALITY\_DIAMOND,}
+\DoxyCodeLine{00407\ \ \ FourLeafClover\ =\ EVENT\_QUALITY\_FOURLEAFCLOVER}
+\DoxyCodeLine{00408\ \};}
+\DoxyCodeLine{00409\ }
+\DoxyCodeLine{00410\ std::ostream\&\ operator<<(std::ostream\&\ os,\ \textcolor{keyword}{const}\ EventQuality\&\ qual);}
+\DoxyCodeLine{00411\ }
+\DoxyCodeLine{00412\ \textcolor{comment}{/*********************************************************/}}
+\DoxyCodeLine{00413\ }
+\DoxyCodeLine{00414\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ COMPRESSION\_LEVEL\_UNKNOWN\ \ \ \ \ \ \ \ \ =\ \ 0;}
+\DoxyCodeLine{00415\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ u8\ COMPRESSION\_LEVEL\_NONE\ \ \ \ \ \ \ \ \ \ \ \ =\ \ 10;}
+\DoxyCodeLine{00416\ }
+\DoxyCodeLine{00417\ \textcolor{keyword}{enum\ class}\ CompressionLevel\ :\ u8\ \{}
+\DoxyCodeLine{00418\ \ \ Unknown\ \ \ \ \ \ \ \ =\ COMPRESSION\_LEVEL\_UNKNOWN,}
+\DoxyCodeLine{00419\ \ \ None\ \ \ \ \ \ \ \ \ \ \ =\ COMPRESSION\_LEVEL\_NONE,}
+\DoxyCodeLine{00420\ \};}
+\DoxyCodeLine{00421\ }
+\DoxyCodeLine{00422\ std::ostream\&\ operator<<(std::ostream\&\ os,\ \textcolor{keyword}{const}\ CompressionLevel\&\ level);}
+\DoxyCodeLine{00423\ }
+\DoxyCodeLine{00424\ }
+\DoxyCodeLine{00443\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structMasterTriggerEvent}{MasterTriggerEvent}}\ \{}
+\DoxyCodeLine{00445\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ \mbox{\hyperlink{structMasterTriggerEvent_ab0ef9b6a29d44f1771cedc15e077a16f}{HEAD}}\ =\ 0xAAAA;}
+\DoxyCodeLine{00447\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ \mbox{\hyperlink{structMasterTriggerEvent_a747c17bdb302ac0a1609df7c63f52bce}{TAIL}}\ =\ 0x5555;}
+\DoxyCodeLine{00449\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ usize\ \mbox{\hyperlink{structMasterTriggerEvent_a9e1848db7aa8353345ce582d0ee5b688}{SIZE}}\ =\ 0;\ \textcolor{comment}{//\ size\ in\ bytes}}
+\DoxyCodeLine{00451\ \ \ EventStatus\ event\_status\ =\ EventStatus::Unknown;}
+\DoxyCodeLine{00453\ \ \ u32\ \mbox{\hyperlink{structMasterTriggerEvent_a2fc1e8b3d4f1e769b4bce8a58a166c78}{event\_id}}\ \ \ \ \ \ \ \ \ \ \ \ \ =\ 0;\ }
+\DoxyCodeLine{00455\ \ \ u32\ \mbox{\hyperlink{structMasterTriggerEvent_a886a68d557a93210b86b3e2d1b96bfa9}{timestamp}}\ \ \ \ \ \ \ \ \ \ \ \ =\ 0;\ }
+\DoxyCodeLine{00457\ \ \ u32\ \mbox{\hyperlink{structMasterTriggerEvent_a30d57d1dc8bd9e7fc55d1af7ad6ebc92}{tiu\_timestamp}}\ \ \ \ \ \ \ \ =\ 0;\ }
+\DoxyCodeLine{00459\ \ \ u32\ \mbox{\hyperlink{structMasterTriggerEvent_aa49962e24c04ede5087ff1876feecd36}{tiu\_gps32}}\ \ \ \ \ \ \ \ \ \ \ \ =\ 0;\ }
+\DoxyCodeLine{00461\ \ \ u32\ \mbox{\hyperlink{structMasterTriggerEvent_ab7def730b945ec5fb1da944dbd95ab25}{tiu\_gps16}}\ \ \ \ \ \ \ \ \ \ \ \ =\ 0;\ }
+\DoxyCodeLine{00463\ \ \ u32\ \mbox{\hyperlink{structMasterTriggerEvent_ab438df14fccd804df45411f51a85719b}{crc}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00464\ \ \ u16\ trigger\_source\ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00465\ \ \ u32\ dsi\_j\_mask\ \ \ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00466\ \ \ Vec<u16>\ channel\_mask\ \ \ \ =\ Vec<u16>();}
+\DoxyCodeLine{00467\ \ \ u64\ mtb\_link\_mask\ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00468\ \ \ }
+\DoxyCodeLine{00469\ \ \ \mbox{\hyperlink{structMasterTriggerEvent}{MasterTriggerEvent}}();}
+\DoxyCodeLine{00470\ \ \ }
+\DoxyCodeLine{00473\ \ \ [[deprecated(\textcolor{stringliteral}{"{}The\ format\ of\ the\ gps\ timestamp\ changed\ and\ it\ is\ only\ 32\ bits\ as\ of\ now"{}})]]}
+\DoxyCodeLine{00474\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structMasterTriggerEvent_ad3c4ac7bb6281b653e0acbc6b12d08cb}{get\_timestamp\_gps48}}()\ const\ -\/>\ u64;}
+\DoxyCodeLine{00476\ \ \ auto\ \mbox{\hyperlink{structMasterTriggerEvent_a7d8ab2286a38201ff595780f7fdaebdd}{get\_timestamp\_gps}}()\ const\ -\/>\ u32;}
+\DoxyCodeLine{00479\ \ \ auto\ \mbox{\hyperlink{structMasterTriggerEvent_a4e5f49e1159baa964c9e0ae92022e32d}{get\_timestamp\_abs48}}()\ const\ -\/>\ u64;}
+\DoxyCodeLine{00480\ \ \ auto\ get\_rb\_link\_ids()\ \ \ \ \ const\ -\/>\ Vec<u8>;}
+\DoxyCodeLine{00493\ \ \ auto\ \mbox{\hyperlink{structMasterTriggerEvent_ade4e97a28b5e4fbf813a0a76f4697f04}{get\_trigger\_hits}}()\ const\ }
+\DoxyCodeLine{00494\ \ \ \ \ -\/>\ Vec<std::tuple<u8,\ u8,\ u8,\ LTBThreshold>>;}
+\DoxyCodeLine{00495\ }
+\DoxyCodeLine{00497\ \ \ auto\ \mbox{\hyperlink{structMasterTriggerEvent_a5c3ff428d20e4ccf4482e97f52a88371}{get\_trigger\_sources}}()\ const\ -\/>\ Vec<TriggerType>;\ }
+\DoxyCodeLine{00509\ \ \ static\ auto\ \mbox{\hyperlink{structMasterTriggerEvent_a315575319015cffa18d2637e942222bb}{from\_bytestream}}(const\ Vec<u8>\ \&bytestream,\ u64\ \&pos)}
+\DoxyCodeLine{00510\ \ \ \ \ -\/>\ \mbox{\hyperlink{structMasterTriggerEvent}{MasterTriggerEvent}};}
+\DoxyCodeLine{00512\ \ \ auto\ \mbox{\hyperlink{structMasterTriggerEvent_ae782da4a20e32d2f928f79927d71900e}{to\_string}}()\ const\ -\/>\ std::\textcolor{keywordtype}{string};}
+\DoxyCodeLine{00513\ \};}
+\DoxyCodeLine{00514\ }
+\DoxyCodeLine{00528\ struct\ \mbox{\hyperlink{structTofEvent}{TofEvent}}\ \{}
+\DoxyCodeLine{00529\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ \mbox{\hyperlink{structMasterTriggerEvent_ab0ef9b6a29d44f1771cedc15e077a16f}{HEAD}}\ =\ 0xAAAA;}
+\DoxyCodeLine{00530\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ \mbox{\hyperlink{structMasterTriggerEvent_a747c17bdb302ac0a1609df7c63f52bce}{TAIL}}\ =\ 0x5555;}
+\DoxyCodeLine{00531\ }
+\DoxyCodeLine{00532\ \ \ EventStatus\ status;}
+\DoxyCodeLine{00533\ \ \ \mbox{\hyperlink{structTofEventHeader}{TofEventHeader}}\ header;}
+\DoxyCodeLine{00534\ \ \ \mbox{\hyperlink{structMasterTriggerEvent}{MasterTriggerEvent}}\ mt\_event;}
+\DoxyCodeLine{00535\ }
+\DoxyCodeLine{00538\ \ \ Vec<RBEvent>\ \ \ \ \ \ \mbox{\hyperlink{structTofEvent_a577628b0f2d6beacc40f6bad1adc135a}{rb\_events}};}
+\DoxyCodeLine{00539\ }
+\DoxyCodeLine{00540\ \ \ \mbox{\hyperlink{structTofEvent}{TofEvent}}();}
+\DoxyCodeLine{00541\ }
+\DoxyCodeLine{00553\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structMasterTriggerEvent_a315575319015cffa18d2637e942222bb}{from\_bytestream}}(\textcolor{keyword}{const}\ Vec<u8>\ \&bytestream,\ u64\ \&pos)}
+\DoxyCodeLine{00554\ \ \ \ \ -\/>\ r::Result<TofEvent,\ Gaps::IOError>;}
+\DoxyCodeLine{00555\ }
+\DoxyCodeLine{00567\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ from\_tofpacket(\textcolor{keyword}{const}\ \mbox{\hyperlink{structTofPacket}{TofPacket}}\ \&packet)\ -\/>\ \mbox{\hyperlink{structTofEvent}{TofEvent}};}
+\DoxyCodeLine{00568\ }
+\DoxyCodeLine{00569\ \textcolor{preprocessor}{\ \ \#ifdef\ BUILD\_CXX\_DB}}
+\DoxyCodeLine{00572\ \ \ \textcolor{keyword}{auto}\ set\_paddlemap(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespaceGaps_a84fb383b1df4955afc6ea35a9b15ff44}{Gaps::TofPaddleMap}}\&)\ -\/>\ void;}
+\DoxyCodeLine{00573\ \textcolor{preprocessor}{\ \ \#endif}}
+\DoxyCodeLine{00574\ \ \ \ \ }
+\DoxyCodeLine{00575\ \ \ [[deprecated(\textcolor{stringliteral}{"{}RBMissingHit\ is\ deprecated"{}})]]}
+\DoxyCodeLine{00576\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ get\_n\_rbmissinghits(u32\ mask)\ -\/>\ u32;}
+\DoxyCodeLine{00577\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ get\_n\_rbevents(u32\ mask)\ -\/>\ u32;}
+\DoxyCodeLine{00579\ \ \ \textcolor{keyword}{auto}\ get\_hits()\ const\ -\/>\ Vec<\mbox{\hyperlink{structTofHit}{TofHit}}>;}
+\DoxyCodeLine{00582\ \ \ auto\ normalize\_hit\_times()\ -\/>\ \textcolor{keywordtype}{void};}
+\DoxyCodeLine{00583\ }
+\DoxyCodeLine{00585\ \ \ auto\ \mbox{\hyperlink{structMasterTriggerEvent_ae782da4a20e32d2f928f79927d71900e}{to\_string}}()\ const\ -\/>\ std::\textcolor{keywordtype}{string};}
+\DoxyCodeLine{00586\ }
+\DoxyCodeLine{00590\ \ \ auto\ get\_rbevent(u8\ board\_id)\ const\ -\/>\ const\ \mbox{\hyperlink{structRBEvent}{RBEvent}}\&;\ }
+\DoxyCodeLine{00591\ }
+\DoxyCodeLine{00595\ \ \ auto\ get\_rbids()\ const\ -\/>\ Vec<u8>;}
+\DoxyCodeLine{00596\ }
+\DoxyCodeLine{00597\ \ \ private:}
+\DoxyCodeLine{00602\ \ \ \ \ auto\ passed\_consistency\_check()\ -\/>\ \textcolor{keywordtype}{bool};}
+\DoxyCodeLine{00603\ }
+\DoxyCodeLine{00606\ \ \ \ \ \mbox{\hyperlink{structRBEvent}{RBEvent}}\ \_empty\_event\ =\ \mbox{\hyperlink{structRBEvent}{RBEvent}}();}
+\DoxyCodeLine{00607\ \};}
+\DoxyCodeLine{00608\ }
+\DoxyCodeLine{00609\ }
+\DoxyCodeLine{00610\ \textcolor{comment}{/************************}}
+\DoxyCodeLine{00611\ \textcolor{comment}{\ *\ A\ part\ of\ a\ TofEvent\ }}
+\DoxyCodeLine{00612\ \textcolor{comment}{\ *\ -\/\ a\ single\ waveform\ }}
+\DoxyCodeLine{00613\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00614\ \textcolor{comment}{\ *\ That\ is\ a\ waveform\ for\ }}
+\DoxyCodeLine{00615\ \textcolor{comment}{\ *\ a\ specific\ channel\ for\ a\ }}
+\DoxyCodeLine{00616\ \textcolor{comment}{\ *\ specific\ id.}}
+\DoxyCodeLine{00617\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00618\ \textcolor{comment}{\ *\ Each\ paddle\ has\ 2\ waveforms}}
+\DoxyCodeLine{00619\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00620\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00621\ \textcolor{comment}{\ */}\ }
+\DoxyCodeLine{00622\ struct\ \mbox{\hyperlink{structRBWaveform}{RBWaveform}}\ \{}
+\DoxyCodeLine{00623\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ \mbox{\hyperlink{structMasterTriggerEvent_ab0ef9b6a29d44f1771cedc15e077a16f}{HEAD}}\ =\ 0xAAAA;}
+\DoxyCodeLine{00624\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ \mbox{\hyperlink{structMasterTriggerEvent_a747c17bdb302ac0a1609df7c63f52bce}{TAIL}}\ =\ 0x5555;}
+\DoxyCodeLine{00625\ }
+\DoxyCodeLine{00626\ \ \ u32\ \ \ \ \ \ \ \mbox{\hyperlink{structMasterTriggerEvent_a2fc1e8b3d4f1e769b4bce8a58a166c78}{event\_id}}\ \ \ \ \ ;\ }
+\DoxyCodeLine{00627\ \ \ u8\ \ \ \ \ \ \ \ rb\_id\ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00628\ \ \ u8\ \ \ \ \ \ \ \ rb\_channel\_a\ ;\ }
+\DoxyCodeLine{00629\ \ \ u8\ \ \ \ \ \ \ \ rb\_channel\_b\ ;}
+\DoxyCodeLine{00630\ \ \ u16\ \ \ \ \ \ \ stop\_cell\ \ \ \ ;}
+\DoxyCodeLine{00631\ \ \ Vec<u16>\ \ adc\_a\ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00632\ \ \ Vec<u16>\ \ adc\_b\ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00633\ \ \ }
+\DoxyCodeLine{00634\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structMasterTriggerEvent_a315575319015cffa18d2637e942222bb}{from\_bytestream}}(\textcolor{keyword}{const}\ Vec<u8>\ \&bytestream,\ u64\ \&pos)\ -\/>\ \mbox{\hyperlink{structRBWaveform}{RBWaveform}};}
+\DoxyCodeLine{00635\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structMasterTriggerEvent_ae782da4a20e32d2f928f79927d71900e}{to\_string}}()\ \textcolor{keyword}{const}\ -\/>\ std::string;}
+\DoxyCodeLine{00636\ \};}
+\DoxyCodeLine{00637\ }
+\DoxyCodeLine{00638\ }
+\DoxyCodeLine{00645\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structTofEventSummary}{TofEventSummary}}\ \{}
+\DoxyCodeLine{00646\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ HEAD\ =\ 0xAAAA;}
+\DoxyCodeLine{00647\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ u16\ TAIL\ =\ 0x5555;}
+\DoxyCodeLine{00648\ }
+\DoxyCodeLine{00649\ \ \ Gaps::ProtocolVersion\ version\ ;}
+\DoxyCodeLine{00650\ \ \ EventStatus\ status\ \ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00651\ \ \ u8\ \ \ \ \ \ \ \ \ \ quality\ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00652\ \ \ u16\ \ \ \ \ \ \ \ \ trigger\_sources\ \ \ ;\ }
+\DoxyCodeLine{00656\ \ \ u8\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structTofEventSummary_aa3587b9819d57488a264b78e0fdb630e}{n\_trigger\_paddles}}\ ;\ }
+\DoxyCodeLine{00657\ \ \ u32\ \ \ \ \ \ \ \ \ event\_id\ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00658\ \ \ u16\ \ \ \ \ \ \ \ \ run\_id\ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00659\ \ \ u32\ \ \ \ \ \ \ \ \ timestamp32\ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00660\ \ \ u16\ \ \ \ \ \ \ \ \ timestamp16\ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00661\ \ \ \textcolor{comment}{//\ deprecated,\ won't\ get\ serialized}}
+\DoxyCodeLine{00662\ \ \ \textcolor{comment}{//u16\ \ \ \ \ \ \ \ \ primary\_beta\ \ \ \ \ \ ;\ }}
+\DoxyCodeLine{00663\ \ \ \textcolor{comment}{//u16\ \ \ \ \ \ \ \ \ primary\_charge\ \ \ \ ;}}
+\DoxyCodeLine{00664\ \ \ }
+\DoxyCodeLine{00665\ \ \ u16\ \ \ \ \ \ \ \ \ drs\_dead\_lost\_hits;\ }
+\DoxyCodeLine{00666\ \ \ u32\ \ \ \ \ \ \ \ \ dsi\_j\_mask\ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00667\ \ \ Vec<u16>\ \ \ \ channel\_mask\ \ \ \ \ \ ;}
+\DoxyCodeLine{00668\ \ \ u64\ \ \ \ \ \ \ \ \ mtb\_link\_mask\ \ \ \ \ ;}
+\DoxyCodeLine{00669\ \ \ Vec<TofHit>\ hits\ \ \ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00670\ \ \ }
+\DoxyCodeLine{00671\ \ \ \textcolor{comment}{//\ flight\ computer\ event\ variable\ packet}}
+\DoxyCodeLine{00672\ \ \ u8\ \ \ \ \ \ \ \ \ \ n\_hits\_umb\ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00673\ \ \ u8\ \ \ \ \ \ \ \ \ \ n\_hits\_cbe\ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00674\ \ \ u8\ \ \ \ \ \ \ \ \ \ n\_hits\_cor\ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00675\ \ \ f32\ \ \ \ \ \ \ \ \ tot\_edep\_umb\ \ \ \ \ \ ;}
+\DoxyCodeLine{00676\ \ \ f32\ \ \ \ \ \ \ \ \ tot\_edep\_cbe\ \ \ \ \ \ ;}
+\DoxyCodeLine{00677\ \ \ f32\ \ \ \ \ \ \ \ \ tot\_edep\_cor\ \ \ \ \ \ ;}
+\DoxyCodeLine{00678\ \ \ }
+\DoxyCodeLine{00679\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ from\_tofpacket(\textcolor{keyword}{const}\ \mbox{\hyperlink{structTofPacket}{TofPacket}}\ \&packet)\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00680\ \ \ \ \ -\/>\ r::Result<TofEventSummary,\ Gaps::IOError>;}
+\DoxyCodeLine{00681\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ from\_bytestream(\textcolor{keyword}{const}\ Vec<u8>\ \&stream,\ u64\ \&pos)\ -\/>\ r::Result<TofEventSummary,\ Gaps::IOError>\ ;}
+\DoxyCodeLine{00682\ \ \ }
+\DoxyCodeLine{00683\ \textcolor{preprocessor}{\ \ \#ifdef\ BUILD\_CXX\_DB}}
+\DoxyCodeLine{00686\ \ \ \textcolor{keyword}{auto}\ set\_paddlemap(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespaceGaps_a84fb383b1df4955afc6ea35a9b15ff44}{Gaps::TofPaddleMap}}\&)\ -\/>\ void;}
+\DoxyCodeLine{00689\ \ \ \textcolor{keyword}{auto}\ normalize\_hit\_times()\ -\/>\ void;}
+\DoxyCodeLine{00690\ \textcolor{preprocessor}{\ \ \#endif}}
+\DoxyCodeLine{00691\ }
+\DoxyCodeLine{00692\ \ \ \textcolor{comment}{//\ combined\ timestamp}}
+\DoxyCodeLine{00693\ \ \ \textcolor{keyword}{auto}\ get\_timestamp48()\ const\ -\/>\ u64;}
+\DoxyCodeLine{00694\ \ }
+\DoxyCodeLine{00695\ \ \ auto\ get\_rb\_link\_ids()\ const\ -\/>\ Vec<u8>;}
+\DoxyCodeLine{00696\ \ \ }
+\DoxyCodeLine{00709\ \ \ auto\ get\_trigger\_hits()\ const\ -\/>\ Vec<std::tuple<u8,\ u8,\ u8,\ LTBThreshold>>;}
+\DoxyCodeLine{00711\ \ \ auto\ get\_trigger\_sources()\ const\ -\/>\ Vec<TriggerType>;\ }
+\DoxyCodeLine{00712\ \ \ }
+\DoxyCodeLine{00713\ \ \ auto\ to\_string()\ const\ -\/>\ std::\textcolor{keywordtype}{string};}
+\DoxyCodeLine{00714\ \};}
+\DoxyCodeLine{00715\ }
+\DoxyCodeLine{00716\ std::ostream\&\ operator<<(std::ostream\&\ os,\ const\ \mbox{\hyperlink{structTofHit}{TofHit}}\&\ pad);}
+\DoxyCodeLine{00717\ }
+\DoxyCodeLine{00718\ std::ostream\&\ operator<<(std::ostream\&\ os,\ const\ \mbox{\hyperlink{structMasterTriggerEvent}{MasterTriggerEvent}}\&\ mt);}
+\DoxyCodeLine{00719\ }
+\DoxyCodeLine{00720\ std::ostream\&\ operator<<(std::ostream\&\ os,\ const\ \mbox{\hyperlink{structTofEvent}{TofEvent}}\&\ et);}
+\DoxyCodeLine{00721\ }
+\DoxyCodeLine{00722\ std::ostream\&\ operator<<(std::ostream\&\ os,\ const\ \mbox{\hyperlink{structRBEvent}{RBEvent}}\&\ re);}
+\DoxyCodeLine{00723\ }
+\DoxyCodeLine{00724\ std::ostream\&\ operator<<(std::ostream\&\ os,\ const\ \mbox{\hyperlink{structRBEventHeader}{RBEventHeader}}\&\ rh);}
+\DoxyCodeLine{00725\ }
+\DoxyCodeLine{00726\ std::ostream\&\ operator<<(std::ostream\&\ os,\ const\ \mbox{\hyperlink{structRBWaveform}{RBWaveform}}\&\ rh);}
+\DoxyCodeLine{00727\ }
+\DoxyCodeLine{00728\ std::ostream\&\ operator<<(std::ostream\&\ os,\ const\ \mbox{\hyperlink{structTofEventSummary}{TofEventSummary}}\&\ tes);}
+\DoxyCodeLine{00729\ }
+\DoxyCodeLine{00730\ \textcolor{preprocessor}{\#endif\ }}
+
+\end{DoxyCode}

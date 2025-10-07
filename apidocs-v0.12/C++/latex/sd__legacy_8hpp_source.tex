@@ -1,0 +1,405 @@
+\doxysection{sd\+\_\+legacy.\+hpp}
+\hypertarget{sd__legacy_8hpp_source}{}\label{sd__legacy_8hpp_source}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/sd\_legacy.hpp@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/sd\_legacy.hpp}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifdef\ BUILD\_WITH\_ROOT}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#ifndef\ SD\_LEGACY\_H\_INCLUDED}}
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#define\ SD\_LEGACY\_H\_INCLUDED}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ "{}TObject.h"{}}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ "{}TVector3.h"{}}}
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ "{}tof\_typedefs.h"{}}\ }
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00010\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceGaps}{Gaps}}\ \{}
+\DoxyCodeLine{00011\ \ \ \textcolor{keyword}{namespace\ }Telemetry\ \{}
+\DoxyCodeLine{00012\ \ \ \ \ \textcolor{keyword}{class\ }MergedEvent;}
+\DoxyCodeLine{00013\ \ \ \}}
+\DoxyCodeLine{00014\ \}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{keyword}{namespace\ }gondola\ \{}
+\DoxyCodeLine{00017\ \ \ \textcolor{keyword}{auto}\ read\_sd\_legacy\_example()\ -\/>\ void;\ }
+\DoxyCodeLine{00018\ \ \ }
+\DoxyCodeLine{00021\ \ \ \textcolor{keyword}{struct\ }SDRootReader\ \{}
+\DoxyCodeLine{00022\ \ \ }
+\DoxyCodeLine{00023\ \ \ \};}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \}}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \textcolor{keyword}{typedef}\ i32\ CFitStatusType;}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \textcolor{keyword}{class\ }CEventBase\ :\ \textcolor{keyword}{public}\ TObject\ \{}
+\DoxyCodeLine{00030\ \ \ \textcolor{keyword}{public}:\ }
+\DoxyCodeLine{00031\ \ \ \ \ CEventBase()\ \{\}}
+\DoxyCodeLine{00032\ \ \ \ \ }
+\DoxyCodeLine{00033\ \ \ \ \ u32\ runNumber\_;}
+\DoxyCodeLine{00034\ \ \ \ \ u32\ subRunNumber\_;}
+\DoxyCodeLine{00035\ \ \ \ \ u32\ eventNumber\_;}
+\DoxyCodeLine{00036\ \ \ \ \ u64\ eventTime\_;}
+\DoxyCodeLine{00037\ \ \ \ \ u32\ eventId\_;}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{comment}{//\ generated\ primary}}
+\DoxyCodeLine{00040\ \ \ \ \ f64\ \ \ \ \ \ \ primaryBetaGenerated\_;}
+\DoxyCodeLine{00041\ \ \ \ \ TVector3\ \ primaryMomentumDirectionGenerated\_;}
+\DoxyCodeLine{00042\ \ \ \ \ f64\ \ \ \ \ \ \ primaryKineticEnergyGenerated\_;}
+\DoxyCodeLine{00043\ \ \ \ \ }
+\DoxyCodeLine{00044\ \ \ \ \ ClassDef(CEventBase,\ 13)}
+\DoxyCodeLine{00045\ \};}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \textcolor{keyword}{class\ }CTrackBase\ :\ \textcolor{keyword}{public}\ TObject\ \{}
+\DoxyCodeLine{00048\ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00049\ \ \ \ \ CTrackBase()\ \{\}}
+\DoxyCodeLine{00050\ \ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ Primary;}
+\DoxyCodeLine{00052\ \ \ \ \ u32\ \ \ \ \ \ TrackId;}
+\DoxyCodeLine{00053\ \ \ \ \ u32\ \ \ \ \ \ VertexVolumeId;}
+\DoxyCodeLine{00054\ \ \ \ \ TVector3\ VertexPosition;}
+\DoxyCodeLine{00055\ \ \ \ \ u32\ \ \ \ \ \ LastVolumeId;}
+\DoxyCodeLine{00056\ \ \ \ \ TVector3\ LastPosition;}
+\DoxyCodeLine{00057\ \ \ \ \ f64\ \ \ \ \ \ ColumnDensity;\ \textcolor{comment}{//\ column\ density\ [g/cm2]}}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \ \ \ \ Vec<f64>\ \ \ \ \ \ EnergyDeposition;}
+\DoxyCodeLine{00060\ \ \ \ \ Vec<f64>\ \ \ \ \ \ GlobalTime;}
+\DoxyCodeLine{00061\ \ \ \ \ Vec<f64>\ \ \ \ \ \ StepLength;}
+\DoxyCodeLine{00062\ \ \ \ \ Vec<u32>\ \ \ \ \ \ VolumeId;}
+\DoxyCodeLine{00063\ \ \ \ \ Vec<TVector3>\ Position;}
+\DoxyCodeLine{00064\ \ \ \ \ Vec<TVector3>\ PositionResidual;}
+\DoxyCodeLine{00065\ \ \ \ \ Vec<TVector3>\ MomentumDirection;}
+\DoxyCodeLine{00066\ \ \ \ \ Vec<f64>\ \ \ \ \ \ Depth;\ \textcolor{comment}{//\ column\ density\ [g/cm2]}}
+\DoxyCodeLine{00067\ \ \ \ \ Vec<f64>\ \ \ \ \ \ ColumnDensityUntilStep;\ \textcolor{comment}{//\ column\ density\ [g/cm2]}}
+\DoxyCodeLine{00068\ \ \ \ \ }
+\DoxyCodeLine{00069\ \ \ \ \ ClassDef(CTrackBase,\ 5);}
+\DoxyCodeLine{00070\ \};}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \textcolor{keyword}{class\ }CTrackRec\ :\ \textcolor{keyword}{public}\ CTrackBase\ \{}
+\DoxyCodeLine{00073\ \ \ \textcolor{keyword}{public}:\ }
+\DoxyCodeLine{00074\ \ \ \ \ CTrackRec()\ \{\}}
+\DoxyCodeLine{00075\ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{keywordtype}{bool}\ Used;\ }
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{keywordtype}{bool}\ Associated;}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \ f64\ \ Chi2;}
+\DoxyCodeLine{00080\ \ \ \ \ i32\ \ Ndof;}
+\DoxyCodeLine{00081\ \ \ \ \ CFitStatusType\ FitStatus;\ }
+\DoxyCodeLine{00082\ \ \ \ \ }
+\DoxyCodeLine{00083\ \ \ \ \ ClassDefOverride(CTrackRec,\ 7);}
+\DoxyCodeLine{00084\ \};}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \textcolor{keyword}{class\ }GRecoHit\ :\ \textcolor{keyword}{public}\ TObject\ \{\ }
+\DoxyCodeLine{00087\ \ \ \textcolor{keyword}{public}:\ }
+\DoxyCodeLine{00088\ \ \ \ \ GRecoHit()\ \{\}}
+\DoxyCodeLine{00089\ \ \ \ \ \textcolor{comment}{//\ getters\ for\ compatibility\ -\/\ not\ sure\ if\ }}
+\DoxyCodeLine{00090\ \ \ \ \ \textcolor{comment}{//\ changing\ the\ private\ members\ to\ public\ }}
+\DoxyCodeLine{00091\ \ \ \ \ \textcolor{comment}{//\ will\ cause\ any\ issues}}
+\DoxyCodeLine{00092\ \ \ \ \ \textcolor{keyword}{auto}\ GetVolId()\ const\ -\/>\ u32;}
+\DoxyCodeLine{00093\ \ \ \ \ auto\ GetEDep()\ \ const\ -\/>\ f64;}
+\DoxyCodeLine{00094\ \ \ \ \ auto\ GetPos()\ \ \ const\ -\/>\ TVector3;}
+\DoxyCodeLine{00095\ \ \ \ \ auto\ GetTime()\ \ const\ -\/>\ f64;}
+\DoxyCodeLine{00096\ \ \ \ \ auto\ GetIdx()\ \ \ const\ -\/>\ i32;}
+\DoxyCodeLine{00097\ \ \ private:\ \ }
+\DoxyCodeLine{00098\ \ \ \ \ u32\ volume\_id\_;}
+\DoxyCodeLine{00099\ \ \ \ \ f64\ energydep\_;}
+\DoxyCodeLine{00100\ \ \ \ \ TVector3\ hit\_position\_;}
+\DoxyCodeLine{00101\ \ \ \ \ f64\ hit\_time\_;}
+\DoxyCodeLine{00102\ \ \ \ \ i32\ index\_;\ }
+\DoxyCodeLine{00103\ \ \ \ \ }
+\DoxyCodeLine{00104\ \ \ \ \ ClassDef(GRecoHit,\ 5);}
+\DoxyCodeLine{00105\ \};\ \ }
+\DoxyCodeLine{00106\ typedef\ Vec<GRecoHit>\ GRecoHitSeries;}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ class\ CEventRec\ :\ public\ CEventBase\ \{}
+\DoxyCodeLine{00109\ \ \ }
+\DoxyCodeLine{00110\ \ \ \textcolor{comment}{//\ This\ is\ the\ actual\ compatibility\ layer.\ }}
+\DoxyCodeLine{00111\ \ \ \textcolor{comment}{//\ Populate\ a\ CEventRec\ object\ from\ a\ }}
+\DoxyCodeLine{00112\ \ \ \textcolor{comment}{//\ MergedEvent}}
+\DoxyCodeLine{00113\ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00114\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ from\_telemetry(\mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent}{Gaps::Telemetry::MergedEvent}}\ \textcolor{keyword}{const}\ \&event)\ -\/>\ CEventRec;}
+\DoxyCodeLine{00115\ \ \ \ \ \textcolor{keyword}{auto}\ to\_telemetry()\ -\/>\ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent}{Gaps::Telemetry::MergedEvent}};}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00118\ \ \ \ \ CEventRec()\ \{\}}
+\DoxyCodeLine{00119\ \ \ \ \ }
+\DoxyCodeLine{00120\ \ \ \ \ std::string\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ activeReco\_;}
+\DoxyCodeLine{00121\ \ \ \ \ std::map<std::string,TVector3>\ \ \ \ \ \ \ \ \ primaryStoppingPosition\_;}
+\DoxyCodeLine{00122\ \ \ \ \ std::map<std::string,u32>\ \ \ \ \ \ \ \ \ \ \ \ \ \ primaryStoppingVolume\_;}
+\DoxyCodeLine{00123\ \ \ \ \ std::map<std::string,f64>\ \ \ \ \ \ \ \ \ \ \ \ \ \ primaryStoppingTime\_;}
+\DoxyCodeLine{00124\ \ \ \ \ std::map<std::string,f64>\ \ \ \ \ \ \ \ \ \ \ \ \ \ primaryBeta\_;}
+\DoxyCodeLine{00125\ \ \ \ \ std::map<std::string,f64>\ \ \ \ \ \ \ \ \ \ \ \ \ \ primaryBetaError\_;}
+\DoxyCodeLine{00126\ \ \ \ \ std::map<std::string,TVector3>\ \ \ \ \ \ \ \ \ primaryMomentumDirection\_;}
+\DoxyCodeLine{00127\ \ \ \ \ std::map<std::string,Vec<f64>>\ \ \ \ \ \ \ \ \ primaryEnergyDepositions\_;\ }
+\DoxyCodeLine{00128\ \ \ \ \ std::map<std::string,Vec<i32>>\ \ \ \ \ \ \ \ \ HitTrackIndex;\ }
+\DoxyCodeLine{00129\ \ \ \ \ std::map<std::string,f64>\ \ \ \ \ \ \ \ \ \ \ \ \ \ Chi2;\ }
+\DoxyCodeLine{00130\ \ \ \ \ std::map<std::string,i32>\ \ \ \ \ \ \ \ \ \ \ \ \ \ Ndof;\ }
+\DoxyCodeLine{00131\ \ \ \ \ std::map<std::string,Vec<f64>>\ \ \ \ \ \ \ \ \ ParCov;\ }
+\DoxyCodeLine{00132\ \ \ \ \ std::map<std::string,CFitStatusType>\ \ \ FitStatus;\ }
+\DoxyCodeLine{00133\ }
+\DoxyCodeLine{00134\ \ \ \ \ std::map<std::string,Vec<f64>>\ \ \ \ \ \ \ \ \ SdFitPar;\ }
+\DoxyCodeLine{00135\ \ \ \ \ std::map<std::string,Vec<f64>>\ \ \ \ \ \ \ \ \ SdFitErr;\ }
+\DoxyCodeLine{00136\ \ \ \ \ std::map<std::string,f64>\ \ \ \ \ \ \ \ \ \ \ \ \ \ SdFitChi2\ \ ;\ }
+\DoxyCodeLine{00137\ \ \ \ \ std::map<std::string,i32>\ \ \ \ \ \ \ \ \ \ \ \ \ \ SdFitNdof\ \ ;\ }
+\DoxyCodeLine{00138\ \ \ \ \ GRecoHitSeries\ hitseries\_\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ Vec<GRecoHit>(\{\});}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ \ \ std::map<std::string,\ Vec<CTrackRec*>>\ Tracks;}
+\DoxyCodeLine{00141\ \ \ \ \ Vec<std::string>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ registeredRecos\_;}
+\DoxyCodeLine{00142\ \ \ \ \ }
+\DoxyCodeLine{00143\ \ \ \ \ ClassDefOverride(CEventRec,\ 12)}
+\DoxyCodeLine{00144\ \};}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00146\ \textcolor{keyword}{namespace\ }Crane\ \{\ }
+\DoxyCodeLine{00147\ \ \ \textcolor{keyword}{namespace\ }Calibration\ \{}
+\DoxyCodeLine{00148\ \ \ \ \ \textcolor{keyword}{class\ }CRawHeader\ :\ \textcolor{keyword}{public}\ TObject\ \{}
+\DoxyCodeLine{00149\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ CRawHeader()\ \{\}}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \ \ u8\ \ type;}
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ u32\ timestamp;}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ u16\ counter;}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ u16\ length;}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00157\ \ \ \ \ \ \ \ \ u64\ systime;}
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ u32\ eventid;}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ Vec<u64>\ \ trk\_eventtime;}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ Vec<u64>\ \ trk\_eventid;}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ Vec<u16>\ \ trk\_eventid\_valid;}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ Vec<u16>\ \ trk\_layer;}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ Vec<u8>\ \ \ tof\_packettype;}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ ClassDef(CRawHeader,\ 4);}
+\DoxyCodeLine{00167\ \ \ \ \ \};}
+\DoxyCodeLine{00168\ \ \ \ \ }
+\DoxyCodeLine{00169\ \ \ \ \ \textcolor{keyword}{class\ }CRawTrk\ :\ \textcolor{keyword}{public}\ TObject\ \{}
+\DoxyCodeLine{00170\ \ \ }
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00172\ }
+\DoxyCodeLine{00173\ \ \ \ \ \ \ \ \ CRawTrk()\ \{\}}
+\DoxyCodeLine{00174\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00175\ \ \ \ \ \ \ \ \ u8\ \ \ \ \ \ \ flag;}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ u32\ \ \ \ \ \ eventid;}
+\DoxyCodeLine{00177\ \ \ \ \ \ \ \ \ Vec<u64>\ eventtime;}
+\DoxyCodeLine{00178\ \ \ \ \ \ \ \ \ Vec<u8>\ \ layer;}
+\DoxyCodeLine{00179\ \ \ \ \ \ \ \ \ Vec<u8>\ \ row;}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \ \ Vec<u8>\ \ \textcolor{keyword}{module};}
+\DoxyCodeLine{00181\ \ \ \ \ \ \ \ \ Vec<u8>\ \ channel;}
+\DoxyCodeLine{00182\ \ \ \ \ \ \ \ \ Vec<u16>\ adcdata;}
+\DoxyCodeLine{00183\ }
+\DoxyCodeLine{00184\ \ \ \ \ \ \ \ \ Vec<i32>\ hindex;\ \textcolor{comment}{//\ hit\ index\ inside\ CEventRec}}
+\DoxyCodeLine{00185\ }
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ ClassDef(CRawTrk,\ 4);}
+\DoxyCodeLine{00187\ \ \ \ \ \};}
+\DoxyCodeLine{00188\ \ \ }
+\DoxyCodeLine{00189\ \ \ \ \ \textcolor{keyword}{class\ }CRawTofHits\ :\ \textcolor{keyword}{public}\ TObject\ \{}
+\DoxyCodeLine{00190\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00191\ \ \ \ \ \ \ \ \ CRawTofHits()\ \{\}}
+\DoxyCodeLine{00192\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00193\ \ \ \ \ \ \ \ \ Vec<u8>\ \ trigger\_th\ \ ;}
+\DoxyCodeLine{00194\ \ \ \ \ \ \ \ \ Vec<f64>\ timestamp48\ ;}
+\DoxyCodeLine{00195\ \ \ \ \ \ \ \ \ Vec<u8>\ \ paddle\_id\ \ \ ;}
+\DoxyCodeLine{00196\ \ \ \ \ \ \ \ \ Vec<f32>\ base\_a\ \ \ \ \ \ ;}
+\DoxyCodeLine{00197\ \ \ \ \ \ \ \ \ Vec<f32>\ base\_b\ \ \ \ \ \ ;}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \ \ Vec<f32>\ base\_a\_rms\ \ ;}
+\DoxyCodeLine{00199\ \ \ \ \ \ \ \ \ Vec<f32>\ base\_b\_rms\ \ ;}
+\DoxyCodeLine{00200\ \ \ \ \ \ \ \ \ Vec<f32>\ phase\ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00201\ \ \ \ \ \ \ \ \ Vec<f32>\ time\_a\ \ \ \ \ \ ;}
+\DoxyCodeLine{00202\ \ \ \ \ \ \ \ \ Vec<f32>\ time\_b\ \ \ \ \ \ ;}
+\DoxyCodeLine{00203\ \ \ \ \ \ \ \ \ Vec<f32>\ peak\_a\ \ \ \ \ \ ;}
+\DoxyCodeLine{00204\ \ \ \ \ \ \ \ \ Vec<f32>\ peak\_b\ \ \ \ \ \ ;}
+\DoxyCodeLine{00205\ \ \ \ \ \ \ \ \ Vec<f32>\ charge\_a\ \ \ \ ;}
+\DoxyCodeLine{00206\ \ \ \ \ \ \ \ \ Vec<f32>\ charge\_b\ \ \ \ ;}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \ \ Vec<f32>\ charge\_min\_i;}
+\DoxyCodeLine{00208\ \ \ \ \ \ \ \ \ Vec<f32>\ x\_0\ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00209\ \ \ \ \ \ \ \ \ Vec<f32>\ t\_0\ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00210\ }
+\DoxyCodeLine{00211\ \ \ \ \ \ \ \ \ Vec<f32>\ t\_shift\ \ \ \ \ ;}
+\DoxyCodeLine{00212\ \ \ \ \ \ \ \ \ Vec<i32>\ hindex\ \ \ \ \ \ ;\ \textcolor{comment}{//\ hit\ index\ inside\ CEventRec}}
+\DoxyCodeLine{00213\ \ \ \ \ \ \ \ \ ClassDef(CRawTofHits,\ 9);}
+\DoxyCodeLine{00214\ \ \ \ \ \};}
+\DoxyCodeLine{00215\ }
+\DoxyCodeLine{00216\ \ \ \ \ \textcolor{keyword}{class\ }CRawTrigger\ :\ \textcolor{keyword}{public}\ TObject\ \{}
+\DoxyCodeLine{00217\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00218\ }
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \ \ CRawTrigger()\ \{\}}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ Vec<u8>\ mtb\_link\_ids\ \ \ ;\ }
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ Vec<u8>\ dsi\ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ Vec<u8>\ j\ \ \ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \ \ Vec<u8>\ ch\ \ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \ \ Vec<u8>\ th\ \ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \ \ Vec<u8>\ paddle\_id\ \ \ \ \ \ ;}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ Vec<u8>\ trigger\_sources;}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \ \ ClassDef(CRawTrigger,\ 3);}
+\DoxyCodeLine{00229\ \ \ \ \ \};}
+\DoxyCodeLine{00230\ }
+\DoxyCodeLine{00231\ \ \ \ \ \textcolor{keyword}{class\ }CRawTofWFs\ :\ \textcolor{keyword}{public}\ TObject\ \{}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00233\ }
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \ \ CRawTofWFs()\ \{\}}
+\DoxyCodeLine{00235\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00236\ \ \ \ \ \ \ \ \ Vec<f64>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ timestamp48\ \{\};\ }
+\DoxyCodeLine{00237\ \ \ \ \ \ \ \ \ Vec<u8>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rb\_id\ \ \ \ \ \ \ \{\};}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \ \ Vec<u8>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ rb\_channel\ \ \{\};}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ \ \ Vec<Vec<u16>>\ \ \ \ \ \ \ \ \ \ \ adc\ \ \ \ \ \ \ \ \ \{\};}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \ \ Vec<Vec<f32>>\ \ \ \ \ \ \ \ \ \ \ voltages\ \ \ \ \{\};}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ Vec<Vec<f32>>\ \ \ \ \ \ \ \ \ \ \ times\ \ \ \ \ \ \ \{\};}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ Vec<i32>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ paddle\_id\ \ \ \{\};}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ Vec<Vec<u16>>\ \ \ \ \ \ \ \ \ \ \ adc\_9\ \ \ \ \ \ \ \{\};}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ Vec<Vec<f32>>\ \ \ \ \ \ \ \ \ \ \ voltages\_9\ \ \{\};}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ Vec<Vec<f32>>\ \ \ \ \ \ \ \ \ \ \ times\_9\ \ \ \ \ \{\};}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ ClassDef(CRawTofWFs,\ 6);}
+\DoxyCodeLine{00248\ \ \ \ \ \};}
+\DoxyCodeLine{00249\ }
+\DoxyCodeLine{00250\ }
+\DoxyCodeLine{00251\ \ \ \ \ \textcolor{keyword}{class\ }CRawTof\ :\ \textcolor{keyword}{public}\ TObject\ \{}
+\DoxyCodeLine{00252\ \ \ }
+\DoxyCodeLine{00253\ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00254\ \ \ \ \ \ \ \ \ CRawTof()\ \{\}}
+\DoxyCodeLine{00255\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ \ \ \ \ \ \ \ \ flag;}
+\DoxyCodeLine{00256\ \ \ \ \ \ \ \ \ u32\ \ \ \ \ \ \ \ \ \ runid;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//MTB\ pkt}}
+\DoxyCodeLine{00257\ \ \ \ \ \ \ \ \ u32\ \ \ \ \ \ \ \ \ \ eventid;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//summary\ pkt}}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \ \ u8\ \ \ \ \ \ \ \ \ \ \ event\_status;}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ \ \ f64\ \ \ \ \ \ \ \ \ \ timestamp48\ ;\ \ \ \ \ \ \ \ \ \textcolor{comment}{//summary\ pkt}}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \ \ u32\ \ \ \ \ \ \ \ \ \ timestamp\ ;\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//MTB\ pkt\ ???}}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \ \ u64\ \ \ \ \ \ \ \ \ \ timestamp\_gps48\ ;\ \ \ \ \textcolor{comment}{//MTB\ pkt}}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \ \ u64\ \ \ \ \ \ \ \ \ \ timestamp\_abs48\ ;\ \ \ \ \textcolor{comment}{//MTB\ pkt}}
+\DoxyCodeLine{00263\ }
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ CRawTofHits\ \ hits;\ \ \ \ \ \ }
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \ \ CRawTofWFs\ \ \ wfs;\ \ \ \ \ \ \ }
+\DoxyCodeLine{00266\ \ \ \ \ \ \ \ \ CRawTrigger\ \ trg;\ \ \ \ \textcolor{comment}{//\ =\ CRawTrigger();\ \ \ \ \ \ ///<\ trigger\ hits}}
+\DoxyCodeLine{00267\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00268\ \ \ \ \ \ \ \ \ ClassDef(CRawTof,\ 10);}
+\DoxyCodeLine{00269\ \ \ \ \ \};\ }
+\DoxyCodeLine{00270\ \ \ \}}
+\DoxyCodeLine{00271\ \}}
+\DoxyCodeLine{00272\ }
+\DoxyCodeLine{00273\ \textcolor{comment}{//-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00274\ \textcolor{comment}{//\ Reconstruction\ classes}}
+\DoxyCodeLine{00275\ }
+\DoxyCodeLine{00276\ \textcolor{keyword}{namespace\ }Crane\{}
+\DoxyCodeLine{00277\ \ \ \textcolor{keyword}{namespace\ }Reconstruction\ \{}
+\DoxyCodeLine{00278\ \ \ \ \ \textcolor{keyword}{namespace\ }TrackFit\ \{}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ }
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \textcolor{keyword}{typedef}\ GRecoHit\ GDataHit;}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \textcolor{keyword}{class\ }Plane\ \{}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \ \ Plane()\ \{\}}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \ f64\ a,\ b,\ c,\ d;\ \ \ \ \ \ \ \ \textcolor{comment}{//the\ (a,\ b,\ c,\ d)\ in\ a*x\ +\ b*y\ +\ c*z\ +\ d\ =\ 0.}}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ }
+\DoxyCodeLine{00287\ \ \ \ \ \ \ \textcolor{keyword}{class\ }ReferencePlane\ :\ \textcolor{keyword}{public}\ Plane\ \{}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \ \ ReferencePlane()\ \{\}}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \ TVector3\ origin\_;}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ TVector3\ orientation\_;}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ }
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \textcolor{keyword}{class\ }GDataPar\ \{}
+\DoxyCodeLine{00295\ \ \ \ \ }
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \ \ \ \ GDataPar()\{\}}
+\DoxyCodeLine{00298\ \ \ \ \ \ \ \ \ \ \ ReferencePlane\ par\_ref\_plane\_;\ }
+\DoxyCodeLine{00299\ \ \ \ \ \ \ \ \ \ \ Vec<f64>\ \ \ \ \ \ \ par\_;\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00300\ \ \ \ \ \ \ \ \ \ \ Vec<f64>\ \ \ \ \ \ \ par\_cov\_;\ \ \ \ \ \ \ }
+\DoxyCodeLine{00301\ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00302\ \ \ \ \ \ \ \ \ \ \ f64\ \ \ \ \ \ \ \ \ \ \ \ chi2\_;}
+\DoxyCodeLine{00303\ \ \ \ \ \ \ \ \ \ \ i32\ \ \ \ \ \ \ \ \ \ \ \ ndof\_;}
+\DoxyCodeLine{00304\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00305\ \ \ \ \ \ \ }
+\DoxyCodeLine{00306\ \ \ \ \ \ \ \textcolor{keyword}{class\ }GDataTime\ :\ \textcolor{keyword}{public}\ GDataPar\ \{}
+\DoxyCodeLine{00307\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \ \ \ \ GDataTime()\ \{\}}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//friend\ class\ GFitLine;}}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//friend\ class\ GFitTime;}}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//friend\ class\ GDataTrack;}}
+\DoxyCodeLine{00312\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00313\ \ \ \ \ \ \ }
+\DoxyCodeLine{00314\ \ \ \ \ \ \ \textcolor{keyword}{class\ }GDataLine\ :\ \textcolor{keyword}{public}\ GDataPar\ \{}
+\DoxyCodeLine{00315\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00316\ \ \ \ \ \ \ \ \ \ \ GDataLine()\ \{\}}
+\DoxyCodeLine{00317\ }
+\DoxyCodeLine{00318\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//friend\ class\ GFitLine;}}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//friend\ class\ GFitStar;}}
+\DoxyCodeLine{00320\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//friend\ class\ GDataTrack;}}
+\DoxyCodeLine{00321\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00322\ }
+\DoxyCodeLine{00323\ \ \ \ \ \ \ \textcolor{keyword}{class\ }GDataDEDX\ :\ \textcolor{keyword}{public}\ GDataPar\ \{}
+\DoxyCodeLine{00324\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00325\ \ \ \ \ \ \ \ \ \ \ GDataDEDX()\{\}}
+\DoxyCodeLine{00326\ }
+\DoxyCodeLine{00327\ \ \ \ \ \ \ \ \ \ \ u16\ par\_type\_;\ \textcolor{comment}{//\ =\ -\/1;}}
+\DoxyCodeLine{00328\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00329\ \ \ \ \ \ \ }
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \textcolor{keyword}{class\ }GDataDEDX\_NRS\ :\ \textcolor{keyword}{public}\ GDataDEDX\ \{}
+\DoxyCodeLine{00331\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00332\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00333\ }
+\DoxyCodeLine{00334\ \ \ \ \ \ \ \textcolor{keyword}{class\ }GDataPoint\ \{}
+\DoxyCodeLine{00335\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00336\ \ \ \ \ \ \ \ \ \ \ GDataPoint()\ \{\}}
+\DoxyCodeLine{00337\ }
+\DoxyCodeLine{00338\ \ \ \ \ \ \ \ \ \ \ Vec<GDataHit>\ \ hits\_;\ }
+\DoxyCodeLine{00339\ \ \ \ \ \ \ \ \ \ \ ReferencePlane\ volume\_plane\_;\ }
+\DoxyCodeLine{00340\ }
+\DoxyCodeLine{00341\ \ \ \ \ \ \ \ \ \ \ u64\ \ \ \ \ \ hit\_energy\_\ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00342\ \ \ \ \ \ \ \ \ \ \ u64\ \ \ \ \ \ hit\_time\_\ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00343\ \ \ \ \ \ \ \ \ \ \ u64\ \ \ \ \ \ hit\_energy\_err\_\ \ \ ;}
+\DoxyCodeLine{00344\ \ \ \ \ \ \ \ \ \ \ u64\ \ \ \ \ \ hit\_time\_err\_\ \ \ \ \ ;}
+\DoxyCodeLine{00345\ \ \ \ \ \ \ \ \ \ \ TVector3\ hit\_position\_err\_\ ;}
+\DoxyCodeLine{00346\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ \ \ \ \ flag\_\ \ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00347\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00348\ \ \ \ \ \ \ }
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \textcolor{keyword}{using\ }GTrajectoryPoint\ =\ std::pair<f64,f64>;}
+\DoxyCodeLine{00350\ \ \ \ \ \ \ \textcolor{comment}{//\ FIXME\ -\/\ this\ is\ a\ bug\ in\ Elena's\ code.\ It\ seems\ this\ is\ intended\ to\ }}
+\DoxyCodeLine{00351\ \ \ \ \ \ \ \textcolor{comment}{//\ inherit\ from\ TObject\ }}
+\DoxyCodeLine{00352\ \ \ \ \ \ \ \textcolor{keyword}{class\ }GDataTrack\ \{}
+\DoxyCodeLine{00353\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00354\ \ \ \ \ \ \ \ \ \ \ GDataTrack()\ \{\}}
+\DoxyCodeLine{00355\ }
+\DoxyCodeLine{00356\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//friend\ class\ GFitDEDX;}}
+\DoxyCodeLine{00357\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//friend\ class\ GFitLine;}}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//friend\ class\ GFitTime;}}
+\DoxyCodeLine{00359\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//friend\ class\ GFindVertex;}}
+\DoxyCodeLine{00360\ }
+\DoxyCodeLine{00361\ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{char}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ flag\_;}
+\DoxyCodeLine{00362\ \ \ \ \ \ \ \ \ \ \ Vec<GDataPoint>\ \ \ \ \ \ \ \ vxyz\_;\ }
+\DoxyCodeLine{00363\ \ \ \ \ \ \ \ \ \ \ GDataLine\ \ \ \ \ \ \ \ \ \ \ \ \ \ pline\_;\ }
+\DoxyCodeLine{00364\ \ \ \ \ \ \ \ \ \ \ GDataTime\ \ \ \ \ \ \ \ \ \ \ \ \ \ ptime\_;\ }
+\DoxyCodeLine{00365\ \ \ \ \ \ \ \ \ \ \ GDataDEDX\ \ \ \ \ \ \ \ \ \ \ \ \ \ *pdedx\_;\ }
+\DoxyCodeLine{00366\ \ \ \ \ \ \ \ \ \ \ Vec<GTrajectoryPoint>\ \ vxyz\_eval\_;\ }
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \ \ \ \ Vec<f64>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dedx\_;\ \ \ \ \ \ \ }
+\DoxyCodeLine{00368\ \ \ \ \ \ \ \ \ \ \ Vec<f64>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ xdepth\_;\ \ \ \ \ }
+\DoxyCodeLine{00369\ \ \ \ \ \ \ \ \ \ \ Vec<f64>\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ dedx\_eval\_;\ \ }
+\DoxyCodeLine{00370\ \ \ \ \ \ \ \ \ \ \ GTrajectoryPoint\ \ \ \ \ \ \ start\_eval\_;}
+\DoxyCodeLine{00371\ \ \ \ \ \ \ \ \ \ \ GTrajectoryPoint\ \ \ \ \ \ \ stop\_eval\_;}
+\DoxyCodeLine{00372\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00373\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//ClassDef(GDataTrack,1);}}
+\DoxyCodeLine{00374\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00375\ }
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \textcolor{keyword}{class\ }GDataVertex\ :\ \textcolor{keyword}{public}\ GDataPar\ \{}
+\DoxyCodeLine{00377\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00378\ \ \ \ \ \ \ \ \ \ \ GDataVertex()\ \{\}}
+\DoxyCodeLine{00379\ }
+\DoxyCodeLine{00380\ \ \ \ \ \ \ \ \ \ \ std::pair<f64,f64>\ time\_\ \ ;\textcolor{comment}{//FIX\ TEMPORANEO\ MESSO\ A\ MANO\ QUI}}
+\DoxyCodeLine{00381\ \ \ \ \ \ \ \ \ \ \ std::pair<f64,f64>\ xdepth\_;\textcolor{comment}{//\ FIX\ TEMPORANEO\ MESSO\ A\ MANO\ QUI}}
+\DoxyCodeLine{00382\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00383\ }
+\DoxyCodeLine{00384\ \ \ \ \ \ \ \textcolor{keyword}{class\ }GDataEvent\ :\ \textcolor{keyword}{public}\ TObject\ \{}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00386\ }
+\DoxyCodeLine{00387\ \ \ \ \ \ \ \ \ \ \ GDataEvent()\ \{\}}
+\DoxyCodeLine{00388\ \ \ \ \ }
+\DoxyCodeLine{00389\ \ \ \ \ \ \ \ \ \ \ i32\ status\_;}
+\DoxyCodeLine{00390\ \ \ \ \ \ \ \ \ \ \ Vec<GDataPoint>\ points\_;\ }
+\DoxyCodeLine{00391\ \ \ \ \ \ \ \ \ \ \ Vec<GDataTrack>\ tracks\_;\ }
+\DoxyCodeLine{00392\ \ \ \ \ \ \ \ \ \ \ GDataVertex\ vertex\_;\ \ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00393\ }
+\DoxyCodeLine{00394\ \ \ \ \ \ \ \ \ \ \ ClassDef(GDataEvent,1);}
+\DoxyCodeLine{00395\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00396\ \ \ \ \ \}\textcolor{comment}{//\ end\ of\ namespace\ TrackFit}}
+\DoxyCodeLine{00397\ \ \ \}\ \textcolor{comment}{//\ end\ of\ namespace\ Reconstruction}}
+\DoxyCodeLine{00398\ \}\ \textcolor{comment}{//\ end\ of\ namespace\ Crane}}
+\DoxyCodeLine{00399\ }
+\DoxyCodeLine{00400\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00401\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}
