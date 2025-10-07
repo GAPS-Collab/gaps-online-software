@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["read_input_mode","select_noi_mode","select_sma_mode","select_tcal_mode","select_vcal_mode"]};

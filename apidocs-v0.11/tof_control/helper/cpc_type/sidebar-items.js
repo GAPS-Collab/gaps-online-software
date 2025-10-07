@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["CPCTempError"],"struct":["CPCTemp"]};

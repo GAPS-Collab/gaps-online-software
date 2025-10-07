@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["checked_logit","logistic","logit"]};

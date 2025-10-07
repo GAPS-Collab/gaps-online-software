@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["PBError"],"struct":["PBMoniData","PBTemp","PBVcp"]};

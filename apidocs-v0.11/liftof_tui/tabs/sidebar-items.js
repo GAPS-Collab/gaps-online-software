@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["tab_alerts","tab_commands","tab_cpu","tab_heartbeats","tab_home","tab_mt","tab_paddles","tab_rbs","tab_settings","tab_telemetry","tab_tofhit","tab_tofsummary"]};

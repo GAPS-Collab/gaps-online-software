@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["CurrentRow","ExcludeCurrentRow","ExcludeGroup","ExcludeNoOthers","ExcludeTies","Groups","Range","Rows","UnboundedFollowing","UnboundedPreceding"]};

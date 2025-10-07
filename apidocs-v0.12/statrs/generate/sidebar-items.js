@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["log_spaced"],"struct":["InfinitePeriodic","InfiniteSawtooth","InfiniteSinusoidal","InfiniteSquare","InfiniteTriangle"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["LTBError"],"struct":["LTBMoniData","LTBTemp","LTBThreshold"]};

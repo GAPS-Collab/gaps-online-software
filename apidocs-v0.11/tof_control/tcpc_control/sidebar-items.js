@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["tcpc_temp","tcpc_vcp"]};

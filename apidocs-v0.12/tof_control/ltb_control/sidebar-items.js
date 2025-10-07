@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["ltb_init","ltb_temp","ltb_threshold"]};

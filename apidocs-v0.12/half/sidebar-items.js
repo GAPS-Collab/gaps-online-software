@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["prelude","slice","vec"],"struct":["bf16","f16"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["beta","erf","evaluate","exponential","factorial","gamma","harmonic","logistic"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["clear_port_statistics"]};

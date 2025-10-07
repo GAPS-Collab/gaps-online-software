@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["BuildStrategy","TofOperationMode"],"struct":["AnalysisEngineConfig","BuildStrategyIter","DataPublisherConfig","LTBThresholdConfig","PreampBiasConfig","RBChannelMaskConfig","RunConfig","TOFEventBuilderConfig","TofOperationModeIter","TofRBConfig","TofRunConfig","TriggerConfig"]};
