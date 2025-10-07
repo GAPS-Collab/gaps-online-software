@@ -1,23 +1,21 @@
-name: BuildBot
+name: LelewaaBuildBot
 
 on:
   workflow_dispatch:
   push:
     branches:
     - LELEWAA-0.10
-    - PAKII-0.11
     - main
   pull_request:
     branches: 
     - LELEWAA-0.10
-    - PAKII-0.11
     - main
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
 
 jobs:
-  build:
+  build-lelewaa:
     # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
@@ -64,14 +62,53 @@ jobs:
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: source $HOME/.cargo/env && cmake -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/install -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_LIFTOF=ON -DBUILD_CXXPYBINDINGS=ON -DBUILD_RUSTPYBINDINGS=ON -DBUILD_CXXDB=ON -DBUILD_CXXBINDINGS=ON -DBUILD_RUSTTELEMETRY=ON -DBUILD_CARASPACE=ON -DBUILD_EXAMPLES=ON
 
+    - name: C++ Docs 
+      run: source $HOME/.cargo/env && cd ${{github.workspace}}/build && make doc 
+
+
+    - name: Rust Docs
+      run: source $HOME/.cargo/env && cd ${{github.workspace}}/build && make doc && make liftof-doc && make go-pybindings-rust-doc
+    
+    - name: Create .nojekyll
+      run: touch ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/html/.nojekyll
+      shell: bash
+
+    - name: Create python API docs
+      run: source ${{github.workspace }}/install/setup-env.sh && cd ${{ github.workspace }}/python/doc/ && rye run sphinx-build -M html . build
+
+    - name: Consolidate Python docs
+      run: cp -r ${{ github.workspace }}/python/doc/build/html/* ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/
+      shell: bash
+
+    - name: Consolidate Rust docs
+      run: cp -r ${{ github.workspace }}/tof/liftof/target/doc/* ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/html/
+      shell: bash
+
+    - name: Consolidate docs for pybindings 
+      run: cp -r ${{ github.workspace }}/python/pybindings/target/doc/* ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/html/
+      shell: bash
+      
+    #- name: Consolidate pydocs
+    #  run: cp -r ${{ github.workspace }}/python/doc/build/html ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/html/gaps_online
+    #  shell: bash
+
+    - name: Resort docs 
+      run: mv ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version}}/html/* ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/ 
+
+    - name: Deploy to GitHub Pages
+      uses: JamesIves/github-pages-deploy-action@3.7.1
+      with:
+        github_token: ${{ secrets.PAT_TOKEN }}
+        #branch: ${{ inputs.branch }}
+        #folder: ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/html/
+        folder: ${{ github.workspace }}/build/doc/
+        branch: gh-pages
+    
     - name: Build
       # Build your program with the given configuration
       #run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
       run: source $HOME/.cargo/env && cd ${{github.workspace}}/build && make -j 4 
     
-    - name: C++ Docs 
-      run: source $HOME/.cargo/env && cd ${{github.workspace}}/build && make doc 
-
     - name: Install 
       run: source $HOME/.cargo/env && cd ${{github.workspace}}/build && make install
  
@@ -88,38 +125,4 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       #run: ctest -C ${{env.BUILD_TYPE}}
       run: source $HOME/.cargo/env && cd ${{github.workspace}}/tof/liftof/liftof-lib && cargo test --all-features && cargo test 
-
-    - name: Rust Docs
-      run: source $HOME/.cargo/env && cd ${{github.workspace}}/build && make doc && make liftof-doc && make go-pybindings-rust-doc
-    
-    - name: Create .nojekyll
-      run: touch ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/html/.nojekyll
-      shell: bash
-
-    - name: Create python API docs
-      run: source ${{github.workspace }}/install/setup-env.sh && cd ${{ github.workspace }}/python/doc/ && rye run sphinx-build -M html . build
-
-    - name: Consolidate docs
-      run: cp -r ${{ github.workspace }}/tof/liftof/target/doc/* ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/html/
-      shell: bash
-    
-    - name: Consolidate docs for pybindings 
-      run: cp -r ${{ github.workspace }}/python/pybindings/target/doc/* ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/html/
-      shell: bash
-      
-    - name: Consolidate pydocs
-      run: cp -r ${{ github.workspace }}/python/doc/build/html ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/html/gaps_online
-      shell: bash
-
-    - name: Resort docs 
-      run: mv ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version}}/html/* ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/ 
-
-    - name: Deploy to GitHub Pages
-      uses: JamesIves/github-pages-deploy-action@3.7.1
-      with:
-        github_token: ${{ secrets.PAT_TOKEN }}
-        #branch: ${{ inputs.branch }}
-        #folder: ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/html/
-        folder: ${{ github.workspace }}/build/doc/
-        branch: gh-pages
 
