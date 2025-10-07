@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["DragState"],"struct":["Popup","PopupState","SizedWrapper"],"trait":["SizedWidgetRef"]};

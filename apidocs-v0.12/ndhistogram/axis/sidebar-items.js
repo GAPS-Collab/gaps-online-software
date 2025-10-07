@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["BinInterval","SingleValueBinInterval"],"struct":["Category","CategoryNoFlow","Uniform","UniformCyclic","UniformNoFlow","Variable","VariableCyclic","VariableNoFlow"],"trait":["Axis"]};
