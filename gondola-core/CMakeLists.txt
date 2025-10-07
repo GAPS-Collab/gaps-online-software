@@ -36,7 +36,6 @@ if (BUILD_CXX_BINDINGS)
               C++/src/telemetry_reader.cxx
               C++/src/monitoring.cxx
               C++/src/legacy.cxx
-              C++/src/logging.cxx
               C++/src/version.cxx
               C++/src/telemetry_dataclasses.cxx
               C++/src/caraspace.cxx

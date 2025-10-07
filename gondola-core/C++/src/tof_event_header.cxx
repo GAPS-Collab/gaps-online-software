@@ -1,10 +1,8 @@
+#include "spdlog/spdlog.h"
+#include "spdlog/cfg/env.h"
+
 #include "events/tof_event_header.hpp"
 #include "io/parsers.h"
-#include "logging.hpp"
-//#include "serialization.h"
-
-//#include "spdlog/spdlog.h"
-//#include "spdlog/cfg/env.h"
 
 using namespace result;
 namespace g = Gaps;

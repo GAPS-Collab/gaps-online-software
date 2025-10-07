@@ -1,4 +1,6 @@
-#include "logging.hpp"
+#include <format>
+#include "spdlog/cfg/env.h"
+
 #include "packets/tof_packet.h"
 #include "serialization.h"
 #include "io/parsers.h"
@@ -117,7 +119,7 @@ auto TofPacket::from_bytestream(const Vec<u8> &bytestream, u64 &pos)
   packet.head = head;
   packet.packet_type  = static_cast<PacketType>(bytestream[pos]); pos+=1;
   packet.payload_size = Gaps::parse_u32(bytestream, pos);
-  log_debug("Found TofPacket of type " << packet_type_to_string(packet.packet_type) << " with " << packet.payload_size << " bytes payload!");
+  spdlog::debug("Found TofPacket of type {} with {} bytes payload!", packet_type_to_string(packet.packet_type), packet.payload_size);
   usize payload_end = pos + packet.payload_size;
   Vec<u8> packet_bytestream(bytestream.begin()+ pos,
                             bytestream.begin()+ payload_end)  ;

@@ -6,7 +6,6 @@
 
 #include "serialization.h"
 #include "io/parsers.h"
-#include "logging.hpp"
 #include "io.hpp"
 
 using namespace result;

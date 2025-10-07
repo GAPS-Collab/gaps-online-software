@@ -4,7 +4,6 @@
 
 #include "tof_typedefs.h"
 #include "io/parsers.h"
-#include "logging.hpp"
 #include "serialization.h"
 
 // file i/o

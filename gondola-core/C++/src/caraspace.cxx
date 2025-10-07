@@ -7,7 +7,6 @@
 #include "spdlog/spdlog.h"
 #include "spdlog/cfg/env.h"
 
-#include "logging.hpp"
 #include "io/parsers.h"
 #include "caraspace.hpp"
 #include "io.hpp"
@@ -202,7 +201,7 @@ gtel::Packet g::CRFrame::get_telemetrypacket(std::string name) {
     tp         = gtel::Packet::from_bytestream(f_obj.payload, pos); 
     //std::cout << tp.to_string() << std::endl;
   } else {
-    log_error("Trying to get TofPacket " << name << " however, that is of type " << static_cast<u8>(dtype)); 
+    spdlog::error("Trying to get TofPacket {}  however, that is of type {}", name, static_cast<u8>(dtype)); 
     return tp;
   }
   return tp;

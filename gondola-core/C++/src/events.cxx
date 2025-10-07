@@ -10,7 +10,6 @@
 #include "events.h"
 #include "io/parsers.h"
 #include "serialization.h"
-#include "logging.hpp"
 #include "version.h"
 
 #include "spdlog/cfg/env.h"
@@ -130,7 +129,7 @@ auto RBEventHeader::from_bytestream(const Vec<u8> &stream, u64 &pos)\
   RBEventHeader header;
   u16 head                  = g::parse_u16(stream, pos);
   if (head != RBEventHeader::HEAD) {
-    log_error("[RBEventHeader::from_bytestream] Header signature " << head << " invalid!");
+    spdlog::error("[RBEventHeader::from_bytestream] Header signature {} invalid!", head);
   }
   header.rb_id               = g::parse_u8(stream , pos);  
   header.event_id            = g::parse_u32(stream, pos);  
@@ -145,7 +144,7 @@ auto RBEventHeader::from_bytestream(const Vec<u8> &stream, u64 &pos)\
   header.timestamp16         = g::parse_u16(stream, pos);
   u16 tail                   = g::parse_u16(stream, pos);
   if (tail != RBEventHeader::TAIL) {
-    log_error("Tail signature incorrect! Got tail " << tail);
+    spdlog::error("Tail signature incorrect! Got tail {}", tail);
   }
   return Ok(header); 
 }
@@ -284,11 +283,11 @@ std::string RBEvent::to_string() const {
 
 bool RBEvent::channel_check(u8 channel) const {
   if (channel == 0) {
-    log_error("Remember, channels start at 1. 0 does not exist!");
+    spdlog::error("Remember, channels start at 1. 0 does not exist!");
     return false;
   }
   if (channel > 9) {
-    log_error("Thera are no channels > 9!");
+    spdlog::error("Thera are no channels > 9!");
     return false;
   }
   return true;
@@ -336,10 +335,10 @@ auto RBEvent::calc_baseline(const Vec<f32> &volts, usize min_bin, usize max_bin)
 auto RBEvent::from_bytestream(const Vec<u8> &stream, u64 &pos) 
   -> RBEvent {
   RBEvent event = RBEvent();
-  log_debug("Start decoding at pos " << pos);
+  spdlog::debug("Start decoding at pos {}", pos);
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != RBEvent::HEAD)  {
-    log_error("[RBEvent::from_bytestream] Header signature invalid!");  
+    spdlog::error("[RBEvent::from_bytestream] Header signature invalid!");  
     event.status = EventStatus::IncompleteReadout;
     return event;
   }
@@ -358,7 +357,7 @@ auto RBEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
     return event;
   }
   event.header    = header.unwrap();
-  log_debug("Decoded RBEventHeader!");
+  spdlog::debug("Decoded RBEventHeader!");
   if (event.header.is_event_fragment() || event.header.drs_lost_trigger()) {
     return event;
   }
@@ -380,7 +379,7 @@ auto RBEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
   }
   u16 tail = Gaps::parse_u16(stream, pos);
   if (tail != RBEvent::TAIL) {
-    log_error("After parsing the event, we found an invalid tail signature " << tail);
+    spdlog::error("After parsing the event, we found an invalid tail signature {}", tail);
   }
   return event;
 }
@@ -389,7 +388,7 @@ auto RBEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
 
 RBMissingHit RBMissingHit::from_bytestream(const Vec<u8> &stream,
                                            u64 &pos) {
-  log_debug("Start decoding at pos " << pos);
+  spdlog::debug("Start decoding at pos {}", pos);
   u16 head = Gaps::parse_u16(stream, pos);
   RBMissingHit miss  = RBMissingHit();
   if (head != RBMissingHit::HEAD)  {
@@ -407,7 +406,7 @@ RBMissingHit RBMissingHit::from_bytestream(const Vec<u8> &stream,
   miss.rb_ch         = Gaps::parse_u8(stream, pos);
   u16 tail = Gaps::parse_u16(stream, pos);
   if (tail != RBMissingHit::TAIL) {
-    log_error("After parsing the event, we found an invalid tail signature " << tail);
+    spdlog::error("After parsing the event, we found an invalid tail signature {}", tail);
   }
   return miss;
 }
@@ -667,16 +666,16 @@ auto TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
       //+ MasterTriggerEvent::SIZE
       + 4; // size for hits & rbevents
   if (stream.size() - pos < expected_size) {
-    log_error("Incomplete readout! Expecting at least " << expected_size << " bytes, but only got " << stream.size());
+    spdlog::error("Incomplete readout! Expecting at least {} bytes, but only got {}", expected_size, stream.size());
     event.status = EventStatus::IncompleteReadout;
     auto message = std::format("TofEvent can not be parsed from a vector with size {}, when {} bytes are expected!", stream.size(), expected_size);
     auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
     return Err(err);
   }
-  log_debug("Start decoding at pos " << pos);
+  spdlog::debug("Start decoding at pos ",pos);
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != TofEvent::HEAD)  {
-    log_error("No header signature found!");  
+    spdlog::error("No header signature found!");  
     event.status = EventStatus::IncompleteReadout;
     auto message = std::format("TofEvent has incorrect header!");
     auto err = g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, message);
@@ -714,7 +713,7 @@ auto TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
 TofEvent TofEvent::from_tofpacket(const TofPacket &packet) {
   TofEvent event;
   if (packet.packet_type != PacketType::TofEvent) {
-    log_error("Wrong packet type! " << packet_type_to_string(packet.packet_type));
+    spdlog::error("Wrong packet type! {}", packet_type_to_string(packet.packet_type));
     return event;
   } 
   u64 _pos = 0;
@@ -731,7 +730,7 @@ const RBEvent& TofEvent::get_rbevent(u8 board_id) const {
       return ev;
     }
   }
-  log_error("No RBEvent for board " << board_id);
+  spdlog::error("No RBEvent for board ", board_id);
   return _empty_event;
 }
 
@@ -748,7 +747,7 @@ Vec<u8> TofEvent::get_rbids() const {
 /**********************************************************/
     
 bool TofEvent::passed_consistency_check() {
-  log_error("This is not implmented yet!");
+  spdlog::error("This is not implmented yet!");
   return false;
 }
 
@@ -841,7 +840,7 @@ Vec<std::tuple<u8, u8, u8, LTBThreshold>> MasterTriggerEvent::get_trigger_hits()
   auto dsi_j_mask_bits = std::bitset<32>(dsi_j_mask);
   u32 n_masks_needed   = dsi_j_mask_bits.count();
   if (channel_mask.size() < n_masks_needed) {
-    log_error("We need " << n_masks_needed << " hit masks, but only have " << channel_mask.size() << "! This is bad!");
+    spdlog::error("We need {} hit masks, but only have {}! This is bad!", n_masks_needed, channel_mask.size());
     return hits;
   }
   u8 n_mask = 0;
@@ -912,7 +911,7 @@ MasterTriggerEvent MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream
   
   u16 header = Gaps::parse_u16(bytestream, pos);
   if (header != MasterTriggerEvent::HEAD) {
-    log_error("Wrong header signature!");
+    spdlog::error("Wrong header signature!");
     return event;
   }
   event.event_status   = (EventStatus)Gaps::parse_u8 (bytestream, pos);
@@ -936,7 +935,7 @@ MasterTriggerEvent MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream
   //u64 tail_pos = search_for_2byte_marker(bytestream,0x55,has_ended,pos);   
   u16 tail = Gaps::parse_u16(bytestream, pos);
   if (tail != MasterTriggerEvent::TAIL) {
-    log_error("Invalid tail signature!");
+    spdlog::error("Invalid tail signature!");
   }
   //event.n_paddles          = Gaps::parse_u8 (bytestream, pos);
 
@@ -1175,7 +1174,7 @@ TofHit TofHit::from_bytestream(const Vec<u8> &bytestream,
  // FIXME checks - packetlength, checksum ?
  u16 tail = Gaps::parse_u16(bytestream, pos);
  if (tail != TAIL) {
-   log_error("TofHit TAIL signature " << tail << " is incorrect!");
+   spdlog::error("TofHit TAIL signature {} is incorrect!", tail);
  }
  return hit; 
 }
@@ -1245,7 +1244,7 @@ RBWaveform RBWaveform::from_bytestream(const Vec<u8> &stream,
   wf.adc_b = u8_to_u16(data_b);
   u16 tail   = Gaps::parse_u16(stream, pos);
   if (tail != RBWaveform::TAIL) {
-    log_error("After parsing, we found an invalid tail signature " << tail);
+    spdlog::error("After parsing, we found an invalid tail signature {}", tail);
   }
   return wf;
 } 
@@ -1311,7 +1310,7 @@ Vec<std::tuple<u8, u8, u8, LTBThreshold>> TofEventSummary::get_trigger_hits() co
   auto dsi_j_mask_bits = std::bitset<32>(dsi_j_mask);
   u32 n_masks_needed   = dsi_j_mask_bits.count();
   if (channel_mask.size() < n_masks_needed) {
-    log_error("We need " << n_masks_needed << " hit masks, but only have " << channel_mask.size() << "! This is bad!");
+    spdlog::error("We need {} hit masks, but only have {}! This is bad!", n_masks_needed,  channel_mask.size());
     return hits;
   }
   u8 n_mask = 0;
