@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["MatrixLayout"],"trait":["AllocatedArray","AllocatedArrayMut"]};

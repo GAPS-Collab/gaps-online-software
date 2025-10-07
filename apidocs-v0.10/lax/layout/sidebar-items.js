@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["MatrixLayout"],"fn":["square_transpose","transpose"]};

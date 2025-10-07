@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"macro":["assert_aclose","assert_close_l1","assert_close_l2","assert_close_max","assert_rclose"],"mod":["assert","cholesky","convert","diagonal","eig","eigh","error","generate","inner","krylov","layout","least_squares","lobpcg","norm","operator","opnorm","qr","solve","solveh","svd","svddc","trace","triangular","tridiagonal","types"]};

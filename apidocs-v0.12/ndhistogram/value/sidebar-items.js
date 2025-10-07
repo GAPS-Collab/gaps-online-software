@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["Mean","Sum","WeightedMean","WeightedSum"]};

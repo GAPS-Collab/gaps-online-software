@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["new_chunked_idx_table"],"trait":["ChunkedIdxTable"]};

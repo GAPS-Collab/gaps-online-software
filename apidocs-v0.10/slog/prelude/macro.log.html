@@ -1,0 +1,129 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Log message a logging record"><title>log in slog::prelude - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-aa0817cf.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="slog" data-themes="" data-resource-suffix="" data-rustdoc-version="1.90.0 (1159e78c4 2025-09-14)" data-channel="1.90.0" data-search-js="search-fa3e91e5.js" data-settings-js="settings-5514c975.js" ><script src="../../static.files/storage-68b7e25d.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../static.files/main-eebb9057.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc macro"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../slog/index.html">slog</a><span class="version">2.8.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">log</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#supported-invocations" title="Supported invocations">Supported invocations</a><ul><li><a href="#simple" title="Simple">Simple</a></li><li><a href="#formatting-support" title="Formatting support:">Formatting support:</a></li><li><a href="#tags" title="Tags">Tags</a></li><li><a href="#own-implementations-of-kv-and-value" title="Own implementations of `KV` and `Value`">Own implementations of <code>KV</code> and <code>Value</code></a></li><li><a href="#fmtdisplay-and-fmtdebug-values" title="`fmt::Display` and `fmt::Debug` values"><code>fmt::Display</code> and <code>fmt::Debug</code> values</a></li></ul></li></ul></section><div id="rustdoc-modnav"><h2><a href="index.html">In slog::<wbr>prelude</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../index.html">slog</a>::<wbr><a href="index.html">prelude</a></div><h1>Macro <span class="macro">log</span><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../src/slog/lib.rs.html#659-712">Source</a> </span></div><pre class="rust item-decl"><code>macro_rules! log {
+    (2 @ { $($fmt:tt)* }, { $($kv:tt)* },  $l:expr, $lvl:expr, $tag:expr, $msg_fmt:expr) =&gt; { ... };
+    (2 @ { $($fmt:tt)* }, { $($kv:tt)* }, $l:expr, $lvl:expr, $tag:expr, $msg_fmt:expr,) =&gt; { ... };
+    (2 @ { $($fmt:tt)* }, { $($kv:tt)* }, $l:expr, $lvl:expr, $tag:expr, $msg_fmt:expr;) =&gt; { ... };
+    (2 @ { $($fmt:tt)* }, { $($kv:tt)* }, $l:expr, $lvl:expr, $tag:expr, $msg_fmt:expr, $($args:tt)*) =&gt; { ... };
+    (1 @ { $($fmt:tt)* }, { $($kv:tt)* }, $l:expr, $lvl:expr, $tag:expr, $msg_fmt:expr, $k:ident = $v:expr) =&gt; { ... };
+    (1 @ { $($fmt:tt)* }, { $($kv:tt)* }, $l:expr, $lvl:expr, $tag:expr, $msg_fmt:expr, $k:ident = $v:expr;) =&gt; { ... };
+    (1 @ { $($fmt:tt)* }, { $($kv:tt)* }, $l:expr, $lvl:expr, $tag:expr, $msg_fmt:expr, $k:ident = $v:expr,) =&gt; { ... };
+    (1 @ { $($fmt:tt)* }, { $($kv:tt)* }, $l:expr, $lvl:expr, $tag:expr, $msg_fmt:expr, $k:ident = $v:expr; $($args:tt)*) =&gt; { ... };
+    (1 @ { $($fmt:tt)* }, { $($kv:tt)* }, $l:expr, $lvl:expr, $tag:expr, $msg_fmt:expr, $k:ident = $v:expr, $($args:tt)*) =&gt; { ... };
+    (1 @ { $($fmt:tt)* }, { $($kv:tt)* }, $l:expr, $lvl:expr, $tag:expr, $msg_fmt:expr,) =&gt; { ... };
+    (1 @ { $($fmt:tt)* }, { $($kv:tt)* }, $l:expr, $lvl:expr, $tag:expr, $msg_fmt:expr) =&gt; { ... };
+    (1 @ { $($fmt:tt)* }, { $($kv:tt)* }, $l:expr, $lvl:expr, $tag:expr, $msg_fmt:expr, ; $($args:tt)*) =&gt; { ... };
+    (1 @ { $($fmt:tt)* }, { $($kv:tt)* }, $l:expr, $lvl:expr, $tag:expr, $msg_fmt:expr; $($args:tt)*) =&gt; { ... };
+    (1 @ { $($fmt:tt)* }, { $($kv:tt)* }, $l:expr, $lvl:expr, $tag:expr, $msg_fmt:expr, $f:tt $($args:tt)*) =&gt; { ... };
+    ($l:expr, $lvl:expr, $tag:expr, $($args:tt)*) =&gt; { ... };
+}</code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Log message a logging record</p>
+<p>Use wrappers <code>error!</code>, <code>warn!</code> etc. instead</p>
+<p>The <code>max_level_*</code> and <code>release_max_level*</code> cargo features can be used to
+statically disable logging at various levels. See <a href="index.html#notable-details">slog notable
+details</a></p>
+<p>Use <a href="macro.slog_log.html">version with longer name</a> if you want to prevent
+clash with legacy <code>log</code> crate macro names.</p>
+<h3 id="supported-invocations"><a class="doc-anchor" href="#supported-invocations">§</a>Supported invocations</h3><h4 id="simple"><a class="doc-anchor" href="#simple">§</a>Simple</h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>drain = slog::Discard;
+<span class="kw">let </span>root = slog::Logger::root(
+    drain,
+    <span class="macro">slog::o!</span>(<span class="string">"key1" </span>=&gt; <span class="string">"value1"</span>, <span class="string">"key2" </span>=&gt; <span class="string">"value2"</span>),
+);
+<span class="macro">slog::info!</span>(root, <span class="string">"test info log"</span>; <span class="string">"log-key" </span>=&gt; <span class="bool-val">true</span>);</code></pre></div>
+<p>Note that <code>"key" =&gt; value</code> part is optional:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>drain = slog::Discard;
+<span class="kw">let </span>root = slog::Logger::root(
+    drain,
+    <span class="macro">slog::o!</span>(<span class="string">"key1" </span>=&gt; <span class="string">"value1"</span>, <span class="string">"key2" </span>=&gt; <span class="string">"value2"</span>),
+);
+<span class="macro">slog::info!</span>(root, <span class="string">"test info log"</span>);</code></pre></div>
+<h4 id="formatting-support"><a class="doc-anchor" href="#formatting-support">§</a>Formatting support:</h4>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>drain = slog::Discard;
+<span class="kw">let </span>root = slog::Logger::root(drain,
+    <span class="macro">slog::o!</span>(<span class="string">"key1" </span>=&gt; <span class="string">"value1"</span>, <span class="string">"key2" </span>=&gt; <span class="string">"value2"</span>)
+);
+<span class="macro">slog::info!</span>(root, <span class="string">"formatted {num_entries} entries of {}"</span>, <span class="string">"something"</span>, num_entries = <span class="number">2</span>; <span class="string">"log-key" </span>=&gt; <span class="bool-val">true</span>);</code></pre></div>
+<p>Note:</p>
+<ul>
+<li><code>;</code> is used to separate message arguments and key value pairs.</li>
+<li>message behaves like <code>format!</code>/<code>format_args!</code></li>
+<li>Named arguments to messages will be added to key-value pairs as well!</li>
+</ul>
+<p><code>"key" =&gt; value</code> part is optional:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>drain = slog::Discard;
+<span class="kw">let </span>root = slog::Logger::root(
+    drain,
+    <span class="macro">slog::o!</span>(<span class="string">"key1" </span>=&gt; <span class="string">"value1"</span>, <span class="string">"key2" </span>=&gt; <span class="string">"value2"</span>),
+);
+<span class="macro">slog::info!</span>(root, <span class="string">"formatted: {}"</span>, <span class="number">1</span>);</code></pre></div>
+<p>Use formatting support wisely. Prefer named arguments, so the associated
+data is not “lost” by becoming an untyped string in the message.</p>
+<h4 id="tags"><a class="doc-anchor" href="#tags">§</a>Tags</h4>
+<p>All above versions can be supplemented with a tag - string literal prefixed
+with <code>#</code>.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>drain = slog::Discard;
+<span class="kw">let </span>root = slog::Logger::root(drain,
+    <span class="macro">slog::o!</span>(<span class="string">"key1" </span>=&gt; <span class="string">"value1"</span>, <span class="string">"key2" </span>=&gt; <span class="string">"value2"</span>)
+);
+<span class="kw">let </span>ops = <span class="number">3</span>;
+<span class="macro">slog::info!</span>(
+    root,
+    #"performance-metric<span class="string">", "thread </span>speed<span class="string">"; "ops_per_sec" =&gt; ops
+);</span></code></pre></div>
+<p>See <code>Record::tag()</code> for more information about tags.</p>
+<h4 id="own-implementations-of-kv-and-value"><a class="doc-anchor" href="#own-implementations-of-kv-and-value">§</a>Own implementations of <code>KV</code> and <code>Value</code></h4>
+<p>List of key value pairs is a comma separated list of key-values. Typically,
+a designed syntax is used in form of <code>k =&gt; v</code> where <code>k</code> can be any type
+that implements <code>Value</code> type.</p>
+<p>It’s possible to directly specify type that implements <code>KV</code> trait without
+<code>=&gt;</code> syntax.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>slog::{KV, Value, Record, Serializer, Key, o, info};
+<span class="kw">struct </span>MyKV;
+<span class="kw">struct </span>MyV;
+
+<span class="kw">impl </span>KV <span class="kw">for </span>MyKV {
+    <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, _record: <span class="kw-2">&amp;</span>Record, serializer: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Serializer) -&gt; slog::Result {
+        serializer.emit_u32(<span class="string">"MyK"</span>.into(), <span class="number">16</span>)
+    }
+}
+
+<span class="kw">impl </span>Value <span class="kw">for </span>MyV {
+    <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, _record: <span class="kw-2">&amp;</span>Record, key: Key, serializer: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Serializer) -&gt; slog::Result {
+        serializer.emit_u32(<span class="string">"MyKV"</span>.into(), <span class="number">16</span>)
+    }
+}
+
+<span class="kw">let </span>drain = slog::Discard;
+
+<span class="kw">let </span>root = slog::Logger::root(drain, <span class="macro">o!</span>(MyKV));
+
+<span class="macro">info!</span>(
+    root,
+    <span class="string">"testing MyV"</span>; <span class="string">"MyV" </span>=&gt; MyV
+);</code></pre></div>
+<h4 id="fmtdisplay-and-fmtdebug-values"><a class="doc-anchor" href="#fmtdisplay-and-fmtdebug-values">§</a><code>fmt::Display</code> and <code>fmt::Debug</code> values</h4>
+<p>Slog macros support couple of formatting modifiers for convenience.</p>
+<p>Value of any type that implements <code>std::fmt::Display</code> can be prefixed with
+<code>%</code> in <code>k =&gt; v</code> expression to use its text representation returned by
+<code>format_args!("{}", v)</code>. This is especially useful for errors. Not that
+this does not allocate any <code>String</code> since it operates on <code>fmt::Arguments</code>.
+You can also use the <code>#%</code> prefix to use the “alternate” form of formatting,
+represented by the <code>{:#}</code> formatting specifier.</p>
+<p>Similarly to use <code>std::fmt::Debug</code> value can be prefixed with <code>?</code>,
+or pretty-printed with <code>#?</code>.</p>
+<p>Errors can be prefixed with <code>#</code> as a shorthand. Error values will be wrapped
+with <a href="../struct.ErrorValue.html" title="struct slog::ErrorValue"><code>ErrorValue</code></a>. Error references will be wrapped in <a href="../struct.ErrorRef.html" title="struct slog::ErrorRef"><code>ErrorRef</code></a>.</p>
+<p>Full list of supported formats can always be inspected by looking at
+<a href="macro.log.html"><code>kv</code> macro</a></p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>drain = slog::Discard;
+<span class="kw">let </span>log  = slog::Logger::root(drain, <span class="macro">slog::o!</span>());
+
+<span class="kw">let </span><span class="kw-2">mut </span>output = String::new();
+
+<span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="macro">write!</span>(<span class="kw-2">&amp;mut </span>output, <span class="string">"write to string"</span>) {
+    <span class="macro">slog::error!</span>(log, <span class="string">"write failed"</span>; <span class="string">"err" </span>=&gt; %e);
+}</code></pre></div>
+</div></details></section></div></main></body></html>

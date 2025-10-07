@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"attr":["declare_sql_function"],"macro":["define_sql_function","sql_function"]};

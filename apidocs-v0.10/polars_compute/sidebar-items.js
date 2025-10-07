@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["arithmetic","arity","bitwise","cardinality","cast","comparisons","filter","float_sum","gather","horizontal_flatten","hyperloglogplus","if_then_else","min_max","propagate_dictionary","size","sum","unique","var_cov"],"trait":["NotSimdPrimitive"]};

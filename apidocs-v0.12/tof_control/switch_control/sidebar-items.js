@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["clear_port_statistics_all"],"mod":["switch_info","switch_port","switch_util"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["make_growable"],"struct":["GrowableBinary","GrowableBinaryViewArray","GrowableBoolean","GrowableDictionary","GrowableFixedSizeBinary","GrowableFixedSizeList","GrowableList","GrowableNull","GrowablePrimitive","GrowableStruct","GrowableUtf8"],"trait":["Growable"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["mgs"],"struct":["MGS"]};

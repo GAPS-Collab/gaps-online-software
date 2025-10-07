@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["ActiveMenu","MTMenuItem","MenuItem","PAMoniMenuItem","RBMenuItem","RWMenuItem","SettingsMenuItem","TEMenuItem","THMenuItem","TSMenuItem","UIMenuItem"],"struct":["EventMenu","HBMenu","MainMenu","MoniMenu","PAMoniMenu","PaddleMenu","RBMenu","RBMenu2","RWMenu","SettingsMenu","THMenu","TSMenu","TelemetryMenu","TriggerMenu"],"trait":["UIMenu"]};

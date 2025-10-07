@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["packet_distributor","render_logs","telly_packet_counter"],"mod":["colors","layout","menu","tabs","widgets"]};

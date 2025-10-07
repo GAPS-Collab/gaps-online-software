@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["Component","OutOfBound","Shifters","Variable"],"fn":["load_alerts"],"struct":["TofAlert","TofAlertConfig","TofAlertManifest"],"trait":["Pageable"]};

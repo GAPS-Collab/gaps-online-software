@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["wrap_prescale_to_u32"],"struct":["PyMasterTrigger"]};

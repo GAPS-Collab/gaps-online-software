@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["SwitchError"],"struct":["AllSwitchData","SwitchData","SwitchInfo","SwitchPort"]};

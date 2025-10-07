@@ -1,0 +1,37 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Provides the gamma and related functions"><title>statrs::function::gamma - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-aa0817cf.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="statrs" data-themes="" data-resource-suffix="" data-rustdoc-version="1.90.0 (1159e78c4 2025-09-14)" data-channel="1.90.0" data-search-js="search-fa3e91e5.js" data-settings-js="settings-5514c975.js" ><script src="../../../static.files/storage-68b7e25d.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../../static.files/main-eebb9057.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../statrs/index.html">statrs</a><span class="version">0.16.1</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Module gamma</a></h2><h3><a href="#functions">Module Items</a></h3><ul class="block"><li><a href="#functions" title="Functions">Functions</a></li></ul></section><div id="rustdoc-modnav"><h2><a href="../index.html">In statrs::<wbr>function</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../index.html">statrs</a>::<wbr><a href="../index.html">function</a></div><h1>Module <span>gamma</span><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../src/statrs/function/gamma.rs.html#1-808">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Provides the <a href="https://en.wikipedia.org/wiki/Gamma_function">gamma</a> and
+related functions</p>
+</div></details><h2 id="functions" class="section-header">Functions<a href="#functions" class="anchor">§</a></h2><dl class="item-table"><dt><a class="fn" href="fn.checked_gamma_li.html" title="fn statrs::function::gamma::checked_gamma_li">checked_<wbr>gamma_<wbr>li</a></dt><dd>Computes the lower incomplete gamma function
+<code>gamma(a,x) = int(exp(-t)t^(a-1), t=0..x) for a &gt; 0, x &gt; 0</code>
+where <code>a</code> is the argument for the gamma function and <code>x</code>
+is the upper integral limit.</dd><dt><a class="fn" href="fn.checked_gamma_lr.html" title="fn statrs::function::gamma::checked_gamma_lr">checked_<wbr>gamma_<wbr>lr</a></dt><dd>Computes the lower incomplete regularized gamma function
+<code>P(a,x) = 1 / Gamma(a) * int(exp(-t)t^(a-1), t=0..x) for real a &gt; 0, x &gt; 0</code>
+where <code>a</code> is the argument for the gamma function and <code>x</code> is the upper
+integral limit.</dd><dt><a class="fn" href="fn.checked_gamma_ui.html" title="fn statrs::function::gamma::checked_gamma_ui">checked_<wbr>gamma_<wbr>ui</a></dt><dd>Computes the upper incomplete gamma function
+<code>Gamma(a,x) = int(exp(-t)t^(a-1), t=0..x) for a &gt; 0, x &gt; 0</code>
+where <code>a</code> is the argument for the gamma function and
+<code>x</code> is the lower intergral limit.</dd><dt><a class="fn" href="fn.checked_gamma_ur.html" title="fn statrs::function::gamma::checked_gamma_ur">checked_<wbr>gamma_<wbr>ur</a></dt><dd>Computes the upper incomplete regularized gamma function
+<code>Q(a,x) = 1 / Gamma(a) * int(exp(-t)t^(a-1), t=0..x) for a &gt; 0, x &gt; 0</code>
+where <code>a</code> is the argument for the gamma function and
+<code>x</code> is the lower integral limit.</dd><dt><a class="fn" href="fn.digamma.html" title="fn statrs::function::gamma::digamma">digamma</a></dt><dd>Computes the Digamma function which is defined as the derivative of
+the log of the gamma function. The implementation is based on
+“Algorithm AS 103”, Jose Bernardo, Applied Statistics, Volume 25, Number 3
+1976, pages 315 - 317</dd><dt><a class="fn" href="fn.gamma.html" title="fn statrs::function::gamma::gamma">gamma</a></dt><dd>Computes the gamma function with an accuracy
+of 16 floating point digits. The implementation
+is derived from “An Analysis of the Lanczos Gamma Approximation”,
+Glendon Ralph Pugh, 2004 p. 116</dd><dt><a class="fn" href="fn.gamma_li.html" title="fn statrs::function::gamma::gamma_li">gamma_<wbr>li</a></dt><dd>Computes the lower incomplete gamma function
+<code>gamma(a,x) = int(exp(-t)t^(a-1), t=0..x) for a &gt; 0, x &gt; 0</code>
+where <code>a</code> is the argument for the gamma function and <code>x</code>
+is the upper integral limit.</dd><dt><a class="fn" href="fn.gamma_lr.html" title="fn statrs::function::gamma::gamma_lr">gamma_<wbr>lr</a></dt><dd>Computes the lower incomplete regularized gamma function
+<code>P(a,x) = 1 / Gamma(a) * int(exp(-t)t^(a-1), t=0..x) for real a &gt; 0, x &gt; 0</code>
+where <code>a</code> is the argument for the gamma function and <code>x</code> is the upper
+integral limit.</dd><dt><a class="fn" href="fn.gamma_ui.html" title="fn statrs::function::gamma::gamma_ui">gamma_<wbr>ui</a></dt><dd>Computes the upper incomplete gamma function
+<code>Gamma(a,x) = int(exp(-t)t^(a-1), t=0..x) for a &gt; 0, x &gt; 0</code>
+where <code>a</code> is the argument for the gamma function and
+<code>x</code> is the lower intergral limit.</dd><dt><a class="fn" href="fn.gamma_ur.html" title="fn statrs::function::gamma::gamma_ur">gamma_<wbr>ur</a></dt><dd>Computes the upper incomplete regularized gamma function
+<code>Q(a,x) = 1 / Gamma(a) * int(exp(-t)t^(a-1), t=0..x) for a &gt; 0, x &gt; 0</code>
+where <code>a</code> is the argument for the gamma function and
+<code>x</code> is the lower integral limit.</dd><dt><a class="fn" href="fn.inv_digamma.html" title="fn statrs::function::gamma::inv_digamma">inv_<wbr>digamma</a></dt><dt><a class="fn" href="fn.ln_gamma.html" title="fn statrs::function::gamma::ln_gamma">ln_<wbr>gamma</a></dt><dd>Computes the logarithm of the gamma function
+with an accuracy of 16 floating point digits.
+The implementation is derived from
+“An Analysis of the Lanczos Gamma Approximation”,
+Glendon Ralph Pugh, 2004 p. 116</dd></dl></section></div></main></body></html>

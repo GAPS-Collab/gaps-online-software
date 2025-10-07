@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["HybridRleChunk"],"fn":["bitpacked_encode","encode"],"struct":["BitmapIter","HybridRleChunkIter","HybridRleDecoder"],"trait":["Encoder"]};

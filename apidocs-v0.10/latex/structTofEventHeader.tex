@@ -1,0 +1,102 @@
+\doxysection{Tof\+Event\+Header Struct Reference}
+\hypertarget{structTofEventHeader}{}\label{structTofEventHeader}\index{TofEventHeader@{TofEventHeader}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structTofEventHeader_a95de6ccc8f6ab8f908b9c3974eed489d}\label{structTofEventHeader_a95de6ccc8f6ab8f908b9c3974eed489d} 
+auto {\bfseries to\+\_\+string} () const -\/$>$ std\+::string
+\begin{DoxyCompactList}\small\item\em String representation for printing to output. \end{DoxyCompactList}\item 
+\Hypertarget{structTofEventHeader_a336d678cdfa4739984089e5745a05a13}\label{structTofEventHeader_a336d678cdfa4739984089e5745a05a13} 
+auto {\bfseries get\+\_\+timestamp48} () const -\/$>$ f64
+\begin{DoxyCompactList}\small\item\em get the timestamp \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structTofEventHeader_a710c9bec8ad60819b7cd1b529a9053fc}\label{structTofEventHeader_a710c9bec8ad60819b7cd1b529a9053fc} 
+static auto {\bfseries from\+\_\+bytestream} (const Vec$<$ u8 $>$ \&stream, u64 \&pos) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{structTofEventHeader}{Tof\+Event\+Header}}, \mbox{\hyperlink{classGaps_1_1IOError}{g\+::\+IOError}} $>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structTofEventHeader_a0344aabc7855587b6588b76095bfc16f}\label{structTofEventHeader_a0344aabc7855587b6588b76095bfc16f} 
+u32 {\bfseries run\+\_\+id} = 0
+\item 
+\Hypertarget{structTofEventHeader_aadecbef8416ce5b41be418145313f4af}\label{structTofEventHeader_aadecbef8416ce5b41be418145313f4af} 
+u32 {\bfseries event\+\_\+id} = 0
+\item 
+u32 \mbox{\hyperlink{structTofEventHeader_a30d35e7ff4f51562a82e6797d4cc6471}{timestamp32}} = 0
+\item 
+\Hypertarget{structTofEventHeader_a1ae1a568c2e86b1117d29ebac2b4e5c4}\label{structTofEventHeader_a1ae1a568c2e86b1117d29ebac2b4e5c4} 
+u16 {\bfseries timestamp16} = 0
+\item 
+\Hypertarget{structTofEventHeader_a453add1435c6688c05eb5be39f0c8579}\label{structTofEventHeader_a453add1435c6688c05eb5be39f0c8579} 
+u16 {\bfseries primary\+\_\+beta} = 0
+\item 
+\Hypertarget{structTofEventHeader_a3f4d8ead72c25cedc6f0438e461b63f7}\label{structTofEventHeader_a3f4d8ead72c25cedc6f0438e461b63f7} 
+u16 {\bfseries primary\+\_\+beta\+\_\+unc} = 0
+\item 
+\Hypertarget{structTofEventHeader_adb212c8ee206b54cbcc5e86187a8e7ed}\label{structTofEventHeader_adb212c8ee206b54cbcc5e86187a8e7ed} 
+u16 {\bfseries primary\+\_\+charge} = 0
+\item 
+\Hypertarget{structTofEventHeader_af0de9f52529aba44312888204a8fcd10}\label{structTofEventHeader_af0de9f52529aba44312888204a8fcd10} 
+u16 {\bfseries primary\+\_\+charge\+\_\+unc} = 0
+\item 
+\Hypertarget{structTofEventHeader_a7a48152dc548f3acf633a0c425ea8622}\label{structTofEventHeader_a7a48152dc548f3acf633a0c425ea8622} 
+u16 {\bfseries primary\+\_\+outer\+\_\+tof\+\_\+x} = 0
+\item 
+\Hypertarget{structTofEventHeader_a04d7e9c425e32b4245ca48023b4bc40a}\label{structTofEventHeader_a04d7e9c425e32b4245ca48023b4bc40a} 
+u16 {\bfseries primary\+\_\+outer\+\_\+tof\+\_\+y} = 0
+\item 
+\Hypertarget{structTofEventHeader_aa8386fc320feb595f6313cb7895e6a0c}\label{structTofEventHeader_aa8386fc320feb595f6313cb7895e6a0c} 
+u16 {\bfseries primary\+\_\+outer\+\_\+tof\+\_\+z} = 0
+\item 
+\Hypertarget{structTofEventHeader_a522d485f799e42d25447f51e3ce980a5}\label{structTofEventHeader_a522d485f799e42d25447f51e3ce980a5} 
+u16 {\bfseries primary\+\_\+inner\+\_\+tof\+\_\+x} = 0
+\item 
+\Hypertarget{structTofEventHeader_a0c0c44c084d86fbc1dcf3e9dfddaa67d}\label{structTofEventHeader_a0c0c44c084d86fbc1dcf3e9dfddaa67d} 
+u16 {\bfseries primary\+\_\+inner\+\_\+tof\+\_\+y} = 0
+\item 
+\Hypertarget{structTofEventHeader_a4c9ae00f5e59dcf913e6d6465a924072}\label{structTofEventHeader_a4c9ae00f5e59dcf913e6d6465a924072} 
+u16 {\bfseries primary\+\_\+inner\+\_\+tof\+\_\+z} = 0
+\item 
+\Hypertarget{structTofEventHeader_a916d2d4278fe845eabea50e83b77a7ad}\label{structTofEventHeader_a916d2d4278fe845eabea50e83b77a7ad} 
+u8 {\bfseries nhit\+\_\+outer\+\_\+tof} = 0
+\item 
+\Hypertarget{structTofEventHeader_a65f64a5e6479abe0cf00241ef124ed2f}\label{structTofEventHeader_a65f64a5e6479abe0cf00241ef124ed2f} 
+u8 {\bfseries nhit\+\_\+inner\+\_\+tof} = 0
+\item 
+\Hypertarget{structTofEventHeader_a7b9ec5bdfce61ac7378c743ecbd72b46}\label{structTofEventHeader_a7b9ec5bdfce61ac7378c743ecbd72b46} 
+u8 {\bfseries trigger\+\_\+info} = 0
+\item 
+\Hypertarget{structTofEventHeader_a6aef4415b91200c7127bdf155093cb66}\label{structTofEventHeader_a6aef4415b91200c7127bdf155093cb66} 
+u8 {\bfseries ctr\+\_\+etx} = 0
+\item 
+\Hypertarget{structTofEventHeader_a91216712f915a0be5f206f53c75720a2}\label{structTofEventHeader_a91216712f915a0be5f206f53c75720a2} 
+u8 {\bfseries n\+\_\+paddles} = 0
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structTofEventHeader_aa95ed917e133f54d10324caa9948630e}\label{structTofEventHeader_aa95ed917e133f54d10324caa9948630e} 
+static constexpr u16 {\bfseries HEAD} = 0x\+AAAA
+\item 
+\Hypertarget{structTofEventHeader_a375102e402d700d56dcc1f4ee58f454f}\label{structTofEventHeader_a375102e402d700d56dcc1f4ee58f454f} 
+static constexpr u16 {\bfseries TAIL} = 0x5555
+\item 
+\Hypertarget{structTofEventHeader_ac04deaa816c673898949934f3b0551d4}\label{structTofEventHeader_ac04deaa816c673898949934f3b0551d4} 
+static constexpr usize {\bfseries SIZE} = 47
+\begin{DoxyCompactList}\small\item\em fixed size including head and tail \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structTofEventHeader_a30d35e7ff4f51562a82e6797d4cc6471}\label{structTofEventHeader_a30d35e7ff4f51562a82e6797d4cc6471} 
+\index{TofEventHeader@{TofEventHeader}!timestamp32@{timestamp32}}
+\index{timestamp32@{timestamp32}!TofEventHeader@{TofEventHeader}}
+\doxysubsubsection{\texorpdfstring{timestamp32}{timestamp32}}
+{\footnotesize\ttfamily u32 Tof\+Event\+Header\+::timestamp32 = 0}
+
+a reference to a timestamp which is not yet decided 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/tof/dataclasses/\+C++/include/events/tof\+\_\+event\+\_\+header.\+hpp\end{DoxyCompactItemize}

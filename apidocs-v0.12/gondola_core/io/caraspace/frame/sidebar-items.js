@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["MERGED_EVENT_TYPES"],"enum":["CRFrameObjectType"],"struct":["CRFrame","CRFrameObject","CRFrameObjectTypeIter"]};

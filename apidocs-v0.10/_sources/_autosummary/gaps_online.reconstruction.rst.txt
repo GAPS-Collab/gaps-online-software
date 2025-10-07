@@ -1,0 +1,22 @@
+gaps\_online.reconstruction
+===========================
+
+.. automodule:: gaps_online.reconstruction
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      line3d
+      line3d_2pts
+      line_fit
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      FitStatus
+      LeastSquares
+      Reconstruction
+   

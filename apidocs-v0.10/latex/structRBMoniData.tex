@@ -1,0 +1,155 @@
+\doxysection{RBMoni\+Data Struct Reference}
+\hypertarget{structRBMoniData}{}\label{structRBMoniData}\index{RBMoniData@{RBMoniData}}
+
+
+{\ttfamily \#include $<$monitoring.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structRBMoniData_a54eda68207c82795cde45dacf62fe352}\label{structRBMoniData_a54eda68207c82795cde45dacf62fe352} 
+auto {\bfseries to\+\_\+string} () const -\/$>$ std\+::string
+\begin{DoxyCompactList}\small\item\em String representatioin for printing. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structRBMoniData_a8426bb2234591edd51a9806293679893}\label{structRBMoniData_a8426bb2234591edd51a9806293679893} 
+static auto {\bfseries from\+\_\+bytestream} (const Vec$<$ u8 $>$ \&stream, usize \&pos) -\/$>$ \mbox{\hyperlink{structRBMoniData}{RBMoni\+Data}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structRBMoniData_ab82bb3205a8aa362748714000b628534}\label{structRBMoniData_ab82bb3205a8aa362748714000b628534} 
+u8 {\bfseries board\+\_\+id}
+\item 
+\Hypertarget{structRBMoniData_abb385a6a883190b2b5e4b7b4f755a909}\label{structRBMoniData_abb385a6a883190b2b5e4b7b4f755a909} 
+u16 {\bfseries rate}
+\begin{DoxyCompactList}\small\item\em Rate as recorded by the board itself. \end{DoxyCompactList}\item 
+\Hypertarget{structRBMoniData_ac37c12e0e593813d787a5a55378c4fe0}\label{structRBMoniData_ac37c12e0e593813d787a5a55378c4fe0} 
+f32 {\bfseries tmp\+\_\+drs}
+\item 
+\Hypertarget{structRBMoniData_a288247c5fc91dade24d13418a4b71135}\label{structRBMoniData_a288247c5fc91dade24d13418a4b71135} 
+f32 {\bfseries tmp\+\_\+clk}
+\item 
+\Hypertarget{structRBMoniData_ac2178293438b0f7b610a1b9ca1a8817f}\label{structRBMoniData_ac2178293438b0f7b610a1b9ca1a8817f} 
+f32 {\bfseries tmp\+\_\+adc}
+\item 
+\Hypertarget{structRBMoniData_ae155d590200088364810f20cabb818cb}\label{structRBMoniData_ae155d590200088364810f20cabb818cb} 
+f32 {\bfseries tmp\+\_\+zynq}
+\begin{DoxyCompactList}\small\item\em fpga temperature \end{DoxyCompactList}\item 
+\Hypertarget{structRBMoniData_a81b779cde246d92ce8587578dc611a7e}\label{structRBMoniData_a81b779cde246d92ce8587578dc611a7e} 
+f32 {\bfseries tmp\+\_\+lis3mdltr}
+\item 
+\Hypertarget{structRBMoniData_a13db6f0d7103175ffb480b1e110e39c0}\label{structRBMoniData_a13db6f0d7103175ffb480b1e110e39c0} 
+f32 {\bfseries tmp\+\_\+bm280}
+\item 
+\Hypertarget{structRBMoniData_a417357f8a34942a7eefecb7ba73800ba}\label{structRBMoniData_a417357f8a34942a7eefecb7ba73800ba} 
+f32 {\bfseries pressure}
+\begin{DoxyCompactList}\small\item\em ambient pressure \end{DoxyCompactList}\item 
+\Hypertarget{structRBMoniData_a412fc44c126e97ef56e2d4bc7344ed6a}\label{structRBMoniData_a412fc44c126e97ef56e2d4bc7344ed6a} 
+f32 {\bfseries humidity}
+\begin{DoxyCompactList}\small\item\em ambient humidity \end{DoxyCompactList}\item 
+\Hypertarget{structRBMoniData_ae1850028094b81c5f51d1c0d6ae84c75}\label{structRBMoniData_ae1850028094b81c5f51d1c0d6ae84c75} 
+f32 {\bfseries mag\+\_\+x}
+\item 
+\Hypertarget{structRBMoniData_ab511c4787d80be9d549322b2253f8f8a}\label{structRBMoniData_ab511c4787d80be9d549322b2253f8f8a} 
+f32 {\bfseries mag\+\_\+y}
+\item 
+\Hypertarget{structRBMoniData_a5f9d7cfa9aa1c162d31b7af6dcc411e9}\label{structRBMoniData_a5f9d7cfa9aa1c162d31b7af6dcc411e9} 
+f32 {\bfseries mag\+\_\+z}
+\item 
+\Hypertarget{structRBMoniData_aceb4fef6fbabb001a8fff0744f2ae23f}\label{structRBMoniData_aceb4fef6fbabb001a8fff0744f2ae23f} 
+f32 {\bfseries mag\+\_\+tot}
+\begin{DoxyCompactList}\small\item\em total strength of magnetic field \end{DoxyCompactList}\item 
+\Hypertarget{structRBMoniData_af9b36ce65a4c08fc4c96f0e3d0e28597}\label{structRBMoniData_af9b36ce65a4c08fc4c96f0e3d0e28597} 
+f32 {\bfseries drs\+\_\+dvdd\+\_\+voltage}
+\item 
+\Hypertarget{structRBMoniData_ac7c2b0f45daa1ef6320d3cc858b60847}\label{structRBMoniData_ac7c2b0f45daa1ef6320d3cc858b60847} 
+f32 {\bfseries drs\+\_\+dvdd\+\_\+current}
+\item 
+\Hypertarget{structRBMoniData_a888bef9190dba4d8478f4e15a4c33e22}\label{structRBMoniData_a888bef9190dba4d8478f4e15a4c33e22} 
+f32 {\bfseries drs\+\_\+dvdd\+\_\+power}
+\item 
+\Hypertarget{structRBMoniData_a9cab3b7af3ea4b624fd4a552d6476ada}\label{structRBMoniData_a9cab3b7af3ea4b624fd4a552d6476ada} 
+f32 {\bfseries p3v3\+\_\+voltage}
+\item 
+\Hypertarget{structRBMoniData_a6da3dcf006a0f5058cdb29851a492ea7}\label{structRBMoniData_a6da3dcf006a0f5058cdb29851a492ea7} 
+f32 {\bfseries p3v3\+\_\+current}
+\item 
+\Hypertarget{structRBMoniData_ae6a62eb2919b1140a09bdaa50365518d}\label{structRBMoniData_ae6a62eb2919b1140a09bdaa50365518d} 
+f32 {\bfseries p3v3\+\_\+power}
+\item 
+\Hypertarget{structRBMoniData_a7666c370c2c03b25caee815de70c76ba}\label{structRBMoniData_a7666c370c2c03b25caee815de70c76ba} 
+f32 {\bfseries zynq\+\_\+voltage}
+\item 
+\Hypertarget{structRBMoniData_a51dbf25f6bf674424e22bc8d89584609}\label{structRBMoniData_a51dbf25f6bf674424e22bc8d89584609} 
+f32 {\bfseries zynq\+\_\+current}
+\item 
+\Hypertarget{structRBMoniData_a54b56e3d78d3798df489ca69a73f1d26}\label{structRBMoniData_a54b56e3d78d3798df489ca69a73f1d26} 
+f32 {\bfseries zynq\+\_\+power}
+\item 
+\Hypertarget{structRBMoniData_a1c15756a484b85f4e942c5a66671d2d2}\label{structRBMoniData_a1c15756a484b85f4e942c5a66671d2d2} 
+f32 {\bfseries p3v5\+\_\+voltage}
+\item 
+\Hypertarget{structRBMoniData_aed70f98cdf2262ca4cc3f97dc8b1b51c}\label{structRBMoniData_aed70f98cdf2262ca4cc3f97dc8b1b51c} 
+f32 {\bfseries p3v5\+\_\+current}
+\item 
+\Hypertarget{structRBMoniData_af58767cfac0f1c9a37fdb2cfd7744f61}\label{structRBMoniData_af58767cfac0f1c9a37fdb2cfd7744f61} 
+f32 {\bfseries p3v5\+\_\+power}
+\item 
+\Hypertarget{structRBMoniData_a399b5ce026cb0d801a43bfb2a2b7784b}\label{structRBMoniData_a399b5ce026cb0d801a43bfb2a2b7784b} 
+f32 {\bfseries adc\+\_\+dvdd\+\_\+voltage}
+\item 
+\Hypertarget{structRBMoniData_abe77865e852d18b85bc0c9a0aef9f7eb}\label{structRBMoniData_abe77865e852d18b85bc0c9a0aef9f7eb} 
+f32 {\bfseries adc\+\_\+dvdd\+\_\+current}
+\item 
+\Hypertarget{structRBMoniData_a81f0ce3873ad1bdea1b121d385509843}\label{structRBMoniData_a81f0ce3873ad1bdea1b121d385509843} 
+f32 {\bfseries adc\+\_\+dvdd\+\_\+power}
+\item 
+\Hypertarget{structRBMoniData_a826e5f2ed6b93012211dae018f72a489}\label{structRBMoniData_a826e5f2ed6b93012211dae018f72a489} 
+f32 {\bfseries adc\+\_\+avdd\+\_\+voltage}
+\item 
+\Hypertarget{structRBMoniData_aaa3ab0ffa3f670681b2771df183875f2}\label{structRBMoniData_aaa3ab0ffa3f670681b2771df183875f2} 
+f32 {\bfseries adc\+\_\+avdd\+\_\+current}
+\item 
+\Hypertarget{structRBMoniData_a95b37a3957b630fb227f6f83f39bc848}\label{structRBMoniData_a95b37a3957b630fb227f6f83f39bc848} 
+f32 {\bfseries adc\+\_\+avdd\+\_\+power}
+\item 
+\Hypertarget{structRBMoniData_ab3cf1ee816df4e302d4b7e72a5026758}\label{structRBMoniData_ab3cf1ee816df4e302d4b7e72a5026758} 
+f32 {\bfseries drs\+\_\+avdd\+\_\+voltage}
+\item 
+\Hypertarget{structRBMoniData_a8a281efd433166d8b214d70d57d8b63f}\label{structRBMoniData_a8a281efd433166d8b214d70d57d8b63f} 
+f32 {\bfseries drs\+\_\+avdd\+\_\+current}
+\item 
+\Hypertarget{structRBMoniData_ae44113bde57af43f6bac150fa0b7db6f}\label{structRBMoniData_ae44113bde57af43f6bac150fa0b7db6f} 
+f32 {\bfseries drs\+\_\+avdd\+\_\+power}
+\item 
+\Hypertarget{structRBMoniData_a10ba2673c2e73bf9414c2e4282f610cf}\label{structRBMoniData_a10ba2673c2e73bf9414c2e4282f610cf} 
+f32 {\bfseries n1v5\+\_\+voltage}
+\item 
+\Hypertarget{structRBMoniData_a01b009477c7bae11d5f2b204c98959de}\label{structRBMoniData_a01b009477c7bae11d5f2b204c98959de} 
+f32 {\bfseries n1v5\+\_\+current}
+\item 
+\Hypertarget{structRBMoniData_a5ddb6335b38810b40fe95a4364937af4}\label{structRBMoniData_a5ddb6335b38810b40fe95a4364937af4} 
+f32 {\bfseries n1v5\+\_\+power}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structRBMoniData_af0fd599482d9920ae5fd83427c869d44}\label{structRBMoniData_af0fd599482d9920ae5fd83427c869d44} 
+static constexpr u16 {\bfseries HEAD} = 0x\+AAAA
+\item 
+\Hypertarget{structRBMoniData_afe860414ccf731932e401c13186ab4a3}\label{structRBMoniData_afe860414ccf731932e401c13186ab4a3} 
+static constexpr u16 {\bfseries TAIL} = 0x5555
+\item 
+\Hypertarget{structRBMoniData_a77400272ec5ace080b53f638e79b902d}\label{structRBMoniData_a77400272ec5ace080b53f638e79b902d} 
+static constexpr u8 {\bfseries SIZE} = 151
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Sensors on the Readoutboards 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/tof/dataclasses/\+C++/include/packets/monitoring.\+h\end{DoxyCompactItemize}

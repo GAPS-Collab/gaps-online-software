@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["ltb_pwr_switch"]};

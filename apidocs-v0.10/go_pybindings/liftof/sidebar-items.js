@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["py_waveform_analysis","test_db","wrap_calc_edep_simple","wrap_fit_sine_sydney"],"struct":["PyLiftofSettings"]};

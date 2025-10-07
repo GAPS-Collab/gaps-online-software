@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"macro":["check_param","make_kv","trait_bound"],"mod":["core","prelude","solver"]};

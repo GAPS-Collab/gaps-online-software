@@ -1,0 +1,59 @@
+\doxysection{Gaps\+::CRReader Struct Reference}
+\hypertarget{structGaps_1_1CRReader}{}\label{structGaps_1_1CRReader}\index{Gaps::CRReader@{Gaps::CRReader}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structGaps_1_1CRReader_a8e78c67262ac6bdc95186f69bd16c56d}\label{structGaps_1_1CRReader_a8e78c67262ac6bdc95186f69bd16c56d} 
+{\bfseries CRReader} (std\+::string pathname)
+\item 
+\Hypertarget{structGaps_1_1CRReader_a024e31e103fa46dd941eaa3bc0510f95}\label{structGaps_1_1CRReader_a024e31e103fa46dd941eaa3bc0510f95} 
+{\bfseries CRReader} (const \mbox{\hyperlink{structGaps_1_1CRReader}{CRReader}} \&)=delete
+\item 
+\Hypertarget{structGaps_1_1CRReader_aac73042f0750d81b3cc8d285f1d2ad3a}\label{structGaps_1_1CRReader_aac73042f0750d81b3cc8d285f1d2ad3a} 
+auto {\bfseries set\+\_\+path} (std\+::string pathname) -\/$>$ void
+\item 
+auto \mbox{\hyperlink{structGaps_1_1CRReader_ad87ca9ebd20e590832418ca7f013b4d0}{get\+\_\+next\+\_\+frame}} () -\/$>$ \mbox{\hyperlink{structGaps_1_1CRFrame}{CRFrame}}
+\item 
+\Hypertarget{structGaps_1_1CRReader_a1232c60fafc5fbd5931a48515ac6427e}\label{structGaps_1_1CRReader_a1232c60fafc5fbd5931a48515ac6427e} 
+auto {\bfseries get\+\_\+filenames} () const -\/$>$ Vec$<$ std\+::string $>$
+\item 
+auto \mbox{\hyperlink{structGaps_1_1CRReader_a6021efc266d1fe854a5cea466204b4ab}{is\+\_\+exhausted}} () const -\/$>$ bool
+\item 
+auto \mbox{\hyperlink{structGaps_1_1CRReader_aecf4c85b1df2aec1b012bf2712866464}{n\+\_\+packets\+\_\+read}} () const -\/$>$ bool
+\item 
+auto \mbox{\hyperlink{structGaps_1_1CRReader_aea1c7edb8d8f7dcfeeffaa1185ad66f6}{get\+\_\+rbcalibrations}} (u8 n\+\_\+rb) -\/$>$ RBCalibration\+Map
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structGaps_1_1CRReader_ad87ca9ebd20e590832418ca7f013b4d0}\label{structGaps_1_1CRReader_ad87ca9ebd20e590832418ca7f013b4d0} 
+\index{Gaps::CRReader@{Gaps::CRReader}!get\_next\_frame@{get\_next\_frame}}
+\index{get\_next\_frame@{get\_next\_frame}!Gaps::CRReader@{Gaps::CRReader}}
+\doxysubsubsection{\texorpdfstring{get\_next\_frame()}{get\_next\_frame()}}
+{\footnotesize\ttfamily auto Gaps\+::\+CRReader\+::get\+\_\+next\+\_\+frame (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) -\/$>$  \mbox{\hyperlink{structGaps_1_1CRFrame}{CRFrame}}}
+
+Walk over the file, and return the next frame as saved in the file.
+
+Advaces all internal position markers. If the last frame is reached, an exception will be risen. After the reader is exhausted, is has to be re-\/initialized \Hypertarget{structGaps_1_1CRReader_aea1c7edb8d8f7dcfeeffaa1185ad66f6}\label{structGaps_1_1CRReader_aea1c7edb8d8f7dcfeeffaa1185ad66f6} 
+\index{Gaps::CRReader@{Gaps::CRReader}!get\_rbcalibrations@{get\_rbcalibrations}}
+\index{get\_rbcalibrations@{get\_rbcalibrations}!Gaps::CRReader@{Gaps::CRReader}}
+\doxysubsubsection{\texorpdfstring{get\_rbcalibrations()}{get\_rbcalibrations()}}
+{\footnotesize\ttfamily auto Gaps\+::\+CRReader\+::get\+\_\+rbcalibrations (\begin{DoxyParamCaption}\item[{u8}]{n\+\_\+rb }\end{DoxyParamCaption}) -\/$>$  RBCalibration\+Map}
+
+get the \doxylink{structRBCalibration}{RBCalibration} map the paramter is the number of RBs we expect in this run \Hypertarget{structGaps_1_1CRReader_a6021efc266d1fe854a5cea466204b4ab}\label{structGaps_1_1CRReader_a6021efc266d1fe854a5cea466204b4ab} 
+\index{Gaps::CRReader@{Gaps::CRReader}!is\_exhausted@{is\_exhausted}}
+\index{is\_exhausted@{is\_exhausted}!Gaps::CRReader@{Gaps::CRReader}}
+\doxysubsubsection{\texorpdfstring{is\_exhausted()}{is\_exhausted()}}
+{\footnotesize\ttfamily auto Gaps\+::\+CRReader\+::is\+\_\+exhausted (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$  bool}
+
+All packets have been read from the file. If they should be read again, the reader has to be created again \Hypertarget{structGaps_1_1CRReader_aecf4c85b1df2aec1b012bf2712866464}\label{structGaps_1_1CRReader_aecf4c85b1df2aec1b012bf2712866464} 
+\index{Gaps::CRReader@{Gaps::CRReader}!n\_packets\_read@{n\_packets\_read}}
+\index{n\_packets\_read@{n\_packets\_read}!Gaps::CRReader@{Gaps::CRReader}}
+\doxysubsubsection{\texorpdfstring{n\_packets\_read()}{n\_packets\_read()}}
+{\footnotesize\ttfamily auto Gaps\+::\+CRReader\+::n\+\_\+packets\+\_\+read (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$  bool}
+
+The number of files this reader has read from the file 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/tof/dataclasses/\+C++/include/caraspace.\+hpp\end{DoxyCompactItemize}
