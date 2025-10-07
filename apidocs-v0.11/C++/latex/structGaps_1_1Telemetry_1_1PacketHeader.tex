@@ -1,0 +1,126 @@
+\doxysection{Gaps\+::Telemetry\+::Packet\+Header Struct Reference}
+\hypertarget{structGaps_1_1Telemetry_1_1PacketHeader}{}\label{structGaps_1_1Telemetry_1_1PacketHeader}\index{Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}}
+
+
+{\ttfamily \#include $<$telemetry\+\_\+dataclasses.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader_a5ca4bf3a5213a9c6aead86e1f54fb80c}{get\+\_\+gcutime}} () -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a94dab5770726ccbef8c7d026cfbdf8e5}{f64}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader_a0ac2a1f8311ca6849e48288ed6a5d7b1}{to\+\_\+string}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ std\+::string
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader_ac8898e25d4090ffd486ee1e3f9cf641e}{to\+\_\+bytestream}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader_adaab519231ace7b898884d17311f320b}{from\+\_\+bytestream}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{stream}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}}) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader}{Packet\+Header}}, \mbox{\hyperlink{classGaps_1_1IOError}{Gaps\+::\+IOError}} $>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader_ae08b78f8e0bb397be1a2796f69d59caa}{sync}} \{0\}
+\item 
+\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7}{Bfsw\+Packet\+Type}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader_a94af133585a793dcba895004fde1c561}{ptype}} \{\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a88183b946cc5f0e8c96b2e66e1c74a7e}{Bfsw\+Packet\+Type\+::\+Unknown}}\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader_a8edf2627e90e8188fc17592d17e7a23a}{timestamp}} \{0\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader_a354c31ed8fe5949e5bf28d3d291aff0b}{counter}} \{0\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader_ad59298ac1cc731b73bd7e9dec346d1e7}{length}} \{0\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader_a516c17f56d986c678242955a735f22b3}{checksum}} \{0\}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader_a114f984a2e93c51a08fb1e99a62210c2}{SIZE}} = 13
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader_a4e9f7ba945ce6c1b336333bf0cfce31f}{HEAD}} = 0x90eb
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structGaps_1_1Telemetry_1_1PacketHeader_adaab519231ace7b898884d17311f320b}\label{structGaps_1_1Telemetry_1_1PacketHeader_adaab519231ace7b898884d17311f320b} 
+\index{Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}!from\_bytestream@{from\_bytestream}}
+\index{from\_bytestream@{from\_bytestream}!Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}}
+\doxysubsubsection{\texorpdfstring{from\_bytestream()}{from\_bytestream()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} Gaps\+::\+Telemetry\+::\+Packet\+Header\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&}]{stream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&}]{pos }\end{DoxyParamCaption}) -\/$>$ r\+::\+Result$<$\mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader}{Packet\+Header}}, \mbox{\hyperlink{classGaps_1_1IOError}{Gaps\+::\+IOError}}$>$\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1PacketHeader_a5ca4bf3a5213a9c6aead86e1f54fb80c}\label{structGaps_1_1Telemetry_1_1PacketHeader_a5ca4bf3a5213a9c6aead86e1f54fb80c} 
+\index{Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}!get\_gcutime@{get\_gcutime}}
+\index{get\_gcutime@{get\_gcutime}!Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}}
+\doxysubsubsection{\texorpdfstring{get\_gcutime()}{get\_gcutime()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a94dab5770726ccbef8c7d026cfbdf8e5}{f64}} Gaps\+::\+Telemetry\+::\+Packet\+Header\+::get\+\_\+gcutime (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a94dab5770726ccbef8c7d026cfbdf8e5}{f64}}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1PacketHeader_ac8898e25d4090ffd486ee1e3f9cf641e}\label{structGaps_1_1Telemetry_1_1PacketHeader_ac8898e25d4090ffd486ee1e3f9cf641e} 
+\index{Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}!to\_bytestream@{to\_bytestream}}
+\index{to\_bytestream@{to\_bytestream}!Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}}
+\doxysubsubsection{\texorpdfstring{to\_bytestream()}{to\_bytestream()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} Gaps\+::\+Telemetry\+::\+Packet\+Header\+::to\+\_\+bytestream (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}$>$}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1PacketHeader_a0ac2a1f8311ca6849e48288ed6a5d7b1}\label{structGaps_1_1Telemetry_1_1PacketHeader_a0ac2a1f8311ca6849e48288ed6a5d7b1} 
+\index{Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} Gaps\+::\+Telemetry\+::\+Packet\+Header\+::to\+\_\+string (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ std\+::string}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structGaps_1_1Telemetry_1_1PacketHeader_a516c17f56d986c678242955a735f22b3}\label{structGaps_1_1Telemetry_1_1PacketHeader_a516c17f56d986c678242955a735f22b3} 
+\index{Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}!checksum@{checksum}}
+\index{checksum@{checksum}!Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}}
+\doxysubsubsection{\texorpdfstring{checksum}{checksum}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Gaps\+::\+Telemetry\+::\+Packet\+Header\+::checksum \{0\}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1PacketHeader_a354c31ed8fe5949e5bf28d3d291aff0b}\label{structGaps_1_1Telemetry_1_1PacketHeader_a354c31ed8fe5949e5bf28d3d291aff0b} 
+\index{Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}!counter@{counter}}
+\index{counter@{counter}!Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}}
+\doxysubsubsection{\texorpdfstring{counter}{counter}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Gaps\+::\+Telemetry\+::\+Packet\+Header\+::counter \{0\}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1PacketHeader_a4e9f7ba945ce6c1b336333bf0cfce31f}\label{structGaps_1_1Telemetry_1_1PacketHeader_a4e9f7ba945ce6c1b336333bf0cfce31f} 
+\index{Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}!HEAD@{HEAD}}
+\index{HEAD@{HEAD}!Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}}
+\doxysubsubsection{\texorpdfstring{HEAD}{HEAD}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Gaps\+::\+Telemetry\+::\+Packet\+Header\+::\+HEAD = 0x90eb\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1PacketHeader_ad59298ac1cc731b73bd7e9dec346d1e7}\label{structGaps_1_1Telemetry_1_1PacketHeader_ad59298ac1cc731b73bd7e9dec346d1e7} 
+\index{Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}!length@{length}}
+\index{length@{length}!Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}}
+\doxysubsubsection{\texorpdfstring{length}{length}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Gaps\+::\+Telemetry\+::\+Packet\+Header\+::length \{0\}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1PacketHeader_a94af133585a793dcba895004fde1c561}\label{structGaps_1_1Telemetry_1_1PacketHeader_a94af133585a793dcba895004fde1c561} 
+\index{Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}!ptype@{ptype}}
+\index{ptype@{ptype}!Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}}
+\doxysubsubsection{\texorpdfstring{ptype}{ptype}}
+{\footnotesize\ttfamily \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7}{Bfsw\+Packet\+Type}} Gaps\+::\+Telemetry\+::\+Packet\+Header\+::ptype \{\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a88183b946cc5f0e8c96b2e66e1c74a7e}{Bfsw\+Packet\+Type\+::\+Unknown}}\}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1PacketHeader_a114f984a2e93c51a08fb1e99a62210c2}\label{structGaps_1_1Telemetry_1_1PacketHeader_a114f984a2e93c51a08fb1e99a62210c2} 
+\index{Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}!SIZE@{SIZE}}
+\index{SIZE@{SIZE}!Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}}
+\doxysubsubsection{\texorpdfstring{SIZE}{SIZE}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Gaps\+::\+Telemetry\+::\+Packet\+Header\+::\+SIZE = 13\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1PacketHeader_ae08b78f8e0bb397be1a2796f69d59caa}\label{structGaps_1_1Telemetry_1_1PacketHeader_ae08b78f8e0bb397be1a2796f69d59caa} 
+\index{Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}!sync@{sync}}
+\index{sync@{sync}!Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}}
+\doxysubsubsection{\texorpdfstring{sync}{sync}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Gaps\+::\+Telemetry\+::\+Packet\+Header\+::sync \{0\}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1PacketHeader_a8edf2627e90e8188fc17592d17e7a23a}\label{structGaps_1_1Telemetry_1_1PacketHeader_a8edf2627e90e8188fc17592d17e7a23a} 
+\index{Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}!timestamp@{timestamp}}
+\index{timestamp@{timestamp}!Gaps::Telemetry::PacketHeader@{Gaps::Telemetry::PacketHeader}}
+\doxysubsubsection{\texorpdfstring{timestamp}{timestamp}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} Gaps\+::\+Telemetry\+::\+Packet\+Header\+::timestamp \{0\}}
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/\mbox{\hyperlink{telemetry__dataclasses_8hpp}{telemetry\+\_\+dataclasses.\+hpp}}\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/\mbox{\hyperlink{telemetry__dataclasses_8cxx}{telemetry\+\_\+dataclasses.\+cxx}}\end{DoxyCompactItemize}

@@ -1,0 +1,215 @@
+\doxysection{legacy.\+h}
+\hypertarget{legacy_8h_source}{}\label{legacy_8h_source}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/legacy.h@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/legacy.h}}
+\mbox{\hyperlink{legacy_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifdef\ BUILD\_WITH\_ROOT}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#ifndef\ LEGACY\_H\_INCLUDED}}
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#define\ LEGACY\_H\_INCLUDED}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tof__typedefs_8h}{tof\_typedefs.h}}"{}}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ NCHN\ \ \ \ \ \ \ \ \ 9}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#define\ MAX\_NUM\_PEAKS\ \ \ 50\ \ }}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#define\ ERRVAL\ \ \ \ \ \ (999999999)}}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \textcolor{comment}{//\ These\ two\ \#defines\ give\ the\ necessary\ information\ for\ integrating\ to}}
+\DoxyCodeLine{00022\ \textcolor{comment}{//\ find\ the\ charge\ in\ the\ peak\ (these\ should\ be\ in\ ns)}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#define\ PEAK\_OFFSET\ \ -\/4}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#define\ PEAK\_LENGTH\ \ 12}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{RemoveSpikes}}(\textcolor{keywordtype}{double}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{wf}}[\mbox{\hyperlink{events_8h_a68c7ec06e4b37cff650691a741abe1ac}{NCHN}}][1024],\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{tCell}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{spikes}}[]);}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GAPS}}\ \{\ }
+\DoxyCodeLine{00031\ \ \ }
+\DoxyCodeLine{00032\ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{PADDLE\_END}}\ :\ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{namespaceGaps_a900b25ea53c4b01b14e10492303daa9ca7fc56270e7a70fa81a5935b72eacbe29}{A}}\ =\ 10,}
+\DoxyCodeLine{00034\ \ \ \ \ \mbox{\hyperlink{namespaceGaps_a900b25ea53c4b01b14e10492303daa9ca9d5ed678fe57bcca610140957afab571}{B}}\ =\ 20,}
+\DoxyCodeLine{00035\ \ \ \ \ UNKNOWN\ =\ 30}
+\DoxyCodeLine{00036\ \};}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \textcolor{comment}{//\ Types\ of\ Thresholds\ to\ use\ in\ determining\ timing}}
+\DoxyCodeLine{00039\ \textcolor{keyword}{enum}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{THRTYPE}}\ \{\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{CONSTANT}},\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{CFD\_ELEC}},\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{CFD\_SIMPLE}},\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{PCONSTANT}},\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{PCFD}}\ \};}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \textcolor{comment}{//\ I\ moved\ these\ to\ cfde\_frac\ and\ cfde\_offset\ below\ and\ made\ routines}}
+\DoxyCodeLine{00042\ \textcolor{comment}{//\ so\ that\ they\ can\ be\ set\ without\ recompiling.}}
+\DoxyCodeLine{00043\ \textcolor{comment}{//\#define\ CFD\_FRACTION\ \ 0.1}}
+\DoxyCodeLine{00044\ \textcolor{comment}{//\ CFD\_OFFSET\ should\ be\ an\ integer\ so\ we\ don't\ have\ to\ interpolate\ our}}
+\DoxyCodeLine{00045\ \textcolor{comment}{//\ FADC\ data.\ \ }}
+\DoxyCodeLine{00046\ \textcolor{comment}{//\#define\ CFD\_OFFSET\ \ \ \ 5.0}}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \textcolor{comment}{//\ Note:\ \ The\ NORMAL\ entry\ is\ there\ to\ make\ it\ easier\ to\ fill\ the}}
+\DoxyCodeLine{00049\ \textcolor{comment}{//\ channel\_status\ flag\ in\ the\ PMT0\ bank.\ \ A\ value\ of\ zero\ there}}
+\DoxyCodeLine{00050\ \textcolor{comment}{//\ indicates\ "{}no\ stacq\ data"{},\ so,\ it\ will\ be\ filled\ with\ 1\ if\ the\ data}}
+\DoxyCodeLine{00051\ \textcolor{comment}{//\ is\ valid\ and\ not\ saturated.\ \ Otherwise,\ it\ will\ be\ filled\ with\ zero}}
+\DoxyCodeLine{00052\ \textcolor{comment}{//\ if\ the\ data\ is\ not\ valid\ and\ with\ the\ saturated\ flag\ value\ if\ it\ is}}
+\DoxyCodeLine{00053\ \textcolor{comment}{//\ valid.\ \ }}
+\DoxyCodeLine{00054\ \textcolor{keyword}{enum}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{SAT\_FLAGS}}\ \{\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{NOT\_SAT}},\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{NORMAL}},\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{SAT}},\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{NO\_FIT}},\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{FIT\_GOOD}},\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{FIT\_BAD}}\};}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Pulse}}(\textcolor{keywordtype}{double}\ *x,\ \textcolor{keywordtype}{double}\ *\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{par}});}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \textcolor{keyword}{class\ }\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Waveform}}\ \{}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Waveform}}\ (\textcolor{keywordtype}{double}\ *\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{data}},\ \textcolor{keywordtype}{double}\ *\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{time}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{chnl}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{flag}}\ =\ 0);}
+\DoxyCodeLine{00063\ \ \ \textcolor{comment}{//\ Constructor\ 'flag'\ is\ set\ by\ default\ unless\ the\ waveform\ is}}
+\DoxyCodeLine{00064\ \ \ \textcolor{comment}{//\ constructed\ with\ a\ call\ to\ the\ contrary.\ \ Thus,\ the\ default}}
+\DoxyCodeLine{00065\ \ \ \textcolor{comment}{//\ behavior\ is\ to\ provide\ immediate\ access\ to\ pulse\ positions,}}
+\DoxyCodeLine{00066\ \ \ \textcolor{comment}{//\ times,\ heights,\ etc....\ \ For\ someone\ who\ wants\ to\ do\ a\ more}}
+\DoxyCodeLine{00067\ \ \ \textcolor{comment}{//\ specialized\ analysis,\ the\ constructor\ can\ be\ called\ with\ flag=0}}
+\DoxyCodeLine{00068\ \ \ \textcolor{comment}{//\ so\ that\ we\ do\ not\ waste\ time\ doing\ the\ ped\ and\ peak\ calculations.}}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Waveform}}\ (\textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{size}});}
+\DoxyCodeLine{00071\ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{\string~Waveform}}\ (\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \ \ \textcolor{comment}{//\ MEMBER\ FUNCTIONS}}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{SetWave}}(std::vector<double>);}
+\DoxyCodeLine{00076\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{SetTime}}(std::vector<double>);}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \ \ \textcolor{comment}{//\ Stuff\ related\ to\ the\ actual\ data}}
+\DoxyCodeLine{00079\ \ \ \textcolor{keywordtype}{void}\ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{SetThreshold}}(\textcolor{keywordtype}{float}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{PmtThreshold}});}
+\DoxyCodeLine{00080\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetWaveSize}}(\textcolor{keywordtype}{void})\{\textcolor{keywordflow}{return}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{wf\_size}};\}}
+\DoxyCodeLine{00081\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{SetBin}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{idx}},\ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{val}});}
+\DoxyCodeLine{00082\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetBin}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{idx}});}
+\DoxyCodeLine{00083\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetBinTime}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{idx}});}
+\DoxyCodeLine{00084\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetBinDC}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{idx}});}
+\DoxyCodeLine{00085\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetMaxBin}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{lo}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{size}});}
+\DoxyCodeLine{00086\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetMaxBinTime}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{lo}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{size}});}
+\DoxyCodeLine{00087\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetMaxVal}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{lo}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{size}});}
+\DoxyCodeLine{00088\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetMinBin}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{lo}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{size}});}
+\DoxyCodeLine{00089\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetMinBinTime}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{lo}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{size}});}
+\DoxyCodeLine{00090\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetMinVal}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{lo}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{size}});}
+\DoxyCodeLine{00091\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetPeakValue}}(\textcolor{keywordtype}{float}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{lo}},\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{size}});}
+\DoxyCodeLine{00092\ \ \ \textcolor{keywordtype}{void}\ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Rescale}}(\textcolor{keywordtype}{double}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{factor}});}
+\DoxyCodeLine{00093\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Integrate}}(\textcolor{keywordtype}{float}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{lo}},\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{size}});}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \ \ \textcolor{comment}{//\ Stuff\ related\ to\ the\ pedestals}}
+\DoxyCodeLine{00096\ \ \ \textcolor{keywordtype}{void}\ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{SetPedestal}}(\textcolor{keywordtype}{double}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pedestal}})\{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{wf\_pedestal}}\ =\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pedestal}};\}}
+\DoxyCodeLine{00097\ \ \ \textcolor{keywordtype}{void}\ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{SetRunPedestal}}(\textcolor{keywordtype}{double}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{runped}})\{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{run\_pedestal}}\ =\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{runped}};\}}
+\DoxyCodeLine{00098\ \ \ \textcolor{keywordtype}{void}\ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{SetPedRange}}(\textcolor{keywordtype}{float}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{range}});}
+\DoxyCodeLine{00099\ \ \ \textcolor{keywordtype}{void}\ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{SetPedBegin}}(\textcolor{keywordtype}{float}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{begin}});}
+\DoxyCodeLine{00100\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetPedRange}}(\textcolor{keywordtype}{void})\{\textcolor{keywordflow}{return}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{wf\_ped\_range}};\}}
+\DoxyCodeLine{00101\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetPedBegin}}(\textcolor{keywordtype}{void})\{\textcolor{keywordflow}{return}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{wf\_ped\_begin}};\}}
+\DoxyCodeLine{00102\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetPedestal}}(\textcolor{keywordtype}{void})\{\textcolor{keywordflow}{return}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{wf\_pedestal}};\}}
+\DoxyCodeLine{00103\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetPedsigma}}(\textcolor{keywordtype}{void})\{\textcolor{keywordflow}{return}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{wf\_pedsigma}};\}}
+\DoxyCodeLine{00104\ \ \ \textcolor{keywordtype}{void}\ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{CalcPedestalRange}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00105\ \ \ \textcolor{keywordtype}{void}\ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{CalcPedestalDynamic}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00106\ \ \ \textcolor{keywordtype}{void}\ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{SubtractPedestal}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \ \ \textcolor{comment}{//\ Stuff\ related\ to\ the\ peaks}}
+\DoxyCodeLine{00109\ \ \ \textcolor{keywordtype}{void}\ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{SetMaxPeaks}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{max\_num}});}
+\DoxyCodeLine{00110\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetMaxPeaks}}(\textcolor{keywordtype}{void})\{\textcolor{keywordflow}{return}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{max\_num\_peaks}};\}}
+\DoxyCodeLine{00111\ \ \ \textcolor{keywordtype}{void}\ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{CleanUpPeaks}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00112\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetNumPeaks}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00113\ \ \ \textcolor{keywordtype}{void}\ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{SetCFDSFraction}}(\textcolor{keywordtype}{double}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{fraction}})\ \{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{cfds\_frac}}\ =\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{fraction}};\}}
+\DoxyCodeLine{00114\ \ \ \textcolor{keywordtype}{void}\ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{SetCFDEFraction}}(\textcolor{keywordtype}{double}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{fraction}})\ \{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{cfde\_frac}}\ =\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{fraction}};\}}
+\DoxyCodeLine{00115\ \ \ \textcolor{keywordtype}{void}\ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{SetCFDEOffset}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{offset}})\ \{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{cfde\_offset}}\ =\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{offset}};\}}
+\DoxyCodeLine{00116\ \ \ \textcolor{keywordtype}{void}\ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{FindPeaks}}(\textcolor{keywordtype}{float}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{start}},\ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{size}});}
+\DoxyCodeLine{00117\ \ \ \textcolor{keywordtype}{void}\ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{FindTdc}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pk\_num}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{th\_type}}\ =\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{CFD\_SIMPLE}});}
+\DoxyCodeLine{00118\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetSpikes}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{i}});}
+\DoxyCodeLine{00119\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetTdcs}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{i}});}
+\DoxyCodeLine{00120\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetCharge}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{i}});}
+\DoxyCodeLine{00121\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetHeight}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{i}});}
+\DoxyCodeLine{00122\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetWidth}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{i}});}
+\DoxyCodeLine{00123\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetPeakTime}}(\textcolor{keywordtype}{void})\ \{\textcolor{keywordflow}{return}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{PeakValueTime}};\}}
+\DoxyCodeLine{00124\ \ \ }
+\DoxyCodeLine{00125\ \ \ \textcolor{comment}{//\ Stuff\ related\ to\ the\ pulses}}
+\DoxyCodeLine{00126\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetPulsepars}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{i}})\ \{\textcolor{keywordflow}{return}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pulsepars}}[\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{i}}];\}}
+\DoxyCodeLine{00127\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetPulsechi2}}()\ \{\textcolor{keywordflow}{return}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pulsechi2}};\}}
+\DoxyCodeLine{00128\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetNDF}}()\ \{\textcolor{keywordflow}{return}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{ndf}};\}}
+\DoxyCodeLine{00129\ \ \ \textcolor{keywordtype}{void}\ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{FitPulse}}(\textcolor{keywordtype}{void});}
+\DoxyCodeLine{00130\ }
+\DoxyCodeLine{00131\ \ \ \textcolor{comment}{//\ Stuff\ related\ to\ converting\ from\ mV\ to\ DC\ and\ vice\ versa}}
+\DoxyCodeLine{00132\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetNsPerBin}}(\textcolor{keywordtype}{void})\ \ \{\textcolor{keywordflow}{return}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bin\_ns}};\}}
+\DoxyCodeLine{00133\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetOffset}}(\textcolor{keywordtype}{void})\ \ \ \ \{\textcolor{keywordflow}{return}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{offset}};\}}
+\DoxyCodeLine{00134\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetTimingCorr}}(\textcolor{keywordtype}{void})\{\textcolor{keywordflow}{return}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{timing\_corr}};\}}
+\DoxyCodeLine{00135\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{GetImpedance}}(\textcolor{keywordtype}{void})\ \{\textcolor{keywordflow}{return}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{impedance}};\}}
+\DoxyCodeLine{00136\ \ \ \textcolor{keywordtype}{void}\ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{SetImpedance}}(\textcolor{keywordtype}{double}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{val}})\ \{\textcolor{keywordflow}{if}\ (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{val}}>0)\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{impedance}}\ =\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{val}};\}}
+\DoxyCodeLine{00137\ }
+\DoxyCodeLine{00138\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00139\ }
+\DoxyCodeLine{00140\ \ \ \textcolor{comment}{//\ DATA\ MEMBERS}}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00142\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{ch}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ STACEE\ channel\ we\ are\ working\ with}}
+\DoxyCodeLine{00143\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{runno}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Run\ Number}}
+\DoxyCodeLine{00144\ \ \ \textcolor{keywordtype}{float}\ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Threshold}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ PMT\ Threshold\ in\ DC\ (for\ now...)}}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00146\ \ \ \textcolor{comment}{//\ Stuff\ related\ to\ the\ actual\ data}}
+\DoxyCodeLine{00147\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{wf\_size}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ How\ much\ data\ was\ written\ to\ disk}}
+\DoxyCodeLine{00148\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{base}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ 0\ mV\ baseline\ in\ FADC\ counts}}
+\DoxyCodeLine{00149\ \ \ \textcolor{keywordtype}{double}\ \ *\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{WaveData}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ 'in\ memory'\ waveform\ data}}
+\DoxyCodeLine{00150\ \ \ \textcolor{keywordtype}{double}\ \ *\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{WaveTime}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ 'in\ memory'\ waveform\ times}}
+\DoxyCodeLine{00151\ \ \ \textcolor{keywordtype}{double}\ \ *\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{wf\_baseline}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ To\ subtract\ reference\ baseline\ (mV)}}
+\DoxyCodeLine{00152\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{PeakValueTime}};\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Time\ of\ peak\ (GetPeakValue\ sets)}}
+\DoxyCodeLine{00153\ \ \ }
+\DoxyCodeLine{00154\ \ \ \textcolor{comment}{//\ Stuff\ related\ to\ the\ pedestals}}
+\DoxyCodeLine{00155\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{wf\_ped\_range}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ How\ much\ data\ used\ for\ ped\ calcs}}
+\DoxyCodeLine{00156\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{wf\_ped\_begin}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Start\ of\ trace\ for\ ped\ calcs}}
+\DoxyCodeLine{00157\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{wf\_pedestal}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Pedestal\ value}}
+\DoxyCodeLine{00158\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{run\_pedestal}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Average\ pedestal\ for\ run}}
+\DoxyCodeLine{00159\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{wf\_pedsigma}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Deviation\ of\ pedestal\ distribution}}
+\DoxyCodeLine{00160\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{wf\_pedshift}};\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Amount\ pedestal\ shifts\ (in\ DC)\ just}}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ because\ we\ connect\ inputs\ to\ FADCs}}
+\DoxyCodeLine{00162\ }
+\DoxyCodeLine{00163\ \ \ \textcolor{comment}{//\ Stuff\ related\ to\ the\ peaks}}
+\DoxyCodeLine{00164\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{max\_num\_peaks}};}
+\DoxyCodeLine{00165\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{num\_peaks}};}
+\DoxyCodeLine{00166\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{peaks\_found}};\ \ \ \ \ \textcolor{comment}{//\ Have\ we\ found\ the\ peaks\ yet?}}
+\DoxyCodeLine{00167\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{peaks\_allocated}};\ \textcolor{comment}{//\ Have\ we\ measured\ the\ peak\ properties\ yet?}}
+\DoxyCodeLine{00168\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{peak\_plot}};\ \ \ \ \ \ \ \textcolor{comment}{//\ Show\ peak\ positions\ when\ plotting?}}
+\DoxyCodeLine{00169\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{large\_peaks}};\ \ \ \ \ \textcolor{comment}{//\ Extrapolate\ saturated\ peaks?}}
+\DoxyCodeLine{00170\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ *\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{begin\_pk}};\ \ \ \ \ \ \ \textcolor{comment}{//\ First\ bin\ included\ in\ peak}}
+\DoxyCodeLine{00171\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ *\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{end\_pk}};\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Last\ bin\ included\ in\ peak}}
+\DoxyCodeLine{00172\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ *\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{spikes}};\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ How\ smooth\ is\ the\ peak}}
+\DoxyCodeLine{00173\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ *\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{peaks}};\ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Bin\ values\ of\ the\ actual\ peak\ positions}}
+\DoxyCodeLine{00174\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{cfde\_offset}};\ \ \ \ \ \textcolor{comment}{//\ Offset\ for\ electronic\ CFD\ (in\ bin\ values)}}
+\DoxyCodeLine{00175\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{cfds\_frac}};\ \ \ \ \ \ \ \textcolor{comment}{//\ Fraction\ of\ peak\ ave\ for\ simple\ CFD\ }}
+\DoxyCodeLine{00176\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{cfde\_frac}};\ \ \ \ \ \ \ \textcolor{comment}{//\ Fraction\ of\ trace\ for\ electronic\ CFD\ }}
+\DoxyCodeLine{00177\ \ \ \textcolor{keywordtype}{double}\ \ *\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{tdcs}};\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Something\ similar\ to\ what\ a\ TDC\ would\ give}}
+\DoxyCodeLine{00178\ \ \ \textcolor{keywordtype}{double}\ \ *width;}
+\DoxyCodeLine{00179\ \ \ \textcolor{keywordtype}{double}\ \ *height;}
+\DoxyCodeLine{00180\ \ \ \textcolor{keywordtype}{double}\ \ *\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{charge}};}
+\DoxyCodeLine{00181\ }
+\DoxyCodeLine{00182\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pulsepars}}[4];\ \ \ \ \ \ \textcolor{comment}{//\ Pulse\ parameters}}
+\DoxyCodeLine{00183\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pulsechi2}};}
+\DoxyCodeLine{00184\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{ndf}};}
+\DoxyCodeLine{00185\ \ \ \textcolor{keywordtype}{float}\ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pulse\_start}};}
+\DoxyCodeLine{00186\ }
+\DoxyCodeLine{00187\ \ \ \textcolor{comment}{//\ Converting\ from\ FADC\ data\ to\ mV,\ charge,\ etc...}}
+\DoxyCodeLine{00188\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{acq\_ch}};}
+\DoxyCodeLine{00189\ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{dc2mv}};}
+\DoxyCodeLine{00190\ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{offset}};}
+\DoxyCodeLine{00191\ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bin\_ns}};}
+\DoxyCodeLine{00192\ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{impedance}};}
+\DoxyCodeLine{00193\ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{saturated\_lo}};}
+\DoxyCodeLine{00194\ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{saturated\_hi}};}
+\DoxyCodeLine{00195\ }
+\DoxyCodeLine{00196\ \ \ \textcolor{comment}{//\ Since\ the\ trace\ in\ the\ Dig0\ bank\ is\ stored\ in\ integer\ increments,}}
+\DoxyCodeLine{00197\ \ \ \textcolor{comment}{//\ but\ we\ want\ times\ in\ floats,\ we\ have\ to\ correct\ for\ the\ round\ off}}
+\DoxyCodeLine{00198\ \ \ \textcolor{comment}{//\ error\ (which\ is\ written\ in\ the\ Dig0\ bank).}}
+\DoxyCodeLine{00199\ \ \ \textcolor{keywordtype}{double}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{timing\_corr}};}
+\DoxyCodeLine{00200\ }
+\DoxyCodeLine{00201\ \ \ \textcolor{comment}{//\ MEMBER\ FUNCTIONS}}
+\DoxyCodeLine{00202\ \ \ \textcolor{keywordtype}{void}\ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{InitializePointers}}();}
+\DoxyCodeLine{00203\ \ \ \textcolor{keywordtype}{void}\ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{InitializeVariables}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{no\_acq}});}
+\DoxyCodeLine{00204\ \ \ \textcolor{keywordtype}{void}\ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Message}}(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{s}});\ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Print\ out\ messages\ as\ needed}}
+\DoxyCodeLine{00205\ \ \ \textcolor{comment}{//\ Stuff\ related\ to\ the\ peaks}}
+\DoxyCodeLine{00206\ \ \ \textcolor{keywordtype}{void}\ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{AllocatePeaks}}();}
+\DoxyCodeLine{00207\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{FindInterpolatedTime}}(\textcolor{keywordtype}{float}\ thresh,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{idx}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{size}});}
+\DoxyCodeLine{00208\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{FindCFDElecTime}}(\textcolor{keywordtype}{float}\ thresh,\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{idx}},\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{size}});}
+\DoxyCodeLine{00209\ \ \ \textcolor{keywordtype}{double}\ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{FindCFDSimpTime}}(\textcolor{keywordtype}{int}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pk\_num}});}
+\DoxyCodeLine{00210\ \ \ \textcolor{keywordtype}{int}\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Time2Bin}}(\textcolor{keywordtype}{float}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{t\_ns}});}
+\DoxyCodeLine{00211\ }
+\DoxyCodeLine{00212\ \};}
+\DoxyCodeLine{00213\ }
+\DoxyCodeLine{00214\ \}\ \textcolor{comment}{//\ end\ of\ namespace\ GAPS}}
+\DoxyCodeLine{00215\ }
+\DoxyCodeLine{00216\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00217\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

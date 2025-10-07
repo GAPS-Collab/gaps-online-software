@@ -1,0 +1,189 @@
+\doxysection{Gaps\+::Telemetry\+::Merged\+Event Struct Reference}
+\hypertarget{structGaps_1_1Telemetry_1_1MergedEvent}{}\label{structGaps_1_1Telemetry_1_1MergedEvent}\index{Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}}
+
+
+The actual merged event sent over telemetry.  
+
+
+
+
+{\ttfamily \#include $<$telemetry\+\_\+dataclasses.\+hpp$>$}
+
+
+
+Collaboration diagram for Gaps\+::Telemetry\+::Merged\+Event\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structGaps_1_1Telemetry_1_1MergedEvent__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_a52e74d2a0e00fe11d6ec0cee88324586}{to\+\_\+string}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ std\+::string
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_aa8620c44973659b3db75d3ca905b7720}{from\+\_\+bytestream}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{stream}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}}) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent}{Merged\+Event}}, \mbox{\hyperlink{classGaps_1_1IOError}{Gaps\+::\+IOError}} $>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader}{Packet\+Header}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_aabdb5f1360d18e95b18ef90a3ad00635}{header}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_a79d568dbe0c0b73a160744a10eb44582}{version}} = 0
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_ad76f37f9b077dd56529e84bdb8631a86}{flags0}} = 0
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_af235b78763764d52dcd6828cddf91052}{flags1}} = 0
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_aa4c1ffce12bef2645c0648b0befcdf3e}{row\+\_\+flags}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_ae592578705c7a80aea439fa4806b1570}{creation\+\_\+time}} = 0
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_a7a3761922ec63d47b3db72b6a195e7dc}{event\+\_\+id}} = 0
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_a98d8e2804521987cf8fa8121e76cf273}{n\+\_\+tof\+\_\+hits}} = 0
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_ade6865babdc397965f93af427d6a8a92}{n\+\_\+trk\+\_\+hits}} = 0
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkEvent}{Trk\+Event}} $>$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_a3c7f786371fca298bfbb97c255aed86d}{tracker\+\_\+events}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkHit}{Trk\+Hit}} $>$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_a8eced956b3da0ab453f8a437f56f38c7}{trk\+\_\+hits}}
+\item 
+\mbox{\hyperlink{structTofEventSummary}{Tof\+Event\+Summary}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_a8cf0592765e523a54e16f5df84b267a5}{tof\+\_\+event}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_a769c35b008e60fce88f21c5994fa5573}{raw\+\_\+data}}
+\item 
+\mbox{\hyperlink{structGaps_1_1Telemetry_1_1TofMetaData}{Tof\+Meta\+Data}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_ac75618682a739aa7834dc17eae60d876}{tof\+\_\+meta}}
+\item 
+\mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkMetaData}{Trk\+Meta\+Data}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_a17f34a88a1e7b1228454c6b93105600a}{tracker\+\_\+meta}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} $>$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_a9ecb55bc2fee7dbfb0d7156e046fc4f6}{tracker\+\_\+oscillators}} = \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}$>$(10,0)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The actual merged event sent over telemetry. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structGaps_1_1Telemetry_1_1MergedEvent_aa8620c44973659b3db75d3ca905b7720}\label{structGaps_1_1Telemetry_1_1MergedEvent_aa8620c44973659b3db75d3ca905b7720} 
+\index{Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}!from\_bytestream@{from\_bytestream}}
+\index{from\_bytestream@{from\_bytestream}!Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}}
+\doxysubsubsection{\texorpdfstring{from\_bytestream()}{from\_bytestream()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} Gaps\+::\+Telemetry\+::\+Merged\+Event\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&}]{stream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&}]{pos }\end{DoxyParamCaption}) -\/$>$ r\+::\+Result$<$\mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent}{Merged\+Event}}, \mbox{\hyperlink{classGaps_1_1IOError}{Gaps\+::\+IOError}}$>$\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1MergedEvent_a52e74d2a0e00fe11d6ec0cee88324586}\label{structGaps_1_1Telemetry_1_1MergedEvent_a52e74d2a0e00fe11d6ec0cee88324586} 
+\index{Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} Gaps\+::\+Telemetry\+::\+Merged\+Event\+::to\+\_\+string (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ std\+::string}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structGaps_1_1Telemetry_1_1MergedEvent_ae592578705c7a80aea439fa4806b1570}\label{structGaps_1_1Telemetry_1_1MergedEvent_ae592578705c7a80aea439fa4806b1570} 
+\index{Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}!creation\_time@{creation\_time}}
+\index{creation\_time@{creation\_time}!Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}}
+\doxysubsubsection{\texorpdfstring{creation\_time}{creation\_time}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} Gaps\+::\+Telemetry\+::\+Merged\+Event\+::creation\+\_\+time = 0}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1MergedEvent_a7a3761922ec63d47b3db72b6a195e7dc}\label{structGaps_1_1Telemetry_1_1MergedEvent_a7a3761922ec63d47b3db72b6a195e7dc} 
+\index{Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}!event\_id@{event\_id}}
+\index{event\_id@{event\_id}!Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}}
+\doxysubsubsection{\texorpdfstring{event\_id}{event\_id}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} Gaps\+::\+Telemetry\+::\+Merged\+Event\+::event\+\_\+id = 0}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1MergedEvent_ad76f37f9b077dd56529e84bdb8631a86}\label{structGaps_1_1Telemetry_1_1MergedEvent_ad76f37f9b077dd56529e84bdb8631a86} 
+\index{Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}!flags0@{flags0}}
+\index{flags0@{flags0}!Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}}
+\doxysubsubsection{\texorpdfstring{flags0}{flags0}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} Gaps\+::\+Telemetry\+::\+Merged\+Event\+::flags0 = 0}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1MergedEvent_af235b78763764d52dcd6828cddf91052}\label{structGaps_1_1Telemetry_1_1MergedEvent_af235b78763764d52dcd6828cddf91052} 
+\index{Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}!flags1@{flags1}}
+\index{flags1@{flags1}!Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}}
+\doxysubsubsection{\texorpdfstring{flags1}{flags1}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} Gaps\+::\+Telemetry\+::\+Merged\+Event\+::flags1 = 0}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1MergedEvent_aabdb5f1360d18e95b18ef90a3ad00635}\label{structGaps_1_1Telemetry_1_1MergedEvent_aabdb5f1360d18e95b18ef90a3ad00635} 
+\index{Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}!header@{header}}
+\index{header@{header}!Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}}
+\doxysubsubsection{\texorpdfstring{header}{header}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader}{Packet\+Header}} Gaps\+::\+Telemetry\+::\+Merged\+Event\+::header}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1MergedEvent_a98d8e2804521987cf8fa8121e76cf273}\label{structGaps_1_1Telemetry_1_1MergedEvent_a98d8e2804521987cf8fa8121e76cf273} 
+\index{Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}!n\_tof\_hits@{n\_tof\_hits}}
+\index{n\_tof\_hits@{n\_tof\_hits}!Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}}
+\doxysubsubsection{\texorpdfstring{n\_tof\_hits}{n\_tof\_hits}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} Gaps\+::\+Telemetry\+::\+Merged\+Event\+::n\+\_\+tof\+\_\+hits = 0}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1MergedEvent_ade6865babdc397965f93af427d6a8a92}\label{structGaps_1_1Telemetry_1_1MergedEvent_ade6865babdc397965f93af427d6a8a92} 
+\index{Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}!n\_trk\_hits@{n\_trk\_hits}}
+\index{n\_trk\_hits@{n\_trk\_hits}!Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}}
+\doxysubsubsection{\texorpdfstring{n\_trk\_hits}{n\_trk\_hits}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Gaps\+::\+Telemetry\+::\+Merged\+Event\+::n\+\_\+trk\+\_\+hits = 0}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1MergedEvent_a769c35b008e60fce88f21c5994fa5573}\label{structGaps_1_1Telemetry_1_1MergedEvent_a769c35b008e60fce88f21c5994fa5573} 
+\index{Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}!raw\_data@{raw\_data}}
+\index{raw\_data@{raw\_data}!Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}}
+\doxysubsubsection{\texorpdfstring{raw\_data}{raw\_data}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}$>$ Gaps\+::\+Telemetry\+::\+Merged\+Event\+::raw\+\_\+data}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1MergedEvent_aa4c1ffce12bef2645c0648b0befcdf3e}\label{structGaps_1_1Telemetry_1_1MergedEvent_aa4c1ffce12bef2645c0648b0befcdf3e} 
+\index{Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}!row\_flags@{row\_flags}}
+\index{row\_flags@{row\_flags}!Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}}
+\doxysubsubsection{\texorpdfstring{row\_flags}{row\_flags}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}$>$ Gaps\+::\+Telemetry\+::\+Merged\+Event\+::row\+\_\+flags}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1MergedEvent_a8cf0592765e523a54e16f5df84b267a5}\label{structGaps_1_1Telemetry_1_1MergedEvent_a8cf0592765e523a54e16f5df84b267a5} 
+\index{Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}!tof\_event@{tof\_event}}
+\index{tof\_event@{tof\_event}!Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}}
+\doxysubsubsection{\texorpdfstring{tof\_event}{tof\_event}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structTofEventSummary}{Tof\+Event\+Summary}} Gaps\+::\+Telemetry\+::\+Merged\+Event\+::tof\+\_\+event}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1MergedEvent_ac75618682a739aa7834dc17eae60d876}\label{structGaps_1_1Telemetry_1_1MergedEvent_ac75618682a739aa7834dc17eae60d876} 
+\index{Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}!tof\_meta@{tof\_meta}}
+\index{tof\_meta@{tof\_meta}!Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}}
+\doxysubsubsection{\texorpdfstring{tof\_meta}{tof\_meta}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TofMetaData}{Tof\+Meta\+Data}} Gaps\+::\+Telemetry\+::\+Merged\+Event\+::tof\+\_\+meta}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1MergedEvent_a3c7f786371fca298bfbb97c255aed86d}\label{structGaps_1_1Telemetry_1_1MergedEvent_a3c7f786371fca298bfbb97c255aed86d} 
+\index{Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}!tracker\_events@{tracker\_events}}
+\index{tracker\_events@{tracker\_events}!Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}}
+\doxysubsubsection{\texorpdfstring{tracker\_events}{tracker\_events}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkEvent}{Trk\+Event}}$>$ Gaps\+::\+Telemetry\+::\+Merged\+Event\+::tracker\+\_\+events}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1MergedEvent_a17f34a88a1e7b1228454c6b93105600a}\label{structGaps_1_1Telemetry_1_1MergedEvent_a17f34a88a1e7b1228454c6b93105600a} 
+\index{Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}!tracker\_meta@{tracker\_meta}}
+\index{tracker\_meta@{tracker\_meta}!Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}}
+\doxysubsubsection{\texorpdfstring{tracker\_meta}{tracker\_meta}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkMetaData}{Trk\+Meta\+Data}} Gaps\+::\+Telemetry\+::\+Merged\+Event\+::tracker\+\_\+meta}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1MergedEvent_a9ecb55bc2fee7dbfb0d7156e046fc4f6}\label{structGaps_1_1Telemetry_1_1MergedEvent_a9ecb55bc2fee7dbfb0d7156e046fc4f6} 
+\index{Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}!tracker\_oscillators@{tracker\_oscillators}}
+\index{tracker\_oscillators@{tracker\_oscillators}!Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}}
+\doxysubsubsection{\texorpdfstring{tracker\_oscillators}{tracker\_oscillators}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}$>$ Gaps\+::\+Telemetry\+::\+Merged\+Event\+::tracker\+\_\+oscillators = \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}$>$(10,0)}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1MergedEvent_a8eced956b3da0ab453f8a437f56f38c7}\label{structGaps_1_1Telemetry_1_1MergedEvent_a8eced956b3da0ab453f8a437f56f38c7} 
+\index{Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}!trk\_hits@{trk\_hits}}
+\index{trk\_hits@{trk\_hits}!Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}}
+\doxysubsubsection{\texorpdfstring{trk\_hits}{trk\_hits}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkHit}{Trk\+Hit}}$>$ Gaps\+::\+Telemetry\+::\+Merged\+Event\+::trk\+\_\+hits}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1MergedEvent_a79d568dbe0c0b73a160744a10eb44582}\label{structGaps_1_1Telemetry_1_1MergedEvent_a79d568dbe0c0b73a160744a10eb44582} 
+\index{Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}!version@{version}}
+\index{version@{version}!Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}}
+\doxysubsubsection{\texorpdfstring{version}{version}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} Gaps\+::\+Telemetry\+::\+Merged\+Event\+::version = 0}
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/\mbox{\hyperlink{telemetry__dataclasses_8hpp}{telemetry\+\_\+dataclasses.\+hpp}}\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/\mbox{\hyperlink{telemetry__dataclasses_8cxx}{telemetry\+\_\+dataclasses.\+cxx}}\end{DoxyCompactItemize}

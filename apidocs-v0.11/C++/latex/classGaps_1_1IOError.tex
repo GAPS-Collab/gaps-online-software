@@ -1,0 +1,100 @@
+\doxysection{Gaps\+::IOError Class Reference}
+\hypertarget{classGaps_1_1IOError}{}\label{classGaps_1_1IOError}\index{Gaps::IOError@{Gaps::IOError}}
+
+
+{\ttfamily \#include $<$errors.\+hpp$>$}
+
+\doxysubsubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872}{Error\+Kind}} \{ \newline
+\mbox{\hyperlink{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872a7700d8c06be44e20cc35c7b67bb196a6}{Stream\+Too\+Short}}
+, \mbox{\hyperlink{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872ae88402395166afe541888385c1f08cea}{Wrong\+Delimiter}}
+, \mbox{\hyperlink{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872a6880a1b15a1ca734913a8fbafd20d9d8}{Packet\+Not\+Found}}
+, \mbox{\hyperlink{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872a332c27e37d34b4727f6023e6210a1b88}{Wrong\+Packet\+Type}}
+, \newline
+\mbox{\hyperlink{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872aad32eacf390a76aeb96d7b02aaa1704d}{Wrong\+Header\+Bytes}}
+, \mbox{\hyperlink{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872a288ce6c63e5e376ff77b0a0f8c44bd1e}{Wrong\+Tail\+Bytes}}
+, \mbox{\hyperlink{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872aea8fdf52eb835a70c796c9105add11b9}{Event\+Header\+Corrupt}}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classGaps_1_1IOError_af4acdf9e0ef65cc786cfc9f9ddb96942}{IOError}} (\mbox{\hyperlink{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872}{Error\+Kind}} \mbox{\hyperlink{classGaps_1_1IOError_a6661071ac1a1f46031920fa4a8e46045}{kind}}, std\+::string \mbox{\hyperlink{classGaps_1_1IOError_a78257492ce405e6ffe2db121312bded8}{reason}}="{}"{})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872}{Error\+Kind}} \mbox{\hyperlink{classGaps_1_1IOError_a6661071ac1a1f46031920fa4a8e46045}{kind}}
+\item 
+std\+::string \mbox{\hyperlink{classGaps_1_1IOError_a78257492ce405e6ffe2db121312bded8}{reason}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Enumeration Documentation}
+\Hypertarget{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872}\label{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872} 
+\index{Gaps::IOError@{Gaps::IOError}!ErrorKind@{ErrorKind}}
+\index{ErrorKind@{ErrorKind}!Gaps::IOError@{Gaps::IOError}}
+\doxysubsubsection{\texorpdfstring{ErrorKind}{ErrorKind}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{enum}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{class}} \mbox{\hyperlink{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872}{Gaps\+::\+IOError\+::\+Error\+Kind}}\hspace{0.3cm}{\ttfamily [strong]}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{StreamTooShort@{StreamTooShort}!Gaps::IOError@{Gaps::IOError}}\index{Gaps::IOError@{Gaps::IOError}!StreamTooShort@{StreamTooShort}}}\Hypertarget{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872a7700d8c06be44e20cc35c7b67bb196a6}\label{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872a7700d8c06be44e20cc35c7b67bb196a6} 
+Stream\+Too\+Short&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{WrongDelimiter@{WrongDelimiter}!Gaps::IOError@{Gaps::IOError}}\index{Gaps::IOError@{Gaps::IOError}!WrongDelimiter@{WrongDelimiter}}}\Hypertarget{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872ae88402395166afe541888385c1f08cea}\label{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872ae88402395166afe541888385c1f08cea} 
+Wrong\+Delimiter&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PacketNotFound@{PacketNotFound}!Gaps::IOError@{Gaps::IOError}}\index{Gaps::IOError@{Gaps::IOError}!PacketNotFound@{PacketNotFound}}}\Hypertarget{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872a6880a1b15a1ca734913a8fbafd20d9d8}\label{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872a6880a1b15a1ca734913a8fbafd20d9d8} 
+Packet\+Not\+Found&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{WrongPacketType@{WrongPacketType}!Gaps::IOError@{Gaps::IOError}}\index{Gaps::IOError@{Gaps::IOError}!WrongPacketType@{WrongPacketType}}}\Hypertarget{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872a332c27e37d34b4727f6023e6210a1b88}\label{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872a332c27e37d34b4727f6023e6210a1b88} 
+Wrong\+Packet\+Type&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{WrongHeaderBytes@{WrongHeaderBytes}!Gaps::IOError@{Gaps::IOError}}\index{Gaps::IOError@{Gaps::IOError}!WrongHeaderBytes@{WrongHeaderBytes}}}\Hypertarget{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872aad32eacf390a76aeb96d7b02aaa1704d}\label{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872aad32eacf390a76aeb96d7b02aaa1704d} 
+Wrong\+Header\+Bytes&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{WrongTailBytes@{WrongTailBytes}!Gaps::IOError@{Gaps::IOError}}\index{Gaps::IOError@{Gaps::IOError}!WrongTailBytes@{WrongTailBytes}}}\Hypertarget{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872a288ce6c63e5e376ff77b0a0f8c44bd1e}\label{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872a288ce6c63e5e376ff77b0a0f8c44bd1e} 
+Wrong\+Tail\+Bytes&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EventHeaderCorrupt@{EventHeaderCorrupt}!Gaps::IOError@{Gaps::IOError}}\index{Gaps::IOError@{Gaps::IOError}!EventHeaderCorrupt@{EventHeaderCorrupt}}}\Hypertarget{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872aea8fdf52eb835a70c796c9105add11b9}\label{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872aea8fdf52eb835a70c796c9105add11b9} 
+Event\+Header\+Corrupt&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classGaps_1_1IOError_af4acdf9e0ef65cc786cfc9f9ddb96942}\label{classGaps_1_1IOError_af4acdf9e0ef65cc786cfc9f9ddb96942} 
+\index{Gaps::IOError@{Gaps::IOError}!IOError@{IOError}}
+\index{IOError@{IOError}!Gaps::IOError@{Gaps::IOError}}
+\doxysubsubsection{\texorpdfstring{IOError()}{IOError()}}
+{\footnotesize\ttfamily Gaps\+::\+IOError\+::\+IOError (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872}{Error\+Kind}}}]{kind,  }\item[{std\+::string}]{reason = {\ttfamily "{}"{}} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{classGaps_1_1IOError_a6661071ac1a1f46031920fa4a8e46045}\label{classGaps_1_1IOError_a6661071ac1a1f46031920fa4a8e46045} 
+\index{Gaps::IOError@{Gaps::IOError}!kind@{kind}}
+\index{kind@{kind}!Gaps::IOError@{Gaps::IOError}}
+\doxysubsubsection{\texorpdfstring{kind}{kind}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classGaps_1_1IOError_aef5d09096037b3efe50862e2b52a9872}{Error\+Kind}} Gaps\+::\+IOError\+::kind}
+
+\Hypertarget{classGaps_1_1IOError_a78257492ce405e6ffe2db121312bded8}\label{classGaps_1_1IOError_a78257492ce405e6ffe2db121312bded8} 
+\index{Gaps::IOError@{Gaps::IOError}!reason@{reason}}
+\index{reason@{reason}!Gaps::IOError@{Gaps::IOError}}
+\doxysubsubsection{\texorpdfstring{reason}{reason}}
+{\footnotesize\ttfamily std\+::string Gaps\+::\+IOError\+::reason}
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/\mbox{\hyperlink{errors_8hpp}{errors.\+hpp}}\end{DoxyCompactItemize}

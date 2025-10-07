@@ -1,0 +1,216 @@
+\doxysection{Gaps\+::Telemetry Namespace Reference}
+\hypertarget{namespaceGaps_1_1Telemetry}{}\label{namespaceGaps_1_1Telemetry}\index{Gaps::Telemetry@{Gaps::Telemetry}}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling}{Cooling}}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent}{Merged\+Event}}
+\begin{DoxyCompactList}\small\item\em The actual merged event sent over telemetry. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Packet}{Packet}}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader}{Packet\+Header}}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TofMetaData}{Tof\+Meta\+Data}}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkCalibratedHit}{Trk\+Calibrated\+Hit}}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkEvent}{Trk\+Event}}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkEventPacket}{Trk\+Event\+Packet}}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkHeader}{Trk\+Header}}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkHit}{Trk\+Hit}}
+\item 
+struct \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkMetaData}{Trk\+Meta\+Data}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7}{Bfsw\+Packet\+Type}} \+: u8 \{ \newline
+\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a88183b946cc5f0e8c96b2e66e1c74a7e}{Unknown}} = 0
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a03b147d4e815a1141e70c967b84c7078}{Card\+HKP}} = 30
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7abe6258f33139d3f656ed32777e3be064}{Cooling\+HK}} = 40
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a6f44f3023587714a8b55153eab21c599}{PDUHK}} = 50
+, \newline
+\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a26b8a5f8cbb692e906c8eed4b88cc0bd}{Tracker}} = 80
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ac673eb57c4b7d3d8227f8b7e0f844b08}{Tracker\+DAQCntr}} = 81
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a8c578de37278ada488d763ea86c5cf20}{GPS}} = 82
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a809a59ac536e0b86400daa219166044d}{Trk\+Temp\+Leak}} = 83
+, \newline
+\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ad0954fab889c8ba1bde629f48ca65579}{Boring\+Event}} = 90
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a3f21342e6e827fe801c4cc55a3d0176d}{RBWaveform}} = 91
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a1d633e18b49ad6ab196ff08b21e0a052}{Any\+Tof\+HK}} = 92
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7acea8f127836a6605812b4be35b4f0f98}{Gcu\+Evt\+Bld\+Settings}} = 93
+, \newline
+\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a4710fd064a284cc5804517e941c8e52b}{Lab\+Jack\+HK}} = 100
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a86fcb2eddd83abe6f2766d955905d8e7}{Mag\+HK}} = 108
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ab786f26bcf3a3e7b4924849ee2fc8629}{Gcu\+Mon}} = 110
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a2b585905be50d3772320efb7466bd3dc}{Interesting\+Event}} = 190
+, \newline
+\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ad7fa164f74f80c6b1fec72ce6d863316}{No\+Gaps\+Trigger\+Event}} = 191
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a853ccc9f2032abb9d46425b422483e41}{No\+Tof\+Data\+Event}} = 192
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ab25d8b2099e52bb9300aca6661601b8b}{Ack}} = 200
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ac44f8f7d9b9f501fe9278cd56521f28a}{Any\+Tracker\+HK}} = 255
+, \newline
+\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a3af1c2347947b15a909f18ce619e24b0}{Tm\+P33}} = 33
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a59bc9db36d18bc4f966588c15f838ceb}{Tm\+P34}} = 34
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ae88686fb9569ff38ca663d7efdda90ed}{Tm\+P37}} = 37
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a0d56068e768f5962d797c5670478468e}{Tm\+P38}} = 38
+, \newline
+\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a87150ebdcc6874870c92ae7ccc6a0f6e}{Tm\+P55}} = 55
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ac9dda4e6d942ab37fc1729d5ed8e73f4}{Tm\+P64}} = 64
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a05066a6687f88e8a23c6a2f86066bbb4}{Tm\+P96}} = 96
+, \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a0eb669abecb3b34dadc793ec5e098d8b}{Tm\+P214}} = 214
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a77bbbb6b3cce9cad492971b5a0cd96d2}{bfsw\+\_\+ptype\+\_\+to\+\_\+u8}} (\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7}{Bfsw\+Packet\+Type}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pt}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}
+\begin{DoxyCompactList}\small\item\em FIXME -\/ this is obviously incomplete. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespaceGaps_1_1Telemetry_ac903eef887c284115fb188cc72bf287f}{bfsw\+\_\+ptype\+\_\+to\+\_\+str}} (\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7}{Bfsw\+Packet\+Type}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pt}}) -\/$>$ std\+::string
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7} 
+\index{Gaps::Telemetry@{Gaps::Telemetry}!BfswPacketType@{BfswPacketType}}
+\index{BfswPacketType@{BfswPacketType}!Gaps::Telemetry@{Gaps::Telemetry}}
+\doxysubsubsection{\texorpdfstring{BfswPacketType}{BfswPacketType}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{enum}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{class}} \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7}{Gaps\+::\+Telemetry\+::\+Bfsw\+Packet\+Type}} \+: \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\hspace{0.3cm}{\ttfamily [strong]}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Unknown@{Unknown}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!Unknown@{Unknown}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a88183b946cc5f0e8c96b2e66e1c74a7e}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a88183b946cc5f0e8c96b2e66e1c74a7e} 
+Unknown&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CardHKP@{CardHKP}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!CardHKP@{CardHKP}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a03b147d4e815a1141e70c967b84c7078}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a03b147d4e815a1141e70c967b84c7078} 
+Card\+HKP&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CoolingHK@{CoolingHK}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!CoolingHK@{CoolingHK}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7abe6258f33139d3f656ed32777e3be064}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7abe6258f33139d3f656ed32777e3be064} 
+Cooling\+HK&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PDUHK@{PDUHK}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!PDUHK@{PDUHK}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a6f44f3023587714a8b55153eab21c599}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a6f44f3023587714a8b55153eab21c599} 
+PDUHK&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Tracker@{Tracker}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!Tracker@{Tracker}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a26b8a5f8cbb692e906c8eed4b88cc0bd}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a26b8a5f8cbb692e906c8eed4b88cc0bd} 
+Tracker&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TrackerDAQCntr@{TrackerDAQCntr}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!TrackerDAQCntr@{TrackerDAQCntr}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ac673eb57c4b7d3d8227f8b7e0f844b08}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ac673eb57c4b7d3d8227f8b7e0f844b08} 
+Tracker\+DAQCntr&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{GPS@{GPS}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!GPS@{GPS}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a8c578de37278ada488d763ea86c5cf20}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a8c578de37278ada488d763ea86c5cf20} 
+GPS&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TrkTempLeak@{TrkTempLeak}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!TrkTempLeak@{TrkTempLeak}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a809a59ac536e0b86400daa219166044d}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a809a59ac536e0b86400daa219166044d} 
+Trk\+Temp\+Leak&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{BoringEvent@{BoringEvent}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!BoringEvent@{BoringEvent}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ad0954fab889c8ba1bde629f48ca65579}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ad0954fab889c8ba1bde629f48ca65579} 
+Boring\+Event&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RBWaveform@{RBWaveform}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!RBWaveform@{RBWaveform}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a3f21342e6e827fe801c4cc55a3d0176d}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a3f21342e6e827fe801c4cc55a3d0176d} 
+RBWaveform&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{AnyTofHK@{AnyTofHK}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!AnyTofHK@{AnyTofHK}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a1d633e18b49ad6ab196ff08b21e0a052}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a1d633e18b49ad6ab196ff08b21e0a052} 
+Any\+Tof\+HK&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{GcuEvtBldSettings@{GcuEvtBldSettings}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!GcuEvtBldSettings@{GcuEvtBldSettings}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7acea8f127836a6605812b4be35b4f0f98}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7acea8f127836a6605812b4be35b4f0f98} 
+Gcu\+Evt\+Bld\+Settings&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{LabJackHK@{LabJackHK}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!LabJackHK@{LabJackHK}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a4710fd064a284cc5804517e941c8e52b}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a4710fd064a284cc5804517e941c8e52b} 
+Lab\+Jack\+HK&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{MagHK@{MagHK}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!MagHK@{MagHK}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a86fcb2eddd83abe6f2766d955905d8e7}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a86fcb2eddd83abe6f2766d955905d8e7} 
+Mag\+HK&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{GcuMon@{GcuMon}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!GcuMon@{GcuMon}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ab786f26bcf3a3e7b4924849ee2fc8629}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ab786f26bcf3a3e7b4924849ee2fc8629} 
+Gcu\+Mon&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{InterestingEvent@{InterestingEvent}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!InterestingEvent@{InterestingEvent}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a2b585905be50d3772320efb7466bd3dc}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a2b585905be50d3772320efb7466bd3dc} 
+Interesting\+Event&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{NoGapsTriggerEvent@{NoGapsTriggerEvent}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!NoGapsTriggerEvent@{NoGapsTriggerEvent}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ad7fa164f74f80c6b1fec72ce6d863316}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ad7fa164f74f80c6b1fec72ce6d863316} 
+No\+Gaps\+Trigger\+Event&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{NoTofDataEvent@{NoTofDataEvent}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!NoTofDataEvent@{NoTofDataEvent}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a853ccc9f2032abb9d46425b422483e41}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a853ccc9f2032abb9d46425b422483e41} 
+No\+Tof\+Data\+Event&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Ack@{Ack}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!Ack@{Ack}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ab25d8b2099e52bb9300aca6661601b8b}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ab25d8b2099e52bb9300aca6661601b8b} 
+Ack&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{AnyTrackerHK@{AnyTrackerHK}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!AnyTrackerHK@{AnyTrackerHK}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ac44f8f7d9b9f501fe9278cd56521f28a}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ac44f8f7d9b9f501fe9278cd56521f28a} 
+Any\+Tracker\+HK&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TmP33@{TmP33}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!TmP33@{TmP33}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a3af1c2347947b15a909f18ce619e24b0}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a3af1c2347947b15a909f18ce619e24b0} 
+Tm\+P33&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TmP34@{TmP34}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!TmP34@{TmP34}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a59bc9db36d18bc4f966588c15f838ceb}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a59bc9db36d18bc4f966588c15f838ceb} 
+Tm\+P34&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TmP37@{TmP37}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!TmP37@{TmP37}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ae88686fb9569ff38ca663d7efdda90ed}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ae88686fb9569ff38ca663d7efdda90ed} 
+Tm\+P37&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TmP38@{TmP38}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!TmP38@{TmP38}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a0d56068e768f5962d797c5670478468e}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a0d56068e768f5962d797c5670478468e} 
+Tm\+P38&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TmP55@{TmP55}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!TmP55@{TmP55}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a87150ebdcc6874870c92ae7ccc6a0f6e}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a87150ebdcc6874870c92ae7ccc6a0f6e} 
+Tm\+P55&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TmP64@{TmP64}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!TmP64@{TmP64}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ac9dda4e6d942ab37fc1729d5ed8e73f4}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7ac9dda4e6d942ab37fc1729d5ed8e73f4} 
+Tm\+P64&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TmP96@{TmP96}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!TmP96@{TmP96}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a05066a6687f88e8a23c6a2f86066bbb4}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a05066a6687f88e8a23c6a2f86066bbb4} 
+Tm\+P96&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TmP214@{TmP214}!Gaps::Telemetry@{Gaps::Telemetry}}\index{Gaps::Telemetry@{Gaps::Telemetry}!TmP214@{TmP214}}}\Hypertarget{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a0eb669abecb3b34dadc793ec5e098d8b}\label{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7a0eb669abecb3b34dadc793ec5e098d8b} 
+Tm\+P214&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{namespaceGaps_1_1Telemetry_ac903eef887c284115fb188cc72bf287f}\label{namespaceGaps_1_1Telemetry_ac903eef887c284115fb188cc72bf287f} 
+\index{Gaps::Telemetry@{Gaps::Telemetry}!bfsw\_ptype\_to\_str@{bfsw\_ptype\_to\_str}}
+\index{bfsw\_ptype\_to\_str@{bfsw\_ptype\_to\_str}!Gaps::Telemetry@{Gaps::Telemetry}}
+\doxysubsubsection{\texorpdfstring{bfsw\_ptype\_to\_str()}{bfsw\_ptype\_to\_str()}}
+{\footnotesize\ttfamily std\+::string Gaps\+::\+Telemetry\+::bfsw\+\_\+ptype\+\_\+to\+\_\+str (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7}{gtl\+::\+Bfsw\+Packet\+Type}}}]{pt }\end{DoxyParamCaption}) -\/$>$ std\+::string}
+
+\Hypertarget{namespaceGaps_1_1Telemetry_a77bbbb6b3cce9cad492971b5a0cd96d2}\label{namespaceGaps_1_1Telemetry_a77bbbb6b3cce9cad492971b5a0cd96d2} 
+\index{Gaps::Telemetry@{Gaps::Telemetry}!bfsw\_ptype\_to\_u8@{bfsw\_ptype\_to\_u8}}
+\index{bfsw\_ptype\_to\_u8@{bfsw\_ptype\_to\_u8}!Gaps::Telemetry@{Gaps::Telemetry}}
+\doxysubsubsection{\texorpdfstring{bfsw\_ptype\_to\_u8()}{bfsw\_ptype\_to\_u8()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} Gaps\+::\+Telemetry\+::bfsw\+\_\+ptype\+\_\+to\+\_\+u8 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7}{gtl\+::\+Bfsw\+Packet\+Type}}}]{pt }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}}
+
+
+
+FIXME -\/ this is obviously incomplete. 
+

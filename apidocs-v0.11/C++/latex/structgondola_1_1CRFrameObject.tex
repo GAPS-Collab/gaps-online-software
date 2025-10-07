@@ -1,0 +1,104 @@
+\doxysection{gondola\+::CRFrame\+Object Struct Reference}
+\hypertarget{structgondola_1_1CRFrameObject}{}\label{structgondola_1_1CRFrameObject}\index{gondola::CRFrameObject@{gondola::CRFrameObject}}
+
+
+{\ttfamily \#include $<$caraspace.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1CRFrameObject_a9db436e8a3f36f8f8862ca3d95466e44}{to\+\_\+bytestream}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1CRFrameObject_a3196f8667f5985f4344e6d39e51f0982}{to\+\_\+string}} () -\/$>$ std\+::string
+\begin{DoxyCompactList}\small\item\em string representation for printing \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1CRFrameObject_ae9b6b4da5a35210f616f1663aebcfb9b}{from\+\_\+bytestream}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{stream}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}}) -\/$>$ \mbox{\hyperlink{structgondola_1_1CRFrameObject}{CRFrame\+Object}}
+\begin{DoxyCompactList}\small\item\em Decode a serializable from a bytestream ~\newline
+ \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structgondola_1_1CRFrameObject_a2edf45499451f94355d7fd686898e78e}{version}}
+\item 
+\mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68}{CRFrame\+Object\+Type}} \mbox{\hyperlink{structgondola_1_1CRFrameObject_a2e3d538a8bf72ab32dbe7f9665d04628}{ftype}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{structgondola_1_1CRFrameObject_ab79776d9e2a7370a2b4986d207001963}{payload}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1CRFrameObject_a93d8e4d5e30cd59ba83416b2e3ebcee4}{HEAD}} = 0x\+AAAA
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1CRFrameObject_a530c2c307cd4e221c15cc3e24195c8c7}{TAIL}} = 0x5555
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structgondola_1_1CRFrameObject_ae9b6b4da5a35210f616f1663aebcfb9b}\label{structgondola_1_1CRFrameObject_ae9b6b4da5a35210f616f1663aebcfb9b} 
+\index{gondola::CRFrameObject@{gondola::CRFrameObject}!from\_bytestream@{from\_bytestream}}
+\index{from\_bytestream@{from\_bytestream}!gondola::CRFrameObject@{gondola::CRFrameObject}}
+\doxysubsubsection{\texorpdfstring{from\_bytestream()}{from\_bytestream()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structgondola_1_1CRFrameObject}{g\+::\+CRFrame\+Object}} gondola\+::\+CRFrame\+Object\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$}]{stream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&}]{pos }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{structgondola_1_1CRFrameObject}{CRFrame\+Object}}\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Decode a serializable from a bytestream ~\newline
+ 
+
+\Hypertarget{structgondola_1_1CRFrameObject_a9db436e8a3f36f8f8862ca3d95466e44}\label{structgondola_1_1CRFrameObject_a9db436e8a3f36f8f8862ca3d95466e44} 
+\index{gondola::CRFrameObject@{gondola::CRFrameObject}!to\_bytestream@{to\_bytestream}}
+\index{to\_bytestream@{to\_bytestream}!gondola::CRFrameObject@{gondola::CRFrameObject}}
+\doxysubsubsection{\texorpdfstring{to\_bytestream()}{to\_bytestream()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+CRFrame\+Object\+::to\+\_\+bytestream (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}$>$}
+
+\Hypertarget{structgondola_1_1CRFrameObject_a3196f8667f5985f4344e6d39e51f0982}\label{structgondola_1_1CRFrameObject_a3196f8667f5985f4344e6d39e51f0982} 
+\index{gondola::CRFrameObject@{gondola::CRFrameObject}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!gondola::CRFrameObject@{gondola::CRFrameObject}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily std\+::string gondola\+::\+CRFrame\+Object\+::to\+\_\+string (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) -\/$>$ std\+::string}
+
+
+
+string representation for printing 
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structgondola_1_1CRFrameObject_a2e3d538a8bf72ab32dbe7f9665d04628}\label{structgondola_1_1CRFrameObject_a2e3d538a8bf72ab32dbe7f9665d04628} 
+\index{gondola::CRFrameObject@{gondola::CRFrameObject}!ftype@{ftype}}
+\index{ftype@{ftype}!gondola::CRFrameObject@{gondola::CRFrameObject}}
+\doxysubsubsection{\texorpdfstring{ftype}{ftype}}
+{\footnotesize\ttfamily \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68}{CRFrame\+Object\+Type}} gondola\+::\+CRFrame\+Object\+::ftype}
+
+\Hypertarget{structgondola_1_1CRFrameObject_a93d8e4d5e30cd59ba83416b2e3ebcee4}\label{structgondola_1_1CRFrameObject_a93d8e4d5e30cd59ba83416b2e3ebcee4} 
+\index{gondola::CRFrameObject@{gondola::CRFrameObject}!HEAD@{HEAD}}
+\index{HEAD@{HEAD}!gondola::CRFrameObject@{gondola::CRFrameObject}}
+\doxysubsubsection{\texorpdfstring{HEAD}{HEAD}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+CRFrame\+Object\+::\+HEAD = 0x\+AAAA\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+\Hypertarget{structgondola_1_1CRFrameObject_ab79776d9e2a7370a2b4986d207001963}\label{structgondola_1_1CRFrameObject_ab79776d9e2a7370a2b4986d207001963} 
+\index{gondola::CRFrameObject@{gondola::CRFrameObject}!payload@{payload}}
+\index{payload@{payload}!gondola::CRFrameObject@{gondola::CRFrameObject}}
+\doxysubsubsection{\texorpdfstring{payload}{payload}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}$>$ gondola\+::\+CRFrame\+Object\+::payload}
+
+\Hypertarget{structgondola_1_1CRFrameObject_a530c2c307cd4e221c15cc3e24195c8c7}\label{structgondola_1_1CRFrameObject_a530c2c307cd4e221c15cc3e24195c8c7} 
+\index{gondola::CRFrameObject@{gondola::CRFrameObject}!TAIL@{TAIL}}
+\index{TAIL@{TAIL}!gondola::CRFrameObject@{gondola::CRFrameObject}}
+\doxysubsubsection{\texorpdfstring{TAIL}{TAIL}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+CRFrame\+Object\+::\+TAIL = 0x5555\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+\Hypertarget{structgondola_1_1CRFrameObject_a2edf45499451f94355d7fd686898e78e}\label{structgondola_1_1CRFrameObject_a2edf45499451f94355d7fd686898e78e} 
+\index{gondola::CRFrameObject@{gondola::CRFrameObject}!version@{version}}
+\index{version@{version}!gondola::CRFrameObject@{gondola::CRFrameObject}}
+\doxysubsubsection{\texorpdfstring{version}{version}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} gondola\+::\+CRFrame\+Object\+::version}
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/\mbox{\hyperlink{caraspace_8hpp}{caraspace.\+hpp}}\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/\mbox{\hyperlink{caraspace_8cxx}{caraspace.\+cxx}}\end{DoxyCompactItemize}

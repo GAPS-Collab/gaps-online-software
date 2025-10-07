@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["pa_bias","pa_init","pa_temp"]};

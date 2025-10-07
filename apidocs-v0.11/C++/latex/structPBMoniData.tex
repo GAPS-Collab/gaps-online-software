@@ -1,0 +1,180 @@
+\doxysection{PBMoni\+Data Struct Reference}
+\hypertarget{structPBMoniData}{}\label{structPBMoniData}\index{PBMoniData@{PBMoniData}}
+
+
+{\ttfamily \#include $<$monitoring.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structPBMoniData_a968b96cd13d24e35f727278474f4e646}{PBMoni\+Data}} ()
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structPBMoniData_a2020971026eabe5f0cd9a7d750758b19}{to\+\_\+string}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ std\+::string
+\begin{DoxyCompactList}\small\item\em String representation for pretty printing. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structPBMoniData_ad9e03e70be334dd511e3cf87c7761f62}{from\+\_\+bytestream}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{stream}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}}) -\/$>$ \mbox{\hyperlink{structPBMoniData}{PBMoni\+Data}}
+\begin{DoxyCompactList}\small\item\em Factor function -\/ restore \doxylink{structPAMoniData}{PAMoni\+Data} from byte-\/representation. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structPBMoniData_aa3d348ce1924ff9e8049f871a56d6ba4}{board\+\_\+id}}
+\item 
+std\+::array$<$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}, 3 $>$ \mbox{\hyperlink{structPBMoniData_a5704203569de9abf8c9fd3e4090a9081}{p3v6\+\_\+preamp\+\_\+vcp}}
+\item 
+std\+::array$<$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}, 3 $>$ \mbox{\hyperlink{structPBMoniData_a12ad3e558a28670ca05e62813ba76d0c}{n1v6\+\_\+preamp\+\_\+vcp}}
+\item 
+std\+::array$<$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}, 3 $>$ \mbox{\hyperlink{structPBMoniData_a333838d69fb6ab35e9bef8e2637531b2}{p3v4f\+\_\+ltb\+\_\+vcp}}
+\item 
+std\+::array$<$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}, 3 $>$ \mbox{\hyperlink{structPBMoniData_afa0e56c40a617c4f832de2a4ba1351cf}{p3v4d\+\_\+ltb\+\_\+vcp}}
+\item 
+std\+::array$<$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}, 3 $>$ \mbox{\hyperlink{structPBMoniData_afede999d1f936147e28e7c177ce3d2c0}{p3v6\+\_\+ltb\+\_\+vcp}}
+\item 
+std\+::array$<$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}, 3 $>$ \mbox{\hyperlink{structPBMoniData_a20370d5481002f057549f71952b849b6}{n1v6\+\_\+ltb\+\_\+vcp}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structPBMoniData_aed7fbf92af521232b18d94695a0d7a68}{pds\+\_\+temp}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structPBMoniData_a1391678afa9799a41d26997a0accaa3f}{pas\+\_\+temp}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structPBMoniData_a468db626b837765f2e8149681e6201d4}{nas\+\_\+temp}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structPBMoniData_a75659c6d2b3447bb80621df8258dfcc9}{shv\+\_\+temp}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structPBMoniData_a3a281e686fab235ec6dd046933881119}{HEAD}} = 0x\+AAAA
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structPBMoniData_a2250837be3ca77f05c903dc1cd226236}{TAIL}} = 0x5555
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structPBMoniData_a475374b91e61c9285981e02f0a4fe845}{SIZE}} = 89
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Sensors on the Power Board 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structPBMoniData_a968b96cd13d24e35f727278474f4e646}\label{structPBMoniData_a968b96cd13d24e35f727278474f4e646} 
+\index{PBMoniData@{PBMoniData}!PBMoniData@{PBMoniData}}
+\index{PBMoniData@{PBMoniData}!PBMoniData@{PBMoniData}}
+\doxysubsubsection{\texorpdfstring{PBMoniData()}{PBMoniData()}}
+{\footnotesize\ttfamily PBMoni\+Data\+::\+PBMoni\+Data (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structPBMoniData_ad9e03e70be334dd511e3cf87c7761f62}\label{structPBMoniData_ad9e03e70be334dd511e3cf87c7761f62} 
+\index{PBMoniData@{PBMoniData}!from\_bytestream@{from\_bytestream}}
+\index{from\_bytestream@{from\_bytestream}!PBMoniData@{PBMoniData}}
+\doxysubsubsection{\texorpdfstring{from\_bytestream()}{from\_bytestream()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structPBMoniData}{PBMoni\+Data}} PBMoni\+Data\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{stream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&}]{pos }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{structPBMoniData}{PBMoni\+Data}}\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Factor function -\/ restore \doxylink{structPAMoniData}{PAMoni\+Data} from byte-\/representation. 
+
+\Hypertarget{structPBMoniData_a2020971026eabe5f0cd9a7d750758b19}\label{structPBMoniData_a2020971026eabe5f0cd9a7d750758b19} 
+\index{PBMoniData@{PBMoniData}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!PBMoniData@{PBMoniData}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily std\+::string PBMoni\+Data\+::to\+\_\+string (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ std\+::string}
+
+
+
+String representation for pretty printing. 
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structPBMoniData_aa3d348ce1924ff9e8049f871a56d6ba4}\label{structPBMoniData_aa3d348ce1924ff9e8049f871a56d6ba4} 
+\index{PBMoniData@{PBMoniData}!board\_id@{board\_id}}
+\index{board\_id@{board\_id}!PBMoniData@{PBMoniData}}
+\doxysubsubsection{\texorpdfstring{board\_id}{board\_id}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} PBMoni\+Data\+::board\+\_\+id}
+
+\Hypertarget{structPBMoniData_a3a281e686fab235ec6dd046933881119}\label{structPBMoniData_a3a281e686fab235ec6dd046933881119} 
+\index{PBMoniData@{PBMoniData}!HEAD@{HEAD}}
+\index{HEAD@{HEAD}!PBMoniData@{PBMoniData}}
+\doxysubsubsection{\texorpdfstring{HEAD}{HEAD}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} PBMoni\+Data\+::\+HEAD = 0x\+AAAA\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+\Hypertarget{structPBMoniData_a20370d5481002f057549f71952b849b6}\label{structPBMoniData_a20370d5481002f057549f71952b849b6} 
+\index{PBMoniData@{PBMoniData}!n1v6\_ltb\_vcp@{n1v6\_ltb\_vcp}}
+\index{n1v6\_ltb\_vcp@{n1v6\_ltb\_vcp}!PBMoniData@{PBMoniData}}
+\doxysubsubsection{\texorpdfstring{n1v6\_ltb\_vcp}{n1v6\_ltb\_vcp}}
+{\footnotesize\ttfamily std\+::array$<$\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}, 3$>$ PBMoni\+Data\+::n1v6\+\_\+ltb\+\_\+vcp}
+
+\Hypertarget{structPBMoniData_a12ad3e558a28670ca05e62813ba76d0c}\label{structPBMoniData_a12ad3e558a28670ca05e62813ba76d0c} 
+\index{PBMoniData@{PBMoniData}!n1v6\_preamp\_vcp@{n1v6\_preamp\_vcp}}
+\index{n1v6\_preamp\_vcp@{n1v6\_preamp\_vcp}!PBMoniData@{PBMoniData}}
+\doxysubsubsection{\texorpdfstring{n1v6\_preamp\_vcp}{n1v6\_preamp\_vcp}}
+{\footnotesize\ttfamily std\+::array$<$\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}, 3$>$ PBMoni\+Data\+::n1v6\+\_\+preamp\+\_\+vcp}
+
+\Hypertarget{structPBMoniData_a468db626b837765f2e8149681e6201d4}\label{structPBMoniData_a468db626b837765f2e8149681e6201d4} 
+\index{PBMoniData@{PBMoniData}!nas\_temp@{nas\_temp}}
+\index{nas\_temp@{nas\_temp}!PBMoniData@{PBMoniData}}
+\doxysubsubsection{\texorpdfstring{nas\_temp}{nas\_temp}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} PBMoni\+Data\+::nas\+\_\+temp}
+
+\Hypertarget{structPBMoniData_afa0e56c40a617c4f832de2a4ba1351cf}\label{structPBMoniData_afa0e56c40a617c4f832de2a4ba1351cf} 
+\index{PBMoniData@{PBMoniData}!p3v4d\_ltb\_vcp@{p3v4d\_ltb\_vcp}}
+\index{p3v4d\_ltb\_vcp@{p3v4d\_ltb\_vcp}!PBMoniData@{PBMoniData}}
+\doxysubsubsection{\texorpdfstring{p3v4d\_ltb\_vcp}{p3v4d\_ltb\_vcp}}
+{\footnotesize\ttfamily std\+::array$<$\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}, 3$>$ PBMoni\+Data\+::p3v4d\+\_\+ltb\+\_\+vcp}
+
+\Hypertarget{structPBMoniData_a333838d69fb6ab35e9bef8e2637531b2}\label{structPBMoniData_a333838d69fb6ab35e9bef8e2637531b2} 
+\index{PBMoniData@{PBMoniData}!p3v4f\_ltb\_vcp@{p3v4f\_ltb\_vcp}}
+\index{p3v4f\_ltb\_vcp@{p3v4f\_ltb\_vcp}!PBMoniData@{PBMoniData}}
+\doxysubsubsection{\texorpdfstring{p3v4f\_ltb\_vcp}{p3v4f\_ltb\_vcp}}
+{\footnotesize\ttfamily std\+::array$<$\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}, 3$>$ PBMoni\+Data\+::p3v4f\+\_\+ltb\+\_\+vcp}
+
+\Hypertarget{structPBMoniData_afede999d1f936147e28e7c177ce3d2c0}\label{structPBMoniData_afede999d1f936147e28e7c177ce3d2c0} 
+\index{PBMoniData@{PBMoniData}!p3v6\_ltb\_vcp@{p3v6\_ltb\_vcp}}
+\index{p3v6\_ltb\_vcp@{p3v6\_ltb\_vcp}!PBMoniData@{PBMoniData}}
+\doxysubsubsection{\texorpdfstring{p3v6\_ltb\_vcp}{p3v6\_ltb\_vcp}}
+{\footnotesize\ttfamily std\+::array$<$\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}, 3$>$ PBMoni\+Data\+::p3v6\+\_\+ltb\+\_\+vcp}
+
+\Hypertarget{structPBMoniData_a5704203569de9abf8c9fd3e4090a9081}\label{structPBMoniData_a5704203569de9abf8c9fd3e4090a9081} 
+\index{PBMoniData@{PBMoniData}!p3v6\_preamp\_vcp@{p3v6\_preamp\_vcp}}
+\index{p3v6\_preamp\_vcp@{p3v6\_preamp\_vcp}!PBMoniData@{PBMoniData}}
+\doxysubsubsection{\texorpdfstring{p3v6\_preamp\_vcp}{p3v6\_preamp\_vcp}}
+{\footnotesize\ttfamily std\+::array$<$\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}, 3$>$ PBMoni\+Data\+::p3v6\+\_\+preamp\+\_\+vcp}
+
+\Hypertarget{structPBMoniData_a1391678afa9799a41d26997a0accaa3f}\label{structPBMoniData_a1391678afa9799a41d26997a0accaa3f} 
+\index{PBMoniData@{PBMoniData}!pas\_temp@{pas\_temp}}
+\index{pas\_temp@{pas\_temp}!PBMoniData@{PBMoniData}}
+\doxysubsubsection{\texorpdfstring{pas\_temp}{pas\_temp}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} PBMoni\+Data\+::pas\+\_\+temp}
+
+\Hypertarget{structPBMoniData_aed7fbf92af521232b18d94695a0d7a68}\label{structPBMoniData_aed7fbf92af521232b18d94695a0d7a68} 
+\index{PBMoniData@{PBMoniData}!pds\_temp@{pds\_temp}}
+\index{pds\_temp@{pds\_temp}!PBMoniData@{PBMoniData}}
+\doxysubsubsection{\texorpdfstring{pds\_temp}{pds\_temp}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} PBMoni\+Data\+::pds\+\_\+temp}
+
+\Hypertarget{structPBMoniData_a75659c6d2b3447bb80621df8258dfcc9}\label{structPBMoniData_a75659c6d2b3447bb80621df8258dfcc9} 
+\index{PBMoniData@{PBMoniData}!shv\_temp@{shv\_temp}}
+\index{shv\_temp@{shv\_temp}!PBMoniData@{PBMoniData}}
+\doxysubsubsection{\texorpdfstring{shv\_temp}{shv\_temp}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} PBMoni\+Data\+::shv\+\_\+temp}
+
+\Hypertarget{structPBMoniData_a475374b91e61c9285981e02f0a4fe845}\label{structPBMoniData_a475374b91e61c9285981e02f0a4fe845} 
+\index{PBMoniData@{PBMoniData}!SIZE@{SIZE}}
+\index{SIZE@{SIZE}!PBMoniData@{PBMoniData}}
+\doxysubsubsection{\texorpdfstring{SIZE}{SIZE}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} PBMoni\+Data\+::\+SIZE = 89\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+\Hypertarget{structPBMoniData_a2250837be3ca77f05c903dc1cd226236}\label{structPBMoniData_a2250837be3ca77f05c903dc1cd226236} 
+\index{PBMoniData@{PBMoniData}!TAIL@{TAIL}}
+\index{TAIL@{TAIL}!PBMoniData@{PBMoniData}}
+\doxysubsubsection{\texorpdfstring{TAIL}{TAIL}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} PBMoni\+Data\+::\+TAIL = 0x5555\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/packets/\mbox{\hyperlink{monitoring_8h}{monitoring.\+h}}\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/\mbox{\hyperlink{monitoring_8cxx}{monitoring.\+cxx}}\end{DoxyCompactItemize}

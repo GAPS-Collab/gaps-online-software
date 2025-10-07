@@ -1,0 +1,18 @@
+gondola.visual.tof
+==================
+
+.. automodule:: gondola.visual.tof
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      plot_hg_lg_hits
+      plot_waveforms
+      tof_2dproj
+      tof_hits_time_evolution
+      tof_projection_xy
+      unroll_cbe_sides
+      unroll_cor
+   

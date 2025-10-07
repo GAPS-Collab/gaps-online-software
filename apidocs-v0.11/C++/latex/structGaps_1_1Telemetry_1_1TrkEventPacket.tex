@@ -1,0 +1,93 @@
+\doxysection{Gaps\+::Telemetry\+::Trk\+Event\+Packet Struct Reference}
+\hypertarget{structGaps_1_1Telemetry_1_1TrkEventPacket}{}\label{structGaps_1_1Telemetry_1_1TrkEventPacket}\index{Gaps::Telemetry::TrkEventPacket@{Gaps::Telemetry::TrkEventPacket}}
+
+
+{\ttfamily \#include $<$telemetry\+\_\+dataclasses.\+hpp$>$}
+
+
+
+Collaboration diagram for Gaps\+::Telemetry\+::Trk\+Event\+Packet\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structGaps_1_1Telemetry_1_1TrkEventPacket__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkEventPacket_ab3d8e593117ea82857e7cff601af7989}{to\+\_\+string}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ std\+::string
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkEventPacket_a84634f5c1b1935af02d6a39abbbf2340}{from\+\_\+bytestream}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{stream}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}}) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkEventPacket}{Trk\+Event\+Packet}}, \mbox{\hyperlink{classGaps_1_1IOError}{Gaps\+::\+IOError}} $>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader}{Packet\+Header}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkEventPacket_a83b723e9c21b6d7684d75a0e8efefd28}{header}}
+\item 
+\mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkHeader}{Trk\+Header}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkEventPacket_aaae46f85f76cc3f58cf2128aa4e38d6a}{daq\+\_\+header}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkEvent}{Trk\+Event}} $>$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkEventPacket_a6c09cbffa22cf1cb5715238b5e9adb33}{events}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkEventPacket_a5032ce8cc55044d6a444ed9bae90c60f}{run\+\_\+id}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkEventPacket_a8dfc26e2bdf3eea4ad3f9883bb8e18a4}{run\+\_\+id\+\_\+old}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkEventPacket_a84634f5c1b1935af02d6a39abbbf2340}\label{structGaps_1_1Telemetry_1_1TrkEventPacket_a84634f5c1b1935af02d6a39abbbf2340} 
+\index{Gaps::Telemetry::TrkEventPacket@{Gaps::Telemetry::TrkEventPacket}!from\_bytestream@{from\_bytestream}}
+\index{from\_bytestream@{from\_bytestream}!Gaps::Telemetry::TrkEventPacket@{Gaps::Telemetry::TrkEventPacket}}
+\doxysubsubsection{\texorpdfstring{from\_bytestream()}{from\_bytestream()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} Gaps\+::\+Telemetry\+::\+Trk\+Event\+Packet\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&}]{stream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&}]{pos }\end{DoxyParamCaption}) -\/$>$ r\+::\+Result$<$\mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkEventPacket}{Trk\+Event\+Packet}}, \mbox{\hyperlink{classGaps_1_1IOError}{Gaps\+::\+IOError}}$>$\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkEventPacket_ab3d8e593117ea82857e7cff601af7989}\label{structGaps_1_1Telemetry_1_1TrkEventPacket_ab3d8e593117ea82857e7cff601af7989} 
+\index{Gaps::Telemetry::TrkEventPacket@{Gaps::Telemetry::TrkEventPacket}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!Gaps::Telemetry::TrkEventPacket@{Gaps::Telemetry::TrkEventPacket}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} Gaps\+::\+Telemetry\+::\+Trk\+Event\+Packet\+::to\+\_\+string (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ std\+::string}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkEventPacket_aaae46f85f76cc3f58cf2128aa4e38d6a}\label{structGaps_1_1Telemetry_1_1TrkEventPacket_aaae46f85f76cc3f58cf2128aa4e38d6a} 
+\index{Gaps::Telemetry::TrkEventPacket@{Gaps::Telemetry::TrkEventPacket}!daq\_header@{daq\_header}}
+\index{daq\_header@{daq\_header}!Gaps::Telemetry::TrkEventPacket@{Gaps::Telemetry::TrkEventPacket}}
+\doxysubsubsection{\texorpdfstring{daq\_header}{daq\_header}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkHeader}{Trk\+Header}} Gaps\+::\+Telemetry\+::\+Trk\+Event\+Packet\+::daq\+\_\+header}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkEventPacket_a6c09cbffa22cf1cb5715238b5e9adb33}\label{structGaps_1_1Telemetry_1_1TrkEventPacket_a6c09cbffa22cf1cb5715238b5e9adb33} 
+\index{Gaps::Telemetry::TrkEventPacket@{Gaps::Telemetry::TrkEventPacket}!events@{events}}
+\index{events@{events}!Gaps::Telemetry::TrkEventPacket@{Gaps::Telemetry::TrkEventPacket}}
+\doxysubsubsection{\texorpdfstring{events}{events}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkEvent}{Trk\+Event}}$>$ Gaps\+::\+Telemetry\+::\+Trk\+Event\+Packet\+::events}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkEventPacket_a83b723e9c21b6d7684d75a0e8efefd28}\label{structGaps_1_1Telemetry_1_1TrkEventPacket_a83b723e9c21b6d7684d75a0e8efefd28} 
+\index{Gaps::Telemetry::TrkEventPacket@{Gaps::Telemetry::TrkEventPacket}!header@{header}}
+\index{header@{header}!Gaps::Telemetry::TrkEventPacket@{Gaps::Telemetry::TrkEventPacket}}
+\doxysubsubsection{\texorpdfstring{header}{header}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader}{Packet\+Header}} Gaps\+::\+Telemetry\+::\+Trk\+Event\+Packet\+::header}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkEventPacket_a5032ce8cc55044d6a444ed9bae90c60f}\label{structGaps_1_1Telemetry_1_1TrkEventPacket_a5032ce8cc55044d6a444ed9bae90c60f} 
+\index{Gaps::Telemetry::TrkEventPacket@{Gaps::Telemetry::TrkEventPacket}!run\_id@{run\_id}}
+\index{run\_id@{run\_id}!Gaps::Telemetry::TrkEventPacket@{Gaps::Telemetry::TrkEventPacket}}
+\doxysubsubsection{\texorpdfstring{run\_id}{run\_id}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Gaps\+::\+Telemetry\+::\+Trk\+Event\+Packet\+::run\+\_\+id}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1TrkEventPacket_a8dfc26e2bdf3eea4ad3f9883bb8e18a4}\label{structGaps_1_1Telemetry_1_1TrkEventPacket_a8dfc26e2bdf3eea4ad3f9883bb8e18a4} 
+\index{Gaps::Telemetry::TrkEventPacket@{Gaps::Telemetry::TrkEventPacket}!run\_id\_old@{run\_id\_old}}
+\index{run\_id\_old@{run\_id\_old}!Gaps::Telemetry::TrkEventPacket@{Gaps::Telemetry::TrkEventPacket}}
+\doxysubsubsection{\texorpdfstring{run\_id\_old}{run\_id\_old}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} Gaps\+::\+Telemetry\+::\+Trk\+Event\+Packet\+::run\+\_\+id\+\_\+old}
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/\mbox{\hyperlink{telemetry__dataclasses_8hpp}{telemetry\+\_\+dataclasses.\+hpp}}\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/\mbox{\hyperlink{telemetry__dataclasses_8cxx}{telemetry\+\_\+dataclasses.\+cxx}}\end{DoxyCompactItemize}

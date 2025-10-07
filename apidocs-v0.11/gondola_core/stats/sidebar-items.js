@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["calculate_column_stat","gamma_pdf","mean","standard_deviation"]};

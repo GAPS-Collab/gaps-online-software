@@ -1,0 +1,162 @@
+\doxysection{RBEvent Struct Reference}
+\hypertarget{structRBEvent}{}\label{structRBEvent}\index{RBEvent@{RBEvent}}
+
+
+{\ttfamily \#include $<$events.\+h$>$}
+
+
+
+Collaboration diagram for RBEvent\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=173pt]{structRBEvent__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structRBEvent_ac70a9aa70bfd93f7fdc5e16a415a41ee}{RBEvent}} ()
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structRBEvent_ac9a533a0d9531af36233e92ef305c14f}{get\+\_\+channel\+\_\+by\+\_\+label}} (\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} channel) \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} $>$ \&
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structRBEvent_ad0f45025ee074d4b6b1384af7ff2bc0e}{get\+\_\+channel\+\_\+by\+\_\+id}} (\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} channel) \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} $>$ \&
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structRBEvent_aaab8fff24b75fbc42fd0e284a1a6670e}{get\+\_\+channel\+\_\+adc}} (\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} channel) \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} $>$ \&
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structRBEvent_a1e466392e32d6197bc46268b210b95fe}{to\+\_\+string}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ std\+::string
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structRBEvent_a4ea69d298fb6dba54f44e9b77c4698ac}{calc\+\_\+baseline}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{volts}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{min\+\_\+bin}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{max\+\_\+bin}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}
+\begin{DoxyCompactList}\small\item\em Get the baseline for a single channel. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structRBEvent_aaa29a66fec66932e1295904b26c10793}{from\+\_\+bytestream}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}}, \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}}) -\/$>$ \mbox{\hyperlink{structRBEvent}{RBEvent}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structRBEvent_aabd7b0be3bf8bb0f282919f598a5e8b1}{data\+\_\+type}} = 0
+\item 
+\mbox{\hyperlink{events_8h_a097b60adc604ef5a27f55edda6360293}{Event\+Status}} \mbox{\hyperlink{structRBEvent_aa14d698611932312daaa83322d43b0b0}{status}} = \mbox{\hyperlink{events_8h_a097b60adc604ef5a27f55edda6360293a88183b946cc5f0e8c96b2e66e1c74a7e}{Event\+Status\+::\+Unknown}}
+\item 
+\mbox{\hyperlink{structRBEventHeader}{RBEvent\+Header}} \mbox{\hyperlink{structRBEvent_a968bb4d3a9f08b6c7d3308e974d5b774}{header}} = \mbox{\hyperlink{structRBEventHeader}{RBEvent\+Header}}()
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} $>$ $>$ \mbox{\hyperlink{structRBEvent_adf62961449f222af9f394e4d0f342279}{adc}} = \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}$>$$>$()
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{structTofHit}{Tof\+Hit}} $>$ \mbox{\hyperlink{structRBEvent_ad64827ac0afd730ffaa26d93a793be94}{hits}} = \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{structTofHit}{Tof\+Hit}}$>$()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structRBEvent_a25bfe9837c3a8f8bd03709837f51a004}{HEAD}} = 0x\+AAAA
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structRBEvent_a86fc17996359ac81f0ae9fa10b8125b8}{TAIL}} = 0x5555
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A complete event for a single readout board with header and channel data. The size is flexible, only active datachannels are recorded. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structRBEvent_ac70a9aa70bfd93f7fdc5e16a415a41ee}\label{structRBEvent_ac70a9aa70bfd93f7fdc5e16a415a41ee} 
+\index{RBEvent@{RBEvent}!RBEvent@{RBEvent}}
+\index{RBEvent@{RBEvent}!RBEvent@{RBEvent}}
+\doxysubsubsection{\texorpdfstring{RBEvent()}{RBEvent()}}
+{\footnotesize\ttfamily RBEvent\+::\+RBEvent (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structRBEvent_a4ea69d298fb6dba54f44e9b77c4698ac}\label{structRBEvent_a4ea69d298fb6dba54f44e9b77c4698ac} 
+\index{RBEvent@{RBEvent}!calc\_baseline@{calc\_baseline}}
+\index{calc\_baseline@{calc\_baseline}!RBEvent@{RBEvent}}
+\doxysubsubsection{\texorpdfstring{calc\_baseline()}{calc\_baseline()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} RBEvent\+::calc\+\_\+baseline (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} $>$ \&}]{volts,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}}]{min\+\_\+bin,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}}]{max\+\_\+bin }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Get the baseline for a single channel. 
+
+\Hypertarget{structRBEvent_aaa29a66fec66932e1295904b26c10793}\label{structRBEvent_aaa29a66fec66932e1295904b26c10793} 
+\index{RBEvent@{RBEvent}!from\_bytestream@{from\_bytestream}}
+\index{from\_bytestream@{from\_bytestream}!RBEvent@{RBEvent}}
+\doxysubsubsection{\texorpdfstring{from\_bytestream()}{from\_bytestream()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} RBEvent\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{bytestream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \&}]{pos }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{structRBEvent}{RBEvent}}\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{structRBEvent_aaab8fff24b75fbc42fd0e284a1a6670e}\label{structRBEvent_aaab8fff24b75fbc42fd0e284a1a6670e} 
+\index{RBEvent@{RBEvent}!get\_channel\_adc@{get\_channel\_adc}}
+\index{get\_channel\_adc@{get\_channel\_adc}!RBEvent@{RBEvent}}
+\doxysubsubsection{\texorpdfstring{get\_channel\_adc()}{get\_channel\_adc()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} $>$ \& RBEvent\+::get\+\_\+channel\+\_\+adc (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}}]{channel }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}$>$\&}
+
+\Hypertarget{structRBEvent_ad0f45025ee074d4b6b1384af7ff2bc0e}\label{structRBEvent_ad0f45025ee074d4b6b1384af7ff2bc0e} 
+\index{RBEvent@{RBEvent}!get\_channel\_by\_id@{get\_channel\_by\_id}}
+\index{get\_channel\_by\_id@{get\_channel\_by\_id}!RBEvent@{RBEvent}}
+\doxysubsubsection{\texorpdfstring{get\_channel\_by\_id()}{get\_channel\_by\_id()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} $>$ \& RBEvent\+::get\+\_\+channel\+\_\+by\+\_\+id (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}}]{channel }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}$>$\&}
+
+\Hypertarget{structRBEvent_ac9a533a0d9531af36233e92ef305c14f}\label{structRBEvent_ac9a533a0d9531af36233e92ef305c14f} 
+\index{RBEvent@{RBEvent}!get\_channel\_by\_label@{get\_channel\_by\_label}}
+\index{get\_channel\_by\_label@{get\_channel\_by\_label}!RBEvent@{RBEvent}}
+\doxysubsubsection{\texorpdfstring{get\_channel\_by\_label()}{get\_channel\_by\_label()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} $>$ \& RBEvent\+::get\+\_\+channel\+\_\+by\+\_\+label (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}}]{channel }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}$>$\&}
+
+\Hypertarget{structRBEvent_a1e466392e32d6197bc46268b210b95fe}\label{structRBEvent_a1e466392e32d6197bc46268b210b95fe} 
+\index{RBEvent@{RBEvent}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!RBEvent@{RBEvent}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily std\+::string RBEvent\+::to\+\_\+string (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ std\+::string}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structRBEvent_adf62961449f222af9f394e4d0f342279}\label{structRBEvent_adf62961449f222af9f394e4d0f342279} 
+\index{RBEvent@{RBEvent}!adc@{adc}}
+\index{adc@{adc}!RBEvent@{RBEvent}}
+\doxysubsubsection{\texorpdfstring{adc}{adc}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}$>$ $>$ RBEvent\+::adc = \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}$>$$>$()}
+
+\Hypertarget{structRBEvent_aabd7b0be3bf8bb0f282919f598a5e8b1}\label{structRBEvent_aabd7b0be3bf8bb0f282919f598a5e8b1} 
+\index{RBEvent@{RBEvent}!data\_type@{data\_type}}
+\index{data\_type@{data\_type}!RBEvent@{RBEvent}}
+\doxysubsubsection{\texorpdfstring{data\_type}{data\_type}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} RBEvent\+::data\+\_\+type = 0}
+
+\Hypertarget{structRBEvent_a25bfe9837c3a8f8bd03709837f51a004}\label{structRBEvent_a25bfe9837c3a8f8bd03709837f51a004} 
+\index{RBEvent@{RBEvent}!HEAD@{HEAD}}
+\index{HEAD@{HEAD}!RBEvent@{RBEvent}}
+\doxysubsubsection{\texorpdfstring{HEAD}{HEAD}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} RBEvent\+::\+HEAD = 0x\+AAAA\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+\Hypertarget{structRBEvent_a968bb4d3a9f08b6c7d3308e974d5b774}\label{structRBEvent_a968bb4d3a9f08b6c7d3308e974d5b774} 
+\index{RBEvent@{RBEvent}!header@{header}}
+\index{header@{header}!RBEvent@{RBEvent}}
+\doxysubsubsection{\texorpdfstring{header}{header}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structRBEventHeader}{RBEvent\+Header}} RBEvent\+::header = \mbox{\hyperlink{structRBEventHeader}{RBEvent\+Header}}()}
+
+\Hypertarget{structRBEvent_ad64827ac0afd730ffaa26d93a793be94}\label{structRBEvent_ad64827ac0afd730ffaa26d93a793be94} 
+\index{RBEvent@{RBEvent}!hits@{hits}}
+\index{hits@{hits}!RBEvent@{RBEvent}}
+\doxysubsubsection{\texorpdfstring{hits}{hits}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{structTofHit}{Tof\+Hit}}$>$ RBEvent\+::hits = \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{structTofHit}{Tof\+Hit}}$>$()}
+
+\Hypertarget{structRBEvent_aa14d698611932312daaa83322d43b0b0}\label{structRBEvent_aa14d698611932312daaa83322d43b0b0} 
+\index{RBEvent@{RBEvent}!status@{status}}
+\index{status@{status}!RBEvent@{RBEvent}}
+\doxysubsubsection{\texorpdfstring{status}{status}}
+{\footnotesize\ttfamily \mbox{\hyperlink{events_8h_a097b60adc604ef5a27f55edda6360293}{Event\+Status}} RBEvent\+::status = \mbox{\hyperlink{events_8h_a097b60adc604ef5a27f55edda6360293a88183b946cc5f0e8c96b2e66e1c74a7e}{Event\+Status\+::\+Unknown}}}
+
+\Hypertarget{structRBEvent_a86fc17996359ac81f0ae9fa10b8125b8}\label{structRBEvent_a86fc17996359ac81f0ae9fa10b8125b8} 
+\index{RBEvent@{RBEvent}!TAIL@{TAIL}}
+\index{TAIL@{TAIL}!RBEvent@{RBEvent}}
+\doxysubsubsection{\texorpdfstring{TAIL}{TAIL}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} RBEvent\+::\+TAIL = 0x5555\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/\mbox{\hyperlink{events_8h}{events.\+h}}\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/\mbox{\hyperlink{events_8cxx}{events.\+cxx}}\end{DoxyCompactItemize}

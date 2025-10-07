@@ -1,0 +1,44 @@
+\doxysection{commands.\+h}
+\hypertarget{commands_8h_source}{}\label{commands_8h_source}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/commands.h@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/commands.h}}
+\mbox{\hyperlink{commands_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ COMMANDS\_H\_INCLUDED}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ COMMANDS\_H\_INCLUDED}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5}{TofCommandCode}}\ \{}
+\DoxyCodeLine{00005\ \ \ \textcolor{comment}{//\ power\ class\ -\/\ 1}}
+\DoxyCodeLine{00006\ \ \ \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5ae9c8eade06d1ec34dca401148f6be400}{PowerOn}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 11,}
+\DoxyCodeLine{00007\ \ \ \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a280a96254b645aa2c2c336ef2e235c37}{PowerOff}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 10,}
+\DoxyCodeLine{00008\ \ \ \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a5ccb7ca0427893159961c5ceb2ec1823}{PowerCycle}}\ \ \ \ \ \ \ \ \ \ \ \ =\ 12,}
+\DoxyCodeLine{00009\ \ \ \textcolor{comment}{//\ setup\ class\ -\/\ 2}}
+\DoxyCodeLine{00010\ \ \ \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5af7eada35f62bbdaa13e1c1504bc2ebb0}{RBSetup}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 20,}
+\DoxyCodeLine{00011\ \ \ \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5aafcd3fc24b5ee264e0075d8db2f5ff21}{SetThresholds}}\ \ \ \ \ \ \ \ \ =\ 21,}
+\DoxyCodeLine{00012\ \ \ \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a375184f29a7e1367b8f3a95eaf3f1e27}{SetMtConfig}}\ \ \ \ \ \ \ \ \ \ \ =\ 22,}
+\DoxyCodeLine{00013\ \ \ \textcolor{comment}{//\ run\ class\ -\/\ 3}}
+\DoxyCodeLine{00014\ \ \ \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a5497710f622f618ff38118b7d8b29656}{StartValidationRun}}\ \ \ \ =\ 32,}
+\DoxyCodeLine{00015\ \ \ \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a6c501bfa3e8a998879abc522e2e696d9}{DataRunStart}}\ \ \ \ \ \ \ \ \ \ =\ 31,}
+\DoxyCodeLine{00016\ \ \ \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a8e31559789ff4a8ed253a3989cf0569b}{DataRunEnd}}\ \ \ \ \ \ \ \ \ \ \ \ =\ 30,}
+\DoxyCodeLine{00017\ \ \ \textcolor{comment}{//\ request\ class\ -\/4}}
+\DoxyCodeLine{00018\ \ \ \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a924d6a405c008b2465b6be8f0a461d55}{RequestWaveforms}}\ \ \ \ \ \ =\ 41,}
+\DoxyCodeLine{00019\ \ \ \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a3c5549e985a70b2fbed3b0e80a958cda}{RequestEvent}}\ \ \ \ \ \ \ \ \ \ =\ 42,}
+\DoxyCodeLine{00020\ \ \ \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5af72fec5053e2e1a0cf70d8be92ff0d3d}{RequestMoni}}\ \ \ \ \ \ \ \ \ \ \ =\ 43,}
+\DoxyCodeLine{00021\ \ \ \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a9bec63f1704d072d7ef8814c5dd99d73}{UnspoolEventCache}}\ \ \ \ \ =\ 44,}
+\DoxyCodeLine{00022\ \ \ \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5ad05712d903c22c0e3d0e3e21c7777031}{StreamAnyEvent}}\ \ \ \ \ \ \ \ =\ 45,\ }
+\DoxyCodeLine{00023\ \ \ \textcolor{comment}{//\ calibration\ class\ 5}}
+\DoxyCodeLine{00024\ \ \ \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5abde98af4420f17829ac40a2311384b97}{VoltageCalibration}}\ \ \ \ =\ 51,}
+\DoxyCodeLine{00025\ \ \ \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a83bad94620be1879a1bcadf2cae35aed}{TimingCalibration}}\ \ \ \ \ =\ 52,}
+\DoxyCodeLine{00026\ \ \ \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a65b56336792a0f107e6b14c0aa170348}{CreateCalibrationFile}}\ =\ 53,}
+\DoxyCodeLine{00027\ \ \ \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a88183b946cc5f0e8c96b2e66e1c74a7e}{Unknown}}}
+\DoxyCodeLine{00028\ \};}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{commands_8h_aee4b019262fd08438aee34c463daaad3}{TofResponse}}\ \{}
+\DoxyCodeLine{00031\ \ \ \mbox{\hyperlink{commands_8h_aee4b019262fd08438aee34c463daaad3a505a83f220c02df2f85c3810cd9ceb38}{Success}}\ \ \ \ \ \ \ \ \ \ \ \ =\ 1,}
+\DoxyCodeLine{00032\ \ \ \mbox{\hyperlink{commands_8h_aee4b019262fd08438aee34c463daaad3a4542287cbc392d52b6ad0f901726d176}{GeneralFailure}}\ \ \ \ \ =\ 2,}
+\DoxyCodeLine{00033\ \ \ \mbox{\hyperlink{commands_8h_aee4b019262fd08438aee34c463daaad3a917990e3dd3a189696e241ee2865f99c}{EventNotReady}}\ \ \ \ \ \ =\ 3,}
+\DoxyCodeLine{00034\ \ \ \mbox{\hyperlink{commands_8h_aee4b019262fd08438aee34c463daaad3a3ca67500cb048b1be12614013b2c8466}{SerializationIssue}}\ =\ 4,}
+\DoxyCodeLine{00035\ \ \ \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a88183b946cc5f0e8c96b2e66e1c74a7e}{Unknown}}}
+\DoxyCodeLine{00036\ \};}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

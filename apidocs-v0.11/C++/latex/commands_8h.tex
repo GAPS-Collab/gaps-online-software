@@ -1,0 +1,150 @@
+\doxysection{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/commands.h File Reference}
+\hypertarget{commands_8h}{}\label{commands_8h}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/commands.h@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/commands.h}}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5}{Tof\+Command\+Code}} \{ \newline
+\mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5ae9c8eade06d1ec34dca401148f6be400}{Power\+On}} = 11
+, \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a280a96254b645aa2c2c336ef2e235c37}{Power\+Off}} = 10
+, \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a5ccb7ca0427893159961c5ceb2ec1823}{Power\+Cycle}} = 12
+, \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5af7eada35f62bbdaa13e1c1504bc2ebb0}{RBSetup}} = 20
+, \newline
+\mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5aafcd3fc24b5ee264e0075d8db2f5ff21}{Set\+Thresholds}} = 21
+, \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a375184f29a7e1367b8f3a95eaf3f1e27}{Set\+Mt\+Config}} = 22
+, \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a5497710f622f618ff38118b7d8b29656}{Start\+Validation\+Run}} = 32
+, \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a6c501bfa3e8a998879abc522e2e696d9}{Data\+Run\+Start}} = 31
+, \newline
+\mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a8e31559789ff4a8ed253a3989cf0569b}{Data\+Run\+End}} = 30
+, \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a924d6a405c008b2465b6be8f0a461d55}{Request\+Waveforms}} = 41
+, \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a3c5549e985a70b2fbed3b0e80a958cda}{Request\+Event}} = 42
+, \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5af72fec5053e2e1a0cf70d8be92ff0d3d}{Request\+Moni}} = 43
+, \newline
+\mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a9bec63f1704d072d7ef8814c5dd99d73}{Unspool\+Event\+Cache}} = 44
+, \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5ad05712d903c22c0e3d0e3e21c7777031}{Stream\+Any\+Event}} = 45
+, \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5abde98af4420f17829ac40a2311384b97}{Voltage\+Calibration}} = 51
+, \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a83bad94620be1879a1bcadf2cae35aed}{Timing\+Calibration}} = 52
+, \newline
+\mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a65b56336792a0f107e6b14c0aa170348}{Create\+Calibration\+File}} = 53
+, \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a88183b946cc5f0e8c96b2e66e1c74a7e}{Unknown}}
+ \}
+\item 
+enum class \mbox{\hyperlink{commands_8h_aee4b019262fd08438aee34c463daaad3}{Tof\+Response}} \{ \newline
+\mbox{\hyperlink{commands_8h_aee4b019262fd08438aee34c463daaad3a505a83f220c02df2f85c3810cd9ceb38}{Success}} = 1
+, \mbox{\hyperlink{commands_8h_aee4b019262fd08438aee34c463daaad3a4542287cbc392d52b6ad0f901726d176}{General\+Failure}} = 2
+, \mbox{\hyperlink{commands_8h_aee4b019262fd08438aee34c463daaad3a917990e3dd3a189696e241ee2865f99c}{Event\+Not\+Ready}} = 3
+, \mbox{\hyperlink{commands_8h_aee4b019262fd08438aee34c463daaad3a3ca67500cb048b1be12614013b2c8466}{Serialization\+Issue}} = 4
+, \newline
+\mbox{\hyperlink{commands_8h_aee4b019262fd08438aee34c463daaad3a88183b946cc5f0e8c96b2e66e1c74a7e}{Unknown}}
+ \}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5}\label{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5} 
+\index{commands.h@{commands.h}!TofCommandCode@{TofCommandCode}}
+\index{TofCommandCode@{TofCommandCode}!commands.h@{commands.h}}
+\doxysubsubsection{\texorpdfstring{TofCommandCode}{TofCommandCode}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{enum}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{class}} \mbox{\hyperlink{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5}{Tof\+Command\+Code}}\hspace{0.3cm}{\ttfamily [strong]}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PowerOn@{PowerOn}!commands.h@{commands.h}}\index{commands.h@{commands.h}!PowerOn@{PowerOn}}}\Hypertarget{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5ae9c8eade06d1ec34dca401148f6be400}\label{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5ae9c8eade06d1ec34dca401148f6be400} 
+Power\+On&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PowerOff@{PowerOff}!commands.h@{commands.h}}\index{commands.h@{commands.h}!PowerOff@{PowerOff}}}\Hypertarget{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a280a96254b645aa2c2c336ef2e235c37}\label{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a280a96254b645aa2c2c336ef2e235c37} 
+Power\+Off&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PowerCycle@{PowerCycle}!commands.h@{commands.h}}\index{commands.h@{commands.h}!PowerCycle@{PowerCycle}}}\Hypertarget{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a5ccb7ca0427893159961c5ceb2ec1823}\label{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a5ccb7ca0427893159961c5ceb2ec1823} 
+Power\+Cycle&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RBSetup@{RBSetup}!commands.h@{commands.h}}\index{commands.h@{commands.h}!RBSetup@{RBSetup}}}\Hypertarget{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5af7eada35f62bbdaa13e1c1504bc2ebb0}\label{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5af7eada35f62bbdaa13e1c1504bc2ebb0} 
+RBSetup&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SetThresholds@{SetThresholds}!commands.h@{commands.h}}\index{commands.h@{commands.h}!SetThresholds@{SetThresholds}}}\Hypertarget{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5aafcd3fc24b5ee264e0075d8db2f5ff21}\label{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5aafcd3fc24b5ee264e0075d8db2f5ff21} 
+Set\+Thresholds&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SetMtConfig@{SetMtConfig}!commands.h@{commands.h}}\index{commands.h@{commands.h}!SetMtConfig@{SetMtConfig}}}\Hypertarget{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a375184f29a7e1367b8f3a95eaf3f1e27}\label{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a375184f29a7e1367b8f3a95eaf3f1e27} 
+Set\+Mt\+Config&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{StartValidationRun@{StartValidationRun}!commands.h@{commands.h}}\index{commands.h@{commands.h}!StartValidationRun@{StartValidationRun}}}\Hypertarget{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a5497710f622f618ff38118b7d8b29656}\label{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a5497710f622f618ff38118b7d8b29656} 
+Start\+Validation\+Run&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DataRunStart@{DataRunStart}!commands.h@{commands.h}}\index{commands.h@{commands.h}!DataRunStart@{DataRunStart}}}\Hypertarget{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a6c501bfa3e8a998879abc522e2e696d9}\label{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a6c501bfa3e8a998879abc522e2e696d9} 
+Data\+Run\+Start&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{DataRunEnd@{DataRunEnd}!commands.h@{commands.h}}\index{commands.h@{commands.h}!DataRunEnd@{DataRunEnd}}}\Hypertarget{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a8e31559789ff4a8ed253a3989cf0569b}\label{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a8e31559789ff4a8ed253a3989cf0569b} 
+Data\+Run\+End&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RequestWaveforms@{RequestWaveforms}!commands.h@{commands.h}}\index{commands.h@{commands.h}!RequestWaveforms@{RequestWaveforms}}}\Hypertarget{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a924d6a405c008b2465b6be8f0a461d55}\label{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a924d6a405c008b2465b6be8f0a461d55} 
+Request\+Waveforms&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RequestEvent@{RequestEvent}!commands.h@{commands.h}}\index{commands.h@{commands.h}!RequestEvent@{RequestEvent}}}\Hypertarget{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a3c5549e985a70b2fbed3b0e80a958cda}\label{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a3c5549e985a70b2fbed3b0e80a958cda} 
+Request\+Event&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RequestMoni@{RequestMoni}!commands.h@{commands.h}}\index{commands.h@{commands.h}!RequestMoni@{RequestMoni}}}\Hypertarget{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5af72fec5053e2e1a0cf70d8be92ff0d3d}\label{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5af72fec5053e2e1a0cf70d8be92ff0d3d} 
+Request\+Moni&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{UnspoolEventCache@{UnspoolEventCache}!commands.h@{commands.h}}\index{commands.h@{commands.h}!UnspoolEventCache@{UnspoolEventCache}}}\Hypertarget{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a9bec63f1704d072d7ef8814c5dd99d73}\label{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a9bec63f1704d072d7ef8814c5dd99d73} 
+Unspool\+Event\+Cache&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{StreamAnyEvent@{StreamAnyEvent}!commands.h@{commands.h}}\index{commands.h@{commands.h}!StreamAnyEvent@{StreamAnyEvent}}}\Hypertarget{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5ad05712d903c22c0e3d0e3e21c7777031}\label{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5ad05712d903c22c0e3d0e3e21c7777031} 
+Stream\+Any\+Event&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{VoltageCalibration@{VoltageCalibration}!commands.h@{commands.h}}\index{commands.h@{commands.h}!VoltageCalibration@{VoltageCalibration}}}\Hypertarget{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5abde98af4420f17829ac40a2311384b97}\label{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5abde98af4420f17829ac40a2311384b97} 
+Voltage\+Calibration&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TimingCalibration@{TimingCalibration}!commands.h@{commands.h}}\index{commands.h@{commands.h}!TimingCalibration@{TimingCalibration}}}\Hypertarget{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a83bad94620be1879a1bcadf2cae35aed}\label{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a83bad94620be1879a1bcadf2cae35aed} 
+Timing\+Calibration&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CreateCalibrationFile@{CreateCalibrationFile}!commands.h@{commands.h}}\index{commands.h@{commands.h}!CreateCalibrationFile@{CreateCalibrationFile}}}\Hypertarget{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a65b56336792a0f107e6b14c0aa170348}\label{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a65b56336792a0f107e6b14c0aa170348} 
+Create\+Calibration\+File&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Unknown@{Unknown}!commands.h@{commands.h}}\index{commands.h@{commands.h}!Unknown@{Unknown}}}\Hypertarget{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a88183b946cc5f0e8c96b2e66e1c74a7e}\label{commands_8h_ad6d9706eb4e1aa6ed956444c5cd2a3b5a88183b946cc5f0e8c96b2e66e1c74a7e} 
+Unknown&\\
+\hline
+
+\end{DoxyEnumFields}
+\Hypertarget{commands_8h_aee4b019262fd08438aee34c463daaad3}\label{commands_8h_aee4b019262fd08438aee34c463daaad3} 
+\index{commands.h@{commands.h}!TofResponse@{TofResponse}}
+\index{TofResponse@{TofResponse}!commands.h@{commands.h}}
+\doxysubsubsection{\texorpdfstring{TofResponse}{TofResponse}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{enum}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{class}} \mbox{\hyperlink{commands_8h_aee4b019262fd08438aee34c463daaad3}{Tof\+Response}}\hspace{0.3cm}{\ttfamily [strong]}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Success@{Success}!commands.h@{commands.h}}\index{commands.h@{commands.h}!Success@{Success}}}\Hypertarget{commands_8h_aee4b019262fd08438aee34c463daaad3a505a83f220c02df2f85c3810cd9ceb38}\label{commands_8h_aee4b019262fd08438aee34c463daaad3a505a83f220c02df2f85c3810cd9ceb38} 
+Success&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{GeneralFailure@{GeneralFailure}!commands.h@{commands.h}}\index{commands.h@{commands.h}!GeneralFailure@{GeneralFailure}}}\Hypertarget{commands_8h_aee4b019262fd08438aee34c463daaad3a4542287cbc392d52b6ad0f901726d176}\label{commands_8h_aee4b019262fd08438aee34c463daaad3a4542287cbc392d52b6ad0f901726d176} 
+General\+Failure&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{EventNotReady@{EventNotReady}!commands.h@{commands.h}}\index{commands.h@{commands.h}!EventNotReady@{EventNotReady}}}\Hypertarget{commands_8h_aee4b019262fd08438aee34c463daaad3a917990e3dd3a189696e241ee2865f99c}\label{commands_8h_aee4b019262fd08438aee34c463daaad3a917990e3dd3a189696e241ee2865f99c} 
+Event\+Not\+Ready&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{SerializationIssue@{SerializationIssue}!commands.h@{commands.h}}\index{commands.h@{commands.h}!SerializationIssue@{SerializationIssue}}}\Hypertarget{commands_8h_aee4b019262fd08438aee34c463daaad3a3ca67500cb048b1be12614013b2c8466}\label{commands_8h_aee4b019262fd08438aee34c463daaad3a3ca67500cb048b1be12614013b2c8466} 
+Serialization\+Issue&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Unknown@{Unknown}!commands.h@{commands.h}}\index{commands.h@{commands.h}!Unknown@{Unknown}}}\Hypertarget{commands_8h_aee4b019262fd08438aee34c463daaad3a88183b946cc5f0e8c96b2e66e1c74a7e}\label{commands_8h_aee4b019262fd08438aee34c463daaad3a88183b946cc5f0e8c96b2e66e1c74a7e} 
+Unknown&\\
+\hline
+
+\end{DoxyEnumFields}

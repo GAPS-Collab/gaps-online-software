@@ -1,0 +1,82 @@
+\doxysection{gondola\+::Telemetry\+Packet\+Reader Struct Reference}
+\hypertarget{structgondola_1_1TelemetryPacketReader}{}\label{structgondola_1_1TelemetryPacketReader}\index{gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}}
+
+
+{\ttfamily \#include $<$telemetry\+\_\+reader.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_ab7631ea45bff2d8efba6b952e52562bb}{Telemetry\+Packet\+Reader}} ()
+\item 
+\mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_ab06f74e00c5c2813a0013404782384cc}{Telemetry\+Packet\+Reader}} (std\+::string \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pathname}})
+\item 
+\mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_a545a1ffc5d615f4d8db56bd18fde81bd}{Telemetry\+Packet\+Reader}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader}{Telemetry\+Packet\+Reader}} \&)=\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{delete}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_aecb4a47ffb724ec5913e15928b4e0aaa}{set\+\_\+path}} (std\+::string \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pathname}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_aeab4c103035559c98ade8313f5650958}{get\+\_\+filenames}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ std\+::string $>$
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_a51f8d07aa658c56d2ddd5054b7a85806}{get\+\_\+next\+\_\+packet}} () -\/$>$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Packet}{Gaps\+::\+Telemetry\+::\+Packet}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_a954e5dbc2e1e3b39bb854303bd8c9873}{is\+\_\+exhausted}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Read serialized Telemetry\+Packets from an existing file
+
+Read GAPS binary files ("{}Berkeley binaries) 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structgondola_1_1TelemetryPacketReader_ab7631ea45bff2d8efba6b952e52562bb}\label{structgondola_1_1TelemetryPacketReader_ab7631ea45bff2d8efba6b952e52562bb} 
+\index{gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}!TelemetryPacketReader@{TelemetryPacketReader}}
+\index{TelemetryPacketReader@{TelemetryPacketReader}!gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}}
+\doxysubsubsection{\texorpdfstring{TelemetryPacketReader()}{TelemetryPacketReader()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily gondola\+::\+Telemetry\+Packet\+Reader\+::\+Telemetry\+Packet\+Reader (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\Hypertarget{structgondola_1_1TelemetryPacketReader_ab06f74e00c5c2813a0013404782384cc}\label{structgondola_1_1TelemetryPacketReader_ab06f74e00c5c2813a0013404782384cc} 
+\index{gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}!TelemetryPacketReader@{TelemetryPacketReader}}
+\index{TelemetryPacketReader@{TelemetryPacketReader}!gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}}
+\doxysubsubsection{\texorpdfstring{TelemetryPacketReader()}{TelemetryPacketReader()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily gondola\+::\+Telemetry\+Packet\+Reader\+::\+Telemetry\+Packet\+Reader (\begin{DoxyParamCaption}\item[{std\+::string}]{pathname }\end{DoxyParamCaption})}
+
+\Hypertarget{structgondola_1_1TelemetryPacketReader_a545a1ffc5d615f4d8db56bd18fde81bd}\label{structgondola_1_1TelemetryPacketReader_a545a1ffc5d615f4d8db56bd18fde81bd} 
+\index{gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}!TelemetryPacketReader@{TelemetryPacketReader}}
+\index{TelemetryPacketReader@{TelemetryPacketReader}!gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}}
+\doxysubsubsection{\texorpdfstring{TelemetryPacketReader()}{TelemetryPacketReader()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily gondola\+::\+Telemetry\+Packet\+Reader\+::\+Telemetry\+Packet\+Reader (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader}{Telemetry\+Packet\+Reader}} \&}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [delete]}}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structgondola_1_1TelemetryPacketReader_aeab4c103035559c98ade8313f5650958}\label{structgondola_1_1TelemetryPacketReader_aeab4c103035559c98ade8313f5650958} 
+\index{gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}!get\_filenames@{get\_filenames}}
+\index{get\_filenames@{get\_filenames}!gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}}
+\doxysubsubsection{\texorpdfstring{get\_filenames()}{get\_filenames()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Telemetry\+Packet\+Reader\+::get\+\_\+filenames (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$std\+::string$>$}
+
+\Hypertarget{structgondola_1_1TelemetryPacketReader_a51f8d07aa658c56d2ddd5054b7a85806}\label{structgondola_1_1TelemetryPacketReader_a51f8d07aa658c56d2ddd5054b7a85806} 
+\index{gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}!get\_next\_packet@{get\_next\_packet}}
+\index{get\_next\_packet@{get\_next\_packet}!gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}}
+\doxysubsubsection{\texorpdfstring{get\_next\_packet()}{get\_next\_packet()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Telemetry\+Packet\+Reader\+::get\+\_\+next\+\_\+packet (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Packet}{Gaps\+::\+Telemetry\+::\+Packet}}}
+
+\Hypertarget{structgondola_1_1TelemetryPacketReader_a954e5dbc2e1e3b39bb854303bd8c9873}\label{structgondola_1_1TelemetryPacketReader_a954e5dbc2e1e3b39bb854303bd8c9873} 
+\index{gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}!is\_exhausted@{is\_exhausted}}
+\index{is\_exhausted@{is\_exhausted}!gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}}
+\doxysubsubsection{\texorpdfstring{is\_exhausted()}{is\_exhausted()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}} gondola\+::\+Telemetry\+Packet\+Reader\+::is\+\_\+exhausted (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}}}
+
+All packets have been read from the file. If they should be read again, the reader has to be created again \Hypertarget{structgondola_1_1TelemetryPacketReader_aecb4a47ffb724ec5913e15928b4e0aaa}\label{structgondola_1_1TelemetryPacketReader_aecb4a47ffb724ec5913e15928b4e0aaa} 
+\index{gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}!set\_path@{set\_path}}
+\index{set\_path@{set\_path}!gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}}
+\doxysubsubsection{\texorpdfstring{set\_path()}{set\_path()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Telemetry\+Packet\+Reader\+::set\+\_\+path (\begin{DoxyParamCaption}\item[{std\+::string}]{pathname }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}}
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/io/\mbox{\hyperlink{telemetry__reader_8hpp}{telemetry\+\_\+reader.\+hpp}}\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/\mbox{\hyperlink{telemetry__reader_8cxx}{telemetry\+\_\+reader.\+cxx}}\end{DoxyCompactItemize}

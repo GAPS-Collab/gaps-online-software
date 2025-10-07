@@ -1,0 +1,118 @@
+\doxysection{RBWaveform Struct Reference}
+\hypertarget{structRBWaveform}{}\label{structRBWaveform}\index{RBWaveform@{RBWaveform}}
+
+
+{\ttfamily \#include $<$events.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structRBWaveform_ae75ad42948f2acd00fb05ef6719467f3}{to\+\_\+string}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ std\+::string
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structRBWaveform_a40454b935b379955faa8118c6fdd00e1}{from\+\_\+bytestream}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}}, \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}}) -\/$>$ \mbox{\hyperlink{structRBWaveform}{RBWaveform}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{structRBWaveform_ac181e3faf63b4e0675e86dad6aa55208}{event\+\_\+id}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structRBWaveform_a40599a4a3dab919b26019dcf9d90d28b}{rb\+\_\+id}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structRBWaveform_a9db73fbc4a6dc5f651fcb319cd551b30}{rb\+\_\+channel\+\_\+a}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structRBWaveform_acc3c39ed928341daec03ece0e96441d5}{rb\+\_\+channel\+\_\+b}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structRBWaveform_ae789129964e8dd970c282e40b73745bc}{stop\+\_\+cell}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} $>$ \mbox{\hyperlink{structRBWaveform_a1a4f4231f62e12efbd58bded24f66ed1}{adc\+\_\+a}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} $>$ \mbox{\hyperlink{structRBWaveform_a18355bdde96f9e99774c48018572d6f7}{adc\+\_\+b}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structRBWaveform_a99822d28f65f508b21386d7bbc440916}{HEAD}} = 0x\+AAAA
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structRBWaveform_a4b46b2f7ba400b7d63e29b600ae9db5c}{TAIL}} = 0x5555
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structRBWaveform_a40454b935b379955faa8118c6fdd00e1}\label{structRBWaveform_a40454b935b379955faa8118c6fdd00e1} 
+\index{RBWaveform@{RBWaveform}!from\_bytestream@{from\_bytestream}}
+\index{from\_bytestream@{from\_bytestream}!RBWaveform@{RBWaveform}}
+\doxysubsubsection{\texorpdfstring{from\_bytestream()}{from\_bytestream()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structRBWaveform}{RBWaveform}} RBWaveform\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{bytestream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \&}]{pos }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{structRBWaveform}{RBWaveform}}\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{structRBWaveform_ae75ad42948f2acd00fb05ef6719467f3}\label{structRBWaveform_ae75ad42948f2acd00fb05ef6719467f3} 
+\index{RBWaveform@{RBWaveform}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!RBWaveform@{RBWaveform}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} RBWaveform\+::to\+\_\+string (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ std\+::string}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structRBWaveform_a1a4f4231f62e12efbd58bded24f66ed1}\label{structRBWaveform_a1a4f4231f62e12efbd58bded24f66ed1} 
+\index{RBWaveform@{RBWaveform}!adc\_a@{adc\_a}}
+\index{adc\_a@{adc\_a}!RBWaveform@{RBWaveform}}
+\doxysubsubsection{\texorpdfstring{adc\_a}{adc\_a}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}$>$ RBWaveform\+::adc\+\_\+a}
+
+\Hypertarget{structRBWaveform_a18355bdde96f9e99774c48018572d6f7}\label{structRBWaveform_a18355bdde96f9e99774c48018572d6f7} 
+\index{RBWaveform@{RBWaveform}!adc\_b@{adc\_b}}
+\index{adc\_b@{adc\_b}!RBWaveform@{RBWaveform}}
+\doxysubsubsection{\texorpdfstring{adc\_b}{adc\_b}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}$>$ RBWaveform\+::adc\+\_\+b}
+
+\Hypertarget{structRBWaveform_ac181e3faf63b4e0675e86dad6aa55208}\label{structRBWaveform_ac181e3faf63b4e0675e86dad6aa55208} 
+\index{RBWaveform@{RBWaveform}!event\_id@{event\_id}}
+\index{event\_id@{event\_id}!RBWaveform@{RBWaveform}}
+\doxysubsubsection{\texorpdfstring{event\_id}{event\_id}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} RBWaveform\+::event\+\_\+id}
+
+\Hypertarget{structRBWaveform_a99822d28f65f508b21386d7bbc440916}\label{structRBWaveform_a99822d28f65f508b21386d7bbc440916} 
+\index{RBWaveform@{RBWaveform}!HEAD@{HEAD}}
+\index{HEAD@{HEAD}!RBWaveform@{RBWaveform}}
+\doxysubsubsection{\texorpdfstring{HEAD}{HEAD}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} RBWaveform\+::\+HEAD = 0x\+AAAA\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+\Hypertarget{structRBWaveform_a9db73fbc4a6dc5f651fcb319cd551b30}\label{structRBWaveform_a9db73fbc4a6dc5f651fcb319cd551b30} 
+\index{RBWaveform@{RBWaveform}!rb\_channel\_a@{rb\_channel\_a}}
+\index{rb\_channel\_a@{rb\_channel\_a}!RBWaveform@{RBWaveform}}
+\doxysubsubsection{\texorpdfstring{rb\_channel\_a}{rb\_channel\_a}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} RBWaveform\+::rb\+\_\+channel\+\_\+a}
+
+\Hypertarget{structRBWaveform_acc3c39ed928341daec03ece0e96441d5}\label{structRBWaveform_acc3c39ed928341daec03ece0e96441d5} 
+\index{RBWaveform@{RBWaveform}!rb\_channel\_b@{rb\_channel\_b}}
+\index{rb\_channel\_b@{rb\_channel\_b}!RBWaveform@{RBWaveform}}
+\doxysubsubsection{\texorpdfstring{rb\_channel\_b}{rb\_channel\_b}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} RBWaveform\+::rb\+\_\+channel\+\_\+b}
+
+\Hypertarget{structRBWaveform_a40599a4a3dab919b26019dcf9d90d28b}\label{structRBWaveform_a40599a4a3dab919b26019dcf9d90d28b} 
+\index{RBWaveform@{RBWaveform}!rb\_id@{rb\_id}}
+\index{rb\_id@{rb\_id}!RBWaveform@{RBWaveform}}
+\doxysubsubsection{\texorpdfstring{rb\_id}{rb\_id}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} RBWaveform\+::rb\+\_\+id}
+
+\Hypertarget{structRBWaveform_ae789129964e8dd970c282e40b73745bc}\label{structRBWaveform_ae789129964e8dd970c282e40b73745bc} 
+\index{RBWaveform@{RBWaveform}!stop\_cell@{stop\_cell}}
+\index{stop\_cell@{stop\_cell}!RBWaveform@{RBWaveform}}
+\doxysubsubsection{\texorpdfstring{stop\_cell}{stop\_cell}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} RBWaveform\+::stop\+\_\+cell}
+
+\Hypertarget{structRBWaveform_a4b46b2f7ba400b7d63e29b600ae9db5c}\label{structRBWaveform_a4b46b2f7ba400b7d63e29b600ae9db5c} 
+\index{RBWaveform@{RBWaveform}!TAIL@{TAIL}}
+\index{TAIL@{TAIL}!RBWaveform@{RBWaveform}}
+\doxysubsubsection{\texorpdfstring{TAIL}{TAIL}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} RBWaveform\+::\+TAIL = 0x5555\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/\mbox{\hyperlink{events_8h}{events.\+h}}\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/\mbox{\hyperlink{events_8cxx}{events.\+cxx}}\end{DoxyCompactItemize}

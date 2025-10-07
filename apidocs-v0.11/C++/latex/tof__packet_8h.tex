@@ -1,0 +1,183 @@
+\doxysection{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/packets/tof\+\_\+packet.h File Reference}
+\hypertarget{tof__packet_8h}{}\label{tof__packet_8h}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/packets/tof\_packet.h@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/packets/tof\_packet.h}}
+{\ttfamily \#include $<$cstdint$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include "{}result/result.\+h"{}}\newline
+{\ttfamily \#include "{}tof\+\_\+typedefs.\+h"{}}\newline
+{\ttfamily \#include "{}errors.\+hpp"{}}\newline
+Include dependency graph for tof\+\_\+packet.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{tof__packet_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{tof__packet_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structTofPacket}{Tof\+Packet}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Concepts}
+\begin{DoxyCompactItemize}
+\item 
+concept \mbox{\hyperlink{conceptHasFromByteStream}{Has\+From\+Byte\+Stream}}
+\begin{DoxyCompactList}\small\item\em Ensures that $<$\+T$>$ has a method \+::from\+\_\+bytestream. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565}{Packet\+Type}} \+: u8 \{ \newline
+\mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a88183b946cc5f0e8c96b2e66e1c74a7e}{Unknown}} = UNKNOWN
+, \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565aee97be03cb04119af45014d815621ce1}{Command}} = COMMAND
+, \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a802b5fdb165ab14edcc0cb12a56fb884}{RBEvent}} = RBEVENT
+, \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a73acb556ee85b83d287b122b37ede01e}{Tof\+Event}} = TOFEVENT
+, \newline
+\mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a3f21342e6e827fe801c4cc55a3d0176d}{RBWaveform}} = RBWAVEFORM
+, \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a6046537136bf4784175124a473eb23c5}{Tof\+Event\+Summary}} = TOFEVENTSUMMARY
+, \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a661112d00f638b5bce7272d6ca21214f}{Heart\+Beat}} = HEARTBEAT
+, \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565af60357a8d17e45793298323f1b372a74}{Scalar}} = SCALAR
+, \newline
+\mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565aad802a366bceaf2d53a8c76b453dd107}{Master\+Trigger}} = MT
+, \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a913389040de89788aad1047510832b0e}{RBHeader}} = RBHEADER
+, \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a290065ac442025f6fbe83611db302589}{CPUMoni\+Data}} = CPUMONIDATA
+, \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565ad7a28d6ab27c3c5981ed8ec8b27c2fd5}{MTBMoni}} = MTB\+\_\+\+MONI
+, \newline
+\mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a466f9c5a3fe78a1c234dc798e10c28c9}{RBMoni}} = RB\+\_\+\+MONI
+, \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a0387b7c02ee3c0f7173e91f83a4449ed}{PBMoni\+Data}} = PBMONIDATA
+, \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a3c64749bf59870406f1829de950f0c32}{LTBMoni\+Data}} = LTBMONIDATA
+, \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565afdb532729b15c1e9d760dba414e1add3}{PAMoni\+Data}} = PAMONIDATA
+, \newline
+\mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a66abd0c429817b4ba095225dea523ffb}{RBEvent\+Payload}} = RBEVENTPAYLOAD
+, \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565aa123f32d4806410ef0c5d14d3ee393ae}{RBEvent\+Memory\+View}} = RBEVENTMEMORYVIEW
+, \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565ab31d9b68634b6ea4105b346f0a194f25}{RBCalibration}} = RBCALIBRATION
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{tof__packet_8h_afc0753627894b52ac18d066558073911}{packet\+\_\+type\+\_\+to\+\_\+string}} (\mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565}{Packet\+Type}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pt}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::string}}
+\begin{DoxyCompactList}\small\item\em String representation of enum "{}\+Packet\+Type"{}. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \& \mbox{\hyperlink{tof__packet_8h_a4d0cbe08cca67dbd54b989e4bdaa1d0c}{operator$<$$<$}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565}{Packet\+Type}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pck}})
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \& \mbox{\hyperlink{tof__packet_8h_a04668bcc1d70be6d7cd7e78f35a57131}{operator$<$$<$}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structTofPacket}{Tof\+Packet}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pck}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Enumeration Type Documentation}
+\Hypertarget{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565}\label{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565} 
+\index{tof\_packet.h@{tof\_packet.h}!PacketType@{PacketType}}
+\index{PacketType@{PacketType}!tof\_packet.h@{tof\_packet.h}}
+\doxysubsubsection{\texorpdfstring{PacketType}{PacketType}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{enum}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{class}} \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565}{Packet\+Type}} \+: \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\hspace{0.3cm}{\ttfamily [strong]}}
+
+The Packet\+Type is essential to identify individual Tof\+Packets. This has to resemble the Rust API \begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Unknown@{Unknown}!tof\_packet.h@{tof\_packet.h}}\index{tof\_packet.h@{tof\_packet.h}!Unknown@{Unknown}}}\Hypertarget{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a88183b946cc5f0e8c96b2e66e1c74a7e}\label{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a88183b946cc5f0e8c96b2e66e1c74a7e} 
+Unknown&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Command@{Command}!tof\_packet.h@{tof\_packet.h}}\index{tof\_packet.h@{tof\_packet.h}!Command@{Command}}}\Hypertarget{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565aee97be03cb04119af45014d815621ce1}\label{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565aee97be03cb04119af45014d815621ce1} 
+Command&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RBEvent@{RBEvent}!tof\_packet.h@{tof\_packet.h}}\index{tof\_packet.h@{tof\_packet.h}!RBEvent@{RBEvent}}}\Hypertarget{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a802b5fdb165ab14edcc0cb12a56fb884}\label{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a802b5fdb165ab14edcc0cb12a56fb884} 
+RBEvent&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TofEvent@{TofEvent}!tof\_packet.h@{tof\_packet.h}}\index{tof\_packet.h@{tof\_packet.h}!TofEvent@{TofEvent}}}\Hypertarget{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a73acb556ee85b83d287b122b37ede01e}\label{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a73acb556ee85b83d287b122b37ede01e} 
+Tof\+Event&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RBWaveform@{RBWaveform}!tof\_packet.h@{tof\_packet.h}}\index{tof\_packet.h@{tof\_packet.h}!RBWaveform@{RBWaveform}}}\Hypertarget{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a3f21342e6e827fe801c4cc55a3d0176d}\label{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a3f21342e6e827fe801c4cc55a3d0176d} 
+RBWaveform&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{TofEventSummary@{TofEventSummary}!tof\_packet.h@{tof\_packet.h}}\index{tof\_packet.h@{tof\_packet.h}!TofEventSummary@{TofEventSummary}}}\Hypertarget{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a6046537136bf4784175124a473eb23c5}\label{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a6046537136bf4784175124a473eb23c5} 
+Tof\+Event\+Summary&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{HeartBeat@{HeartBeat}!tof\_packet.h@{tof\_packet.h}}\index{tof\_packet.h@{tof\_packet.h}!HeartBeat@{HeartBeat}}}\Hypertarget{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a661112d00f638b5bce7272d6ca21214f}\label{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a661112d00f638b5bce7272d6ca21214f} 
+Heart\+Beat&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Scalar@{Scalar}!tof\_packet.h@{tof\_packet.h}}\index{tof\_packet.h@{tof\_packet.h}!Scalar@{Scalar}}}\Hypertarget{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565af60357a8d17e45793298323f1b372a74}\label{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565af60357a8d17e45793298323f1b372a74} 
+Scalar&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{MasterTrigger@{MasterTrigger}!tof\_packet.h@{tof\_packet.h}}\index{tof\_packet.h@{tof\_packet.h}!MasterTrigger@{MasterTrigger}}}\Hypertarget{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565aad802a366bceaf2d53a8c76b453dd107}\label{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565aad802a366bceaf2d53a8c76b453dd107} 
+Master\+Trigger&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RBHeader@{RBHeader}!tof\_packet.h@{tof\_packet.h}}\index{tof\_packet.h@{tof\_packet.h}!RBHeader@{RBHeader}}}\Hypertarget{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a913389040de89788aad1047510832b0e}\label{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a913389040de89788aad1047510832b0e} 
+RBHeader&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{CPUMoniData@{CPUMoniData}!tof\_packet.h@{tof\_packet.h}}\index{tof\_packet.h@{tof\_packet.h}!CPUMoniData@{CPUMoniData}}}\Hypertarget{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a290065ac442025f6fbe83611db302589}\label{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a290065ac442025f6fbe83611db302589} 
+CPUMoni\+Data&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{MTBMoni@{MTBMoni}!tof\_packet.h@{tof\_packet.h}}\index{tof\_packet.h@{tof\_packet.h}!MTBMoni@{MTBMoni}}}\Hypertarget{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565ad7a28d6ab27c3c5981ed8ec8b27c2fd5}\label{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565ad7a28d6ab27c3c5981ed8ec8b27c2fd5} 
+MTBMoni&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RBMoni@{RBMoni}!tof\_packet.h@{tof\_packet.h}}\index{tof\_packet.h@{tof\_packet.h}!RBMoni@{RBMoni}}}\Hypertarget{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a466f9c5a3fe78a1c234dc798e10c28c9}\label{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a466f9c5a3fe78a1c234dc798e10c28c9} 
+RBMoni&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PBMoniData@{PBMoniData}!tof\_packet.h@{tof\_packet.h}}\index{tof\_packet.h@{tof\_packet.h}!PBMoniData@{PBMoniData}}}\Hypertarget{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a0387b7c02ee3c0f7173e91f83a4449ed}\label{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a0387b7c02ee3c0f7173e91f83a4449ed} 
+PBMoni\+Data&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{LTBMoniData@{LTBMoniData}!tof\_packet.h@{tof\_packet.h}}\index{tof\_packet.h@{tof\_packet.h}!LTBMoniData@{LTBMoniData}}}\Hypertarget{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a3c64749bf59870406f1829de950f0c32}\label{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a3c64749bf59870406f1829de950f0c32} 
+LTBMoni\+Data&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{PAMoniData@{PAMoniData}!tof\_packet.h@{tof\_packet.h}}\index{tof\_packet.h@{tof\_packet.h}!PAMoniData@{PAMoniData}}}\Hypertarget{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565afdb532729b15c1e9d760dba414e1add3}\label{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565afdb532729b15c1e9d760dba414e1add3} 
+PAMoni\+Data&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RBEventPayload@{RBEventPayload}!tof\_packet.h@{tof\_packet.h}}\index{tof\_packet.h@{tof\_packet.h}!RBEventPayload@{RBEventPayload}}}\Hypertarget{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a66abd0c429817b4ba095225dea523ffb}\label{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a66abd0c429817b4ba095225dea523ffb} 
+RBEvent\+Payload&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RBEventMemoryView@{RBEventMemoryView}!tof\_packet.h@{tof\_packet.h}}\index{tof\_packet.h@{tof\_packet.h}!RBEventMemoryView@{RBEventMemoryView}}}\Hypertarget{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565aa123f32d4806410ef0c5d14d3ee393ae}\label{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565aa123f32d4806410ef0c5d14d3ee393ae} 
+RBEvent\+Memory\+View&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{RBCalibration@{RBCalibration}!tof\_packet.h@{tof\_packet.h}}\index{tof\_packet.h@{tof\_packet.h}!RBCalibration@{RBCalibration}}}\Hypertarget{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565ab31d9b68634b6ea4105b346f0a194f25}\label{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565ab31d9b68634b6ea4105b346f0a194f25} 
+RBCalibration&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{tof__packet_8h_a4d0cbe08cca67dbd54b989e4bdaa1d0c}\label{tof__packet_8h_a4d0cbe08cca67dbd54b989e4bdaa1d0c} 
+\index{tof\_packet.h@{tof\_packet.h}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!tof\_packet.h@{tof\_packet.h}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \& \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{operator}}$<$$<$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565}{Packet\+Type}} \&}]{pck }\end{DoxyParamCaption})}
+
+\Hypertarget{tof__packet_8h_a04668bcc1d70be6d7cd7e78f35a57131}\label{tof__packet_8h_a04668bcc1d70be6d7cd7e78f35a57131} 
+\index{tof\_packet.h@{tof\_packet.h}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!tof\_packet.h@{tof\_packet.h}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \& \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{operator}}$<$$<$ (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::ostream}} \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structTofPacket}{Tof\+Packet}} \&}]{pck }\end{DoxyParamCaption})}
+
+\Hypertarget{tof__packet_8h_afc0753627894b52ac18d066558073911}\label{tof__packet_8h_afc0753627894b52ac18d066558073911} 
+\index{tof\_packet.h@{tof\_packet.h}!packet\_type\_to\_string@{packet\_type\_to\_string}}
+\index{packet\_type\_to\_string@{packet\_type\_to\_string}!tof\_packet.h@{tof\_packet.h}}
+\doxysubsubsection{\texorpdfstring{packet\_type\_to\_string()}{packet\_type\_to\_string()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} packet\+\_\+type\+\_\+to\+\_\+string (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565}{Packet\+Type}}}]{pt }\end{DoxyParamCaption}) -\/$>$  \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::string}}}
+
+
+
+String representation of enum "{}\+Packet\+Type"{}. 
+

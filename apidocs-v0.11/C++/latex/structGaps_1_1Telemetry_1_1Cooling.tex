@@ -1,0 +1,244 @@
+\doxysection{Gaps\+::Telemetry\+::Cooling Struct Reference}
+\hypertarget{structGaps_1_1Telemetry_1_1Cooling}{}\label{structGaps_1_1Telemetry_1_1Cooling}\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+
+
+{\ttfamily \#include $<$telemetry\+\_\+dataclasses.\+hpp$>$}
+
+
+
+Collaboration diagram for Gaps\+::Telemetry\+::Cooling\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=248pt]{structGaps_1_1Telemetry_1_1Cooling__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_a4086664623ebda77e637d97f06a15907}{to\+\_\+string}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ std\+::string
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_a0dbb7e7b8cb04a1f9dcd13ce53c5900f}{from\+\_\+bytestream}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{stream}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}}) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling}{Cooling}}, \mbox{\hyperlink{classGaps_1_1IOError}{Gaps\+::\+IOError}} $>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader}{Packet\+Header}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_a8aefb7a7d2950108f3c69493c40d2b42}{header}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_a27608113d5c758441a1dacb0d5ad2d77}{frame\+\_\+counter}} \{0xffffffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_a79b1d372d41c52b6a9449de9aef2c39b}{status\+\_\+1}} \{0xff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_afd052e480cb002037faadbbe3bcfd476}{status\+\_\+2}} \{0xff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_a68ad196d3acd58fbd0d910487d79ce70}{rx\+\_\+byte\+\_\+num}} \{0xff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_ab19ff509dddfe24b14f9fe3fdd97c697}{rx\+\_\+cmd\+\_\+num}} \{0xff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_a75ee0ac5a7a8e45b7cb9256379cb3bff}{last\+\_\+cmd}} \{0xffffffffffffffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_afa5fe879a7c94ed357d77c8752952eda}{rsv\+\_\+t}} \{0xffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_a117c45a339ab3f61a7afc949fca7adde}{rh\+\_\+on}} \{0xffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_a27aaf10c06e011eee6be36e9b1b28096}{rh\+\_\+off}} \{0xffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_a4df03fd13aa95f67793699c0e2a320f4}{fpga\+\_\+board\+\_\+v\+\_\+in}} \{0xffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_a85b09bdcb0cea0dd7886b1ed046fc83f}{fpga\+\_\+board\+\_\+i\+\_\+in}} \{0xffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_aaa63970dcae6f25d3b4d2725fe4d4508}{fpga\+\_\+board\+\_\+t}} \{0xffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_a7c791e72b411b7283e59760a4522cd91}{fpga\+\_\+board\+\_\+p}} \{0xffff\}
+\item 
+std\+::array$<$ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}, 64 $>$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_a8c70c6c8035dfe26b4d4377402f4d808}{rtd}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_a9753a5304e60cfa0b4e5567022382a1e}{sh\+\_\+current}} \{0xffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_a015064d51ac8adb699b4c0713da268bf}{rh\+\_\+current}} \{0xffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_a52c8cba8b9b264a65bf0dc153bb206c6}{pw\+\_\+board1\+\_\+t}} \{0xffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_ab891e633844b5232edd3dce42eaf2031}{pw\+\_\+board2\+\_\+t}} \{0xffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_ae678ee505797a00d9cc41de8ea103198}{sh1\+\_\+time\+\_\+left}} \{0xffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_a844c005d6e5f968fb16622c82d392ff1}{sh2\+\_\+time\+\_\+left}} \{0xffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_aec28fcc2744fe03cca642e20f481123b}{sh3\+\_\+time\+\_\+left}} \{0xffff\}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling_a0a99f319de8be241cc725acd964605ad}{SIZE}} = 105
+\begin{DoxyCompactList}\small\item\em size with packet header \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_a0dbb7e7b8cb04a1f9dcd13ce53c5900f}\label{structGaps_1_1Telemetry_1_1Cooling_a0dbb7e7b8cb04a1f9dcd13ce53c5900f} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!from\_bytestream@{from\_bytestream}}
+\index{from\_bytestream@{from\_bytestream}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{from\_bytestream()}{from\_bytestream()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} Gaps\+::\+Telemetry\+::\+Cooling\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&}]{stream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&}]{pos }\end{DoxyParamCaption}) -\/$>$ r\+::\+Result$<$\mbox{\hyperlink{structGaps_1_1Telemetry_1_1Cooling}{Cooling}}, \mbox{\hyperlink{classGaps_1_1IOError}{Gaps\+::\+IOError}}$>$\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_a4086664623ebda77e637d97f06a15907}\label{structGaps_1_1Telemetry_1_1Cooling_a4086664623ebda77e637d97f06a15907} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} Gaps\+::\+Telemetry\+::\+Cooling\+::to\+\_\+string (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ std\+::string}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_a85b09bdcb0cea0dd7886b1ed046fc83f}\label{structGaps_1_1Telemetry_1_1Cooling_a85b09bdcb0cea0dd7886b1ed046fc83f} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!fpga\_board\_i\_in@{fpga\_board\_i\_in}}
+\index{fpga\_board\_i\_in@{fpga\_board\_i\_in}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{fpga\_board\_i\_in}{fpga\_board\_i\_in}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Gaps\+::\+Telemetry\+::\+Cooling\+::fpga\+\_\+board\+\_\+i\+\_\+in \{0xffff\}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_a7c791e72b411b7283e59760a4522cd91}\label{structGaps_1_1Telemetry_1_1Cooling_a7c791e72b411b7283e59760a4522cd91} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!fpga\_board\_p@{fpga\_board\_p}}
+\index{fpga\_board\_p@{fpga\_board\_p}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{fpga\_board\_p}{fpga\_board\_p}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Gaps\+::\+Telemetry\+::\+Cooling\+::fpga\+\_\+board\+\_\+p \{0xffff\}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_aaa63970dcae6f25d3b4d2725fe4d4508}\label{structGaps_1_1Telemetry_1_1Cooling_aaa63970dcae6f25d3b4d2725fe4d4508} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!fpga\_board\_t@{fpga\_board\_t}}
+\index{fpga\_board\_t@{fpga\_board\_t}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{fpga\_board\_t}{fpga\_board\_t}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Gaps\+::\+Telemetry\+::\+Cooling\+::fpga\+\_\+board\+\_\+t \{0xffff\}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_a4df03fd13aa95f67793699c0e2a320f4}\label{structGaps_1_1Telemetry_1_1Cooling_a4df03fd13aa95f67793699c0e2a320f4} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!fpga\_board\_v\_in@{fpga\_board\_v\_in}}
+\index{fpga\_board\_v\_in@{fpga\_board\_v\_in}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{fpga\_board\_v\_in}{fpga\_board\_v\_in}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Gaps\+::\+Telemetry\+::\+Cooling\+::fpga\+\_\+board\+\_\+v\+\_\+in \{0xffff\}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_a27608113d5c758441a1dacb0d5ad2d77}\label{structGaps_1_1Telemetry_1_1Cooling_a27608113d5c758441a1dacb0d5ad2d77} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!frame\_counter@{frame\_counter}}
+\index{frame\_counter@{frame\_counter}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{frame\_counter}{frame\_counter}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} Gaps\+::\+Telemetry\+::\+Cooling\+::frame\+\_\+counter \{0xffffffff\}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_a8aefb7a7d2950108f3c69493c40d2b42}\label{structGaps_1_1Telemetry_1_1Cooling_a8aefb7a7d2950108f3c69493c40d2b42} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!header@{header}}
+\index{header@{header}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{header}{header}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader}{Packet\+Header}} Gaps\+::\+Telemetry\+::\+Cooling\+::header}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_a75ee0ac5a7a8e45b7cb9256379cb3bff}\label{structGaps_1_1Telemetry_1_1Cooling_a75ee0ac5a7a8e45b7cb9256379cb3bff} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!last\_cmd@{last\_cmd}}
+\index{last\_cmd@{last\_cmd}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{last\_cmd}{last\_cmd}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} Gaps\+::\+Telemetry\+::\+Cooling\+::last\+\_\+cmd \{0xffffffffffffffff\}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_a52c8cba8b9b264a65bf0dc153bb206c6}\label{structGaps_1_1Telemetry_1_1Cooling_a52c8cba8b9b264a65bf0dc153bb206c6} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!pw\_board1\_t@{pw\_board1\_t}}
+\index{pw\_board1\_t@{pw\_board1\_t}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{pw\_board1\_t}{pw\_board1\_t}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Gaps\+::\+Telemetry\+::\+Cooling\+::pw\+\_\+board1\+\_\+t \{0xffff\}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_ab891e633844b5232edd3dce42eaf2031}\label{structGaps_1_1Telemetry_1_1Cooling_ab891e633844b5232edd3dce42eaf2031} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!pw\_board2\_t@{pw\_board2\_t}}
+\index{pw\_board2\_t@{pw\_board2\_t}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{pw\_board2\_t}{pw\_board2\_t}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Gaps\+::\+Telemetry\+::\+Cooling\+::pw\+\_\+board2\+\_\+t \{0xffff\}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_a015064d51ac8adb699b4c0713da268bf}\label{structGaps_1_1Telemetry_1_1Cooling_a015064d51ac8adb699b4c0713da268bf} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!rh\_current@{rh\_current}}
+\index{rh\_current@{rh\_current}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{rh\_current}{rh\_current}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Gaps\+::\+Telemetry\+::\+Cooling\+::rh\+\_\+current \{0xffff\}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_a27aaf10c06e011eee6be36e9b1b28096}\label{structGaps_1_1Telemetry_1_1Cooling_a27aaf10c06e011eee6be36e9b1b28096} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!rh\_off@{rh\_off}}
+\index{rh\_off@{rh\_off}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{rh\_off}{rh\_off}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Gaps\+::\+Telemetry\+::\+Cooling\+::rh\+\_\+off \{0xffff\}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_a117c45a339ab3f61a7afc949fca7adde}\label{structGaps_1_1Telemetry_1_1Cooling_a117c45a339ab3f61a7afc949fca7adde} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!rh\_on@{rh\_on}}
+\index{rh\_on@{rh\_on}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{rh\_on}{rh\_on}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Gaps\+::\+Telemetry\+::\+Cooling\+::rh\+\_\+on \{0xffff\}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_afa5fe879a7c94ed357d77c8752952eda}\label{structGaps_1_1Telemetry_1_1Cooling_afa5fe879a7c94ed357d77c8752952eda} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!rsv\_t@{rsv\_t}}
+\index{rsv\_t@{rsv\_t}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{rsv\_t}{rsv\_t}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Gaps\+::\+Telemetry\+::\+Cooling\+::rsv\+\_\+t \{0xffff\}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_a8c70c6c8035dfe26b4d4377402f4d808}\label{structGaps_1_1Telemetry_1_1Cooling_a8c70c6c8035dfe26b4d4377402f4d808} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!rtd@{rtd}}
+\index{rtd@{rtd}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{rtd}{rtd}}
+{\footnotesize\ttfamily std\+::array$<$\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}, 64$>$ Gaps\+::\+Telemetry\+::\+Cooling\+::rtd}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_a68ad196d3acd58fbd0d910487d79ce70}\label{structGaps_1_1Telemetry_1_1Cooling_a68ad196d3acd58fbd0d910487d79ce70} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!rx\_byte\_num@{rx\_byte\_num}}
+\index{rx\_byte\_num@{rx\_byte\_num}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{rx\_byte\_num}{rx\_byte\_num}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} Gaps\+::\+Telemetry\+::\+Cooling\+::rx\+\_\+byte\+\_\+num \{0xff\}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_ab19ff509dddfe24b14f9fe3fdd97c697}\label{structGaps_1_1Telemetry_1_1Cooling_ab19ff509dddfe24b14f9fe3fdd97c697} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!rx\_cmd\_num@{rx\_cmd\_num}}
+\index{rx\_cmd\_num@{rx\_cmd\_num}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{rx\_cmd\_num}{rx\_cmd\_num}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} Gaps\+::\+Telemetry\+::\+Cooling\+::rx\+\_\+cmd\+\_\+num \{0xff\}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_ae678ee505797a00d9cc41de8ea103198}\label{structGaps_1_1Telemetry_1_1Cooling_ae678ee505797a00d9cc41de8ea103198} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!sh1\_time\_left@{sh1\_time\_left}}
+\index{sh1\_time\_left@{sh1\_time\_left}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{sh1\_time\_left}{sh1\_time\_left}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Gaps\+::\+Telemetry\+::\+Cooling\+::sh1\+\_\+time\+\_\+left \{0xffff\}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_a844c005d6e5f968fb16622c82d392ff1}\label{structGaps_1_1Telemetry_1_1Cooling_a844c005d6e5f968fb16622c82d392ff1} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!sh2\_time\_left@{sh2\_time\_left}}
+\index{sh2\_time\_left@{sh2\_time\_left}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{sh2\_time\_left}{sh2\_time\_left}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Gaps\+::\+Telemetry\+::\+Cooling\+::sh2\+\_\+time\+\_\+left \{0xffff\}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_aec28fcc2744fe03cca642e20f481123b}\label{structGaps_1_1Telemetry_1_1Cooling_aec28fcc2744fe03cca642e20f481123b} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!sh3\_time\_left@{sh3\_time\_left}}
+\index{sh3\_time\_left@{sh3\_time\_left}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{sh3\_time\_left}{sh3\_time\_left}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Gaps\+::\+Telemetry\+::\+Cooling\+::sh3\+\_\+time\+\_\+left \{0xffff\}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_a9753a5304e60cfa0b4e5567022382a1e}\label{structGaps_1_1Telemetry_1_1Cooling_a9753a5304e60cfa0b4e5567022382a1e} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!sh\_current@{sh\_current}}
+\index{sh\_current@{sh\_current}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{sh\_current}{sh\_current}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Gaps\+::\+Telemetry\+::\+Cooling\+::sh\+\_\+current \{0xffff\}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_a0a99f319de8be241cc725acd964605ad}\label{structGaps_1_1Telemetry_1_1Cooling_a0a99f319de8be241cc725acd964605ad} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!SIZE@{SIZE}}
+\index{SIZE@{SIZE}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{SIZE}{SIZE}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Gaps\+::\+Telemetry\+::\+Cooling\+::\+SIZE = 105\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+size with packet header 
+
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_a79b1d372d41c52b6a9449de9aef2c39b}\label{structGaps_1_1Telemetry_1_1Cooling_a79b1d372d41c52b6a9449de9aef2c39b} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!status\_1@{status\_1}}
+\index{status\_1@{status\_1}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{status\_1}{status\_1}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} Gaps\+::\+Telemetry\+::\+Cooling\+::status\+\_\+1 \{0xff\}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1Cooling_afd052e480cb002037faadbbe3bcfd476}\label{structGaps_1_1Telemetry_1_1Cooling_afd052e480cb002037faadbbe3bcfd476} 
+\index{Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}!status\_2@{status\_2}}
+\index{status\_2@{status\_2}!Gaps::Telemetry::Cooling@{Gaps::Telemetry::Cooling}}
+\doxysubsubsection{\texorpdfstring{status\_2}{status\_2}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} Gaps\+::\+Telemetry\+::\+Cooling\+::status\+\_\+2 \{0xff\}}
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/\mbox{\hyperlink{telemetry__dataclasses_8hpp}{telemetry\+\_\+dataclasses.\+hpp}}\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/\mbox{\hyperlink{telemetry__dataclasses_8cxx}{telemetry\+\_\+dataclasses.\+cxx}}\end{DoxyCompactItemize}

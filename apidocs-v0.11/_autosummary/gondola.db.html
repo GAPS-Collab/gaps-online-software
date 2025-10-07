@@ -1,0 +1,740 @@
+
+<!DOCTYPE html>
+
+
+<html lang="python" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>gondola.db &#8212; gondola 0.11.8 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=3adbc293"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.db';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="gondola.gondola_core" href="gondola.gondola_core.html" />
+    <link rel="prev" title="gondola.calibration" href="gondola.calibration.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="python"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">gondola 0.11.8 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../guided_tour.html">
+    A guided tour to get you started
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="gondola.html">
+    gondola
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../guided_tour.html">
+    A guided tour to get you started
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="gondola.html">
+    gondola
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="gondola.calibration.html">gondola.calibration</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">gondola.db</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.gondola_core.html">gondola.gondola_core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.io.html">gondola.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.reconstruction.html">gondola.reconstruction</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="gondola.tof.html">gondola.tof</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="gondola.tof.analysis.html">gondola.tof.analysis</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="gondola.tracker.html">gondola.tracker</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="gondola.tracker.analysis.html">gondola.tracker.analysis</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="gondola.visual.html">gondola.visual</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="gondola.visual.tof.html">gondola.visual.tof</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gondola.visual.tracker.html">gondola.visual.tracker</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="gondola.html" class="nav-link">gondola</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">gondola.db</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-gondola.db">
+<span id="gondola-db"></span><h1>gondola.db<a class="headerlink" href="#module-gondola.db" title="Link to this heading">#</a></h1>
+<p>Gondola core database functionality. This is a wrapper around 
+the database functions in gondola-db</p>
+<p class="rubric">Classes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.TofPaddle" title="gondola.db.TofPaddle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofPaddle</span></code></a>()</p></td>
+<td><p>A single TOF paddle with 2 ends comnected</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.db.</span></span><span class="sig-name descname"><span class="pre">TofPaddle</span></span><a class="headerlink" href="#gondola.db.TofPaddle" title="Link to this definition">#</a></dt>
+<dd><p>A single TOF paddle with 2 ends comnected</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.all">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.db.TofPaddle.all" title="Link to this definition">#</a></dt>
+<dd><p>Retrieve all 160 paddles from the database</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.all_as_dict">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">all_as_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.db.TofPaddle.all_as_dict" title="Link to this definition">#</a></dt>
+<dd><p>Retrieve all paddles from the database and return 
+a dictionary as dict([rbid, TofPaddle])</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.by_rbid">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">by_rbid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rbid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.db.TofPaddle.by_rbid" title="Link to this definition">#</a></dt>
+<dd><p>Retrieve all paddles connected to a certain 
+ReadoutBoard from the database</p>
+<dl class="simple">
+<dt># Arguments </dt><dd><ul class="simple">
+<li><p>rbid   : RB id of the desired ReadoutBoard (typically &lt; 50)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.cable_len">
+<span class="sig-name descname"><span class="pre">cable_len</span></span><a class="headerlink" href="#gondola.db.TofPaddle.cable_len" title="Link to this definition">#</a></dt>
+<dd><p>DEPRECATED - the length of the Harting
+cable connected to this paddle</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.center_pos">
+<span class="sig-name descname"><span class="pre">center_pos</span></span><a class="headerlink" href="#gondola.db.TofPaddle.center_pos" title="Link to this definition">#</a></dt>
+<dd><p>The center position of the paddle (middle of all 3 local dimensions)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.draw_xy">
+<span class="sig-name descname"><span class="pre">draw_xy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edgecolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'b'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">facecolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'b'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Rectangle</span></span></span><a class="headerlink" href="#gondola.db.TofPaddle.draw_xy" title="Link to this definition">#</a></dt>
+<dd><p>Draw a matplotlib patch for xy projection</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.draw_xz">
+<span class="sig-name descname"><span class="pre">draw_xz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edgecolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'b'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">facecolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'b'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Rectangle</span></span></span><a class="headerlink" href="#gondola.db.TofPaddle.draw_xz" title="Link to this definition">#</a></dt>
+<dd><p>Draw a matplotlib patch for xy projection</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.draw_yz">
+<span class="sig-name descname"><span class="pre">draw_yz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edgecolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'b'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">facecolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'b'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Rectangle</span></span></span><a class="headerlink" href="#gondola.db.TofPaddle.draw_yz" title="Link to this definition">#</a></dt>
+<dd><p>Draw a matplotlib patch for xy projection</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.dsi">
+<span class="sig-name descname"><span class="pre">dsi</span></span><a class="headerlink" href="#gondola.db.TofPaddle.dsi" title="Link to this definition">#</a></dt>
+<dd><p>Retrive the DSI connector this paddle
+is connected through the RB/LTB to 
+the MTB</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.global_pos_x_l0">
+<span class="sig-name descname"><span class="pre">global_pos_x_l0</span></span><a class="headerlink" href="#gondola.db.TofPaddle.global_pos_x_l0" title="Link to this definition">#</a></dt>
+<dd><p>The x-coordinate of the center position of the paddle</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.global_pos_y_l0">
+<span class="sig-name descname"><span class="pre">global_pos_y_l0</span></span><a class="headerlink" href="#gondola.db.TofPaddle.global_pos_y_l0" title="Link to this definition">#</a></dt>
+<dd><p>The y-coordinate of the center position of the paddle</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.global_pos_z_l0">
+<span class="sig-name descname"><span class="pre">global_pos_z_l0</span></span><a class="headerlink" href="#gondola.db.TofPaddle.global_pos_z_l0" title="Link to this definition">#</a></dt>
+<dd><p>The z-coordinate of the center position of the paddle</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.height">
+<span class="sig-name descname"><span class="pre">height</span></span><a class="headerlink" href="#gondola.db.TofPaddle.height" title="Link to this definition">#</a></dt>
+<dd><p>Get the (local) height of the paddle</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.j_ltb">
+<span class="sig-name descname"><span class="pre">j_ltb</span></span><a class="headerlink" href="#gondola.db.TofPaddle.j_ltb" title="Link to this definition">#</a></dt>
+<dd><p>Retrieve the j address of the DSI connector 
+this paddle is connected through the LTB
+to the MTB</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.j_rb">
+<span class="sig-name descname"><span class="pre">j_rb</span></span><a class="headerlink" href="#gondola.db.TofPaddle.j_rb" title="Link to this definition">#</a></dt>
+<dd><p>Retrieve the j address of the DSI connector 
+this paddle is connected through the RB
+to the MTB</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.length">
+<span class="sig-name descname"><span class="pre">length</span></span><a class="headerlink" href="#gondola.db.TofPaddle.length" title="Link to this definition">#</a></dt>
+<dd><p>Get the (local) length of the paddle</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.lowest_rb_ch_py">
+<span class="sig-name descname"><span class="pre">lowest_rb_ch_py</span></span><a class="headerlink" href="#gondola.db.TofPaddle.lowest_rb_ch_py" title="Link to this definition">#</a></dt>
+<dd><p>Get the (numerically) lower of the two 
+RB channels the TOF paddle is connected with 
+to its associate ReadoutBoard</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.lt_slot">
+<span class="sig-name descname"><span class="pre">lt_slot</span></span><a class="headerlink" href="#gondola.db.TofPaddle.lt_slot" title="Link to this definition">#</a></dt>
+<dd><p>Convert DSI and J connection to the actual 
+slot they are plugged in on the MTB (0-24)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.ltb_chA">
+<span class="sig-name descname"><span class="pre">ltb_chA</span></span><a class="headerlink" href="#gondola.db.TofPaddle.ltb_chA" title="Link to this definition">#</a></dt>
+<dd><p>Get the LTB channel the A-side of this 
+paddle is connected to</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.ltb_chB">
+<span class="sig-name descname"><span class="pre">ltb_chB</span></span><a class="headerlink" href="#gondola.db.TofPaddle.ltb_chB" title="Link to this definition">#</a></dt>
+<dd><p>Get the LTB channel the B-side of this 
+paddle is connected to</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.ltb_id">
+<span class="sig-name descname"><span class="pre">ltb_id</span></span><a class="headerlink" href="#gondola.db.TofPaddle.ltb_id" title="Link to this definition">#</a></dt>
+<dd><p>Get the LTB id the low-gain channels 
+of this paddle are connected to</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.mtb_link_id">
+<span class="sig-name descname"><span class="pre">mtb_link_id</span></span><a class="headerlink" href="#gondola.db.TofPaddle.mtb_link_id" title="Link to this definition">#</a></dt>
+<dd><p>The MTB link id is an internal number
+used by the MTB to identify ReadoutBoards</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.normal">
+<span class="sig-name descname"><span class="pre">normal</span></span><a class="headerlink" href="#gondola.db.TofPaddle.normal" title="Link to this definition">#</a></dt>
+<dd><p>Return normal axis - that is orthogonal to the principal ans 
+paralel to the axis of &quot;width&quot;</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.paddle_id">
+<span class="sig-name descname"><span class="pre">paddle_id</span></span><a class="headerlink" href="#gondola.db.TofPaddle.paddle_id" title="Link to this definition">#</a></dt>
+<dd><p>The paddle id of the paddle in range [1,160]</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.panel_id">
+<span class="sig-name descname"><span class="pre">panel_id</span></span><a class="headerlink" href="#gondola.db.TofPaddle.panel_id" title="Link to this definition">#</a></dt>
+<dd><p>Retrieve the panel id.</p>
+<p>Panel 1-6  : Cube 
+Panel 7-14 : Umbrella 
+Panel &gt; 14 : Cortina</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.pb_chA">
+<span class="sig-name descname"><span class="pre">pb_chA</span></span><a class="headerlink" href="#gondola.db.TofPaddle.pb_chA" title="Link to this definition">#</a></dt>
+<dd><p>Get the channel on the powerboard 
+the paddle A-side is connected to</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.pb_chB">
+<span class="sig-name descname"><span class="pre">pb_chB</span></span><a class="headerlink" href="#gondola.db.TofPaddle.pb_chB" title="Link to this definition">#</a></dt>
+<dd><p>Get the channel on the powerboard 
+the paddle b-side is connected to</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.pb_id">
+<span class="sig-name descname"><span class="pre">pb_id</span></span><a class="headerlink" href="#gondola.db.TofPaddle.pb_id" title="Link to this definition">#</a></dt>
+<dd><p>Get the powerboard id for the respective
+powerboard which provides the driving 
+voltage for this paddle</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.principal">
+<span class="sig-name descname"><span class="pre">principal</span></span><a class="headerlink" href="#gondola.db.TofPaddle.principal" title="Link to this definition">#</a></dt>
+<dd><p>The principal is the direction along the longest
+dimension from A -&gt; B</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.rb_chA">
+<span class="sig-name descname"><span class="pre">rb_chA</span></span><a class="headerlink" href="#gondola.db.TofPaddle.rb_chA" title="Link to this definition">#</a></dt>
+<dd><p>Get the ReadoutBoard channel to which 
+the A-side of the Paddle is connected</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.rb_chB">
+<span class="sig-name descname"><span class="pre">rb_chB</span></span><a class="headerlink" href="#gondola.db.TofPaddle.rb_chB" title="Link to this definition">#</a></dt>
+<dd><p>Get the ReadoutBoard channel to which 
+the b-side of the Paddle is connected</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.rb_id">
+<span class="sig-name descname"><span class="pre">rb_id</span></span><a class="headerlink" href="#gondola.db.TofPaddle.rb_id" title="Link to this definition">#</a></dt>
+<dd><p>Retrieve the Readoutboard id for the 
+Readoutboard the paddle is connected to</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.rb_slot">
+<span class="sig-name descname"><span class="pre">rb_slot</span></span><a class="headerlink" href="#gondola.db.TofPaddle.rb_slot" title="Link to this definition">#</a></dt>
+<dd><p>Convert DSI and J connection to the actual 
+slot they are plugged in on the MTB (0-24)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.sideA_pos">
+<span class="sig-name descname"><span class="pre">sideA_pos</span></span><a class="headerlink" href="#gondola.db.TofPaddle.sideA_pos" title="Link to this definition">#</a></dt>
+<dd><p>The position of the SiPm at the A-side</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.volume_id">
+<span class="sig-name descname"><span class="pre">volume_id</span></span><a class="headerlink" href="#gondola.db.TofPaddle.volume_id" title="Link to this definition">#</a></dt>
+<dd><p>Retrieve the volume id. The volume id is 
+assigned by the simulation</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddle.width">
+<span class="sig-name descname"><span class="pre">width</span></span><a class="headerlink" href="#gondola.db.TofPaddle.width" title="Link to this definition">#</a></dt>
+<dd><p>Get the (local) width of the paddle</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="gondola.calibration.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">gondola.calibration</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="gondola.gondola_core.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">gondola.gondola_core</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle"><code class="docutils literal notranslate"><span class="pre">TofPaddle</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.all"><code class="docutils literal notranslate"><span class="pre">TofPaddle.all()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.all_as_dict"><code class="docutils literal notranslate"><span class="pre">TofPaddle.all_as_dict()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.by_rbid"><code class="docutils literal notranslate"><span class="pre">TofPaddle.by_rbid()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.cable_len"><code class="docutils literal notranslate"><span class="pre">TofPaddle.cable_len</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.center_pos"><code class="docutils literal notranslate"><span class="pre">TofPaddle.center_pos</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.draw_xy"><code class="docutils literal notranslate"><span class="pre">TofPaddle.draw_xy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.draw_xz"><code class="docutils literal notranslate"><span class="pre">TofPaddle.draw_xz()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.draw_yz"><code class="docutils literal notranslate"><span class="pre">TofPaddle.draw_yz()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.dsi"><code class="docutils literal notranslate"><span class="pre">TofPaddle.dsi</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.global_pos_x_l0"><code class="docutils literal notranslate"><span class="pre">TofPaddle.global_pos_x_l0</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.global_pos_y_l0"><code class="docutils literal notranslate"><span class="pre">TofPaddle.global_pos_y_l0</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.global_pos_z_l0"><code class="docutils literal notranslate"><span class="pre">TofPaddle.global_pos_z_l0</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.height"><code class="docutils literal notranslate"><span class="pre">TofPaddle.height</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.j_ltb"><code class="docutils literal notranslate"><span class="pre">TofPaddle.j_ltb</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.j_rb"><code class="docutils literal notranslate"><span class="pre">TofPaddle.j_rb</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.length"><code class="docutils literal notranslate"><span class="pre">TofPaddle.length</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.lowest_rb_ch_py"><code class="docutils literal notranslate"><span class="pre">TofPaddle.lowest_rb_ch_py</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.lt_slot"><code class="docutils literal notranslate"><span class="pre">TofPaddle.lt_slot</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.ltb_chA"><code class="docutils literal notranslate"><span class="pre">TofPaddle.ltb_chA</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.ltb_chB"><code class="docutils literal notranslate"><span class="pre">TofPaddle.ltb_chB</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.ltb_id"><code class="docutils literal notranslate"><span class="pre">TofPaddle.ltb_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.mtb_link_id"><code class="docutils literal notranslate"><span class="pre">TofPaddle.mtb_link_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.normal"><code class="docutils literal notranslate"><span class="pre">TofPaddle.normal</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.paddle_id"><code class="docutils literal notranslate"><span class="pre">TofPaddle.paddle_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.panel_id"><code class="docutils literal notranslate"><span class="pre">TofPaddle.panel_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.pb_chA"><code class="docutils literal notranslate"><span class="pre">TofPaddle.pb_chA</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.pb_chB"><code class="docutils literal notranslate"><span class="pre">TofPaddle.pb_chB</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.pb_id"><code class="docutils literal notranslate"><span class="pre">TofPaddle.pb_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.principal"><code class="docutils literal notranslate"><span class="pre">TofPaddle.principal</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.rb_chA"><code class="docutils literal notranslate"><span class="pre">TofPaddle.rb_chA</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.rb_chB"><code class="docutils literal notranslate"><span class="pre">TofPaddle.rb_chB</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.rb_id"><code class="docutils literal notranslate"><span class="pre">TofPaddle.rb_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.rb_slot"><code class="docutils literal notranslate"><span class="pre">TofPaddle.rb_slot</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.sideA_pos"><code class="docutils literal notranslate"><span class="pre">TofPaddle.sideA_pos</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.volume_id"><code class="docutils literal notranslate"><span class="pre">TofPaddle.volume_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.width"><code class="docutils literal notranslate"><span class="pre">TofPaddle.width</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/_autosummary/gondola.db.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, J.A.Stoessl.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
