@@ -11,7 +11,9 @@
 #include <string>
 #include <algorithm>
 
-#include "logging.hpp"
+#include "spdlog/spdlog.h"
+#include "spdlog/cfg/env.h"
+
 #include "io/parsers.h"
 #include "calibration.h"
 #include "io.hpp"
@@ -299,27 +301,22 @@ auto spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]) -> void {
       dfilter = filter + 2 * wf[i][(j + 3) % 1024] + wf[i][(j + 4) % 1024] - wf[i][(j + 5) % 1024];
       //::info("filter {}, dfilter {}", filter, dfilter);
       if (filter > 20 && filter < 100) {
-        if (n_sp[i] < 10)   // record maximum of 10 spikes
-        {
+        if (n_sp[i] < 10) {  // record maximum of 10 spikes
           sp[i][n_sp[i]] = (j + 1) % 1024;
           n_sp[i]++;
         } else {                // too many spikes -> something wrong
-          log_warn("Spike cleaning not possible, too many spikes (" << n_sp[i] << ") in ch " << i << "!");
+          spdlog::warn("Spike cleaning not possible, too many spikes ({}) in ch {}!", n_sp[i],  i );
           return;
         }
         // filter condition avoids mistaking pulse for spike sometimes
       }
-      else if (dfilter > 40 && dfilter < 100 && filter > 10)
-      {
-        if (n_sp[i] < 9)   // record maximum of 10 spikes
-        {
+      else if (dfilter > 40 && dfilter < 100 && filter > 10) {
+        if (n_sp[i] < 9) {   // record maximum of 10 spikes
           sp[i][n_sp[i]] = (j + 1) % 1024;
           sp[i][n_sp[i] + 1] = (j + 3) % 1024;
           n_sp[i] += 2;
-        }
-        else                // too many spikes -> something wrong
-        {
-          log_warn("Spike cleaning not possible, too many spikes (" << n_sp[i] << ") in ch " << i << "!");
+        } else { // too many spikes -> something wrong
+          spdlog::warn("Spike cleaning not possible, too many spikes ({}) in ch {}!" ,n_sp[i], i);
           return;
         }
       }
@@ -348,41 +345,36 @@ auto spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]) -> void {
   */
 
   /* go through all spikes and look for neighbors */
-  for (i = 0; i < nChn; i++)
-  {
-    for (j = 0; j < n_sp[i]; j++)
-    {
+  for (i = 0; i < nChn; i++) {
+    for (j = 0; j < n_sp[i]; j++) {
       nSymmetric = 0;
       nNeighbor = 0;
       /* check if this spike has a symmetric partner in any channel */
-      for (k = 0; k < nChn; k++)
-      {
-        for (l = 0; l < n_sp[k]; l++)
-          if ((sp[i][j] + sp[k][l] - 2 * tCell) % 1024 == 1022)
-          {
+      for (k = 0; k < nChn; k++) {
+        for (l = 0; l < n_sp[k]; l++) {
+          if ((sp[i][j] + sp[k][l] - 2 * tCell) % 1024 == 1022) {
             nSymmetric++;
             break;
           }
+        }
       }
       /* check if this spike has same spike is in any other channels */
-      for (k = 0; k < nChn; k++)
-        if (i != k)
-        {
-          for (l = 0; l < n_sp[k]; l++)
-            if (sp[i][j] == sp[k][l])
-            {
+      for (k = 0; k < nChn; k++) {
+        if (i != k) {
+          for (l = 0; l < n_sp[k]; l++) {
+            if (sp[i][j] == sp[k][l]) {
               nNeighbor++;
               break;
             }
+          }
         }
+      }
       /* if at least two matching spikes, treat this as a real spike */
-      if (nNeighbor >= 2)
-      {
+      if (nNeighbor >= 2) {
         for (k = 0; k < n_rsp; k++)
           if (rsp[k] == sp[i][j]) // ignore repeats
             break;
-        if (n_rsp < 10 && k == n_rsp)
-        {
+        if (n_rsp < 10 && k == n_rsp) {
           rsp[n_rsp] = sp[i][j];
           n_rsp++;
         }
@@ -593,7 +585,7 @@ auto go::RBCalibration::from_bytestream(const Vec<u8> &stream,
   }
   u16 tail = Gaps::parse_u16(stream, pos);
   if (tail != RBEvent::TAIL) {
-    log_error("After parsing, we found an invalid tail signature " << tail);
+    spdlog::error("After parsing, we found an invalid tail signature {}", tail);
   }
   return calibration;
 }
@@ -624,11 +616,11 @@ auto go::RBCalibration::from_file(const String &filename, bool discard_events) -
 
 auto go::RBCalibration::channel_check(u8 channel) const -> bool {
   if (channel == 0) {
-    log_error("Remember, channels start at 1. 0 does not exist!");
+    spdlog::error("Remember, channels start at 1. 0 does not exist!");
     return false;
   }
   if (channel > 9) {
-    log_error("Thera are no channels > 9!");
+    spdlog::error("Thera are no channels > 9!");
     return false;
   }
   return true;

@@ -1,6 +1,8 @@
+#include "spdlog/spdlog.h"
+#include "spdlog/cfg/env.h"
+
 #include "telemetry_dataclasses.hpp"
 #include "io/parsers.h"
-#include "logging.hpp"
 
 namespace gtl = Gaps::Telemetry;
 namespace g   = Gaps;

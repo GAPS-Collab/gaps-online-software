@@ -1,8 +1,10 @@
 #include <format>
 
+#include "spdlog/spdlog.h"
+#include "spdlog/cfg/env.h"
+
 #include "packets/monitoring.h"
 #include "io/parsers.h"
-#include "logging.hpp"
 
 LTBMoniData::LTBMoniData() {
   board_id          = 0;
@@ -16,7 +18,7 @@ LTBMoniData LTBMoniData::from_bytestream(const Vec<u8> &stream,
   auto moni = LTBMoniData();
   u16 head          = Gaps::parse_u16(stream, pos);
   if (head != LTBMoniData::HEAD) {
-    log_error("No header signature (0xAAAA) found for decoding of LTBMoniData!");   
+    spdlog::error("No header signature (0xAAAA) found for decoding of LTBMoniData!");   
   }
   moni.board_id    = Gaps::parse_u8(stream, pos);
   moni.trenz_temp  = Gaps::parse_f32(stream, pos);
@@ -26,7 +28,7 @@ LTBMoniData LTBMoniData::from_bytestream(const Vec<u8> &stream,
   }
   u16 tail         = Gaps::parse_u16(stream, pos);
   if (tail != LTBMoniData::TAIL) {
-    log_error("No tail signature (0x5555) found for decoding of LTBMoniData!");   
+    spdlog::error("No tail signature (0x5555) found for decoding of LTBMoniData!");   
   }
   return moni;
 }
@@ -93,7 +95,7 @@ RBMoniData RBMoniData::from_bytestream(const Vec<u8> &payload,
   RBMoniData moni   = RBMoniData();
   u16 head          = Gaps::parse_u16(payload, pos);
   if (head != RBMoniData::HEAD) {
-    log_error("No header signature (0xAAAA) found for decoding of RBMoniData!");   
+    spdlog::error("No header signature (0xAAAA) found for decoding of RBMoniData!");   
   }
   moni.board_id          = Gaps::parse_u8(payload, pos);  
   moni.rate              = Gaps::parse_u16(payload, pos);  
@@ -135,7 +137,7 @@ RBMoniData RBMoniData::from_bytestream(const Vec<u8> &payload,
   moni.n1v5_power        = Gaps::parse_f32(payload, pos);  
   u16 tail               = Gaps::parse_u16(payload, pos);
   if (tail != RBMoniData::TAIL) {
-    log_error("No tail signature (0x5555) found for decoding of RBMoniData!");   
+    spdlog::error("No tail signature (0x5555) found for decoding of RBMoniData!");   
   }
   return moni;
 }
@@ -203,7 +205,7 @@ PBMoniData PBMoniData::from_bytestream(const Vec<u8> &stream,
   auto moni = PBMoniData();
   u16 head             = Gaps::parse_u16(stream, pos);
   if (head != PBMoniData::HEAD) {
-    log_error("No header signature (0xAAAA) found for decoding of PBMoniData!");   
+    spdlog::error("No header signature (0xAAAA) found for decoding of PBMoniData!");   
   }
   moni.board_id         = Gaps::parse_u8(stream, pos);
   for (auto k : {0,1,2}) {
@@ -230,7 +232,7 @@ PBMoniData PBMoniData::from_bytestream(const Vec<u8> &stream,
   moni.shv_temp         = Gaps::parse_f32(stream, pos);
   u16 tail              = Gaps::parse_u16(stream, pos);
   if (tail != PBMoniData::TAIL) {
-    log_error("No tail signature (0x5555) found for decoding of PBMoniData!");   
+    spdlog::error("No tail signature (0x5555) found for decoding of PBMoniData!");   
   }
   return moni;
 }
@@ -262,7 +264,7 @@ PAMoniData PAMoniData::from_bytestream(const Vec<u8> &stream,
   auto moni            = PAMoniData();
   u16 head             = Gaps::parse_u16(stream, pos);
   if (head != PAMoniData::HEAD) {
-    log_error("No header signature (0xAAAA) found for decoding of PAMoniData!");   
+    spdlog::error("No header signature (0xAAAA) found for decoding of PAMoniData!");   
   }
   moni.board_id        = Gaps::parse_u8(stream, pos);
   for (usize k=0;k<16;k++) {
@@ -273,7 +275,7 @@ PAMoniData PAMoniData::from_bytestream(const Vec<u8> &stream,
   }
   u16 tail             = Gaps::parse_u16(stream, pos);
   if (tail != PAMoniData::TAIL) {
-    log_error("No tail signature (0x5555) found for decoding of PAMoniData!");   
+    spdlog::error("No tail signature (0x5555) found for decoding of PAMoniData!");   
   }
   return moni;
 }
@@ -308,7 +310,7 @@ MtbMoniData MtbMoniData::from_bytestream(const Vec<u8> &payload,
   auto moni = MtbMoniData();
   u16 head          = Gaps::parse_u16(payload, pos);
   if (head != MtbMoniData::HEAD) {
-    log_error("No header signature (0xAAAA) found for decoding of MtbMoniData!");   
+    spdlog::error("No header signature (0xAAAA) found for decoding of MtbMoniData!");   
   }
   moni.tiu_busy_len  = Gaps::parse_u32(payload, pos);
   moni.tiu_status    = Gaps::parse_u8( payload, pos);
@@ -322,7 +324,7 @@ MtbMoniData MtbMoniData::from_bytestream(const Vec<u8> &payload,
   moni.lost_rate     = Gaps::parse_u16(payload, pos);
   u16 tail           = Gaps::parse_u16(payload, pos);
   if (tail != MtbMoniData::TAIL) {
-    log_error("No tail signature (0x5555) found for decoding of MtbMoniData!");   
+    spdlog::error("No tail signature (0x5555) found for decoding of MtbMoniData!");   
   }
   return moni;
 }
@@ -398,7 +400,7 @@ CPUMoniData CPUMoniData::from_bytestream(const Vec<u8> &stream,
   auto moni = CPUMoniData();
   u16 head  = Gaps::parse_u16(stream, pos);
   if (head != CPUMoniData::HEAD) {
-    log_error("No header signature (0xAAAA) found for decoding of CPUMoniData!");   
+    spdlog::error("No header signature (0xAAAA) found for decoding of CPUMoniData!");   
   }
   moni.uptime        = Gaps::parse_u32(stream, pos); 
   moni.disk_usage    = Gaps::parse_u8(stream, pos); 
@@ -411,7 +413,7 @@ CPUMoniData CPUMoniData::from_bytestream(const Vec<u8> &stream,
   moni.mb_temp    = Gaps::parse_f32(stream, pos);
   u16 tail  = Gaps::parse_u16(stream, pos);
   if (tail != CPUMoniData::TAIL) {
-    log_error("No tail signature (0x5555) found for decoding of CPUMoniData!");   
+    spdlog::error("No tail signature (0x5555) found for decoding of CPUMoniData!");   
   }
   return moni;
 }
