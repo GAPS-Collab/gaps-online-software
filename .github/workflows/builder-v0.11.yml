@@ -90,10 +90,6 @@ jobs:
       run: cp ${{ github.workspace }}/resources/assets/GAPSLOGO_2023_small.png ${{ github.workspace }}/build/doc/ 
       shell: bash
 
-    - name: Consolidate docs/landing page (theme)
-      run: cp -r ${{ github.workspace }}/doc/pelican-docs/output/* ${{ github.workspace }}/build/doc/
-      shell: bash
-
     # The C++ docs are already in the correct folder
     - name: Consolidate Rust docs
       run: cp -r ${{ github.workspace }}/liftof/target/doc/* ${{ github.workspace }}/build/doc/apidocs-v${{ steps.sw_version.outputs.version }}/
