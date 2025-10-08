@@ -868,7 +868,11 @@ pub struct LiftofSettings {
   /// packet. If a verification run is desired, change this 
   /// number to the number of seconds to do the verification 
   /// run
-  pub verification_runtime_sec   : u32,
+  #[deprecated(since = "0.11", note = "Use flag verfication_rnn and runtime instead!")]
+  pub verification_runtime_sec   : Option<u32>,
+  /// If this is set, don't save anything to disk 
+  /// and just transmit the TofDetectorStatus packet
+  pub verification_run           : Option<bool>,
   /// Settings to control the MTB
   pub mtb_settings               : MTBSettings,
   /// Settings for the TOF event builder
@@ -905,7 +909,8 @@ impl LiftofSettings {
       run_analysis_engine       : true,
       pre_run_calibration       : false,
       save_cali_wf              : false,
-      verification_runtime_sec  : 0, // no verification run per default
+      verification_runtime_sec  : None, // no verification run per default
+      verification_run          : None,
       mtb_settings              : MTBSettings::new(),
       event_builder_settings    : TofEventBuilderSettings::new(),
       analysis_engine_settings  : AnalysisEngineSettings::new(),
@@ -923,60 +928,6 @@ impl LiftofSettings {
   pub fn from_tofrunconfig(&mut self, cfg : &TofRunConfig) {
     if cfg.runtime.is_some() {
       self.runtime_sec = cfg.runtime.unwrap() as u64;
-    }
-  }
-
-  /// Change a value by giving the specific key as 
-  /// a string, the value then will be parsed 
-  /// accordingly
-  #[deprecated(since="0.10.0", note="This is a dev deadend and will be nuked!")]
-  pub fn set_by_key(&mut self, key : &str, value : String) {
-    match key {
-      "runtime_sec"               => {
-        if let Ok(val) = value.parse::<u64>() {
-          self.runtime_sec = val;
-        } else {
-          error!("Unable to parse {value}!");
-        }
-      }
-      "cpu_moni_interval_sec"     => {
-        if let Ok(val) = value.parse::<u64>() {
-          self.cpu_moni_interval_sec = val;
-        } else {
-          error!("Unable to parse {value}!");
-        }
-      }
-      "rb_ignorelist_run"         => {
-      }
-      "run_analysis_engine"       => {
-        if let Ok(val) = value.parse::<bool>() {
-          self.run_analysis_engine = val;
-        } else {
-          error!("Unable to parse {value}!");
-        }
-      }
-      "pre_run_calibration"       => {
-        if let Ok(val) = value.parse::<bool>() {
-          self.pre_run_calibration = val;
-        } else {
-          error!("Unable to parse {value}!");
-        }
-      }
-      "save_cali_wf"              => {
-        if let Ok(val) = value.parse::<bool>() {
-          self.save_cali_wf = val;
-        } else {
-          error!("Unable to parse {value}!");
-        }
-      }
-      "verification_runtime_sec"  => {
-        if let Ok(val) = value.parse::<u32>() {
-          self.verification_runtime_sec = val;
-        } else {
-          error!("Unable to parse {value}!");
-        }
-      }
-      _ => error!("Set by key for {} is not implemented!", key)
     }
   }
 
