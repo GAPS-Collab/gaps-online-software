@@ -211,22 +211,22 @@ namespace Gaps {
      // std::vector<tracker_hit> tracker_hits;
      // std::vector<uint64_t> tracker_oscillators;
       
-      PacketHeader    header;
-      u8              version = 0;
-      u8              flags0  = 0;
-      u8              flags1  = 0;
-      Vec<u8>         row_flags;
-      u64             creation_time = 0;
-      u32             event_id      = 0;
-      u8              n_tof_hits    = 0;
-      u16             n_trk_hits    = 0;
-      Vec<TrkEvent>   tracker_events;  
-      Vec<TrkHit>     trk_hits;
-      TofEventSummary tof_event;
-      Vec<u8>         raw_data;
-      TofMetaData     tof_meta;
-      TrkMetaData     tracker_meta;
-      Vec<u64>        tracker_oscillators = Vec<u64>(10,0) ;
+      PacketHeader             header;
+      u8                       version = 0;
+      u8                       flags0  = 0;
+      u8                       flags1  = 0;
+      Vec<u8>                  row_flags;
+      u64                      creation_time = 0;
+      u32                      event_id      = 0;
+      u8                       n_tof_hits    = 0;
+      u16                      n_trk_hits    = 0;
+      Vec<TrkEvent>            tracker_events;  
+      Vec<TrkHit>              trk_hits;
+      gondola::TofEventSummary tof_event;
+      Vec<u8>                  raw_data;
+      TofMetaData              tof_meta;
+      TrkMetaData              tracker_meta;
+      Vec<u64>                 tracker_oscillators = Vec<u64>(10,0) ;
     
       auto to_string() const -> std::string;
       static auto from_bytestream(Vec<u8> const &stream, usize &pos)

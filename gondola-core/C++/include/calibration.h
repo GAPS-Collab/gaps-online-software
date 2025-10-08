@@ -19,9 +19,10 @@
 #include "tof_typedefs.h"
 #include "events.h"
 
-class RBEvent;
 
 namespace gondola {
+
+  class RBEvent;
 
   /// The original "RemoveSpikes" from the
   /// DRS4 manual

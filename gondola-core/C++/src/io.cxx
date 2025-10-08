@@ -140,21 +140,21 @@ Vec<TofPacket> get_tofpackets(const String filename, PacketType filter) {
 
 /***************************************************/
 
-Vec<TofEvent> unpack_tofevents_from_tofpackets(const Vec<u8> &bytestream, u64 start_pos) {
-  Vec<TofEvent> events = Vec<TofEvent>();
+Vec<gondola::TofEvent> unpack_tofevents_from_tofpackets(const Vec<u8> &bytestream, u64 start_pos) {
+  auto events = Vec<gondola::TofEvent>();
   u64 pos  = start_pos;
   // just make sure in the beginning they
   // are not the same
   u64 last_pos = start_pos += 1;
   TofPacket packet;
-  TofEvent event;
+  gondola::TofEvent event;
   while (true) {
     last_pos = pos;
     packet = TofPacket::from_bytestream(bytestream, pos).unwrap();
     //if (n_packets == 100) {break;}
     if (pos != last_pos) {
       if (packet.packet_type == PacketType::TofEvent) {
-        event = TofEvent::from_tofpacket(packet);
+        event = gondola::TofEvent::from_tofpacket(packet);
         events.push_back(event);
       }
     } else {
@@ -167,8 +167,8 @@ Vec<TofEvent> unpack_tofevents_from_tofpackets(const Vec<u8> &bytestream, u64 st
 
 /***************************************************/
 
-Vec<TofEvent> unpack_tofevents_from_tofpackets(const String filename) {
-  Vec<TofEvent> events = Vec<TofEvent>();
+auto unpack_tofevents_from_tofpackets(const String filename) -> Vec<gondola::TofEvent> {
+  auto events = Vec<gondola::TofEvent>();
   auto stream = get_bytestream_from_file(filename); 
   spdlog::debug("Read {} bytes from {}", stream.size(), filename);
   bool has_ended = false;

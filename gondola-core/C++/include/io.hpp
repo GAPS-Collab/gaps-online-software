@@ -38,15 +38,6 @@ namespace gondola {
 } 
 
 /**
- * Extract only event ids from a bytestream with raw readoutboard binary data
- *
- * @param bytestream : Readoutboard binary (.robin) data.
- * @param start_pos  : Byte position to start searching from in bytestream
- */
-[[deprecated("This might not even be correct!")]]
-Vec<u32> get_event_ids_from_raw_stream(const Vec<u8> &bytestream, u64 &start_pos);
-
-/**
  * Extract TofPackets from a stream of binary data 
  *
  * @param bytestream : Binary TofPacket data.
@@ -73,7 +64,7 @@ Vec<TofPacket> get_tofpackets(const String filename, PacketType filter = PacketT
  * @param bytestream : Binary TofPacket data.
  * @param start_pos  : Byte position to start searching from in bytestream
  */
-Vec<TofEvent> unpack_tofevents_from_tofpackets(const Vec<u8> &bytestream, u64 start_pos);
+Vec<gondola::TofEvent> unpack_tofevents_from_tofpackets(const Vec<u8> &bytestream, u64 start_pos);
 
 /**
  * Directly gets TofEvents from a stream with tofpackets, assuming all
@@ -81,7 +72,7 @@ Vec<TofEvent> unpack_tofevents_from_tofpackets(const Vec<u8> &bytestream, u64 st
  *
  * @param filename : Binary file with TofPacket data.
  */
-Vec<TofEvent> unpack_tofevents_from_tofpackets(const String filename);
+Vec<gondola::TofEvent> unpack_tofevents_from_tofpackets(const String filename);
 
 namespace Gaps {
 
@@ -112,7 +103,7 @@ namespace Gaps {
       std::ifstream  stream_file_;
       bool           exhausted_;
       usize          n_packets_read_;
-      String         filename_;
+      std::string    filename_;
   };
 }
 

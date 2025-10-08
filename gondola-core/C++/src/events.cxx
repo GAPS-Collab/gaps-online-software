@@ -14,7 +14,8 @@
 
 #include "spdlog/cfg/env.h"
 
-namespace g = Gaps;
+//namespace g = Gaps;
+namespace g = gondola;
 using namespace result;
 
 /// masks to decode LTB hit masks
@@ -55,7 +56,7 @@ Vec<u16> u8_to_u16(const Vec<u8> &vec_u8) {
 
 /*************************************/
 
-RBEventHeader::RBEventHeader() {
+g::RBEventHeader::RBEventHeader() {
   rb_id              = 0; 
   event_id           = 0; 
   channel_mask       = 0; 
@@ -71,7 +72,7 @@ RBEventHeader::RBEventHeader() {
 
 /*************************************/
 
-std::string RBEventHeader::to_string() const {
+auto g::RBEventHeader::to_string() const -> std::string {
   auto sfit = get_sine_fit();
   std::string repr = "<RBEventHeader";
   repr += "\n  rb id          " + std::to_string(rb_id)                 ;
@@ -100,7 +101,7 @@ std::string RBEventHeader::to_string() const {
 
 /*************************************/
 
-Vec<u8> RBEventHeader::get_channels() const {
+auto g::RBEventHeader::get_channels() const -> Vec<u8> {
   Vec<u8>  channels = Vec<u8>();
   for (u8 k=0;k<9;k++) {
     if ((channel_mask & (1 << k)) > 0) {
@@ -112,37 +113,37 @@ Vec<u8> RBEventHeader::get_channels() const {
 
 /*************************************/
 
-u8 RBEventHeader::get_nchan() const {
+u8 g::RBEventHeader::get_nchan() const {
   return get_channels().size(); 
 }
 
 /*************************************/
 
-auto RBEventHeader::from_bytestream(const Vec<u8> &stream, u64 &pos)\
-  -> Result<RBEventHeader, g::IOError> {
+auto g::RBEventHeader::from_bytestream(const Vec<u8> &stream, u64 &pos)\
+  -> Result<RBEventHeader, Gaps::IOError> {
   //Gaps::set_loglevel(Gaps::LOGLEVEL::info);
   if (stream.size() < RBEventHeader::SIZE) {
     auto message = std::format("RBEventHeader can not be parsed from a string with size {}, when {} bytes are expected!", stream.size(), RBEventHeader::SIZE);
-    auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
+    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::StreamTooShort, message);
     return Err(err);
   }
   RBEventHeader header;
-  u16 head                  = g::parse_u16(stream, pos);
+  u16 head                  = Gaps::parse_u16(stream, pos);
   if (head != RBEventHeader::HEAD) {
     spdlog::error("[RBEventHeader::from_bytestream] Header signature {} invalid!", head);
   }
-  header.rb_id               = g::parse_u8(stream , pos);  
-  header.event_id            = g::parse_u32(stream, pos);  
-  header.channel_mask        = g::parse_u16(stream, pos);   
-  header.status_byte         = g::parse_u8(stream , pos); 
-  header.stop_cell           = g::parse_u16(stream, pos);  
-  header.ch9_amp             = g::parse_u16(stream, pos);  
-  header.ch9_freq            = g::parse_u16(stream, pos);  
-  header.ch9_phase           = g::parse_u32(stream, pos);  
-  header.fpga_temp           = g::parse_u16(stream, pos);  
-  header.timestamp32         = g::parse_u32(stream, pos);
-  header.timestamp16         = g::parse_u16(stream, pos);
-  u16 tail                   = g::parse_u16(stream, pos);
+  header.rb_id               = Gaps::parse_u8(stream , pos);  
+  header.event_id            = Gaps::parse_u32(stream, pos);  
+  header.channel_mask        = Gaps::parse_u16(stream, pos);   
+  header.status_byte         = Gaps::parse_u8(stream , pos); 
+  header.stop_cell           = Gaps::parse_u16(stream, pos);  
+  header.ch9_amp             = Gaps::parse_u16(stream, pos);  
+  header.ch9_freq            = Gaps::parse_u16(stream, pos);  
+  header.ch9_phase           = Gaps::parse_u32(stream, pos);  
+  header.fpga_temp           = Gaps::parse_u16(stream, pos);  
+  header.timestamp32         = Gaps::parse_u32(stream, pos);
+  header.timestamp16         = Gaps::parse_u16(stream, pos);
+  u16 tail                   = Gaps::parse_u16(stream, pos);
   if (tail != RBEventHeader::TAIL) {
     spdlog::error("Tail signature incorrect! Got tail {}", tail);
   }
@@ -151,13 +152,13 @@ auto RBEventHeader::from_bytestream(const Vec<u8> &stream, u64 &pos)\
 
 /*************************************/
 
-bool RBEventHeader::has_ch9() const {
+bool g::RBEventHeader::has_ch9() const {
   return (channel_mask & 512) > 0;
 }
 
 /*************************************/
   
-f32 RBEventHeader::get_fpga_temp() const {
+f32 g::RBEventHeader::get_fpga_temp() const {
   f32 zynq_temp = (((fpga_temp & 4095) * 503.975) / 4096.0) - 273.15;
   //f32 temp = (fpga_temp * 503.975/4096) - 273.15;
   return zynq_temp;
@@ -165,49 +166,49 @@ f32 RBEventHeader::get_fpga_temp() const {
 
 /*************************************/
 
-bool RBEventHeader::is_event_fragment() const {
+bool g::RBEventHeader::is_event_fragment() const {
   return (status_byte & 1) > 0;
 }
 
 /*************************************/
 
-bool RBEventHeader::drs_lost_trigger() const {
+bool g::RBEventHeader::drs_lost_trigger() const {
   return ((status_byte >> 1) & 1) > 0;
 }
 
 /*************************************/
 
-bool RBEventHeader::lost_lock() const {
+bool g::RBEventHeader::lost_lock() const {
   return ((status_byte >> 2) & 1) > 0;
 }
 
 /*************************************/
 
-bool RBEventHeader::lost_lock_last_sec() const {
+bool g::RBEventHeader::lost_lock_last_sec() const {
   return ((status_byte >> 3) & 1) > 0;
 }
 
 /*************************************/
 
-bool RBEventHeader::is_locked() const {
+bool g::RBEventHeader::is_locked() const {
   return !(lost_lock());
 }
 
 /*************************************/
 
-bool RBEventHeader::is_locked_last_sec() const {
+bool g::RBEventHeader::is_locked_last_sec() const {
   return !(lost_lock_last_sec());
 }
 
 /*************************************/
 
-u64 RBEventHeader::get_timestamp48() const {
+u64 g::RBEventHeader::get_timestamp48() const {
   return ((u64)timestamp16 << 32) | (u64)timestamp32;
 }
 
 /*************************************/
 
-Vec<u8> RBEventHeader::get_active_data_channels() const {
+Vec<u8> g::RBEventHeader::get_active_data_channels() const {
   Vec<u8> active_channels;
   for (auto const &ch : {1,2,3,4,5,6,7,8} ) {
     if ((channel_mask & (u8)pow(2, ch - 1)) == (u8)pow(2,ch - 1)) active_channels.push_back(ch);
@@ -218,14 +219,14 @@ Vec<u8> RBEventHeader::get_active_data_channels() const {
 
 /*************************************/
 
-u8 RBEventHeader::get_n_datachan() const {
+u8 g::RBEventHeader::get_n_datachan() const {
   Vec<u8> active_channels = get_active_data_channels();
   return (u8)active_channels.size();
 }
 
 /*************************************/
 
-std::array<f32, 3> RBEventHeader::get_sine_fit() const {
+std::array<f32, 3> g::RBEventHeader::get_sine_fit() const {
   f32 u16_MAX = 65535;
   f32 amp    = (20.0 * ch9_amp   /u16_MAX) - 10.0;
   f32 freq   = (20.0 * ch9_freq  /u16_MAX) - 10.0;
@@ -236,7 +237,7 @@ std::array<f32, 3> RBEventHeader::get_sine_fit() const {
 
 /*************************************/
 
-RBEvent::RBEvent() {  
+g::RBEvent::RBEvent() {  
   data_type = 0;
   status    = EventStatus::Unknown;
   header = RBEventHeader();
@@ -244,12 +245,12 @@ RBEvent::RBEvent() {
   for (usize k=0; k<NCHN; k++) {
     adc.push_back(Vec<u16>());
   }
-  hits  = Vec<TofHit>();
+  hits  = Vec<g::TofHit>();
 }
 
 /**********************************************************/
 
-std::string RBEvent::to_string() const {
+auto g::RBEvent::to_string() const -> std::string {
   std::string repr = "<RBEvent\n";
   std::stringstream ss;
   ss << status;
@@ -281,7 +282,7 @@ std::string RBEvent::to_string() const {
 
 /**********************************************************/
 
-bool RBEvent::channel_check(u8 channel) const {
+bool g::RBEvent::channel_check(u8 channel) const {
   if (channel == 0) {
     spdlog::error("Remember, channels start at 1. 0 does not exist!");
     return false;
@@ -295,24 +296,24 @@ bool RBEvent::channel_check(u8 channel) const {
 
 /**********************************************************/
   
-const Vec<u16>& RBEvent::get_channel_adc(u8 channel) const {
+const Vec<u16>& g::RBEvent::get_channel_adc(u8 channel) const {
   if (!(channel_check(channel))) {
     return _empty_channel;
   }
   return adc[channel -1]; 
 }
   
-const Vec<u16>& RBEvent::get_channel_by_label(u8 channel) const {
+const Vec<u16>& g::RBEvent::get_channel_by_label(u8 channel) const {
   return adc[channel - 1];
 }
 
-const Vec<u16>& RBEvent::get_channel_by_id(u8 channel) const {
+const Vec<u16>& g::RBEvent::get_channel_by_id(u8 channel) const {
   return adc[channel];
 }
 
 /**********************************************************/
 
-auto RBEvent::calc_baseline(const Vec<f32> &volts, usize min_bin, usize max_bin) 
+auto g::RBEvent::calc_baseline(const Vec<f32> &volts, usize min_bin, usize max_bin) 
   -> f32 {
   f32 bl     = 0;
   for (usize idx = 0; idx<volts.size(); idx++) {
@@ -332,7 +333,7 @@ auto RBEvent::calc_baseline(const Vec<f32> &volts, usize min_bin, usize max_bin)
 
 /**********************************************************/
 
-auto RBEvent::from_bytestream(const Vec<u8> &stream, u64 &pos) 
+auto g::RBEvent::from_bytestream(const Vec<u8> &stream, u64 &pos) 
   -> RBEvent {
   RBEvent event = RBEvent();
   spdlog::debug("Start decoding at pos {}", pos);
@@ -374,7 +375,7 @@ auto RBEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
   }
   // Decode the hits
   for (u8 k=0;k<nhits;k++) {
-    auto hit = TofHit::from_bytestream(stream, pos);
+    auto hit = g::TofHit::from_bytestream(stream, pos);
     event.hits.push_back(hit);
   }
   u16 tail = Gaps::parse_u16(stream, pos);
@@ -386,222 +387,197 @@ auto RBEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
 
 /**********************************************************/
 
-RBMissingHit RBMissingHit::from_bytestream(const Vec<u8> &stream,
-                                           u64 &pos) {
-  spdlog::debug("Start decoding at pos {}", pos);
-  u16 head = Gaps::parse_u16(stream, pos);
-  RBMissingHit miss  = RBMissingHit();
-  if (head != RBMissingHit::HEAD)  {
-    //log_error("No header signature found!");  
-    return miss;  
+namespace gondola {
+  std::ostream& operator<<(std::ostream& os, const g::EventQuality& qual) {
+     os << "<EventQuality: " ;
+     switch (qual) {
+       case g::EventQuality::Unknown : { 
+         os << "Unknown>";
+         break;
+       }
+       case g::EventQuality::Silver : { 
+         os << "Silver>";
+         break;
+       }
+       case g::EventQuality::Gold : { 
+         os << "Gold>";
+         break;
+       }
+       case g::EventQuality::Diamond : { 
+         os << "Diamond>";
+         break;
+       }
+       case g::EventQuality::FourLeafClover : { 
+         os << "FourLeafClover>";
+         break;
+       }
+     }
+     return os;
   }
-  // verify_fixed already advances pos by 2
-  miss.event_id      = Gaps::parse_u32(stream, pos);
-  miss.ltb_hit_index = Gaps::parse_u8(stream, pos);
-  miss.ltb_id        = Gaps::parse_u8(stream, pos);
-  miss.ltb_dsi       = Gaps::parse_u8(stream, pos);
-  miss.ltb_j         = Gaps::parse_u8(stream, pos);
-  miss.ltb_ch        = Gaps::parse_u8(stream, pos);
-  miss.rb_id         = Gaps::parse_u8(stream, pos);
-  miss.rb_ch         = Gaps::parse_u8(stream, pos);
-  u16 tail = Gaps::parse_u16(stream, pos);
-  if (tail != RBMissingHit::TAIL) {
-    spdlog::error("After parsing the event, we found an invalid tail signature {}", tail);
+    
+  /**********************************************************/
+  
+  std::ostream& operator<<(std::ostream& os, const g::CompressionLevel& level) {
+     os << "<CompressionLevel: " ;
+     switch (level) {
+       case g::CompressionLevel::Unknown : { 
+         os << "Unknown>";
+         break;
+       }
+       case g::CompressionLevel::None : { 
+         os << "None>";
+         break;
+       }
+     }
+     return os;
   }
-  return miss;
+  
+  /**********************************************************/
+  
+  std::ostream& operator<<(std::ostream& os, const g::EventStatus& qual) {
+     os << "<EventStatus: " ;
+     switch (qual) {
+       case g::EventStatus::Unknown : { 
+         os << "Unknown>";
+         break;
+       }
+       case g::EventStatus::Crc32Wrong : { 
+         os << "Crc32Wrong>";
+         break;
+       }
+       case g::EventStatus::TailWrong : { 
+         os << "TailWrong>";
+         break;
+       }
+       case g::EventStatus::IncompleteReadout : { 
+         os << "IncompleteReadout>";
+         break;
+       }
+       case g::EventStatus::Perfect : { 
+         os << "Perfect>";
+         break;
+       }
+       case g::EventStatus::ChannelIDWrong : { 
+         os << "ChannelIDWrong>";
+         break;
+       }
+       case g::EventStatus::CellSyncErrors : {
+         os << "CellSyncErrors>";
+         break;
+       }
+       case g::EventStatus::ChnSyncErrors  : {
+         os << "ChnSyncErrors>";
+         break;
+       }
+       case g::EventStatus::CellAndChnSyncErrors : {
+         os << "CellAndChnSyncErrors>";
+         break;
+       }
+       case g::EventStatus::AnyDataMangling : {
+         os << "AnyDataMangling>";
+         break;
+       }
+       case g::EventStatus::IncompatibleData : {
+         os << "IncompleteData>";
+         break;
+       }
+       case g::EventStatus::EventTimeOut   : {
+         os << "EventTimeOut>";
+         break;
+       }
+       case g::EventStatus::GoodNoCRCOrErrBitCheck : {
+         os << "GoodNoCRCOrErrBitCheck>";
+         break;
+       }
+       case g::EventStatus::GoodNoCRCCheck : {
+         os << "GoodNoCRCCheck>";
+         break;
+       }
+       case g::EventStatus::GoodNoErrBitCheck : {
+         os << "GoodNoErrBitCheck>";
+         break;
+       }
+     }
+     return os;
+  }
+  
+  /**********************************************************/
+  
+  std::ostream& operator<<(std::ostream& os, const g::TriggerType& t_type) {
+     os << "<TriggerType: " ;
+     switch (t_type) {
+       case g::TriggerType::Unknown : { 
+         os << "Unknown>";
+         break;
+       }
+       case g::TriggerType::Gaps : { 
+         os << "Gaps>";
+         break;
+       }
+       case g::TriggerType::Any : { 
+         os << "Any>";
+         break;
+       }
+       case g::TriggerType::Track : { 
+         os << "Track>";
+         break;
+       }
+       case g::TriggerType::TrackCentral : { 
+         os << "TrackCentral>";
+         break;
+       }
+       case g::TriggerType::Poisson : { 
+         os << "Poisson>";
+         break;
+       }
+       case g::TriggerType::Forced : { 
+         os << "Forced>";
+         break;
+       }
+     }
+     return os;
+  }
+  
+  /**********************************************************/
+  
+  std::ostream& operator<<(std::ostream& os, const g::LTBThreshold& thresh) {
+     os << "<LTBThresholde: " ;
+     switch (thresh) {
+       case g::LTBThreshold::Unknown : { 
+         os << "Unknown>";
+         break;
+       }
+       case g::LTBThreshold::NoHit : { 
+         os << "NoHit>";
+         break;
+       }
+       case g::LTBThreshold::Hit : { 
+         os << "Hit>";
+         break;
+       }
+       case g::LTBThreshold::Beta : { 
+         os << "Beta>";
+         break;
+       }
+       case g::LTBThreshold::Veto : { 
+         os << "Veto>";
+         break;
+       }
+     }
+     return os;
+  }
 }
 
 /**********************************************************/
 
-std::ostream& operator<<(std::ostream& os, const EventQuality& qual) {
-   os << "<EventQuality: " ;
-   switch (qual) {
-     case EventQuality::Unknown : { 
-       os << "Unknown>";
-       break;
-     }
-     case EventQuality::Silver : { 
-       os << "Silver>";
-       break;
-     }
-     case EventQuality::Gold : { 
-       os << "Gold>";
-       break;
-     }
-     case EventQuality::Diamond : { 
-       os << "Diamond>";
-       break;
-     }
-     case EventQuality::FourLeafClover : { 
-       os << "FourLeafClover>";
-       break;
-     }
-   }
-   return os;
-}
-
-/**********************************************************/
-
-std::ostream& operator<<(std::ostream& os, const CompressionLevel& level) {
-   os << "<CompressionLevel: " ;
-   switch (level) {
-     case CompressionLevel::Unknown : { 
-       os << "Unknown>";
-       break;
-     }
-     case CompressionLevel::None : { 
-       os << "None>";
-       break;
-     }
-   }
-   return os;
-}
-
-/**********************************************************/
-
-std::ostream& operator<<(std::ostream& os, const EventStatus& qual) {
-   os << "<EventStatus: " ;
-   switch (qual) {
-     case EventStatus::Unknown : { 
-       os << "Unknown>";
-       break;
-     }
-     case EventStatus::Crc32Wrong : { 
-       os << "Crc32Wrong>";
-       break;
-     }
-     case EventStatus::TailWrong : { 
-       os << "TailWrong>";
-       break;
-     }
-     case EventStatus::IncompleteReadout : { 
-       os << "IncompleteReadout>";
-       break;
-     }
-     case EventStatus::Perfect : { 
-       os << "Perfect>";
-       break;
-     }
-     case EventStatus::ChannelIDWrong : { 
-       os << "ChannelIDWrong>";
-       break;
-     }
-     case EventStatus::CellSyncErrors : {
-       os << "CellSyncErrors>";
-       break;
-     }
-     case EventStatus::ChnSyncErrors  : {
-       os << "ChnSyncErrors>";
-       break;
-     }
-     case EventStatus::CellAndChnSyncErrors : {
-       os << "CellAndChnSyncErrors>";
-       break;
-     }
-     case EventStatus::AnyDataMangling : {
-       os << "AnyDataMangling>";
-       break;
-     }
-     case EventStatus::IncompatibleData : {
-       os << "IncompleteData>";
-       break;
-     }
-     case EventStatus::EventTimeOut   : {
-       os << "EventTimeOut>";
-       break;
-     }
-     case EventStatus::GoodNoCRCOrErrBitCheck : {
-       os << "GoodNoCRCOrErrBitCheck>";
-       break;
-     }
-     case EventStatus::GoodNoCRCCheck : {
-       os << "GoodNoCRCCheck>";
-       break;
-     }
-     case EventStatus::GoodNoErrBitCheck : {
-       os << "GoodNoErrBitCheck>";
-       break;
-     }
-   }
-   return os;
-}
-
-/**********************************************************/
-
-std::ostream& operator<<(std::ostream& os, const TriggerType& t_type) {
-   os << "<TriggerType: " ;
-   switch (t_type) {
-     case TriggerType::Unknown : { 
-       os << "Unknown>";
-       break;
-     }
-     case TriggerType::Gaps : { 
-       os << "Gaps>";
-       break;
-     }
-     case TriggerType::Any : { 
-       os << "Any>";
-       break;
-     }
-     case TriggerType::Track : { 
-       os << "Track>";
-       break;
-     }
-     case TriggerType::TrackCentral : { 
-       os << "TrackCentral>";
-       break;
-     }
-     case TriggerType::Poisson : { 
-       os << "Poisson>";
-       break;
-     }
-     case TriggerType::Forced : { 
-       os << "Forced>";
-       break;
-     }
-   }
-   return os;
-}
-
-/**********************************************************/
-
-std::ostream& operator<<(std::ostream& os, const LTBThreshold& thresh) {
-   os << "<LTBThresholde: " ;
-   switch (thresh) {
-     case LTBThreshold::Unknown : { 
-       os << "Unknown>";
-       break;
-     }
-     case LTBThreshold::NoHit : { 
-       os << "NoHit>";
-       break;
-     }
-     case LTBThreshold::Hit : { 
-       os << "Hit>";
-       break;
-     }
-     case LTBThreshold::Beta : { 
-       os << "Beta>";
-       break;
-     }
-     case LTBThreshold::Veto : { 
-       os << "Veto>";
-       break;
-     }
-   }
-   return os;
-}
-
-/**********************************************************/
-
-u32 TofEvent::get_n_rbevents(u32 mask){
+auto g::TofEvent::get_n_rbevents(u32 mask) -> u32 {
   return (mask & 0xFF);
 }
 
 /**********************************************************/
 
 #ifdef BUILD_CXXDB
-auto TofEvent::normalize_hit_times() -> void {
+auto g::TofEvent::normalize_hit_times() -> void {
 
   if (rb_events.size() == 0) {
     return;
@@ -632,17 +608,17 @@ auto TofEvent::normalize_hit_times() -> void {
 
 /**********************************************************/
 
-TofEvent::TofEvent() {
-  status       = EventStatus::IncompleteReadout;
+g::TofEvent::TofEvent() {
+  status       = g::EventStatus::IncompleteReadout;
   header       = TofEventHeader();
-  mt_event     = MasterTriggerEvent();
-  rb_events    = Vec<RBEvent>();
+  mt_event     = g::MasterTriggerEvent();
+  rb_events    = Vec<g::RBEvent>();
 }
 
 /**********************************************************/
 
 #ifdef BUILD_CXXDB
-auto TofEvent::set_paddlemap(const Gaps::TofPaddleMap& paddlemap) -> void {
+auto g::TofEvent::set_paddlemap(const Gaps::TofPaddleMap& paddlemap) -> void {
   for (auto &ev : rb_events) {
     for (auto &h : ev.hits) {
       h.set_paddle(paddlemap.at(h.paddle_id));
@@ -653,8 +629,8 @@ auto TofEvent::set_paddlemap(const Gaps::TofPaddleMap& paddlemap) -> void {
 
 /**********************************************************/
 
-auto TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
-  -> Result<TofEvent, g::IOError> {
+auto g::TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
+  -> Result<TofEvent, Gaps::IOError> {
   spdlog::cfg::load_env_levels();
   TofEvent event = TofEvent();
   // FIXME - we need more of these checks
@@ -669,7 +645,7 @@ auto TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
     spdlog::error("Incomplete readout! Expecting at least {} bytes, but only got {}", expected_size, stream.size());
     event.status = EventStatus::IncompleteReadout;
     auto message = std::format("TofEvent can not be parsed from a vector with size {}, when {} bytes are expected!", stream.size(), expected_size);
-    auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
+    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::StreamTooShort, message);
     return Err(err);
   }
   spdlog::debug("Start decoding at pos ",pos);
@@ -678,7 +654,7 @@ auto TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
     spdlog::error("No header signature found!");  
     event.status = EventStatus::IncompleteReadout;
     auto message = std::format("TofEvent has incorrect header!");
-    auto err = g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, message);
+    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongHeaderBytes, message);
     return Err(err);
   }
   // for now skip quality and compression level
@@ -687,16 +663,16 @@ auto TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
   if (!header.is_ok()) {
     auto msg = std::format("TofEventHeader corrup!");
     spdlog::error(msg);
-    auto err = g::IOError(g::IOError::ErrorKind::EventHeaderCorrupt);
+    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::EventHeaderCorrupt);
     return Err(err);
   }
   event.header = header.unwrap();
-  event.mt_event    = MasterTriggerEvent::from_bytestream(stream, pos);
+  event.mt_event    = g::MasterTriggerEvent::from_bytestream(stream, pos);
   //pos += 45; // for now skip master trigger event
   u32 mask          = Gaps::parse_u32(stream, pos);
   u32 n_rbevents    = get_n_rbevents(mask);
   for (u32 k=0; k< n_rbevents; k++) {
-    RBEvent rb_event = RBEvent::from_bytestream(stream, pos);
+    auto rb_event = g::RBEvent::from_bytestream(stream, pos);
     event.rb_events.push_back(rb_event);
     if (rb_event.status == EventStatus::IncompleteReadout) {
       event.status = EventStatus::IncompleteReadout;
@@ -710,7 +686,7 @@ auto TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
   
 /**********************************************************/
 
-TofEvent TofEvent::from_tofpacket(const TofPacket &packet) {
+auto g::TofEvent::from_tofpacket(const TofPacket &packet) -> TofEvent {
   TofEvent event;
   if (packet.packet_type != PacketType::TofEvent) {
     spdlog::error("Wrong packet type! {}", packet_type_to_string(packet.packet_type));
@@ -724,7 +700,7 @@ TofEvent TofEvent::from_tofpacket(const TofPacket &packet) {
 
 /**********************************************************/
   
-const RBEvent& TofEvent::get_rbevent(u8 board_id) const {
+const g::RBEvent& g::TofEvent::get_rbevent(u8 board_id) const {
   for (const auto &ev : rb_events) {
     if (ev.header.rb_id == board_id) {
       return ev;
@@ -736,7 +712,7 @@ const RBEvent& TofEvent::get_rbevent(u8 board_id) const {
 
 /**********************************************************/
   
-Vec<u8> TofEvent::get_rbids() const {
+Vec<u8> g::TofEvent::get_rbids() const {
   Vec<u8> rb_ids = Vec<u8>();
   for (const auto &ev : rb_events) {
     rb_ids.push_back(ev.header.rb_id);
@@ -746,7 +722,7 @@ Vec<u8> TofEvent::get_rbids() const {
 
 /**********************************************************/
     
-bool TofEvent::passed_consistency_check() {
+bool g::TofEvent::passed_consistency_check() {
   spdlog::error("This is not implmented yet!");
   return false;
 }
@@ -754,19 +730,19 @@ bool TofEvent::passed_consistency_check() {
 /**********************************************************/
 
   
-u64 MasterTriggerEvent::get_timestamp_gps48() const {
+u64 g::MasterTriggerEvent::get_timestamp_gps48() const {
   return (((u64)tiu_gps16 << 32) | (u64) tiu_gps32); 
 }
 
 /*************************************/
 
-auto MasterTriggerEvent::get_timestamp_gps() const -> u32 {
+auto g::MasterTriggerEvent::get_timestamp_gps() const -> u32 {
   return tiu_gps32;
 }
 
 /*************************************/
 
-u64 MasterTriggerEvent::get_timestamp_abs48() const {
+u64 g::MasterTriggerEvent::get_timestamp_abs48() const {
   u64 gps       = (u64)get_timestamp_gps();
   u64 ts        = (u64)timestamp;
   if (ts < (u64)tiu_timestamp) {
@@ -780,35 +756,35 @@ u64 MasterTriggerEvent::get_timestamp_abs48() const {
 
 /*************************************/
 
-Vec<TriggerType> MasterTriggerEvent::get_trigger_sources() const {
-  auto t_types = Vec<TriggerType>();
+Vec<g::TriggerType> g::MasterTriggerEvent::get_trigger_sources() const {
+  auto t_types = Vec<g::TriggerType>();
   u16 gaps_trigger = (trigger_source >> 5 & 0x1) == 1;
   if (gaps_trigger) {
-    t_types.push_back(TriggerType::Gaps);
+    t_types.push_back(g::TriggerType::Gaps);
   }
   u16 any_trigger    = (trigger_source >> 6 & 0x1) == 1;
   if (any_trigger) {
-    t_types.push_back(TriggerType::Any);
+    t_types.push_back(g::TriggerType::Any);
   }
   u16 forced_trigger = (trigger_source >> 7 & 0x1) == 1;
   if (forced_trigger) {
-    t_types.push_back(TriggerType::Forced);
+    t_types.push_back(g::TriggerType::Forced);
   }
   u16 track_trigger  = (trigger_source >> 8 & 0x1) == 1;
   if (track_trigger) {
-    t_types.push_back(TriggerType::Track);
+    t_types.push_back(g::TriggerType::Track);
   }
   u16 central_track_trigger
                      = (trigger_source >> 9 & 0x1) == 1;
   if (central_track_trigger) {
-    t_types.push_back(TriggerType::TrackCentral);
+    t_types.push_back(g::TriggerType::TrackCentral);
   }
   return t_types;
 } 
 
 /**********************************************************/
 
-MasterTriggerEvent::MasterTriggerEvent() {
+g::MasterTriggerEvent::MasterTriggerEvent() {
   event_id       = 0; 
   timestamp      = 0; 
   tiu_timestamp  = 0; 
@@ -823,7 +799,7 @@ MasterTriggerEvent::MasterTriggerEvent() {
 
 /**********************************************************/
   
-Vec<u8> MasterTriggerEvent::get_rb_link_ids() const {
+auto g::MasterTriggerEvent::get_rb_link_ids() const -> Vec<u8> {
   auto links = Vec<u8>();
   for (u8 k=0;k<64;k++) {
     if (((u64)(mtb_link_mask >> k) & (u64)0x1) == 1) {
@@ -832,10 +808,12 @@ Vec<u8> MasterTriggerEvent::get_rb_link_ids() const {
   }
   return links;
 }
-    
-Vec<std::tuple<u8, u8, u8, LTBThreshold>> MasterTriggerEvent::get_trigger_hits() const {
 
-  auto hits = Vec<std::tuple<u8,u8,u8,LTBThreshold>>(); 
+/**********************************************************/
+    
+Vec<std::tuple<u8, u8, u8, g::LTBThreshold>> g::MasterTriggerEvent::get_trigger_hits() const {
+
+  auto hits = Vec<std::tuple<u8,u8,u8,g::LTBThreshold>>(); 
   //let n_masks_needed = self.dsi_j_mask.count_ones() / 2 + self.dsi_j_mask.count_ones() % 2;
   auto dsi_j_mask_bits = std::bitset<32>(dsi_j_mask);
   u32 n_masks_needed   = dsi_j_mask_bits.count();
@@ -886,10 +864,10 @@ Vec<std::tuple<u8, u8, u8, LTBThreshold>> MasterTriggerEvent::get_trigger_hits()
 
 /*************************************/
 
-MasterTriggerEvent MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream,
-                                                       u64 &pos) {
+g::MasterTriggerEvent g::MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream,
+                                                          u64 &pos) {
 
-  MasterTriggerEvent event;
+  g::MasterTriggerEvent event;
   
   // HACK - we make this compatible with the old data, 
   // but old data won't be useful
@@ -910,7 +888,7 @@ MasterTriggerEvent MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream
   //}
   
   u16 header = Gaps::parse_u16(bytestream, pos);
-  if (header != MasterTriggerEvent::HEAD) {
+  if (header != g::MasterTriggerEvent::HEAD) {
     spdlog::error("Wrong header signature!");
     return event;
   }
@@ -934,7 +912,7 @@ MasterTriggerEvent MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream
   //bool has_ended = false;
   //u64 tail_pos = search_for_2byte_marker(bytestream,0x55,has_ended,pos);   
   u16 tail = Gaps::parse_u16(bytestream, pos);
-  if (tail != MasterTriggerEvent::TAIL) {
+  if (tail != g::MasterTriggerEvent::TAIL) {
     spdlog::error("Invalid tail signature!");
   }
   //event.n_paddles          = Gaps::parse_u8 (bytestream, pos);
@@ -959,7 +937,7 @@ MasterTriggerEvent MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream
   return event;
 }
 
-std::string MasterTriggerEvent::to_string() const {
+auto g::MasterTriggerEvent::to_string() const -> std::string {
   std::string repr = "<MasterTriggerEvent";
   repr += std::format("\n  event_status  : {}",(u8)event_status ); 
   repr += std::format("\n  event_id      : {}",event_id     ); 
@@ -984,8 +962,10 @@ std::string MasterTriggerEvent::to_string() const {
   return repr;
 }
 
-Vec<TofHit> TofEvent::get_hits() const {
-  Vec<TofHit> hits;
+/*************************************/
+
+Vec<g::TofHit> g::TofEvent::get_hits() const {
+  Vec<g::TofHit> hits;
   for (auto &rb : rb_events) {
     for (auto &h : rb.hits) {
       hits.push_back(h);
@@ -994,7 +974,9 @@ Vec<TofHit> TofEvent::get_hits() const {
   return hits;
 }
 
-std::string TofEvent::to_string() const {
+/*************************************/
+
+auto g::TofEvent::to_string() const -> std::string {
   std::string repr = "<TofEvent\n";
   repr += "  " + header.to_string()   + "\n";
   repr += "  " + mt_event.to_string() + "\n";
@@ -1005,20 +987,20 @@ std::string TofEvent::to_string() const {
 
 /*************************************/
 
-void TofHit::set_paddle_len(f32 paddle_len) {
+void g::TofHit::set_paddle_len(f32 paddle_len) {
   paddle_len = paddle_len;
 }
 
 /*************************************/
 
 #ifdef BUILD_CXXDB
-auto TofHit::set_paddle(const Gaps::TofPaddle& paddle) -> void {
+auto g::TofHit::set_paddle(const Gaps::TofPaddle& paddle) -> void {
   paddle_len    = paddle.length;
   coax_cbl_time = paddle.coax_cable_time; 
   hart_cbl_time = paddle.harting_cable_time;
 }
 
-auto TofHit::get_phase_delay() const -> f32 {
+auto g::TofHit::get_phase_delay() const -> f32 {
   f32 freq = 20e6;
   f32 phase_fixed = phase;
   auto PI = std::numbers::pi_v<f32>;
@@ -1032,18 +1014,22 @@ auto TofHit::get_phase_delay() const -> f32 {
   return phase_delay;
 }
 
-auto TofHit::get_cable_delay() const -> f32 {
+/*************************************/
+
+auto g::TofHit::get_cable_delay() const -> f32 {
   return hart_cbl_time - coax_cbl_time;
 }
 
-auto TofHit::get_t0()          const -> f32 {
+/*************************************/
+
+auto g::TofHit::get_t0()          const -> f32 {
   return get_t0_relative() + get_cable_delay() + get_phase_delay();
 }
 #endif
 
 /*************************************/
 
-f32 TofHit::get_time_a() const {
+f32 g::TofHit::get_time_a() const {
  if (version == Gaps::ProtocolVersion::Unknown) {
    f32 prec = 0.004;
    return prec*time_a;
@@ -1052,7 +1038,9 @@ f32 TofHit::get_time_a() const {
  }
 }
 
-f32 TofHit::get_time_b() const {
+/*************************************/
+
+f32 g::TofHit::get_time_b() const {
   if (version == Gaps::ProtocolVersion::Unknown) {
     f32 prec = 0.004;//ns
     return prec*time_b;
@@ -1061,7 +1049,7 @@ f32 TofHit::get_time_b() const {
   }
 }
 
-f32 TofHit::get_peak_a() const {
+f32 g::TofHit::get_peak_a() const {
   if (version == Gaps::ProtocolVersion::Unknown) {
     f32 prec = 0.2;
     return prec*peak_a;
@@ -1070,7 +1058,7 @@ f32 TofHit::get_peak_a() const {
   }
 }
 
-f32 TofHit::get_peak_b() const {
+f32 g::TofHit::get_peak_b() const {
   if (version == Gaps::ProtocolVersion::Unknown) {
     f32 prec = 0.2;
     return prec*peak_b;
@@ -1079,7 +1067,7 @@ f32 TofHit::get_peak_b() const {
   }
 }
 
-f32 TofHit::get_charge_a() const {
+f32 g::TofHit::get_charge_a() const {
   if (version == Gaps::ProtocolVersion::Unknown) {
     f32 prec = 0.01; //pC
     return prec*charge_a - 50;
@@ -1088,7 +1076,7 @@ f32 TofHit::get_charge_a() const {
   }
 }
 
-f32 TofHit::get_charge_b() const {
+f32 g::TofHit::get_charge_b() const {
   if (version == Gaps::ProtocolVersion::Unknown) {
     f32 prec = 0.01;
     return prec*charge_b - 50;
@@ -1097,12 +1085,12 @@ f32 TofHit::get_charge_b() const {
   }
 }
 
-f32 TofHit::get_charge_min_i() const {
+f32 g::TofHit::get_charge_min_i() const {
   f32 prec = 0.002;// minI
   return prec*charge_min_i - 10;
 }
 
-f32 TofHit::get_x_pos() const {
+f32 g::TofHit::get_x_pos() const {
   // FIXME - check if it is really in the middle
   if (version == Gaps::ProtocolVersion::Unknown) {
     f32 prec = 0.005; //cm
@@ -1112,19 +1100,19 @@ f32 TofHit::get_x_pos() const {
   }
 }
 
-f32 TofHit::get_t0_relative() const {
+f32 g::TofHit::get_t0_relative() const {
   // FIXME - we should just consistently make the paddle len in mm!
   return 0.5*(time_a_f32 + time_b_f32 - (10.0*paddle_len/(10.0*C_LIGHT_PADDLE)));
 }
 
-f32 TofHit::get_t_avg() const {
+f32 g::TofHit::get_t_avg() const {
   f32 prec = 0.004;//ps
   return prec*t_average;
 }
 
 /// combine the slow timestamp with 
 /// the fast to get the full
-f64 TofHit::get_timestamp48() const {
+f64 g::TofHit::get_timestamp48() const {
   f64 ts48 = timestamp16 << 16 | timestamp32;
   return ts48;
 }
@@ -1132,7 +1120,7 @@ f64 TofHit::get_timestamp48() const {
 #ifdef BUILD_CXXDB
 /// simple calculation based on Philip's 
 /// attenuation function as used in pgaps
-auto TofHit::get_edep() const -> f32 {
+auto g::TofHit::get_edep() const -> f32 {
   f32 x0    = get_x_pos();
   f32 att_a = (std::exp(3.9-0.00126*( x0+paddle_len/2.))+22.15)/ (std::exp(3.9)+22.15);
   f32 att_b = (std::exp(3.9-0.00126*(-x0+paddle_len/2.))+22.15)/ (std::exp(3.9)+22.15);
@@ -1141,9 +1129,8 @@ auto TofHit::get_edep() const -> f32 {
 }
 #endif
 
-TofHit TofHit::from_bytestream(const Vec<u8> &bytestream,
-                               u64 &pos) {
- TofHit hit = TofHit();
+auto g::TofHit::from_bytestream(const Vec<u8> &bytestream, u64 &pos) -> g::TofHit {
+ auto hit = g::TofHit();
  u16 maybe_header = Gaps::parse_u16(bytestream, pos);
  if (maybe_header != hit.HEAD) {
    //log_error("Can not find HEADER at presumed position. Maybe give a different value for start_pos?");
@@ -1179,7 +1166,7 @@ TofHit TofHit::from_bytestream(const Vec<u8> &bytestream,
  return hit; 
 }
 
-std::string TofHit::to_string() const {
+auto g::TofHit::to_string() const -> std::string {
   std::string vstr = Gaps::pversion_to_string(version);
   std::string repr = std::format("<TofHit ({})", vstr);
   //repr += std::format("\n -- format test {:.2f}", get_time_a() );
@@ -1220,7 +1207,7 @@ std::string TofHit::to_string() const {
   return repr;
 }
 
-RBWaveform RBWaveform::from_bytestream(const Vec<u8> &stream,
+g::RBWaveform g::RBWaveform::from_bytestream(const Vec<u8> &stream,
                                        u64 &pos) {
   RBWaveform wf = RBWaveform();
   u16 head = Gaps::parse_u16(stream, pos);
@@ -1249,7 +1236,7 @@ RBWaveform RBWaveform::from_bytestream(const Vec<u8> &stream,
   return wf;
 } 
 
-auto RBWaveform::to_string() const -> std::string {
+auto g::RBWaveform::to_string() const -> std::string {
   std::string repr = "<RBWaveform";
   //repr += std::format("\n  format test {:.2f}", get_time_a() );
   repr += std::format("\n  Event ID  : {}", event_id);
@@ -1271,41 +1258,41 @@ auto RBWaveform::to_string() const -> std::string {
   return repr;
 }
 
-auto TofEventSummary::get_trigger_sources() const -> Vec<TriggerType> {
-  auto t_types = Vec<TriggerType>();
+auto g::TofEventSummary::get_trigger_sources() const -> Vec<g::TriggerType> {
+  auto t_types = Vec<g::TriggerType>();
   u16 gaps_trigger = (trigger_sources >> 5 & 0x1) == 1;
   if (gaps_trigger) {
-    t_types.push_back(TriggerType::Gaps);
+    t_types.push_back(g::TriggerType::Gaps);
   }
   u16 any_trigger    = (trigger_sources >> 6 & 0x1) == 1;
   if (any_trigger) {
-    t_types.push_back(TriggerType::Any);
+    t_types.push_back(g::TriggerType::Any);
   }
   u16 forced_trigger = (trigger_sources >> 7 & 0x1) == 1;
   if (forced_trigger) {
-    t_types.push_back(TriggerType::Forced);
+    t_types.push_back(g::TriggerType::Forced);
   }
   u16 track_trigger  = (trigger_sources >> 8 & 0x1) == 1;
   if (track_trigger) {
-    t_types.push_back(TriggerType::Track);
+    t_types.push_back(g::TriggerType::Track);
   }
   u16 central_track_trigger
                      = (trigger_sources >> 9 & 0x1) == 1;
   if (central_track_trigger) {
-    t_types.push_back(TriggerType::TrackCentral);
+    t_types.push_back(g::TriggerType::TrackCentral);
   }
   return t_types;
 } 
 
 #ifdef BUILD_CXXDB
-auto TofEventSummary::normalize_hit_times() -> void {
+auto g::TofEventSummary::normalize_hit_times() -> void {
   //FIXME
 }
 #endif
 
 
-Vec<std::tuple<u8, u8, u8, LTBThreshold>> TofEventSummary::get_trigger_hits() const {
-  auto hits = Vec<std::tuple<u8,u8,u8,LTBThreshold>>(); 
+Vec<std::tuple<u8, u8, u8, g::LTBThreshold>> g::TofEventSummary::get_trigger_hits() const {
+  auto hits = Vec<std::tuple<u8,u8,u8, g::LTBThreshold>>(); 
   //let n_masks_needed = self.dsi_j_mask.count_ones() / 2 + self.dsi_j_mask.count_ones() % 2;
   auto dsi_j_mask_bits = std::bitset<32>(dsi_j_mask);
   u32 n_masks_needed   = dsi_j_mask_bits.count();
@@ -1354,7 +1341,7 @@ Vec<std::tuple<u8, u8, u8, LTBThreshold>> TofEventSummary::get_trigger_hits() co
   return hits;
 }
 
-Vec<u8> TofEventSummary::get_rb_link_ids() const {
+auto g::TofEventSummary::get_rb_link_ids() const -> Vec<u8> {
   auto links = Vec<u8>();
   for (u8 k=0;k<64;k++) {
     if (((u64)(mtb_link_mask >> k) & (u64)0x1) == 1) {
@@ -1365,12 +1352,12 @@ Vec<u8> TofEventSummary::get_rb_link_ids() const {
 }
 
 
-auto TofEventSummary::from_bytestream(const Vec<u8> &stream, u64 &pos) 
-  -> Result<TofEventSummary, Gaps::IOError> {
+auto g::TofEventSummary::from_bytestream(const Vec<u8> &stream, u64 &pos) 
+  -> Result<g::TofEventSummary, Gaps::IOError> {
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != TofEventSummary::HEAD) {
     auto message = std::format("Decoding of HEAD failed! Got {} instead!", head);
-    auto err = g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, message);
+    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongHeaderBytes, message);
     return Err(err);
   }
   TofEventSummary tes;
@@ -1403,44 +1390,44 @@ auto TofEventSummary::from_bytestream(const Vec<u8> &stream, u64 &pos)
   tes.mtb_link_mask     = Gaps::parse_u64(stream, pos);
   u16 nhits             = Gaps::parse_u16(stream, pos);
   for (u16 k=0; k<nhits; k++) {
-    TofHit h = TofHit::from_bytestream(stream, pos);
+    auto h = g::TofHit::from_bytestream(stream, pos);
     tes.hits.push_back(h);
   }
   u16 tail = Gaps::parse_u16(stream, pos);
-  if (tail != TofEventSummary::TAIL) {
+  if (tail != g::TofEventSummary::TAIL) {
     auto message = std::format("Decoding of TAIL failed! Got {} instead!", tail);
-    auto err = g::IOError(g::IOError::ErrorKind::WrongTailBytes, message);
+    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongTailBytes, message);
     return Err(err);
   }
   return Ok(tes);
 }
 
-auto TofEventSummary::from_tofpacket(const TofPacket &packet) 
-  -> Result<TofEventSummary, g::IOError> {
+auto g::TofEventSummary::from_tofpacket(const TofPacket &packet) 
+  -> Result<TofEventSummary, Gaps::IOError> {
   TofEventSummary event;
   if (packet.packet_type != PacketType::TofEventSummary) {
     auto message = std::format("Wrong packet type! {}", packet_type_to_string(packet.packet_type));
     spdlog::error(message);
-    auto err = g::IOError(g::IOError::ErrorKind::WrongPacketType, message);
+    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongPacketType, message);
     return Err(err);
   } 
   u64 _pos = 0;
   return TofEventSummary::from_bytestream(packet.payload, _pos);
 }
 
-u64 TofEventSummary::get_timestamp48() const {
+u64 g::TofEventSummary::get_timestamp48() const {
   return ((u64)timestamp16 << 32) | (u64)timestamp32;
 }
 
 #ifdef BUILD_CXXDB
-auto TofEventSummary::set_paddlemap(const Gaps::TofPaddleMap& paddlemap) -> void {
+auto g::TofEventSummary::set_paddlemap(const Gaps::TofPaddleMap& paddlemap) -> void {
   for (auto &h : hits) {
     h.set_paddle(paddlemap.at(h.paddle_id));
   }
 };
 #endif
 
-std::string TofEventSummary::to_string() const {
+auto g::TofEventSummary::to_string() const -> std::string {
   std::ostringstream oss;
   oss << status;  // Use the << operator to stream the enum
   std::string repr = "<TofEventSummary";
@@ -1475,38 +1462,40 @@ std::string TofEventSummary::to_string() const {
   return repr;
 }
 
-std::ostream& operator<<(std::ostream& os, const TofHit& th) {
-  os << th.to_string();
-  return os;
+namespace gondola {
+  
+  std::ostream& operator<<(std::ostream& os, const g::TofHit& th) {
+    os << th.to_string();
+    return os;
+  }
+  
+  std::ostream& operator<<(std::ostream& os, const g::MasterTriggerEvent& mt) {
+    os << mt.to_string();
+    return os;
+  }
+  
+  std::ostream& operator<<(std::ostream& os, const g::TofEvent& te) {
+    os << te.to_string();
+    return os;
+  }
+  
+  std::ostream& operator<<(std::ostream& os, const g::RBEvent& re) {
+    os << re.to_string();
+    return os;
+  }
+  
+  std::ostream& operator<<(std::ostream& os, const g::RBEventHeader& rh) {
+    os << rh.to_string();
+    return os;
+  }
+  
+  std::ostream& operator<<(std::ostream& os, const g::RBWaveform& wf) {
+    os << wf.to_string();
+    return os;
+  }
+  
+  std::ostream& operator<<(std::ostream& os, const g::TofEventSummary& tes) {
+    os << tes.to_string();
+    return os;
+  }
 }
-
-std::ostream& operator<<(std::ostream& os, const MasterTriggerEvent& mt) {
-  os << mt.to_string();
-  return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const TofEvent& te) {
-  os << te.to_string();
-  return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const RBEvent& re) {
-  os << re.to_string();
-  return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const RBEventHeader& rh) {
-  os << rh.to_string();
-  return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const RBWaveform& wf) {
-  os << wf.to_string();
-  return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const TofEventSummary& tes) {
-  os << tes.to_string();
-  return os;
-}
-

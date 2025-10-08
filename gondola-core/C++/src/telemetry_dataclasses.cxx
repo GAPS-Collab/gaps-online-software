@@ -340,7 +340,7 @@ auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
     usize tpos = 0;
     auto tof_packet = TofPacket::from_bytestream(tof_data, tpos);
     if (tof_packet.is_ok()) {
-      auto tof_event = TofEventSummary::from_tofpacket(tof_packet.unwrap());
+      auto tof_event = gondola::TofEventSummary::from_tofpacket(tof_packet.unwrap());
       if (tof_event.is_ok()) {
         evt.tof_event = tof_event.unwrap();
       }
