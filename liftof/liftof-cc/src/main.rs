@@ -16,6 +16,7 @@ use std::time::{
   Instant,
   Duration,
 };
+
 //use std::collections::HashMap;
 //use std::io::Write;
 use std::process::{
@@ -50,42 +51,6 @@ use crossbeam_channel::{
 
 use spinners::{Spinner, Spinners};
 
-//use tof_dataclasses::events::{
-//  MasterTriggerEvent,
-//  RBEvent
-//};
-//
-//use tof_dataclasses::ipbus::IPBus;
-//use tof_dataclasses::packets::TofPacket;
-//use tof_dataclasses::database::{
-//  connect_to_db,
-//  get_linkid_rbid_map,
-//  ReadoutBoard,
-//};
-//
-////use tof_dataclasses::constants::PAD_CMD_32BIT;
-//use tof_dataclasses::commands::{
-//  //TofCommand,
-//  //TofCommandCode,
-//  //TofResponse,
-//  get_rbratmap_hardcoded,
-//  get_ratrbmap_hardcoded,
-//};
-
-//use liftof_lib::{
-//  signal_handler,
-//  init_env_logger,
-//  //color_log,
-//  LIFTOF_LOGO_SHOW,
-//  master_trigger,
-//  LiftofSettings,
-//};
-//
-//use liftof_lib::master_trigger::control::{
-//  unset_all_triggers,
-//};
-//
-//use liftof_lib::thread_control::ThreadControl;
 
 use gondola_core::prelude::*;
 use gondola_core::init_env_logger;
@@ -94,7 +59,6 @@ use gondola_core::io::ipbus::IPBus;
 use liftof_cc::{
   prepare_run,
   calibrate_tof,
-  verification_run,
   restart_liftof_rb,
   ssh_command_rbs,
   get_queue,
@@ -331,8 +295,8 @@ fn main() {
   }
   
   // now as we have the config, initialize the thread control
-  let db_path               = config.db_path.clone();
-  let mut conn_             = connect_to_db_path(&db_path).expect("Unable to establish a connection to the DB! CHeck db_path in the liftof settings (.toml) file!");
+  //let db_path               = config.db_path.clone();
+  //let conn_                 = connect_to_db_path(&db_path).expect("Unable to establish a connection to the DB! CHeck db_path in the liftof settings (.toml) file!");
   // if this call does not go through, we might as well fail early.
   let mut rb_list           = ReadoutBoard::all().expect("Unable to retrieve RB information! Unable to continue, check db_path in the liftof settings (.toml) file and DB integrity!");
   let rb_ignorelist         = config.rb_ignorelist_always.clone();
@@ -445,8 +409,8 @@ fn main() {
   let cpu_moni_interval     = config.cpu_moni_interval_sec;
   //let cmd_dispatch_settings = config.cmd_dispatcher_settings.clone();
   let pre_run_calibration   = config.pre_run_calibration; 
-  let verification_rt_sec   = config.verification_runtime_sec;
-  //let staging_dir           = config.staging_dir.clone();
+  let do_verification_run   = config.verification_run.unwrap_or(false);
+  //let staging_dir         = config.staging_dir.clone();
   
   /*******************************************************
    * Channels (crossbeam, unbounded) for inter-thread
@@ -719,13 +683,20 @@ fn main() {
         let tc_cali = thread_control.clone();
         calibrate_tof(tc_cali, &rb_list, true);
       }
-      if verification_rt_sec > 0 {
+      if do_verification_run {
         println!("=> Starting verification run!");
-        restart_liftof_rb(&rb_id_list);
-        let tc_verification = thread_control.clone();
-        let tp_sender_veri  = tp_to_sink.clone();
-        verification_run(verification_rt_sec, tp_sender_veri, tc_verification, true);
-        println!("=> Verification run finished!");
+        match thread_control.lock() {
+          Ok(mut tc) => {
+            tc.write_data_to_disk       = false;
+            tc.verification_active      = true;
+            tc.thread_master_trg_active = true;
+            tc.calibration_active       = false;
+            tc.thread_event_bldr_active = true;
+          }
+          Err(err) => {
+            error!("Can't acquire lock for ThreadControl! {err}");
+          },
+        }
       }
       // in this scenario, we want to end
       // after we are done
@@ -828,6 +799,24 @@ fn main() {
           }
         }
         _ => ()
+      }
+      
+      // move the socket out of here for further use
+      let mut detector_status = TofDetectorStatus::new();
+      match thread_control.lock() {
+        Ok(tc) => {
+          detector_status = tc.detector_status.clone();
+        },
+        Err(err) => {
+          error!("Can't acquire lock for ThreadControl! {err}");
+        },
+      }
+      println!("=> Acquired TofDetectorStatus!");
+      println!("{}", detector_status);
+      let pack = detector_status.pack();
+      match tp_to_sink.send(pack) {
+        Err(err) => error!("Unable to send TofDetectorStatus to data sink! {err}"),
+        Ok(_)    => ()
       }
       //if !args.no_shark {
       //  spinner.stop();

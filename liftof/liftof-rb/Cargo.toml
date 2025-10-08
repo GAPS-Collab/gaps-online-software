@@ -35,6 +35,5 @@ version  = "0.9"
 optional = true
 git      = "https://github.com/GAPS-Collab/tof-control.git"
 branch   = "minimal"
-
 #[target.armv7-unknown-linux-gnueabi]
 #linker = "/usr/bin/arm-none-eabi-gcc"
