@@ -172,6 +172,19 @@ auto gtl::TrkHeader::from_bytestream(Vec<u8> const &stream, usize &pos)
 
 //----------------------------------------
 
+auto gtl::TrkHit::decode_id(u32 hw_id) -> Vec<u32> {
+  Vec<u32> result;
+  u32 remaining_number = hw_id;
+  u32 channel          = remaining_number % 100;
+  remaining_number    /= 100; // Removes channel contribution (e.g., 2050307 -> 20503)
+  u32 mod              = remaining_number % 100;
+  remaining_number    /= 100; // Removes module contribution (e.g., 20503 -> 205)
+  u32 row              = remaining_number % 10;
+  remaining_number    /= 10; // Removes row contribution (e.g., 205 -> 20)
+  u32 layer            = remaining_number;
+  return {layer, row, mod, channel};
+}
+
 auto gtl::TrkHit::to_string() const -> std::string {
   std::string repr = "<TrackerHit:";
   repr += std::format("\n  Layer      : {}", layer);

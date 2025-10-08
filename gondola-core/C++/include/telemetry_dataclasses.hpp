@@ -113,6 +113,10 @@ namespace Gaps {
       /// an extra ASIC event code field. Let's unify those here
       u8  asic_event_code {0};
       auto to_string() const -> std::string;
+      
+      /// Decode layer, row, module, channel from the strip id 
+      static auto decode_id(u32 hw_id) -> Vec<u32>;
+    
     };
    
     struct TrkEvent {
