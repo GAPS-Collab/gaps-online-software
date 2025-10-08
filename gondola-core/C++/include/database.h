@@ -140,6 +140,20 @@ namespace Gaps {
   auto get_trackerstrippedestals() -> TrkStripPedMap;
 }
 
+// new items shall go directly into the new gondola namespace 
+namespace gondola {
+
+  /// The mapping of volume id to hardware id, which is either the strip
+  /// identifier or the paddle id 
+  auto get_hid_vid_map() -> HashMap<u32, u32>;
+
+  /// The mapping of hardwer id (either paddle id or strip id to the 
+  /// volume id
+  auto get_vid_hid_map() -> HashMap<u32, u32>; 
+}
+
+
+
 std::ostream& operator<<(std::ostream& os, const Gaps::TofPaddle& paddle);
 
 std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStrip& strip);
@@ -147,5 +161,8 @@ std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStrip& strip);
 std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStripMask& strip);
 
 std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStripPedestal& strip);
+
+
+
 
 #endif

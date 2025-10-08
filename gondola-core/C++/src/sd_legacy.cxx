@@ -7,10 +7,11 @@
 #include "sd_legacy.hpp"
 #include "telemetry_dataclasses.hpp"
 #include "events.h"
+#include "database.h"
 
 namespace cb = Crane::Calibration;
 namespace tf = Crane::Reconstruction::TrackFit;
-
+namespace  g = gondola;
 namespace gt = Gaps::Telemetry; 
 
 ClassImp(GRecoHit);
@@ -29,6 +30,7 @@ ClassImp(tr::GDataEvent);
 
 
 void gondola::read_sd_legacy_example() {
+  auto hid_vid_map    = gondola::get_hid_vid_map();
   TChain * input_tree = new TChain("TreeRec");
   input_tree->Add("/srv/gaps/gaps-online-software/example-data/Run9125.gse5_241213_151813UTC_rec.root");
   //input_tree->Add("/srv/gaps/gaps-online-software/example-date/Run9125.gse5_241213_125815UTC_rec.root");
@@ -42,7 +44,7 @@ void gondola::read_sd_legacy_example() {
     std::cout << input_event->runNumber_ << std::endl; 
     //std::cout << input_event->run_number << std::endl; 
     std::cout << input_event->eventId_ << std::endl; 
-    std::cout << input_event->to_telemetry().to_string() << std::endl;
+    std::cout << input_event->to_telemetry(hid_vid_map).to_string() << std::endl;
     break;
   }
 }
@@ -76,26 +78,32 @@ auto CEventRec::from_telemetry(gt::MergedEvent const &event) -> CEventRec {
   return sd_event;
 }
 
-auto CEventRec::to_telemetry() -> gt::MergedEvent {
+//------------------------------------------------------------------------
+
+auto CEventRec::to_telemetry(HashMap<u32, u32> const &vid_hid_map) -> gt::MergedEvent {
   auto event = gt::MergedEvent();
   event.event_id = eventId_;
   for (auto const &hit : hitseries_) {
     // check if tracker or tof hit 
     if (hit.GetVolId() > 200000000) {
       Gaps::Telemetry::TrkHit trk_hit;
+      u32 hw_id = vid_hid_map.at((u32)hit.GetVolId());
+      auto lrms = Gaps::Telemetry::TrkHit::decode_id(hw_id);
       // some fields are just lost
-      //trk_hit.layer           {-1};
-      //trk_hit.row             {-1};
-      //trk_hit.module          {-1};
-      //trk_hit.channel         {-1};
+      trk_hit.layer           = lrms[0];
+      trk_hit.row             = lrms[1];
+      trk_hit.module          = lrms[2];
+      trk_hit.channel         = lrms[3];
       //trk_hit.adc             {-1};
       //trk_hit.oscillator      {-1};
       trk_hit.energy = hit.GetEDep();
       //trk_hit.asic_event_code {0};
       event.trk_hits.push_back(trk_hit);
     } else {
-      TofHit tofhit;
-      tofhit.event_t0 = hit.GetTime();  
+      g::TofHit tofhit;
+      tofhit.event_t0  = hit.GetTime();  
+      //tofhit.
+      tofhit.paddle_id = vid_hid_map.at(hit.GetVolId());  
       event.tof_event.hits.push_back(tofhit);
     }
   }  

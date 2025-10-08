@@ -112,7 +112,7 @@ class CEventRec : public CEventBase {
   // MergedEvent
   public:
     static auto from_telemetry(Gaps::Telemetry::MergedEvent const &event) -> CEventRec;
-    auto to_telemetry() -> Gaps::Telemetry::MergedEvent;
+    auto to_telemetry(HashMap<u32, u32> const &hid_vid_map) -> Gaps::Telemetry::MergedEvent;
 
   public:
     CEventRec() {}

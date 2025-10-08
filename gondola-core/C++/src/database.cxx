@@ -302,6 +302,32 @@ auto Gaps::get_module_position(u8 layer, u8 row, u8 mod, const Gaps::TrkStripMap
   return result;
 }
 
+auto gondola::get_hid_vid_map() -> HashMap<u32, u32> {
+  auto map = HashMap<u32, u32>();
+  auto paddles = Gaps::get_tofpaddles();
+  auto strips  = Gaps::get_trackerstrips();
+  for (const auto& p : paddles) {
+    map.insert(std::make_pair(p.first, p.second.volume_id));  
+  }
+  for (const auto& s : strips) {
+    map.insert(std::make_pair(s.first, s.second.volume_id));  
+  }
+  return map;
+}
+
+auto gondola::get_vid_hid_map() -> HashMap<u32, u32> {
+  auto map = HashMap<u32, u32>();
+  auto paddles = Gaps::get_tofpaddles();
+  auto strips  = Gaps::get_trackerstrips();
+  for (const auto& p : paddles) {
+    map.insert(std::make_pair(p.second.volume_id, p.first));  
+  }
+  for (const auto& s : strips) {
+    map.insert(std::make_pair(s.second.volume_id, s.first));   
+  }
+  return map;
+}
+
 std::ostream& operator<<(std::ostream& os, const Gaps::TofPaddle& tp) {
   os << tp.to_string();
   return os;
