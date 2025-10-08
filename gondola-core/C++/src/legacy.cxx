@@ -9,6 +9,7 @@
 
 #include "legacy.h"
 
+#include "spdlog/cfg/env.h"
 
 // Some useful macros
 #define SQR(A)               ( (A) * (A) )
@@ -373,7 +374,7 @@ void Waveform::SetPedRange(float range) {
     char txt[1000];
     sprintf(txt,"Invalid range for calculating pedestals--%4d.  Not set", 
             bin_range);
-    sdplog::trace(txt);
+    spdlog::trace(txt);
   } else if (wf_ped_begin+bin_range > wf_size) {
     char txt[1000];
     spdlog::warn("SetPedRange:  Range goes beyond waveform.");
@@ -398,7 +399,7 @@ void Waveform::SetPedBegin(float begin)
   else if (begin_bin+wf_ped_range > wf_size)
   {
     char txt[1000];
-    sdplog::warn("Starting too far into waveform.");
+    spdlog::warn("Starting too far into waveform.");
     sprintf(txt,"\twf_ped_begin not set to %d(%d)",begin_bin,wf_ped_range);
     spdlog::warn(txt);
   }
@@ -893,7 +894,7 @@ int Waveform::Time2Bin(float t_ns){
       return (i-1); 
 
   //log_trace("-- " << t_ns);
-  sdplog::trace("Did not find a bin corresponding to the given time.");
+  spdlog::trace("Did not find a bin corresponding to the given time.");
   return (-1);
 }
 ////////////////////////////////////////////////////////////////////////////
