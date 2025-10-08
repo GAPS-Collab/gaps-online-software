@@ -68,7 +68,7 @@ macro_rules! pythonize_telemetry {
       fn from_telemetrypacket(packet : TelemetryPacket) -> PyResult<Self> {
         //if packet.telemetry_header.packet_type !=
         match Self::from_bytestream(&packet.payload, &mut 0) {
-          Ok(mut tl) => {
+          Ok(tl) => {
             return Ok(tl);
           }
           Err(err) => {
