@@ -73,6 +73,11 @@ pub struct MTBSettings {
   pub tiu_ignore_busy    : bool,
   pub tofbot_webhook     : String,
   pub hb_send_interval   : u64,
+  /// Instruct the MTB to ignore the tiu 
+  /// busy time and instead impose always 
+  /// the same deadtime of 600mu sec on 
+  /// itself
+  pub use_fixed_deadtime : Option<bool>,
 }
 
 impl MTBSettings {
@@ -93,6 +98,7 @@ impl MTBSettings {
       use_combo_trigger       : false,
       global_trigger_type     : TriggerType::Unknown,
       global_trigger_prescale : 1.0,
+      use_fixed_deadtime      : None,
     }
   }
 
