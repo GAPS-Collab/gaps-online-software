@@ -511,12 +511,14 @@ pub fn master_trigger(mt_address     : &str,
   let mut settings       : MTBSettings;
   let mut cali_active    : bool;
   let mut holdoff        : bool;
+  let mut veri_active    : bool;
   loop {
     match thread_control.lock() {
       Ok(tc) => {
         settings    = tc.liftof_settings.mtb_settings.clone();  
         cali_active = tc.calibration_active; 
         holdoff     = tc.holdoff_mtb_thread;
+        veri_active = tc.verification_active;
       }
       Err(err) => {
         error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
@@ -772,12 +774,14 @@ pub fn master_trigger(mt_address     : &str,
         }
         last_event_id = _ev.event_id;
         heartbeat.n_events += 1;
-        match mt_sender.send(_ev) {
-          Err(err) => {
-            error!("Can not send TofEvent over channel! {err}");
-            heartbeat.n_ev_unsent += 1;
-          },
-          Ok(_) => ()
+        if !veri_active {
+          match mt_sender.send(_ev) {
+            Err(err) => {
+              error!("Can not send TofEvent over channel! {err}");
+              heartbeat.n_ev_unsent += 1;
+            },
+            Ok(_) => ()
+          }
         }
       }
     }

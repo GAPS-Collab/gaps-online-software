@@ -412,6 +412,23 @@ fn main() {
   let do_verification_run   = config.verification_run.unwrap_or(false);
   //let staging_dir         = config.staging_dir.clone();
   
+  if do_verification_run {
+    println!("=> Starting verification run!");
+    match thread_control.lock() {
+      Ok(mut tc) => {
+        tc.write_data_to_disk       = false;
+        tc.verification_active      = true;
+        tc.thread_master_trg_active = true;
+        tc.calibration_active       = false;
+        tc.thread_event_bldr_active = false;
+      }
+      Err(err) => {
+        error!("Can't acquire lock for ThreadControl! {err}");
+      },
+    }
+    thread::sleep(4*one_second);
+  }
+  
   /*******************************************************
    * Channels (crossbeam, unbounded) for inter-thread
    * communications.
@@ -682,21 +699,6 @@ fn main() {
       if pre_run_calibration {
         let tc_cali = thread_control.clone();
         calibrate_tof(tc_cali, &rb_list, true);
-      }
-      if do_verification_run {
-        println!("=> Starting verification run!");
-        match thread_control.lock() {
-          Ok(mut tc) => {
-            tc.write_data_to_disk       = false;
-            tc.verification_active      = true;
-            tc.thread_master_trg_active = true;
-            tc.calibration_active       = false;
-            tc.thread_event_bldr_active = true;
-          }
-          Err(err) => {
-            error!("Can't acquire lock for ThreadControl! {err}");
-          },
-        }
       }
       // in this scenario, we want to end
       // after we are done

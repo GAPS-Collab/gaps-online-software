@@ -29,8 +29,6 @@ use std::time::{
   Instant,
 };
 
-use crossbeam_channel::Sender;
-
 use indicatif::{
   ProgressBar,
   ProgressStyle
@@ -203,7 +201,7 @@ pub fn end_run(cc_pub_addr : &str) {
   cmd_sender.bind(cc_pub_addr).expect("Unable to bind to (PUB) socket!");
   // after we opened the socket, give the RBs a chance to connect
   println!("=> Sending run stop command to all RBs...");
-  println!("=> Waiting for RBs to stoop data acquisition..");
+  println!("=> Waiting for RBs to stop data acquisition..");
   for _ in 0..10 {
     print!("..");
   }
