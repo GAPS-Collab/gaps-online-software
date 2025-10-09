@@ -58,6 +58,15 @@ auto g::TelemetryPacketReader::prime_next_file_() -> void {
   }
 }
 
+auto g::TelemetryPacketReader::count_packets() -> u64 {
+  u64 npacks = 0;
+  while (!is_exhausted()) {
+    get_next_packet();
+    ++npacks;
+  }
+  return npacks;
+}
+
 auto g::TelemetryPacketReader::get_next_packet() -> Gaps::Telemetry::Packet {
   auto packet = Gaps::Telemetry::Packet();
   while (true) { 

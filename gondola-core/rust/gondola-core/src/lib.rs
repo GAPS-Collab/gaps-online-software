@@ -174,6 +174,19 @@ fn tof_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<TofCuts>()?;
   m.add_class::<PyMasterTrigger>()?;
   m.add_function(wrap_pyfunction!(to_board_id_string, m)?)?;
+  // the commands
+  m.add_function(wrap_pyfunction!(start_run, m)?)?;
+  m.add_function(wrap_pyfunction!(stop_run, m)?)?;
+  m.add_function(wrap_pyfunction!(restart_liftofrb, m)?)?;
+  m.add_function(wrap_pyfunction!(enable_verification_run, m)?)?;
+  m.add_function(wrap_pyfunction!(shutdown_all_rbs, m)?)?;
+  m.add_function(wrap_pyfunction!(shutdown_rat, m)?)?;
+  m.add_function(wrap_pyfunction!(shutdown_ratpair, m)?)?;
+  m.add_function(wrap_pyfunction!(shutdown_rb, m)?)?;
+  m.add_function(wrap_pyfunction!(shutdown_tofcpu, m)?)?;
+
+
+
   Ok(())
 }
 

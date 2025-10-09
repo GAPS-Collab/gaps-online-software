@@ -295,8 +295,10 @@ fn main() {
   }
   
   // now as we have the config, initialize the thread control
-  //let db_path               = config.db_path.clone();
-  //let conn_                 = connect_to_db_path(&db_path).expect("Unable to establish a connection to the DB! CHeck db_path in the liftof settings (.toml) file!");
+  let db_path               = config.db_path.clone();
+  // connecting to the database will set the $GONDOLA_DB_URL variable so that the database can be
+  // foudn for subsequent calls
+  let _conn                 = connect_to_db_path(&db_path).expect("Unable to establish a connection to the DB! CHeck db_path in the liftof settings (.toml) file!");
   // if this call does not go through, we might as well fail early.
   let mut rb_list           = ReadoutBoard::all().expect("Unable to retrieve RB information! Unable to continue, check db_path in the liftof settings (.toml) file and DB integrity!");
   let rb_ignorelist         = config.rb_ignorelist_always.clone();
@@ -411,6 +413,23 @@ fn main() {
   let pre_run_calibration   = config.pre_run_calibration; 
   let do_verification_run   = config.verification_run.unwrap_or(false);
   //let staging_dir         = config.staging_dir.clone();
+  
+  if do_verification_run {
+    println!("=> Starting verification run!");
+    match thread_control.lock() {
+      Ok(mut tc) => {
+        tc.write_data_to_disk       = false;
+        tc.verification_active      = true;
+        tc.thread_master_trg_active = true;
+        tc.calibration_active       = false;
+        tc.thread_event_bldr_active = false;
+      }
+      Err(err) => {
+        error!("Can't acquire lock for ThreadControl! {err}");
+      },
+    }
+    thread::sleep(4*one_second);
+  }
   
   /*******************************************************
    * Channels (crossbeam, unbounded) for inter-thread
@@ -682,21 +701,6 @@ fn main() {
       if pre_run_calibration {
         let tc_cali = thread_control.clone();
         calibrate_tof(tc_cali, &rb_list, true);
-      }
-      if do_verification_run {
-        println!("=> Starting verification run!");
-        match thread_control.lock() {
-          Ok(mut tc) => {
-            tc.write_data_to_disk       = false;
-            tc.verification_active      = true;
-            tc.thread_master_trg_active = true;
-            tc.calibration_active       = false;
-            tc.thread_event_bldr_active = true;
-          }
-          Err(err) => {
-            error!("Can't acquire lock for ThreadControl! {err}");
-          },
-        }
       }
       // in this scenario, we want to end
       // after we are done

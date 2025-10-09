@@ -940,31 +940,21 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let allow_commands = args.allow_commands;
   
   let config          : LiftofSettings;
-  match args.config {
-    None => {
-      match LiftofSettings::from_toml(&args.config.unwrap()) {
-        Err(err) => {
-          error!("CRITICAL! Unable to parse .toml settings file! {}", err);
-          panic!("Unable to parse config file!");
-        }
-        Ok(_cfg) => {
-          config = _cfg;
-        }
+  if let Some(config_data) = args.config { 
+    //cfg_file_str = cfg_file.clone();
+    match LiftofSettings::from_toml(&config_data) {
+      Err(err) => {
+        error!("CRITICAL! Unable to parse .toml settings file! {}", err);
+        panic!("Unable to parse config file!");
+      }
+      Ok(_cfg) => {
+        config = _cfg;
       }
     }
-    Some(cfg_file) => {
-      //cfg_file_str = cfg_file.clone();
-      match LiftofSettings::from_toml(&cfg_file) {
-        Err(err) => {
-          error!("CRITICAL! Unable to parse .toml settings file! {}", err);
-          panic!("Unable to parse config file!");
-        }
-        Ok(_cfg) => {
-          config = _cfg;
-        }
-      }
-    } // end Some
-  } // end match
+  } else {
+    error!("No config file specified! Please specify a config file with -c <your-config.toml>!");
+    panic!("Can not proceed without config file! Please specify a config file with -c <your-config.toml>!");
+  }
  
   // alerts for everybody! (yay I guess..)
   let global_alerts      = Arc::new(Mutex::new(HashMap::<&'static str, TofAlert<'static>>::new())); 
@@ -1000,7 +990,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let mut readoutboards = HashMap::<u8, ReadoutBoard>::new();
   let db_path = config.db_path;
   info!("Reading database from {}", db_path);
-  //let rb_conn = connect_to_db_path(&db_path).expect("Unable to read database! Are you sure it can be found at the expected location?");
+  // We need this so that this will set the GONDOLA_DB_URL variable! (FIXME?)
+  let rb_conn = connect_to_db_path(&db_path).expect("Unable to read database! Are you sure it can be found at the expected location?");
   let rbs     = ReadoutBoard::all().expect("Unable to read ReadoutBoard table from the database!");
   let mtlink_rb_map = get_linkid_rbid_map(&rbs);
   for mut rb in rbs {

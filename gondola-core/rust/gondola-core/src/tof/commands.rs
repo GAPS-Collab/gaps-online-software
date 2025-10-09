@@ -527,12 +527,26 @@ pub fn stop_run() -> Option<TofCommand> {
   })
 }
 
+/// Enable verfication runs before every run start
+/// 
+/// A verification run will not send any event
+/// packets, but only a TofDetectorStatus frame
+#[cfg_attr(feature="pybindings", pyfunction)]
+pub fn enable_verification_run(enabled : bool) -> Option<TofCommand> {
+  Some(TofCommand {
+    command_code : TofCommandCode::StartValidationRun,
+    payload      : vec![enabled as u8],
+  })
+}
+
+
+
 /// Run a calibration of all RBs
 ///
 /// # Arguments:
 ///   * pre_run_calibration : Run the RBCalibration routine before 
 ///                           every run start
-///   * send_packetes       : Send the RBCalibration packets
+    ///   * send_packetes       : Send the RBCalibration packets
 ///   * save_events         : Save the events to the RBCalibration
 ///                           packets
 #[cfg_attr(feature="pybindings", pyfunction)]

@@ -138,7 +138,7 @@ pub fn global_data_sink(incoming       : &Receiver<TofPacket>,
           }
         },
         Err(err) => {
-          error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
+          error!("Can't acquire lock for ThreadControl! {err}");
         },
       }
       check_settings_timer = Instant::now();
