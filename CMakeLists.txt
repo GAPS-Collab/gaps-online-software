@@ -150,7 +150,7 @@ if(DOXYGEN_FOUND)
     COMMENT "Generating C++ API documentation with Doxygen"
     VERBATIM
   )
-  install(DIRECTORY ${CMAKE_BINARY_DIR}/doc/C++/html DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/C++API/)
+  #install(DIRECTORY ${CMAKE_BINARY_DIR}/doc/C++/html DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/C++API/)
 endif()
 
 if (BUILD_LIFTOF)

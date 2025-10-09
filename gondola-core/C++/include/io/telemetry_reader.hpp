@@ -25,7 +25,10 @@ namespace gondola {
     auto get_filenames() const -> Vec<std::string>; 
     
     auto get_next_packet() -> Gaps::Telemetry::Packet; 
-    
+
+    /// count the packets within the Telemetry fiel 
+    auto count_packets() -> u64;
+
     /// All packets have been read from the file. 
     /// If they should be read again, the reader 
     /// has to be created again
