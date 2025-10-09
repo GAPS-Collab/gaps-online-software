@@ -69,7 +69,7 @@ var NAVTREEINDEX =
 "structGaps_1_1Telemetry_1_1MergedEvent.html#a7a3761922ec63d47b3db72b6a195e7dc",
 "structGaps_1_1TrackerStrip.html#ab4036006009e3eaf409c944dda1c2c9e",
 "structTofEventHeader.html#a7a48152dc548f3acf633a0c425ea8622",
-"tof__typedefs_8h.html#a5148c9c1252e19e12def2814f71690e3"
+"tof__typedefs_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
