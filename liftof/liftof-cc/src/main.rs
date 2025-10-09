@@ -295,8 +295,10 @@ fn main() {
   }
   
   // now as we have the config, initialize the thread control
-  //let db_path               = config.db_path.clone();
-  //let conn_                 = connect_to_db_path(&db_path).expect("Unable to establish a connection to the DB! CHeck db_path in the liftof settings (.toml) file!");
+  let db_path               = config.db_path.clone();
+  // connecting to the database will set the $GONDOLA_DB_URL variable so that the database can be
+  // foudn for subsequent calls
+  let _conn                 = connect_to_db_path(&db_path).expect("Unable to establish a connection to the DB! CHeck db_path in the liftof settings (.toml) file!");
   // if this call does not go through, we might as well fail early.
   let mut rb_list           = ReadoutBoard::all().expect("Unable to retrieve RB information! Unable to continue, check db_path in the liftof settings (.toml) file and DB integrity!");
   let rb_ignorelist         = config.rb_ignorelist_always.clone();
