@@ -119,7 +119,7 @@ namespace Gaps {
       u8          layer;
       u8          flags1;
       u32         event_id; 
-      u32         event_time;
+      u64         event_time;
       Vec<TrkHit> hits;
 
       auto to_string() const -> std::string;
