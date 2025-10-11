@@ -14,9 +14,10 @@ var searchData=
   ['tofevent_11',['TofEvent',['../tof__packet_8h.html#aa69433dde428a8cd2a2242fb3592a565a73acb556ee85b83d287b122b37ede01e',1,'tof_packet.h']]],
   ['tofeventsummary_12',['TofEventSummary',['../tof__packet_8h.html#aa69433dde428a8cd2a2242fb3592a565a6046537136bf4784175124a473eb23c5',1,'tof_packet.h']]],
   ['tofpacket_13',['TofPacket',['../namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68a0a5f7d79c74b92d33255fc332e25b536',1,'gondola']]],
-  ['track_14',['Track',['../events_8h.html#a4a0b0f32c84d56c15f094cf09291a6c7a92ea731d3af6677905303c88689f5d55',1,'events.h']]],
-  ['trackcentral_15',['TrackCentral',['../events_8h.html#a4a0b0f32c84d56c15f094cf09291a6c7abc421fa7f533c3d639eeebfd29fdf499',1,'events.h']]],
-  ['tracker_16',['Tracker',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a26b8a5f8cbb692e906c8eed4b88cc0bd',1,'Gaps::Telemetry']]],
-  ['trackerdaqcntr_17',['TrackerDAQCntr',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7ac673eb57c4b7d3d8227f8b7e0f844b08',1,'Gaps::Telemetry']]],
-  ['trktempleak_18',['TrkTempLeak',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a809a59ac536e0b86400daa219166044d',1,'Gaps::Telemetry']]]
+  ['toomanytrkevents_14',['TooManyTrkEvents',['../classGaps_1_1IOError.html#aef5d09096037b3efe50862e2b52a9872a1af5bfa5aee6996e722fe0553a11d381',1,'Gaps::IOError']]],
+  ['track_15',['Track',['../events_8h.html#a4a0b0f32c84d56c15f094cf09291a6c7a92ea731d3af6677905303c88689f5d55',1,'events.h']]],
+  ['trackcentral_16',['TrackCentral',['../events_8h.html#a4a0b0f32c84d56c15f094cf09291a6c7abc421fa7f533c3d639eeebfd29fdf499',1,'events.h']]],
+  ['tracker_17',['Tracker',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a26b8a5f8cbb692e906c8eed4b88cc0bd',1,'Gaps::Telemetry']]],
+  ['trackerdaqcntr_18',['TrackerDAQCntr',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7ac673eb57c4b7d3d8227f8b7e0f844b08',1,'Gaps::Telemetry']]],
+  ['trktempleak_19',['TrkTempLeak',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a809a59ac536e0b86400daa219166044d',1,'Gaps::Telemetry']]]
 ];

@@ -1,5 +1,7 @@
 var NAVTREEINDEX5 =
 {
+"tof__typedefs_8h.html#a10e7ddbc8860248f8aacfe07bed96192":[5,0,1,0,0,16,8],
+"tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf":[5,0,1,0,0,16,15],
 "tof__typedefs_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234":[5,0,1,0,0,16,12],
 "tof__typedefs_8h.html#a48d6cd8e4135fb2ff7e7f2dac84089ec":[5,0,1,0,0,16,5],
 "tof__typedefs_8h.html#a5148c9c1252e19e12def2814f71690e3":[5,0,1,0,0,16,14],
