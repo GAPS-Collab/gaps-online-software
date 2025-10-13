@@ -1357,7 +1357,7 @@ impl RBCalibrations {
   
   /// Self check if the timing constants are sane 
   pub fn passes_timing_checks(&self) -> bool {
-    for ch in 0..8 {
+    for ch in 0..9 {
       let mut mean = 0.0;
       for k in 0..NWORDS {
         mean += self.tbin[ch][k];
@@ -1380,7 +1380,7 @@ impl RBCalibrations {
 
   /// Self check if the voltage constants are sane
   pub fn passes_voltage_checks(&self) -> bool {
-    for ch in 0..8 {
+    for ch in 0..9 {
       let mut mean = 0.0;
       for k in 0..NWORDS {
         mean += self.v_offsets[ch][k];
