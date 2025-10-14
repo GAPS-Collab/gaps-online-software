@@ -52,6 +52,16 @@ std::string gtl::bfsw_ptype_to_str(gtl::BfswPacketType pt) {
       return "NoTofDataEvent";
     case gtl::BfswPacketType::CoolingHK:
       return "CoolingHK";
+    case gtl::BfswPacketType::CardHKP:
+      return "CardHKP";
+    case gtl::BfswPacketType::PDUHK:
+      return "PDUHK";
+    case gtl::BfswPacketType::AnyTofHK:
+      return "AnyTofHK";
+    case gtl::BfswPacketType::LabJackHK:
+      return "LabJackHK";
+    case gtl::BfswPacketType::TrackerDAQCntr:
+      return "TrackerDAQCntr";
     default:
       return std::format("Unknown/NotImplemented ({})", (int)pt) ;
   }
@@ -59,9 +69,11 @@ std::string gtl::bfsw_ptype_to_str(gtl::BfswPacketType pt) {
 
 //----------------------------------------
 
-f64 gtl::PacketHeader::get_gcutime(){
+f64 gtl::PacketHeader::get_gcutime() const {
   return timestamp * 0.064 + 1631030675.0;
 };
+
+//----------------------------------------
 
 auto gtl::PacketHeader::to_bytestream() const -> Vec<u8> {
   Vec<u8> bytes{0xeb, 0x90};

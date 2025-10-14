@@ -1,15 +1,19 @@
 // This file is part of gaps-online-software and published 
 // under the GPLv3 license
 
-#include "io/telemetry_reader.hpp"
+#include <algorithm>
+
 #include "spdlog/spdlog.h"
 #include "spdlog/cfg/env.h"
-
-namespace g = gondola;
 
 //FIXME 
 #include "caraspace.hpp"
 #include "io/parsers.h"
+#include "io/telemetry_reader.hpp"
+
+namespace g = gondola;
+
+//--------------------------------------------------------------------------
 
 auto g::TelemetryPacketReader::set_path(std::string pathname) -> void {
   auto files = g::list_path_contents_sorted(pathname, true);
@@ -26,6 +30,8 @@ auto g::TelemetryPacketReader::set_path(std::string pathname) -> void {
   }
 }
 
+//--------------------------------------------------------------------------
+
 g::TelemetryPacketReader::TelemetryPacketReader() : 
   exhausted_      (0),
   //n_packets_read_ (0),
@@ -37,13 +43,19 @@ g::TelemetryPacketReader::TelemetryPacketReader() :
   //#endif 
 };
 
+//--------------------------------------------------------------------------
+
 g::TelemetryPacketReader::TelemetryPacketReader(String pathname) : TelemetryPacketReader::TelemetryPacketReader() {
   set_path(pathname);
 }
 
+//--------------------------------------------------------------------------
+
 auto g::TelemetryPacketReader::get_filenames() const -> Vec<std::string> {
   return filenames_;
 }
+
+//--------------------------------------------------------------------------
 
 auto g::TelemetryPacketReader::prime_next_file_() -> void {
   if (file_idx_ > filenames_.size() - 2) { // -2 because -1 is the last index
@@ -58,6 +70,8 @@ auto g::TelemetryPacketReader::prime_next_file_() -> void {
   }
 }
 
+//--------------------------------------------------------------------------
+
 auto g::TelemetryPacketReader::count_packets() -> u64 {
   u64 npacks = 0;
   while (!is_exhausted()) {
@@ -67,8 +81,52 @@ auto g::TelemetryPacketReader::count_packets() -> u64 {
   return npacks;
 }
 
+//--------------------------------------------------------------------------
+
+auto g::TelemetryPacketReader::register_packet_type_(g::TelemetryPacketType const &ptype) -> void {
+   if (packet_index_.contains(ptype)) {
+     ++packet_index_[ptype];
+   } else {
+     packet_index_.insert(std::make_pair(ptype,1)); 
+   }
+} 
+
+//--------------------------------------------------------------------------
+
+auto g::TelemetryPacketReader::cache_all_packets() -> void {
+  in_caching_ = true;
+  while (!exhausted_) {
+    auto packet = get_next_packet();
+    packet_cache_.push_back(packet);
+  }
+
+  // Sort packet cache by timestamp and packet counter
+  std::sort(packet_cache_.begin(), packet_cache_.end(),
+    [](const g::TelemetryPacket& a, const g::TelemetryPacket& b) {
+    if (a.header.timestamp != b.header.timestamp) {
+        return a.header.get_gcutime() > b.header.get_gcutime();
+    }
+    return a.header.counter < b.header.counter;
+  });
+
+  in_caching_ = false;
+}
+
+//--------------------------------------------------------------------------
+
+auto g::TelemetryPacketReader::get_packet_index() const -> const HashMap<TelemetryPacketType, u64>& {
+  return packet_index_;
+}
+
+//--------------------------------------------------------------------------
+
 auto g::TelemetryPacketReader::get_next_packet() -> Gaps::Telemetry::Packet {
   auto packet = Gaps::Telemetry::Packet();
+  if (packet_cache_.size() > 0 && !in_caching_) { // packets have been cached, return those
+    packet = packet_cache_.back();
+    packet_cache_.pop_back();
+    return packet;
+  }
   while (true) { 
     if (stream_file_.eof()) {
       prime_next_file_();
@@ -95,10 +153,12 @@ auto g::TelemetryPacketReader::get_next_packet() -> Gaps::Telemetry::Packet {
         //u8 packet_type = stream_file_.get();
         Vec<u8> buffer = bytestream(11);
         stream_file_.read(reinterpret_cast<char*>(buffer.data()), 11);
-        // because bytestream does not contain header, size is at 5 
-        usize pos = 7;
-        //u64 p_size;
-        u16 p_size       = Gaps::parse_u16(buffer, pos);
+        // because bytestream does not contain header, size is at 7 instead 
+        // of 9 
+        usize pos   = 7;
+        // reminder! The size is the size including the 13bytes header, so we 
+        // need to subtrackt that 
+        u16 p_size  = Gaps::parse_u16(buffer, pos) - 13;
         payload.insert(payload.end(), buffer.begin(), buffer.end());
         // now we just need to append p_size bytes
         Vec<u8> buffer_data = bytestream(p_size);
@@ -107,6 +167,7 @@ auto g::TelemetryPacketReader::get_next_packet() -> Gaps::Telemetry::Packet {
         pos = 0;
         auto packet = Gaps::Telemetry::Packet::from_bytestream(payload, pos);
         ++n_packs_read_;
+        register_packet_type_(packet.header.ptype);
         return packet;
       }
     } 
@@ -114,8 +175,28 @@ auto g::TelemetryPacketReader::get_next_packet() -> Gaps::Telemetry::Packet {
   return packet;
 }
 
-bool g::TelemetryPacketReader::is_exhausted() const {
+//--------------------------------------------------------------------------
+
+auto g::TelemetryPacketReader::is_exhausted() const -> bool {
   return exhausted_;
+}
+
+//--------------------------------------------------------------------------
+
+auto g::TelemetryPacketReader::print_packet_index() const -> void {
+  for (auto const &pair : packet_index_) {
+    std::cout << " -- " << Gaps::Telemetry::bfsw_ptype_to_str(pair.first) << " -> " << pair.second << std::endl;
+  }
+}
+
+//--------------------------------------------------------------------------
+
+auto g::TelemetryPacketReader::rewind() -> void {
+  exhausted_   = false;
+  file_idx_    = 0;
+  stream_file_ = std::ifstream(filenames_[0], std::ios::binary);   
+  stream_file_.seekg (0, stream_file_.end);
+  auto file_size = stream_file_.tellg();
 }
 
 

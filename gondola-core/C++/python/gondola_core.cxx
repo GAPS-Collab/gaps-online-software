@@ -5,6 +5,8 @@
 #include "sd_legacy.hpp" 
 #include "io.hpp" 
 #include "caraspace.hpp"
+#include "telemetry_dataclasses.hpp"
+#include "io/telemetry_reader.hpp"
 
 int add(int a, int b) { return a + b; }
 
@@ -104,6 +106,65 @@ NB_MODULE(gondola_cxx, m) {
     .def_ro("header"       , &TofEvent::header)
     .def_prop_ro("rb_ids"  , &TofEvent::get_rbids)
     .def("to_string"       , &TofEvent::to_string);
+
+  //---------------------------------------------------------
+  // Telemetry packets & reader
+  nb::enum_<g::TelemetryPacketType>(m, "TelemetryPacketType")
+    .value("Unknown"           , g::TelemetryPacketType::Unknown            )
+    .value("CardHKP"           , g::TelemetryPacketType::CardHKP            )
+    .value("CoolingHK"         , g::TelemetryPacketType::CoolingHK          )
+    .value("PDUHK"             , g::TelemetryPacketType::PDUHK              )
+    .value("Tracker"           , g::TelemetryPacketType::Tracker            )
+    .value("TrackerDAQCntr"    , g::TelemetryPacketType::TrackerDAQCntr     )
+    .value("GPS"               , g::TelemetryPacketType::GPS                )
+    .value("TrkTempLeak"       , g::TelemetryPacketType::TrkTempLeak        )
+    .value("BoringEvent"       , g::TelemetryPacketType::BoringEvent        )
+    .value("RBWaveform"        , g::TelemetryPacketType::RBWaveform         )
+    .value("AnyTofHK"          , g::TelemetryPacketType::AnyTofHK           )
+    .value("GcuEvtBldSettings" , g::TelemetryPacketType::GcuEvtBldSettings  )
+    .value("LabJackHK"         , g::TelemetryPacketType::LabJackHK          )
+    .value("MagHK"             , g::TelemetryPacketType::MagHK              )
+    .value("GcuMon"            , g::TelemetryPacketType::GcuMon             )
+    .value("InterestingEvent"  , g::TelemetryPacketType::InterestingEvent   )
+    .value("NoGapsTriggerEvent", g::TelemetryPacketType::NoGapsTriggerEvent )
+    .value("NoTofDataEvent"    , g::TelemetryPacketType::NoTofDataEvent     )
+    .value("Ack"               , g::TelemetryPacketType::Ack                )     
+    .value("TmP33"             , g::TelemetryPacketType::TmP33              )
+    .value("TmP34"             , g::TelemetryPacketType::TmP34              )
+    .value("TmP37"             , g::TelemetryPacketType::TmP37              )
+    .value("TmP38"             , g::TelemetryPacketType::TmP38              )
+    .value("TmP55"             , g::TelemetryPacketType::TmP55              )
+    .value("TmP64"             , g::TelemetryPacketType::TmP64              )
+    .value("TmP96"             , g::TelemetryPacketType::TmP96              )
+    .value("TmP214"            , g::TelemetryPacketType::TmP214             )
+    .value("AnyTrackerHK"      , g::TelemetryPacketType::AnyTrackerHK       );
+  
+  nb::class_<g::TelemetryPacketHeader>(m, "TelemetryPacketHeader")
+    .def(nb::init<>())
+    .def_prop_ro("gcutime" , &g::TelemetryPacketHeader::get_gcutime)
+    .def_ro("packet_type"  , &g::TelemetryPacketHeader::ptype)
+    .def_ro("counter"      , &g::TelemetryPacketHeader::counter)
+    .def_ro("length"       , &g::TelemetryPacketHeader::length)
+    .def_ro("checksum"     , &g::TelemetryPacketHeader::checksum)
+    .def("to_string"       , &g::TelemetryPacketHeader::to_string);
+
+  nb::class_<g::TelemetryPacket>(m, "TelemetryPacket")
+    .def(nb::init<>())
+    .def_ro("header"       , &g::TelemetryPacket::header)
+    .def_ro("payload"      , &g::TelemetryPacket::payload)
+    .def("from_bytestream" , &g::TelemetryPacket::from_bytestream)
+    .def("to_string"       , &g::TelemetryPacket::to_string);
+  
+  nb::class_<g::TelemetryPacketReader>(m, "TelemetryPacketReader")
+    .def(nb::init<std::string>())
+    .def_prop_ro("filenames"         , &g::TelemetryPacketReader::get_filenames)
+    .def("get_next_packet"           , &g::TelemetryPacketReader::get_next_packet)
+    .def_prop_ro("exhausted"         , &g::TelemetryPacketReader::is_exhausted)
+    .def_prop_ro("get_packet_index"  , &g::TelemetryPacketReader::get_packet_index)
+    .def("print_packet_index"        , &g::TelemetryPacketReader::print_packet_index)
+    .def("cache_all_packets"         , &g::TelemetryPacketReader::cache_all_packets)
+    .def("count_packets"             , &g::TelemetryPacketReader::count_packets)
+    .def("rewind"                    , &g::TelemetryPacketReader::rewind); 
 }
 
 
