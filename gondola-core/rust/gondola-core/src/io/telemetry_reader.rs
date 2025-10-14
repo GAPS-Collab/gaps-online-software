@@ -10,6 +10,7 @@ use std::io::{
   Seek,
   SeekFrom,
 };
+use std::cmp::Ordering;
 
 use crate::prelude::*;
 
@@ -52,7 +53,11 @@ pub struct TelemetryPacketReader {
   pub n_duplicates    : usize,
   /// A cache to allow to quench duplicates 
   /// pkt counter -> pkt checksum
-  dedup_cache         : HashMap<u16, VecDeque<u16>>
+  dedup_cache         : HashMap<u16, VecDeque<u16>>,
+  /// If ::cache_all_packets is called, this will hold 
+  /// all TelemetryPackets sorted by timestamp and 
+  /// packet counter
+  pub packet_cache    : Vec<TelemetryPacket> 
 }
 
 
@@ -102,6 +107,7 @@ impl TelemetryPacketReader {
               n_packs_skipped   : 0,
               n_duplicates      : 0,
               dedup_cache       : dedup_cache,
+              packet_cache      : Vec::<TelemetryPacket>::new()
             };
             packet_reader
           }
@@ -109,7 +115,35 @@ impl TelemetryPacketReader {
       }
     }
   } 
-  
+ 
+  /// Instead of reading packets one at a time, we can read the entire input 
+  /// at once and keep it in memory. This allows to sort the packeges.
+  ///
+  /// This comes with a performance cost and extended memory needs, however, 
+  /// it might be helpful for debugging
+  pub fn cache_all_packets(&mut self) {
+    loop {
+      match self.read_next_item() {
+        None => {
+          info!("Read all packets!");
+          break;
+        }
+        Some(pack) => {
+          self.packet_cache.push(pack);
+        }
+      }
+    }
+    // sort the packet cache by timestamp and counter of 
+    // the header 
+    self.packet_cache.sort_by(|a,b|{
+      b.header.get_gcutime().partial_cmp(&a.header.get_gcutime()).unwrap_or(Ordering::Equal)  
+      .then(b.header.counter.cmp(&a.header.counter))
+    });
+    // reverse the vector, so that the first packet gets 
+    // returned first 
+    self.packet_cache.reverse();
+  }
+
   pub fn clear_dedup_cache(&mut self) {
     let mut dedup_cache = HashMap::<u16, VecDeque<u16>>::with_capacity(u16::MAX as usize + 1);  
     for k in 0..u16::MAX as usize + 1 {
@@ -197,7 +231,7 @@ impl TelemetryPacketReader {
           }
           // read the the size of the packet
           // first we have to skip 6 bytes
-          let mut buffer_skip = [0,0,0,0,0,0,0];
+          let mut buffer_skip = [0,0,0,0,0,0];
           match self.file_reader.read_exact(&mut buffer_skip) {
             Err(err) => {
               debug!("Unable to read from file! {err}");
@@ -210,7 +244,7 @@ impl TelemetryPacketReader {
               };
             }
             Ok(_) => {
-              self.cursor += 7;
+              self.cursor += 6;
             }
           }
           let mut buffer_psize = [0,0];
@@ -229,9 +263,11 @@ impl TelemetryPacketReader {
             }
           }
           let vec_data = buffer_psize.to_vec();
-          let size     = parse_u16(&vec_data, &mut 0);
+          // packet size is the size including the header, so for the 
+          // payload only we have to subtract that.
+          let size     = parse_u16(&vec_data, &mut 0) - 13;
           let mut temp_buffer = vec![0; size as usize];
-          // skip 2 more bytes
+          // skip 2 more bytes for the header checksum
           match self.file_reader.read_exact(&mut buffer_psize) {
             Err(_err) => {
               match self.prime_next_file() {
@@ -324,8 +360,7 @@ impl TelemetryPacketReader {
           let mut thead     = TelemetryPacketHeader::new();
           thead.sync        = 0x90eb;
           thead.packet_type = TelemetryPacketType::from(buffer[0]);
-          let ptype    = TelemetryPacketType::from(buffer[0]);
-          // read the the size of the packet
+          //let ptype    = TelemetryPacketType::from(buffer[0]);
           let mut buffer_ts = [0,0,0,0];
           match self.file_reader.read_exact(&mut buffer_ts) {
             Err(err) => {
@@ -381,7 +416,7 @@ impl TelemetryPacketReader {
             return None;
           }
           size -= TelemetryPacketHeader::SIZE as u16;
-          if ptype != self.filter && self.filter != TelemetryPacketType::Unknown {
+          if thead.packet_type != self.filter && self.filter != TelemetryPacketType::Unknown {
             match self.file_reader.seek(SeekFrom::Current(size as i64)) {
               Err(err) => {
                 debug!("Unable to read more data! {err}");
@@ -536,7 +571,7 @@ reader!(TelemetryPacketReader, TelemetryPacket);
 impl TelemetryPacketReader {
 
   #[new]
-  #[pyo3(signature = (filenames_or_directory, dedup = true, start_time = None, end_time = None))]
+  #[pyo3(signature = (filenames_or_directory, dedup = false, start_time = None, end_time = None))]
   fn new_py(filenames_or_directory : &Bound<'_,PyAny>, dedup : bool, start_time : Option<f64>, end_time : Option<f64>) -> PyResult<Self> {
     
     let mut string_value = String::from("foo");
@@ -591,6 +626,21 @@ impl TelemetryPacketReader {
   #[pyo3(name = "count_packets")]
   fn count_packets_py(&mut self) -> (usize,usize,HashMap<TelemetryPacketType,usize>) {
     self.count_packets()
+  }
+
+  #[pyo3(name = "cache_all_packets")]
+  fn cache_all_packets_py(&mut self) {
+    self.cache_all_packets();
+  }
+
+  /// Retrieve a copy of the internal packet cache.
+  /// This will only yield a meaningful result after 
+  /// a call to .cache_all_packets(). Since the entire
+  /// cache is copied in the processs, this is slow 
+  /// and might only be helpful for debugging. 
+  #[pyo3(name = "copy_packet_cache")]
+  fn copy_packet_cache(&self) -> Vec<TelemetryPacket> {
+    self.packet_cache.clone()
   }
 
   //#[getter]

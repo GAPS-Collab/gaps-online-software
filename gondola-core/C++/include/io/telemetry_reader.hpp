@@ -11,6 +11,12 @@
 #include "io.hpp"
 
 namespace gondola {
+
+  /// FIXME - this will be renamed to be the same as in rust
+  typedef Gaps::Telemetry::BfswPacketType TelemetryPacketType;
+  typedef Gaps::Telemetry::Packet         TelemetryPacket;
+  typedef Gaps::Telemetry::PacketHeader   TelemetryPacketHeader;
+
   /// Read serialized TelemetryPackets from an existing file
   ///
   /// Read GAPS binary files ("Berkeley binaries)
@@ -33,6 +39,27 @@ namespace gondola {
     /// If they should be read again, the reader 
     /// has to be created again
     auto is_exhausted()   const -> bool;
+
+    /// The packet index is a map of TelemetryPacketType -> Number of seen 
+    /// packets 
+    auto get_packet_index() const -> const HashMap<TelemetryPacketType, u64>&; 
+   
+    /// In cached mode, the reader will first read all packets from a file and 
+    /// then sort them by their timestamp and counter value. 
+    /// This comes at a performance cost, but will allow a more precise estimate 
+    /// about missing packets.
+    ///
+    /// To run in cached mode, run ::cache_all_packets before any ::get_next_packet 
+    /// calls. 
+    auto cache_all_packets() -> void;  
+    
+    /// Print the package index, converting the TelemetryPacketType to a string for 
+    /// implementation independent viewing
+    auto print_packet_index() const -> void;  
+
+    /// Restart the reading of packets from the beginning of the underlying buffers 
+    auto rewind() -> void;
+
     private:
       /// Indicate if the reader has run out of 
       /// packets 
@@ -75,6 +102,15 @@ namespace gondola {
       /// pkt counter -> pkt checksum
       //dedup_cache         : HashMap<u16, VecDeque<u16>>
       auto prime_next_file_() -> void;
+      /// Add the packet type to the counters in the index 
+      auto register_packet_type_(TelemetryPacketType const &ptyep) -> void;
+      /// Remember each packet we have seen and count it 
+      HashMap<TelemetryPacketType, u64> packet_index_;
+      /// This is only used in cached mode and will contain the whole file 
+      /// deserialized as packets 
+      Vec<TelemetryPacket> packet_cache_ = {};
+      /// An indicator set internally during the caching process 
+      bool in_caching_ = false; 
   };
 }
 

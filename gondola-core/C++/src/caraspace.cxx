@@ -222,13 +222,19 @@ g::CRReader::CRReader() :
   #endif 
 };
 
+//--------------------------------------------------
+
 g::CRReader::CRReader(String pathname) : CRReader::CRReader() {
   set_path(pathname);
 }
 
+//--------------------------------------------------
+
 Vec<std::string> g::CRReader::get_filenames() const {
   return filenames_;
 }
+
+//--------------------------------------------------
     
 auto g::CRReader::get_rbcalibrations(u8 n_rb) -> g::RBCalibrationMap {
   g::RBCalibrationMap cali_map;
@@ -260,6 +266,8 @@ auto g::CRReader::get_rbcalibrations(u8 n_rb) -> g::RBCalibrationMap {
   return cali_map; 
 };     
 
+//--------------------------------------------------
+
 void g::CRReader::set_path(std::string pathname) {
   auto files = list_path_contents_sorted(pathname);
   if (files.size() == 0) {
@@ -286,16 +294,42 @@ void g::CRReader::set_path(std::string pathname) {
   }
 }
 
-bool g::CRReader::is_exhausted() const {
+//--------------------------------------------------
+
+auto g::CRReader::is_exhausted() const -> bool {
   if (is_from_telemetry_) {
     return telly_reader_->is_exhausted();
   }
   return exhausted_;
 }
 
-bool g::CRReader::n_packets_read() const {
+//--------------------------------------------------
+
+auto g::CRReader::is_from_telemetry() const -> bool {
+  return is_from_telemetry_;
+}
+
+//--------------------------------------------------
+    
+auto g::CRReader::get_telemetry_packet_index() const -> const HashMap<TelemetryPacketType, u64> & {
+  return telly_reader_->get_packet_index(); 
+}
+
+//--------------------------------------------------
+
+auto g::CRReader::cache_telemetry_first() -> void {
+  if (is_from_telemetry_) {
+    telly_reader_->cache_all_packets();
+  }
+}
+
+//--------------------------------------------------
+
+auto g::CRReader::n_packets_read() const -> bool {
   return n_packets_read_;
 }
+
+//--------------------------------------------------
 
 auto g::CRReader::prime_next_file_() -> void {
   if (fileindex_ > filenames_.size() - 2) { // -2 because -1 is the last index
