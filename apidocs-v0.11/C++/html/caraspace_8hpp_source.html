@@ -125,7 +125,7 @@ $(document).ready(function(){initNavTree('caraspace_8hpp_source.html',''); initR
 <div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68">   23</a></span>  <span class="keyword">enum class</span> <a class="code hl_enumeration" href="namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68">CRFrameObjectType</a> : <a class="code hl_typedef" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a> {</div>
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    <a class="code hl_enumvalue" href="namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68a88183b946cc5f0e8c96b2e66e1c74a7e">Unknown</a>           = 0,</div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    <a class="code hl_struct" href="structTofPacket.html">TofPacket</a>         = 10,</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    <a class="code hl_enumvalue" href="namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68aac967e66068a7e25b02b4b2e6bcc4504">TelemetryPacket</a>   = 20,</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    <a class="code hl_struct" href="structGaps_1_1Telemetry_1_1Packet.html">TelemetryPacket</a>   = 20,</div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>  };</div>
 </div>
 <div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span> </div>
@@ -180,32 +180,39 @@ $(document).ready(function(){initNavTree('caraspace_8hpp_source.html',''); initR
 <div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    auto n_packets_read() const -&gt; <span class="keywordtype">bool</span>;</div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    auto get_rbcalibrations(<a class="code hl_typedef" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a> n_rb) -&gt; <a class="code hl_typedef" href="namespacegondola.html#ae720591de7c0e9e18619d265295f1ebe">RBCalibrationMap</a>;     </div>
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span> </div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>  private:  </div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    <span class="preprocessor">#ifdef BUILD_CXXDB</span></div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    <a class="code hl_typedef" href="namespaceGaps.html#a84fb383b1df4955afc6ea35a9b15ff44">Gaps::TofPaddleMap</a> paddles_          ; </div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="preprocessor">    #endif </span></div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    <span class="keywordtype">bool</span>               exhausted_        ;</div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    <a class="code hl_typedef" href="tof__typedefs_8h.html#a5148c9c1252e19e12def2814f71690e3">usize</a>              n_packets_read_   ;</div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    <a class="code hl_typedef" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">Vec&lt;std::string&gt;</a>   filenames_        ;</div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    std::ifstream      stream_file_      ;</div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    <a class="code hl_typedef" href="tof__typedefs_8h.html#a5148c9c1252e19e12def2814f71690e3">usize</a>              fileindex_        ;</div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>    <span class="keyword">auto</span>               prime_next_file_() -&gt; void;</div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    <span class="keywordtype">bool</span>             is_from_telemetry_;</div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    std::unique_ptr&lt;TelemetryPacketReader&gt; telly_reader_;</div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>  };</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    auto is_from_telemetry() const -&gt; <span class="keywordtype">bool</span>;</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span> </div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    auto get_telemetry_packet_index() const -&gt; const <a class="code hl_typedef" href="tof__typedefs_8h.html#af5449d3b4076aa8188b912b9b069fc5a">HashMap</a>&lt;<a class="code hl_enumeration" href="namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7">TelemetryPacketType</a>, <a class="code hl_typedef" href="tof__typedefs_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&gt; &amp;;</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span> </div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    auto cache_telemetry_first() -&gt; <span class="keywordtype">void</span>;</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span> </div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>  private:  </div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    <span class="preprocessor">#ifdef BUILD_CXXDB</span></div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    <a class="code hl_typedef" href="namespaceGaps.html#a84fb383b1df4955afc6ea35a9b15ff44">Gaps::TofPaddleMap</a> paddles_          ; </div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span><span class="preprocessor">    #endif </span></div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    <span class="keywordtype">bool</span>               exhausted_        ;</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>    <a class="code hl_typedef" href="tof__typedefs_8h.html#a5148c9c1252e19e12def2814f71690e3">usize</a>              n_packets_read_   ;</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    <a class="code hl_typedef" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">Vec&lt;std::string&gt;</a>   filenames_        ;</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    std::ifstream      stream_file_      ;</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    <a class="code hl_typedef" href="tof__typedefs_8h.html#a5148c9c1252e19e12def2814f71690e3">usize</a>              fileindex_        ;</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    <span class="keyword">auto</span>               prime_next_file_() -&gt; void;</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>    <span class="keywordtype">bool</span>             is_from_telemetry_;</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>    std::unique_ptr&lt;TelemetryPacketReader&gt; telly_reader_;</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>  };</div>
 </div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>}</div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>}</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span><span class="preprocessor">#endif</span></div>
 <div class="ttc" id="acalibration_8h_html"><div class="ttname"><a href="calibration_8h.html">calibration.h</a></div></div>
 <div class="ttc" id="adatabase_8h_html"><div class="ttname"><a href="database_8h.html">database.h</a></div></div>
 <div class="ttc" id="aerrors_8hpp_html"><div class="ttname"><a href="errors_8hpp.html">errors.hpp</a></div></div>
+<div class="ttc" id="anamespaceGaps_1_1Telemetry_html_a3567431f12c1aa2d8da946e149b62aa7"><div class="ttname"><a href="namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7">Gaps::Telemetry::BfswPacketType</a></div><div class="ttdeci">BfswPacketType</div><div class="ttdef"><b>Definition</b> telemetry_dataclasses.hpp:18</div></div>
 <div class="ttc" id="anamespaceGaps_html"><div class="ttname"><a href="namespaceGaps.html">Gaps</a></div><div class="ttdef"><b>Definition</b> database.h:9</div></div>
 <div class="ttc" id="anamespaceGaps_html_a84fb383b1df4955afc6ea35a9b15ff44"><div class="ttname"><a href="namespaceGaps.html#a84fb383b1df4955afc6ea35a9b15ff44">Gaps::TofPaddleMap</a></div><div class="ttdeci">std::map&lt; u8, TofPaddle &gt; TofPaddleMap</div><div class="ttdoc">A map of paddle id -&gt; TofPaddle.</div><div class="ttdef"><b>Definition</b> database.h:62</div></div>
 <div class="ttc" id="anamespacegondola_html"><div class="ttname"><a href="namespacegondola.html">gondola</a></div><div class="ttdef"><b>Definition</b> calibration.h:19</div></div>
 <div class="ttc" id="anamespacegondola_html_a466ace2a4c29903ffca2f1f86b41ba68"><div class="ttname"><a href="namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68">gondola::CRFrameObjectType</a></div><div class="ttdeci">CRFrameObjectType</div><div class="ttdoc">These are objects which can be stored in a caraspace frame</div><div class="ttdef"><b>Definition</b> caraspace.hpp:23</div></div>
 <div class="ttc" id="anamespacegondola_html_a466ace2a4c29903ffca2f1f86b41ba68a88183b946cc5f0e8c96b2e66e1c74a7e"><div class="ttname"><a href="namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68a88183b946cc5f0e8c96b2e66e1c74a7e">gondola::CRFrameObjectType::Unknown</a></div><div class="ttdeci">@ Unknown</div></div>
-<div class="ttc" id="anamespacegondola_html_a466ace2a4c29903ffca2f1f86b41ba68aac967e66068a7e25b02b4b2e6bcc4504"><div class="ttname"><a href="namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68aac967e66068a7e25b02b4b2e6bcc4504">gondola::CRFrameObjectType::TelemetryPacket</a></div><div class="ttdeci">@ TelemetryPacket</div></div>
 <div class="ttc" id="anamespacegondola_html_ae720591de7c0e9e18619d265295f1ebe"><div class="ttname"><a href="namespacegondola.html#ae720591de7c0e9e18619d265295f1ebe">gondola::RBCalibrationMap</a></div><div class="ttdeci">std::map&lt; u8, RBCalibration &gt; RBCalibrationMap</div><div class="ttdoc">shortcut for the typically used map of rb_id -&gt; calibrations</div><div class="ttdef"><b>Definition</b> calibration.h:99</div></div>
+<div class="ttc" id="astructGaps_1_1Telemetry_1_1Packet_html"><div class="ttname"><a href="structGaps_1_1Telemetry_1_1Packet.html">Gaps::Telemetry::Packet</a></div><div class="ttdef"><b>Definition</b> telemetry_dataclasses.hpp:72</div></div>
 <div class="ttc" id="astructTofPacket_html"><div class="ttname"><a href="structTofPacket.html">TofPacket</a></div><div class="ttdef"><b>Definition</b> tof_packet.h:83</div></div>
 <div class="ttc" id="astructgondola_1_1CRFrameObject_html"><div class="ttname"><a href="structgondola_1_1CRFrameObject.html">gondola::CRFrameObject</a></div><div class="ttdef"><b>Definition</b> caraspace.hpp:29</div></div>
 <div class="ttc" id="astructgondola_1_1CRFrameObject_html_a2e3d538a8bf72ab32dbe7f9665d04628"><div class="ttname"><a href="structgondola_1_1CRFrameObject.html#a2e3d538a8bf72ab32dbe7f9665d04628">gondola::CRFrameObject::ftype</a></div><div class="ttdeci">CRFrameObjectType ftype</div><div class="ttdef"><b>Definition</b> caraspace.hpp:34</div></div>
@@ -230,6 +237,7 @@ $(document).ready(function(){initNavTree('caraspace_8hpp_source.html',''); initR
 <div class="ttc" id="atof__typedefs_8h_html_a5148c9c1252e19e12def2814f71690e3"><div class="ttname"><a href="tof__typedefs_8h.html#a5148c9c1252e19e12def2814f71690e3">usize</a></div><div class="ttdeci">size_t usize</div><div class="ttdef"><b>Definition</b> tof_typedefs.h:34</div></div>
 <div class="ttc" id="atof__typedefs_8h_html_a92c50087ca0e64fa93fc59402c55f8ca"><div class="ttname"><a href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a></div><div class="ttdeci">uint8_t u8</div><div class="ttdef"><b>Definition</b> tof_typedefs.h:26</div></div>
 <div class="ttc" id="atof__typedefs_8h_html_ace9d960e74685e2cd84b36132dbbf8aa"><div class="ttname"><a href="tof__typedefs_8h.html#ace9d960e74685e2cd84b36132dbbf8aa">u16</a></div><div class="ttdeci">uint16_t u16</div><div class="ttdef"><b>Definition</b> tof_typedefs.h:27</div></div>
+<div class="ttc" id="atof__typedefs_8h_html_af5449d3b4076aa8188b912b9b069fc5a"><div class="ttname"><a href="tof__typedefs_8h.html#af5449d3b4076aa8188b912b9b069fc5a">HashMap</a></div><div class="ttdeci">std::map&lt; T, U &gt; HashMap</div><div class="ttdoc">Define std::map the same as HashMap in Rust.</div><div class="ttdef"><b>Definition</b> tof_typedefs.h:47</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

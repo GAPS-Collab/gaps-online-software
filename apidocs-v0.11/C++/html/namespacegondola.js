@@ -6,6 +6,9 @@ var namespacegondola =
     [ "RBCalibration", "structgondola_1_1RBCalibration.html", "structgondola_1_1RBCalibration" ],
     [ "TelemetryPacketReader", "structgondola_1_1TelemetryPacketReader.html", "structgondola_1_1TelemetryPacketReader" ],
     [ "RBCalibrationMap", "namespacegondola.html#ae720591de7c0e9e18619d265295f1ebe", null ],
+    [ "TelemetryPacket", "namespacegondola.html#adb061fbe28da00055cd7fb65249a77df", null ],
+    [ "TelemetryPacketHeader", "namespacegondola.html#abddc47f5a39ae5245979bc0a1b2cceea", null ],
+    [ "TelemetryPacketType", "namespacegondola.html#a1b9982f07cad746b60c39b2d2a71497d", null ],
     [ "CRFrameObjectType", "namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68", [
       [ "Unknown", "namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68a88183b946cc5f0e8c96b2e66e1c74a7e", null ],
       [ "TofPacket", "namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68a0a5f7d79c74b92d33255fc332e25b536", null ],

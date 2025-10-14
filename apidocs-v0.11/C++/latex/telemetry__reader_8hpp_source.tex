@@ -15,43 +15,61 @@
 \DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{io_8hpp}{io.hpp}}"{}}}
 \DoxyCodeLine{00012\ }
 \DoxyCodeLine{00013\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacegondola}{gondola}}\ \{}
-\DoxyCodeLine{00017\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structgondola_1_1TelemetryPacketReader}{TelemetryPacketReader}}\ \{}
-\DoxyCodeLine{00018\ \ \ \ \ }
-\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_ab7631ea45bff2d8efba6b952e52562bb}{TelemetryPacketReader}}();}
-\DoxyCodeLine{00020\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_ab7631ea45bff2d8efba6b952e52562bb}{TelemetryPacketReader}}(std::string\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pathname}});}
-\DoxyCodeLine{00021\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_a545a1ffc5d615f4d8db56bd18fde81bd}{TelemetryPacketReader}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader}{TelemetryPacketReader}}\&)\ =\ \textcolor{keyword}{delete};}
-\DoxyCodeLine{00022\ \ \ \ \ }
-\DoxyCodeLine{00023\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_aecb4a47ffb724ec5913e15928b4e0aaa}{set\_path}}(std::string\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pathname}})\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}};}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00016\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7}{Gaps::Telemetry::BfswPacketType}}\ \mbox{\hyperlink{namespacegondola_a1b9982f07cad746b60c39b2d2a71497d}{TelemetryPacketType}};}
+\DoxyCodeLine{00017\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Packet}{Gaps::Telemetry::Packet}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacegondola_adb061fbe28da00055cd7fb65249a77df}{TelemetryPacket}};}
+\DoxyCodeLine{00018\ \ \ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader}{Gaps::Telemetry::PacketHeader}}\ \ \ \mbox{\hyperlink{namespacegondola_abddc47f5a39ae5245979bc0a1b2cceea}{TelemetryPacketHeader}};}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00023\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structgondola_1_1TelemetryPacketReader}{TelemetryPacketReader}}\ \{}
 \DoxyCodeLine{00024\ \ \ \ \ }
-\DoxyCodeLine{00025\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_aeab4c103035559c98ade8313f5650958}{get\_filenames}}()\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}<std::\textcolor{keywordtype}{string}>;\ }
-\DoxyCodeLine{00026\ \ \ \ \ }
-\DoxyCodeLine{00027\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}}\ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_a51f8d07aa658c56d2ddd5054b7a85806}{get\_next\_packet}}()\ -\/>\ \mbox{\hyperlink{namespaceGaps}{Gaps}}::Telemetry::Packet;\ }
-\DoxyCodeLine{00028\ }
-\DoxyCodeLine{00030\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}}\ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_a4ac18e3e88c5c9d83901668b170b48c3}{count\_packets}}()\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}};}
-\DoxyCodeLine{00031\ }
-\DoxyCodeLine{00035\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}}\ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_a954e5dbc2e1e3b39bb854303bd8c9873}{is\_exhausted}}()\ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ -\/>\ \textcolor{keywordtype}{bool};}
-\DoxyCodeLine{00036\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{private}}:}
-\DoxyCodeLine{00039\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ exhausted\_\ \ \ \ \ \ \ \ \ \ \ \ ;}
-\DoxyCodeLine{00040\ \ \ \ \ \ \ }
-\DoxyCodeLine{00044\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}<std::\textcolor{keywordtype}{string}>\ filenames\_;\ \ \ \ \ \ \ }
-\DoxyCodeLine{00047\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ file\_idx\_\ \ \ \ \ \ \ \ \ \ \ \ ;}
-\DoxyCodeLine{00052\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ dedup\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ;}
-\DoxyCodeLine{00054\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a94dab5770726ccbef8c7d026cfbdf8e5}{f64}}\ start\_time\ \ \ \ \ \ \ \ \ \ \ \ \ \ ;\ }
-\DoxyCodeLine{00056\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a94dab5770726ccbef8c7d026cfbdf8e5}{f64}}\ end\_time\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ;\ }
-\DoxyCodeLine{00058\ \ \ \ \ \ \ std::\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{ifstream}}\ \ stream\_file\_\ ;\ \ \ \ \ }
-\DoxyCodeLine{00059\ \ \ \ \ \ \ \textcolor{comment}{//file\_reader\ \ \ \ \ \ \ \ \ :\ BufReader<File>,}}
-\DoxyCodeLine{00061\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ cursor\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ;}
-\DoxyCodeLine{00063\ \ \ \ \ \ \ \textcolor{comment}{//pub\ filter\ \ \ \ \ \ \ \ \ \ :\ TelemetryPacketType,}}
-\DoxyCodeLine{00065\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ n\_packs\_read\_\ \ \ \ \ \ \ \ \ ;}
-\DoxyCodeLine{00067\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ n\_packs\_skipped\ \ \ \ \ ;}
-\DoxyCodeLine{00069\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ skip\_ahead\ \ \ \ \ \ \ \ \ \ ;}
-\DoxyCodeLine{00071\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ stop\_after\ \ \ \ \ \ \ \ \ \ ;}
-\DoxyCodeLine{00073\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ n\_duplicates\ \ \ \ \ \ \ \ ;}
-\DoxyCodeLine{00076\ \ \ \ \ \ \ \textcolor{comment}{//dedup\_cache\ \ \ \ \ \ \ \ \ :\ HashMap<u16,\ VecDeque<u16>>}}
-\DoxyCodeLine{00077\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}}\ prime\_next\_file\_()\ -\/>\ \textcolor{keywordtype}{void};}
-\DoxyCodeLine{00078\ \ \ \};}
-\DoxyCodeLine{00079\ \}}
-\DoxyCodeLine{00080\ }
-\DoxyCodeLine{00081\ \textcolor{preprocessor}{\#endif\ }}
+\DoxyCodeLine{00025\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_ab7631ea45bff2d8efba6b952e52562bb}{TelemetryPacketReader}}();}
+\DoxyCodeLine{00026\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_ab7631ea45bff2d8efba6b952e52562bb}{TelemetryPacketReader}}(std::string\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pathname}});}
+\DoxyCodeLine{00027\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_a545a1ffc5d615f4d8db56bd18fde81bd}{TelemetryPacketReader}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader}{TelemetryPacketReader}}\&)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{00028\ \ \ \ \ }
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_aecb4a47ffb724ec5913e15928b4e0aaa}{set\_path}}(std::string\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pathname}})\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}};}
+\DoxyCodeLine{00030\ \ \ \ \ }
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_aeab4c103035559c98ade8313f5650958}{get\_filenames}}()\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}<std::\textcolor{keywordtype}{string}>;\ }
+\DoxyCodeLine{00032\ \ \ \ \ }
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}}\ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_a51f8d07aa658c56d2ddd5054b7a85806}{get\_next\_packet}}()\ -\/>\ \mbox{\hyperlink{namespaceGaps}{Gaps}}::Telemetry::Packet;\ }
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00036\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}}\ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_a4ac18e3e88c5c9d83901668b170b48c3}{count\_packets}}()\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}};}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00041\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}}\ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_a16cf37c876f8496252347f8c21939b2f}{is\_exhausted}}()\ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ -\/>\ \textcolor{keywordtype}{bool};}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}}\ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_a6008e84c1ee2b9ab5b92ec4a4b564fb6}{get\_packet\_index}}()\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{HashMap}}<\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7}{TelemetryPacketType}},\ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}>\&;\ }
+\DoxyCodeLine{00046\ \ \ \ }
+\DoxyCodeLine{00054\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}}\ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_adf7dd2adf0d5b771941f6b604e50b8b1}{cache\_all\_packets}}()\ -\/>\ \textcolor{keywordtype}{void};\ \ }
+\DoxyCodeLine{00055\ \ \ \ \ }
+\DoxyCodeLine{00058\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}}\ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_a8c859d9bd436871196abae1261b880b4}{print\_packet\_index}}()\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ -\/>\ \textcolor{keywordtype}{void};\ \ }
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00061\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}}\ \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_af621967fdf97e696ca285427a8f91207}{rewind}}()\ -\/>\ \textcolor{keywordtype}{void};}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{private}}:}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ exhausted\_\ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ }
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}<std::\textcolor{keywordtype}{string}>\ filenames\_;\ \ \ \ \ \ \ }
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ file\_idx\_\ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ dedup\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a94dab5770726ccbef8c7d026cfbdf8e5}{f64}}\ start\_time\ \ \ \ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a94dab5770726ccbef8c7d026cfbdf8e5}{f64}}\ end\_time\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00085\ \ \ \ \ \ \ std::\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{ifstream}}\ \ stream\_file\_\ ;\ \ \ \ \ }
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \textcolor{comment}{//file\_reader\ \ \ \ \ \ \ \ \ :\ BufReader<File>,}}
+\DoxyCodeLine{00088\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ cursor\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \textcolor{comment}{//pub\ filter\ \ \ \ \ \ \ \ \ \ :\ TelemetryPacketType,}}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ n\_packs\_read\_\ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ n\_packs\_skipped\ \ \ \ \ ;}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ skip\_ahead\ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00098\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ stop\_after\ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ n\_duplicates\ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \textcolor{comment}{//dedup\_cache\ \ \ \ \ \ \ \ \ :\ HashMap<u16,\ VecDeque<u16>>}}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}}\ prime\_next\_file\_()\ -\/>\ \textcolor{keywordtype}{void};}
+\DoxyCodeLine{00106\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}}\ register\_packet\_type\_(\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7}{TelemetryPacketType}}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{ptyep}})\ -\/>\ \textcolor{keywordtype}{void};}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{HashMap}}<\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7}{TelemetryPacketType}},\ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}>\ packet\_index\_;}
+\DoxyCodeLine{00111\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}<\mbox{\hyperlink{structGaps_1_1Telemetry_1_1Packet}{TelemetryPacket}}>\ packet\_cache\_\ =\ \{\};}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ in\_caching\_\ =\ \textcolor{keyword}{false};\ }
+\DoxyCodeLine{00114\ \ \ \};}
+\DoxyCodeLine{00115\ \}}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \textcolor{preprocessor}{\#endif\ }}
 
 \end{DoxyCode}
