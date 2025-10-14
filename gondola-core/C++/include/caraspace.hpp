@@ -93,6 +93,23 @@ namespace gondola {
     /// the paramter is the number of RBs we expect in this run
     auto get_rbcalibrations(u8 n_rb) -> RBCalibrationMap;     
 
+    /// Has this been created from telemetry dirctly? 
+    auto is_from_telemetry() const -> bool;
+
+    /// An index of seen TelemetryPacketTypes in CRFrames. This might 
+    /// be of limited use in case that this reader has been run over 
+    /// L0 files, but this feature might get implemented in the future.
+    auto get_telemetry_packet_index() const -> const HashMap<TelemetryPacketType, u64> &;
+
+    /// In case we are reading from bin files, we can run the underlying TelemetryPacketReader 
+    /// in cached mode, which will allow us to have all packets sorted by time and packet header 
+    /// counter in memory. A call to ::cache_telemetry_first right after the instanciation of 
+    /// a CRReader will trigger the underlying TelemetryPacketReader to go through the caching 
+    /// process. After that, the created frames will be sorted in time and by counter value 
+    ///
+    /// This has ONLY an effect if we are reading .bin files! 
+    auto cache_telemetry_first() -> void;
+
   private:  
     #ifdef BUILD_CXXDB
     Gaps::TofPaddleMap paddles_          ; 
