@@ -148,14 +148,14 @@ auto gtl::Packet::to_string() const -> std::string {
 
 auto gtl::TrkHeader::to_string() const -> std::string {
   std::string repr = "<TrkHeader:";
-  repr += std::format("  sync     : {}", sync);
-  repr += std::format("  crc      : {}", crc);
-  repr += std::format("  sys_id   : {}", sys_id);
-  repr += std::format("  pkt_id   : {}", packet_id);
-  repr += std::format("  length   : {}", length);
-  repr += std::format("  daq_cnt  : {}", daq_count);
-  repr += std::format("  sys_time : {}", sys_time);
-  repr += std::format("  version  : {}", version);
+  repr += std::format("\n  sync     : {}", sync);
+  repr += std::format("\n  crc      : {}", crc);
+  repr += std::format("\n  sys_id   : {}", sys_id);
+  repr += std::format("\n  pkt_id   : {}", packet_id);
+  repr += std::format("\n  length   : {}", length);
+  repr += std::format("\n  daq_cnt  : {}", daq_count);
+  repr += std::format("\n  sys_time : {}", sys_time);
+  repr += std::format("\n  version  : {}", version);
   return repr;
 }
 
@@ -167,7 +167,6 @@ auto gtl::TrkHeader::from_bytestream(Vec<u8> const &stream, usize &pos)
     auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
     return Err(err);
   } 
-  
   header.sync   = parse_u16(stream, pos);
   header.crc    = parse_u16(stream, pos);
   header.sys_id = parse_u8(stream, pos);
@@ -241,19 +240,82 @@ auto gtl::TrkEventPacket::to_string() const -> std::string {
 auto gtl::TrkEventPacket::from_bytestream(Vec<u8> const &stream, usize &pos)
   -> r::Result<TrkEventPacket, Gaps::IOError> {
   TrkEventPacket packet;
-  auto packet_header = PacketHeader::from_bytestream(stream, pos);
-  if (packet_header.is_ok()) {
-    packet.header = packet_header.unwrap();
-  } else {
-    return Err(packet_header.unwrap_err());
-  }
+  //auto packet_header = PacketHeader::from_bytestream(stream, pos);
+  //if (packet_header.is_ok()) {
+  //  packet.header = packet_header.unwrap();
+  //} else {
+  //  spdlog::error("Unpacking of the telemetry header failed!");
+  //  return Err(packet_header.unwrap_err());
+  //}
   auto trk_header = TrkHeader::from_bytestream(stream, pos);
   if (trk_header.is_ok()) {
     packet.daq_header = trk_header.unwrap();
   } else {
     return Err(trk_header.unwrap_err());
   }
-  // FIXME 
+  if (packet.daq_header.version >= 5) {
+    packet.run_id = Gaps::parse_u16(stream, pos);
+  } else {
+    packet.run_id_old = Gaps::parse_u8(stream, pos);
+  }
+  // now read the events
+  const size_t event_header_size = 12;
+  while (true) {
+    // FIXME - Alex seemingly has a bug here
+    if ((packet.daq_header.version >= 4) && ((pos == stream.size()) || ((pos + 1 == stream.size()) && (stream.at(pos) == 0xff))       )) {
+      return Ok(packet);
+    } 
+    if (pos + event_header_size > stream.size()) { 
+      std::string message("Unable to read more TrackerEvents! Stream is too short!");
+      //spdlog::error("{}",packet.to_string());
+      auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
+      return Err(err);
+    }
+    gtl::TrkEvent trk_event;
+    trk_event.layer = packet.daq_header.sys_id;
+    u8 n_hits = parse_u8(stream, pos);
+    trk_event.flags1   = parse_u8(stream, pos);
+    trk_event.event_id = parse_u32(stream, pos);
+    u32 lower          = parse_u32(stream, pos);
+    u16 upper          = parse_u16(stream, pos);
+    u64 systime        = (static_cast<uint64_t>(upper) << 32) | lower;
+    trk_event.event_time = systime;
+    if (n_hits > 192) {
+      // should that return error instead?
+      return Ok(packet);
+    } 
+    if ((pos + (3*n_hits)) > stream.size()) {
+      auto message =  std::format("Unable to read all {} tracker hits! Stream is too short!", n_hits);
+      //spdlog::error("{}",packet.to_string());
+      auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
+      return Err(err);
+    }
+    for (u8 j = 0; j<n_hits; j++) {
+      u8 h0 = parse_u8(stream, pos);
+      u8 h1 = parse_u8(stream, pos);
+      u8 h2 = parse_u8(stream, pos);
+      u8  asic_event_code = h2 >> 6;
+      u8  channel = h0 & 0b11111;
+      u8  module = h0 >> 5;
+      u8  row = h1 & 0b111;
+      u16 adc = ((h2 & 0b00111111) << 5) |        (h1 >> 3);
+
+      auto hit = TrkHit();
+      hit.channel = channel;
+      hit.module  = module;
+      hit.row     = row;
+      hit.adc     = adc;
+      hit.asic_event_code = asic_event_code;
+      trk_event.hits.push_back(std::move(hit));
+    }
+    packet.events.push_back(std::move(trk_event));
+  }
+  if (packet.events.size() > 170) {
+    std::string message = std::format("There seem to be more than 170 events (!) in the tracker. This is nonsense!");
+    spdlog::error("{}",message);
+    auto err = g::IOError(g::IOError::ErrorKind::TooManyTrkEvents, message);
+    return Err(err); 
+  }
   return Ok(packet);
 }
 
@@ -355,7 +417,8 @@ auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
   //}
   u16 num_tof_bytes = parse_u16(stream, pos);
   if (stream.size() < pos + num_tof_bytes) {
-    std::string message = std::format("Stream does not contain enough TOF bytes!");
+    //spdlog::error("{}", evt.to_string());
+    std::string message = std::format("Stream does not contain enough TOF bytes! We expect {} when the remaing size is only {}", num_tof_bytes, stream.size() - pos);
     spdlog::error("{}",message);
     auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
     return Err(err);

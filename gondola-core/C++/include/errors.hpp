@@ -8,6 +8,7 @@ namespace Gaps {
    
       enum class ErrorKind {
         StreamTooShort,
+        TooManyTrkEvents,
         WrongDelimiter,
         PacketNotFound,
         WrongPacketType,
