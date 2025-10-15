@@ -233,7 +233,14 @@ impl TofPacketReader {
     Some(self.filenames[self.file_idx].clone())
   }
   
-  /// Preview the number of frames in this reader
+  /// Run once over the entire file, skipping most of its content 
+  /// but retrieve the number of packets available. 
+  ///
+  /// After a succesful count, the reader is rewound automatically
+  ///
+  /// # Returns:
+  ///   number of packets in the current file or, if multiple files given, 
+  ///   all of them.
   pub fn count_packets(&mut self) -> usize {
     let _ = self.rewind();
     let mut nframes = 0usize;
@@ -313,11 +320,11 @@ impl TofPacketReader {
               }
             }
             Ok(_) => {
-              self.cursor += 8;
+              self.cursor += 4;
             }
           }
           let vec_data = buffer_psize.to_vec();
-          let size     = parse_u64(&vec_data, &mut 0);
+          let size     = parse_u32(&vec_data, &mut 0);
           let mut temp_buffer = vec![0; size as usize];
           match self.file_reader.read_exact(&mut temp_buffer) { 
           //match self.file_reader.seek(SeekFrom::Current(size as i64)) {
@@ -499,7 +506,15 @@ impl TofPacketReader {
       Ok(_) => Ok(())
     }
   }
-
+  
+  /// Run once over the entire file, skipping most of its content 
+  /// but retrieve the number of packets available. 
+  ///
+  /// After a succesful count, the reader is rewound automatically
+  ///
+  /// # Returns:
+  ///   number of packets in the current file or, if multiple files given, 
+  ///   all of them.
   #[pyo3(name="count_packets")]
   fn count_packets_py(&mut self) -> usize {
     self.count_packets()
