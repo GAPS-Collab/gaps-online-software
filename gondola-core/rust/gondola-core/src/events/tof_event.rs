@@ -789,11 +789,6 @@ impl Serialization for TofEvent {
       //println!("{}", next_rb_event);
       te.rb_events.push(next_rb_event);
     }
-    let tail = parse_u16(stream, pos);
-    if tail != Self::TAIL {
-      error!("Decoding of TAIL failed! Got {} instead!", tail);
-      return Err(SerializationError::TailInvalid);
-    }
     //println!("{}",te);
     
     // FIXME - this is slow, use Arc<> instead. However, then make 
@@ -803,6 +798,11 @@ impl Serialization for TofEvent {
       for h in &rbev.hits {
         te.hits.push(*h);
       }
+    }
+    let tail = parse_u16(stream, pos);
+    if tail != Self::TAIL {
+      error!("Decoding of TAIL failed! Got {} instead!", tail);
+      return Err(SerializationError::TailInvalid);
     }
     return Ok(te);
   }
