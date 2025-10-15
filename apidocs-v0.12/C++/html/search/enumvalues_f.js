@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['tailwrong_0',['TailWrong',['../events_8h.html#a097b60adc604ef5a27f55edda6360293aec81a5026e321b3f9ff2f610e52d532e',1,'events.h']]],
+  ['tailwrong_0',['TailWrong',['../namespacegondola.html#ae4efa4080cf89476f85e917971613baaaec81a5026e321b3f9ff2f610e52d532e',1,'gondola']]],
   ['telemetrypacket_1',['TelemetryPacket',['../namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68aac967e66068a7e25b02b4b2e6bcc4504',1,'gondola']]],
   ['timingcalibration_2',['TimingCalibration',['../commands_8h.html#ad6d9706eb4e1aa6ed956444c5cd2a3b5a83bad94620be1879a1bcadf2cae35aed',1,'commands.h']]],
   ['tmp214_3',['TmP214',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a0eb669abecb3b34dadc793ec5e098d8b',1,'Gaps::Telemetry']]],
@@ -14,9 +14,10 @@ var searchData=
   ['tofevent_11',['TofEvent',['../tof__packet_8h.html#aa69433dde428a8cd2a2242fb3592a565a73acb556ee85b83d287b122b37ede01e',1,'tof_packet.h']]],
   ['tofeventsummary_12',['TofEventSummary',['../tof__packet_8h.html#aa69433dde428a8cd2a2242fb3592a565a6046537136bf4784175124a473eb23c5',1,'tof_packet.h']]],
   ['tofpacket_13',['TofPacket',['../namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68a0a5f7d79c74b92d33255fc332e25b536',1,'gondola']]],
-  ['track_14',['Track',['../events_8h.html#a4a0b0f32c84d56c15f094cf09291a6c7a92ea731d3af6677905303c88689f5d55',1,'events.h']]],
-  ['trackcentral_15',['TrackCentral',['../events_8h.html#a4a0b0f32c84d56c15f094cf09291a6c7abc421fa7f533c3d639eeebfd29fdf499',1,'events.h']]],
-  ['tracker_16',['Tracker',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a26b8a5f8cbb692e906c8eed4b88cc0bd',1,'Gaps::Telemetry']]],
-  ['trackerdaqcntr_17',['TrackerDAQCntr',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7ac673eb57c4b7d3d8227f8b7e0f844b08',1,'Gaps::Telemetry']]],
-  ['trktempleak_18',['TrkTempLeak',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a809a59ac536e0b86400daa219166044d',1,'Gaps::Telemetry']]]
+  ['toomanytrkevents_14',['TooManyTrkEvents',['../classGaps_1_1IOError.html#aef5d09096037b3efe50862e2b52a9872a1af5bfa5aee6996e722fe0553a11d381',1,'Gaps::IOError']]],
+  ['track_15',['Track',['../namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21a92ea731d3af6677905303c88689f5d55',1,'gondola']]],
+  ['trackcentral_16',['TrackCentral',['../namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21abc421fa7f533c3d639eeebfd29fdf499',1,'gondola']]],
+  ['tracker_17',['Tracker',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a26b8a5f8cbb692e906c8eed4b88cc0bd',1,'Gaps::Telemetry']]],
+  ['trackerdaqcntr_18',['TrackerDAQCntr',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7ac673eb57c4b7d3d8227f8b7e0f844b08',1,'Gaps::Telemetry']]],
+  ['trktempleak_19',['TrkTempLeak',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a809a59ac536e0b86400daa219166044d',1,'Gaps::Telemetry']]]
 ];

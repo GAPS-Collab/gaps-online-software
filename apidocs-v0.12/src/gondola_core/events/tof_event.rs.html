@@ -789,20 +789,20 @@
 <a href=#789 id=789 data-nosnippet>789</a>      <span class="comment">//println!("{}", next_rb_event);
 <a href=#790 id=790 data-nosnippet>790</a>      </span>te.rb_events.push(next_rb_event);
 <a href=#791 id=791 data-nosnippet>791</a>    }
-<a href=#792 id=792 data-nosnippet>792</a>    <span class="kw">let </span>tail = parse_u16(stream, pos);
-<a href=#793 id=793 data-nosnippet>793</a>    <span class="kw">if </span>tail != <span class="self">Self</span>::TAIL {
-<a href=#794 id=794 data-nosnippet>794</a>      <span class="macro">error!</span>(<span class="string">"Decoding of TAIL failed! Got {} instead!"</span>, tail);
-<a href=#795 id=795 data-nosnippet>795</a>      <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::TailInvalid);
-<a href=#796 id=796 data-nosnippet>796</a>    }
-<a href=#797 id=797 data-nosnippet>797</a>    <span class="comment">//println!("{}",te);
-<a href=#798 id=798 data-nosnippet>798</a>    
-<a href=#799 id=799 data-nosnippet>799</a>    // FIXME - this is slow, use Arc&lt;&gt; instead. However, then make 
-<a href=#800 id=800 data-nosnippet>800</a>    // sure to copy them in case we get rid of the rb evvnts 
-<a href=#801 id=801 data-nosnippet>801</a>    // (or does Arc take care of it) 
-<a href=#802 id=802 data-nosnippet>802</a>    </span><span class="kw">for </span>rbev <span class="kw">in </span><span class="kw-2">&amp;</span>te.rb_events {
-<a href=#803 id=803 data-nosnippet>803</a>      <span class="kw">for </span>h <span class="kw">in </span><span class="kw-2">&amp;</span>rbev.hits {
-<a href=#804 id=804 data-nosnippet>804</a>        te.hits.push(<span class="kw-2">*</span>h);
-<a href=#805 id=805 data-nosnippet>805</a>      }
+<a href=#792 id=792 data-nosnippet>792</a>    <span class="comment">//println!("{}",te);
+<a href=#793 id=793 data-nosnippet>793</a>    
+<a href=#794 id=794 data-nosnippet>794</a>    // FIXME - this is slow, use Arc&lt;&gt; instead. However, then make 
+<a href=#795 id=795 data-nosnippet>795</a>    // sure to copy them in case we get rid of the rb evvnts 
+<a href=#796 id=796 data-nosnippet>796</a>    // (or does Arc take care of it) 
+<a href=#797 id=797 data-nosnippet>797</a>    </span><span class="kw">for </span>rbev <span class="kw">in </span><span class="kw-2">&amp;</span>te.rb_events {
+<a href=#798 id=798 data-nosnippet>798</a>      <span class="kw">for </span>h <span class="kw">in </span><span class="kw-2">&amp;</span>rbev.hits {
+<a href=#799 id=799 data-nosnippet>799</a>        te.hits.push(<span class="kw-2">*</span>h);
+<a href=#800 id=800 data-nosnippet>800</a>      }
+<a href=#801 id=801 data-nosnippet>801</a>    }
+<a href=#802 id=802 data-nosnippet>802</a>    <span class="kw">let </span>tail = parse_u16(stream, pos);
+<a href=#803 id=803 data-nosnippet>803</a>    <span class="kw">if </span>tail != <span class="self">Self</span>::TAIL {
+<a href=#804 id=804 data-nosnippet>804</a>      <span class="macro">error!</span>(<span class="string">"Decoding of TAIL failed! Got {} instead!"</span>, tail);
+<a href=#805 id=805 data-nosnippet>805</a>      <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::TailInvalid);
 <a href=#806 id=806 data-nosnippet>806</a>    }
 <a href=#807 id=807 data-nosnippet>807</a>    <span class="kw">return </span><span class="prelude-val">Ok</span>(te);
 <a href=#808 id=808 data-nosnippet>808</a>  }

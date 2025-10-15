@@ -19,8 +19,18 @@
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_a51f8d07aa658c56d2ddd5054b7a85806}{get\+\_\+next\+\_\+packet}} () -\/$>$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Packet}{Gaps\+::\+Telemetry\+::\+Packet}}
 \item 
-\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_a954e5dbc2e1e3b39bb854303bd8c9873}{is\+\_\+exhausted}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}}
-\end{DoxyCompactItemize}
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_a4ac18e3e88c5c9d83901668b170b48c3}{count\+\_\+packets}} () -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}
+\begin{DoxyCompactList}\small\item\em count the packets within the Telemetry fiel \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_a16cf37c876f8496252347f8c21939b2f}{is\+\_\+exhausted}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_a6008e84c1ee2b9ab5b92ec4a4b564fb6}{get\+\_\+packet\+\_\+index}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7}{Telemetry\+Packet\+Type}}, \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} $>$ \&
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_adf7dd2adf0d5b771941f6b604e50b8b1}{cache\+\_\+all\+\_\+packets}} () -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_a8c859d9bd436871196abae1261b880b4}{print\+\_\+packet\+\_\+index}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader_af621967fdf97e696ca285427a8f91207}{rewind}} () -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}
+\begin{DoxyCompactList}\small\item\em Restart the reading of packets from the beginning of the underlying buffers. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \doxysubsection{Detailed Description}
@@ -50,6 +60,25 @@ Read GAPS binary files ("{}Berkeley binaries)
 
 
 \doxysubsection{Member Function Documentation}
+\Hypertarget{structgondola_1_1TelemetryPacketReader_adf7dd2adf0d5b771941f6b604e50b8b1}\label{structgondola_1_1TelemetryPacketReader_adf7dd2adf0d5b771941f6b604e50b8b1} 
+\index{gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}!cache\_all\_packets@{cache\_all\_packets}}
+\index{cache\_all\_packets@{cache\_all\_packets}!gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}}
+\doxysubsubsection{\texorpdfstring{cache\_all\_packets()}{cache\_all\_packets()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Telemetry\+Packet\+Reader\+::cache\+\_\+all\+\_\+packets (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}}
+
+In cached mode, the reader will first read all packets from a file and then sort them by their timestamp and counter value. This comes at a performance cost, but will allow a more precise estimate about missing packets.
+
+To run in cached mode, run \doxylink{structgondola_1_1TelemetryPacketReader_adf7dd2adf0d5b771941f6b604e50b8b1}{cache\+\_\+all\+\_\+packets} before any \doxylink{structgondola_1_1TelemetryPacketReader_a51f8d07aa658c56d2ddd5054b7a85806}{get\+\_\+next\+\_\+packet} calls. ~\newline
+ \Hypertarget{structgondola_1_1TelemetryPacketReader_a4ac18e3e88c5c9d83901668b170b48c3}\label{structgondola_1_1TelemetryPacketReader_a4ac18e3e88c5c9d83901668b170b48c3} 
+\index{gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}!count\_packets@{count\_packets}}
+\index{count\_packets@{count\_packets}!gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}}
+\doxysubsubsection{\texorpdfstring{count\_packets()}{count\_packets()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Telemetry\+Packet\+Reader\+::count\+\_\+packets (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}}
+
+
+
+count the packets within the Telemetry fiel 
+
 \Hypertarget{structgondola_1_1TelemetryPacketReader_aeab4c103035559c98ade8313f5650958}\label{structgondola_1_1TelemetryPacketReader_aeab4c103035559c98ade8313f5650958} 
 \index{gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}!get\_filenames@{get\_filenames}}
 \index{get\_filenames@{get\_filenames}!gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}}
@@ -62,13 +91,36 @@ Read GAPS binary files ("{}Berkeley binaries)
 \doxysubsubsection{\texorpdfstring{get\_next\_packet()}{get\_next\_packet()}}
 {\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Telemetry\+Packet\+Reader\+::get\+\_\+next\+\_\+packet (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Packet}{Gaps\+::\+Telemetry\+::\+Packet}}}
 
-\Hypertarget{structgondola_1_1TelemetryPacketReader_a954e5dbc2e1e3b39bb854303bd8c9873}\label{structgondola_1_1TelemetryPacketReader_a954e5dbc2e1e3b39bb854303bd8c9873} 
+\Hypertarget{structgondola_1_1TelemetryPacketReader_a6008e84c1ee2b9ab5b92ec4a4b564fb6}\label{structgondola_1_1TelemetryPacketReader_a6008e84c1ee2b9ab5b92ec4a4b564fb6} 
+\index{gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}!get\_packet\_index@{get\_packet\_index}}
+\index{get\_packet\_index@{get\_packet\_index}!gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}}
+\doxysubsubsection{\texorpdfstring{get\_packet\_index()}{get\_packet\_index()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Telemetry\+Packet\+Reader\+::get\+\_\+packet\+\_\+index (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7}{Telemetry\+Packet\+Type}}, \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}$>$\&}
+
+The packet index is a map of Telemetry\+Packet\+Type -\/\texorpdfstring{$>$}{>} Number of seen packets ~\newline
+ \Hypertarget{structgondola_1_1TelemetryPacketReader_a16cf37c876f8496252347f8c21939b2f}\label{structgondola_1_1TelemetryPacketReader_a16cf37c876f8496252347f8c21939b2f} 
 \index{gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}!is\_exhausted@{is\_exhausted}}
 \index{is\_exhausted@{is\_exhausted}!gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}}
 \doxysubsubsection{\texorpdfstring{is\_exhausted()}{is\_exhausted()}}
-{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}} gondola\+::\+Telemetry\+Packet\+Reader\+::is\+\_\+exhausted (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Telemetry\+Packet\+Reader\+::is\+\_\+exhausted (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}}}
 
-All packets have been read from the file. If they should be read again, the reader has to be created again \Hypertarget{structgondola_1_1TelemetryPacketReader_aecb4a47ffb724ec5913e15928b4e0aaa}\label{structgondola_1_1TelemetryPacketReader_aecb4a47ffb724ec5913e15928b4e0aaa} 
+All packets have been read from the file. If they should be read again, the reader has to be created again \Hypertarget{structgondola_1_1TelemetryPacketReader_a8c859d9bd436871196abae1261b880b4}\label{structgondola_1_1TelemetryPacketReader_a8c859d9bd436871196abae1261b880b4} 
+\index{gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}!print\_packet\_index@{print\_packet\_index}}
+\index{print\_packet\_index@{print\_packet\_index}!gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}}
+\doxysubsubsection{\texorpdfstring{print\_packet\_index()}{print\_packet\_index()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Telemetry\+Packet\+Reader\+::print\+\_\+packet\+\_\+index (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}}
+
+Print the package index, converting the Telemetry\+Packet\+Type to a string for implementation independent viewing \Hypertarget{structgondola_1_1TelemetryPacketReader_af621967fdf97e696ca285427a8f91207}\label{structgondola_1_1TelemetryPacketReader_af621967fdf97e696ca285427a8f91207} 
+\index{gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}!rewind@{rewind}}
+\index{rewind@{rewind}!gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}}
+\doxysubsubsection{\texorpdfstring{rewind()}{rewind()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Telemetry\+Packet\+Reader\+::rewind (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}}
+
+
+
+Restart the reading of packets from the beginning of the underlying buffers. 
+
+\Hypertarget{structgondola_1_1TelemetryPacketReader_aecb4a47ffb724ec5913e15928b4e0aaa}\label{structgondola_1_1TelemetryPacketReader_aecb4a47ffb724ec5913e15928b4e0aaa} 
 \index{gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}!set\_path@{set\_path}}
 \index{set\_path@{set\_path}!gondola::TelemetryPacketReader@{gondola::TelemetryPacketReader}}
 \doxysubsubsection{\texorpdfstring{set\_path()}{set\_path()}}

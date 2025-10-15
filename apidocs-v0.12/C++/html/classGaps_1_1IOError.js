@@ -2,6 +2,7 @@ var classGaps_1_1IOError =
 [
     [ "ErrorKind", "classGaps_1_1IOError.html#aef5d09096037b3efe50862e2b52a9872", [
       [ "StreamTooShort", "classGaps_1_1IOError.html#aef5d09096037b3efe50862e2b52a9872a7700d8c06be44e20cc35c7b67bb196a6", null ],
+      [ "TooManyTrkEvents", "classGaps_1_1IOError.html#aef5d09096037b3efe50862e2b52a9872a1af5bfa5aee6996e722fe0553a11d381", null ],
       [ "WrongDelimiter", "classGaps_1_1IOError.html#aef5d09096037b3efe50862e2b52a9872ae88402395166afe541888385c1f08cea", null ],
       [ "PacketNotFound", "classGaps_1_1IOError.html#aef5d09096037b3efe50862e2b52a9872a6880a1b15a1ca734913a8fbafd20d9d8", null ],
       [ "WrongPacketType", "classGaps_1_1IOError.html#aef5d09096037b3efe50862e2b52a9872a332c27e37d34b4727f6023e6210a1b88", null ],

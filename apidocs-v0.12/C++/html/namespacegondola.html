@@ -109,9 +109,23 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1CRReader.html">CRReader</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1MasterTriggerEvent.html">MasterTriggerEvent</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1RBCalibration.html">RBCalibration</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1RBEvent.html">RBEvent</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1RBEventHeader.html">RBEventHeader</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1RBWaveform.html">RBWaveform</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1TelemetryPacketReader.html">TelemetryPacketReader</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1TofEvent.html">TofEvent</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1TofEventSummary.html">TofEventSummary</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1TofHit.html">TofHit</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
@@ -119,6 +133,13 @@ Typedefs</h2></td></tr>
 <tr class="memitem:ae720591de7c0e9e18619d265295f1ebe" id="r_ae720591de7c0e9e18619d265295f1ebe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">typedef</a> std::map&lt; <a class="el" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a>, <a class="el" href="structgondola_1_1RBCalibration.html">RBCalibration</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#ae720591de7c0e9e18619d265295f1ebe">RBCalibrationMap</a></td></tr>
 <tr class="memdesc:ae720591de7c0e9e18619d265295f1ebe"><td class="mdescLeft">&#160;</td><td class="mdescRight">shortcut for the typically used map of rb_id -&gt; calibrations  <br /></td></tr>
 <tr class="separator:ae720591de7c0e9e18619d265295f1ebe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b9982f07cad746b60c39b2d2a71497d" id="r_a1b9982f07cad746b60c39b2d2a71497d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">typedef</a> <a class="el" href="namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7">Gaps::Telemetry::BfswPacketType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a1b9982f07cad746b60c39b2d2a71497d">TelemetryPacketType</a></td></tr>
+<tr class="memdesc:a1b9982f07cad746b60c39b2d2a71497d"><td class="mdescLeft">&#160;</td><td class="mdescRight">FIXME - this will be renamed to be the same as in rust.  <br /></td></tr>
+<tr class="separator:a1b9982f07cad746b60c39b2d2a71497d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb061fbe28da00055cd7fb65249a77df" id="r_adb061fbe28da00055cd7fb65249a77df"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">typedef</a> <a class="el" href="structGaps_1_1Telemetry_1_1Packet.html">Gaps::Telemetry::Packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#adb061fbe28da00055cd7fb65249a77df">TelemetryPacket</a></td></tr>
+<tr class="separator:adb061fbe28da00055cd7fb65249a77df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abddc47f5a39ae5245979bc0a1b2cceea" id="r_abddc47f5a39ae5245979bc0a1b2cceea"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">typedef</a> <a class="el" href="structGaps_1_1Telemetry_1_1PacketHeader.html">Gaps::Telemetry::PacketHeader</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#abddc47f5a39ae5245979bc0a1b2cceea">TelemetryPacketHeader</a></td></tr>
+<tr class="separator:abddc47f5a39ae5245979bc0a1b2cceea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
 Enumerations</h2></td></tr>
@@ -129,6 +150,64 @@ Enumerations</h2></td></tr>
 <tr class="memdesc:a466ace2a4c29903ffca2f1f86b41ba68"><td class="mdescLeft">&#160;</td><td class="mdescRight">These are objects which can be stored in a caraspace frame <br  />
   <a href="namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68">More...</a><br /></td></tr>
 <tr class="separator:a466ace2a4c29903ffca2f1f86b41ba68"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae4efa4080cf89476f85e917971613baa" id="r_ae4efa4080cf89476f85e917971613baa"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baa">EventStatus</a> : u8 { <br />
+&#160;&#160;<a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaa88183b946cc5f0e8c96b2e66e1c74a7e">Unknown</a> = EVENTSTATUS_UNKNOWN
+, <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaa1b8508e116432ac1383a292c6a0d05c1">Crc32Wrong</a> = EVENTSTATUS_CRC32WRONG
+, <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaaec81a5026e321b3f9ff2f610e52d532e">TailWrong</a> = EVENTSTATUS_TAILWRONG
+, <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaae47816a3c64358b80c028dc88edcab3c">ChannelIDWrong</a> = EVENTSTATUS_CHIDWRONG
+, <br />
+&#160;&#160;<a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaa89db10b7258e552827a62fd8d1e4309e">CellSyncErrors</a> = EVENTSTATUS_CELLSYNCERR
+, <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaa99ef53b53786cbe479e9a7075a2492df">ChnSyncErrors</a> = EVENTSTATUS_CHNSYNCERR
+, <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaa4d9a974c1af3b5418f3b61dbd735bc14">CellAndChnSyncErrors</a> = EVENTSTATUS_CELLANDCHNSYNCERR
+, <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaa914a42ba7d6f75029e02b8c5e8a80016">AnyDataMangling</a> = EVENTSTATUS_ANYDATAMANGLING
+, <br />
+&#160;&#160;<a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaaba59a6fba632d1543589d766abc636df">IncompatibleData</a> = EVENTSTATUS_INCOMPATIBLEDATA
+, <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaa44ce38fea2e8223bad3229cd0eac17da">EventTimeOut</a> = EVENTSTATUS_EVENTTIMEOUT
+, <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaa5c7a66b675c172f368c8331b20c68c45">GoodNoCRCOrErrBitCheck</a> = EVENTSTATUS_GOODNOCRCORERRBITCHECK
+, <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaa3a4bcec2a877d364580a1a753dd0d1c8">GoodNoCRCCheck</a> = EVENTSTATUS_GOODNOCRCCHECK
+, <br />
+&#160;&#160;<a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaa69a7cfda8af8a54154e556f4d766926c">GoodNoErrBitCheck</a> = EVENTSTATUS_GOODNOERRBITCHECK
+, <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaae0a530b3e7e74423e454a99e3c6d0b69">IncompleteReadout</a> = EVENTSTATUS_INCOMPLETEREADOUT
+, <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaa56cdd7e9e3cef1974f4075c03a80332d">Perfect</a> = EVENTSTATUS_PERFECT
+<br />
+ }</td></tr>
+<tr class="separator:ae4efa4080cf89476f85e917971613baa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac91e1b082fd02305f77ee3d0338ff21" id="r_aac91e1b082fd02305f77ee3d0338ff21"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21">TriggerType</a> : u8 { <br />
+&#160;&#160;<a class="el" href="namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21a88183b946cc5f0e8c96b2e66e1c74a7e">Unknown</a> = TRIGGERTYPE_UNKNOWN
+, <a class="el" href="namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21a41d31d862aea788d0c2b86ac6df3c0ae">Gaps</a> = TRIGGERTYPE_GAPS
+, <a class="el" href="namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21aed36a1ef76a59ee3f15180e0441188ad">Any</a> = TRIGGERTYPE_ANY
+, <a class="el" href="namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21a92ea731d3af6677905303c88689f5d55">Track</a> = TRIGGERTYPE_TRACK
+, <br />
+&#160;&#160;<a class="el" href="namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21abc421fa7f533c3d639eeebfd29fdf499">TrackCentral</a> = TRIGGERTYPE_TRACKCENTRAL
+, <a class="el" href="namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21adff200b0bb8d3c69fbd54cb43664cd7e">Poisson</a> = TRIGGERTYPE_POISSON
+, <a class="el" href="namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21adc2eb84d1f952ad0e6b58014aabd616a">Forced</a> = TRIGGERTYPE_FORCED
+<br />
+ }</td></tr>
+<tr class="separator:aac91e1b082fd02305f77ee3d0338ff21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e679dd5cf65b9be26ead6c7555f2580" id="r_a3e679dd5cf65b9be26ead6c7555f2580"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a3e679dd5cf65b9be26ead6c7555f2580">LTBThreshold</a> : u8 { <br />
+&#160;&#160;<a class="el" href="namespacegondola.html#a3e679dd5cf65b9be26ead6c7555f2580af8246e1e45d89414e8bf56ffe1680a54">NoHit</a> = LTBTHRESHOLD_NOHIT
+, <a class="el" href="namespacegondola.html#a3e679dd5cf65b9be26ead6c7555f2580aebfe5e1791db03c4cd6ab95801e0977d">Hit</a> = LTBTHRESHOLD_HIT
+, <a class="el" href="namespacegondola.html#a3e679dd5cf65b9be26ead6c7555f2580a0b87d66b88c72957dfea8c9605016442">Beta</a> = LTBTHRESHOLD_BETA
+, <a class="el" href="namespacegondola.html#a3e679dd5cf65b9be26ead6c7555f2580a98865aa73ddbf0657187d430de3c38bc">Veto</a> = LTBTHRESHOLD_VETO
+, <br />
+&#160;&#160;<a class="el" href="namespacegondola.html#a3e679dd5cf65b9be26ead6c7555f2580a88183b946cc5f0e8c96b2e66e1c74a7e">Unknown</a> = LTBTHRESHOLD_UNKNOWN
+<br />
+ }</td></tr>
+<tr class="separator:a3e679dd5cf65b9be26ead6c7555f2580"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac61bd1b8e62eab79a1089be6ecc1ca3d" id="r_ac61bd1b8e62eab79a1089be6ecc1ca3d"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#ac61bd1b8e62eab79a1089be6ecc1ca3d">EventQuality</a> : u8 { <br />
+&#160;&#160;<a class="el" href="namespacegondola.html#ac61bd1b8e62eab79a1089be6ecc1ca3da88183b946cc5f0e8c96b2e66e1c74a7e">Unknown</a> = EVENT_QUALITY_UNKNOWN
+, <a class="el" href="namespacegondola.html#ac61bd1b8e62eab79a1089be6ecc1ca3daf96e345fdc19cbd4cf15256c251a39a0">Silver</a> = EVENT_QUALITY_SILVER
+, <a class="el" href="namespacegondola.html#ac61bd1b8e62eab79a1089be6ecc1ca3da9768feb3fdb1f267b06093bc572952dd">Gold</a> = EVENT_QUALITY_GOLD
+, <a class="el" href="namespacegondola.html#ac61bd1b8e62eab79a1089be6ecc1ca3da8f7671185d590914ac21c7511767b699">Diamond</a> = EVENT_QUALITY_DIAMOND
+, <br />
+&#160;&#160;<a class="el" href="namespacegondola.html#ac61bd1b8e62eab79a1089be6ecc1ca3da62cf3c3f187eab330ce1a7ecac59b539">FourLeafClover</a> = EVENT_QUALITY_FOURLEAFCLOVER
+<br />
+ }</td></tr>
+<tr class="separator:ac61bd1b8e62eab79a1089be6ecc1ca3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62baa478e4adaaf6d242f135c1c9f84d" id="r_a62baa478e4adaaf6d242f135c1c9f84d"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a62baa478e4adaaf6d242f135c1c9f84d">CompressionLevel</a> : u8 { <a class="el" href="namespacegondola.html#a62baa478e4adaaf6d242f135c1c9f84da88183b946cc5f0e8c96b2e66e1c74a7e">Unknown</a> = COMPRESSION_LEVEL_UNKNOWN
+, <a class="el" href="namespacegondola.html#a62baa478e4adaaf6d242f135c1c9f84da6adf97f83acf6453d4a6a4b1070f3754">None</a> = COMPRESSION_LEVEL_NONE
+ }</td></tr>
+<tr class="separator:a62baa478e4adaaf6d242f135c1c9f84d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -143,6 +222,34 @@ Functions</h2></td></tr>
 <tr class="memitem:abbe7c2c301e4f6cdd581d33c97be557d" id="r_abbe7c2c301e4f6cdd581d33c97be557d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#abbe7c2c301e4f6cdd581d33c97be557d">load_tof_calibrations</a> (std::string <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">pathname</a>) -&gt; std::map&lt; <a class="el" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a>, <a class="el" href="structgondola_1_1RBCalibration.html">RBCalibration</a> &gt;</td></tr>
 <tr class="memdesc:abbe7c2c301e4f6cdd581d33c97be557d"><td class="mdescLeft">&#160;</td><td class="mdescRight">convenience function to load all the calibration files from a certain directory  <br /></td></tr>
 <tr class="separator:abbe7c2c301e4f6cdd581d33c97be557d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b25ba3aba0e585295ecefc0701cf7de" id="r_a3b25ba3aba0e585295ecefc0701cf7de"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a3b25ba3aba0e585295ecefc0701cf7de">get_hid_vid_map</a> () -&gt; <a class="el" href="tof__typedefs_8h.html#af5449d3b4076aa8188b912b9b069fc5a">HashMap</a>&lt; <a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a>, <a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a> &gt;</td></tr>
+<tr class="separator:a3b25ba3aba0e585295ecefc0701cf7de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab1c635d648526ddffc8f60a7b9a0a8a6" id="r_ab1c635d648526ddffc8f60a7b9a0a8a6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#ab1c635d648526ddffc8f60a7b9a0a8a6">get_vid_hid_map</a> () -&gt; <a class="el" href="tof__typedefs_8h.html#af5449d3b4076aa8188b912b9b069fc5a">HashMap</a>&lt; <a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a>, <a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a> &gt;</td></tr>
+<tr class="separator:ab1c635d648526ddffc8f60a7b9a0a8a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2eecfb1d930e8ee8c37624b8d7356928" id="r_a2eecfb1d930e8ee8c37624b8d7356928"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a2eecfb1d930e8ee8c37624b8d7356928">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baa">gondola::EventStatus</a> &amp;status)</td></tr>
+<tr class="separator:a2eecfb1d930e8ee8c37624b8d7356928"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70a1b591bf58b6e149e2ec815142e4ac" id="r_a70a1b591bf58b6e149e2ec815142e4ac"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a70a1b591bf58b6e149e2ec815142e4ac">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21">gondola::TriggerType</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">t_type</a>)</td></tr>
+<tr class="separator:a70a1b591bf58b6e149e2ec815142e4ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a95d0c48f85317911ad997722c25219b6" id="r_a95d0c48f85317911ad997722c25219b6"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a95d0c48f85317911ad997722c25219b6">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="namespacegondola.html#a3e679dd5cf65b9be26ead6c7555f2580">gondola::LTBThreshold</a> &amp;thresh)</td></tr>
+<tr class="separator:a95d0c48f85317911ad997722c25219b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9de221b8ccf9c0782f0790897ff063c5" id="r_a9de221b8ccf9c0782f0790897ff063c5"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a9de221b8ccf9c0782f0790897ff063c5">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="namespacegondola.html#ac61bd1b8e62eab79a1089be6ecc1ca3d">gondola::EventQuality</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">qual</a>)</td></tr>
+<tr class="separator:a9de221b8ccf9c0782f0790897ff063c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9086a1522bf1269d1824786811a08141" id="r_a9086a1522bf1269d1824786811a08141"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a9086a1522bf1269d1824786811a08141">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="namespacegondola.html#a62baa478e4adaaf6d242f135c1c9f84d">gondola::CompressionLevel</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">level</a>)</td></tr>
+<tr class="separator:a9086a1522bf1269d1824786811a08141"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46b0240dcaddd2703faa7a239ae7e686" id="r_a46b0240dcaddd2703faa7a239ae7e686"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a46b0240dcaddd2703faa7a239ae7e686">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1TofHit.html">gondola::TofHit</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">pad</a>)</td></tr>
+<tr class="separator:a46b0240dcaddd2703faa7a239ae7e686"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af7a52fb6dd43dfd349044a3baee18d6d" id="r_af7a52fb6dd43dfd349044a3baee18d6d"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#af7a52fb6dd43dfd349044a3baee18d6d">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1MasterTriggerEvent.html">gondola::MasterTriggerEvent</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">mt</a>)</td></tr>
+<tr class="separator:af7a52fb6dd43dfd349044a3baee18d6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6878be1debdc1d7832f0e68faa4be862" id="r_a6878be1debdc1d7832f0e68faa4be862"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a6878be1debdc1d7832f0e68faa4be862">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1TofEvent.html">gondola::TofEvent</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">et</a>)</td></tr>
+<tr class="separator:a6878be1debdc1d7832f0e68faa4be862"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba7a0abca261a73c5b085036ea3d85c9" id="r_aba7a0abca261a73c5b085036ea3d85c9"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#aba7a0abca261a73c5b085036ea3d85c9">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1RBEvent.html">gondola::RBEvent</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">re</a>)</td></tr>
+<tr class="separator:aba7a0abca261a73c5b085036ea3d85c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a801130bb64dc4827fdc3f24f8c8894eb" id="r_a801130bb64dc4827fdc3f24f8c8894eb"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a801130bb64dc4827fdc3f24f8c8894eb">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1RBEventHeader.html">gondola::RBEventHeader</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">rh</a>)</td></tr>
+<tr class="separator:a801130bb64dc4827fdc3f24f8c8894eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9cb0b91c67a4b60151e456492a27d37" id="r_ac9cb0b91c67a4b60151e456492a27d37"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#ac9cb0b91c67a4b60151e456492a27d37">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1RBWaveform.html">gondola::RBWaveform</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">rh</a>)</td></tr>
+<tr class="separator:ac9cb0b91c67a4b60151e456492a27d37"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad142b09b980b0577047b677bd0750252" id="r_ad142b09b980b0577047b677bd0750252"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#ad142b09b980b0577047b677bd0750252">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1TofEventSummary.html">gondola::TofEventSummary</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">tes</a>)</td></tr>
+<tr class="separator:ad142b09b980b0577047b677bd0750252"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae1a0adbbbcd177ece4e936813e8ab262" id="r_ae1a0adbbbcd177ece4e936813e8ab262"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#ae1a0adbbbcd177ece4e936813e8ab262">list_path_contents_sorted</a> (<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> std::string &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">input</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">bool</a> <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">use_telemetry_re</a>=<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">false</a>) -&gt; <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">Vec</a>&lt; std::string &gt;</td></tr>
 <tr class="separator:ae1a0adbbbcd177ece4e936813e8ab262"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad6d0e546d1e3ff1ce3af42dae3177d29" id="r_ad6d0e546d1e3ff1ce3af42dae3177d29"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#ad6d0e546d1e3ff1ce3af42dae3177d29">to_le_bytes</a> (<a class="el" href="tof__typedefs_8h.html#ace9d960e74685e2cd84b36132dbbf8aa">u16</a> <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">number</a>) -&gt; <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">Vec</a>&lt; <a class="el" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a> &gt;</td></tr>
@@ -167,7 +274,77 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="adb061fbe28da00055cd7fb65249a77df" name="adb061fbe28da00055cd7fb65249a77df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb061fbe28da00055cd7fb65249a77df">&#9670;&#160;</a></span>TelemetryPacket</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">typedef</a> <a class="el" href="structGaps_1_1Telemetry_1_1Packet.html">Gaps::Telemetry::Packet</a> <a class="el" href="namespacegondola.html#adb061fbe28da00055cd7fb65249a77df">gondola::TelemetryPacket</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abddc47f5a39ae5245979bc0a1b2cceea" name="abddc47f5a39ae5245979bc0a1b2cceea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abddc47f5a39ae5245979bc0a1b2cceea">&#9670;&#160;</a></span>TelemetryPacketHeader</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">typedef</a> <a class="el" href="structGaps_1_1Telemetry_1_1PacketHeader.html">Gaps::Telemetry::PacketHeader</a> <a class="el" href="namespacegondola.html#abddc47f5a39ae5245979bc0a1b2cceea">gondola::TelemetryPacketHeader</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1b9982f07cad746b60c39b2d2a71497d" name="a1b9982f07cad746b60c39b2d2a71497d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b9982f07cad746b60c39b2d2a71497d">&#9670;&#160;</a></span>TelemetryPacketType</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">typedef</a> <a class="el" href="namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7">Gaps::Telemetry::BfswPacketType</a> <a class="el" href="namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7">gondola::TelemetryPacketType</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>FIXME - this will be renamed to be the same as in rust. </p>
+
+</div>
+</div>
 <h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="a62baa478e4adaaf6d242f135c1c9f84d" name="a62baa478e4adaaf6d242f135c1c9f84d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a62baa478e4adaaf6d242f135c1c9f84d">&#9670;&#160;</a></span>CompressionLevel</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">enum</a> <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">class</a> <a class="el" href="namespacegondola.html#a62baa478e4adaaf6d242f135c1c9f84d">gondola::CompressionLevel</a> : <a class="el" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a62baa478e4adaaf6d242f135c1c9f84da88183b946cc5f0e8c96b2e66e1c74a7e" name="a62baa478e4adaaf6d242f135c1c9f84da88183b946cc5f0e8c96b2e66e1c74a7e"></a>Unknown&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a62baa478e4adaaf6d242f135c1c9f84da6adf97f83acf6453d4a6a4b1070f3754" name="a62baa478e4adaaf6d242f135c1c9f84da6adf97f83acf6453d4a6a4b1070f3754"></a>None&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+</div>
+</div>
 <a id="a466ace2a4c29903ffca2f1f86b41ba68" name="a466ace2a4c29903ffca2f1f86b41ba68"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a466ace2a4c29903ffca2f1f86b41ba68">&#9670;&#160;</a></span>CRFrameObjectType</h2>
 
@@ -198,7 +375,187 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="ac61bd1b8e62eab79a1089be6ecc1ca3d" name="ac61bd1b8e62eab79a1089be6ecc1ca3d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac61bd1b8e62eab79a1089be6ecc1ca3d">&#9670;&#160;</a></span>EventQuality</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">enum</a> <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">class</a> <a class="el" href="namespacegondola.html#ac61bd1b8e62eab79a1089be6ecc1ca3d">gondola::EventQuality</a> : <a class="el" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>EventQuality will get assigned by online reconstructions or the flight computer. This contains information about physics and might pre-select "golden" candidate events. The default event quelity is EventQuality::UNKNOWN </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ac61bd1b8e62eab79a1089be6ecc1ca3da88183b946cc5f0e8c96b2e66e1c74a7e" name="ac61bd1b8e62eab79a1089be6ecc1ca3da88183b946cc5f0e8c96b2e66e1c74a7e"></a>Unknown&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ac61bd1b8e62eab79a1089be6ecc1ca3daf96e345fdc19cbd4cf15256c251a39a0" name="ac61bd1b8e62eab79a1089be6ecc1ca3daf96e345fdc19cbd4cf15256c251a39a0"></a>Silver&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ac61bd1b8e62eab79a1089be6ecc1ca3da9768feb3fdb1f267b06093bc572952dd" name="ac61bd1b8e62eab79a1089be6ecc1ca3da9768feb3fdb1f267b06093bc572952dd"></a>Gold&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ac61bd1b8e62eab79a1089be6ecc1ca3da8f7671185d590914ac21c7511767b699" name="ac61bd1b8e62eab79a1089be6ecc1ca3da8f7671185d590914ac21c7511767b699"></a>Diamond&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ac61bd1b8e62eab79a1089be6ecc1ca3da62cf3c3f187eab330ce1a7ecac59b539" name="ac61bd1b8e62eab79a1089be6ecc1ca3da62cf3c3f187eab330ce1a7ecac59b539"></a>FourLeafClover&#160;</td><td class="fielddoc"><p>FourLeavClover events are events with exactly 4 hits in overlapping pannels. 2 overlapping in the Umbrella/Cortina, 2 overlapping in the TOF cube </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="ae4efa4080cf89476f85e917971613baa" name="ae4efa4080cf89476f85e917971613baa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae4efa4080cf89476f85e917971613baa">&#9670;&#160;</a></span>EventStatus</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">enum</a> <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">class</a> <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baa">gondola::EventStatus</a> : <a class="el" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>The event status indicates if there are technical issues with the retrieval of the event. If there are no problems, events should have status EventStatus::EVENTSTATUS_PERFECT (42) </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ae4efa4080cf89476f85e917971613baaa88183b946cc5f0e8c96b2e66e1c74a7e" name="ae4efa4080cf89476f85e917971613baaa88183b946cc5f0e8c96b2e66e1c74a7e"></a>Unknown&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ae4efa4080cf89476f85e917971613baaa1b8508e116432ac1383a292c6a0d05c1" name="ae4efa4080cf89476f85e917971613baaa1b8508e116432ac1383a292c6a0d05c1"></a>Crc32Wrong&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ae4efa4080cf89476f85e917971613baaaec81a5026e321b3f9ff2f610e52d532e" name="ae4efa4080cf89476f85e917971613baaaec81a5026e321b3f9ff2f610e52d532e"></a>TailWrong&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ae4efa4080cf89476f85e917971613baaae47816a3c64358b80c028dc88edcab3c" name="ae4efa4080cf89476f85e917971613baaae47816a3c64358b80c028dc88edcab3c"></a>ChannelIDWrong&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ae4efa4080cf89476f85e917971613baaa89db10b7258e552827a62fd8d1e4309e" name="ae4efa4080cf89476f85e917971613baaa89db10b7258e552827a62fd8d1e4309e"></a>CellSyncErrors&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ae4efa4080cf89476f85e917971613baaa99ef53b53786cbe479e9a7075a2492df" name="ae4efa4080cf89476f85e917971613baaa99ef53b53786cbe479e9a7075a2492df"></a>ChnSyncErrors&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ae4efa4080cf89476f85e917971613baaa4d9a974c1af3b5418f3b61dbd735bc14" name="ae4efa4080cf89476f85e917971613baaa4d9a974c1af3b5418f3b61dbd735bc14"></a>CellAndChnSyncErrors&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ae4efa4080cf89476f85e917971613baaa914a42ba7d6f75029e02b8c5e8a80016" name="ae4efa4080cf89476f85e917971613baaa914a42ba7d6f75029e02b8c5e8a80016"></a>AnyDataMangling&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ae4efa4080cf89476f85e917971613baaaba59a6fba632d1543589d766abc636df" name="ae4efa4080cf89476f85e917971613baaaba59a6fba632d1543589d766abc636df"></a>IncompatibleData&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ae4efa4080cf89476f85e917971613baaa44ce38fea2e8223bad3229cd0eac17da" name="ae4efa4080cf89476f85e917971613baaa44ce38fea2e8223bad3229cd0eac17da"></a>EventTimeOut&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ae4efa4080cf89476f85e917971613baaa5c7a66b675c172f368c8331b20c68c45" name="ae4efa4080cf89476f85e917971613baaa5c7a66b675c172f368c8331b20c68c45"></a>GoodNoCRCOrErrBitCheck&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ae4efa4080cf89476f85e917971613baaa3a4bcec2a877d364580a1a753dd0d1c8" name="ae4efa4080cf89476f85e917971613baaa3a4bcec2a877d364580a1a753dd0d1c8"></a>GoodNoCRCCheck&#160;</td><td class="fielddoc"><p>The event status is good, but we did not perform any CRC32 check </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ae4efa4080cf89476f85e917971613baaa69a7cfda8af8a54154e556f4d766926c" name="ae4efa4080cf89476f85e917971613baaa69a7cfda8af8a54154e556f4d766926c"></a>GoodNoErrBitCheck&#160;</td><td class="fielddoc"><p>The event is good, but we did not perform error checks </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ae4efa4080cf89476f85e917971613baaae0a530b3e7e74423e454a99e3c6d0b69" name="ae4efa4080cf89476f85e917971613baaae0a530b3e7e74423e454a99e3c6d0b69"></a>IncompleteReadout&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ae4efa4080cf89476f85e917971613baaa56cdd7e9e3cef1974f4075c03a80332d" name="ae4efa4080cf89476f85e917971613baaa56cdd7e9e3cef1974f4075c03a80332d"></a>Perfect&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+</div>
+</div>
+<a id="a3e679dd5cf65b9be26ead6c7555f2580" name="a3e679dd5cf65b9be26ead6c7555f2580"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3e679dd5cf65b9be26ead6c7555f2580">&#9670;&#160;</a></span>LTBThreshold</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">enum</a> <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">class</a> <a class="el" href="namespacegondola.html#a3e679dd5cf65b9be26ead6c7555f2580">gondola::LTBThreshold</a> : <a class="el" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a3e679dd5cf65b9be26ead6c7555f2580af8246e1e45d89414e8bf56ffe1680a54" name="a3e679dd5cf65b9be26ead6c7555f2580af8246e1e45d89414e8bf56ffe1680a54"></a>NoHit&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a3e679dd5cf65b9be26ead6c7555f2580aebfe5e1791db03c4cd6ab95801e0977d" name="a3e679dd5cf65b9be26ead6c7555f2580aebfe5e1791db03c4cd6ab95801e0977d"></a>Hit&#160;</td><td class="fielddoc"><p>First threshold, 40mV, about 0.75 minI. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a3e679dd5cf65b9be26ead6c7555f2580a0b87d66b88c72957dfea8c9605016442" name="a3e679dd5cf65b9be26ead6c7555f2580a0b87d66b88c72957dfea8c9605016442"></a>Beta&#160;</td><td class="fielddoc"><p>Second threshold, 32mV (? error in doc ?, about 2.5 minI. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a3e679dd5cf65b9be26ead6c7555f2580a98865aa73ddbf0657187d430de3c38bc" name="a3e679dd5cf65b9be26ead6c7555f2580a98865aa73ddbf0657187d430de3c38bc"></a>Veto&#160;</td><td class="fielddoc"><p>Third threshold, 375mV about 30 minI. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a3e679dd5cf65b9be26ead6c7555f2580a88183b946cc5f0e8c96b2e66e1c74a7e" name="a3e679dd5cf65b9be26ead6c7555f2580a88183b946cc5f0e8c96b2e66e1c74a7e"></a>Unknown&#160;</td><td class="fielddoc"><p>Use u8::MAX for Unknown, since 0 is pre-determined for "NoHit, <br  />
+ </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="aac91e1b082fd02305f77ee3d0338ff21" name="aac91e1b082fd02305f77ee3d0338ff21"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aac91e1b082fd02305f77ee3d0338ff21">&#9670;&#160;</a></span>TriggerType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">enum</a> <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">class</a> <a class="el" href="namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21">gondola::TriggerType</a> : <a class="el" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>GAPS Trigger types/sources. Description can be found elsewhere. More than oen of them can be active at the same time </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="aac91e1b082fd02305f77ee3d0338ff21a88183b946cc5f0e8c96b2e66e1c74a7e" name="aac91e1b082fd02305f77ee3d0338ff21a88183b946cc5f0e8c96b2e66e1c74a7e"></a>Unknown&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="aac91e1b082fd02305f77ee3d0338ff21a41d31d862aea788d0c2b86ac6df3c0ae" name="aac91e1b082fd02305f77ee3d0338ff21a41d31d862aea788d0c2b86ac6df3c0ae"></a>Gaps&#160;</td><td class="fielddoc"><p>-&gt; 1-10 "pysics" triggers </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aac91e1b082fd02305f77ee3d0338ff21aed36a1ef76a59ee3f15180e0441188ad" name="aac91e1b082fd02305f77ee3d0338ff21aed36a1ef76a59ee3f15180e0441188ad"></a>Any&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="aac91e1b082fd02305f77ee3d0338ff21a92ea731d3af6677905303c88689f5d55" name="aac91e1b082fd02305f77ee3d0338ff21a92ea731d3af6677905303c88689f5d55"></a>Track&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="aac91e1b082fd02305f77ee3d0338ff21abc421fa7f533c3d639eeebfd29fdf499" name="aac91e1b082fd02305f77ee3d0338ff21abc421fa7f533c3d639eeebfd29fdf499"></a>TrackCentral&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="aac91e1b082fd02305f77ee3d0338ff21adff200b0bb8d3c69fbd54cb43664cd7e" name="aac91e1b082fd02305f77ee3d0338ff21adff200b0bb8d3c69fbd54cb43664cd7e"></a>Poisson&#160;</td><td class="fielddoc"><blockquote class="doxtable">
+<p>&zwj;100 -&gt; Debug triggers </p>
+</blockquote>
+</td></tr>
+<tr><td class="fieldname"><a id="aac91e1b082fd02305f77ee3d0338ff21adc2eb84d1f952ad0e6b58014aabd616a" name="aac91e1b082fd02305f77ee3d0338ff21adc2eb84d1f952ad0e6b58014aabd616a"></a>Forced&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+</div>
+</div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="a3b25ba3aba0e585295ecefc0701cf7de" name="a3b25ba3aba0e585295ecefc0701cf7de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3b25ba3aba0e585295ecefc0701cf7de">&#9670;&#160;</a></span>get_hid_vid_map()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a> gondola::get_hid_vid_map </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> -&gt;  <a class="el" href="tof__typedefs_8h.html#af5449d3b4076aa8188b912b9b069fc5a">HashMap</a>&lt; <a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a>, <a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a> &gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The mapping of volume id to hardware id, which is either the strip identifier or the paddle id <br  />
+ </p>
+
+</div>
+</div>
+<a id="ab1c635d648526ddffc8f60a7b9a0a8a6" name="ab1c635d648526ddffc8f60a7b9a0a8a6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab1c635d648526ddffc8f60a7b9a0a8a6">&#9670;&#160;</a></span>get_vid_hid_map()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a> gondola::get_vid_hid_map </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> -&gt;  <a class="el" href="tof__typedefs_8h.html#af5449d3b4076aa8188b912b9b069fc5a">HashMap</a>&lt; <a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a>, <a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a> &gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The mapping of hardwer id (either paddle id or strip id to the volume id </p>
+
+</div>
+</div>
 <a id="ae1a0adbbbcd177ece4e936813e8ab262" name="ae1a0adbbbcd177ece4e936813e8ab262"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae1a0adbbbcd177ece4e936813e8ab262">&#9670;&#160;</a></span>list_path_contents_sorted()</h2>
 
@@ -251,6 +608,342 @@ Arguments</h1>
 </div><div class="memdoc">
 
 <p>convenience function to load all the calibration files from a certain directory </p>
+
+</div>
+</div>
+<a id="a9086a1522bf1269d1824786811a08141" name="a9086a1522bf1269d1824786811a08141"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9086a1522bf1269d1824786811a08141">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[1/12]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream &amp; gondola::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="namespacegondola.html#a62baa478e4adaaf6d242f135c1c9f84d">gondola::CompressionLevel</a> &amp;&#160;</td>
+          <td class="paramname"><em>level</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9de221b8ccf9c0782f0790897ff063c5" name="a9de221b8ccf9c0782f0790897ff063c5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9de221b8ccf9c0782f0790897ff063c5">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[2/12]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream &amp; gondola::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="namespacegondola.html#ac61bd1b8e62eab79a1089be6ecc1ca3d">gondola::EventQuality</a> &amp;&#160;</td>
+          <td class="paramname"><em>qual</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2eecfb1d930e8ee8c37624b8d7356928" name="a2eecfb1d930e8ee8c37624b8d7356928"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2eecfb1d930e8ee8c37624b8d7356928">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[3/12]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream &amp; gondola::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baa">gondola::EventStatus</a> &amp;&#160;</td>
+          <td class="paramname"><em>status</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a95d0c48f85317911ad997722c25219b6" name="a95d0c48f85317911ad997722c25219b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a95d0c48f85317911ad997722c25219b6">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[4/12]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream &amp; gondola::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="namespacegondola.html#a3e679dd5cf65b9be26ead6c7555f2580">gondola::LTBThreshold</a> &amp;&#160;</td>
+          <td class="paramname"><em>thresh</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af7a52fb6dd43dfd349044a3baee18d6d" name="af7a52fb6dd43dfd349044a3baee18d6d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af7a52fb6dd43dfd349044a3baee18d6d">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[5/12]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream &amp; gondola::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1MasterTriggerEvent.html">gondola::MasterTriggerEvent</a> &amp;&#160;</td>
+          <td class="paramname"><em>mt</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aba7a0abca261a73c5b085036ea3d85c9" name="aba7a0abca261a73c5b085036ea3d85c9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aba7a0abca261a73c5b085036ea3d85c9">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[6/12]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream &amp; gondola::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1RBEvent.html">gondola::RBEvent</a> &amp;&#160;</td>
+          <td class="paramname"><em>re</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a801130bb64dc4827fdc3f24f8c8894eb" name="a801130bb64dc4827fdc3f24f8c8894eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a801130bb64dc4827fdc3f24f8c8894eb">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[7/12]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream &amp; gondola::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1RBEventHeader.html">gondola::RBEventHeader</a> &amp;&#160;</td>
+          <td class="paramname"><em>rh</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac9cb0b91c67a4b60151e456492a27d37" name="ac9cb0b91c67a4b60151e456492a27d37"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9cb0b91c67a4b60151e456492a27d37">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[8/12]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream &amp; gondola::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1RBWaveform.html">gondola::RBWaveform</a> &amp;&#160;</td>
+          <td class="paramname"><em>rh</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6878be1debdc1d7832f0e68faa4be862" name="a6878be1debdc1d7832f0e68faa4be862"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6878be1debdc1d7832f0e68faa4be862">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[9/12]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream &amp; gondola::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1TofEvent.html">gondola::TofEvent</a> &amp;&#160;</td>
+          <td class="paramname"><em>et</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad142b09b980b0577047b677bd0750252" name="ad142b09b980b0577047b677bd0750252"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad142b09b980b0577047b677bd0750252">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[10/12]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream &amp; gondola::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1TofEventSummary.html">gondola::TofEventSummary</a> &amp;&#160;</td>
+          <td class="paramname"><em>tes</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a46b0240dcaddd2703faa7a239ae7e686" name="a46b0240dcaddd2703faa7a239ae7e686"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a46b0240dcaddd2703faa7a239ae7e686">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[11/12]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream &amp; gondola::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1TofHit.html">gondola::TofHit</a> &amp;&#160;</td>
+          <td class="paramname"><em>pad</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a70a1b591bf58b6e149e2ec815142e4ac" name="a70a1b591bf58b6e149e2ec815142e4ac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a70a1b591bf58b6e149e2ec815142e4ac">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[12/12]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream &amp; gondola::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21">gondola::TriggerType</a> &amp;&#160;</td>
+          <td class="paramname"><em>t_type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>

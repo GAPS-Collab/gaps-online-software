@@ -129,14 +129,27 @@
 \DoxyCodeLine{00140\ \ \ auto\ \mbox{\hyperlink{namespaceGaps_a9f34404b09be3f6fd69f8e09d2c045d2}{get\_trackerstrippedestals}}()\ -\/>\ \mbox{\hyperlink{namespaceGaps_afdf1ea5d924eac5baad0144da1280503}{TrkStripPedMap}};}
 \DoxyCodeLine{00141\ \}}
 \DoxyCodeLine{00142\ }
-\DoxyCodeLine{00143\ std::ostream\&\ operator<<(std::ostream\&\ os,\ const\ \mbox{\hyperlink{namespaceGaps}{Gaps}}::TofPaddle\&\ paddle);}
-\DoxyCodeLine{00144\ }
-\DoxyCodeLine{00145\ std::ostream\&\ operator<<(std::ostream\&\ os,\ const\ \mbox{\hyperlink{namespaceGaps}{Gaps}}::TrackerStrip\&\ strip);}
-\DoxyCodeLine{00146\ }
-\DoxyCodeLine{00147\ std::ostream\&\ operator<<(std::ostream\&\ os,\ const\ \mbox{\hyperlink{namespaceGaps}{Gaps}}::TrackerStripMask\&\ strip);}
-\DoxyCodeLine{00148\ }
-\DoxyCodeLine{00149\ std::ostream\&\ operator<<(std::ostream\&\ os,\ const\ \mbox{\hyperlink{namespaceGaps}{Gaps}}::TrackerStripPedestal\&\ strip);}
-\DoxyCodeLine{00150\ }
-\DoxyCodeLine{00151\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00143\ \textcolor{comment}{//\ new\ items\ shall\ go\ directly\ into\ the\ new\ gondola\ namespace\ }}
+\DoxyCodeLine{00144\ namespace\ \mbox{\hyperlink{namespacegondola}{gondola}}\ \{}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00148\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacegondola_a3b25ba3aba0e585295ecefc0701cf7de}{get\_hid\_vid\_map}}()\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{HashMap<u32,\ u32>}};}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00152\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacegondola_ab1c635d648526ddffc8f60a7b9a0a8a6}{get\_vid\_hid\_map}}()\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{HashMap<u32,\ u32>}};\ }
+\DoxyCodeLine{00153\ \}}
+\DoxyCodeLine{00154\ }
+\DoxyCodeLine{00155\ }
+\DoxyCodeLine{00156\ }
+\DoxyCodeLine{00157\ std::ostream\&\ \mbox{\hyperlink{calibration_8h_aeda1597c580e9ea2e8bde99ac6934b9a}{operator<<}}(std::ostream\&\ os,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structGaps_1_1TofPaddle}{Gaps::TofPaddle}}\&\ paddle);}
+\DoxyCodeLine{00158\ }
+\DoxyCodeLine{00159\ std::ostream\&\ \mbox{\hyperlink{calibration_8h_aeda1597c580e9ea2e8bde99ac6934b9a}{operator<<}}(std::ostream\&\ os,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structGaps_1_1TrackerStrip}{Gaps::TrackerStrip}}\&\ strip);}
+\DoxyCodeLine{00160\ }
+\DoxyCodeLine{00161\ std::ostream\&\ \mbox{\hyperlink{calibration_8h_aeda1597c580e9ea2e8bde99ac6934b9a}{operator<<}}(std::ostream\&\ os,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structGaps_1_1TrackerStripMask}{Gaps::TrackerStripMask}}\&\ strip);}
+\DoxyCodeLine{00162\ }
+\DoxyCodeLine{00163\ std::ostream\&\ \mbox{\hyperlink{calibration_8h_aeda1597c580e9ea2e8bde99ac6934b9a}{operator<<}}(std::ostream\&\ os,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structGaps_1_1TrackerStripPedestal}{Gaps::TrackerStripPedestal}}\&\ strip);}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00165\ }
+\DoxyCodeLine{00166\ }
+\DoxyCodeLine{00167\ }
+\DoxyCodeLine{00168\ \textcolor{preprocessor}{\#endif}}
 
 \end{DoxyCode}

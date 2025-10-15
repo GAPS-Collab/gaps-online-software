@@ -26,7 +26,7 @@
 \DoxyCodeLine{00023\ \ \ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68}{CRFrameObjectType}}\ :\ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \{}
 \DoxyCodeLine{00024\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a88183b946cc5f0e8c96b2e66e1c74a7e}{Unknown}}\ \ \ \ \ \ \ \ \ \ \ =\ 0,}
 \DoxyCodeLine{00025\ \ \ \ \ \mbox{\hyperlink{structTofPacket}{TofPacket}}\ \ \ \ \ \ \ \ \ =\ 10,}
-\DoxyCodeLine{00026\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68aac967e66068a7e25b02b4b2e6bcc4504}{TelemetryPacket}}\ \ \ =\ 20,}
+\DoxyCodeLine{00026\ \ \ \ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Packet}{TelemetryPacket}}\ \ \ =\ 20,}
 \DoxyCodeLine{00027\ \ \ \};}
 \DoxyCodeLine{00028\ }
 \DoxyCodeLine{00029\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structgondola_1_1CRFrameObject}{CRFrameObject}}\ \{}
@@ -75,20 +75,26 @@
 \DoxyCodeLine{00091\ \ \ \ \ auto\ n\_packets\_read()\ const\ -\/>\ \textcolor{keywordtype}{bool};}
 \DoxyCodeLine{00094\ \ \ \ \ auto\ get\_rbcalibrations(\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ n\_rb)\ -\/>\ \mbox{\hyperlink{namespacegondola_ae720591de7c0e9e18619d265295f1ebe}{RBCalibrationMap}};\ \ \ \ \ }
 \DoxyCodeLine{00095\ }
-\DoxyCodeLine{00096\ \ \ private:\ \ }
-\DoxyCodeLine{00097\ \ \ \ \ \textcolor{preprocessor}{\#ifdef\ BUILD\_CXXDB}}
-\DoxyCodeLine{00098\ \ \ \ \ \mbox{\hyperlink{namespaceGaps_a84fb383b1df4955afc6ea35a9b15ff44}{Gaps::TofPaddleMap}}\ paddles\_\ \ \ \ \ \ \ \ \ \ ;\ }
-\DoxyCodeLine{00099\ \textcolor{preprocessor}{\ \ \ \ \#endif\ }}
-\DoxyCodeLine{00100\ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ exhausted\_\ \ \ \ \ \ \ \ ;}
-\DoxyCodeLine{00101\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ n\_packets\_read\_\ \ \ ;}
-\DoxyCodeLine{00102\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<std::string>}}\ \ \ filenames\_\ \ \ \ \ \ \ \ ;}
-\DoxyCodeLine{00103\ \ \ \ \ std::ifstream\ \ \ \ \ \ stream\_file\_\ \ \ \ \ \ ;}
-\DoxyCodeLine{00104\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ fileindex\_\ \ \ \ \ \ \ \ ;}
-\DoxyCodeLine{00105\ \ \ \ \ \textcolor{keyword}{auto}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ prime\_next\_file\_()\ -\/>\ void;}
-\DoxyCodeLine{00110\ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \ \ \ \ \ is\_from\_telemetry\_;}
-\DoxyCodeLine{00111\ \ \ \ \ std::unique\_ptr<TelemetryPacketReader>\ telly\_reader\_;}
-\DoxyCodeLine{00112\ \ \ \};}
-\DoxyCodeLine{00113\ \}}
-\DoxyCodeLine{00114\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00097\ \ \ \ \ auto\ is\_from\_telemetry()\ const\ -\/>\ \textcolor{keywordtype}{bool};}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00102\ \ \ \ \ auto\ get\_telemetry\_packet\_index()\ const\ -\/>\ const\ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{HashMap}}<\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7}{TelemetryPacketType}},\ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}>\ \&;}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00111\ \ \ \ \ auto\ cache\_telemetry\_first()\ -\/>\ \textcolor{keywordtype}{void};}
+\DoxyCodeLine{00112\ }
+\DoxyCodeLine{00113\ \ \ private:\ \ }
+\DoxyCodeLine{00114\ \ \ \ \ \textcolor{preprocessor}{\#ifdef\ BUILD\_CXXDB}}
+\DoxyCodeLine{00115\ \ \ \ \ \mbox{\hyperlink{namespaceGaps_a84fb383b1df4955afc6ea35a9b15ff44}{Gaps::TofPaddleMap}}\ paddles\_\ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00116\ \textcolor{preprocessor}{\ \ \ \ \#endif\ }}
+\DoxyCodeLine{00117\ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ exhausted\_\ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00118\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ n\_packets\_read\_\ \ \ ;}
+\DoxyCodeLine{00119\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<std::string>}}\ \ \ filenames\_\ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00120\ \ \ \ \ std::ifstream\ \ \ \ \ \ stream\_file\_\ \ \ \ \ \ ;}
+\DoxyCodeLine{00121\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ fileindex\_\ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00122\ \ \ \ \ \textcolor{keyword}{auto}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ prime\_next\_file\_()\ -\/>\ void;}
+\DoxyCodeLine{00127\ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \ \ \ \ \ is\_from\_telemetry\_;}
+\DoxyCodeLine{00128\ \ \ \ \ std::unique\_ptr<TelemetryPacketReader>\ telly\_reader\_;}
+\DoxyCodeLine{00129\ \ \ \};}
+\DoxyCodeLine{00130\ \}}
+\DoxyCodeLine{00131\ \textcolor{preprocessor}{\#endif}}
 
 \end{DoxyCode}

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['quality_0',['quality',['../structTofEventSummary.html#a5002ecb7dd20fe0eb01af2d5c32c28cd',1,'TofEventSummary']]]
+  ['quality_0',['quality',['../structgondola_1_1TofEventSummary.html#a7bc7ce1eb768ee4fad31a2d0069fbca9',1,'gondola::TofEventSummary']]]
 ];

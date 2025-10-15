@@ -4,6 +4,12 @@ gondola.tof
 .. automodule:: gondola.tof
 
    
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      RBPaddleID
+   
 .. rubric:: Modules
 
 .. autosummary::

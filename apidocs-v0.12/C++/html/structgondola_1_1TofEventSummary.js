@@ -1,0 +1,28 @@
+var structgondola_1_1TofEventSummary =
+[
+    [ "get_rb_link_ids", "structgondola_1_1TofEventSummary.html#aef0ecf225b2416060c80c8168a853717", null ],
+    [ "get_timestamp48", "structgondola_1_1TofEventSummary.html#a5fdf2515c8ade30200a851ba36fb47ab", null ],
+    [ "get_trigger_hits", "structgondola_1_1TofEventSummary.html#a4a0a0f4504f3c9d773a3654c9c188837", null ],
+    [ "get_trigger_sources", "structgondola_1_1TofEventSummary.html#a203f4aef2eaaa057763a8894054eb23d", null ],
+    [ "to_string", "structgondola_1_1TofEventSummary.html#aab3047d910763c5b440120e22b1f8faf", null ],
+    [ "channel_mask", "structgondola_1_1TofEventSummary.html#af828cd81c1608dcb33f25aa1fb6599ac", null ],
+    [ "drs_dead_lost_hits", "structgondola_1_1TofEventSummary.html#a988ac3fe001dfa162bb7156030816d7b", null ],
+    [ "dsi_j_mask", "structgondola_1_1TofEventSummary.html#a8ce0f34b21f5c54ad5ce458b7812aa84", null ],
+    [ "event_id", "structgondola_1_1TofEventSummary.html#a984d0ebb4651fce3b889b8b3a57e95ad", null ],
+    [ "hits", "structgondola_1_1TofEventSummary.html#a497593eb93b84576a00b5087504511f9", null ],
+    [ "mtb_link_mask", "structgondola_1_1TofEventSummary.html#aa9e34dff102d7922f57c7bfb02de1010", null ],
+    [ "n_hits_cbe", "structgondola_1_1TofEventSummary.html#a7c226a2f15de9d4637a490563351bdb5", null ],
+    [ "n_hits_cor", "structgondola_1_1TofEventSummary.html#a38dede4bf34689a4924801e4341249cb", null ],
+    [ "n_hits_umb", "structgondola_1_1TofEventSummary.html#a857e0b1b6b3ada7cb9998f03ff52b463", null ],
+    [ "n_trigger_paddles", "structgondola_1_1TofEventSummary.html#aa2cc6620d029f9252afaf87daf77be4a", null ],
+    [ "quality", "structgondola_1_1TofEventSummary.html#a7bc7ce1eb768ee4fad31a2d0069fbca9", null ],
+    [ "run_id", "structgondola_1_1TofEventSummary.html#a8a043011b172d54a95784a3f542aef4b", null ],
+    [ "status", "structgondola_1_1TofEventSummary.html#ac4df63562b86925145676dd3ba90a302", null ],
+    [ "timestamp16", "structgondola_1_1TofEventSummary.html#ade24c2b515368efea640f275611274b8", null ],
+    [ "timestamp32", "structgondola_1_1TofEventSummary.html#aba82b60f99252610c7b05847e557f040", null ],
+    [ "tot_edep_cbe", "structgondola_1_1TofEventSummary.html#a9f1a56ab50a3e00dae4a2969e124487c", null ],
+    [ "tot_edep_cor", "structgondola_1_1TofEventSummary.html#a1a127213deb4bb0fc81c3cc6d491d93c", null ],
+    [ "tot_edep_umb", "structgondola_1_1TofEventSummary.html#aa4a812c158e913d3a95be82207953ba4", null ],
+    [ "trigger_sources", "structgondola_1_1TofEventSummary.html#a37baf6d63dfe170c63e6b7f8f4bdb734", null ],
+    [ "version", "structgondola_1_1TofEventSummary.html#a9182f44815c457c6553ff21321793f41", null ]
+];

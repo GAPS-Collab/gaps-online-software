@@ -1,10 +1,10 @@
 var searchData=
 [
   ['telemetrypacketreader_0',['TelemetryPacketReader',['../structgondola_1_1TelemetryPacketReader.html',1,'gondola']]],
-  ['tofevent_1',['TofEvent',['../structTofEvent.html',1,'']]],
+  ['tofevent_1',['TofEvent',['../structgondola_1_1TofEvent.html',1,'gondola']]],
   ['tofeventheader_2',['TofEventHeader',['../structTofEventHeader.html',1,'']]],
-  ['tofeventsummary_3',['TofEventSummary',['../structTofEventSummary.html',1,'']]],
-  ['tofhit_4',['TofHit',['../structTofHit.html',1,'']]],
+  ['tofeventsummary_3',['TofEventSummary',['../structgondola_1_1TofEventSummary.html',1,'gondola']]],
+  ['tofhit_4',['TofHit',['../structgondola_1_1TofHit.html',1,'gondola']]],
   ['tofmetadata_5',['TofMetaData',['../structGaps_1_1Telemetry_1_1TofMetaData.html',1,'Gaps::Telemetry']]],
   ['tofpacket_6',['TofPacket',['../structTofPacket.html',1,'']]],
   ['tofpacketreader_7',['TofPacketReader',['../classGaps_1_1TofPacketReader.html',1,'Gaps']]],
