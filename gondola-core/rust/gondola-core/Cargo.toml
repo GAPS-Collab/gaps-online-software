@@ -70,11 +70,6 @@ optional = true
 version  = "0.1"
 optional = true
 
-[dependencies.tof-control]
-version  = "0.9"
-optional = true
-git      = "https://github.com/GAPS-Collab/tof-control.git"
-branch   = "minimal"
 
 [dev-dependencies]
 criterion = "0.4"
