@@ -585,8 +585,12 @@ pub struct AnalysisEngineSettings {
   pub max_peaks              : usize,
   /// Timing CFG fraction
   pub cfd_fraction           : f32,
-  /// Time over threshold threshold in mV
-  pub tot_threshold          : Option<f32>
+  /// Time over threshold threshold in mV for 
+  /// the lower
+  pub tot_threshold_high     : Option<f32>,
+  /// Time over threshold threshold in mV for 
+  /// the upper
+  pub tot_threshold_low      : Option<f32>
 }
 
 impl AnalysisEngineSettings {
@@ -604,7 +608,8 @@ impl AnalysisEngineSettings {
       find_pks_thresh           : 10.0,
       max_peaks                 : 5,
       cfd_fraction              : 0.2,
-      tot_threshold             : Some(500.0),
+      tot_threshold_low         : Some(250.0),
+      tot_threshold_high        : Some(750.0),
     }
   }
 }
