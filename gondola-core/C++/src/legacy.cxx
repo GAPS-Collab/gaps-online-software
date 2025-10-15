@@ -8,8 +8,8 @@
 #include <iostream>
 
 #include "legacy.h"
-
 #include "spdlog/cfg/env.h"
+#include "spdlog/spdlog.h"
 
 // Some useful macros
 #define SQR(A)               ( (A) * (A) )
