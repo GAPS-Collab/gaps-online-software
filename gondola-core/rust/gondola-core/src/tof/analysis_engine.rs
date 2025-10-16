@@ -211,18 +211,31 @@ pub fn waveform_analysis(event         : &mut RBEvent,
         tdc = cfd_times[0];
       }
       //println!("Calucalated tdc {}, charge {}, max {} for ch {}!", tdc, charge, max_volts, ch); 
-      //if rb.channel_to_paddle_end_id[*raw_ch as usize] > 2000 {
       if k == 0 {
-        //hit.ftime_a      = tdc;
-        //hit.fpeak_a      = max_volts;
         hit.set_time_a(tdc);
         hit.set_charge_a(charge);
         hit.set_peak_a(max_volts);
         hit.baseline_a     = f16::from_f32(ped);
         hit.baseline_a_rms = f16::from_f32(ped_err);
+        // calculate time over threshold 
+        match settings.tot_threshold_low {
+          Some(thr) => {
+            let th_low_sl     = time_over_threshold(&voltages, &times, thr); 
+            hit.TOT_low_a     = f16::from_f32(th_low_sl.0);
+            hit.TOT_slp_low_a = f16::from_f32(th_low_sl.1);
+          } 
+          None => () 
+        }
+        match settings.tot_threshold_high {
+          Some(thr) => {
+            let th_high_sl      = time_over_threshold(&voltages, &times, thr); 
+            hit.TOT_high_a      = f16::from_f32(th_high_sl.0);
+            hit.TOT_slp_high_a  = f16::from_f32(th_high_sl.1);
+          } 
+          None => () 
+        }
       } else {
-        //hit.ftime_b = tdc;
-        //hit.fpeak_b = max_volts;
+
         hit.set_time_b(tdc);
         hit.set_charge_b(charge);
         hit.set_peak_b(max_volts);
@@ -231,6 +244,23 @@ pub fn waveform_analysis(event         : &mut RBEvent,
         // this is the seoond iteration,
         // we are done!
         hit.phase = f16::from_f32(fit_result.2);
+        // calculate time over threshold 
+        match settings.tot_threshold_low {
+          Some(thr) => {
+            let th_low_sl   = time_over_threshold(&voltages, &times, thr); 
+            hit.TOT_low_b     = f16::from_f32(th_low_sl.0);
+            hit.TOT_slp_low_b = f16::from_f32(th_low_sl.1);
+          } 
+          None => () 
+        }
+        match settings.tot_threshold_high {
+          Some(thr) => {
+            let th_high_sl  = time_over_threshold(&voltages, &times, thr); 
+            hit.TOT_high_b     = f16::from_f32(th_high_sl.0);
+            hit.TOT_slp_high_b = f16::from_f32(th_high_sl.1);
+          } 
+          None => () 
+        }
         paddles.insert(pid, hit);
       }
     }
