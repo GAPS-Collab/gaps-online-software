@@ -38,6 +38,38 @@ pub fn get_max_value_idx<T : std::cmp::PartialOrd + std::fmt::Display + Copy>(va
 } // end fn
 
 //---------------------------------------------------
+  
+/// Calculate the time in ns for which the waveform is 
+/// above a certain threshold for paddle end A
+///
+/// # Retunrs:
+///   time over threshold in ns, slope (+- 2bins around crossin)
+pub fn time_over_threshold(voltages : &Vec<f32>, times : &Vec<f32>,threshold : f32) -> (f32, f32) {
+  let mut tot   : f32 = 0.0;
+  let mut vlt_0 : f32 = -1.0;
+  let mut vlt_1 : f32 = -1.0;
+  let mut t_0   : f32 = -1.0;
+  let mut t_1   : f32 = -1.0;
+  for k in 1..voltages.len() {
+    if voltages[k] > threshold {
+      tot += times[k] - times[k-1];
+      if k > 1 && k < voltages.len() - 2 {
+        if (vlt_0 < 0.0) {
+          vlt_0 = voltages[k - 2]; 
+          t_0   = times[k - 2];
+        }
+        if (vlt_1 < 0.0) {
+          vlt_1 = voltages[k + 2]; 
+          t_1   = times[k + 2];
+        }
+      }
+    }
+  }
+  let slope = (vlt_1 - vlt_0)/(t_1 - t_0);
+  return (tot, slope);
+}
+
+//---------------------------------------------------
 
 #[cfg(feature="pybindings")]
 #[pyfunction]

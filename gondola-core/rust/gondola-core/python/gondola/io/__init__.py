@@ -20,13 +20,29 @@ get_all_telemetry_event_names = _gc.io.get_all_telemetry_event_names
 #read_example                  = _gc.io.read_example
 get_runfilename               = _gc.io.get_runfilename 
 get_califilename              = _gc.io.get_califilename
-CRFrameObject                 = _gc.io.CRFrameObject 
+CRFrameObject                 = _gc.io.CRFrameObject
+CRFrameObject.__module__      = __name__ 
+CRFrameObject.__name__        = 'CRFrameObject'
 DataSourceKind                = _gc.io.DataSourceKind 
 CRReader                      = _gc.io.CRReader
+CRReader.__module__           = __name__ 
+CRReader.__name__             = 'CRReader' 
+
+
 CRWriter                      = _gc.io.CRWriter
+CRWriter.__module__           = __name__ 
+CRWriter.__name__             = 'CRWriter' 
 CRFrame                       = _gc.io.CRFrame
+CRFrame.__module__            = __name__ 
+CRFrame.__name__              = 'CRFrame' 
 TofPacketReader               = _gc.io.TofPacketReader
+TofPacketReader.__module__    = __name__ 
+TofPacketReader.__name__      = 'TofPacketReader'
+
 TelemetryPacketReader         = _gc.io.TelemetryPacketReader
+TelemetryPacketReader.__module__ = __name__ 
+TelemetryPacketReader.__name__  = 'TelemetryPacketReader' 
+
 list_path_contents_sorted     = _gc.io.list_path_contents_sorted
 get_utc_now                   = _gc.io.get_utc_timestamp 
 get_utc_date                  = _gc.io.get_utc_date
