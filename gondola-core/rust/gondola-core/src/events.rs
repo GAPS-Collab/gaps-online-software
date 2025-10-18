@@ -199,6 +199,67 @@ impl TriggerType {
     }
     t_types
   }
+ pub fn to_u8(&self) -> u8 {
+    match self {
+      TriggerType::Unknown => {
+        return 0;
+      }
+      TriggerType::Poisson => {
+        return 100;
+      }
+      TriggerType::Forced => {
+        return 101;
+      }
+      TriggerType::FixedRate => {
+        return 102;
+      }
+      TriggerType::Any => {
+        return 1;
+      }
+      TriggerType::Track => {
+        return 2;
+      }
+      TriggerType::TrackCentral => {
+        return 3;
+      }
+      TriggerType::Gaps => {
+        return 4;
+      }
+      TriggerType::Gaps633 => {
+        return 5;
+      }
+      TriggerType::Gaps422 => {
+        return 6;
+      }
+      TriggerType::Gaps211 => {
+        return 7;
+      }
+      TriggerType::TrackUmbCentral => {
+        return 8;
+      }
+      TriggerType::Gaps1044 => {
+        return 9;
+      }
+      TriggerType::UmbCube => {
+        return 21;
+      }
+      TriggerType::UmbCubeZ => {
+        return 22; 
+      }
+      TriggerType::UmbCorCube => {
+        return 23;
+      }
+      TriggerType::CorCubeSide => {
+        return 24;
+      }
+      TriggerType::Umb3Cube => {
+        return 25;
+      }
+      TriggerType::ConfigurableTrigger => {
+        return 200;  
+      }
+    }
+  }
 }
 
 #[cfg(feature="pybindings")]
