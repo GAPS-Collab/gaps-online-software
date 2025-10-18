@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.tof &#8212; gondola 0.11.8 documentation</title>
+    <title>gondola.tof &#8212; gondola 0.11.10 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=3adbc293"></script>
+    <script src="../_static/documentation_options.js?v=c4cff289"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.tof';</script>
@@ -110,7 +110,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.11.8 documentation</p>
+    <p class="title logo__title">gondola 0.11.10 documentation</p>
   
 </a></div>
     
@@ -312,6 +312,1103 @@
   <section id="module-gondola.tof">
 <span id="gondola-tof"></span><h1>gondola.tof<a class="headerlink" href="#module-gondola.tof" title="Link to this heading">#</a></h1>
 <p>TOF related entities which did not fit anywhere else</p>
+<p class="rubric">Classes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.tof.MasterTrigger" title="gondola.tof.MasterTrigger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MasterTrigger</span></code></a>(target_address)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.tof.PreampBiasConfig" title="gondola.tof.PreampBiasConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PreampBiasConfig</span></code></a></p></td>
+<td><p>Set preamp voltages</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.tof.RBChannelMaskConfig" title="gondola.tof.RBChannelMaskConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RBChannelMaskConfig</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.tof.RBPaddleID" title="gondola.tof.RBPaddleID"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RBPaddleID</span></code></a>()</p></td>
+<td><p>Squeze the rb channel - paddle mapping into 5 bytes for a single RB</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.tof.TofCommand" title="gondola.tof.TofCommand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofCommand</span></code></a>()</p></td>
+<td><p>A general command class with an arbitrary payload</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.tof.TofCuts" title="gondola.tof.TofCuts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofCuts</span></code></a>()</p></td>
+<td><p>Sets of cuts which can be imposed on  TofEvents</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.tof.TofDetectorStatus" title="gondola.tof.TofDetectorStatus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofDetectorStatus</span></code></a>()</p></td>
+<td><p>Report dead channels/non-active detectors for the TOF system</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.tof.TofRunConfig" title="gondola.tof.TofRunConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofRunConfig</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.tof.TriggerConfig" title="gondola.tof.TriggerConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriggerConfig</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.tof.RBPaddleID">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.tof.</span></span><span class="sig-name descname"><span class="pre">RBPaddleID</span></span><a class="headerlink" href="#gondola.tof.RBPaddleID" title="Link to this definition">#</a></dt>
+<dd><p>Squeze the rb channel - paddle mapping into 5 bytes
+for a single RB</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.RBPaddleID.get_paddle_id">
+<span class="sig-name descname"><span class="pre">get_paddle_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.RBPaddleID.get_paddle_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.tof.TofDetectorStatus">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.tof.</span></span><span class="sig-name descname"><span class="pre">TofDetectorStatus</span></span><a class="headerlink" href="#gondola.tof.TofDetectorStatus" title="Link to this definition">#</a></dt>
+<dd><p>Report dead channels/non-active detectors
+for the TOF system</p>
+<p>This is a very simple approach
+A channels are the paddle_id - 1
+while B channels are encoded as paddle_id - 159</p>
+<p>Dead channels will be 0, active channels 
+will be 1</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofDetectorStatus.channels000_031">
+<span class="sig-name descname"><span class="pre">channels000_031</span></span><a class="headerlink" href="#gondola.tof.TofDetectorStatus.channels000_031" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofDetectorStatus.channels032_063">
+<span class="sig-name descname"><span class="pre">channels032_063</span></span><a class="headerlink" href="#gondola.tof.TofDetectorStatus.channels032_063" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofDetectorStatus.channels064_095">
+<span class="sig-name descname"><span class="pre">channels064_095</span></span><a class="headerlink" href="#gondola.tof.TofDetectorStatus.channels064_095" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofDetectorStatus.channels096_127">
+<span class="sig-name descname"><span class="pre">channels096_127</span></span><a class="headerlink" href="#gondola.tof.TofDetectorStatus.channels096_127" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofDetectorStatus.channels128_159">
+<span class="sig-name descname"><span class="pre">channels128_159</span></span><a class="headerlink" href="#gondola.tof.TofDetectorStatus.channels128_159" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofDetectorStatus.channels160_191">
+<span class="sig-name descname"><span class="pre">channels160_191</span></span><a class="headerlink" href="#gondola.tof.TofDetectorStatus.channels160_191" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofDetectorStatus.channels192_223">
+<span class="sig-name descname"><span class="pre">channels192_223</span></span><a class="headerlink" href="#gondola.tof.TofDetectorStatus.channels192_223" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofDetectorStatus.channels224_255">
+<span class="sig-name descname"><span class="pre">channels224_255</span></span><a class="headerlink" href="#gondola.tof.TofDetectorStatus.channels224_255" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofDetectorStatus.channels256_297">
+<span class="sig-name descname"><span class="pre">channels256_297</span></span><a class="headerlink" href="#gondola.tof.TofDetectorStatus.channels256_297" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofDetectorStatus.channels298_319">
+<span class="sig-name descname"><span class="pre">channels298_319</span></span><a class="headerlink" href="#gondola.tof.TofDetectorStatus.channels298_319" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TofDetectorStatus.from_bytestream">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_bytestream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytestream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TofDetectorStatus.from_bytestream" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TofDetectorStatus.from_random">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_random</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TofDetectorStatus.from_random" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TofDetectorStatus.from_tofpacket">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_tofpacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TofDetectorStatus.from_tofpacket" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TofDetectorStatus.pack">
+<span class="sig-name descname"><span class="pre">pack</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TofDetectorStatus.pack" title="Link to this definition">#</a></dt>
+<dd><p>Pack self into a TofPacket to be written on disk
+or sent over network</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.tof.TofCommand">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.tof.</span></span><span class="sig-name descname"><span class="pre">TofCommand</span></span><a class="headerlink" href="#gondola.tof.TofCommand" title="Link to this definition">#</a></dt>
+<dd><p>A general command class with an arbitrary payload</p>
+<p>Since the commands should in general be small
+the maixmal payload size is limited to 256 bytes</p>
+<p>All commands will get broadcasted and the 
+receiver has to figure out if they have 
+to rect to that command</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCommand.command_code">
+<span class="sig-name descname"><span class="pre">command_code</span></span><a class="headerlink" href="#gondola.tof.TofCommand.command_code" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TofCommand.from_bytestream">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_bytestream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytestream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TofCommand.from_bytestream" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TofCommand.from_random">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_random</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TofCommand.from_random" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TofCommand.from_tofpacket">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_tofpacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TofCommand.from_tofpacket" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TofCommand.get_cc_u8">
+<span class="sig-name descname"><span class="pre">get_cc_u8</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TofCommand.get_cc_u8" title="Link to this definition">#</a></dt>
+<dd><p>An explicit getter for the 
+command code, to interface 
+with BFSW/GSE systems</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TofCommand.pack">
+<span class="sig-name descname"><span class="pre">pack</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TofCommand.pack" title="Link to this definition">#</a></dt>
+<dd><p>Pack self into a TofPacket to be written on disk
+or sent over network</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TofCommand.to_bytestream">
+<span class="sig-name descname"><span class="pre">to_bytestream</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TofCommand.to_bytestream" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TofCommand.wrap_n_pack">
+<span class="sig-name descname"><span class="pre">wrap_n_pack</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TofCommand.wrap_n_pack" title="Link to this definition">#</a></dt>
+<dd><p>Pack myself nicely in a TofPacket and 
+serialize myself</p>
+<p>Can be used to interface with BFSW/GSE
+systems</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.tof.PreampBiasConfig">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.tof.</span></span><span class="sig-name descname"><span class="pre">PreampBiasConfig</span></span><a class="headerlink" href="#gondola.tof.PreampBiasConfig" title="Link to this definition">#</a></dt>
+<dd><p>Set preamp voltages</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.tof.RBChannelMaskConfig">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.tof.</span></span><span class="sig-name descname"><span class="pre">RBChannelMaskConfig</span></span><a class="headerlink" href="#gondola.tof.RBChannelMaskConfig" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.tof.</span></span><span class="sig-name descname"><span class="pre">TriggerConfig</span></span><a class="headerlink" href="#gondola.tof.TriggerConfig" title="Link to this definition">#</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.combo_trigger_prescale">
+<span class="sig-name descname"><span class="pre">combo_trigger_prescale</span></span><a class="headerlink" href="#gondola.tof.TriggerConfig.combo_trigger_prescale" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.combo_trigger_type">
+<span class="sig-name descname"><span class="pre">combo_trigger_type</span></span><a class="headerlink" href="#gondola.tof.TriggerConfig.combo_trigger_type" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.from_bytestream">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_bytestream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytestream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TriggerConfig.from_bytestream" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.from_random">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_random</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TriggerConfig.from_random" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.from_tofpacket">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_tofpacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TriggerConfig.from_tofpacket" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.gaps_trigger_use_beta">
+<span class="sig-name descname"><span class="pre">gaps_trigger_use_beta</span></span><a class="headerlink" href="#gondola.tof.TriggerConfig.gaps_trigger_use_beta" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.hb_send_interval">
+<span class="sig-name descname"><span class="pre">hb_send_interval</span></span><a class="headerlink" href="#gondola.tof.TriggerConfig.hb_send_interval" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.mtb_moni_interval">
+<span class="sig-name descname"><span class="pre">mtb_moni_interval</span></span><a class="headerlink" href="#gondola.tof.TriggerConfig.mtb_moni_interval" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.pack">
+<span class="sig-name descname"><span class="pre">pack</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TriggerConfig.pack" title="Link to this definition">#</a></dt>
+<dd><p>Pack self into a TofPacket to be written on disk
+or sent over network</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.prescale">
+<span class="sig-name descname"><span class="pre">prescale</span></span><a class="headerlink" href="#gondola.tof.TriggerConfig.prescale" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.set_combo_trigger_prescale">
+<span class="sig-name descname"><span class="pre">set_combo_trigger_prescale</span></span><a class="headerlink" href="#gondola.tof.TriggerConfig.set_combo_trigger_prescale" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.set_combo_trigger_type">
+<span class="sig-name descname"><span class="pre">set_combo_trigger_type</span></span><a class="headerlink" href="#gondola.tof.TriggerConfig.set_combo_trigger_type" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.set_gaps_trigger_use_beta">
+<span class="sig-name descname"><span class="pre">set_gaps_trigger_use_beta</span></span><a class="headerlink" href="#gondola.tof.TriggerConfig.set_gaps_trigger_use_beta" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.set_hb_send_interval">
+<span class="sig-name descname"><span class="pre">set_hb_send_interval</span></span><a class="headerlink" href="#gondola.tof.TriggerConfig.set_hb_send_interval" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.set_mtb_moni_interval">
+<span class="sig-name descname"><span class="pre">set_mtb_moni_interval</span></span><a class="headerlink" href="#gondola.tof.TriggerConfig.set_mtb_moni_interval" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.set_prescale">
+<span class="sig-name descname"><span class="pre">set_prescale</span></span><a class="headerlink" href="#gondola.tof.TriggerConfig.set_prescale" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.set_tiu_ignore_busy">
+<span class="sig-name descname"><span class="pre">set_tiu_ignore_busy</span></span><a class="headerlink" href="#gondola.tof.TriggerConfig.set_tiu_ignore_busy" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.set_trace_suppression">
+<span class="sig-name descname"><span class="pre">set_trace_suppression</span></span><a class="headerlink" href="#gondola.tof.TriggerConfig.set_trace_suppression" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.set_trigger_type">
+<span class="sig-name descname"><span class="pre">set_trigger_type</span></span><a class="headerlink" href="#gondola.tof.TriggerConfig.set_trigger_type" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.set_use_combo_trigger">
+<span class="sig-name descname"><span class="pre">set_use_combo_trigger</span></span><a class="headerlink" href="#gondola.tof.TriggerConfig.set_use_combo_trigger" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.tiu_ignore_busy">
+<span class="sig-name descname"><span class="pre">tiu_ignore_busy</span></span><a class="headerlink" href="#gondola.tof.TriggerConfig.tiu_ignore_busy" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.to_bytestream">
+<span class="sig-name descname"><span class="pre">to_bytestream</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TriggerConfig.to_bytestream" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.trace_suppression">
+<span class="sig-name descname"><span class="pre">trace_suppression</span></span><a class="headerlink" href="#gondola.tof.TriggerConfig.trace_suppression" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.trigger_type">
+<span class="sig-name descname"><span class="pre">trigger_type</span></span><a class="headerlink" href="#gondola.tof.TriggerConfig.trigger_type" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TriggerConfig.use_combo_trigger">
+<span class="sig-name descname"><span class="pre">use_combo_trigger</span></span><a class="headerlink" href="#gondola.tof.TriggerConfig.use_combo_trigger" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.tof.TofRunConfig">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.tof.</span></span><span class="sig-name descname"><span class="pre">TofRunConfig</span></span><a class="headerlink" href="#gondola.tof.TofRunConfig" title="Link to this definition">#</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TofRunConfig.from_bytestream">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_bytestream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytestream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TofRunConfig.from_bytestream" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TofRunConfig.from_random">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_random</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TofRunConfig.from_random" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TofRunConfig.from_tofpacket">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_tofpacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TofRunConfig.from_tofpacket" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TofRunConfig.pack">
+<span class="sig-name descname"><span class="pre">pack</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TofRunConfig.pack" title="Link to this definition">#</a></dt>
+<dd><p>Pack self into a TofPacket to be written on disk
+or sent over network</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofRunConfig.runtime">
+<span class="sig-name descname"><span class="pre">runtime</span></span><a class="headerlink" href="#gondola.tof.TofRunConfig.runtime" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofRunConfig.set_runtime">
+<span class="sig-name descname"><span class="pre">set_runtime</span></span><a class="headerlink" href="#gondola.tof.TofRunConfig.set_runtime" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.tof.</span></span><span class="sig-name descname"><span class="pre">TofCuts</span></span><a class="headerlink" href="#gondola.tof.TofCuts" title="Link to this definition">#</a></dt>
+<dd><p>Sets of cuts which can be imposed on 
+TofEvents</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.acc_frac_cos_theta">
+<span class="sig-name descname"><span class="pre">acc_frac_cos_theta</span></span><a class="headerlink" href="#gondola.tof.TofCuts.acc_frac_cos_theta" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.acc_frac_fh_must_be_umb">
+<span class="sig-name descname"><span class="pre">acc_frac_fh_must_be_umb</span></span><a class="headerlink" href="#gondola.tof.TofCuts.acc_frac_fh_must_be_umb" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.acc_frac_fhi_not_bot">
+<span class="sig-name descname"><span class="pre">acc_frac_fhi_not_bot</span></span><a class="headerlink" href="#gondola.tof.TofCuts.acc_frac_fhi_not_bot" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.acc_frac_fho_must_panel7">
+<span class="sig-name descname"><span class="pre">acc_frac_fho_must_panel7</span></span><a class="headerlink" href="#gondola.tof.TofCuts.acc_frac_fho_must_panel7" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.acc_frac_hit_all">
+<span class="sig-name descname"><span class="pre">acc_frac_hit_all</span></span><a class="headerlink" href="#gondola.tof.TofCuts.acc_frac_hit_all" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.acc_frac_hit_cbe">
+<span class="sig-name descname"><span class="pre">acc_frac_hit_cbe</span></span><a class="headerlink" href="#gondola.tof.TofCuts.acc_frac_hit_cbe" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.acc_frac_hit_cor">
+<span class="sig-name descname"><span class="pre">acc_frac_hit_cor</span></span><a class="headerlink" href="#gondola.tof.TofCuts.acc_frac_hit_cor" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.acc_frac_hit_umb">
+<span class="sig-name descname"><span class="pre">acc_frac_hit_umb</span></span><a class="headerlink" href="#gondola.tof.TofCuts.acc_frac_hit_umb" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.acc_frac_lh_must_panel2">
+<span class="sig-name descname"><span class="pre">acc_frac_lh_must_panel2</span></span><a class="headerlink" href="#gondola.tof.TofCuts.acc_frac_lh_must_panel2" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.accept">
+<span class="sig-name descname"><span class="pre">accept</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TofCuts.accept" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.clear_stats">
+<span class="sig-name descname"><span class="pre">clear_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TofCuts.clear_stats" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TofCuts.copy" title="Link to this definition">#</a></dt>
+<dd><p>Return a literal full deep copy 
+of the instance</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.cos_theta_acc">
+<span class="sig-name descname"><span class="pre">cos_theta_acc</span></span><a class="headerlink" href="#gondola.tof.TofCuts.cos_theta_acc" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.fh_must_be_umb">
+<span class="sig-name descname"><span class="pre">fh_must_be_umb</span></span><a class="headerlink" href="#gondola.tof.TofCuts.fh_must_be_umb" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.fh_umb_acc">
+<span class="sig-name descname"><span class="pre">fh_umb_acc</span></span><a class="headerlink" href="#gondola.tof.TofCuts.fh_umb_acc" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.fhi_not_bot">
+<span class="sig-name descname"><span class="pre">fhi_not_bot</span></span><a class="headerlink" href="#gondola.tof.TofCuts.fhi_not_bot" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.fhi_not_bot_acc">
+<span class="sig-name descname"><span class="pre">fhi_not_bot_acc</span></span><a class="headerlink" href="#gondola.tof.TofCuts.fhi_not_bot_acc" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.fho_must_panel7">
+<span class="sig-name descname"><span class="pre">fho_must_panel7</span></span><a class="headerlink" href="#gondola.tof.TofCuts.fho_must_panel7" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.fho_must_panel7_acc">
+<span class="sig-name descname"><span class="pre">fho_must_panel7_acc</span></span><a class="headerlink" href="#gondola.tof.TofCuts.fho_must_panel7_acc" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.from_toml">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_toml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TofCuts.from_toml" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.get_frac_thru_going">
+<span class="sig-name descname"><span class="pre">get_frac_thru_going</span></span><a class="headerlink" href="#gondola.tof.TofCuts.get_frac_thru_going" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.hit_all_acc">
+<span class="sig-name descname"><span class="pre">hit_all_acc</span></span><a class="headerlink" href="#gondola.tof.TofCuts.hit_all_acc" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.hit_cbe_acc">
+<span class="sig-name descname"><span class="pre">hit_cbe_acc</span></span><a class="headerlink" href="#gondola.tof.TofCuts.hit_cbe_acc" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.hit_cor_acc">
+<span class="sig-name descname"><span class="pre">hit_cor_acc</span></span><a class="headerlink" href="#gondola.tof.TofCuts.hit_cor_acc" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.hit_high_edep">
+<span class="sig-name descname"><span class="pre">hit_high_edep</span></span><a class="headerlink" href="#gondola.tof.TofCuts.hit_high_edep" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.hit_high_edep_acc">
+<span class="sig-name descname"><span class="pre">hit_high_edep_acc</span></span><a class="headerlink" href="#gondola.tof.TofCuts.hit_high_edep_acc" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.hit_umb_acc">
+<span class="sig-name descname"><span class="pre">hit_umb_acc</span></span><a class="headerlink" href="#gondola.tof.TofCuts.hit_umb_acc" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.hits_rmvd_csl">
+<span class="sig-name descname"><span class="pre">hits_rmvd_csl</span></span><a class="headerlink" href="#gondola.tof.TofCuts.hits_rmvd_csl" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.hits_rmvd_ls">
+<span class="sig-name descname"><span class="pre">hits_rmvd_ls</span></span><a class="headerlink" href="#gondola.tof.TofCuts.hits_rmvd_ls" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.hits_total">
+<span class="sig-name descname"><span class="pre">hits_total</span></span><a class="headerlink" href="#gondola.tof.TofCuts.hits_total" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.is_compatible">
+<span class="sig-name descname"><span class="pre">is_compatible</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TofCuts.is_compatible" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.lh_must_panel2">
+<span class="sig-name descname"><span class="pre">lh_must_panel2</span></span><a class="headerlink" href="#gondola.tof.TofCuts.lh_must_panel2" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.lh_must_panel2_acc">
+<span class="sig-name descname"><span class="pre">lh_must_panel2_acc</span></span><a class="headerlink" href="#gondola.tof.TofCuts.lh_must_panel2_acc" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.ls_cleaning_t_err">
+<span class="sig-name descname"><span class="pre">ls_cleaning_t_err</span></span><a class="headerlink" href="#gondola.tof.TofCuts.ls_cleaning_t_err" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.max_cos_theta">
+<span class="sig-name descname"><span class="pre">max_cos_theta</span></span><a class="headerlink" href="#gondola.tof.TofCuts.max_cos_theta" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.max_hit_all">
+<span class="sig-name descname"><span class="pre">max_hit_all</span></span><a class="headerlink" href="#gondola.tof.TofCuts.max_hit_all" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.max_hit_cbe">
+<span class="sig-name descname"><span class="pre">max_hit_cbe</span></span><a class="headerlink" href="#gondola.tof.TofCuts.max_hit_cbe" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.max_hit_cor">
+<span class="sig-name descname"><span class="pre">max_hit_cor</span></span><a class="headerlink" href="#gondola.tof.TofCuts.max_hit_cor" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.max_hit_umb">
+<span class="sig-name descname"><span class="pre">max_hit_umb</span></span><a class="headerlink" href="#gondola.tof.TofCuts.max_hit_umb" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.min_cos_theta">
+<span class="sig-name descname"><span class="pre">min_cos_theta</span></span><a class="headerlink" href="#gondola.tof.TofCuts.min_cos_theta" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.min_hit_all">
+<span class="sig-name descname"><span class="pre">min_hit_all</span></span><a class="headerlink" href="#gondola.tof.TofCuts.min_hit_all" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.min_hit_cbe">
+<span class="sig-name descname"><span class="pre">min_hit_cbe</span></span><a class="headerlink" href="#gondola.tof.TofCuts.min_hit_cbe" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.min_hit_cor">
+<span class="sig-name descname"><span class="pre">min_hit_cor</span></span><a class="headerlink" href="#gondola.tof.TofCuts.min_hit_cor" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.min_hit_umb">
+<span class="sig-name descname"><span class="pre">min_hit_umb</span></span><a class="headerlink" href="#gondola.tof.TofCuts.min_hit_umb" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.nevents">
+<span class="sig-name descname"><span class="pre">nevents</span></span><a class="headerlink" href="#gondola.tof.TofCuts.nevents" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.only_causal_hits">
+<span class="sig-name descname"><span class="pre">only_causal_hits</span></span><a class="headerlink" href="#gondola.tof.TofCuts.only_causal_hits" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.pretty_print_efficiency">
+<span class="sig-name descname"><span class="pre">pretty_print_efficiency</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TofCuts.pretty_print_efficiency" title="Link to this definition">#</a></dt>
+<dd><p>Return a prettily formated string with 
+the efficiency information for all the 
+individual cuts</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.thru_going">
+<span class="sig-name descname"><span class="pre">thru_going</span></span><a class="headerlink" href="#gondola.tof.TofCuts.thru_going" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.thru_going_acc">
+<span class="sig-name descname"><span class="pre">thru_going_acc</span></span><a class="headerlink" href="#gondola.tof.TofCuts.thru_going_acc" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.to_toml">
+<span class="sig-name descname"><span class="pre">to_toml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.TofCuts.to_toml" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.TofCuts.void">
+<span class="sig-name descname"><span class="pre">void</span></span><a class="headerlink" href="#gondola.tof.TofCuts.void" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.tof.</span></span><span class="sig-name descname"><span class="pre">MasterTrigger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_address</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger" title="Link to this definition">#</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.disable_cyclic_trig">
+<span class="sig-name descname"><span class="pre">disable_cyclic_trig</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.disable_cyclic_trig" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.enable_cyclic_trig">
+<span class="sig-name descname"><span class="pre">enable_cyclic_trig</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.enable_cyclic_trig" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_configurable_trigger">
+<span class="sig-name descname"><span class="pre">get_configurable_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_configurable_trigger" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_cortina_thresh">
+<span class="sig-name descname"><span class="pre">get_cortina_thresh</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_cortina_thresh" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_cube_bot_thresh">
+<span class="sig-name descname"><span class="pre">get_cube_bot_thresh</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_cube_bot_thresh" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_cube_corner_thresh">
+<span class="sig-name descname"><span class="pre">get_cube_corner_thresh</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_cube_corner_thresh" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_cube_side_thresh">
+<span class="sig-name descname"><span class="pre">get_cube_side_thresh</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_cube_side_thresh" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_cube_top_thresh">
+<span class="sig-name descname"><span class="pre">get_cube_top_thresh</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_cube_top_thresh" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_cyclic_trigger_interval">
+<span class="sig-name descname"><span class="pre">get_cyclic_trigger_interval</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_cyclic_trigger_interval" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_enable_cyclic_trig">
+<span class="sig-name descname"><span class="pre">get_enable_cyclic_trig</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_enable_cyclic_trig" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_event">
+<span class="sig-name descname"><span class="pre">get_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">read_until_footer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_event" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_event_cnt">
+<span class="sig-name descname"><span class="pre">get_event_cnt</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_event_cnt" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_event_queue_full">
+<span class="sig-name descname"><span class="pre">get_event_queue_full</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_event_queue_full" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_event_queue_size">
+<span class="sig-name descname"><span class="pre">get_event_queue_size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_event_queue_size" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_expected_pid">
+<span class="sig-name descname"><span class="pre">get_expected_pid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_expected_pid" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_gaps_trigger_prescale">
+<span class="sig-name descname"><span class="pre">get_gaps_trigger_prescale</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_gaps_trigger_prescale" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_inner_tof_thresh">
+<span class="sig-name descname"><span class="pre">get_inner_tof_thresh</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_inner_tof_thresh" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_lt_link_automask">
+<span class="sig-name descname"><span class="pre">get_lt_link_automask</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_lt_link_automask" title="Link to this definition">#</a></dt>
+<dd><p>get LT LINK AUTOMASK toggle status</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_lt_link_en0">
+<span class="sig-name descname"><span class="pre">get_lt_link_en0</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_lt_link_en0" title="Link to this definition">#</a></dt>
+<dd><p>Get the status of enabling for LTBs 0-9</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_lt_link_en02">
+<span class="sig-name descname"><span class="pre">get_lt_link_en02</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_lt_link_en02" title="Link to this definition">#</a></dt>
+<dd><p>Get the status of enabling for LTBs 20-29</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_lt_link_en1">
+<span class="sig-name descname"><span class="pre">get_lt_link_en1</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_lt_link_en1" title="Link to this definition">#</a></dt>
+<dd><p>Get the status of enabling for LTBs 10-19</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_lt_link_en3">
+<span class="sig-name descname"><span class="pre">get_lt_link_en3</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_lt_link_en3" title="Link to this definition">#</a></dt>
+<dd><p>Get the status of enabling for LTBs 30-39</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_lt_link_en4">
+<span class="sig-name descname"><span class="pre">get_lt_link_en4</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_lt_link_en4" title="Link to this definition">#</a></dt>
+<dd><p>Get the status of enabling for LTBs 40-49</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_ltb_event_cnts">
+<span class="sig-name descname"><span class="pre">get_ltb_event_cnts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_ltb_event_cnts" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_ltb_links_ready">
+<span class="sig-name descname"><span class="pre">get_ltb_links_ready</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_ltb_links_ready" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_nevents_in_queue">
+<span class="sig-name descname"><span class="pre">get_nevents_in_queue</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_nevents_in_queue" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_outer_tof_thresh">
+<span class="sig-name descname"><span class="pre">get_outer_tof_thresh</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_outer_tof_thresh" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_packet_id">
+<span class="sig-name descname"><span class="pre">get_packet_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_packet_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_rb_event_cnts">
+<span class="sig-name descname"><span class="pre">get_rb_event_cnts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_rb_event_cnts" title="Link to this definition">#</a></dt>
+<dd><p>Readout the RB event counter registers</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_total_tof_thresh">
+<span class="sig-name descname"><span class="pre">get_total_tof_thresh</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_total_tof_thresh" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_trace_suppression">
+<span class="sig-name descname"><span class="pre">get_trace_suppression</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_trace_suppression" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_umbrella_center_thresh">
+<span class="sig-name descname"><span class="pre">get_umbrella_center_thresh</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_umbrella_center_thresh" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_umbrella_thresh">
+<span class="sig-name descname"><span class="pre">get_umbrella_thresh</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_umbrella_thresh" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.lost_rate">
+<span class="sig-name descname"><span class="pre">lost_rate</span></span><a class="headerlink" href="#gondola.tof.MasterTrigger.lost_rate" title="Link to this definition">#</a></dt>
+<dd><p>Get the lost global trigger rate in Hz</p>
+<p>This is the rate of triggers which got 
+dropped due to TIU BUSY signal + those which 
+get dropped due to the RBs being busy</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.rate">
+<span class="sig-name descname"><span class="pre">rate</span></span><a class="headerlink" href="#gondola.tof.MasterTrigger.rate" title="Link to this definition">#</a></dt>
+<dd><p>Get the global trigger rate in Hz</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.rb_lost_rate">
+<span class="sig-name descname"><span class="pre">rb_lost_rate</span></span><a class="headerlink" href="#gondola.tof.MasterTrigger.rb_lost_rate" title="Link to this definition">#</a></dt>
+<dd><p>The lost rate which occured due to RB busy timeouts</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.realign_packet_id">
+<span class="sig-name descname"><span class="pre">realign_packet_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.realign_packet_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.reset_daq">
+<span class="sig-name descname"><span class="pre">reset_daq</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.reset_daq" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.reset_ltb_counters">
+<span class="sig-name descname"><span class="pre">reset_ltb_counters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.reset_ltb_counters" title="Link to this definition">#</a></dt>
+<dd><p>Reset all the LTB counters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.reset_rb_counters">
+<span class="sig-name descname"><span class="pre">reset_rb_counters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.reset_rb_counters" title="Link to this definition">#</a></dt>
+<dd><p>Reset all the RB counters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_any_trigger">
+<span class="sig-name descname"><span class="pre">set_any_trigger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prescale</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_any_trigger" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_central_track_trigger">
+<span class="sig-name descname"><span class="pre">set_central_track_trigger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prescale</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_central_track_trigger" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_configurable_trigger">
+<span class="sig-name descname"><span class="pre">set_configurable_trigger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_configurable_trigger" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_corcubeside_trigger">
+<span class="sig-name descname"><span class="pre">set_corcubeside_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_corcubeside_trigger" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_cortina_thresh">
+<span class="sig-name descname"><span class="pre">set_cortina_thresh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_cortina_thresh" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_cube_bot_thresh">
+<span class="sig-name descname"><span class="pre">set_cube_bot_thresh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_cube_bot_thresh" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_cube_corner_thresh">
+<span class="sig-name descname"><span class="pre">set_cube_corner_thresh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_cube_corner_thresh" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_cube_side_thresh">
+<span class="sig-name descname"><span class="pre">set_cube_side_thresh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_cube_side_thresh" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_cube_top_thresh">
+<span class="sig-name descname"><span class="pre">set_cube_top_thresh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_cube_top_thresh" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_cyclic_trigger_interval">
+<span class="sig-name descname"><span class="pre">set_cyclic_trigger_interval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interval</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_cyclic_trigger_interval" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_gaps422_central_track_trigger">
+<span class="sig-name descname"><span class="pre">set_gaps422_central_track_trigger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prescale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_beta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_gaps422_central_track_trigger" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_gaps_any_trigger">
+<span class="sig-name descname"><span class="pre">set_gaps_any_trigger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prescale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_beta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_gaps_any_trigger" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_gaps_central_track_trigger">
+<span class="sig-name descname"><span class="pre">set_gaps_central_track_trigger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prescale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_beta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_gaps_central_track_trigger" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_gaps_track_trigger">
+<span class="sig-name descname"><span class="pre">set_gaps_track_trigger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prescale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_beta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_gaps_track_trigger" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_gaps_trigger_prescale">
+<span class="sig-name descname"><span class="pre">set_gaps_trigger_prescale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prescale</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_gaps_trigger_prescale" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_inner_tof_thresh">
+<span class="sig-name descname"><span class="pre">set_inner_tof_thresh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_inner_tof_thresh" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_lt_link_automask">
+<span class="sig-name descname"><span class="pre">set_lt_link_automask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">toggle</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_lt_link_automask" title="Link to this definition">#</a></dt>
+<dd><p>set LT LINK AUTOMASK toggle status</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_lt_link_en0">
+<span class="sig-name descname"><span class="pre">set_lt_link_en0</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_lt_link_en0" title="Link to this definition">#</a></dt>
+<dd><p>Set on/off link enabling for LTBs 0-9</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_lt_link_en1">
+<span class="sig-name descname"><span class="pre">set_lt_link_en1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_lt_link_en1" title="Link to this definition">#</a></dt>
+<dd><p>Set on/off link enabling for LTBs 10-19</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_lt_link_en2">
+<span class="sig-name descname"><span class="pre">set_lt_link_en2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_lt_link_en2" title="Link to this definition">#</a></dt>
+<dd><p>Set on/off link enabling for LTBs 20-29</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_lt_link_en3">
+<span class="sig-name descname"><span class="pre">set_lt_link_en3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_lt_link_en3" title="Link to this definition">#</a></dt>
+<dd><p>Set on/off link enabling for LTBs 30-39</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_lt_link_en4">
+<span class="sig-name descname"><span class="pre">set_lt_link_en4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_lt_link_en4" title="Link to this definition">#</a></dt>
+<dd><p>Set on/off link enabling for LTBs 40-49</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_ltb_ch_mask">
+<span class="sig-name descname"><span class="pre">set_ltb_ch_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lt_link</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_ltb_ch_mask" title="Link to this definition">#</a></dt>
+<dd><p>Set a channel mask for a LTB.</p>
+<p># Arguments
+* lt_link : 0-24, dsi/j connection of the LTB on the MTB
+* mask    : bitmask 1 = ch0 2 = ch1, etc. setting a channel</p>
+<blockquote>
+<div><p>to 1 will DISABLE the channel!</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_outer_tof_thresh">
+<span class="sig-name descname"><span class="pre">set_outer_tof_thresh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_outer_tof_thresh" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_packet_id">
+<span class="sig-name descname"><span class="pre">set_packet_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_packet_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_poisson_trigger">
+<span class="sig-name descname"><span class="pre">set_poisson_trigger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rate</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_poisson_trigger" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_total_tof_thresh">
+<span class="sig-name descname"><span class="pre">set_total_tof_thresh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_total_tof_thresh" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_trace_suppression">
+<span class="sig-name descname"><span class="pre">set_trace_suppression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace_sup</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_trace_suppression" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_track_trigger">
+<span class="sig-name descname"><span class="pre">set_track_trigger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prescale</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_track_trigger" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_track_trigger_is_global">
+<span class="sig-name descname"><span class="pre">set_track_trigger_is_global</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_track_trigger_is_global" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_umb3cube_trigger">
+<span class="sig-name descname"><span class="pre">set_umb3cube_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_umb3cube_trigger" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_umbcorcube_trigger">
+<span class="sig-name descname"><span class="pre">set_umbcorcube_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_umbcorcube_trigger" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_umbcube_trigger">
+<span class="sig-name descname"><span class="pre">set_umbcube_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_umbcube_trigger" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_umbcubez_trigger">
+<span class="sig-name descname"><span class="pre">set_umbcubez_trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_umbcubez_trigger" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_umbrella_center_thresh">
+<span class="sig-name descname"><span class="pre">set_umbrella_center_thresh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_umbrella_center_thresh" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.set_umbrella_thresh">
+<span class="sig-name descname"><span class="pre">set_umbrella_thresh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.set_umbrella_thresh" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.stop_all_triggers">
+<span class="sig-name descname"><span class="pre">stop_all_triggers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.stop_all_triggers" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.tiu_bad">
+<span class="sig-name descname"><span class="pre">tiu_bad</span></span><a class="headerlink" href="#gondola.tof.MasterTrigger.tiu_bad" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.tiu_busy_ignore">
+<span class="sig-name descname"><span class="pre">tiu_busy_ignore</span></span><a class="headerlink" href="#gondola.tof.MasterTrigger.tiu_busy_ignore" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.tiu_busy_stuck">
+<span class="sig-name descname"><span class="pre">tiu_busy_stuck</span></span><a class="headerlink" href="#gondola.tof.MasterTrigger.tiu_busy_stuck" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.tiu_emulation_mode">
+<span class="sig-name descname"><span class="pre">tiu_emulation_mode</span></span><a class="headerlink" href="#gondola.tof.MasterTrigger.tiu_emulation_mode" title="Link to this definition">#</a></dt>
+<dd><p>Check if the TIU emulation mode is on</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.tiu_emulation_mode_bsy_cnt">
+<span class="sig-name descname"><span class="pre">tiu_emulation_mode_bsy_cnt</span></span><a class="headerlink" href="#gondola.tof.MasterTrigger.tiu_emulation_mode_bsy_cnt" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.tiu_lost_rate">
+<span class="sig-name descname"><span class="pre">tiu_lost_rate</span></span><a class="headerlink" href="#gondola.tof.MasterTrigger.tiu_lost_rate" title="Link to this definition">#</a></dt>
+<dd><p>The lost rate which occured due to the tracker BUSY signal</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.trigger">
+<span class="sig-name descname"><span class="pre">trigger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.trigger" title="Link to this definition">#</a></dt>
+<dd><p>Issue a one-time forced trigger</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.use_tiu_aux_link">
+<span class="sig-name descname"><span class="pre">use_tiu_aux_link</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">use_it</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.use_tiu_aux_link" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <p class="rubric">Modules</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
@@ -361,6 +1458,230 @@
                 <dialog id="pst-secondary-sidebar-modal"></dialog>
                 <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.RBPaddleID"><code class="docutils literal notranslate"><span class="pre">RBPaddleID</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.RBPaddleID.get_paddle_id"><code class="docutils literal notranslate"><span class="pre">RBPaddleID.get_paddle_id()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofDetectorStatus"><code class="docutils literal notranslate"><span class="pre">TofDetectorStatus</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofDetectorStatus.channels000_031"><code class="docutils literal notranslate"><span class="pre">TofDetectorStatus.channels000_031</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofDetectorStatus.channels032_063"><code class="docutils literal notranslate"><span class="pre">TofDetectorStatus.channels032_063</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofDetectorStatus.channels064_095"><code class="docutils literal notranslate"><span class="pre">TofDetectorStatus.channels064_095</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofDetectorStatus.channels096_127"><code class="docutils literal notranslate"><span class="pre">TofDetectorStatus.channels096_127</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofDetectorStatus.channels128_159"><code class="docutils literal notranslate"><span class="pre">TofDetectorStatus.channels128_159</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofDetectorStatus.channels160_191"><code class="docutils literal notranslate"><span class="pre">TofDetectorStatus.channels160_191</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofDetectorStatus.channels192_223"><code class="docutils literal notranslate"><span class="pre">TofDetectorStatus.channels192_223</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofDetectorStatus.channels224_255"><code class="docutils literal notranslate"><span class="pre">TofDetectorStatus.channels224_255</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofDetectorStatus.channels256_297"><code class="docutils literal notranslate"><span class="pre">TofDetectorStatus.channels256_297</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofDetectorStatus.channels298_319"><code class="docutils literal notranslate"><span class="pre">TofDetectorStatus.channels298_319</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofDetectorStatus.from_bytestream"><code class="docutils literal notranslate"><span class="pre">TofDetectorStatus.from_bytestream()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofDetectorStatus.from_random"><code class="docutils literal notranslate"><span class="pre">TofDetectorStatus.from_random()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofDetectorStatus.from_tofpacket"><code class="docutils literal notranslate"><span class="pre">TofDetectorStatus.from_tofpacket()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofDetectorStatus.pack"><code class="docutils literal notranslate"><span class="pre">TofDetectorStatus.pack()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCommand"><code class="docutils literal notranslate"><span class="pre">TofCommand</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCommand.command_code"><code class="docutils literal notranslate"><span class="pre">TofCommand.command_code</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCommand.from_bytestream"><code class="docutils literal notranslate"><span class="pre">TofCommand.from_bytestream()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCommand.from_random"><code class="docutils literal notranslate"><span class="pre">TofCommand.from_random()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCommand.from_tofpacket"><code class="docutils literal notranslate"><span class="pre">TofCommand.from_tofpacket()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCommand.get_cc_u8"><code class="docutils literal notranslate"><span class="pre">TofCommand.get_cc_u8()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCommand.pack"><code class="docutils literal notranslate"><span class="pre">TofCommand.pack()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCommand.to_bytestream"><code class="docutils literal notranslate"><span class="pre">TofCommand.to_bytestream()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCommand.wrap_n_pack"><code class="docutils literal notranslate"><span class="pre">TofCommand.wrap_n_pack()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.PreampBiasConfig"><code class="docutils literal notranslate"><span class="pre">PreampBiasConfig</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.RBChannelMaskConfig"><code class="docutils literal notranslate"><span class="pre">RBChannelMaskConfig</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig"><code class="docutils literal notranslate"><span class="pre">TriggerConfig</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.combo_trigger_prescale"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.combo_trigger_prescale</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.combo_trigger_type"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.combo_trigger_type</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.from_bytestream"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.from_bytestream()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.from_random"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.from_random()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.from_tofpacket"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.from_tofpacket()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.gaps_trigger_use_beta"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.gaps_trigger_use_beta</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.hb_send_interval"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.hb_send_interval</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.mtb_moni_interval"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.mtb_moni_interval</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.pack"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.pack()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.prescale"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.prescale</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.set_combo_trigger_prescale"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.set_combo_trigger_prescale</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.set_combo_trigger_type"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.set_combo_trigger_type</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.set_gaps_trigger_use_beta"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.set_gaps_trigger_use_beta</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.set_hb_send_interval"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.set_hb_send_interval</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.set_mtb_moni_interval"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.set_mtb_moni_interval</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.set_prescale"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.set_prescale</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.set_tiu_ignore_busy"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.set_tiu_ignore_busy</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.set_trace_suppression"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.set_trace_suppression</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.set_trigger_type"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.set_trigger_type</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.set_use_combo_trigger"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.set_use_combo_trigger</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.tiu_ignore_busy"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.tiu_ignore_busy</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.to_bytestream"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.to_bytestream()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.trace_suppression"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.trace_suppression</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.trigger_type"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.trigger_type</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TriggerConfig.use_combo_trigger"><code class="docutils literal notranslate"><span class="pre">TriggerConfig.use_combo_trigger</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofRunConfig"><code class="docutils literal notranslate"><span class="pre">TofRunConfig</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofRunConfig.from_bytestream"><code class="docutils literal notranslate"><span class="pre">TofRunConfig.from_bytestream()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofRunConfig.from_random"><code class="docutils literal notranslate"><span class="pre">TofRunConfig.from_random()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofRunConfig.from_tofpacket"><code class="docutils literal notranslate"><span class="pre">TofRunConfig.from_tofpacket()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofRunConfig.pack"><code class="docutils literal notranslate"><span class="pre">TofRunConfig.pack()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofRunConfig.runtime"><code class="docutils literal notranslate"><span class="pre">TofRunConfig.runtime</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofRunConfig.set_runtime"><code class="docutils literal notranslate"><span class="pre">TofRunConfig.set_runtime</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts"><code class="docutils literal notranslate"><span class="pre">TofCuts</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.acc_frac_cos_theta"><code class="docutils literal notranslate"><span class="pre">TofCuts.acc_frac_cos_theta</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.acc_frac_fh_must_be_umb"><code class="docutils literal notranslate"><span class="pre">TofCuts.acc_frac_fh_must_be_umb</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.acc_frac_fhi_not_bot"><code class="docutils literal notranslate"><span class="pre">TofCuts.acc_frac_fhi_not_bot</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.acc_frac_fho_must_panel7"><code class="docutils literal notranslate"><span class="pre">TofCuts.acc_frac_fho_must_panel7</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.acc_frac_hit_all"><code class="docutils literal notranslate"><span class="pre">TofCuts.acc_frac_hit_all</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.acc_frac_hit_cbe"><code class="docutils literal notranslate"><span class="pre">TofCuts.acc_frac_hit_cbe</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.acc_frac_hit_cor"><code class="docutils literal notranslate"><span class="pre">TofCuts.acc_frac_hit_cor</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.acc_frac_hit_umb"><code class="docutils literal notranslate"><span class="pre">TofCuts.acc_frac_hit_umb</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.acc_frac_lh_must_panel2"><code class="docutils literal notranslate"><span class="pre">TofCuts.acc_frac_lh_must_panel2</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.accept"><code class="docutils literal notranslate"><span class="pre">TofCuts.accept()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.clear_stats"><code class="docutils literal notranslate"><span class="pre">TofCuts.clear_stats()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.copy"><code class="docutils literal notranslate"><span class="pre">TofCuts.copy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.cos_theta_acc"><code class="docutils literal notranslate"><span class="pre">TofCuts.cos_theta_acc</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.fh_must_be_umb"><code class="docutils literal notranslate"><span class="pre">TofCuts.fh_must_be_umb</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.fh_umb_acc"><code class="docutils literal notranslate"><span class="pre">TofCuts.fh_umb_acc</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.fhi_not_bot"><code class="docutils literal notranslate"><span class="pre">TofCuts.fhi_not_bot</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.fhi_not_bot_acc"><code class="docutils literal notranslate"><span class="pre">TofCuts.fhi_not_bot_acc</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.fho_must_panel7"><code class="docutils literal notranslate"><span class="pre">TofCuts.fho_must_panel7</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.fho_must_panel7_acc"><code class="docutils literal notranslate"><span class="pre">TofCuts.fho_must_panel7_acc</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.from_toml"><code class="docutils literal notranslate"><span class="pre">TofCuts.from_toml()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.get_frac_thru_going"><code class="docutils literal notranslate"><span class="pre">TofCuts.get_frac_thru_going</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.hit_all_acc"><code class="docutils literal notranslate"><span class="pre">TofCuts.hit_all_acc</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.hit_cbe_acc"><code class="docutils literal notranslate"><span class="pre">TofCuts.hit_cbe_acc</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.hit_cor_acc"><code class="docutils literal notranslate"><span class="pre">TofCuts.hit_cor_acc</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.hit_high_edep"><code class="docutils literal notranslate"><span class="pre">TofCuts.hit_high_edep</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.hit_high_edep_acc"><code class="docutils literal notranslate"><span class="pre">TofCuts.hit_high_edep_acc</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.hit_umb_acc"><code class="docutils literal notranslate"><span class="pre">TofCuts.hit_umb_acc</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.hits_rmvd_csl"><code class="docutils literal notranslate"><span class="pre">TofCuts.hits_rmvd_csl</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.hits_rmvd_ls"><code class="docutils literal notranslate"><span class="pre">TofCuts.hits_rmvd_ls</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.hits_total"><code class="docutils literal notranslate"><span class="pre">TofCuts.hits_total</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.is_compatible"><code class="docutils literal notranslate"><span class="pre">TofCuts.is_compatible()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.lh_must_panel2"><code class="docutils literal notranslate"><span class="pre">TofCuts.lh_must_panel2</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.lh_must_panel2_acc"><code class="docutils literal notranslate"><span class="pre">TofCuts.lh_must_panel2_acc</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.ls_cleaning_t_err"><code class="docutils literal notranslate"><span class="pre">TofCuts.ls_cleaning_t_err</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.max_cos_theta"><code class="docutils literal notranslate"><span class="pre">TofCuts.max_cos_theta</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.max_hit_all"><code class="docutils literal notranslate"><span class="pre">TofCuts.max_hit_all</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.max_hit_cbe"><code class="docutils literal notranslate"><span class="pre">TofCuts.max_hit_cbe</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.max_hit_cor"><code class="docutils literal notranslate"><span class="pre">TofCuts.max_hit_cor</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.max_hit_umb"><code class="docutils literal notranslate"><span class="pre">TofCuts.max_hit_umb</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.min_cos_theta"><code class="docutils literal notranslate"><span class="pre">TofCuts.min_cos_theta</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.min_hit_all"><code class="docutils literal notranslate"><span class="pre">TofCuts.min_hit_all</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.min_hit_cbe"><code class="docutils literal notranslate"><span class="pre">TofCuts.min_hit_cbe</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.min_hit_cor"><code class="docutils literal notranslate"><span class="pre">TofCuts.min_hit_cor</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.min_hit_umb"><code class="docutils literal notranslate"><span class="pre">TofCuts.min_hit_umb</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.nevents"><code class="docutils literal notranslate"><span class="pre">TofCuts.nevents</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.only_causal_hits"><code class="docutils literal notranslate"><span class="pre">TofCuts.only_causal_hits</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.pretty_print_efficiency"><code class="docutils literal notranslate"><span class="pre">TofCuts.pretty_print_efficiency()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.thru_going"><code class="docutils literal notranslate"><span class="pre">TofCuts.thru_going</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.thru_going_acc"><code class="docutils literal notranslate"><span class="pre">TofCuts.thru_going_acc</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.to_toml"><code class="docutils literal notranslate"><span class="pre">TofCuts.to_toml()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCuts.void"><code class="docutils literal notranslate"><span class="pre">TofCuts.void</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger"><code class="docutils literal notranslate"><span class="pre">MasterTrigger</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.disable_cyclic_trig"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.disable_cyclic_trig()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.enable_cyclic_trig"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.enable_cyclic_trig()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_configurable_trigger"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_configurable_trigger()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_cortina_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_cortina_thresh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_cube_bot_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_cube_bot_thresh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_cube_corner_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_cube_corner_thresh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_cube_side_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_cube_side_thresh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_cube_top_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_cube_top_thresh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_cyclic_trigger_interval"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_cyclic_trigger_interval()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_enable_cyclic_trig"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_enable_cyclic_trig()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_event"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_event()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_event_cnt"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_event_cnt()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_event_queue_full"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_event_queue_full()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_event_queue_size"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_event_queue_size()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_expected_pid"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_expected_pid()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_gaps_trigger_prescale"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_gaps_trigger_prescale()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_inner_tof_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_inner_tof_thresh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_lt_link_automask"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_lt_link_automask()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_lt_link_en0"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_lt_link_en0()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_lt_link_en02"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_lt_link_en02()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_lt_link_en1"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_lt_link_en1()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_lt_link_en3"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_lt_link_en3()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_lt_link_en4"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_lt_link_en4()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_ltb_event_cnts"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_ltb_event_cnts()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_ltb_links_ready"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_ltb_links_ready()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_nevents_in_queue"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_nevents_in_queue()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_outer_tof_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_outer_tof_thresh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_packet_id"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_packet_id()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_rb_event_cnts"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_rb_event_cnts()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_total_tof_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_total_tof_thresh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_trace_suppression"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_trace_suppression()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_umbrella_center_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_umbrella_center_thresh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_umbrella_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_umbrella_thresh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.lost_rate"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.lost_rate</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.rate"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.rate</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.rb_lost_rate"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.rb_lost_rate</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.realign_packet_id"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.realign_packet_id()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.reset_daq"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.reset_daq()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.reset_ltb_counters"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.reset_ltb_counters()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.reset_rb_counters"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.reset_rb_counters()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_any_trigger"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_any_trigger()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_central_track_trigger"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_central_track_trigger()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_configurable_trigger"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_configurable_trigger()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_corcubeside_trigger"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_corcubeside_trigger()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_cortina_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_cortina_thresh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_cube_bot_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_cube_bot_thresh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_cube_corner_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_cube_corner_thresh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_cube_side_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_cube_side_thresh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_cube_top_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_cube_top_thresh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_cyclic_trigger_interval"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_cyclic_trigger_interval()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_gaps422_central_track_trigger"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_gaps422_central_track_trigger()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_gaps_any_trigger"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_gaps_any_trigger()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_gaps_central_track_trigger"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_gaps_central_track_trigger()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_gaps_track_trigger"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_gaps_track_trigger()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_gaps_trigger_prescale"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_gaps_trigger_prescale()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_inner_tof_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_inner_tof_thresh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_lt_link_automask"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_lt_link_automask()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_lt_link_en0"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_lt_link_en0()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_lt_link_en1"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_lt_link_en1()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_lt_link_en2"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_lt_link_en2()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_lt_link_en3"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_lt_link_en3()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_lt_link_en4"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_lt_link_en4()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_ltb_ch_mask"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_ltb_ch_mask()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_outer_tof_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_outer_tof_thresh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_packet_id"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_packet_id()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_poisson_trigger"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_poisson_trigger()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_total_tof_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_total_tof_thresh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_trace_suppression"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_trace_suppression()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_track_trigger"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_track_trigger()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_track_trigger_is_global"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_track_trigger_is_global()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_umb3cube_trigger"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_umb3cube_trigger()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_umbcorcube_trigger"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_umbcorcube_trigger()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_umbcube_trigger"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_umbcube_trigger()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_umbcubez_trigger"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_umbcubez_trigger()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_umbrella_center_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_umbrella_center_thresh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_umbrella_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_umbrella_thresh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.stop_all_triggers"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.stop_all_triggers()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.tiu_bad"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.tiu_bad</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.tiu_busy_ignore"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.tiu_busy_ignore</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.tiu_busy_stuck"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.tiu_busy_stuck</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.tiu_emulation_mode"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.tiu_emulation_mode</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.tiu_emulation_mode_bsy_cnt"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.tiu_emulation_mode_bsy_cnt</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.tiu_lost_rate"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.tiu_lost_rate</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.trigger"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.trigger()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.use_tiu_aux_link"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.use_tiu_aux_link()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
 
   <div class="sidebar-secondary-item">
   <div role="note" aria-label="source link">
