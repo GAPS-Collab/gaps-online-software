@@ -172,6 +172,7 @@ fn tof_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<TriggerConfig>()?;
   m.add_class::<TofRunConfig>()?;
   m.add_class::<TofCuts>()?;
+  #[cfg(feature="tof-liftof")]
   m.add_class::<PyMasterTrigger>()?;
   m.add_function(wrap_pyfunction!(to_board_id_string, m)?)?;
   // the commands

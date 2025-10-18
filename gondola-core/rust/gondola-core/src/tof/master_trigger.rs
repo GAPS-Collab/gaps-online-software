@@ -761,7 +761,7 @@ pub fn master_trigger(mt_address     : &str,
           _ => ()
         }
       },
-      Some(Ok(_ev)) => {
+      Some(Ok(mut _ev)) => {
         if _ev.event_id == last_event_id {
           error!("We got a duplicate event from the MTB!");
           continue;
@@ -774,10 +774,15 @@ pub fn master_trigger(mt_address     : &str,
         }
         last_event_id = _ev.event_id;
         heartbeat.n_events += 1;
-
         heartbeat.trigger_type = TriggerType::from((_ev.mt_trigger_sources & 0x00FF) as u8);
         heartbeat.combo_trig_type = TriggerType::from(((_ev.mt_trigger_sources & 0xFF00) >> 8) as u8);
-
+        // we have to make sure some of the fields get properly filled and 
+        // "transfer" some of the mt_* fields to the fields which get actually serialzied 
+        let mt_timestamp           = _ev.get_mt_timestamp_abs();
+        _ev.timestamp32        = (mt_timestamp  & 0x00000000ffffffff ) as u32;
+        _ev.timestamp16        = ((mt_timestamp & 0x0000ffff00000000 ) >> 32) as u16;
+        _ev.trigger_sources    = _ev.mt_trigger_sources; // FIXME
+        _ev.n_trigger_paddles  = _ev.get_trigger_hits().len() as u8;
         if !veri_active {
           match mt_sender.send(_ev) {
             Err(err) => {

@@ -54,11 +54,11 @@ pub fn time_over_threshold(voltages : &Vec<f32>, times : &Vec<f32>,threshold : f
     if voltages[k] > threshold {
       tot += times[k] - times[k-1];
       if k > 1 && k < voltages.len() - 2 {
-        if (vlt_0 < 0.0) {
+        if vlt_0 < 0.0 {
           vlt_0 = voltages[k - 2]; 
           t_0   = times[k - 2];
         }
-        if (vlt_1 < 0.0) {
+        if vlt_1 < 0.0 {
           vlt_1 = voltages[k + 2]; 
           t_1   = times[k + 2];
         }
