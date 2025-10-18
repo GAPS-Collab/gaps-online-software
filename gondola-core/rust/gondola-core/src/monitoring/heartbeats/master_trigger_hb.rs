@@ -355,6 +355,20 @@ impl MoniData for MasterTriggerHB {
       "lost_trate"          => Some(self.lost_trate as f32),
       "prescale_track"      => Some(self.prescale_track as f32),
       "prescale_gaps"       => Some(self.prescale_gaps as f32),
+      "clock_rate"          => Some(self.clock_rate as f32),
+      "rb_lost_rate"        => Some(self.rb_lost_rate as f32),
+      "tiu_timeout_cnt"     => Some(self.tiu_timeout_cnt as f32),
+      "tiu_busy_rate"       => Some(self.tiu_busy_rate as f32),
+      "trg_lost_trg_rate"   => Some(self.trg_lost_trg_rate as f32),
+      "prescale_bypass"     => Some(self.prescale_bypass as u8 as f32),
+      "tiu_ignore_deadtime" => Some(self.tiu_ignore_deadtime as u8 as f32),
+      "trigger_type"        => Some(self.trigger_type.to_u8() as f32),
+      "combo_trig_type"     => Some(self.combo_trig_type.to_u8() as f32), 
+      "gaps_blocked_rate"   => Some(self.gaps_blocked_rate as f32), 
+      "track_blocked_rate"  => Some(self.track_blocked_rate as f32),
+      "any_blocked_rate"    => Some(self.any_blocked_rate as f32), 
+      "trkctrl_blocked_rate"=> Some(self.trkctrl_blocked_rate as f32),
+      "trkumbctrl_blocked"  => Some(self.trkumbctrl_blocked as f32),
       //"timestamp"           => Some(self.timestamp as f32),
       _                     => None
     }
@@ -362,10 +376,12 @@ impl MoniData for MasterTriggerHB {
 
   /// A list of the variables in this MoniData
   fn keys() -> Vec<&'static str> {
-    vec!["board_id", "total_elapsed", "n_events",
+    vec!["total_elapsed", "trigger_type", "combo_trig_type", "n_events",
          "evq_num_events_last", "evq_num_events_avg", "n_ev_unsent",
-         "n_ev_missed", "trate", "lost_trate", "prescale_track",
-         "prescale_gaps"]
+         "n_ev_missed", "trate", "lost_trate","clock_rate", "rb_lost_rate", "prescale_track",
+         "prescale_gaps", "tiu_ignore_deadtime", "tiu_timeout_cnt", "tiu_busy_rate", "trg_lost_trg_rate", 
+         "gaps_blocked_rate", "track_blocked_rate", "any_blocked_rate", "trkctrl_blocked_rate",
+         "trkumbctrl_blocked", "prescale_bypass"]
   }
 }
 
@@ -378,6 +394,67 @@ moniseries!(MasterTriggerHBSeries, MasterTriggerHB);
 impl MasterTriggerHB {
 
   //    version             
+
+  #[getter]
+  fn get_clock_rate(&self) -> u64 {
+      self.clock_rate
+  }
+  #[getter]
+  fn get_trigger_type(&self) -> TriggerType {
+      self.trigger_type
+  }
+
+  #[getter]
+  fn get_combo_trig_type(&self) -> TriggerType {
+      self.combo_trig_type
+  }
+  #[getter]
+  fn get_rb_lost_rate(&self) -> u64 {
+      self.rb_lost_rate
+  }
+
+  #[getter]
+  fn get_tiu_ignore_deadtime(&self) -> bool {
+      self.tiu_ignore_deadtime
+  }
+  #[getter]
+  fn get_tiu_timeout_cnt(&self) -> u64 {
+      self.tiu_timeout_cnt
+  }
+  #[getter]
+  fn get_tiu_busy_rate(&self) -> u16 {
+      self.tiu_busy_rate
+  }
+  #[getter]
+  fn get_trg_lost_trg_rate(&self) -> u16 {
+      self.trg_lost_trg_rate
+  }
+  #[getter]
+  fn get_gaps_blocked_rate(&self) -> u16 {
+      self.gaps_blocked_rate
+  }
+
+  #[getter]
+  fn get_track_blocked_rate(&self) -> u16 {
+      self.track_blocked_rate
+  }
+
+  #[getter]
+  fn get_any_blocked_rate(&self) -> u16 {
+      self.any_blocked_rate
+  }
+  #[getter]
+  fn get_track_central_blocked_rate(&self) -> u16 {
+      self.trkctrl_blocked_rate
+  }
+  #[getter]
+  fn get_track_umb_central_blocked_rate(&self) -> u16 {
+      self.trkumbctrl_blocked
+  }
+  #[getter]
+  fn get_prescale_bypass(&self) -> bool {
+      self.prescale_bypass
+  }
   #[getter]
   fn get_total_elapsed(&self) -> u64 {
     self.total_elapsed
