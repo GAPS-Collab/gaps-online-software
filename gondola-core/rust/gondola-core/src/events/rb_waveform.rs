@@ -229,9 +229,9 @@ impl Serialization for RBWaveform {
       return Err(SerializationError::HeadInvalid {});
     }
     wf.event_id          = parse_u32(stream, pos);
-    wf.rb_id             = parse_u8 (stream, pos);
-    wf.rb_channel_a      = parse_u8 (stream, pos);
-    wf.rb_channel_b      = parse_u8 (stream, pos);
+    wf.rb_id             = parse_u8(stream, pos);
+    wf.rb_channel_a      = parse_u8(stream, pos);
+    wf.rb_channel_b      = parse_u8(stream, pos);
     wf.stop_cell         = parse_u16(stream, pos);
     //wf.paddle_id         = parse_u8 (stream, pos);
     if stream.len() < *pos+2*NWORDS {
