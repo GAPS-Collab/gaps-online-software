@@ -728,6 +728,7 @@ fn main() {
         Ok(mut tc) => {
           // literally, literally releasing the clamps!!
           tc.holdoff_mtb_thread = false;
+          tc.thread_event_bldr_active = true;
         }
         Err(err) => {
           error!("Can't acquire lock for ThreadControl at this time! Unable to launch! {err}");

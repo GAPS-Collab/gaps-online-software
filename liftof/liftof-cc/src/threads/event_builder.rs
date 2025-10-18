@@ -20,33 +20,9 @@ use crossbeam_channel::{
   Sender,
 };
 
-//use tof_dataclasses::events::{
-//  MasterTriggerEvent,
-//  TofEvent,
-//  RBEvent,
-//  EventStatus,
-//};
-//
-//use tof_dataclasses::serialization::Packable;
-//use tof_dataclasses::packets::TofPacket;
-//use tof_dataclasses::commands::config::BuildStrategy;
-//use tof_dataclasses::heartbeats::EVTBLDRHeartbeat;
-//
-//use liftof_lib::settings::{
-//  TofEventBuilderSettings,
-//};
-//use liftof_lib::thread_control::ThreadControl;
-
 use gondola_core::prelude::*;
 
 use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
-
-// just for debugging
-//use tof_dataclasses::io::{
-//  TofPacketWriter,
-//  FileType
-//};
-
 
 /// Events ... assemble! 
 ///
@@ -125,7 +101,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
   let mut event_id_cache       = VecDeque::<u32>::with_capacity(EVENT_BUILDER_EVID_CACHE_SIZE);
   let mut n_received           : usize;
   let mut last_evid            = 0;
-  let mut n_sent               = 0usize;
+  //let mut n_sent               = 0usize;
   // debug
   let mut last_rb_evid         : u32;
   let mut n_rbe_per_te         = 0usize;
@@ -145,8 +121,8 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
       match thread_control.try_lock() {
         Ok(mut tc) => {
           if !tc.thread_event_bldr_active {
-            println!("= => [evt_builder] (thread_event_bldr_active == false) shutting down...");
-            break; 
+            //println!("= => [evt_builder] (thread_event_bldr_active == false) shutting down...");
+            continue; 
           }
           //println!("= => [evt_builder] {}", tc);
           if tc.stop_flag {
@@ -188,9 +164,9 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
           //n_receiving_errors += 1;
           continue;
         }   
-        Ok(mt) => {
-          debug!("Received MasterTriggerEvent {}!", mt);
-          let mut event       = TofEvent::from(mt);
+        Ok(mut event) => {
+          debug!("Received MasterTriggerEvent {}!", event);
+          //let mut event       = TofEvent::from(mt);
           event.run_id = run_id as u16; // FIXME - might be too big
           if last_evid != 0 {
             if event.event_id != last_evid + 1 {
@@ -285,6 +261,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
                 }
               } else {
                 // Just ad it without questioning
+                //println!("PUSHING NEW RG EVENT WITH {} HITS", rb_ev.hits.len());
                 ev.rb_events.push(rb_ev);
                 //println!("[EVTBUILDER] DEBUG n rb expected : {}, n rbs {}",ev.mt_event.get_n_rbs_expected(), ev.rb_events.len());
               }
@@ -307,7 +284,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
     // This concludes the actually "event building" part
     // -----------------------------------------------------
 
-    let av_rb_ev = n_rbe_per_te as f64 / n_sent as f64;
+    let av_rb_ev = n_rbe_per_te as f64 / heartbeat.n_sent as f64;
     if settings.build_strategy == BuildStrategy::Adaptive || 
       settings.build_strategy  == BuildStrategy::AdaptiveThorough {
       settings.n_rbe_per_loop  = av_rb_ev.ceil() as u32;
@@ -372,6 +349,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
               | BuildStrategy::Smart 
               | BuildStrategy::Unknown => {
                 if ev.is_complete() {
+                  //println!("EV HAS {} RBEVENTS", ev.rb_events.len());
                   ready_to_send = true;
                 }
               }
@@ -425,29 +403,41 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
             // sum up lost hits due to drs4 deadtime
             heartbeat.drs_bsy_lost_hg_hits += ev_to_send.get_lost_hits() as u64;
 
-            let mut save_to_disk = true;
-            n_sent += 1;
+            // now we are finshed for now, and we are preparing to pass the event on  
+            ev_to_send.move_hits(); // <- moves the hits from the rbevents to the .hits vector
+            //println!("GOT {} ", ev_to_send.hits.len());
+            ev_to_send.calc_gcu_variables();
             heartbeat.n_sent += 1;
+            let mut no_write_to_disk = false;
+            let no_send_over_nw  = false; 
             if send_tev_sum {
               //let tes  = ev_to_send.get_summary();
               // FIXME - these might be all zero!
               if settings.only_save_interesting {
-                save_to_disk = false;
+                no_write_to_disk = true;
                 if ev_to_send.n_hits_umb   >= settings.thr_n_hits_umb 
                 && ev_to_send.n_hits_cbe   >= settings.thr_n_hits_cbe
                 && ev_to_send.n_hits_cor   >= settings.thr_n_hits_cor
                 && ev_to_send.tot_edep_umb >= settings.thr_tot_edep_umb
                 && ev_to_send.tot_edep_cbe >= settings.thr_tot_edep_cbe
                 && ev_to_send.tot_edep_cor >= settings.thr_tot_edep_cor {
-                  save_to_disk = true;
+                  no_write_to_disk = false;
                 }
               }
-              let pack = ev_to_send.pack();
+              //for wf in ev_to_send.get_waveforms() {
+              //  println!( "FS {} ", wf);
+              //}
+              //for ev in &ev_to_send.rb_events {
+              //   println!("{:?}", ev.hits);
+              //}
+              let mut pack = ev_to_send.pack();
+              pack.no_write_to_disk = no_write_to_disk;
               match data_sink.send(pack) {
                 Err(err) => {
                   error!("Packet sending failed! Err {}", err);
                 }
                 Ok(_)    => {
+                  
                   debug!("Event with id {} sent!", evid);
                 }
               }
@@ -472,21 +462,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
               rbwf_ctr += 1; // increase for every event, not wf
             }
             
-            // always sent TofEvents, so they get written to disk.
-            // There is one exception though, in case we have 
-            // "interesting" event cuts in place, then this can 
-            // be restricted.
-            if save_to_disk {
-              let pack = ev_to_send.pack();
-              match data_sink.send(pack) {
-                Err(err) => {
-                  error!("Packet sending failed! Err {}", err);
-                }
-                Ok(_)    => {
-                  debug!("Event with id {} sent!", evid);
-                }
-              }
-            } 
           // this happens when we are NOT ready to send -> cache it!
           } else { 
             event_id_cache.push_front(evid);
