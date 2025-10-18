@@ -160,14 +160,10 @@ pub fn global_data_sink(incoming       : &Receiver<TofPacket>,
         debug!("Got new tof packet {}", pack.packet_type);
         // if it is not some event type, just write it to disk
         if writer.is_some() {
-          match pack.packet_type {
-            TofPacketType::TofEvent 
-            | TofPacketType::RBWaveform => (),
-            _ => {
-              writer.as_mut().unwrap().add_tof_packet(&pack);
-              heartbeat.n_pack_write_disk += 1;
-              heartbeat.n_bytes_written += pack.payload.len() as u64;   
-            }
+          if !pack.no_write_to_disk {
+            writer.as_mut().unwrap().add_tof_packet(&pack);
+            heartbeat.n_pack_write_disk += 1;
+            heartbeat.n_bytes_written += pack.payload.len() as u64;   
           }
         }
        
