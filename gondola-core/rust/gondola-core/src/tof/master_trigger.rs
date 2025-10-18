@@ -802,7 +802,6 @@ pub fn master_trigger(mt_address     : &str,
           heartbeat.evq_num_events_avg = (evq_num_events as u64)/(n_iter_loop as u64);
         }
       }
-      
       heartbeat.total_elapsed += hb_timer.elapsed().as_secs() as u64;
       match TRIGGER_RATE.get(&mut bus) {
         Ok(trate) => {
@@ -820,12 +819,117 @@ pub fn master_trigger(mt_address     : &str,
           error!("Unable to query {}! {err}", LOST_TRIGGER_RATE);
         }
       }
+
+       match RB_LOST_RATE.get(&mut bus) {
+           Err(err) => {
+               error!("Unable to query {}! {err}", RB_LOST_RATE);
+           }
+           Ok(rb_lost_rate) => {
+               heartbeat.rb_lost_rate = rb_lost_rate as u64;
+           }
+       }
+
+       match CLOCK_RATE.get(&mut bus) {
+           Err(err) => { 
+               error!("Unable to query {}! {err}", CLOCK_RATE);
+           }
+           Ok(clock_rate) => {
+               heartbeat.clock_rate = clock_rate as u64;
+           }
+       }
+      match MIN_DEAD_TIME_MODE.get(&mut bus) {
+          Err(err) => {
+              error!("Unable to query {}! {err}", MIN_DEAD_TIME_MODE);
+          }
+          Ok(tiu_ignore_deadtime) => {
+              heartbeat.tiu_ignore_deadtime = tiu_ignore_deadtime as bool;
+          }
+      }
+
+      match TIU_TIMEOUT_CNT.get(&mut bus) {
+          Err(err) => {
+              error!("Unable to query {}! {err}", TIU_TIMEOUT_CNT);
+          }
+          Ok(tiu_timeout_cnt) => {
+              heartbeat.tiu_timeout_cnt = tiu_timeout_cnt as u64;
+          }
+      }
+
+      match TIU_BUSY_RATE.get(&mut bus) {
+          Err(err) => {
+              error!("Unable to query {} {err}!", TIU_BUSY_RATE);
+          }
+          Ok(tiu_busy_rate) => {
+              heartbeat.tiu_busy_rate = tiu_busy_rate as u16;
+          }
+      }
+
+      match TRG_LOST_TRIGGER_RATE.get(&mut bus) {
+          Err(err) => {
+              error!("Unable to query {} {err}!", TRG_LOST_TRIGGER_RATE);
+          }
+          Ok(trg_lost_trg_rate) => {
+              heartbeat.trg_lost_trg_rate = trg_lost_trg_rate as u16;
+          }
+      }
+      
+      match GAPS_TRIGGER_BLOCKED_RATE.get(&mut bus) {
+          Err(err) => {
+              error!("Unable to query {} {err}!", GAPS_TRIGGER_BLOCKED_RATE);
+          }
+          Ok(gaps_blocked_rate) => {
+              heartbeat.gaps_blocked_rate = gaps_blocked_rate as u16;
+          }
+      }
+      match TRACK_TRIGGER_BLOCKED_RATE.get(&mut bus) {
+          Err(err) => {
+              error!("Unable to query {} {err}!", TRACK_TRIGGER_BLOCKED_RATE);
+          }
+          Ok(track_blocked_rate) => {
+              heartbeat.track_blocked_rate = track_blocked_rate as u16;
+          }
+      }
+      match ANY_TRIGGER_BLOCKED_RATE.get(&mut bus) {
+          Err(err) => {
+              error!("Unable to query {} {err}!", ANY_TRIGGER_BLOCKED_RATE);
+          }
+          Ok(any_blocked_rate) => {
+              heartbeat.any_blocked_rate = any_blocked_rate as u16;
+          }
+      }
+
+      match TRACK_CENTRAL_BLOCKED_RATE.get(&mut bus) {
+        Err(err) => {
+            error!("Unable to query {} {err}!", TRACK_CENTRAL_BLOCKED_RATE);
+        }
+        Ok(trkctrl_blocked_rate) => {
+            heartbeat.trkctrl_blocked_rate = trkctrl_blocked_rate as u16;
+        }
+      }
+
+      match TRACK_UMB_CENTRAL_BLOCKED_RATE.get(&mut bus) {
+          Err(err) => {
+              error!("Unable to query {} {err}!", TRACK_UMB_CENTRAL_BLOCKED_RATE);
+          }
+          Ok(trkumbctrl_blocked) => {
+              heartbeat.trkumbctrl_blocked = trkumbctrl_blocked as u16;
+          }
+      }
+
+      match PRESCALE_BYPASS.get(&mut bus) {
+          Err(err) => {
+              error!("Unable to query {} {err}!", PRESCALE_BYPASS);
+          }
+          Ok(prescale_bypass) => {
+              heartbeat.prescale_bypass = prescale_bypass as bool;
+          }
+
       match TRACK_TRIG_PRESCALE.get(&mut bus) {
         Ok(ps) => {
           heartbeat.prescale_track = (ps as f32) / (u32::MAX as f32) ;
         }
         Err(err) => {
-          error!("Unable to query {}! {err}", LOST_TRIGGER_RATE);
+          error!("Unable to query {}! {err}", TRACK_TRIG_PRESCALE);
         }
       }
       match GAPS_TRIG_PRESCALE.get(&mut bus) {
@@ -833,7 +937,7 @@ pub fn master_trigger(mt_address     : &str,
           heartbeat.prescale_gaps = (ps as f32) / (u32::MAX as f32) ;
         }
         Err(err) => {
-          error!("Unable to query {}! {err}", LOST_TRIGGER_RATE);
+          error!("Unable to query {}! {err}", GAPS_TRIG_PRESCALE);
         }
       }
       heartbeat.version = ProtocolVersion::V1; 
