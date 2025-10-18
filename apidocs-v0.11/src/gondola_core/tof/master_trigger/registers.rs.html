@@ -2365,284 +2365,291 @@
 <a href=#2365 id=2365 data-nosnippet>2365</a>  pulse : <span class="bool-val">false</span>,
 <a href=#2366 id=2366 data-nosnippet>2366</a>};
 <a href=#2367 id=2367 data-nosnippet>2367</a>
-<a href=#2368 id=2368 data-nosnippet>2368</a>
-<a href=#2369 id=2369 data-nosnippet>2369</a><span class="comment">// All the trigger settings
-<a href=#2370 id=2370 data-nosnippet>2370</a>
-<a href=#2371 id=2371 data-nosnippet>2371</a>// .... WIP!!! So many are not implemented yet....
-<a href=#2372 id=2372 data-nosnippet>2372</a>
-<a href=#2373 id=2373 data-nosnippet>2373</a>//LOOPBACK  0x0     0x0     [31:0]  rw  0x0     Loopback register
-<a href=#2374 id=2374 data-nosnippet>2374</a>//CLOCK_RATE    0x1     0x4     [31:0]  r       System clock frequency
-<a href=#2375 id=2375 data-nosnippet>2375</a>//FB_CLOCK_RATE_0   0x2     0x8     [31:0]  r       Feedback clock frequency
-<a href=#2376 id=2376 data-nosnippet>2376</a>//FB_CLOCK_RATE_1   0x3     0xc     [31:0]  r       Feedback clock frequency
-<a href=#2377 id=2377 data-nosnippet>2377</a>//FB_CLOCK_RATE_2   0x4     0x10    [31:0]  r       Feedback clock frequency
-<a href=#2378 id=2378 data-nosnippet>2378</a>//FB_CLOCK_RATE_3   0x5     0x14    [31:0]  r       Feedback clock frequency
-<a href=#2379 id=2379 data-nosnippet>2379</a>//FB_CLOCK_RATE_4   0x6     0x18    [31:0]  r       Feedback clock frequency
-<a href=#2380 id=2380 data-nosnippet>2380</a>//DSI_ON    0x7     0x1c    [4:0]   rw  0x1F    Bitmask 1 = enable DSI
-<a href=#2381 id=2381 data-nosnippet>2381</a>//RESYNC    0xa     0x28    0   w   Pulse   Write 1 to resync
-<a href=#2382 id=2382 data-nosnippet>2382</a>//ANY_TRIG_IS_GLOBAL    0xb     0x2c    0   rw  0x0     1 makes the ANY trigger read all paddles.
-<a href=#2383 id=2383 data-nosnippet>2383</a>//TRACK_TRIG_IS_GLOBAL  0xb     0x2c    1   rw  0x0     1 makes the TRACK trigger read all paddles.
-<a href=#2384 id=2384 data-nosnippet>2384</a>//TRACK_CENTRAL_IS_GLOBAL   0xb     0x2c    2   rw  0x0     1 makes the TRACK central read all paddles.
-<a href=#2385 id=2385 data-nosnippet>2385</a>//TRACK_CENTRAL_IS_GLOBAL   0xb     0x2c    2   rw  0x0     1 makes the TRACK central read all paddles.
-<a href=#2386 id=2386 data-nosnippet>2386</a>//TIU_EMU_BUSY_CNT  0xe     0x38    [31:14]     rw  0xC350  Number of 10 ns clock cyles that the emulator will remain busy
-<a href=#2387 id=2387 data-nosnippet>2387</a>//TIU_BAD   0xf     0x3c    0   r       1 means that the tiu link is not working
-<a href=#2388 id=2388 data-nosnippet>2388</a>//LT_INPUT_STRETCH  0xf     0x3c    [7:4]   rw  0xF     Number of clock cycles to stretch the LT inputs by
-<a href=#2389 id=2389 data-nosnippet>2389</a>//MT.EVENT_QUEUE
-<a href=#2390 id=2390 data-nosnippet>2390</a>//
-<a href=#2391 id=2391 data-nosnippet>2391</a>//DAQ Buffer
-<a href=#2392 id=2392 data-nosnippet>2392</a>//Node  Adr     Adr8    Bits    Perm    Def     Description
-<a href=#2393 id=2393 data-nosnippet>2393</a>//RESET     0x10    0x40    0   w   Pulse   DAQ Buffer Reset
-<a href=#2394 id=2394 data-nosnippet>2394</a>//DATA  0x11    0x44    [31:0]  r       DAQ Read Data
-<a href=#2395 id=2395 data-nosnippet>2395</a>//FULL  0x12    0x48    0   r       DAQ Buffer Full
-<a href=#2396 id=2396 data-nosnippet>2396</a>//EMPTY     0x12    0x48    1   r       DAQ Buffer Empty
-<a href=#2397 id=2397 data-nosnippet>2397</a>//SIZE  0x13    0x4c    [31:16]     r       DAQ Buffer Head Event Size
-<a href=#2398 id=2398 data-nosnippet>2398</a>//
-<a href=#2399 id=2399 data-nosnippet>2399</a>//MT
-<a href=#2400 id=2400 data-nosnippet>2400</a>//
-<a href=#2401 id=2401 data-nosnippet>2401</a>//
-<a href=#2402 id=2402 data-nosnippet>2402</a>//MT.HIT_COUNTERS
-<a href=#2403 id=2403 data-nosnippet>2403</a>//
-<a href=#2404 id=2404 data-nosnippet>2404</a>//Counters
-<a href=#2405 id=2405 data-nosnippet>2405</a>//Node  Adr     Adr8    Bits    Perm    Def     Description
-<a href=#2406 id=2406 data-nosnippet>2406</a>//LT0   0x20    0x80    [23:0]  r       hit count on LT=0
-<a href=#2407 id=2407 data-nosnippet>2407</a>//LT1   0x21    0x84    [23:0]  r       hit count on LT=1
-<a href=#2408 id=2408 data-nosnippet>2408</a>//LT2   0x22    0x88    [23:0]  r       hit count on LT=2
-<a href=#2409 id=2409 data-nosnippet>2409</a>//LT3   0x23    0x8c    [23:0]  r       hit count on LT=3
-<a href=#2410 id=2410 data-nosnippet>2410</a>//LT4   0x24    0x90    [23:0]  r       hit count on LT=4
-<a href=#2411 id=2411 data-nosnippet>2411</a>//LT5   0x25    0x94    [23:0]  r       hit count on LT=5
-<a href=#2412 id=2412 data-nosnippet>2412</a>//LT6   0x26    0x98    [23:0]  r       hit count on LT=6
-<a href=#2413 id=2413 data-nosnippet>2413</a>//LT7   0x27    0x9c    [23:0]  r       hit count on LT=7
-<a href=#2414 id=2414 data-nosnippet>2414</a>//LT8   0x28    0xa0    [23:0]  r       hit count on LT=8
-<a href=#2415 id=2415 data-nosnippet>2415</a>//LT9   0x29    0xa4    [23:0]  r       hit count on LT=9
-<a href=#2416 id=2416 data-nosnippet>2416</a>//LT10  0x2a    0xa8    [23:0]  r       hit count on LT=10
-<a href=#2417 id=2417 data-nosnippet>2417</a>//LT11  0x2b    0xac    [23:0]  r       hit count on LT=11
-<a href=#2418 id=2418 data-nosnippet>2418</a>//LT12  0x2c    0xb0    [23:0]  r       hit count on LT=12
-<a href=#2419 id=2419 data-nosnippet>2419</a>//LT13  0x2d    0xb4    [23:0]  r       hit count on LT=13
-<a href=#2420 id=2420 data-nosnippet>2420</a>//LT14  0x2e    0xb8    [23:0]  r       hit count on LT=14
-<a href=#2421 id=2421 data-nosnippet>2421</a>//LT15  0x2f    0xbc    [23:0]  r       hit count on LT=15
-<a href=#2422 id=2422 data-nosnippet>2422</a>//LT16  0x30    0xc0    [23:0]  r       hit count on LT=16
-<a href=#2423 id=2423 data-nosnippet>2423</a>//LT17  0x31    0xc4    [23:0]  r       hit count on LT=17
-<a href=#2424 id=2424 data-nosnippet>2424</a>//LT18  0x32    0xc8    [23:0]  r       hit count on LT=18
-<a href=#2425 id=2425 data-nosnippet>2425</a>//LT19  0x33    0xcc    [23:0]  r       hit count on LT=19
-<a href=#2426 id=2426 data-nosnippet>2426</a>//LT20  0x34    0xd0    [23:0]  r       hit count on LT=20
-<a href=#2427 id=2427 data-nosnippet>2427</a>//LT21  0x35    0xd4    [23:0]  r       hit count on LT=21
-<a href=#2428 id=2428 data-nosnippet>2428</a>//LT22  0x36    0xd8    [23:0]  r       hit count on LT=22
-<a href=#2429 id=2429 data-nosnippet>2429</a>//LT23  0x37    0xdc    [23:0]  r       hit count on LT=23
-<a href=#2430 id=2430 data-nosnippet>2430</a>//LT24  0x38    0xe0    [23:0]  r       hit count on LT=24
-<a href=#2431 id=2431 data-nosnippet>2431</a>//RESET     0x39    0xe4    0   w   Pulse   Write 1 to reset hit counters.
-<a href=#2432 id=2432 data-nosnippet>2432</a>//SNAP  0x3a    0xe8    0   rw  0x1     1 to snap the hit counters.
-<a href=#2433 id=2433 data-nosnippet>2433</a>//
-<a href=#2434 id=2434 data-nosnippet>2434</a>//MT
-<a href=#2435 id=2435 data-nosnippet>2435</a>//
-<a href=#2436 id=2436 data-nosnippet>2436</a>//Implements various control and monitoring functions of the DRS Logic
-<a href=#2437 id=2437 data-nosnippet>2437</a>//Node  Adr     Adr8    Bits    Perm    Def     Description
-<a href=#2438 id=2438 data-nosnippet>2438</a>//ETH_RX_BAD_FRAME_CNT  0x3d    0xf4    [15:0]  r       Ethernet MAC bad frame error
-<a href=#2439 id=2439 data-nosnippet>2439</a>
-<a href=#2440 id=2440 data-nosnippet>2440</a>
-<a href=#2441 id=2441 data-nosnippet>2441</a>//ETH_RX_BAD_FCS_CNT   0x3d    0xf4    [31:16]     r       Ethernet MAC bad fcs
+<a href=#2368 id=2368 data-nosnippet>2368</a><span class="kw">pub const </span>RESYNC  : MTBRegister&lt;<span class="lifetime">'static</span>&gt; = MTBRegister {
+<a href=#2369 id=2369 data-nosnippet>2369</a>  addr  : <span class="number">0xa</span>,
+<a href=#2370 id=2370 data-nosnippet>2370</a>  mask  : <span class="number">0x00000001</span>,
+<a href=#2371 id=2371 data-nosnippet>2371</a>  descr : <span class="string">"Write 1 to RESYNC RB clocks"</span>,
+<a href=#2372 id=2372 data-nosnippet>2372</a>  rmw   : <span class="bool-val">false</span>, 
+<a href=#2373 id=2373 data-nosnippet>2373</a>  ro    : <span class="bool-val">false</span>, 
+<a href=#2374 id=2374 data-nosnippet>2374</a>  pulse : <span class="bool-val">true</span>,
+<a href=#2375 id=2375 data-nosnippet>2375</a>};
+<a href=#2376 id=2376 data-nosnippet>2376</a><span class="comment">// All the trigger settings
+<a href=#2377 id=2377 data-nosnippet>2377</a>
+<a href=#2378 id=2378 data-nosnippet>2378</a>// .... WIP!!! So many are not implemented yet....
+<a href=#2379 id=2379 data-nosnippet>2379</a>
+<a href=#2380 id=2380 data-nosnippet>2380</a>//LOOPBACK  0x0     0x0     [31:0]  rw  0x0     Loopback register
+<a href=#2381 id=2381 data-nosnippet>2381</a>//CLOCK_RATE    0x1     0x4     [31:0]  r       System clock frequency
+<a href=#2382 id=2382 data-nosnippet>2382</a>//FB_CLOCK_RATE_0   0x2     0x8     [31:0]  r       Feedback clock frequency
+<a href=#2383 id=2383 data-nosnippet>2383</a>//FB_CLOCK_RATE_1   0x3     0xc     [31:0]  r       Feedback clock frequency
+<a href=#2384 id=2384 data-nosnippet>2384</a>//FB_CLOCK_RATE_2   0x4     0x10    [31:0]  r       Feedback clock frequency
+<a href=#2385 id=2385 data-nosnippet>2385</a>//FB_CLOCK_RATE_3   0x5     0x14    [31:0]  r       Feedback clock frequency
+<a href=#2386 id=2386 data-nosnippet>2386</a>//FB_CLOCK_RATE_4   0x6     0x18    [31:0]  r       Feedback clock frequency
+<a href=#2387 id=2387 data-nosnippet>2387</a>//DSI_ON    0x7     0x1c    [4:0]   rw  0x1F    Bitmask 1 = enable DSI
+<a href=#2388 id=2388 data-nosnippet>2388</a>//RESYNC    0xa     0x28    0   w   Pulse   Write 1 to resync
+<a href=#2389 id=2389 data-nosnippet>2389</a>//ANY_TRIG_IS_GLOBAL    0xb     0x2c    0   rw  0x0     1 makes the ANY trigger read all paddles.
+<a href=#2390 id=2390 data-nosnippet>2390</a>//TRACK_TRIG_IS_GLOBAL  0xb     0x2c    1   rw  0x0     1 makes the TRACK trigger read all paddles.
+<a href=#2391 id=2391 data-nosnippet>2391</a>//TRACK_CENTRAL_IS_GLOBAL   0xb     0x2c    2   rw  0x0     1 makes the TRACK central read all paddles.
+<a href=#2392 id=2392 data-nosnippet>2392</a>//TRACK_CENTRAL_IS_GLOBAL   0xb     0x2c    2   rw  0x0     1 makes the TRACK central read all paddles.
+<a href=#2393 id=2393 data-nosnippet>2393</a>//TIU_EMU_BUSY_CNT  0xe     0x38    [31:14]     rw  0xC350  Number of 10 ns clock cyles that the emulator will remain busy
+<a href=#2394 id=2394 data-nosnippet>2394</a>//TIU_BAD   0xf     0x3c    0   r       1 means that the tiu link is not working
+<a href=#2395 id=2395 data-nosnippet>2395</a>//LT_INPUT_STRETCH  0xf     0x3c    [7:4]   rw  0xF     Number of clock cycles to stretch the LT inputs by
+<a href=#2396 id=2396 data-nosnippet>2396</a>//MT.EVENT_QUEUE
+<a href=#2397 id=2397 data-nosnippet>2397</a>//
+<a href=#2398 id=2398 data-nosnippet>2398</a>//DAQ Buffer
+<a href=#2399 id=2399 data-nosnippet>2399</a>//Node  Adr     Adr8    Bits    Perm    Def     Description
+<a href=#2400 id=2400 data-nosnippet>2400</a>//RESET     0x10    0x40    0   w   Pulse   DAQ Buffer Reset
+<a href=#2401 id=2401 data-nosnippet>2401</a>//DATA  0x11    0x44    [31:0]  r       DAQ Read Data
+<a href=#2402 id=2402 data-nosnippet>2402</a>//FULL  0x12    0x48    0   r       DAQ Buffer Full
+<a href=#2403 id=2403 data-nosnippet>2403</a>//EMPTY     0x12    0x48    1   r       DAQ Buffer Empty
+<a href=#2404 id=2404 data-nosnippet>2404</a>//SIZE  0x13    0x4c    [31:16]     r       DAQ Buffer Head Event Size
+<a href=#2405 id=2405 data-nosnippet>2405</a>//
+<a href=#2406 id=2406 data-nosnippet>2406</a>//MT
+<a href=#2407 id=2407 data-nosnippet>2407</a>//
+<a href=#2408 id=2408 data-nosnippet>2408</a>//
+<a href=#2409 id=2409 data-nosnippet>2409</a>//MT.HIT_COUNTERS
+<a href=#2410 id=2410 data-nosnippet>2410</a>//
+<a href=#2411 id=2411 data-nosnippet>2411</a>//Counters
+<a href=#2412 id=2412 data-nosnippet>2412</a>//Node  Adr     Adr8    Bits    Perm    Def     Description
+<a href=#2413 id=2413 data-nosnippet>2413</a>//LT0   0x20    0x80    [23:0]  r       hit count on LT=0
+<a href=#2414 id=2414 data-nosnippet>2414</a>//LT1   0x21    0x84    [23:0]  r       hit count on LT=1
+<a href=#2415 id=2415 data-nosnippet>2415</a>//LT2   0x22    0x88    [23:0]  r       hit count on LT=2
+<a href=#2416 id=2416 data-nosnippet>2416</a>//LT3   0x23    0x8c    [23:0]  r       hit count on LT=3
+<a href=#2417 id=2417 data-nosnippet>2417</a>//LT4   0x24    0x90    [23:0]  r       hit count on LT=4
+<a href=#2418 id=2418 data-nosnippet>2418</a>//LT5   0x25    0x94    [23:0]  r       hit count on LT=5
+<a href=#2419 id=2419 data-nosnippet>2419</a>//LT6   0x26    0x98    [23:0]  r       hit count on LT=6
+<a href=#2420 id=2420 data-nosnippet>2420</a>//LT7   0x27    0x9c    [23:0]  r       hit count on LT=7
+<a href=#2421 id=2421 data-nosnippet>2421</a>//LT8   0x28    0xa0    [23:0]  r       hit count on LT=8
+<a href=#2422 id=2422 data-nosnippet>2422</a>//LT9   0x29    0xa4    [23:0]  r       hit count on LT=9
+<a href=#2423 id=2423 data-nosnippet>2423</a>//LT10  0x2a    0xa8    [23:0]  r       hit count on LT=10
+<a href=#2424 id=2424 data-nosnippet>2424</a>//LT11  0x2b    0xac    [23:0]  r       hit count on LT=11
+<a href=#2425 id=2425 data-nosnippet>2425</a>//LT12  0x2c    0xb0    [23:0]  r       hit count on LT=12
+<a href=#2426 id=2426 data-nosnippet>2426</a>//LT13  0x2d    0xb4    [23:0]  r       hit count on LT=13
+<a href=#2427 id=2427 data-nosnippet>2427</a>//LT14  0x2e    0xb8    [23:0]  r       hit count on LT=14
+<a href=#2428 id=2428 data-nosnippet>2428</a>//LT15  0x2f    0xbc    [23:0]  r       hit count on LT=15
+<a href=#2429 id=2429 data-nosnippet>2429</a>//LT16  0x30    0xc0    [23:0]  r       hit count on LT=16
+<a href=#2430 id=2430 data-nosnippet>2430</a>//LT17  0x31    0xc4    [23:0]  r       hit count on LT=17
+<a href=#2431 id=2431 data-nosnippet>2431</a>//LT18  0x32    0xc8    [23:0]  r       hit count on LT=18
+<a href=#2432 id=2432 data-nosnippet>2432</a>//LT19  0x33    0xcc    [23:0]  r       hit count on LT=19
+<a href=#2433 id=2433 data-nosnippet>2433</a>//LT20  0x34    0xd0    [23:0]  r       hit count on LT=20
+<a href=#2434 id=2434 data-nosnippet>2434</a>//LT21  0x35    0xd4    [23:0]  r       hit count on LT=21
+<a href=#2435 id=2435 data-nosnippet>2435</a>//LT22  0x36    0xd8    [23:0]  r       hit count on LT=22
+<a href=#2436 id=2436 data-nosnippet>2436</a>//LT23  0x37    0xdc    [23:0]  r       hit count on LT=23
+<a href=#2437 id=2437 data-nosnippet>2437</a>//LT24  0x38    0xe0    [23:0]  r       hit count on LT=24
+<a href=#2438 id=2438 data-nosnippet>2438</a>//RESET     0x39    0xe4    0   w   Pulse   Write 1 to reset hit counters.
+<a href=#2439 id=2439 data-nosnippet>2439</a>//SNAP  0x3a    0xe8    0   rw  0x1     1 to snap the hit counters.
+<a href=#2440 id=2440 data-nosnippet>2440</a>//
+<a href=#2441 id=2441 data-nosnippet>2441</a>//MT
 <a href=#2442 id=2442 data-nosnippet>2442</a>//
-<a href=#2443 id=2443 data-nosnippet>2443</a>//MT.CHANNEL_MASK
-<a href=#2444 id=2444 data-nosnippet>2444</a>//
-<a href=#2445 id=2445 data-nosnippet>2445</a>//1 to mask a channel
-<a href=#2446 id=2446 data-nosnippet>2446</a>//Node  Adr     Adr8    Bits    Perm    Def     Description
-<a href=#2447 id=2447 data-nosnippet>2447</a>//LT0   0x50    0x140   [7:0]   rw  0x0     1 to mask a channel of LT=0
-<a href=#2448 id=2448 data-nosnippet>2448</a>//LT1   0x51    0x144   [7:0]   rw  0x0     1 to mask a channel of LT=1
-<a href=#2449 id=2449 data-nosnippet>2449</a>//LT2   0x52    0x148   [7:0]   rw  0x0     1 to mask a channel of LT=2
-<a href=#2450 id=2450 data-nosnippet>2450</a>//LT3   0x53    0x14c   [7:0]   rw  0x0     1 to mask a channel of LT=3
-<a href=#2451 id=2451 data-nosnippet>2451</a>//LT4   0x54    0x150   [7:0]   rw  0x0     1 to mask a channel of LT=4
-<a href=#2452 id=2452 data-nosnippet>2452</a>//LT5   0x55    0x154   [7:0]   rw  0x0     1 to mask a channel of LT=5
-<a href=#2453 id=2453 data-nosnippet>2453</a>//LT6   0x56    0x158   [7:0]   rw  0x0     1 to mask a channel of LT=6
-<a href=#2454 id=2454 data-nosnippet>2454</a>//LT7   0x57    0x15c   [7:0]   rw  0x0     1 to mask a channel of LT=7
-<a href=#2455 id=2455 data-nosnippet>2455</a>//LT8   0x58    0x160   [7:0]   rw  0x0     1 to mask a channel of LT=8
-<a href=#2456 id=2456 data-nosnippet>2456</a>//LT9   0x59    0x164   [7:0]   rw  0x0     1 to mask a channel of LT=9
-<a href=#2457 id=2457 data-nosnippet>2457</a>//LT10  0x5a    0x168   [7:0]   rw  0x0     1 to mask a channel of LT=10
-<a href=#2458 id=2458 data-nosnippet>2458</a>//LT11  0x5b    0x16c   [7:0]   rw  0x0     1 to mask a channel of LT=11
-<a href=#2459 id=2459 data-nosnippet>2459</a>//LT12  0x5c    0x170   [7:0]   rw  0x0     1 to mask a channel of LT=12
-<a href=#2460 id=2460 data-nosnippet>2460</a>//LT13  0x5d    0x174   [7:0]   rw  0x0     1 to mask a channel of LT=13
-<a href=#2461 id=2461 data-nosnippet>2461</a>//LT14  0x5e    0x178   [7:0]   rw  0x0     1 to mask a channel of LT=14
-<a href=#2462 id=2462 data-nosnippet>2462</a>//LT15  0x5f    0x17c   [7:0]   rw  0x0     1 to mask a channel of LT=15
-<a href=#2463 id=2463 data-nosnippet>2463</a>//LT16  0x60    0x180   [7:0]   rw  0x0     1 to mask a channel of LT=16
-<a href=#2464 id=2464 data-nosnippet>2464</a>//LT17  0x61    0x184   [7:0]   rw  0x0     1 to mask a channel of LT=17
-<a href=#2465 id=2465 data-nosnippet>2465</a>//LT18  0x62    0x188   [7:0]   rw  0x0     1 to mask a channel of LT=18
-<a href=#2466 id=2466 data-nosnippet>2466</a>//LT19  0x63    0x18c   [7:0]   rw  0x0     1 to mask a channel of LT=19
-<a href=#2467 id=2467 data-nosnippet>2467</a>//LT20  0x64    0x190   [7:0]   rw  0x0     1 to mask a channel of LT=20
-<a href=#2468 id=2468 data-nosnippet>2468</a>//LT21  0x65    0x194   [7:0]   rw  0x0     1 to mask a channel of LT=21
-<a href=#2469 id=2469 data-nosnippet>2469</a>//LT22  0x66    0x198   [7:0]   rw  0x0     1 to mask a channel of LT=22
-<a href=#2470 id=2470 data-nosnippet>2470</a>//LT23  0x67    0x19c   [7:0]   rw  0x0     1 to mask a channel of LT=23
-<a href=#2471 id=2471 data-nosnippet>2471</a>//LT24  0x68    0x1a0   [7:0]   rw  0x0     1 to mask a channel of LT=24
-<a href=#2472 id=2472 data-nosnippet>2472</a>//
-<a href=#2473 id=2473 data-nosnippet>2473</a>//MT.COARSE_DELAYS
-<a href=#2474 id=2474 data-nosnippet>2474</a>//Node  Adr     Adr8    Bits    Perm    Def     Description
-<a href=#2475 id=2475 data-nosnippet>2475</a>//LT0   0xc0    0x300   [3:0]   rw  0x0     Integer clock delay of LT LINK 0
-<a href=#2476 id=2476 data-nosnippet>2476</a>//LT1   0xc1    0x304   [3:0]   rw  0x0     Integer clock delay of LT LINK 1
-<a href=#2477 id=2477 data-nosnippet>2477</a>//LT2   0xc2    0x308   [3:0]   rw  0x0     Integer clock delay of LT LINK 2
-<a href=#2478 id=2478 data-nosnippet>2478</a>//LT3   0xc3    0x30c   [3:0]   rw  0x0     Integer clock delay of LT LINK 3
-<a href=#2479 id=2479 data-nosnippet>2479</a>//LT4   0xc4    0x310   [3:0]   rw  0x0     Integer clock delay of LT LINK 4
-<a href=#2480 id=2480 data-nosnippet>2480</a>//LT5   0xc5    0x314   [3:0]   rw  0x0     Integer clock delay of LT LINK 5
-<a href=#2481 id=2481 data-nosnippet>2481</a>//LT6   0xc6    0x318   [3:0]   rw  0x0     Integer clock delay of LT LINK 6
-<a href=#2482 id=2482 data-nosnippet>2482</a>//LT7   0xc7    0x31c   [3:0]   rw  0x0     Integer clock delay of LT LINK 7
-<a href=#2483 id=2483 data-nosnippet>2483</a>//LT8   0xc8    0x320   [3:0]   rw  0x0     Integer clock delay of LT LINK 8
-<a href=#2484 id=2484 data-nosnippet>2484</a>//LT9   0xc9    0x324   [3:0]   rw  0x0     Integer clock delay of LT LINK 9
-<a href=#2485 id=2485 data-nosnippet>2485</a>//LT10  0xca    0x328   [3:0]   rw  0x0     Integer clock delay of LT LINK 10
-<a href=#2486 id=2486 data-nosnippet>2486</a>//LT11  0xcb    0x32c   [3:0]   rw  0x0     Integer clock delay of LT LINK 11
-<a href=#2487 id=2487 data-nosnippet>2487</a>//LT12  0xcc    0x330   [3:0]   rw  0x0     Integer clock delay of LT LINK 12
-<a href=#2488 id=2488 data-nosnippet>2488</a>//LT13  0xcd    0x334   [3:0]   rw  0x0     Integer clock delay of LT LINK 13
-<a href=#2489 id=2489 data-nosnippet>2489</a>//LT14  0xce    0x338   [3:0]   rw  0x0     Integer clock delay of LT LINK 14
-<a href=#2490 id=2490 data-nosnippet>2490</a>//LT15  0xcf    0x33c   [3:0]   rw  0x0     Integer clock delay of LT LINK 15
-<a href=#2491 id=2491 data-nosnippet>2491</a>//LT16  0xd0    0x340   [3:0]   rw  0x0     Integer clock delay of LT LINK 16
-<a href=#2492 id=2492 data-nosnippet>2492</a>//LT17  0xd1    0x344   [3:0]   rw  0x0     Integer clock delay of LT LINK 17
-<a href=#2493 id=2493 data-nosnippet>2493</a>//LT18  0xd2    0x348   [3:0]   rw  0x0     Integer clock delay of LT LINK 18
-<a href=#2494 id=2494 data-nosnippet>2494</a>//LT19  0xd3    0x34c   [3:0]   rw  0x0     Integer clock delay of LT LINK 19
-<a href=#2495 id=2495 data-nosnippet>2495</a>//LT20  0xd4    0x350   [3:0]   rw  0x0     Integer clock delay of LT LINK 20
-<a href=#2496 id=2496 data-nosnippet>2496</a>//LT21  0xd5    0x354   [3:0]   rw  0x0     Integer clock delay of LT LINK 21
-<a href=#2497 id=2497 data-nosnippet>2497</a>//LT22  0xd6    0x358   [3:0]   rw  0x0     Integer clock delay of LT LINK 22
-<a href=#2498 id=2498 data-nosnippet>2498</a>//LT23  0xd7    0x35c   [3:0]   rw  0x0     Integer clock delay of LT LINK 23
-<a href=#2499 id=2499 data-nosnippet>2499</a>//LT24  0xd8    0x360   [3:0]   rw  0x0     Integer clock delay of LT LINK 24
-<a href=#2500 id=2500 data-nosnippet>2500</a>//LT25  0xd9    0x364   [3:0]   rw  0x0     Integer clock delay of LT LINK 25
-<a href=#2501 id=2501 data-nosnippet>2501</a>//LT26  0xda    0x368   [3:0]   rw  0x0     Integer clock delay of LT LINK 26
-<a href=#2502 id=2502 data-nosnippet>2502</a>//LT27  0xdb    0x36c   [3:0]   rw  0x0     Integer clock delay of LT LINK 27
-<a href=#2503 id=2503 data-nosnippet>2503</a>//LT28  0xdc    0x370   [3:0]   rw  0x0     Integer clock delay of LT LINK 28
-<a href=#2504 id=2504 data-nosnippet>2504</a>//LT29  0xdd    0x374   [3:0]   rw  0x0     Integer clock delay of LT LINK 29
-<a href=#2505 id=2505 data-nosnippet>2505</a>//LT30  0xde    0x378   [3:0]   rw  0x0     Integer clock delay of LT LINK 30
-<a href=#2506 id=2506 data-nosnippet>2506</a>//LT31  0xdf    0x37c   [3:0]   rw  0x0     Integer clock delay of LT LINK 31
-<a href=#2507 id=2507 data-nosnippet>2507</a>//LT32  0xe0    0x380   [3:0]   rw  0x0     Integer clock delay of LT LINK 32
-<a href=#2508 id=2508 data-nosnippet>2508</a>//LT33  0xe1    0x384   [3:0]   rw  0x0     Integer clock delay of LT LINK 33
-<a href=#2509 id=2509 data-nosnippet>2509</a>//LT34  0xe2    0x388   [3:0]   rw  0x0     Integer clock delay of LT LINK 34
-<a href=#2510 id=2510 data-nosnippet>2510</a>//LT35  0xe3    0x38c   [3:0]   rw  0x0     Integer clock delay of LT LINK 35
-<a href=#2511 id=2511 data-nosnippet>2511</a>//LT36  0xe4    0x390   [3:0]   rw  0x0     Integer clock delay of LT LINK 36
-<a href=#2512 id=2512 data-nosnippet>2512</a>//LT37  0xe5    0x394   [3:0]   rw  0x0     Integer clock delay of LT LINK 37
-<a href=#2513 id=2513 data-nosnippet>2513</a>//LT38  0xe6    0x398   [3:0]   rw  0x0     Integer clock delay of LT LINK 38
-<a href=#2514 id=2514 data-nosnippet>2514</a>//LT39  0xe7    0x39c   [3:0]   rw  0x0     Integer clock delay of LT LINK 39
-<a href=#2515 id=2515 data-nosnippet>2515</a>//LT40  0xe8    0x3a0   [3:0]   rw  0x0     Integer clock delay of LT LINK 40
-<a href=#2516 id=2516 data-nosnippet>2516</a>//LT41  0xe9    0x3a4   [3:0]   rw  0x0     Integer clock delay of LT LINK 41
-<a href=#2517 id=2517 data-nosnippet>2517</a>//LT42  0xea    0x3a8   [3:0]   rw  0x0     Integer clock delay of LT LINK 42
-<a href=#2518 id=2518 data-nosnippet>2518</a>//LT43  0xeb    0x3ac   [3:0]   rw  0x0     Integer clock delay of LT LINK 43
-<a href=#2519 id=2519 data-nosnippet>2519</a>//LT44  0xec    0x3b0   [3:0]   rw  0x0     Integer clock delay of LT LINK 44
-<a href=#2520 id=2520 data-nosnippet>2520</a>//LT45  0xed    0x3b4   [3:0]   rw  0x0     Integer clock delay of LT LINK 45
-<a href=#2521 id=2521 data-nosnippet>2521</a>//LT46  0xee    0x3b8   [3:0]   rw  0x0     Integer clock delay of LT LINK 46
-<a href=#2522 id=2522 data-nosnippet>2522</a>//LT47  0xef    0x3bc   [3:0]   rw  0x0     Integer clock delay of LT LINK 47
-<a href=#2523 id=2523 data-nosnippet>2523</a>//LT48  0xf0    0x3c0   [3:0]   rw  0x0     Integer clock delay of LT LINK 48
-<a href=#2524 id=2524 data-nosnippet>2524</a>//LT49  0xf1    0x3c4   [3:0]   rw  0x0     Integer clock delay of LT LINK 49
-<a href=#2525 id=2525 data-nosnippet>2525</a>//
-<a href=#2526 id=2526 data-nosnippet>2526</a>//MT.RB_READOUT_CNTS
-<a href=#2527 id=2527 data-nosnippet>2527</a>//
-<a href=#2528 id=2528 data-nosnippet>2528</a>//Counters
-<a href=#2529 id=2529 data-nosnippet>2529</a>//Node  Adr     Adr8    Bits    Perm    Def     Description
-<a href=#2530 id=2530 data-nosnippet>2530</a>//CNTS_0    0xf2    0x3c8   [7:0]   r       Readout count on RB=0
-<a href=#2531 id=2531 data-nosnippet>2531</a>//CNTS_1    0xf2    0x3c8   [15:8]  r       Readout count on RB=1
-<a href=#2532 id=2532 data-nosnippet>2532</a>//CNTS_2    0xf2    0x3c8   [23:16]     r       Readout count on RB=2
-<a href=#2533 id=2533 data-nosnippet>2533</a>//CNTS_3    0xf2    0x3c8   [31:24]     r       Readout count on RB=3
-<a href=#2534 id=2534 data-nosnippet>2534</a>//CNTS_4    0xf3    0x3cc   [7:0]   r       Readout count on RB=4
-<a href=#2535 id=2535 data-nosnippet>2535</a>//CNTS_5    0xf3    0x3cc   [15:8]  r       Readout count on RB=5
-<a href=#2536 id=2536 data-nosnippet>2536</a>//CNTS_6    0xf3    0x3cc   [23:16]     r       Readout count on RB=6
-<a href=#2537 id=2537 data-nosnippet>2537</a>//CNTS_7    0xf3    0x3cc   [31:24]     r       Readout count on RB=7
-<a href=#2538 id=2538 data-nosnippet>2538</a>//CNTS_8    0xf4    0x3d0   [7:0]   r       Readout count on RB=8
-<a href=#2539 id=2539 data-nosnippet>2539</a>//CNTS_9    0xf4    0x3d0   [15:8]  r       Readout count on RB=9
-<a href=#2540 id=2540 data-nosnippet>2540</a>//CNTS_10   0xf4    0x3d0   [23:16]     r       Readout count on RB=10
-<a href=#2541 id=2541 data-nosnippet>2541</a>//CNTS_11   0xf4    0x3d0   [31:24]     r       Readout count on RB=11
-<a href=#2542 id=2542 data-nosnippet>2542</a>//CNTS_12   0xf5    0x3d4   [7:0]   r       Readout count on RB=12
-<a href=#2543 id=2543 data-nosnippet>2543</a>//CNTS_13   0xf5    0x3d4   [15:8]  r       Readout count on RB=13
-<a href=#2544 id=2544 data-nosnippet>2544</a>//CNTS_14   0xf5    0x3d4   [23:16]     r       Readout count on RB=14
-<a href=#2545 id=2545 data-nosnippet>2545</a>//CNTS_15   0xf5    0x3d4   [31:24]     r       Readout count on RB=15
-<a href=#2546 id=2546 data-nosnippet>2546</a>//CNTS_16   0xf6    0x3d8   [7:0]   r       Readout count on RB=16
-<a href=#2547 id=2547 data-nosnippet>2547</a>//CNTS_17   0xf6    0x3d8   [15:8]  r       Readout count on RB=17
-<a href=#2548 id=2548 data-nosnippet>2548</a>//CNTS_18   0xf6    0x3d8   [23:16]     r       Readout count on RB=18
-<a href=#2549 id=2549 data-nosnippet>2549</a>//CNTS_19   0xf6    0x3d8   [31:24]     r       Readout count on RB=19
-<a href=#2550 id=2550 data-nosnippet>2550</a>//CNTS_20   0xf7    0x3dc   [7:0]   r       Readout count on RB=20
-<a href=#2551 id=2551 data-nosnippet>2551</a>//CNTS_21   0xf7    0x3dc   [15:8]  r       Readout count on RB=21
-<a href=#2552 id=2552 data-nosnippet>2552</a>//CNTS_22   0xf7    0x3dc   [23:16]     r       Readout count on RB=22
-<a href=#2553 id=2553 data-nosnippet>2553</a>//CNTS_23   0xf7    0x3dc   [31:24]     r       Readout count on RB=23
-<a href=#2554 id=2554 data-nosnippet>2554</a>//CNTS_24   0xf8    0x3e0   [7:0]   r       Readout count on RB=24
-<a href=#2555 id=2555 data-nosnippet>2555</a>//CNTS_25   0xf8    0x3e0   [15:8]  r       Readout count on RB=25
-<a href=#2556 id=2556 data-nosnippet>2556</a>//CNTS_26   0xf8    0x3e0   [23:16]     r       Readout count on RB=26
-<a href=#2557 id=2557 data-nosnippet>2557</a>//CNTS_27   0xf8    0x3e0   [31:24]     r       Readout count on RB=27
-<a href=#2558 id=2558 data-nosnippet>2558</a>//CNTS_28   0xf9    0x3e4   [7:0]   r       Readout count on RB=28
-<a href=#2559 id=2559 data-nosnippet>2559</a>//CNTS_29   0xf9    0x3e4   [15:8]  r       Readout count on RB=29
-<a href=#2560 id=2560 data-nosnippet>2560</a>//CNTS_30   0xf9    0x3e4   [23:16]     r       Readout count on RB=30
-<a href=#2561 id=2561 data-nosnippet>2561</a>//CNTS_31   0xf9    0x3e4   [31:24]     r       Readout count on RB=31
-<a href=#2562 id=2562 data-nosnippet>2562</a>//CNTS_32   0xfa    0x3e8   [7:0]   r       Readout count on RB=32
-<a href=#2563 id=2563 data-nosnippet>2563</a>//CNTS_33   0xfa    0x3e8   [15:8]  r       Readout count on RB=33
-<a href=#2564 id=2564 data-nosnippet>2564</a>//CNTS_34   0xfa    0x3e8   [23:16]     r       Readout count on RB=34
-<a href=#2565 id=2565 data-nosnippet>2565</a>//CNTS_35   0xfa    0x3e8   [31:24]     r       Readout count on RB=35
-<a href=#2566 id=2566 data-nosnippet>2566</a>//CNTS_36   0xfb    0x3ec   [7:0]   r       Readout count on RB=36
-<a href=#2567 id=2567 data-nosnippet>2567</a>//CNTS_37   0xfb    0x3ec   [15:8]  r       Readout count on RB=37
-<a href=#2568 id=2568 data-nosnippet>2568</a>//CNTS_38   0xfb    0x3ec   [23:16]     r       Readout count on RB=38
-<a href=#2569 id=2569 data-nosnippet>2569</a>//CNTS_39   0xfb    0x3ec   [31:24]     r       Readout count on RB=39
-<a href=#2570 id=2570 data-nosnippet>2570</a>//CNTS_40   0xfc    0x3f0   [7:0]   r       Readout count on RB=40
-<a href=#2571 id=2571 data-nosnippet>2571</a>//CNTS_41   0xfc    0x3f0   [15:8]  r       Readout count on RB=41
-<a href=#2572 id=2572 data-nosnippet>2572</a>//CNTS_42   0xfc    0x3f0   [23:16]     r       Readout count on RB=42
-<a href=#2573 id=2573 data-nosnippet>2573</a>//CNTS_43   0xfc    0x3f0   [31:24]     r       Readout count on RB=43
-<a href=#2574 id=2574 data-nosnippet>2574</a>//CNTS_44   0xfd    0x3f4   [7:0]   r       Readout count on RB=44
-<a href=#2575 id=2575 data-nosnippet>2575</a>//CNTS_45   0xfd    0x3f4   [15:8]  r       Readout count on RB=45
-<a href=#2576 id=2576 data-nosnippet>2576</a>//CNTS_46   0xfd    0x3f4   [23:16]     r       Readout count on RB=46
-<a href=#2577 id=2577 data-nosnippet>2577</a>//CNTS_47   0xfd    0x3f4   [31:24]     r       Readout count on RB=47
-<a href=#2578 id=2578 data-nosnippet>2578</a>//CNTS_48   0xfe    0x3f8   [7:0]   r       Readout count on RB=48
-<a href=#2579 id=2579 data-nosnippet>2579</a>//CNTS_49   0xfe    0x3f8   [15:8]  r       Readout count on RB=49
-<a href=#2580 id=2580 data-nosnippet>2580</a>//RESET     0xff    0x3fc   0   w   Pulse   Write 1 to reset hit counters.
-<a href=#2581 id=2581 data-nosnippet>2581</a>//SNAP  0x100   0x400   0   rw  0x1     1 to snap the hit counters.
-<a href=#2582 id=2582 data-nosnippet>2582</a>//
-<a href=#2583 id=2583 data-nosnippet>2583</a>//MT.PULSER
-<a href=#2584 id=2584 data-nosnippet>2584</a>//
-<a href=#2585 id=2585 data-nosnippet>2585</a>//LTB Channel Pulser
-<a href=#2586 id=2586 data-nosnippet>2586</a>//Node  Adr     Adr8    Bits    Perm    Def     Description
-<a href=#2587 id=2587 data-nosnippet>2587</a>//FIRE  0x100   0x400   0   w   Pulse   Write 1 to Fire the Pulser.
-<a href=#2588 id=2588 data-nosnippet>2588</a>//CH_0_24   0x101   0x404   [24:0]  rw  0x0     Set fire bits for channels 0 to 24
-<a href=#2589 id=2589 data-nosnippet>2589</a>//CH_25_49  0x102   0x408   [24:0]  rw  0x0     Set fire bits for channels 25 to 49
-<a href=#2590 id=2590 data-nosnippet>2590</a>//CH_50_74  0x103   0x40c   [24:0]  rw  0x0     Set fire bits for channels 50 to 74
-<a href=#2591 id=2591 data-nosnippet>2591</a>//CH_75_99  0x104   0x410   [24:0]  rw  0x0     Set fire bits for channels 75 to 99
-<a href=#2592 id=2592 data-nosnippet>2592</a>//CH_100_124    0x105   0x414   [24:0]  rw  0x0     Set fire bits for channels 100 to 124
-<a href=#2593 id=2593 data-nosnippet>2593</a>//CH_125_149    0x106   0x418   [24:0]  rw  0x0     Set fire bits for channels 125 to 149
-<a href=#2594 id=2594 data-nosnippet>2594</a>//CH_150_174    0x107   0x41c   [24:0]  rw  0x0     Set fire bits for channels 150 to 174
-<a href=#2595 id=2595 data-nosnippet>2595</a>//CH_175_199    0x108   0x420   [24:0]  rw  0x0     Set fire bits for channels 175 to 199
-<a href=#2596 id=2596 data-nosnippet>2596</a>//
-<a href=#2597 id=2597 data-nosnippet>2597</a>//MT.XADC
-<a href=#2598 id=2598 data-nosnippet>2598</a>//
-<a href=#2599 id=2599 data-nosnippet>2599</a>//Zynq XADC
-<a href=#2600 id=2600 data-nosnippet>2600</a>//Node  Adr     Adr8    Bits    Perm    Def     Description
-<a href=#2601 id=2601 data-nosnippet>2601</a>//CALIBRATION   0x120   0x480   [11:0]  r       XADC Calibration
-<a href=#2602 id=2602 data-nosnippet>2602</a>//VCCPINT   0x120   0x480   [27:16]     r       XADC vccpint
-<a href=#2603 id=2603 data-nosnippet>2603</a>//VCCPAUX   0x121   0x484   [11:0]  r       XADC Calibration
-<a href=#2604 id=2604 data-nosnippet>2604</a>//VCCODDR   0x121   0x484   [27:16]     r       XADC vccoddr
-<a href=#2605 id=2605 data-nosnippet>2605</a>//TEMP  0x122   0x488   [11:0]  r       XADC Temperature
-<a href=#2606 id=2606 data-nosnippet>2606</a>//VCCINT    0x122   0x488   [27:16]     r       XADC vccint
-<a href=#2607 id=2607 data-nosnippet>2607</a>//VCCAUX    0x123   0x48c   [11:0]  r       XADC VCCAUX
-<a href=#2608 id=2608 data-nosnippet>2608</a>//VCCBRAM   0x123   0x48c   [27:16]     r       XADC vccbram
-<a href=#2609 id=2609 data-nosnippet>2609</a>//
-<a href=#2610 id=2610 data-nosnippet>2610</a>//MT.HOG
-<a href=#2611 id=2611 data-nosnippet>2611</a>//
-<a href=#2612 id=2612 data-nosnippet>2612</a>//HOG Parameters
-<a href=#2613 id=2613 data-nosnippet>2613</a>//Node  Adr     Adr8    Bits    Perm    Def     Description
-<a href=#2614 id=2614 data-nosnippet>2614</a>//GLOBAL_DATE   0x200   0x800   [31:0]  r       HOG Global Date
-<a href=#2615 id=2615 data-nosnippet>2615</a>//GLOBAL_TIME   0x201   0x804   [31:0]  r       HOG Global Time
-<a href=#2616 id=2616 data-nosnippet>2616</a>//GLOBAL_VER    0x202   0x808   [31:0]  r       HOG Global Version
-<a href=#2617 id=2617 data-nosnippet>2617</a>//GLOBAL_SHA    0x203   0x80c   [31:0]  r       HOG Global SHA
-<a href=#2618 id=2618 data-nosnippet>2618</a>//TOP_SHA   0x204   0x810   [31:0]  r       HOG Top SHA
-<a href=#2619 id=2619 data-nosnippet>2619</a>//TOP_VER   0x205   0x814   [31:0]  r       HOG Top Version
-<a href=#2620 id=2620 data-nosnippet>2620</a>//HOG_SHA   0x206   0x818   [31:0]  r       HOG SHA
-<a href=#2621 id=2621 data-nosnippet>2621</a>//HOG_VER   0x207   0x81c   [31:0]  r       HOG Version
-<a href=#2622 id=2622 data-nosnippet>2622</a>//Module SPI adr = 0x1000
-<a href=#2623 id=2623 data-nosnippet>2623</a>//
-<a href=#2624 id=2624 data-nosnippet>2624</a>//SPI
-<a href=#2625 id=2625 data-nosnippet>2625</a>//Node  Adr     Adr8    Bits    Perm    Def     Description
-<a href=#2626 id=2626 data-nosnippet>2626</a>//d0    0x1000  0x4000  [31:0]  rw  ~~  Data reg 0
-<a href=#2627 id=2627 data-nosnippet>2627</a>//d1    0x1001  0x4004  [31:0]  rw  ~~  Data reg 1
-<a href=#2628 id=2628 data-nosnippet>2628</a>//d2    0x1002  0x4008  [31:0]  rw  ~~  Data reg 2
-<a href=#2629 id=2629 data-nosnippet>2629</a>//d3    0x1003  0x400c  [31:0]  rw  ~~  Data reg 3
-<a href=#2630 id=2630 data-nosnippet>2630</a>//ctrl  0x1004  0x4010  [31:0]  rw  ~~  Control reg
-<a href=#2631 id=2631 data-nosnippet>2631</a>//divider   0x1005  0x4014  [31:0]  rw  ~~  Clock divider reg
-<a href=#2632 id=2632 data-nosnippet>2632</a>//ss    0x1006  0x4018  [31:0]  rw  ~~  Slave select reg
-<a href=#2633 id=2633 data-nosnippet>2633</a>//Module I2C adr = 0x1100
-<a href=#2634 id=2634 data-nosnippet>2634</a>//
-<a href=#2635 id=2635 data-nosnippet>2635</a>//I2C master controller
-<a href=#2636 id=2636 data-nosnippet>2636</a>//
-<a href=#2637 id=2637 data-nosnippet>2637</a>//I2C
-<a href=#2638 id=2638 data-nosnippet>2638</a>//
-<a href=#2639 id=2639 data-nosnippet>2639</a>//I2C master controller
-<a href=#2640 id=2640 data-nosnippet>2640</a>//Node  Adr     Adr8    Bits    Perm    Def     Description
-<a href=#2641 id=2641 data-nosnippet>2641</a>//ps_lo     0x1100  0x4400  [7:0]   rw  ~~  Prescale low byte
-<a href=#2642 id=2642 data-nosnippet>2642</a>//ps_hi     0x1101  0x4404  [7:0]   rw  ~~  Prescale low byte
-<a href=#2643 id=2643 data-nosnippet>2643</a>//ctrl  0x1102  0x4408  [7:0]   rw  ~~  Control
-<a href=#2644 id=2644 data-nosnippet>2644</a>//data  0x1103  0x440c  [7:0]   rw  ~~  Data
-<a href=#2645 id=2645 data-nosnippet>2645</a>//cmd_stat  0x1104  0x4410  [7:0]   rw  ~~  Command / status
-<a href=#2646 id=2646 data-nosnippet>2646</a>
-<a href=#2647 id=2647 data-nosnippet>2647</a>
-<a href=#2648 id=2648 data-nosnippet>2648</a></span></code></pre></div></section></main></body></html>
+<a href=#2443 id=2443 data-nosnippet>2443</a>//Implements various control and monitoring functions of the DRS Logic
+<a href=#2444 id=2444 data-nosnippet>2444</a>//Node  Adr     Adr8    Bits    Perm    Def     Description
+<a href=#2445 id=2445 data-nosnippet>2445</a>//ETH_RX_BAD_FRAME_CNT  0x3d    0xf4    [15:0]  r       Ethernet MAC bad frame error
+<a href=#2446 id=2446 data-nosnippet>2446</a>
+<a href=#2447 id=2447 data-nosnippet>2447</a>
+<a href=#2448 id=2448 data-nosnippet>2448</a>//ETH_RX_BAD_FCS_CNT   0x3d    0xf4    [31:16]     r       Ethernet MAC bad fcs
+<a href=#2449 id=2449 data-nosnippet>2449</a>//
+<a href=#2450 id=2450 data-nosnippet>2450</a>//MT.CHANNEL_MASK
+<a href=#2451 id=2451 data-nosnippet>2451</a>//
+<a href=#2452 id=2452 data-nosnippet>2452</a>//1 to mask a channel
+<a href=#2453 id=2453 data-nosnippet>2453</a>//Node  Adr     Adr8    Bits    Perm    Def     Description
+<a href=#2454 id=2454 data-nosnippet>2454</a>//LT0   0x50    0x140   [7:0]   rw  0x0     1 to mask a channel of LT=0
+<a href=#2455 id=2455 data-nosnippet>2455</a>//LT1   0x51    0x144   [7:0]   rw  0x0     1 to mask a channel of LT=1
+<a href=#2456 id=2456 data-nosnippet>2456</a>//LT2   0x52    0x148   [7:0]   rw  0x0     1 to mask a channel of LT=2
+<a href=#2457 id=2457 data-nosnippet>2457</a>//LT3   0x53    0x14c   [7:0]   rw  0x0     1 to mask a channel of LT=3
+<a href=#2458 id=2458 data-nosnippet>2458</a>//LT4   0x54    0x150   [7:0]   rw  0x0     1 to mask a channel of LT=4
+<a href=#2459 id=2459 data-nosnippet>2459</a>//LT5   0x55    0x154   [7:0]   rw  0x0     1 to mask a channel of LT=5
+<a href=#2460 id=2460 data-nosnippet>2460</a>//LT6   0x56    0x158   [7:0]   rw  0x0     1 to mask a channel of LT=6
+<a href=#2461 id=2461 data-nosnippet>2461</a>//LT7   0x57    0x15c   [7:0]   rw  0x0     1 to mask a channel of LT=7
+<a href=#2462 id=2462 data-nosnippet>2462</a>//LT8   0x58    0x160   [7:0]   rw  0x0     1 to mask a channel of LT=8
+<a href=#2463 id=2463 data-nosnippet>2463</a>//LT9   0x59    0x164   [7:0]   rw  0x0     1 to mask a channel of LT=9
+<a href=#2464 id=2464 data-nosnippet>2464</a>//LT10  0x5a    0x168   [7:0]   rw  0x0     1 to mask a channel of LT=10
+<a href=#2465 id=2465 data-nosnippet>2465</a>//LT11  0x5b    0x16c   [7:0]   rw  0x0     1 to mask a channel of LT=11
+<a href=#2466 id=2466 data-nosnippet>2466</a>//LT12  0x5c    0x170   [7:0]   rw  0x0     1 to mask a channel of LT=12
+<a href=#2467 id=2467 data-nosnippet>2467</a>//LT13  0x5d    0x174   [7:0]   rw  0x0     1 to mask a channel of LT=13
+<a href=#2468 id=2468 data-nosnippet>2468</a>//LT14  0x5e    0x178   [7:0]   rw  0x0     1 to mask a channel of LT=14
+<a href=#2469 id=2469 data-nosnippet>2469</a>//LT15  0x5f    0x17c   [7:0]   rw  0x0     1 to mask a channel of LT=15
+<a href=#2470 id=2470 data-nosnippet>2470</a>//LT16  0x60    0x180   [7:0]   rw  0x0     1 to mask a channel of LT=16
+<a href=#2471 id=2471 data-nosnippet>2471</a>//LT17  0x61    0x184   [7:0]   rw  0x0     1 to mask a channel of LT=17
+<a href=#2472 id=2472 data-nosnippet>2472</a>//LT18  0x62    0x188   [7:0]   rw  0x0     1 to mask a channel of LT=18
+<a href=#2473 id=2473 data-nosnippet>2473</a>//LT19  0x63    0x18c   [7:0]   rw  0x0     1 to mask a channel of LT=19
+<a href=#2474 id=2474 data-nosnippet>2474</a>//LT20  0x64    0x190   [7:0]   rw  0x0     1 to mask a channel of LT=20
+<a href=#2475 id=2475 data-nosnippet>2475</a>//LT21  0x65    0x194   [7:0]   rw  0x0     1 to mask a channel of LT=21
+<a href=#2476 id=2476 data-nosnippet>2476</a>//LT22  0x66    0x198   [7:0]   rw  0x0     1 to mask a channel of LT=22
+<a href=#2477 id=2477 data-nosnippet>2477</a>//LT23  0x67    0x19c   [7:0]   rw  0x0     1 to mask a channel of LT=23
+<a href=#2478 id=2478 data-nosnippet>2478</a>//LT24  0x68    0x1a0   [7:0]   rw  0x0     1 to mask a channel of LT=24
+<a href=#2479 id=2479 data-nosnippet>2479</a>//
+<a href=#2480 id=2480 data-nosnippet>2480</a>//MT.COARSE_DELAYS
+<a href=#2481 id=2481 data-nosnippet>2481</a>//Node  Adr     Adr8    Bits    Perm    Def     Description
+<a href=#2482 id=2482 data-nosnippet>2482</a>//LT0   0xc0    0x300   [3:0]   rw  0x0     Integer clock delay of LT LINK 0
+<a href=#2483 id=2483 data-nosnippet>2483</a>//LT1   0xc1    0x304   [3:0]   rw  0x0     Integer clock delay of LT LINK 1
+<a href=#2484 id=2484 data-nosnippet>2484</a>//LT2   0xc2    0x308   [3:0]   rw  0x0     Integer clock delay of LT LINK 2
+<a href=#2485 id=2485 data-nosnippet>2485</a>//LT3   0xc3    0x30c   [3:0]   rw  0x0     Integer clock delay of LT LINK 3
+<a href=#2486 id=2486 data-nosnippet>2486</a>//LT4   0xc4    0x310   [3:0]   rw  0x0     Integer clock delay of LT LINK 4
+<a href=#2487 id=2487 data-nosnippet>2487</a>//LT5   0xc5    0x314   [3:0]   rw  0x0     Integer clock delay of LT LINK 5
+<a href=#2488 id=2488 data-nosnippet>2488</a>//LT6   0xc6    0x318   [3:0]   rw  0x0     Integer clock delay of LT LINK 6
+<a href=#2489 id=2489 data-nosnippet>2489</a>//LT7   0xc7    0x31c   [3:0]   rw  0x0     Integer clock delay of LT LINK 7
+<a href=#2490 id=2490 data-nosnippet>2490</a>//LT8   0xc8    0x320   [3:0]   rw  0x0     Integer clock delay of LT LINK 8
+<a href=#2491 id=2491 data-nosnippet>2491</a>//LT9   0xc9    0x324   [3:0]   rw  0x0     Integer clock delay of LT LINK 9
+<a href=#2492 id=2492 data-nosnippet>2492</a>//LT10  0xca    0x328   [3:0]   rw  0x0     Integer clock delay of LT LINK 10
+<a href=#2493 id=2493 data-nosnippet>2493</a>//LT11  0xcb    0x32c   [3:0]   rw  0x0     Integer clock delay of LT LINK 11
+<a href=#2494 id=2494 data-nosnippet>2494</a>//LT12  0xcc    0x330   [3:0]   rw  0x0     Integer clock delay of LT LINK 12
+<a href=#2495 id=2495 data-nosnippet>2495</a>//LT13  0xcd    0x334   [3:0]   rw  0x0     Integer clock delay of LT LINK 13
+<a href=#2496 id=2496 data-nosnippet>2496</a>//LT14  0xce    0x338   [3:0]   rw  0x0     Integer clock delay of LT LINK 14
+<a href=#2497 id=2497 data-nosnippet>2497</a>//LT15  0xcf    0x33c   [3:0]   rw  0x0     Integer clock delay of LT LINK 15
+<a href=#2498 id=2498 data-nosnippet>2498</a>//LT16  0xd0    0x340   [3:0]   rw  0x0     Integer clock delay of LT LINK 16
+<a href=#2499 id=2499 data-nosnippet>2499</a>//LT17  0xd1    0x344   [3:0]   rw  0x0     Integer clock delay of LT LINK 17
+<a href=#2500 id=2500 data-nosnippet>2500</a>//LT18  0xd2    0x348   [3:0]   rw  0x0     Integer clock delay of LT LINK 18
+<a href=#2501 id=2501 data-nosnippet>2501</a>//LT19  0xd3    0x34c   [3:0]   rw  0x0     Integer clock delay of LT LINK 19
+<a href=#2502 id=2502 data-nosnippet>2502</a>//LT20  0xd4    0x350   [3:0]   rw  0x0     Integer clock delay of LT LINK 20
+<a href=#2503 id=2503 data-nosnippet>2503</a>//LT21  0xd5    0x354   [3:0]   rw  0x0     Integer clock delay of LT LINK 21
+<a href=#2504 id=2504 data-nosnippet>2504</a>//LT22  0xd6    0x358   [3:0]   rw  0x0     Integer clock delay of LT LINK 22
+<a href=#2505 id=2505 data-nosnippet>2505</a>//LT23  0xd7    0x35c   [3:0]   rw  0x0     Integer clock delay of LT LINK 23
+<a href=#2506 id=2506 data-nosnippet>2506</a>//LT24  0xd8    0x360   [3:0]   rw  0x0     Integer clock delay of LT LINK 24
+<a href=#2507 id=2507 data-nosnippet>2507</a>//LT25  0xd9    0x364   [3:0]   rw  0x0     Integer clock delay of LT LINK 25
+<a href=#2508 id=2508 data-nosnippet>2508</a>//LT26  0xda    0x368   [3:0]   rw  0x0     Integer clock delay of LT LINK 26
+<a href=#2509 id=2509 data-nosnippet>2509</a>//LT27  0xdb    0x36c   [3:0]   rw  0x0     Integer clock delay of LT LINK 27
+<a href=#2510 id=2510 data-nosnippet>2510</a>//LT28  0xdc    0x370   [3:0]   rw  0x0     Integer clock delay of LT LINK 28
+<a href=#2511 id=2511 data-nosnippet>2511</a>//LT29  0xdd    0x374   [3:0]   rw  0x0     Integer clock delay of LT LINK 29
+<a href=#2512 id=2512 data-nosnippet>2512</a>//LT30  0xde    0x378   [3:0]   rw  0x0     Integer clock delay of LT LINK 30
+<a href=#2513 id=2513 data-nosnippet>2513</a>//LT31  0xdf    0x37c   [3:0]   rw  0x0     Integer clock delay of LT LINK 31
+<a href=#2514 id=2514 data-nosnippet>2514</a>//LT32  0xe0    0x380   [3:0]   rw  0x0     Integer clock delay of LT LINK 32
+<a href=#2515 id=2515 data-nosnippet>2515</a>//LT33  0xe1    0x384   [3:0]   rw  0x0     Integer clock delay of LT LINK 33
+<a href=#2516 id=2516 data-nosnippet>2516</a>//LT34  0xe2    0x388   [3:0]   rw  0x0     Integer clock delay of LT LINK 34
+<a href=#2517 id=2517 data-nosnippet>2517</a>//LT35  0xe3    0x38c   [3:0]   rw  0x0     Integer clock delay of LT LINK 35
+<a href=#2518 id=2518 data-nosnippet>2518</a>//LT36  0xe4    0x390   [3:0]   rw  0x0     Integer clock delay of LT LINK 36
+<a href=#2519 id=2519 data-nosnippet>2519</a>//LT37  0xe5    0x394   [3:0]   rw  0x0     Integer clock delay of LT LINK 37
+<a href=#2520 id=2520 data-nosnippet>2520</a>//LT38  0xe6    0x398   [3:0]   rw  0x0     Integer clock delay of LT LINK 38
+<a href=#2521 id=2521 data-nosnippet>2521</a>//LT39  0xe7    0x39c   [3:0]   rw  0x0     Integer clock delay of LT LINK 39
+<a href=#2522 id=2522 data-nosnippet>2522</a>//LT40  0xe8    0x3a0   [3:0]   rw  0x0     Integer clock delay of LT LINK 40
+<a href=#2523 id=2523 data-nosnippet>2523</a>//LT41  0xe9    0x3a4   [3:0]   rw  0x0     Integer clock delay of LT LINK 41
+<a href=#2524 id=2524 data-nosnippet>2524</a>//LT42  0xea    0x3a8   [3:0]   rw  0x0     Integer clock delay of LT LINK 42
+<a href=#2525 id=2525 data-nosnippet>2525</a>//LT43  0xeb    0x3ac   [3:0]   rw  0x0     Integer clock delay of LT LINK 43
+<a href=#2526 id=2526 data-nosnippet>2526</a>//LT44  0xec    0x3b0   [3:0]   rw  0x0     Integer clock delay of LT LINK 44
+<a href=#2527 id=2527 data-nosnippet>2527</a>//LT45  0xed    0x3b4   [3:0]   rw  0x0     Integer clock delay of LT LINK 45
+<a href=#2528 id=2528 data-nosnippet>2528</a>//LT46  0xee    0x3b8   [3:0]   rw  0x0     Integer clock delay of LT LINK 46
+<a href=#2529 id=2529 data-nosnippet>2529</a>//LT47  0xef    0x3bc   [3:0]   rw  0x0     Integer clock delay of LT LINK 47
+<a href=#2530 id=2530 data-nosnippet>2530</a>//LT48  0xf0    0x3c0   [3:0]   rw  0x0     Integer clock delay of LT LINK 48
+<a href=#2531 id=2531 data-nosnippet>2531</a>//LT49  0xf1    0x3c4   [3:0]   rw  0x0     Integer clock delay of LT LINK 49
+<a href=#2532 id=2532 data-nosnippet>2532</a>//
+<a href=#2533 id=2533 data-nosnippet>2533</a>//MT.RB_READOUT_CNTS
+<a href=#2534 id=2534 data-nosnippet>2534</a>//
+<a href=#2535 id=2535 data-nosnippet>2535</a>//Counters
+<a href=#2536 id=2536 data-nosnippet>2536</a>//Node  Adr     Adr8    Bits    Perm    Def     Description
+<a href=#2537 id=2537 data-nosnippet>2537</a>//CNTS_0    0xf2    0x3c8   [7:0]   r       Readout count on RB=0
+<a href=#2538 id=2538 data-nosnippet>2538</a>//CNTS_1    0xf2    0x3c8   [15:8]  r       Readout count on RB=1
+<a href=#2539 id=2539 data-nosnippet>2539</a>//CNTS_2    0xf2    0x3c8   [23:16]     r       Readout count on RB=2
+<a href=#2540 id=2540 data-nosnippet>2540</a>//CNTS_3    0xf2    0x3c8   [31:24]     r       Readout count on RB=3
+<a href=#2541 id=2541 data-nosnippet>2541</a>//CNTS_4    0xf3    0x3cc   [7:0]   r       Readout count on RB=4
+<a href=#2542 id=2542 data-nosnippet>2542</a>//CNTS_5    0xf3    0x3cc   [15:8]  r       Readout count on RB=5
+<a href=#2543 id=2543 data-nosnippet>2543</a>//CNTS_6    0xf3    0x3cc   [23:16]     r       Readout count on RB=6
+<a href=#2544 id=2544 data-nosnippet>2544</a>//CNTS_7    0xf3    0x3cc   [31:24]     r       Readout count on RB=7
+<a href=#2545 id=2545 data-nosnippet>2545</a>//CNTS_8    0xf4    0x3d0   [7:0]   r       Readout count on RB=8
+<a href=#2546 id=2546 data-nosnippet>2546</a>//CNTS_9    0xf4    0x3d0   [15:8]  r       Readout count on RB=9
+<a href=#2547 id=2547 data-nosnippet>2547</a>//CNTS_10   0xf4    0x3d0   [23:16]     r       Readout count on RB=10
+<a href=#2548 id=2548 data-nosnippet>2548</a>//CNTS_11   0xf4    0x3d0   [31:24]     r       Readout count on RB=11
+<a href=#2549 id=2549 data-nosnippet>2549</a>//CNTS_12   0xf5    0x3d4   [7:0]   r       Readout count on RB=12
+<a href=#2550 id=2550 data-nosnippet>2550</a>//CNTS_13   0xf5    0x3d4   [15:8]  r       Readout count on RB=13
+<a href=#2551 id=2551 data-nosnippet>2551</a>//CNTS_14   0xf5    0x3d4   [23:16]     r       Readout count on RB=14
+<a href=#2552 id=2552 data-nosnippet>2552</a>//CNTS_15   0xf5    0x3d4   [31:24]     r       Readout count on RB=15
+<a href=#2553 id=2553 data-nosnippet>2553</a>//CNTS_16   0xf6    0x3d8   [7:0]   r       Readout count on RB=16
+<a href=#2554 id=2554 data-nosnippet>2554</a>//CNTS_17   0xf6    0x3d8   [15:8]  r       Readout count on RB=17
+<a href=#2555 id=2555 data-nosnippet>2555</a>//CNTS_18   0xf6    0x3d8   [23:16]     r       Readout count on RB=18
+<a href=#2556 id=2556 data-nosnippet>2556</a>//CNTS_19   0xf6    0x3d8   [31:24]     r       Readout count on RB=19
+<a href=#2557 id=2557 data-nosnippet>2557</a>//CNTS_20   0xf7    0x3dc   [7:0]   r       Readout count on RB=20
+<a href=#2558 id=2558 data-nosnippet>2558</a>//CNTS_21   0xf7    0x3dc   [15:8]  r       Readout count on RB=21
+<a href=#2559 id=2559 data-nosnippet>2559</a>//CNTS_22   0xf7    0x3dc   [23:16]     r       Readout count on RB=22
+<a href=#2560 id=2560 data-nosnippet>2560</a>//CNTS_23   0xf7    0x3dc   [31:24]     r       Readout count on RB=23
+<a href=#2561 id=2561 data-nosnippet>2561</a>//CNTS_24   0xf8    0x3e0   [7:0]   r       Readout count on RB=24
+<a href=#2562 id=2562 data-nosnippet>2562</a>//CNTS_25   0xf8    0x3e0   [15:8]  r       Readout count on RB=25
+<a href=#2563 id=2563 data-nosnippet>2563</a>//CNTS_26   0xf8    0x3e0   [23:16]     r       Readout count on RB=26
+<a href=#2564 id=2564 data-nosnippet>2564</a>//CNTS_27   0xf8    0x3e0   [31:24]     r       Readout count on RB=27
+<a href=#2565 id=2565 data-nosnippet>2565</a>//CNTS_28   0xf9    0x3e4   [7:0]   r       Readout count on RB=28
+<a href=#2566 id=2566 data-nosnippet>2566</a>//CNTS_29   0xf9    0x3e4   [15:8]  r       Readout count on RB=29
+<a href=#2567 id=2567 data-nosnippet>2567</a>//CNTS_30   0xf9    0x3e4   [23:16]     r       Readout count on RB=30
+<a href=#2568 id=2568 data-nosnippet>2568</a>//CNTS_31   0xf9    0x3e4   [31:24]     r       Readout count on RB=31
+<a href=#2569 id=2569 data-nosnippet>2569</a>//CNTS_32   0xfa    0x3e8   [7:0]   r       Readout count on RB=32
+<a href=#2570 id=2570 data-nosnippet>2570</a>//CNTS_33   0xfa    0x3e8   [15:8]  r       Readout count on RB=33
+<a href=#2571 id=2571 data-nosnippet>2571</a>//CNTS_34   0xfa    0x3e8   [23:16]     r       Readout count on RB=34
+<a href=#2572 id=2572 data-nosnippet>2572</a>//CNTS_35   0xfa    0x3e8   [31:24]     r       Readout count on RB=35
+<a href=#2573 id=2573 data-nosnippet>2573</a>//CNTS_36   0xfb    0x3ec   [7:0]   r       Readout count on RB=36
+<a href=#2574 id=2574 data-nosnippet>2574</a>//CNTS_37   0xfb    0x3ec   [15:8]  r       Readout count on RB=37
+<a href=#2575 id=2575 data-nosnippet>2575</a>//CNTS_38   0xfb    0x3ec   [23:16]     r       Readout count on RB=38
+<a href=#2576 id=2576 data-nosnippet>2576</a>//CNTS_39   0xfb    0x3ec   [31:24]     r       Readout count on RB=39
+<a href=#2577 id=2577 data-nosnippet>2577</a>//CNTS_40   0xfc    0x3f0   [7:0]   r       Readout count on RB=40
+<a href=#2578 id=2578 data-nosnippet>2578</a>//CNTS_41   0xfc    0x3f0   [15:8]  r       Readout count on RB=41
+<a href=#2579 id=2579 data-nosnippet>2579</a>//CNTS_42   0xfc    0x3f0   [23:16]     r       Readout count on RB=42
+<a href=#2580 id=2580 data-nosnippet>2580</a>//CNTS_43   0xfc    0x3f0   [31:24]     r       Readout count on RB=43
+<a href=#2581 id=2581 data-nosnippet>2581</a>//CNTS_44   0xfd    0x3f4   [7:0]   r       Readout count on RB=44
+<a href=#2582 id=2582 data-nosnippet>2582</a>//CNTS_45   0xfd    0x3f4   [15:8]  r       Readout count on RB=45
+<a href=#2583 id=2583 data-nosnippet>2583</a>//CNTS_46   0xfd    0x3f4   [23:16]     r       Readout count on RB=46
+<a href=#2584 id=2584 data-nosnippet>2584</a>//CNTS_47   0xfd    0x3f4   [31:24]     r       Readout count on RB=47
+<a href=#2585 id=2585 data-nosnippet>2585</a>//CNTS_48   0xfe    0x3f8   [7:0]   r       Readout count on RB=48
+<a href=#2586 id=2586 data-nosnippet>2586</a>//CNTS_49   0xfe    0x3f8   [15:8]  r       Readout count on RB=49
+<a href=#2587 id=2587 data-nosnippet>2587</a>//RESET     0xff    0x3fc   0   w   Pulse   Write 1 to reset hit counters.
+<a href=#2588 id=2588 data-nosnippet>2588</a>//SNAP  0x100   0x400   0   rw  0x1     1 to snap the hit counters.
+<a href=#2589 id=2589 data-nosnippet>2589</a>//
+<a href=#2590 id=2590 data-nosnippet>2590</a>//MT.PULSER
+<a href=#2591 id=2591 data-nosnippet>2591</a>//
+<a href=#2592 id=2592 data-nosnippet>2592</a>//LTB Channel Pulser
+<a href=#2593 id=2593 data-nosnippet>2593</a>//Node  Adr     Adr8    Bits    Perm    Def     Description
+<a href=#2594 id=2594 data-nosnippet>2594</a>//FIRE  0x100   0x400   0   w   Pulse   Write 1 to Fire the Pulser.
+<a href=#2595 id=2595 data-nosnippet>2595</a>//CH_0_24   0x101   0x404   [24:0]  rw  0x0     Set fire bits for channels 0 to 24
+<a href=#2596 id=2596 data-nosnippet>2596</a>//CH_25_49  0x102   0x408   [24:0]  rw  0x0     Set fire bits for channels 25 to 49
+<a href=#2597 id=2597 data-nosnippet>2597</a>//CH_50_74  0x103   0x40c   [24:0]  rw  0x0     Set fire bits for channels 50 to 74
+<a href=#2598 id=2598 data-nosnippet>2598</a>//CH_75_99  0x104   0x410   [24:0]  rw  0x0     Set fire bits for channels 75 to 99
+<a href=#2599 id=2599 data-nosnippet>2599</a>//CH_100_124    0x105   0x414   [24:0]  rw  0x0     Set fire bits for channels 100 to 124
+<a href=#2600 id=2600 data-nosnippet>2600</a>//CH_125_149    0x106   0x418   [24:0]  rw  0x0     Set fire bits for channels 125 to 149
+<a href=#2601 id=2601 data-nosnippet>2601</a>//CH_150_174    0x107   0x41c   [24:0]  rw  0x0     Set fire bits for channels 150 to 174
+<a href=#2602 id=2602 data-nosnippet>2602</a>//CH_175_199    0x108   0x420   [24:0]  rw  0x0     Set fire bits for channels 175 to 199
+<a href=#2603 id=2603 data-nosnippet>2603</a>//
+<a href=#2604 id=2604 data-nosnippet>2604</a>//MT.XADC
+<a href=#2605 id=2605 data-nosnippet>2605</a>//
+<a href=#2606 id=2606 data-nosnippet>2606</a>//Zynq XADC
+<a href=#2607 id=2607 data-nosnippet>2607</a>//Node  Adr     Adr8    Bits    Perm    Def     Description
+<a href=#2608 id=2608 data-nosnippet>2608</a>//CALIBRATION   0x120   0x480   [11:0]  r       XADC Calibration
+<a href=#2609 id=2609 data-nosnippet>2609</a>//VCCPINT   0x120   0x480   [27:16]     r       XADC vccpint
+<a href=#2610 id=2610 data-nosnippet>2610</a>//VCCPAUX   0x121   0x484   [11:0]  r       XADC Calibration
+<a href=#2611 id=2611 data-nosnippet>2611</a>//VCCODDR   0x121   0x484   [27:16]     r       XADC vccoddr
+<a href=#2612 id=2612 data-nosnippet>2612</a>//TEMP  0x122   0x488   [11:0]  r       XADC Temperature
+<a href=#2613 id=2613 data-nosnippet>2613</a>//VCCINT    0x122   0x488   [27:16]     r       XADC vccint
+<a href=#2614 id=2614 data-nosnippet>2614</a>//VCCAUX    0x123   0x48c   [11:0]  r       XADC VCCAUX
+<a href=#2615 id=2615 data-nosnippet>2615</a>//VCCBRAM   0x123   0x48c   [27:16]     r       XADC vccbram
+<a href=#2616 id=2616 data-nosnippet>2616</a>//
+<a href=#2617 id=2617 data-nosnippet>2617</a>//MT.HOG
+<a href=#2618 id=2618 data-nosnippet>2618</a>//
+<a href=#2619 id=2619 data-nosnippet>2619</a>//HOG Parameters
+<a href=#2620 id=2620 data-nosnippet>2620</a>//Node  Adr     Adr8    Bits    Perm    Def     Description
+<a href=#2621 id=2621 data-nosnippet>2621</a>//GLOBAL_DATE   0x200   0x800   [31:0]  r       HOG Global Date
+<a href=#2622 id=2622 data-nosnippet>2622</a>//GLOBAL_TIME   0x201   0x804   [31:0]  r       HOG Global Time
+<a href=#2623 id=2623 data-nosnippet>2623</a>//GLOBAL_VER    0x202   0x808   [31:0]  r       HOG Global Version
+<a href=#2624 id=2624 data-nosnippet>2624</a>//GLOBAL_SHA    0x203   0x80c   [31:0]  r       HOG Global SHA
+<a href=#2625 id=2625 data-nosnippet>2625</a>//TOP_SHA   0x204   0x810   [31:0]  r       HOG Top SHA
+<a href=#2626 id=2626 data-nosnippet>2626</a>//TOP_VER   0x205   0x814   [31:0]  r       HOG Top Version
+<a href=#2627 id=2627 data-nosnippet>2627</a>//HOG_SHA   0x206   0x818   [31:0]  r       HOG SHA
+<a href=#2628 id=2628 data-nosnippet>2628</a>//HOG_VER   0x207   0x81c   [31:0]  r       HOG Version
+<a href=#2629 id=2629 data-nosnippet>2629</a>//Module SPI adr = 0x1000
+<a href=#2630 id=2630 data-nosnippet>2630</a>//
+<a href=#2631 id=2631 data-nosnippet>2631</a>//SPI
+<a href=#2632 id=2632 data-nosnippet>2632</a>//Node  Adr     Adr8    Bits    Perm    Def     Description
+<a href=#2633 id=2633 data-nosnippet>2633</a>//d0    0x1000  0x4000  [31:0]  rw  ~~  Data reg 0
+<a href=#2634 id=2634 data-nosnippet>2634</a>//d1    0x1001  0x4004  [31:0]  rw  ~~  Data reg 1
+<a href=#2635 id=2635 data-nosnippet>2635</a>//d2    0x1002  0x4008  [31:0]  rw  ~~  Data reg 2
+<a href=#2636 id=2636 data-nosnippet>2636</a>//d3    0x1003  0x400c  [31:0]  rw  ~~  Data reg 3
+<a href=#2637 id=2637 data-nosnippet>2637</a>//ctrl  0x1004  0x4010  [31:0]  rw  ~~  Control reg
+<a href=#2638 id=2638 data-nosnippet>2638</a>//divider   0x1005  0x4014  [31:0]  rw  ~~  Clock divider reg
+<a href=#2639 id=2639 data-nosnippet>2639</a>//ss    0x1006  0x4018  [31:0]  rw  ~~  Slave select reg
+<a href=#2640 id=2640 data-nosnippet>2640</a>//Module I2C adr = 0x1100
+<a href=#2641 id=2641 data-nosnippet>2641</a>//
+<a href=#2642 id=2642 data-nosnippet>2642</a>//I2C master controller
+<a href=#2643 id=2643 data-nosnippet>2643</a>//
+<a href=#2644 id=2644 data-nosnippet>2644</a>//I2C
+<a href=#2645 id=2645 data-nosnippet>2645</a>//
+<a href=#2646 id=2646 data-nosnippet>2646</a>//I2C master controller
+<a href=#2647 id=2647 data-nosnippet>2647</a>//Node  Adr     Adr8    Bits    Perm    Def     Description
+<a href=#2648 id=2648 data-nosnippet>2648</a>//ps_lo     0x1100  0x4400  [7:0]   rw  ~~  Prescale low byte
+<a href=#2649 id=2649 data-nosnippet>2649</a>//ps_hi     0x1101  0x4404  [7:0]   rw  ~~  Prescale low byte
+<a href=#2650 id=2650 data-nosnippet>2650</a>//ctrl  0x1102  0x4408  [7:0]   rw  ~~  Control
+<a href=#2651 id=2651 data-nosnippet>2651</a>//data  0x1103  0x440c  [7:0]   rw  ~~  Data
+<a href=#2652 id=2652 data-nosnippet>2652</a>//cmd_stat  0x1104  0x4410  [7:0]   rw  ~~  Command / status
+<a href=#2653 id=2653 data-nosnippet>2653</a>
+<a href=#2654 id=2654 data-nosnippet>2654</a>
+<a href=#2655 id=2655 data-nosnippet>2655</a></span></code></pre></div></section></main></body></html>
