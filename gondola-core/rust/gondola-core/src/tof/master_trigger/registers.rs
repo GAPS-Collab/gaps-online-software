@@ -2365,7 +2365,14 @@ pub const ETH_RX_BAD_FCS_CNT  : MTBRegister<'static> = MTBRegister {
   pulse : false,
 };
 
-
+pub const RESYNC  : MTBRegister<'static> = MTBRegister {
+  addr  : 0xa,
+  mask  : 0x00000001,
+  descr : "Write 1 to RESYNC RB clocks",
+  rmw   : false, 
+  ro    : false, 
+  pulse : true,
+};
 // All the trigger settings
 
 // .... WIP!!! So many are not implemented yet....
