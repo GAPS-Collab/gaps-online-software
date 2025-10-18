@@ -11,17 +11,45 @@ RBPaddleID.__module__ = __name__
 RBPaddleID.__name__   = "RBPaddleID"
 #RBPaddleID.__doc__    = _gc.tof.RBPaddleID.__doc__
 TofDetectorStatus   = _gc.tof.TofDetectorStatus
+TofDetectorStatus.__module__ = __name__ 
+TofDetectorStatus.__name__   = 'TofDetectorStatus' 
+
+# enums 
 TofCommandCode      = _gc.tof.TofCommandCode
-TofCommand          = _gc.tof.TofCommand
-TofOperationMode    = _gc.tof.TofOperationMode
 BuildStrategy       = _gc.tof.BuildStrategy
+TofOperationMode    = _gc.tof.TofOperationMode
+
+TofCommand          = _gc.tof.TofCommand
+TofCommand.__module__ = __name__ 
+TofCommand.__name__   = "TofCommand" 
+
 PreampBiasConfig    = _gc.tof.PreampBiasConfig
+PreampBiasConfig.__module__ = __name__ 
+PreampBiasConfig.__name__ = "PreampBiasConfig"
+
 RBChannelMaskConfig = _gc.tof.RBChannelMaskConfig
+RBChannelMaskConfig.__module__ = __name__ 
+RBChannelMaskConfig.__name__   = "RBChannelMaskConfig"
+
 TriggerConfig       = _gc.tof.TriggerConfig
+TriggerConfig.__module__ = __name__ 
+TriggerConfig.__name__   = "TriggerConfig" 
+
 TofRunConfig        = _gc.tof.TofRunConfig
+TofRunConfig.__module__ = __name__ 
+TofRunConfig.__name__   = "TofRunConfig" 
+
+
 TofCuts             = _gc.tof.TofCuts
+TofCuts.__module__  = __name__ 
+TofCuts.__name__    = 'TofCuts' 
+
 to_board_id_string  = _gc.tof.to_board_id_string
 TofAnalysis         = analysis.TofAnalysis
+
+MasterTrigger       = _gc.tof.MasterTrigger 
+MasterTrigger.__module__ = __name__
+MasterTrigger.__name__   = 'MasterTrigger'
 
 ## command factories
 #start_run            = _gc.tof.start_run 
