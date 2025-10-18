@@ -774,6 +774,10 @@ pub fn master_trigger(mt_address     : &str,
         }
         last_event_id = _ev.event_id;
         heartbeat.n_events += 1;
+
+        heartbeat.trigger_type = TriggerType::from((_ev.mt_trigger_sources & 0x00FF) as u8);
+        heartbeat.combo_trig_type = TriggerType::from(((_ev.mt_trigger_sources & 0xFF00) >> 8) as u8);
+
         if !veri_active {
           match mt_sender.send(_ev) {
             Err(err) => {
