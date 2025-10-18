@@ -820,9 +820,9 @@ pub fn master_trigger(mt_address     : &str,
         }
       }
 
-       match RB_LOST_RATE.get(&mut bus) {
+       match RB_LOST_TRIGGER_RATE.get(&mut bus) {
            Err(err) => {
-               error!("Unable to query {}! {err}", RB_LOST_RATE);
+               error!("Unable to query {}! {err}", RB_LOST_TRIGGER_RATE);
            }
            Ok(rb_lost_rate) => {
                heartbeat.rb_lost_rate = rb_lost_rate as u64;
@@ -837,18 +837,18 @@ pub fn master_trigger(mt_address     : &str,
                heartbeat.clock_rate = clock_rate as u64;
            }
        }
-      match MIN_DEAD_TIME_MODE.get(&mut bus) {
+      match MIN_DEADTIME_MODE.get(&mut bus) {
           Err(err) => {
-              error!("Unable to query {}! {err}", MIN_DEAD_TIME_MODE);
+              error!("Unable to query {}! {err}", MIN_DEADTIME_MODE);
           }
           Ok(tiu_ignore_deadtime) => {
-              heartbeat.tiu_ignore_deadtime = tiu_ignore_deadtime as bool;
+              heartbeat.tiu_ignore_deadtime = tiu_ignore_deadtime != 0;
           }
       }
 
-      match TIU_TIMEOUT_CNT.get(&mut bus) {
+      match TIU_TIMEOUT_CONST.get(&mut bus) {
           Err(err) => {
-              error!("Unable to query {}! {err}", TIU_TIMEOUT_CNT);
+              error!("Unable to query {}! {err}", TIU_TIMEOUT_CONST);
           }
           Ok(tiu_timeout_cnt) => {
               heartbeat.tiu_timeout_cnt = tiu_timeout_cnt as u64;
@@ -921,8 +921,9 @@ pub fn master_trigger(mt_address     : &str,
               error!("Unable to query {} {err}!", PRESCALE_BYPASS);
           }
           Ok(prescale_bypass) => {
-              heartbeat.prescale_bypass = prescale_bypass as bool;
+              heartbeat.prescale_bypass = prescale_bypass != 0;
           }
+      }
 
       match TRACK_TRIG_PRESCALE.get(&mut bus) {
         Ok(ps) => {
