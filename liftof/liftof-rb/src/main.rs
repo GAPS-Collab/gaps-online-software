@@ -74,6 +74,7 @@ use liftof_rb::threads::{
 
 use liftof_rb::api::*;
 use liftof_rb::control::*;
+use tof_control::rb_control::rb_mode::select_sma_mode;
 
 #[derive(Debug, Clone, Parser, PartialEq)]
 pub enum CommandLineCommand {
@@ -542,6 +543,13 @@ fn main() {
     thread::sleep(2*one_sec);
     println!("=> Terminated. So long and thanks for all the \u{1F41F}");
     exit(0);
+  } else {
+    // this should not be necessary, but might catch 
+    // a stuck calibration from a previous attempt
+    match select_sma_mode() {
+      Err(err) => error!("Unable to select SMA mode! {err:?}"),
+      Ok(_)    => ()
+    } 
   }
   
   //***************************************/
