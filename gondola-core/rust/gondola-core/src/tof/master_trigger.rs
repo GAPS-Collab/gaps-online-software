@@ -613,7 +613,12 @@ pub fn master_trigger(mt_address     : &str,
     Err(err) => error!("Can not reset DAQ! {err}"),
     Ok(_)    => ()
   }
-  
+ 
+  match RESYNC.pulse_it(&mut bus) {
+    Err(err) => error!("Unable to resycn MTB and RB clocks! {err}"),
+    Ok(_)    => println!("=> RB and MTB clocks synchronized!")
+  }
+
   match EVENT_CNT_RESET.set(&mut bus, 1) {
     Err(err) => error!("Unable to reset event counter! {err}"),
     Ok(_)    => println!("=> Event counter reset!")

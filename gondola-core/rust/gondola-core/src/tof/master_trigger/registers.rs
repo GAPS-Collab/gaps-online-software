@@ -94,6 +94,15 @@ impl MTBRegister<'_> {
     Ok(rv)
   }
 
+  /// Pulse the specific register, 
+  ///
+  /// This is really no different from writing a 1 in it.
+  /// Pulsing means that the value in the register is non 
+  /// persistent 
+  pub fn pulse_it(&self, bus : &mut IPBus) 
+    -> Result<(), Box<dyn Error>> {
+    self.write(bus, 0x1)
+  }
 
   // FIXME - basically whenever we have a amsk 
   // != u32::MAX we need rmw
@@ -2345,6 +2354,7 @@ pub const TRIG_GEN_RATE : MTBRegister<'static> = MTBRegister {
   ro    : false,
   pulse : false,
 };
+
 ///ETH_RX_BAD_FRAME_CNT     0x3d    0xf4    \[15:0\]    Ethernet MAC bad frame error
 pub const ETH_RX_BAD_FRAME_CNT  : MTBRegister<'static> = MTBRegister {
   addr  : 0x3d,
@@ -2365,6 +2375,9 @@ pub const ETH_RX_BAD_FCS_CNT  : MTBRegister<'static> = MTBRegister {
   pulse : false,
 };
 
+/// RESYNC    0xa     0x28    0   w   Pulse   Write 1 to resync
+/// This will synchronize the RB and MTB clocks and should be issued 
+/// at run start.
 pub const RESYNC  : MTBRegister<'static> = MTBRegister {
   addr  : 0xa,
   mask  : 0x00000001,
