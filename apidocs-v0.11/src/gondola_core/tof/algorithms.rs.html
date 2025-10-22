@@ -54,11 +54,11 @@
 <a href=#54 id=54 data-nosnippet>54</a>    <span class="kw">if </span>voltages[k] &gt; threshold {
 <a href=#55 id=55 data-nosnippet>55</a>      tot += times[k] - times[k-<span class="number">1</span>];
 <a href=#56 id=56 data-nosnippet>56</a>      <span class="kw">if </span>k &gt; <span class="number">1 </span>&amp;&amp; k &lt; voltages.len() - <span class="number">2 </span>{
-<a href=#57 id=57 data-nosnippet>57</a>        <span class="kw">if </span>(vlt_0 &lt; <span class="number">0.0</span>) {
+<a href=#57 id=57 data-nosnippet>57</a>        <span class="kw">if </span>vlt_0 &lt; <span class="number">0.0 </span>{
 <a href=#58 id=58 data-nosnippet>58</a>          vlt_0 = voltages[k - <span class="number">2</span>]; 
 <a href=#59 id=59 data-nosnippet>59</a>          t_0   = times[k - <span class="number">2</span>];
 <a href=#60 id=60 data-nosnippet>60</a>        }
-<a href=#61 id=61 data-nosnippet>61</a>        <span class="kw">if </span>(vlt_1 &lt; <span class="number">0.0</span>) {
+<a href=#61 id=61 data-nosnippet>61</a>        <span class="kw">if </span>vlt_1 &lt; <span class="number">0.0 </span>{
 <a href=#62 id=62 data-nosnippet>62</a>          vlt_1 = voltages[k + <span class="number">2</span>]; 
 <a href=#63 id=63 data-nosnippet>63</a>          t_1   = times[k + <span class="number">2</span>];
 <a href=#64 id=64 data-nosnippet>64</a>        }
