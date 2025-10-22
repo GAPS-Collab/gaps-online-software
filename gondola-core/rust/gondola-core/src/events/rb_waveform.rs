@@ -3,6 +3,8 @@
 
 use crate::prelude::*;
 
+use std::mem;
+
 /// Waveform container for Tof waveforms
 /// This holds the waveforms for both 
 /// paddle ends. Fields are available to 
@@ -220,14 +222,16 @@ impl TofPackable for RBWaveform {
 impl Serialization for RBWaveform {
   const HEAD               : u16    = 43690; //0xAAAA
   const TAIL               : u16    = 21845; //0x5555
-  
+  const SIZE               : usize  = 13 + (4*NWORDS);
+
   fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
     -> Result<Self, SerializationError> {
+    Self::verify_fixed(stream, pos)?;
     let mut wf           = RBWaveform::new();
-    if parse_u16(stream, pos) != Self::HEAD {
-      error!("The given position {} does not point to a valid header signature of {}", pos, Self::HEAD);
-      return Err(SerializationError::HeadInvalid {});
-    }
+    //if parse_u16(stream, pos) != Self::HEAD {
+    //  error!("The given position {} does not point to a valid header signature of {}", pos, Self::HEAD);
+    //  return Err(SerializationError::HeadInvalid {});
+    //}
     wf.event_id          = parse_u32(stream, pos);
     wf.rb_id             = parse_u8(stream, pos);
     wf.rb_channel_a      = parse_u8(stream, pos);
@@ -238,6 +242,8 @@ impl Serialization for RBWaveform {
       return Err(SerializationError::StreamTooShort);
     }
     let data_a           = &stream[*pos..*pos+2*NWORDS];
+    //println!("{} data_a stack size", mem::sizeof(data_a));
+
     wf.adc_a             = u8_to_u16(data_a);
     *pos += 2*NWORDS;
     if stream.len() < *pos+2*NWORDS {
@@ -250,6 +256,7 @@ impl Serialization for RBWaveform {
       error!("The given position {} does not point to a tail signature of {}", pos, Self::TAIL);
       return Err(SerializationError::TailInvalid);
     }
+    *pos +=2;
     Ok(wf)
   }
 
@@ -467,11 +474,11 @@ impl FromRandom for RBWaveform {
     let mut wf      = Self::new();
     let mut rng     = rand::rng();
     wf.event_id     = rng.random::<u32>();
-    wf.rb_id        = rng.random::<u8>();
-    wf.rb_channel_a = rng.random::<u8>();
-    wf.rb_channel_b = rng.random::<u8>();
-    wf.stop_cell    = rng.random::<u16>();
-    wf.paddle_id    = rng.random::<u8>();
+    wf.rb_id        = rng.random_range(1..50);
+    wf.rb_channel_a = rng.random_range(1..9);
+    wf.rb_channel_b = rng.random_range(1..9);
+    wf.stop_cell    = rng.random_range(0..1024);
+    //wf.paddle_id    = rng.random::<u8>();
     let random_numbers_a: Vec<u16> = (0..NWORDS).map(|_| rng.random()).collect();
     wf.adc_a        = random_numbers_a;
     let random_numbers_b: Vec<u16> = (0..NWORDS).map(|_| rng.random()).collect();
