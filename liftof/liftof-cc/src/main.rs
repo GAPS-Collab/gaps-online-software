@@ -349,7 +349,8 @@ fn main() {
   
   // send tofpackets to data sink
   let (tp_to_sink, tp_from_threads)   = init_channels::<TofPacket>();
- 
+  let (te_to_sink, te_from_builder)   = init_channels::<TofEvent>();
+
   let thread_control_sh = Arc::clone(&thread_control);
   let _sig_handle = thread::Builder::new()
     .name("signal_handler".into())
@@ -583,6 +584,7 @@ fn main() {
     .name("data-sink".into())
     .spawn(move || {
       global_data_sink(&tp_from_threads,
+                       &te_from_builder,
                        thread_control_gds);
     })
     .expect("Failed to spawn data-sink thread!");
@@ -634,6 +636,7 @@ fn main() {
                     event_builder(&master_ev_rec,
                                   &ev_from_rb,
                                   &tp_to_sink_c,
+                                  &te_to_sink,
                                   mtb_link_id_map,
                                   thread_control_eb);
      })

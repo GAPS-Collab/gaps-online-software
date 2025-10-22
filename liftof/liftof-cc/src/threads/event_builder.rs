@@ -52,6 +52,7 @@ use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
 pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
                       ev_from_rb     : &Receiver<RBEvent>,
                       data_sink      : &Sender<TofPacket>,
+                      data_sink_ev   : &Sender<TofEvent>,
                       mtb_link_map   : HashMap<u8,u8>,
                       thread_control : Arc<Mutex<ThreadControl>>) { 
   // deleteme
@@ -166,7 +167,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
         }   
         Ok(mut event) => {
           debug!("Received MasterTriggerEvent {}!", event);
-          //let mut event       = TofEvent::from(mt);
           event.run_id = run_id as u16; // FIXME - might be too big
           if last_evid != 0 {
             if event.event_id != last_evid + 1 {
@@ -393,6 +393,24 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
             if ev_timed_out {
               ev_to_send.status = EventStatus::EventTimeOut;
             }
+            //if send_rbwaveform {
+            //  if rbwf_ctr == send_rbwf_freq as u64 {
+            //    for wf in ev_to_send.get_waveforms() {
+            //      let mut pack = wf.pack();
+            //      pack.no_write_to_disk = true;
+            //      match data_sink.send(pack) {
+            //        Err(err) => {
+            //          error!("Packet sending failed! Err {}", err);
+            //        }
+            //        Ok(_)    => {
+            //          debug!("Event with id {} sent!", evid);
+            //        }
+            //      }
+            //    }
+            //    rbwf_ctr = 0;
+            //  }
+            //  rbwf_ctr += 1; // increase for every event, not wf
+            //}
             // update event status, so that we will also see in an 
             // (optionally) produced tof event summary if the 
             // event has isuses
@@ -403,36 +421,37 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
             // sum up lost hits due to drs4 deadtime
             heartbeat.drs_bsy_lost_hg_hits += ev_to_send.get_lost_hits() as u64;
 
-            // now we are finshed for now, and we are preparing to pass the event on  
-            ev_to_send.move_hits(); // <- moves the hits from the rbevents to the .hits vector
             //println!("GOT {} ", ev_to_send.hits.len());
-            ev_to_send.calc_gcu_variables();
             heartbeat.n_sent += 1;
             let mut no_write_to_disk = false;
             let no_send_over_nw  = false; 
             if send_tev_sum {
               //let tes  = ev_to_send.get_summary();
               // FIXME - these might be all zero!
-              if settings.only_save_interesting {
-                no_write_to_disk = true;
-                if ev_to_send.n_hits_umb   >= settings.thr_n_hits_umb 
-                && ev_to_send.n_hits_cbe   >= settings.thr_n_hits_cbe
-                && ev_to_send.n_hits_cor   >= settings.thr_n_hits_cor
-                && ev_to_send.tot_edep_umb >= settings.thr_tot_edep_umb
-                && ev_to_send.tot_edep_cbe >= settings.thr_tot_edep_cbe
-                && ev_to_send.tot_edep_cor >= settings.thr_tot_edep_cor {
-                  no_write_to_disk = false;
-                }
-              }
+              //if settings.only_save_interesting {
+              //  no_write_to_disk = true;
+              //  if ev_to_send.n_hits_umb   >= settings.thr_n_hits_umb 
+              //  && ev_to_send.n_hits_cbe   >= settings.thr_n_hits_cbe
+              //  && ev_to_send.n_hits_cor   >= settings.thr_n_hits_cor
+              //  && ev_to_send.tot_edep_umb >= settings.thr_tot_edep_umb
+              //  && ev_to_send.tot_edep_cbe >= settings.thr_tot_edep_cbe
+              //  && ev_to_send.tot_edep_cor >= settings.thr_tot_edep_cor {
+              //    no_write_to_disk = false;
+              //  }
+              //}
               //for wf in ev_to_send.get_waveforms() {
               //  println!( "FS {} ", wf);
               //}
               //for ev in &ev_to_send.rb_events {
               //   println!("{:?}", ev.hits);
               //}
-              let mut pack = ev_to_send.pack();
-              pack.no_write_to_disk = no_write_to_disk;
-              match data_sink.send(pack) {
+              // Right now we want version V3 (which should already 
+              // be set), so it saves waveforms 
+              // FIXME - this all should go to the data_publsher
+              ev_to_send.version = ProtocolVersion::V3;
+              //let mut pack = ev_to_send.pack();
+              //pack.no_write_to_disk = no_write_to_disk;
+              match data_sink_ev.send(ev_to_send) {
                 Err(err) => {
                   error!("Packet sending failed! Err {}", err);
                 }
@@ -444,23 +463,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
             }
 
             //if 
-            if send_rbwaveform {
-              if rbwf_ctr == send_rbwf_freq as u64 {
-                for wf in ev_to_send.get_waveforms() {
-                  let pack = wf.pack();
-                  match data_sink.send(pack) {
-                    Err(err) => {
-                      error!("Packet sending failed! Err {}", err);
-                    }
-                    Ok(_)    => {
-                      debug!("Event with id {} sent!", evid);
-                    }
-                  }
-                }
-                rbwf_ctr = 0;
-              }
-              rbwf_ctr += 1; // increase for every event, not wf
-            }
             
           // this happens when we are NOT ready to send -> cache it!
           } else { 

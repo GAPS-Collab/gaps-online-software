@@ -16,20 +16,12 @@ use std::sync::{
 use crossbeam_channel::Sender;
 
 use gondola_core::prelude::*;
-//use tof_dataclasses::monitoring::{
-//    CPUMoniData,
-//};
-//use tof_dataclasses::packets::TofPacket;
-//use tof_dataclasses::threading::ThreadControl;
 
 #[cfg(feature="tof-ctrl")]
 use tof_control::helper::cpu_type::{
     CPUTempDebug,
     CPUInfoDebug,
 };
-
-//use liftof_lib::thread_control::ThreadControl;
-
 
 /// Monitor the main tof computer (sysinfo)
 ///
