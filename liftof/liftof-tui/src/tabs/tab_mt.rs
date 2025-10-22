@@ -54,19 +54,6 @@ use ndhistogram::axis::{
 
 use gondola_core::prelude::*;
 
-//use tof_dataclasses::packets::{
-//  TofPacket,
-//  PacketType
-//};
-//
-//use tof_dataclasses::events::TofEvent;
-//use tof_dataclasses::monitoring::MtbMoniData;
-//use tof_dataclasses::errors::SerializationError;
-//use tof_dataclasses::database::DsiJChPidMapping;
-//use tof_dataclasses::events::master_trigger::LTBThreshold;
-//
-//use tof_dataclasses::alerts::*;
-
 use crate::colors::{
   ColorTheme,
 };
@@ -175,17 +162,6 @@ impl<'a> MTTab<'a> {
       Ok(pack)    => {
         //error!("Got next packet {}!", pack);
         match pack.packet_type {
-          TofPacketType::MasterTrigger => {
-            match pack.unpack() {
-              Ok(_ev) => {
-                mte = _ev;
-              },
-              Err(err) => {
-                error!("Unable to unpack TofEvent! {err}");
-                return Err(err);
-              }
-            }
-          },
           TofPacketType::MtbMoniData   => {
             info!("Got new MtbMoniData!");
             let moni : MtbMoniData = pack.unpack()?;

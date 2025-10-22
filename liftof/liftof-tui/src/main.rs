@@ -30,10 +30,12 @@ use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode},
 };
 
-//extern crate crossbeam_channel;
-use crossbeam_channel::{unbounded,
-                        Sender,
-                        Receiver};
+use crossbeam_channel::{
+  unbounded,
+  //bounded,
+  Sender,
+  Receiver
+};
 
 
 use ratatui::prelude::Alignment;
@@ -82,28 +84,6 @@ use liftof_tui::colors::{
 };
 
 use liftof_tui::*;// {
-//  MainLayout,
-//  EventTab,
-//  HomeTab,
-//  SettingsTab,
-//  TofHitTab,
-//  RBTab,
-//  RBTabView,
-//  MTTab,
-//  CPUTab,
-//  //RBWaveformTab,
-//  TofSummaryTab, 
-//  TelemetryTab,
-//  TelemetryTabView,
-//  AlertTab,
-//  CommandTab,
-//  PaddleTab,
-//  HeartBeatTab,
-//  HeartBeatView,
-//  //packet_sorter,
-//  packet_distributor,
-//  socket_wrap_tofstream
-//};
 
 use clap::{arg,
            command,
@@ -265,22 +245,21 @@ impl<'a> TabbedInterface<'a> {
   }
 
   pub fn receive_packet(&mut self) {
+    // trigger tab 
     match self.mt_tab.receive_packet() {
       Err(err) => error!("Can not receive TofPackets for MTTab! {err}"),
       Ok(_)    => ()
     }
+    // paddle tab 
     match self.pd_tab.receive_packet() {
       Err(err) => error!("Can not receive TofEvent for PaddleTab! {err}"),
       Ok(_)    => ()
     }
+    // readoutboard tab 
     match self.wf_tab.receive_packet() {
       Err(err) => error!("Can not receive TofPackets for WfTab! {err}"),
       Ok(_)    => ()
     }
-    //match self.event_tab.receive_packet() {
-    //  Err(err) => error!("Can not receive TofPackets for EventTab! {err}"),
-    //  Ok(_)    => ()
-    //}
     match self.cpu_tab.receive_packet() {
       Err(err) => error!("Can not receive TofPackets for CPUTab! {err}"),
       Ok(_)    => ()
@@ -289,10 +268,6 @@ impl<'a> TabbedInterface<'a> {
       Err(err) => error!("Can not receive TofPackets for TofHitTab! {err}"),
       Ok(_)    => ()
     }
-    //match self.rbwf_tab.receive_packet() {
-    //  Err(err) => error!("Can not receive RBWaveforms! {err}"),
-    //  Ok(_)    => ()
-    //}
     match self.ts_tab.receive_packet() {
       Err(err) => error!("Can not receive TofEventSummaries for TofEventSummaryTab! {err}"),
       Ok(_)    => ()
@@ -301,13 +276,8 @@ impl<'a> TabbedInterface<'a> {
       Err(err) => error!("Can not receive Heartbeats for HeartBeatTab! {err}"),
       Ok(_)    => ()
     }
-    // the same though, so maybe for now it is fine
-    match self.te_tab.receive_packet() {
-      Err(err) => error!("Can not receive a new packet from the Telemetry Stream! {err}"),
-      Ok(_)    => ()
-    }
     // check for alerts
-    self.al_tab.check_alert_state();
+   self.al_tab.check_alert_state();
   }
 
   fn update_color_theme(&mut self, cs : ColorSet) {
@@ -935,7 +905,7 @@ impl<'a> TabbedInterface<'a> {
 }
 
 fn main () -> Result<(), Box<dyn std::error::Error>>{
-  
+
   let args = Args::parse();                   
   let allow_commands = args.allow_commands;
   
@@ -1034,13 +1004,15 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let (te_pack_send,  te_pack_recv)     : (Sender<TelemetryPacket>, Receiver<TelemetryPacket>) = unbounded();
 
   // sender receiver for inter thread communication with decoded packets
-  let (mte_send, mte_recv)         : (Sender<TofEvent>, Receiver<TofEvent>) = unbounded();
-  let (rbe_send, rbe_recv)         : (Sender<RBEvent>, Receiver<RBEvent>)                       = unbounded();
-  let (th_send, th_recv)           : (Sender<TofHit>, Receiver<TofHit>)                         = unbounded();
-  let (ts_send, ts_recv)           : (Sender<TofEvent>, Receiver<TofEvent>)                     = unbounded();
+  let (mte_send, mte_recv)              : (Sender<TofEvent>, Receiver<TofEvent>)   = unbounded();
+  let (rbe_send, rbe_recv)              : (Sender<RBEvent>, Receiver<RBEvent>)     = unbounded();
+  let (th_send, th_recv)                : (Sender<TofHit>, Receiver<TofHit>)       = unbounded();
+  //let (ts_send, ts_recv)                : (Sender<TofEvent>, Receiver<TofEvent>)   = unbounded();
+  // packet_distributir  <-> event tab
+  let (ts_send, ts_recv)                : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
   // channel to send TofEventSummary from tofevent to paddle tab
-  let (ts_send_pdl, ts_recv_pdl)   : (Sender<TofEvent>, Receiver<TofEvent>)                     = unbounded();
-  //let (te_send, _te_recv)          : (Sender<TofEvent>, Receiver<TofEvent>)                     = unbounded();
+  let (ts_send_pdl, ts_recv_pdl)        : (Sender<TofEvent>, Receiver<TofEvent>)   = unbounded();
+  //let (te_send, _te_recv)             : (Sender<TofEvent>, Receiver<TofEvent>)   = unbounded();
 
   // send tof packets containing heartbeats
   let (hb_pack_send, hb_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
@@ -1072,14 +1044,6 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                               _tp_to_distrib);
       }).expect("Unable to spawn socket-wrap-tofstream thread!");
   }
-  //  let _packet_recv_thread = thread::Builder::new()
-  //    .name("packet-receiver".into())
-  //    .spawn(move || {
-  //      let telemetry_address : &str = "tcp://127.0.0.1:55555";
-  //      socket_wrap_telemetry(telemetry_address, 
-  //                            tp_to_distrib );
-  //    })
-  //  .expect("Failed to spawn mt packet receiver thread!");
 
 
   // FIXME - spawn a new thread per each tab!
@@ -1095,6 +1059,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   }
   let _packet_dist_thread = thread::Builder::new()
     .name("packet-distributor".into())
+    //.stack_size(4*1024*1024)
     .spawn(move || {
       packet_distributor(tp_from_sock,
                          mt_pack_send, 
@@ -1109,7 +1074,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                          home_stream_wd_cnt,
                          packet_map,
                          writer);
-    }).expect("Failed to spawn mt packet receiver thread!");
+    }).expect("Failed to spawn mt packet distributor thread!");
   
   // spawn the telemetry receiver thread
   let telemetry_address : &str = "tcp://127.0.0.1:55555";
@@ -1192,6 +1157,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   // The tabs
   let ts_tab          = TofSummaryTab::new(ts_recv,
                                            ts_send_pdl,
+                                           mte_send,  
+                                           rbe_send,
                                            &dsijch_paddle_map,
                                            color_theme.clone());
   let mt_tab          = MTTab::new(mt_pack_recv,
@@ -1212,7 +1179,6 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                                    color_theme.clone());
   let settings_tab    = SettingsTab::new(color_theme.clone());
   let home_tab        = HomeTab::new(color_theme.clone(), home_streamer, packet_map_home);
-  //let event_tab       = EventTab::new(ev_pack_recv, mte_send, rbe_send, th_send, te_send, color_theme);
   let hit_tab         = TofHitTab::new(th_recv,color_theme.clone());
   //let rbwf_tab        = RBWaveformTab::new(rbwf_pack_recv,
   //                                         readoutboards,
@@ -1267,12 +1233,31 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let shared_tabs_c = shared_tabs.clone();
   let _update_thread = thread::Builder::new()
     .name("tab-packet-receiver".into())
+    //.stack_size(8000000)
     .spawn(move || {
       loop {
         match shared_tabs_c.lock() {
           Err(err) => error!("Can't get lock on shared tabs! {err}"),
           Ok(mut tabs) => {
             tabs.receive_packet();
+          }
+        }
+      }
+    }).expect("Failed to spawn tab-packet-receiver thread!");
+ 
+  let shared_tabs_cc = shared_tabs.clone();
+  let _solitairy_conf_thread = thread::Builder::new()
+    .name("tab-jail".into())
+    //.stack_size(8000000)
+    .spawn(move || {
+      loop {
+        match shared_tabs_cc.lock() {
+          Err(err) => error!("Can't get lock on shared tabs! {err}"),
+          Ok(mut tabs) => {
+            match tabs.pd_tab.receive_packet() {
+              Err(err) => error!("Can not receive TofEvent for PaddleTab! {err}"),
+              Ok(_)    => ()
+            }
           }
         }
       }

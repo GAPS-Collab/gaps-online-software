@@ -34,7 +34,8 @@ use ratatui::{
   layout::{Alignment, Constraint, Direction, Layout, Rect},
   style::{
     Modifier,
-    Style
+    Style,
+    Color
   },
   text::{
     //Span,
@@ -50,6 +51,7 @@ use ratatui::{
     Paragraph,
     Row,
     Table,
+    Cell,
   },
 };
 
@@ -58,28 +60,6 @@ use crossbeam_channel::{
 };
 
 use gondola_core::prelude::*;
-//use tof_dataclasses::packets::{
-//  TofPacket,
-//  PacketType
-//};
-//
-//use tof_dataclasses::calibrations::RBCalibrations;
-//use tof_dataclasses::errors::SerializationError;
-//use tof_dataclasses::events::RBEvent;
-////use tof_dataclasses::serialization::Serialization;
-//use tof_dataclasses::monitoring::{
-//  RBMoniData,
-//  LTBMoniData,
-//  PAMoniData,
-//  RBMoniDataSeries,
-//  LTBMoniDataSeries,
-//  PAMoniDataSeries,
-//};
-//
-//use tof_dataclasses::series::MoniSeries;
-//use tof_dataclasses::io::RBEventMemoryStreamer;
-//use tof_dataclasses::database::ReadoutBoard;
-//use tof_dataclasses::alerts::*;
 
 use crate::widgets::{
   timeseries,
@@ -186,7 +166,7 @@ impl RBTab<'_>  {
       if rb_non_exist.contains(&k) {
         continue;
       }
-      global_rates.insert(k as u8, String::from("\u{203c} no data yet"));
+      global_rates.insert(k as u8, String::from("no data"));
     }
     let mut moni_old_check = HashMap::<u8, Instant>::new();
     for k in 1..51 {
@@ -1340,18 +1320,26 @@ RBTab {
         let mut rbids = Vec::from_iter(&mut self.global_rates.keys());
         rbids.sort();
         let mut ncol = 0;
-        let mut this_row = Vec::<String>::new();
+        let mut this_row = Vec::<Cell>::new();
         for k in rbids {
-          this_row.push(format!("RB {:02}", k));
+          let rb_cell = format!("RB {:02}",k);
           if self.global_rates[k] == String::from("0") {
-            this_row.push(format!("\u{203c} {} Hz", self.global_rates[k]));
+
+            this_row.push(Cell::new(rb_cell).style(Style::new().fg(Color::Red).bold()));
+            this_row.push(Cell::new(format!("\u{203c} {} Hz", self.global_rates[k])).style(Style::new().fg(Color::Red).bold()));
+          } else if self.global_rates[k] == "no data" {
+            this_row.push(Cell::new(rb_cell).style(Style::new().fg(Color::Red).bold()));
+            this_row.push(Cell::new(format!("\u{203c} {}", self.global_rates[k])).style(Style::new().fg(Color::Red).bold()));
           } else {
-            this_row.push(format!("\u{2714} {} Hz", self.global_rates[k]));
+            this_row.push(Cell::new(rb_cell).style(Style::new().fg(Color::Green)));
+            this_row.push(Cell::new(format!("\u{2714} {} Hz", self.global_rates[k])).style(Style::new().fg(Color::Green)));
+
           }
           ncol += 2;
           if ncol == 8 {
-            rows.push(Row::new(this_row.clone()));
-            this_row = Vec::<String>::new();
+            rows.push(Row::new(this_row.drain(..).collect::<Vec<Cell>>()));
+            //rows.push(Row::new(this_row.clone()));
+            this_row = Vec::<Cell>::new();
             ncol = 0;
           }
           //let this_row = vec![format!("{}",k) , format!("{}", global_rates[k])];
@@ -1359,14 +1347,14 @@ RBTab {
         }
         // Columns widths are constrained in the same way as Layout...
         let widths = [
+          Constraint::Percentage(10),
           Constraint::Percentage(12),
+          Constraint::Percentage(10),
           Constraint::Percentage(12),
+          Constraint::Percentage(10),
           Constraint::Percentage(12),
-          Constraint::Percentage(12),
-          Constraint::Percentage(12),
-          Constraint::Percentage(12),
-          Constraint::Percentage(12),
-          Constraint::Percentage(16),
+          Constraint::Percentage(10),
+          Constraint::Percentage(24),
         ];
         let table = Table::new(rows, widths)
           // ...and they can be separated by a fixed spacing.
@@ -1376,7 +1364,16 @@ RBTab {
           // It has an optional header, which is simply a Row always visible at the top.
           .header(
             Row::new(vec!["RBs", "Rate", "RBs", "Rate", "RBs", "Rate", "RBs", "Rate"])
-              .style(self.theme.style())
+              //.style(self.theme.style())
+              .style(
+                Style::new()
+                // Use your theme's style, but modify it
+                .patch(self.theme.style())
+                .bold()
+                // Or any color that contrasts with the background, e.g., Green or Cyan
+                //.bg(Color::DarkGray)
+              )
+
               // To add space between the header and the rest of the rows, specify the margin
               .bottom_margin(1),
           )
