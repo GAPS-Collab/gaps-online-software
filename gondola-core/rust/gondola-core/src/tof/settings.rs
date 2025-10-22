@@ -844,6 +844,9 @@ impl Default for DataPublisherSettings {
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[cfg_attr(feature="pybindings", pyclass)]
 pub struct LiftofSettings {
+  /// The config version indicates, which version of 
+  /// Liftof of this file is intended for, e.g. "0.11"
+  pub config_version             : Option<String>,
   /// read run .toml files from this directory and 
   /// automotically work through them 1by1
   pub staging_dir                : String,
@@ -908,6 +911,7 @@ pub struct LiftofSettings {
 impl LiftofSettings {
   pub fn new() -> Self {
     LiftofSettings {
+      config_version            : None, 
       staging_dir               : String::from("/home/gaps/liftof-staging"),
       calibration_dir           : String::from(""),
       db_path                   : String::from("/home/gaps/config/gaps_flight.db"),
