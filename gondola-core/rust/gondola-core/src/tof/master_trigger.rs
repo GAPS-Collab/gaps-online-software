@@ -1089,7 +1089,29 @@ impl PyMasterTrigger {
       }
     }
   }
-  
+  #[getter]
+  fn get_prescale_bypass(&mut self) -> PyResult<u32> {
+      match PRESCALE_BYPASS.get(&mut self.ipbus) {
+          Ok(rate) => {
+              return Ok(rate);
+          }
+          Err(err) => {
+              return Err(PyValyeError::new_err(err.to_string()));
+          }
+      }
+  }
+  #[getter]
+  fn clock_rate(&mut self) -> PyResult<u32> {
+      match CLOCK_RATE.get(&mut self.ipbus) {
+          Ok(rate) => {
+              return Ok(rate);
+          }
+          Err(err) => {
+              return Err(PyValueError::new_err(err.to_string()));
+          }
+      }
+  }
+
   #[getter]
   /// The lost rate which occured due to RB busy timeouts
   fn rb_lost_rate(&mut self) -> PyResult<u32> {
@@ -1115,8 +1137,44 @@ impl PyMasterTrigger {
       }
     }
   }
-
+  
+  /// the lost rate due to the trigger internal busy
   #[getter]
+  fn trg_lost_trg_rate(&mut self) -> PyResult<u32> {
+      match TRG_LOST_TRIGGER_RATE.get(&mut self.ipbus) {
+          Ok(rate) => {
+              return Ok(rate);
+          }
+          Err(err) => {
+              return Err(PyValueError::new_err(err.to_string()));
+          }
+      }
+  }
+
+  /// the amount of fixed deadtime used by the tiu in units of 10ns
+  #[getter]
+  fn tiu_timeout_cnt(&mut self) -> PyResult<u32> {
+      match TIU_TIMEOUT_CNT.get(&mut self.ipbus) {
+          Ok(rate) => {
+              return Ok(rate);
+          }
+          Err(err) => {
+              return Err(PyValueError::new_err(err.to_string()));
+          }
+      }
+  }
+  /// get tiu busy rate in Hz
+  #[getter]
+  fn tiu_busy_rate(&mut self) -> PyResult<u32> {
+      match TIU_BUSY_RATE.get(&mut self.ipbus) {
+          Ok(rate) => {
+              return Ok(rate);
+          }
+          Err(err) => {
+              return Err(PyValueErr::new_err(err.to_string()));
+          }
+      }
+  }
   /// Check if the TIU emulation mode is on
   ///
   fn get_tiu_emulation_mode(&mut self) -> PyResult<u32> {
@@ -1129,8 +1187,20 @@ impl PyMasterTrigger {
       }
     }
   }
- 
-  #[setter]
+  /// check if the MTB is ignoring the TIU and using fixed internal busy
+  #[getter]
+  fn get_ignore_tiu_busy(&mut self) -> PyResult<u32> {
+      match MIN_DEADTIME_MODE.get(&mut self.ipbus) {
+          Ok(mode) => {
+              return Ok(mode);
+          }
+          Err(err) => {
+              return Err(PyValueError::new_err(err.to_string()));
+          }
+      }
+  }
+
+ #[setter]
   fn set_tiu_emulation_mode(&mut self, value : u32) -> PyResult<()> {
     match TIU_EMULATION_MODE.set(&mut self.ipbus, value) {
       Ok(_) => {
@@ -1140,6 +1210,17 @@ impl PyMasterTrigger {
         return Err(PyValueError::new_err(err.to_string()));
       }
     }
+  }
+ #[setter]
+  fn set_ingore_tiu_busy(&mut self, value : u32) -> PyResult<()> {
+      match MIN_DEADTIME_MODE.set(&mut self.ipbus, value) {
+          Ok(_) => {
+              return Ok(());
+          }
+          Err(err) => {
+              return Err(PyValueError::new_err(err.to_string()));
+          }
+      }
   }
 
   #[setter]
@@ -1165,7 +1246,7 @@ impl PyMasterTrigger {
       }
     }
   }
-
+  
   fn get_enable_cyclic_trig(&mut self) -> PyResult<bool> {
     match TRIG_CYCLIC_EN.get(&mut self.ipbus) {
       Ok(value) => {
