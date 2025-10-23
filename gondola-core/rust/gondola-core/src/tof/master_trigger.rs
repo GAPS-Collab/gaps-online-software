@@ -1153,7 +1153,7 @@ impl PyMasterTrigger {
 
   /// the amount of fixed deadtime used by the tiu in units of 10ns
   #[getter]
-  fn tiu_timeout_cnt(&mut self) -> PyResult<u32> {
+  fn get_tiu_timeout_cnt(&mut self) -> PyResult<u32> {
       match TIU_TIMEOUT_CONST.get(&mut self.ipbus) {
           Ok(rate) => {
               return Ok(rate);
@@ -1213,7 +1213,7 @@ impl PyMasterTrigger {
   }
 
  #[setter]
-  fn tiu_timeout_cnt(&mut self, value : u32) -> PyResult<()> {
+  fn set_tiu_timeout_cnt(&mut self, value : u32) -> PyResult<()> {
       match TIU_TIMEOUT_CONST.set(&mut self.ipbus, value) {
           Ok(_) => {
               return Ok(());
