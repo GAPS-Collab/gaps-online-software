@@ -1096,7 +1096,7 @@
 <a href=#1096 id=1096 data-nosnippet>1096</a>              <span class="kw">return </span><span class="prelude-val">Ok</span>(rate);
 <a href=#1097 id=1097 data-nosnippet>1097</a>          }
 <a href=#1098 id=1098 data-nosnippet>1098</a>          <span class="prelude-val">Err</span>(err) =&gt; {
-<a href=#1099 id=1099 data-nosnippet>1099</a>              <span class="kw">return </span><span class="prelude-val">Err</span>(PyValyeError::new_err(err.to_string()));
+<a href=#1099 id=1099 data-nosnippet>1099</a>              <span class="kw">return </span><span class="prelude-val">Err</span>(PyValueError::new_err(err.to_string()));
 <a href=#1100 id=1100 data-nosnippet>1100</a>          }
 <a href=#1101 id=1101 data-nosnippet>1101</a>      }
 <a href=#1102 id=1102 data-nosnippet>1102</a>  }
@@ -1154,7 +1154,7 @@
 <a href=#1154 id=1154 data-nosnippet>1154</a>  <span class="doccomment">/// the amount of fixed deadtime used by the tiu in units of 10ns
 <a href=#1155 id=1155 data-nosnippet>1155</a>  </span><span class="attr">#[getter]
 <a href=#1156 id=1156 data-nosnippet>1156</a>  </span><span class="kw">fn </span>tiu_timeout_cnt(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; PyResult&lt;u32&gt; {
-<a href=#1157 id=1157 data-nosnippet>1157</a>      <span class="kw">match </span>TIU_TIMEOUT_CNT.get(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus) {
+<a href=#1157 id=1157 data-nosnippet>1157</a>      <span class="kw">match </span>TIU_TIMEOUT_CONST.get(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus) {
 <a href=#1158 id=1158 data-nosnippet>1158</a>          <span class="prelude-val">Ok</span>(rate) =&gt; {
 <a href=#1159 id=1159 data-nosnippet>1159</a>              <span class="kw">return </span><span class="prelude-val">Ok</span>(rate);
 <a href=#1160 id=1160 data-nosnippet>1160</a>          }
@@ -1171,7 +1171,7 @@
 <a href=#1171 id=1171 data-nosnippet>1171</a>              <span class="kw">return </span><span class="prelude-val">Ok</span>(rate);
 <a href=#1172 id=1172 data-nosnippet>1172</a>          }
 <a href=#1173 id=1173 data-nosnippet>1173</a>          <span class="prelude-val">Err</span>(err) =&gt; {
-<a href=#1174 id=1174 data-nosnippet>1174</a>              <span class="kw">return </span><span class="prelude-val">Err</span>(PyValueErr::new_err(err.to_string()));
+<a href=#1174 id=1174 data-nosnippet>1174</a>              <span class="kw">return </span><span class="prelude-val">Err</span>(PyValueError::new_err(err.to_string()));
 <a href=#1175 id=1175 data-nosnippet>1175</a>          }
 <a href=#1176 id=1176 data-nosnippet>1176</a>      }
 <a href=#1177 id=1177 data-nosnippet>1177</a>  }

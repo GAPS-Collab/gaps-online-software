@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.tof &#8212; gondola 0.11.11 documentation</title>
+    <title>gondola.tof &#8212; gondola 0.11.12 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=39bfcdcf"></script>
+    <script src="../_static/documentation_options.js?v=e55e8a44"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.tof';</script>
@@ -110,7 +110,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.11.11 documentation</p>
+    <p class="title logo__title">gondola 0.11.12 documentation</p>
   
 </a></div>
     
@@ -979,7 +979,12 @@ individual cuts</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="gondola.tof.MasterTrigger">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.tof.</span></span><span class="sig-name descname"><span class="pre">MasterTrigger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_address</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger" title="Link to this definition">#</a></dt>
-<dd><dl class="py method">
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.clock_rate">
+<span class="sig-name descname"><span class="pre">clock_rate</span></span><a class="headerlink" href="#gondola.tof.MasterTrigger.clock_rate" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="gondola.tof.MasterTrigger.disable_cyclic_trig">
 <span class="sig-name descname"><span class="pre">disable_cyclic_trig</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.disable_cyclic_trig" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -1132,6 +1137,12 @@ individual cuts</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_tiu_emulation_mode">
+<span class="sig-name descname"><span class="pre">get_tiu_emulation_mode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_tiu_emulation_mode" title="Link to this definition">#</a></dt>
+<dd><p>Check if the TIU emulation mode is on</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="gondola.tof.MasterTrigger.get_total_tof_thresh">
 <span class="sig-name descname"><span class="pre">get_total_tof_thresh</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.get_total_tof_thresh" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -1152,6 +1163,17 @@ individual cuts</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.ignore_tiu_busy">
+<span class="sig-name descname"><span class="pre">ignore_tiu_busy</span></span><a class="headerlink" href="#gondola.tof.MasterTrigger.ignore_tiu_busy" title="Link to this definition">#</a></dt>
+<dd><p>check if the MTB is ignoring the TIU and using fixed internal busy</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.ingore_tiu_busy">
+<span class="sig-name descname"><span class="pre">ingore_tiu_busy</span></span><a class="headerlink" href="#gondola.tof.MasterTrigger.ingore_tiu_busy" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.tof.MasterTrigger.lost_rate">
 <span class="sig-name descname"><span class="pre">lost_rate</span></span><a class="headerlink" href="#gondola.tof.MasterTrigger.lost_rate" title="Link to this definition">#</a></dt>
 <dd><p>Get the lost global trigger rate in Hz</p>
@@ -1159,6 +1181,11 @@ individual cuts</p>
 dropped due to TIU BUSY signal + those which 
 get dropped due to the RBs being busy</p>
 </dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.prescale_bypass">
+<span class="sig-name descname"><span class="pre">prescale_bypass</span></span><a class="headerlink" href="#gondola.tof.MasterTrigger.prescale_bypass" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.tof.MasterTrigger.rate">
@@ -1403,6 +1430,12 @@ get dropped due to the RBs being busy</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.tiu_busy_rate">
+<span class="sig-name descname"><span class="pre">tiu_busy_rate</span></span><a class="headerlink" href="#gondola.tof.MasterTrigger.tiu_busy_rate" title="Link to this definition">#</a></dt>
+<dd><p>get tiu busy rate in Hz</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.tof.MasterTrigger.tiu_busy_stuck">
 <span class="sig-name descname"><span class="pre">tiu_busy_stuck</span></span><a class="headerlink" href="#gondola.tof.MasterTrigger.tiu_busy_stuck" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -1410,8 +1443,7 @@ get dropped due to the RBs being busy</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.tof.MasterTrigger.tiu_emulation_mode">
 <span class="sig-name descname"><span class="pre">tiu_emulation_mode</span></span><a class="headerlink" href="#gondola.tof.MasterTrigger.tiu_emulation_mode" title="Link to this definition">#</a></dt>
-<dd><p>Check if the TIU emulation mode is on</p>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.tof.MasterTrigger.tiu_emulation_mode_bsy_cnt">
@@ -1422,6 +1454,18 @@ get dropped due to the RBs being busy</p>
 <dt class="sig sig-object py" id="gondola.tof.MasterTrigger.tiu_lost_rate">
 <span class="sig-name descname"><span class="pre">tiu_lost_rate</span></span><a class="headerlink" href="#gondola.tof.MasterTrigger.tiu_lost_rate" title="Link to this definition">#</a></dt>
 <dd><p>The lost rate which occured due to the tracker BUSY signal</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.tiu_timeout_cnt">
+<span class="sig-name descname"><span class="pre">tiu_timeout_cnt</span></span><a class="headerlink" href="#gondola.tof.MasterTrigger.tiu_timeout_cnt" title="Link to this definition">#</a></dt>
+<dd><p>the amount of fixed deadtime used by the tiu in units of 10ns</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.trg_lost_trg_rate">
+<span class="sig-name descname"><span class="pre">trg_lost_trg_rate</span></span><a class="headerlink" href="#gondola.tof.MasterTrigger.trg_lost_trg_rate" title="Link to this definition">#</a></dt>
+<dd><p>the lost rate due to the trigger internal busy</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1621,6 +1665,7 @@ get dropped due to the RBs being busy</p>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger"><code class="docutils literal notranslate"><span class="pre">MasterTrigger</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.clock_rate"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.clock_rate</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.disable_cyclic_trig"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.disable_cyclic_trig()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.enable_cyclic_trig"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.enable_cyclic_trig()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_configurable_trigger"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_configurable_trigger()</span></code></a></li>
@@ -1650,11 +1695,15 @@ get dropped due to the RBs being busy</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_outer_tof_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_outer_tof_thresh()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_packet_id"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_packet_id()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_rb_event_cnts"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_rb_event_cnts()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_tiu_emulation_mode"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_tiu_emulation_mode()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_total_tof_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_total_tof_thresh()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_trace_suppression"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_trace_suppression()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_umbrella_center_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_umbrella_center_thresh()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_umbrella_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_umbrella_thresh()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.ignore_tiu_busy"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.ignore_tiu_busy</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.ingore_tiu_busy"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.ingore_tiu_busy</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.lost_rate"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.lost_rate</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.prescale_bypass"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.prescale_bypass</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.rate"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.rate</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.rb_lost_rate"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.rb_lost_rate</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.realign_packet_id"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.realign_packet_id()</span></code></a></li>
@@ -1700,10 +1749,13 @@ get dropped due to the RBs being busy</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.stop_all_triggers"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.stop_all_triggers()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.tiu_bad"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.tiu_bad</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.tiu_busy_ignore"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.tiu_busy_ignore</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.tiu_busy_rate"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.tiu_busy_rate</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.tiu_busy_stuck"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.tiu_busy_stuck</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.tiu_emulation_mode"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.tiu_emulation_mode</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.tiu_emulation_mode_bsy_cnt"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.tiu_emulation_mode_bsy_cnt</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.tiu_lost_rate"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.tiu_lost_rate</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.tiu_timeout_cnt"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.tiu_timeout_cnt</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.trg_lost_trg_rate"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.trg_lost_trg_rate</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.trigger"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.trigger()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.use_tiu_aux_link"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.use_tiu_aux_link()</span></code></a></li>
 </ul>
