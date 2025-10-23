@@ -38,21 +38,30 @@ def get_version(binary):
     os.chdir('..')
     return version
 
-def build_for_muslx86_64(binary, njobs=24, clean=False):
+def build_for_muslx86_64(binary, njobs=24, clean=False, debug=False):
     if binary == 'liftof-scheduler':
         os.chdir('liftof-cc')
     else:
         os.chdir(f'{binary}')
     if clean:
         sub.run(["cargo clean"], shell=True)
-    build_cmd = f'CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cross build -j {njobs} --target=x86_64-unknown-linux-musl --bin {binary} --release --all-features'
+    release_flag = '--release'
+    if debug:
+        release_flag = ''
+    build_cmd = f'CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cross build -j {njobs} --target=x86_64-unknown-linux-musl --bin {binary} {release_flag} --all-features'
     result = sub.run([build_cmd], shell=True)
-    shutil.move(f'../target/x86_64-unknown-linux-musl/release/{binary}', '../build/')
+    if not release_flag:
+        shutil.move(f'../target/x86_64-unknown-linux-musl/debug/{binary}', '../build/')
+    else:
+        shutil.move(f'../target/x86_64-unknown-linux-musl/release/{binary}', '../build/')
     os.chdir('..')
     version_cmd = f"build/{binary} -V | tail -n 1"
     result = sub.run([version_cmd], shell=True, capture_output=True, text=True)
     version = result.stdout.split()[1]
-    shutil.copy(f'build/{binary}', f'releases/{binary}.musl.x86.{version}')
+    if not release_flag:
+        shutil.copy(f'build/{binary}', f'releases/{binary}.musl.x86.debug.{version}')
+    else:
+        shutil.copy(f'build/{binary}', f'releases/{binary}.musl.x86.{version}')
 
 def build_for_arm32(binary, njobs=24, clean=False):
     """
@@ -125,6 +134,7 @@ if __name__ == '__main__':
     buildparser.add_argument("--no-musl", action="store_true", help="Do not use musl as libc replacement (not recommended)")
     buildparser.add_argument("--get-version", action="store_true", help="Get the lastest version string from the compiled binary!")
     buildparser.add_argument("--clean", action="store_true", help="Run a 'cargo clean' before the build")
+    buildparser.add_argument("--debug", action="store_true", help="Don't build with --release flag (do not use in production)", default=False)
     buildparser.add_argument("binary", type=str, help="Select the binary to build")
 
     deployparser = subparsers.add_parser('deploy', help='Deploy liftof components')
@@ -156,7 +166,7 @@ if __name__ == '__main__':
             #if args.no_musl:
             #    build_for_gnux86_64(arggs.binary, njobs=args.j)
             #else:
-            build_for_muslx86_64(args.binary, njobs=args.j, clean=args.clean)
+            build_for_muslx86_64(args.binary, njobs=args.j, clean=args.clean, debug=args.debug)
         if args.cmd == 'deploy':
             if args.debug:
                 deploy(args.binary, dest_dir='bin/debug')

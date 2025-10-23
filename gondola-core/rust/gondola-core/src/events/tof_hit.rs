@@ -75,9 +75,6 @@ pub struct TofHit {
   pub peak_b         : f16,
   pub charge_a       : f16,
   pub charge_b       : f16,
-  // only 2 bytes of version
-  // are used thus we have a reserved field
-  pub reserved       : u8,
   pub version        : ProtocolVersion,
   // for now, but we want to use half instead
   pub baseline_a     : f16,
@@ -86,7 +83,14 @@ pub struct TofHit {
   pub baseline_b_rms : f16,
   // phase of the sine fit
   pub phase          : f16,
-  
+  pub TOT_low_a      : f16,
+  pub TOT_low_b      : f16,
+  pub TOT_high_a     : f16,
+  pub TOT_high_b     : f16,
+  pub TOT_slp_low_a  : f16,
+  pub TOT_slp_low_b  : f16,
+  pub TOT_slp_high_a : f16, 
+  pub TOT_slp_high_b : f16,
   //-------------------------------
   // NON-SERIALIZED FIELDS
   //-------------------------------
@@ -133,12 +137,19 @@ impl TofHit {
       valid           : true,
       // v1 variables 
       version         : ProtocolVersion::V1,
-      reserved        : 0,
       baseline_a      : f16::from_f32(0.0),
       baseline_a_rms  : f16::from_f32(0.0),
       baseline_b      : f16::from_f32(0.0),
       baseline_b_rms  : f16::from_f32(0.0),
       phase           : f16::from_f32(0.0),
+      TOT_low_a       : f16::from_f32(0.0),
+      TOT_low_b       : f16::from_f32(0.0),
+      TOT_high_a      : f16::from_f32(0.0),
+      TOT_high_b      : f16::from_f32(0.0),
+      TOT_slp_low_a   : f16::from_f32(0.0),
+      TOT_slp_low_b   : f16::from_f32(0.0),
+      TOT_slp_high_a  : f16::from_f32(0.0),
+      TOT_slp_high_b  : f16::from_f32(0.0),
     }
   }
   
@@ -280,7 +291,7 @@ impl TofHit {
   fn phase_py(&self) -> f32 {
     self.phase.to_f32()
   }
- 
+
   #[getter]
   #[pyo3(name="cable_delay")]
   /// Get the cable correction time
@@ -361,7 +372,55 @@ impl TofHit {
   fn get_time_b_py(&self) -> f32 {
     self.get_time_b()
   }
-  
+
+  #[getter]
+  #[pyo3(name="TOT_low_a")]
+  fn get_tot_low_a_py(&self) -> f32 {
+      self.get_tot_low_a()
+  }
+
+  #[getter]
+  #[pyo3(name="TOT_low_b")]
+  fn get_tot_low_b_py(&self) -> f32 {
+      self.get_tot_low_b()
+  }
+
+  #[getter]
+  #[pyo3(name="TOT_high_a")]
+  fn get_tot_high_a_py(&self) -> f32 {
+      self.get_tot_high_a()
+  }
+
+  #[getter]
+  #[pyo3(name="TOT_high_b")]
+  fn get_tot_high_b_py(&self) -> f32 {
+      self.get_tot_high_b()
+  }
+
+  #[getter]
+  #[pyo3(name="TOT_slp_low_a")]
+  fn get_tot_slp_low_a_py(&self) -> f32 {
+      self.get_tot_slp_low_a()
+  }
+
+  #[getter]
+  #[pyo3(name="TOT_slp_low_b")]
+  fn get_tot_slp_low_b_py(&self) -> f32 {
+      self.get_tot_slp_low_b()
+  }
+
+  #[getter]
+  #[pyo3(name="TOT_slp_high_a")]
+  fn get_tot_slp_high_a_py(&self) -> f32 {
+      self.get_tot_slp_high_a()
+  }
+
+  #[getter]
+  #[pyo3(name="TOT_slp_high_b")]
+  fn get_tot_slp_high_b_py(&self) -> f32 {
+      self.get_tot_slp_high_b()
+  }
+
   #[getter]
   #[pyo3(name="peak_a")]
   fn get_peak_a_py(&self) -> f32 {
@@ -521,6 +580,36 @@ impl TofHit {
     self.time_b.to_f32()
   }
   
+  pub fn get_tot_low_a(&self) -> f32 {
+    self.TOT_low_a.to_f32()
+  }
+
+  pub fn get_tot_low_b(&self) -> f32 {
+    self.TOT_low_b.to_f32()
+  }
+
+  pub fn get_tot_high_a(&self) -> f32 {
+    self.TOT_high_a.to_f32()
+  }
+
+  pub fn get_tot_high_b(&self) -> f32 {
+    self.TOT_high_b.to_f32()
+  }
+
+  pub fn get_tot_slp_low_a(&self) -> f32 {
+    self.TOT_slp_low_a.to_f32()
+  }
+
+  pub fn get_tot_slp_low_b(&self) -> f32 {
+    self.TOT_slp_low_b.to_f32()
+  }
+
+  pub fn get_tot_slp_high_a(&self) -> f32 {
+    self.TOT_slp_high_a.to_f32()
+  }
+  pub fn get_tot_slp_high_b(&self) -> f32 {
+    self.TOT_slp_high_b.to_f32()
+  }
   pub fn get_peak_a(&self) -> f32 {
     self.peak_a.to_f32()
   }
@@ -636,6 +725,11 @@ impl fmt::Display for TofHit {
     LE Time A/B   {:.2} {:.2}   
     Height  A/B   {:.2} {:.2}
     Charge  A/B   {:.2} {:.2}
+  ** time over threshold information
+    Lo TOT A/B    {:.2} {:.2}
+    Hi TOT A/B    {:.2} {:.2}
+    Lo Slope A/B  {:.2} {:.2}
+    Hi Slope A/B  {:.2} {:.2}
   ** paddle {} ** 
     Length        {:.2}
     Timing offset {:.2} (ns)
@@ -660,6 +754,14 @@ impl fmt::Display for TofHit {
             self.get_peak_b(),
             self.get_charge_a(),
             self.get_charge_b(),
+            self.get_tot_low_a(),
+            self.get_tot_low_b(),
+            self.get_tot_high_a(),
+            self.get_tot_high_b(),
+            self.get_tot_slp_low_a(),
+            self.get_tot_slp_low_b(),
+            self.get_tot_slp_high_a(),
+            self.get_tot_slp_high_b(),
             paddle_info,
             self.paddle_len,
             self.timing_offset,
@@ -686,7 +788,7 @@ impl Serialization for TofHit {
   
   const HEAD          : u16   = 61680; //0xF0F0)
   const TAIL          : u16   = 3855;
-  const SIZE          : usize = 30; // size in bytes with HEAD and TAIL
+  const SIZE          : usize = 44; // size in bytes with HEAD and TAIL
 
   /// Serialize the packet
   ///
@@ -709,14 +811,20 @@ impl Serialization for TofHit {
     bytestream.extend_from_slice(&self.peak_b      .to_le_bytes()); 
     bytestream.extend_from_slice(&self.charge_a    .to_le_bytes()); 
     bytestream.extend_from_slice(&self.charge_b    .to_le_bytes()); 
-    // charge_min_i has been removed, so just insert a 0 here 
-    bytestream.extend_from_slice(&0u16.to_le_bytes()); 
+    bytestream.extend_from_slice(&self.TOT_low_a   .to_le_bytes());
     bytestream.extend_from_slice(&self.baseline_a   .to_le_bytes());
     bytestream.extend_from_slice(&self.baseline_a_rms.to_le_bytes());
     bytestream.extend_from_slice(&self.phase       .to_le_bytes());
     bytestream.push(self.version.to_u8());
-    bytestream.extend_from_slice(&self.baseline_b.to_le_bytes());
+    bytestream.extend_from_slice(&self.baseline_b  .to_le_bytes());
     bytestream.extend_from_slice(&self.baseline_b_rms.to_le_bytes());
+    bytestream.extend_from_slice(&self.TOT_low_b   .to_le_bytes());
+    bytestream.extend_from_slice(&self.TOT_high_a  .to_le_bytes());
+    bytestream.extend_from_slice(&self.TOT_high_b  .to_le_bytes());
+    bytestream.extend_from_slice(&self.TOT_slp_low_a.to_le_bytes());
+    bytestream.extend_from_slice(&self.TOT_slp_low_b.to_le_bytes());
+    bytestream.extend_from_slice(&self.TOT_slp_high_a.to_le_bytes());
+    bytestream.extend_from_slice(&self.TOT_slp_high_b.to_le_bytes());
     bytestream.extend_from_slice(&Self::TAIL       .to_le_bytes()); 
     bytestream
   }
@@ -742,9 +850,7 @@ impl Serialization for TofHit {
     pp.peak_b         = parse_f16(stream, pos);
     pp.charge_a       = parse_f16(stream, pos);
     pp.charge_b       = parse_f16(stream, pos);
-    // we have a currently empty field
-    *pos += 2;
-    //pp.charge_min_i   = parse_u16(stream, pos);
+    pp.TOT_low_a      = parse_f16(stream, pos);
     pp.baseline_a     = parse_f16(stream, pos);
     pp.baseline_a_rms = parse_f16(stream, pos);
     let mut phase_vec = Vec::<u8>::new();
@@ -760,6 +866,13 @@ impl Serialization for TofHit {
     }
     pp.baseline_b      = parse_f16(stream, pos);
     pp.baseline_b_rms  = parse_f16(stream, pos);
+    pp.TOT_low_b       = parse_f16(stream, pos);
+    pp.TOT_high_a      = parse_f16(stream, pos);
+    pp.TOT_high_b      = parse_f16(stream, pos);
+    pp.TOT_slp_low_a   = parse_f16(stream, pos);
+    pp.TOT_slp_low_b   = parse_f16(stream, pos);
+    pp.TOT_slp_high_a  = parse_f16(stream, pos);
+    pp.TOT_slp_high_b  = parse_f16(stream, pos);
     *pos += 2; // always have to do this when using verify fixed
     Ok(pp)
   }
@@ -784,7 +897,14 @@ impl FromRandom for TofHit {
     pp.baseline_b     = f16::from_f32(rng.random::<f32>());
     pp.baseline_b_rms = f16::from_f32(rng.random::<f32>());
     pp.phase          = f16::from_f32(rng.random::<f32>());
-    
+    pp.TOT_low_a      = f16::from_f32(rng.random::<f32>());
+    pp.TOT_low_b      = f16::from_f32(rng.random::<f32>());
+    pp.TOT_high_a     = f16::from_f32(rng.random::<f32>());
+    pp.TOT_high_b     = f16::from_f32(rng.random::<f32>()); 
+    pp.TOT_slp_low_a  = f16::from_f32(rng.random::<f32>());
+    pp.TOT_slp_low_b  = f16::from_f32(rng.random::<f32>());
+    pp.TOT_slp_high_a = f16::from_f32(rng.random::<f32>()); 
+    pp.TOT_slp_high_b = f16::from_f32(rng.random::<f32>()); 
     pp.paddle_len       = 0.0; 
     pp.coax_cable_time  = 0.0; 
     pp.hart_cable_time  = 0.0; 
@@ -831,7 +951,7 @@ impl FromRandom for TofHit {
 // 
 //  /// Set the length and cable length for the paddle
 //  /// FIXME - take gaps_online.db.Paddle as argument
-//  fn set_paddle(&mut self, plen : f32, coax_cbl_time : f32, hart_cbl_time : f32 ) {
+//  fn set_paddle(&mut s1elf, plen : f32, coax_cbl_time : f32, hart_cbl_time : f32 ) {
 //    self.hit.paddle_len = plen;
 //    self.hit.coax_cable_time = coax_cbl_time;
 //    self.hit.hart_cable_time = hart_cbl_time;

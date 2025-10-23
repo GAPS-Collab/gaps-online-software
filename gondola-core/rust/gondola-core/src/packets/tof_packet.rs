@@ -1,6 +1,6 @@
 //! TofPacket provides a wrapper to write objects which implement
 //! TofPackable into files
-// The following file is part of gaps-online-software and published 
+// This file is part of gaps-online-software and published 
 // under the GPLv3 license
 
 use crate::prelude::*;
@@ -31,6 +31,7 @@ pub struct TofPacket {
   /// FIXME - future extension
   pub no_send_over_nw    : bool,
   /// creation_time for the instance
+  // FIXME - do we really need the last 2?
   pub creation_time      : Instant,
   pub valid              : bool, // will be always valid, unless invalidated
 }
@@ -102,28 +103,31 @@ impl TofPacket {
   /// Unpack the TofPacket and return its content
   pub fn unpack<T>(&self) -> Result<T, SerializationError>
     where T: TofPackable + Serialization {
-    // if the alternative tof packet type is unknown, it must 
-    // be of type TOF_PACKET_TYPE, alternatively either one 
-    // of Both
+
+    // first check TOF_PACKET_ALT, if that is != UNKNOWN, 
+    // call from_bytestream_alt. If it is UNKNOWN, proceed
+    // "as usual"
+    let mut pos : usize = 0;
     if T::TOF_PACKET_TYPE_ALT != TofPacketType::Unknown {
       if T::TOF_PACKET_TYPE_ALT == self.packet_type {
-        let unpacked : T = T::from_bytestream_alt(&self.payload, &mut 0)?;
+        let unpacked : T = T::from_bytestream_alt(&self.payload, &mut pos)?;
         return Ok(unpacked); 
-      } else if T::TOF_PACKET_TYPE == self.packet_type{
-        let unpacked : T = T::from_bytestream(&self.payload, &mut 0)?;
+      } else if T::TOF_PACKET_TYPE == self.packet_type {
+        let unpacked : T = T::from_bytestream(&self.payload, &mut pos)?;
         return Ok(unpacked); 
       } else {
         error!("This packet of type {} is neither for a {} nor a {}  packet!", self.packet_type, T::TOF_PACKET_TYPE, T::TOF_PACKET_TYPE_ALT);
         return Err(SerializationError::IncorrectPacketType); 
       }
-    } else {
+    } else { // TOF_PACKET_ALT is UNKNOWN, so we just proceed as usual
       if T::TOF_PACKET_TYPE != self.packet_type {
         error!("This bytestream is not for a {} packet!", self.packet_type);
         return Err(SerializationError::IncorrectPacketType);
+      } else {
+        let unpacked : T = T::from_bytestream(&self.payload, &mut pos)?;
+        Ok(unpacked)
       }
     }
-    let unpacked : T = T::from_bytestream(&self.payload, &mut 0)?;
-    Ok(unpacked)
   }
   
   pub fn age(&self) -> u64 {

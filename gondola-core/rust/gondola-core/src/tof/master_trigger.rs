@@ -319,6 +319,21 @@ pub fn configure_mtb(bus : &mut IPBus,
     }
   }
 
+  // Oct 2025 - new "fixed deadtime mode" - will ignore the deadtime 
+  // coming from the TIU  
+  let use_fixed_deadtime = settings.use_fixed_deadtime.unwrap_or(false);  
+  if use_fixed_deadtime {
+    match MIN_DEADTIME_MODE.set(bus, use_fixed_deadtime as u32) {
+      Err(err) => { 
+        error!("Unable to set MTB in fixed deadtime mode {err}!");
+      }
+      Ok(_)    => {
+        warn!("Ignoring the busy part of the TIU signal from the TIU due to min deadtime setting!");
+        println!("==> MTB in 'Min/fixed deadtime mode'. This will ignore the BUSY part of the TIU signal");
+      }
+    }
+  }
+
   info!("Settting rb integration window!");
   let int_wind = settings.rb_int_window;
   match set_rb_int_window(bus, int_wind) {
@@ -613,7 +628,12 @@ pub fn master_trigger(mt_address     : &str,
     Err(err) => error!("Can not reset DAQ! {err}"),
     Ok(_)    => ()
   }
-  
+ 
+  match RESYNC.pulse_it(&mut bus) {
+    Err(err) => error!("Unable to resycn MTB and RB clocks! {err}"),
+    Ok(_)    => println!("=> RB and MTB clocks synchronized!")
+  }
+
   match EVENT_CNT_RESET.set(&mut bus, 1) {
     Err(err) => error!("Unable to reset event counter! {err}"),
     Ok(_)    => println!("=> Event counter reset!")
@@ -761,7 +781,7 @@ pub fn master_trigger(mt_address     : &str,
           _ => ()
         }
       },
-      Some(Ok(_ev)) => {
+      Some(Ok(mut _ev)) => {
         if _ev.event_id == last_event_id {
           error!("We got a duplicate event from the MTB!");
           continue;
@@ -774,6 +794,15 @@ pub fn master_trigger(mt_address     : &str,
         }
         last_event_id = _ev.event_id;
         heartbeat.n_events += 1;
+        heartbeat.trigger_type = TriggerType::from((_ev.mt_trigger_sources & 0x00FF) as u8);
+        heartbeat.combo_trig_type = TriggerType::from(((_ev.mt_trigger_sources & 0xFF00) >> 8) as u8);
+        // we have to make sure some of the fields get properly filled and 
+        // "transfer" some of the mt_* fields to the fields which get actually serialzied 
+        let mt_timestamp           = _ev.get_mt_timestamp_abs();
+        _ev.timestamp32        = (mt_timestamp  & 0x00000000ffffffff ) as u32;
+        _ev.timestamp16        = ((mt_timestamp & 0x0000ffff00000000 ) >> 32) as u16;
+        _ev.trigger_sources    = _ev.mt_trigger_sources; // FIXME
+        _ev.n_trigger_paddles  = _ev.get_trigger_hits().len() as u8;
         if !veri_active {
           match mt_sender.send(_ev) {
             Err(err) => {
@@ -802,7 +831,6 @@ pub fn master_trigger(mt_address     : &str,
           heartbeat.evq_num_events_avg = (evq_num_events as u64)/(n_iter_loop as u64);
         }
       }
-      
       heartbeat.total_elapsed += hb_timer.elapsed().as_secs() as u64;
       match TRIGGER_RATE.get(&mut bus) {
         Ok(trate) => {
@@ -820,12 +848,118 @@ pub fn master_trigger(mt_address     : &str,
           error!("Unable to query {}! {err}", LOST_TRIGGER_RATE);
         }
       }
+
+       match RB_LOST_TRIGGER_RATE.get(&mut bus) {
+           Err(err) => {
+               error!("Unable to query {}! {err}", RB_LOST_TRIGGER_RATE);
+           }
+           Ok(rb_lost_rate) => {
+               heartbeat.rb_lost_rate = rb_lost_rate as u64;
+           }
+       }
+
+       match CLOCK_RATE.get(&mut bus) {
+           Err(err) => { 
+               error!("Unable to query {}! {err}", CLOCK_RATE);
+           }
+           Ok(clock_rate) => {
+               heartbeat.clock_rate = clock_rate as u64;
+           }
+       }
+      match MIN_DEADTIME_MODE.get(&mut bus) {
+          Err(err) => {
+              error!("Unable to query {}! {err}", MIN_DEADTIME_MODE);
+          }
+          Ok(tiu_ignore_deadtime) => {
+              heartbeat.tiu_ignore_deadtime = tiu_ignore_deadtime != 0;
+          }
+      }
+
+      match TIU_TIMEOUT_CONST.get(&mut bus) {
+          Err(err) => {
+              error!("Unable to query {}! {err}", TIU_TIMEOUT_CONST);
+          }
+          Ok(tiu_timeout_cnt) => {
+              heartbeat.tiu_timeout_cnt = tiu_timeout_cnt as u64;
+          }
+      }
+
+      match TIU_BUSY_RATE.get(&mut bus) {
+          Err(err) => {
+              error!("Unable to query {} {err}!", TIU_BUSY_RATE);
+          }
+          Ok(tiu_busy_rate) => {
+              heartbeat.tiu_busy_rate = tiu_busy_rate as u16;
+          }
+      }
+
+      match TRG_LOST_TRIGGER_RATE.get(&mut bus) {
+          Err(err) => {
+              error!("Unable to query {} {err}!", TRG_LOST_TRIGGER_RATE);
+          }
+          Ok(trg_lost_trg_rate) => {
+              heartbeat.trg_lost_trg_rate = trg_lost_trg_rate as u16;
+          }
+      }
+      
+      match GAPS_TRIGGER_BLOCKED_RATE.get(&mut bus) {
+          Err(err) => {
+              error!("Unable to query {} {err}!", GAPS_TRIGGER_BLOCKED_RATE);
+          }
+          Ok(gaps_blocked_rate) => {
+              heartbeat.gaps_blocked_rate = gaps_blocked_rate as u16;
+          }
+      }
+      match TRACK_TRIGGER_BLOCKED_RATE.get(&mut bus) {
+          Err(err) => {
+              error!("Unable to query {} {err}!", TRACK_TRIGGER_BLOCKED_RATE);
+          }
+          Ok(track_blocked_rate) => {
+              heartbeat.track_blocked_rate = track_blocked_rate as u16;
+          }
+      }
+      match ANY_TRIGGER_BLOCKED_RATE.get(&mut bus) {
+          Err(err) => {
+              error!("Unable to query {} {err}!", ANY_TRIGGER_BLOCKED_RATE);
+          }
+          Ok(any_blocked_rate) => {
+              heartbeat.any_blocked_rate = any_blocked_rate as u16;
+          }
+      }
+
+      match TRACK_CENTRAL_BLOCKED_RATE.get(&mut bus) {
+        Err(err) => {
+            error!("Unable to query {} {err}!", TRACK_CENTRAL_BLOCKED_RATE);
+        }
+        Ok(trkctrl_blocked_rate) => {
+            heartbeat.trkctrl_blocked_rate = trkctrl_blocked_rate as u16;
+        }
+      }
+
+      match TRACK_UMB_CENTRAL_BLOCKED_RATE.get(&mut bus) {
+          Err(err) => {
+              error!("Unable to query {} {err}!", TRACK_UMB_CENTRAL_BLOCKED_RATE);
+          }
+          Ok(trkumbctrl_blocked) => {
+              heartbeat.trkumbctrl_blocked = trkumbctrl_blocked as u16;
+          }
+      }
+
+      match PRESCALE_BYPASS.get(&mut bus) {
+          Err(err) => {
+              error!("Unable to query {} {err}!", PRESCALE_BYPASS);
+          }
+          Ok(prescale_bypass) => {
+              heartbeat.prescale_bypass = prescale_bypass != 0;
+          }
+      }
+
       match TRACK_TRIG_PRESCALE.get(&mut bus) {
         Ok(ps) => {
           heartbeat.prescale_track = (ps as f32) / (u32::MAX as f32) ;
         }
         Err(err) => {
-          error!("Unable to query {}! {err}", LOST_TRIGGER_RATE);
+          error!("Unable to query {}! {err}", TRACK_TRIG_PRESCALE);
         }
       }
       match GAPS_TRIG_PRESCALE.get(&mut bus) {
@@ -833,7 +967,7 @@ pub fn master_trigger(mt_address     : &str,
           heartbeat.prescale_gaps = (ps as f32) / (u32::MAX as f32) ;
         }
         Err(err) => {
-          error!("Unable to query {}! {err}", LOST_TRIGGER_RATE);
+          error!("Unable to query {}! {err}", GAPS_TRIG_PRESCALE);
         }
       }
       heartbeat.version = ProtocolVersion::V1; 
@@ -955,7 +1089,29 @@ impl PyMasterTrigger {
       }
     }
   }
-  
+  #[getter]
+  fn get_prescale_bypass(&mut self) -> PyResult<u32> {
+      match PRESCALE_BYPASS.get(&mut self.ipbus) {
+          Ok(rate) => {
+              return Ok(rate);
+          }
+          Err(err) => {
+              return Err(PyValueError::new_err(err.to_string()));
+          }
+      }
+  }
+  #[getter]
+  fn clock_rate(&mut self) -> PyResult<u32> {
+      match CLOCK_RATE.get(&mut self.ipbus) {
+          Ok(rate) => {
+              return Ok(rate);
+          }
+          Err(err) => {
+              return Err(PyValueError::new_err(err.to_string()));
+          }
+      }
+  }
+
   #[getter]
   /// The lost rate which occured due to RB busy timeouts
   fn rb_lost_rate(&mut self) -> PyResult<u32> {
@@ -981,8 +1137,44 @@ impl PyMasterTrigger {
       }
     }
   }
-
+  
+  /// the lost rate due to the trigger internal busy
   #[getter]
+  fn trg_lost_trg_rate(&mut self) -> PyResult<u32> {
+      match TRG_LOST_TRIGGER_RATE.get(&mut self.ipbus) {
+          Ok(rate) => {
+              return Ok(rate);
+          }
+          Err(err) => {
+              return Err(PyValueError::new_err(err.to_string()));
+          }
+      }
+  }
+
+  /// the amount of fixed deadtime used by the tiu in units of 10ns
+  #[getter]
+  fn get_tiu_timeout_cnt(&mut self) -> PyResult<u32> {
+      match TIU_TIMEOUT_CONST.get(&mut self.ipbus) {
+          Ok(rate) => {
+              return Ok(rate);
+          }
+          Err(err) => {
+              return Err(PyValueError::new_err(err.to_string()));
+          }
+      }
+  }
+  /// get tiu busy rate in Hz
+  #[getter]
+  fn tiu_busy_rate(&mut self) -> PyResult<u32> {
+      match TIU_BUSY_RATE.get(&mut self.ipbus) {
+          Ok(rate) => {
+              return Ok(rate);
+          }
+          Err(err) => {
+              return Err(PyValueError::new_err(err.to_string()));
+          }
+      }
+  }
   /// Check if the TIU emulation mode is on
   ///
   fn get_tiu_emulation_mode(&mut self) -> PyResult<u32> {
@@ -995,8 +1187,20 @@ impl PyMasterTrigger {
       }
     }
   }
- 
-  #[setter]
+  /// check if the MTB is ignoring the TIU and using fixed internal busy
+  #[getter]
+  fn get_ignore_tiu_busy(&mut self) -> PyResult<u32> {
+      match MIN_DEADTIME_MODE.get(&mut self.ipbus) {
+          Ok(mode) => {
+              return Ok(mode);
+          }
+          Err(err) => {
+              return Err(PyValueError::new_err(err.to_string()));
+          }
+      }
+  }
+
+ #[setter]
   fn set_tiu_emulation_mode(&mut self, value : u32) -> PyResult<()> {
     match TIU_EMULATION_MODE.set(&mut self.ipbus, value) {
       Ok(_) => {
@@ -1006,6 +1210,29 @@ impl PyMasterTrigger {
         return Err(PyValueError::new_err(err.to_string()));
       }
     }
+  }
+
+ #[setter]
+  fn set_tiu_timeout_cnt(&mut self, value : u32) -> PyResult<()> {
+      match TIU_TIMEOUT_CONST.set(&mut self.ipbus, value) {
+          Ok(_) => {
+              return Ok(());
+          }
+          Err(err) => {
+              return Err(PyValueError::new_err(err.to_string()));
+          }
+      }
+  }
+ #[setter]
+  fn set_ingore_tiu_busy(&mut self, value : u32) -> PyResult<()> {
+      match MIN_DEADTIME_MODE.set(&mut self.ipbus, value) {
+          Ok(_) => {
+              return Ok(());
+          }
+          Err(err) => {
+              return Err(PyValueError::new_err(err.to_string()));
+          }
+      }
   }
 
   #[setter]
@@ -1031,7 +1258,7 @@ impl PyMasterTrigger {
       }
     }
   }
-
+  
   fn get_enable_cyclic_trig(&mut self) -> PyResult<bool> {
     match TRIG_CYCLIC_EN.get(&mut self.ipbus) {
       Ok(value) => {

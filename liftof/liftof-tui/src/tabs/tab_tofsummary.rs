@@ -48,11 +48,6 @@ use ratatui::{
 };
 
 use gondola_core::prelude::*;
-////use tof_dataclasses::packets::TofPacket;
-//use tof_dataclasses::events::TofEvent;
-//use tof_dataclasses::errors::SerializationError;
-////use tof_dataclasses::serialization::Serialization;
-//use tof_dataclasses::database::DsiJChPidMapping;
 
 use crate::colors::{
     ColorTheme,
@@ -68,9 +63,11 @@ use crate::widgets::{
 
 #[derive(Debug, Clone)]
 pub struct TofSummaryTab {
-  pub ts_receiver     : Receiver<TofEvent>,
+  pub ts_receiver     : Receiver<TofPacket>,
   /// pass our events on when we are done with them!
   pub ts_sender       : Sender<TofEvent>,
+  pub rbe_sender      : Sender<RBEvent>,
+  pub mte_sender      : Sender<TofEvent>,
   pub summary_queue   : VecDeque<TofEvent>,
   pub queue_size      : usize,
   pub n_trg_pdl_histo : Hist1D<Uniform<f32>>, 
@@ -89,8 +86,10 @@ pub struct TofSummaryTab {
 }
 
 impl TofSummaryTab {
-  pub fn new(ts_receiver  : Receiver<TofEvent>,
+  pub fn new(ts_receiver  : Receiver<TofPacket>,
              ts_sender    : Sender<TofEvent>,
+             mte_sender   : Sender<TofEvent>,
+             rbe_sender   : Sender<RBEvent>,
              dsijchpidmap : &DsiJChPidMapping,
              theme        : ColorTheme) -> Self {
     
@@ -99,6 +98,8 @@ impl TofSummaryTab {
     Self {
       ts_receiver     : ts_receiver,
       ts_sender       : ts_sender,
+      mte_sender      : mte_sender,
+      rbe_sender      : rbe_sender,
       summary_queue   : VecDeque::<TofEvent>::new(),
       queue_size      : 10000,
       n_trg_pdl_histo : ndhistogram!(bins),
@@ -119,7 +120,17 @@ impl TofSummaryTab {
       Err(_err)  => {
         trace!("Unable to receive new TofEvent!");
       },
-      Ok(ts)    => {
+      Ok(tp)    => {
+        let ts = tp.unpack::<TofEvent>()?;
+        //let ts : TofEvent;
+        //match tp.unpack::<TofEvent>() {
+        //  Err(err) => {
+        //    error!("Can't unpack TofEvent! {}", err);
+
+        //  }
+        //}
+
+
         // triggerd paddles histogram
         self.n_trg_pdl_histo.fill(&(ts.n_trigger_paddles as f32));
         // missing hg hits for paddles histogram
@@ -151,11 +162,23 @@ impl TofSummaryTab {
           self.evid_test_info += &(format!("\n-- -- previous: {:?}", self.evid_test_chnks));
           self.event_id_test.clear();
         }
+        // pass on RBEvents 
+        for rbev in &ts.rb_events {
+          match self.rbe_sender.send(rbev.clone()) {
+            Ok(_) => (),
+            Err(err) => error!("Unable to pass on RBEvent! {err}")
+          }
+        }
         self.summary_queue.push_back(ts.clone());
         if self.summary_queue.len() > self.queue_size {
           self.summary_queue.pop_front();
         }
-        match self.ts_sender.send(ts) {
+
+        match self.ts_sender.send(ts.clone()) {
+          Ok(_)    => (),
+          Err(err) => error!("Unable to pass on TofEvent! {err}")
+        }
+        match self.mte_sender.send(ts) {
           Ok(_)    => (),
           Err(err) => error!("Unable to pass on TofEvent! {err}")
         }

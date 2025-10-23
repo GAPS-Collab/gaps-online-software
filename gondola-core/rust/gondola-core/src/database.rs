@@ -11,9 +11,11 @@ use diesel::prelude::*;
 mod schema;
     
 use schema::tof_db_rat::dsl::*;
-//use schema::tof_db_dsicard::dsl::*;
 
+/// Low gain/LTB connections to paddle ID 
 pub type DsiJChPidMapping = HashMap<u8, HashMap<u8, HashMap<u8, (u8, u8)>>>;
+/// RB ID and RB Ch to paddle ID mapping 
+pub type RbChPidMapping = HashMap<u8, HashMap<u8, u8>>;
 
 /// Connect to a database at a given location
 pub fn connect_to_db_path(db_path : &str) -> Result<diesel::SqliteConnection, ConnectionError> {
@@ -134,6 +136,81 @@ pub fn get_linkid_rbid_map(rbs : &Vec<ReadoutBoard>) -> HashMap<u8, u8>{
     mapping.insert(rb.mtb_link_id, rb.rb_id);
   }
   mapping
+}
+
+//---------------------------------------------------------------------
+
+/// Create a map for rbid, ch -> paddle id. This is only for the A 
+/// side and will not have an entry in case the given RB channel
+/// is connected to the B side of the paddle
+pub fn get_rb_ch_pid_a_map() -> Option<RbChPidMapping> {
+  let paddles = TofPaddle::all()?;
+  let mut mapping = RbChPidMapping::new();
+  for rbid  in 1..51 {
+    let mut chmap = HashMap::<u8, u8>::new();
+    for ch in 1..9 {
+      chmap.insert(ch,0);
+    }
+    mapping.insert(rbid,chmap);
+  }
+  for pdl in paddles {
+    let rb_id = pdl.rb_id  as u8;
+    let ch_a  = pdl.rb_chA as u8;
+    let pid   = pdl.paddle_id as u8;
+    *mapping.get_mut(&rb_id).unwrap().get_mut(&ch_a).unwrap() = pid;
+  }
+  Some(mapping)
+}
+
+//---------------------------------------------------------------------
+
+/// Create a map for rbid, ch -> paddle id. This is only for the B 
+/// side and will not have an entry in case the given RB channel
+/// is connected to the A side of the paddle
+pub fn get_rb_ch_pid_b_map() -> Option<RbChPidMapping> {
+  let mut mapping = RbChPidMapping::new();
+  let paddles = TofPaddle::all()?;
+  for rbid  in 1..51 {
+    let mut chmap = HashMap::<u8, u8>::new();
+    for ch in 1..9 {
+      chmap.insert(ch,0);
+    }
+    mapping.insert(rbid,chmap);
+  }
+
+  for pdl in paddles {
+    let rb_id = pdl.rb_id  as u8;
+    let ch_b  = pdl.rb_chB as u8;
+    let pid   = pdl.paddle_id as u8;
+    *mapping.get_mut(&rb_id).unwrap().get_mut(&ch_b).unwrap() = pid;
+  }
+  Some(mapping)
+}
+
+//---------------------------------------------------------------------
+
+/// Create a map for rbid, ch -> paddle id. 
+///
+/// This version is oblivious to the paddle ends 
+pub fn get_rb_ch_pid() -> Option<RbChPidMapping> {
+  let paddles = TofPaddle::all()?;
+  let mut mapping = RbChPidMapping::new();
+  for rbid  in 1..51 {
+    let mut chmap = HashMap::<u8, u8>::new();
+    for ch in 1..9 {
+      chmap.insert(ch,0);
+    }
+    mapping.insert(rbid,chmap);
+  }
+  for pdl in paddles {
+    let rb_id = pdl.rb_id  as u8;
+    let ch_a  = pdl.rb_chA as u8;
+    let ch_b  = pdl.rb_chB as u8;
+    let pid   = pdl.paddle_id as u8;
+    *mapping.get_mut(&rb_id).unwrap().get_mut(&ch_a).unwrap() = pid;
+    *mapping.get_mut(&rb_id).unwrap().get_mut(&ch_b).unwrap() = pid;
+  }
+  Some(mapping)
 }
 
 //---------------------------------------------------------------------

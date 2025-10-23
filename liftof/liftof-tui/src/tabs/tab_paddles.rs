@@ -3,6 +3,8 @@
 //! TofHits
 //!
 
+use std::mem;
+
 use std::collections::{
   HashMap,
   VecDeque,
@@ -47,22 +49,6 @@ use ndhistogram::axis::{
 };
 
 use gondola_core::prelude::*;
-
-
-////use tof_dataclasses::serialization::Serialization;
-//use tof_dataclasses::errors::SerializationError;
-//use tof_dataclasses::packets::TofPacket;
-//use tof_dataclasses::events::{
-//  //RBEvent,
-//  //TofEvent,
-//  TofEvent,
-//  //TofHit,
-//  //TofEventHeader,
-//  //MasterTriggerEvent,
-//  RBWaveform,
-//};
-//use tof_dataclasses::calibrations::RBCalibrations;
-//use tof_dataclasses::database::Paddle;
 
 use crate::colors::ColorTheme;
 use crate::menu::{
@@ -122,6 +108,7 @@ pub struct PaddleTab<'a> {
   pub pdl_active         : bool,
   pub pdl_selector       : usize,
   pub pdl_changed        : bool,
+  pub rb_ch_map          : RbChPidMapping,
 }
 
 impl PaddleTab<'_> {
@@ -188,7 +175,7 @@ impl PaddleTab<'_> {
       lwf_ch_a.insert(pid, VecDeque::<(f64,f64)>::new());
       lwf_ch_b.insert(pid, VecDeque::<(f64,f64)>::new());
     }
-
+    let rb_ch_map = get_rb_ch_pid().unwrap();
     Self {
       theme,
       te_receiver,
@@ -224,6 +211,7 @@ impl PaddleTab<'_> {
       pdl_active        : false,
       pdl_selector      : 1,
       pdl_changed       : false,
+      rb_ch_map         : rb_ch_map,  
     }
   }
   
@@ -264,7 +252,29 @@ impl PaddleTab<'_> {
       Err(_err) => {
       }
       Ok(wf_pack)    => {
-        let mut wf : RBWaveform = wf_pack.unpack()?;
+        //info!("Got new RBWaveform! {}", wf_pack);
+        //println!("Size of rbwaveform {}", mem::size_of::<RBWaveform>());
+        //return Ok(());
+        let mut wf : RBWaveform;
+        //wf = RBWaveform::from_random();
+        //wf = wf.pack().unpack().unwrap();
+        //println!("{:?}", wf.adc_a); 
+        ////wf = RBWaveform::new();
+        match wf_pack.unpack::<RBWaveform>() {
+          Ok(wf_) => {
+            //return Ok(());
+            wf = wf_;
+            //println!("{:?}", wf.adc_a);
+          }
+          Err(err) => {
+            error!("Got broken Wf packet {err}");
+            return Ok(());
+          }
+        }
+        //let mut wf : RBWaveform = wf_pack.unpack()?;
+        //let mut pos = 0;
+        //let mut wf : RBWaveform = RBWaveform::from_bytestream(&wf_pack.payload, &mut pos)?;
+        //let mut wf = RBWaveform::new();
         match self.calibrations.get(&wf.rb_id) {
           None => error!("RBCalibrations for board {} not available!", wf.rb_id),
           Some(rbcal) => {
@@ -274,19 +284,23 @@ impl PaddleTab<'_> {
             }
           }
         }
-        if wf.paddle_id == self.current_paddle.paddle_id as u8 {
-          let rb_channel_a = wf.rb_channel_a + 1;
-          let rb_channel_b = wf.rb_channel_b + 1;
-          if (rb_channel_a != self.current_paddle.rb_chA as u8 ) 
-             || (rb_channel_b != self.current_paddle.rb_chB as u8 ) {
-            error!("Inconsistent paddle RB channels! Maybe A and B are switched!");
-          }
+        // patch it for now
+        if wf.paddle_id == 0 {
+          wf.paddle_id = self.rb_ch_map[&wf.rb_id][&wf.rb_channel_a];
         }
         if wf.paddle_id == 0 {
           error!("Got waveform with padle id 0!");
         } else if wf.paddle_id > 160 {
           error!("Got paddle id which is too large! {}", wf.paddle_id);
         } else {
+          if wf.paddle_id == self.current_paddle.paddle_id as u8 {
+            let rb_channel_a = wf.rb_channel_a + 1;
+            let rb_channel_b = wf.rb_channel_b + 1;
+            if (rb_channel_a != self.current_paddle.rb_chA as u8 ) 
+               || (rb_channel_b != self.current_paddle.rb_chB as u8 ) {
+              error!("Inconsistent paddle RB channels! Maybe A and B are switched!");
+            }
+          }
           let pid = wf.paddle_id as u8;
           *self.wf.get_mut(&pid).unwrap() = wf;
         }
@@ -338,6 +352,7 @@ impl PaddleTab<'_> {
         return Ok(());
       }
     }
+    return Ok(());
   }
 
   // Color::Blue was nice for background

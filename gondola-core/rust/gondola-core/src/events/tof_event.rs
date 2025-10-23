@@ -25,7 +25,8 @@ use std::cmp::Ordering;
 /// * ProtocolVersion::V2     - v0.11 (gondola-core) version of TofEvent(Summary).
 ///   This version will not write out GCU variables and does not expect them to be in the 
 ///   bytestream. If desired, this version can read/write RBEvents. 
-///
+/// * ProtocolVersion::V3     - the "latest and greatest". This version has gcuvariables 
+///                             AND rbevents. RBEvents can be stripped off later on.
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature="pybindings", pyclass)]
 pub struct TofEvent {
@@ -82,8 +83,8 @@ pub struct TofEvent {
   // to carry waveforms. These then can be stripped off
   pub rb_events          : Vec<RBEvent>,
   /// Start time for a time to wait for incoming RBEvents
-  pub creation_time     : Instant,
-  pub write_to_disk     : bool, 
+  pub creation_time      : Instant,
+  pub write_to_disk      : bool, 
 }
 
 impl TofEvent {
@@ -121,9 +122,54 @@ impl TofEvent {
       write_to_disk      : true,
     }
   }
- 
-  /// Remove any RBEvents from the event 
+
+  /// Calculate the timestamp from the MTB inlcuding GPS and all
+  ///
+  /// This will be the most precise timestamp in GAPS, based on 
+  /// a 100MHz oscillator and if GPS is active, it will fix itself
+  /// with the GPS 1PPS pulse
+  pub fn get_mt_timestamp_abs(&self) -> u64 {
+    let gps = self.mt_tiu_gps32 as u64;
+    let mut timestamp = self.mt_timestamp as u64;
+    if timestamp < self.mt_tiu_timestamp as u64 {
+      // it has wrapped
+      timestamp += u32::MAX as u64 + 1;
+    }
+    let gps_mult = match 100_000_000u64.checked_mul(gps) {
+    //let gps_mult = match 100_000u64.checked_mul(gps) {
+      Some(result) => result,
+      None => {
+          // Handle overflow case here
+          // Example: log an error, return a default value, etc.
+          0 // Example fallback value
+      }
+    };
+    let ts = gps_mult + (timestamp - self.mt_tiu_timestamp as u64);
+    ts
+  }
+
+  /// Move hits out of RBEvents and in the general 
+  /// hitvector. 
+  ///
+  /// This should be done once an event is complete.
+  /// The RBEvents keep the associated waveforms, but 
+  /// the hits all move into a single vector
+  pub fn move_hits(&mut self) {
+    let mut all_hits = Vec::<TofHit>::with_capacity(5);
+    for rbev in &mut self.rb_events {
+       all_hits.append(&mut rbev.hits);
+    }
+    self.hits = all_hits;
+  }
+
+  /// Remove any RBEvents from the event. 
+  ///
+  /// This will move the hits out of the 
+  /// RBEvents and put them in the hit vector.
   pub fn strip_rbevents(&mut self) {
+    if self.hits.len() == 0 {
+      self.move_hits();
+    }
     self.rb_events.clear();
   }
   
@@ -166,6 +212,16 @@ impl TofEvent {
       self.strip_rbevents();
     }
     self.version = ProtocolVersion::V1;
+    if self.n_hits_cbe == 0 && self.n_hits_umb == 0 && self.n_hits_cor == 0 {
+      self.calc_gcu_variables();
+    }
+  }
+ 
+  /// Calculate the infamous "interesting event" (TM Kaliroe) variables 
+  /// for the TOF. 
+  ///
+  /// This is necessary since the GCU is too weak to do math :) 
+  pub fn calc_gcu_variables(&mut self) {
     for h in &self.hits {
       if h.paddle_id <= 60 {
         self.n_hits_cbe += 1;
@@ -181,7 +237,7 @@ impl TofEvent {
       }
     }
   }
-  
+
   /// Ensure compatibility with older data, which 
   /// contained a different type of TofEvent
   pub fn decode_depr_tofevent_size_header(mask : &u32) 
@@ -608,6 +664,74 @@ impl TofEvent {
     }
     wfs
   }
+
+  /// Change the status version when the event is already 
+  /// packed. The status version is encoded in byte 2 
+  /// (starting from 0) in the payload of the TofPacket 
+  pub fn set_packed_status_version(pack : &mut TofPacket, version : ProtocolVersion) 
+    -> Result<(), SerializationError> {
+    if pack.packet_type != TofPacketType::TofEvent {
+      return Err(SerializationError::IncorrectPacketType);
+    }
+    let mut status_version = pack.payload[2];
+    // null the bytes relevant for the version 
+    status_version  = status_version & 0x3f;
+    // now or the bytes for the new version 
+    status_version  = status_version | version.to_u8();
+    pack.payload[2] = status_version; 
+    Ok(()) 
+  }
+
+  /// For events with ProtocolVersion == V3, 
+  /// we have the rbevents at the end and the 
+  /// packet contains the GCU variables.
+  ///
+  /// This can remove the rbevents from a packed bytestrem,
+  /// and will reset the ProtocolVersion to V2.
+  /// The result is an event which should be ready 
+  /// to be sent to the GCU.
+  pub fn strip_packed_rbevents_for_pv3(pack : &mut TofPacket)
+    -> Result<(), SerializationError> {
+    if pack.packet_type != TofPacketType::TofEvent {
+      return Err(SerializationError::IncorrectPacketType);
+    }
+    let status_version = pack.payload[2];
+    let mut version    = ProtocolVersion::from(status_version & 0xc0);
+    if version != ProtocolVersion::V3 {
+      error!("This operation can only be executed on {}, however, this is version {}!", ProtocolVersion::V3, version);
+      return Err(SerializationError::WrongProtocolVersion);
+    }
+    // jump to the start of RBEvents 
+    let mut pos = 0usize;
+    pos += 10; // header 
+    pos += 15; // gcu variables (protocolversion V1 & V3) 
+    pos += 15;
+    if pack.payload.len() >= pos {
+      return Err(SerializationError::StreamTooShort);
+    }
+    let nmasks = parse_u8(&pack.payload, &mut pos);
+    for _ in 0..nmasks {
+      pos += 2;
+    }
+    pos += 8;
+    let nhits  = parse_u16(&pack.payload,&mut pos);
+    // set back the version
+    for _ in 0..nhits {
+      pos += TofHit::SIZE;
+      // FIXME - if we don't be able to manage 
+      //         to have a consistent size for 
+      //         TofHit, we have to deserialize them 
+      //         here (or write a minimal deserializer
+    }
+    // the next byte is finally the number of RBEvents. 
+    // So we set that to 0, strip the rest of the paylod 
+    // and re-attach the TAIL
+    pack.payload.truncate(pack.payload.len() - pos);
+    pack.payload.extend_from_slice(&Self::TAIL.to_le_bytes());
+    version = ProtocolVersion::V2;
+    Self::set_packed_status_version(pack, version)?;
+    Ok(())
+  }
 }
 
 impl TofPackable for TofEvent {
@@ -630,7 +754,8 @@ impl Serialization for TofEvent {
     stream.extend_from_slice(&self.n_trigger_paddles.to_le_bytes());
     stream.extend_from_slice(&self.event_id.to_le_bytes());
     // depending on the version, we send the fc event packet
-    if self.version == ProtocolVersion::V1 {
+    if self.version == ProtocolVersion::V1 
+      || self.version == ProtocolVersion::V3 {
       stream.extend_from_slice(&self.n_hits_umb  .to_le_bytes()); 
       stream.extend_from_slice(&self.n_hits_cbe  .to_le_bytes()); 
       stream.extend_from_slice(&self.n_hits_cor  .to_le_bytes()); 
@@ -657,7 +782,8 @@ impl Serialization for TofEvent {
     }
     // for the new (>=v0.11) event, we will always write 
     // the rb events
-    if self.version == ProtocolVersion::V2 {
+    if self.version == ProtocolVersion::V2 
+      || self.version == ProtocolVersion::V3 {
       stream.push(self.rb_events.len() as u8);
       for rbev in &self.rb_events {
         stream.extend_from_slice(&rbev.to_bytestream());
@@ -670,21 +796,23 @@ impl Serialization for TofEvent {
   fn from_bytestream(stream    : &Vec<u8>, 
                      pos       : &mut usize) 
     -> Result<Self, SerializationError>{
-    let mut event           = Self::new();
-    let head = parse_u16(stream, pos);
+    let mut event = Self::new();
+    let head      = parse_u16(stream, pos);
     if head != Self::HEAD {
       error!("Decoding of HEAD failed! Got {} instead!", head);
       return Err(SerializationError::HeadInvalid);
     }
-    let status_version_u8     = parse_u8(stream, pos);
-    let status                = EventStatus::from(status_version_u8 & 0x3f);
-    let version               = ProtocolVersion::from(status_version_u8 & 0xc0); 
+    
+    let status_version_u8   = parse_u8(stream, pos);
+    let status              = EventStatus::from(status_version_u8 & 0x3f);
+    let version             = ProtocolVersion::from(status_version_u8 & 0xc0); 
     event.status            = status;
     event.version           = version;
     event.trigger_sources   = parse_u16(stream, pos);
     event.n_trigger_paddles = parse_u8(stream, pos);
     event.event_id          = parse_u32(stream, pos);
-    if event.version == ProtocolVersion::V1 {
+    if event.version == ProtocolVersion::V1
+      || event.version == ProtocolVersion::V3 {
       event.n_hits_umb      = parse_u8(stream, pos); 
       event.n_hits_cbe      = parse_u8(stream, pos); 
       event.n_hits_cor      = parse_u8(stream, pos); 
@@ -702,13 +830,18 @@ impl Serialization for TofEvent {
     for _ in 0..n_channel_masks {
       event.channel_mask.push(parse_u16(stream, pos));
     }
-    event.mtb_link_mask     = parse_u64(stream, pos);
-    let nhits                 = parse_u16(stream, pos);
+    event.mtb_link_mask      = parse_u64(stream, pos);
+    let nhits                = parse_u16(stream, pos);
+    //println!("{}", event);
+    if nhits > 160 {
+      error!("There are an abnormous amount of hits in this event!");
+      return Err(SerializationError::StreamTooLong);
+    } 
     for _ in 0..nhits {
       event.hits.push(TofHit::from_bytestream(stream, pos)?);
     }
-    if event.version == ProtocolVersion::V2 {
-      // for this version, we can have rb events 
+    if event.version == ProtocolVersion::V2 
+      || event.version == ProtocolVersion::V3 {
       let n_rb_events = parse_u8(stream, pos);
       if n_rb_events > 0 {
         for _ in 0..n_rb_events {
@@ -728,8 +861,8 @@ impl Serialization for TofEvent {
   /// Allows to get TofEvent from a packet 
   /// of the deprecate packet type TofEventDeprecated.
   /// This packet type was formerly known as TofEvent
-  /// This will dismiss all the 
-  /// waveforms and RBEvents
+  ///
+  /// This will produce an event with rbevents & hits.
   fn from_bytestream_alt(stream    : &Vec<u8>, 
                          pos       : &mut usize) 
     -> Result<Self, SerializationError> {
@@ -781,7 +914,7 @@ impl Serialization for TofEvent {
     }
     //let mt_event      = MasterTriggerEvent::from_bytestream(stream, &mut pos)?;
     let v_sizes           = Self::decode_depr_tofevent_size_header(&parse_u32(stream, pos));
-    //println!("{:?}", v_sizes);
+    println!("VSIZES {:?}", v_sizes);
     for _ in 0..v_sizes.0 {
       // we are getting all waveforms for now, but we can 
       // discard them later
@@ -828,6 +961,15 @@ impl fmt::Display for TofEvent {
     repr += &(format!("\n   |-> timestamp48 : {}", self.get_timestamp48())); 
     //repr += &(format!("\n  PrimaryBeta      : {}", self.get_beta())); 
     //repr += &(format!("\n  PrimaryCharge    : {}", self.primary_charge));
+    if self.version == ProtocolVersion::V1 {
+      repr += "---- V1 variables ----";
+      repr += &(format!("\n n_hits_umb   : {}", self.n_hits_umb  )); 
+      repr += &(format!("\n n_hits_cbe   : {}", self.n_hits_cbe  )); 
+      repr += &(format!("\n n_hits_cor   : {}", self.n_hits_cor  )); 
+      repr += &(format!("\n tot_edep_umb : {}", self.tot_edep_umb)); 
+      repr += &(format!("\n tot_edep_cbe : {}", self.tot_edep_cbe)); 
+      repr += &(format!("\n tot_edep_cor : {}", self.tot_edep_cor)); 
+    }
     repr += &(format!("\n  ** ** TRIGGER HITS (DSI/J/CH) [{} LTBS] ** **", self.dsi_j_mask.count_ones()));
     for k in self.get_trigger_hits() {
       repr += &(format!("\n  => {}/{}/({},{}) ({}) ", k.0, k.1, k.2.0, k.2.1, k.3));
@@ -861,7 +1003,7 @@ impl fmt::Display for TofEvent {
 impl FromRandom for TofEvent {
 
   fn from_random() -> Self {
-    let mut event           = Self::new();
+    let mut event             = Self::new();
     let mut rng               = rand::rng();
     let status                = EventStatus::from_random();
     let version               = ProtocolVersion::from_random();
@@ -1027,6 +1169,11 @@ impl TofEvent {
     self.get_trigger_sources()
   } 
 
+  #[pyo3(name="move_hits")]
+  pub fn move_hits_py(&mut self) {
+    self.move_hits()
+  }
+
   #[getter]
   #[pyo3(name="hits")]
   pub fn hits_py<'_py>(&self) -> Vec<TofHit> {
@@ -1138,6 +1285,36 @@ impl TofEvent {
   fn get_waveforms_py(&self) -> Vec<RBWaveform> {
     self.get_waveforms()
   }
+
+  #[staticmethod]
+  #[pyo3(name = "set_packed_status_version")]
+  fn set_packed_status_version_py(pack : &mut TofPacket, version : ProtocolVersion) 
+    -> PyResult<()> {
+    match Self::set_packed_status_version(pack, version) {
+      Err(err) => {
+        return Err(PyValueError::new_err("Unable to set status version! {err}"));
+      } 
+      Ok(_) => {
+        return Ok(());
+      }
+    }
+  }
+
+  #[staticmethod]
+  #[pyo3(name = "strip_packed_rbevents_for_pv3")]
+  fn strip_packed_rbevents_for_pv3_py(pack : &mut TofPacket, version : ProtocolVersion) 
+    -> PyResult<()> {
+    match Self::strip_packed_rbevents_for_pv3(pack) {
+      Err(err) => {
+        return Err(PyValueError::new_err("Unable to set status version! {err}"));
+      } 
+      Ok(_) => {
+        return Ok(());
+      }
+    }
+  }
+
+
 }
 
 #[cfg(feature="pybindings")]
@@ -1146,6 +1323,7 @@ pythonize_packable!(TofEvent);
 //---------------------------------------------------
 
 #[test]
+#[cfg(feature="random")]
 fn packable_tofeventv0() {
   for _ in 0..500 {
     let mut data = TofEvent::from_random();
@@ -1176,6 +1354,7 @@ fn packable_tofeventv0() {
 }  
 
 #[test]
+#[cfg(feature="random")]
 fn packable_tofeventv1() {
   for _ in 0..500 {
     let mut data = TofEvent::from_random();
@@ -1204,6 +1383,7 @@ fn packable_tofeventv1() {
 }  
 
 #[test]
+#[cfg(feature="random")]
 fn packable_tofeventv2() {
   for _ in 0..500 {
     let mut data = TofEvent::from_random();
@@ -1231,6 +1411,65 @@ fn packable_tofeventv2() {
   }
 }  
 
+#[test]
+#[cfg(feature="random")]
+fn packable_tofeventv3() {
+  for _ in 0..500 {
+    let mut data = TofEvent::from_random();
+    if data.version != ProtocolVersion::V3 {
+      continue;
+    }
+    let mut test : TofEvent = data.pack().unpack().unwrap();
+    //println!("{}", data.hits[0]);
+    //println!("{}", test.hits[0]);
+    // Manually zero these fields, since comparison with nan will fail and 
+    // from_random did not touch these
+    let fix_time = Instant::now();
+    test.creation_time = fix_time;
+    data.creation_time = fix_time;
+    for h in &mut test.hits {
+      h.paddle_len       = 0.0; 
+      h.coax_cable_time  = 0.0; 
+      h.hart_cable_time  = 0.0; 
+      h.x                = 0.0; 
+      h.y                = 0.0; 
+      h.z                = 0.0; 
+      h.event_t0         = 0.0;
+    }
+    assert_eq!(data, test);
+  }
+}  
+
+#[test]
+#[cfg(feature="random")]
+fn tofevent_move_hits() {
+  let mut event = TofEvent::from_random();
+  let mut n_hits_exp = 0usize;
+  for rb in &event.rb_events {
+    n_hits_exp += rb.hits.len();
+  }
+  event.hits.clear();
+  event.move_hits();
+  for rb in &event.rb_events {
+    assert_eq!(rb.hits.len(),0);
+  }
+  assert_eq!(n_hits_exp, event.hits.len());
+
+}
+
+#[test]
+#[cfg(feature="random")] 
+fn tofevent_striprbevents() {
+  let mut event      = TofEvent::from_random();
+  let mut n_hits_exp = 0usize;
+  for rb in &event.rb_events {
+    n_hits_exp += rb.hits.len();
+  }
+  event.hits.clear();
+  event.strip_rbevents();
+  assert_eq!(event.rb_events.len(),0);
+  assert_eq!(n_hits_exp, event.hits.len());
+}
 
 //#[test]
 //#[cfg(feature = "random")]

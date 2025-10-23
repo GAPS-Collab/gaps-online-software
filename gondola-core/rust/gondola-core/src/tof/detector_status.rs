@@ -85,10 +85,10 @@ impl TofDetectorStatus {
 
   /// Get all paddle ids which have dead 
   /// channels on the A-side
-  pub fn get_dead_paddles_a(&self) -> Vec<u8> {
+  pub fn get_active_paddles_a(&self) -> Vec<u8> {
     let mut dead_a = Vec::<u8>::new();
-    let inactive = self.get_inactive_channels_idx();
-    for k in inactive.iter() {
+    let active = self.get_active_channels_idx();
+    for k in active.iter() {
       if *k < 160 {
         dead_a.push(*k as u8);
       }
@@ -98,10 +98,10 @@ impl TofDetectorStatus {
 
   /// Get all paddle ids which have dead 
   /// channels on the B-side
-  pub fn get_dead_paddles_b(&self) -> Vec<u8> {
+  pub fn get_active_paddles_b(&self) -> Vec<u8> {
     let mut dead_b = Vec::<u8>::new();
-    let inactive = self.get_inactive_channels_idx();
-    for k in inactive.iter() {
+    let active = self.get_active_channels_idx();
+    for k in active.iter() {
       if *k >= 160 {
         dead_b.push((*k-159) as u8);
       }
@@ -111,7 +111,7 @@ impl TofDetectorStatus {
 
   /// Index of inactive channels in the range of 
   /// 0-319. These indizes are MTBChannel numbers
-  fn get_inactive_channels_idx(&self) -> Vec<u16> {
+  fn get_active_channels_idx(&self) -> Vec<u16> {
     let mut channels = Vec::<u16>::new();
     for k in 0..10 {
       if (self.channels000_031 >> k & 0x1) == 1 {

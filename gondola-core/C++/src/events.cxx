@@ -576,9 +576,8 @@ auto g::TofEvent::get_n_rbevents(u32 mask) -> u32 {
 
 /**********************************************************/
 
-#ifdef BUILD_CXXDB
+#ifdef BUILD_CXX_DB
 auto g::TofEvent::normalize_hit_times() -> void {
-
   if (rb_events.size() == 0) {
     return;
   }
@@ -1286,12 +1285,33 @@ auto g::TofEventSummary::get_trigger_sources() const -> Vec<g::TriggerType> {
 
 #ifdef BUILD_CXXDB
 auto g::TofEventSummary::normalize_hit_times() -> void {
-  //FIXME
+  if (hits.size() == 0) {
+    return;
+  }
+  auto PI = std::numbers::pi_v<f32>;
+  bool first_phase = false;
+  f32 phase0 = 0;
+  for (auto &h : hits) {
+    if (!first_phase) {
+      phase0 = h.phase;
+      first_phase = true;
+    }
+    auto t0 = h.get_t0_relative() + h.get_cable_delay();
+    auto phase_diff = h.phase - phase0;
+    while (phase_diff < - PI/2.0) {
+      phase_diff += 2.0*PI;
+    }
+    while (phase_diff > PI/2.0) {
+      phase_diff -= 2.0*PI;
+    }
+    auto t_shift = 50.0*phase_diff/(2.0*PI);
+    h.event_t0 = t0 + t_shift;
+  }
 }
 #endif
 
 
-Vec<std::tuple<u8, u8, u8, g::LTBThreshold>> g::TofEventSummary::get_trigger_hits() const {
+auto g::TofEventSummary::get_trigger_hits() const -> Vec<std::tuple<u8,u8,u8, g::LTBThreshold>> {
   auto hits = Vec<std::tuple<u8,u8,u8, g::LTBThreshold>>(); 
   //let n_masks_needed = self.dsi_j_mask.count_ones() / 2 + self.dsi_j_mask.count_ones() % 2;
   auto dsi_j_mask_bits = std::bitset<32>(dsi_j_mask);

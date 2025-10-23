@@ -168,7 +168,8 @@ fn main() {
   let current_dir      = format!("{}/current", staging_dir.clone());
   let default_cfg_file = format!("{}/default/liftof-config-default.toml", staging_dir.clone());
   let db_path     = config.db_path.clone();
-  let mut conn_    = connect_to_db_path(&db_path).expect("Unable to establish a connection to the DB! CHeck db_path in the liftof settings (.toml) file!");
+  // this will set tne necessary environment variable
+  let mut _conn    = connect_to_db_path(&db_path).expect("Unable to establish a connection to the DB! CHeck db_path in the liftof settings (.toml) file!");
   // if this call does not go through, we might as well fail early.
   let rb_list     = ReadoutBoard::all().expect("Unable to retrieve RB information! Unable to continue, check db_path in the liftof settings (.toml) file and DB integrity!");
   let mut all_rb_ids  = Vec::<u8>::new();

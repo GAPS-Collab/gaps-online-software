@@ -585,8 +585,12 @@ pub struct AnalysisEngineSettings {
   pub max_peaks              : usize,
   /// Timing CFG fraction
   pub cfd_fraction           : f32,
-  /// Time over threshold threshold in mV
-  pub tot_threshold          : Option<f32>
+  /// Time over threshold threshold in mV for 
+  /// the lower
+  pub tot_threshold_high     : Option<f32>,
+  /// Time over threshold threshold in mV for 
+  /// the upper
+  pub tot_threshold_low      : Option<f32>
 }
 
 impl AnalysisEngineSettings {
@@ -604,7 +608,8 @@ impl AnalysisEngineSettings {
       find_pks_thresh           : 10.0,
       max_peaks                 : 5,
       cfd_fraction              : 0.2,
-      tot_threshold             : Some(500.0),
+      tot_threshold_low         : Some(250.0),
+      tot_threshold_high        : Some(750.0),
     }
   }
 }
@@ -839,6 +844,9 @@ impl Default for DataPublisherSettings {
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 #[cfg_attr(feature="pybindings", pyclass)]
 pub struct LiftofSettings {
+  /// The config version indicates, which version of 
+  /// Liftof of this file is intended for, e.g. "0.11"
+  pub config_version             : Option<String>,
   /// read run .toml files from this directory and 
   /// automotically work through them 1by1
   pub staging_dir                : String,
@@ -903,6 +911,7 @@ pub struct LiftofSettings {
 impl LiftofSettings {
   pub fn new() -> Self {
     LiftofSettings {
+      config_version            : None, 
       staging_dir               : String::from("/home/gaps/liftof-staging"),
       calibration_dir           : String::from(""),
       db_path                   : String::from("/home/gaps/config/gaps_flight.db"),

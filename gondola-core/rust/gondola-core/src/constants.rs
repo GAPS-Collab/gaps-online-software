@@ -71,7 +71,7 @@ pub const LIFTOF_LOGO_SHOW  : &str  = "
           >> with undying support from the Hawaiian islands \u{1f30a}\u{1f308}\u{1f965}\u{1f334}
 
           * Documentation
-          ==> GitHub   https://github.com/GAPS-Collab/gaps-online-software/tree/LELEWAA-0.11
+          ==> GitHub   https://github.com/GAPS-Collab/gaps-online-software/tree/PAKII-0.11
           ==> API docs https://gaps-collab.github.io/gaps-online-software/
 
   ";

@@ -34,6 +34,7 @@ use gondola_core::prelude::*;
 ///                      start/stop signals.
 ///                      Keeps global settings.
 pub fn global_data_sink(incoming       : &Receiver<TofPacket>,
+                        incoming_ev    : &Receiver<TofEvent>,
                         thread_control : Arc<Mutex<ThreadControl>>) {
   // when the thread starts, we need to wait a bit
   // till thread_control becomes usable
@@ -152,39 +153,72 @@ pub fn global_data_sink(incoming       : &Receiver<TofPacket>,
     } else if !write_stream {
       writer = None;
     }
+
     let mut send_this_packet = true;
-    match incoming.recv() {
+    match incoming.try_recv() {
       Err(err) => trace!("No new packet, err {err}"),
       Ok(pack) => {
         debug!("Got new tof packet {}", pack.packet_type);
         // if it is not some event type, just write it to disk
         if writer.is_some() {
-          match pack.packet_type {
-            TofPacketType::TofEvent 
-            | TofPacketType::RBWaveform => (),
-            _ => {
-              writer.as_mut().unwrap().add_tof_packet(&pack);
-              heartbeat.n_pack_write_disk += 1;
-              heartbeat.n_bytes_written += pack.payload.len() as u64;   
-            }
+          if !pack.no_write_to_disk {
+            writer.as_mut().unwrap().add_tof_packet(&pack);
+            heartbeat.n_pack_write_disk += 1;
+            heartbeat.n_bytes_written += pack.payload.len() as u64;   
           }
         }
-       
+        match data_socket.send(pack.to_bytestream(),0) {
+          Err(err) => error !("Not able to send packet over 0MQ PUB! {err}"),
+          Ok(_)    => {
+            trace!("TofPacket sent");
+            heartbeat.n_packets_sent += 1;
+          }
+        } // end match
+      } 
+    } 
+    match incoming_ev.recv() {
+      Err(err) => trace!("Unable to receive event packet! {err}"),
+      Ok(mut ev_)  => { 
         // FIXME - we need to work on the system to 
         // select how to send waveforms or not
-        match pack.packet_type {
-          TofPacketType::TofEventDeprecated =>  {
-            send_this_packet = send_tof_event_packets; 
-          }
-          TofPacketType::RBWaveform => {
-            send_this_packet = send_rbwaveform_packets;
-          }
-          TofPacketType::TofEvent => {
-            send_this_packet = send_tof_summary_packets;
-          }
-          _ => ()
+        
+        let mut pack = ev_.pack();
+        // Now move hits, strip waveforms and calculate gcu variables 
+        ev_.calc_gcu_variables();
+        let only_save_interesting = false;
+        let mut write_to_disk = true;
+        if only_save_interesting {
+          //if ev_to_send.n_hits_umb   < settings.thr_n_hits_umb 
+          //&& ev_to_send.n_hits_cbe   < settings.thr_n_hits_cbe
+          //&& ev_to_send.n_hits_cor   < settings.thr_n_hits_cor
+          //&& ev_to_send.tot_edep_umb < settings.thr_tot_edep_umb
+          //&& ev_to_send.tot_edep_cbe < settings.thr_tot_edep_cbe
+          //&& ev_to_send.tot_edep_cor < settings.thr_tot_edep_cor {
+          //  write_to_disk = false;
+          //}
         }
-        if send_this_packet {
+        if writer.is_some() && write_to_disk {
+          writer.as_mut().unwrap().add_tof_packet(&pack);
+          heartbeat.n_pack_write_disk += 1;
+          heartbeat.n_bytes_written += pack.payload.len() as u64;   
+        }
+
+        if send_rbwaveform_packets {
+          for wf in ev_.get_waveforms() { 
+            match data_socket.send(wf.pack().to_bytestream(),0) {
+              Err(err) => error !("Not able to send packet over 0MQ PUB! {err}"),
+              Ok(_)    => {
+                trace!("TofPacket sent");
+                heartbeat.n_packets_sent += 1;
+              }
+            } // end match
+          } 
+        }
+
+        //ev_.strip_rbevents();
+        ev_.move_hits();
+        pack = ev_.pack();
+        if send_tof_summary_packets {
           match data_socket.send(pack.to_bytestream(),0) {
             Err(err) => error !("Not able to send packet over 0MQ PUB! {err}"),
             Ok(_)    => {

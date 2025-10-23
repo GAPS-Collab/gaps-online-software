@@ -94,6 +94,15 @@ impl MTBRegister<'_> {
     Ok(rv)
   }
 
+  /// Pulse the specific register, 
+  ///
+  /// This is really no different from writing a 1 in it.
+  /// Pulsing means that the value in the register is non 
+  /// persistent 
+  pub fn pulse_it(&self, bus : &mut IPBus) 
+    -> Result<(), Box<dyn Error>> {
+    self.write(bus, 0x1)
+  }
 
   // FIXME - basically whenever we have a amsk 
   // != u32::MAX we need rmw
@@ -167,6 +176,17 @@ impl fmt::Display for MTBRegister<'_> {
 //
 // Implements various control and monitoring functions of the DRS Logic
 
+/// FPGA System clock rate
+/// CLOCK_RATE      0x1     0x4     \[31:0\]    r   system clock frequency
+pub const CLOCK_RATE : MTBRegister<'static> = MTBRegister {
+  addr    : 0x1,
+  mask    : 0xffffffff,
+  descr   : "System clock frequency",
+  rmw     : false,
+  ro      : true,
+  pulse   : false,
+};
+
 ///Prescale value for the GAPS trigger. 0 == 0% (off), 2**32-1 == 100%
 /// GAPS_TRIG_PRESCALE 0x248 0x920 \[31:0\] rw 0xffffffff
 pub const GAPS_TRIG_PRESCALE : MTBRegister<'static> = MTBRegister {
@@ -190,7 +210,6 @@ pub const FORCE_TRIGGER : MTBRegister<'static> = MTBRegister {
   pulse : true,
 };
 
-///// TIU_USE_AUX_LINK 	0xe 	0x38 	1 	rw 	0x0 	1 to use J11; 0 to use J3
 /// Check if the TIU link is bad
 /// TIU_BAD 	0xf 	0x3c 	0 	r 		1 means that the tiu link is not working
 pub const TIU_BAD : MTBRegister<'static> = MTBRegister {
@@ -350,6 +369,18 @@ pub const TIU_BUSY_IGNORE : MTBRegister<'static> = MTBRegister {
   ro    : false,
   pulse : false,
 };
+
+///Minimize deadtime by ignoring the TIU module
+///MIN_DEADTIME_MODE    0xf     0x3c    3   rw  0x0 
+pub const MIN_DEADTIME_MODE : MTBRegister<'static> = MTBRegister {
+  addr  : 0xf,
+  mask  : 0x8,
+  descr : "Minimize deadtime by ignoring TIU module, but will use fixed deadtime",
+  rmw   : true,
+  ro    : false,
+  pulse : false,
+};
+
 
 
 /// The global event id
@@ -538,6 +569,18 @@ pub const TRACK_CENTRAL_PRESCALE : MTBRegister<'static> = MTBRegister {
   pulse : false
 };
 
+/// PRESCALE_BYPASS set true to ignore prescale setting
+/// PRESCALE_BYPASS     0x44    0x110   0   rw  0x0     1 to bypass prescales
+pub const PRESCALE_BYPASS  : MTBRegister<'static> = MTBRegister {
+  addr  : 0x44, 
+  mask  : 0x1,
+  descr : "Set 1 to bypass the prescale",
+  rmw   : true, 
+  ro    : false, 
+  pulse : false, 
+};
+
+
 /// Prescale factor for the CENTRAL UMBRELLA TRACK trigger
 /// TRACK_UMB_CENTRAL_PRESCALE 	0x249 	0x924 	\[31:0\] 	rw 	0x0 	Prescale value for the Umbrella Center + Cube Top Track Trigger. 0 == 0% (off), 2**32-1 == 100%
 pub const TRACK_UMB_CENTRAL_PRESCALE : MTBRegister<'static> = MTBRegister {
@@ -548,6 +591,74 @@ pub const TRACK_UMB_CENTRAL_PRESCALE : MTBRegister<'static> = MTBRegister {
   ro    : false,
   pulse : false
 };
+
+/// Rate of Track trigger blocked due to prescaler of disable
+/// TRACK_TRIGGER_BLOCKED_RATE  0x250   0x940   \[23:0\]  r   Rate of this trigger blocked due to prescaler or disable
+pub const TRACK_TRIGGER_BLOCKED_RATE : MTBRegister<'static> = MTBRegister {
+  addr  : 0x250,
+  mask  : 0x00ffffff,
+  descr : "Rate of this trigger blocked due to prescaler or disable",
+  rmw   : false,
+  ro    : true, 
+  pulse : false
+};
+
+/// Rate of Any trigger blocked due to prescaler or disable
+/// ANY_TRIGGER_BLOCKED_RATE  0x251   0x944   \[23:0\]    r Rate of this trigger blocked due to
+/// prescaler or disable
+pub const ANY_TRIGGER_BLOCKED_RATE : MTBRegister<'static> = MTBRegister {
+  addr  : 0x251,
+  mask  : 0x00ffffff,
+  descr : "Rate of this trigger blocked due to prescaler or disable",
+  rmw   : false, 
+  ro    : true,
+  pulse : false
+};
+
+/// Rate of Track Central trigger blocked due precaler disable
+/// TRACK_CENTRAL_BLOCKED_RATE  0x252   0x948   \[23:0\]    r
+pub const TRACK_CENTRAL_BLOCKED_RATE : MTBRegister<'static> = MTBRegister {
+  addr  : 0x252,
+  mask  : 0x00ffffff,
+  descr : "Rate of this trigger blocked due to prescaler or disable",
+  rmw   : false,
+  ro    : true,
+  pulse : false
+};
+
+/// Rate of Track Umbrella Central trigger blocked due to prescaler or disable
+/// TRACK_UMB_CENTRAL_BLOCKED_RATE  0x253   0x94c   \[23:0\]    r
+pub const TRACK_UMB_CENTRAL_BLOCKED_RATE : MTBRegister<'static> = MTBRegister {
+  addr  : 0x253,
+  mask  : 0x00ffffff,
+  descr : "Rate of this trigger blocked due to prescaler or disable",
+  rmw   : false, 
+  ro    : true, 
+  pulse : false
+};
+
+/// Rate of TIU asserting busy. Measures the fraction of time the TIU was busy.
+/// TIU_BUSY_RATE   0x254   0x950   \[23:0\]    r   
+pub const TIU_BUSY_RATE : MTBRegister<'static> = MTBRegister {
+  addr  : 0x254,
+  mask  : 0x00ffffff,
+  descr : "FIX: Rate of TIU asserting busy. Measures the fraction of time the TIU was busy",
+  rmw   : false, 
+  ro    : true, 
+  pulse : false
+};
+
+/// Minimum enforced deadtime for TIU triggers. In units of 10 ns. A setting of 105 is the default of 1.05us.
+/// TIU_TIMEOUT_CNT     0x255   0x954   \[19:0\]    rw
+pub const TIU_TIMEOUT_CONST : MTBRegister<'static> = MTBRegister {
+  addr  : 0x255,
+  mask  : 0x000fffff,
+  descr : "Minimum enforced deadtime for TIU. Units are 10ns. A setting of 105 is the default of 1.05us",
+  rmw   : true, 
+  ro    : false, 
+  pulse : false
+};
+
 
 //Implements various control and monitoring functions of the DRS Logic
 
@@ -754,6 +865,28 @@ pub const TIU_LOST_TRIGGER_RATE : MTBRegister<'static> = MTBRegister {
   descr : "Get tiu lost trigger rate in Hz",
   rmw   : false,
   ro    : true,
+  pulse : false
+};
+
+///Rate of lost triggers due to MTB internal trigger block deadtime (in Hz)
+///TRG_LOST_TRIGGER_RATE   0x24e    0x938   \[23:0\]  r
+pub const TRG_LOST_TRIGGER_RATE : MTBRegister<'static> = MTBRegister {
+  addr  : 0x24e,
+  mask  : 0x00ffffff,
+  descr : "Rate of lost triggers due to MTB internal trigger block deadtime (in Hz)",
+  rmw   : false,
+  ro    : true,
+  pulse : false
+};
+
+///Rate of GAPS trigger blocked due to prescaler or disable
+///GAPS_TRIGGER_BLOCKED_RATE    0x24f   0x93c   \[23:0\]
+pub const GAPS_TRIGGER_BLOCKED_RATE : MTBRegister<'static> = MTBRegister {
+  addr  : 0x24f,
+  mask  : 0x00ffffff,
+  descr : "Rate of GAPS trigger blocked due to prescaler or disable",
+  rmw   : false,
+  ro    : true, 
   pulse : false
 };
 
@@ -2074,6 +2207,87 @@ pub const RB_CNTS_SNAP : MTBRegister<'static> = MTBRegister {
   pulse : false,
 };
 
+/// Set fire bits for LTB Ch 0-24
+/// CH_0_24     0x101   0x404   \[24:0\]    rw  0x0
+pub const CH_0_24  : MTBRegister<'static> = MTBRegister  {
+  addr  : 0x101,
+  mask  : 0x1ffffff,
+  descr : "Set fire bits for LTB ch 0-24",
+  rmw   : true, 
+  ro    : false,
+  pulse : false,
+};
+
+/// CH_25_49    0x102   0x408   \[24:0\]    rw 0x0
+pub const CH_25_49  : MTBRegister<'static> = MTBRegister  {
+  addr  : 0x102,
+  mask  : 0x1ffffff,
+  descr : "Set fire bit for LTB ch 25-49",
+  rmw   : true, 
+  ro    : false, 
+  pulse : false, 
+};
+
+/// CH_50_74    0x103   0x40c   rw  \[24:0\]    0x0
+pub const CH_50_74  : MTBRegister<'static>  = MTBRegister  {
+  addr  : 0x103,
+  mask  : 0x1ffffff,
+  descr : "Set fire bit for LTB ch 50-74",
+  rmw   : true, 
+  ro    : false, 
+  pulse : false
+};
+
+/// CH_75_99    0x104   0x410   
+pub const CH_75_99  :  MTBRegister<'static> = MTBRegister  {
+  addr  : 0x104,
+  mask  : 0x1ffffff,
+  descr : "Set fire bit for LTB ch 75-99",
+  rmw   : true,
+  ro    : false, 
+  pulse : false,
+};
+
+/// CH_100_124  0x105   0x414
+pub const CH_100_124  : MTBRegister<'static> = MTBRegister  {
+  addr  : 0x105,
+  mask  : 0x1ffffff,
+  descr : "Set fire bit for DSI ch 100-124",
+  rmw   : true, 
+  ro    : false, 
+  pulse : false
+};
+
+/// CH_125_149  0x106   0x418   
+pub const CH_125_149  :  MTBRegister<'static> = MTBRegister  {
+  addr  : 0x106,
+  mask  : 0x1ffffff,
+  descr : "Set fire bit for DSI ch 125-149",
+  rmw   : true,
+  ro    : false, 
+  pulse : false
+};
+
+/// CH_150_174  0x107
+pub const CH_150_174  : MTBRegister<'static> = MTBRegister {
+  addr  : 0x107,
+  mask  : 0x1ffffff,
+  descr : "Set fire bit for DSI ch 150-174",
+  rmw   : true, 
+  ro    : false, 
+  pulse : false
+};
+
+///CH 175-199    0x108
+pub const CH_175_199  :  MTBRegister<'static> = MTBRegister  {
+  addr  : 0x108, 
+  mask  : 0x1ffffff,
+  descr : "Set fire bit for DSI ch 175-199",
+  rmw   : true, 
+  ro    : false, 
+  pulse : false
+};
+
 /// Add the central track trigger to all triggers
 /// TRACK_CENTRAL_IS_GLOBAL   0xb     0x2c    2   rw  0x0     1 makes the TRACK central read all paddles.
 pub const TRACK_CENTRAL_IS_GLOBAL : MTBRegister<'static> = MTBRegister {
@@ -2141,6 +2355,37 @@ pub const TRIG_GEN_RATE : MTBRegister<'static> = MTBRegister {
   pulse : false,
 };
 
+///ETH_RX_BAD_FRAME_CNT     0x3d    0xf4    \[15:0\]    Ethernet MAC bad frame error
+pub const ETH_RX_BAD_FRAME_CNT  : MTBRegister<'static> = MTBRegister {
+  addr  : 0x3d,
+  mask  : 0xffff,
+  descr : "Ethernet MAC bad frame error",
+  rmw   : false,
+  ro    : true, 
+  pulse : false,
+};
+
+///ETH_RX_BAD_FCS_CNT   0x3d    0xf4    \[31:16\]   Ethernet MAC bad fcs
+pub const ETH_RX_BAD_FCS_CNT  : MTBRegister<'static> = MTBRegister {
+  addr  : 0x3d,
+  mask  : 0xffff0000,
+  descr : "Ethernet MAC bad fcs", 
+  rmw   : false,
+  ro    : true, 
+  pulse : false,
+};
+
+/// RESYNC    0xa     0x28    0   w   Pulse   Write 1 to resync
+/// This will synchronize the RB and MTB clocks and should be issued 
+/// at run start.
+pub const RESYNC  : MTBRegister<'static> = MTBRegister {
+  addr  : 0xa,
+  mask  : 0x00000001,
+  descr : "Write 1 to RESYNC RB clocks",
+  rmw   : false, 
+  ro    : false, 
+  pulse : true,
+};
 // All the trigger settings
 
 // .... WIP!!! So many are not implemented yet....
@@ -2211,7 +2456,9 @@ pub const TRIG_GEN_RATE : MTBRegister<'static> = MTBRegister {
 //Implements various control and monitoring functions of the DRS Logic
 //Node  Adr     Adr8    Bits    Perm    Def     Description
 //ETH_RX_BAD_FRAME_CNT  0x3d    0xf4    [15:0]  r       Ethernet MAC bad frame error
-//ETH_RX_BAD_FCS_CNT    0x3d    0xf4    [31:16]     r       Ethernet MAC bad fcs
+
+
+//ETH_RX_BAD_FCS_CNT   0x3d    0xf4    [31:16]     r       Ethernet MAC bad fcs
 //
 //MT.CHANNEL_MASK
 //
