@@ -1153,7 +1153,7 @@
 <a href=#1153 id=1153 data-nosnippet>1153</a>
 <a href=#1154 id=1154 data-nosnippet>1154</a>  <span class="doccomment">/// the amount of fixed deadtime used by the tiu in units of 10ns
 <a href=#1155 id=1155 data-nosnippet>1155</a>  </span><span class="attr">#[getter]
-<a href=#1156 id=1156 data-nosnippet>1156</a>  </span><span class="kw">fn </span>tiu_timeout_cnt(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; PyResult&lt;u32&gt; {
+<a href=#1156 id=1156 data-nosnippet>1156</a>  </span><span class="kw">fn </span>get_tiu_timeout_cnt(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; PyResult&lt;u32&gt; {
 <a href=#1157 id=1157 data-nosnippet>1157</a>      <span class="kw">match </span>TIU_TIMEOUT_CONST.get(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus) {
 <a href=#1158 id=1158 data-nosnippet>1158</a>          <span class="prelude-val">Ok</span>(rate) =&gt; {
 <a href=#1159 id=1159 data-nosnippet>1159</a>              <span class="kw">return </span><span class="prelude-val">Ok</span>(rate);
@@ -1213,7 +1213,7 @@
 <a href=#1213 id=1213 data-nosnippet>1213</a>  }
 <a href=#1214 id=1214 data-nosnippet>1214</a>
 <a href=#1215 id=1215 data-nosnippet>1215</a> <span class="attr">#[setter]
-<a href=#1216 id=1216 data-nosnippet>1216</a>  </span><span class="kw">fn </span>tiu_timeout_cnt(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value : u32) -&gt; PyResult&lt;()&gt; {
+<a href=#1216 id=1216 data-nosnippet>1216</a>  </span><span class="kw">fn </span>set_tiu_timeout_cnt(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value : u32) -&gt; PyResult&lt;()&gt; {
 <a href=#1217 id=1217 data-nosnippet>1217</a>      <span class="kw">match </span>TIU_TIMEOUT_CONST.set(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ipbus, value) {
 <a href=#1218 id=1218 data-nosnippet>1218</a>          <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
 <a href=#1219 id=1219 data-nosnippet>1219</a>              <span class="kw">return </span><span class="prelude-val">Ok</span>(());
