@@ -10,7 +10,7 @@ var structGaps_1_1Telemetry_1_1MergedEvent =
     [ "n_trk_hits", "structGaps_1_1Telemetry_1_1MergedEvent.html#ade6865babdc397965f93af427d6a8a92", null ],
     [ "raw_data", "structGaps_1_1Telemetry_1_1MergedEvent.html#a769c35b008e60fce88f21c5994fa5573", null ],
     [ "row_flags", "structGaps_1_1Telemetry_1_1MergedEvent.html#aa4c1ffce12bef2645c0648b0befcdf3e", null ],
-    [ "tof_event", "structGaps_1_1Telemetry_1_1MergedEvent.html#a06cd6971493b05d3f0d1e5254e6c3a47", null ],
+    [ "tof_event", "structGaps_1_1Telemetry_1_1MergedEvent.html#a8cf0592765e523a54e16f5df84b267a5", null ],
     [ "tof_meta", "structGaps_1_1Telemetry_1_1MergedEvent.html#ac75618682a739aa7834dc17eae60d876", null ],
     [ "tracker_events", "structGaps_1_1Telemetry_1_1MergedEvent.html#a3c7f786371fca298bfbb97c255aed86d", null ],
     [ "tracker_meta", "structGaps_1_1Telemetry_1_1MergedEvent.html#a17f34a88a1e7b1228454c6b93105600a", null ],

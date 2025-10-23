@@ -42,6 +42,8 @@ The python module is called `gondola`.
    :caption: Contents:
 
    guided_tour
+   liftof 
+   tofcpu
    gondola 
 
 PYTHON API Software documentation

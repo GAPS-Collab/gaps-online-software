@@ -8,7 +8,15 @@ gondola.tof
 
    .. autosummary::
    
+      MasterTrigger
+      PreampBiasConfig
+      RBChannelMaskConfig
       RBPaddleID
+      TofCommand
+      TofCuts
+      TofDetectorStatus
+      TofRunConfig
+      TriggerConfig
    
 .. rubric:: Modules
 

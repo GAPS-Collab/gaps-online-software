@@ -210,22 +210,22 @@
 \DoxyCodeLine{00215\ \ \ \ \ \ \textcolor{comment}{//\ std::vector<tracker\_hit>\ tracker\_hits;}}
 \DoxyCodeLine{00216\ \ \ \ \ \ \textcolor{comment}{//\ std::vector<uint64\_t>\ tracker\_oscillators;}}
 \DoxyCodeLine{00217\ \ \ \ \ \ \ }
-\DoxyCodeLine{00218\ \ \ \ \ \ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader}{PacketHeader}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_aabdb5f1360d18e95b18ef90a3ad00635}{header}};}
-\DoxyCodeLine{00219\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ version\ =\ 0;}
-\DoxyCodeLine{00220\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ flags0\ \ =\ 0;}
-\DoxyCodeLine{00221\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ flags1\ \ =\ 0;}
-\DoxyCodeLine{00222\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u8>}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_aa4c1ffce12bef2645c0648b0befcdf3e}{row\_flags}};}
-\DoxyCodeLine{00223\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ creation\_time\ =\ 0;}
-\DoxyCodeLine{00224\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ event\_id\ \ \ \ \ \ =\ 0;}
-\DoxyCodeLine{00225\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ n\_tof\_hits\ \ \ \ =\ 0;}
-\DoxyCodeLine{00226\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ n\_trk\_hits\ \ \ \ =\ 0;}
-\DoxyCodeLine{00227\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<TrkEvent>}}\ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_a3c7f786371fca298bfbb97c255aed86d}{tracker\_events}};\ \ }
-\DoxyCodeLine{00228\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<TrkHit>}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_a8eced956b3da0ab453f8a437f56f38c7}{trk\_hits}};}
-\DoxyCodeLine{00229\ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TofEventSummary}{gondola::TofEventSummary}}\ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_a06cd6971493b05d3f0d1e5254e6c3a47}{tof\_event}};}
-\DoxyCodeLine{00230\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u8>}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_a769c35b008e60fce88f21c5994fa5573}{raw\_data}};}
-\DoxyCodeLine{00231\ \ \ \ \ \ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TofMetaData}{TofMetaData}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_ac75618682a739aa7834dc17eae60d876}{tof\_meta}};}
-\DoxyCodeLine{00232\ \ \ \ \ \ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkMetaData}{TrkMetaData}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_a17f34a88a1e7b1228454c6b93105600a}{tracker\_meta}};}
-\DoxyCodeLine{00233\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u64>}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ tracker\_oscillators\ =\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u64>}}(10,0)\ ;}
+\DoxyCodeLine{00218\ \ \ \ \ \ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader}{PacketHeader}}\ \ \ \ header\ \ \ \ \ \ \ \ \ =\ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1PacketHeader}{PacketHeader}}();}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ version\ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ flags0\ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ flags1\ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u8>}}\ \ \ \ \ \ \ \ \ row\_flags\ \ \ \ \ \ =\ \{\};}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}\ \ \ \ \ \ \ \ \ \ \ \ \ creation\_time\ \ =\ 0;}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}\ \ \ \ \ \ \ \ \ \ \ \ \ event\_id\ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ n\_tof\_hits\ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \ \ \ \ \ \ \ \ \ \ \ \ n\_trk\_hits\ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<TrkEvent>}}\ \ \ tracker\_events\ =\ \{\};\ \ }
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<TrkHit>}}\ \ \ \ \ trk\_hits\ \ \ \ \ \ \ =\ \{\};}
+\DoxyCodeLine{00229\ \ \ \ \ \ \ \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a6046537136bf4784175124a473eb23c5}{TofEventSummary}}\ tof\_event\ \ \ \ \ \ =\ \mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565a6046537136bf4784175124a473eb23c5}{TofEventSummary}}();}
+\DoxyCodeLine{00230\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u8>}}\ \ \ \ \ \ \ \ \ raw\_data\ \ \ \ \ \ \ =\ \{\};}
+\DoxyCodeLine{00231\ \ \ \ \ \ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TofMetaData}{TofMetaData}}\ \ \ \ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_ac75618682a739aa7834dc17eae60d876}{tof\_meta}};}
+\DoxyCodeLine{00232\ \ \ \ \ \ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1TrkMetaData}{TrkMetaData}}\ \ \ \ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_a17f34a88a1e7b1228454c6b93105600a}{tracker\_meta}};}
+\DoxyCodeLine{00233\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u64>}}\ \ \ \ \ \ \ \ tracker\_oscillators\ =\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u64>}}(10,0)\ ;}
 \DoxyCodeLine{00234\ \ \ \ \ }
 \DoxyCodeLine{00235\ \ \ \ \ \ \ \textcolor{keyword}{auto}\ to\_string()\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ -\/>\ std::\textcolor{keywordtype}{string};}
 \DoxyCodeLine{00236\ \ \ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}}\ from\_bytestream(\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}<\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}>\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{stream}},\ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}})}

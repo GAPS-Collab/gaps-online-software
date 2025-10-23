@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["calculate_pedestal","cfd_simple","find_peaks","find_peaks_zscore","fit_sine_simple","get_max_value_idx","integrate","interpolate_time","time2bin"]};
+window.SIDEBAR_ITEMS = {"fn":["calculate_pedestal","cfd_simple","find_peaks","find_peaks_zscore","fit_sine_simple","get_max_value_idx","integrate","interpolate_time","time2bin","time_over_threshold"]};

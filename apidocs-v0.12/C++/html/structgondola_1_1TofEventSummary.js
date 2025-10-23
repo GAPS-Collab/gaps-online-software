@@ -2,7 +2,7 @@ var structgondola_1_1TofEventSummary =
 [
     [ "get_rb_link_ids", "structgondola_1_1TofEventSummary.html#aef0ecf225b2416060c80c8168a853717", null ],
     [ "get_timestamp48", "structgondola_1_1TofEventSummary.html#a5fdf2515c8ade30200a851ba36fb47ab", null ],
-    [ "get_trigger_hits", "structgondola_1_1TofEventSummary.html#a4a0a0f4504f3c9d773a3654c9c188837", null ],
+    [ "get_trigger_hits", "structgondola_1_1TofEventSummary.html#a52272d947d0c4fa8a75fb532f5b04de2", null ],
     [ "get_trigger_sources", "structgondola_1_1TofEventSummary.html#a203f4aef2eaaa057763a8894054eb23d", null ],
     [ "to_string", "structgondola_1_1TofEventSummary.html#aab3047d910763c5b440120e22b1f8faf", null ],
     [ "channel_mask", "structgondola_1_1TofEventSummary.html#af828cd81c1608dcb33f25aa1fb6599ac", null ],
