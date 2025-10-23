@@ -1211,6 +1211,18 @@ impl PyMasterTrigger {
       }
     }
   }
+
+ #[setter]
+  fn tiu_timeout_cnt(&mut self, value : u32) -> PyResult<()> {
+      match TIU_TIMEOUT_CONST.set(&mut self.ipbus, value) {
+          Ok(_) => {
+              return Ok(());
+          }
+          Err(err) => {
+              return Err(PyValueError::new_err(err.to_string()));
+          }
+      }
+  }
  #[setter]
   fn set_ingore_tiu_busy(&mut self, value : u32) -> PyResult<()> {
       match MIN_DEADTIME_MODE.set(&mut self.ipbus, value) {
