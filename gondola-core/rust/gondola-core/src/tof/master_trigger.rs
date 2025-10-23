@@ -1096,7 +1096,7 @@ impl PyMasterTrigger {
               return Ok(rate);
           }
           Err(err) => {
-              return Err(PyValyeError::new_err(err.to_string()));
+              return Err(PyValueError::new_err(err.to_string()));
           }
       }
   }
@@ -1154,7 +1154,7 @@ impl PyMasterTrigger {
   /// the amount of fixed deadtime used by the tiu in units of 10ns
   #[getter]
   fn tiu_timeout_cnt(&mut self) -> PyResult<u32> {
-      match TIU_TIMEOUT_CNT.get(&mut self.ipbus) {
+      match TIU_TIMEOUT_CONST.get(&mut self.ipbus) {
           Ok(rate) => {
               return Ok(rate);
           }
@@ -1171,7 +1171,7 @@ impl PyMasterTrigger {
               return Ok(rate);
           }
           Err(err) => {
-              return Err(PyValueErr::new_err(err.to_string()));
+              return Err(PyValueError::new_err(err.to_string()));
           }
       }
   }
