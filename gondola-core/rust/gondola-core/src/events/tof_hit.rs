@@ -838,10 +838,9 @@ impl Serialization for TofHit {
   /// * bytestream : 
   fn from_bytestream(stream : &Vec<u8>, pos : &mut usize) 
     -> Result<Self, SerializationError> {
-    let mut pp  = Self::new();
+    let mut pp             = Self::new();
     let mut version_lt_011 = false;
-    let (size,_,__) = Self::guess_size(stream, *pos, 28)?;
-    println!("{} SIZE", size);
+    let (size,_,__)        = Self::guess_size(stream, *pos, 28)?;
     if size == 30 {
       version_lt_011 = true;
       let head      = parse_u16(stream, pos);
@@ -903,28 +902,33 @@ impl FromRandom for TofHit {
   fn from_random() -> TofHit {
     let mut pp  = TofHit::new();
     let mut rng = rand::rng();
+    // randomly create old/new style hits 
+    let version_lt_011 = rng.random::<bool>();
+        
+    pp.paddle_id       = rng.random_range(0..161);
+    pp.time_a          = f16::from_f32(rng.random::<f32>());
+    pp.time_b          = f16::from_f32(rng.random::<f32>());
+    pp.peak_a          = f16::from_f32(rng.random::<f32>());
+    pp.peak_b          = f16::from_f32(rng.random::<f32>());
+    pp.charge_a        = f16::from_f32(rng.random::<f32>());
+    pp.charge_b        = f16::from_f32(rng.random::<f32>());
+    pp.version         = ProtocolVersion::from(rng.random::<u8>());
+    pp.baseline_a      = f16::from_f32(rng.random::<f32>());
+    pp.baseline_a_rms  = f16::from_f32(rng.random::<f32>());
+    pp.baseline_b      = f16::from_f32(rng.random::<f32>());
+    pp.baseline_b_rms  = f16::from_f32(rng.random::<f32>());
+    pp.phase           = f16::from_f32(rng.random::<f32>());
     
-    pp.paddle_id      = rng.random_range(0..161);
-    pp.time_a         = f16::from_f32(rng.random::<f32>());
-    pp.time_b         = f16::from_f32(rng.random::<f32>());
-    pp.peak_a         = f16::from_f32(rng.random::<f32>());
-    pp.peak_b         = f16::from_f32(rng.random::<f32>());
-    pp.charge_a       = f16::from_f32(rng.random::<f32>());
-    pp.charge_b       = f16::from_f32(rng.random::<f32>());
-    pp.version        = ProtocolVersion::from(rng.random::<u8>());
-    pp.baseline_a     = f16::from_f32(rng.random::<f32>());
-    pp.baseline_a_rms = f16::from_f32(rng.random::<f32>());
-    pp.baseline_b     = f16::from_f32(rng.random::<f32>());
-    pp.baseline_b_rms = f16::from_f32(rng.random::<f32>());
-    pp.phase          = f16::from_f32(rng.random::<f32>());
-    pp.TOT_low_a      = f16::from_f32(rng.random::<f32>());
-    pp.TOT_low_b      = f16::from_f32(rng.random::<f32>());
-    pp.TOT_high_a     = f16::from_f32(rng.random::<f32>());
-    pp.TOT_high_b     = f16::from_f32(rng.random::<f32>()); 
-    pp.TOT_slp_low_a  = f16::from_f32(rng.random::<f32>());
-    pp.TOT_slp_low_b  = f16::from_f32(rng.random::<f32>());
-    pp.TOT_slp_high_a = f16::from_f32(rng.random::<f32>()); 
-    pp.TOT_slp_high_b = f16::from_f32(rng.random::<f32>()); 
+    if !version_lt_011 {
+      pp.TOT_low_a      = f16::from_f32(rng.random::<f32>());
+      pp.TOT_low_b      = f16::from_f32(rng.random::<f32>());
+      pp.TOT_high_a     = f16::from_f32(rng.random::<f32>());
+      pp.TOT_high_b     = f16::from_f32(rng.random::<f32>()); 
+      pp.TOT_slp_low_a  = f16::from_f32(rng.random::<f32>());
+      pp.TOT_slp_low_b  = f16::from_f32(rng.random::<f32>());
+      pp.TOT_slp_high_a = f16::from_f32(rng.random::<f32>()); 
+      pp.TOT_slp_high_b = f16::from_f32(rng.random::<f32>()); 
+    }
     pp.paddle_len       = 0.0; 
     pp.coax_cable_time  = 0.0; 
     pp.hart_cable_time  = 0.0; 
@@ -937,208 +941,6 @@ impl FromRandom for TofHit {
 }
 
 //---------------------------------------------------------------
-
-//#[cfg(feature="pybindings")]
-//#[pyclass]
-//#[pyo3(name="TofHit")]
-//pub struct PyTofHit {
-//  hit : TofHit,
-//}
-//
-//#[cfg(feature="pybindings")]
-//#[pymethods]
-//impl PyTofHit {
-//  //#[new]
-//  //fn new() -> Self {
-//  //  Self {
-//  //    hit : TofHit::new(),
-//  //  }
-//  //}
-//
-//  pub fn set_timing_offset(&mut self, offset : f32) {
-//    self.hit.timing_offset = offset;
-//  }
-//
-//  /// Calculate the distance to another hit. For this 
-//  /// to work, the hit coordinates have had to be 
-//  /// determined, so this will only return a 
-//  /// propper result after the paddle information 
-//  /// is added
-//  pub fn distance(&self, other : &PyTofHit) -> f32 {
-//    //((self.x - other.x).powi(2) + (self.y - other.y).powi(2) + (self.z - other.z).powi(2)).sqrt()
-//    self.hit.distance(&other.hit)
-//  }
-// 
-//  /// Set the length and cable length for the paddle
-//  /// FIXME - take gaps_online.db.Paddle as argument
-//  fn set_paddle(&mut s1elf, plen : f32, coax_cbl_time : f32, hart_cbl_time : f32 ) {
-//    self.hit.paddle_len = plen;
-//    self.hit.coax_cable_time = coax_cbl_time;
-//    self.hit.hart_cable_time = hart_cbl_time;
-//  }
-//
-//  #[getter]
-//  fn x(&self) -> f32 {
-//    self.hit.x
-//  }
-//  
-//  #[getter]
-//  fn y(&self) -> f32 {
-//    self.hit.y
-//  }
-//
-//  #[getter]
-//  fn z(&self) -> f32 {
-//    self.hit.z
-//  }
-//
-//  #[getter]
-//  fn get_t0_uncorrected(&self) -> f32 {
-//    self.hit.get_t0_uncorrected()
-//  }
-//  
-//  /// Event t0 is the calculated interaction time based on 
-//  /// the RELATIVE phase shifts consdering ALL hits in this
-//  /// event. This might be of importance to catch rollovers
-//  /// in the phase of channel9. 
-//  /// In total, we are restricting ourselves to a time of 
-//  /// 50ns per events and adjust the phase in such a way that 
-//  /// everything fits into this interval. This will 
-//  /// significantly import the beta reconstruction for particles
-//  /// which hit the TOF within this timing window.
-//  ///
-//  /// If a timing offset is set, this will be added
-//  #[getter]
-//  fn get_event_t0(&self) -> f32 {
-//    self.hit.get_t0()
-//  }
-//
-//  #[getter]
-//  fn get_obeys_causality(&self) -> bool {
-//    self.hit.obeys_causality()
-//  }
-//
-//  #[getter]
-//  fn get_coax_cbl_time(&self) -> f32 {
-//    self.hit.coax_cable_time
-//  }
-//
-//  #[getter]
-//  fn get_hart_cbl_time(&self) -> f32 {
-//    self.hit.hart_cable_time
-//  }
-//
-//  /// Reconstructed particle interaction time,
-//  /// calculated from the waveforms of the two
-//  /// different paddle ends. If the paddle has 
-//  /// been set, this takes phase and cable 
-//  /// length into account
-//  #[getter]
-//  fn t0(&self) -> f32 {
-//    self.hit.get_t0()
-//  }
-//
-//  #[getter]
-//  fn get_phase_delay(&self) -> f32 {
-//    self.hit.get_phase_delay()
-//  }
-//
-//  #[getter]
-//  fn get_cable_delay(&self) -> f32 {
-//    self.hit.get_cable_delay()
-//  }
-//
-//  #[getter]
-//  fn version(&self) -> ProtocolVersion {
-//    self.hit.version
-//  }
-//
-//  #[getter]
-//  fn phase(&self) -> f32 {
-//    self.hit.phase.to_f32()
-//  }
-//
-//  #[getter]
-//  fn baseline_a(&self) -> f32 {
-//    self.hit.baseline_a.to_f32()
-//  }
-//
-//  #[getter]
-//  fn baseline_a_rms(&self) -> f32 {
-//    self.hit.baseline_a_rms.to_f32()
-//  }
-//  
-//  #[getter]
-//  fn baseline_b(&self) -> f32 {
-//    self.hit.baseline_b.to_f32()
-//  }
-//
-//  #[getter]
-//  fn baseline_b_rms(&self) -> f32 {
-//    self.hit.baseline_b_rms.to_f32()
-//  }
-//
-//  #[getter]
-//  fn peak_a(&self) -> f32 {
-//    self.hit.get_peak_a()
-//  }
-//  
-//  #[getter]
-//  fn peak_b(&self) -> f32 {
-//    self.hit.get_peak_b()
-//  }
-//  
-//  #[getter]
-//  fn charge_a(&self) -> f32 {
-//    self.hit.get_charge_a()
-//  }
-//  
-//  #[getter]
-//  fn charge_b(&self) -> f32 {
-//    self.hit.get_charge_b()
-//  }
-//
-//  #[getter]
-//  fn time_a(&self) -> f32 {
-//    self.hit.get_time_a()
-//  }
-//  
-//  #[getter]
-//  fn time_b(&self) -> f32 {
-//    self.hit.get_time_b()
-//  }
-//
-//  /// Reconstructed particle interaction position
-//  /// along the long axis of the paddle.
-//  /// For the other dimensions, there is no information
-//  /// about the position.
-//  /// Reconstructed with the waveforms of both paddle ends.
-//  #[getter]
-//  fn pos(&self) -> f32 {
-//    self.hit.get_pos()
-//  }
-// 
-//  /// The paddle id (1-160) of the hit paddle
-//  #[getter]
-//  fn paddle_id(&self) -> u8 {
-//    self.hit.paddle_id
-//  }
-//
-//  #[getter]
-//  fn edep(&self) -> f32 {
-//    self.hit.get_edep()
-//  }
-//
-//  #[getter]
-//  fn get_paddle_len(&self) -> f32 {
-//    self.hit.paddle_len
-//  }
-//
-//}
-//
-//#[cfg(feature="pybindings")]
-//impl_pythonize_display!(PyTofHit, |s: &PyTofHit| s.hit.to_string());
-
 
 #[cfg(feature = "random")]
 #[test]
