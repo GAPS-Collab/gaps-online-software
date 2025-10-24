@@ -213,7 +213,7 @@
 <a href=#213 id=213 data-nosnippet>213</a>  //  return 0
 <a href=#214 id=214 data-nosnippet>214</a>  //}
 <a href=#215 id=215 data-nosnippet>215</a>
-<a href=#216 id=216 data-nosnippet>216</a>  </span><span class="kw">fn </span>string_to_bytes(value : String) -&gt; Vec&lt;u8&gt; {
+<a href=#216 id=216 data-nosnippet>216</a>  </span><span class="kw">pub fn </span>string_to_bytes(value : String) -&gt; Vec&lt;u8&gt; {
 <a href=#217 id=217 data-nosnippet>217</a>    <span class="kw">let </span><span class="kw-2">mut </span>stream  = Vec::&lt;u8&gt;::new();
 <a href=#218 id=218 data-nosnippet>218</a>    <span class="kw">let </span><span class="kw-2">mut </span>payload = value.into_bytes();
 <a href=#219 id=219 data-nosnippet>219</a>    <span class="kw">let </span>string_size = payload.len() <span class="kw">as </span>u16; <span class="comment">// limit size

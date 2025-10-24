@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/diesel-2.3.2/src/type_impls/tuples.rs`."><title>tuples.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-aa0817cf.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="diesel" data-themes="" data-resource-suffix="" data-rustdoc-version="1.90.0 (1159e78c4 2025-09-14)" data-channel="1.90.0" data-search-js="search-fa3e91e5.js" data-settings-js="settings-5514c975.js" ><script src="../../../static.files/storage-68b7e25d.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-eebb9057.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">diesel/type_impls/</div>tuples.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span><span class="kw">crate</span>::associations::BelongsTo;
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/diesel-2.3.3/src/type_impls/tuples.rs`."><title>tuples.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-aa0817cf.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="diesel" data-themes="" data-resource-suffix="" data-rustdoc-version="1.90.0 (1159e78c4 2025-09-14)" data-channel="1.90.0" data-search-js="search-fa3e91e5.js" data-settings-js="settings-5514c975.js" ><script src="../../../static.files/storage-68b7e25d.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-eebb9057.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">diesel/type_impls/</div>tuples.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span><span class="kw">crate</span>::associations::BelongsTo;
 <a href=#2 id=2 data-nosnippet>2</a><span class="kw">use </span><span class="kw">crate</span>::backend::Backend;
 <a href=#3 id=3 data-nosnippet>3</a><span class="kw">use </span><span class="kw">crate</span>::deserialize::{
 <a href=#4 id=4 data-nosnippet>4</a>    <span class="self">self</span>, FromSqlRow, FromStaticSqlRow, Queryable, SqlTypeOrSelectable, StaticallySizedRow,
@@ -25,11 +25,11 @@
 <a href=#25 id=25 data-nosnippet>25</a>
 <a href=#26 id=26 data-nosnippet>26</a><span class="macro">macro_rules!</span> fake_variadic {
 <a href=#27 id=27 data-nosnippet>27</a>    (<span class="number">1i32 </span>-&gt; $(<span class="macro-nonterminal">$tt</span>: tt)<span class="kw-2">*</span>) =&gt; {
-<a href=#28 id=28 data-nosnippet>28</a>        <span class="attr">#[cfg_attr(docsrs, doc(fake_variadic))]
+<a href=#28 id=28 data-nosnippet>28</a>        <span class="attr">#[cfg_attr(diesel_docsrs, doc(fake_variadic))]
 <a href=#29 id=29 data-nosnippet>29</a>        </span>$(<span class="macro-nonterminal">$tt</span>)*
 <a href=#30 id=30 data-nosnippet>30</a>    };
 <a href=#31 id=31 data-nosnippet>31</a>    (<span class="macro-nonterminal">$idx</span>:tt -&gt; $(<span class="macro-nonterminal">$tt</span>: tt)<span class="kw-2">*</span>) =&gt; {
-<a href=#32 id=32 data-nosnippet>32</a>        <span class="attr">#[cfg_attr(docsrs, doc(hidden))]
+<a href=#32 id=32 data-nosnippet>32</a>        <span class="attr">#[cfg_attr(diesel_docsrs, doc(hidden))]
 <a href=#33 id=33 data-nosnippet>33</a>        </span>$(<span class="macro-nonterminal">$tt</span>)*
 <a href=#34 id=34 data-nosnippet>34</a>    };
 <a href=#35 id=35 data-nosnippet>35</a>}
@@ -432,7 +432,7 @@
 <a href=#432 id=432 data-nosnippet>432</a>
 <a href=#433 id=433 data-nosnippet>433</a><span class="macro">macro_rules!</span> impl_from_sql_row {
 <a href=#434 id=434 data-nosnippet>434</a>    ((<span class="macro-nonterminal">$T1</span>: ident,), (<span class="macro-nonterminal">$ST1</span>: ident,)) =&gt; {
-<a href=#435 id=435 data-nosnippet>435</a>        <span class="attr">#[cfg_attr(docsrs, doc(fake_variadic))]
+<a href=#435 id=435 data-nosnippet>435</a>        <span class="attr">#[cfg_attr(diesel_docsrs, doc(fake_variadic))]
 <a href=#436 id=436 data-nosnippet>436</a>        </span><span class="kw">impl</span>&lt;<span class="macro-nonterminal">$T1</span>, <span class="macro-nonterminal">$ST1</span>, __DB&gt; <span class="kw">crate</span>::deserialize::FromStaticSqlRow&lt;(<span class="macro-nonterminal">$ST1</span>,), __DB&gt; <span class="kw">for </span>(<span class="macro-nonterminal">$T1</span>,) <span class="kw">where
 <a href=#437 id=437 data-nosnippet>437</a>            </span>__DB: Backend,
 <a href=#438 id=438 data-nosnippet>438</a>            <span class="macro-nonterminal">$ST1</span>: CompatibleType&lt;<span class="macro-nonterminal">$T1</span>, __DB&gt;,
@@ -448,7 +448,7 @@
 <a href=#448 id=448 data-nosnippet>448</a>        }
 <a href=#449 id=449 data-nosnippet>449</a>    };
 <a href=#450 id=450 data-nosnippet>450</a>    ((<span class="macro-nonterminal">$T1</span>: ident, $(<span class="macro-nonterminal">$T</span>: ident,)<span class="kw-2">*</span>), (<span class="macro-nonterminal">$ST1</span>: ident, $(<span class="macro-nonterminal">$ST</span>: ident,)<span class="kw-2">*</span>)) =&gt; {
-<a href=#451 id=451 data-nosnippet>451</a>        <span class="attr">#[cfg_attr(docsrs, doc(hidden))]
+<a href=#451 id=451 data-nosnippet>451</a>        <span class="attr">#[cfg_attr(diesel_docsrs, doc(hidden))]
 <a href=#452 id=452 data-nosnippet>452</a>        #[diagnostic::do_not_recommend]
 <a href=#453 id=453 data-nosnippet>453</a>        </span><span class="kw">impl</span>&lt;<span class="macro-nonterminal">$T1</span>, $(<span class="macro-nonterminal">$T</span>,)* $(<span class="macro-nonterminal">$ST</span>,)* __DB&gt; FromSqlRow&lt;($(<span class="macro-nonterminal">$ST</span>,)* <span class="kw">crate</span>::sql_types::Untyped), __DB&gt; <span class="kw">for </span>($(<span class="macro-nonterminal">$T</span>,)* <span class="macro-nonterminal">$T1</span>)
 <a href=#454 id=454 data-nosnippet>454</a>        <span class="kw">where </span>__DB: Backend,
@@ -476,7 +476,7 @@
 <a href=#476 id=476 data-nosnippet>476</a>            }
 <a href=#477 id=477 data-nosnippet>477</a>        }
 <a href=#478 id=478 data-nosnippet>478</a>
-<a href=#479 id=479 data-nosnippet>479</a>        <span class="attr">#[cfg_attr(docsrs, doc(hidden))]
+<a href=#479 id=479 data-nosnippet>479</a>        <span class="attr">#[cfg_attr(diesel_docsrs, doc(hidden))]
 <a href=#480 id=480 data-nosnippet>480</a>        </span><span class="kw">impl</span>&lt;<span class="macro-nonterminal">$T1</span>, <span class="macro-nonterminal">$ST1</span>, $(<span class="macro-nonterminal">$T</span>,)* $(<span class="macro-nonterminal">$ST</span>,)* __DB&gt; FromStaticSqlRow&lt;($(<span class="macro-nonterminal">$ST</span>,)* <span class="macro-nonterminal">$ST1</span>,), __DB&gt; <span class="kw">for </span>($(<span class="macro-nonterminal">$T</span>,)* <span class="macro-nonterminal">$T1</span>,) <span class="kw">where
 <a href=#481 id=481 data-nosnippet>481</a>            </span>__DB: Backend,
 <a href=#482 id=482 data-nosnippet>482</a>            <span class="macro-nonterminal">$ST1</span>: CompatibleType&lt;<span class="macro-nonterminal">$T1</span>, __DB&gt;,
@@ -511,7 +511,7 @@
 <a href=#511 id=511 data-nosnippet>511</a>
 <a href=#512 id=512 data-nosnippet>512</a><span class="macro">macro_rules!</span> impl_valid_grouping_for_tuple_of_columns {
 <a href=#513 id=513 data-nosnippet>513</a>    (<span class="macro-nonterminal">$T1</span>: ident, $(<span class="macro-nonterminal">$T</span>: ident,)+) =&gt; {
-<a href=#514 id=514 data-nosnippet>514</a>        <span class="attr">#[cfg_attr(docsrs, doc(hidden))]
+<a href=#514 id=514 data-nosnippet>514</a>        <span class="attr">#[cfg_attr(diesel_docsrs, doc(hidden))]
 <a href=#515 id=515 data-nosnippet>515</a>        </span><span class="kw">impl</span>&lt;<span class="macro-nonterminal">$T1</span>, $(<span class="macro-nonterminal">$T</span>,)* __GroupByClause&gt; ValidGrouping&lt;__GroupByClause&gt; <span class="kw">for </span>(<span class="macro-nonterminal">$T1</span>, $(<span class="macro-nonterminal">$T</span>,)<span class="kw-2">*</span>)
 <a href=#516 id=516 data-nosnippet>516</a>        <span class="kw">where
 <a href=#517 id=517 data-nosnippet>517</a>            </span><span class="macro-nonterminal">$T1</span>: ValidGrouping&lt;__GroupByClause&gt;,
@@ -538,7 +538,7 @@
 <a href=#538 id=538 data-nosnippet>538</a>            <span class="kw">type </span>Output = &lt;<span class="macro-nonterminal">$T1 </span><span class="kw">as </span>IsContainedInGroupBy&lt;Col&gt;&gt;::Output;
 <a href=#539 id=539 data-nosnippet>539</a>        }
 <a href=#540 id=540 data-nosnippet>540</a>
-<a href=#541 id=541 data-nosnippet>541</a>        <span class="attr">#[cfg_attr(docsrs, doc(fake_variadic))]
+<a href=#541 id=541 data-nosnippet>541</a>        <span class="attr">#[cfg_attr(diesel_docsrs, doc(fake_variadic))]
 <a href=#542 id=542 data-nosnippet>542</a>        </span><span class="kw">impl</span>&lt;<span class="macro-nonterminal">$T1</span>, __GroupByClause&gt; ValidGrouping&lt;__GroupByClause&gt; <span class="kw">for </span>(<span class="macro-nonterminal">$T1</span>,)
 <a href=#543 id=543 data-nosnippet>543</a>            <span class="kw">where </span><span class="macro-nonterminal">$T1</span>: ValidGrouping&lt;__GroupByClause&gt;
 <a href=#544 id=544 data-nosnippet>544</a>        {
@@ -555,7 +555,7 @@
 <a href=#555 id=555 data-nosnippet>555</a>        bounds = [$(<span class="macro-nonterminal">$bounds</span>: tt)<span class="kw-2">*</span>],
 <a href=#556 id=556 data-nosnippet>556</a>        is_null = [$(<span class="macro-nonterminal">$is_null</span>: tt)<span class="kw-2">*</span>],
 <a href=#557 id=557 data-nosnippet>557</a>    )=&gt; {
-<a href=#558 id=558 data-nosnippet>558</a>        <span class="attr">#[cfg_attr(docsrs, doc(hidden))]
+<a href=#558 id=558 data-nosnippet>558</a>        <span class="attr">#[cfg_attr(diesel_docsrs, doc(hidden))]
 <a href=#559 id=559 data-nosnippet>559</a>        </span><span class="kw">impl</span>&lt;$(<span class="macro-nonterminal">$ST</span>,)<span class="kw-2">*</span>&gt; SqlType <span class="kw">for </span>($(<span class="macro-nonterminal">$ST</span>,)<span class="kw-2">*</span>)
 <a href=#560 id=560 data-nosnippet>560</a>        <span class="kw">where
 <a href=#561 id=561 data-nosnippet>561</a>            </span>$(<span class="macro-nonterminal">$ST</span>: SqlType,)*
@@ -591,7 +591,7 @@
 <a href=#591 id=591 data-nosnippet>591</a>        }
 <a href=#592 id=592 data-nosnippet>592</a>    };
 <a href=#593 id=593 data-nosnippet>593</a>    (<span class="macro-nonterminal">$T1</span>: ident,) =&gt; {
-<a href=#594 id=594 data-nosnippet>594</a>        <span class="attr">#[cfg_attr(docsrs, doc(fake_variadic))]
+<a href=#594 id=594 data-nosnippet>594</a>        <span class="attr">#[cfg_attr(diesel_docsrs, doc(fake_variadic))]
 <a href=#595 id=595 data-nosnippet>595</a>        </span><span class="kw">impl</span>&lt;<span class="macro-nonterminal">$T1</span>&gt; SqlType <span class="kw">for </span>(<span class="macro-nonterminal">$T1</span>,)
 <a href=#596 id=596 data-nosnippet>596</a>        <span class="kw">where </span><span class="macro-nonterminal">$T1</span>: SqlType,
 <a href=#597 id=597 data-nosnippet>597</a>        {
