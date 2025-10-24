@@ -1,5 +1,5 @@
 //! Basic event structure for all TOF systems
-// The following file is part of gaps-online-software and published 
+// This file is part of gaps-online-software and published 
 // under the GPLv3 license
 
 use crate::prelude::*;

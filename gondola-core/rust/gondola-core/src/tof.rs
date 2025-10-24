@@ -39,7 +39,8 @@ pub mod signal_handler;
 pub use signal_handler::*;
 pub mod analysis;
 pub use analysis::*;
-
+pub mod panic;
+pub use panic::*;
 #[cfg(feature="pybindings")]
 use pyo3::pyfunction;
 /// Convert an int value to the board ID string.

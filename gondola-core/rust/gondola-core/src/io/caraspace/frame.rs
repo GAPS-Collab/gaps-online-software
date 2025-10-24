@@ -213,7 +213,7 @@ impl CRFrame {
   //  return 0
   //}
 
-  fn string_to_bytes(value : String) -> Vec<u8> {
+  pub fn string_to_bytes(value : String) -> Vec<u8> {
     let mut stream  = Vec::<u8>::new();
     let mut payload = value.into_bytes();
     let string_size = payload.len() as u16; // limit size
