@@ -801,6 +801,8 @@ pub fn master_trigger(mt_address     : &str,
         _ev.timestamp16        = ((mt_timestamp & 0x0000ffff00000000 ) >> 32) as u16;
         _ev.trigger_sources    = _ev.mt_trigger_sources; // FIXME
         _ev.n_trigger_paddles  = _ev.get_trigger_hits().len() as u8;
+        heartbeat.trigger_type = TriggerType::from((_ev.mt_trigger_sources & 0x00FF) as u8);
+        heartbeat.combo_trig_type = TriggerType::from(((_ev.mt_trigger_sources & 0xFF00) >> 8) as u8);
         if !veri_active {
           match mt_sender.send(_ev) {
             Err(err) => {
@@ -818,8 +820,6 @@ pub fn master_trigger(mt_address     : &str,
       continue;
     }
     if hb_timer.elapsed() >= hb_interval {
-      heartbeat.trigger_type = TriggerType::from((_ev.mt_trigger_sources & 0x00FF) as u8);
-      heartbeat.combo_trig_type = TriggerType::from(((_ev.mt_trigger_sources & 0xFF00) >> 8) as u8);
       match EVQ_NUM_EVENTS.get(&mut bus) {
         Err(err) => {
           error!("Unable to query {}! {err}", EVQ_NUM_EVENTS);
