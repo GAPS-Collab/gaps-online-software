@@ -794,8 +794,6 @@ pub fn master_trigger(mt_address     : &str,
         }
         last_event_id = _ev.event_id;
         heartbeat.n_events += 1;
-        heartbeat.trigger_type = TriggerType::from((_ev.mt_trigger_sources & 0x00FF) as u8);
-        heartbeat.combo_trig_type = TriggerType::from(((_ev.mt_trigger_sources & 0xFF00) >> 8) as u8);
         // we have to make sure some of the fields get properly filled and 
         // "transfer" some of the mt_* fields to the fields which get actually serialzied 
         let mt_timestamp           = _ev.get_mt_timestamp_abs();
@@ -820,6 +818,8 @@ pub fn master_trigger(mt_address     : &str,
       continue;
     }
     if hb_timer.elapsed() >= hb_interval {
+      heartbeat.trigger_type = TriggerType::from((_ev.mt_trigger_sources & 0x00FF) as u8);
+      heartbeat.combo_trig_type = TriggerType::from(((_ev.mt_trigger_sources & 0xFF00) >> 8) as u8);
       match EVQ_NUM_EVENTS.get(&mut bus) {
         Err(err) => {
           error!("Unable to query {}! {err}", EVQ_NUM_EVENTS);
