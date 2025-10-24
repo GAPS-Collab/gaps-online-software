@@ -839,7 +839,19 @@ impl Serialization for TofHit {
   fn from_bytestream(stream : &Vec<u8>, pos : &mut usize) 
     -> Result<Self, SerializationError> {
     let mut pp  = Self::new();
-    Self::verify_fixed(stream, pos)?;
+    let mut version_lt_011 = false;
+    let (size,_,__) = Self::guess_size(stream, *pos, 28)?;
+    println!("{} SIZE", size);
+    if size == 30 {
+      version_lt_011 = true;
+      let head      = parse_u16(stream, pos);
+      if head != Self::HEAD {
+        error!("Decoding of HEAD failed! Got {} instead!", head);
+        return Err(SerializationError::HeadInvalid);
+      }
+    } else {
+      Self::verify_fixed(stream, pos)?;
+    }
     // since we passed the above test, the packet
     // is valid
     pp.valid          = true;
@@ -866,14 +878,22 @@ impl Serialization for TofHit {
     }
     pp.baseline_b      = parse_f16(stream, pos);
     pp.baseline_b_rms  = parse_f16(stream, pos);
-    pp.TOT_low_b       = parse_f16(stream, pos);
-    pp.TOT_high_a      = parse_f16(stream, pos);
-    pp.TOT_high_b      = parse_f16(stream, pos);
-    pp.TOT_slp_low_a   = parse_f16(stream, pos);
-    pp.TOT_slp_low_b   = parse_f16(stream, pos);
-    pp.TOT_slp_high_a  = parse_f16(stream, pos);
-    pp.TOT_slp_high_b  = parse_f16(stream, pos);
-    *pos += 2; // always have to do this when using verify fixed
+    if !version_lt_011 {
+      pp.TOT_low_b       = parse_f16(stream, pos);
+      pp.TOT_high_a      = parse_f16(stream, pos);
+      pp.TOT_high_b      = parse_f16(stream, pos);
+      pp.TOT_slp_low_a   = parse_f16(stream, pos);
+      pp.TOT_slp_low_b   = parse_f16(stream, pos);
+      pp.TOT_slp_high_a  = parse_f16(stream, pos);
+      pp.TOT_slp_high_b  = parse_f16(stream, pos);
+      *pos += 2; // always have to do this when using verify fixed
+    } else {
+      let tail = parse_u16(stream, pos);
+      if tail != Self::TAIL {
+        error!("Decoding of TAIL failed for version {}! Got {} instead!", version, tail);
+        return Err(SerializationError::TailInvalid);
+      }
+    }
     Ok(pp)
   }
 }
