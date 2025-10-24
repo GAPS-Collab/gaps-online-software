@@ -102,6 +102,17 @@ macro_rules! expand_and_test_enum {
         assert_eq!($name::from(data as u8), data);
       }
     }
+
+    #[cfg(feature="pybindings")]
+    #[pymethods]
+    impl $name {
+    
+      #[staticmethod]  
+      #[pyo3(name = "from_u8")]
+      fn from_py(byte : u8) -> Self {
+        Self::from(byte) 
+      }
+    }
   };
 }
 
