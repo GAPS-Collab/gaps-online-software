@@ -20,15 +20,22 @@
 //!
 //! # features:
 //!
-//! * random - allow random number generated data classes for 
-//!            testing
+//! * random              - allow random number generated data classes for 
+//!                         testing
 //!
-//! * database - access a data base for advanced paddle
-//!              mapping, readoutboard and ltb information etc.
-//!              This will introduce a dependency on sqlite and 
-//!              diesel
-//!
-//!
+//! * database            - access a data base for advanced paddle
+//!                         mapping, readoutboard and ltb information etc.
+//!                         This will introduce a dependency on sqlite and 
+//!                         diesel
+//! * tof-control         - allows to control LTB & Powerboard from the RBs 
+//!                         over i2c. Since the i2c protocoll is not supported 
+//!                         on Mac, code with this feature enable won't build 
+//!                         on Apple systems. 
+//! * advanced-algorithms - allows to use a different algorithm for pulse extraction 
+//! * pybindings          - build the python library "gondola". Most of the entitities 
+//!                         within "gondola-core" have pybindings, e.g. events, hits.
+//! * tof-liftof          - build the code which is required to build liftof, the flight
+//!                         code utiilizing this library 
 // This file is part of gaps-online-software and published 
 // under the GPLv3 license
 

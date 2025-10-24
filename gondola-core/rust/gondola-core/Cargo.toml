@@ -1,6 +1,6 @@
 [package]
 name = "gondola-core"
-version = "0.11.11"
+version = "0.11.13"
 edition = "2024"
 
 [lib]
@@ -36,12 +36,13 @@ tofcontrol          = ["tof-control"]
 advanced-algorithms = ["smoothed_z_score"]
 # build a python library 
 pybindings          = ["pyo3","pyo3-log","numpy", "serde-pickle", "polars", "pyo3-polars"]
-experimental        = []
 # experimental, might go away. Attempt to include SimpleDet data
 root                = ["oxyroot", "root-io"]
 # extra features to access TOF components directly, e.g. MTB. THis 
 # will be required for the build of liftof
 tof-liftof          = ["signal-hook"]
+# define the default features for easy testing 
+default             = ["random", "database", "tof-liftof"]
 
 [dependencies.pyo3]
 version  = "0.25"

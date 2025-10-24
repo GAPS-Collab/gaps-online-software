@@ -211,7 +211,7 @@ pub fn get_califilename(rb_id : u8, latest : bool) -> String {
 /// * timestamp :  substitute the current time with this timestamp
 ///                (or basically any other string) instead.
 #[cfg_attr(feature="pybindings", pyfunction)]
-pub fn get_runfilename(run : u32, subrun : u64, rb_id : Option<u8>, timestamp : Option<String>) -> String {
+pub fn get_runfilename(run : u32, subrun : u64, rb_id : Option<u8>, timestamp : Option<String>, tof_only : bool) -> String {
   let ts : String;
   match timestamp {
     Some(_ts) => {
@@ -224,10 +224,14 @@ pub fn get_runfilename(run : u32, subrun : u64, rb_id : Option<u8>, timestamp : 
   let fname : String;
   match rb_id {
     None => {
-      fname = format!("Run{run}_{subrun}.{ts}.gaps");
+      if tof_only {
+        fname = format!("Run{run}_{subrun}.{ts}.tof.gaps"); 
+      } else {
+        fname = format!("Run{run}_{subrun}.{ts}.gaps");
+      }
     }
     Some(rbid) => {
-      fname = format!("Run{run}_{subrun}.{ts}.RB{rbid:02}.gaps");
+      fname = format!("Run{run}_{subrun}.{ts}.RB{rbid:02}.tof.gaps");
     }
   }
   fname
