@@ -151,7 +151,8 @@ macro_rules! pythonize_packable_no_new {
             return Ok(slf);
           }
           Err(err) => {
-            return Err(PyValueError::new_err(err.to_string()));
+            let err_msg = format!("Unable to deserialize bytestream! {err}");
+            return Err(PyValueError::new_err(err_mesg));
           }  
         }
       }
