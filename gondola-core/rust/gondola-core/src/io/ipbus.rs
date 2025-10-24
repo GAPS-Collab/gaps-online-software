@@ -30,6 +30,9 @@ pub const UDP_SOCKET_SLEEP_USEC  : u64 = 100;
 ///
 /// Technically, the IPBusPacketType is 
 /// only 1 byte!
+
+
+#[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
 #[derive(Debug, PartialEq, Clone, Copy, FromRepr, AsRefStr, EnumIter)]
 #[repr(u8)]
 pub enum IPBusPacketType {
