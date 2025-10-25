@@ -15,17 +15,30 @@ TofPaddle.__module__         = __name__
 TofPaddle.__name__           = "TofPaddle"
 TofPaddle.__doc__            = _gc.db.TofPaddle.__doc__
 ReadoutBoard                 = _gc.db.ReadoutBoard
+ReadoutBoard.__module__      = __name__ 
+ReadoutBoard.__name__        = 'ReadoutBoard' 
 TrackerStrip                 = _gc.db.TrackerStrip
+TrackerStrip.__module__      = __name__ 
+TrackerStrip.__name__        = 'TrackerStrip' 
 TrackerStripMask             = _gc.db.TrackerStripMask 
+TrackerStripMask.__module__  = __name__ 
+TrackerStrip.__name__        = 'TrackerStrip' 
 TrackerStripPedestal         = _gc.db.TrackerStripPedestal 
+TrackerStripPedestal.__module__ = __name__ 
+TrackerStripPedestal.__name__   = 'TrackerStripPedestal' 
 TrackerStripTransferFunction = _gc.db.TrackerStripTransferFunction 
+TrackerStripTransferFunction.__module__ = __name__ 
+TrackerStripTransferFunction.__name__    = 'TrackerStripPedestal' 
 TrackerStripCmnNoise         = _gc.db.TrackerStripCmnNoise
+TrackerStripCmnNoise.__module__  = __name__ 
+TrackerStripCmnNoise.__name__    = 'TrackerStripCmnNoise'
 get_all_rbids_in_db          = _gc.db.get_all_rbids_in_db
 get_hid_vid_map              = _gc.db.get_hid_vid_map
 get_vid_hid_map              = _gc.db.get_vid_hid_map
 get_dsi_j_ch_pid_map         = _gc.db.get_dsi_j_ch_pid_map
 
-__all__ = ['TofPaddle']
+__all__ = ['TofPaddle','ReadoutBoard','TrackerStrip','TrackerStripPedestal', 'TrackerStripTransferFunction',\
+'TrackerStripCmnNoise']
 
 #----------------------------------------
 # extend the TofPaddles with a few methods
