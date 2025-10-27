@@ -1,4 +1,5 @@
 #include <format>
+#include "spdlog/spdlog.h"
 #include "spdlog/cfg/env.h"
 
 #include "packets/tof_packet.h"

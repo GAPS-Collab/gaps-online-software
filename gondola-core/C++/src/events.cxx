@@ -12,6 +12,7 @@
 #include "serialization.h"
 #include "version.h"
 
+#include "spdlog/spdlog.h"
 #include "spdlog/cfg/env.h"
 
 namespace g = Gaps;
@@ -1149,11 +1150,11 @@ TofHit TofHit::from_bytestream(const Vec<u8> &bytestream,
    return hit;
  }
  // UPDATE - get version byte first!
- u64 ver_pos       = pos + 22; // version byte is at position 23
+ u64 ver_pos            = pos + 21; // version byte is at position 23
  if (bytestream.size() <= ver_pos) {
    return hit;
  }
- u8  version        = Gaps::parse_u8(bytestream, ver_pos) & 0xc0;
+ u8  version        = Gaps::parse_u8(bytestream, ver_pos);
  hit.version        = (Gaps::ProtocolVersion) version;
  hit.paddle_id      = bytestream[pos]; pos+=1;
  hit.time_a_f32     = Gaps::parse_f16(bytestream, pos); 

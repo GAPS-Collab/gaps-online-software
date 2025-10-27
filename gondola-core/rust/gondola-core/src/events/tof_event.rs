@@ -866,7 +866,7 @@ impl Serialization for TofEvent {
   fn from_bytestream_alt(stream    : &Vec<u8>, 
                          pos       : &mut usize) 
     -> Result<Self, SerializationError> {
-    let head    = parse_u16(stream, pos);
+    let head = parse_u16(stream, pos);
     if head != TofEvent::HEAD {
       return Err(SerializationError::HeadInvalid);
     }
@@ -890,18 +890,18 @@ impl Serialization for TofEvent {
     if te.has_any_mangling() {
       te.status = EventStatus::AnyDataMangling;
     }
-    te.event_id           = parse_u32(stream, pos);
-    let mtb_timestamp      = parse_u32(stream, pos);
-    let tiu_timestamp      = parse_u32(stream, pos);
-    let tiu_gps32          = parse_u32(stream, pos);
-    let _tiu_gps16          = parse_u16(stream,pos);
+    te.event_id        = parse_u32(stream, pos);
+    let mtb_timestamp  = parse_u32(stream, pos);
+    let tiu_timestamp  = parse_u32(stream, pos);
+    let tiu_gps32      = parse_u32(stream, pos);
+    let _tiu_gps16     = parse_u16(stream,pos);
     let _crc           = parse_u32(stream, pos);
-    let mt_timestamp  = (mt_event_get_timestamp_abs48(mtb_timestamp, tiu_gps32, tiu_timestamp ) as f64/1000.0).floor()  as u64; 
-    te.timestamp32         = (mt_timestamp  & 0x00000000ffffffff ) as u32;
-    te.timestamp16         = ((mt_timestamp & 0x0000ffff00000000 ) >> 32) as u16;
-    te.trigger_sources     = parse_u16(stream, pos);
-    te.dsi_j_mask          = parse_u32(stream, pos);
-    let n_channel_masks   = parse_u8(stream, pos);
+    let mt_timestamp   = (mt_event_get_timestamp_abs48(mtb_timestamp, tiu_gps32, tiu_timestamp ) as f64/1000.0).floor()  as u64; 
+    te.timestamp32      = (mt_timestamp  & 0x00000000ffffffff ) as u32;
+    te.timestamp16      = ((mt_timestamp & 0x0000ffff00000000 ) >> 32) as u16;
+    te.trigger_sources  = parse_u16(stream, pos);
+    te.dsi_j_mask       = parse_u32(stream, pos);
+    let n_channel_masks = parse_u8(stream, pos);
     for _ in 0..n_channel_masks {
       te.channel_mask.push(parse_u16(stream, pos));
     }
@@ -914,7 +914,7 @@ impl Serialization for TofEvent {
     }
     //let mt_event      = MasterTriggerEvent::from_bytestream(stream, &mut pos)?;
     let v_sizes           = Self::decode_depr_tofevent_size_header(&parse_u32(stream, pos));
-    println!("VSIZES {:?}", v_sizes);
+    //println!("TofEvent - rbevents,  {:?}", v_sizes);
     for _ in 0..v_sizes.0 {
       // we are getting all waveforms for now, but we can 
       // discard them later
@@ -1292,7 +1292,8 @@ impl TofEvent {
     -> PyResult<()> {
     match Self::set_packed_status_version(pack, version) {
       Err(err) => {
-        return Err(PyValueError::new_err("Unable to set status version! {err}"));
+        let err_mesg = format!("Unable to set status version! {}", err);
+        return Err(PyValueError::new_err(err_mesg));
       } 
       Ok(_) => {
         return Ok(());
@@ -1306,7 +1307,8 @@ impl TofEvent {
     -> PyResult<()> {
     match Self::strip_packed_rbevents_for_pv3(pack) {
       Err(err) => {
-        return Err(PyValueError::new_err("Unable to set status version! {err}"));
+        let err_msg = format!("Unable to strip packed rbevents{}", err);
+        return Err(PyValueError::new_err(err_mesg));
       } 
       Ok(_) => {
         return Ok(());

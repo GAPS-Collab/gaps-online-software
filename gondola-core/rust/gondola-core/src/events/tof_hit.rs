@@ -1,4 +1,4 @@
-// The following file is part of gaps-online-software and published 
+// This file is part of gaps-online-software and published 
 // under the GPLv3 license
 
 use crate::prelude::*;
@@ -867,9 +867,9 @@ impl Serialization for TofHit {
     let mut phase_vec = Vec::<u8>::new();
     phase_vec.push(parse_u8(stream, pos));
     phase_vec.push(parse_u8(stream, pos));
-    pp.phase    = parse_f16(&phase_vec, &mut 0);
-    let version      = ProtocolVersion::from(parse_u8(stream, pos));
-    pp.version       = version;
+    pp.phase          = parse_f16(&phase_vec, &mut 0);
+    let version       = ProtocolVersion::from(parse_u8(stream, pos));
+    pp.version        = version;
     match pp.version {
       ProtocolVersion::V1 => {
       }
