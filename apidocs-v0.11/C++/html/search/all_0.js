@@ -12,12 +12,11 @@ var searchData=
   ['adc_5fdvdd_5fcurrent_9',['adc_dvdd_current',['../structRBMoniData.html#abe77865e852d18b85bc0c9a0aef9f7eb',1,'RBMoniData']]],
   ['adc_5fdvdd_5fpower_10',['adc_dvdd_power',['../structRBMoniData.html#a81f0ce3873ad1bdea1b121d385509843',1,'RBMoniData']]],
   ['adc_5fdvdd_5fvoltage_11',['adc_dvdd_voltage',['../structRBMoniData.html#a399b5ce026cb0d801a43bfb2a2b7784b',1,'RBMoniData']]],
-  ['add_12',['add',['../gondola__core_8cxx.html#aa99823a0fc8313c9c32541ce768fb801',1,'gondola_core.cxx']]],
-  ['any_13',['Any',['../events_8h.html#a4a0b0f32c84d56c15f094cf09291a6c7aed36a1ef76a59ee3f15180e0441188ad',1,'events.h']]],
-  ['anydatamangling_14',['AnyDataMangling',['../events_8h.html#a097b60adc604ef5a27f55edda6360293a914a42ba7d6f75029e02b8c5e8a80016',1,'events.h']]],
-  ['anytofhk_15',['AnyTofHK',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a1d633e18b49ad6ab196ff08b21e0a052',1,'Gaps::Telemetry']]],
-  ['anytrackerhk_16',['AnyTrackerHK',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7ac44f8f7d9b9f501fe9278cd56521f28a',1,'Gaps::Telemetry']]],
-  ['api_20software_20documentation_17',['gaps-online-software C++ API software documentation',['../index.html',1,'']]],
-  ['arguments_18',['Arguments',['../namespacegondola.html#autotoc_md2',1,'']]],
-  ['asic_5fevent_5fcode_19',['asic_event_code',['../structGaps_1_1Telemetry_1_1TrkHit.html#a180d4a0a852c376b0646d4de4d7a9298',1,'Gaps::Telemetry::TrkHit']]]
+  ['any_12',['Any',['../events_8h.html#a4a0b0f32c84d56c15f094cf09291a6c7aed36a1ef76a59ee3f15180e0441188ad',1,'events.h']]],
+  ['anydatamangling_13',['AnyDataMangling',['../events_8h.html#a097b60adc604ef5a27f55edda6360293a914a42ba7d6f75029e02b8c5e8a80016',1,'events.h']]],
+  ['anytofhk_14',['AnyTofHK',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a1d633e18b49ad6ab196ff08b21e0a052',1,'Gaps::Telemetry']]],
+  ['anytrackerhk_15',['AnyTrackerHK',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7ac44f8f7d9b9f501fe9278cd56521f28a',1,'Gaps::Telemetry']]],
+  ['api_20software_20documentation_16',['gaps-online-software C++ API software documentation',['../index.html',1,'']]],
+  ['arguments_17',['Arguments',['../namespacegondola.html#autotoc_md2',1,'']]],
+  ['asic_5fevent_5fcode_18',['asic_event_code',['../structGaps_1_1Telemetry_1_1TrkHit.html#a180d4a0a852c376b0646d4de4d7a9298',1,'Gaps::Telemetry::TrkHit']]]
 ];
