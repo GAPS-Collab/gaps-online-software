@@ -115,8 +115,12 @@ auto go::spike_cleaning_all(Vec<Vec<f32>> &wf, bool calibrated) -> void {
 //        wf[:,i+1] = wf[:,i] + dV
 //        wf[:,i+2] = wf[:,i] + 2*dV
 //    return wf
+  if (wf.empty() || wf[0].empty()) {
+    return;
+  }
+
   int thresh = 360;
-  int thresh_single = 200;  // threshold for single spikes 
+  int thresh_single = 200;  // threshold for single spikes
 
   if (calibrated) {
     thresh = 16;
@@ -274,7 +278,19 @@ auto go::spike_cleaning_all(Vec<Vec<f32>> &wf, bool calibrated) -> void {
 
 /************************************************/
 
-auto spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]) -> void {
+auto go::spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]) -> void {
+  // Validate input dimensions
+  if (wf.empty() || wf.size() != NCHN) {
+    spdlog::error("spike_cleaning_drs4: Expected {} channels, got {}", NCHN, wf.size());
+    return;
+  }
+  for (size_t i = 0; i < wf.size(); i++) {
+    if (wf[i].size() != 1024) {
+      spdlog::error("spike_cleaning_drs4: Channel {} expected 1024 samples, got {}", i, wf[i].size());
+      return;
+    }
+  }
+
   int i, j, k, l;
   double x, y;
   int sp[NCHN][10];
@@ -386,7 +402,7 @@ auto spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]) -> void {
   for (k = 0; k < n_rsp; k++) {
     spikes[k] = rsp[k];
     for (i = 0; i < nChn; i++) {
-      if (k < n_rsp && fabs(rsp[k] - rsp[k + 1] % 1024) == 2) {
+      if (k < n_rsp - 1 && fabs(rsp[k] - rsp[k + 1] % 1024) == 2) {
         /* remove double spike */
         j = rsp[k] > rsp[k + 1] ? rsp[k + 1] : rsp[k];
         x = wf[i][(j - 1) % 1024];
@@ -423,7 +439,7 @@ auto spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]) -> void {
         }
       }
     }
-    if (k < n_rsp && fabs(rsp[k] - rsp[k + 1] % 1024) == 2)
+    if (k < n_rsp - 1 && fabs(rsp[k] - rsp[k + 1] % 1024) == 2)
       k++; // skip second half of double spike
   }
 }

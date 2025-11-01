@@ -8,6 +8,7 @@
 #include "caraspace.hpp"
 #include "telemetry_dataclasses.hpp"
 #include "io/telemetry_reader.hpp"
+#include "calibration.h"
 
 namespace nb = nanobind;
 namespace g  = gondola;
@@ -173,7 +174,20 @@ NB_MODULE(gondola_cxx, m) {
     .def("print_packet_index"        , &g::TelemetryPacketReader::print_packet_index)
     .def("cache_all_packets"         , &g::TelemetryPacketReader::cache_all_packets)
     .def("count_packets"             , &g::TelemetryPacketReader::count_packets)
-    .def("rewind"                    , &g::TelemetryPacketReader::rewind); 
+    .def("rewind"                    , &g::TelemetryPacketReader::rewind);
+
+  // Spike cleaning functions
+  m.def("spike_cleaning_drs4", &g::spike_cleaning_drs4, 
+        nb::arg("wf"), nb::arg("tCell"), nb::arg("spikes"),
+        "Original DRS4 spike cleaning from the DRS4 manual");
+  
+  m.def("spike_cleaning_simple", &g::spike_cleaning_simple, 
+        nb::arg("voltages"), nb::arg("calibrated") = true,
+        "Simpler spike cleaning version (by Jamie)");
+  
+  m.def("spike_cleaning_all", &g::spike_cleaning_all, 
+        nb::arg("voltages"), nb::arg("calibrated") = true,
+        "Jamie's simpler version with single-width spike correction");
 }
 
 
