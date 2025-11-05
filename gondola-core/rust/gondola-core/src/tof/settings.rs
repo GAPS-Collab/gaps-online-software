@@ -777,6 +777,9 @@ impl AnalysisEngineSettings {
   }
 }
 
+//-------------------------------------------------------------
+
+#[cfg(feature="pybindings")]
 pythonize!(AnalysisEngineSettings);
 
 //--------------------------------------------------------------
