@@ -7,6 +7,6 @@ var searchData=
   ['simprimary_4',['SimPrimary',['../structSimPrimary.html#a3fb6b8a490c2fffc878db9ee63621d56',1,'SimPrimary']]],
   ['slice_5',['slice',['../namespaceGaps.html#a1abc8354f5db84adaa571b27c783a38f',1,'Gaps']]],
   ['spike_5fcleaning_5fall_6',['spike_cleaning_all',['../namespacegondola.html#a56a2781343a042a385b34244fe8e4934',1,'gondola']]],
-  ['spike_5fcleaning_5fdrs4_7',['spike_cleaning_drs4',['../namespacegondola.html#a51016fc759994f7a750d933ea9dee8b5',1,'gondola::spike_cleaning_drs4()'],['../calibration_8cxx.html#a6f208c0b99fdb15db3e56a834074b048',1,'spike_cleaning_drs4():&#160;calibration.cxx']]],
+  ['spike_5fcleaning_5fdrs4_7',['spike_cleaning_drs4',['../namespacegondola.html#a51016fc759994f7a750d933ea9dee8b5',1,'gondola']]],
   ['spike_5fcleaning_5fsimple_8',['spike_cleaning_simple',['../namespacegondola.html#aad98e262d4567278c4414be5db426023',1,'gondola']]]
 ];

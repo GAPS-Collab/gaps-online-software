@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.io &#8212; gondola 0.11.13 documentation</title>
+    <title>gondola.io &#8212; gondola 0.11.15 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=182eb502"></script>
+    <script src="../_static/documentation_options.js?v=7a9d3c55"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.io';</script>
@@ -110,7 +110,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.11.13 documentation</p>
+    <p class="title logo__title">gondola 0.11.15 documentation</p>
   
 </a></div>
     
@@ -351,7 +351,7 @@ obtain various flavors of data used trhoughout GAPS.</p>
 <td><p>Get a timestamp from a '.bin' file as written  by telemetry</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#gondola.io.grace_get_telemetry_binaries" title="gondola.io.grace_get_telemetry_binaries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grace_get_telemetry_binaries</span></code></a>(...[, data_dir])</p></td>
-<td><p></p></td>
+<td><p>Get the relevant telemetry data files for time period from a directory.</p></td>
 </tr>
 </tbody>
 </table>
@@ -745,7 +745,21 @@ by telemetry</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="gondola.io.grace_get_telemetry_binaries">
 <span class="sig-prename descclassname"><span class="pre">gondola.io.</span></span><span class="sig-name descname"><span class="pre">grace_get_telemetry_binaries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unix_time_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unix_time_stop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/gaps_binaries/live/raw/ethernet'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.grace_get_telemetry_binaries" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the relevant telemetry data files for time period from a directory. 
+This function is preferred over get_telemetry_binaries, since it is more 
+precise in constricting the time range</p>
+<dl class="simple">
+<dt># Arguments</dt><dd><ul class="simple">
+<li><p>unix_time_start : seconds since epoch for run start</p></li>
+<li><p>unix_time_end   : seconds since epoch for run end</p></li>
+</ul>
+</dd>
+<dt># Keyword Arguments</dt><dd><ul class="simple">
+<li><p>data_dir        : folder with telemetry binaries ('.bin')</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

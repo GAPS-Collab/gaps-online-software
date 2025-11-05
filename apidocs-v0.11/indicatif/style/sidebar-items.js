@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["ProgressStyle","TemplateError"],"trait":["ProgressTracker"]};
+window.SIDEBAR_ITEMS = {"fn":["write_ansi_range"],"struct":["ProgressStyle","TemplateError"],"trait":["ProgressTracker"]};

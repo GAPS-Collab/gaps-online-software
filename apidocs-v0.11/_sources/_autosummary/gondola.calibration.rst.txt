@@ -10,3 +10,9 @@ gondola.calibration
    
       load_rb_calibrations
    
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      RBCalibrations
+   

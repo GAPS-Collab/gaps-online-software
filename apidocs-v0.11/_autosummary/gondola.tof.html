@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.tof &#8212; gondola 0.11.13 documentation</title>
+    <title>gondola.tof &#8212; gondola 0.11.15 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=182eb502"></script>
+    <script src="../_static/documentation_options.js?v=7a9d3c55"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.tof';</script>
@@ -110,7 +110,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.11.13 documentation</p>
+    <p class="title logo__title">gondola 0.11.15 documentation</p>
   
 </a></div>
     
@@ -343,31 +343,34 @@
 <p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.tof.MasterTrigger" title="gondola.tof.MasterTrigger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MasterTrigger</span></code></a>(target_address)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.tof.AnalysisEngineSettings" title="gondola.tof.AnalysisEngineSettings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AnalysisEngineSettings</span></code></a>()</p></td>
+<td><p>Settings to change the configuration of the analysis engine  (pulse extraction)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.tof.MasterTrigger" title="gondola.tof.MasterTrigger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MasterTrigger</span></code></a>(target_address)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.tof.PreampBiasConfig" title="gondola.tof.PreampBiasConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PreampBiasConfig</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.tof.PreampBiasConfig" title="gondola.tof.PreampBiasConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PreampBiasConfig</span></code></a></p></td>
 <td><p>Set preamp voltages</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.tof.RBChannelMaskConfig" title="gondola.tof.RBChannelMaskConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RBChannelMaskConfig</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.tof.RBChannelMaskConfig" title="gondola.tof.RBChannelMaskConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RBChannelMaskConfig</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.tof.RBPaddleID" title="gondola.tof.RBPaddleID"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RBPaddleID</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.tof.RBPaddleID" title="gondola.tof.RBPaddleID"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RBPaddleID</span></code></a>()</p></td>
 <td><p>Squeze the rb channel - paddle mapping into 5 bytes for a single RB</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.tof.TofCommand" title="gondola.tof.TofCommand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofCommand</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.tof.TofCommand" title="gondola.tof.TofCommand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofCommand</span></code></a>()</p></td>
 <td><p>A general command class with an arbitrary payload</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.tof.TofCuts" title="gondola.tof.TofCuts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofCuts</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.tof.TofCuts" title="gondola.tof.TofCuts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofCuts</span></code></a>()</p></td>
 <td><p>Sets of cuts which can be imposed on  TofEvents</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.tof.TofDetectorStatus" title="gondola.tof.TofDetectorStatus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofDetectorStatus</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.tof.TofDetectorStatus" title="gondola.tof.TofDetectorStatus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofDetectorStatus</span></code></a>()</p></td>
 <td><p>Report dead channels/non-active detectors for the TOF system</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.tof.TofRunConfig" title="gondola.tof.TofRunConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofRunConfig</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.tof.TofRunConfig" title="gondola.tof.TofRunConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofRunConfig</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.tof.TriggerConfig" title="gondola.tof.TriggerConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriggerConfig</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.tof.TriggerConfig" title="gondola.tof.TriggerConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriggerConfig</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -466,6 +469,83 @@ will be 1</p>
 <dd><p>Pack self into a TofPacket to be written on disk
 or sent over network</p>
 </dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.tof.AnalysisEngineSettings">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.tof.</span></span><span class="sig-name descname"><span class="pre">AnalysisEngineSettings</span></span><a class="headerlink" href="#gondola.tof.AnalysisEngineSettings" title="Link to this definition">#</a></dt>
+<dd><p>Settings to change the configuration of the analysis engine 
+(pulse extraction)</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.AnalysisEngineSettings.cfd_fraction">
+<span class="sig-name descname"><span class="pre">cfd_fraction</span></span><a class="headerlink" href="#gondola.tof.AnalysisEngineSettings.cfd_fraction" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.AnalysisEngineSettings.find_pks_t_start">
+<span class="sig-name descname"><span class="pre">find_pks_t_start</span></span><a class="headerlink" href="#gondola.tof.AnalysisEngineSettings.find_pks_t_start" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.AnalysisEngineSettings.find_pks_t_window">
+<span class="sig-name descname"><span class="pre">find_pks_t_window</span></span><a class="headerlink" href="#gondola.tof.AnalysisEngineSettings.find_pks_t_window" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.AnalysisEngineSettings.find_pks_thresh">
+<span class="sig-name descname"><span class="pre">find_pks_thresh</span></span><a class="headerlink" href="#gondola.tof.AnalysisEngineSettings.find_pks_thresh" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.AnalysisEngineSettings.integration_start">
+<span class="sig-name descname"><span class="pre">integration_start</span></span><a class="headerlink" href="#gondola.tof.AnalysisEngineSettings.integration_start" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.AnalysisEngineSettings.integration_window">
+<span class="sig-name descname"><span class="pre">integration_window</span></span><a class="headerlink" href="#gondola.tof.AnalysisEngineSettings.integration_window" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.AnalysisEngineSettings.max_peaks">
+<span class="sig-name descname"><span class="pre">max_peaks</span></span><a class="headerlink" href="#gondola.tof.AnalysisEngineSettings.max_peaks" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.AnalysisEngineSettings.min_peak_size">
+<span class="sig-name descname"><span class="pre">min_peak_size</span></span><a class="headerlink" href="#gondola.tof.AnalysisEngineSettings.min_peak_size" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.AnalysisEngineSettings.pedestal_begin_bin">
+<span class="sig-name descname"><span class="pre">pedestal_begin_bin</span></span><a class="headerlink" href="#gondola.tof.AnalysisEngineSettings.pedestal_begin_bin" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.AnalysisEngineSettings.pedestal_thresh">
+<span class="sig-name descname"><span class="pre">pedestal_thresh</span></span><a class="headerlink" href="#gondola.tof.AnalysisEngineSettings.pedestal_thresh" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.AnalysisEngineSettings.pedestal_win_bins">
+<span class="sig-name descname"><span class="pre">pedestal_win_bins</span></span><a class="headerlink" href="#gondola.tof.AnalysisEngineSettings.pedestal_win_bins" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.AnalysisEngineSettings.tot_threshold_high">
+<span class="sig-name descname"><span class="pre">tot_threshold_high</span></span><a class="headerlink" href="#gondola.tof.AnalysisEngineSettings.tot_threshold_high" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.AnalysisEngineSettings.tot_threshold_low">
+<span class="sig-name descname"><span class="pre">tot_threshold_low</span></span><a class="headerlink" href="#gondola.tof.AnalysisEngineSettings.tot_threshold_low" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.AnalysisEngineSettings.use_zscore">
+<span class="sig-name descname"><span class="pre">use_zscore</span></span><a class="headerlink" href="#gondola.tof.AnalysisEngineSettings.use_zscore" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -1558,6 +1638,23 @@ get dropped due to the RBs being busy</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofDetectorStatus.from_random"><code class="docutils literal notranslate"><span class="pre">TofDetectorStatus.from_random()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofDetectorStatus.from_tofpacket"><code class="docutils literal notranslate"><span class="pre">TofDetectorStatus.from_tofpacket()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofDetectorStatus.pack"><code class="docutils literal notranslate"><span class="pre">TofDetectorStatus.pack()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.AnalysisEngineSettings"><code class="docutils literal notranslate"><span class="pre">AnalysisEngineSettings</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.AnalysisEngineSettings.cfd_fraction"><code class="docutils literal notranslate"><span class="pre">AnalysisEngineSettings.cfd_fraction</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.AnalysisEngineSettings.find_pks_t_start"><code class="docutils literal notranslate"><span class="pre">AnalysisEngineSettings.find_pks_t_start</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.AnalysisEngineSettings.find_pks_t_window"><code class="docutils literal notranslate"><span class="pre">AnalysisEngineSettings.find_pks_t_window</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.AnalysisEngineSettings.find_pks_thresh"><code class="docutils literal notranslate"><span class="pre">AnalysisEngineSettings.find_pks_thresh</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.AnalysisEngineSettings.integration_start"><code class="docutils literal notranslate"><span class="pre">AnalysisEngineSettings.integration_start</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.AnalysisEngineSettings.integration_window"><code class="docutils literal notranslate"><span class="pre">AnalysisEngineSettings.integration_window</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.AnalysisEngineSettings.max_peaks"><code class="docutils literal notranslate"><span class="pre">AnalysisEngineSettings.max_peaks</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.AnalysisEngineSettings.min_peak_size"><code class="docutils literal notranslate"><span class="pre">AnalysisEngineSettings.min_peak_size</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.AnalysisEngineSettings.pedestal_begin_bin"><code class="docutils literal notranslate"><span class="pre">AnalysisEngineSettings.pedestal_begin_bin</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.AnalysisEngineSettings.pedestal_thresh"><code class="docutils literal notranslate"><span class="pre">AnalysisEngineSettings.pedestal_thresh</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.AnalysisEngineSettings.pedestal_win_bins"><code class="docutils literal notranslate"><span class="pre">AnalysisEngineSettings.pedestal_win_bins</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.AnalysisEngineSettings.tot_threshold_high"><code class="docutils literal notranslate"><span class="pre">AnalysisEngineSettings.tot_threshold_high</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.AnalysisEngineSettings.tot_threshold_low"><code class="docutils literal notranslate"><span class="pre">AnalysisEngineSettings.tot_threshold_low</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.AnalysisEngineSettings.use_zscore"><code class="docutils literal notranslate"><span class="pre">AnalysisEngineSettings.use_zscore</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.TofCommand"><code class="docutils literal notranslate"><span class="pre">TofCommand</span></code></a><ul class="nav section-nav flex-column">
