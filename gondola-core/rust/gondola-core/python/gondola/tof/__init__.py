@@ -14,6 +14,11 @@ TofDetectorStatus   = _gc.tof.TofDetectorStatus
 TofDetectorStatus.__module__ = __name__ 
 TofDetectorStatus.__name__   = 'TofDetectorStatus' 
 
+AnalysisEngineSettings = _gc.tof.AnalysisEngineSettings 
+AnalysisEngineSettings.__module__ = __name__ 
+AnalysisEngineSettings.__name__   = 'AnalysisEngineSettings' 
+
+
 # enums 
 TofCommandCode      = _gc.tof.TofCommandCode
 BuildStrategy       = _gc.tof.BuildStrategy
@@ -51,40 +56,42 @@ MasterTrigger       = _gc.tof.MasterTrigger
 MasterTrigger.__module__ = __name__
 MasterTrigger.__name__   = 'MasterTrigger'
 
+waveform_analysis   = _gc.tof.waveform_analysis 
+
 ## command factories
-#start_run            = _gc.tof.start_run 
+start_run            = _gc.tof.start_run 
 #start_run.__module__ = __name__
 #start_run.__name___  = 'start_run'
 #
-#stop_run            = _gc.tof.stop_run 
+stop_run            = _gc.tof.stop_run 
 #stop_run.__module__ = __name__
 #stop_run.__name___  = 'stop_run'
 #
-#enable_verification_run            = _gc.tof.enable_verification_run  
+enable_verification_run            = _gc.tof.enable_verification_run  
 #enable_verification_run.__module__ = __name__
 #enable_verification_run.__name___  = 'enable_verification_run'
 #
-#restart_liftofrb    = _gc.tof.restart_liftofrb 
+restart_liftofrb    = _gc.tof.restart_liftofrb 
 #restart_liftofrb.___module__ = __name__ 
 #restart_liftofrb.__name__ = 'restart_liftofrb'
 #
-#shutdown_all_rbs    = _gc.tof.shutdown_all_rbs
+shutdown_all_rbs    = _gc.tof.shutdown_all_rbs
 #shutdown_all_rbs.__module__ = __name__
 #shutdown_all_rbs.__name__   = 'shutdown_all_rbs'
 #
-#shutdown_rat        = _gc.tof.shutdown_rat 
+shutdown_rat        = _gc.tof.shutdown_rat 
 #shutdown_rat.__module__ = __name__ 
 #shutdown_rat.__name__   = 'shutdown_rat' 
 #
-#shutdown_ratpair    = _gc.tof.shutdown_ratpair
+shutdown_ratpair    = _gc.tof.shutdown_ratpair
 #shutdown_ratpair.__module__ = __name__ 
 #shutdown_ratpair.__name__ = 'shutdown_ratpair' 
 #
-#shutdown_rb         = _gc.tof.shutdown_rb 
+shutdown_rb         = _gc.tof.shutdown_rb 
 #shutdown_rb.__module__  = __name__
 #shutdown_rb.__name__    = 'shutdown_rb' 
 #
-#shutdown_tofcpu     = _gc.tof.shutdown_tofcpu 
+shutdown_tofcpu     = _gc.tof.shutdown_tofcpu 
 #shutdown_tofcpu.__module__ = __name__ 
 #shutdown_tofcpu.__name__   = 'shutdown_tofcpu'
 #

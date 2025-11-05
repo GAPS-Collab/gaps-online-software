@@ -63,6 +63,8 @@ pub mod database;
 // python convention
 pub const VERSION: &str = env!("CARGO_PKG_VERSION"); 
 
+use crate::errors::*;
+
 /// A simple helper macro adding an as_str function 
 /// as well as the Display method to any enum.
 ///
@@ -190,8 +192,10 @@ fn tof_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<TriggerConfig>()?;
   m.add_class::<TofRunConfig>()?;
   m.add_class::<TofCuts>()?;
+  m.add_class::<AnalysisEngineSettings>()?;
   #[cfg(feature="tof-liftof")]
   m.add_class::<PyMasterTrigger>()?;
+  m.add_function(wrap_pyfunction!(waveform_analysis, m)?)?;
   m.add_function(wrap_pyfunction!(to_board_id_string, m)?)?;
   // the commands
   m.add_function(wrap_pyfunction!(start_run, m)?)?;
@@ -373,6 +377,73 @@ fn get_version() -> &'static str {
   return VERSION;
 }
 
+// add exceptions for the custom Error types
+//#[cfg(feature="pybindings")]
+//pyo3::create_exception!(gondola_core_py, MasterTriggerError, pyo3::exceptions::PyException);
+//#[cfg(feature="pybindings")]
+//pyo3::create_exception!(gondola_core_py, RunError, pyo3::exceptions::PyException);
+//#[cfg(feature="pybindings")]
+//pyo3::create_exception!(gondola_core_py, TofError, pyo3::exceptions::PyException);
+//#[cfg(feature="pybindings")]
+//pyo3::create_exception!(gondola_core_py, StagingError, pyo3::exceptions::PyException);
+//#[cfg(feature="pybindings")]
+//pyo3::create_exception!(gondola_core_py, SensorError, pyo3::exceptions::PyException);
+//#[cfg(feature="pybindings")]
+//pyo3::create_exception!(gondola_core_py, UserError, pyo3::exceptions::PyException);
+//#[cfg(feature="pybindings")]
+//pyo3::create_exception!(gondola_core_py, CalibrationError, pyo3::exceptions::PyException);
+//#[cfg(feature="pybindings")]
+//pyo3::create_exception!(gondola_core_py, WaveformError, pyo3::exceptions::PyException);
+//#[cfg(feature="pybindings")]
+//pyo3::create_exception!(gondola_core_py, IPBusError, pyo3::exceptions::PyException);
+//#[cfg(feature="pybindings")]
+//pyo3::create_exception!(gondola_core_py, SerializationError, pyo3::exceptions::PyException);
+//#[cfg(feature="pybindings")]
+//pyo3::create_exception!(gondola_core_py, AnalysisError, pyo3::exceptions::PyException); 
+#[cfg(feature="pybindings")]
+pyo3::create_exception!(gondola_core_py, PyMasterTriggerError, pyo3::exceptions::PyException);
+#[cfg(feature="pybindings")]
+pyo3::create_exception!(gondola_core_py, PyRunError, pyo3::exceptions::PyException);
+#[cfg(feature="pybindings")]
+pyo3::create_exception!(gondola_core_py, PyTofError, pyo3::exceptions::PyException);
+#[cfg(feature="pybindings")]
+pyo3::create_exception!(gondola_core_py, PyStagingError, pyo3::exceptions::PyException);
+#[cfg(feature="pybindings")]
+pyo3::create_exception!(gondola_core_py, PySensorError, pyo3::exceptions::PyException);
+#[cfg(feature="pybindings")]
+pyo3::create_exception!(gondola_core_py, PyUserError, pyo3::exceptions::PyException);
+#[cfg(feature="pybindings")]
+pyo3::create_exception!(gondola_core_py, PyCalibrationError, pyo3::exceptions::PyException);
+#[cfg(feature="pybindings")]
+pyo3::create_exception!(gondola_core_py, PyWaveformError, pyo3::exceptions::PyException);
+#[cfg(feature="pybindings")]
+pyo3::create_exception!(gondola_core_py, PyIPBusError, pyo3::exceptions::PyException);
+#[cfg(feature="pybindings")]
+pyo3::create_exception!(gondola_core_py, PySerializationError, pyo3::exceptions::PyException);
+#[cfg(feature="pybindings")]
+pyo3::create_exception!(gondola_core_py, PyAnalysisError, pyo3::exceptions::PyException); 
+
+#[macro_export]
+macro_rules! pythonize_error {
+  ($name:ident, $pyname:ident) => {
+
+    impl From<$name> for PyErr {
+      fn from(err: $name) -> PyErr {
+        // You can use a standard Python exception if you prefer, 
+        // e.g., pyo3::exceptions::PyValueError::new_err(...)
+        // But mapping to your custom PyAnalysisError is usually better. 
+        $pyname::new_err(format!("<GondolaCoreException: {}>", err))
+      }
+    }
+  }
+}
+
+#[cfg(feature="pybindings")]
+pythonize_error!(SerializationError, PySerializationError);
+#[cfg(feature="pybindings")]
+pythonize_error!(AnalysisError, PyAnalysisError);
+
+
 /// Python API to rust version of tof-dataclasses.
 ///
 /// Currently, this contains only the analysis 
@@ -393,5 +464,11 @@ fn gondola_core_py<'_py>(m : &Bound<'_py, PyModule>) -> PyResult<()> { //: Pytho
   m.add_wrapped(wrap_pymodule!(stats_py))?;
   m.add_wrapped(wrap_pymodule!(algo_py))?;
   m.add_wrapped(wrap_pymodule!(calibration_py))?;
+  //m.add("SerializationError",  pyo3::types::PyAnyMethods::<PySerializationError>::get_type(m))?;
+  //m.add("AnalysisError",  pyo3::types::PyAnyMethods::<PyAnalysisError>::get_type(m))?;
   Ok(())
 }
+
+
+
+

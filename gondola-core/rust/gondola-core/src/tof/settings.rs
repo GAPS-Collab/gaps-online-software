@@ -559,6 +559,7 @@ impl Default for RBSettings {
 /// Settings to change the configuration of the analysis engine 
 /// (pulse extraction)
 #[derive(Debug, Copy, Clone, serde::Serialize, serde::Deserialize)]
+#[cfg_attr(feature="pybindings", pyclass)]
 pub struct AnalysisEngineSettings {
   /// pulse integration start
   pub integration_start      : f32,
@@ -627,6 +628,158 @@ impl Default for AnalysisEngineSettings {
     Self::new()
   }
 }
+
+//--------------------------------------------------------------
+
+
+#[cfg(feature="pybindings")]
+#[pymethods]
+impl AnalysisEngineSettings {
+
+  #[getter]
+  fn get_integration_start(&self) -> f32 {
+    self.integration_start
+  }
+
+  #[setter]
+  fn set_integration_start(&mut self, value : f32) {
+    self.integration_start = value;
+  }
+  
+  #[getter]
+  fn get_integration_window(&self) -> f32 {
+    self.integration_window
+  }
+
+  #[setter]
+  fn set_integration_window(&mut self, value : f32) {
+    self.integration_window = value;
+  }
+  
+  #[getter]
+  fn get_pedestal_thresh(&self) -> f32 {
+    self.pedestal_thresh
+  }
+
+  #[setter]
+  fn set_pedestal_thresh(&mut self, value : f32) {
+    self.pedestal_thresh = value;
+  }
+  
+  #[getter]
+  fn get_pedestal_begin_bin(&self) -> usize {
+    self.pedestal_begin_bin 
+  }
+
+  #[setter]
+  fn set_pedestal_begin_bin(&mut self, value : usize) {
+    self.pedestal_begin_bin = value;
+  }
+  
+  #[getter]
+  fn get_pedestal_win_bins(&self) -> usize {
+    self.pedestal_win_bins
+  }
+
+  #[setter]
+  fn set_pedestal_win_bins(&mut self, value : usize) {
+    self.pedestal_win_bins = value;
+  }
+  
+  #[getter]
+  fn get_use_zscore(&self) -> bool {
+    self.use_zscore
+  }
+
+  #[setter]
+  fn set_use_zscore(&mut self, value : bool) {
+    self.use_zscore = value; 
+  }
+
+  #[getter]
+  fn get_find_pks_t_start(&self) -> f32 {
+    self.find_pks_t_start
+  }
+
+  #[setter]
+  fn set_find_pks_t_start(&mut self, value : f32) {
+    self.find_pks_t_start = value;
+  }
+
+  #[getter]
+  fn get_find_pks_t_window(&self) -> f32 {
+    self.find_pks_t_window
+  }
+
+  #[setter]
+  fn set_find_pks_t_window(&mut self, value : f32) {
+    self.find_pks_t_window = value;
+  }
+  
+  #[getter]
+  fn get_min_peak_size(&self) -> usize {
+    self.min_peak_size
+  }
+
+  #[setter]
+  fn set_min_peak_size(&mut self, value : usize) {
+    self.min_peak_size = value;
+  }
+  
+  #[getter]
+  fn get_find_pks_thresh(&self) -> f32 {
+    self.find_pks_thresh
+  }
+
+  #[setter]
+  fn set_find_pks_thresh(&mut self, value : f32) {
+    self.find_pks_thresh = value; 
+  }
+  
+  #[getter]
+  fn get_max_peaks(&self) -> usize {
+    self.max_peaks
+  }
+
+  #[setter]
+  fn set_max_peaks(&mut self, value : usize) {
+    self.max_peaks = value;
+  }
+
+  #[getter]
+  fn get_cfd_fraction(&self) -> f32 {
+    self.cfd_fraction
+  }
+
+  #[setter]
+  fn set_cfd_fraction(&mut self, value : f32) {
+    self.cfd_fraction = value;
+  }
+  
+  #[getter]
+  fn get_tot_threshold_low(&self) -> Option<f32> {
+    self.tot_threshold_low
+  }
+
+  #[setter]
+  fn set_tot_threshold_low(&mut self, value : Option<f32>) {
+    self.tot_threshold_low = value;
+  }
+  
+  #[getter]
+  fn get_tot_threshold_high(&self) -> Option<f32> {
+    self.tot_threshold_high
+  }
+
+  #[setter]
+  fn set_tot_threshold_high(&mut self, value : Option<f32>) {
+    self.tot_threshold_high = value;
+  }
+}
+
+pythonize!(AnalysisEngineSettings);
+
+//--------------------------------------------------------------
 
 /// Settings to change the configuration of the TOF Eventbuilder
 #[derive(Debug, Copy, Clone, serde::Serialize, serde::Deserialize)]

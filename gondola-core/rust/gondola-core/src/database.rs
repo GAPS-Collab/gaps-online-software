@@ -1118,7 +1118,32 @@ impl ReadoutBoard {
   pub fn all_py() -> Option<Vec<Self>> {
     Self::all()
   } 
-  
+
+  /// Load a calibration file for this specific Readoutboard
+  #[pyo3(name="load_calibration")]
+  pub fn load_calibration_py(&mut self, path : &Bound<'_,PyAny>) -> PyResult<()> {
+    let mut string_value = String::from("foo");
+    if let Ok(s) = path.extract::<String>() {
+       string_value = s;
+    } //else if let Ok(p) = filename_or_directory.extract::<&Path>() {
+    if let Ok(fspath_method) = path.getattr("__fspath__") {
+      if let Ok(fspath_result) = fspath_method.call0() {
+        if let Ok(py_string) = fspath_result.extract::<String>() {
+          string_value = py_string;
+        }
+      }
+    }
+    self.calib_file_path = string_value;
+    match self.load_latest_calibration() {
+      Ok(_) => {
+        return Ok(())
+      }
+      Err(err) => { 
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
   #[staticmethod]
   #[pyo3(name="all_as_dict")]
   pub fn all_as_dict_py() -> Option<HashMap<u8,Self>> {
@@ -2075,6 +2100,205 @@ impl TrackerStripMask {
 
 #[cfg(feature="pybindings")]
 pythonize!(TrackerStripMask);
+
+//----------------------------------
+
+///// Masking of unusable strips as curated by the tracker team 
+//#[derive(Debug,PartialEq, Clone,Queryable, Selectable, serde::Serialize, serde::Deserialize)]
+//#[diesel(table_name = schema::tof_db_tofpaddletimingconstant)]
+//#[diesel(primary_key(data_id))]
+//#[allow(non_snake_case)]
+//#[cfg_attr(feature="pybindings", pyclass)]
+//pub struct TofPaddleTimingConstant {
+//  pub data_id             : i32,
+//  pub paddle_id           : i32,    
+//  pub volume_id           : i64,    
+//  pub utc_timestamp_start : i64,
+//  pub utc_timestamp_stop  : i64,
+//  pub name                : Option<String>, 
+//  pub version             : Option<i32>,   
+//  pub timing_constant     : f32,  
+//}
+//
+//impl TofPaddleTimingConstant {
+//
+//  pub fn new() -> Self {
+//    Self {
+//      data_id             : 0,
+//      paddle_id           : 0,    
+//      volume_id           : 0,    
+//      utc_timestamp_start : 0,  
+//      utc_timestamp_stop  : 0,
+//      name                : None, 
+//      version             : true
+//    }
+//  }
+// 
+//  pub fn all_names() -> Result<Vec<String>, ConnectionError> {
+//    let mut conn = connect_to_db()?;
+//    let mut names = Vec::<String>::new();
+//    let unique_names =
+//      schema::tof_db_trackerstripmask::table.select(
+//      schema::tof_db_trackerstripmask::name)
+//      .distinct()
+//      .load::<Option<String>>(&mut conn).expect("Error getting names from db!");
+//    for k in unique_names {
+//      if let Some(n) = k {
+//        names.push(n);
+//      }
+//    }
+//    Ok(names)
+//  }
+//
+//  /// Get Tracker strip mask 
+//  ///
+//  /// # Returns:
+//  ///   * HashMap<u32 [strip id], TrackerStripMask> 
+//  pub fn as_dict_by_name(fname : &str) -> Result<HashMap<u32,Self>, ConnectionError> {
+//    use schema::tof_db_trackerstripmask::dsl::*;
+//    let mut strips = HashMap::<u32, Self>::new();
+//    if fname == "" {
+//      match Self::all() {
+//        None => {
+//          error!("Unable to retrive ANY TrackerStripMask");
+//          return Ok(strips);
+//        }
+//        Some(_strips) => {
+//          for k in _strips {
+//            strips.insert(k.strip_id as u32, k);
+//          }
+//          return Ok(strips);
+//        }
+//      }
+//    }
+//    let mut conn = connect_to_db()?;
+//    match tof_db_trackerstripmask.filter(
+//      schema::tof_db_trackerstripmask::name.eq(fname)).load::<Self>(&mut conn) {
+//      Err(err) => {
+//        error!("We can't find any tracker strip masks in the database! {err}");
+//        return Ok(strips);
+//      }
+//      Ok(masks_) => {
+//        for s in masks_ {
+//          strips.insert(s.strip_id as u32, s );
+//        }
+//      }
+//    }
+//    return Ok(strips);
+//  }
+//
+//  /// Get all tracker strip mask from the database
+//  ///
+//  /// # Returns:
+//  ///   * HashMap<u32 [strip id], TrackeStripMask> 
+//  pub fn all() -> Option<Vec<Self>> {
+//    use schema::tof_db_trackerstripmask::dsl::*;
+//    let mut conn = connect_to_db().ok()?;
+//    match tof_db_trackerstripmask.load::<Self>(&mut conn) {
+//      Err(err) => {
+//        error!("Unable to load tracker strips from db! {err}");
+//        return None;
+//      }
+//      Ok(strips) => {
+//        return Some(strips);
+//      }
+//    }
+//  }
+//}
+//
+//impl Default for TrackerStripMask {
+//  fn default() -> Self {
+//    Self::new()
+//  }
+//}
+//
+//impl fmt::Display for TrackerStripMask {
+//  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//    let mut repr = format!("<TrackerStripMask [{}]:", self.strip_id);
+//    repr += &(format!("\n   vid           : {}", self.volume_id));
+//    repr += "\n   UTC Timestamps (Begin/End):";
+//    repr += &(format!("\n   {}/{}", self.utc_timestamp_start, self.utc_timestamp_stop));    
+//    if self.name.is_some() {
+//      repr += &(format!("\n   name        : {}", self.name.clone().unwrap())); 
+//    }
+//    repr += &(format!("\n   active        : {}", self.active));   
+//    write!(f, "{}", repr)
+//  }
+//}
+//
+//#[cfg(feature="pybindings")]
+//#[pymethods]
+//impl TrackerStripMask {
+//  
+//  #[staticmethod]
+//  #[pyo3(name="all")]
+//  pub fn all_py() -> Option<Vec<Self>> {
+//    Self::all()
+//  } 
+//  
+//  #[staticmethod]
+//  #[pyo3(name="all_names")]
+//  /// Get all names for registered datasets. These
+//  /// can be used in .as_dict_by_name() to query 
+//  /// the db for a set of values
+//  pub fn all_names_py() -> Option<Vec<String>> {
+//    match Self::all_names() {
+//      Err(_) => {
+//        return None;
+//      }
+//      Ok(names) => {
+//        return Some(names);
+//      }
+//    }
+//  }
+//  
+//  #[staticmethod]
+//  #[pyo3(name="as_dict_by_name")]
+//  pub fn all_as_dict_py(name : &str) -> Option<HashMap<u32,Self>> {
+//    match Self::as_dict_by_name(name) {
+//      Err(err) => {
+//        error!("Unable to retrieve tracker strip mask dictionary. {err}. Did you laod the setup-env.sh shell?");
+//        return None;
+//      }
+//      Ok(_data) => {
+//        return Some(_data);
+//      }
+//    }
+//  } 
+//  
+//  #[getter]
+//  fn get_strip_id     (&self) -> i32 {    
+//    self.strip_id
+//  }
+//  
+//  #[getter]
+//  fn get_volume_id    (&self) -> i64 {    
+//    self.volume_id
+//  }
+//  
+//  #[getter]
+//  fn get_utc_timestamp_start(&self) -> i64 {
+//    self.utc_timestamp_start
+//  }
+//  
+//  #[getter]
+//  fn get_utc_timestamp_stop(&self) -> i64 {
+//    self.utc_timestamp_stop
+//  }
+//  
+//  #[getter]
+//  fn get_name    (&self) -> Option<String> {
+//    self.name.clone()
+//  }
+//  
+//  #[getter]
+//  fn get_active       (&self) -> bool { 
+//    self.active
+//  }
+//}
+//
+//#[cfg(feature="pybindings")]
+//pythonize!(TrackerStripMask);
 
 //----------------------------------
 
