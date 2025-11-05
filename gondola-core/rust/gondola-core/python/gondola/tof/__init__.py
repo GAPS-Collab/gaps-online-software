@@ -6,6 +6,13 @@ from .. import _gondola_core  as _gc
 
 from . import analysis
 
+__all__ = ['shutdown_tofcpu', 'shutdown_rb', 'shutdown_ratpair', 'shutdown_rat',\
+'shutdown_all_rbs', 'restart_liftofrb', 'enable_verification_run', 'stop_run', \
+'start_run', 'waveform_analysis', 'MasterTrigger', 'TofAnalysis', 'to_board_id_string',\
+'TofCuts','TofRunConfig','TriggerConfig', 'RBChannelMaskConfig', 'PreampBiasConfig', \
+'TofCommand', 'TofOperationMode', 'BuildStrategy', 'TofCommandCode', 'AnalysisEngineSettings', \
+'TofDetectorStatus', 'RBPaddleID']
+
 RBPaddleID            = _gc.tof.RBPaddleID
 RBPaddleID.__module__ = __name__
 RBPaddleID.__name__   = "RBPaddleID"
@@ -45,6 +52,8 @@ TofRunConfig.__module__ = __name__
 TofRunConfig.__name__   = "TofRunConfig" 
 
 
+waveform_analysis   = _gc.tof.waveform_analysis 
+
 TofCuts             = _gc.tof.TofCuts
 TofCuts.__module__  = __name__ 
 TofCuts.__name__    = 'TofCuts' 
@@ -56,7 +65,6 @@ MasterTrigger       = _gc.tof.MasterTrigger
 MasterTrigger.__module__ = __name__
 MasterTrigger.__name__   = 'MasterTrigger'
 
-waveform_analysis   = _gc.tof.waveform_analysis 
 
 ## command factories
 start_run            = _gc.tof.start_run 
