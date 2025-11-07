@@ -24,4 +24,5 @@ TRK_GAIN_FILE=../tracker-calibration/SiLi-gains.txt
 ./add_trk_pls_to_db.py --gain-file $TRK_GAIN_FILE --utc-start 0 --utc-stop 1733951270 --pulse-file ../tracker-calibration/SiLi-pulsed_channels_1211.txt 
 ./add_trk_pls_to_db.py --gain-file $TRK_GAIN_FILE --utc-start 1733951270 --utc-stop 1734031538 --pulse-file ../tracker-calibration/SiLi-pulsed_channels_1212.txt 
 ./add_trk_pls_to_db.py --gain-file $TRK_GAIN_FILE --utc-start 1734031538 --utc-stop 9999999999 --pulse-file ../tracker-calibration/SiLi-pulsed_channels_1213.txt 
-
+# the timing constants for the TOF - 1 per paddle
+./add_tof_timing_const_to_db.py  --timing-const-file ../master-spreadsheet/gaps_paddle_constants.json --name GraceV1 
