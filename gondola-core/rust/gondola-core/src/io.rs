@@ -197,7 +197,6 @@ pub fn get_califilename(rb_id : u8, latest : bool) -> String {
 }
 
 //----------------------------------------------------------
-
 /// A standardized name for regular run files saved by
 /// the liftof suite
 ///
@@ -210,6 +209,8 @@ pub fn get_califilename(rb_id : u8, latest : bool) -> String {
 ///                a rb id can be specified as well
 /// * timestamp :  substitute the current time with this timestamp
 ///                (or basically any other string) instead.
+/// * tof_only  :  if true, the filename will end with the suffix 
+///                .tof.gaps, if false it will end simply with .gaps 
 #[cfg_attr(feature="pybindings", pyfunction)]
 pub fn get_runfilename(run : u32, subrun : u64, rb_id : Option<u8>, timestamp : Option<String>, tof_only : bool) -> String {
   let ts : String;

@@ -118,6 +118,19 @@ diesel::table! {
 }
 
 diesel::table! {
+  tof_db_tofpaddletimingconstant (data_id) {
+      data_id             -> Integer,
+      paddle_id           -> Integer,
+      volume_id           -> BigInt, 
+      utc_timestamp_start -> BigInt,
+      utc_timestamp_stop  -> BigInt,
+      name                -> Nullable<Text>,
+      version             -> Nullable<Integer>,
+      timing_constant     -> Float, 
+  }
+}
+
+diesel::table! {
   tof_db_trackerstrip (strip_id) {
     strip_id            -> Integer,
     layer               -> Integer, 

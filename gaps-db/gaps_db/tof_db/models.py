@@ -52,6 +52,35 @@ class RAT(models.Model):
 
 ##########################################################################
 
+class TofPaddleTimingConstant(models.Model):
+    """
+    An unknown constant which can be added to the individual 
+    paddle event times for a more precise beta calculation.
+    """
+    data_id              = models.AutoField(primary_key=True,
+                                            help_text="Identify this specific dataset")
+    paddle_id            = models.PositiveSmallIntegerField(null=False)
+    volume_id            = models.PositiveBigIntegerField(
+                                    default=0,
+                                    null=False,
+                                    unique=True,
+                                    help_text="The VolumeId as used in the GAPS simulation code")
+    utc_timestamp_start  = models.PositiveBigIntegerField(null=False, default=0,
+                                                          help_text="UNIX Timestamp for first point in time where this constant is relevant")
+    utc_timestamp_stop   = models.PositiveBigIntegerField(null=False, default=0,
+                                                          help_text="UNIX Timestamp for last point in time when this constant is relevant")
+    name                 = models.CharField(max_length=1024,
+                                            null=True,
+                                            default="",
+                                            help_text="A for better indentification of the offsets")
+    version              = models.PositiveIntegerField(null=True, default=0, help_text="Version identifier for Paddle timing constants")
+    timing_copnstant     = models.FloatField(
+                                    default=0,
+                                    null=False,
+                                    help_text="Actual constant in ns")
+
+##########################################################################
+
 class DSICard(models.Model):
     """
     A DSI card which is plugged into one of five slots on the MTB
