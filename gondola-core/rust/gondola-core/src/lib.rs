@@ -192,6 +192,9 @@ fn tof_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<TriggerConfig>()?;
   m.add_class::<TofRunConfig>()?;
   m.add_class::<TofCuts>()?;
+  m.add_class::<TofAnalysis>()?;
+  m.add_class::<TofAnalysisCache>()?;
+  m.add_class::<TofAnalysisPaddleCache>()?;
   m.add_class::<AnalysisEngineSettings>()?;
   #[cfg(feature="tof-liftof")]
   m.add_class::<PyMasterTrigger>()?;

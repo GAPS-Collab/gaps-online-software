@@ -591,9 +591,10 @@ def load_run(event_type         = EventType.Merged,\
             #if st.session_state.abort_run_loader:
             #    st.session_state.abort_run_loader = False
             #    break
-    st.session_state.tof_analysis.finish()
-    st.session_state.trk_analysis.finish()
-    st.session_state.reco.finish()
+    with st.spinner("Creating plots...", show_time=True):
+        st.session_state.tof_analysis.finish()
+        st.session_state.trk_analysis.finish()
+        st.session_state.reco.finish()
     #st.session_state.tof_analysis_done = True
 
 
@@ -1821,11 +1822,11 @@ if check_password():
                 #print ("Mesh loaded!") 
                 # Create a PyVista plotter
                 plotter.set_background("#0E1117")
-                print ("Plotter created")
+                #print ("Plotter created")
                 # Example: point cloud
                 #points = np.random.rand(100, 3) * 10  # 100 random points in space
                 points = np.array([k for k in zip(xs,ys,zs)])/10
-                print (points)
+                #print (points)
                 #sizes = np.linspace(5, 20, len(points))       # point sizes
                 colors = np.random.rand(len(points), 3)       # RGB colors in [0,1]
                 
@@ -1875,7 +1876,7 @@ if check_password():
                 # Add mesh as wireframe
                 #plotter.add_mesh(mesh, color="#F0F0F0", style="wireframe", line_width=1)
                     plotter.add_mesh(box, color="#F0F0F0", style="wireframe", line_width=1)
-                print ("mesh added")
+                #print ("mesh added")
 
                 # Render inside Streamlit
                 plotter.reset_camera()
@@ -1907,9 +1908,10 @@ if check_password():
         else: 
             r = st.session_state.tof_analysis
             st.write(f"{r.n_events} were loaded in the analysis!")
-            st.write(f"-- {r.no_hitmiss} [{100*r.no_hitmiss/r.n_events:.3f}%] events had no hit missing")
-            st.write(f"-- {r.one_hitmiss} [{100*r.one_hitmiss/r.n_events:.3f}%] events had one hits missing")
-            st.write(f"-- {r.two_hitmiss} [{100*r.two_hitmiss/r.n_events:.3f}%] events had two or more hits missing")
+            if r.n_events > 0:
+                st.write(f"-- {r.no_hitmiss} [{100*r.no_hitmiss/r.n_events:.3f}%] events had no hit missing")
+                st.write(f"-- {r.one_hitmiss} [{100*r.one_hitmiss/r.n_events:.3f}%] events had one hits missing")
+                st.write(f"-- {r.two_hitmiss} [{100*r.two_hitmiss/r.n_events:.3f}%] events had two or more hits missing")
             print (r.nhit_plots['hit'].bincontent) 
             print (r.nhit_plots['thit'].bincontent) 
 

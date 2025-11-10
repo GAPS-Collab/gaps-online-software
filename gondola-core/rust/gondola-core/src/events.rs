@@ -298,7 +298,7 @@ expand_and_test_enum!(LTBThreshold, test_ltbthreshold_repr);
 
 //--------------------------------------------
 
-#[derive(Debug, Copy, Clone, PartialEq,FromRepr, AsRefStr, EnumIter)]
+#[derive(Debug, Copy, Clone, PartialEq, Hash, Eq, FromRepr, AsRefStr, EnumIter)]
 #[repr(u8)]
 #[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
 pub enum EventStatus {
