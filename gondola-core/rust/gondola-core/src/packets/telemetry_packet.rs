@@ -45,6 +45,18 @@ impl TelemetryPacket {
   fn is_event_packet_py(&self) -> bool {
     self.is_event_packet()
   }
+
+  #[pyo3(name="to_bytestream")]
+  fn to_bytestream_py(&self) -> Vec<u8> {
+    self.to_bytestream()
+  }
+
+  #[staticmethod]
+  #[pyo3(name="from_bytestream")]
+  fn from_bytestream_py(stream : Vec<u8>, pos : usize) -> Result<Self, SerializationError> {
+    let mut pos_ = pos;
+    Self::from_bytestream(&stream, &mut pos_)
+  }
 }
 
 impl TelemetryPacket {
