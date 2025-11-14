@@ -50,7 +50,7 @@ def gander_scatter_plot(xs, ys,
     #ax.set_ylim(bottom=0)
     
     ax.set_xlabel(xlabel, loc='right')
-    ax.set_ylabel(ylabel, loc='top')
+    ax.set_ylabel(ylabel, loc='top')#, rotation=0)
     ax.set_title(title, loc='right')
     #if log:
     #    ax.set_yscale('symlog')

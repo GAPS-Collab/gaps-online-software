@@ -19,8 +19,8 @@ The main purpose of this development efforts are:
 * consolidation/refactoring of the code. The different aspects of the project are scattered over many subprojects, but some functionality is common, especially for data i/o. 
 * stronger integration of the rust-pybidings. These are currently kept mostly seperate. "Mostly" is the problem here.
 * provide easy-to-use applications for specific purposes: E.g. live data checkout, detector occupancy evolution over time.  
-* finally an event viewer
-* changes to the build system to be more rye-friendly for the python part and provide a better system wfor the setup of the environment (rye compatible .env) files
+* finally an event viewer in some capacity
+* changes to the build system to be more rye-friendly for the python part and provide a better system for the setup of the environment (rye compatible .env) files and hosting the python code on pypi.
 * **A reduction of the data size** - Especially housekeeping data has many `u64` fields, for whcih we can live with `u32` instead.
 * **Unification of TofEvent and TofEventSummary, as well as the deprecation of the MasterTriggerEvent**- all relevant information is kept in the TofEventSummary already, except the `RBEvents`. The TofEvent contains many fields, which are actually never used and currently are all zeroed out.   
 * improved installation for Apple systems
@@ -36,31 +36,36 @@ The main purpose of this development efforts are:
 
 ## API docs 
 
-The API docs for Rust/C++/Python are hosted on github-pages. However, the current documentation is
-always referring to the the main branch, so it might or might not be accurate.
+The documentation supports different release versions of the code and is hosted on github-pages.
 
 [API-docs](https://gaps-collab.github.io/gaps-online-software/)
 
-## prerequisites
+## installation
 
-* rust toolchain - to compile `liftof` flight software suite as well as
-  `tof-dataclasses` and `telemetry-dataclasses` 
-* `cmake` is used as a build system
-*  a number of C++ libraries are pulled from github during installation.
-* The C++ API uses the C++20 standard and thus wants gcc-13 or later.
+### Installation of the python library 
+
+The python code is called `gondola` and hosted on [pypi](https://pypi.org/project/gondola/) and can 
+be installed with `uv/rye/pip` and friends.
 
 ### software repository
 
 The code is organized in a github repository at 
 * [github](https://github.com/GAPS-Collab/gaps-online-software)
 
-## installation
-
 ### Clone the repository wit submodules
 
 We are using git submodules to pull in some of the dependencies.
 To automatically check them out when clone te repository, use
 `git clone --recurse-submodules`
+
+## prerequisites
+
+* rust toolchain - to compile `liftof` flight software suite as well as the 
+  core library `gondola-core` with the pybindings. Rust edtion 2024 is 
+  required
+* `cmake` is used as a build system for the C++ part.
+* The C++ API uses the C++20 standard and thus wants gcc-13 or later.
+* Doxygen to build the C++ documentation locally.
 
 ### Branches and how to get updates
 
@@ -73,12 +78,13 @@ named `develop`  will be unstable.
 The branches following the naming scheme "FISHNAME-X.X" are dedicated to specific tasks, 
 e.g. the NTS campaign. Please see the dedicated README for the specific branch.
 
-The `main` branch will be the latest development branch and the last release branch will follow the 
+The `main` branch will be the latest development branch or that what is considered useful for the specific
+purpose at the time and the last release branch will follow the 
 main branch closely.  
 
 Pre-releases will happen on an irregular timeline and are associated with specific git tags.
 
-### Build system
+### Build system (C++)
 
 The installation uses `cmake`. Create a build directory and execute
 `cmake <gaps-online-software source directory> --install-prefix <install_dir>`
@@ -100,12 +106,9 @@ Do so with
 It will greet you with a banner.
 
 After that, you can either write your own C++ code, linking to the gaps-online-software
-C++ API, or use the include pybindings (if `pybind11` was available at compile time)
+C++ API, or use the included pybindings
 
-To use the pybindings, simply fire up an (i)python shell and type:
-`import gaps_tof as gt`
-
-Then the bindings should be ready. Example code on how to use them can be found in 
+Example code on how to use them can be found in 
 `<install_dir>/examples/`
 
 [More detailed installation instructions can be found in INSTALL.MD](INSTALL.md)
