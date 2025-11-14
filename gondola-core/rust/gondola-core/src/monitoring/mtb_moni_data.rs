@@ -208,18 +208,18 @@ impl MoniData for MtbMoniData {
   fn get(&self, varname : &str) -> Option<f32> {
     match varname {
       "board_id"     => Some(0.0f32),
-      "tiu_busy_len" => Some(self.tiu_busy_len as f32), 
-      "tiu_status"   => Some(self.tiu_status as f32), 
+      "tiu_busy_len" => Some(self.tiu_busy_len    as f32), 
+      "tiu_status"   => Some(self.tiu_status      as f32), 
       "daq_queue_len"  => Some(self.daq_queue_len as f32), 
       //"prescale"     => Some(self.get_prescale()),
       "temp"         => Some(self.get_fpga_temp()), 
       "vccint"       => Some(Self::adc_vcc_conversion(self.vccint)), 
       "vccaux"       => Some(Self::adc_vcc_conversion(self.vccaux)), 
       "vccbram"      => Some(Self::adc_vcc_conversion(self.vccbram)), 
-      "rate"         => Some(self.rate as f32), 
-      "lost_rate"    => Some(self.lost_rate as f32), 
+      "rate"         => Some(self.rate         as f32), 
+      "lost_rate"    => Some(self.lost_rate    as f32), 
       "rb_lost_rate" => Some(self.rb_lost_rate as f32), 
-      "timestamp"    => Some(self.timestamp as f32),
+      "timestamp"    => Some(self.timestamp    as f32),
       _              => None
     }
   }

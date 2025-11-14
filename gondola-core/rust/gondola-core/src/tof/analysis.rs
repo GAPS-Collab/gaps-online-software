@@ -816,11 +816,11 @@ impl TofAnalysis {
     }
   }
 
-  fn get_n_mangled(&self) -> u64 {
+  pub fn get_n_mangled(&self) -> u64 {
     *self.event_stati.get(&EventStatus::AnyDataMangling).unwrap_or(&0)
   }
 
-  fn get_n_timedout(&self) -> u64 {
+  pub fn get_n_timedout(&self) -> u64 {
     *self.event_stati.get(&EventStatus::EventTimeOut).unwrap_or(&0)
   }
 
