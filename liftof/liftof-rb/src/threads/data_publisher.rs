@@ -17,12 +17,6 @@ use std::sync::{
 use crossbeam_channel::Receiver;
 
 use gondola_core::prelude::*;
-//use tof_dataclasses::packets::{TofPacket,
-//                               PacketType};
-//use tof_dataclasses::events::{RBEvent,
-//                              DataType};
-//use tof_dataclasses::serialization::Serialization;
-//use liftof_lib::thread_control::ThreadControl;
 
 use crate::api::{
     prefix_board_id_noquery,

@@ -77,9 +77,9 @@ auto Gaps::get_tofpaddles() -> std::map<u8, Gaps::TofPaddle> {
   // FIXME - find a better name for the database variable
   //         env name
   auto paddle_map = std::map<u8, Gaps::TofPaddle>();
-  auto db_path = std::getenv("DATABASE_URL");
+  auto db_path = std::getenv("GONDOLA_DB_URL");
   if (db_path == nullptr) {
-    spdlog::error("Unable to retrieve database! The DATABASE_URL shell variable is not set. Did you load the setup-env.sh shell?");
+    spdlog::error("Unable to retrieve database! The GONDOLA_DB_URL shell variable is not set. Did you load the setup-env.sh shell?");
     return paddle_map;
   } 
   std::string dbname(db_path);
@@ -165,9 +165,9 @@ auto Gaps::get_trackerstrips() -> std::map<u32, Gaps::TrackerStrip> {
   // FIXME - find a better name for the database variable
   //         env name
   auto strip_map = std::map<u32, Gaps::TrackerStrip>();
-  auto db_path = std::getenv("DATABASE_URL");
+  auto db_path = std::getenv("GONDOLA_DB_URL");
   if (db_path == nullptr) {
-    spdlog::error("Unable to retrieve database! The DATABASE_URL shell variable is not set. Did you load the setup-env.sh shell?");
+    spdlog::error("Unable to retrieve database! The GONDOLA_DB_URL shell variable is not set. Did you load the setup-env.sh shell?");
     return strip_map;
   } 
   std::string dbname(db_path);
@@ -222,9 +222,9 @@ auto Gaps::TrackerStripMask::to_string() const -> std::string {
 
 auto Gaps::get_trackerstripmasks(std::string mask_name) -> Gaps::TrkStripMaskMap {
   Gaps::TrkStripMaskMap mask_map;
-  auto db_path = std::getenv("DATABASE_URL");
+  auto db_path = std::getenv("GONDOLA_DB_URL");
   if (db_path == nullptr) {
-    spdlog::error("Unable to retrieve database! The DATABASE_URL shell variable is not set. Did you load the setup-env.sh shell?");
+    spdlog::error("Unable to retrieve database! The GONDOLA_DB_URL shell variable is not set. Did you load the setup-env.sh shell?");
     return mask_map;
   } 
   std::string dbname(db_path);
@@ -261,9 +261,9 @@ auto Gaps::TrackerStripPedestal::to_string() const -> std::string {
 
 auto Gaps::get_trackerstrippedestals() -> Gaps::TrkStripPedMap {
   Gaps::TrkStripPedMap ped_map;
-  auto db_path = std::getenv("DATABASE_URL");
+  auto db_path = std::getenv("GONDOLA_DB_URL");
   if (db_path == nullptr) {
-    spdlog::error("Unable to retrieve database! The DATABASE_URL shell variable is not set. Did you load the setup-env.sh shell?");
+    spdlog::error("Unable to retrieve database! The GONDOLA_DB_URL shell variable is not set. Did you load the setup-env.sh shell?");
     return ped_map;
   } 
   std::string dbname(db_path);
@@ -328,6 +328,55 @@ auto gondola::get_vid_hid_map() -> HashMap<u32, u32> {
   return map;
 }
 
+//--------------------------------------------------------------
+
+auto gondola::TofPaddleTimingConstant::to_string() const -> std::string {
+  std::string repr = "<TofPaddleTimingConstant:";
+  repr += std::format("\n paddle id             : {}",  paddle_id );
+  repr += std::format("\n volume id             : {}",  volume_id);
+  repr += std::format("\n Timestamp (UTC) start : {}",  utc_timestamp_start);
+  repr += std::format("\n Timestamp (UTC) stop  : {}",  utc_timestamp_stop);
+  repr += std::format("\n name                  : {}",  name); 
+  repr += std::format("\n version               : {}",  version); 
+  repr += std::format("\n timing_constant       : {}>", timing_constant    ); 
+  return repr;
+}
+
+//--------------------------------------------------------------
+
+auto gondola::get_tofpaddletimingconstants(std::string name) -> gondola::TofPaddleTimingConstantMap {
+  gondola::TofPaddleTimingConstantMap tmg_map;
+  auto db_path = std::getenv("GONDOLA_DB_URL");
+  if (db_path == nullptr) {
+    spdlog::error("Unable to retrieve database! The GONDOLA_DB_URL shell variable is not set. Did you load the setup-env.sh shell?");
+    return tmg_map;
+  } 
+  std::string dbname(db_path);
+  auto storage = make_storage(dbname,
+    make_table("tof_db_tofpaddletimingconstant",
+      make_column("data_id"              , &gondola::TofPaddleTimingConstant::data_id, primary_key()),
+      make_column("paddle_id"            , &gondola::TofPaddleTimingConstant::paddle_id),
+      make_column("volume_id"            , &gondola::TofPaddleTimingConstant::volume_id),  
+      make_column("utc_timestamp_start"  , &gondola::TofPaddleTimingConstant::utc_timestamp_start),
+      make_column("utc_timestamp_stop"   , &gondola::TofPaddleTimingConstant::utc_timestamp_stop),
+      make_column("name"                 , &gondola::TofPaddleTimingConstant::name),
+      make_column("version"              , &gondola::TofPaddleTimingConstant::version),
+      make_column("timing_constant"      , &gondola::TofPaddleTimingConstant::timing_constant)));  
+  
+  auto tcs = storage.get_all<gondola::TofPaddleTimingConstant>();
+  for (auto const &tc : tcs) {
+    if (name != "") {
+      if (tc.name != name) {
+        continue;
+      }
+    }
+    tmg_map.insert({tc.paddle_id, tc.timing_constant});
+  }  
+  return tmg_map;
+}
+
+//--------------------------------------------------------------
+
 std::ostream& operator<<(std::ostream& os, const Gaps::TofPaddle& tp) {
   os << tp.to_string();
   return os;
@@ -345,6 +394,11 @@ std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStripMask& ts) {
 
 std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStripPedestal& ts) {
   os << ts.to_string();
+  return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const gondola::TofPaddleTimingConstant& tc) {
+  os << tc.to_string();
   return os;
 }
 

@@ -13,16 +13,16 @@ This is version AULEPE-0.12. [Aulepe are sailfish!](https://en.wikipedia.org/wik
 ## CHANGELOG/Migration guide  
 [Since v0.12 we are keeping a global CHANELOG.MD](CHANGELOG.md)
 
-* Antarctic RBWaveform data from telemetry can not be read with this version, use v0.11 instead 
+* Antarctic RBWaveform data from telemetry might not be able to be read be read with this version, use v0.11 instead 
 ## API docs 
 
-The API docs for Rust/C++/Python are hosted on github-pages. However, the current documentation is
-always referring to the the main branch, so it might or might not be accurate.
+The documentation supports different release versions of the code and is hosted on github-pages.
 
 [API-docs](https://gaps-collab.github.io/gaps-online-software/)
 
-## prerequisites
+## installation
 
+<<<<<<< HEAD
 * rust toolchain - to compile `liftof` flight software suite as well as
   `tof-dataclasses` and `telemetry-dataclasses` 
 * `cmake` is used as a build system
@@ -31,19 +31,32 @@ always referring to the the main branch, so it might or might not be accurate.
 * We highly recommend the excellent [rye](https://rye.astral.sh/) to deal with 
   python installations, however, the developer has announced that rye is succeeded by 
   uv, so in the future we will migrate  
+=======
+### Installation of the python library 
+
+The python code is called `gondola` and hosted on [pypi](https://pypi.org/project/gondola/) and can 
+be installed with `uv/rye/pip` and friends.
+>>>>>>> PAKII-0.11
 
 ### software repository
 
 The code is organized in a public github repository at 
 * [github](https://github.com/GAPS-Collab/gaps-online-software)
 
-## installation
-
 ### Clone the repository wit submodules
 
 We are using git submodules to pull in some of the dependencies.
 To automatically check them out when clone te repository, use
 `git clone --recurse-submodules`
+
+## prerequisites
+
+* rust toolchain - to compile `liftof` flight software suite as well as the 
+  core library `gondola-core` with the pybindings. Rust edtion 2024 is 
+  required
+* `cmake` is used as a build system for the C++ part.
+* The C++ API uses the C++20 standard and thus wants gcc-13 or later.
+* Doxygen to build the C++ documentation locally.
 
 ### Branches and how to get updates
 
@@ -55,11 +68,19 @@ Usually, each branch has a specific purpose, everything with version numbers < 1
 The branches following the naming scheme "FISHNAME-X.X" are dedicated to specific tasks, 
 e.g. the NTS campaign. Please see the dedicated README for the specific branch.
 
+<<<<<<< HEAD
 We are following a git-flow model, which is e.g. described [here](https://www.gitkraken.com/learn/git/git-flow). This means that `main` should point to the latest release, however, it has to be considered that until
 we are at version < 1.0.0, there are no "official" releases. Instead, the main branch will point to the 
 most stable and useful version at the time for the sake of convenience.
+=======
+The `main` branch will be the latest development branch or that what is considered useful for the specific
+purpose at the time and the last release branch will follow the 
+main branch closely.  
 
-### Build system
+Pre-releases will happen on an irregular timeline and are associated with specific git tags.
+>>>>>>> PAKII-0.11
+
+### Build system (C++)
 
 The installation uses `cmake`. Create a build directory and execute
 `cmake <gaps-online-software source directory> --install-prefix <install_dir>`
@@ -81,7 +102,7 @@ Do so with
 It will greet you with a banner.
 
 After that, you can either write your own C++ code, linking to the gaps-online-software
-C++ API, or use the include pybindings (if `pybind11` was available at compile time)
+C++ API, or use the included pybindings
 
 Example code on how to use them can be found in 
 `<install_dir>/examples/`

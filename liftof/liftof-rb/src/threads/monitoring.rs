@@ -13,18 +13,6 @@ use std::thread;
 
 use crossbeam_channel::Sender;
 
-//use tof_dataclasses::errors::SensorError;
-//use tof_dataclasses::serialization::Packable;
-//use tof_dataclasses::monitoring::{
-//    RBMoniData,
-//    PAMoniData,
-//    PBMoniData,
-//    LTBMoniData,
-//};
-//use tof_dataclasses::packets::TofPacket;
-////use tof_dataclasses::threading::ThreadControl;
-//use liftof_lib::thread_control::ThreadControl;
-
 // Takeru's tof-control code
 use tof_control::helper::pb_type::{
     PBTemp,
@@ -51,7 +39,7 @@ use tof_control::helper::rb_type::{
 use gondola_core::prelude::*;
 
 use crate::control::{
-    get_trigger_rate
+  get_trigger_rate
 };
 
 

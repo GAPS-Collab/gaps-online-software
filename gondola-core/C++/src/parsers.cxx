@@ -1,5 +1,7 @@
 #include <cstring>
 #include <iostream>
+#include <cstdint>
+ 
 #include "io/parsers.h"
 
 auto gondola::to_le_bytes(u16 number) -> Vec<u8> {
@@ -86,6 +88,15 @@ f32 u32tof32(u32 val) {
 f32 Gaps::parse_f16(const Vec<u8> &bytestream,
                     usize &pos) {
   u16 bits = Gaps::parse_u16(bytestream, pos);
+  #ifdef __FLT16_MANT_DIG__
+  union {
+    u16      bytes;
+    _Float16 half;
+  } converter; 
+  converter.bytes = bits;
+  return static_cast<f32>(converter.half);
+  #else 
+  #warning "Compiler does not support _Float16. Fallback to buggy hand-written implementation"
   //  // Check for signed zero
   //  // TODO: Replace mem::transmute with from_bits() once from_bits is const-stabilized
   f32 result;
@@ -141,6 +152,7 @@ f32 Gaps::parse_f16(const Vec<u8> &bytestream,
   //  unsafe { mem::transmute::<u32, f32>(sign | exp | man) }
   u32 bits_u32 = sign | exp | man;
   return u32tof32(bits_u32);
+  #endif
 }
 
 /***********************************************/

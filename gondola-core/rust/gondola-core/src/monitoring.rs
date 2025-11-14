@@ -93,6 +93,8 @@ pub trait MoniData {
 pub trait MoniSeries<T>
   where T : Copy + MoniData {
 
+  fn get_first_ts(&self) -> u64;
+
   fn get_data(&self) -> &HashMap<u8,VecDeque<T>>;
 
   fn get_data_mut(&mut self) -> &mut HashMap<u8,VecDeque<T>>;
@@ -100,6 +102,8 @@ pub trait MoniSeries<T>
   fn get_max_size(&self) -> usize;
 
   fn get_timestamps(&self) -> &Vec<u64>;
+
+  fn add_timestamp(&mut self, ts : u64);
 
   /// A HashMap of -> rbid, Vec\<var\> 
   fn get_var(&self, varname : &str) -> HashMap<u8, Vec<f32>> {
@@ -161,6 +165,7 @@ pub trait MoniSeries<T>
           error!("Unable to get series for {}", k);
         }
         Some(ser) => {
+          //println!("{}", ser);
           series.push(ser.into());
         }
       }
@@ -187,8 +192,8 @@ pub trait MoniSeries<T>
   fn get_series(&self, varname : &str) -> Option<Series> {
     let mut data = Vec::<f32>::with_capacity(self.get_data().len());
     let sorted_keys: Vec<u8> = self.get_data().keys().cloned().collect();
-    for rbid in sorted_keys.iter() {
-      let dqe = self.get_data().get(rbid).unwrap(); //uwrap is fine, bc we checked earlier
+    for board_id in sorted_keys.iter() {
+      let dqe = self.get_data().get(board_id).unwrap(); //uwrap is fine, bc we checked earlier
       for moni in dqe {
         match moni.get(varname) {
           None => {
@@ -278,7 +283,15 @@ macro_rules! moniseries {
     }
     
     impl MoniSeries<$class> for $name {
-    
+   
+      fn get_first_ts(&self) -> u64 {
+        if self.timestamps.len() == 0 {
+          return 0;
+        } else {
+          self.timestamps[0]
+        }
+      }
+
       fn get_data(&self) -> &HashMap<u8,VecDeque<$class>> {
         return &self.data;
       }
@@ -290,8 +303,16 @@ macro_rules! moniseries {
       fn get_max_size(&self) -> usize {
         return self.max_size;
       }
-    
+  
+      fn add_timestamp(&mut self, ts : u64) {
+        self.timestamps.push(ts);
+      }
+
       fn get_timestamps(&self) -> &Vec<u64> {
+        //if self.timestamps.len() == 0 {
+        //  let mut timestamps = Vec::<u64>::new();
+        //  for k in self.
+        //} 
         return &self.timestamps;
       }
     }
@@ -310,6 +331,12 @@ macro_rules! moniseries {
       #[pyo3(name="max_size")]
       fn get_max_size_py(&self) -> usize {
         self.get_max_size()
+      }
+
+      #[getter]
+      #[pyo3(name="get_first_ts")]
+      fn get_first_ts_py(&self) -> u64 {
+        self.get_first_ts()
       }
 
       /// If monitoring is retrieved from telemetry, we 
@@ -382,6 +409,8 @@ macro_rules! moniseries {
                   }
                   Ok(hk) => {
                     let mut pos = 0;
+                    // subtract the 2020/1/1 midnight from the gcutime to make 
+                    // it f32
                     let gcutime = hk.header.get_gcutime() as u64;
                     match TofPacket::from_bytestream(&hk.payload, &mut pos) {
                       Err(err) => {
@@ -394,7 +423,8 @@ macro_rules! moniseries {
                               println!("Error unpacking! {err}");
                             }
                             Ok(mut moni) => {
-                              moni.set_timestamp(gcutime); 
+                              self.add_timestamp(gcutime);
+                              moni.set_timestamp(gcutime - self.get_first_ts()); 
                               self.add(moni);
                               //self.timestamps.push(gcutime);
                             }

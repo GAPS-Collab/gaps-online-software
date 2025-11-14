@@ -150,9 +150,30 @@ namespace gondola {
   /// The mapping of hardwer id (either paddle id or strip id to the 
   /// volume id
   auto get_vid_hid_map() -> HashMap<u32, u32>; 
+  
+  /// Arbitrary timing constant which is calibrated out 
+  /// by requiring that overrlapping paddles should see 
+  /// the same signal at the same time. Between panels, 
+  /// the muon signal should be received at the known time  
+  struct TofPaddleTimingConstant {
+    u32         data_id; 
+    u8          paddle_id ;
+    u64         volume_id;
+    u64         utc_timestamp_start;
+    u64         utc_timestamp_stop;
+    std::string name; 
+    f32         version;
+    f32         timing_constant; 
+  
+    auto to_string() const -> std::string;
+
+  };
+
+  typedef std::map<u32, f32> TofPaddleTimingConstantMap;
+
+  auto get_tofpaddletimingconstants(std::string mask_name = "") -> TofPaddleTimingConstantMap;
+
 }
-
-
 
 std::ostream& operator<<(std::ostream& os, const Gaps::TofPaddle& paddle);
 
@@ -162,7 +183,6 @@ std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStripMask& strip);
 
 std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStripPedestal& strip);
 
-
-
+std::ostream& operator<<(std::ostream& os, const gondola::TofPaddleTimingConstant& paddle);
 
 #endif

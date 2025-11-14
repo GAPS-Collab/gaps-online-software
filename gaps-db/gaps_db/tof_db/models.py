@@ -7,7 +7,7 @@ from django.db import models
 import numpy as np
 import matplotlib.pyplot as plt
 import tqdm
-
+import json 
 from pathlib import Path
 from matplotlib.patches import Rectangle
 
@@ -48,6 +48,79 @@ class RAT(models.Model):
         _repr += f'\n  RB2               : {self.rb2_id}'                   
         _repr += f'\n  LTB               : {self.ltb_id}'                   
         _repr += f'\n  H. cable len [cm] : {self.ltb_harting_cable_length}>' 
+        return _repr
+
+##########################################################################
+
+class TofPaddleTimingConstant(models.Model):
+    """
+    An unknown constant which can be added to the individual 
+    paddle event times for a more precise beta calculation.
+    """
+    data_id              = models.AutoField(primary_key=True,
+                                            help_text="Identify this specific dataset")
+    paddle_id            = models.PositiveSmallIntegerField(null=False)
+    volume_id            = models.PositiveBigIntegerField(
+                                    default=0,
+                                    null=False,
+                                    unique=True,
+                                    help_text="The VolumeId as used in the GAPS simulation code")
+    utc_timestamp_start  = models.PositiveBigIntegerField(null=False, default=0,
+                                                          help_text="UNIX Timestamp for first point in time where this constant is relevant")
+    utc_timestamp_stop   = models.PositiveBigIntegerField(null=False, default=0,
+                                                          help_text="UNIX Timestamp for last point in time when this constant is relevant")
+    name                 = models.CharField(max_length=1024,
+                                            null=True,
+                                            default="",
+                                            help_text="A for better indentification of the offsets")
+    version              = models.PositiveIntegerField(null=True, default=0, help_text="Version identifier for Paddle timing constants")
+    timing_constant      = models.FloatField(
+                                    default=0,
+                                    null=False,
+                                    help_text="Actual constant in ns")
+    @staticmethod
+    def get_from_file(filename, utc_start = 0, utc_stop = 0, name = None, version = None, no_fail_on_vid_check = False):
+        """
+        Create database compatible objects from a regular text file
+        """
+        print (filename)
+        f = open(filename)
+        f = json.load(f)
+        #new_json = dict()
+        all_paddles = Paddle.objects.all() 
+        all_paddles = {k.paddle_id : k for k in all_paddles}
+        tcs = []
+        for k in f:
+            tc = TofPaddleTimingConstant()
+            tc.paddle_id       = int(k['paddle_id']) 
+            vid                = int(k['volume_id'])
+            if vid != all_paddles[tc.paddle_id].volume_id:
+                print (f'Error - vid mismatch for paddle {tc.paddle_id} {tc.volume_id} vs {k["volume_id"]}')
+                #print (k) 
+                #print (all_paddles[tc.paddle_id])
+                if not no_fail_on_vid_check:
+                    raise ValueError
+            tc.volume_id       = vid 
+            tc.timing_constant = k['total_offset']
+            tc.utc_timestamp_start = utc_start 
+            tc.utc_timestamp_stop  = utc_stop 
+            tc.name                = name 
+            tc.version             = version 
+            tcs.append(tc)
+        return tcs 
+
+    def __str__(self):
+        return self.__repr__()
+    
+    def __repr__(self):
+        _repr = f'<TofPaddleTimingConstant [{self.paddle_id}]:'
+        _repr += f'\n  Volume ID : {self.volume_id}'  
+        _repr += f'\n  UTC Timestmamps begin/end'
+        _repr += f'\n    {self.utc_timestamp_start} //{self.utc_timestamp_stop} '  
+        _repr += f'\n  Name                       : {self.name}'  
+        _repr += f'\n  Version                    : {self.version}'  
+        _repr += f'\n  tmg cont (paddle + panel)  : {self.timing_constant}>'
+
         return _repr
 
 ##########################################################################

@@ -10,7 +10,7 @@ use crate::prelude::*;
 /// This can be used for the error, which is 
 /// in % of the lightspeed so everything 
 /// > 1 is non-sensical
-const NO_LIGHTSPEED_CUTS : f64 = 42e9;
+pub const NO_LIGHTSPEED_CUTS : f64 = 42e9;
 
 /// Sets of cuts which can be imposed on 
 /// TofEvents 

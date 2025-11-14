@@ -130,8 +130,7 @@ pub fn socket_wrap_telemetry(address     : &str,
   }
 }
 
-
-
+//-----------------------------------------------------
 
 // only used here
 use crc::Crc;

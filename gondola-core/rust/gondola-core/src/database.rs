@@ -1118,7 +1118,32 @@ impl ReadoutBoard {
   pub fn all_py() -> Option<Vec<Self>> {
     Self::all()
   } 
-  
+
+  /// Load a calibration file for this specific Readoutboard
+  #[pyo3(name="load_calibration")]
+  pub fn load_calibration_py(&mut self, path : &Bound<'_,PyAny>) -> PyResult<()> {
+    let mut string_value = String::from("foo");
+    if let Ok(s) = path.extract::<String>() {
+       string_value = s;
+    } //else if let Ok(p) = filename_or_directory.extract::<&Path>() {
+    if let Ok(fspath_method) = path.getattr("__fspath__") {
+      if let Ok(fspath_result) = fspath_method.call0() {
+        if let Ok(py_string) = fspath_result.extract::<String>() {
+          string_value = py_string;
+        }
+      }
+    }
+    self.calib_file_path = string_value;
+    match self.load_latest_calibration() {
+      Ok(_) => {
+        return Ok(())
+      }
+      Err(err) => { 
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
   #[staticmethod]
   #[pyo3(name="all_as_dict")]
   pub fn all_as_dict_py() -> Option<HashMap<u8,Self>> {
@@ -2075,6 +2100,221 @@ impl TrackerStripMask {
 
 #[cfg(feature="pybindings")]
 pythonize!(TrackerStripMask);
+
+//----------------------------------
+
+/// Masking of unusable strips as curated by the tracker team 
+#[derive(Debug,PartialEq, Clone,Queryable, Selectable, serde::Serialize, serde::Deserialize)]
+#[diesel(table_name = schema::tof_db_tofpaddletimingconstant)]
+#[diesel(primary_key(data_id))]
+#[allow(non_snake_case)]
+#[cfg_attr(feature="pybindings", pyclass)]
+pub struct TofPaddleTimingConstant {
+  pub data_id             : i32,
+  pub paddle_id           : i32,    
+  pub volume_id           : i64,    
+  pub utc_timestamp_start : i64,
+  pub utc_timestamp_stop  : i64,
+  pub name                : Option<String>, 
+  pub version             : Option<i32>,   
+  pub timing_constant     : f32,  
+}
+
+impl TofPaddleTimingConstant {
+
+  pub fn new() -> Self {
+    Self {
+      data_id             : 0,
+      paddle_id           : 0,    
+      volume_id           : 0,    
+      utc_timestamp_start : 0,  
+      utc_timestamp_stop  : 0,
+      name                : None, 
+      version             : None,
+      timing_constant     : 0.0,
+    }
+  }
+
+  /// Retrieve the names under which the timing constants are 
+  /// saved 
+  pub fn all_names() -> Result<Vec<String>, ConnectionError> {
+    let mut conn = connect_to_db()?;
+    let mut names = Vec::<String>::new();
+    let unique_names =
+      schema::tof_db_tofpaddletimingconstant::table.select(
+      schema::tof_db_tofpaddletimingconstant::name)
+      .distinct()
+      .load::<Option<String>>(&mut conn).expect("Error getting names from db!");
+    for k in unique_names {
+      if let Some(n) = k {
+        names.push(n);
+      }
+    }
+    Ok(names)
+  }
+
+  /// Get Tof timing constants as associated with a distinct name 
+  ///
+  /// # Returns:
+  ///   * HashMap<u32 \[paddle id\], Self> 
+  pub fn as_dict_by_name(fname : &str) -> Result<HashMap<u8,Self>, ConnectionError> {
+    use schema::tof_db_tofpaddletimingconstant::dsl::*;
+    let mut paddles = HashMap::<u8, Self>::new();
+    if fname == "" {
+      match Self::all() {
+        None => {
+          error!("Unable to retrive ANY TofPaddleTimingConstant");
+          return Ok(paddles);
+        }
+        Some(_paddles) => {
+          for k in _paddles {
+            paddles.insert(k.paddle_id as u8, k);
+          }
+          return Ok(paddles);
+        }
+      }
+    }
+    let mut conn = connect_to_db()?;
+    match tof_db_tofpaddletimingconstant.filter(
+      schema::tof_db_tofpaddletimingconstant::name.eq(fname)).load::<Self>(&mut conn) {
+      Err(err) => {
+        error!("We can't find any TOF paddle timing constants in the database! {err}");
+        return Ok(paddles);
+      }
+      Ok(paddles_) => {
+        for p in paddles_ {
+          paddles.insert(p.paddle_id as u8, p );
+        }
+      }
+    }
+    return Ok(paddles);
+  }
+
+  /// Get all tracker strip mask from the database
+  ///
+  /// # Returns:
+  ///   * HashMap<u32 [strip id], TrackeStripMask> 
+  pub fn all() -> Option<Vec<Self>> {
+    use schema::tof_db_tofpaddletimingconstant::dsl::*;
+    let mut conn = connect_to_db().ok()?;
+    match tof_db_tofpaddletimingconstant.load::<Self>(&mut conn) {
+      Err(err) => {
+        error!("Unable to load TOF paddle timing constants from db! {err}");
+        return None;
+      }
+      Ok(tc) => {
+        return Some(tc);
+      }
+    }
+  }
+}
+
+impl Default for TofPaddleTimingConstant {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
+impl fmt::Display for TofPaddleTimingConstant {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = format!("<TofPaddleTimingConstant [{}]:", self.paddle_id);
+    repr += &(format!("\n   vid           : {}", self.volume_id));
+    repr += "\n   UTC Timestamps (Begin/End):";
+    repr += &(format!("\n   {}/{}", self.utc_timestamp_start, self.utc_timestamp_stop));    
+    if self.name.is_some() {
+      repr += &(format!("\n   name        : {}", self.name.clone().unwrap())); 
+    }
+    if self.version.is_some() {
+      repr += &(format!("\n   version        : {}", self.version.unwrap())); 
+    }
+    repr += &(format!("\n   timing const.    : {}", self.timing_constant));   
+    write!(f, "{}", repr)
+  }
+}
+
+#[cfg(feature="pybindings")]
+#[pymethods]
+impl TofPaddleTimingConstant {
+  
+  #[staticmethod]
+  #[pyo3(name="all")]
+  pub fn all_py() -> Option<Vec<Self>> {
+    Self::all()
+  } 
+  
+  #[staticmethod]
+  #[pyo3(name="all_names")]
+  /// Get all names for registered datasets. These
+  /// can be used in .as_dict_by_name() to query 
+  /// the db for a set of values
+  pub fn all_names_py() -> Option<Vec<String>> {
+    match Self::all_names() {
+      Err(_) => {
+        return None;
+      }
+      Ok(names) => {
+        return Some(names);
+      }
+    }
+  }
+ 
+  /// Get the TOF paddle timing constants as associated by a specific 
+  /// name
+  ///
+  /// # Arguments 
+  ///   * name : The name the constants are associated with 
+  #[staticmethod]
+  #[pyo3(name="as_dict_by_name")]
+  pub fn all_as_dict_py(name : &str) -> Option<HashMap<u8,Self>> {
+    match Self::as_dict_by_name(name) {
+      Err(err) => {
+        error!("Unable to retrieve TOF paddle timing constants dictionary. {err}. Did you laod the setup-env.sh shell?");
+        return None;
+      }
+      Ok(_data) => {
+        return Some(_data);
+      }
+    }
+  } 
+  
+  #[getter]
+  fn get_paddle_id     (&self) -> i32 {    
+    self.paddle_id
+  }
+  
+  #[getter]
+  fn get_volume_id    (&self) -> i64 {    
+    self.volume_id
+  }
+  
+  #[getter]
+  fn get_utc_timestamp_start(&self) -> i64 {
+    self.utc_timestamp_start
+  }
+  
+  #[getter]
+  fn get_utc_timestamp_stop(&self) -> i64 {
+    self.utc_timestamp_stop
+  }
+  
+  #[getter]
+  fn get_name    (&self) -> Option<String> {
+    self.name.clone()
+  }
+ 
+  #[getter]
+  fn get_version    (&self) -> Option<i32> {
+    self.version.clone()
+  }
+  
+  #[getter]
+  fn get_timing_constant       (&self) -> f32 { 
+    self.timing_constant
+  }
+}
+
+#[cfg(feature="pybindings")]
+pythonize!(TofPaddleTimingConstant);
 
 //----------------------------------
 

@@ -21,6 +21,20 @@ pub trait Serialization {
   /// NOT HAVE a fixed size, SIZE will be 0
   /// (so default value of the trait
   const SIZE: usize = 0;
+  
+  /// Guess the size of te packet. This can be a 
+  /// preformance issue if te offset position 
+  /// is far off
+  ///
+  /// This will not advance the pos marker!
+  fn guess_size(stream : &Vec<u8>,
+                pos    : usize,
+                offset : usize)
+      -> Result<(usize,usize,usize), SerializationError> {
+    let head_pos = seek_marker(stream, Self::HEAD, pos)?; 
+    let tail_pos = seek_marker(stream, Self::TAIL, pos+ offset)?;
+    Ok((tail_pos + 2 - head_pos, head_pos, tail_pos))
+  }
 
   /// Verify that the serialized representation of the struct has the 
   /// correct size, including header + footer.

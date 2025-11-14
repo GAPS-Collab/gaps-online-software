@@ -2,18 +2,24 @@
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
 
+#include "version.h"
 #include "sd_legacy.hpp" 
 #include "io.hpp" 
 #include "caraspace.hpp"
 #include "telemetry_dataclasses.hpp"
 #include "io/telemetry_reader.hpp"
-
-int add(int a, int b) { return a + b; }
+#include "calibration.h"
 
 namespace nb = nanobind;
 namespace g  = gondola;
 
 NB_MODULE(gondola_cxx, m) {
+
+  nb::enum_<Gaps::ProtocolVersion>(m, "ProtocolVersion") 
+    .value("Unknown"           , Gaps::ProtocolVersion::Unknown)
+    .value("V1"                , Gaps::ProtocolVersion::V1)
+    .value("V2"                , Gaps::ProtocolVersion::V2)
+    .value("V3"                , Gaps::ProtocolVersion::V3); 
 
   // packets 
   nb::enum_<PacketType>(m, "TofPacketType")
@@ -82,6 +88,7 @@ NB_MODULE(gondola_cxx, m) {
   // events  
   nb::class_<TofHit>(m, "TofHit")
     .def(nb::init<>())
+    .def_ro("version"      , &TofHit::version)
     .def_prop_ro("time_a"  , &TofHit::get_time_a)
     .def_prop_ro("time_b"  , &TofHit::get_time_b)
     .def_prop_ro("charge_a", &TofHit::get_charge_a)
@@ -89,6 +96,8 @@ NB_MODULE(gondola_cxx, m) {
     .def_prop_ro("peak_a"  , &TofHit::get_peak_a)
     .def_prop_ro("peak_b"  , &TofHit::get_peak_b)
     .def_prop_ro("edep"    , &TofHit::get_edep)
+    .def_ro("event_t0"     , &TofHit::event_t0)
+    .def_ro("paddle_id"    , &TofHit::paddle_id)
     .def("to_string", &TofHit::to_string)
     .def("__repr__", [](TofHit &h) {
       return "<NBWrapper" + h.to_string() + ">";
@@ -102,6 +111,7 @@ NB_MODULE(gondola_cxx, m) {
   nb::class_<TofEvent>(m, "TofEvent")
     .def(nb::init<>())
     .def_static("from_tofpacket",&TofEvent::from_tofpacket) 
+    .def("normalize_hit_times", &TofEvent::normalize_hit_times)
     .def_prop_ro("hits"    , &TofEvent::get_hits)
     .def_ro("header"       , &TofEvent::header)
     .def_prop_ro("rb_ids"  , &TofEvent::get_rbids)
@@ -164,7 +174,20 @@ NB_MODULE(gondola_cxx, m) {
     .def("print_packet_index"        , &g::TelemetryPacketReader::print_packet_index)
     .def("cache_all_packets"         , &g::TelemetryPacketReader::cache_all_packets)
     .def("count_packets"             , &g::TelemetryPacketReader::count_packets)
-    .def("rewind"                    , &g::TelemetryPacketReader::rewind); 
+    .def("rewind"                    , &g::TelemetryPacketReader::rewind);
+
+  // Spike cleaning functions
+  m.def("spike_cleaning_drs4", &g::spike_cleaning_drs4, 
+        nb::arg("wf"), nb::arg("tCell"), nb::arg("spikes"),
+        "Original DRS4 spike cleaning from the DRS4 manual");
+  
+  m.def("spike_cleaning_simple", &g::spike_cleaning_simple, 
+        nb::arg("voltages"), nb::arg("calibrated") = true,
+        "Simpler spike cleaning version (by Jamie)");
+  
+  m.def("spike_cleaning_all", &g::spike_cleaning_all, 
+        nb::arg("voltages"), nb::arg("calibrated") = true,
+        "Jamie's simpler version with single-width spike correction");
 }
 
 

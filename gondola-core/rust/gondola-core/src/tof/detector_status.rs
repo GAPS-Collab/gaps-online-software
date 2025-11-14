@@ -90,7 +90,7 @@ impl TofDetectorStatus {
     let active = self.get_active_channels_idx();
     for k in active.iter() {
       if *k < 160 {
-        dead_a.push(*k as u8);
+        dead_a.push(*k as u8 + 1);
       }
     }
     dead_a

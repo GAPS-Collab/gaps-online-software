@@ -169,6 +169,8 @@ pub use crate::pythonize_display;
 #[cfg(feature="pybindings")]
 pub use crate::pythonize_monidata;
 pub use crate::moniseries;
+#[cfg(feature="pybindings")]
+pub use crate::pythonize_error;
 
 #[cfg(feature="random")]
 pub use crate::random::FromRandom;
@@ -225,4 +227,6 @@ pub use crate::errors::{
 // macro to avoid boring enum boilerplate
 pub use crate::expand_and_test_enum;
 pub use crate::reader;
+
+
 

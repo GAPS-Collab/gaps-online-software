@@ -60,9 +60,9 @@ impl CRWriter {
     }
     let filename : String;
     if let Some(subrun) = subrun_id {
-      filename = format!("{}{}", file_path, get_runfilename(run_id, subrun, None, timestamp));
+      filename = format!("{}{}", file_path, get_runfilename(run_id, subrun, None, timestamp, false));
     } else {
-      filename = format!("{}{}", file_path, get_runfilename(run_id, 0, None, timestamp));
+      filename = format!("{}{}", file_path, get_runfilename(run_id, 0, None, timestamp, false));
     }
     let path     = Path::new(&filename); 
     println!("Writing to file {filename}");
@@ -84,7 +84,7 @@ impl CRWriter {
 
   pub fn get_file(&self, timestamp : Option<String>) -> File { 
     let file : File;
-    let filename = format!("{}{}", self.file_path, get_runfilename(self.run_id, self.file_id as u64, None, timestamp));
+    let filename = format!("{}{}", self.file_path, get_runfilename(self.run_id, self.file_id as u64, None, timestamp, false));
     //let filename = self.file_path.clone() + &get_runfilename(runid,self.file_id as u64, None);
     let path     = Path::new(&filename); 
     info!("Writing to file {filename}");

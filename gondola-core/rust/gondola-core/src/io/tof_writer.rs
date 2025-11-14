@@ -61,7 +61,7 @@ impl TofPacketWriter {
         file_name = filename;
       }
       FileType::RunFile(runid) => {
-        let filename = format!("{}{}", file_path, get_runfilename(runid, 0, None, None));
+        let filename = format!("{}{}", file_path, get_runfilename(runid, 0, None, None, true));
         let path     = Path::new(&filename); 
         println!("Writing to file {filename}");
         file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
@@ -106,7 +106,7 @@ impl TofPacketWriter {
         file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
       }
       FileType::RunFile(runid) => {
-        let filename = format!("{}{}", self.file_path, get_runfilename(*runid, self.file_id as u64, None, None));
+        let filename = format!("{}{}", self.file_path, get_runfilename(*runid, self.file_id as u64, None, None, true));
         //let filename = self.file_path.clone() + &get_runfilename(runid,self.file_id as u64, None);
         let path     = Path::new(&filename); 
         info!("Writing to file {filename}");

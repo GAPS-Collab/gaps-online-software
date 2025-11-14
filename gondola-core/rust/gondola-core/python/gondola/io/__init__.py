@@ -5,6 +5,8 @@ obtain various flavors of data used trhoughout GAPS.
 
 from .. import _gondola_core  as _gc 
 
+from . import streamers
+
 import sys
 if sys.version_info.minor <= 10:
     from datetime import datetime, timezone
@@ -111,6 +113,18 @@ def get_telemetry_binaries(unix_time_start, unix_time_stop,\
 
 def grace_get_telemetry_binaries(unix_time_start, unix_time_stop,\
                                  data_dir='/gaps_binaries/live/raw/ethernet'):
+    """
+    Get the relevant telemetry data files for time period from a directory. 
+    This function is preferred over get_telemetry_binaries, since it is more 
+    precise in constricting the time range
+
+    # Arguments
+        * unix_time_start : seconds since epoch for run start
+        * unix_time_end   : seconds since epoch for run end
+
+    # Keyword Arguments
+        * data_dir        : folder with telemetry binaries ('.bin')
+    """
 
     # file format is something like RAW240712_094325.bin
     t_start = datetime.fromtimestamp(unix_time_start, UTC)
