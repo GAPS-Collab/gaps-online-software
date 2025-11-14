@@ -16,7 +16,8 @@ dependencies = [
     "loguru>=0.7",
     "vtk>=9",
     "iminuit>=2",
-    "polars>=1.33"
+    "polars>=1.33",
+    "pyzmq>=27",
 ]
 
 [build-system]
