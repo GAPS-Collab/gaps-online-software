@@ -1,5 +1,10 @@
 //! Readoutboard communication. Get events and 
-//! monitoring data
+//! monitoring data.
+//!
+//! Each readoutboard gets connected through a zmq socket 
+//! over ethernet and has its own thread. 
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
 
 use std::collections::HashMap;
 
@@ -81,11 +86,12 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
   let mut verification_active = false;
   
   let ae_settings         : AnalysisEngineSettings; 
-  let run_analysis_engine : bool;
+  let mut run_analysis_engine : bool;
   match thread_control.lock() {
     Ok(tc) => {
       ae_settings         = tc.liftof_settings.analysis_engine_settings.clone();
       run_analysis_engine = tc.liftof_settings.run_analysis_engine;
+      verification_active = tc.liftof_settings.verification_run.unwrap_or(false);
     }
     Err(err) => {
       error!("Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}");
@@ -93,13 +99,20 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
       return;
     }
   }
+  if verification_active {
+    // needs analysis engine since it relies on hits 
+    run_analysis_engine = true;
+    println!("=> RUnning verfication!");
+  } else {
+    println!("=> Not running verification!");
+  }
   if run_analysis_engine {
     info!("Will run analysis engine!");
     //println!("Will use the following settings! {}", ae_settings);
   } else {
     warn!("Will not run analysis engine!");
   }
-
+  
   // start continuous thread activity, read data from RB sockets,
   // do analysis and pass them on.
   loop {
@@ -124,9 +137,9 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
             }
             break;
           }
-          verification_active = tc.verification_active;
+          //verification_active = tc.verification_active;
           if verification_active {
-            debug!("Found verification flag active!");
+            //println!("RB thread for RB {} is in 'verification' mode!", board_id);
             tc.detector_status.update_from_map(this_status.clone());
           }
         },
@@ -176,13 +189,13 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
                                           ae_settings) {
                     Ok(_) => (),
                     Err(err) => {
-                      warn!("Unable to analyze waveforms for this event! {err}");
+                      error!("Unable to analyze waveforms for this event! {err}");
                     }
                   }
                 }
                 if verification_active {
-                  debug!("Found active verification run, will update hit map!");
-                  debug!("{}", event);
+                  //println!("Found active verification run, will update hit map!");
+                  //debug!("{}", event);
                   for h in &event.hits {
                     // average charge/peak hit
                     let verification_charge_threshhold = 10.0f32;
@@ -202,6 +215,7 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
                     }
                   }
                 } else {
+                  //println!("RBEVENT, RB HAS {} HITS", event.hits.len());
                   match ev_to_builder.send(event) {
                     Ok(_) => (),
                     Err(err) => {
