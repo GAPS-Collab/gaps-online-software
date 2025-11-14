@@ -161,7 +161,7 @@ namespace gondola {
 
   };
 
-  typedef std::map<u32, bool> TofPaddleTimingConstantMap;
+  typedef std::map<u32, f32> TofPaddleTimingConstantMap;
 
   auto get_tofpaddletimingconstants(std::string mask_name = "") -> TofPaddleTimingConstantMap;
 
