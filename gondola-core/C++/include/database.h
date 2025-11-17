@@ -141,8 +141,7 @@ namespace Gaps {
 }
 
 namespace gondola {
-
-  
+ 
   /// Arbitrary timing constant which is calibrated out 
   /// by requiring that overrlapping paddles should see 
   /// the same signal at the same time. Between panels, 
@@ -164,7 +163,6 @@ namespace gondola {
   typedef std::map<u32, f32> TofPaddleTimingConstantMap;
 
   auto get_tofpaddletimingconstants(std::string mask_name = "") -> TofPaddleTimingConstantMap;
-
 }
 
 

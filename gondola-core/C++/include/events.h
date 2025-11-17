@@ -34,7 +34,7 @@
 #endif
 
 namespace r = result;
-//namespace g = Gaps;
+namespace gon = gondola;
 
 class RBCalibration;
 
@@ -579,7 +579,7 @@ struct TofEvent {
   auto get_hits() const -> Vec<TofHit>;
   /// normalize all the hit times, taking the global ch9 
   /// phase into account
-  auto normalize_hit_times() -> void;
+  auto normalize_hit_times(const gon::TofPaddleTimingConstantMap &paddle_offsets = gon::TofPaddleTimingConstantMap()) -> void;
 
   /// string representation for printing
   auto to_string() const -> std::string;
@@ -686,7 +686,7 @@ struct TofEventSummary {
   auto set_paddlemap(const Gaps::TofPaddleMap&) -> void;
   /// normalize all the hit times, taking the global ch9 
   /// phase into account
-  auto normalize_hit_times() -> void;
+  auto normalize_hit_times(const gon::TofPaddleTimingConstantMap &paddle_offsets = gon::TofPaddleTimingConstantMap()) -> void;
   #endif
 
   // combined timestamp
