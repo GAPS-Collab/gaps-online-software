@@ -268,6 +268,9 @@ fn packets_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<TelemetryPacket>()?;
   m.add_class::<TelemetryPacketHeader>()?;
   m.add_class::<TrackerHeader>()?;
+  m.add_class::<PduChannel>()?;
+  m.add_class::<Pac1934>()?;
+  m.add_class::<PduHKPacket>()?;
   m.add_function(wrap_pyfunction!(make_systime,m)?)?;
   Ok(())
 }
