@@ -158,6 +158,7 @@ fn packet_sorter(packet_type : &TofPacketType,
         TofPacketType::BfswAckPacket         => pack_key = "BfswAckPacket",
         TofPacketType::PanicPacket           => pack_key = "PanicPacket",
         TofPacketType::MultiPacket           => pack_key = "MultiPacket",
+        TofPacketType::PanicPacket           => pack_key = "PanicPacket",
       }
       if pm.get(pack_key).is_some() {
         *pm.get_mut(pack_key).unwrap() += 1;
