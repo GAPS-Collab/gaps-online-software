@@ -252,10 +252,10 @@ impl Serialization for RBWaveform {
     let data_b           = &stream[*pos..*pos+2*NWORDS];
     wf.adc_b             = u8_to_u16(data_b);
     *pos += 2*NWORDS;
-    if parse_u16(stream, pos) != Self::TAIL {
-      error!("The given position {} does not point to a tail signature of {}", pos, Self::TAIL);
-      return Err(SerializationError::TailInvalid);
-    }
+    //if parse_u16(stream, pos) != Self::TAIL {
+      //error!("The given position {} does not point to a tail signature of {}", pos, Self::TAIL);
+      //return Err(SerializationError::TailInvalid);
+    //}
     *pos +=2;
     Ok(wf)
   }
