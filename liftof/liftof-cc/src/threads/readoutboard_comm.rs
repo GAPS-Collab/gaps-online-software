@@ -189,7 +189,7 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
                                           ae_settings) {
                     Ok(_) => (),
                     Err(err) => {
-                      error!("Unable to analyze waveforms for this event! {err}");
+                      error!("Unable to analyze waveforms for this event on RB {}! {err}", &rb.rb_id);
                     }
                   }
                 }
