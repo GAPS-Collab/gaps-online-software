@@ -31,7 +31,7 @@ indicatif = ">=0.17.3"
 signal-hook = "0.3"
 
 [dependencies.tof-control]
-version  = "0.9"
+version  = "1.0"
 optional = false
 git      = "https://github.com/GAPS-Collab/tof-control.git"
 branch   = "minimal"
