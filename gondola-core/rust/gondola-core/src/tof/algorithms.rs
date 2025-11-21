@@ -98,10 +98,10 @@ pub fn get_max_value_idx_py<'_py>(value : Bound<'_py,PyArray1<f32>>,
 ///                   within the bin 
 ///   * idx         : Together with size define a range for the search for 
 ///                   the bin which should have the implementation applied 
-///                   to [voltages[idx], voltages[idx + size]]
+///                   to \[voltages\[idx\], voltages\[idx + size\]\]
 ///   * size        : Together with idx define a range for the search for 
 ///                   the bin which should have the implementation applied 
-///                   to [voltages[idx], voltages[idx + size]]
+///                   to \[voltages\[idx\], voltages\[idx + size\]\]
 pub fn interpolate_time<T : AsRef<[f32]>> (volts         : &T,
                                            times         : &T, 
                                            mut threshold : f32,
@@ -149,10 +149,10 @@ pub fn interpolate_time<T : AsRef<[f32]>> (volts         : &T,
 ///                   within the bin 
 ///   * idx         : Together with size define a range for the search for 
 ///                   the bin which should have the implementation applied 
-///                   to [voltages[idx], voltages[idx + size]]
+///                   to \[voltages\[idx\], voltages\[idx + size\]\]
 ///   * size        : Together with idx define a range for the search for 
 ///                   the bin which should have the implementation applied 
-///                   to [voltages[idx], voltages[idx + size]]
+///                   to \[voltages\[idx\], voltages\[idx + size\]\]
 pub fn interpolate_time_py(voltages    : PyReadonlyArray1<f32>,
                            nanoseconds : PyReadonlyArray1<f32>,
                            threshold   : f32,

@@ -134,7 +134,7 @@ pub fn parse_string<T: AsRef<[u8]>>(stream : &T, pos : &mut usize) -> String {
 /// representation of u32 (neither le or be, but 
 /// shuffled)
 /// 
-/// <div class="warning>
+/// <div class="warning">
 /// This assumes an underlying representation of 
 /// an atomic unit of 16bit instead of 8.
 /// This is a non-convetional byte respresentation

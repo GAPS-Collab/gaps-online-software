@@ -32,6 +32,9 @@ TrackerStripTransferFunction.__name__    = 'TrackerStripPedestal'
 TrackerStripCmnNoise         = _gc.db.TrackerStripCmnNoise
 TrackerStripCmnNoise.__module__  = __name__ 
 TrackerStripCmnNoise.__name__    = 'TrackerStripCmnNoise'
+TofPaddleTimingCostant            = _gc.db.TofPaddleTimingCostant 
+TofPaddleTimingCostant.__module__ = __name__ 
+TofPaddleTimingCostant.__name__   = 'TofPaddleTimingConstant'
 get_all_rbids_in_db          = _gc.db.get_all_rbids_in_db
 get_hid_vid_map              = _gc.db.get_hid_vid_map
 get_vid_hid_map              = _gc.db.get_vid_hid_map
@@ -51,7 +54,8 @@ def _create_box(self):
     pr   = self.principal
     norm = self.normal
     cube = vtk.vtkCubeSource()
-    edgepaddle = False
+    edgepaddle_u = False
+    edgepaddle_v = False
     if (pr == np.array([1,0,0])).all() or (pr == np.array([-1,0,0])).all():
         cube.SetXLength(self.length)  # Width in X
         if (norm == np.array([0,1,0])).all() or (norm == np.array([0,-1,0])).all():
@@ -77,7 +81,10 @@ def _create_box(self):
         # set the other two and then we have to rotat by 45 deg
         cube.SetXLength(self.height)
         cube.SetYLength(self.width)
-        edgepaddle = True
+        if (pr == np.array([0,0,1])).all():
+            edgepaddle_u = True
+        if (pr == np.array([0,0,-1])).all():
+            edgepaddle_v = True
         #transform_filter = vtk.vtkTransformPolyDataFilter()
         #transform_filter.SetInputData(cube.GetOutput())
         #transform_filter.SetTransform(trafo)
@@ -87,8 +94,18 @@ def _create_box(self):
     cube.Update()
     transform = vtk.vtkTransform()
     transform.Translate(self.global_pos_x_l0, self.global_pos_y_l0, self.global_pos_z_l0)
-    if edgepaddle:
-        transform.RotateWXYZ(45, [0,0,1])  # angle, (x, y, z) axis to rotate around
+    #if edgepaddle_u:
+    #    transform.RotateWXYZ(90, [0,0,1])  # angle, (x, y, z) axis to rotate around
+    # FIXME - all are edgepaddle v
+    if edgepaddle_v:
+        if (norm == np.array([1.0, 1.0, 0.0])).all():
+            transform.RotateWXYZ(45, [0,0,1])  # angle, (x, y, z) axis to rotate around
+        if (norm == np.array([1.0, -1.0, 0.0])).all():
+            transform.RotateWXYZ(-45, [0,0,1])  # angle, (x, y, z) axis to rotate around
+        if (norm == np.array([-1.0, 1.0, 0.0])).all():
+            transform.RotateWXYZ(-45, [0,0,1])  # angle, (x, y, z) axis to rotate around
+        if (norm == np.array([-1.0, -1.0, 0.0])).all():
+            transform.RotateWXYZ(45, [0,0,1])  # angle, (x, y, z) axis to rotate around
     transform_filter = vtk.vtkTransformPolyDataFilter()
     transform_filter.SetInputData(cube.GetOutput())
     transform_filter.SetTransform(transform)

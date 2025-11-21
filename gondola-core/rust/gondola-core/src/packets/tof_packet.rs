@@ -308,6 +308,11 @@ impl TofPacket {
     }
   }
 
+  #[pyo3(name="to_bytestream")]
+  fn to_bytestream_py(&self) -> Vec<u8> {
+    self.to_bytestream()
+  }
+
   #[getter]
   #[pyo3(name="payload")]
   fn get_payload_py(&self) -> Vec<u8> {

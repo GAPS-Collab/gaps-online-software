@@ -15,7 +15,8 @@
 #include "spdlog/spdlog.h"
 #include "spdlog/cfg/env.h"
 
-namespace g = Gaps;
+namespace g   = Gaps;
+namespace gon = gondola;
 using namespace result;
 
 /// masks to decode LTB hit masks
@@ -602,7 +603,7 @@ u32 TofEvent::get_n_rbevents(u32 mask){
 /**********************************************************/
 
 #ifdef BUILD_CXXDB
-auto TofEvent::normalize_hit_times() -> void {
+auto TofEvent::normalize_hit_times(const gon::TofPaddleTimingConstantMap &offsets) -> void {
   if (rb_events.size() == 0) {
     return;
   }
@@ -625,6 +626,9 @@ auto TofEvent::normalize_hit_times() -> void {
       }
       auto t_shift = 50.0*phase_diff/(2.0*PI);
       h.event_t0 = t0 + t_shift;
+      if (!offsets.empty()) {
+        h.event_t0 -= offsets.at(h.paddle_id);
+      }
     }
   }
 }
@@ -1298,7 +1302,7 @@ auto TofEventSummary::get_trigger_sources() const -> Vec<TriggerType> {
 } 
 
 #ifdef BUILD_CXXDB
-auto TofEventSummary::normalize_hit_times() -> void {
+auto TofEventSummary::normalize_hit_times(const gon::TofPaddleTimingConstantMap &offsets) -> void {
   if (hits.size() == 0) {
     return;
   }
@@ -1320,6 +1324,9 @@ auto TofEventSummary::normalize_hit_times() -> void {
     }
     auto t_shift = 50.0*phase_diff/(2.0*PI);
     h.event_t0 = t0 + t_shift;
+    if (!offsets.empty()) {
+      h.event_t0 -= offsets.at(h.paddle_id);
+    }
   }
   //FIXME
 }

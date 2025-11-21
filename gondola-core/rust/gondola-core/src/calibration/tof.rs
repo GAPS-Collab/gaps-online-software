@@ -9,7 +9,7 @@ use crate::prelude::*;
 /// to the beginning by a given offset.
 /// 
 /// This is similar to 
-/// https://numpy.org/doc/2.2/reference/generated/numpy.roll.html
+/// <https://numpy.org/doc/2.2/reference/generated/numpy.roll.html>
 ///
 /// # Arguments:
 ///   * `vec`   : The vector to be rolled over. It will 

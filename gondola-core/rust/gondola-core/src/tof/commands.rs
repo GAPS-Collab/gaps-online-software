@@ -162,7 +162,7 @@ impl TofCommand {
 }
 
 impl TofPackable for TofCommand {
-  const TOF_PACKET_TYPE : TofPacketType = TofPacketType::TofCommandV2;
+  const TOF_PACKET_TYPE : TofPacketType = TofPacketType::TofCommand;
 }
 
 impl Serialization for TofCommand {

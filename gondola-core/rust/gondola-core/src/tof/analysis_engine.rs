@@ -23,6 +23,7 @@ use crate::prelude::*;
 /// * settings    : Parameters to configure the waveform
 ///                 analysis & peak finding
 #[cfg(feature="database")]
+#[cfg_attr(feature="pybindings", pyfunction)] 
 pub fn waveform_analysis(event         : &mut RBEvent,
                          rb            : &ReadoutBoard,
                          settings      : AnalysisEngineSettings)

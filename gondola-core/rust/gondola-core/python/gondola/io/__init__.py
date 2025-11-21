@@ -5,6 +5,8 @@ obtain various flavors of data used trhoughout GAPS.
 
 from .. import _gondola_core  as _gc 
 
+from . import streamers
+
 import sys
 if sys.version_info.minor <= 10:
     from datetime import datetime, timezone

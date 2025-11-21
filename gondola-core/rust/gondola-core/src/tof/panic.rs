@@ -9,7 +9,7 @@ use crate::prelude::*;
 /// To be sent right before a panic occurs
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature="pybindings", pyclass)]
-struct PanicPacket {
+pub struct PanicPacket {
   sender  : u8,
   message : String,
 }

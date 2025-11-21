@@ -6,6 +6,8 @@
 //!
 //! Standalone, statically linked binary to be either run manually 
 //! or to be managed by systemd
+//! 
+//! Compile for ARM7 architecture with musl 
 
 use std::os::raw::c_int;
 use std::process::exit;
@@ -55,13 +57,6 @@ use tof_control::ltb_control::ltb_threshold::set_threshold;
 
 use gondola_core::prelude::*;
 use gondola_core::init_env_logger;
-
-//#[cfg(feature="database")]
-//use tof_dataclasses::database::{
-//  ReadoutBoard,
-//  connect_to_db,
-//  RAT
-//};
 
 use liftof_rb::threads::{
   runner,
@@ -416,7 +411,7 @@ fn main() {
       // don't stop after a certain time, 
       // but just when we hit Ctrl+C
       end_after_run = run_config.nseconds > 0;
-      output_fname = Some(get_runfilename(1,1,Some(rb_id),None));
+      output_fname = Some(get_runfilename(1,1,Some(rb_id),None,true));
     } 
   }
   let run_stat = Arc::new(Mutex::new(RunStatistics::new()));

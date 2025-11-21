@@ -10,6 +10,8 @@ import sys
 import tomllib 
 import cmocean
 import concurrent.futures as fut
+import polars as pl
+
 from enum import Enum
 from copy import deepcopy as copy
 from pathlib import Path
@@ -43,6 +45,10 @@ from gander_session import *
 
 #------------------------------------------------
 
+ELIGIBLE_RBS = [1,2,3,4,5,6,7,8,9,11,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,39,40,41,42,44,46]
+
+#------------------------------------------------
+
 # Retrieve the password from secrets
 try:
     stored_password = st.secrets["password"]
@@ -50,10 +56,17 @@ except KeyError:
     st.error("Password not found in secrets.toml. Please configure the secrets file.")
     st.stop()
 
-#################################################
+#------------------------------------------------
 
 def emit_empty_session_state():
+    """
+    Prepare the session state dictionary
+    """
     session_state = {
+        'telemetry_connected'   : False,
+        # update the app every interval, when 
+        # connected to telemetry
+        'update_every'          : 1,
         # app control 
         'use_dark_theme'        : True,
         'plot_theme_gaps'       : False,
@@ -111,11 +124,6 @@ def read_config(toml_filepath : Path):
     return config_data
 
 #################################################
-
-#SILI_RADIUS   = 5
-TOF_CALI_PATH = '/data1/gaps/mcmurdo/tof/calib'
-#L0_RUN_PATH   = '/data2/gaps/L0'
-L0_RUN_PATH = '/prestaging/no-waveforms'
 
 BINS_TIMING        = np.linspace(-100, 300, 70)
 BINS_NHIT          = np.arange(-0.5, 30.5, 1)
@@ -372,16 +380,30 @@ def file_loader(f, event_type,\
         (tof_analysis,[(filename, packet_type, event),..]) : The events are sampled from the 
                                                              the beginning of the file
     """
+    # detect automagically if the source is a file or a socket 
+    stream_mode = False
+    if str(f).startswith('tcp') and st.session_state.telemetry_active:
+        stream_mode = True
+
+
     event_samples = []
-    reader   = gon.io.CRReader(f)
-    # set the calibration files 
-    reader.set_tracker_calibrations_from_fnames(mask        = st.session_state.trk_calibration['mask'],
-                                                pedestal    = st.session_state.trk_calibration['pedestal'],
-                                                transfer_fn = st.session_state.trk_calibration['tf'],
-                                                cmn_noise   = st.session_state.trk_calibration['cmn_noise'])
+    if stream_mode:
+        reader   = gon.io.streamer.TelemetrySocketReader(f)
+        pass
+    else:
+        reader   = gon.io.CRReader(f)
+        # set the calibration files 
+        reader.set_tracker_calibrations_from_fnames(mask        = st.session_state.trk_calibration['mask'],
+                                                    pedestal    = st.session_state.trk_calibration['pedestal'],
+                                                    transfer_fn = st.session_state.trk_calibration['tf'],
+                                                    cmn_noise   = st.session_state.trk_calibration['cmn_noise'])
     if write_to_basket:
-        f_rundata = gon.io.get_rundata_from_file(str(f)) 
-        runid, srunid, ts = f_rundata['run'], f_rundata['subrun'], f_rundata['utctime']
+        if stream_mode:
+            # FIXME
+            runid, srunid, ts = 0,0,0
+        else:
+            f_rundata = gon.io.get_rundata_from_file(str(f)) 
+            runid, srunid, ts = f_rundata['run'], f_rundata['subrun'], f_rundata['utctime']
         writer = gon.io.CRWriter('/prestaging/basket',runid, subrun_id=srunid, timestamp=ts)
         logger.info(f'Will use writer : {writer}')
     # FIXME - this whole 'do_tof_analysis' stuff needs to go
@@ -490,15 +512,18 @@ def file_loader(f, event_type,\
             reco =reco_analysis.reco(ev)
             if nframes % 100 == 0:
                 print (nframes)
+        if stream_mode:
+            if nframes >= st.session_state.telemetry_chunk_size:
+                break            
     return (tof_analysis, trk_analysis,reco_analysis, event_samples)
 
-#-----------------------------------------
-
-@st.fragment 
-def clear_loaded_runs():
-    st.session_state.event_cache = []
-
-#-----------------------------------------
+##-----------------------------------------
+#
+#@st.fragment 
+#def clear_loaded_runs():
+#    st.session_state.event_cache = []
+#
+##-----------------------------------------
 
 @st.fragment
 def clear_analysis():
@@ -520,6 +545,15 @@ def clear_analysis():
 def clear_cuts():
     st.session_state.tof_analysis.cuts = gon.tof.analysis.TofCuts()
     st.session_state.trk_analysis.cuts = gon.tracker.analysis.TrackerCuts()
+
+#-----------------------------------------
+
+@st.fragment
+def telemetry_loader(address,
+                     update_interval,
+                     nbins):
+    pass
+
 
 #-----------------------------------------
 
@@ -570,15 +604,16 @@ def load_run(event_type         = EventType.Merged,\
     else:
         for f in stqdm(st.session_state.infiles, desc="Loading run data, this might take a while...", total = len(st.session_state.infiles)):
             if st.session_state.load_moni_data:
-                st.session_state.moni_data['mtb'].add_crfile(str(f))
-                st.session_state.moni_data['rb'].add_crfile(str(f))
-                st.session_state.moni_data['pa'].add_crfile(str(f))
+                st.session_state.moni_data['mtb'] .add_crfile(str(f))
+                st.session_state.moni_data['rb']  .add_crfile(str(f))
+                st.session_state.moni_data['pa']  .add_crfile(str(f))
                 st.session_state.moni_data['evbh'].add_crfile(str(f))
+                st.session_state.moni_data['ltb'] .add_crfile(str(f))
             result = file_loader(f, event_type,
-                                 merged_event_types = merged_event_types,
-                                 search_event_id = search_event_id,
-                                 tof_analysis_kwargs = tof_analysis_kwargs,\
-                                 trk_analysis_kwargs = trk_analysis_kwargs,
+                                 merged_event_types   = merged_event_types,
+                                 search_event_id      = search_event_id,
+                                 tof_analysis_kwargs  = tof_analysis_kwargs,\
+                                 trk_analysis_kwargs  = trk_analysis_kwargs,
                                  reco_analysis_kwargs = reco_analysis_kwargs,\
                                  write_to_basket = write_to_basket)
             if result[0] is not None:
@@ -591,9 +626,10 @@ def load_run(event_type         = EventType.Merged,\
             #if st.session_state.abort_run_loader:
             #    st.session_state.abort_run_loader = False
             #    break
-    st.session_state.tof_analysis.finish()
-    st.session_state.trk_analysis.finish()
-    st.session_state.reco.finish()
+    with st.spinner("Creating plots...", show_time=True):
+        st.session_state.tof_analysis.finish()
+        st.session_state.trk_analysis.finish()
+        st.session_state.reco.finish()
     #st.session_state.tof_analysis_done = True
 
 
@@ -766,18 +802,18 @@ def load_run(event_type         = EventType.Merged,\
 #    ST_SESSION_PLOTS = result
 #    return result                
 
-def tof_elena(hits):
-    phase_0 = hits[0].phase
-    for h in hits:
-        phi_shift = h.phase - phase_0
-        while phi_shift < -np.pi/2:
-            phi_shift += 2.0*np.pi
-        while phi_shift > np.pi/2:
-            phi_shift -= 2.0*np.pi
-        t_shift    = 50.0*phi_shift/(2.0*np.pi);
-        print (h)
-        print(t_shift)
-        print (t_shift + h.cable_delay)
+#def tof_elena(hits):
+#    phase_0 = hits[0].phase
+#    for h in hits:
+#        phi_shift = h.phase - phase_0
+#        while phi_shift < -np.pi/2:
+#            phi_shift += 2.0*np.pi
+#        while phi_shift > np.pi/2:
+#            phi_shift -= 2.0*np.pi
+#        t_shift    = 50.0*phi_shift/(2.0*np.pi);
+#        print (h)
+#        print(t_shift)
+#        print (t_shift + h.cable_delay)
 
 # this dubs as the __name__ == '__main__' hook
 if check_password():
@@ -789,55 +825,17 @@ if check_password():
     calibs = [k for k in reversed(sorted(Path(config['data']['tof_calib']).glob('24*')))]
     calib = gon.calibration.load_rb_calibrations(calibs[0])
    
-    moni_data = {'mtb'  : gon.monitoring.MtbMoniDataSeries(),
-                 'rb'   : gon.monitoring.RBMoniDataSeries(),
-                 'pa'   : gon.monitoring.PAMoniDataSeries(),
-                 'pb'   : gon.monitoring.PBMoniDataSeries(),
-                 'evbh' : gon.monitoring.EventBuilderHBSeries()}
+    moni_data = {'mtb'   : gon.monitoring.MtbMoniDataSeries(),
+                 'rb'    : gon.monitoring.RBMoniDataSeries(),
+                 'pa'    : gon.monitoring.PAMoniDataSeries(),
+                 'pb'    : gon.monitoring.PBMoniDataSeries(),
+                 'evbh'  : gon.monitoring.EventBuilderHBSeries(),
+                 'mtbhb' : gon.monitoring.MasterTriggerHBSeries(),
+                 'dshb'  : gon.monitoring.DataSinkHBSeries(),
+                 'ltb'   : gon.monitoring.LTBMoniDataSeries()}
     
     session_state = emit_empty_session_state()
-    #session_state = {
-    #    # app control 
-    #    'use_dark_theme'        : True,
-    #    'plot_theme_gaps'       : False,
-    #    'mark_preliminary'      : False,
-    #    'mplib_rcprams'         : copy(plt.rcParams),
-    #    'write_to_disk'         : False,
-    #    # plots and event data
-    #    'waveform_figs'         : None,
-    #    'strip_dict'            : strip_dict,
-    #    'no_plot_first_bins_wf' : False,
-    #    'no_plot_first_bins_wf2': False,
-    #    'no_plot_last_bins_wf'  : False,
-    #    # input 
-    #    'infiles'               : [],
-    #    'files_loaded'          : [],
-    #    'run_id'                : None, 
-    #    'event_id'              : [],
-    #    'load_moni_data'        : False,
-    #    'moni_data'             : moni_data,
-    #    'load_waveforms'        : False,
-    #    #'reader'                : go.io.CRReader(DEFAULT_FILE),
-    #    'current_event_in_file' : 0,
-    #    #'current_run_path'      : DEFAULT_FILE,
-    #    'tof_calib'             : calib,
-    #    # event viewer          
-    #    'ev_viewer_cache'       : [],
-    #    'ev_viewer_cache_size'  : 1000,
-    #    'ev_viewer_idx'         : 0,
-    #    # cuts
-    #    'apply_tracker_mask'    : False,
-    #    'search_event_id'       : 0,
-    #    # TOF analysis part
-    #    'tof_analysis'          : gon.tof.TofAnalysis(),
-    #    # TRK analysis part
-    #    'trk_analysis'          : go.tracker.analysis.TrackerAnalysis(),
-    #    'reco'                  : go.reconstruction.Reconstruction(),
-    #    'trk_calibration'       : { 'mask' : None, 'pedestal'  : None,\
-    #                                'tf'   : None, 'cmn_noise' : None}
-    #}
-
-
+    
     def configure_app():
         logger.info('Configuring app!')
         st.set_page_config(page_title="GAPS event view event {session['event_id}",
@@ -859,10 +857,8 @@ if check_password():
         """
         General run overview. Present files and .toml files of the current run
         """
-        st.header('Run overview (L0)')
-        st.divider()
         if st.session_state.files_loaded:
-            st.subheader('Run statistic')
+            st.subheader('Loaded data - Run statistic')
             with st.expander(f"Loaded {len(st.session_state.files_loaded)} files!"):
                 for k in st.session_state.files_loaded:
                     st.write(f'-- {k}')
@@ -881,9 +877,17 @@ if check_password():
         load_run_kwargs = dict()
           
         # create tabbed interface
-        tab_run, tab_reco, tab_tofanalysis, tab_trkanalysis, tab_tof_cali, tab_settings, = st.tabs(["Run", "Reconstruction", "TOF analysis", "TRK analysis", "TOF cali", "Other settings"])
-        
+        tab_telemetry, tab_run, tab_reco, tab_tofanalysis, tab_trkanalysis, tab_tof_cali, tab_settings, = st.tabs(["Telemetry", "Load data", "Reconstruction", "TOF analysis", "TRK analysis", "TOF cali", "Other settings"])
+       
+        with tab_telemetry:
+            st.session_state.telemetry_connected = st.checkbox('Connect to telemetry', value=st.session_state.telemetry_connected)
+            address = st.text_input("TCP port for telemetry packet stream", value="tcp://")
+            st.session_state.update_every        = st.number_input("Update interval (mins)", value=1)
+
         with tab_run:
+            if st.session_state.telemetry_connected:
+                st.warning('Disable telemetry first!', icon=":warning:") 
+                return 
             if len(st.session_state.files_loaded) > 0:
                 st.button("Clear loaded run!", on_click=reset_session_state) 
             else:
@@ -1309,16 +1313,86 @@ if check_password():
             bad   = sorted([cal for cal in calib.values() if not cal.check()], key=lambda x: x.rb_id)
             if st.session_state['tof_calib'] is not None:
                 if bad:
-                    st.header("Some boards failed the calibration self-check!")
-                    st.write(f'-- -- {[k.rb_id for k in bad]}')
+                    st.warning(f"Some boards failed the calibration self-check! Failing boards:\t {" ".join([str(k.rb_id) for k in bad])}", icon=':material/add_alert:')
                     st.write("RBs with failed calibrations:")
                     for k in bad:
+                        cali = st.session_state['tof_calib'][k.rb_id]
                         with st.expander(f"Calibration for RB {k.rb_id}"): 
-                            st.text(f"Used TOF calibration files {st.session_state['tof_calib'][k.rb_id]}") 
+                            st.text(f"Used TOF calibration files {cali}") 
+                            plot_histograms = st.checkbox('Plot distributions', key=f'plot_cali_dist_{k.rb_id}_voffset')
+                            if plot_histograms:
+                                for ch in range(9):
+                                    st.subheader(f'Channel {ch + 1}')
+                                    st.divider()
+                                    hist = d.factory.hist1d(cali.v_offsets[ch], 70) 
+                                    fig  = gander_plot(hist,
+                                                       xlabel = 'V Offsets',
+                                                       title  = f'RB {k.rb_id}/ CH {ch+1}')
+                                    st.pyplot(fig)
+                                    
+                                    hist = d.factory.hist1d(cali.v_inc[ch], 70) 
+                                    fig  = gander_plot(hist,
+                                                       xlabel = 'V Inc',
+                                                       title  = f'RB {k.rb_id}/ CH {ch+1}')
+                                    st.pyplot(fig)
+                                    
+                                    hist = d.factory.hist1d(cali.v_dips[ch], 70) 
+                                    fig  = gander_plot(hist,
+                                                       xlabel = 'V Dips',
+                                                       title  = f'RB {k.rb_id}/ CH {ch+1}')
+                                    st.pyplot(fig)
+                                    
+                                    hist = d.factory.hist1d(cali.v_offsets[ch], 70) 
+                                    fig  = gander_plot(hist,
+                                                       xlabel = 'V Offsets',
+                                                       title  = f'RB {k.rb_id}/ CH {ch+1}')
+                                    print (dir(cali)) 
+                                    hist = d.factory.hist1d(cali.tbin[ch], 70) 
+                                    fig  = gander_plot(hist,
+                                                       xlabel = 'T bins',
+                                                       title  = f'RB {k.rb_id}/ CH {ch+1}')
+                                    st.pyplot(fig)
+                                    st.divider()
+
+
                 st.divider()
                 for k in good:
                     with st.expander(f"Calibration for RB {k.rb_id}"):
-                        st.text(f"Used TOF calibration files {st.session_state['tof_calib'][k.rb_id]}") 
+                        st.text(f"{st.session_state['tof_calib'][k.rb_id]}") 
+                        plot_histograms = st.checkbox('Plot distributions', key=f'plot_cali_dist_{k.rb_id}_voffset')
+                        if plot_histograms:
+                            for ch in range(9):
+                                st.subheader(f'Channel {ch + 1}')
+                                st.divider()
+                                hist = d.factory.hist1d(cali.v_offsets[ch], 70) 
+                                fig  = gander_plot(hist,
+                                                   xlabel = 'V Offsets',
+                                                   title  = f'RB {k.rb_id}/ CH {ch+1}')
+                                st.pyplot(fig)
+                                
+                                hist = d.factory.hist1d(cali.v_inc[ch], 70) 
+                                fig  = gander_plot(hist,
+                                                   xlabel = 'V Inc',
+                                                   title  = f'RB {k.rb_id}/ CH {ch+1}')
+                                st.pyplot(fig)
+                                
+                                hist = d.factory.hist1d(cali.v_dips[ch], 70) 
+                                fig  = gander_plot(hist,
+                                                   xlabel = 'V Dips',
+                                                   title  = f'RB {k.rb_id}/ CH {ch+1}')
+                                st.pyplot(fig)
+                                
+                                hist = d.factory.hist1d(cali.v_offsets[ch], 70) 
+                                fig  = gander_plot(hist,
+                                                   xlabel = 'V Offsets',
+                                                   title  = f'RB {k.rb_id}/ CH {ch+1}')
+                                print (dir(cali)) 
+                                hist = d.factory.hist1d(cali.tbin[ch], 70) 
+                                fig  = gander_plot(hist,
+                                                   xlabel = 'T bins',
+                                                   title  = f'RB {k.rb_id}/ CH {ch+1}')
+                                st.pyplot(fig)
+                                st.divider()
 
         with tab_settings:
             st.subheader("Settings")
@@ -1821,11 +1895,11 @@ if check_password():
                 #print ("Mesh loaded!") 
                 # Create a PyVista plotter
                 plotter.set_background("#0E1117")
-                print ("Plotter created")
+                #print ("Plotter created")
                 # Example: point cloud
                 #points = np.random.rand(100, 3) * 10  # 100 random points in space
                 points = np.array([k for k in zip(xs,ys,zs)])/10
-                print (points)
+                #print (points)
                 #sizes = np.linspace(5, 20, len(points))       # point sizes
                 colors = np.random.rand(len(points), 3)       # RGB colors in [0,1]
                 
@@ -1875,7 +1949,7 @@ if check_password():
                 # Add mesh as wireframe
                 #plotter.add_mesh(mesh, color="#F0F0F0", style="wireframe", line_width=1)
                     plotter.add_mesh(box, color="#F0F0F0", style="wireframe", line_width=1)
-                print ("mesh added")
+                #print ("mesh added")
 
                 # Render inside Streamlit
                 plotter.reset_camera()
@@ -1907,9 +1981,10 @@ if check_password():
         else: 
             r = st.session_state.tof_analysis
             st.write(f"{r.n_events} were loaded in the analysis!")
-            st.write(f"-- {r.no_hitmiss} [{100*r.no_hitmiss/r.n_events:.3f}%] events had no hit missing")
-            st.write(f"-- {r.one_hitmiss} [{100*r.one_hitmiss/r.n_events:.3f}%] events had one hits missing")
-            st.write(f"-- {r.two_hitmiss} [{100*r.two_hitmiss/r.n_events:.3f}%] events had two or more hits missing")
+            if r.n_events > 0:
+                st.write(f"-- {r.no_hitmiss} [{100*r.no_hitmiss/r.n_events:.3f}%] events had no hit missing")
+                st.write(f"-- {r.one_hitmiss} [{100*r.one_hitmiss/r.n_events:.3f}%] events had one hits missing")
+                st.write(f"-- {r.two_hitmiss} [{100*r.two_hitmiss/r.n_events:.3f}%] events had two or more hits missing")
             print (r.nhit_plots['hit'].bincontent) 
             print (r.nhit_plots['thit'].bincontent) 
 
@@ -2329,9 +2404,10 @@ if check_password():
     #    st.pyplot(fig)
 
 
+    #@st.cache_data
     @st.fragment
     def page_monitoring():
-        tab_run, tab_campaign, = st.tabs(["Run", "McMurdo Campaign 2024/25"])
+        tab_rb, tab_ltb, tab_pa, tab_pb, tab_hb = st.tabs(["RB","LTB","PA","PB","Heartbeats"])
         kwargs = {'color'  : 'w',\
                   'alpha'  : 0.4,\
                   'ls'     : 'dashed'
@@ -2339,37 +2415,110 @@ if check_password():
                   #'lw'     : 0.9}
         if not st.session_state.use_dark_theme:
             kwargs['color'] = 'k'
-        with tab_run:
+            
+        with tab_rb:
+            df = st.session_state.moni_data['rb'].get_dataframe().filter((pl.col("timestamp") < 1200*3600))
+            available_boards   = set(df['board_id'])
+            available_boards   = set([int(k) for k in available_boards])
+            n_available_boards = len(available_boards) 
+            if n_available_boards != len(ELIGIBLE_RBS):
+                missing_boards = set(ELIGIBLE_RBS).difference(available_boards)
+                for board in missing_boards:
+                    st.warning(f"RB {board} has no monitoring data!", icon=":material/add_alert:")
+            #average_rate =  df.select(pl.col('rate').mean())
+            mean_rb_rate = df.group_by("board_id").agg(pl.col("rate").mean().alias("mean_rb_rate"))
+            for board_id in available_boards:
+                if (mean_rb_rate.filter((pl.col('board_id') == board_id)))['mean_rb_rate'].item() < 1:
+                    st.warning(f"RB {board_id} has a rate of 0!", icon=":material/add_alert:")
+            st.dataframe(mean_rb_rate)
+            with st.expander('RBMoni data'):
+                # sometimes the GCU time is weird, so we limit ourselves to a 50day flight
+                # average rates
+                for board in available_boards:
+                    with st.expander(f"RB {board}"):
+                        rbmoni  = df.filter(pl.col("board_id") == board)#.select("rate")
+                        rbtimes = rbmoni['timestamp']/3600 # time in h
+
+                        fig   = gander_scatter_plot(rbtimes,rbmoni['rate'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title=f'RB{int(board)} rate', xlabel='MET [h]', ylabel='Hz', **kwargs)
+                        st.pyplot(fig)
+                        
+                        fig   = gander_scatter_plot(rbtimes,rbmoni['tmp_drs'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title=f'RB{int(board)} DRS TMP', xlabel='MET [h]', ylabel='C', **kwargs)
+                        st.pyplot(fig)
+                        
+                        fig   = gander_scatter_plot(rbtimes,rbmoni['pressure'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title=f'Pressure', xlabel='MET [h]', ylabel='hPa', **kwargs)
+                        st.pyplot(fig)
+                        
+                        fig   = gander_scatter_plot(rbtimes,rbmoni['humidity'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title=f'Humidity', xlabel='MET [h]', ylabel='rel. hum.', **kwargs)
+                        st.pyplot(fig)
+        
+        with tab_ltb:
+            df    = st.session_state.moni_data['ltb'].get_dataframe().filter((pl.col("timestamp") < 1200*3600))
+            times = df['timestamp']/3600 
+            
+            # Last thresholds
+            st.subheader(f"Last LTB moni data (MET {times[-1]:0.2}h)")
+            st.divider()
+            st.dataframe(df.tail(1))
+            st.divider()  
+            fig   = gander_scatter_plot(times,df['ltb_temp'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='LTB Temp', xlabel='MET [h]', ylabel='C', **kwargs)
+            st.pyplot(fig)
+
+        with tab_pa:
+            with st.expander('PAMoni data'):
+                df = st.session_state.moni_data['pa'].get_dataframe().filter((pl.col("timestamp") < 1200*3600))
+                available_boards = set(df['board_id'])
+                for board in available_boards:
+                    rbmoni  = df.filter(pl.col("board_id") == board)#.select("rate")
+                    rbtimes = rbmoni['timestamp']
+                    rbtimes = rbtimes/3600
+                    fig   = gander_scatter_plot(rbtimes,rbmoni['temps1'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title=f'PB for RB{int(board)} - T1', xlabel='MET [h]', ylabel='C', **kwargs)
+                    st.pyplot(fig)
+
+        with tab_hb:
             with st.expander(f"Event builder HeartBeat"):
-                df = st.session_state.moni_data['evbh'].get_dataframe()
-                times = df['timestamp']
-                times = np.array(times) 
-                times -= times[0]
-                times =  times/3600
+                df    = st.session_state.moni_data['evbh'].get_dataframe().filter((pl.col("timestamp") < 1200*3600))
+                times = df['timestamp']/3600 
+                
                 fig   = gander_scatter_plot(times,df['data_mangled_ev'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - mangled events', xlabel='MET [h]', ylabel='No. of mangled events', **kwargs)
                 st.pyplot(fig)
                 
                 fig   = gander_scatter_plot(times,df['n_timed_out'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - timed out events', xlabel='MET [h]', ylabel='No. of timed out events', **kwargs)
                 st.pyplot(fig)
                 
-                fig   = gander_scatter_plot(times,df['event_id_cache_size'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - Cache size', xlabel='MET [h]', ylabel='Cache size (event id)', **kwargs)
+                fig   = gander_scatter_plot(times,df['event_id_cache_size'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - Cache size (ids)', xlabel='MET [h]', ylabel='Cache size (event id)', **kwargs)
+                st.pyplot(fig)
+                
+                fig   = gander_scatter_plot(times,df['event_cache_size'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - Cache size (events)', xlabel='MET [h]', ylabel='Cache size (event id)', **kwargs)
                 st.pyplot(fig)
                 
                 fig   = gander_scatter_plot(times,df['n_rbe_per_te'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - RBEvents/TofEvent', xlabel='MET [h]', ylabel='N(RBEvents)/N(TofEvents)', **kwargs)
                 st.pyplot(fig)
                 
                 fig   = gander_scatter_plot(times,df['n_rbe_discarded_tot'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - Number of discarded RB events', xlabel='MET [h]', ylabel='N(RBEvents) lost', **kwargs)
+                st.pyplot(fig) 
+
+                fig   = gander_scatter_plot(times,df['n_rbe_discarded_tot'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - Number of discarded RB events', xlabel='MET [h]', ylabel='N(RBEvents) lost', **kwargs)
+                st.pyplot(fig) 
+
                 fig   = gander_scatter_plot(times,df['n_mte_skipped'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - Number of discarded events from the MTB', xlabel='MET [h]', ylabel='N skipped', **kwargs)
+                st.pyplot(fig)
+                
+                fig   = gander_scatter_plot(times,df['rbe_wo_mte'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - Number of RBEvents without MasterTrigger', xlabel='MET [h]', ylabel='N skipped', **kwargs)
+                st.pyplot(fig)
+                
+                fig   = gander_scatter_plot(times,df['drs_bsy_lost_hg_hits'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='Lost Hits (DRS Busy)', xlabel='MET [h]', ylabel='N', **kwargs)
                 st.pyplot(fig)
 
             with st.expander(f"MTB Data"):
-                df = st.session_state.moni_data['mtb'].get_dataframe()
-                times = st.session_state.moni_data['mtb'].timestamps 
+                df = st.session_state.moni_data['mtb'].get_dataframe().filter((pl.col("timestamp") < 1200*3600))
+                ##times = st.session_state.moni_data['mtb'].timestamps 
                 times = df['timestamp']
-                times = np.array(times) 
-                times -= times[0]
-                times =  times/3600
+                times =  times/3600.0
                 fig   = gander_scatter_plot(times,df['rate'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='MTB rate', xlabel='MET [h]', ylabel='Hz', **kwargs)
+                st.pyplot(fig)
+                
+                hist  = d.factory.hist1d(df['rate'], 45)
+                fig   = gander_plot(hist,figsize=lo.FIGSIZE_A4_LANDSCAPE, title='MTB rate (from reg)', xlabel='Hz', gauss_fit=True)
                 st.pyplot(fig)
                 
                 # lsot rate
@@ -2397,81 +2546,16 @@ if check_password():
                 fig   = gander_scatter_plot(times,df['tiu_busy_len'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='Last reported trk busy in sample', xlabel='MET [h]', ylabel='$\mu$s/10', **kwargs)
                 st.pyplot(fig)
             
-            with st.expander('RBMoni data'):
-                df = st.session_state.moni_data['rb'].get_dataframe()
-                available_boards = set(df['board_id'])
-                #times = st.session_state.moni_data['rb'].timestamps 
-                #times = np.array(times) 
-                #times -= times[0]
-                #times =  times/3600
-                for board in available_boards:
-                    #rbtimes = (df['board_id'] == board).to_numpy()
-                    #rbtimes = times[rbtimes]
-                    rbmoni  = df.filter(pl.col("board_id") == board)#.select("rate")
-                    rbtimes = df.filter(pl.col('board_id') == board)#.select('timestamps')
-                    #print (rate['rate'])
-                    #print (rate)
-                    rbtimes = rbtimes['timestamp']
-                    rbtimes = np.array(rbtimes)
-                    rbtimes -= rbtimes[0]
-                    rbtimes = rbtimes/3600
-                    st.write(len(rbtimes))
-                    testdata = st.session_state.moni_data['rb'].get_var_for_board('rate', int(board))
-                    st.write(len(testdata))
-                    fig   = gander_scatter_plot(rbtimes,testdata,figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title=f'RB{int(board)} rate', xlabel='MET [h]', ylabel='Hz', **kwargs)
-                    st.pyplot(fig)
+                fig   = gander_scatter_plot(times,df['tiu_busy_len'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='Last reported trk busy in sample', xlabel='MET [h]', ylabel='$\mu$s/10', **kwargs)
+                st.pyplot(fig)
 
-                    fig   = gander_scatter_plot(rbtimes,rbmoni['board_id'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title=f'RB{int(board)} rate', xlabel='MET [h]', ylabel='Hz', **kwargs)
-                    st.pyplot(fig)
-                    
-                    fig   = gander_scatter_plot(rbtimes,rbmoni['rate'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title=f'RB{int(board)} rate', xlabel='MET [h]', ylabel='Hz', **kwargs)
-                    st.pyplot(fig)
-                    
-                    fig   = gander_scatter_plot(rbtimes,rbmoni['tmp_drs'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title=f'RB{int(board)} DRS TMP', xlabel='MET [h]', ylabel='C', **kwargs)
-                    st.pyplot(fig)
-
-            with st.expander('PAMoni data'):
-                df = st.session_state.moni_data['pa'].get_dataframe()
-                available_boards = set(df['board_id'])
-                #times = st.session_state.moni_data['rb'].timestamps 
-                #times = np.array(times) 
-                #times -= times[0]
-                #times =  times/3600
-                for board in available_boards:
-                    #rbtimes = (df['board_id'] == board).to_numpy()
-                    #rbtimes = times[rbtimes]
-                    rbmoni  = df.filter(pl.col("board_id") == board)#.select("rate")
-                    rbtimes = df.filter(pl.col('board_id') == board)#.select('timestamps')
-                    #print (rate['rate'])
-                    #print (rate)
-                    rbtimes = rbtimes['timestamp']
-                    rbtimes = np.array(rbtimes)
-                    rbtimes -= rbtimes[0]
-                    rbtimes = rbtimes/3600
-                    st.write(len(rbtimes))
-                    #testdata = st.session_state.moni_data['rb'].get_var_for_board('rate', int(board))
-                    #st.write(len(testdata))
-                    fig   = gander_scatter_plot(rbtimes,rbmoni['temps1'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title=f'PB for RB{int(board)} - T1', xlabel='MET [h]', ylabel='C', **kwargs)
-                    st.pyplot(fig)
-        with tab_campaign:
-            st.subheader('Moni Data for 2024/25 Antarctic campaign')
-            #def extract_moni_subrun(name):
-            #    pattern = re.compile('McMurdo.(?P<subrun>[0-9]*).moni.gaps')
-            #    subrun = int(pattern.search(str(name)).groupdict()['subrun'])
-            #    return subrun
-            #infiles = Path(config['data']['campaign_moni_data'])
-            #infiles = sorted([k for k in infiles.glob('*.gaps')], key=extract_moni_subrun)
-            #load_bar = st.progress(0, text='Creating monitoring plots')
-            ##infiles = infiles[:1]
-            #print ('this is tab_campaign')
-            ##infiles = [infiles[0]]
-            #fig = create_monitoring_plots(infiles, load_bar, key='TelemetryPacketType.AnyTofHK')
-            #load_bar.empty()
-            #st.pyplot(fig)
+                hist  = d.factory.hist1d(df['tiu_busy_len'], int(len(times)/15))
+                fig   = gander_plot(hist,figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='Sampled TRK BUSY', xlabel='$\mu$s/10')
+                st.pyplot(fig)
 
     # The app
     st.logo('../resources/assets/GAPSLOGO_2023.png', size='large')
-    pg = st.navigation([st.Page(page_run           , title="Load runs & setup"), 
+    pg = st.navigation([st.Page(page_run           , title="Data source & setup"), 
                         st.Page(page_event_view    , title="Event view"),
                         st.Page(page_reco          , title="Reconstruction"),
                         st.Page(page_nhit          , title="NHit distributions"),

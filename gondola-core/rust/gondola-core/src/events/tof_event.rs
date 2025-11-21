@@ -1308,7 +1308,7 @@ impl TofEvent {
     match Self::strip_packed_rbevents_for_pv3(pack) {
       Err(err) => {
         let err_msg = format!("Unable to strip packed rbevents{}", err);
-        return Err(PyValueError::new_err(err_mesg));
+        return Err(PyValueError::new_err(err_msg));
       } 
       Ok(_) => {
         return Ok(());

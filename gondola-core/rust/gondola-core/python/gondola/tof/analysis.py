@@ -175,6 +175,18 @@ class TofAnalysis:
         return all_paddle_plots, paddle_caches
 
     @property
+    def occupancy(self):
+        return self._analysis.occupancy 
+
+    @property
+    def occupancy_t(self):
+        return self._analysis.occupancy_t
+
+    @property 
+    def n_events(self):
+        return self._analysis.n_events
+
+    @property
     def rate(self):
         if self.run_time == 0:
             return 0
@@ -195,7 +207,7 @@ class TofAnalysis:
         """
         #print (f'LAST EV TIME  {self.last_ev_time}')
         #print (f'FIRST EV TIME {self.first_ev_time}')
-        return 1e-5*(self.last_ev_time - self.first_ev_time)
+        return 1e-5*(self._analysis.last_event_t - self._analysis.first_event_t)
 
     def reinit(self, nbins = 90):
         """
@@ -249,6 +261,8 @@ class TofAnalysis:
           active                   : if True, this analysis will actually "do something"
                                      and acquire events
         """
+        self._analysis       = _gc.tof.TofAnalysis() 
+
         # process kwargs
         self.skip_mangled    = skip_mangled
         self.skip_timeout    = skip_timeout
@@ -258,7 +272,7 @@ class TofAnalysis:
         self.cuts            = cuts
         self.active          = active 
         self.offsets         = None
-        self.event_stati     = dict() 
+        #self.event_stati     = dict() 
         if self.use_offsets:
             self.offsets = dict()
             offsets = json.load(open('offsets.json'))
@@ -269,12 +283,12 @@ class TofAnalysis:
                     self.offsets[k_int] = offsets[k]
         
         self.define_bins(nbins = self.nbins)
-        self.first_ev_time = np.inf
-        self.last_ev_time  = 0
+        #self.first_ev_time = np.inf
+        #self.last_ev_time  = 0
         self.finished      = False
         self.n_mangled     = 0
         self.n_timed_out   = 0
-        self.n_events      = 0
+        #self.n_events      = 0
         pp_hist, pp_cache  = self._paddle_plots()
         self.paddle_plots  = pp_hist
         self.paddle_cache  = pp_cache
@@ -291,12 +305,12 @@ class TofAnalysis:
         self.hg_mapping    = _gc.db.get_dsi_j_ch_pid_map()
         # hit histogram
         self.nhit          = 0
-        self.no_hitmiss    = 0
-        self.one_hitmiss   = 0
-        self.two_hitmiss   = 0
-        self.extra_hits    = 0
-        self.occupancy     = {k : 0 for k in range(1,161)}
-        self.occupancy_t   = {k : 0 for k in range(1,161)}
+        #self.no_hitmiss    = 0
+        #self.one_hitmiss   = 0
+        #self.two_hitmiss   = 0
+        #self.extra_hits    = 0
+        #self.occupancy     = {k : 0 for k in range(1,161)}
+        #self.occupancy_t   = {k : 0 for k in range(1,161)}
         # beta analysis
         # select specific paddles for beta 
         self.pid_inner     = pid_inner
@@ -315,7 +329,22 @@ class TofAnalysis:
         self.c_rblink           = []
         self.c_miss_hit         = []
         self.c_nc_pid           = []
-   
+  
+    @property
+    def no_hitmiss(self):
+        return self._analysis.no_hitmiss
+    
+    @property
+    def one_hitmiss(self):
+        return self._analysis.one_hitmiss
+    
+    @property
+    def two_hitmiss(self):
+        return self._analysis.two_hitmiss
+    
+    @property
+    def extra_hits(self):
+        return self._analysis.extra_hits
 
     @property
     def n_mangled_frac(self):
@@ -331,70 +360,73 @@ class TofAnalysis:
         else:
             return 0
 
+    @property
+    def event_stati(self):
+        return self._analysis.event_stati
+
+
     def _is_compatible(self, other):
-        if self.beta_analysis != other.beta_analysis:
+        if self._analysis.skip_mangled  != other._analysis.skip_mangled:
+            return False 
+        if self._analysis.skip_timeout  != other._analysis.skip_timeout:
             return False
-        if self.pid_inner != other.pid_inner:
+        if self._analysis.beta_analysis != other._analysis.beta_analysis:
             return False
-        if self.pid_outer != other.pid_outer:
+        if self._analysis.pid_inner != other._analysis.pid_inner:
             return False
-        if not self.cuts.is_compatible(other.cuts):
+        if self._analysis.pid_outer != other._analysis.pid_outer:
+            return False
+        if not self._analysis.cuts.is_compatible(other._analysis.cuts):
             return False
         return True
 
     def __iadd__(self, other):
         if not self._is_compatible(other):
             raise ValueError("Analysis are not compatible! Both must have the same setup!")
-        if other.first_ev_time < self.first_ev_time:
-            self.first_ev_time = other.first_ev_time
-        if other.last_ev_time > self.last_ev_time:
-            self.last_ev_time = other.last_ev_time
-        self.cuts          += other.cuts
-        self.skip_mangled  += other.skip_mangled
-        self.skip_timeout  += other.skip_timeout
-        self.n_mangled     += other.n_mangled 
-        self.n_timed_out   += other.n_timed_out 
-        self.n_events      += other.n_events
+        #return other
+        if other._analysis.first_event_t < self._analysis.first_event_t:
+            self._analysis.first_event_t = other._analysis.first_event_t
+        if other._analysis.last_event_t > self._analysis.last_event_t:
+            self._analysis.last_event_t = other._analysis.last_event_t
+        self._analysis.cuts          += other._analysis.cuts
+        #self._analysis.skip_mangled  += other._analysis.skip_mangled
+        #self._analysis.skip_timeout  += other._analysis.skip_timeout
+        self._analysis.n_mangled     += other._analysis.n_mangled 
+        self._analysis.n_timed_out   += other._analysis.n_timed_out 
+        self._analysis.n_events      += other._analysis.n_events
         for k in self.nhit_plots:
             self.nhit_plots[k] += other.nhit_plots[k]
         for k in self.tmg_plots:
             self.tmg_plots[k] += other.tmg_plots[k]
-            self.tmg_cache[k].extend(other.tmg_cache[k])
+        
+        #    self.tmg_cache[k].extend(other.tmg_cache[k])
         for k in self.edep_plots:
             self.edep_plots[k] += other.edep_plots[k]
-            self.edep_cache[k].extend(other.edep_cache[k])
+        #    self.edep_cache[k].extend(other.edep_cache[k])
 
-        # hit histogram
-        self.nhit          += other.nhit 
-        self.no_hitmiss    += other.no_hitmiss
-        self.one_hitmiss   += other.one_hitmiss
-        self.two_hitmiss   += other.two_hitmiss
-        self.extra_hits    += other.extra_hits
-        for pid in range(1,161):
-            self.occupancy[pid]   += other.occupancy[pid] 
-            self.occupancy_t[pid] += other.occupancy_t[pid] 
-        # nhit plots
-        self.c_hit             .extend(other.c_hit) 
-        self.c_thit            .extend(other.c_thit) 
-        self.c_rblink          .extend(other.c_rblink) 
-        self.c_miss_hit        .extend(other.c_miss_hit) 
-        self.c_nc_pid          .extend(other.c_nc_pid)
-        
+        ## hit histogram
+        self._analysis.nhit          += other._analysis.nhit 
+        self._analysis.no_hitmiss    += other._analysis.no_hitmiss
+        self._analysis.one_hitmiss   += other._analysis.one_hitmiss
+        self._analysis.two_hitmiss   += other._analysis.two_hitmiss
+        self._analysis.extra_hits    += other._analysis.extra_hits
+        self._analysis.add_other_occupancy(other._analysis.occupancy)
+        self._analysis.add_other_occupancy_t(other._analysis.occupancy_t)
+        self._analysis.add_other_hit_cache(other._analysis)
+        self._analysis.add_other_event_stati(other._analysis)
+        self._analysis.add_other_cache(other._analysis)
         for pid in range(1,161):
             for k in self.paddle_plots[pid]:
                 self.paddle_plots[pid][k] += other.paddle_plots[pid][k]
-                self.paddle_cache[pid][k].extend(other.paddle_cache[pid][k])
-        for k in other.event_stati:
-            if not k in self.event_stati:
-                self.event_stati[k] = other.event_stati[k] 
-            else:
-                self.event_stati[k] += other.event_stati[k]
+                #self.paddle_cache[pid][k].extend(other.paddle_cache[pid][k])
+        self._analysis.add_other_paddle_cache(other._analysis);
         return self
 
     def __add__(self, other):
         new_analysis = TofAnalysis(skip_mangled = self.skip_mangled,
                                    skip_timeout = self.skip_timeout,
                                    beta_analysis= self.beta_analysis)
+        new_analysis._analysis = self._analysis
         new_analysis += self
         new_analysis += other
         return new_analysis
@@ -403,39 +435,68 @@ class TofAnalysis:
         """
         Fill the histograms with the cached values
         """
-        if len(self.c_hit) >= self.event_cache_size: 
-            self.nhit_plots['hit'     ].fill(np.array(self.c_hit)) 
-            self.nhit_plots['thit'    ].fill(np.array(self.c_thit)) 
-            self.nhit_plots['rblink'  ].fill(np.array(self.c_rblink)) 
-            self.nhit_plots['miss_hit'].fill(np.array(self.c_miss_hit)) 
-            self.nhit_plots['nc_pdls'] .fill(np.array(self.c_nc_pid))
-            # nhit  
-            self.c_hit     .clear()
-            self.c_thit    .clear()
-            self.c_rblink  .clear()
-            self.c_miss_hit.clear()
-            self.c_nc_pid  .clear()
-            if self.beta_analysis:
-                c_dist_vs_beta  = np.array([ k for k in zip(self.tmg_cache['dist'], self.tmg_cache['beta'])])
-                c_dist_vs_tdiff = np.array([ k for k in zip(self.tmg_cache['dist'], self.tmg_cache['t_diff'])])
-                c_beta_vs_theta = np.array([ k for k in zip(self.tmg_cache['beta'], self.tmg_cache['cos_theta'])])
-                self.tmg_plots['dist_vs_beta'].fill(c_dist_vs_beta)
-                self.tmg_plots['dist_vs_tdiff'].fill(c_dist_vs_tdiff)
-                self.tmg_plots['beta_vs_theta'].fill(c_beta_vs_theta)
+        if self._analysis.hit_cache_len >= self.event_cache_size: 
+            # hit statistics
+            self.nhit_plots['hit'     ].fill(self._analysis.c_hit) 
+            self.nhit_plots['thit'    ].fill(self._analysis.c_thit) 
+            self.nhit_plots['rblink'  ].fill(self._analysis.c_rblink) 
+            self.nhit_plots['miss_hit'].fill(self._analysis.c_miss_hit) 
+            self.nhit_plots['nc_pdls'] .fill(self._analysis.c_nc_pid)
+            self._analysis.clear_hit_stats()
+            print (f'beta analysis {self._analysis.beta_analysis}')
+            if self._analysis.beta_analysis:
+            #    c_dist_vs_beta  = np.array([ k for k in zip(self.tmg_cache['dist'], self.tmg_cache['beta'])])
+            #    c_dist_vs_tdiff = np.array([ k for k in zip(self.tmg_cache['dist'], self.tmg_cache['t_diff'])])
+            #    c_beta_vs_theta = np.array([ k for k in zip(self.tmg_cache['beta'], self.tmg_cache['cos_theta'])])
+            #    self.tmg_plots['dist_vs_beta'].fill(c_dist_vs_beta)
+            #    self.tmg_plots['dist_vs_tdiff'].fill(c_dist_vs_tdiff)
+            #    self.tmg_plots['beta_vs_theta'].fill(c_beta_vs_theta)
                 for k in self.tmg_plots:
+                    #print (k)
                     if k in ['dist_vs_beta', 'dist_vs_tdiff', 'beta_vs_theta']:
                         continue
-                    self.tmg_plots[k].fill(np.array(self.tmg_cache[k]))
-                    self.tmg_cache[k].clear()
+                    if k in ['pid_inner','pid_outer']:
+                        self.tmg_plots[k].fill(self._analysis.cache.get_u8_data(k))
+                        print (self._analysis.cache.get_u8_data('pid_inner'))
+                    else:
+                        self.tmg_plots[k].fill(self._analysis.cache.get_f32_data(k))
                 for k in self.edep_plots:
-                    self.edep_plots[k].fill(np.array(self.edep_cache[k]))
-                    self.edep_cache[k].clear()
+                    if k != "edep":
+                        pnl = int(k[8:])
+                        self.edep_plots[k].fill(self._analysis.cache.get_f32_data_panel("edep", pnl))
+                        continue
+                    self.edep_plots[k].fill(self._analysis.cache.get_f32_data(k))
+                self._analysis.cache.clear()
 
-        for paddle_id in range(1,161):
-            for k in self.paddle_plots[paddle_id]:
-                if len(self.paddle_cache[paddle_id][k]) >= self.hit_cache_size:
-                    self.paddle_plots[paddle_id][k].fill(np.array(self.paddle_cache[paddle_id][k]))
-                    self.paddle_cache[paddle_id][k].clear()
+            for paddle_id in range(1,161):
+                for k in self.paddle_plots[paddle_id]:
+                    #print (f'getting {paddle_id} {k}')
+                    if k == 'charge2d':#,'amp2d','pos_edep']:
+                        datax = self._analysis.paddle_cache.get_f32_data('charge_a', paddle_id)
+                        datay = self._analysis.paddle_cache.get_f32_data('charge_b', paddle_id)
+                        data  = np.array([j for j in zip(datax,datay)])
+                        #print (data)
+                        self.paddle_plots[paddle_id]['charge2d'].fill((datax,datay))
+                        continue
+                    if k == 'amp2d':
+                        datax = self._analysis.paddle_cache.get_f32_data('amp_a', paddle_id)
+                        datay = self._analysis.paddle_cache.get_f32_data('amp_b', paddle_id)
+                        #data  = np.array([j for j in zip(datax,datay)])
+                        #print (data)
+                        self.paddle_plots[paddle_id]['amp2d'].fill((datax,datay))
+                        continue
+                    if k == 'pos_edep':
+                        datax = self._analysis.paddle_cache.get_f32_data('x0', paddle_id)
+                        datay = self._analysis.paddle_cache.get_f32_data('edep', paddle_id)
+                        #data  = np.array([j for j in zip(datax,datay)])
+                        #print (data)
+                        self.paddle_plots[paddle_id]['pos_edep'].fill((datax,datay))
+                        continue
+                    #if self._analysis.paddle_cache.cache_size(paddle_id) >= self.hit_cache_size:
+                    #if len(self.paddle_cache[paddle_id][k]) >= self.hit_cache_size:
+                    self.paddle_plots[paddle_id][k].fill(self._analysis.paddle_cache.get_f32_data(k, paddle_id))
+                    self._analysis.paddle_cache.clear(k, paddle_id)
+                    #print (f'filling cache for {paddle_id} {k}')
 
     def finish(self):
         """
@@ -463,179 +524,182 @@ class TofAnalysis:
         if not self.active:
             return
 
+
         if self.finished:
             print ("WARN: Analysis has been finished already. Not able to add more events.")
             return
         
-        if self.first_ev_time == np.inf:
-            self.first_ev_time = ev.timestamp48
-        self.last_ev_time = ev.timestamp48
-        try:
-            self.event_stati[ev.status]
-            self.event_stati[ev.status] += 1
-        except KeyError:
-            self.event_stati[ev.event_status] = 1 
-        except Exception as e:
-            print (e)
-            raise
-        if ev.status == _gc.events.EventStatus.AnyDataMangling:
-            #logger.debug(f'Found mangled event with id {ev.event_id}')
-            self.n_mangled += 1
-            if self.skip_mangled:
-                return
-        if ev.status == _gc.events.EventStatus.EventTimeOut:
-            #logger.debug(f'Found timed out event with id {ev.event_id}')
-            self.n_timed_out += 1
-            if self.skip_timeout:
-                return
-        # FIXME - speed these up
-        nhit_ev        = 0
-        nhit_t_ev      = 0
-        self.n_events += 1
-        # at the very first, add the timings if desired
-        if self.use_offsets:
-            ev.set_timing_offsets(self.offsets)
-            #print (ev)
-        ev.normalize_hit_times()
-
-        # before cutting, calculate missing hits
-        # the problem for removing hits right now
-        # is the fact that if we do a hit cleaning,
-        # it will be only for the HG hits and not 
-        # the LG hits, so if we do a missing hit calculation 
-        # after the hit cleaning, we will artificially 
-        # increase the number of missing hits
-        # FIXME - this is currently a bit inconsistent.
-        missing        = [int(k) for k in ev.get_missing_paddles_hg(self.hg_mapping)]
-        self.c_miss_hit.extend(missing)
-
-        # since we might do hit cleaning, for now 
-        # let's explicitly copy the event, see also
-        # issue #82
-        if not self.cuts.void:
-            ev_for_cuts = ev.copy()
-            if not self.cuts.accept(ev_for_cuts):
-                return
-        # if desired, apply the cleanings
-        if self.cuts.only_causal_hits:
-            rm_pids = ev.remove_non_causal_hits()
-            self.c_nc_pid.extend(rm_pids)
-            #hits_rmvd_csl  = len(rm_pids)
-        if self.cuts.ls_cleaning_t_err != np.inf:
-            rm_pids = ev.lightspeed_cleaning(self.cuts.ls_cleaning_t_err)
-            #hits_rmvd_ls   = len(rm_pids)
-
-        for h in ev.trigger_hits:
-            #pid = find_paddle(h, self.paddles.values())
-            try:
-                pid = self.hg_mapping[h[0]][h[1]][h[2][0]] 
-            except KeyError:
-                pid = self.hg_mapping[h[0]][h[1]][h[2][1]] 
-
-            #self.occupancy_t[pid] += 1
-            nhit_t_ev += 1
-        if self.beta_analysis:
-            outer_h = []
-            inner_h = []
-        for h in ev.hits:
-            # for gondola, the hits should have paddle information 
-            # already
-            pdl = self.paddles[h.paddle_id]
-            #h.set_paddle(10*pdl.length, pdl.cable_len, pdl.coax_cable_time, pdl.harting_cable_time)
-            if pdl.panel_id < 22:
-                edep_key = f'edep_pnl{pdl.panel_id}'
-                self.edep_cache[edep_key].append(h.edep)
-                self.edep_cache['edep'].append(h.edep)
-            if h.edep > 0:
-                self.occupancy[h.paddle_id] += 1
-            nhit_ev += 1
-            if self.beta_analysis:
-                if self.pid_outer is None:
-                    if h.paddle_id > 60:
-                        outer_h.append(h)
-                else:
-                    if h.paddle_id == self.pid_outer:
-                        outer_h.append(h)
-                if self.pid_inner is None:
-                    if h.paddle_id < 61:
-                        inner_h.append(h)
-                else:
-                    if h.paddle_id == self.pid_inner:
-                        inner_h.append(h)
-            # fill the caches
-            #if h.charge_a < 0 or h.charge_b < 0:
-            #    print (h)
-            #    raise ValueError
-            self.paddle_cache[h.paddle_id]['charge2d'].append([h.charge_a, h.charge_b])
-            self.paddle_cache[h.paddle_id]['amp2d']   .append([h.peak_a, h.peak_b])
-            self.paddle_cache[h.paddle_id]['amp_a']   .append(h.peak_a)
-            self.paddle_cache[h.paddle_id]['amp_b']   .append(h.peak_b)
-            self.paddle_cache[h.paddle_id]['time_a']  .append(h.time_a)
-            self.paddle_cache[h.paddle_id]['time_b']  .append(h.time_b)
-            self.paddle_cache[h.paddle_id]['charge_a'].append(h.charge_a)
-            self.paddle_cache[h.paddle_id]['charge_b'].append(h.charge_b)
-            self.paddle_cache[h.paddle_id]['bl_a']    .append(h.baseline_a)
-            self.paddle_cache[h.paddle_id]['bl_b']    .append(h.baseline_b)
-            self.paddle_cache[h.paddle_id]['bl_a_rms'].append(h.baseline_a_rms)
-            self.paddle_cache[h.paddle_id]['bl_b_rms'].append(h.baseline_b_rms)
-            self.paddle_cache[h.paddle_id]['x0']      .append(h.pos/h.paddle_len)
-            self.paddle_cache[h.paddle_id]['t0']      .append(h.event_t0)
-            self.paddle_cache[h.paddle_id]['edep']    .append(h.edep)
-            self.paddle_cache[h.paddle_id]['pos_edep'].append([h.pos/h.paddle_len, h.edep])
+        self._analysis.add_event(ev)
         
-        # hit counting 
-        n_rblink_ev    = len(ev.rb_link_ids)
-        self.nhit     += nhit_ev
-        if nhit_t_ev == nhit_ev:
-            self.no_hitmiss += 1 
-        elif (nhit_t_ev - nhit_ev) == 1:
-            self.one_hitmiss += 1
-        elif (nhit_t_ev - nhit_ev) > 1:
-            self.two_hitmiss += 1
-        elif (nhit_ev > nhit_t_ev):
-            self.extra_hits += 1
-        
-        self.c_hit.append(nhit_ev)
-        self.c_thit.append(nhit_t_ev)
-        self.c_rblink.append(n_rblink_ev)
+        #if self.first_ev_time == np.inf:
+        #    self.first_ev_time = ev.timestamp48
+        #self.last_ev_time = ev.timestamp48
+        #try:
+        #    self.event_stati[ev.status]
+        #    self.event_stati[ev.status] += 1
+        #except KeyError:
+        #    self.event_stati[ev.event_status] = 1 
+        #except Exception as e:
+        #    print (e)
+        #    raise
+        #if ev.status == _gc.events.EventStatus.AnyDataMangling:
+        #    #logger.debug(f'Found mangled event with id {ev.event_id}')
+        #    self.n_mangled += 1
+        #    if self.skip_mangled:
+        #        return
+        #if ev.status == _gc.events.EventStatus.EventTimeOut:
+        #    #logger.debug(f'Found timed out event with id {ev.event_id}')
+        #    self.n_timed_out += 1
+        #    if self.skip_timeout:
+        #        return
+        ## FIXME - speed these up
+        #nhit_ev        = 0
+        #nhit_t_ev      = 0
+        #self.n_events += 1
+        ## at the very first, add the timings if desired
+        #if self.use_offsets:
+        #    ev.set_timing_offsets(self.offsets)
+        #    #print (ev)
+        #ev.normalize_hit_times()
 
-        if not self.beta_analysis:
-            return
-        
-        outer_h = sorted(outer_h, key=lambda x: x.event_t0)
-        inner_h = sorted(inner_h, key=lambda x: x.event_t0)
-        if inner_h and outer_h:
-            #first_hit = sorted([h for h in ev.hits], key=lambda x: x.phase_delay)
-            #last_hit  = first_hit[-1].phase_delay
-            #first_hit = first_hit[0].phase_delay
-            #print (inner_h, outer_h)
-            diff_h  = inner_h[0].event_t0 - outer_h[0].event_t0 
-            dist = inner_h[0].distance(outer_h[0])/1000
-            cos_theta = abs(outer_h[0].z - inner_h[0].z)/(1000*dist)  
-            if diff_h == 0:
-                beta = 0
-            else:
-                beta = dist/(diff_h*1e-9)/299792458
-            self.tmg_cache['dist']   .append(dist)
-            self.tmg_cache['x_outer'].append(outer_h[0].x)
-            self.tmg_cache['y_outer'].append(outer_h[0].y)
-            self.tmg_cache['z_outer'].append(outer_h[0].z)
-            self.tmg_cache['x_inner'].append(inner_h[0].x)
-            self.tmg_cache['y_inner'].append(inner_h[0].y)
-            self.tmg_cache['z_inner'].append(inner_h[0].z)
-            self.tmg_cache['pid_inner'].append(inner_h[0].paddle_id)
-            self.tmg_cache['pid_outer'].append(outer_h[0].paddle_id)
-            self.tmg_cache['cos_theta'].append(cos_theta)
-            self.tmg_cache['cos2_theta'].append(cos_theta*cos_theta)
-            if beta < 0:
-                beta = -1*beta
-            self.tmg_cache['beta']    .append(beta)
-            self.tmg_cache['t_outer'] .append(outer_h[0].event_t0)
-            self.tmg_cache['t_inner'] .append(inner_h[0].event_t0)  
-            self.tmg_cache['t_diff']  .append(inner_h[0].event_t0 - outer_h[0].event_t0)  
-            self.tmg_cache['ph_delay'].append(inner_h[0].phase_delay - outer_h[0].phase_delay)
+        ## before cutting, calculate missing hits
+        ## the problem for removing hits right now
+        ## is the fact that if we do a hit cleaning,
+        ## it will be only for the HG hits and not 
+        ## the LG hits, so if we do a missing hit calculation 
+        ## after the hit cleaning, we will artificially 
+        ## increase the number of missing hits
+        ## FIXME - this is currently a bit inconsistent.
+        #missing        = [int(k) for k in ev.get_missing_paddles_hg(self.hg_mapping)]
+        #self.c_miss_hit.extend(missing)
+
+        ## since we might do hit cleaning, for now 
+        ## let's explicitly copy the event, see also
+        ## issue #82
+        #if not self.cuts.void:
+        #    ev_for_cuts = ev.copy()
+        #    if not self.cuts.accept(ev_for_cuts):
+        #        return
+        ## if desired, apply the cleanings
+        #if self.cuts.only_causal_hits:
+        #    rm_pids = ev.remove_non_causal_hits()
+        #    self.c_nc_pid.extend(rm_pids)
+        #    #hits_rmvd_csl  = len(rm_pids)
+        #if self.cuts.ls_cleaning_t_err != np.inf:
+        #    rm_pids = ev.lightspeed_cleaning(self.cuts.ls_cleaning_t_err)
+        #    #hits_rmvd_ls   = len(rm_pids)
+
+        #for h in ev.trigger_hits:
+        #    #pid = find_paddle(h, self.paddles.values())
+        #    try:
+        #        pid = self.hg_mapping[h[0]][h[1]][h[2][0]] 
+        #    except KeyError:
+        #        pid = self.hg_mapping[h[0]][h[1]][h[2][1]] 
+
+        #    #self.occupancy_t[pid] += 1
+        #    nhit_t_ev += 1
+        #if self.beta_analysis:
+        #    outer_h = []
+        #    inner_h = []
+        #for h in ev.hits:
+        #    # for gondola, the hits should have paddle information 
+        #    # already
+        #    pdl = self.paddles[h.paddle_id]
+        #    #h.set_paddle(10*pdl.length, pdl.cable_len, pdl.coax_cable_time, pdl.harting_cable_time)
+        #    if pdl.panel_id < 22:
+        #        edep_key = f'edep_pnl{pdl.panel_id}'
+        #        self.edep_cache[edep_key].append(h.edep)
+        #        self.edep_cache['edep'].append(h.edep)
+        #    if h.edep > 0:
+        #        self.occupancy[h.paddle_id] += 1
+        #    nhit_ev += 1
+        #    if self.beta_analysis:
+        #        if self.pid_outer is None:
+        #            if h.paddle_id > 60:
+        #                outer_h.append(h)
+        #        else:
+        #            if h.paddle_id == self.pid_outer:
+        #                outer_h.append(h)
+        #        if self.pid_inner is None:
+        #            if h.paddle_id < 61:
+        #                inner_h.append(h)
+        #        else:
+        #            if h.paddle_id == self.pid_inner:
+        #                inner_h.append(h)
+        #    # fill the caches
+        #    #if h.charge_a < 0 or h.charge_b < 0:
+        #    #    print (h)
+        #    #    raise ValueError
+        #    self.paddle_cache[h.paddle_id]['charge2d'].append([h.charge_a, h.charge_b])
+        #    self.paddle_cache[h.paddle_id]['amp2d']   .append([h.peak_a, h.peak_b])
+        #    self.paddle_cache[h.paddle_id]['amp_a']   .append(h.peak_a)
+        #    self.paddle_cache[h.paddle_id]['amp_b']   .append(h.peak_b)
+        #    self.paddle_cache[h.paddle_id]['time_a']  .append(h.time_a)
+        #    self.paddle_cache[h.paddle_id]['time_b']  .append(h.time_b)
+        #    self.paddle_cache[h.paddle_id]['charge_a'].append(h.charge_a)
+        #    self.paddle_cache[h.paddle_id]['charge_b'].append(h.charge_b)
+        #    self.paddle_cache[h.paddle_id]['bl_a']    .append(h.baseline_a)
+        #    self.paddle_cache[h.paddle_id]['bl_b']    .append(h.baseline_b)
+        #    self.paddle_cache[h.paddle_id]['bl_a_rms'].append(h.baseline_a_rms)
+        #    self.paddle_cache[h.paddle_id]['bl_b_rms'].append(h.baseline_b_rms)
+        #    self.paddle_cache[h.paddle_id]['x0']      .append(h.pos/h.paddle_len)
+        #    self.paddle_cache[h.paddle_id]['t0']      .append(h.event_t0)
+        #    self.paddle_cache[h.paddle_id]['edep']    .append(h.edep)
+        #    self.paddle_cache[h.paddle_id]['pos_edep'].append([h.pos/h.paddle_len, h.edep])
+        #
+        ## hit counting 
+        #n_rblink_ev    = len(ev.rb_link_ids)
+        #self.nhit     += nhit_ev
+        #if nhit_t_ev == nhit_ev:
+        #    self.no_hitmiss += 1 
+        #elif (nhit_t_ev - nhit_ev) == 1:
+        #    self.one_hitmiss += 1
+        #elif (nhit_t_ev - nhit_ev) > 1:
+        #    self.two_hitmiss += 1
+        #elif (nhit_ev > nhit_t_ev):
+        #    self.extra_hits += 1
+        #
+        #self.c_hit.append(nhit_ev)
+        #self.c_thit.append(nhit_t_ev)
+        #self.c_rblink.append(n_rblink_ev)
+
+        #if not self.beta_analysis:
+        #    return
+        #
+        #outer_h = sorted(outer_h, key=lambda x: x.event_t0)
+        #inner_h = sorted(inner_h, key=lambda x: x.event_t0)
+        #if inner_h and outer_h:
+        #    #first_hit = sorted([h for h in ev.hits], key=lambda x: x.phase_delay)
+        #    #last_hit  = first_hit[-1].phase_delay
+        #    #first_hit = first_hit[0].phase_delay
+        #    #print (inner_h, outer_h)
+        #    diff_h  = inner_h[0].event_t0 - outer_h[0].event_t0 
+        #    dist = inner_h[0].distance(outer_h[0])/1000
+        #    cos_theta = abs(outer_h[0].z - inner_h[0].z)/(1000*dist)  
+        #    if diff_h == 0:
+        #        beta = 0
+        #    else:
+        #        beta = dist/(diff_h*1e-9)/299792458
+        #    self.tmg_cache['dist']   .append(dist)
+        #    self.tmg_cache['x_outer'].append(outer_h[0].x)
+        #    self.tmg_cache['y_outer'].append(outer_h[0].y)
+        #    self.tmg_cache['z_outer'].append(outer_h[0].z)
+        #    self.tmg_cache['x_inner'].append(inner_h[0].x)
+        #    self.tmg_cache['y_inner'].append(inner_h[0].y)
+        #    self.tmg_cache['z_inner'].append(inner_h[0].z)
+        #    self.tmg_cache['pid_inner'].append(inner_h[0].paddle_id)
+        #    self.tmg_cache['pid_outer'].append(outer_h[0].paddle_id)
+        #    self.tmg_cache['cos_theta'].append(cos_theta)
+        #    self.tmg_cache['cos2_theta'].append(cos_theta*cos_theta)
+        #    if beta < 0:
+        #        beta = -1*beta
+        #    self.tmg_cache['beta']    .append(beta)
+        #    self.tmg_cache['t_outer'] .append(outer_h[0].event_t0)
+        #    self.tmg_cache['t_inner'] .append(inner_h[0].event_t0)  
+        #    self.tmg_cache['t_diff']  .append(inner_h[0].event_t0 - outer_h[0].event_t0)  
+        #    self.tmg_cache['ph_delay'].append(inner_h[0].phase_delay - outer_h[0].phase_delay)
  
-        # fill is the massive bottleneck here, thus let's try to reduce the amount of calls 
+        ## fill is the massive bottleneck here, thus let's try to reduce the amount of calls 
         self.fill_histograms()    
         return 
 

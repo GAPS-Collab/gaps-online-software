@@ -37,7 +37,9 @@ pub use master_trigger::registers::*;
 pub mod signal_handler;
 #[cfg(feature="tof-liftof")]
 pub use signal_handler::*;
+#[cfg(feature="pybindings")]
 pub mod analysis;
+#[cfg(feature="pybindings")]
 pub use analysis::*;
 pub mod panic;
 pub use panic::*;

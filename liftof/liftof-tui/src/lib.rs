@@ -156,6 +156,7 @@ fn packet_sorter(packet_type : &TofPacketType,
         TofPacketType::RBCalibrationFlightV  => pack_key = "RBCalibrationFlightV",
         TofPacketType::RBCalibrationFlightT  => pack_key = "RBCalibrationFlightT",
         TofPacketType::BfswAckPacket         => pack_key = "BfswAckPacket",
+        TofPacketType::PanicPacket           => pack_key = "PanicPacket",
         TofPacketType::MultiPacket           => pack_key = "MultiPacket",
       }
       if pm.get(pack_key).is_some() {
