@@ -77,7 +77,11 @@ impl MoniData for DataSinkHB {
   }
   
   fn get_timestamp(&self) -> u64 {
-    self.timestamp 
+    if self.timestamp == 0 {
+      return self.met;
+    } else {
+      return self.timestamp;
+    }
   }
 
   fn set_timestamp(&mut self, ts : u64) {
