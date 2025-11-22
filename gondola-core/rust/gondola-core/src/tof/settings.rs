@@ -799,6 +799,7 @@ pub struct TofEventBuilderSettings {
   pub greediness          : u8,
   pub wait_nrb            : u8,
   pub hb_send_interval    : u16,
+  pub ingore_mtb_link_ids : Option<Vec<u8>,
   /// Allows to restrict saving the event to disk
   /// based on the interesting event parameters
   /// (These are minimum values)
@@ -824,6 +825,7 @@ impl TofEventBuilderSettings {
       wait_nrb              : 40,
       hb_send_interval      : 30,
       only_save_interesting : false,
+      ignore_mtb_link_ids   : None,
       thr_n_hits_umb        : 0,
       thr_n_hits_cbe        : 0,
       thr_n_hits_cor        : 0,
