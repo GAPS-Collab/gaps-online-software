@@ -23,7 +23,7 @@
 \DoxyCodeLine{00034\ \textcolor{preprocessor}{\#endif}}
 \DoxyCodeLine{00035\ }
 \DoxyCodeLine{00036\ \textcolor{keyword}{namespace\ }r\ =\ result;}
-\DoxyCodeLine{00037\ \textcolor{comment}{//namespace\ g\ =\ Gaps;}}
+\DoxyCodeLine{00037\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacegondola}{gon}}\ =\ \mbox{\hyperlink{namespacegondola}{gondola}};}
 \DoxyCodeLine{00038\ }
 \DoxyCodeLine{00039\ \textcolor{keyword}{class\ }\mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565ab31d9b68634b6ea4105b346f0a194f25}{RBCalibration}};}
 \DoxyCodeLine{00040\ }
@@ -408,7 +408,7 @@
 \DoxyCodeLine{00576\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structTofEvent_a1e939a5161bf8c0ed41f1127fc6042d2}{get\_n\_rbmissinghits}}(\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{mask}})\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}};}
 \DoxyCodeLine{00577\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ get\_n\_rbevents(\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{mask}})\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}};}
 \DoxyCodeLine{00579\ \ \ \textcolor{keyword}{auto}\ get\_hits()\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}<\mbox{\hyperlink{structTofHit}{TofHit}}>;}
-\DoxyCodeLine{00582\ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}}\ normalize\_hit\_times()\ -\/>\ \textcolor{keywordtype}{void};}
+\DoxyCodeLine{00582\ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}}\ normalize\_hit\_times(\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ \mbox{\hyperlink{namespacegondola}{gon}}::TofPaddleTimingConstantMap\ \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{paddle\_offsets}}\ =\ \mbox{\hyperlink{namespacegondola}{gon}}::TofPaddleTimingConstantMap())\ -\/>\ \textcolor{keywordtype}{void};}
 \DoxyCodeLine{00583\ }
 \DoxyCodeLine{00585\ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}}\ to\_string()\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ -\/>\ std::\textcolor{keywordtype}{string};}
 \DoxyCodeLine{00586\ }
@@ -489,7 +489,7 @@
 \DoxyCodeLine{00682\ \ \ }
 \DoxyCodeLine{00683\ \textcolor{preprocessor}{\ \ \#ifdef\ BUILD\_CXX\_DB}}
 \DoxyCodeLine{00686\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{set\_paddlemap}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespaceGaps_a84fb383b1df4955afc6ea35a9b15ff44}{Gaps::TofPaddleMap}}\&)\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}};}
-\DoxyCodeLine{00689\ \ \ \textcolor{keyword}{auto}\ normalize\_hit\_times()\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}};}
+\DoxyCodeLine{00689\ \ \ \textcolor{keyword}{auto}\ normalize\_hit\_times(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacegondola_a1c2c2768738a98e4ab3c0aa6d31d88e0}{gon::TofPaddleTimingConstantMap}}\ \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{paddle\_offsets}}\ =\ \mbox{\hyperlink{namespacegondola_a1c2c2768738a98e4ab3c0aa6d31d88e0}{gon::TofPaddleTimingConstantMap}}())\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}};}
 \DoxyCodeLine{00690\ \textcolor{preprocessor}{\ \ \#endif}}
 \DoxyCodeLine{00691\ }
 \DoxyCodeLine{00692\ \ \ \textcolor{comment}{//\ combined\ timestamp}}

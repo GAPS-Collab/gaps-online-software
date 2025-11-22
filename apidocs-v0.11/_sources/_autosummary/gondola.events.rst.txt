@@ -1,0 +1,18 @@
+gondola.events
+==============
+
+.. automodule:: gondola.events
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      RBEvent
+      RBEventHeader
+      RBWaveform
+      TelemetryEvent
+      TofEvent
+      TofHit
+      TrackerHit
+   

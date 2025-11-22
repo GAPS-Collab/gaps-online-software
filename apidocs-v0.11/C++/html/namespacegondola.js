@@ -5,15 +5,18 @@ var namespacegondola =
     [ "CRReader", "structgondola_1_1CRReader.html", "structgondola_1_1CRReader" ],
     [ "RBCalibration", "structgondola_1_1RBCalibration.html", "structgondola_1_1RBCalibration" ],
     [ "TelemetryPacketReader", "structgondola_1_1TelemetryPacketReader.html", "structgondola_1_1TelemetryPacketReader" ],
+    [ "TofPaddleTimingConstant", "structgondola_1_1TofPaddleTimingConstant.html", "structgondola_1_1TofPaddleTimingConstant" ],
     [ "RBCalibrationMap", "namespacegondola.html#ae720591de7c0e9e18619d265295f1ebe", null ],
     [ "TelemetryPacket", "namespacegondola.html#adb061fbe28da00055cd7fb65249a77df", null ],
     [ "TelemetryPacketHeader", "namespacegondola.html#abddc47f5a39ae5245979bc0a1b2cceea", null ],
     [ "TelemetryPacketType", "namespacegondola.html#a1b9982f07cad746b60c39b2d2a71497d", null ],
+    [ "TofPaddleTimingConstantMap", "namespacegondola.html#a1c2c2768738a98e4ab3c0aa6d31d88e0", null ],
     [ "CRFrameObjectType", "namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68", [
       [ "Unknown", "namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68a88183b946cc5f0e8c96b2e66e1c74a7e", null ],
       [ "TofPacket", "namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68a0a5f7d79c74b92d33255fc332e25b536", null ],
       [ "TelemetryPacket", "namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68aac967e66068a7e25b02b4b2e6bcc4504", null ]
     ] ],
+    [ "get_tofpaddletimingconstants", "namespacegondola.html#ada24c8b1eefc326eb57c09b7663da004", null ],
     [ "list_path_contents_sorted", "namespacegondola.html#ae1a0adbbbcd177ece4e936813e8ab262", null ],
     [ "load_tof_calibrations", "namespacegondola.html#abbe7c2c301e4f6cdd581d33c97be557d", null ],
     [ "spike_cleaning_all", "namespacegondola.html#a56a2781343a042a385b34244fe8e4934", null ],

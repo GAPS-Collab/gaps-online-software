@@ -36,6 +36,7 @@ var hierarchy =
     [ "TofPacket", "structTofPacket.html", null ],
     [ "Gaps::TofPacketReader", "classGaps_1_1TofPacketReader.html", null ],
     [ "Gaps::TofPaddle", "structGaps_1_1TofPaddle.html", null ],
+    [ "gondola::TofPaddleTimingConstant", "structgondola_1_1TofPaddleTimingConstant.html", null ],
     [ "Gaps::TrackerStrip", "structGaps_1_1TrackerStrip.html", null ],
     [ "Gaps::TrackerStripMask", "structGaps_1_1TrackerStripMask.html", null ],
     [ "Gaps::TrackerStripPedestal", "structGaps_1_1TrackerStripPedestal.html", null ],

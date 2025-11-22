@@ -23,3 +23,10 @@ gondola.io
       TelemetryPacketReader
       TofPacketReader
    
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   streamers

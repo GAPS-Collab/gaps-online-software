@@ -18,6 +18,7 @@
 
    calibration
    db
+   events
    gondola_core
    io
    reconstruction

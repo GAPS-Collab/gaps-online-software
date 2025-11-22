@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.tof.analysis &#8212; gondola 0.11.15 documentation</title>
+    <title>gondola.tof.analysis &#8212; gondola 0.11.18 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=7a9d3c55"></script>
+    <script src="../_static/documentation_options.js?v=428a11bd"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.tof.analysis';</script>
@@ -110,7 +110,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.11.15 documentation</p>
+    <p class="title logo__title">gondola 0.11.18 documentation</p>
   
 </a></div>
     
@@ -261,8 +261,12 @@
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="gondola.calibration.html">gondola.calibration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.db.html">gondola.db</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.events.html">gondola.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.gondola_core.html">gondola.gondola_core</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gondola.io.html">gondola.io</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="gondola.io.html">gondola.io</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="gondola.io.streamers.html">gondola.io.streamers</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.reconstruction.html">gondola.reconstruction</a></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="gondola.tof.html">gondola.tof</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">gondola.tof.analysis</a></li>
@@ -375,6 +379,21 @@ seen events, cut efficiencies, etc.</p>
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.occupancy">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">occupancy</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.occupancy" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.occupancy_t">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">occupancy_t</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.occupancy_t" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.n_events">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_events</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.n_events" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.rate">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rate</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.rate" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -436,6 +455,26 @@ instead.</p>
 </dd></dl>
 
 <dl class="py property">
+<dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.no_hitmiss">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">no_hitmiss</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.no_hitmiss" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.one_hitmiss">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">one_hitmiss</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.one_hitmiss" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.two_hitmiss">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">two_hitmiss</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.two_hitmiss" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.extra_hits">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">extra_hits</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.extra_hits" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.n_mangled_frac">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_mangled_frac</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.n_mangled_frac" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -443,6 +482,11 @@ instead.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.n_timed_out_frac">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_timed_out_frac</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.n_timed_out_frac" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.event_stati">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">event_stati</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.event_stati" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -523,13 +567,21 @@ instead.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.analysis.TofAnalysis"><code class="docutils literal notranslate"><span class="pre">TofAnalysis</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.analysis.TofAnalysis.define_bins"><code class="docutils literal notranslate"><span class="pre">TofAnalysis.define_bins()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.analysis.TofAnalysis.pretty_print_statistics"><code class="docutils literal notranslate"><span class="pre">TofAnalysis.pretty_print_statistics()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.analysis.TofAnalysis.occupancy"><code class="docutils literal notranslate"><span class="pre">TofAnalysis.occupancy</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.analysis.TofAnalysis.occupancy_t"><code class="docutils literal notranslate"><span class="pre">TofAnalysis.occupancy_t</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.analysis.TofAnalysis.n_events"><code class="docutils literal notranslate"><span class="pre">TofAnalysis.n_events</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.analysis.TofAnalysis.rate"><code class="docutils literal notranslate"><span class="pre">TofAnalysis.rate</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.analysis.TofAnalysis.rate_nocut"><code class="docutils literal notranslate"><span class="pre">TofAnalysis.rate_nocut</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.analysis.TofAnalysis.run_time"><code class="docutils literal notranslate"><span class="pre">TofAnalysis.run_time</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.analysis.TofAnalysis.reinit"><code class="docutils literal notranslate"><span class="pre">TofAnalysis.reinit()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.analysis.TofAnalysis.__init__"><code class="docutils literal notranslate"><span class="pre">TofAnalysis.__init__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.analysis.TofAnalysis.no_hitmiss"><code class="docutils literal notranslate"><span class="pre">TofAnalysis.no_hitmiss</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.analysis.TofAnalysis.one_hitmiss"><code class="docutils literal notranslate"><span class="pre">TofAnalysis.one_hitmiss</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.analysis.TofAnalysis.two_hitmiss"><code class="docutils literal notranslate"><span class="pre">TofAnalysis.two_hitmiss</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.analysis.TofAnalysis.extra_hits"><code class="docutils literal notranslate"><span class="pre">TofAnalysis.extra_hits</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.analysis.TofAnalysis.n_mangled_frac"><code class="docutils literal notranslate"><span class="pre">TofAnalysis.n_mangled_frac</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.analysis.TofAnalysis.n_timed_out_frac"><code class="docutils literal notranslate"><span class="pre">TofAnalysis.n_timed_out_frac</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.analysis.TofAnalysis.event_stati"><code class="docutils literal notranslate"><span class="pre">TofAnalysis.event_stati</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.analysis.TofAnalysis.fill_histograms"><code class="docutils literal notranslate"><span class="pre">TofAnalysis.fill_histograms()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.analysis.TofAnalysis.finish"><code class="docutils literal notranslate"><span class="pre">TofAnalysis.finish()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.analysis.TofAnalysis.add_event"><code class="docutils literal notranslate"><span class="pre">TofAnalysis.add_event()</span></code></a></li>

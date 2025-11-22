@@ -12,12 +12,16 @@ struct \mbox{\hyperlink{structgondola_1_1CRReader}{CRReader}}
 struct \mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}}
 \item 
 struct \mbox{\hyperlink{structgondola_1_1TelemetryPacketReader}{Telemetry\+Packet\+Reader}}
+\item 
+struct \mbox{\hyperlink{structgondola_1_1TofPaddleTimingConstant}{Tof\+Paddle\+Timing\+Constant}}
 \end{DoxyCompactItemize}
 \doxysubsubsection*{Typedefs}
 \begin{DoxyCompactItemize}
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, \mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}} $>$ \mbox{\hyperlink{namespacegondola_ae720591de7c0e9e18619d265295f1ebe}{RBCalibration\+Map}}
 \begin{DoxyCompactList}\small\item\em shortcut for the typically used map of rb\+\_\+id -\/\texorpdfstring{$>$}{>} calibrations \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} $>$ \mbox{\hyperlink{namespacegondola_a1c2c2768738a98e4ab3c0aa6d31d88e0}{Tof\+Paddle\+Timing\+Constant\+Map}}
+\item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7}{Gaps\+::\+Telemetry\+::\+Bfsw\+Packet\+Type}} \mbox{\hyperlink{namespacegondola_a1b9982f07cad746b60c39b2d2a71497d}{Telemetry\+Packet\+Type}}
 \begin{DoxyCompactList}\small\item\em FIXME -\/ this will be renamed to be the same as in rust. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Packet}{Gaps\+::\+Telemetry\+::\+Packet}} \mbox{\hyperlink{namespacegondola_adb061fbe28da00055cd7fb65249a77df}{Telemetry\+Packet}}
@@ -44,6 +48,8 @@ enum class \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68}{
 \begin{DoxyCompactList}\small\item\em Jamie\textquotesingle{}s simpler version with single-\/width spike correction. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_abbe7c2c301e4f6cdd581d33c97be557d}{load\+\_\+tof\+\_\+calibrations}} (std\+::string \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pathname}}) -\/$>$ std\+::map$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, \mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}} $>$
 \begin{DoxyCompactList}\small\item\em convenience function to load all the calibration files from a certain directory \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_ada24c8b1eefc326eb57c09b7663da004}{get\+\_\+tofpaddletimingconstants}} (std\+::string mask\+\_\+name="{}"{}) -\/$>$ \mbox{\hyperlink{namespacegondola_a1c2c2768738a98e4ab3c0aa6d31d88e0}{Tof\+Paddle\+Timing\+Constant\+Map}}
+\item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_ae1a0adbbbcd177ece4e936813e8ab262}{list\+\_\+path\+\_\+contents\+\_\+sorted}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} std\+::string \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{input}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{use\+\_\+telemetry\+\_\+re}}=\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{false}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ std\+::string $>$
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_ad6d0e546d1e3ff1ce3af42dae3177d29}{to\+\_\+le\+\_\+bytes}} (\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{number}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$
@@ -85,6 +91,12 @@ shortcut for the typically used map of rb\+\_\+id -\/\texorpdfstring{$>$}{>} cal
 
 FIXME -\/ this will be renamed to be the same as in rust. 
 
+\Hypertarget{namespacegondola_a1c2c2768738a98e4ab3c0aa6d31d88e0}\label{namespacegondola_a1c2c2768738a98e4ab3c0aa6d31d88e0} 
+\index{gondola@{gondola}!TofPaddleTimingConstantMap@{TofPaddleTimingConstantMap}}
+\index{TofPaddleTimingConstantMap@{TofPaddleTimingConstantMap}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{TofPaddleTimingConstantMap}{TofPaddleTimingConstantMap}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}$>$ \mbox{\hyperlink{namespacegondola_a1c2c2768738a98e4ab3c0aa6d31d88e0}{gondola\+::\+Tof\+Paddle\+Timing\+Constant\+Map}}}
+
 
 
 \doxysubsection{Enumeration Type Documentation}
@@ -116,6 +128,12 @@ Telemetry\+Packet&\\
 
 
 \doxysubsection{Function Documentation}
+\Hypertarget{namespacegondola_ada24c8b1eefc326eb57c09b7663da004}\label{namespacegondola_ada24c8b1eefc326eb57c09b7663da004} 
+\index{gondola@{gondola}!get\_tofpaddletimingconstants@{get\_tofpaddletimingconstants}}
+\index{get\_tofpaddletimingconstants@{get\_tofpaddletimingconstants}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{get\_tofpaddletimingconstants()}{get\_tofpaddletimingconstants()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::get\+\_\+tofpaddletimingconstants (\begin{DoxyParamCaption}\item[{std\+::string}]{mask\+\_\+name = {\ttfamily "{}"{}} }\end{DoxyParamCaption}) -\/$>$  \mbox{\hyperlink{namespacegondola_a1c2c2768738a98e4ab3c0aa6d31d88e0}{Tof\+Paddle\+Timing\+Constant\+Map}}}
+
 \Hypertarget{namespacegondola_ae1a0adbbbcd177ece4e936813e8ab262}\label{namespacegondola_ae1a0adbbbcd177ece4e936813e8ab262} 
 \index{gondola@{gondola}!list\_path\_contents\_sorted@{list\_path\_contents\_sorted}}
 \index{list\_path\_contents\_sorted@{list\_path\_contents\_sorted}!gondola@{gondola}}

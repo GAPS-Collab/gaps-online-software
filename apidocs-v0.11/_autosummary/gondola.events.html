@@ -1,0 +1,1593 @@
+
+<!DOCTYPE html>
+
+
+<html lang="python" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>gondola.events &#8212; gondola 0.11.18 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=428a11bd"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.events';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="gondola.gondola_core" href="gondola.gondola_core.html" />
+    <link rel="prev" title="gondola.db" href="gondola.db.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="python"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">gondola 0.11.18 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../guided_tour.html">
+    A guided tour to get you started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../liftof.html">
+    The liftof system - TOF command & control
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tofcpu.html">
+    TOFCPU information
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="gondola.html">
+    gondola
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../guided_tour.html">
+    A guided tour to get you started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../liftof.html">
+    The liftof system - TOF command & control
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tofcpu.html">
+    TOFCPU information
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="gondola.html">
+    gondola
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="gondola.calibration.html">gondola.calibration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.db.html">gondola.db</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">gondola.events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.gondola_core.html">gondola.gondola_core</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="gondola.io.html">gondola.io</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="gondola.io.streamers.html">gondola.io.streamers</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.reconstruction.html">gondola.reconstruction</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="gondola.tof.html">gondola.tof</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="gondola.tof.analysis.html">gondola.tof.analysis</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="gondola.tracker.html">gondola.tracker</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="gondola.tracker.analysis.html">gondola.tracker.analysis</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="gondola.visual.html">gondola.visual</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="gondola.visual.tof.html">gondola.visual.tof</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gondola.visual.tracker.html">gondola.visual.tracker</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="gondola.html" class="nav-link">gondola</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">gondola.events</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-gondola.events">
+<span id="gondola-events"></span><h1>gondola.events<a class="headerlink" href="#module-gondola.events" title="Link to this heading">#</a></h1>
+<p>Every possible event type in GAPS which is relevant for 
+&quot;online&quot; analysis</p>
+<p class="rubric">Classes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.events.RBEvent" title="gondola.events.RBEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RBEvent</span></code></a>()</p></td>
+<td><p>Event data for each individual ReadoutBoard (RB)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.events.RBEventHeader" title="gondola.events.RBEventHeader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RBEventHeader</span></code></a>()</p></td>
+<td><p>The RBEvent header gets generated once per event per RB.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.events.RBWaveform" title="gondola.events.RBWaveform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RBWaveform</span></code></a>()</p></td>
+<td><p>Waveform container for Tof waveforms This holds the waveforms for both  paddle ends.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.events.TelemetryEvent" title="gondola.events.TelemetryEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TelemetryEvent</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.events.TofEvent" title="gondola.events.TofEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofEvent</span></code></a>()</p></td>
+<td><p>Main event class for the TOF.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.events.TofHit" title="gondola.events.TofHit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofHit</span></code></a>()</p></td>
+<td><p>An extracted hit from a TofPaddle, as extracted by the  online software and provided algorithm (in v0.11 algorithm is provided by J.Zweerink)</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.events.TrackerHit" title="gondola.events.TrackerHit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerHit</span></code></a>()</p></td>
+<td><p>Hit on a tracker strip</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.events.TofHit">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">TofHit</span></span><a class="headerlink" href="#gondola.events.TofHit" title="Link to this definition">#</a></dt>
+<dd><p>An extracted hit from a TofPaddle, as extracted by the 
+online software and provided algorithm
+(in v0.11 algorithm is provided by J.Zweerink)</p>
+<p>A TofHit holds the information for an extracted single 
+hit on a peak, which is defined by a peak in at least one 
+of the two waveforms. 
+The TofHit holds extracted information for both of the 
+waveforms, only if both are available a position reconstruction
+on the paddle can be attempted.</p>
+<p>A and B are the different ends of the paddle</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.TOT_high_a">
+<span class="sig-name descname"><span class="pre">TOT_high_a</span></span><a class="headerlink" href="#gondola.events.TofHit.TOT_high_a" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.TOT_high_b">
+<span class="sig-name descname"><span class="pre">TOT_high_b</span></span><a class="headerlink" href="#gondola.events.TofHit.TOT_high_b" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.TOT_low_a">
+<span class="sig-name descname"><span class="pre">TOT_low_a</span></span><a class="headerlink" href="#gondola.events.TofHit.TOT_low_a" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.TOT_low_b">
+<span class="sig-name descname"><span class="pre">TOT_low_b</span></span><a class="headerlink" href="#gondola.events.TofHit.TOT_low_b" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.TOT_slp_high_a">
+<span class="sig-name descname"><span class="pre">TOT_slp_high_a</span></span><a class="headerlink" href="#gondola.events.TofHit.TOT_slp_high_a" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.TOT_slp_high_b">
+<span class="sig-name descname"><span class="pre">TOT_slp_high_b</span></span><a class="headerlink" href="#gondola.events.TofHit.TOT_slp_high_b" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.TOT_slp_low_a">
+<span class="sig-name descname"><span class="pre">TOT_slp_low_a</span></span><a class="headerlink" href="#gondola.events.TofHit.TOT_slp_low_a" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.TOT_slp_low_b">
+<span class="sig-name descname"><span class="pre">TOT_slp_low_b</span></span><a class="headerlink" href="#gondola.events.TofHit.TOT_slp_low_b" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.baseline_a">
+<span class="sig-name descname"><span class="pre">baseline_a</span></span><a class="headerlink" href="#gondola.events.TofHit.baseline_a" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.baseline_a_rms">
+<span class="sig-name descname"><span class="pre">baseline_a_rms</span></span><a class="headerlink" href="#gondola.events.TofHit.baseline_a_rms" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.baseline_b">
+<span class="sig-name descname"><span class="pre">baseline_b</span></span><a class="headerlink" href="#gondola.events.TofHit.baseline_b" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.baseline_b_rms">
+<span class="sig-name descname"><span class="pre">baseline_b_rms</span></span><a class="headerlink" href="#gondola.events.TofHit.baseline_b_rms" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.cable_delay">
+<span class="sig-name descname"><span class="pre">cable_delay</span></span><a class="headerlink" href="#gondola.events.TofHit.cable_delay" title="Link to this definition">#</a></dt>
+<dd><p>Get the cable correction time</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.charge_a">
+<span class="sig-name descname"><span class="pre">charge_a</span></span><a class="headerlink" href="#gondola.events.TofHit.charge_a" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.charge_b">
+<span class="sig-name descname"><span class="pre">charge_b</span></span><a class="headerlink" href="#gondola.events.TofHit.charge_b" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.coax_cbl_time">
+<span class="sig-name descname"><span class="pre">coax_cbl_time</span></span><a class="headerlink" href="#gondola.events.TofHit.coax_cbl_time" title="Link to this definition">#</a></dt>
+<dd><p>The time in ns the signal spends in the coax 
+cables from the SiPMs to the RAT</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TofHit.distance">
+<span class="sig-name descname"><span class="pre">distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofHit.distance" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the distance to another hit. For this 
+to work, the hit coordinates have had to be 
+determined, so this will only return a 
+propper result after the paddle information 
+is added</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.edep">
+<span class="sig-name descname"><span class="pre">edep</span></span><a class="headerlink" href="#gondola.events.TofHit.edep" title="Link to this definition">#</a></dt>
+<dd><p>Philip's energy deposition based on peak height</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.event_t0">
+<span class="sig-name descname"><span class="pre">event_t0</span></span><a class="headerlink" href="#gondola.events.TofHit.event_t0" title="Link to this definition">#</a></dt>
+<dd><p>Event t0 is the calculated interaction time based on 
+the RELATIVE phase shifts consdering ALL hits in this
+event. This might be of importance to catch rollovers
+in the phase of channel9. 
+In total, we are restricting ourselves to a time of 
+50ns per events and adjust the phase in such a way that 
+everything fits into this interval. This will 
+significantly import the beta reconstruction for particles
+which hit the TOF within this timing window.</p>
+<p>If a timing offset is set, this will be added</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.hart_cbl_time">
+<span class="sig-name descname"><span class="pre">hart_cbl_time</span></span><a class="headerlink" href="#gondola.events.TofHit.hart_cbl_time" title="Link to this definition">#</a></dt>
+<dd><p>The time in ns the signal spends in the Harting
+cables from the RATs to the MTB</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TofHit.obeys_causality">
+<span class="sig-name descname"><span class="pre">obeys_causality</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofHit.obeys_causality" title="Link to this definition">#</a></dt>
+<dd><p>If the two reconstructed pulse times are not related to each other by the paddle length,
+meaning that they can't be caused by the same event, we dub this hit as &quot;not following
+causality&quot;</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.paddle_id">
+<span class="sig-name descname"><span class="pre">paddle_id</span></span><a class="headerlink" href="#gondola.events.TofHit.paddle_id" title="Link to this definition">#</a></dt>
+<dd><p>The paddle id (1-160) of the hit paddle</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.paddle_len">
+<span class="sig-name descname"><span class="pre">paddle_len</span></span><a class="headerlink" href="#gondola.events.TofHit.paddle_len" title="Link to this definition">#</a></dt>
+<dd><p>The length of the paddle, only available after 
+the paddle information has been added through
+&quot;set_paddle&quot;</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.peak_a">
+<span class="sig-name descname"><span class="pre">peak_a</span></span><a class="headerlink" href="#gondola.events.TofHit.peak_a" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.peak_b">
+<span class="sig-name descname"><span class="pre">peak_b</span></span><a class="headerlink" href="#gondola.events.TofHit.peak_b" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.phase">
+<span class="sig-name descname"><span class="pre">phase</span></span><a class="headerlink" href="#gondola.events.TofHit.phase" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.phase_delay">
+<span class="sig-name descname"><span class="pre">phase_delay</span></span><a class="headerlink" href="#gondola.events.TofHit.phase_delay" title="Link to this definition">#</a></dt>
+<dd><p>Get the delay relative to other readoutboards based 
+on the channel9 sine wave</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.pos">
+<span class="sig-name descname"><span class="pre">pos</span></span><a class="headerlink" href="#gondola.events.TofHit.pos" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the position across the paddle from
+the two times at the paddle ends</p>
+<p><strong>This will be measured from the A side</strong></p>
+<p>Just to be extra clear, this assumes the two 
+sets of cables for each paddle end have the
+same length</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TofHit.set_paddle">
+<span class="sig-name descname"><span class="pre">set_paddle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plen</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coax_cbl_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hart_cbl_time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofHit.set_paddle" title="Link to this definition">#</a></dt>
+<dd><p>Set the length and cable length for the paddle
+FIXME - take gaps_online.db.Paddle as argument</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.t0">
+<span class="sig-name descname"><span class="pre">t0</span></span><a class="headerlink" href="#gondola.events.TofHit.t0" title="Link to this definition">#</a></dt>
+<dd><p>That this works, the length of the paddle has to 
+be set before (in mm).
+This assumes that the cable on both sides of the paddle are 
+the same length</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.t0_uncorrected">
+<span class="sig-name descname"><span class="pre">t0_uncorrected</span></span><a class="headerlink" href="#gondola.events.TofHit.t0_uncorrected" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the interaction time based on the peak timings measured 
+at the paddle ends A and B</p>
+<p>This does not correct for any cable length
+or ch9 phase shift</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.time_a">
+<span class="sig-name descname"><span class="pre">time_a</span></span><a class="headerlink" href="#gondola.events.TofHit.time_a" title="Link to this definition">#</a></dt>
+<dd><p>Arrival time of the photons at side A</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.time_b">
+<span class="sig-name descname"><span class="pre">time_b</span></span><a class="headerlink" href="#gondola.events.TofHit.time_b" title="Link to this definition">#</a></dt>
+<dd><p>Arrival time of the photons at side B</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.version">
+<span class="sig-name descname"><span class="pre">version</span></span><a class="headerlink" href="#gondola.events.TofHit.version" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#gondola.events.TofHit.x" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#gondola.events.TofHit.y" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.z">
+<span class="sig-name descname"><span class="pre">z</span></span><a class="headerlink" href="#gondola.events.TofHit.z" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.events.TrackerHit">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">TrackerHit</span></span><a class="headerlink" href="#gondola.events.TrackerHit" title="Link to this definition">#</a></dt>
+<dd><p>Hit on a tracker strip</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TrackerHit.adc">
+<span class="sig-name descname"><span class="pre">adc</span></span><a class="headerlink" href="#gondola.events.TrackerHit.adc" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TrackerHit.channel">
+<span class="sig-name descname"><span class="pre">channel</span></span><a class="headerlink" href="#gondola.events.TrackerHit.channel" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TrackerHit.energy">
+<span class="sig-name descname"><span class="pre">energy</span></span><a class="headerlink" href="#gondola.events.TrackerHit.energy" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TrackerHit.layer">
+<span class="sig-name descname"><span class="pre">layer</span></span><a class="headerlink" href="#gondola.events.TrackerHit.layer" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TrackerHit.module">
+<span class="sig-name descname"><span class="pre">module</span></span><a class="headerlink" href="#gondola.events.TrackerHit.module" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TrackerHit.oscillator">
+<span class="sig-name descname"><span class="pre">oscillator</span></span><a class="headerlink" href="#gondola.events.TrackerHit.oscillator" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TrackerHit.row">
+<span class="sig-name descname"><span class="pre">row</span></span><a class="headerlink" href="#gondola.events.TrackerHit.row" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TrackerHit.strip_id">
+<span class="sig-name descname"><span class="pre">strip_id</span></span><a class="headerlink" href="#gondola.events.TrackerHit.strip_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TrackerHit.subtract_pedestal">
+<span class="sig-name descname"><span class="pre">subtract_pedestal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pedestal</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TrackerHit.subtract_pedestal" title="Link to this definition">#</a></dt>
+<dd><p>Change the ADC value, e.g. if the 
+pedestal should be subtracted</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TrackerHit.x">
+<span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#gondola.events.TrackerHit.x" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TrackerHit.y">
+<span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#gondola.events.TrackerHit.y" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TrackerHit.z">
+<span class="sig-name descname"><span class="pre">z</span></span><a class="headerlink" href="#gondola.events.TrackerHit.z" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.events.RBEventHeader">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">RBEventHeader</span></span><a class="headerlink" href="#gondola.events.RBEventHeader" title="Link to this definition">#</a></dt>
+<dd><p>The RBEvent header gets generated once per event
+per RB. 
+Contains information about event id, timestamps,
+etc.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBEventHeader.channel_mask">
+<span class="sig-name descname"><span class="pre">channel_mask</span></span><a class="headerlink" href="#gondola.events.RBEventHeader.channel_mask" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBEventHeader.drs_deadtime">
+<span class="sig-name descname"><span class="pre">drs_deadtime</span></span><a class="headerlink" href="#gondola.events.RBEventHeader.drs_deadtime" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBEventHeader.drs_lost_trigger">
+<span class="sig-name descname"><span class="pre">drs_lost_trigger</span></span><a class="headerlink" href="#gondola.events.RBEventHeader.drs_lost_trigger" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBEventHeader.event_id">
+<span class="sig-name descname"><span class="pre">event_id</span></span><a class="headerlink" href="#gondola.events.RBEventHeader.event_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBEventHeader.fpga_temp">
+<span class="sig-name descname"><span class="pre">fpga_temp</span></span><a class="headerlink" href="#gondola.events.RBEventHeader.fpga_temp" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.RBEventHeader.get_channels">
+<span class="sig-name descname"><span class="pre">get_channels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBEventHeader.get_channels" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBEventHeader.is_event_fragment">
+<span class="sig-name descname"><span class="pre">is_event_fragment</span></span><a class="headerlink" href="#gondola.events.RBEventHeader.is_event_fragment" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBEventHeader.is_locked">
+<span class="sig-name descname"><span class="pre">is_locked</span></span><a class="headerlink" href="#gondola.events.RBEventHeader.is_locked" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBEventHeader.is_locked_last_sec">
+<span class="sig-name descname"><span class="pre">is_locked_last_sec</span></span><a class="headerlink" href="#gondola.events.RBEventHeader.is_locked_last_sec" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBEventHeader.lost_lock">
+<span class="sig-name descname"><span class="pre">lost_lock</span></span><a class="headerlink" href="#gondola.events.RBEventHeader.lost_lock" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBEventHeader.lost_lock_last_sec">
+<span class="sig-name descname"><span class="pre">lost_lock_last_sec</span></span><a class="headerlink" href="#gondola.events.RBEventHeader.lost_lock_last_sec" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBEventHeader.rb_id">
+<span class="sig-name descname"><span class="pre">rb_id</span></span><a class="headerlink" href="#gondola.events.RBEventHeader.rb_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBEventHeader.stop_cell">
+<span class="sig-name descname"><span class="pre">stop_cell</span></span><a class="headerlink" href="#gondola.events.RBEventHeader.stop_cell" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBEventHeader.timestamp16">
+<span class="sig-name descname"><span class="pre">timestamp16</span></span><a class="headerlink" href="#gondola.events.RBEventHeader.timestamp16" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBEventHeader.timestamp32">
+<span class="sig-name descname"><span class="pre">timestamp32</span></span><a class="headerlink" href="#gondola.events.RBEventHeader.timestamp32" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.events.RBEvent">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">RBEvent</span></span><a class="headerlink" href="#gondola.events.RBEvent" title="Link to this definition">#</a></dt>
+<dd><p>Event data for each individual ReadoutBoard (RB)</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.RBEvent.from_bytestream">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_bytestream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytestream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBEvent.from_bytestream" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.RBEvent.from_random">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_random</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBEvent.from_random" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.RBEvent.from_tofpacket">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_tofpacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBEvent.from_tofpacket" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.RBEvent.get_waveform">
+<span class="sig-name descname"><span class="pre">get_waveform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBEvent.get_waveform" title="Link to this definition">#</a></dt>
+<dd><p>Get adc values directly from the RBEvent with zero copy</p>
+<p>The channel has to go from 1-9</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.RBEvent.get_waveform_slow">
+<span class="sig-name descname"><span class="pre">get_waveform_slow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBEvent.get_waveform_slow" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBEvent.header">
+<span class="sig-name descname"><span class="pre">header</span></span><a class="headerlink" href="#gondola.events.RBEvent.header" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBEvent.hits">
+<span class="sig-name descname"><span class="pre">hits</span></span><a class="headerlink" href="#gondola.events.RBEvent.hits" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.RBEvent.pack">
+<span class="sig-name descname"><span class="pre">pack</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBEvent.pack" title="Link to this definition">#</a></dt>
+<dd><p>Pack self into a TofPacket to be written on disk
+or sent over network</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBEvent.status">
+<span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#gondola.events.RBEvent.status" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBEvent.waveforms">
+<span class="sig-name descname"><span class="pre">waveforms</span></span><a class="headerlink" href="#gondola.events.RBEvent.waveforms" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">RBWaveform</span></span><a class="headerlink" href="#gondola.events.RBWaveform" title="Link to this definition">#</a></dt>
+<dd><p>Waveform container for Tof waveforms
+This holds the waveforms for both 
+paddle ends. Fields are available to 
+hold calibrated waveforms, however,
+only adc will be saved to disk.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.adc_a">
+<span class="sig-name descname"><span class="pre">adc_a</span></span><a class="headerlink" href="#gondola.events.RBWaveform.adc_a" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.adc_b">
+<span class="sig-name descname"><span class="pre">adc_b</span></span><a class="headerlink" href="#gondola.events.RBWaveform.adc_b" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.apply_spike_filter">
+<span class="sig-name descname"><span class="pre">apply_spike_filter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBWaveform.apply_spike_filter" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.calibrate">
+<span class="sig-name descname"><span class="pre">calibrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cali</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBWaveform.calibrate" title="Link to this definition">#</a></dt>
+<dd><p>Apply the readoutboard calibration to convert adc/bins
+to millivolts and nanoseconds</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.charge_a_below_500_trap">
+<span class="sig-name descname"><span class="pre">charge_a_below_500_trap</span></span><a class="headerlink" href="#gondola.events.RBWaveform.charge_a_below_500_trap" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.charge_a_trap">
+<span class="sig-name descname"><span class="pre">charge_a_trap</span></span><a class="headerlink" href="#gondola.events.RBWaveform.charge_a_trap" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.charge_b_below_500_trap">
+<span class="sig-name descname"><span class="pre">charge_b_below_500_trap</span></span><a class="headerlink" href="#gondola.events.RBWaveform.charge_b_below_500_trap" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.charge_b_trap">
+<span class="sig-name descname"><span class="pre">charge_b_trap</span></span><a class="headerlink" href="#gondola.events.RBWaveform.charge_b_trap" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.event_id">
+<span class="sig-name descname"><span class="pre">event_id</span></span><a class="headerlink" href="#gondola.events.RBWaveform.event_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.from_bytestream">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_bytestream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytestream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBWaveform.from_bytestream" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.from_random">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_random</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBWaveform.from_random" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.from_tofpacket">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_tofpacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBWaveform.from_tofpacket" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.get_tot_a">
+<span class="sig-name descname"><span class="pre">get_tot_a</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBWaveform.get_tot_a" title="Link to this definition">#</a></dt>
+<dd><p>Time over threshold - waveform needs to be 
+calibrated. 
+Paddle end A</p>
+<dl class="simple">
+<dt># Arguments:</dt><dd><ul class="simple">
+<li><p>threshold : value in mV</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.get_tot_b">
+<span class="sig-name descname"><span class="pre">get_tot_b</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBWaveform.get_tot_b" title="Link to this definition">#</a></dt>
+<dd><p>Time over threshold - waveform needs to be 
+calibrated. 
+Paddle end B</p>
+<dl class="simple">
+<dt># Arguments:</dt><dd><ul class="simple">
+<li><p>threshold : value in mV</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.max_peak_a_guess">
+<span class="sig-name descname"><span class="pre">max_peak_a_guess</span></span><a class="headerlink" href="#gondola.events.RBWaveform.max_peak_a_guess" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.max_peak_b_guess">
+<span class="sig-name descname"><span class="pre">max_peak_b_guess</span></span><a class="headerlink" href="#gondola.events.RBWaveform.max_peak_b_guess" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.pack">
+<span class="sig-name descname"><span class="pre">pack</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBWaveform.pack" title="Link to this definition">#</a></dt>
+<dd><p>Pack self into a TofPacket to be written on disk
+or sent over network</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.paddle_id">
+<span class="sig-name descname"><span class="pre">paddle_id</span></span><a class="headerlink" href="#gondola.events.RBWaveform.paddle_id" title="Link to this definition">#</a></dt>
+<dd><p>Paddle ID of this wveform (1-160)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.rb_channel_a">
+<span class="sig-name descname"><span class="pre">rb_channel_a</span></span><a class="headerlink" href="#gondola.events.RBWaveform.rb_channel_a" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.rb_channel_b">
+<span class="sig-name descname"><span class="pre">rb_channel_b</span></span><a class="headerlink" href="#gondola.events.RBWaveform.rb_channel_b" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.rb_id">
+<span class="sig-name descname"><span class="pre">rb_id</span></span><a class="headerlink" href="#gondola.events.RBWaveform.rb_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.stop_cell">
+<span class="sig-name descname"><span class="pre">stop_cell</span></span><a class="headerlink" href="#gondola.events.RBWaveform.stop_cell" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.subtract_pedestals">
+<span class="sig-name descname"><span class="pre">subtract_pedestals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBWaveform.subtract_pedestals" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.times_a">
+<span class="sig-name descname"><span class="pre">times_a</span></span><a class="headerlink" href="#gondola.events.RBWaveform.times_a" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.times_b">
+<span class="sig-name descname"><span class="pre">times_b</span></span><a class="headerlink" href="#gondola.events.RBWaveform.times_b" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.voltages_a">
+<span class="sig-name descname"><span class="pre">voltages_a</span></span><a class="headerlink" href="#gondola.events.RBWaveform.voltages_a" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.RBWaveform.voltages_b">
+<span class="sig-name descname"><span class="pre">voltages_b</span></span><a class="headerlink" href="#gondola.events.RBWaveform.voltages_b" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.events.TofEvent">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">TofEvent</span></span><a class="headerlink" href="#gondola.events.TofEvent" title="Link to this definition">#</a></dt>
+<dd><p>Main event class for the TOF. This will be sent over telemetry and be 
+written to disk</p>
+<p>CHANGELOG: v0.11 (gondola-core): Merges TofEvent, TofEventSummary and 
+MasterTriggerEvent all into a single TofEvent, based on former TofEventSummary.
+The new TofEvent has the ability to cary RBEvents and thus mimick the &quot;old&quot; TofEvent
+We are using the version flag to indicate:
+* ProtocolVersion::Unknown - The &quot;old&quot; TofEventSummary. (now &quot;TofEvent&quot;). No extra</p>
+<blockquote>
+<div><p>variables for the GCU, no RBEvents</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>ProtocolVersion::V1      - The version crafted for Antarctica '24/'25 containing 
+a bunch of summary variables for the GCU (e.g. nhits(umbrella)). This version will 
+add these variables to the bytestream and also if ProtocolVersion::V1 is read out 
+from the bytestream, the variables are expected to be in it. This is to keep compatibility
+with the gcu</p></li>
+<li><p>ProtocolVersion::V2     - v0.11 (gondola-core) version of TofEvent(Summary).
+This version will not write out GCU variables and does not expect them to be in the 
+bytestream. If desired, this version can read/write RBEvents.</p></li>
+<li><dl class="simple">
+<dt>ProtocolVersion::V3     - the &quot;latest and greatest&quot;. This version has gcuvariables </dt><dd><p>AND rbevents. RBEvents can be stripped off later on.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.copy" title="Link to this definition">#</a></dt>
+<dd><p>Emit a copy of self</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.event_id">
+<span class="sig-name descname"><span class="pre">event_id</span></span><a class="headerlink" href="#gondola.events.TofEvent.event_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.event_status">
+<span class="sig-name descname"><span class="pre">event_status</span></span><a class="headerlink" href="#gondola.events.TofEvent.event_status" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.from_bytestream">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_bytestream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytestream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.from_bytestream" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.from_random">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_random</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.from_random" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.from_tofpacket">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_tofpacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.from_tofpacket" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.get_edep">
+<span class="sig-name descname"><span class="pre">get_edep</span></span><a class="headerlink" href="#gondola.events.TofEvent.get_edep" title="Link to this definition">#</a></dt>
+<dd><p>Total energy depostion in the complete TOF</p>
+<p>Utilizes Philip's formula based on 
+peak height</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.get_edep_cortina">
+<span class="sig-name descname"><span class="pre">get_edep_cortina</span></span><a class="headerlink" href="#gondola.events.TofEvent.get_edep_cortina" title="Link to this definition">#</a></dt>
+<dd><p>Total energy depostion in the Cortina</p>
+<p>Utilizes Philip's formula based on 
+peak height</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.get_edep_cube">
+<span class="sig-name descname"><span class="pre">get_edep_cube</span></span><a class="headerlink" href="#gondola.events.TofEvent.get_edep_cube" title="Link to this definition">#</a></dt>
+<dd><p>Total energy depostion in the Cube</p>
+<p>Utilizes Philip's formula based on 
+peak height</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.get_edep_umbrella">
+<span class="sig-name descname"><span class="pre">get_edep_umbrella</span></span><a class="headerlink" href="#gondola.events.TofEvent.get_edep_umbrella" title="Link to this definition">#</a></dt>
+<dd><p>Total energy depostion in the Umbrella</p>
+<p>Utilizes Philip's formula based on 
+peak height</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.get_missing_paddles_hg">
+<span class="sig-name descname"><span class="pre">get_missing_paddles_hg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mapping</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.get_missing_paddles_hg" title="Link to this definition">#</a></dt>
+<dd><p>Compare the hg hits of the event with the triggered paddles and 
+return the paddles which have at least a missing HG hit</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.get_triggered_paddles">
+<span class="sig-name descname"><span class="pre">get_triggered_paddles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mapping</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.get_triggered_paddles" title="Link to this definition">#</a></dt>
+<dd><p>Get all the paddle ids which have been triggered</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.has_any_mangling">
+<span class="sig-name descname"><span class="pre">has_any_mangling</span></span><a class="headerlink" href="#gondola.events.TofEvent.has_any_mangling" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.hitmap">
+<span class="sig-name descname"><span class="pre">hitmap</span></span><a class="headerlink" href="#gondola.events.TofEvent.hitmap" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.hits">
+<span class="sig-name descname"><span class="pre">hits</span></span><a class="headerlink" href="#gondola.events.TofEvent.hits" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.lightspeed_cleaning">
+<span class="sig-name descname"><span class="pre">lightspeed_cleaning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t_err</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.lightspeed_cleaning" title="Link to this definition">#</a></dt>
+<dd><p>Remove hits from the hitseries which can not 
+be caused by the same particle, which means 
+that for these two specific hits beta with 
+respect to the first hit in the event is 
+larger than one
+That this works, first hits need to be 
+&quot;normalized&quot; by calling normalize_hit_times</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.lost_hits">
+<span class="sig-name descname"><span class="pre">lost_hits</span></span><a class="headerlink" href="#gondola.events.TofEvent.lost_hits" title="Link to this definition">#</a></dt>
+<dd><p>The hits we were not able to read out because the DRS4 chip
+on the RBs was busy</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.move_hits">
+<span class="sig-name descname"><span class="pre">move_hits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.move_hits" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.nhits">
+<span class="sig-name descname"><span class="pre">nhits</span></span><a class="headerlink" href="#gondola.events.TofEvent.nhits" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.nhits_cbe">
+<span class="sig-name descname"><span class="pre">nhits_cbe</span></span><a class="headerlink" href="#gondola.events.TofEvent.nhits_cbe" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.nhits_cor">
+<span class="sig-name descname"><span class="pre">nhits_cor</span></span><a class="headerlink" href="#gondola.events.TofEvent.nhits_cor" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.nhits_umb">
+<span class="sig-name descname"><span class="pre">nhits_umb</span></span><a class="headerlink" href="#gondola.events.TofEvent.nhits_umb" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.normalize_hit_times">
+<span class="sig-name descname"><span class="pre">normalize_hit_times</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.normalize_hit_times" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.pack">
+<span class="sig-name descname"><span class="pre">pack</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.pack" title="Link to this definition">#</a></dt>
+<dd><p>Pack self into a TofPacket to be written on disk
+or sent over network</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.pointcloud">
+<span class="sig-name descname"><span class="pre">pointcloud</span></span><a class="headerlink" href="#gondola.events.TofEvent.pointcloud" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.rb_events">
+<span class="sig-name descname"><span class="pre">rb_events</span></span><a class="headerlink" href="#gondola.events.TofEvent.rb_events" title="Link to this definition">#</a></dt>
+<dd><p>The event might have RBEvents associated with it</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.rb_link_ids">
+<span class="sig-name descname"><span class="pre">rb_link_ids</span></span><a class="headerlink" href="#gondola.events.TofEvent.rb_link_ids" title="Link to this definition">#</a></dt>
+<dd><p>RB Link IDS (not RB ids) which fall into the 
+trigger window</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.remove_non_causal_hits">
+<span class="sig-name descname"><span class="pre">remove_non_causal_hits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.remove_non_causal_hits" title="Link to this definition">#</a></dt>
+<dd><p>Remove all hits from the event's hit series which 
+do NOT obey causality. that is where the timings
+measured at ends A and B can not be correlated
+by the assumed speed of light in the paddle</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.set_packed_status_version">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_packed_status_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pack</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.set_packed_status_version" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.set_timing_offsets">
+<span class="sig-name descname"><span class="pre">set_timing_offsets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timing_offsets</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.set_timing_offsets" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.status">
+<span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#gondola.events.TofEvent.status" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.strip_packed_rbevents_for_pv3">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">strip_packed_rbevents_for_pv3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pack</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.strip_packed_rbevents_for_pv3" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.timestamp16">
+<span class="sig-name descname"><span class="pre">timestamp16</span></span><a class="headerlink" href="#gondola.events.TofEvent.timestamp16" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.timestamp32">
+<span class="sig-name descname"><span class="pre">timestamp32</span></span><a class="headerlink" href="#gondola.events.TofEvent.timestamp32" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.timestamp48">
+<span class="sig-name descname"><span class="pre">timestamp48</span></span><a class="headerlink" href="#gondola.events.TofEvent.timestamp48" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.trigger_hits">
+<span class="sig-name descname"><span class="pre">trigger_hits</span></span><a class="headerlink" href="#gondola.events.TofEvent.trigger_hits" title="Link to this definition">#</a></dt>
+<dd><p>Hits which formed a trigger</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.trigger_sources">
+<span class="sig-name descname"><span class="pre">trigger_sources</span></span><a class="headerlink" href="#gondola.events.TofEvent.trigger_sources" title="Link to this definition">#</a></dt>
+<dd><p>The active triggers in this event. This can be more than one, 
+if multiple trigger conditions are satisfied.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.waveforms">
+<span class="sig-name descname"><span class="pre">waveforms</span></span><a class="headerlink" href="#gondola.events.TofEvent.waveforms" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.events.TelemetryEvent">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">TelemetryEvent</span></span><a class="headerlink" href="#gondola.events.TelemetryEvent" title="Link to this definition">#</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TelemetryEvent.event_id">
+<span class="sig-name descname"><span class="pre">event_id</span></span><a class="headerlink" href="#gondola.events.TelemetryEvent.event_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TelemetryEvent.from_telemetrypacket">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_telemetrypacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TelemetryEvent.from_telemetrypacket" title="Link to this definition">#</a></dt>
+<dd><p>Populate a merged event from a TelemetryPacket.</p>
+<p>Telemetry packet type should be 90 (MergedEvent)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TelemetryEvent.get_trk_energy">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_trk_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TelemetryEvent.get_trk_energy" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TelemetryEvent.header">
+<span class="sig-name descname"><span class="pre">header</span></span><a class="headerlink" href="#gondola.events.TelemetryEvent.header" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TelemetryEvent.tof">
+<span class="sig-name descname"><span class="pre">tof</span></span><a class="headerlink" href="#gondola.events.TelemetryEvent.tof" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TelemetryEvent.tracker">
+<span class="sig-name descname"><span class="pre">tracker</span></span><a class="headerlink" href="#gondola.events.TelemetryEvent.tracker" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TelemetryEvent.tracker_pointcloud">
+<span class="sig-name descname"><span class="pre">tracker_pointcloud</span></span><a class="headerlink" href="#gondola.events.TelemetryEvent.tracker_pointcloud" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TelemetryEvent.version">
+<span class="sig-name descname"><span class="pre">version</span></span><a class="headerlink" href="#gondola.events.TelemetryEvent.version" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="gondola.db.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">gondola.db</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="gondola.gondola_core.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">gondola.gondola_core</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit"><code class="docutils literal notranslate"><span class="pre">TofHit</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.TOT_high_a"><code class="docutils literal notranslate"><span class="pre">TofHit.TOT_high_a</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.TOT_high_b"><code class="docutils literal notranslate"><span class="pre">TofHit.TOT_high_b</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.TOT_low_a"><code class="docutils literal notranslate"><span class="pre">TofHit.TOT_low_a</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.TOT_low_b"><code class="docutils literal notranslate"><span class="pre">TofHit.TOT_low_b</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.TOT_slp_high_a"><code class="docutils literal notranslate"><span class="pre">TofHit.TOT_slp_high_a</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.TOT_slp_high_b"><code class="docutils literal notranslate"><span class="pre">TofHit.TOT_slp_high_b</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.TOT_slp_low_a"><code class="docutils literal notranslate"><span class="pre">TofHit.TOT_slp_low_a</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.TOT_slp_low_b"><code class="docutils literal notranslate"><span class="pre">TofHit.TOT_slp_low_b</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.baseline_a"><code class="docutils literal notranslate"><span class="pre">TofHit.baseline_a</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.baseline_a_rms"><code class="docutils literal notranslate"><span class="pre">TofHit.baseline_a_rms</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.baseline_b"><code class="docutils literal notranslate"><span class="pre">TofHit.baseline_b</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.baseline_b_rms"><code class="docutils literal notranslate"><span class="pre">TofHit.baseline_b_rms</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.cable_delay"><code class="docutils literal notranslate"><span class="pre">TofHit.cable_delay</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.charge_a"><code class="docutils literal notranslate"><span class="pre">TofHit.charge_a</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.charge_b"><code class="docutils literal notranslate"><span class="pre">TofHit.charge_b</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.coax_cbl_time"><code class="docutils literal notranslate"><span class="pre">TofHit.coax_cbl_time</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.distance"><code class="docutils literal notranslate"><span class="pre">TofHit.distance()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.edep"><code class="docutils literal notranslate"><span class="pre">TofHit.edep</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.event_t0"><code class="docutils literal notranslate"><span class="pre">TofHit.event_t0</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.hart_cbl_time"><code class="docutils literal notranslate"><span class="pre">TofHit.hart_cbl_time</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.obeys_causality"><code class="docutils literal notranslate"><span class="pre">TofHit.obeys_causality()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.paddle_id"><code class="docutils literal notranslate"><span class="pre">TofHit.paddle_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.paddle_len"><code class="docutils literal notranslate"><span class="pre">TofHit.paddle_len</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.peak_a"><code class="docutils literal notranslate"><span class="pre">TofHit.peak_a</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.peak_b"><code class="docutils literal notranslate"><span class="pre">TofHit.peak_b</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.phase"><code class="docutils literal notranslate"><span class="pre">TofHit.phase</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.phase_delay"><code class="docutils literal notranslate"><span class="pre">TofHit.phase_delay</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.pos"><code class="docutils literal notranslate"><span class="pre">TofHit.pos</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.set_paddle"><code class="docutils literal notranslate"><span class="pre">TofHit.set_paddle()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.t0"><code class="docutils literal notranslate"><span class="pre">TofHit.t0</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.t0_uncorrected"><code class="docutils literal notranslate"><span class="pre">TofHit.t0_uncorrected</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.time_a"><code class="docutils literal notranslate"><span class="pre">TofHit.time_a</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.time_b"><code class="docutils literal notranslate"><span class="pre">TofHit.time_b</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.version"><code class="docutils literal notranslate"><span class="pre">TofHit.version</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.x"><code class="docutils literal notranslate"><span class="pre">TofHit.x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.y"><code class="docutils literal notranslate"><span class="pre">TofHit.y</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.z"><code class="docutils literal notranslate"><span class="pre">TofHit.z</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerHit"><code class="docutils literal notranslate"><span class="pre">TrackerHit</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerHit.adc"><code class="docutils literal notranslate"><span class="pre">TrackerHit.adc</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerHit.channel"><code class="docutils literal notranslate"><span class="pre">TrackerHit.channel</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerHit.energy"><code class="docutils literal notranslate"><span class="pre">TrackerHit.energy</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerHit.layer"><code class="docutils literal notranslate"><span class="pre">TrackerHit.layer</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerHit.module"><code class="docutils literal notranslate"><span class="pre">TrackerHit.module</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerHit.oscillator"><code class="docutils literal notranslate"><span class="pre">TrackerHit.oscillator</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerHit.row"><code class="docutils literal notranslate"><span class="pre">TrackerHit.row</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerHit.strip_id"><code class="docutils literal notranslate"><span class="pre">TrackerHit.strip_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerHit.subtract_pedestal"><code class="docutils literal notranslate"><span class="pre">TrackerHit.subtract_pedestal()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerHit.x"><code class="docutils literal notranslate"><span class="pre">TrackerHit.x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerHit.y"><code class="docutils literal notranslate"><span class="pre">TrackerHit.y</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerHit.z"><code class="docutils literal notranslate"><span class="pre">TrackerHit.z</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEventHeader"><code class="docutils literal notranslate"><span class="pre">RBEventHeader</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEventHeader.channel_mask"><code class="docutils literal notranslate"><span class="pre">RBEventHeader.channel_mask</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEventHeader.drs_deadtime"><code class="docutils literal notranslate"><span class="pre">RBEventHeader.drs_deadtime</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEventHeader.drs_lost_trigger"><code class="docutils literal notranslate"><span class="pre">RBEventHeader.drs_lost_trigger</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEventHeader.event_id"><code class="docutils literal notranslate"><span class="pre">RBEventHeader.event_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEventHeader.fpga_temp"><code class="docutils literal notranslate"><span class="pre">RBEventHeader.fpga_temp</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEventHeader.get_channels"><code class="docutils literal notranslate"><span class="pre">RBEventHeader.get_channels()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEventHeader.is_event_fragment"><code class="docutils literal notranslate"><span class="pre">RBEventHeader.is_event_fragment</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEventHeader.is_locked"><code class="docutils literal notranslate"><span class="pre">RBEventHeader.is_locked</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEventHeader.is_locked_last_sec"><code class="docutils literal notranslate"><span class="pre">RBEventHeader.is_locked_last_sec</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEventHeader.lost_lock"><code class="docutils literal notranslate"><span class="pre">RBEventHeader.lost_lock</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEventHeader.lost_lock_last_sec"><code class="docutils literal notranslate"><span class="pre">RBEventHeader.lost_lock_last_sec</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEventHeader.rb_id"><code class="docutils literal notranslate"><span class="pre">RBEventHeader.rb_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEventHeader.stop_cell"><code class="docutils literal notranslate"><span class="pre">RBEventHeader.stop_cell</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEventHeader.timestamp16"><code class="docutils literal notranslate"><span class="pre">RBEventHeader.timestamp16</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEventHeader.timestamp32"><code class="docutils literal notranslate"><span class="pre">RBEventHeader.timestamp32</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEvent"><code class="docutils literal notranslate"><span class="pre">RBEvent</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEvent.from_bytestream"><code class="docutils literal notranslate"><span class="pre">RBEvent.from_bytestream()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEvent.from_random"><code class="docutils literal notranslate"><span class="pre">RBEvent.from_random()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEvent.from_tofpacket"><code class="docutils literal notranslate"><span class="pre">RBEvent.from_tofpacket()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEvent.get_waveform"><code class="docutils literal notranslate"><span class="pre">RBEvent.get_waveform()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEvent.get_waveform_slow"><code class="docutils literal notranslate"><span class="pre">RBEvent.get_waveform_slow()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEvent.header"><code class="docutils literal notranslate"><span class="pre">RBEvent.header</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEvent.hits"><code class="docutils literal notranslate"><span class="pre">RBEvent.hits</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEvent.pack"><code class="docutils literal notranslate"><span class="pre">RBEvent.pack()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEvent.status"><code class="docutils literal notranslate"><span class="pre">RBEvent.status</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBEvent.waveforms"><code class="docutils literal notranslate"><span class="pre">RBEvent.waveforms</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform"><code class="docutils literal notranslate"><span class="pre">RBWaveform</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.adc_a"><code class="docutils literal notranslate"><span class="pre">RBWaveform.adc_a</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.adc_b"><code class="docutils literal notranslate"><span class="pre">RBWaveform.adc_b</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.apply_spike_filter"><code class="docutils literal notranslate"><span class="pre">RBWaveform.apply_spike_filter()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.calibrate"><code class="docutils literal notranslate"><span class="pre">RBWaveform.calibrate()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.charge_a_below_500_trap"><code class="docutils literal notranslate"><span class="pre">RBWaveform.charge_a_below_500_trap</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.charge_a_trap"><code class="docutils literal notranslate"><span class="pre">RBWaveform.charge_a_trap</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.charge_b_below_500_trap"><code class="docutils literal notranslate"><span class="pre">RBWaveform.charge_b_below_500_trap</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.charge_b_trap"><code class="docutils literal notranslate"><span class="pre">RBWaveform.charge_b_trap</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.event_id"><code class="docutils literal notranslate"><span class="pre">RBWaveform.event_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.from_bytestream"><code class="docutils literal notranslate"><span class="pre">RBWaveform.from_bytestream()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.from_random"><code class="docutils literal notranslate"><span class="pre">RBWaveform.from_random()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.from_tofpacket"><code class="docutils literal notranslate"><span class="pre">RBWaveform.from_tofpacket()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.get_tot_a"><code class="docutils literal notranslate"><span class="pre">RBWaveform.get_tot_a()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.get_tot_b"><code class="docutils literal notranslate"><span class="pre">RBWaveform.get_tot_b()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.max_peak_a_guess"><code class="docutils literal notranslate"><span class="pre">RBWaveform.max_peak_a_guess</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.max_peak_b_guess"><code class="docutils literal notranslate"><span class="pre">RBWaveform.max_peak_b_guess</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.pack"><code class="docutils literal notranslate"><span class="pre">RBWaveform.pack()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.paddle_id"><code class="docutils literal notranslate"><span class="pre">RBWaveform.paddle_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.rb_channel_a"><code class="docutils literal notranslate"><span class="pre">RBWaveform.rb_channel_a</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.rb_channel_b"><code class="docutils literal notranslate"><span class="pre">RBWaveform.rb_channel_b</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.rb_id"><code class="docutils literal notranslate"><span class="pre">RBWaveform.rb_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.stop_cell"><code class="docutils literal notranslate"><span class="pre">RBWaveform.stop_cell</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.subtract_pedestals"><code class="docutils literal notranslate"><span class="pre">RBWaveform.subtract_pedestals()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.times_a"><code class="docutils literal notranslate"><span class="pre">RBWaveform.times_a</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.times_b"><code class="docutils literal notranslate"><span class="pre">RBWaveform.times_b</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.voltages_a"><code class="docutils literal notranslate"><span class="pre">RBWaveform.voltages_a</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.RBWaveform.voltages_b"><code class="docutils literal notranslate"><span class="pre">RBWaveform.voltages_b</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent"><code class="docutils literal notranslate"><span class="pre">TofEvent</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.copy"><code class="docutils literal notranslate"><span class="pre">TofEvent.copy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.event_id"><code class="docutils literal notranslate"><span class="pre">TofEvent.event_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.event_status"><code class="docutils literal notranslate"><span class="pre">TofEvent.event_status</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.from_bytestream"><code class="docutils literal notranslate"><span class="pre">TofEvent.from_bytestream()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.from_random"><code class="docutils literal notranslate"><span class="pre">TofEvent.from_random()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.from_tofpacket"><code class="docutils literal notranslate"><span class="pre">TofEvent.from_tofpacket()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.get_edep"><code class="docutils literal notranslate"><span class="pre">TofEvent.get_edep</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.get_edep_cortina"><code class="docutils literal notranslate"><span class="pre">TofEvent.get_edep_cortina</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.get_edep_cube"><code class="docutils literal notranslate"><span class="pre">TofEvent.get_edep_cube</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.get_edep_umbrella"><code class="docutils literal notranslate"><span class="pre">TofEvent.get_edep_umbrella</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.get_missing_paddles_hg"><code class="docutils literal notranslate"><span class="pre">TofEvent.get_missing_paddles_hg()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.get_triggered_paddles"><code class="docutils literal notranslate"><span class="pre">TofEvent.get_triggered_paddles()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.has_any_mangling"><code class="docutils literal notranslate"><span class="pre">TofEvent.has_any_mangling</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.hitmap"><code class="docutils literal notranslate"><span class="pre">TofEvent.hitmap</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.hits"><code class="docutils literal notranslate"><span class="pre">TofEvent.hits</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.lightspeed_cleaning"><code class="docutils literal notranslate"><span class="pre">TofEvent.lightspeed_cleaning()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.lost_hits"><code class="docutils literal notranslate"><span class="pre">TofEvent.lost_hits</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.move_hits"><code class="docutils literal notranslate"><span class="pre">TofEvent.move_hits()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.nhits"><code class="docutils literal notranslate"><span class="pre">TofEvent.nhits</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.nhits_cbe"><code class="docutils literal notranslate"><span class="pre">TofEvent.nhits_cbe</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.nhits_cor"><code class="docutils literal notranslate"><span class="pre">TofEvent.nhits_cor</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.nhits_umb"><code class="docutils literal notranslate"><span class="pre">TofEvent.nhits_umb</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.normalize_hit_times"><code class="docutils literal notranslate"><span class="pre">TofEvent.normalize_hit_times()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.pack"><code class="docutils literal notranslate"><span class="pre">TofEvent.pack()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.pointcloud"><code class="docutils literal notranslate"><span class="pre">TofEvent.pointcloud</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.rb_events"><code class="docutils literal notranslate"><span class="pre">TofEvent.rb_events</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.rb_link_ids"><code class="docutils literal notranslate"><span class="pre">TofEvent.rb_link_ids</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.remove_non_causal_hits"><code class="docutils literal notranslate"><span class="pre">TofEvent.remove_non_causal_hits()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.set_packed_status_version"><code class="docutils literal notranslate"><span class="pre">TofEvent.set_packed_status_version()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.set_timing_offsets"><code class="docutils literal notranslate"><span class="pre">TofEvent.set_timing_offsets()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.status"><code class="docutils literal notranslate"><span class="pre">TofEvent.status</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.strip_packed_rbevents_for_pv3"><code class="docutils literal notranslate"><span class="pre">TofEvent.strip_packed_rbevents_for_pv3()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.timestamp16"><code class="docutils literal notranslate"><span class="pre">TofEvent.timestamp16</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.timestamp32"><code class="docutils literal notranslate"><span class="pre">TofEvent.timestamp32</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.timestamp48"><code class="docutils literal notranslate"><span class="pre">TofEvent.timestamp48</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.trigger_hits"><code class="docutils literal notranslate"><span class="pre">TofEvent.trigger_hits</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.trigger_sources"><code class="docutils literal notranslate"><span class="pre">TofEvent.trigger_sources</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.waveforms"><code class="docutils literal notranslate"><span class="pre">TofEvent.waveforms</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.event_id"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.event_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.from_telemetrypacket"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.from_telemetrypacket()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.get_trk_energy"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.get_trk_energy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.header"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.header</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.tof"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.tof</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.tracker"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.tracker</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.tracker_pointcloud"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.tracker_pointcloud</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.version"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.version</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/_autosummary/gondola.events.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, J.A.Stoessl.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

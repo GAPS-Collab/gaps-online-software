@@ -26,7 +26,8 @@ var annotated_dup =
       [ "CRFrameObject", "structgondola_1_1CRFrameObject.html", "structgondola_1_1CRFrameObject" ],
       [ "CRReader", "structgondola_1_1CRReader.html", "structgondola_1_1CRReader" ],
       [ "RBCalibration", "structgondola_1_1RBCalibration.html", "structgondola_1_1RBCalibration" ],
-      [ "TelemetryPacketReader", "structgondola_1_1TelemetryPacketReader.html", "structgondola_1_1TelemetryPacketReader" ]
+      [ "TelemetryPacketReader", "structgondola_1_1TelemetryPacketReader.html", "structgondola_1_1TelemetryPacketReader" ],
+      [ "TofPaddleTimingConstant", "structgondola_1_1TofPaddleTimingConstant.html", "structgondola_1_1TofPaddleTimingConstant" ]
     ] ],
     [ "std", null, [
       [ "formatter< EventStatus >", "structstd_1_1formatter_3_01EventStatus_01_4.html", "structstd_1_1formatter_3_01EventStatus_01_4" ]

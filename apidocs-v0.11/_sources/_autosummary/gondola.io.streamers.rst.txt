@@ -1,0 +1,13 @@
+gondola.io.streamers
+====================
+
+.. automodule:: gondola.io.streamers
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      PacketStreamer
+      TelemetrySocketReader
+   
