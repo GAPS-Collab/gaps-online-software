@@ -300,16 +300,21 @@ RBTab {
         }, 
         Some(_rb_id) => {
           let cali_path = format!("calibrations/RB{:02}.cali.tof.gaps", _rb_id + 1);
-          if fs::metadata(cali_path.clone()).is_ok() {
-            match RBCalibrations::from_file(cali_path.clone(), true) {
-              Err(err) => error!("Unable to load RBCalibration from file {}! {err}", cali_path),
-              Ok(cali) => {
-                self.rb_calibration = cali;
-                self.cali_loaded    = true;
+          match fs::metadata(cali_path.clone()) {
+            Ok(_) => {
+              match RBCalibrations::from_file(cali_path.clone(), true) {
+                Err(err) => error!("Unable to load RBCalibration from file {}! {err}", cali_path),
+                Ok(cali) => {
+                  self.rb_calibration = cali;
+                  self.cali_loaded    = true;
+                }
               }
-            } 
-          } else {
-            self.cali_loaded = false;
+            }
+            Err(err) => {
+              error!("Something is wrong with path {}! {err}", cali_path.clone());
+          
+              self.cali_loaded = false;
+            }
           }
         }
       }
@@ -574,6 +579,7 @@ RBTab {
         match self.rbs.get(&self.rb_selector) {
           Some(_rb) => {
             view_string = format!("{}", _rb.to_summary_str());
+            //view_string = format!("{}", _rb);
           }
           None => {
             view_string = format!("No information for RB {} in DB \n or DB not available!", self.rb_selector);

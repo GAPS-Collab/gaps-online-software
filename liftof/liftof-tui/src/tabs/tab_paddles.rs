@@ -285,9 +285,10 @@ impl PaddleTab<'_> {
           }
         }
         // patch it for now
-        if wf.paddle_id == 0 {
-          wf.paddle_id = self.rb_ch_map[&wf.rb_id][&wf.rb_channel_a];
-        }
+        //if wf.paddle_id == 0 {
+        //  
+        //  wf.paddle_id = self.rb_ch_map[&wf.rb_id][&wf.rb_channel_a];
+        //}
         if wf.paddle_id == 0 {
           error!("Got waveform with padle id 0!");
         } else if wf.paddle_id > 160 {
