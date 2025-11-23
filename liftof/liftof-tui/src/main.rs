@@ -910,22 +910,40 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let allow_commands = args.allow_commands;
   
   let config          : LiftofSettings;
-  if let Some(config_data) = args.config { 
-    //cfg_file_str = cfg_file.clone();
-    match LiftofSettings::from_toml(&config_data) {
-      Err(err) => {
-        error!("CRITICAL! Unable to parse .toml settings file! {}", err);
-        panic!("Unable to parse config file!");
-      }
-      Ok(_cfg) => {
-        config = _cfg;
+  match args.config {
+    Some(config_data) => { 
+      //cfg_file_str = cfg_file.clone();
+      match LiftofSettings::from_toml(&config_data) {
+        Err(err) => {
+          error!("CRITICAL! Unable to parse .toml settings file! {}", err);
+          panic!("Unable to parse config file!");
+        }
+        Ok(_cfg) => {
+          config = _cfg;
+        }
       }
     }
-  } else {
-    error!("No config file specified! Please specify a config file with -c <your-config.toml>!");
-    panic!("Can not proceed without config file! Please specify a config file with -c <your-config.toml>!");
-  }
- 
+    None => {
+      info!("No config file given, will try '/home/gaps/staging/current/liftof-config.toml'"); 
+      match LiftofSettings::from_toml("/home/gaps/staging/current/liftof-config.toml") {
+        Err(err) => {
+          match LiftofSettings::from_toml("liftof-config.toml") {
+            Err(err) => {
+        
+              panic!("I can't find any valid config file, even though I tried in the usual locations! Please specify one with -c ");
+            }
+            Ok(_cfg) => {
+              config = _cfg;
+            }
+          }
+        }
+        Ok(_cfg) => {
+          config = _cfg;
+        }
+      }
+    }
+  } 
+
   // alerts for everybody! (yay I guess..)
   let global_alerts      = Arc::new(Mutex::new(HashMap::<&'static str, TofAlert<'static>>::new())); 
   match args.alert_manifest {
