@@ -1174,10 +1174,16 @@ TofHit TofHit::from_bytestream(const Vec<u8> &bytestream,
  pos += 1; // skip version
  hit.baseline_b     = Gaps::parse_f16(bytestream, pos);
  hit.baseline_b_rms = Gaps::parse_f16(bytestream, pos);
- 
+
  // FIXME checks - packetlength, checksum ?
+ //if (version == 64) {
+ //  pos +=   
+ //}
+ // skip new variables for now
+ pos += 14;
  u16 tail = Gaps::parse_u16(bytestream, pos);
  if (tail != TAIL) {
+   spdlog::error("VERSION {}", version); 
    spdlog::error("TofHit TAIL signature {} is incorrect!", tail);
  }
  return hit; 
