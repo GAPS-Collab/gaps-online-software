@@ -326,6 +326,8 @@ pub enum EventStatus {
   EventTimeOut           = 23u8,
   /// A RB misses Ch9 data
   NoChannel9             = 24u8,
+  /// A RBReceives a strange event id 
+  RBEventWacky           = 25u8,
   GoodNoCRCOrErrBitCheck = 39u8,
   /// The event status is good, but we did not 
   /// perform any CRC32 check

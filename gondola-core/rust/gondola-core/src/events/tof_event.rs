@@ -385,20 +385,38 @@ impl TofEvent {
   #[cfg(feature="database")]
   pub fn set_paddles(&mut self, paddles : &HashMap<u8, TofPaddle>) {
     let mut nerror = 0u8;
-    for h in &mut self.hits {
-      match paddles.get(&h.paddle_id) {
-        None => {
-          error!("Got paddle id {} which is not in given map!", h.paddle_id);
-          nerror += 1;
-          continue;
+    if self.hits.len() == 0 {
+      for rbev  in &mut self.rb_events {
+        for h in &mut rbev.hits {
+          match paddles.get(&h.paddle_id) {
+            None => {
+              error!("Got paddle id {} which is not in given map!", h.paddle_id);
+              nerror += 1;
+              continue;
+            }
+            Some(pdl) => {
+              h.set_paddle(pdl);
+            }
+          }
         }
-        Some(pdl) => {
-          h.set_paddle(pdl);
+      }
+    } else {
+      for h in &mut self.hits {
+        match paddles.get(&h.paddle_id) {
+          None => {
+            error!("Got paddle id {} which is not in given map!", h.paddle_id);
+            nerror += 1;
+            continue;
+          }
+          Some(pdl) => {
+            h.set_paddle(pdl);
+          }
         }
       }
     }
     if nerror == 0 {
       self.paddles_set = true;
+      //self.normalize_hit_times();
     }
   }
 
@@ -464,7 +482,7 @@ impl TofEvent {
     let mut links = Vec::<u8>::new();
     for k in 0..64 {
       if (self.mtb_link_mask >> k) as u64 & 0x1 == 1 {
-        links.push(k as u8);
+        links.push(k +1 as u8);
       }
     }
     links
@@ -1315,8 +1333,19 @@ impl TofEvent {
       }
     }
   }
-
-
+  
+  #[cfg(feature="database")]
+  #[staticmethod]
+  fn unpack(pack : &TofPacket) -> PyResult<Self> {
+    if pack.packet_type != Self::TOF_PACKET_TYPE {
+      let err_msg = format!("This is a packet of type {}, but we need type {}", pack.packet_type, Self::TOF_PACKET_TYPE);
+      return Err(PyValueError::new_err(err_msg));
+    }
+    let mut pos = 0;
+    let mut ev = Self::from_bytestream(&pack.payload,&mut pos)?; 
+    ev.set_paddles(&pack.tof_paddles);
+    Ok(ev)
+  }
 }
 
 #[cfg(feature="pybindings")]
