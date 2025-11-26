@@ -175,6 +175,9 @@ NB_MODULE(gondola_cxx, m) {
     .def("cache_all_packets"         , &g::TelemetryPacketReader::cache_all_packets)
     .def("count_packets"             , &g::TelemetryPacketReader::count_packets)
     .def("rewind"                    , &g::TelemetryPacketReader::rewind);
+  
+  nb::class_<g::MergedEvent>(m, "TelemetryEvent")
+    .def(nb::init<>());
 
   // Spike cleaning functions
   m.def("spike_cleaning_drs4", &g::spike_cleaning_drs4, 
