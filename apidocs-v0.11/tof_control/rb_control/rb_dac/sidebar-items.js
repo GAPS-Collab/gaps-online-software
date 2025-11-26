@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["dac_noi_mode","dac_sma_mode","dac_tcal_mode","dac_vcal_mode","read_dac","read_single_dac","set_dac","set_dac_500","set_input_range","zero_dac"]};
+window.SIDEBAR_ITEMS = {"fn":["dac_noi_mode","dac_sma_mode","dac_tcal_mode","dac_vcal_mode","read_dac","read_single_dac","set_dac","set_dac_500","set_input_range","set_single_dac","zero_dac"]};
