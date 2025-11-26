@@ -785,21 +785,26 @@ pythonize!(AnalysisEngineSettings);
 //--------------------------------------------------------------
 
 /// Settings to change the configuration of the TOF Eventbuilder
-#[derive(Debug, Copy, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TofEventBuilderSettings {
-  pub cachesize           : u32,
-  pub n_mte_per_loop      : u32,
-  pub n_rbe_per_loop      : u32,
+  pub cachesize             : u32,
+  pub n_mte_per_loop        : u32,
+  pub n_rbe_per_loop        : u32,
   /// The timeout parameter for the TofEvent. If not
   /// complete after this time, send it onwards anyway
-  pub te_timeout_sec      : u32,
+  pub te_timeout_sec        : u32,
+  /// The timeout parameter for the TofEvent, but only 
+  /// for the combo trigger part. 
+  pub te_timeout_sec_combo  : Option<u32>,
+  /// Only do something when holdoff time has passed 
+  pub holdoff               : Option<u32>,
   /// try to sort the events by id (uses more resources)
-  pub sort_events         : bool,
-  pub build_strategy      : BuildStrategy,
-  pub greediness          : u8,
-  pub wait_nrb            : u8,
-  pub hb_send_interval    : u16,
-  pub ingore_mtb_link_ids : Option<Vec<u8>>,
+  pub sort_events           : bool,
+  pub build_strategy        : BuildStrategy,
+  pub greediness            : u8,
+  pub wait_nrb              : u8,
+  pub hb_send_interval      : u16,
+  pub ignore_mtb_link_ids   : Option<Vec<u8>>,
   /// Allows to restrict saving the event to disk
   /// based on the interesting event parameters
   /// (These are minimum values)
@@ -819,6 +824,8 @@ impl TofEventBuilderSettings {
       n_mte_per_loop        : 1,
       n_rbe_per_loop        : 40,
       te_timeout_sec        : 30,
+      te_timeout_sec_combo  : Some(30),
+      holdoff               : Some(0),
       sort_events           : false,
       build_strategy        : BuildStrategy::Adaptive,
       greediness            : 3,
@@ -847,6 +854,12 @@ impl TofEventBuilderSettings {
     }
     if cfg.te_timeout_sec.is_some() {
       self.te_timeout_sec = cfg.te_timeout_sec.unwrap();
+    }
+    if cfg.te_timeout_sec_combo.is_some() {
+      self.te_timeout_sec_combo = Some(cfg.te_timeout_sec_combo.unwrap());
+    }
+    if cfg.holdoff.is_some() {
+      self.holdoff = Some(cfg.holdoff.unwrap());
     }
     if cfg.sort_events.is_some() {
       self.sort_events = cfg.sort_events.unwrap();
