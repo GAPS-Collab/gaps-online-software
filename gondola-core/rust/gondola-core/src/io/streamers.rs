@@ -554,11 +554,11 @@ impl RBEventMemoryStreamer {
             dig.update(&this_field.to_le_bytes());
             if self.check_channel_errors {
               if ((0x8000 & this_field) >> 15) == 0x1 {
-                error!("Ch error bit set for ch {}!", ch);
+                debug!("Ch error bit set for ch {}!", ch);
                 event_status = EventStatus::ChnSyncErrors;
               }
               if ((0x4000 & this_field) >> 14) == 0x1 {
-                error!("Cell error bit set for ch {}!", ch);
+                debug!("Cell error bit set for ch {}!", ch);
                 event_status = EventStatus::CellSyncErrors;
                 any_cell_error = true;
               }
@@ -570,11 +570,11 @@ impl RBEventMemoryStreamer {
           if self.check_channel_errors {
             let adc_w_errs = u8_to_u16_err_check(&self.stream[self.pos..self.pos + 2*nwords]);
             if adc_w_errs.1 {
-              error!("Ch error bit set for ch {}!", ch);
+              debug!("Ch error bit set for ch {}!", ch);
               event_status = EventStatus::ChnSyncErrors;
               any_cell_error = true;
             } else if adc_w_errs.2 {
-              error!("Cell error bit set for ch {}!", ch);
+              debug!("Cell error bit set for ch {}!", ch);
               event_status = EventStatus::CellSyncErrors;
             }
             event.adc[*ch as usize] = adc_w_errs.0;
