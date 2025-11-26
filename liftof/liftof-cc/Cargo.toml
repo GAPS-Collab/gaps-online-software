@@ -1,6 +1,6 @@
 [package]
 name        = "liftof-cc" # the name of the package
-version     = "0.11.2"    # the current version, obeying semver
+version     = "0.11.3"    # the current version, obeying semver
 authors     = ["J.A. Stoessl <stoessl@hawaii.edu>", "G. Tytus <gtytus@hawaii.edu>"]
 description = "A programm for the GAPS science instrument. Read out the time-of-flight detectors and process their data."
 edition     = "2024"
@@ -43,10 +43,11 @@ toml        = "0.8"
 env_logger  = "0.10"
 
 [dependencies.tof-control]
-version  = "1"
+version  = "0.9.5"
 optional = true
 git      = "https://github.com/GAPS-Collab/tof-control.git"
-branch   = "minimal"
+#branch   = "minimal"
+rev      = "23ab243acf48c4c71a994964dee0b612b8cb6132"
 
 #[workspace.metadata.cross.target.x86_64-unknown-linux-musl]
 ## Install libssl-dev:arm64, see <https://github.com/cross-rs/cross/blob/main/docs/custom_images.md#adding-dependencies-to-existing-images>
