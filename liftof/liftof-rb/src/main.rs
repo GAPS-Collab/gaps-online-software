@@ -128,6 +128,10 @@ fn main() {
   // for deployment script
   let args                     = Args::parse();                   
   
+  // some pre-defined time units for 
+  // sleeping
+  let one_sec     = Duration::from_secs(1);  
+  
   // get board info 
   let rb_info = RBInfo::new();
   // check if it is sane. If we are not able to 
@@ -169,8 +173,9 @@ fn main() {
     None => (),
     Some(ref pb_ltb_rbs) => {
       if pb_ltb_rbs.contains(&rb_id) {
-        println!("Found this rb {} in the list of RBs which control both, PB and LTB!", rb_id);        ltb_connected = true;
+        println!("Found this rb {} in the list of RBs which control both, PB and LTB!", rb_id);        
         pb_connected  = true;
+        ltb_connected = true;
       }
     }
   }
@@ -208,7 +213,7 @@ fn main() {
   }
   let only_perfect_events   = false;
   let cmd_server_address    = config.cmd_dispatcher_settings.cc_server_address.clone();
-  let run_config            = config.rb_settings.get_runconfig();
+  let run_config            = config.rb_settings.get_runconfig(rb_id);
   #[cfg(feature="database")]
   let db_path               = config.db_path.clone();
 
@@ -295,6 +300,7 @@ fn main() {
     cfg_if::cfg_if!{
       if #[cfg(feature="database")] {
         let ltb_cfg = config.ltb_settings.clone();
+        println!("{}", ltb_cfg);
         if ltb_cfg.set_strategy == ParameterSetStrategy::Board 
           && ltb_cfg.set_ltb_thresholds {
           match connect_to_db_path(&db_path) {
@@ -372,6 +378,19 @@ fn main() {
             error!("Received unexpected MTB link ID {} for this board {}! We expected MTB LINK ID {}", link_id, rb_id, rb_expected_link_id);
             error!("Incorrect link ID. This might hint to issues with the MTB mapping!");
             error!("******************************************************************");
+            //let n_attempts = 3u8;
+            //let mut attempt = 0u8;
+            //error!("For debugging purposes, I will check that register {} times", n_attempts);
+            //while attempt < n_attempts { 
+            //  match get_mtb_link_id() {
+            //    Err(err) => error!("Unable to obtain MTB link id! {err}"),
+            //    Ok(link_id) => {
+            //      error!("Got link_id {} on attempt {}", link_id, attempt);
+            //      attempt += 1;
+            //      thread::sleep(one_sec);
+            //    }
+            //  }        
+            //}
             if args.ignore_mtb_link_id_check {
               warn!("The MTB LINK ID check failed, however, we are explicetly instructed to ignore that check, since the --ignore-mte-link-id-check flag is set!");
             } else {
@@ -431,9 +450,6 @@ fn main() {
   //                                      */
   //***************************************/
 
-  // some pre-defined time units for 
-  // sleeping
-  let one_sec     = Duration::from_secs(1);  
 
   // setting up inter-thread comms
   let mut tc = ThreadControl::new();
@@ -539,12 +555,18 @@ fn main() {
     println!("=> Terminated. So long and thanks for all the \u{1F41F}");
     exit(0);
   } else {
-    // this should not be necessary, but might catch 
-    // a stuck calibration from a previous attempt
-    match select_sma_mode() {
-      Err(err) => error!("Unable to select SMA mode! {err:?}"),
-      Ok(_)    => ()
-    } 
+    //// this should not be necessary, but might catch 
+    //// a stuck calibration from a previous attempt
+    //let n_attempts  = 5u8;
+    //let mut attempt = 0u8;
+    //while attempt < n_attempts { 
+    //  match select_sma_mode() {
+    //    Err(err) => error!("Unable to select SMA mode on attempt {}! {err:?}", attempt),
+    //    Ok(_)    => println!(" => Successfully set SMA mode on attempt {}!", attempt)
+    //  }
+    //  thread::sleep(one_sec);
+    //  attempt += 1;
+    //}
   }
   
   //***************************************/
