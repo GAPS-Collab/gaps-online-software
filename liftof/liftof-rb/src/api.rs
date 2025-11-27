@@ -222,7 +222,9 @@ pub fn rb_calibration(rc_to_runner    : &Sender<RunConfig>,
     trigger_poisson_rate    : 0,
     trigger_fixed_rate      : 100,
     data_type               : DataType::Noi,
-    rb_buff_size            : 100
+    rb_buff_size            : Some(100),
+    rb_buff_empty_interval  : None,
+    rb_buff_strategy_smart  : false,
   };
   // here is the general idea. We connect to our own 
   // zmq socket, to gather the events and store them 
@@ -371,7 +373,9 @@ pub fn rb_noi_subcalibration(rc_to_runner    : &Sender<RunConfig>,
     trigger_poisson_rate    : 0,
     trigger_fixed_rate      : 100,
     data_type               : DataType::Noi,
-    rb_buff_size            : 100
+    rb_buff_size            : Some(100),
+    rb_buff_empty_interval  : None,
+    rb_buff_strategy_smart  : false
   }; 
   let socket = connect_to_zmq().expect("Not able to connect to socket, something REAL strange happened.");
 
@@ -450,7 +454,9 @@ pub fn rb_voltage_subcalibration(rc_to_runner    : &Sender<RunConfig>,
     trigger_poisson_rate    : 0,
     trigger_fixed_rate      : 100,
     data_type               : DataType::VoltageCalibration,
-    rb_buff_size            : 1000
+    rb_buff_size            : Some(1000),
+    rb_buff_empty_interval  : None,
+    rb_buff_strategy_smart  : false
   }; 
   let socket = connect_to_zmq().expect("Not able to connect to socket, something REAL strange happened.");
 
@@ -540,7 +546,9 @@ pub fn rb_timing_subcalibration(rc_to_runner    : &Sender<RunConfig>,
     trigger_poisson_rate    : 0,
     trigger_fixed_rate      : 100,
     data_type               : DataType::TimingCalibration,
-    rb_buff_size            : 1000
+    rb_buff_size            : Some(1000),
+    rb_buff_empty_interval  : None,
+    rb_buff_strategy_smart  : false
   }; 
   let socket = connect_to_zmq().expect("Not able to connect to socket, something REAL strange happened.");
 
