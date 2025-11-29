@@ -54,11 +54,13 @@ pub fn unpack_traces<T>(events : &Vec<RBEvent>)
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature="pybindings", pyclass)]
 pub struct RBEvent {
-  pub data_type    : DataType,
-  pub status       : EventStatus,
-  pub header       : RBEventHeader,
-  pub adc          : Vec<Vec<u16>>,
-  pub hits         : Vec<TofHit>,
+  pub data_type     : DataType,
+  pub status        : EventStatus,
+  pub header        : RBEventHeader,
+  pub adc           : Vec<Vec<u16>>,
+  pub hits          : Vec<TofHit>,
+  // not getting serialized
+  pub creation_time : Instant,
 }
 
 impl RBEvent {
@@ -69,11 +71,12 @@ impl RBEvent {
       adc.push(Vec::<u16>::new());
     }
     Self {
-      data_type    : DataType::Unknown,
-      status       : EventStatus::Unknown,
-      header       : RBEventHeader::new(),
-      adc          : adc,
-      hits         : Vec::<TofHit>::new(),
+      data_type     : DataType::Unknown,
+      status        : EventStatus::Unknown,
+      header        : RBEventHeader::new(),
+      adc           : adc,
+      hits          : Vec::<TofHit>::new(),
+      creation_time : Instant::now()
     }
   }
 

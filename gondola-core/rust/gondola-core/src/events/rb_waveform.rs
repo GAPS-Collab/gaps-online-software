@@ -3,8 +3,6 @@
 
 use crate::prelude::*;
 
-use std::mem;
-
 /// Waveform container for Tof waveforms
 /// This holds the waveforms for both 
 /// paddle ends. Fields are available to 
