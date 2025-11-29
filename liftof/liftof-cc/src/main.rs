@@ -59,6 +59,7 @@ use gondola_core::io::ipbus::IPBus;
 use liftof_cc::{
   prepare_run,
   calibrate_tof,
+  rm_liftof_rb_logs,
   restart_liftof_rb,
   ssh_command_rbs,
   get_queue,
@@ -630,11 +631,13 @@ fn main() {
   let (master_ev_send, master_ev_rec) = init_channels::<TofEvent>(); 
   let thread_control_eb = Arc::clone(&thread_control);
   let tp_to_sink_c      = tp_to_sink.clone();
+  let orphanage         = ev_to_builder.clone(); 
   let _evtbldr_handle = thread::Builder::new()
     .name("event-builder".into())
     .spawn(move || {
                     event_builder(&master_ev_rec,
                                   &ev_from_rb,
+                                  &orphanage,
                                   &tp_to_sink_c,
                                   &te_to_sink,
                                   mtb_link_id_map,
@@ -723,6 +726,7 @@ fn main() {
         }
         Err(err) => error!("Unable to connect to MTB to stop triggers! {err}")
       }
+      rm_liftof_rb_logs(&rb_id_list);
       restart_liftof_rb(&rb_id_list);
       let cc_pub_addr = &config.cmd_dispatcher_settings.cc_server_address;
       init_run_start(cc_pub_addr);
@@ -821,6 +825,8 @@ fn main() {
       }
       println!("=> Acquired TofDetectorStatus!");
       println!("{}", detector_status);
+      println!("{:?} Good paddles A", detector_status.get_active_paddles_a()); 
+      println!("{:?} Good paddles B", detector_status.get_active_paddles_b()); 
       let pack = detector_status.pack();
       match tp_to_sink.send(pack) {
         Err(err) => error!("Unable to send TofDetectorStatus to data sink! {err}"),

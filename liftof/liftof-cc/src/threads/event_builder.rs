@@ -51,6 +51,7 @@ use crate::constants::EVENT_BUILDER_EVID_CACHE_SIZE;
 /// * settings       : Configure the event builder
 pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
                       ev_from_rb     : &Receiver<RBEvent>,
+                      orphanage      : &Sender<RBEvent>,
                       data_sink      : &Sender<TofPacket>,
                       data_sink_ev   : &Sender<TofEvent>,
                       mtb_link_map   : HashMap<u8,u8>,
@@ -72,6 +73,9 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
   // this can block it is fine bc it is only 
   // happening once at init
   let mut cali_active : bool;
+  // two trigger types are possible, make the time out depending on them 
+  let mut primary_trigger   : TriggerType;
+  let mut secondary_trigger : TriggerType;
   loop {
     match thread_control.lock() {
       Ok(tc) => {
@@ -81,6 +85,8 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
         settings          = tc.liftof_settings.event_builder_settings.clone();
         run_id            = tc.run_id;
         cali_active       = tc.calibration_active;
+        primary_trigger   = tc.liftof_settings.mtb_settings.trigger_type;
+        secondary_trigger = tc.liftof_settings.mtb_settings.global_trigger_type;
       }
       Err(err) => {
         error!("Can't acquire lock for ThreadControl! {err}");
@@ -113,7 +119,26 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
   let mut retire               = false;
   let mut hb_timer             = Instant::now(); 
   let hb_interval              = Duration::from_secs(settings.hb_send_interval as u64);
-  
+
+  //let mut debug_orphans        = Vec::<RBEvent>::new();
+
+  // holdoff, just empty the channels, until we are confident to start 
+  if let Some(ho) = settings.holdoff {
+    // orphans, stfu
+    while hb_timer.elapsed().as_secs() < ho as u64 {
+      let _foo = m_trig_ev.try_recv();
+      let _bar = ev_from_rb.try_recv();
+    }
+    println!("=> EvtBldr passed holdoff time of {}", ho);
+  }
+  //------- DEBUG -- Measure the timing of the different parts 
+  //------- of the loop
+  //let mut mt_loop_time     = Instant::now();
+  //let mut avg_mt_loop_time = 0u128;
+  //let mut n_iter_mt_loop   = 0usize;
+  //let mut rb_loop_time     = Instant::now();
+  //let mut avg_rb_loop_time = 0u128;
+  //let mut n_iter_rbe_loop  = 0usize;
   loop {
     if check_tc_update.elapsed().as_secs() > 2 {
       //println!("= => [evt_builder] checkling tc..");
@@ -159,7 +184,13 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
     n_received = 0;
     while n_received < settings.n_mte_per_loop as usize {
       // every iteration, we welcome a new master event
+      //mt_loop_time = Instant::now(); 
+      //if m_trig_ev.is_empty() {
+      //  continue;
+      //}
+      // have that deliberatly blocking
       match m_trig_ev.try_recv() {
+      //match m_trig_ev.try_recv() {
         Err(_) => {
           trace!("No new event ready yet!");
           //n_receiving_errors += 1;
@@ -184,6 +215,9 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
           heartbeat.n_mte_received_tot += 1;
         }
       } // end match Ok(mt)
+      //avg_mt_loop_time += mt_loop_time.elapsed().as_nanos();
+      //n_iter_mt_loop += 1;
+      //mt_loop_time     = Instant::now(); 
     } // end getting MTEvents
     trace!("Debug timer MTE received! {:?}", debug_timer.elapsed());
     // recycle that variable for the rb events as well
@@ -193,6 +227,8 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
     // longer pathway (harting cable + ethernet cables) and DRS and user time, RBEvents are 
     // ALWAYS later than the MTEvents.
     'main: while !ev_from_rb.is_empty() && n_received < settings.n_rbe_per_loop as usize {
+      
+      //rb_loop_time = Instant::now();
       match ev_from_rb.try_recv() {
         Err(err) => {
           error!("Can't receive RBEvent! Err {err}");
@@ -200,6 +236,10 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
         Ok(rb_ev) => {
           heartbeat.n_rbe_received_tot += 1;
           n_received += 1;
+          if rb_ev.status == EventStatus::RBEventWacky {
+            continue;
+          }
+
           //match seen_rbevents.get_mut(&rb_ev.header.rb_id) {
           //  Some(value) => {
           //    *value += 1;
@@ -235,13 +275,26 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
                 // we know that this is neither too late nor too early!
                 heartbeat.rbe_wo_mte          += 1;
               }
-              heartbeat.n_rbe_discarded_tot += 1;
-              heartbeat.n_rbe_orphan        += 1;
-              let delta_evid = last_rb_evid - *event_id_cache.back().unwrap();
-              debug!("We can't associate event id {} from RB {} with a MTEvent in range {} .. {}. It is {} event ids ahead !", last_rb_evid, rb_ev.header.rb_id, event_id_cache[0], event_id_cache.back().unwrap(), delta_evid);
-              debug!("{}", rb_ev);
+              //debug_orphans.push(rb_ev);
               //let orphan_pack = rb_ev.pack();
               //writer.add_tof_packet(&orphan_pack);
+              if rb_ev.creation_time.elapsed().as_secs() > 3600 {
+                
+              
+                let delta_evid = last_rb_evid - *event_id_cache.back().unwrap();
+                error!("We can't associate event id {} from RB {} with a MTEvent in range {} .. {}. It is {} event ids ahead !", last_rb_evid, rb_ev.header.rb_id, event_id_cache[0], event_id_cache.back().unwrap(), delta_evid);
+                debug!("{}", rb_ev);
+                error!("Orphan could not be adopted within 1 hour. Kicking them out!");
+                heartbeat.n_rbe_discarded_tot += 1;
+                heartbeat.n_rbe_orphan        += 1;
+                continue 'main
+              }
+              match orphanage.send(rb_ev) {
+                Ok(_) => (),
+                Err(err) => {
+                  error! ("Orphanage does not accept this orphan. They are dying in the gutter all by themselves. What a said world! {err}");
+                }
+              }
               continue 'main;
             },
             Some(ev) => {
@@ -270,13 +323,27 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
           }
         }
       }
+      thread::sleep(Duration::from_nanos(200)); 
+      //avg_rb_loop_time += rb_loop_time.elapsed().as_nanos();
+      //n_iter_rbe_loop  += 1;
     }
     // FIXME - timing debugging
-    let debug_timer_elapsed = debug_timer.elapsed().as_secs_f64();
-    //println!("Debug timer elapsed {}", debug_timer_elapsed);
-    if debug_timer_elapsed > 35.0  {
-      debug_timer = Instant::now(); 
-    }
+    //let debug_timer_elapsed = debug_timer.elapsed().as_secs_f64();
+    ////println!("Debug timer elapsed {}", debug_timer_elapsed);
+    //if debug_timer_elapsed > 90.0  {
+    //  debug_timer = Instant::now(); 
+    //  let mut file = File::create("event_id_cache.txt").unwrap();
+    //  let mut file2 = File::create("orphans.txt").unwrap();
+    //  let content = format!("{:?}", event_id_cache);
+    //  //let content = "This is a line of text.\nAnother line.";
+    //  file.write_all(content.as_bytes()); // write_all expects a byte slice
+    //  let mut content_rbs = String::new();
+    //  for k in &debug_orphans {
+    //    content_rbs += &format!("{}", k);
+    //  }
+    //  file2.write_all(content_rbs.as_bytes()); // write_al
+    //
+    //}
     trace!("Debug timer RBE received! {:?}", debug_timer.elapsed());
 
     // -----------------------------------------------------
@@ -287,7 +354,9 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
     let av_rb_ev = n_rbe_per_te as f64 / heartbeat.n_sent as f64;
     if settings.build_strategy == BuildStrategy::Adaptive || 
       settings.build_strategy  == BuildStrategy::AdaptiveThorough {
-      settings.n_rbe_per_loop  = av_rb_ev.ceil() as u32;
+      //settings.n_rbe_per_loop  = av_rb_ev.ceil() as u32;
+      settings.n_rbe_per_loop  = av_rb_ev.floor() as u32;
+
       // if the rb in the pipeline get too long, catch up
       // and drain it a bit
       if ev_from_rb.len() > 1000 {
@@ -325,7 +394,18 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
           continue;
         },
         Some(ev) => {
-          let ev_timed_out = ev.age() >= settings.te_timeout_sec as u64;
+          //let ev_timed_out : u64;
+          let mut timeout = settings.te_timeout_sec as u64;  
+          for trg in &ev.get_trigger_sources() {
+            // the secondary trigger should superseed the primary trigger and only if 
+            // we have the secondary trigger, we will apply the other timeout 
+            if trg == &secondary_trigger {
+              if let Some(to) = settings.te_timeout_sec_combo { 
+                timeout = to as u64;
+              }
+            }
+          }
+          let ev_timed_out = ev.age() >= timeout;
           // timed out events should be sent in any case
           let mut ready_to_send = ev_timed_out;
           if ev_timed_out {
@@ -482,6 +562,9 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
       heartbeat.tp_sender_cbc_len    = data_sink.len()      as u64;
 
       let pack         = heartbeat.pack();
+      //println!("Avg mt loop time {}", avg_mt_loop_time as f64/n_iter_mt_loop as f64);
+      //println!("Avg rb loop time {}", avg_rb_loop_time as f64/n_iter_rbe_loop as f64);
+
       match data_sink.send(pack) {
         Err(err) => {
           error!("Packet sending failed! Err {}", err);
