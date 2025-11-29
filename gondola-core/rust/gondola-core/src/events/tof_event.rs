@@ -977,10 +977,15 @@ impl fmt::Display for TofEvent {
     repr += &(format!("\n  timestamp32      : {}", self.timestamp32)); 
     repr += &(format!("\n  timestamp16      : {}", self.timestamp16)); 
     repr += &(format!("\n   |-> timestamp48 : {}", self.get_timestamp48())); 
+    repr += &(format!("\n  mt_tiu_gps16     : {}", self.mt_tiu_gps16));
+    repr += &(format!("\n  mt_tiu_gps32     : {}", self.mt_tiu_gps32)); 
+    repr += &(format!("\n  mt_timestamp     : {}", self.mt_timestamp));
+    repr += &(format!("\n  mt_tiu_timestamp : {}", self.mt_tiu_timestamp));
+    repr += &(format!("\n  gps timestamp    : {}", self.get_mt_timestamp_abs()));
     //repr += &(format!("\n  PrimaryBeta      : {}", self.get_beta())); 
     //repr += &(format!("\n  PrimaryCharge    : {}", self.primary_charge));
     if self.version == ProtocolVersion::V1 {
-      repr += "---- V1 variables ----";
+      repr += "\n ---- V1 variables ----";
       repr += &(format!("\n n_hits_umb   : {}", self.n_hits_umb  )); 
       repr += &(format!("\n n_hits_cbe   : {}", self.n_hits_cbe  )); 
       repr += &(format!("\n n_hits_cor   : {}", self.n_hits_cor  )); 
