@@ -334,7 +334,11 @@ pub struct RunConfig {
   /// 18530 bytes. Maximum buffer size is a bit more than 3000 
   /// events. Smaller buffer allows for a more snappy reaction, 
   /// but might require more CPU resources (on the board)
-  pub rb_buff_size            : u16
+  pub rb_buff_size            : Option<u16>,
+  /// The time interval we want to empty the readoutboard buffers
+  pub rb_buff_empty_interval  : Option<f32>,
+  /// This will set the RB to figure it out by itself
+  pub rb_buff_strategy_smart  : bool
 }
 
 impl RunConfig {
@@ -349,56 +353,58 @@ impl RunConfig {
       trigger_poisson_rate    : 0,
       trigger_fixed_rate      : 0,
       data_type               : DataType::Unknown, 
-      rb_buff_size            : 0,
+      rb_buff_size            : None,
+      rb_buff_empty_interval  : None,
+      rb_buff_strategy_smart  : true,
     }
   }
 }
 
-impl Serialization for RunConfig {
-  const HEAD               : u16   = 43690; //0xAAAA
-  const TAIL               : u16   = 21845; //0x5555
-  const SIZE               : usize = 29; // bytes including HEADER + FOOTER
-  
-  fn from_bytestream(bytestream : &Vec<u8>,
-                     pos        : &mut usize)
-    -> Result<Self, SerializationError> {
-    let mut pars = Self::new();
-    Self::verify_fixed(bytestream, pos)?;
-    pars.runid                   = parse_u32 (bytestream, pos);
-    pars.is_active               = parse_bool(bytestream, pos);
-    pars.nevents                 = parse_u32 (bytestream, pos);
-    pars.nseconds                = parse_u32 (bytestream, pos);
-    pars.tof_op_mode           
-      = TofOperationMode::try_from(
-          parse_u8(bytestream, pos))
-      .unwrap_or_else(|_| TofOperationMode::Unknown);
-    pars.trigger_poisson_rate    = parse_u32 (bytestream, pos);
-    pars.trigger_fixed_rate      = parse_u32 (bytestream, pos);
-    pars.data_type    
-      = DataType::try_from(parse_u8(bytestream, pos))
-      .unwrap_or_else(|_| DataType::Unknown);
-    pars.rb_buff_size = parse_u16(bytestream, pos);
-    *pos += 2; // for the tail 
-    //_ = parse_u16(bytestream, pos);
-    Ok(pars)
-  }
-  
-  fn to_bytestream(&self) -> Vec<u8> {
-    let mut stream = Vec::<u8>::with_capacity(Self::SIZE);
-    stream.extend_from_slice(&Self::HEAD.to_le_bytes());
-    stream.extend_from_slice(&self.runid.to_le_bytes());
-    stream.push(self.  is_active as u8);
-    stream.extend_from_slice(&self.nevents.to_le_bytes());    
-    stream.extend_from_slice(&self.  nseconds.to_le_bytes());
-    stream.extend_from_slice(&(self.tof_op_mode as u8).to_le_bytes());
-    stream.extend_from_slice(&self.trigger_poisson_rate.to_le_bytes());
-    stream.extend_from_slice(&self.trigger_fixed_rate.to_le_bytes());
-    stream.push(self.data_type as u8);
-    stream.extend_from_slice(&self.rb_buff_size.to_le_bytes());
-    stream.extend_from_slice(&Self::TAIL.to_le_bytes());
-    stream
-  }
-}
+//impl Serialization for RunConfig {
+//  const HEAD               : u16   = 43690; //0xAAAA
+//  const TAIL               : u16   = 21845; //0x5555
+//  const SIZE               : usize = 29; // bytes including HEADER + FOOTER
+//  
+//  fn from_bytestream(bytestream : &Vec<u8>,
+//                     pos        : &mut usize)
+//    -> Result<Self, SerializationError> {
+//    let mut pars = Self::new();
+//    Self::verify_fixed(bytestream, pos)?;
+//    pars.runid                   = parse_u32 (bytestream, pos);
+//    pars.is_active               = parse_bool(bytestream, pos);
+//    pars.nevents                 = parse_u32 (bytestream, pos);
+//    pars.nseconds                = parse_u32 (bytestream, pos);
+//    pars.tof_op_mode           
+//      = TofOperationMode::try_from(
+//          parse_u8(bytestream, pos))
+//      .unwrap_or_else(|_| TofOperationMode::Unknown);
+//    pars.trigger_poisson_rate    = parse_u32 (bytestream, pos);
+//    pars.trigger_fixed_rate      = parse_u32 (bytestream, pos);
+//    pars.data_type    
+//      = DataType::try_from(parse_u8(bytestream, pos))
+//      .unwrap_or_else(|_| DataType::Unknown);
+//    pars.rb_buff_size = parse_u16(bytestream, pos);
+//    *pos += 2; // for the tail 
+//    //_ = parse_u16(bytestream, pos);
+//    Ok(pars)
+//  }
+//  
+//  fn to_bytestream(&self) -> Vec<u8> {
+//    let mut stream = Vec::<u8>::with_capacity(Self::SIZE);
+//    stream.extend_from_slice(&Self::HEAD.to_le_bytes());
+//    stream.extend_from_slice(&self.runid.to_le_bytes());
+//    stream.push(self.  is_active as u8);
+//    stream.extend_from_slice(&self.nevents.to_le_bytes());    
+//    stream.extend_from_slice(&self.  nseconds.to_le_bytes());
+//    stream.extend_from_slice(&(self.tof_op_mode as u8).to_le_bytes());
+//    stream.extend_from_slice(&self.trigger_poisson_rate.to_le_bytes());
+//    stream.extend_from_slice(&self.trigger_fixed_rate.to_le_bytes());
+//    stream.push(self.data_type as u8);
+//    stream.extend_from_slice(&self.rb_buff_size.to_le_bytes());
+//    stream.extend_from_slice(&Self::TAIL.to_le_bytes());
+//    stream
+//  }
+//}
 
 impl Default for RunConfig {
   fn default() -> Self {
@@ -413,20 +419,24 @@ impl fmt::Display for RunConfig {
     } else {
       write!(f, 
 "<RunConfig -- is_active : true
-    nevents      : {}
-    nseconds     : {}
-    TOF op. mode : {}
-    data type    : {}
-    tr_poi_rate  : {}
-    tr_fix_rate  : {}
-    buff size    : {} [events]>",
+    nevents           : {}
+    nseconds          : {}
+    TOF op. mode      : {}
+    data type         : {}
+    tr_poi_rate       : {}
+    tr_fix_rate       : {}
+    buff size         : {} [events],
+    buff_empty_interv : {} [seconds],
+    buff_strat_smart  : {}>",
       self.nevents,
       self.nseconds,
       self.tof_op_mode,
       self.data_type,
       self.trigger_poisson_rate,
       self.trigger_fixed_rate,
-      self.rb_buff_size)
+      self.rb_buff_size.unwrap_or(0),
+      self.rb_buff_empty_interval.unwrap_or(0.0),
+      self.rb_buff_strategy_smart)
     }
   }
 }
@@ -435,24 +445,25 @@ impl TofPackable for RunConfig {
   const TOF_PACKET_TYPE : TofPacketType = TofPacketType::RunConfig;
 }
 
-#[cfg(feature = "random")]
-impl FromRandom for RunConfig {
-    
-  fn from_random() -> Self {
-    let mut cfg = Self::new();
-    let mut rng  = rand::rng();
-    cfg.runid                   = rng.random::<u32>();
-    cfg.is_active               = rng.random::<bool>();
-    cfg.nevents                 = rng.random::<u32>();
-    cfg.nseconds                = rng.random::<u32>();
-    cfg.tof_op_mode             = TofOperationMode::from_random();
-    cfg.trigger_poisson_rate    = rng.random::<u32>();
-    cfg.trigger_fixed_rate      = rng.random::<u32>();
-    cfg.data_type               = DataType::from_random();
-    cfg.rb_buff_size            = rng.random::<u16>();
-    cfg
-  }
-}
+//#[cfg(feature = "random")]
+//impl FromRandom for RunConfig {
+//    
+//  fn from_random() -> Self {
+//    let mut cfg = Self::new();
+//    let mut rng  = rand::rng();
+//    cfg.runid                   = rng.random::<u32>();
+//    cfg.is_active               = rng.random::<bool>();
+//    cfg.nevents                 = rng.random::<u32>();
+//    cfg.nseconds                = rng.random::<u32>();
+//    cfg.tof_op_mode             = TofOperationMode::from_random();
+//    cfg.trigger_poisson_rate    = rng.random::<u32>();
+//    cfg.trigger_fixed_rate      = rng.random::<u32>();
+//    cfg.data_type               = DataType::from_random();
+//    cfg.rb_buff_size            = rng.random::<u16>();
+//    
+//    cfg
+//  }
+//}
 
 //-------------------------------------------------
 

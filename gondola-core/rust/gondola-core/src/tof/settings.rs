@@ -403,10 +403,12 @@ pub enum RBBufferStrategy {
   /// Readout and switch the buffers every
   /// x events
   NEvents(u16),
-  /// Adapt to the RB rate and readout the buffers
-  /// so that we get switch them every X seconds.
-  /// (Argument is in seconds
-  AdaptToRate(u16),
+  /// Readout the  buffers every NSeconds
+  /// (Argument is in seconds)
+  NSeconds(f32),
+  /// This will use the measured reate on the actual RB 
+  /// to set a sensitive buffer trip value
+  ActuallySmart, 
 }
 
 impl fmt::Display for RBBufferStrategy {
@@ -419,7 +421,7 @@ impl fmt::Display for RBBufferStrategy {
 
 
 /// Settings for the specific clients on the RBs (liftof-rb)
-#[derive(Debug, Copy, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RBSettings {
   /// Don't send events if they have issues. Requires
   /// EventStatus::Perfect. This can not work in the
@@ -437,15 +439,6 @@ pub struct RBSettings {
   /// if different from 0, activate RB self trigger 
   /// with fixed rate setting
   pub trigger_fixed_rate            : u32,
-  ///// if different from 0, activate RB self trigger
-  ///// in poisson mode
-  //pub trigger_poisson_rate    : u32,
-  ///// if different from 0, activate RB self trigger 
-  ///// with fixed rate setting
-  //pub trigger_fixed_rate      : u32,
-  /// Either "Physics" or a calibration related 
-  /// data type, e.g. "VoltageCalibration".
-  /// <div class="warning">This might get deprecated in a future version!</div>
   pub data_type                     : DataType,
   /// This allows for different strategies on how to readout 
   /// the RB buffers. The following refers to the NEvent strategy.
@@ -457,7 +450,8 @@ pub struct RBSettings {
   /// For RBBufferStrategy::AdaptToRate(k), readout (and switch) the buffers every
   /// k seconds. The size of the buffer will be determined
   /// automatically depending on the rate.
-  pub rb_buff_strategy               : RBBufferStrategy,
+  /// This can be set for each RB individually
+  pub rb_buff_strategy               : HashMap<String,RBBufferStrategy>,
   /// The general moni interval. Whenever this time in seconds has
   /// passed, the RB will send a RBMoniData packet
   pub rb_moni_interval               : f32,
@@ -473,6 +467,15 @@ pub struct RBSettings {
 
 impl RBSettings {
   pub fn new() -> Self {
+    let mut rb_buff_strategy  = HashMap::<String, RBBufferStrategy>::new();
+    let rb_ids : Vec<u8>  = vec![1,2,3,4,5,6,7,8,9,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,39,40,41,42,46];
+    if rb_ids.len() != 40 {
+      panic!("Something is wrong with the rb ids, we see {} of them!", rb_ids.len());
+    }
+    for k in rb_ids {
+      let key : String = format!("{k}");
+      rb_buff_strategy.insert(key, RBBufferStrategy::ActuallySmart);
+    }
     Self {
       only_perfect_events            : false,
       calc_crc32                     : false,
@@ -480,7 +483,8 @@ impl RBSettings {
       trigger_fixed_rate             : 0,
       trigger_poisson_rate           : 0,
       data_type                      : DataType::Physics,
-      rb_buff_strategy               : RBBufferStrategy::AdaptToRate(5),
+      //rb_buff_strategy               : HashMap::<u8,RBBufferStrategy::AdaptToRate(5)>,
+      rb_buff_strategy               : rb_buff_strategy,
       rb_moni_interval               : 0.0,
       pb_moni_every_x                : 0.0,
       pa_moni_every_x                : 0.0,
@@ -507,7 +511,7 @@ impl RBSettings {
     }
   }
 
-  pub fn get_runconfig(&self) -> RunConfig {
+  pub fn get_runconfig(&self, board_id : u8) -> RunConfig {
     // missing here - run id, nevents, nseconds,
     //
     let mut rcfg              = RunConfig::new();
@@ -516,27 +520,19 @@ impl RBSettings {
     rcfg.trigger_fixed_rate   = self.trigger_fixed_rate;
     rcfg.trigger_poisson_rate = self.trigger_poisson_rate;
     rcfg.data_type            = self.data_type.clone();
-    let buffer_trip : u16;
-    match self.rb_buff_strategy {
+    let key : String = format!("{board_id}");
+    let buffer_strategy = self.rb_buff_strategy.get(&key).unwrap();
+    match buffer_strategy {
       RBBufferStrategy::NEvents(buff_size) => {
-        buffer_trip = buff_size;
+        rcfg.rb_buff_size = Some(*buff_size as u16);
       },
-      RBBufferStrategy::AdaptToRate(_) => {
-        // For now, let's just set the initial value to
-        // 50 FIXME
-        buffer_trip = 50;
-        //match rate = get_trigger_rate() {
-        //  Err(err) {
-        //    error!("Unable to obtain trigger rate!");
-        //    buffer_trip = 50;
-        //  },
-        //  Ok(rate) => {
-        //    buffer_trip = rate*n_secs as u16;
-        //  }
-        //}
+      RBBufferStrategy::NSeconds(interval) => {
+        rcfg.rb_buff_empty_interval = Some(*interval as f32);
+      },
+      RBBufferStrategy::ActuallySmart => {
+        rcfg.rb_buff_strategy_smart = true;
       }
     }
-    rcfg.rb_buff_size         = buffer_trip as u16;
     rcfg
   }
 }
@@ -1538,7 +1534,7 @@ fn mtb_config() {
 #[test]
 fn write_config_file() {
   let settings = LiftofSettings::new();
-  //println!("{}", settings);
+  println!("{}", settings);
   settings.to_toml(String::from("liftof-config-test.toml"));
 }
 
