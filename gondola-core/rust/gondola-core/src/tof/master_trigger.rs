@@ -91,6 +91,7 @@ fn read_until_footer(bus : &mut IPBus)
 /// * bus       : connected IPBus for UDP comms
 pub fn get_event(bus                     : &mut IPBus)
   -> Option<Result<TofEvent, MasterTriggerError>> {
+  //let mut debug_timer   = Instant::now();
   let mut mte = TofEvent::new();
   let n_daq_words_fixed = 9u32;
   let mut data          : Vec<u32>;
@@ -223,6 +224,8 @@ pub fn get_event(bus                     : &mut IPBus)
       mte.channel_mask.push(second);
     }
   }
+  // debug 
+  //println!("DEBUG GET_EVENT TOOK : {}", debug_timer.elapsed().as_nanos());
   Some(Ok(mte))
 }
 
@@ -801,8 +804,14 @@ pub fn master_trigger(mt_address     : &str,
         _ev.timestamp16        = ((mt_timestamp & 0x0000ffff00000000 ) >> 32) as u16;
         _ev.trigger_sources    = _ev.mt_trigger_sources; // FIXME
         _ev.n_trigger_paddles  = _ev.get_trigger_hits().len() as u8;
-        heartbeat.trigger_type = TriggerType::from((_ev.mt_trigger_sources & 0x00FF) as u8);
-        heartbeat.combo_trig_type = TriggerType::from(((_ev.mt_trigger_sources & 0xFF00) >> 8) as u8);
+        let triggers           = TriggerType::transcode_trigger_sources(_ev.mt_trigger_sources);
+        if triggers.len() == 2 {
+          heartbeat.trigger_type = triggers[0];
+          heartbeat.combo_trig_type = triggers[1];
+        }
+        if triggers.len() == 1 {
+          heartbeat.trigger_type = triggers[0];
+        }
         if !veri_active {
           match mt_sender.send(_ev) {
             Err(err) => {
@@ -2365,8 +2374,8 @@ fn set_track_trigger_is_global(&mut self) -> PyResult<()> {
   }
 
   
-
-  fn get_event(&mut self, read_until_footer : bool, verbose : bool, debug : bool)
+  #[pyo3(name="get_event")]
+  fn get_event_py(&mut self, read_until_footer : bool, verbose : bool, debug : bool)
     -> PyResult<TofEvent> {
     let use_dbg_version = debug;
     if !use_dbg_version {
