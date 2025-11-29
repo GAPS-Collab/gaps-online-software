@@ -583,6 +583,17 @@ pub fn restart_liftof_rb(rb_list : &Vec<u8>) {
   }
 }
 
+/// Restart liftof-rb on RBs
+pub fn rm_liftof_rb_logs(rb_list : &Vec<u8>) {
+  let command = vec![String::from("rm"),
+                     String::from("/home/gaps/logs/liftof.log"),
+                     String::from("/home/gaps/logs/liftof.err")];
+  println!("=> Deleting Logs on RBs!");
+  match ssh_command_rbs(rb_list, command) {
+    Err(err) => debug!("Deleting logs on all RBs failed! {err}"),
+    Ok(_)    => ()
+  }
+}
 
 
 /// Run a full tof calibration - RBCalibration
