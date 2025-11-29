@@ -34,6 +34,7 @@ pub struct TofPacket {
   // FIXME - do we really need the last 2?
   pub creation_time      : Instant,
   pub valid              : bool, // will be always valid, unless invalidated
+  pub tof_paddles        : Arc<HashMap<u8,  TofPaddle>>, 
 }
 
 impl fmt::Display for TofPacket {
@@ -79,6 +80,7 @@ impl TofPacket {
       no_send_over_nw  : false,
       creation_time    : creation_time,
       valid            : true,
+      tof_paddles      : Arc::new(HashMap::<u8, TofPaddle>::new()),
     }
   }
 
@@ -281,7 +283,19 @@ impl TofPacket {
   fn get_packet_type(&self) -> TofPacketType {
     self.packet_type
   }
- 
+
+  fn get_paddle(&self, paddle_id : u8) -> PyResult<TofPaddle> {
+    match self.tof_paddles.get(&paddle_id) {
+      None => {
+        let msg = "TofPacket does not contain a reference to paddle {paddle_id}!";
+        return Err(PyValueError::new_err(msg));
+      }
+      Some(paddle) => {
+        return Ok(paddle.clone());
+      }
+    }
+  }
+
   // FIXME - trust in te process that it referenceces te input vector and not clones it
   /// Factory function for TofPackets
   ///

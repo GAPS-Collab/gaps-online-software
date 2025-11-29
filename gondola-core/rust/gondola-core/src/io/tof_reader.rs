@@ -32,6 +32,9 @@ pub struct TofPacketReader {
   pub stop_after      : usize,
   /// The index of the current file in the internal "filenames" vector.
   pub file_idx        : usize,
+  /// Geometry of each TOF paddle
+  /// e.g. paddles 
+  pub tof_paddles     : Arc<HashMap<u8,TofPaddle>>,
 }
 
 impl TofPacketReader {
@@ -41,6 +44,19 @@ impl TofPacketReader {
   /// FIXME - make this return Result, like the Caraspace reader
   pub fn new(filename_or_directory : &str) -> Self {
     let firstfile : String;
+    #[cfg(feature="database")]
+    let mut paddles  = HashMap::<u8, TofPaddle>::new();
+    #[cfg(not(feature="database"))]
+    let paddles = HashMap::<u8, TofPaddle>::new();
+    #[cfg(feature="database")]
+    match TofPaddle::all_as_dict() {
+      Err(err) => {
+        error!("Unable to retrieve paddle information from DB! {err}");
+      }
+      Ok(pdls) => {
+        paddles   = pdls;         
+      }
+    }
     match list_path_contents_sorted(&filename_or_directory, None) {
       Err(err) => {
         error!("{} does not seem to be either a valid directory or an existing file! {err}", filename_or_directory);
@@ -64,6 +80,7 @@ impl TofPacketReader {
               stop_after      : 0,
               n_packs_skipped : 0,
               file_idx        : 0,
+              tof_paddles     : Arc::new(paddles),
             };
             packet_reader
           }
@@ -215,6 +232,9 @@ impl TofPacketReader {
           if tail != TofPacket::TAIL {
             debug!("TofPacket TAIL signature wrong!");
             return None;
+          }
+          if tp.packet_type == TofPacketType::TofEvent {
+            tp.tof_paddles = self.tof_paddles.clone();
           }
           self.n_packs_read += 1;
           return Some(tp);
