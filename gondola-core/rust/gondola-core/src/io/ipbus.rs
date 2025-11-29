@@ -136,11 +136,11 @@ impl IPBus {
         socket = value;
         // this is not strrictly necessary, but 
         // it is nice to limit communications
-        match socket.set_read_timeout(Some(Duration::from_millis(1))) {
+        match socket.set_read_timeout(Some(Duration::from_micros(1000))) {
           Err(err) => error!("Can not set read timeout for Udp socket! {err}"),
           Ok(_)    => ()
         }
-        match socket.set_write_timeout(Some(Duration::from_millis(1))) {
+        match socket.set_write_timeout(Some(Duration::from_micros(1000))) {
           Err(err) => error!("Can not set write timeout for Udp socket! {err}"),
           Ok(_)    => ()
         }
