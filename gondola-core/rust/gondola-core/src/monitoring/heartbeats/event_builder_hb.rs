@@ -8,6 +8,7 @@ use colored::Colorize;
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[cfg_attr(feature="pybindings", pyclass)]
 pub struct EventBuilderHB {
+  pub version               : ProtocolVersion,
   /// Mission elapsed time in seconds
   pub met_seconds           : u64,
   /// Total number of received MasterTriggerEvents (from MTB)
@@ -61,11 +62,33 @@ pub struct EventBuilderHB {
   // this will not get serialized - can be filled by 
   // gcu timestamp 
   pub timestamp               : u64,
+  // possible new fields for ProtocolVersion::V1
+  pub reserved_0              : u32,
+  pub reserved_1              : u32,
+  pub reserved_2              : u32,
+  pub reserved_3              : u32,
+  pub reserved_4              : u32,
+  pub reserved_5              : u32,
+  pub reserved_6              : u32,
+  pub reserved_7              : u32,
+  pub reserved_8              : u32,
+  pub reserved_9              : u32,
+  pub reserved_10             : u32,
+  pub reserved_11             : u32,
+  pub reserved_12             : u32,
+  pub reserved_13             : u32,
+  pub reserved_14             : u32,
+  pub reserved_15             : u32,
+  pub reserved_16             : u32,
+  pub reserved_17             : u32,
+  pub reserved_18             : u32,
+  pub reserved_19             : u32,
 }
 
 impl EventBuilderHB {
   pub fn new() -> Self {
     Self {
+      version              : ProtocolVersion::Unknown,
       met_seconds          : 0,
       n_mte_received_tot   : 0,
       n_rbe_received_tot   : 0,
@@ -88,6 +111,26 @@ impl EventBuilderHB {
       data_mangled_ev      : 0,
       // seen_rbevents        : seen_rbevents, 
       timestamp            : 0,
+      reserved_0           : 0,
+      reserved_1           : 0,
+      reserved_2           : 0,
+      reserved_3           : 0,
+      reserved_4           : 0,
+      reserved_5           : 0,
+      reserved_6           : 0,
+      reserved_7           : 0,
+      reserved_8           : 0,
+      reserved_9           : 0,
+      reserved_10          : 0,
+      reserved_11          : 0,
+      reserved_12          : 0,
+      reserved_13          : 0,
+      reserved_14          : 0,
+      reserved_15          : 0,
+      reserved_16          : 0,
+      reserved_17          : 0,
+      reserved_18          : 0,
+      reserved_19          : 0
     }
   }
 
@@ -318,7 +361,11 @@ impl Serialization for EventBuilderHB {
     -> Result<Self, SerializationError>{
     Self::verify_fixed(stream,pos)?;
     let mut hb = EventBuilderHB::new();
-    hb.met_seconds          = parse_u64(stream,pos);
+    let version_seconds     = parse_u64(stream,pos);
+    let version = ProtocolVersion::from(((version_seconds & 0xC000000000000000) >> 62) as u8); 
+    let met_seconds = version_seconds & 0x3FFFFFFFFFFFFFFF;
+    hb.met_seconds          = met_seconds;
+    //hb.met_seconds          = parse_u64(stream,pos);
     hb.n_mte_received_tot   = parse_u64(stream,pos);
     hb.n_rbe_received_tot   = parse_u64(stream,pos);
     hb.n_rbe_per_te         = parse_u64(stream,pos);
@@ -334,7 +381,7 @@ impl Serialization for EventBuilderHB {
     hb.mte_receiver_cbc_len = parse_u64(stream,pos);
     hb.rbe_receiver_cbc_len = parse_u64(stream,pos);
     hb.tp_sender_cbc_len    = parse_u64(stream,pos);
-    hb.n_rbe_per_loop         = parse_u64(stream,pos);
+    hb.n_rbe_per_loop       = parse_u64(stream,pos);
     hb.n_rbe_from_past      = parse_u64(stream,pos);
     hb.n_rbe_orphan         = parse_u64(stream,pos);
     hb.data_mangled_ev      = parse_u64(stream,pos);
@@ -346,7 +393,9 @@ impl Serialization for EventBuilderHB {
   fn to_bytestream(&self) -> Vec<u8> {
     let mut bs = Vec::<u8>::with_capacity(Self::SIZE);
     bs.extend_from_slice(&Self::HEAD.to_le_bytes());
-    bs.extend_from_slice(&self.met_seconds.to_le_bytes());
+    let mut version_seconds = (self.version as u64) << 62; 
+    version_seconds = version_seconds | self.met_seconds;
+    bs.extend_from_slice(&version_seconds.to_le_bytes());
     bs.extend_from_slice(&self.n_mte_received_tot.to_le_bytes());
     bs.extend_from_slice(&self.n_rbe_received_tot.to_le_bytes());
     bs.extend_from_slice(&self.n_rbe_per_te.to_le_bytes());
@@ -377,6 +426,8 @@ impl FromRandom for EventBuilderHB {
   fn from_random() -> Self {
     let mut rng              = rand::rng();
     Self {
+      // FIXME 
+      version                : ProtocolVersion::Unknown,
       met_seconds            : rng.random::<u64>(),
       n_rbe_received_tot     : rng.random::<u64>(),
       n_rbe_per_te           : rng.random::<u64>(),
@@ -388,7 +439,8 @@ impl FromRandom for EventBuilderHB {
       event_cache_size       : rng.random::<u64>(),
       // don't randomize this, since it 
       // won't get serialized
-      event_id_cache_size    :                0,
+      event_id_cache_size    :                   0,
+
       drs_bsy_lost_hg_hits   : rng.random::<u64>(),
       rbe_wo_mte             : rng.random::<u64>(),
       mte_receiver_cbc_len   : rng.random::<u64>(),
@@ -399,7 +451,27 @@ impl FromRandom for EventBuilderHB {
       n_rbe_from_past        : rng.random::<u64>(),
       n_rbe_orphan           : rng.random::<u64>(),
       data_mangled_ev        : rng.random::<u64>(),
-      timestamp              : 0
+      timestamp              : rng.random::<u64>(),
+      reserved_0             : rng.random::<u32>(),
+      reserved_1             : rng.random::<u32>(),
+      reserved_2             : rng.random::<u32>(),
+      reserved_3             : rng.random::<u32>(),
+      reserved_4             : rng.random::<u32>(),
+      reserved_5             : rng.random::<u32>(),
+      reserved_6             : rng.random::<u32>(),
+      reserved_7             : rng.random::<u32>(),
+      reserved_8             : rng.random::<u32>(),
+      reserved_9             : rng.random::<u32>(),
+      reserved_10            : rng.random::<u32>(),
+      reserved_11            : rng.random::<u32>(),
+      reserved_12            : rng.random::<u32>(),
+      reserved_13            : rng.random::<u32>(),
+      reserved_14            : rng.random::<u32>(),
+      reserved_15            : rng.random::<u32>(),
+      reserved_16            : rng.random::<u32>(),
+      reserved_17            : rng.random::<u32>(),
+      reserved_18            : rng.random::<u32>(),
+      reserved_19            : rng.random::<u32>(),
     }
   }
 } 
