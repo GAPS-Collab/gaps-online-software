@@ -216,8 +216,20 @@ pub fn global_data_sink(incoming       : &Receiver<TofPacket>,
           } 
         }
 
-        //ev_.strip_rbevents();
         ev_.move_hits();
+        
+        //--------------------------------
+        // DEBUG - have the cake and eat it too!
+        // This will not send waveforms over 
+        // the gcu (because of protocolversion :: V3
+        // but also not strip the RBEvents
+        //ev_.strip_rbevents();
+        //ev_.version = ProtocolVersion::V3;
+        //--------------------------------
+       
+        // this is that the events go over the gcu
+        ev_.strip_rbevents();
+        ev_.version = ProtocolVersion::V1;
         pack = ev_.pack();
         if send_tof_summary_packets {
           match data_socket.send(pack.to_bytestream(),0) {
