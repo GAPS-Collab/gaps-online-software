@@ -583,208 +583,219 @@
 <a href=#583 id=583 data-nosnippet>583</a>  }
 <a href=#584 id=584 data-nosnippet>584</a>}
 <a href=#585 id=585 data-nosnippet>585</a>
-<a href=#586 id=586 data-nosnippet>586</a>
-<a href=#587 id=587 data-nosnippet>587</a>
-<a href=#588 id=588 data-nosnippet>588</a><span class="doccomment">/// Run a full tof calibration - RBCalibration
-<a href=#589 id=589 data-nosnippet>589</a>/// 
-<a href=#590 id=590 data-nosnippet>590</a>/// The purpose of the RB calibration to is to create a 
-<a href=#591 id=591 data-nosnippet>591</a>/// relationship between the adc/timing bins and voltages
-<a href=#592 id=592 data-nosnippet>592</a>/// and nanoseconds
-<a href=#593 id=593 data-nosnippet>593</a>///
-<a href=#594 id=594 data-nosnippet>594</a>/// This function is blocking, until a certain (configurable)
-<a href=#595 id=595 data-nosnippet>595</a>/// timeout is expired. The timeout can be set in the configuration
-<a href=#596 id=596 data-nosnippet>596</a>/// file
-<a href=#597 id=597 data-nosnippet>597</a>///
-<a href=#598 id=598 data-nosnippet>598</a>/// # Argumeents:
-<a href=#599 id=599 data-nosnippet>599</a>///
-<a href=#600 id=600 data-nosnippet>600</a>///   * thread_control : general shared memory to hold configuration
-<a href=#601 id=601 data-nosnippet>601</a>///                      settings, program st ate
-<a href=#602 id=602 data-nosnippet>602</a>///   * rb_list        : List of active readoutboards
-<a href=#603 id=603 data-nosnippet>603</a>///   * show_progress  : if true, it will show a progressbar with 
-<a href=#604 id=604 data-nosnippet>604</a>///                      indicatif
-<a href=#605 id=605 data-nosnippet>605</a>///
-<a href=#606 id=606 data-nosnippet>606</a></span><span class="kw">pub fn </span>calibrate_tof(thread_control : Arc&lt;Mutex&lt;ThreadControl&gt;&gt;,
-<a href=#607 id=607 data-nosnippet>607</a>                     rb_list        : <span class="kw-2">&amp;</span>Vec&lt;ReadoutBoard&gt;,
-<a href=#608 id=608 data-nosnippet>608</a>                     show_progress  : bool) {
-<a href=#609 id=609 data-nosnippet>609</a>
-<a href=#610 id=610 data-nosnippet>610</a>  <span class="kw">let </span>one_second               = Duration::from_millis(<span class="number">1000</span>);
-<a href=#611 id=611 data-nosnippet>611</a>  <span class="kw">let </span><span class="kw-2">mut </span>cc_pub_addr          = String::from(<span class="string">""</span>);
-<a href=#612 id=612 data-nosnippet>612</a>  <span class="kw">let </span>calibration_timeout_fail = Duration::from_secs(<span class="number">300</span>); <span class="comment">// in seconds
-<a href=#613 id=613 data-nosnippet>613</a> 
-<a href=#614 id=614 data-nosnippet>614</a>  </span><span class="kw">let </span><span class="kw-2">mut </span>cali_dir_created = <span class="bool-val">false</span>;
-<a href=#615 id=615 data-nosnippet>615</a>  <span class="kw">let </span><span class="kw-2">mut </span>cali_output_dir  = String::from(<span class="string">""</span>);
-<a href=#616 id=616 data-nosnippet>616</a>  <span class="kw">let </span><span class="kw-2">mut </span>cali_base_dir        = String::from(<span class="string">""</span>);
-<a href=#617 id=617 data-nosnippet>617</a>
-<a href=#618 id=618 data-nosnippet>618</a>  <span class="kw">match </span>thread_control.lock() {
-<a href=#619 id=619 data-nosnippet>619</a>    <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>tc) =&gt; {
-<a href=#620 id=620 data-nosnippet>620</a>      <span class="kw">for </span>rb <span class="kw">in </span>rb_list {
-<a href=#621 id=621 data-nosnippet>621</a>        tc.finished_calibrations.insert(rb.rb_id,<span class="bool-val">false</span>); 
-<a href=#622 id=622 data-nosnippet>622</a>      }
-<a href=#623 id=623 data-nosnippet>623</a>      cali_base_dir = tc.liftof_settings.calibration_dir.clone();
-<a href=#624 id=624 data-nosnippet>624</a>      cc_pub_addr   = tc.liftof_settings.cmd_dispatcher_settings.cc_server_address.clone();
-<a href=#625 id=625 data-nosnippet>625</a>      tc.write_data_to_disk = <span class="bool-val">true</span>;
-<a href=#626 id=626 data-nosnippet>626</a>    },
-<a href=#627 id=627 data-nosnippet>627</a>    <span class="prelude-val">Err</span>(err) =&gt; {
-<a href=#628 id=628 data-nosnippet>628</a>      <span class="macro">error!</span>(<span class="string">"Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}"</span>);
-<a href=#629 id=629 data-nosnippet>629</a>    },
-<a href=#630 id=630 data-nosnippet>630</a>  }
-<a href=#631 id=631 data-nosnippet>631</a>
-<a href=#632 id=632 data-nosnippet>632</a>  <span class="comment">// deprecated commanding
-<a href=#633 id=633 data-nosnippet>633</a>  //let voltage_level = DEFAULT_CALIB_VOLTAGE;
-<a href=#634 id=634 data-nosnippet>634</a>  //let rb_id         = DEFAULT_RB_ID;
-<a href=#635 id=635 data-nosnippet>635</a>  //let extra         = DEFAULT_CALIB_EXTRA;
-<a href=#636 id=636 data-nosnippet>636</a>  //println!("=&gt; Received calibration default command! Will init calibration run of all RBs...");
-<a href=#637 id=637 data-nosnippet>637</a>  //let cmd_payload: u32
-<a href=#638 id=638 data-nosnippet>638</a>  //  = (voltage_level as u32) &lt;&lt; 16 | (rb_id as u32) &lt;&lt; 8 | (extra as u32);
-<a href=#639 id=639 data-nosnippet>639</a>  //let default_calib_depr = TofCommand::DefaultCalibration(cmd_payload);
-<a href=#640 id=640 data-nosnippet>640</a>  //let tp_depr = default_calib_depr.pack();
-<a href=#641 id=641 data-nosnippet>641</a>  //let mut payload_depr = String::from("BRCT").into_bytes();
-<a href=#642 id=642 data-nosnippet>642</a>  //payload_depr.append(&amp;mut tp_depr.to_bytestream());
-<a href=#643 id=643 data-nosnippet>643</a>
-<a href=#644 id=644 data-nosnippet>644</a>  </span><span class="kw">let </span><span class="kw-2">mut </span>default_calib      = TofCommand::new();
-<a href=#645 id=645 data-nosnippet>645</a>  default_calib.command_code = TofCommandCode::RBCalibration;
-<a href=#646 id=646 data-nosnippet>646</a>  <span class="kw">let </span>tp                     = default_calib.pack();
-<a href=#647 id=647 data-nosnippet>647</a>  <span class="kw">let </span><span class="kw-2">mut </span>payload            = String::from(<span class="string">"BRCT"</span>).into_bytes();
-<a href=#648 id=648 data-nosnippet>648</a>  payload.append(<span class="kw-2">&amp;mut </span>tp.to_bytestream());
-<a href=#649 id=649 data-nosnippet>649</a>  <span class="comment">// open 0MQ socket here
-<a href=#650 id=650 data-nosnippet>650</a>  </span><span class="kw">let </span>ctx = zmq::Context::new();
-<a href=#651 id=651 data-nosnippet>651</a>  <span class="kw">let </span>cmd_sender  = ctx.socket(zmq::PUB).expect(<span class="string">"Unable to create 0MQ PUB socket!"</span>);
-<a href=#652 id=652 data-nosnippet>652</a>
-<a href=#653 id=653 data-nosnippet>653</a>  cmd_sender.bind(<span class="kw-2">&amp;</span>cc_pub_addr).expect(<span class="string">"Unable to bind to (PUB) socket!"</span>);
-<a href=#654 id=654 data-nosnippet>654</a>  <span class="macro">println!</span>(<span class="string">"=&gt; Give the RBs a chance to connect and wait a bit.."</span>);
-<a href=#655 id=655 data-nosnippet>655</a>  thread::sleep(<span class="number">10</span><span class="kw-2">*</span>one_second);
-<a href=#656 id=656 data-nosnippet>656</a>  <span class="comment">//match cmd_sender.send(&amp;payload_depr, 0) { Err(err) =&gt; {
-<a href=#657 id=657 data-nosnippet>657</a>  //    error!("Unable to send command! {err}");
-<a href=#658 id=658 data-nosnippet>658</a>  //  },
-<a href=#659 id=659 data-nosnippet>659</a>  //  Ok(_) =&gt; {
-<a href=#660 id=660 data-nosnippet>660</a>  //    println!("=&gt; Calibration  initialized!");
-<a href=#661 id=661 data-nosnippet>661</a>  //  }
-<a href=#662 id=662 data-nosnippet>662</a>  //}
-<a href=#663 id=663 data-nosnippet>663</a>  </span><span class="kw">match </span>cmd_sender.send(<span class="kw-2">&amp;</span>payload, <span class="number">0</span>) { <span class="prelude-val">Err</span>(err) =&gt; {
-<a href=#664 id=664 data-nosnippet>664</a>      <span class="macro">error!</span>(<span class="string">"Unable to send command! {err}"</span>);
-<a href=#665 id=665 data-nosnippet>665</a>    },
-<a href=#666 id=666 data-nosnippet>666</a>    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
-<a href=#667 id=667 data-nosnippet>667</a>      <span class="macro">println!</span>(<span class="string">"=&gt; Calibration  initialized!"</span>);
-<a href=#668 id=668 data-nosnippet>668</a>    }
-<a href=#669 id=669 data-nosnippet>669</a>  }
-<a href=#670 id=670 data-nosnippet>670</a>  <span class="kw">match </span>thread_control.lock() {
-<a href=#671 id=671 data-nosnippet>671</a>    <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>tc) =&gt; {
-<a href=#672 id=672 data-nosnippet>672</a>      <span class="comment">// deactivate the master trigger thread
-<a href=#673 id=673 data-nosnippet>673</a>      </span>tc.thread_master_trg_active =<span class="bool-val">false</span>;
-<a href=#674 id=674 data-nosnippet>674</a>      tc.calibration_active = <span class="bool-val">true</span>;
-<a href=#675 id=675 data-nosnippet>675</a>    },
-<a href=#676 id=676 data-nosnippet>676</a>    <span class="prelude-val">Err</span>(err) =&gt; {
-<a href=#677 id=677 data-nosnippet>677</a>      <span class="macro">error!</span>(<span class="string">"Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}"</span>);
-<a href=#678 id=678 data-nosnippet>678</a>    },
-<a href=#679 id=679 data-nosnippet>679</a>  }
-<a href=#680 id=680 data-nosnippet>680</a>
-<a href=#681 id=681 data-nosnippet>681</a>  <span class="macro">println!</span>(<span class="string">"=&gt; .. now we need to wait until the calibration is finished!"</span>);
-<a href=#682 id=682 data-nosnippet>682</a>  <span class="kw">let </span>bar_template : <span class="kw-2">&amp;</span>str = <span class="string">"[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {pos:&gt;7}/{len:7}"</span>;
-<a href=#683 id=683 data-nosnippet>683</a>  <span class="kw">let </span>bar_style  = ProgressStyle::with_template(bar_template).expect(<span class="string">"Unable to set progressbar style!"</span>);
-<a href=#684 id=684 data-nosnippet>684</a>  <span class="kw">let </span><span class="kw-2">mut </span>bar    = ProgressBar::hidden();
-<a href=#685 id=685 data-nosnippet>685</a>  <span class="kw">if </span>show_progress {
-<a href=#686 id=686 data-nosnippet>686</a>    bar = ProgressBar::new(rb_list.len() <span class="kw">as </span>u64); 
-<a href=#687 id=687 data-nosnippet>687</a>    bar.set_position(<span class="number">0</span>);
-<a href=#688 id=688 data-nosnippet>688</a>    <span class="kw">let </span>bar_label  = String::from(<span class="string">"Acquiring RB calibration data"</span>);
-<a href=#689 id=689 data-nosnippet>689</a>    bar.set_message (bar_label);
-<a href=#690 id=690 data-nosnippet>690</a>    bar.set_prefix  (<span class="string">"\u{2699}\u{1F4D0}"</span>);
-<a href=#691 id=691 data-nosnippet>691</a>    bar.set_style   (bar_style);
-<a href=#692 id=692 data-nosnippet>692</a>  }
-<a href=#693 id=693 data-nosnippet>693</a>
-<a href=#694 id=694 data-nosnippet>694</a>  <span class="comment">// now block until the calibrations are done or we time outu
-<a href=#695 id=695 data-nosnippet>695</a>  // FIXME - set timeout parameter in settings
-<a href=#696 id=696 data-nosnippet>696</a>  </span><span class="kw">let </span>timeout = Instant::now();
-<a href=#697 id=697 data-nosnippet>697</a>  <span class="kw">let </span><span class="kw-2">mut </span>cali_received = <span class="number">0</span>;
-<a href=#698 id=698 data-nosnippet>698</a>  <span class="lifetime">'main</span>: <span class="kw">loop </span>{
-<a href=#699 id=699 data-nosnippet>699</a>    thread::sleep(<span class="number">10</span><span class="kw-2">*</span>one_second);
-<a href=#700 id=700 data-nosnippet>700</a>    <span class="kw">if </span>timeout.elapsed() &gt; calibration_timeout_fail {
-<a href=#701 id=701 data-nosnippet>701</a>      <span class="macro">error!</span>(<span class="string">"Calibration timeout! Calibrations might not be complete!"</span>);
-<a href=#702 id=702 data-nosnippet>702</a>      <span class="kw">match </span>thread_control.lock() {
-<a href=#703 id=703 data-nosnippet>703</a>        <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>tc) =&gt; {
-<a href=#704 id=704 data-nosnippet>704</a>          tc.calibration_active = <span class="bool-val">false</span>;
-<a href=#705 id=705 data-nosnippet>705</a>        }
-<a href=#706 id=706 data-nosnippet>706</a>        <span class="prelude-val">Err</span>(err) =&gt; {
-<a href=#707 id=707 data-nosnippet>707</a>          <span class="macro">error!</span>(<span class="string">"Can't acquire lock for ThreadControl at this time! Unable to set calibration mode! {err}"</span>);
-<a href=#708 id=708 data-nosnippet>708</a>        }
-<a href=#709 id=709 data-nosnippet>709</a>      }
-<a href=#710 id=710 data-nosnippet>710</a>      <span class="kw">if </span>show_progress {
-<a href=#711 id=711 data-nosnippet>711</a>        bar.finish_with_message(<span class="string">"Done"</span>);
-<a href=#712 id=712 data-nosnippet>712</a>      }
-<a href=#713 id=713 data-nosnippet>713</a>      <span class="kw">break</span>;
-<a href=#714 id=714 data-nosnippet>714</a>    }
-<a href=#715 id=715 data-nosnippet>715</a>    <span class="comment">//let mut rbcali = RBCalibrations::new();
-<a href=#716 id=716 data-nosnippet>716</a>    </span><span class="kw">match </span>thread_control.lock() {
-<a href=#717 id=717 data-nosnippet>717</a>      <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>tc) =&gt; {
-<a href=#718 id=718 data-nosnippet>718</a>        <span class="kw">for </span>rbid <span class="kw">in </span>rb_list {
-<a href=#719 id=719 data-nosnippet>719</a>          <span class="comment">// the global data sink sets these flags
-<a href=#720 id=720 data-nosnippet>720</a>          </span><span class="kw">let </span><span class="kw-2">mut </span>finished_keys = Vec::&lt;u8&gt;::new();
-<a href=#721 id=721 data-nosnippet>721</a>          <span class="kw">if </span>tc.stop_flag {
-<a href=#722 id=722 data-nosnippet>722</a>            <span class="macro">println!</span>(<span class="string">"Stop signal received, exiting calibration routine!"</span>);
-<a href=#723 id=723 data-nosnippet>723</a>            <span class="kw">break </span><span class="lifetime">'main</span>;
-<a href=#724 id=724 data-nosnippet>724</a>          }
-<a href=#725 id=725 data-nosnippet>725</a>          <span class="kw">if </span>tc.finished_calibrations[<span class="kw-2">&amp;</span>rbid.rb_id] {
-<a href=#726 id=726 data-nosnippet>726</a>            cali_received += <span class="number">1</span>;
-<a href=#727 id=727 data-nosnippet>727</a>            <span class="kw">let </span>rbcali = tc.calibrations.get(<span class="kw-2">&amp;</span>rbid.rb_id).expect(<span class="string">"We got the signal tat this calibration is ready but it is not!"</span>);
-<a href=#728 id=728 data-nosnippet>728</a>            <span class="kw">let </span>pack   = rbcali.pack();
-<a href=#729 id=729 data-nosnippet>729</a>            <span class="comment">// See RBCalibration reference
-<a href=#730 id=730 data-nosnippet>730</a>            </span><span class="kw">let </span>file_type  = FileType::CalibrationFile(rbid.rb_id);
-<a href=#731 id=731 data-nosnippet>731</a>            <span class="comment">//println!("==&gt; Writing stream to file with prefix {}", streamfile_name);
-<a href=#732 id=732 data-nosnippet>732</a>            //let mut cali_writer = TofPacketWriter::new(write_stream_path.clone(), file_type);
-<a href=#733 id=733 data-nosnippet>733</a>            </span><span class="kw">if </span>!cali_dir_created {
-<a href=#734 id=734 data-nosnippet>734</a>              <span class="kw">let </span>today           = get_utc_timestamp();
-<a href=#735 id=735 data-nosnippet>735</a>              cali_output_dir     = <span class="macro">format!</span>(<span class="string">"{}/{}"</span>, cali_base_dir.clone(), today);
-<a href=#736 id=736 data-nosnippet>736</a>              <span class="kw">match </span>create_dir_all(cali_output_dir.clone()) {
-<a href=#737 id=737 data-nosnippet>737</a>                <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"Created {} for calibration data!"</span>, cali_output_dir),
-<a href=#738 id=738 data-nosnippet>738</a>                <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to create {} for calibration data! {}"</span>, cali_output_dir, err)
-<a href=#739 id=739 data-nosnippet>739</a>              }
-<a href=#740 id=740 data-nosnippet>740</a>              cali_dir_created = <span class="bool-val">true</span>;
-<a href=#741 id=741 data-nosnippet>741</a>            }
-<a href=#742 id=742 data-nosnippet>742</a>            <span class="kw">let </span><span class="kw-2">mut </span>cali_writer = TofPacketWriter::new(cali_output_dir.clone(), file_type);
-<a href=#743 id=743 data-nosnippet>743</a>            cali_writer.add_tof_packet(<span class="kw-2">&amp;</span>pack);
-<a href=#744 id=744 data-nosnippet>744</a>            drop(cali_writer);
-<a href=#745 id=745 data-nosnippet>745</a>
-<a href=#746 id=746 data-nosnippet>746</a>            bar.set_position(cali_received);
-<a href=#747 id=747 data-nosnippet>747</a>            finished_keys.push(rbid.rb_id);
-<a href=#748 id=748 data-nosnippet>748</a>          }
-<a href=#749 id=749 data-nosnippet>749</a>          <span class="kw">for </span>rbid <span class="kw">in </span><span class="kw-2">&amp;</span>finished_keys {
-<a href=#750 id=750 data-nosnippet>750</a>            <span class="kw-2">*</span>tc.finished_calibrations.get_mut(<span class="kw-2">&amp;</span>rbid).unwrap() = <span class="bool-val">false</span>; 
-<a href=#751 id=751 data-nosnippet>751</a>          }
-<a href=#752 id=752 data-nosnippet>752</a>        }
-<a href=#753 id=753 data-nosnippet>753</a>        <span class="comment">// FIXME - this or a timer
-<a href=#754 id=754 data-nosnippet>754</a>        </span><span class="kw">if </span>cali_received <span class="kw">as </span>usize == rb_list.len() {
-<a href=#755 id=755 data-nosnippet>755</a>          <span class="comment">// cali_received = 0;
-<a href=#756 id=756 data-nosnippet>756</a>          // if we want to redo a calibration, 
-<a href=#757 id=757 data-nosnippet>757</a>          // somebody else has to set this 
-<a href=#758 id=758 data-nosnippet>758</a>          // flag again.
-<a href=#759 id=759 data-nosnippet>759</a>          </span>tc.calibration_active = <span class="bool-val">false</span>;
-<a href=#760 id=760 data-nosnippet>760</a>          <span class="comment">// reset the counters
-<a href=#761 id=761 data-nosnippet>761</a>          </span><span class="kw">for </span>rbid <span class="kw">in </span>rb_list {
-<a href=#762 id=762 data-nosnippet>762</a>            <span class="kw-2">*</span>tc.finished_calibrations.get_mut(<span class="kw-2">&amp;</span>rbid.rb_id).unwrap() = <span class="bool-val">false</span>; 
-<a href=#763 id=763 data-nosnippet>763</a>          }
-<a href=#764 id=764 data-nosnippet>764</a>          <span class="kw">if </span>show_progress {
-<a href=#765 id=765 data-nosnippet>765</a>            bar.finish_with_message(<span class="string">"Done"</span>);
-<a href=#766 id=766 data-nosnippet>766</a>          }
-<a href=#767 id=767 data-nosnippet>767</a>          <span class="kw">break</span>;
-<a href=#768 id=768 data-nosnippet>768</a>        }
-<a href=#769 id=769 data-nosnippet>769</a>      }
-<a href=#770 id=770 data-nosnippet>770</a>      <span class="prelude-val">Err</span>(err) =&gt; {
-<a href=#771 id=771 data-nosnippet>771</a>        <span class="macro">error!</span>(<span class="string">"Can't acquire lock for ThreadControl at this time! Unable to set calibration mode! {err}"</span>);
-<a href=#772 id=772 data-nosnippet>772</a>      }
-<a href=#773 id=773 data-nosnippet>773</a>    }
-<a href=#774 id=774 data-nosnippet>774</a>  } <span class="comment">// end loop
-<a href=#775 id=775 data-nosnippet>775</a>  // The last step is to create te symlink
-<a href=#776 id=776 data-nosnippet>776</a>  </span><span class="kw">let </span>cali_link_dir = cali_base_dir.clone() + <span class="string">"latest"</span>;
-<a href=#777 id=777 data-nosnippet>777</a>  <span class="kw">match </span>fs::remove_file(cali_link_dir.clone()) {
-<a href=#778 id=778 data-nosnippet>778</a>    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
-<a href=#779 id=779 data-nosnippet>779</a>      <span class="macro">println!</span>(<span class="string">"=&gt; Symlink {} removed!"</span>, cali_link_dir);
-<a href=#780 id=780 data-nosnippet>780</a>    },
-<a href=#781 id=781 data-nosnippet>781</a>    <span class="prelude-val">Err</span>(err) =&gt; {
-<a href=#782 id=782 data-nosnippet>782</a>      <span class="macro">error!</span>(<span class="string">"Unable to remove symlink to latest calibrations! {err}"</span>);
-<a href=#783 id=783 data-nosnippet>783</a>    }
-<a href=#784 id=784 data-nosnippet>784</a>  }
-<a href=#785 id=785 data-nosnippet>785</a>  <span class="macro">println!</span>(<span class="string">"=&gt; Will create symlink {}"</span>, cali_link_dir);
-<a href=#786 id=786 data-nosnippet>786</a>  <span class="kw">match </span>symlink(cali_output_dir, cali_link_dir) {
-<a href=#787 id=787 data-nosnippet>787</a>    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to create symlink for calibration data! {err}"</span>),
-<a href=#788 id=788 data-nosnippet>788</a>    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
-<a href=#789 id=789 data-nosnippet>789</a>  }
-<a href=#790 id=790 data-nosnippet>790</a>}</code></pre></div></section></main></body></html>
+<a href=#586 id=586 data-nosnippet>586</a><span class="doccomment">/// Restart liftof-rb on RBs
+<a href=#587 id=587 data-nosnippet>587</a></span><span class="kw">pub fn </span>rm_liftof_rb_logs(rb_list : <span class="kw-2">&amp;</span>Vec&lt;u8&gt;) {
+<a href=#588 id=588 data-nosnippet>588</a>  <span class="kw">let </span>command = <span class="macro">vec!</span>[String::from(<span class="string">"rm"</span>),
+<a href=#589 id=589 data-nosnippet>589</a>                     String::from(<span class="string">"/home/gaps/logs/liftof.log"</span>),
+<a href=#590 id=590 data-nosnippet>590</a>                     String::from(<span class="string">"/home/gaps/logs/liftof.err"</span>)];
+<a href=#591 id=591 data-nosnippet>591</a>  <span class="macro">println!</span>(<span class="string">"=&gt; Deleting Logs on RBs!"</span>);
+<a href=#592 id=592 data-nosnippet>592</a>  <span class="kw">match </span>ssh_command_rbs(rb_list, command) {
+<a href=#593 id=593 data-nosnippet>593</a>    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">debug!</span>(<span class="string">"Deleting logs on all RBs failed! {err}"</span>),
+<a href=#594 id=594 data-nosnippet>594</a>    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
+<a href=#595 id=595 data-nosnippet>595</a>  }
+<a href=#596 id=596 data-nosnippet>596</a>}
+<a href=#597 id=597 data-nosnippet>597</a>
+<a href=#598 id=598 data-nosnippet>598</a>
+<a href=#599 id=599 data-nosnippet>599</a><span class="doccomment">/// Run a full tof calibration - RBCalibration
+<a href=#600 id=600 data-nosnippet>600</a>/// 
+<a href=#601 id=601 data-nosnippet>601</a>/// The purpose of the RB calibration to is to create a 
+<a href=#602 id=602 data-nosnippet>602</a>/// relationship between the adc/timing bins and voltages
+<a href=#603 id=603 data-nosnippet>603</a>/// and nanoseconds
+<a href=#604 id=604 data-nosnippet>604</a>///
+<a href=#605 id=605 data-nosnippet>605</a>/// This function is blocking, until a certain (configurable)
+<a href=#606 id=606 data-nosnippet>606</a>/// timeout is expired. The timeout can be set in the configuration
+<a href=#607 id=607 data-nosnippet>607</a>/// file
+<a href=#608 id=608 data-nosnippet>608</a>///
+<a href=#609 id=609 data-nosnippet>609</a>/// # Argumeents:
+<a href=#610 id=610 data-nosnippet>610</a>///
+<a href=#611 id=611 data-nosnippet>611</a>///   * thread_control : general shared memory to hold configuration
+<a href=#612 id=612 data-nosnippet>612</a>///                      settings, program st ate
+<a href=#613 id=613 data-nosnippet>613</a>///   * rb_list        : List of active readoutboards
+<a href=#614 id=614 data-nosnippet>614</a>///   * show_progress  : if true, it will show a progressbar with 
+<a href=#615 id=615 data-nosnippet>615</a>///                      indicatif
+<a href=#616 id=616 data-nosnippet>616</a>///
+<a href=#617 id=617 data-nosnippet>617</a></span><span class="kw">pub fn </span>calibrate_tof(thread_control : Arc&lt;Mutex&lt;ThreadControl&gt;&gt;,
+<a href=#618 id=618 data-nosnippet>618</a>                     rb_list        : <span class="kw-2">&amp;</span>Vec&lt;ReadoutBoard&gt;,
+<a href=#619 id=619 data-nosnippet>619</a>                     show_progress  : bool) {
+<a href=#620 id=620 data-nosnippet>620</a>
+<a href=#621 id=621 data-nosnippet>621</a>  <span class="kw">let </span>one_second               = Duration::from_millis(<span class="number">1000</span>);
+<a href=#622 id=622 data-nosnippet>622</a>  <span class="kw">let </span><span class="kw-2">mut </span>cc_pub_addr          = String::from(<span class="string">""</span>);
+<a href=#623 id=623 data-nosnippet>623</a>  <span class="kw">let </span>calibration_timeout_fail = Duration::from_secs(<span class="number">300</span>); <span class="comment">// in seconds
+<a href=#624 id=624 data-nosnippet>624</a> 
+<a href=#625 id=625 data-nosnippet>625</a>  </span><span class="kw">let </span><span class="kw-2">mut </span>cali_dir_created = <span class="bool-val">false</span>;
+<a href=#626 id=626 data-nosnippet>626</a>  <span class="kw">let </span><span class="kw-2">mut </span>cali_output_dir  = String::from(<span class="string">""</span>);
+<a href=#627 id=627 data-nosnippet>627</a>  <span class="kw">let </span><span class="kw-2">mut </span>cali_base_dir        = String::from(<span class="string">""</span>);
+<a href=#628 id=628 data-nosnippet>628</a>
+<a href=#629 id=629 data-nosnippet>629</a>  <span class="kw">match </span>thread_control.lock() {
+<a href=#630 id=630 data-nosnippet>630</a>    <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>tc) =&gt; {
+<a href=#631 id=631 data-nosnippet>631</a>      <span class="kw">for </span>rb <span class="kw">in </span>rb_list {
+<a href=#632 id=632 data-nosnippet>632</a>        tc.finished_calibrations.insert(rb.rb_id,<span class="bool-val">false</span>); 
+<a href=#633 id=633 data-nosnippet>633</a>      }
+<a href=#634 id=634 data-nosnippet>634</a>      cali_base_dir = tc.liftof_settings.calibration_dir.clone();
+<a href=#635 id=635 data-nosnippet>635</a>      cc_pub_addr   = tc.liftof_settings.cmd_dispatcher_settings.cc_server_address.clone();
+<a href=#636 id=636 data-nosnippet>636</a>      tc.write_data_to_disk = <span class="bool-val">true</span>;
+<a href=#637 id=637 data-nosnippet>637</a>    },
+<a href=#638 id=638 data-nosnippet>638</a>    <span class="prelude-val">Err</span>(err) =&gt; {
+<a href=#639 id=639 data-nosnippet>639</a>      <span class="macro">error!</span>(<span class="string">"Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}"</span>);
+<a href=#640 id=640 data-nosnippet>640</a>    },
+<a href=#641 id=641 data-nosnippet>641</a>  }
+<a href=#642 id=642 data-nosnippet>642</a>
+<a href=#643 id=643 data-nosnippet>643</a>  <span class="comment">// deprecated commanding
+<a href=#644 id=644 data-nosnippet>644</a>  //let voltage_level = DEFAULT_CALIB_VOLTAGE;
+<a href=#645 id=645 data-nosnippet>645</a>  //let rb_id         = DEFAULT_RB_ID;
+<a href=#646 id=646 data-nosnippet>646</a>  //let extra         = DEFAULT_CALIB_EXTRA;
+<a href=#647 id=647 data-nosnippet>647</a>  //println!("=&gt; Received calibration default command! Will init calibration run of all RBs...");
+<a href=#648 id=648 data-nosnippet>648</a>  //let cmd_payload: u32
+<a href=#649 id=649 data-nosnippet>649</a>  //  = (voltage_level as u32) &lt;&lt; 16 | (rb_id as u32) &lt;&lt; 8 | (extra as u32);
+<a href=#650 id=650 data-nosnippet>650</a>  //let default_calib_depr = TofCommand::DefaultCalibration(cmd_payload);
+<a href=#651 id=651 data-nosnippet>651</a>  //let tp_depr = default_calib_depr.pack();
+<a href=#652 id=652 data-nosnippet>652</a>  //let mut payload_depr = String::from("BRCT").into_bytes();
+<a href=#653 id=653 data-nosnippet>653</a>  //payload_depr.append(&amp;mut tp_depr.to_bytestream());
+<a href=#654 id=654 data-nosnippet>654</a>
+<a href=#655 id=655 data-nosnippet>655</a>  </span><span class="kw">let </span><span class="kw-2">mut </span>default_calib      = TofCommand::new();
+<a href=#656 id=656 data-nosnippet>656</a>  default_calib.command_code = TofCommandCode::RBCalibration;
+<a href=#657 id=657 data-nosnippet>657</a>  <span class="kw">let </span>tp                     = default_calib.pack();
+<a href=#658 id=658 data-nosnippet>658</a>  <span class="kw">let </span><span class="kw-2">mut </span>payload            = String::from(<span class="string">"BRCT"</span>).into_bytes();
+<a href=#659 id=659 data-nosnippet>659</a>  payload.append(<span class="kw-2">&amp;mut </span>tp.to_bytestream());
+<a href=#660 id=660 data-nosnippet>660</a>  <span class="comment">// open 0MQ socket here
+<a href=#661 id=661 data-nosnippet>661</a>  </span><span class="kw">let </span>ctx = zmq::Context::new();
+<a href=#662 id=662 data-nosnippet>662</a>  <span class="kw">let </span>cmd_sender  = ctx.socket(zmq::PUB).expect(<span class="string">"Unable to create 0MQ PUB socket!"</span>);
+<a href=#663 id=663 data-nosnippet>663</a>
+<a href=#664 id=664 data-nosnippet>664</a>  cmd_sender.bind(<span class="kw-2">&amp;</span>cc_pub_addr).expect(<span class="string">"Unable to bind to (PUB) socket!"</span>);
+<a href=#665 id=665 data-nosnippet>665</a>  <span class="macro">println!</span>(<span class="string">"=&gt; Give the RBs a chance to connect and wait a bit.."</span>);
+<a href=#666 id=666 data-nosnippet>666</a>  thread::sleep(<span class="number">10</span><span class="kw-2">*</span>one_second);
+<a href=#667 id=667 data-nosnippet>667</a>  <span class="comment">//match cmd_sender.send(&amp;payload_depr, 0) { Err(err) =&gt; {
+<a href=#668 id=668 data-nosnippet>668</a>  //    error!("Unable to send command! {err}");
+<a href=#669 id=669 data-nosnippet>669</a>  //  },
+<a href=#670 id=670 data-nosnippet>670</a>  //  Ok(_) =&gt; {
+<a href=#671 id=671 data-nosnippet>671</a>  //    println!("=&gt; Calibration  initialized!");
+<a href=#672 id=672 data-nosnippet>672</a>  //  }
+<a href=#673 id=673 data-nosnippet>673</a>  //}
+<a href=#674 id=674 data-nosnippet>674</a>  </span><span class="kw">match </span>cmd_sender.send(<span class="kw-2">&amp;</span>payload, <span class="number">0</span>) { <span class="prelude-val">Err</span>(err) =&gt; {
+<a href=#675 id=675 data-nosnippet>675</a>      <span class="macro">error!</span>(<span class="string">"Unable to send command! {err}"</span>);
+<a href=#676 id=676 data-nosnippet>676</a>    },
+<a href=#677 id=677 data-nosnippet>677</a>    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+<a href=#678 id=678 data-nosnippet>678</a>      <span class="macro">println!</span>(<span class="string">"=&gt; Calibration  initialized!"</span>);
+<a href=#679 id=679 data-nosnippet>679</a>    }
+<a href=#680 id=680 data-nosnippet>680</a>  }
+<a href=#681 id=681 data-nosnippet>681</a>  <span class="kw">match </span>thread_control.lock() {
+<a href=#682 id=682 data-nosnippet>682</a>    <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>tc) =&gt; {
+<a href=#683 id=683 data-nosnippet>683</a>      <span class="comment">// deactivate the master trigger thread
+<a href=#684 id=684 data-nosnippet>684</a>      </span>tc.thread_master_trg_active =<span class="bool-val">false</span>;
+<a href=#685 id=685 data-nosnippet>685</a>      tc.calibration_active = <span class="bool-val">true</span>;
+<a href=#686 id=686 data-nosnippet>686</a>    },
+<a href=#687 id=687 data-nosnippet>687</a>    <span class="prelude-val">Err</span>(err) =&gt; {
+<a href=#688 id=688 data-nosnippet>688</a>      <span class="macro">error!</span>(<span class="string">"Can't acquire lock for ThreadControl! Unable to set calibration mode! {err}"</span>);
+<a href=#689 id=689 data-nosnippet>689</a>    },
+<a href=#690 id=690 data-nosnippet>690</a>  }
+<a href=#691 id=691 data-nosnippet>691</a>
+<a href=#692 id=692 data-nosnippet>692</a>  <span class="macro">println!</span>(<span class="string">"=&gt; .. now we need to wait until the calibration is finished!"</span>);
+<a href=#693 id=693 data-nosnippet>693</a>  <span class="kw">let </span>bar_template : <span class="kw-2">&amp;</span>str = <span class="string">"[{elapsed_precise}] {prefix} {msg} {spinner} {bar:60.blue/grey} {pos:&gt;7}/{len:7}"</span>;
+<a href=#694 id=694 data-nosnippet>694</a>  <span class="kw">let </span>bar_style  = ProgressStyle::with_template(bar_template).expect(<span class="string">"Unable to set progressbar style!"</span>);
+<a href=#695 id=695 data-nosnippet>695</a>  <span class="kw">let </span><span class="kw-2">mut </span>bar    = ProgressBar::hidden();
+<a href=#696 id=696 data-nosnippet>696</a>  <span class="kw">if </span>show_progress {
+<a href=#697 id=697 data-nosnippet>697</a>    bar = ProgressBar::new(rb_list.len() <span class="kw">as </span>u64); 
+<a href=#698 id=698 data-nosnippet>698</a>    bar.set_position(<span class="number">0</span>);
+<a href=#699 id=699 data-nosnippet>699</a>    <span class="kw">let </span>bar_label  = String::from(<span class="string">"Acquiring RB calibration data"</span>);
+<a href=#700 id=700 data-nosnippet>700</a>    bar.set_message (bar_label);
+<a href=#701 id=701 data-nosnippet>701</a>    bar.set_prefix  (<span class="string">"\u{2699}\u{1F4D0}"</span>);
+<a href=#702 id=702 data-nosnippet>702</a>    bar.set_style   (bar_style);
+<a href=#703 id=703 data-nosnippet>703</a>  }
+<a href=#704 id=704 data-nosnippet>704</a>
+<a href=#705 id=705 data-nosnippet>705</a>  <span class="comment">// now block until the calibrations are done or we time outu
+<a href=#706 id=706 data-nosnippet>706</a>  // FIXME - set timeout parameter in settings
+<a href=#707 id=707 data-nosnippet>707</a>  </span><span class="kw">let </span>timeout = Instant::now();
+<a href=#708 id=708 data-nosnippet>708</a>  <span class="kw">let </span><span class="kw-2">mut </span>cali_received = <span class="number">0</span>;
+<a href=#709 id=709 data-nosnippet>709</a>  <span class="lifetime">'main</span>: <span class="kw">loop </span>{
+<a href=#710 id=710 data-nosnippet>710</a>    thread::sleep(<span class="number">10</span><span class="kw-2">*</span>one_second);
+<a href=#711 id=711 data-nosnippet>711</a>    <span class="kw">if </span>timeout.elapsed() &gt; calibration_timeout_fail {
+<a href=#712 id=712 data-nosnippet>712</a>      <span class="macro">error!</span>(<span class="string">"Calibration timeout! Calibrations might not be complete!"</span>);
+<a href=#713 id=713 data-nosnippet>713</a>      <span class="kw">match </span>thread_control.lock() {
+<a href=#714 id=714 data-nosnippet>714</a>        <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>tc) =&gt; {
+<a href=#715 id=715 data-nosnippet>715</a>          tc.calibration_active = <span class="bool-val">false</span>;
+<a href=#716 id=716 data-nosnippet>716</a>        }
+<a href=#717 id=717 data-nosnippet>717</a>        <span class="prelude-val">Err</span>(err) =&gt; {
+<a href=#718 id=718 data-nosnippet>718</a>          <span class="macro">error!</span>(<span class="string">"Can't acquire lock for ThreadControl at this time! Unable to set calibration mode! {err}"</span>);
+<a href=#719 id=719 data-nosnippet>719</a>        }
+<a href=#720 id=720 data-nosnippet>720</a>      }
+<a href=#721 id=721 data-nosnippet>721</a>      <span class="kw">if </span>show_progress {
+<a href=#722 id=722 data-nosnippet>722</a>        bar.finish_with_message(<span class="string">"Done"</span>);
+<a href=#723 id=723 data-nosnippet>723</a>      }
+<a href=#724 id=724 data-nosnippet>724</a>      <span class="kw">break</span>;
+<a href=#725 id=725 data-nosnippet>725</a>    }
+<a href=#726 id=726 data-nosnippet>726</a>    <span class="comment">//let mut rbcali = RBCalibrations::new();
+<a href=#727 id=727 data-nosnippet>727</a>    </span><span class="kw">match </span>thread_control.lock() {
+<a href=#728 id=728 data-nosnippet>728</a>      <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>tc) =&gt; {
+<a href=#729 id=729 data-nosnippet>729</a>        <span class="kw">for </span>rbid <span class="kw">in </span>rb_list {
+<a href=#730 id=730 data-nosnippet>730</a>          <span class="comment">// the global data sink sets these flags
+<a href=#731 id=731 data-nosnippet>731</a>          </span><span class="kw">let </span><span class="kw-2">mut </span>finished_keys = Vec::&lt;u8&gt;::new();
+<a href=#732 id=732 data-nosnippet>732</a>          <span class="kw">if </span>tc.stop_flag {
+<a href=#733 id=733 data-nosnippet>733</a>            <span class="macro">println!</span>(<span class="string">"Stop signal received, exiting calibration routine!"</span>);
+<a href=#734 id=734 data-nosnippet>734</a>            <span class="kw">break </span><span class="lifetime">'main</span>;
+<a href=#735 id=735 data-nosnippet>735</a>          }
+<a href=#736 id=736 data-nosnippet>736</a>          <span class="kw">if </span>tc.finished_calibrations[<span class="kw-2">&amp;</span>rbid.rb_id] {
+<a href=#737 id=737 data-nosnippet>737</a>            cali_received += <span class="number">1</span>;
+<a href=#738 id=738 data-nosnippet>738</a>            <span class="kw">let </span>rbcali = tc.calibrations.get(<span class="kw-2">&amp;</span>rbid.rb_id).expect(<span class="string">"We got the signal tat this calibration is ready but it is not!"</span>);
+<a href=#739 id=739 data-nosnippet>739</a>            <span class="kw">let </span>pack   = rbcali.pack();
+<a href=#740 id=740 data-nosnippet>740</a>            <span class="comment">// See RBCalibration reference
+<a href=#741 id=741 data-nosnippet>741</a>            </span><span class="kw">let </span>file_type  = FileType::CalibrationFile(rbid.rb_id);
+<a href=#742 id=742 data-nosnippet>742</a>            <span class="comment">//println!("==&gt; Writing stream to file with prefix {}", streamfile_name);
+<a href=#743 id=743 data-nosnippet>743</a>            //let mut cali_writer = TofPacketWriter::new(write_stream_path.clone(), file_type);
+<a href=#744 id=744 data-nosnippet>744</a>            </span><span class="kw">if </span>!cali_dir_created {
+<a href=#745 id=745 data-nosnippet>745</a>              <span class="kw">let </span>today           = get_utc_timestamp();
+<a href=#746 id=746 data-nosnippet>746</a>              cali_output_dir     = <span class="macro">format!</span>(<span class="string">"{}/{}"</span>, cali_base_dir.clone(), today);
+<a href=#747 id=747 data-nosnippet>747</a>              <span class="kw">match </span>create_dir_all(cali_output_dir.clone()) {
+<a href=#748 id=748 data-nosnippet>748</a>                <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; <span class="macro">info!</span>(<span class="string">"Created {} for calibration data!"</span>, cali_output_dir),
+<a href=#749 id=749 data-nosnippet>749</a>                <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to create {} for calibration data! {}"</span>, cali_output_dir, err)
+<a href=#750 id=750 data-nosnippet>750</a>              }
+<a href=#751 id=751 data-nosnippet>751</a>              cali_dir_created = <span class="bool-val">true</span>;
+<a href=#752 id=752 data-nosnippet>752</a>            }
+<a href=#753 id=753 data-nosnippet>753</a>            <span class="kw">let </span><span class="kw-2">mut </span>cali_writer = TofPacketWriter::new(cali_output_dir.clone(), file_type);
+<a href=#754 id=754 data-nosnippet>754</a>            cali_writer.add_tof_packet(<span class="kw-2">&amp;</span>pack);
+<a href=#755 id=755 data-nosnippet>755</a>            drop(cali_writer);
+<a href=#756 id=756 data-nosnippet>756</a>
+<a href=#757 id=757 data-nosnippet>757</a>            bar.set_position(cali_received);
+<a href=#758 id=758 data-nosnippet>758</a>            finished_keys.push(rbid.rb_id);
+<a href=#759 id=759 data-nosnippet>759</a>          }
+<a href=#760 id=760 data-nosnippet>760</a>          <span class="kw">for </span>rbid <span class="kw">in </span><span class="kw-2">&amp;</span>finished_keys {
+<a href=#761 id=761 data-nosnippet>761</a>            <span class="kw-2">*</span>tc.finished_calibrations.get_mut(<span class="kw-2">&amp;</span>rbid).unwrap() = <span class="bool-val">false</span>; 
+<a href=#762 id=762 data-nosnippet>762</a>          }
+<a href=#763 id=763 data-nosnippet>763</a>        }
+<a href=#764 id=764 data-nosnippet>764</a>        <span class="comment">// FIXME - this or a timer
+<a href=#765 id=765 data-nosnippet>765</a>        </span><span class="kw">if </span>cali_received <span class="kw">as </span>usize == rb_list.len() {
+<a href=#766 id=766 data-nosnippet>766</a>          <span class="comment">// cali_received = 0;
+<a href=#767 id=767 data-nosnippet>767</a>          // if we want to redo a calibration, 
+<a href=#768 id=768 data-nosnippet>768</a>          // somebody else has to set this 
+<a href=#769 id=769 data-nosnippet>769</a>          // flag again.
+<a href=#770 id=770 data-nosnippet>770</a>          </span>tc.calibration_active = <span class="bool-val">false</span>;
+<a href=#771 id=771 data-nosnippet>771</a>          <span class="comment">// reset the counters
+<a href=#772 id=772 data-nosnippet>772</a>          </span><span class="kw">for </span>rbid <span class="kw">in </span>rb_list {
+<a href=#773 id=773 data-nosnippet>773</a>            <span class="kw-2">*</span>tc.finished_calibrations.get_mut(<span class="kw-2">&amp;</span>rbid.rb_id).unwrap() = <span class="bool-val">false</span>; 
+<a href=#774 id=774 data-nosnippet>774</a>          }
+<a href=#775 id=775 data-nosnippet>775</a>          <span class="kw">if </span>show_progress {
+<a href=#776 id=776 data-nosnippet>776</a>            bar.finish_with_message(<span class="string">"Done"</span>);
+<a href=#777 id=777 data-nosnippet>777</a>          }
+<a href=#778 id=778 data-nosnippet>778</a>          <span class="kw">break</span>;
+<a href=#779 id=779 data-nosnippet>779</a>        }
+<a href=#780 id=780 data-nosnippet>780</a>      }
+<a href=#781 id=781 data-nosnippet>781</a>      <span class="prelude-val">Err</span>(err) =&gt; {
+<a href=#782 id=782 data-nosnippet>782</a>        <span class="macro">error!</span>(<span class="string">"Can't acquire lock for ThreadControl at this time! Unable to set calibration mode! {err}"</span>);
+<a href=#783 id=783 data-nosnippet>783</a>      }
+<a href=#784 id=784 data-nosnippet>784</a>    }
+<a href=#785 id=785 data-nosnippet>785</a>  } <span class="comment">// end loop
+<a href=#786 id=786 data-nosnippet>786</a>  // The last step is to create te symlink
+<a href=#787 id=787 data-nosnippet>787</a>  </span><span class="kw">let </span>cali_link_dir = cali_base_dir.clone() + <span class="string">"latest"</span>;
+<a href=#788 id=788 data-nosnippet>788</a>  <span class="kw">match </span>fs::remove_file(cali_link_dir.clone()) {
+<a href=#789 id=789 data-nosnippet>789</a>    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+<a href=#790 id=790 data-nosnippet>790</a>      <span class="macro">println!</span>(<span class="string">"=&gt; Symlink {} removed!"</span>, cali_link_dir);
+<a href=#791 id=791 data-nosnippet>791</a>    },
+<a href=#792 id=792 data-nosnippet>792</a>    <span class="prelude-val">Err</span>(err) =&gt; {
+<a href=#793 id=793 data-nosnippet>793</a>      <span class="macro">error!</span>(<span class="string">"Unable to remove symlink to latest calibrations! {err}"</span>);
+<a href=#794 id=794 data-nosnippet>794</a>    }
+<a href=#795 id=795 data-nosnippet>795</a>  }
+<a href=#796 id=796 data-nosnippet>796</a>  <span class="macro">println!</span>(<span class="string">"=&gt; Will create symlink {}"</span>, cali_link_dir);
+<a href=#797 id=797 data-nosnippet>797</a>  <span class="kw">match </span>symlink(cali_output_dir, cali_link_dir) {
+<a href=#798 id=798 data-nosnippet>798</a>    <span class="prelude-val">Err</span>(err) =&gt; <span class="macro">error!</span>(<span class="string">"Unable to create symlink for calibration data! {err}"</span>),
+<a href=#799 id=799 data-nosnippet>799</a>    <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; ()
+<a href=#800 id=800 data-nosnippet>800</a>  }
+<a href=#801 id=801 data-nosnippet>801</a>}</code></pre></div></section></main></body></html>

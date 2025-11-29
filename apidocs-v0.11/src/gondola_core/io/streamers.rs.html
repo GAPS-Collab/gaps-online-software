@@ -554,11 +554,11 @@
 <a href=#554 id=554 data-nosnippet>554</a>            dig.update(<span class="kw-2">&amp;</span>this_field.to_le_bytes());
 <a href=#555 id=555 data-nosnippet>555</a>            <span class="kw">if </span><span class="self">self</span>.check_channel_errors {
 <a href=#556 id=556 data-nosnippet>556</a>              <span class="kw">if </span>((<span class="number">0x8000 </span>&amp; this_field) &gt;&gt; <span class="number">15</span>) == <span class="number">0x1 </span>{
-<a href=#557 id=557 data-nosnippet>557</a>                <span class="macro">error!</span>(<span class="string">"Ch error bit set for ch {}!"</span>, ch);
+<a href=#557 id=557 data-nosnippet>557</a>                <span class="macro">debug!</span>(<span class="string">"Ch error bit set for ch {}!"</span>, ch);
 <a href=#558 id=558 data-nosnippet>558</a>                event_status = EventStatus::ChnSyncErrors;
 <a href=#559 id=559 data-nosnippet>559</a>              }
 <a href=#560 id=560 data-nosnippet>560</a>              <span class="kw">if </span>((<span class="number">0x4000 </span>&amp; this_field) &gt;&gt; <span class="number">14</span>) == <span class="number">0x1 </span>{
-<a href=#561 id=561 data-nosnippet>561</a>                <span class="macro">error!</span>(<span class="string">"Cell error bit set for ch {}!"</span>, ch);
+<a href=#561 id=561 data-nosnippet>561</a>                <span class="macro">debug!</span>(<span class="string">"Cell error bit set for ch {}!"</span>, ch);
 <a href=#562 id=562 data-nosnippet>562</a>                event_status = EventStatus::CellSyncErrors;
 <a href=#563 id=563 data-nosnippet>563</a>                any_cell_error = <span class="bool-val">true</span>;
 <a href=#564 id=564 data-nosnippet>564</a>              }
@@ -570,11 +570,11 @@
 <a href=#570 id=570 data-nosnippet>570</a>          <span class="kw">if </span><span class="self">self</span>.check_channel_errors {
 <a href=#571 id=571 data-nosnippet>571</a>            <span class="kw">let </span>adc_w_errs = u8_to_u16_err_check(<span class="kw-2">&amp;</span><span class="self">self</span>.stream[<span class="self">self</span>.pos..<span class="self">self</span>.pos + <span class="number">2</span><span class="kw-2">*</span>nwords]);
 <a href=#572 id=572 data-nosnippet>572</a>            <span class="kw">if </span>adc_w_errs.<span class="number">1 </span>{
-<a href=#573 id=573 data-nosnippet>573</a>              <span class="macro">error!</span>(<span class="string">"Ch error bit set for ch {}!"</span>, ch);
+<a href=#573 id=573 data-nosnippet>573</a>              <span class="macro">debug!</span>(<span class="string">"Ch error bit set for ch {}!"</span>, ch);
 <a href=#574 id=574 data-nosnippet>574</a>              event_status = EventStatus::ChnSyncErrors;
 <a href=#575 id=575 data-nosnippet>575</a>              any_cell_error = <span class="bool-val">true</span>;
 <a href=#576 id=576 data-nosnippet>576</a>            } <span class="kw">else if </span>adc_w_errs.<span class="number">2 </span>{
-<a href=#577 id=577 data-nosnippet>577</a>              <span class="macro">error!</span>(<span class="string">"Cell error bit set for ch {}!"</span>, ch);
+<a href=#577 id=577 data-nosnippet>577</a>              <span class="macro">debug!</span>(<span class="string">"Cell error bit set for ch {}!"</span>, ch);
 <a href=#578 id=578 data-nosnippet>578</a>              event_status = EventStatus::CellSyncErrors;
 <a href=#579 id=579 data-nosnippet>579</a>            }
 <a href=#580 id=580 data-nosnippet>580</a>            event.adc[<span class="kw-2">*</span>ch <span class="kw">as </span>usize] = adc_w_errs.<span class="number">0</span>;

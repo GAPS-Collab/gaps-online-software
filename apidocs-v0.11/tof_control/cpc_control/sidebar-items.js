@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["cpc_temp","cpc_vcp"]};
+window.SIDEBAR_ITEMS = {"mod":["cpc_temp"]};
