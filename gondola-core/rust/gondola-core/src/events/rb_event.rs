@@ -60,7 +60,7 @@ pub struct RBEvent {
   pub adc           : Vec<Vec<u16>>,
   pub hits          : Vec<TofHit>,
   // not getting serialized
-  pub creation_time : Instant,
+  pub creation_time : Option<Instant>,
 }
 
 impl RBEvent {
@@ -76,7 +76,7 @@ impl RBEvent {
       header        : RBEventHeader::new(),
       adc           : adc,
       hits          : Vec::<TofHit>::new(),
-      creation_time : Instant::now()
+      creation_time : Some(Instant::now())
     }
   }
 
@@ -586,58 +586,10 @@ impl FromRandom for RBEvent {
       let random_numbers: Vec<u16> = (0..NWORDS).map(|_| rng.random()).collect();
       event.adc[*ch as usize] = random_numbers;
     }
-    //}
+    event.creation_time = None;
     event
   }
 }
-
-
-//impl From<&TofPacket> for RBEvent {
-//  fn from(pk : &TofPacket) -> Self {
-//    match pk.packet_type {
-//      //PacketType::RBEventMemoryView => {
-//      //  match RBEvent::extract_from_rbeventmemoryview(&pk.payload, &mut 0) {
-//      //    Ok(event) => {
-//      //      return event;
-//      //    }
-//      //    Err(err) => { 
-//      //      error!("Can not get RBEvent from RBEventMemoryView! Error {err}!");
-//      //      error!("Returning empty event!");
-//      //      return RBEvent::new();
-//      //    }
-//      //  }
-//      //},
-//      TofPacketType::RBEvent => {
-//        match RBEvent::from_bytestream(&pk.payload, &mut 0) {
-//          Ok(event) => {
-//            return event;
-//          }
-//          Err(err) => { 
-//            error!("Can not decode RBEvent - will return empty event! {err}");
-//            return RBEvent::new();
-//          }
-//        }
-//      },
-//      TofPacketType::RBEventMemoryView => {
-//        let mut streamer = RBEventMemoryStreamer::new();
-//        streamer.add(&pk.payload, pk.payload.len());
-//        match streamer.get_event_at_pos_unchecked(None) {
-//          None => {
-//            return RBEvent::new();
-//          },
-//          Some(ev) => {
-//            return ev;
-//          }
-//        }
-//      },
-//
-//      _ => {
-//        error!("Can not deal with {}! Returning empty event", pk);
-//        return RBEvent::new();
-//      }
-//    }
-//  }
-//}
 
 //-----------------------------------------------------------
   
@@ -746,8 +698,11 @@ fn serialization_rbevent() {
 #[test]
 fn pack_rbevent() {
   for _ in 0..100 {
-    let event  = RBEvent::from_random();
-    let test : RBEvent = event.pack().unpack().unwrap();
+    let mut event          = RBEvent::from_random();
+    let fix_time           = Instant::now();
+    event.creation_time    = None;
+    let mut test : RBEvent = event.pack().unpack().unwrap();
+    test.creation_time     = None;
     assert_eq!(event, test);
   }
 }

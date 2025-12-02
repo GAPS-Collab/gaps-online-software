@@ -362,8 +362,8 @@ impl Serialization for EventBuilderHB {
     Self::verify_fixed(stream,pos)?;
     let mut hb = EventBuilderHB::new();
     let version_seconds     = parse_u64(stream,pos);
-    let version = ProtocolVersion::from(((version_seconds & 0xC000000000000000) >> 62) as u8); 
-    let met_seconds = version_seconds & 0x3FFFFFFFFFFFFFFF;
+    let version             = ProtocolVersion::from(((version_seconds & 0xC000000000000000) >> 62) as u8); 
+    let met_seconds         = version_seconds & 0x3FFFFFFFFFFFFFFF;
     hb.met_seconds          = met_seconds;
     //hb.met_seconds          = parse_u64(stream,pos);
     hb.n_mte_received_tot   = parse_u64(stream,pos);
@@ -428,7 +428,7 @@ impl FromRandom for EventBuilderHB {
     Self {
       // FIXME 
       version                : ProtocolVersion::Unknown,
-      met_seconds            : rng.random::<u64>(),
+      met_seconds            : rng.random::<u64>() & 0x3FFFFFFFFFFFFFFF,
       n_rbe_received_tot     : rng.random::<u64>(),
       n_rbe_per_te           : rng.random::<u64>(),
       n_rbe_discarded_tot    : rng.random::<u64>(),
@@ -451,27 +451,48 @@ impl FromRandom for EventBuilderHB {
       n_rbe_from_past        : rng.random::<u64>(),
       n_rbe_orphan           : rng.random::<u64>(),
       data_mangled_ev        : rng.random::<u64>(),
-      timestamp              : rng.random::<u64>(),
-      reserved_0             : rng.random::<u32>(),
-      reserved_1             : rng.random::<u32>(),
-      reserved_2             : rng.random::<u32>(),
-      reserved_3             : rng.random::<u32>(),
-      reserved_4             : rng.random::<u32>(),
-      reserved_5             : rng.random::<u32>(),
-      reserved_6             : rng.random::<u32>(),
-      reserved_7             : rng.random::<u32>(),
-      reserved_8             : rng.random::<u32>(),
-      reserved_9             : rng.random::<u32>(),
-      reserved_10            : rng.random::<u32>(),
-      reserved_11            : rng.random::<u32>(),
-      reserved_12            : rng.random::<u32>(),
-      reserved_13            : rng.random::<u32>(),
-      reserved_14            : rng.random::<u32>(),
-      reserved_15            : rng.random::<u32>(),
-      reserved_16            : rng.random::<u32>(),
-      reserved_17            : rng.random::<u32>(),
-      reserved_18            : rng.random::<u32>(),
-      reserved_19            : rng.random::<u32>(),
+      timestamp              : 0, // this will get set later or 
+                                  // used by MoniSeries
+      reserved_0             : 0,
+      reserved_1             : 0,
+      reserved_2             : 0,
+      reserved_3             : 0,
+      reserved_4             : 0,
+      reserved_5             : 0,
+      reserved_6             : 0,
+      reserved_7             : 0,
+      reserved_8             : 0,
+      reserved_9             : 0,
+      reserved_10            : 0,
+      reserved_11            : 0,
+      reserved_12            : 0,
+      reserved_13            : 0,
+      reserved_14            : 0,
+      reserved_15            : 0,
+      reserved_16            : 0,
+      reserved_17            : 0,
+      reserved_18            : 0,
+      reserved_19            : 0,
+      //reserved_0             : rng.random::<u32>(),
+      //reserved_1             : rng.random::<u32>(),
+      //reserved_2             : rng.random::<u32>(),
+      //reserved_3             : rng.random::<u32>(),
+      //reserved_4             : rng.random::<u32>(),
+      //reserved_5             : rng.random::<u32>(),
+      //reserved_6             : rng.random::<u32>(),
+      //reserved_7             : rng.random::<u32>(),
+      //reserved_8             : rng.random::<u32>(),
+      //reserved_9             : rng.random::<u32>(),
+      //reserved_10            : rng.random::<u32>(),
+      //reserved_11            : rng.random::<u32>(),
+      //reserved_12            : rng.random::<u32>(),
+      //reserved_13            : rng.random::<u32>(),
+      //reserved_14            : rng.random::<u32>(),
+      //reserved_15            : rng.random::<u32>(),
+      //reserved_16            : rng.random::<u32>(),
+      //reserved_17            : rng.random::<u32>(),
+      //reserved_18            : rng.random::<u32>(),
+      //reserved_19            : rng.random::<u32>(),
     }
   }
 } 

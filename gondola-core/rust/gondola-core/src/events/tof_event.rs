@@ -375,7 +375,8 @@ impl TofEvent {
       h.event_t0 = t0 + t_shift;
     }
     // start the first hit at 0
-    self.hits.sort_by(|a,b| (a.event_t0).partial_cmp(&b.event_t0).unwrap_or(Ordering::Greater));
+    //self.hits.sort_by(|a,b| (a.event_t0).partial_cmp(&b.event_t0).unwrap_or(Ordering::Greater));
+    self.hits.sort_by(|a,b| (a.event_t0).total_cmp(&b.event_t0));
     let t0_first_hit = self.hits[0].event_t0;
     for h in self.hits.iter_mut() {
       h.event_t0 -= t0_first_hit
@@ -1376,6 +1377,12 @@ fn packable_tofeventv0() {
     let fix_time = Instant::now();
     test.creation_time = fix_time;
     data.creation_time = fix_time;
+    for k in &mut data.rb_events {
+      k.creation_time = None;
+    }
+    for k in &mut test.rb_events {
+      k.creation_time = None;
+    }
     for h in &mut test.hits {
       h.paddle_len       = 0.0; 
       h.coax_cable_time  = 0.0; 
@@ -1405,6 +1412,12 @@ fn packable_tofeventv1() {
     let fix_time = Instant::now();
     test.creation_time = fix_time;
     data.creation_time = fix_time;
+    for k in &mut data.rb_events {
+      k.creation_time = None;
+    }
+    for k in &mut test.rb_events {
+      k.creation_time = None;
+    }
     for h in &mut test.hits {
       h.paddle_len       = 0.0; 
       h.coax_cable_time  = 0.0; 
@@ -1434,6 +1447,12 @@ fn packable_tofeventv2() {
     let fix_time = Instant::now();
     test.creation_time = fix_time;
     data.creation_time = fix_time;
+    for k in &mut data.rb_events {
+      k.creation_time = None;
+    }
+    for k in &mut test.rb_events {
+      k.creation_time = None;
+    }
     for h in &mut test.hits {
       h.paddle_len       = 0.0; 
       h.coax_cable_time  = 0.0; 
