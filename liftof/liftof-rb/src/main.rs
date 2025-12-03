@@ -272,7 +272,7 @@ fn main() {
                   if rat_list.len() != 1 {
                     error!("Ambigious preamp mapping! {:?}", rat_list);
                   } else {
-                    rat_id = Some(rat_list[0].rat_id);
+                    rat_id = Some(rat_list[0].rat_id as u8);
                     let key = format!("RAT{:02}", rat_list[0].rat_id);
                     //println!("{:?}", preamp_cfg.rat_preamp_biases);
                     //println!("{}", key);
