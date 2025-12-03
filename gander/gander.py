@@ -244,6 +244,7 @@ def _event_viewer_data() -> dict:
             'tof_hits'                : [],
             'trk_hits'                : [],
             'trk_layers'              : [],
+            'trk_pointcloud'          : [],
             'n_trk_hits_masked'       : None,
             'n_trk_hits_no_mask_info' : None}
 
@@ -306,35 +307,47 @@ def create_event_plots(no_plot_first_bins_wf=False) -> dict:
     data = _event_viewer_data()
     n_trk_hits_masked       = None 
     n_trk_hits_no_mask_info = None
+    telemetry = False
     if isinstance(ev, gon.events.TelemetryEvent):
         ev_tof = ev.tof
         data['tof_event'] = ev_tof
         data['merged_event'] = ev
+        data['packet_type']     = ptype
+        telemetry = True
     else:
-        st.write(f'{type(ev)}')
-        raise ValueError('Right now, event view works only with MergedEvents')
-    data['packet_type']     = ptype
-    if ev.tof.hits:
-        paddle_style            = {'edgecolor' : 'w', 'lw' : 1.0}
-        data['tof_xy']    , ax  = gon.visual.tof.tof_projection_xy(event=ev_tof, cmap=matplotlib.colormaps['seismic'])
-        data['tof_cbe']   , ax2 = gon.visual.tof.unroll_cbe_sides  (event=ev_tof, cmap=matplotlib.colormaps['seismic'], paddle_style = paddle_style)
-        data['tof_cor']   , ax3 = gon.visual.tof.unroll_cor        (event=ev_tof, cmap=matplotlib.colormaps['seismic'], paddle_style = paddle_style)
-        data['tof_xy_all'], data['tof_xz_all'], data['tof_yz_all'] \
-                = gon.visual.tof.tof_2dproj(event=ev_tof, cmap=matplotlib.colormaps['seismic'])
-    data['tof_hits'] = ev.tof.hits
-    for h in ev.tracker:
-        data['trk_hits'].append(h)
-    ## FIXME - the pointcloud needs masking
-    data['trk_pointcloud']          = ev.tracker_pointcloud 
-    data['n_trk_hits_masked']       = n_trk_hits_masked
-    data['n_trk_hits_no_mask_info'] = n_trk_hits_no_mask_info
-    #data['trk_plots'] = plot_tracker(data['trk_hits'], strip_dict)
-    if wf_ev is not None:
-        calib = st.session_state.tof_calib 
-        if no_plot_first_bins_wf:
-            data['waveform_figs'], __ = gon.visual.tof.plot_waveforms(wf_ev, calib=calib, with_hits=True, skip_bins=10)  
-        else:
-            data['waveform_figs'], __ = gon.visual.tof.plot_waveforms(wf_ev, calib=calib, with_hits=True)  
+        ev_tof = ev
+        data['tof_event'] = ev_tof
+        if ev_tof.hits:
+            paddle_style            = {'edgecolor' : 'w', 'lw' : 1.0}
+            data['tof_xy']    , ax  = gon.visual.tof.tof_projection_xy(event=ev_tof, cmap=matplotlib.colormaps['seismic'])
+            data['tof_cbe']   , ax2 = gon.visual.tof.unroll_cbe_sides  (event=ev_tof, cmap=matplotlib.colormaps['seismic'], paddle_style = paddle_style)
+            data['tof_cor']   , ax3 = gon.visual.tof.unroll_cor        (event=ev_tof, cmap=matplotlib.colormaps['seismic'], paddle_style = paddle_style)
+            data['tof_xy_all'], data['tof_xz_all'], data['tof_yz_all'] \
+                    = gon.visual.tof.tof_2dproj(event=ev_tof, cmap=matplotlib.colormaps['seismic'])
+        data['tof_hits'] = ev_tof.hits
+    
+    if telemetry:
+        if ev.tof.hits:
+            paddle_style            = {'edgecolor' : 'w', 'lw' : 1.0}
+            data['tof_xy']    , ax  = gon.visual.tof.tof_projection_xy(event=ev_tof, cmap=matplotlib.colormaps['seismic'])
+            data['tof_cbe']   , ax2 = gon.visual.tof.unroll_cbe_sides  (event=ev_tof, cmap=matplotlib.colormaps['seismic'], paddle_style = paddle_style)
+            data['tof_cor']   , ax3 = gon.visual.tof.unroll_cor        (event=ev_tof, cmap=matplotlib.colormaps['seismic'], paddle_style = paddle_style)
+            data['tof_xy_all'], data['tof_xz_all'], data['tof_yz_all'] \
+                    = gon.visual.tof.tof_2dproj(event=ev_tof, cmap=matplotlib.colormaps['seismic'])
+        data['tof_hits'] = ev.tof.hits
+        for h in ev.tracker:
+            data['trk_hits'].append(h)
+        ## FIXME - the pointcloud needs masking
+        data['trk_pointcloud']          = ev.tracker_pointcloud 
+        data['n_trk_hits_masked']       = n_trk_hits_masked
+        data['n_trk_hits_no_mask_info'] = n_trk_hits_no_mask_info
+        #data['trk_plots'] = plot_tracker(data['trk_hits'], strip_dict)
+        if wf_ev is not None:
+            calib = st.session_state.tof_calib 
+            if no_plot_first_bins_wf:
+                data['waveform_figs'], __ = gon.visual.tof.plot_waveforms(wf_ev, calib=calib, with_hits=True, skip_bins=10)  
+            else:
+                data['waveform_figs'], __ = gon.visual.tof.plot_waveforms(wf_ev, calib=calib, with_hits=True)  
     return data
 
 #    session['trk_hits'] = []
@@ -387,9 +400,13 @@ def file_loader(f, event_type,\
 
 
     event_samples = []
+    is_tof_file   = False
     if stream_mode:
         reader   = gon.io.streamer.TelemetrySocketReader(f)
         pass
+    elif str(f).endswith('tof.gaps'):
+        reader   = gon.io.TofPacketReader(f)
+        is_tof_file = True
     else:
         reader   = gon.io.CRReader(f)
         # set the calibration files 
@@ -425,43 +442,51 @@ def file_loader(f, event_type,\
     exclude_event_types = [k for k in MERGED_EVENT_TYPES if k not in merged_event_types] 
     
     for frame in reader:
-        match event_type:
-            case EventType.Unknown:
-                raise ValueError("Unknown event type!")
-            case EventType.Merged:
-                try:
-                    ev = frame.get_telemetryevent(always_exclude=exclude_event_types)
-                    m_type = ev.header.packet_type 
-                except Exception as e:
-                    logger.warning(f'Merged event is corrupt! {e}')
-                    continue
-                ev_tof = ev.tof
-            case EventType.Tof:
-                m_type = 'TofEvent'
-
-                if not 'PacketType.TofEvent' in frame.index:
-                    if 'PacketType.TofEventSummary' in frame.index:
-                        m_type = 'TofEventSummary'
-                    else:
+        if is_tof_file:
+            pack = frame
+            if pack.packet_type == gon.packets.TofPacketType.TofEvent:
+                ev_tof = gon.events.TofEvent.unpack(pack)
+                ev_tof.move_hits()
+            else:
+                continue
+        else:
+            match event_type:
+                case EventType.Unknown:
+                    raise ValueError("Unknown event type!")
+                case EventType.Merged:
+                    try:
+                        ev = frame.get_telemetryevent(always_exclude=exclude_event_types)
+                        m_type = ev.header.packet_type 
+                    except Exception as e:
+                        logger.warning(f'Merged event is corrupt! {e}')
                         continue
-                # we also do have TofEventSummary data (.tofsum.gaps)
-                # let's double check
-                
-                try:
-                    if m_type == 'TofEventSummary':
-                        #print (frame)
-                        ev_tof = frame.get_tofeventsummary('PacketType.TofEventSummary')
-                        ev = ev_tof
-                    else:
-                        ev = frame.get_tofevent('PacketType.TofEvent')
-                except Exception as e:
-                    logger.warning(f'TofEvent is corrupt! {e}')
-                    continue
-                if m_type == 'TofEvent':
-                    ev_tof = ev.get_summary()
-                #raise ValueError("TofEvent analysis not implemented yet, use merged event!")
-            case _:
-                raise ValueError("Unable to digest this input!")
+                    ev_tof = ev.tof
+                case EventType.Tof:
+                    m_type = 'TofEvent'
+
+                    if not 'PacketType.TofEvent' in frame.index:
+                        if 'PacketType.TofEventSummary' in frame.index:
+                            m_type = 'TofEventSummary'
+                        else:
+                            continue
+                    # we also do have TofEventSummary data (.tofsum.gaps)
+                    # let's double check
+                    
+                    try:
+                        if m_type == 'TofEventSummary':
+                            #print (frame)
+                            ev_tof = frame.get_tofeventsummary('PacketType.TofEventSummary')
+                            ev = ev_tof
+                        else:
+                            ev = frame.get_tofevent('PacketType.TofEvent')
+                    except Exception as e:
+                        logger.warning(f'TofEvent is corrupt! {e}')
+                        continue
+                    #if m_type == 'TofEvent':
+                    #    ev_tof = ev.get_summary()
+                    #raise ValueError("TofEvent analysis not implemented yet, use merged event!")
+                case _:
+                    raise ValueError("Unable to digest this input!")
 
         # this will actually only add events when 
         # it is active
@@ -504,7 +529,11 @@ def file_loader(f, event_type,\
         if len(event_samples) != n_event_samples:
             # let's also get the tof event with the waveforms for this
             wf_event = None
-            if 'PacketType.TofEvent' in frame.index:
+            if is_tof_file:
+                wf_event = ev_tof
+                ev       = ev_tof
+                m_type   = 'TofEvent'
+            elif 'PacketType.TofEvent' in frame.index:
                 wf_event = frame.get_tofevent('PacketType.TofEvent') 
             event_samples.append((f,m_type,(ev, wf_event)))
         
@@ -604,11 +633,18 @@ def load_run(event_type         = EventType.Merged,\
     else:
         for f in stqdm(st.session_state.infiles, desc="Loading run data, this might take a while...", total = len(st.session_state.infiles)):
             if st.session_state.load_moni_data:
-                st.session_state.moni_data['mtb'] .add_crfile(str(f))
-                st.session_state.moni_data['rb']  .add_crfile(str(f))
-                st.session_state.moni_data['pa']  .add_crfile(str(f))
-                st.session_state.moni_data['evbh'].add_crfile(str(f))
-                st.session_state.moni_data['ltb'] .add_crfile(str(f))
+                if str(f).endswith('tof.gaps'):
+                    st.session_state.moni_data['mtb'] .add_toffile(str(f))
+                    st.session_state.moni_data['rb']  .add_toffile(str(f))
+                    st.session_state.moni_data['pa']  .add_toffile(str(f))
+                    st.session_state.moni_data['evbh'].add_toffile(str(f))
+                    st.session_state.moni_data['ltb'] .add_toffile(str(f))
+                else:    
+                    st.session_state.moni_data['mtb'] .add_crfile(str(f))
+                    st.session_state.moni_data['rb']  .add_crfile(str(f))
+                    st.session_state.moni_data['pa']  .add_crfile(str(f))
+                    st.session_state.moni_data['evbh'].add_crfile(str(f))
+                    st.session_state.moni_data['ltb'] .add_crfile(str(f))
             result = file_loader(f, event_type,
                                  merged_event_types   = merged_event_types,
                                  search_event_id      = search_event_id,
@@ -822,7 +858,9 @@ if check_password():
     # setup calibration and mappings - use latest calib as default calibration
     # for now
     # steamlit app
-    calibs = [k for k in reversed(sorted(Path(config['data']['tof_calib']).glob('24*')))]
+    calibs = [k for k in reversed(sorted(Path(config['data']['tof_calib']).glob('25*')))]
+    #print (calibs)
+    #raise
     calib = gon.calibration.load_rb_calibrations(calibs[0])
    
     moni_data = {'mtb'   : gon.monitoring.MtbMoniDataSeries(),
@@ -899,7 +937,7 @@ if check_password():
                 # FIXME - ultimatly, we want to sort by time
                 if st.session_state.load_waveforms:
                     all_runs     = [k for k in Path(config['data']['waveform']).glob('*')]
-                    runids       = [k.name for k in all_runs]
+                    runids       = [k.name for k in all_runs if k.name.isdigit()]
                     selected_run = l_col.selectbox('Select a run (with wf)', tuple(runids))
                     selected_run = all_runs[0].parent / selected_run 
                     sr_infiles   = selected_run.glob('*.gaps')
@@ -915,7 +953,7 @@ if check_password():
                     load_run_kwargs['event_type'] = EventType.Tof
                 else:
                     all_runs     = [k for k in Path(config['data']['no_waveform']).glob('*')]
-                    runids       = [k.name for k in all_runs]
+                    runids       = reversed(sorted([k.name for k in all_runs if k.name.isdigit()]))
                     selected_run = l_col.selectbox('Select a run (no wf)', tuple(runids))
                     selected_run = all_runs[0].parent / selected_run 
                     sr_infiles   = selected_run.glob('*.gaps')
@@ -1305,8 +1343,8 @@ if check_password():
             st.subheader('Select TOF calibrations')
             #st.write('Default path (non-changeable')
             #st.code(TOF_CALI_PATH)
-            calibs = reversed(sorted(Path(config['data']['tof_calib']).glob('24*')))
-            use_this_calib = st.selectbox('241212_125129UTC', tuple(calibs))
+            calibs = reversed(sorted(Path(config['data']['tof_calib']).glob('25*')))
+            use_this_calib = st.selectbox('251120_093503UTC', tuple(calibs))
             calib = gon.calibration.load_rb_calibrations(use_this_calib)
             st.session_state['tof_calib'] = calib
             good  = sorted([cal for cal in calib.values() if cal.check()], key=lambda x: x.rb_id)
@@ -1360,6 +1398,7 @@ if check_password():
                     with st.expander(f"Calibration for RB {k.rb_id}"):
                         st.text(f"{st.session_state['tof_calib'][k.rb_id]}") 
                         plot_histograms = st.checkbox('Plot distributions', key=f'plot_cali_dist_{k.rb_id}_voffset')
+                        cali = st.session_state['tof_calib'][k.rb_id]
                         if plot_histograms:
                             for ch in range(9):
                                 st.subheader(f'Channel {ch + 1}')
@@ -1701,7 +1740,10 @@ if check_password():
 
         with tab_tracker_layers:
             ev_filename , ptype, (ev, wf_ev) = st.session_state.ev_viewer_cache[st.session_state.ev_viewer_idx]
-            trk_plots = gon.visual.tracker.plot_tracker(hits = ev.tracker) 
+            if hasattr(ev,'tracker'):
+                trk_plots = gon.visual.tracker.plot_tracker(hits = ev.tracker) 
+            else:
+                trk_plots = False
             if trk_plots:
                 st.pyplot(trk_plots['trk_proj_xy'], use_container_width=False)
                 st.pyplot(trk_plots['trk_proj_xz'], use_container_width=False)
@@ -2407,7 +2449,7 @@ if check_password():
     #@st.cache_data
     @st.fragment
     def page_monitoring():
-        tab_rb, tab_ltb, tab_pa, tab_pb, tab_hb = st.tabs(["RB","LTB","PA","PB","Heartbeats"])
+        tab_hb, tab_mtb, tab_rb, tab_ltb, tab_pa, tab_pb = st.tabs(["Heartbeats", "MTB",  "RB","LTB","PA","PB"])
         kwargs = {'color'  : 'w',\
                   'alpha'  : 0.4,\
                   'ls'     : 'dashed'
@@ -2415,6 +2457,46 @@ if check_password():
                   #'lw'     : 0.9}
         if not st.session_state.use_dark_theme:
             kwargs['color'] = 'k'
+        with tab_hb:
+            with st.expander(f"Event builder HeartBeat"):
+                df    = st.session_state.moni_data['evbh'].get_dataframe().filter((pl.col("timestamp") < 1200*3600))
+                times = df['timestamp']/3600 
+                
+                fig   = gander_scatter_plot(times,100*df['data_mangled_ev']/df['n_mte_received_tot'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - mangled events', xlabel='MET [h]', ylabel='Mangled events (\%)', **kwargs)
+                st.pyplot(fig)
+                
+                fig   = gander_scatter_plot(times,100*df['n_timed_out']/df['n_mte_received_tot'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - timed out events', xlabel='MET [h]', ylabel='Timed out events (\%)', **kwargs)
+                st.pyplot(fig)
+                
+                fig   = gander_scatter_plot(times,df['event_id_cache_size'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - Cache size (ids)', xlabel='MET [h]', ylabel='Cache size (event id)', **kwargs)
+                st.pyplot(fig)
+                
+                fig   = gander_scatter_plot(times,df['event_cache_size'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - Cache size (events)', xlabel='MET [h]', ylabel='Cache size (event id)', **kwargs)
+                st.pyplot(fig)
+                
+                fig   = gander_scatter_plot(times,df['n_rbe_received_tot']/df['n_mte_received_tot'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - RBEvents/TofEvent', xlabel='MET [h]', ylabel='N(RBEvents)/N(TofEvents)', **kwargs)
+                st.pyplot(fig)
+                
+                fig   = gander_scatter_plot(times,100*df['n_rbe_orphan']/df['n_mte_received_tot'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - Orphan RB events (\%)', xlabel='MET [h]', ylabel='N(RBEvents) lost', **kwargs)
+                st.pyplot(fig) 
+                
+                fig   = gander_scatter_plot(times,100*df['n_rbe_discarded_tot']/df['n_mte_received_tot'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - Number of discarded RB events (\%)', xlabel='MET [h]', ylabel='N(RBEvents) lost', **kwargs)
+                st.pyplot(fig) 
+
+                fig   = gander_scatter_plot(times,df['n_rbe_discarded_tot'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - Number of discarded RB events', xlabel='MET [h]', ylabel='N(RBEvents) lost', **kwargs)
+                st.pyplot(fig) 
+
+                fig   = gander_scatter_plot(times,df['n_mte_skipped'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - Number of discarded events from the MTB', xlabel='MET [h]', ylabel='N skipped', **kwargs)
+                st.pyplot(fig)
+                
+                fig   = gander_scatter_plot(times,df['n_rbe_per_loop'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - Number of RBEvents requested per MasterTriggerEvent', xlabel='MET [h]', ylabel='N skipped', **kwargs)
+                st.pyplot(fig)
+                
+                fig   = gander_scatter_plot(times,df['rbe_wo_mte'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - Number of RBEvents without MasterTrigger', xlabel='MET [h]', ylabel='N skipped', **kwargs)
+                st.pyplot(fig)
+                
+                fig   = gander_scatter_plot(times,df['drs_bsy_lost_hg_hits'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='Lost Hits (DRS Busy)', xlabel='MET [h]', ylabel='N', **kwargs)
+                st.pyplot(fig)
             
         with tab_rb:
             df = st.session_state.moni_data['rb'].get_dataframe().filter((pl.col("timestamp") < 1200*3600))
@@ -2474,45 +2556,13 @@ if check_password():
                     fig   = gander_scatter_plot(rbtimes,rbmoni['temps1'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title=f'PB for RB{int(board)} - T1', xlabel='MET [h]', ylabel='C', **kwargs)
                     st.pyplot(fig)
 
-        with tab_hb:
-            with st.expander(f"Event builder HeartBeat"):
-                df    = st.session_state.moni_data['evbh'].get_dataframe().filter((pl.col("timestamp") < 1200*3600))
-                times = df['timestamp']/3600 
-                
-                fig   = gander_scatter_plot(times,df['data_mangled_ev'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - mangled events', xlabel='MET [h]', ylabel='No. of mangled events', **kwargs)
-                st.pyplot(fig)
-                
-                fig   = gander_scatter_plot(times,df['n_timed_out'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - timed out events', xlabel='MET [h]', ylabel='No. of timed out events', **kwargs)
-                st.pyplot(fig)
-                
-                fig   = gander_scatter_plot(times,df['event_id_cache_size'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - Cache size (ids)', xlabel='MET [h]', ylabel='Cache size (event id)', **kwargs)
-                st.pyplot(fig)
-                
-                fig   = gander_scatter_plot(times,df['event_cache_size'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - Cache size (events)', xlabel='MET [h]', ylabel='Cache size (event id)', **kwargs)
-                st.pyplot(fig)
-                
-                fig   = gander_scatter_plot(times,df['n_rbe_per_te'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - RBEvents/TofEvent', xlabel='MET [h]', ylabel='N(RBEvents)/N(TofEvents)', **kwargs)
-                st.pyplot(fig)
-                
-                fig   = gander_scatter_plot(times,df['n_rbe_discarded_tot'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - Number of discarded RB events', xlabel='MET [h]', ylabel='N(RBEvents) lost', **kwargs)
-                st.pyplot(fig) 
-
-                fig   = gander_scatter_plot(times,df['n_rbe_discarded_tot'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - Number of discarded RB events', xlabel='MET [h]', ylabel='N(RBEvents) lost', **kwargs)
-                st.pyplot(fig) 
-
-                fig   = gander_scatter_plot(times,df['n_mte_skipped'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - Number of discarded events from the MTB', xlabel='MET [h]', ylabel='N skipped', **kwargs)
-                st.pyplot(fig)
-                
-                fig   = gander_scatter_plot(times,df['rbe_wo_mte'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='TOF event builder - Number of RBEvents without MasterTrigger', xlabel='MET [h]', ylabel='N skipped', **kwargs)
-                st.pyplot(fig)
-                
-                fig   = gander_scatter_plot(times,df['drs_bsy_lost_hg_hits'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='Lost Hits (DRS Busy)', xlabel='MET [h]', ylabel='N', **kwargs)
-                st.pyplot(fig)
-
+        with tab_mtb:
             with st.expander(f"MTB Data"):
                 df = st.session_state.moni_data['mtb'].get_dataframe().filter((pl.col("timestamp") < 1200*3600))
                 ##times = st.session_state.moni_data['mtb'].timestamps 
                 times = df['timestamp']
+                if times.eq(0).all():
+                    times = np.array([k for k in range(len(times))])
                 times =  times/3600.0
                 fig   = gander_scatter_plot(times,df['rate'],figsize=lo.FIGSIZE_A4_LANDSCAPE_HALF_HEIGHT, title='MTB rate', xlabel='MET [h]', ylabel='Hz', **kwargs)
                 st.pyplot(fig)
