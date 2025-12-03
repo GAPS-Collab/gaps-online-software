@@ -199,6 +199,16 @@ pub const GAPS_TRIG_PRESCALE : MTBRegister<'static> = MTBRegister {
 };
 
 
+/// SWAP_RB_LINK_IDS 0x247 0x91c 1 rw 0x1
+pub const SWAP_RB_LINK_IDS : MTBRegister<'static> = MTBRegister { 
+  addr  : 0x247,
+  mask  : 0x00000002,
+  descr : "Swaps rb link ids within a RAT",
+  rmw   : true,
+  ro    : false,
+  pulse : false,
+};
+
 /// Force a trigger (has to be previously set)
 /// FORCE_TRIGGER   0x8     0x20    0   w   Pulse   Write 1 to generate a trigger
 pub const FORCE_TRIGGER : MTBRegister<'static> = MTBRegister {

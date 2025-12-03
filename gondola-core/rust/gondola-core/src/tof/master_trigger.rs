@@ -492,6 +492,11 @@ pub fn configure_mtb(bus : &mut IPBus,
       }
     }
   }
+  
+  //match SWAP_RB_LINK_IDS.set(bus,1) {
+  //  Ok(
+  //}
+
   Ok(())
 }
 
@@ -1081,7 +1086,31 @@ impl PyMasterTrigger {
       }
     }
   }
+ 
+  #[getter] 
+  fn get_swap_rb_link_ids(&mut self) -> PyResult<bool> {
+    match SWAP_RB_LINK_IDS.get(&mut self.ipbus) {
+      Ok(swap) => {
+        return Ok(swap > 0);
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
   
+  #[setter] 
+  fn set_swap_rb_link_ids(&mut self, swap : u32) -> PyResult<()> {
+    match SWAP_RB_LINK_IDS.set(&mut self.ipbus, swap) {
+      Ok(_) => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
   #[getter]
   /// Get the lost global trigger rate in Hz
   ///
@@ -1233,7 +1262,7 @@ impl PyMasterTrigger {
       }
   }
  #[setter]
-  fn set_ingore_tiu_busy(&mut self, value : u32) -> PyResult<()> {
+  fn set_ignore_tiu_busy(&mut self, value : u32) -> PyResult<()> {
       match MIN_DEADTIME_MODE.set(&mut self.ipbus, value) {
           Ok(_) => {
               return Ok(());
