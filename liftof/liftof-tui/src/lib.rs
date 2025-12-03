@@ -35,6 +35,24 @@ use crossbeam_channel::{
   Receiver
 };
 
+pub type WaveformCache = HashMap<u8,HashMap<u8, Arc<Mutex<VecDeque<RBWaveform>>>>>;
+
+/// Create a global storage for RBWaveforms 
+pub fn global_waveform_cache() -> WaveformCache {
+  let mut cache = WaveformCache::new();
+  //let rbs   = ReadoutBoard::all();
+  //let paddles = TofPaddle::all_as_dict();
+  for k in 1..50 {
+    let ch_dict = HashMap::<u8, Arc<Mutex<VecDeque<RBWaveform>>>>::new();
+    cache.insert(k as u8, ch_dict);
+    for j in 1..10 {
+      let wfs     = Arc::new(Mutex::new(VecDeque::<RBWaveform>::new()));
+      cache.get_mut(&k).unwrap().insert(j as u8, wfs); 
+    }
+  }
+  cache
+}
+
 /// A map which keeps track of the types of telemetry packets 
 /// received
 pub fn telly_packet_counter(pack_map : &mut HashMap<&str, usize>, packet_type : &TelemetryPacketType) {
@@ -184,17 +202,15 @@ pub fn packet_distributor(tp_from_sock : Receiver<TofPacket>,
                           tp_sender_ev : Sender<TofPacket>,
                           tp_sender_cp : Sender<TofPacket>,
                           tp_sender_tr : Sender<TofPacket>,
-                          rbwf_sender  : Sender<TofPacket>,
+                          //rbwf_sender  : Sender<TofPacket>,
                           ts_send      : Sender<TofPacket>,
                           th_send      : Sender<TofHit>,
                           tp_sender_hb : Sender<TofPacket>,
                           str_list     : Arc<Mutex<VecDeque<String>>>,
                           pck_map      : Arc<Mutex<HashMap<&str, usize>>>,
-                          mut writer   : Option<TofPacketWriter>) {
+                          mut writer   : Option<TofPacketWriter>,
+                          mut wf_cache : Box<WaveformCache>) {
   let mut n_pack = 0usize;
-  // per default, we create master trigger packets from TofEventSummary, 
-  // except we have "real" mtb packets
-  let craft_mte_packets = true;
 
   loop {
     //match data_socket.recv_bytes(0) {
@@ -245,10 +261,67 @@ pub fn packet_distributor(tp_from_sock : Receiver<TofPacket>,
             }
           }
           TofPacketType::RBWaveform => {
-            match rbwf_sender.send(tp) {
-              Err(err) => error!("Can't send TP! {err}"),
-              Ok(_)    => (),
+            match tp.unpack::<RBWaveform>() {
+              Ok(wf) => {
+                 
+                let rb_id = wf.rb_id;
+                let ch_a  = wf.rb_channel_a + 1;
+                let ch_b  = wf.rb_channel_b + 1;
+                debug!("Successfully unpacked RBWaveform! {} {} {}", rb_id, ch_a, ch_b);
+                //if rb_id != 25 {
+                //  continue;
+                //} 
+                //if ch_a != 3 {
+                //  continue
+                //}
+                //println!("{wf}");
+                if rb_id > 50 || rb_id == 0 {
+                  continue;
+                }
+                if ch_a > 9 || ch_a == 0 {
+                  error!("Invalid channel B {}", ch_a);
+                  continue;
+                }
+                if ch_b > 9 || ch_b == 0 {
+                  error!("Invalid channel A {}", ch_b);
+                  continue;
+                }
+                //error!("1 : Pushing wf with rb id {} to {}", wf.rb_id, rb_id);
+                match wf_cache.get_mut(&wf.rb_id).unwrap().get_mut(&ch_a).unwrap().lock() {
+                  Err(err)  => {
+                    error!("Unable to lock waveform cache! {err}");
+                  }
+                  Ok(mut cache) => {
+                    //error!("2 : Pushing wf with rb id {} to {}", wf.rb_id, rb_id);
+                    cache.push_back(wf.clone());
+                    //error!("3 : Pushing wf with rb id {} to {}", wf.rb_id, rb_id);
+                    debug!("Last wf in cache has rb id {}", cache.back().unwrap().rb_id); 
+                    if cache.len() > 1000 {
+                      cache.pop_front();
+                    }
+                  }
+                }
+                match wf_cache.get_mut(&wf.rb_id).unwrap().get_mut(&ch_b).unwrap().lock() {
+                  Err(err)  => {
+                    error!("Unable to lock waveform cache!");
+                  }
+                  Ok(mut cache) => {
+                    cache.push_back(wf.clone());
+                    if cache.len() > 1000 {
+                      cache.pop_front();
+                    }
+                   // println!("Pushing waveform for {rb_id} - {ch_b} to cache of len {}", cache.len());
+                  }
+                }
+              }
+              Err(err) => {
+                error!("Unable to unpack RBWaveform! {err}");
+              }
             }
+            //match rbwf_sender.send(tp) {
+            //  Err(err) => error!("Can't send TP! {err}"),
+            //  Ok(_)    => (),
+            //}
           }
           TofPacketType::TofEvent => {
             match ts_send.send(tp) {

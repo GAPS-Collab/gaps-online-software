@@ -26,6 +26,8 @@ use ndhistogram::axis::{
   Uniform,
 };
 
+use crate::WaveformCache;
+
 use ratatui::prelude::Stylize;
 use ratatui::{
   //backend::CrosstermBackend,
@@ -137,6 +139,7 @@ pub struct RBTab<'a>  {
   pub alerts             : Arc<Mutex<HashMap<&'a str,TofAlert<'a>>>>,
   alerts_active          : bool,
   moni_old_check         : HashMap<u8,Instant>,
+  waveform_cache         : Box<WaveformCache>
 }
 
 impl RBTab<'_>  {
@@ -145,7 +148,8 @@ impl RBTab<'_>  {
                  rb_receiver  : Receiver<RBEvent>,
                  rbs          : HashMap<u8, ReadoutBoard>,
                  alerts       : Arc<Mutex<HashMap<&'a str,TofAlert<'a>>>>,
-                 theme        : ColorTheme) -> RBTab<'a>  {
+                 theme        : ColorTheme,
+                 wf_cache     : Box<WaveformCache>) -> RBTab<'a>  {
     // check if the alerts are active
     let mut alerts_active = false;
     match alerts.lock() {
@@ -276,6 +280,7 @@ RBTab {
       alerts             : alerts,
       alerts_active      : alerts_active,
       moni_old_check     : moni_old_check,
+      waveform_cache     : wf_cache
     }
   }
   
@@ -348,7 +353,11 @@ RBTab {
           ev = _ev;
         }
       }
+    } else {
+      // if the rb_receiver is empty, we might want to try to get waveforms from the 
+      // waveform cache 
     }
+
     if !self.tp_receiver.is_empty() {
       match self.tp_receiver.try_recv() {
         Err(_err) => (),
@@ -450,19 +459,51 @@ RBTab {
    
     if ev.header.event_id != 0 && self.rb_selector == ev.header.rb_id {
       for ch in ev.header.get_channels() {
+        let mut wf = RBWaveform::new();
         if self.cali_loaded {
-          let mut nanos = vec![0f32;1024];
-          let mut volts = vec![0f32;1024];
-          self.rb_calibration.nanoseconds(ch as usize + 1, ev.header.stop_cell as usize, 
-                                          &mut nanos);
-          self.rb_calibration.voltages(ch as usize + 1, ev.header.stop_cell as usize, 
-                                       &ev.adc[ch as usize], &mut volts);
-          //let 
-          for k in 0..nanos.len() {
-            let vals = (nanos[k] as f64, volts[k] as f64);
-            self.ch_data[ch as usize][k] = vals;
+          match self.waveform_cache.get(&ev.header.rb_id).unwrap().get(&(ch + 1)).unwrap().lock() {
+            Err(err)  => {
+              error!("Unable to lock waveform cache!");
+            }
+            Ok(mut cache) => {
+              if cache.len() > 0 {
+                wf = cache.pop_front().unwrap();
+              }
+            }
           }
+          let _ = wf.calibrate(&self.rb_calibration); 
+          //let mut nanos = vec![0f32;1024];
+          //let mut volts = vec![0f32;1024];
+          //self.rb_calibration.nanoseconds(ch as usize + 1, ev.header.stop_cell as usize, 
+          //                                &mut nanos);
+          //self.rb_calibration.voltages(ch as usize + 1, ev.header.stop_cell as usize, 
+          //                             &ev.adc[ch as usize], &mut volts);
+          //let 
+          if ev.header.get_rbpaddleid().is_a(ch + 1){
+            for k in 0..wf.voltages_a.len() {
+              let vals = (wf.nanoseconds_a[k] as f64, wf.voltages_a[k] as f64);
+              self.ch_data[ch as usize][k] = vals;
+            }
+          } else {
+            for k in 0..wf.voltages_b.len() {
+              let vals = (wf.nanoseconds_b[k] as f64, wf.voltages_b[k] as f64);
+              self.ch_data[ch as usize][k] = vals;
+            }
+          }
+
+
         } else {
+          if ev.header.get_rbpaddleid().is_a(ch + 1){
+            for k in 0..wf.voltages_a.len() {
+              let vals = (k as f64, wf.adc_a[k] as f64);
+              self.ch_data[ch as usize][k] = vals;
+            }
+          } else {
+            for k in 0..wf.voltages_b.len() {
+              let vals = (k as f64, wf.adc_b[k] as f64);
+              self.ch_data[ch as usize][k] = vals;
+            }
+          }
           for k in 0..ev.adc[ch as usize].len() {
             let vals = (k as f64, ev.adc[ch as usize][k] as f64);
             self.ch_data[ch as usize][k] = vals;
@@ -470,7 +511,6 @@ RBTab {
           //println!("{:?}", self.ch_data[ch as usize]);
         }
       }
-
       self.nch_histo.fill(&(ev.header.get_nchan() as f32));
       self.n_events += 1;
       if self.last_evid != 0 {

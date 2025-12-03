@@ -17,6 +17,9 @@ namespace Gaps {
     
     enum class BfswPacketType : u8 {
       Unknown            = 0,
+      SipGpsPosition     = 20,
+      SipGpsTime         = 21,
+      SipPressure        = 22,
       CardHKP            = 30,
       CoolingHK          = 40,
       PDUHK              = 50,
@@ -44,8 +47,18 @@ namespace Gaps {
       TmP55              = 55,
       TmP64              = 64,
       //TmP92            = 92,
+      GcuEvtBuilderStats = 94,
+      RPiHKP             = 89,
       TmP96              = 96,
+      LabjackSettings    = 101,
+      HeatHVLVSettings   = 102,
+      SurvivalPacket     = 114,
+      GcuMonHKAddendum   = 120,
+      PacketStats        = 111,
+      TeleMainSettings   = 112,
+      DecimationSettings = 113,
       TmP214             = 214,
+      RatePacket         = 219,
     };
 
     auto bfsw_ptype_to_u8(BfswPacketType pt) -> u8;

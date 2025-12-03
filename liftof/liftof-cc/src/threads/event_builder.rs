@@ -139,6 +139,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
   //let mut rb_loop_time     = Instant::now();
   //let mut avg_rb_loop_time = 0u128;
   //let mut n_iter_rbe_loop  = 0usize;
+  let n_rbe_per_loop_default = settings.n_rbe_per_loop; 
   loop {
     if check_tc_update.elapsed().as_secs() > 2 {
       //println!("= => [evt_builder] checkling tc..");
@@ -269,30 +270,30 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
           // this RBEvent
           match event_cache.get_mut(&last_rb_evid) {
             None => {
-              // This means that either we dropped the MTB event,
-              // or the RBEvent is from the future
-              if last_rb_evid < *event_id_cache.back().unwrap() {
-                // we know that this is neither too late nor too early!
-                heartbeat.rbe_wo_mte          += 1;
-              }
-              //debug_orphans.push(rb_ev);
-              //let orphan_pack = rb_ev.pack();
-              //writer.add_tof_packet(&orphan_pack);
-              if rb_ev.creation_time.elapsed().as_secs() > 3600 {
-                
-              
-                let delta_evid = last_rb_evid - *event_id_cache.back().unwrap();
-                error!("We can't associate event id {} from RB {} with a MTEvent in range {} .. {}. It is {} event ids ahead !", last_rb_evid, rb_ev.header.rb_id, event_id_cache[0], event_id_cache.back().unwrap(), delta_evid);
-                debug!("{}", rb_ev);
-                error!("Orphan could not be adopted within 1 hour. Kicking them out!");
-                heartbeat.n_rbe_discarded_tot += 1;
-                heartbeat.n_rbe_orphan        += 1;
-                continue 'main
-              }
-              match orphanage.send(rb_ev) {
-                Ok(_) => (),
-                Err(err) => {
-                  error! ("Orphanage does not accept this orphan. They are dying in the gutter all by themselves. What a said world! {err}");
+              if let Some(backend_evid) = event_id_cache.back() { 
+                if last_rb_evid < *backend_evid {
+                  // we know that this is neither too late nor too early!
+                  heartbeat.rbe_wo_mte          += 1;
+                }
+                //debug_orphans.push(rb_ev);
+                //let orphan_pack = rb_ev.pack();
+                //writer.add_tof_packet(&orphan_pack);
+                if rb_ev.creation_time.is_some() {
+                  if rb_ev.creation_time.unwrap().elapsed().as_secs() > 300 {
+                    let delta_evid = last_rb_evid - backend_evid;
+                    error!("We can't associate event id {} from RB {} with a MTEvent in range {} .. {}. It is {} event ids ahead !", last_rb_evid, rb_ev.header.rb_id, event_id_cache[0], backend_evid, delta_evid);
+                    debug!("{}", rb_ev);
+                    error!("Orphan could not be adopted within 5 mins. Kicking them out!");
+                    heartbeat.n_rbe_discarded_tot += 1;
+                    heartbeat.n_rbe_orphan        += 1;
+                    continue 'main
+                  }
+                }
+                match orphanage.send(rb_ev) {
+                  Ok(_) => (),
+                  Err(err) => {
+                    error! ("Orphanage does not accept this orphan. They are dying in the gutter all by themselves. What a said world! {err}");
+                  }
                 }
               }
               continue 'main;
@@ -344,7 +345,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
     //  file2.write_all(content_rbs.as_bytes()); // write_al
     //
     //}
-    trace!("Debug timer RBE received! {:?}", debug_timer.elapsed());
+    //trace!("Debug timer RBE received! {:?}", debug_timer.elapsed());
 
     // -----------------------------------------------------
     // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -356,16 +357,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
       settings.build_strategy  == BuildStrategy::AdaptiveThorough {
       //settings.n_rbe_per_loop  = av_rb_ev.ceil() as u32;
       settings.n_rbe_per_loop  = av_rb_ev.floor() as u32;
-
-      // if the rb in the pipeline get too long, catch up
-      // and drain it a bit
-      if ev_from_rb.len() > 1000 {
-        settings.n_rbe_per_loop = ev_from_rb.len() as u32 - 500;
-      }
-      if settings.n_rbe_per_loop == 0 {
-        // failsafe
-        settings.n_rbe_per_loop = 40;
-      }
     }
     if let BuildStrategy::AdaptiveGreedy = settings.build_strategy {
       settings.n_rbe_per_loop = av_rb_ev.ceil() as u32 + settings.greediness as u32;
@@ -373,6 +364,34 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
         // failsafe
         settings.n_rbe_per_loop = 40;
       }
+    }
+    
+ 
+    if ev_from_rb.len() > 1000 {
+      for k in 0..1000 {
+        //while !ev_from_rb.is_empty() {
+        match ev_from_rb.recv() {
+          Err(_) => (), 
+          Ok(ev) => {
+            //FIXME - what to do with these?
+            if ev.creation_time.is_some() {
+              if ev.creation_time.unwrap().elapsed().as_secs() < 90 {
+                match orphanage.send(ev) {
+                  Ok(_) => (),
+                  Err(err) => {
+                    error! ("Orphanage does not accept this orphan. They are dying in the gutter all by themselves. What a said world! {err}");
+                  }
+                } 
+              }
+            }
+          }
+        }        
+      }
+      settings.n_rbe_per_loop = n_rbe_per_loop_default;
+    }
+    if settings.n_rbe_per_loop == 0 {
+      // failsafe
+      settings.n_rbe_per_loop = 40;
     }
     heartbeat.n_rbe_per_loop = settings.n_rbe_per_loop as u64;
 

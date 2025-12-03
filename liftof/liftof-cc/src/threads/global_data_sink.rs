@@ -184,8 +184,6 @@ pub fn global_data_sink(incoming       : &Receiver<TofPacket>,
         // select how to send waveforms or not
         
         let mut pack = ev_.pack();
-        // Now move hits, strip waveforms and calculate gcu variables 
-        ev_.calc_gcu_variables();
         let only_save_interesting = false;
         let mut write_to_disk = true;
         if only_save_interesting {
@@ -216,7 +214,9 @@ pub fn global_data_sink(incoming       : &Receiver<TofPacket>,
           } 
         }
 
+        // Now move hits, strip waveforms and calculate gcu variables 
         ev_.move_hits();
+        ev_.calc_gcu_variables();
         
         //--------------------------------
         // DEBUG - have the cake and eat it too!

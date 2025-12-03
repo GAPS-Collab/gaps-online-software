@@ -67,7 +67,7 @@ use crate::widgets::{
 
 #[derive(Debug, Clone)]
 pub struct MTTab<'a> {
-  pub event_queue    : VecDeque<TofEvent>,
+  pub hb_queue    : VecDeque<TofEvent>,
   pub moni_queue     : VecDeque<MtbMoniData>,
   pub met_queue      : VecDeque<f64>,
   pub rate_queue     : VecDeque<(f64,f64)>,
@@ -120,7 +120,7 @@ impl<'a> MTTab<'a> {
     let mtb_link_bins = Uniform::new(50, 0.0, 50.0).unwrap();
     let panel_bins    = Uniform::new(22, 1.0, 22.0).unwrap();
     Self {
-      event_queue    : VecDeque::<TofEvent>::with_capacity(1000),
+      hb_queue    : VecDeque::<TofEvent>::with_capacity(1000),
       moni_queue     : VecDeque::<MtbMoniData>::with_capacity(1000),
       met_queue      : VecDeque::<f64>::with_capacity(1000),
       rate_queue     : VecDeque::<(f64,f64)>::with_capacity(1000),
@@ -248,9 +248,9 @@ impl<'a> MTTab<'a> {
         self.mtb_link_histo.fill(&(*linked_rbid as f32));
       }
       self.n_events += 1;
-      self.event_queue.push_back(mte.clone());
-      if self.event_queue.len() > self.queue_size {
-        self.event_queue.pop_front();
+      self.hb_queue.push_back(mte.clone());
+      if self.hb_queue.len() > self.queue_size {
+        self.hb_queue.pop_front();
       }
       if self.last_evid != 0 {
         if mte.event_id - self.last_evid != 1 {
@@ -437,11 +437,11 @@ impl<'a> MTTab<'a> {
       )
       .style(self.theme.style());
     
-    let last_event = self.event_queue.back();
+    let last_hb = self.hb_queue.back();
     let view_string : String;
-    match last_event {
-      Some(event) => { 
-        view_string = event.to_string();
+    match last_hb {
+      Some(hb) => { 
+        view_string = hb.to_string();
       }, 
       None => {
         view_string = String::from("EVT QUEUE EMPTY!");

@@ -173,6 +173,7 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
                 match tp.unpack::<RBEvent>() {
                   Ok(rbev_) => {
                     event = rbev_;
+                    event.creation_time = Some(Instant::now());
                   } 
                   Err(err) => {
                     error!("Can't unpack RBEvent! {err}");
