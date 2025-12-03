@@ -31,10 +31,13 @@ indicatif = ">=0.17.3"
 signal-hook = "0.3"
 
 [dependencies.tof-control]
-version  = "0.9.5"
+#version  = "0.9.5"
 optional = false
 git      = "https://github.com/GAPS-Collab/tof-control.git"
 #branch   = "minimal"
-rev      = "23ab243acf48c4c71a994964dee0b612b8cb6132"
+# this one is the old tof-control
+#rev      = "23ab243acf48c4c71a994964dee0b612b8cb6132"
+# and this one is the new
+rev      = "5f63d530fd293cdceede6383ac5b644bbe3deb30"
 #[target.armv7-unknown-linux-gnueabi]
 #linker = "/usr/bin/arm-none-eabi-gcc"
