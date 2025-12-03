@@ -47,6 +47,9 @@ pub trait Serialization {
       // don't panic, monsters will arise downstream.
       panic!("Self::verify_fixed can be only used for structs with a fixed size! In case you are convinced, that your struct has indeed a fixed size, please implement trait Serialization::SIZE with the serialized size in bytes including 4 bytes for header and footer!");
     }
+    if stream.len() < Self::SIZE {
+      return Err(SerializationError::StreamTooShort);
+    }
     let head_pos = seek_marker(stream, Self::HEAD, *pos)?; 
     let tail_pos = seek_marker(stream, Self::TAIL, head_pos + Self::SIZE-2)?;
     if tail_pos + 2 - head_pos != Self::SIZE {

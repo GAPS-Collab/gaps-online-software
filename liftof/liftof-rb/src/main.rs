@@ -255,6 +255,7 @@ fn main() {
     }
   }
 
+  let mut rat_id    : Option<u8> = None;
   if pb_connected {
     // preamp bias settings
     cfg_if::cfg_if!{
@@ -271,6 +272,7 @@ fn main() {
                   if rat_list.len() != 1 {
                     error!("Ambigious preamp mapping! {:?}", rat_list);
                   } else {
+                    rat_id = Some(rat_list[0].rat_id);
                     let key = format!("RAT{:02}", rat_list[0].rat_id);
                     //println!("{:?}", preamp_cfg.rat_preamp_biases);
                     //println!("{}", key);
@@ -307,21 +309,22 @@ fn main() {
             Err(err) => error!("Unable to connect to db! Can not set LTB thresholds! {err}"),
             Ok(mut conn) => {
               // LTB is connected to RB1
-              match RAT::where_rb1id(&mut conn, rb_id) {
+              //match RAT::where_rb1id(&mut conn, rb_id) {
+              match rat_id { 
                 None => error!("Unable to set ltb thresholds! Not able to get board information from db!"),
-                Some(rat_list) => {
-                  if rat_list.len() != 1 {
-                    error!("Ambigious ltb mapping for RB {}! {:?}",rb_id, rat_list);
-                  } else {
-                    let key = format!("RAT{:02}", rat_list[0].rat_id);
-                    match ltb_cfg.rat_ltb_thresholds.get(&key) {
-                      None => error!("Unable to set LTB thresholds! Entry for {} not found in the settings!", key),
-                      Some(thresholds) => {
-                        for ch in 0..2 {
-                          match set_threshold(ch, thresholds[ch as usize]) {
-                            Err(_err) => error!("Unable to set thresholds!"),
-                            Ok(_)    => println!("=> LTB thresholds set! {:?}", thresholds)
-                          }
+                Some(rat_id) => {
+                  //if rat_list.len() != 1 {
+                  //  error!("Ambigious ltb mapping for RB {}! {:?}",rb_id, rat_list);
+                  //} else {
+                  //let key = format!("RAT{:02}", rat_list[0].rat_id);
+                  let key = format!("RAT{:02}", rat_id);
+                  match ltb_cfg.rat_ltb_thresholds.get(&key) {
+                    None => error!("Unable to set LTB thresholds! Entry for {} not found in the settings!", key),
+                    Some(thresholds) => {
+                      for ch in 0..2 {
+                        match set_threshold(ch, thresholds[ch as usize]) {
+                          Err(_err) => error!("Unable to set thresholds!"),
+                          Ok(_)    => println!("=> LTB thresholds set! {:?}", thresholds)
                         }
                       }
                     }
@@ -333,7 +336,7 @@ fn main() {
         }
       } 
     }
-  } // end if pb connected
+  } // end if ltb connected
 
 
   // FIXME - instead of passing the run config around,

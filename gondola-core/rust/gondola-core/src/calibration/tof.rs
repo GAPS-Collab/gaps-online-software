@@ -1837,17 +1837,24 @@ fn serialization_rbcalibration_noeventpayload() {
 #[cfg(feature = "random")]
 #[test]
 fn serialization_rbcalibration_witheventpayload() {
-  let mut calis = Vec::<RBCalibrations>::new();
-  for _ in 0..100 {
+  loop {
     let cali = RBCalibrations::from_random();
     if !cali.serialize_event_data {
       continue;
     }
-    calis.push(cali);
+    let mut test = RBCalibrations::from_bytestream(&cali.to_bytestream(), &mut 0).unwrap();
+    for k in &mut test.vcal_data {
+      k.creation_time = None; 
+    }
+    for k in &mut test.tcal_data {
+      k.creation_time = None; 
+    }
+    for k in &mut test.noi_data {
+      k.creation_time = None; 
+    }
+    assert_eq!(cali, test);
     break;
   }
-  let test = RBCalibrations::from_bytestream(&calis[0].to_bytestream(), &mut 0).unwrap();
-  assert_eq!(calis[0], test);
 }
 
 #[cfg(feature = "random")]

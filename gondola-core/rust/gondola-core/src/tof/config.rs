@@ -2001,21 +2001,22 @@ fn pack_ltbthresholdconfig() {
   }
 }
 
-#[cfg(feature = "random")]
-#[test]
-fn pack_runconfig() {
-  for _ in 0..100 {
-    let cfg  = RunConfig::from_random();
-    let test = cfg.pack().unpack().unwrap();
-    //let test = RunConfig::from_bytestream(&cfg.to_bytestream(), &mut 0).unwrap();
-    assert_eq!(cfg, test);
-
-    let cfg_json = serde_json::to_string(&cfg).unwrap();
-    let test_json 
-      = serde_json::from_str::<RunConfig>(&cfg_json).unwrap();
-    assert_eq!(cfg, test_json);
-  }
-}
+// we don't serialize the config anymore
+//#[cfg(feature = "random")]
+//#[test]
+//fn pack_runconfig() {
+//  for _ in 0..100 {
+//    let cfg  = RunConfig::from_random();
+//    let test = cfg.pack().unpack().unwrap();
+//    //let test = RunConfig::from_bytestream(&cfg.to_bytestream(), &mut 0).unwrap();
+//    assert_eq!(cfg, test);
+//
+//    let cfg_json = serde_json::to_string(&cfg).unwrap();
+//    let test_json 
+//      = serde_json::from_str::<RunConfig>(&cfg_json).unwrap();
+//    assert_eq!(cfg, test_json);
+//  }
+//}
 
 #[cfg(feature = "random")]
 #[test]
