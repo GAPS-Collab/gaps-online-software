@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["packet_distributor","render_logs","telly_packet_counter"],"mod":["colors","layout","menu","tabs","widgets"]};
+window.SIDEBAR_ITEMS = {"fn":["global_waveform_cache","packet_distributor","render_logs","telly_packet_counter"],"mod":["colors","layout","menu","tabs","widgets"],"type":["WaveformCache"]};

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.tof &#8212; gondola 0.11.24 documentation</title>
+    <title>gondola.tof &#8212; gondola 0.11.25 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=fd5bb8fc"></script>
+    <script src="../_static/documentation_options.js?v=002b87ba"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.tof';</script>
@@ -110,7 +110,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.11.24 documentation</p>
+    <p class="title logo__title">gondola 0.11.25 documentation</p>
   
 </a></div>
     
@@ -701,11 +701,6 @@ json file</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.ingore_tiu_busy">
-<span class="sig-name descname"><span class="pre">ingore_tiu_busy</span></span><a class="headerlink" href="#gondola.tof.MasterTrigger.ingore_tiu_busy" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.tof.MasterTrigger.lost_rate">
 <span class="sig-name descname"><span class="pre">lost_rate</span></span><a class="headerlink" href="#gondola.tof.MasterTrigger.lost_rate" title="Link to this definition">#</a></dt>
 <dd><p>Get the lost global trigger rate in Hz</p>
@@ -949,6 +944,11 @@ get dropped due to the RBs being busy</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.tof.MasterTrigger.stop_all_triggers">
 <span class="sig-name descname"><span class="pre">stop_all_triggers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.MasterTrigger.stop_all_triggers" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.tof.MasterTrigger.swap_rb_link_ids">
+<span class="sig-name descname"><span class="pre">swap_rb_link_ids</span></span><a class="headerlink" href="#gondola.tof.MasterTrigger.swap_rb_link_ids" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -2235,7 +2235,6 @@ for a single RB</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_umbrella_center_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_umbrella_center_thresh()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.get_umbrella_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.get_umbrella_thresh()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.ignore_tiu_busy"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.ignore_tiu_busy</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.ingore_tiu_busy"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.ingore_tiu_busy</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.lost_rate"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.lost_rate</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.prescale_bypass"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.prescale_bypass</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.rate"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.rate</span></code></a></li>
@@ -2281,6 +2280,7 @@ for a single RB</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_umbrella_center_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_umbrella_center_thresh()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.set_umbrella_thresh"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.set_umbrella_thresh()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.stop_all_triggers"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.stop_all_triggers()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.swap_rb_link_ids"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.swap_rb_link_ids</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.tiu_bad"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.tiu_bad</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.tiu_busy_ignore"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.tiu_busy_ignore</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.tof.MasterTrigger.tiu_busy_rate"><code class="docutils literal notranslate"><span class="pre">MasterTrigger.tiu_busy_rate</span></code></a></li>

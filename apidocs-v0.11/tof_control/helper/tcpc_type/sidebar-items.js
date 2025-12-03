@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["TCPCTempError","TCPCVcpError"],"struct":["TCPCTemp","TCPCVcp"]};
+window.SIDEBAR_ITEMS = {"enum":["TCPCError"],"struct":["TCPCTemp","TCPCVcp"]};

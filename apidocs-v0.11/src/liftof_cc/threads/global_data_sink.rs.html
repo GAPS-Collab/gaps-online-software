@@ -184,39 +184,39 @@
 <a href=#184 id=184 data-nosnippet>184</a>        // select how to send waveforms or not
 <a href=#185 id=185 data-nosnippet>185</a>        
 <a href=#186 id=186 data-nosnippet>186</a>        </span><span class="kw">let </span><span class="kw-2">mut </span>pack = ev_.pack();
-<a href=#187 id=187 data-nosnippet>187</a>        <span class="comment">// Now move hits, strip waveforms and calculate gcu variables 
-<a href=#188 id=188 data-nosnippet>188</a>        </span>ev_.calc_gcu_variables();
-<a href=#189 id=189 data-nosnippet>189</a>        <span class="kw">let </span>only_save_interesting = <span class="bool-val">false</span>;
-<a href=#190 id=190 data-nosnippet>190</a>        <span class="kw">let </span><span class="kw-2">mut </span>write_to_disk = <span class="bool-val">true</span>;
-<a href=#191 id=191 data-nosnippet>191</a>        <span class="kw">if </span>only_save_interesting {
-<a href=#192 id=192 data-nosnippet>192</a>          <span class="comment">//if ev_to_send.n_hits_umb   &lt; settings.thr_n_hits_umb 
-<a href=#193 id=193 data-nosnippet>193</a>          //&amp;&amp; ev_to_send.n_hits_cbe   &lt; settings.thr_n_hits_cbe
-<a href=#194 id=194 data-nosnippet>194</a>          //&amp;&amp; ev_to_send.n_hits_cor   &lt; settings.thr_n_hits_cor
-<a href=#195 id=195 data-nosnippet>195</a>          //&amp;&amp; ev_to_send.tot_edep_umb &lt; settings.thr_tot_edep_umb
-<a href=#196 id=196 data-nosnippet>196</a>          //&amp;&amp; ev_to_send.tot_edep_cbe &lt; settings.thr_tot_edep_cbe
-<a href=#197 id=197 data-nosnippet>197</a>          //&amp;&amp; ev_to_send.tot_edep_cor &lt; settings.thr_tot_edep_cor {
-<a href=#198 id=198 data-nosnippet>198</a>          //  write_to_disk = false;
-<a href=#199 id=199 data-nosnippet>199</a>          //}
-<a href=#200 id=200 data-nosnippet>200</a>        </span>}
-<a href=#201 id=201 data-nosnippet>201</a>        <span class="kw">if </span>writer.is_some() &amp;&amp; write_to_disk {
-<a href=#202 id=202 data-nosnippet>202</a>          writer.as_mut().unwrap().add_tof_packet(<span class="kw-2">&amp;</span>pack);
-<a href=#203 id=203 data-nosnippet>203</a>          heartbeat.n_pack_write_disk += <span class="number">1</span>;
-<a href=#204 id=204 data-nosnippet>204</a>          heartbeat.n_bytes_written += pack.payload.len() <span class="kw">as </span>u64;   
-<a href=#205 id=205 data-nosnippet>205</a>        }
-<a href=#206 id=206 data-nosnippet>206</a>
-<a href=#207 id=207 data-nosnippet>207</a>        <span class="kw">if </span>send_rbwaveform_packets {
-<a href=#208 id=208 data-nosnippet>208</a>          <span class="kw">for </span>wf <span class="kw">in </span>ev_.get_waveforms() { 
-<a href=#209 id=209 data-nosnippet>209</a>            <span class="kw">match </span>data_socket.send(wf.pack().to_bytestream(),<span class="number">0</span>) {
-<a href=#210 id=210 data-nosnippet>210</a>              <span class="prelude-val">Err</span>(err) =&gt; error !(<span class="string">"Not able to send packet over 0MQ PUB! {err}"</span>),
-<a href=#211 id=211 data-nosnippet>211</a>              <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
-<a href=#212 id=212 data-nosnippet>212</a>                <span class="macro">trace!</span>(<span class="string">"TofPacket sent"</span>);
-<a href=#213 id=213 data-nosnippet>213</a>                heartbeat.n_packets_sent += <span class="number">1</span>;
-<a href=#214 id=214 data-nosnippet>214</a>              }
-<a href=#215 id=215 data-nosnippet>215</a>            } <span class="comment">// end match
-<a href=#216 id=216 data-nosnippet>216</a>          </span>} 
-<a href=#217 id=217 data-nosnippet>217</a>        }
-<a href=#218 id=218 data-nosnippet>218</a>
-<a href=#219 id=219 data-nosnippet>219</a>        ev_.move_hits();
+<a href=#187 id=187 data-nosnippet>187</a>        <span class="kw">let </span>only_save_interesting = <span class="bool-val">false</span>;
+<a href=#188 id=188 data-nosnippet>188</a>        <span class="kw">let </span><span class="kw-2">mut </span>write_to_disk = <span class="bool-val">true</span>;
+<a href=#189 id=189 data-nosnippet>189</a>        <span class="kw">if </span>only_save_interesting {
+<a href=#190 id=190 data-nosnippet>190</a>          <span class="comment">//if ev_to_send.n_hits_umb   &lt; settings.thr_n_hits_umb 
+<a href=#191 id=191 data-nosnippet>191</a>          //&amp;&amp; ev_to_send.n_hits_cbe   &lt; settings.thr_n_hits_cbe
+<a href=#192 id=192 data-nosnippet>192</a>          //&amp;&amp; ev_to_send.n_hits_cor   &lt; settings.thr_n_hits_cor
+<a href=#193 id=193 data-nosnippet>193</a>          //&amp;&amp; ev_to_send.tot_edep_umb &lt; settings.thr_tot_edep_umb
+<a href=#194 id=194 data-nosnippet>194</a>          //&amp;&amp; ev_to_send.tot_edep_cbe &lt; settings.thr_tot_edep_cbe
+<a href=#195 id=195 data-nosnippet>195</a>          //&amp;&amp; ev_to_send.tot_edep_cor &lt; settings.thr_tot_edep_cor {
+<a href=#196 id=196 data-nosnippet>196</a>          //  write_to_disk = false;
+<a href=#197 id=197 data-nosnippet>197</a>          //}
+<a href=#198 id=198 data-nosnippet>198</a>        </span>}
+<a href=#199 id=199 data-nosnippet>199</a>        <span class="kw">if </span>writer.is_some() &amp;&amp; write_to_disk {
+<a href=#200 id=200 data-nosnippet>200</a>          writer.as_mut().unwrap().add_tof_packet(<span class="kw-2">&amp;</span>pack);
+<a href=#201 id=201 data-nosnippet>201</a>          heartbeat.n_pack_write_disk += <span class="number">1</span>;
+<a href=#202 id=202 data-nosnippet>202</a>          heartbeat.n_bytes_written += pack.payload.len() <span class="kw">as </span>u64;   
+<a href=#203 id=203 data-nosnippet>203</a>        }
+<a href=#204 id=204 data-nosnippet>204</a>
+<a href=#205 id=205 data-nosnippet>205</a>        <span class="kw">if </span>send_rbwaveform_packets {
+<a href=#206 id=206 data-nosnippet>206</a>          <span class="kw">for </span>wf <span class="kw">in </span>ev_.get_waveforms() { 
+<a href=#207 id=207 data-nosnippet>207</a>            <span class="kw">match </span>data_socket.send(wf.pack().to_bytestream(),<span class="number">0</span>) {
+<a href=#208 id=208 data-nosnippet>208</a>              <span class="prelude-val">Err</span>(err) =&gt; error !(<span class="string">"Not able to send packet over 0MQ PUB! {err}"</span>),
+<a href=#209 id=209 data-nosnippet>209</a>              <span class="prelude-val">Ok</span>(<span class="kw">_</span>)    =&gt; {
+<a href=#210 id=210 data-nosnippet>210</a>                <span class="macro">trace!</span>(<span class="string">"TofPacket sent"</span>);
+<a href=#211 id=211 data-nosnippet>211</a>                heartbeat.n_packets_sent += <span class="number">1</span>;
+<a href=#212 id=212 data-nosnippet>212</a>              }
+<a href=#213 id=213 data-nosnippet>213</a>            } <span class="comment">// end match
+<a href=#214 id=214 data-nosnippet>214</a>          </span>} 
+<a href=#215 id=215 data-nosnippet>215</a>        }
+<a href=#216 id=216 data-nosnippet>216</a>
+<a href=#217 id=217 data-nosnippet>217</a>        <span class="comment">// Now move hits, strip waveforms and calculate gcu variables 
+<a href=#218 id=218 data-nosnippet>218</a>        </span>ev_.move_hits();
+<a href=#219 id=219 data-nosnippet>219</a>        ev_.calc_gcu_variables();
 <a href=#220 id=220 data-nosnippet>220</a>        
 <a href=#221 id=221 data-nosnippet>221</a>        <span class="comment">//--------------------------------
 <a href=#222 id=222 data-nosnippet>222</a>        // DEBUG - have the cake and eat it too!

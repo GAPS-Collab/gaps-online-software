@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["with_i2c_bus_lock"]};
