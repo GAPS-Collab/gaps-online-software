@@ -273,14 +273,19 @@ pub fn event_processing(board_id            : u8,
                     n_event_id_zero += 1;
                     continue; 
                   } 
-                  if event.header.event_id > 42_000_000u32 {
-                  //if i64::abs(delta_evid) > 10000 {
-                    //error!("Event {}", event);
-                    //error!("Last Event {}", last_event);
-                    error!("The event id is larger than 42000000");
-                    //event.status = EventStatus::RBEventWacky;
-                    n_event_id_too_large += 1;
-                    continue;
+                  if last_event_id != 0 {
+                    let delta_evid = event.header.event_id as i64 - last_event_id as i64;
+                    
+                    //if event.header.event_id > 42_000_000u32 {
+                    if i64::abs(delta_evid) > 90000 {
+                      error!("The event id deviates more than 90000 event ids from the last event id!");
+                      //error!("Event {}", event);
+                      //error!("Last Event {}", last_event);
+                      //error!("The event id is larger than 42000000");
+                      //event.status = EventStatus::RBEventWacky;
+                      n_event_id_too_large += 1;
+                      continue;
+                    }
                   }
                   if last_event_id != 0 {
                     if event.header.event_id != last_event_id + 1 {
@@ -293,10 +298,10 @@ pub fn event_processing(board_id            : u8,
                       }
                     }
                   }
-                  if event.header.event_id != 0 {
-                    last_event_id = event.header.event_id;
-                    //last_event    = event.clone();
-                  }
+                  // Now as we are through our sanity checks, the event id should be can use it for 
+                  // reference
+                  last_event_id = event.header.event_id;
+                  //last_event    = event.clone();
                   //println!("This event id {}!", last_event_id);
                   event.data_type = data_type;
                   // skip for now, since we change event status
