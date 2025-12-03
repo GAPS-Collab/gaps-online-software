@@ -19,9 +19,6 @@ use crate::api::*;
 
 use gondola_core::prelude::*;
 
-use tof_control::helper::rb_type::RBInfo;
-
-
 /// Shutdown a run within the runner thread
 fn termination_seqeunce(prog_ev       : &ProgressBar,
                         prog_a        : &ProgressBar,
@@ -70,7 +67,8 @@ fn termination_seqeunce(prog_ev       : &ProgressBar,
 ///  * force_trigger  : Run in forced trigger mode
 ///
 ///
-pub fn runner(run_config              : &Receiver<RunConfig>,
+pub fn runner(rb_id                   : u8,
+              run_config              : &Receiver<RunConfig>,
               bs_sender               : &Sender<Vec<u8>>,
               dtf_to_evproc           : &Sender<DataType>,
               opmode_to_cache         : &Sender<TofOperationMode>,
@@ -86,17 +84,6 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
   let mut delta_events : u64;
   let mut n_events     : u64 = 0;
 
-  // get board info 
-  let rb_info = RBInfo::new();
-  // check if it is sane. If we are not able to 
-  // get the board id, we might as well panic and restart.
-  if rb_info.board_id == u8::MAX {
-    error!("Board ID field has been set to error state of {}", rb_info.board_id);
-    panic!("Unable to obtain board id! This is a CRITICAL error! Abort!");
-  }
-  // we just follow the convention here. This is the local address on the 
-  // RB network
-  let rb_id = rb_info.board_id;
   let rb_id_str : String =  format!("{rb_id}");
 
   // trigger settings. Per default, we latch to the 

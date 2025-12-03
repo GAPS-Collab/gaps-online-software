@@ -510,7 +510,8 @@ fn main() {
   let _runner_thread = thread::Builder::new()
     .name("runner".into())
     .spawn(move || {
-           runner(&rc_from_cmdr_c,
+           runner(rb_id,
+                  &rc_from_cmdr_c,
                   &bs_send,
                   &dtf_to_evproc,
                   &opmode_to_cache,
