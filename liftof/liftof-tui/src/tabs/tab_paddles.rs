@@ -19,6 +19,8 @@ use crossbeam_channel::{
   //Sender,
 };
 
+use crate::WaveformCache;
+
 use ratatui::prelude::*;
 use ratatui::symbols::Marker;
 
@@ -69,7 +71,8 @@ pub struct PaddleTab<'a> {
   pub theme              : ColorTheme,
   pub te_receiver        : Receiver<TofEvent>,
   pub event_queue        : VecDeque<TofEvent>,
-  pub wf_receiver        : Receiver<TofPacket>,
+  //pub wf_receiver        : Receiver<TofPacket>,
+  pub wf_cache           : Box<WaveformCache>,
   pub queue_size         : usize,
   pub menu               : PaddleMenu<'a>,
   pub wf                 : HashMap<u8, RBWaveform>,
@@ -85,15 +88,15 @@ pub struct PaddleTab<'a> {
   pub baseline_rms_ch_b  : HashMap<u8, Hist1D<Uniform<f32>>>,
 
   // energy depostion & relative position histograms
-  pub h_edep     : HashMap<u8, Hist1D<Uniform<f32>>>,
-  pub h_rel_pos  : HashMap<u8, Hist1D<Uniform<f32>>>,
+  pub h_edep             : HashMap<u8, Hist1D<Uniform<f32>>>,
+  pub h_rel_pos          : HashMap<u8, Hist1D<Uniform<f32>>>,
 
-  pub pca_histo  : HashMap<u8, Hist1D<Uniform<f32>>>,
-  pub pcb_histo  : HashMap<u8, Hist1D<Uniform<f32>>>,
-  pub pha_histo  : HashMap<u8, Hist1D<Uniform<f32>>>,
-  pub phb_histo  : HashMap<u8, Hist1D<Uniform<f32>>>,
-  pub pta_histo  : HashMap<u8, Hist1D<Uniform<f32>>>,
-  pub ptb_histo  : HashMap<u8, Hist1D<Uniform<f32>>>,
+  pub pca_histo          : HashMap<u8, Hist1D<Uniform<f32>>>,
+  pub pcb_histo          : HashMap<u8, Hist1D<Uniform<f32>>>,
+  pub pha_histo          : HashMap<u8, Hist1D<Uniform<f32>>>,
+  pub phb_histo          : HashMap<u8, Hist1D<Uniform<f32>>>,
+  pub pta_histo          : HashMap<u8, Hist1D<Uniform<f32>>>,
+  pub ptb_histo          : HashMap<u8, Hist1D<Uniform<f32>>>,
 
   // charges
   pub charge_a           : HashMap<u8, VecDeque<f64>>,
@@ -109,11 +112,13 @@ pub struct PaddleTab<'a> {
   pub pdl_selector       : usize,
   pub pdl_changed        : bool,
   pub rb_ch_map          : RbChPidMapping,
+  pub last_hit           : String,
 }
 
 impl PaddleTab<'_> {
   pub fn new(te_receiver : Receiver<TofEvent>,
-             wf_receiver : Receiver<TofPacket>,
+             //wf_receiver : Receiver<TofPacket>,
+             wf_cache    : Box<WaveformCache>,
              all_paddles : HashMap<u8, TofPaddle>,
              calibrations: Arc<Mutex<HashMap<u8, RBCalibrations>>>,
              theme       : ColorTheme) -> Self {
@@ -179,7 +184,7 @@ impl PaddleTab<'_> {
     Self {
       theme,
       te_receiver,
-      wf_receiver,
+      wf_cache,
       event_queue       : VecDeque::<TofEvent>::new(),
       queue_size        : 10000, // enough points for histograms! 
                                  
@@ -212,6 +217,7 @@ impl PaddleTab<'_> {
       pdl_selector      : 1,
       pdl_changed       : false,
       rb_ch_map         : rb_ch_map,  
+      last_hit          : String::from(""),
     }
   }
   
@@ -248,65 +254,6 @@ impl PaddleTab<'_> {
   }
  
   pub fn receive_packet(&mut self) -> Result<(), SerializationError> {  
-    match self.wf_receiver.try_recv() {
-      Err(_err) => {
-      }
-      Ok(wf_pack)    => {
-        //info!("Got new RBWaveform! {}", wf_pack);
-        //println!("Size of rbwaveform {}", mem::size_of::<RBWaveform>());
-        //return Ok(());
-        let mut wf : RBWaveform;
-        //wf = RBWaveform::from_random();
-        //wf = wf.pack().unpack().unwrap();
-        //println!("{:?}", wf.adc_a); 
-        ////wf = RBWaveform::new();
-        match wf_pack.unpack::<RBWaveform>() {
-          Ok(wf_) => {
-            //return Ok(());
-            wf = wf_;
-            //println!("{:?}", wf.adc_a);
-          }
-          Err(err) => {
-            error!("Got broken Wf packet {err}");
-            return Ok(());
-          }
-        }
-        //let mut wf : RBWaveform = wf_pack.unpack()?;
-        //let mut pos = 0;
-        //let mut wf : RBWaveform = RBWaveform::from_bytestream(&wf_pack.payload, &mut pos)?;
-        //let mut wf = RBWaveform::new();
-        match self.calibrations.get(&wf.rb_id) {
-          None => error!("RBCalibrations for board {} not available!", wf.rb_id),
-          Some(rbcal) => {
-            match wf.calibrate(rbcal) {
-              Err(err) => error!("Calibration error! {err}"),
-              Ok(_) => ()
-            }
-          }
-        }
-        // patch it for now
-        //if wf.paddle_id == 0 {
-        //  
-        //  wf.paddle_id = self.rb_ch_map[&wf.rb_id][&wf.rb_channel_a];
-        //}
-        if wf.paddle_id == 0 {
-          error!("Got waveform with padle id 0!");
-        } else if wf.paddle_id > 160 {
-          error!("Got paddle id which is too large! {}", wf.paddle_id);
-        } else {
-          if wf.paddle_id == self.current_paddle.paddle_id as u8 {
-            let rb_channel_a = wf.rb_channel_a + 1;
-            let rb_channel_b = wf.rb_channel_b + 1;
-            if (rb_channel_a != self.current_paddle.rb_chA as u8 ) 
-               || (rb_channel_b != self.current_paddle.rb_chB as u8 ) {
-              error!("Inconsistent paddle RB channels! Maybe A and B are switched!");
-            }
-          }
-          let pid = wf.paddle_id as u8;
-          *self.wf.get_mut(&pid).unwrap() = wf;
-        }
-      }
-    }
     match self.te_receiver.try_recv() {
       Err(_err) => {
         return Ok(());
@@ -314,7 +261,12 @@ impl PaddleTab<'_> {
       Ok(mut ev)    => {
         //let hits = ev.get_hits();
         // FIXME - get baselines from hits
+        ev.set_paddles(&self.all_paddles);
+        ev.normalize_hit_times();
         for h in &mut ev.hits {
+          if h.paddle_id == self.current_paddle.paddle_id as u8 {
+            self.last_hit = format!("{}", h);
+          }
           self.h_edep.get_mut(&(h.paddle_id as u8)).unwrap().fill(&h.get_edep());
           h.set_paddle(&self.current_paddle);
           let rel_pos = h.get_pos()/(self.current_paddle.length*10.0);
@@ -365,7 +317,7 @@ impl PaddleTab<'_> {
         let main_lo = Layout::default()
           .direction(Direction::Horizontal)
           .constraints(
-              [Constraint::Percentage(15), Constraint::Percentage(85)].as_ref(),
+              [Constraint::Percentage(15), Constraint::Percentage(40), Constraint::Percentage(45)].as_ref(),
           )
           .split(*main_window);
         let pdl = Block::default()
@@ -418,8 +370,22 @@ impl PaddleTab<'_> {
             .title("Paddle")
             .border_type(BorderType::Rounded),
         );
+        let hit_view = Paragraph::new(self.last_hit.clone())
+          .style(self.theme.style())
+          .alignment(Alignment::Left)
+          //.scroll((5, 10))
+          .block(
+          Block::default()
+            .borders(Borders::ALL)
+            .style(self.theme.style())
+            .title("Hits")
+            .border_type(BorderType::Rounded),
+        );
+
+        //-------------------------------------
         frame.render_stateful_widget(pd_select_list,  main_lo[0], &mut self.pdl_state );
-        frame.render_widget(pd_view, main_lo[1]);
+        frame.render_widget(pd_view,  main_lo[1]);
+        frame.render_widget(hit_view, main_lo[2]);
       }
       UIMenuItem::Signal => {
         let main_lo = Layout::default()
@@ -459,19 +425,123 @@ impl PaddleTab<'_> {
           )
           .split(ch_lo[1]);
 
-        let mut wf_data_a = VecDeque::<(f64, f64)>::new();    
-        let mut wf_data_b = VecDeque::<(f64, f64)>::new();  
         //let mut label_a   = String::from("");
         //let mut label_b   = String::from("");
         let wf_theme      = self.theme.clone();
+    
+        // query the cache only during render, so 
+        // that the rb tab and the paddle tab can 
+        // "take turns"
+        let rb_id  = self.current_paddle.rb_id as u8;
+        let ch     = self.current_paddle.rb_chA;
+        let pid    = self.current_paddle.paddle_id as u8;
+        if pid == 1 {
+          if rb_id != 25 {
+            panic!("Che cazzo fai?!");
+          }
+        }
+        let mut wf = RBWaveform::new();
+        let mut valid = true;
+        if rb_id == 0 || rb_id > 49 {
+          error!("Wrong RB id! {rb_id}");
+          valid = false;
+        }
+        if ch == 0 || ch > 9 {
+          error!("Wrong channel {ch}!");
+          valid = false;
+        }
+        if valid {
+          match self.wf_cache.get(&rb_id).unwrap().get(&(ch as u8)).unwrap().lock() {
+            Err(_)  => {
+              error!("Unable to lock waveform cache!");
+            }
+            Ok(mut cache) => {
+              if cache.len() > 0 {
+                wf = cache.pop_front().unwrap();
+                if wf.rb_id != rb_id {
+                  error!("{} {} {}", wf.rb_id, rb_id, pid);
+                  //panic!("uuuuaaaaaahhhh...");
+                }
+              } else {
+                error!("Empty waveform cache");
+                valid = false;
+                //continue;
+              }
+            }
+          } //else {
+            //error!("Invalid rb/ch data {rb_id}, {ch}, {pid}");
+            //continue
+          //}
+        } 
+        if valid {
+          // end match
+          //match self.wf_receiver.try_recv() {
+          //  Err(_err) => {
+          //  }
+          //  Ok(wf_pack)    => {
+          
+          //    //info!("Got new RBWaveform! {}", wf_pack);
+          //    //println!("Size of rbwaveform {}", mem::size_of::<RBWaveform>());
+          //    //return Ok(());
+          //    let mut wf : RBWaveform;
+              //wf = RBWaveform::from_random();
+              //wf = wf.pack().unpack().unwrap();
+              //println!("{:?}", wf.adc_a); 
+              ////wf = RBWaveform::new();
+          //    match wf_pack.unpack::<RBWaveform>() {
+          //      Ok(wf_) => {
+          //        //return Ok(());
+          //        wf = wf_;
+          //        //println!("{:?}", wf.adc_a);
+          //      }
+          //      Err(err) => {
+          //        error!("Got broken Wf packet {err}");
+          //        return Ok(());
+          //      }
+          //    }
+              //let mut wf : RBWaveform = wf_pack.unpack()?;
+              //let mut pos = 0;
+              //let mut wf : RBWaveform = RBWaveform::from_bytestream(&wf_pack.payload, &mut pos)?;
+              //let mut wf = RBWaveform::new();
+          //}
+          match self.calibrations.get(&wf.rb_id) {
+            None => error!("RBCalibrations for board {} not available!", wf.rb_id),
+            Some(rbcal) => {
+              match wf.calibrate(rbcal) {
+                Err(err) => error!("Calibration error! {err}"),
+                Ok(_) => debug!("Successfully calibrated wf for board {}", &wf.rb_id)
+              }
+            }
+          }
+          // patch it for now
+          //if wf.paddle_id == 0 {
+          //  
+          //  wf.paddle_id = self.rb_ch_map[&wf.rb_id][&wf.rb_channel_a];
+          //}
+          //if wf.rb_id == 0 {
+          //  error!("Got waveform with rb id 0!");
+          //} else if wf.paddle_id > 160 {
+          //  error!("Got paddle id which is too large! {}", wf.paddle_id);
+          //} else {
+          //  if wf.paddle_id == self.current_paddle.paddle_id as u8 {
+          let rb_channel_a = wf.rb_channel_a + 1;
+          let rb_channel_b = wf.rb_channel_b + 1;
+          if (rb_channel_a != self.current_paddle.rb_chA as u8 ) 
+          || (rb_channel_b != self.current_paddle.rb_chB as u8 ) {
+            error!("Inconsistent paddle RB channels! Maybe A and B are switched!");
+          }
+          //let pid = wf.paddle_id as u8;
+          info!("rb {} A {} B {}", wf.rb_id, wf.rb_channel_a + 1, wf.rb_channel_b + 1);
+          *self.wf.get_mut(&pid).unwrap() = wf;
+        } // end valid
         match self.wf.get_mut(&(self.current_paddle.paddle_id as u8)) {
           None => {
-            //for (i,k) in wf.adc.iter().enumerate() {
-            //  wf_data_a.push_back((i as f64, *k as f64));
-            //}
+            error!("No waveform available for {}", self.current_paddle.paddle_id);
           }
           Some(wf) => {
             //label_a  = format!("Paddle {}A, RB {}-{}",self.current_paddle.paddle_id, wf.rb_id, wf.rb_channel_a + 1);
+            let mut wf_data_a = VecDeque::<(f64, f64)>::new();    
+            let mut wf_data_b = VecDeque::<(f64, f64)>::new();  
             if wf.voltages_a.len() == 0 {
               for (i,k) in wf.adc_a.iter().enumerate() {
                 wf_data_a.push_back((i as f64, *k as f64));
@@ -493,19 +563,19 @@ impl PaddleTab<'_> {
               }
             }
             //*self.last_wf_ch_b.get_mut(&wf.paddle_id).unwrap() = wf_data_b;
+            let wf_chart_a = timeseries(&mut wf_data_a,
+                                        self.wf_label_a.clone(),
+                                        self.wf_label_a.clone(),
+                                        &wf_theme);
+            let wf_chart_b = timeseries(&mut wf_data_b,
+                                        self.wf_label_b.clone(),
+                                        self.wf_label_b.clone(),
+                                        &wf_theme);
+            frame.render_widget(wf_chart_a, wf_lo[0]);
+            frame.render_widget(wf_chart_b, wf_lo[1]);
           }
         }
         
-        let wf_chart_a = timeseries(&mut wf_data_a,
-                                    self.wf_label_a.clone(),
-                                    self.wf_label_a.clone(),
-                                    &wf_theme);
-        let wf_chart_b = timeseries(&mut wf_data_b,
-                                    self.wf_label_b.clone(),
-                                    self.wf_label_b.clone(),
-                                    &wf_theme);
-        frame.render_widget(wf_chart_a, wf_lo[0]);
-        frame.render_widget(wf_chart_b, wf_lo[1]);
         
         // 2d charge plot
         let mut ch2d_points = Vec::<(f64, f64)>::new();

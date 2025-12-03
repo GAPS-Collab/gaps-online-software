@@ -155,7 +155,7 @@ pub struct TabbedInterface<'a> {
   pub mt_tab        : MTTab<'a>,
   pub cpu_tab       : CPUTab<'a>,
   // waifu tab
-  pub wf_tab        : RBTab<'a>,
+  pub rb_tab        : RBTab<'a>,
   pub settings_tab  : SettingsTab<'a>,
   pub home_tab      : HomeTab<'a>,
   //pub event_tab     : EventTab,
@@ -195,12 +195,10 @@ impl<'a> TabbedInterface<'a> {
              active_menu  : ActiveMenu,
              mt_tab       : MTTab<'a>,
              cpu_tab      : CPUTab<'a>,
-             wf_tab       : RBTab<'a>,
+             rb_tab       : RBTab<'a>,
              settings_tab : SettingsTab<'a>,
              home_tab     : HomeTab<'a>,
-             //event_tab    : EventTab,
              th_tab       : TofHitTab<'a>,
-             //rbwf_tab     : RBWaveformTab,
              ts_tab       : TofSummaryTab,
              te_tab       : TelemetryTab<'a>,
              al_tab       : AlertTab<'a>,
@@ -223,12 +221,12 @@ impl<'a> TabbedInterface<'a> {
       active_menu ,
       mt_tab      , 
       cpu_tab     , 
-      wf_tab      , 
+      rb_tab      , 
       settings_tab,
       home_tab    , 
       //event_tab   , 
       th_tab      ,
-      //rbwf_tab    ,
+      //rbrb_tab    ,
       ts_tab      ,
       te_tab      ,
       al_tab      ,
@@ -256,7 +254,7 @@ impl<'a> TabbedInterface<'a> {
       Ok(_)    => ()
     }
     // readoutboard tab 
-    match self.wf_tab.receive_packet() {
+    match self.rb_tab.receive_packet() {
       Err(err) => error!("Can not receive TofPackets for WfTab! {err}"),
       Ok(_)    => ()
     }
@@ -276,8 +274,8 @@ impl<'a> TabbedInterface<'a> {
       Err(err) => error!("Can not receive Heartbeats for HeartBeatTab! {err}"),
       Ok(_)    => ()
     }
-    // check for alerts
-   self.al_tab.check_alert_state();
+    //// check for alerts
+    self.al_tab.check_alert_state();
   }
 
   fn update_color_theme(&mut self, cs : ColorSet) {
@@ -293,12 +291,12 @@ impl<'a> TabbedInterface<'a> {
     self.tl_menu.theme.update(&cs);
     self.home_tab    .theme.update(&cs);
     //self.event_tab   .theme.update(&cs);
-    self.wf_tab      .theme.update(&cs);
+    self.rb_tab      .theme.update(&cs);
     self.mt_tab      .theme.update(&cs);
     self.settings_tab.theme.update(&cs);
     self.cpu_tab     .theme.update(&cs);
     self.th_tab      .theme.update(&cs);
-    //self.rbwf_tab    .theme.update(&cs);
+    //self.rbrb_tab    .theme.update(&cs);
     self.ts_tab      .theme.update(&cs);
     self.te_tab      .theme.update(&cs);
     self.cmd_tab     .theme.update(&cs);
@@ -341,11 +339,11 @@ impl<'a> TabbedInterface<'a> {
     match self.active_menu {
       ActiveMenu::RBMenu => {
         self.rb_menu.render(&main_lo.menu, frame);
-        self.wf_tab.render (&main_lo.main, frame);
+        self.rb_tab.render (&main_lo.main, frame);
       }
       _ => {
         self.ui_menu.render(&main_lo.menu, frame);
-        self.wf_tab.render (&main_lo.main, frame);
+        self.rb_tab.render (&main_lo.main, frame);
       }
     }
   }
@@ -401,12 +399,12 @@ impl<'a> TabbedInterface<'a> {
   
   //pub fn render_rbwaveformtab(&mut self, master_lo : &mut MainLayout, frame : &mut Frame) {
   //  self.te_menu.render(&master_lo.rect[0], frame);
-  //  self.rbwf_tab.render(&master_lo.rect[1], frame);
+  //  self.rbrb_tab.render(&master_lo.rect[1], frame);
   //}
 
   //pub fn render_pamonidatatab(&mut self, master_lo : &mut MainLayout, frame : &mut Frame) {
   //  self.pa_menu.render(&master_lo.rect[0], frame);
-  //  self.wf_tab.render(&master_lo.rect[1], frame);
+  //  self.rb_tab.render(&master_lo.rect[1], frame);
   //}
   
   pub fn render_telemetrytab(&mut self, main_lo : &mut MainLayout, frame : &mut Frame) {
@@ -434,7 +432,7 @@ impl<'a> TabbedInterface<'a> {
             self.render_home(main_lo, frame);
           },
           UIMenuItem::ReadoutBoards => {
-            self.wf_tab.view = RBTabView::SelectRB;
+            self.rb_tab.view = RBTabView::SelectRB;
             self.render_rbs(main_lo, frame);
           }
           UIMenuItem::Trigger => {
@@ -686,25 +684,25 @@ impl<'a> TabbedInterface<'a> {
             self.rb_menu.next();
             match self.rb_menu.get_active_menu_item() {
               UIMenuItem::Back => {
-                self.wf_tab.view = RBTabView::SelectRB; 
+                self.rb_tab.view = RBTabView::SelectRB; 
               }
               UIMenuItem::Waveforms => {
-                self.wf_tab.view = RBTabView::Waveform; 
+                self.rb_tab.view = RBTabView::Waveform; 
               }
               UIMenuItem::RBMoniData => {
-                self.wf_tab.view = RBTabView::RBMoniData;
+                self.rb_tab.view = RBTabView::RBMoniData;
               }
               UIMenuItem::PAMoniData => {
-                self.wf_tab.view = RBTabView::PAMoniData;
+                self.rb_tab.view = RBTabView::PAMoniData;
               }
               UIMenuItem::PBMoniData => {
-                self.wf_tab.view = RBTabView::PBMoniData;
+                self.rb_tab.view = RBTabView::PBMoniData;
               }
               UIMenuItem::LTBMoniData => {
-                self.wf_tab.view = RBTabView::LTBMoniData; 
+                self.rb_tab.view = RBTabView::LTBMoniData; 
               }
               UIMenuItem::GlobalRates => {
-                self.wf_tab.view = RBTabView::GlobalRates;
+                self.rb_tab.view = RBTabView::GlobalRates;
               }
               _ => ()
             }
@@ -762,25 +760,25 @@ impl<'a> TabbedInterface<'a> {
             self.rb_menu.prev();
             match self.rb_menu.get_active_menu_item() {
               UIMenuItem::Back => {
-                self.wf_tab.view = RBTabView::SelectRB; 
+                self.rb_tab.view = RBTabView::SelectRB; 
               }
               UIMenuItem::Waveforms => {
-                self.wf_tab.view = RBTabView::Waveform; 
+                self.rb_tab.view = RBTabView::Waveform; 
               }
               UIMenuItem::RBMoniData => {
-                self.wf_tab.view = RBTabView::RBMoniData;
+                self.rb_tab.view = RBTabView::RBMoniData;
               }
               UIMenuItem::PAMoniData => {
-                self.wf_tab.view = RBTabView::PAMoniData;
+                self.rb_tab.view = RBTabView::PAMoniData;
               }
               UIMenuItem::PBMoniData => {
-                self.wf_tab.view = RBTabView::PBMoniData;
+                self.rb_tab.view = RBTabView::PBMoniData;
               }
               UIMenuItem::LTBMoniData => {
-                self.wf_tab.view = RBTabView::LTBMoniData; 
+                self.rb_tab.view = RBTabView::LTBMoniData; 
               }
               UIMenuItem::GlobalRates => {
-                self.wf_tab.view = RBTabView::GlobalRates;
+                self.rb_tab.view = RBTabView::GlobalRates;
               }
               _ => ()
             }
@@ -846,18 +844,18 @@ impl<'a> TabbedInterface<'a> {
         // Paddle lsit
         if self.active_menu == ActiveMenu::MainMenu && self.ui_menu.get_active_menu_item() == UIMenuItem::Paddles {
           self.pd_tab.next_pd();
-          //info!("selected rb {}", self.wf_tab.rb_selector);
+          //info!("selected rb {}", self.rb_tab.rb_selector);
         }
         if self.active_menu == ActiveMenu::Paddles && self.pd_tab.menu.get_active_menu_item() == UIMenuItem::Back {
           self.pd_tab.next_pd();
         }
         // RB list
         if self.active_menu == ActiveMenu::MainMenu && self.ui_menu.get_active_menu_item() == UIMenuItem::ReadoutBoards {
-          self.wf_tab.next_rb();
-          //info!("selected rb {}", self.wf_tab.rb_selector);
+          self.rb_tab.next_rb();
+          //info!("selected rb {}", self.rb_tab.rb_selector);
         }
         if self.active_menu == ActiveMenu::RBMenu && self.rb_menu.get_active_menu_item() == UIMenuItem::Back {
-          self.wf_tab.next_rb();
+          self.rb_tab.next_rb();
         }
         if self.active_menu == ActiveMenu::MainMenu && self.ui_menu.get_active_menu_item() == UIMenuItem::Commands {
           self.cmd_tab.next_cmd();
@@ -879,16 +877,16 @@ impl<'a> TabbedInterface<'a> {
         // Paddle lsit
         if self.active_menu == ActiveMenu::MainMenu && self.ui_menu.get_active_menu_item() == UIMenuItem::Paddles {
           self.pd_tab.prev_pd();
-          //info!("selected rb {}", self.wf_tab.rb_selector);
+          //info!("selected rb {}", self.rb_tab.rb_selector);
         }
         if self.active_menu == ActiveMenu::Paddles && self.pd_tab.menu.get_active_menu_item() == UIMenuItem::Back {
           self.pd_tab.prev_pd();
         }
         if self.active_menu == ActiveMenu::MainMenu && self.ui_menu.get_active_menu_item() == UIMenuItem::ReadoutBoards {
-          self.wf_tab.previous_rb();
+          self.rb_tab.previous_rb();
         }
         if self.active_menu == ActiveMenu::RBMenu && self.rb_menu.get_active_menu_item() == UIMenuItem::Back {
-          self.wf_tab.previous_rb();
+          self.rb_tab.previous_rb();
         }
         if self.active_menu == ActiveMenu::MainMenu && self.ui_menu.get_active_menu_item() == UIMenuItem::Commands {
           self.cmd_tab.prev_cmd();
@@ -908,7 +906,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
 
   let args = Args::parse();                   
   let allow_commands = args.allow_commands;
-  
+  let waveform_cache = Box::new(global_waveform_cache());  
   let config          : LiftofSettings;
   match args.config {
     Some(config_data) => { 
@@ -926,10 +924,9 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
     None => {
       info!("No config file given, will try '/home/gaps/staging/current/liftof-config.toml'"); 
       match LiftofSettings::from_toml("/home/gaps/staging/current/liftof-config.toml") {
-        Err(err) => {
+        Err(_) => {
           match LiftofSettings::from_toml("liftof-config.toml") {
-            Err(err) => {
-        
+            Err(_) => { 
               panic!("I can't find any valid config file, even though I tried in the usual locations! Please specify one with -c ");
             }
             Ok(_cfg) => {
@@ -979,8 +976,8 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let db_path = config.db_path;
   info!("Reading database from {}", db_path);
   // We need this so that this will set the GONDOLA_DB_URL variable! (FIXME?)
-  let rb_conn = connect_to_db_path(&db_path).expect("Unable to read database! Are you sure it can be found at the expected location?");
-  let rbs     = ReadoutBoard::all().expect("Unable to read ReadoutBoard table from the database!");
+  let _cb  = connect_to_db_path(&db_path).expect("Unable to read database! Are you sure it can be found at the expected location?");
+  let rbs  = ReadoutBoard::all().expect("Unable to read ReadoutBoard table from the database!");
   let mtlink_rb_map = get_linkid_rbid_map(&rbs);
   for mut rb in rbs {
     rb.calib_file_path = String::from("calibrations");
@@ -1017,7 +1014,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   let (rb_pack_send, rb_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
   let (ev_pack_send, ev_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
   let (cp_pack_send, cp_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
-  let (rbwf_pack_send, rbwf_pack_recv)  : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
+  //let (rbwf_pack_send, rbwf_pack_recv)  : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
   let (tr_pack_send, tr_pack_recv)      : (Sender<TofPacket>, Receiver<TofPacket>) = unbounded();
   let (te_pack_send,  te_pack_recv)     : (Sender<TelemetryPacket>, Receiver<TelemetryPacket>) = unbounded();
 
@@ -1075,6 +1072,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
     // FIXME - use value from config file
     writer.as_mut().unwrap().mbytes_per_file = 420;
   }
+  let waveform_cache_c    = waveform_cache.clone();
   let _packet_dist_thread = thread::Builder::new()
     .name("packet-distributor".into())
     //.stack_size(4*1024*1024)
@@ -1085,15 +1083,16 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                          ev_pack_send,
                          cp_pack_send,
                          tr_pack_send,
-                         rbwf_pack_send,
+                         //rbwf_pack_send,
                          ts_send,
                          th_sender_c,
                          hb_pack_send,
                          home_stream_wd_cnt,
                          packet_map,
-                         writer);
+                         writer,
+                         waveform_cache_c);
     }).expect("Failed to spawn mt packet distributor thread!");
-  
+
   // spawn the telemetry receiver thread
   let telemetry_address : &str = "tcp://127.0.0.1:55555";
   let _telemetry_receiver_thread = thread::Builder::new()
@@ -1190,15 +1189,16 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                                     global_alerts.clone(),
                                     color_theme.clone());
   // waifu tab
-  let wf_tab          = RBTab::new(rb_pack_recv,
+  let rb_tab          = RBTab::new(rb_pack_recv,
                                    rbe_recv,
                                    readoutboards.clone(),
                                    global_alerts.clone(),
-                                   color_theme.clone());
+                                   color_theme.clone(),
+                                   waveform_cache.clone());
   let settings_tab    = SettingsTab::new(color_theme.clone());
   let home_tab        = HomeTab::new(color_theme.clone(), home_streamer, packet_map_home);
   let hit_tab         = TofHitTab::new(th_recv,color_theme.clone());
-  //let rbwf_tab        = RBWaveformTab::new(rbwf_pack_recv,
+  //let rbrb_tab        = RBWaveformTab::new(rbwf_pack_recv,
   //                                         readoutboards,
   //                                         color_theme.clone());
   let te_tab          : TelemetryTab;
@@ -1215,7 +1215,7 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
   }
   let cmd_sender_addr = String::from("tcp://192.168.37.5:42000");
   let cmd_tab         = CommandTab::new(tr_pack_recv, cmd_sender_addr, color_theme.clone(), allow_commands);
-  let pd_tab          = PaddleTab::new(ts_recv_pdl, rbwf_pack_recv, paddle_map, rbcalibrations, color_theme.clone());
+  let pd_tab          = PaddleTab::new(ts_recv_pdl, waveform_cache.clone(), paddle_map, rbcalibrations, color_theme.clone());
   let hb_tab          = HeartBeatTab::new(hb_pack_recv, color_theme.clone());
   let al_tab          = AlertTab::new(color_theme.clone(),global_alerts.clone()); 
   let active_menu     = ActiveMenu::MainMenu;
@@ -1234,12 +1234,10 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
                                              active_menu,
                                              mt_tab,
                                              cpu_tab,
-                                             wf_tab,
+                                             rb_tab,
                                              settings_tab,
                                              home_tab,
-                                             //event_tab,
                                              hit_tab,
-                                             //rbwf_tab,
                                              ts_tab,
                                              te_tab,
                                              al_tab,
@@ -1280,7 +1278,6 @@ fn main () -> Result<(), Box<dyn std::error::Error>>{
         }
       }
     }).expect("Failed to spawn tab-packet-receiver thread!");
-
   let mut quit_app = false;
   loop {
     match rx.recv() {
