@@ -186,45 +186,44 @@ impl EventBuilderHB {
   pub fn pretty_print(&self) -> String {
     let mut repr = String::from("");
     repr += &(format!("\n \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} EVENTBUILDER HEARTBTEAT \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} "));
-    repr += &(format!("\n Mission elapsed time (MET) [s]      : {}", self.met_seconds).bright_purple());
-    repr += &(format!("\n Num. events sent                    : {}", self.n_sent).bright_purple());
-    repr += &(format!("\n Size of event cache                 : {}", self.event_cache_size).bright_purple());
-    //repr += &(format!("\n Size of event ID cache              : {}", self.event_id_cache_size).bright_purple());
-    repr += &(format!("\n Num. events timed out               : {}", self.n_timed_out).bright_purple());
-    repr += &(format!("\n Percent events timed out            : {:.2}%", self.get_timed_out_frac()*(100 as f64)).bright_purple());
-    //if self.n_sent > 0 && self.n_rbe_per_loop > 0 {
-    //  repr += &(format!("\n Percent events w/out event ID : {:.2}%", (((self.n_rbe_per_loop / self.n_sent) as f64)*(100 as f64))).bright_purple());
-    //} else if self.n_rbe_per_loop > 0 { 
-    //  repr += &(format!("\n Percent events w/out event ID : N/A").bright_purple());
-    //}
+    repr += &(format!("\n Mission elapsed time (MET) [s]             : {}", self.met_seconds).bright_purple());
+    repr += &(format!("\n Num. TofEvents sent                        : {}", self.n_sent).bright_purple());
+    repr += &(format!("\n"));
+    repr += &(format!("\n Size of event cache                        : {}", self.event_cache_size).bright_purple());
+    repr += &(format!("\n Size of event ID cache                     : {}", self.event_id_cache_size).bright_purple());
+    repr += &(format!("\n"));
+    repr += &(format!("\n Num. TofEvents timed out                   : {}", self.n_timed_out).bright_purple());
+    repr += &(format!("\n Percent events timed out                   : {:.2}%", self.get_timed_out_frac()*(100 as f64)).bright_purple());
     if self.n_mte_received_tot > 0{ 
       repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
-      repr += &(format!("\n Num. evts with ANY data mangling  : {}"     , self.data_mangled_ev));
-      repr += &(format!("\n Per. evts with ANY data mangling  : {:.2}%" , self.get_mangled_frac()*(100 as f64)));
+      repr += &(format!("\n Num. evts with ANY data mangling           : {}"     , self.data_mangled_ev));
+      repr += &(format!("\n Per. evts with ANY data mangling           : {:.2}%" , self.get_mangled_frac()*(100 as f64)));
     }
     else {repr += &(format!("\n Percent events with data mangling: unable to calculate"));}
     repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
-    repr += &(format!("\n Received MTEvents                   : {}", self.n_mte_received_tot).bright_purple());
-    repr += &(format!("\n Skipped MTEvents                    : {}", self.n_mte_skipped).bright_purple());
-    repr += &(format!("\n Incoming/outgoing MTEvents fraction : {:.2}", self.get_incoming_vs_outgoing_mte()).bright_purple());
+    repr += &(format!("\n Received MTEvents (from MTB)               : {}", self.n_mte_received_tot).bright_purple());
+    repr += &(format!("\n Skipped MTEvents (gaps in rising event ids): {}", self.n_mte_skipped).bright_purple());
+    repr += &(format!("\n Num. MTBEvevents / Num. TofEvents sent     : {:.2}", self.get_incoming_vs_outgoing_mte()).bright_purple());
     repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
-    repr += &(format!("\n Received RBEvents                   : {}", self.n_rbe_received_tot).bright_purple());
-    repr += &(format!("\n RBEvents Discarded                  : {}", self.n_rbe_discarded_tot).bright_purple());
-    repr += &(format!("\n Percent RBEvents discarded          : {:.2}%", self.get_nrbe_discarded_frac()*(100 as f64)).bright_purple());
-    repr += &(format!("\n DRS4 busy lost hits                 : {}", self.drs_bsy_lost_hg_hits).bright_purple());
-    repr += &(format!("\n RDS4 busy lost hits fraction        : {:.2}%", self.get_drs_lost_frac()*(100.0 as f64)).bright_purple());
-    repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
+    repr += &(format!("\n Received RBEvents                          : {}", self.n_rbe_received_tot).bright_purple());
+    repr += &(format!("\n RBEvents Discarded Total                   : {}", self.n_rbe_discarded_tot).bright_purple());
+    repr += &(format!("\n Percent RBEvents discarded                 : {:.2}%", self.get_nrbe_discarded_frac()*(100 as f64)).bright_purple());
+    repr += &(format!("\n DRS4 busy lost RBEvents                    : {}", self.drs_bsy_lost_hg_hits).bright_purple());
+    repr += &(format!("\n Percent DRS4 busy lost RBEvents            : {:.2}%", self.get_drs_lost_frac()*(100.0 as f64)).bright_purple());
+    repr += &(format!("\n"));
+    repr += &(format!("\n Num. RBEvents with evid from past          : {}",  self.n_rbe_from_past).bright_purple());
+    repr += &(format!("\n Num. RBEvents with evid from future        : {}",  self.n_rbe_orphan).bright_purple());
+    repr += &(format!("\n RBEvents which do not find their MTEvent \n
+                      in the channel on the first try                : {}", self.rbe_wo_mte).bright_blue());
     if self.n_sent > 0 && self.n_mte_received_tot > 0 {
-        repr += &(format!("\n RBEvent/Evts sent               : {:.2}", (self.n_rbe_received_tot as f64/ self.n_sent as f64)).bright_purple());
-        repr += &(format!("\n RBEvent/MTEvents                : {:.2}", (self.n_rbe_received_tot as f64 / self.n_mte_received_tot as f64)).bright_purple()); }
-    repr += &(format!("\n Current RBevents / iteration        : {:.2}", self.n_rbe_per_loop).bright_purple());
-    repr += &(format!("\n Num. RBEvents with evid from past   : {}",  self.n_rbe_from_past).bright_purple());
-    repr += &(format!("\n Num. orphan RBEvents                : {}",  self.n_rbe_orphan).bright_purple());
-    repr += &(format!("\n\n Getting MTE from cache for RBEvent failed {} times :(", self.rbe_wo_mte).bright_blue());
+        repr += &(format!("\n"));
+        repr += &(format!("\n num. RBEvents / num. TofEvts sent           : {:.2}", (self.n_rbe_received_tot as f64/ self.n_sent as f64)).bright_purple());
+        repr += &(format!("\n num. RBEvents / num. MTEvents received      : {:.2}", (self.n_rbe_received_tot as f64 / self.n_mte_received_tot as f64)).bright_purple()); }
+    repr += &(format!("\n n_rbe_per_loop                                  : {:.2}", self.n_rbe_per_loop).bright_purple());
     repr += &(format!("\n \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504} \u{2504}"));
-    repr += &(format!("\n Ch. len MTE Receiver                : {}", self.mte_receiver_cbc_len).bright_purple());
-    repr += &(format!("\n Ch. len RBE Reveiver                : {}", self.rbe_receiver_cbc_len).bright_purple());
-    repr += &(format!("\n Ch. len TP Sender                   : {}", self.tp_sender_cbc_len).bright_purple());
+    repr += &(format!("\n Ch. len MTE Receiver                      : {}", self.mte_receiver_cbc_len).bright_purple());
+    repr += &(format!("\n Ch. len RBE Receiver                      : {}", self.rbe_receiver_cbc_len).bright_purple());
+    repr += &(format!("\n Ch. len TP Sender                         : {}", self.tp_sender_cbc_len).bright_purple());
     repr += &(format!("\n \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50} END EVENTBUILDER HEARTBTEAT \u{2B50} \u{2B50} \u{2B50} \u{2B50} \u{2B50}"));
     repr
   }
