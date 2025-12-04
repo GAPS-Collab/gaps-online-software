@@ -326,7 +326,17 @@ pub fn configure_mtb(bus : &mut IPBus,
   // coming from the TIU  
   let use_fixed_deadtime = settings.use_fixed_deadtime.unwrap_or(false);  
   if use_fixed_deadtime {
-    match MIN_DEADTIME_MODE.set(bus, use_fixed_deadtime as u32) {
+    match MIN_DEADTIME_MODE.set(bus, true as u32) {
+      Err(err) => { 
+        error!("Unable to set MTB in fixed deadtime mode {err}!");
+      }
+      Ok(_)    => {
+        warn!("Ignoring the busy part of the TIU signal from the TIU due to min deadtime setting!");
+        println!("==> MTB in 'Min/fixed deadtime mode'. This will ignore the BUSY part of the TIU signal");
+      }
+    }
+  } else {
+    match MIN_DEADTIME_MODE.set(bus, false as u32) {
       Err(err) => { 
         error!("Unable to set MTB in fixed deadtime mode {err}!");
       }
@@ -336,7 +346,6 @@ pub fn configure_mtb(bus : &mut IPBus,
       }
     }
   }
-
   info!("Settting rb integration window!");
   let int_wind = settings.rb_int_window;
   match set_rb_int_window(bus, int_wind) {
