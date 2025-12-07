@@ -583,6 +583,18 @@ pub fn restart_liftof_rb(rb_list : &Vec<u8>) {
   }
 }
 
+/// Set SMA mode through rb-mode with tof-control's binary
+pub fn set_rbs_sma_mode(rb_list : &Vec<u8>) {
+  let command = vec![String::from("bin/rb-mode"),
+                     String::from("-s"),
+                     String::from("sma")];
+  println!("=> Calling rb-mode on RBs to set SMA mode!");
+  match ssh_command_rbs(rb_list, command) {
+    Err(err) => error!("Calling rb-mode on all RBs failed! {err}"),
+    Ok(_)    => ()
+  }
+}
+
 /// Restart liftof-rb on RBs
 pub fn rm_liftof_rb_logs(rb_list : &Vec<u8>) {
   let command = vec![String::from("rm"),
@@ -631,8 +643,8 @@ pub fn calibrate_tof(thread_control : Arc<Mutex<ThreadControl>>,
       for rb in rb_list {
         tc.finished_calibrations.insert(rb.rb_id,false); 
       }
-      cali_base_dir = tc.liftof_settings.calibration_dir.clone();
-      cc_pub_addr   = tc.liftof_settings.cmd_dispatcher_settings.cc_server_address.clone();
+      cali_base_dir         = tc.liftof_settings.calibration_dir.clone();
+      cc_pub_addr           = tc.liftof_settings.cmd_dispatcher_settings.cc_server_address.clone();
       tc.write_data_to_disk = true;
     },
     Err(err) => {
@@ -705,17 +717,19 @@ pub fn calibrate_tof(thread_control : Arc<Mutex<ThreadControl>>,
   // now block until the calibrations are done or we time outu
   // FIXME - set timeout parameter in settings
   let timeout = Instant::now();
+  let mut left_over_rbs : Vec<u8> = vec![1,2,3,4,5,6,7,8,9,11,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,39,40,41,42,44,46];
   let mut cali_received = 0;
   'main: loop {
     thread::sleep(10*one_second);
     if timeout.elapsed() > calibration_timeout_fail {
       error!("Calibration timeout! Calibrations might not be complete!");
+      error!("Incomplete calibrations {:?}", left_over_rbs);
       match thread_control.lock() {
         Ok(mut tc) => {
           tc.calibration_active = false;
         }
         Err(err) => {
-          error!("Can't acquire lock for ThreadControl at this time! Unable to set calibration mode! {err}");
+          debug!("Can't acquire lock for ThreadControl at this time! Unable to set calibration mode! {err}");
         }
       }
       if show_progress {
@@ -756,6 +770,7 @@ pub fn calibrate_tof(thread_control : Arc<Mutex<ThreadControl>>,
 
             bar.set_position(cali_received);
             finished_keys.push(rbid.rb_id);
+            left_over_rbs.retain(|&x| x != rbid.rb_id);
           }
           for rbid in &finished_keys {
             *tc.finished_calibrations.get_mut(&rbid).unwrap() = false; 
@@ -779,7 +794,7 @@ pub fn calibrate_tof(thread_control : Arc<Mutex<ThreadControl>>,
         }
       }
       Err(err) => {
-        error!("Can't acquire lock for ThreadControl at this time! Unable to set calibration mode! {err}");
+        debug!("Can't acquire lock for ThreadControl at this time! Unable to set calibration mode! {err}");
       }
     }
   } // end loop
