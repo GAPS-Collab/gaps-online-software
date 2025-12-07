@@ -56,12 +56,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
                       data_sink_ev   : &Sender<TofEvent>,
                       mtb_link_map   : HashMap<u8,u8>,
                       thread_control : Arc<Mutex<ThreadControl>>) { 
-  // deleteme
-  //let file_type = FileType::RunFile(12345);
-  //let mut writer = TofPacketWriter::new(String::from("."), file_type);
-  //writer.mbytes_per_file = 420;
-  
-
   // set up the event builder. Since we are now doing settings only at run 
   // start, it is fine to do this outside of the loop
   let mut send_tev_sum    : bool;
@@ -76,6 +70,11 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
   // two trigger types are possible, make the time out depending on them 
   let mut primary_trigger   : TriggerType;
   let mut secondary_trigger : TriggerType;
+  // these are for debugging as long as we don't have the correct link ids working 
+  // these should be +1 for orphans when they are dropped or in case of the link_ids 
+  // when the events time out
+  let mut weird_orphan_rbids    = HashMap::<u8, usize>::new();
+  let mut weird_rbe_link_ids    = HashMap::<u8, usize>::new();
   loop {
     match thread_control.lock() {
       Ok(tc) => {
@@ -133,12 +132,12 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
   }
   //------- DEBUG -- Measure the timing of the different parts 
   //------- of the loop
-  //let mut mt_loop_time     = Instant::now();
-  //let mut avg_mt_loop_time = 0u128;
-  //let mut n_iter_mt_loop   = 0usize;
-  //let mut rb_loop_time     = Instant::now();
-  //let mut avg_rb_loop_time = 0u128;
-  //let mut n_iter_rbe_loop  = 0usize;
+  let mut mt_loop_time     = Instant::now();
+  let mut avg_mt_loop_time = 0u128;
+  let mut n_iter_mt_loop   = 0usize;
+  let mut rb_loop_time     = Instant::now();
+  let mut avg_rb_loop_time = 0u128;
+  let mut n_iter_rbe_loop  = 0usize;
   let n_rbe_per_loop_default = settings.n_rbe_per_loop; 
   loop {
     if check_tc_update.elapsed().as_secs() > 2 {
@@ -184,6 +183,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
     }
     n_received = 0;
     while n_received < settings.n_mte_per_loop as usize {
+      mt_loop_time     = Instant::now(); 
       // every iteration, we welcome a new master event
       //mt_loop_time = Instant::now(); 
       //if m_trig_ev.is_empty() {
@@ -216,9 +216,8 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
           heartbeat.n_mte_received_tot += 1;
         }
       } // end match Ok(mt)
-      //avg_mt_loop_time += mt_loop_time.elapsed().as_nanos();
-      //n_iter_mt_loop += 1;
-      //mt_loop_time     = Instant::now(); 
+      avg_mt_loop_time += mt_loop_time.elapsed().as_nanos();
+      n_iter_mt_loop += 1;
     } // end getting MTEvents
     trace!("Debug timer MTE received! {:?}", debug_timer.elapsed());
     // recycle that variable for the rb events as well
@@ -229,7 +228,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
     // ALWAYS later than the MTEvents.
     'main: while !ev_from_rb.is_empty() && n_received < settings.n_rbe_per_loop as usize {
       
-      //rb_loop_time = Instant::now();
+      rb_loop_time = Instant::now();
       match ev_from_rb.try_recv() {
         Err(err) => {
           error!("Can't receive RBEvent! Err {err}");
@@ -324,9 +323,9 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
           }
         }
       }
-      thread::sleep(Duration::from_nanos(200)); 
-      //avg_rb_loop_time += rb_loop_time.elapsed().as_nanos();
-      //n_iter_rbe_loop  += 1;
+      //thread::sleep(Duration::from_nanos(200)); 
+      avg_rb_loop_time += rb_loop_time.elapsed().as_nanos();
+      n_iter_rbe_loop  += 1;
     }
     // FIXME - timing debugging
     //let debug_timer_elapsed = debug_timer.elapsed().as_secs_f64();
@@ -365,35 +364,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
         settings.n_rbe_per_loop = 40;
       }
     }
-    
- 
-    if ev_from_rb.len() > 1000 {
-      for k in 0..1000 {
-        //while !ev_from_rb.is_empty() {
-        match ev_from_rb.recv() {
-          Err(_) => (), 
-          Ok(ev) => {
-            //FIXME - what to do with these?
-            if ev.creation_time.is_some() {
-              if ev.creation_time.unwrap().elapsed().as_secs() < 90 {
-                match orphanage.send(ev) {
-                  Ok(_) => (),
-                  Err(err) => {
-                    error! ("Orphanage does not accept this orphan. They are dying in the gutter all by themselves. What a said world! {err}");
-                  }
-                } 
-              }
-            }
-          }
-        }        
-      }
-      settings.n_rbe_per_loop = n_rbe_per_loop_default;
-    }
-    if settings.n_rbe_per_loop == 0 {
-      // failsafe
-      settings.n_rbe_per_loop = 40;
-    }
-    heartbeat.n_rbe_per_loop = settings.n_rbe_per_loop as u64;
+
 
     //-----------------------------------------
     // From here on, we are checking all events
@@ -413,7 +384,6 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
           continue;
         },
         Some(ev) => {
-          //let ev_timed_out : u64;
           let mut timeout = settings.te_timeout_sec as u64;  
           for trg in &ev.get_trigger_sources() {
             // the secondary trigger should superseed the primary trigger and only if 
@@ -430,6 +400,14 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
           if ev_timed_out {
             if !ev.is_complete() {
               heartbeat.n_timed_out += 1;
+              // let's check the rb_link_ids here and let's check which one is missing
+              for l_id in ev.get_rb_link_ids() {
+                if weird_rbe_link_ids.contains_key(&l_id) {
+                  *weird_rbe_link_ids.get_mut(&l_id).unwrap() += 1;
+                } else {
+                  weird_rbe_link_ids.insert(l_id, 1);
+                }
+              }
             }
           } else {
             // we are earlier than our time out, maybe the 
@@ -571,6 +549,11 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
       }
     } // end loop over event_id_cache
     if hb_timer.elapsed() >= hb_interval {
+      // print the statistics for the weird orphans 
+      println!("=> Weird orphan statistics. Here is a map of rb_id -> N_orphans (which ended up in the gutter)");
+      println!("=> {:?}", weird_orphan_rbids);
+      println!("-- -- -- -- -- -- -- -- -- -- -- --");
+
       // make sure the heartbeat has the latest mission elapsed time
       heartbeat.met_seconds         += hb_timer.elapsed().as_secs_f64() as u64;// as usize;
       // get the length of the various caches at this moment in time
@@ -581,8 +564,8 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
       heartbeat.tp_sender_cbc_len    = data_sink.len()      as u64;
 
       let pack         = heartbeat.pack();
-      //println!("Avg mt loop time {}", avg_mt_loop_time as f64/n_iter_mt_loop as f64);
-      //println!("Avg rb loop time {}", avg_rb_loop_time as f64/n_iter_rbe_loop as f64);
+      println!("Avg mt loop time {}", avg_mt_loop_time as f64/n_iter_mt_loop as f64);
+      println!("Avg rb loop time {}", avg_rb_loop_time as f64/n_iter_rbe_loop as f64);
 
       match data_sink.send(pack) {
         Err(err) => {
@@ -592,7 +575,179 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
         }
       }
       hb_timer = Instant::now();
-    } 
+    }
+
+    // mitigation for full channels 
+    if ev_from_rb.is_full() {
+    // flush rb events from the rb receiver channel 
+    // limit level 1 
+    //if let Some(pl)  = settings.rbe_purge_limit1 {
+      //settings.n_rbe_per_loop = n_rbe_per_loop_default;
+      //let purge       = settings.rbe_purge_limit1.unwrap_or(ev_from_rb.len() as u32);
+      //let expired_sec = settings.rbe_purge_ev_time1.unwrap_or(30) as u64;
+      //if ev_from_rb.len() > pl as usize {
+      settings.n_rbe_per_loop = n_rbe_per_loop_default;
+      for k in 0..ev_from_rb.capacity().unwrap_or(20000) {
+        match ev_from_rb.try_recv() {
+          Err(_) => (), 
+          Ok(ev) => {
+            ////FIXME - what to do with these?
+            //if ev.creation_time.is_some() {
+            //  if ev.creation_time.unwrap().elapsed().as_secs() < expired_sec {
+            //    match orphanage.send(ev) {
+            //      Ok(_) => (),
+            //      Err(err) => {
+            //        error! ("Orphanage does not accept this orphan. They are dying in the gutter all by themselves. What a said world! {err}");
+            //      }
+            //    } 
+            //  } else {
+            //    //// just do statistics 
+            //    //if weird_orphan_rbids.contains_key(&ev.header.rb_id) {
+            //    //  *weird_orphan_rbids.get_mut(&ev.header.rb_id).unwrap() += 1;
+            //    //} else {
+            //    //  weird_orphan_rbids.insert(ev.header.rb_id,1);
+            //    //}
+            //  }
+            //}
+          }
+        }
+      }
+      //}
+    }
+
+    // flush rb events from the rb receiver channel 
+    // limit level 1 
+    if let Some(pl)  = settings.rbe_purge_limit1 {
+      //settings.n_rbe_per_loop = n_rbe_per_loop_default;
+      //let purge       = settings.rbe_purge_limit1.unwrap_or(ev_from_rb.len() as u32);
+      let purge      = ev_from_rb.len();
+      let expired_sec = settings.rbe_purge_ev_time1.unwrap_or(30) as u64;
+      if ev_from_rb.len() > pl as usize {
+        settings.n_rbe_per_loop = n_rbe_per_loop_default;
+        for k in 0..purge {
+          match ev_from_rb.recv() {
+            Err(_) => (), 
+            Ok(ev) => {
+              //FIXME - what to do with these?
+              if ev.creation_time.is_some() {
+                if ev.creation_time.unwrap().elapsed().as_secs() < expired_sec {
+                  match orphanage.send(ev) {
+                    Ok(_) => (),
+                    Err(err) => {
+                      error! ("Orphanage does not accept this orphan. They are dying in the gutter all by themselves. What a said world! {err}");
+                    }
+                  } 
+                } else {
+                  // just do statistics 
+                  if weird_orphan_rbids.contains_key(&ev.header.rb_id) {
+                    *weird_orphan_rbids.get_mut(&ev.header.rb_id).unwrap() += 1;
+                  } else {
+                    weird_orphan_rbids.insert(ev.header.rb_id,1);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+ 
+    //// flush rb events from the rb receiver channel 
+    //// limit level 2 
+    //if let Some(pl)  = settings.rbe_purge_limit2 {
+    //  let purge       = settings.rbe_purge_limit2.unwrap_or(ev_from_rb.len() as u32);
+    //  let expired_sec = settings.rbe_purge_ev_time2.unwrap_or(30) as u64;
+    //  if ev_from_rb.len() > pl as usize {
+    //    settings.n_rbe_per_loop = n_rbe_per_loop_default;
+    //    for k in 0..purge {
+    //      match ev_from_rb.recv() {
+    //        Err(_) => (), 
+    //        Ok(ev) => {
+    //          //FIXME - what to do with these?
+    //          if ev.creation_time.is_some() {
+    //            if ev.creation_time.unwrap().elapsed().as_secs() < expired_sec {
+    //              match orphanage.send(ev) {
+    //                Ok(_) => (),
+    //                Err(err) => {
+    //                  error! ("Orphanage does not accept this orphan. They are dying in the gutter all by themselves. What a said world! {err}");
+    //                }
+    //              } 
+    //            } else {
+    //              // just do statistics 
+    //              if weird_orphan_rbids.contains_key(&ev.header.rb_id) {
+    //                *weird_orphan_rbids.get_mut(&ev.header.rb_id).unwrap() += 1;
+    //              } else {
+    //                weird_orphan_rbids.insert(ev.header.rb_id,1);
+    //              }
+    //            }
+    //          } 
+    //        }
+    //      }
+    //    }
+    //  }
+    //}
+    //// flush rb events from the rb receiver channel 
+    //// limit level 3 
+    //if let Some(pl)  = settings.rbe_purge_limit3 {
+    //  let purge       = settings.rbe_purge_limit3.unwrap_or(ev_from_rb.len() as u32);
+    //  let expired_sec = settings.rbe_purge_ev_time3.unwrap_or(30) as u64;
+    //  if ev_from_rb.len() > pl as usize {
+    //    settings.n_rbe_per_loop = n_rbe_per_loop_default;
+    //    for k in 0..purge {
+    //      match ev_from_rb.recv() {
+    //        Err(_) => (), 
+    //        Ok(ev) => {
+    //          //FIXME - what to do with these?
+    //          if ev.creation_time.is_some() {
+    //            if ev.creation_time.unwrap().elapsed().as_secs() < expired_sec {
+    //              match orphanage.send(ev) {
+    //                Ok(_) => (),
+    //                Err(err) => {
+    //                  error! ("Orphanage does not accept this orphan. They are dying in the gutter all by themselves. What a said world! {err}");
+    //                }
+    //              } 
+    //            }
+    //          } else {
+    //            // just do statistics 
+    //            if weird_orphan_rbids.contains_key(&ev.header.rb_id) {
+    //              *weird_orphan_rbids.get_mut(&ev.header.rb_id).unwrap() += 1;
+    //            } else {
+    //              weird_orphan_rbids.insert(ev.header.rb_id,1);
+    //            }
+    //          }
+    //        }
+    //      }
+    //    }
+    //  }
+    //}
+    
+    ////if ev_from_rb.len() > 1000 {
+    ////  for k in 0..1000 {
+    ////    //while !ev_from_rb.is_empty() {
+    ////    match ev_from_rb.recv() {
+    ////      Err(_) => (), 
+    ////      Ok(ev) => {
+    ////        //FIXME - what to do with these?
+    ////        if ev.creation_time.is_some() {
+    ////          if ev.creation_time.unwrap().elapsed().as_secs() < 90 {
+    ////            match orphanage.send(ev) {
+    ////              Ok(_) => (),
+    ////              Err(err) => {
+    ////                error! ("Orphanage does not accept this orphan. They are dying in the gutter all by themselves. What a said world! {err}");
+    ////              }
+    ////            } 
+    ////          }
+    ////        }
+    ////      }
+    ////    }        
+    ////  }
+    ////  settings.n_rbe_per_loop = n_rbe_per_loop_default;
+    ////}
+    if settings.n_rbe_per_loop == 0 {
+      // failsafe
+      settings.n_rbe_per_loop = 40;
+    }
+    heartbeat.n_rbe_per_loop = settings.n_rbe_per_loop as u64;
   } // end loop
 }  
 
