@@ -23,6 +23,18 @@ pub mod data_source;
 pub use data_source::DataSource;
 pub mod streamers;
 pub use streamers::*;
+
+use flate2::Compression;
+use flate2::write::GzEncoder;
+use flate2::read::GzDecoder;
+//use similar::TextDiff;
+use std::path::PathBuf;
+//use patch::Patch;
+use diffy::{
+  apply_bytes,
+  Patch,
+  create_patch
+};
 use crate::prelude::*;
 
 //----------------------------------------------------------
@@ -567,6 +579,126 @@ pub trait DataReader<T>
   }
 }
 
+/// Create a compressed bytestream out of a .toml file, so that we can pack it and 
+/// send it as a TofPacket
+pub fn compress_toml(file_path: &Path) -> Result<Vec<u8>, io::Error> {
+  let mut input_file = File::open(file_path)?;
+  let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
+  io::copy(&mut input_file, &mut encoder)?;
+  encoder.finish()
+}
+
+/// Create a compressed bytestream out of a .toml file, so that we can pack it and 
+/// send it as a TofPacket
+#[cfg(feature="pybindings")]
+#[pyfunction]
+#[pyo3(name="compress_toml")]
+pub fn compress_toml_py(file_path: String) -> Result<Vec<u8>, io::Error> {
+  let path_buff = PathBuf::from(file_path);
+  compress_toml(&path_buff)
+}
+
+/// Unpack a bytestream to a .toml file 
+pub fn decompress_toml(compressed_data: &[u8], output_path: &Path) -> Result<(), io::Error> {
+  let mut decoder = GzDecoder::new(compressed_data);
+  let mut output_file = File::create(output_path)?;
+  io::copy(&mut decoder, &mut output_file)?;
+  Ok(())
+}
+
+/// Unpack a bytestream to a .toml file 
+#[cfg(feature="pybindings")]
+#[pyfunction]
+#[pyo3(name="decompress_toml")]
+pub fn decompress_toml_py(compressed_data: &[u8], output_path: String) -> Result<(), io::Error> {
+  let path_buff = PathBuf::from(output_path);
+  decompress_toml(compressed_data, &path_buff)
+}
+
+
+/// Computes the diff between two files, compresses the diff output, and returns it.
+///
+/// # Arguments
+/// * `old_path` - Path to the original file
+/// * `new_path` - Path to the modified file
+pub fn create_compressed_diff(old_path: &Path, new_path: &Path) -> Result<Vec<u8>, io::Error> {
+  let old_text    = fs::read_to_string(old_path)?;
+  let new_text    = fs::read_to_string(new_path)?;
+  let diff        = create_patch(&old_text, &new_text);
+  let diff_bytes  = diff.to_bytes();
+  let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
+  io::copy(&mut diff_bytes.as_slice(), &mut encoder)?;
+  encoder.finish()
+}
+
+/// Computes the diff between two files, compresses the diff output, and returns it.
+///
+/// # Arguments
+/// * `old_path` - Path to the original file
+/// * `new_path` - Path to the modified file
+#[cfg(feature="pybindings")]
+#[pyfunction]
+#[pyo3(name="create_compressed_diff")]
+pub fn create_compressed_diff_py(old_path: String, new_path: String) -> Result<Vec<u8>, io::Error> {
+  let old_file = PathBuf::from(old_path);
+  let new_file = PathBuf::from(new_path);
+  create_compressed_diff(&old_file, &new_file)
+}
+
+
+/// Applies a diff (patch) from a patch file to an original file,
+/// writing the result to a new file.
+///
+/// # Arguments
+/// * `original_file_path` - Path to the original file.
+/// * `patch_file_path` - Path to the file containing the diff (patch).
+///
+/// # Returns
+/// `Result<(), io::Error>` indicating success or failure.
+pub fn apply_diff_to_file(compressed_bytes : Vec<u8>, original_file_path: &str) -> io::Result<()> {
+  let mut decoder = GzDecoder::new(&compressed_bytes[..]); 
+  let mut uncompressed_data = Vec::new();
+  match decoder.read_to_end(&mut uncompressed_data) {
+    Ok(_)  => (),
+    Err(e) => {
+      error!("Unable to decompress the received bytes!");
+      return Err(e); 
+    }
+  }
+
+  // Read the original file content
+  let mut original_file = fs::File::open(original_file_path)?;
+  let mut original_content = String::new();
+  original_file.read_to_string(&mut original_content)?;
+  match Patch::from_bytes(&uncompressed_data.as_slice()) {
+    Ok(patch) => {
+      let modified_content = apply_bytes(&original_content.as_bytes(), &patch)
+        .map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to apply patch: {}", e)))?;
+      let mut output_file = fs::File::create(original_file_path)?;
+      output_file.write_all(&modified_content.as_slice())?;
+    }
+    Err(err) => {
+      error!("Unable to apply the patch! {err}"); 
+    }
+  } 
+  Ok(())
+}
+
+/// Applies a diff (patch) from a patch file to an original file,
+/// writing the result to a new file.
+///
+/// # Arguments
+/// * `original_file_path` - Path to the original file.
+/// * `patch_file_path` - Path to the file containing the diff (patch).
+///
+/// # Returns
+/// `Result<(), io::Error>` indicating success or failure.
+#[cfg(feature="pybindings")]
+#[pyfunction]
+#[pyo3(name="apply_diff_to_file")]
+pub fn apply_diff_to_file_py(compressed_bytes : Vec<u8>, original_file_path: &str) -> io::Result<()> {
+  apply_diff_to_file(compressed_bytes, original_file_path)
+}
 //// blanket implementation: every `T` that implements Reader also implements Iterator
 //impl<T:std::default::Default + Serialization> Iterator for DataReader<T>  { 
 //  type Item = T;

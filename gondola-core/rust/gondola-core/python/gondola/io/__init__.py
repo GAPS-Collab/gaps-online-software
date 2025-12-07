@@ -51,6 +51,11 @@ get_utc_date                  = _gc.io.get_utc_date
 get_datetime                  = _gc.io.get_datetime
 get_rundata_from_file         = _gc.io.get_rundata_from_file
 get_unix_timestamp            = _gc.io.get_unix_timestamp 
+apply_diff_to_file            = _gc.io.apply_diff_to_file 
+compress_toml                 = _gc.io.compress_toml 
+decompress_toml               = _gc.io.decompress_toml
+create_compressed_diff        = _gc.io.create_compressed_diff 
+
 
 def get_ts_from_binfile(fname):
     """ 

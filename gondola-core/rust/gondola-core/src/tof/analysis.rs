@@ -425,6 +425,7 @@ impl TofAnalysisPaddleCache {
   }
 
   pub fn get(&self, varname : &str) -> Option<f32> {
+    error!("Getting {} is not implemented yet!", varname);
     return None;
   }
 
@@ -890,7 +891,7 @@ impl TofAnalysis {
     }
     if self.cuts.ls_cleaning_t_err != NO_LIGHTSPEED_CUTS {
       // FIXME
-      let rm_pids = ev.lightspeed_cleaning(self.cuts.ls_cleaning_t_err as f32);
+      let _rm_pids = ev.lightspeed_cleaning(self.cuts.ls_cleaning_t_err as f32);
     }
     //    #hits_rmvd_ls   = len(rm_pids)
 

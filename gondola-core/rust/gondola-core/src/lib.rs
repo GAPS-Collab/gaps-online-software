@@ -210,9 +210,6 @@ fn tof_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(shutdown_ratpair, m)?)?;
   m.add_function(wrap_pyfunction!(shutdown_rb, m)?)?;
   m.add_function(wrap_pyfunction!(shutdown_tofcpu, m)?)?;
-
-
-
   Ok(())
 }
 
@@ -296,6 +293,12 @@ fn io_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(get_datetime, m)?)?;
   m.add_function(wrap_pyfunction!(get_unix_timestamp, m)?)?;
   m.add_function(wrap_pyfunction!(get_unix_timestamp_from_telemetry, m)?)?;
+  // these are the config file manipulators
+  m.add_function(wrap_pyfunction!(apply_diff_to_file_py, m)?)?;
+  m.add_function(wrap_pyfunction!(compress_toml_py, m)?)?;
+  m.add_function(wrap_pyfunction!(decompress_toml_py, m)?)?;
+  m.add_function(wrap_pyfunction!(create_compressed_diff_py, m)?)?;
+
   m.add_class::<CRFrameObject>()?;
   m.add_class::<CRFrameObjectType>()?;
   m.add_class::<CRFrame>()?;

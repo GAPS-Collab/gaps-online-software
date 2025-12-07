@@ -361,7 +361,7 @@ impl Serialization for EventBuilderHB {
     Self::verify_fixed(stream,pos)?;
     let mut hb = EventBuilderHB::new();
     let version_seconds     = parse_u64(stream,pos);
-    let version             = ProtocolVersion::from(((version_seconds & 0xC000000000000000) >> 62) as u8); 
+    hb.version              = ProtocolVersion::from(((version_seconds & 0xC000000000000000) >> 62) as u8); 
     let met_seconds         = version_seconds & 0x3FFFFFFFFFFFFFFF;
     hb.met_seconds          = met_seconds;
     //hb.met_seconds          = parse_u64(stream,pos);

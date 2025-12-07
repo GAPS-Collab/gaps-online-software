@@ -811,6 +811,18 @@ pub struct TofEventBuilderSettings {
   pub thr_tot_edep_umb      : f32,
   pub thr_tot_edep_cbe      : f32,
   pub thr_tot_edep_cor      : f32,
+  // level 1 purge
+  pub rbe_purge_limit1      : Option<u32>,
+  pub rbe_purge_limit1_n    : Option<u32>,
+  pub rbe_purge_ev_time1    : Option<u32>,
+  // level 2 purge
+  pub rbe_purge_limit2      : Option<u32>,
+  pub rbe_purge_limit2_n    : Option<i32>,
+  pub rbe_purge_ev_time2    : Option<u32>,
+  // level 3 purge
+  pub rbe_purge_limit3      : Option<u32>,
+  pub rbe_purge_limit3_n    : Option<i32>,
+  pub rbe_purge_ev_time3    : Option<u32>,
 }
 
 impl TofEventBuilderSettings {
@@ -835,6 +847,15 @@ impl TofEventBuilderSettings {
       thr_tot_edep_umb      : 0.0,
       thr_tot_edep_cbe      : 0.0,
       thr_tot_edep_cor      : 0.0,
+      rbe_purge_limit1      : None,
+      rbe_purge_limit1_n    : None,
+      rbe_purge_ev_time1    : None,
+      rbe_purge_limit2      : None,
+      rbe_purge_limit2_n    : None,
+      rbe_purge_ev_time2    : None,
+      rbe_purge_limit3      : None,
+      rbe_purge_limit3_n    : None,
+      rbe_purge_ev_time3    : None,
     }
   }
 
@@ -1345,39 +1366,6 @@ impl fmt::Display for LiftofRBConfig {
   }
 }
 
-//#[cfg(feature = "random")]
-//impl FromRandom for LiftofRBConfig {
-//    
-//  fn from_random() -> Self {
-//    let mut cfg = Self::new();
-//    let mut rng  = rand::thread_rng();
-//    cfg.runid                   = rng.gen::<u32>();
-//    cfg.is_active               = rng.gen::<bool>();
-//    cfg.nevents                 = rng.gen::<u32>();
-//    cfg.nseconds                = rng.gen::<u32>();
-//    cfg.tof_op_mode             = TofOperationMode::from_random();
-//    cfg.trigger_poisson_rate    = rng.gen::<u32>();
-//    cfg.trigger_fixed_rate      = rng.gen::<u32>();
-//    cfg.data_type               = DataType::from_random();
-//    cfg.rb_buff_size            = rng.gen::<u16>();
-//    cfg
-//  }
-//}
-//
-//#[cfg(feature = "random")]
-//#[test]
-//fn serialization_runconfig() {
-//  for k in 0..100 {
-//    let cfg  = LiftofRBConfig::from_random();
-//    let test = LiftofRBConfig::from_bytestream(&cfg.to_bytestream(), &mut 0).unwrap();
-//    assert_eq!(cfg, test);
-//
-//    let cfg_json = serde_json::to_string(&cfg).unwrap();
-//    let test_json 
-//      = serde_json::from_str::<LiftofRBConfig>(&cfg_json).unwrap();
-//    assert_eq!(cfg, test_json);
-//  }
-//}
 // #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 // pub struct ChannelMaskSettings {
 //   /// actually apply the below settings
@@ -1534,8 +1522,33 @@ fn mtb_config() {
 #[test]
 fn write_config_file() {
   let settings = LiftofSettings::new();
-  println!("{}", settings);
+  //println!("{}", settings);
   settings.to_toml(String::from("liftof-config-test.toml"));
+}
+
+#[test] 
+fn compress_uncompress_config_file() {
+  write_config_file();
+  let pth         = Path::new("liftof-config-test.toml");
+  let bytestream  = compress_toml(&pth).unwrap();
+  println!("Compressed .toml file to a bytestream of {} bytes!", bytestream.len());
+  let output      = Path::new("liftof-config-decompressed.toml");
+  decompress_toml(&bytestream.as_slice(), output); 
+}
+
+#[test]
+fn diff_config_file_compress_uncompress() {
+  write_config_file();
+  let mut settings = LiftofSettings::new();
+  settings.to_toml(String::from("liftof-config-test.toml"));
+  settings.staging_dir = String::from("/foo/bar");
+  settings.to_toml(String::from("liftof-config-test-changed.toml"));
+  let pth         = Path::new("liftof-config-test.toml");
+  let pth_ch      = Path::new("liftof-config-test-changed.toml");
+  let diff        = create_compressed_diff(&pth, &pth_ch).unwrap();
+  println!("Diff has the size of {} bytes!", diff.len());
+  let output      = Path::new("liftof-config.diff");
+  decompress_toml(&diff.as_slice(), output);
 }
 
 #[test]
