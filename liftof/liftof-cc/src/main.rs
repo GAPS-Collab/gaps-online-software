@@ -17,8 +17,6 @@ use std::time::{
   Duration,
 };
 
-//use std::collections::HashMap;
-//use std::io::Write;
 use std::process::{
   Command,
   Stdio,
@@ -47,6 +45,7 @@ use crossbeam_channel::{
   Sender,
   Receiver,
   unbounded,
+  bounded,
 };
 
 use spinners::{Spinner, Spinners};
@@ -61,6 +60,7 @@ use liftof_cc::{
   calibrate_tof,
   rm_liftof_rb_logs,
   restart_liftof_rb,
+  set_rbs_sma_mode,
   ssh_command_rbs,
   get_queue,
   delete_file,
@@ -167,6 +167,15 @@ fn init_channels<T>() -> (Sender<T>, Receiver<T>) {
   channels
 }
 
+/// Little helper, just makes sure that all the 
+/// channels are of same type
+fn init_bounded_channels<T>(limit : usize) -> (Sender<T>, Receiver<T>) {
+  let channels : (Sender<T>, Receiver<T>) = bounded(limit); 
+  channels
+}
+
+/*************************************/
+
 /*************************************/
 
 fn main() {
@@ -227,7 +236,7 @@ fn main() {
       } else {
         rblist = get_rbratmap_hardcoded().keys().cloned().collect();  
       }
-      info!("Will sort reboot RBs {:?}", rblist);
+      info!("Will soft reboot RBs {:?}", rblist);
       let cmd_args     = vec![String::from("sudo"),
                               String::from("shutdown"),
                               String::from("now")]; 
@@ -374,8 +383,11 @@ fn main() {
   println!("\n\n");
   println!("=> Commencing run start/init procedure...!");
   println!("=> Will use {} readoutboards!", rb_list.len()); 
+  if rb_list.len() > 0 {
+    println!(" -- -- {}", rb_list[0].rb_id); 
+  }
   for k in &rb_list {
-    println!(" -- -- {}", k.rb_id);
+    print!("{}", k.rb_id);
   }
   if rb_ignorelist_tmp.len() > 0 {
     println!("==> For this run, the following RB have been explicitly excluded in the config file");
@@ -445,7 +457,7 @@ fn main() {
 
   
   // readout boards -> event builder RBEvent transmission 
-  let (ev_to_builder, ev_from_rb)     = init_channels::<RBEvent>();
+  let (ev_to_builder, ev_from_rb)     = init_bounded_channels::<RBEvent>(20000);
   //let (ack_to_cmd_disp, ack_from_rb)  = init_channels::<TofResponse>();   
   
   println!("=> Copying {} to all RBs!", &cfg_file_str );
@@ -728,6 +740,7 @@ fn main() {
       }
       rm_liftof_rb_logs(&rb_id_list);
       restart_liftof_rb(&rb_id_list);
+      set_rbs_sma_mode(&rb_id_list);   
       let cc_pub_addr = &config.cmd_dispatcher_settings.cc_server_address;
       init_run_start(cc_pub_addr);
       println!("=> Releasing docking clamps...");
