@@ -14,6 +14,8 @@ use schema::tof_db_rat::dsl::*;
 
 /// Low gain/LTB connections to paddle ID 
 pub type DsiJChPidMapping = HashMap<u8, HashMap<u8, HashMap<u8, (u8, u8)>>>;
+/// Low gain/LTB connections to rb ID 
+pub type DsiJChRbMapping = HashMap<u8, HashMap<u8, HashMap<u8, u8>>>;
 /// RB ID and RB Ch to paddle ID mapping 
 pub type RbChPidMapping = HashMap<u8, HashMap<u8, u8>>;
 
@@ -73,6 +75,56 @@ pub fn get_dsi_j_ch_pid_map(paddles : &Vec<TofPaddle>) -> DsiJChPidMapping {
 
 //---------------------------------------------------------------------
 
+/// Create a mapping of DSI/J(LTB) -> RBID
+///
+/// This will basically tell you for a given LTB hit which rb has 
+/// triggered.
+pub fn get_dsi_j_ch_rb_map(paddles : &Vec<TofPaddle>) -> DsiJChRbMapping {
+  let mut mapping = DsiJChRbMapping::new();
+  for dsi in 1..6 {
+    let mut jmap = HashMap::<u8, HashMap<u8, u8>>::new();
+    for j in 1..6 {
+      let mut rbidch_map : HashMap<u8, u8> = HashMap::new();
+      for ch in 1..17 {
+        let rbidch = 0u8;
+        rbidch_map.insert(ch,rbidch);
+        //map[dsi] = 
+      }
+      jmap.insert(j,rbidch_map);
+    }
+    mapping.insert(dsi,jmap);
+  }
+  for pdl in paddles {
+    let dsi    = pdl.dsi as u8;
+    let   j    = pdl.j_ltb   as u8;
+    let ch_a   = pdl.ltb_chA as u8;
+    let ch_b   = pdl.ltb_chB as u8;
+    let rb_id  = pdl.paddle_id as u8;
+    mapping.get_mut(&dsi).unwrap().get_mut(&j).unwrap().insert(ch_a,rb_id);
+    mapping.get_mut(&dsi).unwrap().get_mut(&j).unwrap().insert(ch_b,rb_id);
+  }
+  return mapping;
+}
+
+//---------------------------------------------------------------------
+
+/// Create a mapping of DSI/J(LTB) -> RBID
+///
+/// This will basically tell you for a given LTB hit which rb has 
+/// triggered.
+#[cfg(feature="pybindings")]
+#[pyfunction]
+#[pyo3(name="get_dsi_j_ch_rb_map")]
+pub fn get_dsi_j_ch_rb_map_py() -> Option<DsiJChRbMapping> {
+  if let Some(paddles) = TofPaddle::all() {
+    return Some(get_dsi_j_ch_rb_map(&paddles));
+  } else {
+    return None;
+  }
+}
+
+//---------------------------------------------------------------------
+
 /// Create a mapping of DSI/J(LTB) -> PaddleID
 ///
 /// This will basically tell you for a given LTB hit which paddle has 
@@ -107,6 +159,8 @@ pub fn get_hid_vid_map() -> Option<HashMap<u32, u64>> {
   }
   Some(hid_vid_map)
 }
+
+//---------------------------------------------------------------------
 
 /// Get a map of volume id -> hardware id
 /// (Paddle id in case of TOF paddke, strip id in case 
