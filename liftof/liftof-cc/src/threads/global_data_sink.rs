@@ -105,7 +105,7 @@ pub fn global_data_sink(incoming       : &Receiver<TofPacket>,
   let mut retire        = false;
   let mut heartbeat     = DataSinkHB::new();
   let mut hb_timer      = Instant::now(); 
-  //let mut rbwf_ctr      = 0u32;
+  let mut rbwf_ctr      = 0u32;
   loop {
     if retire {
       // take a long nap to give other threads 
@@ -123,8 +123,7 @@ pub fn global_data_sink(incoming       : &Receiver<TofPacket>,
         Ok(mut tc) => {
           send_tof_event_packets   = tc.liftof_settings.data_publisher_settings.send_tof_event_packets;      
           send_tof_summary_packets = tc.liftof_settings.data_publisher_settings.send_tof_summary_packets;
-          send_rbwaveform_packets  = tc.liftof_settings.data_publisher_settings.send_rbwaveform_packets;
-    
+          send_rbwaveform_packets  = tc.liftof_settings.data_publisher_settings.send_rbwaveform_packets; 
           if tc.stop_flag {
             tc.thread_data_sink_active = false;
             // we want to make sure that data sink ends the latest
@@ -203,15 +202,18 @@ pub fn global_data_sink(incoming       : &Receiver<TofPacket>,
         }
 
         if send_rbwaveform_packets {
-          for wf in ev_.get_waveforms() { 
-            match data_socket.send(wf.pack().to_bytestream(),0) {
-              Err(err) => error !("Not able to send packet over 0MQ PUB! {err}"),
-              Ok(_)    => {
-                trace!("TofPacket sent");
-                heartbeat.n_packets_sent += 1;
-              }
-            } // end match
-          } 
+          if rbwf_ctr % send_rbwf_every_x_event == 0 {
+            for wf in ev_.get_waveforms() { 
+              match data_socket.send(wf.pack().to_bytestream(),0) {
+                Err(err) => error !("Not able to send packet over 0MQ PUB! {err}"),
+                Ok(_)    => {
+                  trace!("TofPacket sent");
+                  heartbeat.n_packets_sent += 1;
+                }
+              } // end match
+            }
+          }
+          rbwf_ctr += 1;
         }
 
         // Now move hits, strip waveforms and calculate gcu variables 
