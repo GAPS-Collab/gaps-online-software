@@ -953,7 +953,7 @@ if check_password():
                     load_run_kwargs['event_type'] = EventType.Tof
                 else:
                     all_runs     = [k for k in Path(config['data']['no_waveform']).glob('*')]
-                    runids       = reversed(sorted([k.name for k in all_runs if k.name.isdigit()]))
+                    runids       = reversed(sorted([k.name for k in all_runs if k.name.isdigit()], key=lambda x : int(x)))
                     selected_run = l_col.selectbox('Select a run (no wf)', tuple(runids))
                     selected_run = all_runs[0].parent / selected_run 
                     sr_infiles   = selected_run.glob('*.gaps')
