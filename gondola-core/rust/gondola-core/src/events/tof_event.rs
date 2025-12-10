@@ -495,7 +495,7 @@ impl TofEvent {
     let mut links = Vec::<u8>::new();
     for k in 0..64 {
       if (self.mtb_link_mask >> k) as u64 & 0x1 == 1 {
-        links.push(k +1 as u8);
+        links.push(k as u8);
       }
     }
     links
@@ -575,7 +575,7 @@ impl TofEvent {
   }
   
   pub fn get_timestamp48(&self) -> u64 {
-    ((self.timestamp16 as u64) << 32) | self.timestamp32 as u64
+    0x273000000000000 | (((self.timestamp16 as u64) << 32) | self.timestamp32 as u64)
   }
   
   /// Ttotal energy depostion in the TOF - Umbrella
@@ -990,11 +990,11 @@ impl fmt::Display for TofEvent {
     repr += &(format!("\n  timestamp32      : {}", self.timestamp32)); 
     repr += &(format!("\n  timestamp16      : {}", self.timestamp16)); 
     repr += &(format!("\n   |-> timestamp48 : {}", self.get_timestamp48())); 
-    repr += &(format!("\n  mt_tiu_gps16     : {}", self.mt_tiu_gps16));
-    repr += &(format!("\n  mt_tiu_gps32     : {}", self.mt_tiu_gps32)); 
-    repr += &(format!("\n  mt_timestamp     : {}", self.mt_timestamp));
-    repr += &(format!("\n  mt_tiu_timestamp : {}", self.mt_tiu_timestamp));
-    repr += &(format!("\n  gps timestamp    : {}", self.get_mt_timestamp_abs()));
+    //repr += &(format!("\n  mt_tiu_gps16     : {}", self.mt_tiu_gps16));
+    //repr += &(format!("\n  mt_tiu_gps32     : {}", self.mt_tiu_gps32)); 
+    //repr += &(format!("\n  mt_timestamp     : {}", self.mt_timestamp));
+    //repr += &(format!("\n  mt_tiu_timestamp : {}", self.mt_tiu_timestamp));
+    //repr += &(format!("\n  gps timestamp    : {}", self.get_mt_timestamp_abs()));
     //repr += &(format!("\n  PrimaryBeta      : {}", self.get_beta())); 
     //repr += &(format!("\n  PrimaryCharge    : {}", self.primary_charge));
     if self.version == ProtocolVersion::V1 {
