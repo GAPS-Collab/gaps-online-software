@@ -58,8 +58,8 @@ pub enum TofPacketType {
   LiftofRBBinary        = 202u8,
   LiftofBinaryService   = 203u8,
   LiftofCCBinary        = 204u8,
-  LiftofConfig          = 205u8,
-  LiftofConfigDiff      = 206u8,
+  LiftofSettings        = 205u8,
+  LiftofSettingsDiff    = 206u8,
   RBCalibrationFlightV  = 210u8,
   RBCalibrationFlightT  = 211u8,
   /// A klude which allows us to send bfsw ack packets
