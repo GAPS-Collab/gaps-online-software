@@ -1,6 +1,8 @@
 // This file is part of gaps-online-software and published 
 // under the GPLv3 license
 
+ use std::path::PathBuf;
+
 use crate::prelude::*;
 
 #[derive(Debug, Copy, Clone, PartialEq, FromRepr, AsRefStr, EnumIter)]
@@ -17,7 +19,7 @@ pub enum TofCommandCode {
   /// Reload a default (to be defined) config file
   ResetConfigWDefault      = 5u8,
   /// Make the current editable config the active config
-  SubmitConfig           = 6u8,
+  SubmitConfig             = 6u8,
   /// command code to configure the data publisher thread
   SetDataPublisherConfig   = 20u8,
   /// command code for "Set LTB Thresholds"
@@ -79,6 +81,22 @@ pub enum TofCommandCode {
   ShutdownCPU             = 104u8,
   /// Upload a new config file
   UploadConfig            = 105u8,
+  /// Upload a diff for a new config file 
+  UploadConfigDiff        = 106u8,
+  /// Run custom script 
+  RunScriptAlfa           = 107u8,
+  /// Run custom script 
+  RunScriptBravo          = 108u8,
+  /// Run custom script 
+  RunScriptCharlie        = 109u8,
+  /// Run custom script 
+  RunScriptWhiskey        = 110u8,
+  /// Run custom script 
+  RunScriptTango          = 111u8,
+  /// Run custom script 
+  RunScriptFoxtrott       = 112u8,
+  /// Request the config file to be sent 
+  RequestLiftofSettings   = 113u8,
 }
 
 expand_and_test_enum!(TofCommandCode, test_tofcommandcode_repr);
@@ -524,6 +542,84 @@ pub fn stop_run() -> Option<TofCommand> {
   Some(TofCommand {
     command_code : TofCommandCode::DataRunStop,
     payload      : Vec::<u8>::new(),
+  })
+}
+
+/// Custom run action alfa
+#[cfg_attr(feature="pybindings", pyfunction)]
+pub fn run_action_alfa() -> Option<TofCommand> {
+  Some(TofCommand {
+    command_code : TofCommandCode::RunScriptAlfa,
+    payload      : Vec::<u8>::new(),
+  })
+}
+
+/// Custom run action bravo
+#[cfg_attr(feature="pybindings", pyfunction)]
+pub fn run_action_bravo() -> Option<TofCommand> {
+  Some(TofCommand {
+    command_code : TofCommandCode::RunScriptBravo,
+    payload      : Vec::<u8>::new(),
+  })
+}
+
+/// Custom run action charlie
+#[cfg_attr(feature="pybindings", pyfunction)]
+pub fn run_action_charlie() -> Option<TofCommand> {
+  Some(TofCommand {
+    command_code : TofCommandCode::RunScriptCharlie,
+    payload      : Vec::<u8>::new(),
+  })
+}
+
+/// Custom run action whiskey
+#[cfg_attr(feature="pybindings", pyfunction)]
+pub fn run_action_whiskey() -> Option<TofCommand> {
+  Some(TofCommand {
+    command_code : TofCommandCode::RunScriptWhiskey,
+    payload      : Vec::<u8>::new(),
+  })
+}
+
+/// Custom run action tango
+#[cfg_attr(feature="pybindings", pyfunction)]
+pub fn run_action_tango() -> Option<TofCommand> {
+  Some(TofCommand {
+    command_code : TofCommandCode::RunScriptTango,
+    payload      : Vec::<u8>::new(),
+  })
+}
+
+/// Custom run action foxtrott
+#[cfg_attr(feature="pybindings", pyfunction)]
+pub fn run_action_foxtrott() -> Option<TofCommand> {
+  Some(TofCommand {
+    command_code : TofCommandCode::RunScriptFoxtrott,
+    payload      : Vec::<u8>::new(),
+  })
+}
+
+/// Custom run action foxtrott
+#[cfg_attr(feature="pybindings", pyfunction)]
+pub fn request_liftof_settings() -> Option<TofCommand> {
+  Some(TofCommand {
+    command_code : TofCommandCode::RequestLiftofSettings,
+    payload      : Vec::<u8>::new(),
+  })
+}
+
+/// Apply a config diff
+#[cfg_attr(feature="pybindings", pyfunction)]
+pub fn apply_settings_diff(default : String, modified : String) -> Option<TofCommand> {
+  let default_p  = PathBuf::from(default);
+  let modified_p = PathBuf::from(modified);
+  let diff = create_compressed_diff(&default_p, &modified_p).unwrap();
+  if diff.len() > 240 {
+    panic!("Command payload is too long! Sorry, you have to split this up in multiple changes!");
+  }
+  Some(TofCommand {
+    command_code : TofCommandCode::UploadConfigDiff,
+    payload      : diff,
   })
 }
 

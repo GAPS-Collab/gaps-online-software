@@ -210,6 +210,14 @@ fn tof_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(shutdown_ratpair, m)?)?;
   m.add_function(wrap_pyfunction!(shutdown_rb, m)?)?;
   m.add_function(wrap_pyfunction!(shutdown_tofcpu, m)?)?;
+  m.add_function(wrap_pyfunction!(run_action_alfa, m)?)?;
+  m.add_function(wrap_pyfunction!(run_action_bravo, m)?)?;
+  m.add_function(wrap_pyfunction!(run_action_charlie, m)?)?;
+  m.add_function(wrap_pyfunction!(run_action_whiskey, m)?)?;
+  m.add_function(wrap_pyfunction!(run_action_tango, m)?)?;
+  m.add_function(wrap_pyfunction!(run_action_foxtrott, m)?)?;
+  m.add_function(wrap_pyfunction!(request_liftof_settings, m)?)?;
+  m.add_function(wrap_pyfunction!(apply_settings_diff, m)?)?;
   Ok(())
 }
 
