@@ -318,6 +318,10 @@ pub enum EventStatus {
   /// If any of the RBEvents have Sync erros, we flag the tof 
   /// event summary to indicate there were issues
   AnyDataMangling        = 16u8,
+  /// RB is missing, but it is expected that is missing
+  /// when we compare the trigger information with the 
+  /// list of known dead rbs
+  KnownDeadRB            = 17u8,
   IncompleteReadout      = 21u8,
   /// This can be used if there is a version
   /// missmatch and we have to hack something
