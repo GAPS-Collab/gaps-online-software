@@ -672,10 +672,16 @@ pub fn apply_diff_to_file(compressed_bytes : Vec<u8>, original_file_path: &str) 
   original_file.read_to_string(&mut original_content)?;
   match Patch::from_bytes(&uncompressed_data.as_slice()) {
     Ok(patch) => {
-      let modified_content = apply_bytes(&original_content.as_bytes(), &patch)
-        .map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Failed to apply patch: {}", e)))?;
-      let mut output_file = fs::File::create(original_file_path)?;
-      output_file.write_all(&modified_content.as_slice())?;
+      info!("Got patch {:?}", patch);
+      match apply_bytes(&original_content.as_bytes(), &patch) {
+        Ok(modified_content) => {
+          let mut output_file = fs::File::create(original_file_path)?;
+          output_file.write_all(&modified_content.as_slice())?;
+        }
+        Err(err) => {
+          error!("Unable to apply the patch {err}");
+        }
+      }
     }
     Err(err) => {
       error!("Unable to apply the patch! {err}"); 
