@@ -8,6 +8,7 @@ pub mod layout;
 
 use std::sync::Mutex;
 use std::sync::Arc;
+use std::path::PathBuf;
 
 use std::collections::HashMap;
 use std::collections::VecDeque;
@@ -33,6 +34,11 @@ use gondola_core::prelude::*;
 use crossbeam_channel::{
   Sender,
   Receiver
+};
+
+use toml;
+use toml::{
+  Value
 };
 
 pub type WaveformCache = HashMap<u8,HashMap<u8, Arc<Mutex<VecDeque<RBWaveform>>>>>;
@@ -86,12 +92,12 @@ pub fn telly_packet_counter(pack_map : &mut HashMap<&str, usize>, packet_type : 
     TelemetryPacketType::TmP64              => pack_key = "TmP64",
     TelemetryPacketType::TmP96              => pack_key = "TmP96",
     TelemetryPacketType::TmP214             => pack_key = "TmP214",
-  //_                              => pack_key = "Unknown",
+    _                                       => pack_key = "Unknown",
   }
   if pack_map.get(pack_key).is_some() {
     *pack_map.get_mut(pack_key).unwrap() += 1;
   } else {
-    pack_map.insert(pack_key, 0);
+    pack_map.insert(pack_key, 1);
   }
 }
 
@@ -122,10 +128,12 @@ pub fn render_logs<'a>(theme : ColorTheme) -> TuiLoggerWidget<'a> {
 ///
 ///   * packet_type : TofPacket type to llokup it's position in 
 ///                   the map
+///   * packet_size : The size of the packet including header in bytes
 ///   * packet_map  : An arc/mutex to the HashMap we use to store
 ///                   the counted values in.
 fn packet_sorter(packet_type : &TofPacketType,
-                 packet_map  : &Arc<Mutex<HashMap<&str,usize>>>) {
+                 packet_size : usize,
+                 packet_map  : &Arc<Mutex<HashMap<&str,(usize,usize)>>>) {
   match packet_map.lock() {
     Ok(mut pm) => {
       let pack_key : &str;
@@ -171,17 +179,19 @@ fn packet_sorter(packet_type : &TofPacketType,
         TofPacketType::LiftofRBBinary        => pack_key = "LiftofRBBinary",
         TofPacketType::LiftofBinaryService   => pack_key = "LiftofBinaryService",
         TofPacketType::LiftofCCBinary        => pack_key = "LiftofCCBinary",
+        TofPacketType::LiftofSettings        => pack_key = "LiftofSettings",
+        TofPacketType::LiftofSettingsDiff    => pack_key = "LiftofSettingsDiff",
         TofPacketType::RBCalibrationFlightV  => pack_key = "RBCalibrationFlightV",
         TofPacketType::RBCalibrationFlightT  => pack_key = "RBCalibrationFlightT",
         TofPacketType::BfswAckPacket         => pack_key = "BfswAckPacket",
-        TofPacketType::PanicPacket           => pack_key = "PanicPacket",
         TofPacketType::MultiPacket           => pack_key = "MultiPacket",
         TofPacketType::PanicPacket           => pack_key = "PanicPacket",
       }
       if pm.get(pack_key).is_some() {
-        *pm.get_mut(pack_key).unwrap() += 1;
+        pm.get_mut(pack_key).unwrap().0 += 1;
+        pm.get_mut(pack_key).unwrap().1 += packet_size;
       } else {
-        pm.insert(pack_key, 0);
+        pm.insert(pack_key, (1, packet_size));
       }
     }
     Err(err) => {
@@ -196,43 +206,27 @@ fn packet_sorter(packet_type : &TofPacketType,
 ///
 /// This is a Pablo Pubsub kind of persona
 /// (see a fantastic talk at RustConf 2023)
-pub fn packet_distributor(tp_from_sock : Receiver<TofPacket>,
-                          tp_sender_mt : Sender<TofPacket>,
-                          tp_sender_rb : Sender<TofPacket>,
-                          tp_sender_ev : Sender<TofPacket>,
-                          tp_sender_cp : Sender<TofPacket>,
-                          tp_sender_tr : Sender<TofPacket>,
-                          //rbwf_sender  : Sender<TofPacket>,
-                          ts_send      : Sender<TofPacket>,
-                          th_send      : Sender<TofHit>,
-                          tp_sender_hb : Sender<TofPacket>,
-                          str_list     : Arc<Mutex<VecDeque<String>>>,
-                          pck_map      : Arc<Mutex<HashMap<&str, usize>>>,
-                          mut writer   : Option<TofPacketWriter>,
-                          mut wf_cache : Box<WaveformCache>) {
+pub fn packet_distributor(tp_from_sock       : Receiver<TofPacket>,
+                          tp_sender_mt       : Sender<TofPacket>,
+                          tp_sender_rb       : Sender<TofPacket>,
+                          tp_sender_cp       : Sender<TofPacket>,
+                          tp_sender_tr       : Sender<TofPacket>,
+                          ts_send            : Sender<TofPacket>,
+                          tp_sender_hb       : Sender<TofPacket>,
+                          str_list           : Arc<Mutex<VecDeque<String>>>,
+                          pck_map            : Arc<Mutex<HashMap<&str, (usize, usize)>>>,
+                          mut writer         : Option<TofPacketWriter>,
+                          mut wf_cache       : Box<WaveformCache>,
+                          latest_config      : Arc<Mutex<String>>) {
   let mut n_pack = 0usize;
 
   loop {
-    //match data_socket.recv_bytes(0) {
-    //println! ("Incoming receiver length {}", tp_from_sock.len());
-    //println!("len tp_sender_mt {}", tp_sender_mt.len());
-    //println!("len tp_sender_rb {}", tp_sender_rb.len());
-    //println!("len tp_sender_ev {}", tp_sender_ev.len());
-    //println!("len tp_sender_cp {}", tp_sender_cp.len());
-    //println!("len tp_sender_tr {}", tp_sender_tr.len());
-    //println!("len rbwf_sender {}" , rbwf_sender.len());
-    //println!("len th_send {}"     , th_send.len());
-    //println!("len ts_send {}"     , ts_send.len());
-    //println!("len tp_sender_hb {}", tp_sender_hb.len());
     match tp_from_sock.recv() {
       Err(err) => error!("Can't receive TofPacket! {err}"),
       Ok(tp) => {
-        //println!("{:?}", pck_map);
-        //println!("Before packet sorter!");
-        packet_sorter(&tp.packet_type, &pck_map);
-        //println!("After packet sorter!");
+        let packet_size = tp.payload.len() + 9; // 9 is overhead for TofPacket 
+        packet_sorter(&tp.packet_type, packet_size, &pck_map);
         n_pack += 1;
-        //println!("Got TP {}", tp);
         match str_list.lock() {
           Err(err) => error!("Can't lock shared memory! {err}"),
           Ok(mut _list)    => {
@@ -303,7 +297,7 @@ pub fn packet_distributor(tp_from_sock : Receiver<TofPacket>,
                 }
                 match wf_cache.get_mut(&wf.rb_id).unwrap().get_mut(&ch_b).unwrap().lock() {
                   Err(err)  => {
-                    error!("Unable to lock waveform cache!");
+                    error!("Unable to lock waveform cache! {err}");
                   }
                   Ok(mut cache) => {
                     cache.push_back(wf.clone());
@@ -323,66 +317,34 @@ pub fn packet_distributor(tp_from_sock : Receiver<TofPacket>,
             //  Ok(_)    => (),
             //}
           }
+          TofPacketType::LiftofSettings => {
+            info!("Saving received liftof-config.toml data!");
+            let output_file_path = PathBuf::from("latest-liftof-config.toml");
+            match decompress_toml(&tp.payload.as_slice(), &output_file_path) {
+              Err(err) => {
+                error!("Unable to decompressed the received bytes into a valid .toml file! {err}")
+              }
+              Ok(_)    => ()
+            }
+            let contents     = fs::read_to_string(output_file_path).unwrap();
+            let value: Value = toml::from_str(&contents).unwrap();
+            match latest_config.lock() {
+              Ok(mut cfg) => {
+                *cfg = toml::to_string_pretty(&value).unwrap();
+              }
+              Err(err) => {
+                error!("Can not lock String to save config! {err}");
+              }
+            }
+            //latest_config    = Arc::new(toml::to_string_pretty(&value).unwrap());
+            //println!("{:?}", latest_config);
+          }
           TofPacketType::TofEvent => {
             match ts_send.send(tp) {
               Err(err) => error!("Can't send TP! {err}"),
               Ok(_)    => (),
             }
-            
-            //match tp.unpack::<TofEvent>() {
-            //  Err(err) => {
-            //    error!("Unable to unpack TofEvent! {err}");
-            //  }
-            //  Ok(ts) => {
-            //    // FIXME - this is not needed anymore
-            //    //if craft_mte_packets {
-            //    //  //let mte    = MasterTriggerEvent::from(&ts);
-            //    //  //let mte_tp = mte.pack();
-            //    //  //error!("We are sending the following tp {}", mte_tp);
-            //    //  match tp_sender_mt.send(tp.clone()) { 
-            //    //  //match tp_sender_mt.send(mte_tp) {
-            //    //    Err(err) => error!("Can't send MTE TP! {err}"),
-            //    //    Ok(_)    => ()
-            //    //  }
-            //    //}
-            //    //for h in &ts.hits {
-            //    //  match th_send.send(*h) {
-            //    //    Err(err) => error!("Can't send TP! {err}"),
-            //    //    Ok(_)    => (),
-            //    //  }
-            //    //}
-            //    //match ts_send.send(ts) {
-            //    //  Err(err) => error!("Can't send TP! {err}"),
-            //    //  Ok(_)    => (),
-            //    //}
-            //    //match tp_sender_ev.send(tp.clone()) {
-            //    //  Err(err) => error!("Can't send TP! {err}"),
-            //    //  Ok(_)    => (),
-            //    //}
-            //  }
-            //}
           }
-          ////TofPacketType::TofEvent => {
-          ////  // since the tof event contains MTEs, we don't need
-          ////  // to craft them
-          ////  craft_mte_packets = false;
-          ////  match tp_sender_ev.send(tp) {
-          ////    Err(err) => error!("Can't send TP! {err}"),
-          ////    Ok(_)    => (),
-          ////  }
-          ////  // Disasemble the packets
-          ////  //match TofEvent::from_bytestream(tp.payload, &mut 0) {
-          ////  //  Err(err) => {
-          ////  //    error!("Can't decode TofEvent");
-          ////  //  },
-          ////  //  Ok(ev) => {
-          ////  //    //for rbev in ev.rb_events {
-          ////  //    //  let 
-          ////  //    //  match tp_sender_rb.send
-          ////  //    //}
-          ////  //  }
-          ////  //}
-          ////}
           TofPacketType::RBEvent |
           TofPacketType::RBEventMemoryView | 
           TofPacketType::LTBMoniData |

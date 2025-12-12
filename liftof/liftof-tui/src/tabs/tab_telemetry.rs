@@ -17,17 +17,7 @@ use crossbeam_channel::{
 
 use gondola_core::prelude::*;
 
-//use telemetry_dataclasses::packets::{
-//  TelemetryPacketHeader,
-//  TelemetryPacket,
-//  MergedEvent,
-////  TrackerPacket,
-//};
-
 use ratatui::prelude::*;
-
-//use ratatui::terminal::Frame;
-
 
 use ratatui::Frame;
 use ratatui::layout::Rect;
@@ -39,18 +29,6 @@ use ratatui::widgets::{
   Table,
   Row,
 };
-
-//use tof_dataclasses::serialization::{
-//    Serialization,
-////    search_for_u16
-//};
-//use tof_dataclasses::errors::SerializationError;
-//use tof_dataclasses::packets::{
-//  TofPacket,
-//};
-//use tof_dataclasses::serialization::Packable;
-//
-//use telemetry_dataclasses::packets::TelemetryPacketType;
 
 use crate::colors::ColorTheme;
 use crate::telly_packet_counter;
@@ -114,6 +92,20 @@ impl TelemetryTab<'_> {
         if self.header_queue.len() > self.queue_size {
           let _ = self.header_queue.pop_front();
         }
+        if packet.header.packet_type == TelemetryPacketType::RBWaveform {
+          match TofPacket::from_bytestream(&packet.payload, &mut 0) {
+            Err(err) => {
+              error!("Unable to decode AnyHKpacket! {err}");
+            }
+            Ok(tpack) => {
+              if let Some(sender) = &self.tp_sender {
+                if let Err(err) = sender.send(tpack) {
+                  error!("Unable to send TP over channel! {err}");
+                }
+              }
+            }
+          }
+        }
         if packet.header.packet_type == TelemetryPacketType::AnyTofHK {
           match TofPacket::from_bytestream(&packet.payload, &mut 0) {
             Err(err) => {
@@ -130,7 +122,8 @@ impl TelemetryTab<'_> {
         }
         
         if packet.header.packet_type == TelemetryPacketType::BoringEvent 
-          || packet.header.packet_type == TelemetryPacketType::NoGapsTriggerEvent  {
+          || packet.header.packet_type == TelemetryPacketType::NoGapsTriggerEvent  
+          || packet.header.packet_type == TelemetryPacketType::InterestingEvent {
           let expected_size = (packet.header.length as usize) - TelemetryPacketHeader::SIZE;
           if expected_size > packet.payload.len() {
             error!("Unable to decode MergedEvent Telemetry packet of type {}! The expected size is {}, but the payload len is {}", packet.header.packet_type, expected_size - TelemetryPacketHeader::SIZE, packet.payload.len());

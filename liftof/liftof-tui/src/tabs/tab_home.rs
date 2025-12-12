@@ -38,7 +38,7 @@ use crate::colors::ColorTheme;
 pub struct HomeTab<'a> {
   pub theme      : ColorTheme,
   pub streamer   : Arc<Mutex<VecDeque<String>>>,
-  pub pack_stat  : Arc<Mutex<HashMap<&'a str, usize>>>,
+  pub pack_stat  : Arc<Mutex<HashMap<&'a str, (usize,usize)>>>,
   pub stream     : String,
   pub stream_max : usize, 
   start_time     : Instant,
@@ -47,7 +47,7 @@ pub struct HomeTab<'a> {
 impl HomeTab<'_> {
   pub fn new(theme     : ColorTheme,
              streamer  : Arc<Mutex<VecDeque<String>>>,
-             pack_stat : Arc<Mutex<HashMap<&str,usize>>>) -> HomeTab {
+             pack_stat : Arc<Mutex<HashMap<&str,(usize,usize)>>>) -> HomeTab<'_> {
     HomeTab {
       theme,
       streamer, 
@@ -60,38 +60,42 @@ impl HomeTab<'_> {
 
   pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
     let main_chunks = Layout::default()
-      .direction(Direction::Vertical)
+      .direction(Direction::Horizontal)
       .constraints(
-          [Constraint::Percentage(70),
-           Constraint::Percentage(30)].as_ref(),
+          [Constraint::Percentage(60),
+           Constraint::Percentage(40)].as_ref(),
       )
       .split(*main_window);
     
     let upper_chunks = Layout::default()
-        .direction(Direction::Horizontal)
+        .direction(Direction::Vertical)
         .constraints(
-            [Constraint::Percentage(70),
-            Constraint::Percentage(30)].as_ref(),
+            [Constraint::Percentage(75),
+            Constraint::Percentage(25)].as_ref(),
         )
         .split(main_chunks[0]);
  
-    let mut rows   = Vec::<Row>::new();
-    let mut sum_pack = 0;
-    let passed_time = self.start_time.elapsed().as_secs_f64();
+    let mut rows      = Vec::<Row>::new();
+    let mut sum_pack  = 0;
+    let mut sum_bytes = 0;
+    let passed_time   = self.start_time.elapsed().as_secs_f64();
     match self.pack_stat.lock() {
       Err(_err) => (),
       Ok(mut _stat) =>  {
         for k in _stat.keys() {
           //stat_string_render += "  -- -- -- -- -- -- -- -- -- --\n";
-          if _stat[k] != 0 {
-            sum_pack += _stat[k];
-            if k.contains("Heart"){
-              rows.push(Row::new(vec![format!("  \u{1f493} {:.1}", _stat[k]),
-                                      format!("{:.1}", (_stat[k] as f64)/passed_time,),
+          if _stat[k].0 != 0 {
+            sum_pack  += _stat[k].0;
+            sum_bytes += _stat[k].1;
+            if k.contains("HB"){ // heartbeats
+              rows.push(Row::new(vec![format!("  \u{1f493} {:.1}", _stat[k].0),
+                                      format!("{:.1}", (_stat[k].0 as f64)/passed_time,),
+                                      format!("{:.1}", 0.008*(_stat[k].1 as f64)/passed_time,),
                                       format!("[{}]", k)]));
             } else {
-              rows.push(Row::new(vec![format!("  \u{279f} {:.1}", _stat[k]),
-                                      format!("{:.1}", (_stat[k] as f64)/passed_time,),
+              rows.push(Row::new(vec![format!("  \u{279f} {:.1}", _stat[k].0),
+                                      format!("{:.1}", (_stat[k].0 as f64)/passed_time,),
+                                      format!("{:.1}", 0.008*(_stat[k].1 as f64)/passed_time,),
                                       format!("[{}]", k)]));
             }
           }
@@ -101,15 +105,17 @@ impl HomeTab<'_> {
     rows.push(Row::new(vec!["  \u{FE4C}\u{FE4C}\u{FE4C}","\u{FE4C}\u{FE4C}","\u{FE4C}\u{FE4C}\u{FE4C}\u{FE4C}\u{FE4C}\u{FE4C}"])); 
     rows.push(Row::new(vec![format!("  \u{279f}{}", sum_pack),
                        format!("{:.1}/s", (sum_pack as f64)/passed_time),
+                       format!("{:.1}kBit/s", 0.008*&(sum_bytes as f64)/passed_time),
                        format!("[TOTAL]")]));
     
     let widths = [Constraint::Percentage(30),
-                  Constraint::Percentage(20),
-                  Constraint::Percentage(50)];
+                  Constraint::Percentage(10),
+                  Constraint::Percentage(30),
+                  Constraint::Percentage(30)];
     let table  = Table::new(rows, widths)
       .column_spacing(1)
       .header(
-        Row::new(vec!["  N", "\u{1f4e6}/s", "Type"])
+        Row::new(vec!["  N", "\u{1f4e6}/s", "kBit/s", "Type"])
         .bottom_margin(1)
         .top_margin(1)
         .style(Style::new().add_modifier(Modifier::UNDERLINED))
@@ -153,9 +159,9 @@ impl HomeTab<'_> {
         .border_type(BorderType::Rounded)
         .title("Stream")
     );
-    frame.render_widget(main_view,       upper_chunks[0]);
-    frame.render_widget(side_view,       main_chunks[1]);
-    frame.render_widget(table, upper_chunks[1])
+    frame.render_widget(main_view,       main_chunks[0]);
+    frame.render_widget(side_view,       upper_chunks[1]);
+    frame.render_widget(table,           main_chunks[1])
   }
 }
 

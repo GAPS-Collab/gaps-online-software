@@ -7,7 +7,7 @@ use ratatui::widgets::{
     Block,
     BorderType,
     Borders,
-    //Paragraph,
+    Paragraph,
     //BarChart,
     List,
     ListItem,
@@ -21,25 +21,17 @@ use crossbeam_channel::{
     Receiver
 };
 
+use std::sync::Mutex;
 use gondola_core::prelude::*;
 
-//use tof_dataclasses::packets::{
-//  TofPacket,
-//  PacketType
-//};
-//use tof_dataclasses::commands::{
-//  TofCommand,
-//  TofCommandCode,
-//  TofResponse
-//};
-//
-//use tof_dataclasses::serialization::{
-//    Serialization,
-//    SerializationError,
-//    Packable
-//};
-
 use crate::colors::ColorTheme;
+
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum CommandTabView {
+  General,
+  LatestConfig
+}
+
 
 pub struct CommandTab<'a> {
   pub resp_rc            : Receiver<TofPacket>,
@@ -55,15 +47,16 @@ pub struct CommandTab<'a> {
   pub commands           : Vec<TofCommand>,
   pub queue_size         : usize,
   pub tr_queue           : VecDeque<TofResponse>,
+  pub latest_config      : Arc<Mutex<String>>,
+  pub view               : CommandTabView,
 }
 
-
 impl CommandTab<'_> {
-
   pub fn new<'a>(resp_rc        : Receiver<TofPacket>,
                  cmd_pub_addr   : String,
                  theme          : ColorTheme,
-                 allow_commands : bool) -> CommandTab<'a> {  
+                 allow_commands : bool,
+                 latest_config  : Arc<Mutex<String>>) -> CommandTab<'a> {  
     let mut ping_cmd        = TofCommand::new();
     ping_cmd.command_code   = TofCommandCode::Ping;
     let mut start_cmd       = TofCommand::new();
@@ -85,7 +78,6 @@ impl CommandTab<'_> {
 
     let mut kill_cmd        = TofCommand::new();
     kill_cmd.command_code   = TofCommandCode::Kill;
-
 
     let commands = vec![ping_cmd,
                         start_cmd,
@@ -122,6 +114,8 @@ impl CommandTab<'_> {
       commands       : commands,
       queue_size     : 1000,
       tr_queue       : VecDeque::<TofResponse>::new(),
+      latest_config  : latest_config,
+      view           : CommandTabView::General
     }
   }
   
@@ -197,55 +191,89 @@ impl CommandTab<'_> {
   }
 
   pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
+    match self.view {
+      CommandTabView::General => {  
+        let main_lo = Layout::default()
+          .direction(Direction::Horizontal)
+          .constraints(
+              [Constraint::Percentage(20), Constraint::Percentage(80)].as_ref(),
+          )
+          .split(*main_window);
+           let par_title_string = String::from("Select Command");
+           let (first, rest) = par_title_string.split_at(1);
+        
+        let par_title = Line::from(vec![
+             Span::styled(
+                 first,
+                 Style::default()
+                     .fg(self.theme.hc)
+                     .add_modifier(Modifier::UNDERLINED),
+             ),
+             Span::styled(rest, self.theme.style()),
+           ]);
 
-    let main_lo = Layout::default()
-      .direction(Direction::Horizontal)
-      .constraints(
-          [Constraint::Percentage(20), Constraint::Percentage(80)].as_ref(),
-      )
-      .split(*main_window);
-       let par_title_string = String::from("Select Command");
-       let (first, rest) = par_title_string.split_at(1);
-    
-    let par_title = Line::from(vec![
-         Span::styled(
-             first,
-             Style::default()
-                 .fg(self.theme.hc)
-                 .add_modifier(Modifier::UNDERLINED),
-         ),
-         Span::styled(rest, self.theme.style()),
-       ]);
-
-    let cmds = Block::default()
-      .borders(Borders::ALL)
-      .style(self.theme.style())
-      .title(par_title)
-      .border_type(BorderType::Plain);
-    
-    let cmd_select_list = List::new(self.cmdl_items.clone()).block(cmds)
-      .highlight_style(self.theme.highlight().add_modifier(Modifier::BOLD))
-      .highlight_symbol(">>")
-      .repeat_highlight_symbol(true);
-    
-    match self.cmdl_state.selected() {
-      None    => {
-        self.cmdl_selector = 0;
-      },
-      Some(cmd_id) => {
-        // entry 0 is for all paddles
-        let selector =  cmd_id;
-        if self.cmdl_selector != selector {
-          //self.paddle_changed = true;
-          //self.init_histos();
-          self.cmdl_selector = selector;
-        } else {
-          //self.paddle_changed = false;
+        let cmds = Block::default()
+          .borders(Borders::ALL)
+          .style(self.theme.style())
+          .title(par_title)
+          .border_type(BorderType::Plain);
+        
+        let cmd_select_list = List::new(self.cmdl_items.clone()).block(cmds)
+          .highlight_style(self.theme.highlight().add_modifier(Modifier::BOLD))
+          .highlight_symbol(">>")
+          .repeat_highlight_symbol(true);
+        
+        match self.cmdl_state.selected() {
+          None    => {
+            self.cmdl_selector = 0;
+          },
+          Some(cmd_id) => {
+            // entry 0 is for all paddles
+            let selector =  cmd_id;
+            if self.cmdl_selector != selector {
+              //self.paddle_changed = true;
+              //self.init_histos();
+              self.cmdl_selector = selector;
+            } else {
+              //self.paddle_changed = false;
+            }
+          },
         }
-      },
-    }
-    if self.allow_commands {
-      frame.render_stateful_widget(cmd_select_list, main_lo[0], &mut self.cmdl_state );
+        if self.allow_commands {
+          frame.render_stateful_widget(cmd_select_list, main_lo[0], &mut self.cmdl_state );
+        }
+      } 
+      CommandTabView::LatestConfig => {
+        let main_lo = Layout::default()
+          .direction(Direction::Horizontal)
+          .constraints(
+              [Constraint::Percentage(10),
+               //Constraint::Percentage(20),
+               Constraint::Percentage(90)].as_ref(),
+          )
+          .split(*main_window);
+        //println!("CMD VIEW {}", self.latest_config);
+        //let latest_config_view = *self.latest_config;
+        match self.latest_config.lock() {
+          Ok(latest_config_view) => {
+            let liftof_view = Paragraph::new(&*(*latest_config_view))
+              .style(self.theme.style())
+              .alignment(Alignment::Left)
+              //.scroll((5, 10))
+              .block(
+              Block::default()
+                .borders(Borders::ALL)
+                .style(self.theme.style())
+                .title("Latest config")
+                .border_type(BorderType::Rounded),
+            );
+            frame.render_widget(liftof_view, main_lo[1]);
+          }
+          Err(err) => {
+            error!("Can not lock {err}");
+          }
+        }
+      }
     }
   }
 } // end impl

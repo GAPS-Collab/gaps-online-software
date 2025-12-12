@@ -3,7 +3,11 @@
 
 use ratatui::widgets::Tabs;
 use ratatui::text::{Span, Line};
-use ratatui::style::{Color, Modifier, Style};
+use ratatui::style::{
+  //Color,
+  Modifier,
+  Style
+};
 use ratatui::widgets::{Block, Borders};
 use ratatui::Frame;
 use ratatui::layout::Rect;
@@ -22,15 +26,12 @@ pub enum ActiveMenu {
   Monitoring,
   Heartbeats,
   Telemetry,
+  Commands,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum MenuItem {
   Home,
-  //Status,
-  //Alerts,
-  //Commands,
-  //Dashboard,
   TofEvents,
   TofSummary,
   TofHits,
@@ -114,6 +115,8 @@ pub enum UIMenuItem {
   Stream,
   MergedEvents, 
   GPS,
+  // Commands Menu
+  RunSettings,
 }
 
 impl UIMenuItem {
@@ -127,7 +130,8 @@ impl UIMenuItem {
       UIMenuItem::ReadoutBoards  => String::from("ReadoutBoards" ),
       UIMenuItem::Trigger        => String::from("Trigger"       ),
       UIMenuItem::Alerts         => String::from("Alerts"        ),
-      UIMenuItem::Monitoring     => String::from("Monitoring"    ),
+      // FIXME - adjust the value of the UIMenuItem
+      UIMenuItem::Monitoring     => String::from("TOF CPU"       ),
       UIMenuItem::Telemetry      => String::from("Telemetry"     ),
       UIMenuItem::Settings       => String::from("Settings"      ),
       UIMenuItem::Commands       => String::from("Commands"      ),
@@ -158,6 +162,7 @@ impl UIMenuItem {
       UIMenuItem::Stream         => String::from("Stream"),
       UIMenuItem::MergedEvents   => String::from("MergedEvents"),
       UIMenuItem::GPS            => String::from("GPS"),
+      UIMenuItem::RunSettings    => String::from("RunSettings"),
     // _ => String::from("Unknown"),
     } 
   }
@@ -534,6 +539,59 @@ impl PaddleMenu<'_> {
 //============================================
 
 #[derive(Debug, Clone)]
+pub struct CommandMenu<'a>  {
+  pub theme            : ColorTheme,
+  pub active_menu_item : UIMenuItem,
+  pub active_index     : usize, 
+  pub titles           : Vec<Line<'a>>,
+}
+
+impl UIMenu<'_> for CommandMenu<'_> {
+  
+  fn get_items() -> Vec<UIMenuItem> {
+    let items = vec![UIMenuItem::Back,
+                     UIMenuItem::RunSettings];
+    items
+  }
+
+  fn get_theme(&self) -> ColorTheme {
+    self.theme
+  }
+
+  fn set_active_idx(&mut self, idx : usize) {
+    self.active_index = idx;
+  }
+
+  fn get_active_idx(&self) -> usize {
+    self.active_index
+  }
+  
+  fn set_active_menu_item(&mut self, item : UIMenuItem) {
+    self.active_menu_item = item;
+  }
+  
+  fn get_active_menu_item(&self) -> UIMenuItem {
+    self.active_menu_item
+  }
+}
+
+impl CommandMenu<'_> {
+
+  pub fn new(theme : ColorTheme) -> Self {
+    let theme_c = theme.clone();
+    let titles  = Self::get_titles(theme_c);
+    Self {
+      theme,
+      active_index : 0,
+      titles,
+      active_menu_item : UIMenuItem::Back,
+    }
+  }
+}
+
+//============================================
+
+#[derive(Debug, Clone)]
 pub struct HBMenu<'a>  {
   pub theme            : ColorTheme,
   pub active_menu_item : UIMenuItem,
@@ -841,123 +899,6 @@ impl PAMoniMenu {
   }
 }
 
-#[derive(Debug, Clone)]
-pub struct RBMenu  {
-  pub theme : ColorTheme,
-  pub active_menu_item : RBMenuItem,
-}
-
-impl  RBMenu {
-
-  pub fn new(theme : ColorTheme) -> RBMenu {
-    RBMenu {
-      theme,
-      active_menu_item : RBMenuItem::Home,
-    }
-  }
-
-  pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
-    let menu_titles = vec!["Home", "Info", "Waveforms", "RBMoniData", "PAMoniData", "PBMoniData", "LTBMoniData", "SelectBoards [LTB & RB]", "Quit" ];
-    let menu : Vec<Line> = menu_titles
-               .iter()
-               .map(|t| {
-                 if t == &"PBMoniData" || t == &"Hits" {
-                   let (second, rest) = t.split_at(2);
-                   Line::from(vec![
-                     Span::styled(
-                       second,
-                       Style::default()
-                         .fg(self.theme.hc)
-                         .add_modifier(Modifier::UNDERLINED),
-                     ),
-                     Span::styled(rest, self.theme.style()),
-                   ])
-                 } else {
-                   let (first, rest) = t.split_at(1);
-                   Line::from(vec![
-                     Span::styled(
-                         first,
-                         Style::default()
-                             .fg(self.theme.hc)
-                             .add_modifier(Modifier::UNDERLINED),
-                     ),
-                     Span::styled(rest, self.theme.style()),
-                   ])
-                 }
-               })
-               .collect();
-
-    let tabs = Tabs::new(menu)
-        .select(usize::from(self.active_menu_item))
-        .block(Block::default().title("Menu").borders(Borders::ALL))
-        .style(self.theme.style())
-        .highlight_style(self.theme.highlight())
-        .divider(Span::raw("|"));
-    frame.render_widget(tabs, *main_window);
-  }
-}
-
-///////////////////////////////////////////
-
-#[derive(Debug, Copy, Clone)]
-pub enum SettingsMenuItem {
-  Home,
-  Quit
-}
-
-impl From<SettingsMenuItem> for usize {
-  fn from(input: SettingsMenuItem) -> usize {
-    match input {
-      SettingsMenuItem::Home          => 0,
-      SettingsMenuItem::Quit          => 1,
-    }   
-  }
-}
-
-#[derive(Debug, Clone)]
-pub struct SettingsMenu {
-  pub theme : ColorTheme,
-  pub active_menu_item : SettingsMenuItem,
-}
-
-impl  SettingsMenu {
-
-  pub fn new(theme : ColorTheme) -> SettingsMenu {
-    SettingsMenu {
-      theme,
-      active_menu_item : SettingsMenuItem::Home,
-    }
-  }
-
-  pub fn render(&mut self, main_window : &Rect, frame : &mut Frame) {
-    let menu_titles : Vec<&str> = vec!["Home", "Quit" ];
-    let menu : Vec<Line> = menu_titles
-               .iter()
-               .map(|t| {
-                 let (first, rest) = t.split_at(1);
-                 Line::from(vec![
-                   Span::styled(
-                       first,
-                       Style::default()
-                           .fg(Color::Yellow)
-                           .add_modifier(Modifier::UNDERLINED),
-                   ),
-                   Span::styled(rest, self.theme.style()),
-                 ])
-               })
-               .collect();
-
-    let tabs = Tabs::new(menu)
-        .select(usize::from(self.active_menu_item))
-        .block(Block::default().title("Menu").borders(Borders::ALL))
-        .style(self.theme.style())
-        .highlight_style(self.theme.highlight())
-        .divider(Span::raw("|"));
-    frame.render_widget(tabs, *main_window);
-  }
-}
-
-///////////////////////////////////////////
 
 #[derive(Debug, Copy, Clone)]
 pub enum TSMenuItem {

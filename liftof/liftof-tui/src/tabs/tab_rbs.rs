@@ -463,7 +463,7 @@ RBTab {
         if self.cali_loaded {
           match self.waveform_cache.get(&ev.header.rb_id).unwrap().get(&(ch + 1)).unwrap().lock() {
             Err(err)  => {
-              error!("Unable to lock waveform cache!");
+              error!("Unable to lock waveform cache! {err}");
             }
             Ok(mut cache) => {
               if cache.len() > 0 {
@@ -687,6 +687,55 @@ RBTab {
 
         ch_chunks.append(&mut ch_chunks_2);
         // the waveform plots
+        for ch in 0..8 {
+          match self.waveform_cache.get(&self.rb_selector).unwrap().get(&(ch as u8 + 1)).unwrap().lock() {
+            Err(_)  => {
+              error!("Unable to lock waveform cache!");
+            }
+            Ok(mut cache) => {
+              if cache.len() > 0 {
+                let mut wf = cache.pop_front().unwrap();
+                if wf.rb_id != self.rb_selector {
+                  error!("{} {}", wf.rb_id, self.rb_selector);
+                }
+                if self.cali_loaded { 
+                  let _ = wf.calibrate(&self.rb_calibration); 
+                  //if ev.header.get_rbpaddleid().is_a(ch + 1){
+                  for k in 0..wf.voltages_a.len() {
+                    let vals = (wf.nanoseconds_a[k] as f64, wf.voltages_a[k] as f64);
+                    self.ch_data[wf.rb_channel_a as usize][k] = vals;
+                  }
+                  //} else {
+                  for k in 0..wf.voltages_b.len() {
+                    let vals = (wf.nanoseconds_b[k] as f64, wf.voltages_b[k] as f64);
+                    self.ch_data[wf.rb_channel_b as usize][k] = vals;
+                  }
+                  //}
+                } else {
+                  //if ev.header.get_rbpaddleid().is_a(ch + 1){
+                  for k in 0..wf.adc_a.len() {
+                    let vals = (k as f64, wf.adc_a[k] as f64);
+                    self.ch_data[wf.rb_channel_a as usize][k] = vals;
+                  }
+                  //} else {
+                  for k in 0..wf.adc_b.len() {
+                    let vals = (k as f64, wf.adc_b[k] as f64);
+                    self.ch_data[wf.rb_channel_b as usize][k] = vals;
+                  }
+                  //}
+                  //for k in 0..ev.adc[ch as usize].len() {
+                  //  let vals = (k as f64, ev.adc[ch as usize][k] as f64);
+                  //  self.ch_data[ch as usize][k] = vals;
+                  //}
+                }
+              } else {
+                error!("Empty waveform cache for RB {}", self.rb_selector);
+                //continue;
+              }
+            }
+          } //else {
+        } 
+
         for ch in 0..9 {
           let label          = format!("Ch{}", ch + 1);
           let ch_tc_theme    = self.theme.clone();

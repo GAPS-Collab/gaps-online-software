@@ -3,8 +3,6 @@
 //! TofHits
 //!
 
-use std::mem;
-
 use std::collections::{
   HashMap,
   VecDeque,
@@ -305,7 +303,6 @@ impl PaddleTab<'_> {
         return Ok(());
       }
     }
-    return Ok(());
   }
 
   // Color::Blue was nice for background

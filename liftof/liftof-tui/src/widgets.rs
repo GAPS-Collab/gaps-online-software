@@ -20,7 +20,6 @@ use ratatui::widgets::{
     Borders,
 };
 
-//extern crate ndhistogram;
 use ndhistogram::{
     //ndhistogram,
     Histogram,
@@ -288,7 +287,7 @@ pub fn timeseries<'a>(data        : &'a mut VecDeque<(f64,f64)>,
 pub fn gauge(title : String,
              label : String,
              ratio : f64,
-             theme : &ColorTheme) -> LineGauge {
+             theme : &ColorTheme) -> LineGauge<'_> {
     let gauge = LineGauge::default()
       .block(
         Block::default()
