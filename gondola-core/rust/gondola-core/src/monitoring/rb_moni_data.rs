@@ -32,6 +32,7 @@ pub struct RBMoniData {
   pub mag_x              : f32,
   pub mag_y              : f32,
   pub mag_z              : f32,
+  pub lost_event_ids     : u32,
   pub drs_dvdd_voltage   : f32, 
   pub drs_dvdd_current   : f32,
   pub drs_dvdd_power     : f32,
@@ -79,6 +80,7 @@ impl RBMoniData {
       mag_x              : f32::MAX,
       mag_y              : f32::MAX,
       mag_z              : f32::MAX,
+      lost_event_ids     : u32::MAX,
       drs_dvdd_voltage   : f32::MAX, 
       drs_dvdd_current   : f32::MAX,
       drs_dvdd_power     : f32::MAX,
@@ -370,7 +372,9 @@ impl Serialization for RBMoniData {
     stream.extend_from_slice(&self.mag_y             .to_le_bytes()); 
     stream.extend_from_slice(&self.mag_z             .to_le_bytes());
     // padding - just for compatibility
-    stream.extend_from_slice(&0.0_f32                 .to_le_bytes());
+    //stream.extend_from_slice(&0.0_f32                 .to_le_bytes());
+    stream.extend_from_slice(&self.lost_event_ids     .to_le_bytes());
+    //stream.extend_from_slice(&0u16                    .to_le_bytes());
     stream.extend_from_slice(&self.drs_dvdd_voltage   .to_le_bytes()); 
     stream.extend_from_slice(&self.drs_dvdd_current   .to_le_bytes()); 
     stream.extend_from_slice(&self.drs_dvdd_power     .to_le_bytes()); 
@@ -417,8 +421,11 @@ impl Serialization for RBMoniData {
     moni_data.mag_x              = parse_f32(stream, pos); 
     moni_data.mag_y              = parse_f32(stream, pos); 
     moni_data.mag_z              = parse_f32(stream, pos); 
-    // compatibility, no mag_tot anymore
-    *pos += 4;
+    
+    // compatibility, no mag_tot anymore - we are using the 
+    // 4 bytes for different values now 
+    moni_data.lost_event_ids     = parse_u32(stream, pos);
+    //*pos += 2;
     moni_data.drs_dvdd_voltage   = parse_f32(stream, pos); 
     moni_data.drs_dvdd_current   = parse_f32(stream, pos); 
     moni_data.drs_dvdd_power     = parse_f32(stream, pos); 
@@ -467,6 +474,7 @@ impl FromRandom for RBMoniData {
     moni.mag_x              = rng.random::<f32>();
     moni.mag_y              = rng.random::<f32>();
     moni.mag_z              = rng.random::<f32>();
+    moni.lost_event_ids     = rng.random::<u32>();
     moni.drs_dvdd_voltage   = rng.random::<f32>(); 
     moni.drs_dvdd_current   = rng.random::<f32>();
     moni.drs_dvdd_power     = rng.random::<f32>();
@@ -714,5 +722,14 @@ fn monidata_rbmonidata() {
     assert!(data.get(k).is_some());
   }
   assert_eq!(data.get_board_id(), data.board_id);
+}
+
+#[test]
+#[cfg(feature="random")] 
+fn pack_rbmonidata() {
+  let data = RBMoniData::from_random();
+  for _ in 0..100 {
+    assert_eq!(data, data.pack().unpack().unwrap());
+  }
 }
 
