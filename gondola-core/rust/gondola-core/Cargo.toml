@@ -1,6 +1,6 @@
 [package]
 name = "gondola-core"
-version = "0.11.26"
+version = "0.11.33"
 edition = "2024"
 
 [lib]
@@ -79,6 +79,8 @@ criterion = "0.4"
 quickcheck = "1"
 
 [dependencies]
+#similar           = "2"
+diffy             = "0.4"
 comfy-table       = "7.1"
 zmq               = "0.10"
 signal-hook       = { version = "0.3", optional=true}
@@ -106,6 +108,7 @@ ureq              = "2.12" # FIXME - make this a feature
 polars            = { version = "0.51", features = ["lazy"], optional = true }
 pyo3-polars       = { version = "0.24", optional = true }
 env_logger        = "0.10"
+flate2            = "1.1"
 
 # for the database - in case we want to use postgres, 
 # the feature needs to be added here, however, this would
