@@ -5,7 +5,6 @@
 //! The main threads are for the Master Trigger,
 //! Event Builder and the Data sender.
 
-//use chrono::Utc;
 use std::collections::VecDeque; 
 
 use crossbeam_channel::Receiver;
@@ -19,20 +18,6 @@ use ratatui::widgets::{
   //BarChart,
 };
 
-//use tof_dataclasses::packets::{
-//  TofPacket,
-//  TofPacketType
-//};
-//
-//use tof_dataclasses::serialization::{
-//  SerializationError,
-//};
-//
-//use tof_dataclasses::heartbeats::{
-//  EVTBLDRHeartbeat,
-//  HeartBeatDataSink,
-//  MTBHeartbeat,
-//};
 use gondola_core::prelude::*;
 
 use crate::colors::ColorTheme;
@@ -61,6 +46,8 @@ pub struct HeartBeatTab {
   // containers for a bunch of nice looking plots
   pub ev_c_q     : VecDeque<(f64,f64)>,
   pub to_q       : VecDeque<(f64,f64)>,
+  // timeout for combo trigger events
+  pub to_combo_q : VecDeque<(f64,f64)>,
   pub mangl_q    : VecDeque<(f64,f64)>,
   pub rb_disc_q  : VecDeque<(f64,f64)>,
   pub lhit_fr_q  : VecDeque<(f64,f64)>,
@@ -87,6 +74,7 @@ impl HeartBeatTab{
   
       ev_c_q     : VecDeque::<(f64,f64)>::with_capacity(1000),
       to_q       : VecDeque::<(f64,f64)>::with_capacity(1000),
+      to_combo_q : VecDeque::<(f64,f64)>::with_capacity(1000),
       mangl_q    : VecDeque::<(f64,f64)>::with_capacity(1000),
       rb_disc_q  : VecDeque::<(f64,f64)>::with_capacity(1000),
       lhit_fr_q  : VecDeque::<(f64,f64)>::with_capacity(1000),
@@ -121,9 +109,13 @@ impl HeartBeatTab{
             if self.ev_c_q.len() > self.queue_size {
               self.ev_c_q.pop_front(); 
             }
-            self.to_q      .push_back((hb.met_seconds as f64,hb.get_timed_out_frac()*100.0));
+            self.to_q      .push_back((hb.met_seconds as f64,hb.get_timed_out_trigger_frac()*100.0));
             if self.to_q.len() > self.queue_size {
               self.to_q.pop_front(); 
+            }
+            self.to_combo_q.push_back((hb.met_seconds as f64,hb.get_timed_out_combo_frac()*100.0));
+            if self.to_combo_q.len() > self.queue_size {
+              self.to_combo_q.pop_front(); 
             }
             self.mangl_q   .push_back((hb.met_seconds as f64,hb.get_mangled_frac()*100.0));
             if self.mangl_q.len() > self.queue_size {
@@ -236,6 +228,16 @@ impl HeartBeatTab{
                                         &ts_to_theme);
         frame.render_widget(ts_to, hb_ev_rows_left[1]);
         
+        // combo time out event graph 
+        ts_label                 = String::from("Fraction of timed out events (combo) [%]");
+        let ts_to_combo_theme    = self.theme.clone();
+        let mut ts_to_combo_data = self.to_combo_q.clone(); 
+        let ts_to_combo          = timeseries(&mut ts_to_combo_data,
+                                               ts_label.clone(),
+                                               ts_label.clone(),
+                                               &ts_to_combo_theme);
+        frame.render_widget(ts_to_combo, hb_ev_rows_right[1]);
+        
         // data mangl graph 
         ts_label           = String::from("Fraction of mangled events [%]");
         let ts_dm_theme    = self.theme.clone();
@@ -274,7 +276,7 @@ impl HeartBeatTab{
                                            ts_label.clone(),
                                            ts_label.clone(),
                                            &ts_mtech_theme);
-        frame.render_widget(ts_mtech, hb_ev_rows_right[1]);
+        frame.render_widget(ts_mtech, hb_ev_rows_right[2]);
         
         // rbe incoming ch len
         ts_label              = String::from("Incoming RBE buffer len [#ets]");
@@ -284,7 +286,7 @@ impl HeartBeatTab{
                                            ts_label.clone(),
                                            ts_label.clone(),
                                            &ts_rbech_theme);
-        frame.render_widget(ts_rbech, hb_ev_rows_right[2]);
+        frame.render_widget(ts_rbech, hb_ev_rows_right[3]);
       
       }
       HeartBeatView::MTB => {

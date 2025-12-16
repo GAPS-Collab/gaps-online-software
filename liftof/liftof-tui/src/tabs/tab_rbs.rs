@@ -421,7 +421,7 @@ RBTab {
               self.moni_queue.add(moni);
               self.n_moni += 1;
               // capture the rate for the global rate window
-              self.global_rates.insert(moni.board_id, format!("{}",moni.rate));
+              self.global_rates.insert(moni.board_id, format!("{}[{:.1}]",moni.rate,100.0*moni.get_lost_event_ids_over_rate()));
                 
               if !self.met_queue_moni.contains_key(&moni.board_id) {
                 // FIXME - make the 1000 (which is queue size) a member
@@ -1418,12 +1418,12 @@ RBTab {
         let mut this_row = Vec::<Cell>::new();
         for k in rbids {
           let rb_cell = format!("RB {:02}",k);
-          if self.global_rates[k] == String::from("0") {
+          if self.global_rates[k] == String::from("0[0.0]") {
 
-            this_row.push(Cell::new(rb_cell).style(Style::new().fg(Color::Red).bold()));
+            this_row.push(Cell::new(rb_cell).style(Style::new().fg(Color::Red).bold().underlined().slow_blink()));
             this_row.push(Cell::new(format!("\u{203c} {} Hz", self.global_rates[k])).style(Style::new().fg(Color::Red).bold()));
           } else if self.global_rates[k] == "no data" {
-            this_row.push(Cell::new(rb_cell).style(Style::new().fg(Color::Red).bold()));
+            this_row.push(Cell::new(rb_cell).style(Style::new().fg(Color::Red).bold().underlined().slow_blink()));
             this_row.push(Cell::new(format!("\u{203c} {}", self.global_rates[k])).style(Style::new().fg(Color::Red).bold()));
           } else {
             this_row.push(Cell::new(rb_cell).style(Style::new().fg(Color::Green)));
