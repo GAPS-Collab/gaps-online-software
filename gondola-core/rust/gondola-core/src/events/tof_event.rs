@@ -176,11 +176,68 @@ impl TofEvent {
   pub fn age(&self) -> u64 {
     self.creation_time.elapsed().as_secs()
   }
-  
+ 
+  /// The expectedd RBs participating in this event as 
+  /// infered from the RB link ids coming from the MTB
+  pub fn get_expected_rbs(&self, mapping : &HashMap<u8,u8>) -> Vec<u8> {
+    let mut expected_rbs = Vec::<u8>::new();
+    for k in self.get_rb_link_ids() {
+      match mapping.get(&k) {
+        None => {
+          error!("Seeing unassociated link id {k}");
+        }
+        Some(rb_id) => {
+          expected_rbs.push(*rb_id);
+        }
+      }
+    }
+    expected_rbs 
+  }
+
   /// Simple check if the event contains as much RBEvents 
   /// as expected from the provided boards masks by the MTB
-  pub fn is_complete(&self) -> bool {
-    self.get_rb_link_ids().len() == self.rb_events.len()
+  pub fn is_complete(&mut self, exclude_rbs : Option<(&Vec<u8>,&DsiJChRbMapping)>) -> bool {
+    if exclude_rbs.is_none() {
+      return self.get_rb_link_ids().len() == self.rb_events.len();
+    } else {
+      let dead_rbs = exclude_rbs.unwrap();
+      let mut n_known_dead = 0usize;
+      let t_hits = self.get_trigger_hits();
+      for h in t_hits {
+        match dead_rbs.1.get(&h.0) {
+          None => {
+            continue;
+          }
+          Some(dsi) => {
+            match dsi.get(&h.1) {
+              None => {
+                continue;
+              }
+              Some(j) => {
+                match j.get(&h.2.0) {
+                  None => {
+                    continue;
+                  }
+                  Some(rb) => {
+                    if dead_rbs.0.contains(&rb) {
+                      n_known_dead += 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } // end loop over trigger hits
+        //  we use <= here, because sometimes, 
+        //  the link ids are wrong, so n_known_dead 
+        //  might be false positive
+      let n_rb_link_ids = self.get_rb_link_ids().len();
+      //if n_rb_link_ids <= self.rb_events.len() + n_known_dead {
+      //  self.status = EventStatus::KnownDeadRB; 
+      //}
+      return n_rb_link_ids <= self.rb_events.len() + n_known_dead;
+    }
   }
   
   /// The number of hits we did not get 
@@ -190,6 +247,8 @@ impl TofEvent {
     for rbev in &self.rb_events {
       if rbev.header.drs_lost_trigger() {
         let mut nhits = rbev.header.get_nchan() as u16;
+        // FIXME - I don't understand this - that would only work if the RB 
+        // sees 2 channels, that is 1 hit (?) Potential bug
         if nhits > 0 {
           nhits -= 1;
         }
@@ -1122,6 +1181,11 @@ impl TofEvent {
     (pids, twindows)
   }
  
+  /// The run id 
+  #[getter]
+  fn get_run_id(&self) -> u16 { 
+    self.run_id
+  }
 
   /// Remove all hits from the event's hit series which 
   /// do NOT obey causality. that is where the timings

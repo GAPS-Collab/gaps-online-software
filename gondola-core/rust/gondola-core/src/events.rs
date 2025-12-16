@@ -199,7 +199,8 @@ impl TriggerType {
     }
     t_types
   }
- pub fn to_u8(&self) -> u8 {
+ 
+  pub fn to_u8(&self) -> u8 {
     match self {
       TriggerType::Unknown => {
         return 0;
