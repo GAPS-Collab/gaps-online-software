@@ -1780,6 +1780,14 @@ impl RBCalibrations {
   fn check_py(&self) -> bool {
     self.check()
   }
+
+  #[pyo3(name="assemble_from_flightcal")]
+  #[staticmethod]
+  /// Re-assemble a RBCalibration from chopped up parts
+  pub fn assemble_from_flightcal_py(fcal_t : RBCalibrationFlightT,
+                                    fcal_v : RBCalibrationFlightV) -> Self {
+    Self::assemble_from_flightcal(fcal_t, fcal_v).unwrap()
+  }
 }
 
 #[cfg(feature = "pybindings")]
