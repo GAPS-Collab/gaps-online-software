@@ -196,7 +196,7 @@ pub fn get_event(bus                     : &mut IPBus)
       }
     }
   }
-
+  //println!("MTB packet {:?}", data);
   // ---------- FIll the MTBEvent now
   mte.event_id           = data[1];
   mte.mt_timestamp       = data[2];
@@ -206,8 +206,8 @@ pub fn get_event(bus                     : &mut IPBus)
   mte.mt_trigger_sources = ((data[5] & 0xffff0000) >> 16) as u16;
   //mte.get_trigger_sources();
   let rbmask = (data[7] as u64) << 32 | data[6] as u64; 
-  mte.mtb_link_mask  = rbmask;
-  mte.dsi_j_mask     = data[8];
+  mte.mtb_link_mask      = rbmask;
+  mte.dsi_j_mask         = data[8];
   for k in 9..9 + n_hit_words {
     let ltb_hits = data[k as usize];
     // split them up
@@ -813,7 +813,7 @@ pub fn master_trigger(mt_address     : &str,
         heartbeat.n_events += 1;
         // we have to make sure some of the fields get properly filled and 
         // "transfer" some of the mt_* fields to the fields which get actually serialzied 
-        let mt_timestamp           = _ev.get_mt_timestamp_abs();
+        let mt_timestamp       = _ev.get_mt_timestamp_abs();
         _ev.timestamp32        = (mt_timestamp  & 0x00000000ffffffff ) as u32;
         _ev.timestamp16        = ((mt_timestamp & 0x0000ffff00000000 ) >> 32) as u16;
         _ev.trigger_sources    = _ev.mt_trigger_sources; // FIXME

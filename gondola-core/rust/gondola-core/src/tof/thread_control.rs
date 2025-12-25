@@ -62,6 +62,8 @@ pub struct ThreadControl {
   /// initiate a MTB DAQ reset (if the queue is behind)
   pub reset_mtb_daq              : bool,
   pub liftof_settings            : LiftofSettings,
+  /// Have another variable to store bogus event ids on the RBs 
+  pub lost_event_ids             : f32,
 }
 
 impl ThreadControl {
@@ -93,6 +95,7 @@ impl ThreadControl {
       new_run_start_flag         : false,
       reset_mtb_daq              : false,
       liftof_settings            : LiftofSettings::new(),
+      lost_event_ids             : 0.0,
     }
   }
 }

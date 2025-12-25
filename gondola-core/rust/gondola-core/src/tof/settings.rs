@@ -800,6 +800,11 @@ pub struct TofEventBuilderSettings {
   pub greediness            : u8,
   pub wait_nrb              : u8,
   pub hb_send_interval      : u16,
+  /// Analyze the trigger hits and check if the hits are expected
+  /// from a known dead RB. if so, then adjust the expectation
+  /// of number of readoutboards by subtracting the number of 
+  /// expected dead boards from the seen rb_link_ids in this event
+  pub no_expect_dead_rbs    : Option<bool>,
   pub ignore_mtb_link_ids   : Option<Vec<u8>>,
   /// Allows to restrict saving the event to disk
   /// based on the interesting event parameters
@@ -840,6 +845,7 @@ impl TofEventBuilderSettings {
       wait_nrb              : 40,
       hb_send_interval      : 30,
       only_save_interesting : false,
+      no_expect_dead_rbs    : None,
       ignore_mtb_link_ids   : None,
       thr_n_hits_umb        : 0,
       thr_n_hits_cbe        : 0,
