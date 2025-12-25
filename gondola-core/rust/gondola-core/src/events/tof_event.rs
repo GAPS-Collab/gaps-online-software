@@ -1146,7 +1146,17 @@ impl FromRandom for TofEvent {
 #[cfg(feature="pybindings")]
 #[pymethods]
 impl TofEvent {
-  
+   
+  #[pyo3(name="strip_rbevents")]
+  fn strip_rbevents_py(&mut self) {
+    self.strip_rbevents()
+  }
+
+  #[pyo3(name="calc_gcu_variables")]
+  fn calc_gcu_variables_py(&mut self) {
+    self.calc_gcu_variables()
+  }
+
   /// Emit a copy of self
   fn copy(&self) -> Self {
     self.clone()
