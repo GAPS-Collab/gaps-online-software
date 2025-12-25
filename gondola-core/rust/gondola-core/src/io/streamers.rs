@@ -93,14 +93,15 @@ pub fn socket_wrap_telemetry(address     : &str,
   socket.set_subscribe(b"") .expect("Can't subscribe to any message on 0MQ socket! {err}");
   loop {
     match socket.recv_bytes(0) {
-      Err(err)    => error!("Can't receive TofPacket! {err}"),
+      Err(err)    => error!("Can't receive TelemetryPacket! {err}"),
       Ok(mut payload) => {
         match TelemetryPacketHeader::from_bytestream(&payload, &mut 0) {
           Err(err) => {
-            error!("Can not decode telemtry header! {err}");
-            //for k in pos - 5 .. pos + 5 {
-            //  println!("{}",stream[k]);
+            error!("Can not decode telemetry header! {err}");
+            //for k in 0..5 {
+            //  println!("{}",payload[k]);
             //}
+            continue;
           }
           Ok(header) => {
             let mut packet = TelemetryPacket::new();
