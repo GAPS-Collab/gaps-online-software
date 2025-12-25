@@ -103,5 +103,12 @@ shutdown_tofcpu     = _gc.tof.shutdown_tofcpu
 #shutdown_tofcpu.__module__ = __name__ 
 #shutdown_tofcpu.__name__   = 'shutdown_tofcpu'
 #
-
-
+run_action_alfa     = _gc.tof.run_action_alfa 
+run_action_bravo    = _gc.tof.run_action_bravo 
+run_action_charlie  = _gc.tof.run_action_charlie 
+run_action_whiskey  = _gc.tof.run_action_whiskey 
+run_action_tango    = _gc.tof.run_action_tango 
+run_action_foxtrott = _gc.tof.run_action_foxtrott
+request_liftof_setitngs = _gc.tof.request_liftof_settings
+apply_settings_diff     = _gc.tof.apply_settings_diff
+restore_default_config  = _gc.tof.restore_default_config
