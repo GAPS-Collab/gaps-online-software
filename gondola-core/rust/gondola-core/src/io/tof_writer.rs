@@ -8,6 +8,7 @@ use crate::prelude::*;
 /// Operates sequentially, packets can 
 /// be added one at a time, then will
 /// be synced to disk.
+#[cfg_attr(feature="pybindings", pyclass)]
 pub struct TofPacketWriter {
 
   pub file            : File,
@@ -33,6 +34,23 @@ pub struct TofPacketWriter {
   /// internal counter for bytes written in 
   /// this file
   file_nbytes_wr      : usize,
+}
+
+#[cfg(feature="pybindings")]
+#[pymethods]
+impl TofPacketWriter {
+
+#[new]
+  fn new_py(filename : String, runid : u32) -> PyResult<Self> {
+    let writer = TofPacketWriter::new(filename, FileType::RunFile(runid));
+    Ok(writer)
+  }
+
+  #[pyo3(name="add_tof_packet")]
+  pub fn add_tof_packet_py(&mut self, packet : &TofPacket) {
+    self.add_tof_packet(packet);
+  }
+
 }
 
 impl TofPacketWriter {

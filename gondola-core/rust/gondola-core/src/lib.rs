@@ -217,6 +217,7 @@ fn tof_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(run_action_tango, m)?)?;
   m.add_function(wrap_pyfunction!(run_action_foxtrott, m)?)?;
   m.add_function(wrap_pyfunction!(request_liftof_settings, m)?)?;
+  m.add_function(wrap_pyfunction!(restore_default_config, m)?)?;
   m.add_function(wrap_pyfunction!(apply_settings_diff, m)?)?;
   Ok(())
 }
@@ -314,6 +315,7 @@ fn io_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<CRReader>()?;
   m.add_class::<CRWriter>()?;
   m.add_class::<TofPacketReader>()?;
+  m.add_class::<TofPacketWriter>()?;
   m.add_class::<TelemetryPacketReader>()?;
   //m.add_class::<PyDataSource>()?;
   Ok(())

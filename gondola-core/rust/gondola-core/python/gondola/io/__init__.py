@@ -40,6 +40,9 @@ CRFrame.__name__              = 'CRFrame'
 TofPacketReader               = _gc.io.TofPacketReader
 TofPacketReader.__module__    = __name__ 
 TofPacketReader.__name__      = 'TofPacketReader'
+TofPacketWriter               = _gc.io.TofPacketWriter
+TofPacketWriter.__module__    = __name__ 
+TofPacketWriter.__name__      = 'TofPacketWriter'
 
 TelemetryPacketReader         = _gc.io.TelemetryPacketReader
 TelemetryPacketReader.__module__ = __name__ 
