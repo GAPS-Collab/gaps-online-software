@@ -437,6 +437,42 @@ macro_rules! moniseries {
         }
       }
       
+      /// Add an additional (Telemetry) file to the series 
+      ///
+      /// # Arguments:
+      ///   * filename    : The name of the (telemetry) file to add
+      fn add_telemetryfile(&mut self, filename : String) {
+        let reader = TelemetryPacketReader::new(filename, true, None, None);
+        for pack in reader {
+          if pack.header.packet_type == TelemetryPacketType::AnyTofHK {
+            let mut pos = 0;
+            // subtract the 2020/1/1 midnight from the gcutime to make 
+            // it f32
+            let gcutime = pack.header.get_gcutime() as u64;
+            match TofPacket::from_bytestream(&pack.payload, &mut pos) {
+              Err(err) => {
+                println!("Error unpackin! {err}");
+              }
+              Ok(tp) => {
+                if tp.packet_type == <$class>::TOF_PACKET_TYPE  {
+                  match tp.unpack::<$class>() {
+                    Err(err) => {
+                      println!("Error unpacking! {err}");
+                    }
+                    Ok(mut moni) => {
+                      self.add_timestamp(gcutime);
+                      moni.set_timestamp(gcutime - self.get_first_ts()); 
+                      self.add(moni);
+                      //self.timestamps.push(gcutime);
+                    }
+                  }
+                }
+              }
+            } 
+          }
+        }
+      }
+      
       /// Add an additional (Tof) file to the series 
       ///
       /// # Arguments:
