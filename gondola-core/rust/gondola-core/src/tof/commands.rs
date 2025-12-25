@@ -529,6 +529,16 @@ pub fn restart_liftofrb(rbs : Vec<u8>) -> Option<TofCommand> {
 /// Trigger the start of a new data run with 
 /// the next active config
 #[cfg_attr(feature="pybindings", pyfunction)]
+pub fn restore_default_config() -> Option<TofCommand> {
+  Some(TofCommand {
+    command_code : TofCommandCode::ResetConfigWDefault,
+    payload      : Vec::<u8>::new(),
+  })
+}
+
+/// Trigger the start of a new data run with 
+/// the next active config
+#[cfg_attr(feature="pybindings", pyfunction)]
 pub fn start_run() -> Option<TofCommand> {
   Some(TofCommand {
     command_code : TofCommandCode::DataRunStart,
@@ -804,41 +814,6 @@ pub fn change_tofrbconfig(cfg : &TofRBConfig) -> Option<TofCommand> {
 //#[pyo3(name="restart_liftofrb")]
 //pub fn py_restart_liftofrb(rbs : Vec<u8>) -> PyResult<TofCommand> {
 //  match restart_liftofrb(&rbs) {
-//    None => {
-//      return Err(PyValueError::new_err(format!("You encounterd a dragon \u{1f409}! We don't know what's going on either.")));
-//    }
-//    Some(cmd) => {
-//      let pycmd = TofCommand { 
-//       command : cmd
-//      };
-//      return Ok(pycmd);
-//    }
-//  }
-//}
-//
-///// Trigger the start of a new data run with 
-///// the next active config
-//#[pyfunction]
-//#[pyo3(name="start_run")]
-//pub fn py_start_run() -> PyResult<TofCommand> {
-//  match start_run() {
-//    None => {
-//      return Err(PyValueError::new_err(format!("You encounterd a dragon \u{1f409}! We don't know what's going on either.")));
-//    }
-//    Some(cmd) => {
-//      let pycmd = TofCommand { 
-//       command : cmd
-//      };
-//      return Ok(pycmd);
-//    }
-//  }
-//}
-//
-///// Stop the current active run and idle
-//#[pyfunction]
-//#[pyo3(name="stop_run")]
-//pub fn py_stop_run() -> PyResult<TofCommand> {
-//  match stop_run() {
 //    None => {
 //      return Err(PyValueError::new_err(format!("You encounterd a dragon \u{1f409}! We don't know what's going on either.")));
 //    }
