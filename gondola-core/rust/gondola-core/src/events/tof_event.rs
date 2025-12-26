@@ -276,23 +276,40 @@ impl TofEvent {
     }
   }
  
-  /// Calculate the infamous "interesting event" (TM Kaliroe) variables 
-  /// for the TOF. 
-  ///
-  /// This is necessary since the GCU is too weak to do math :) 
+  /// Calculate the TOF part of the interesting events mechanism, whcih is
+  /// NHIT (CBE, COR, UMB) and EDEP (CBE, COR, UMB)
   pub fn calc_gcu_variables(&mut self) {
-    for h in &self.hits {
-      if h.paddle_id <= 60 {
-        self.n_hits_cbe += 1;
-        self.tot_edep_cbe += h.get_edep();
+    if self.hits.len() == 0 {
+      for rbev in &self.rb_events {
+        for h in &rbev.hits {
+          if h.paddle_id <= 60 {
+            self.n_hits_cbe += 1;
+            self.tot_edep_cbe += h.get_edep();
+          }
+          else if h.paddle_id <= 108 && h.paddle_id > 60 {
+            self.n_hits_umb += 1;
+            self.tot_edep_umb += h.get_edep();
+          }
+          else {
+            self.n_hits_cor += 1;
+            self.tot_edep_cor += h.get_edep();
+          }
+        }
       }
-      else if h.paddle_id <= 108 && h.paddle_id > 60 {
-        self.n_hits_umb += 1;
-        self.tot_edep_umb += h.get_edep();
-      }
-      else {
-        self.n_hits_cor += 1;
-        self.tot_edep_cor += h.get_edep();
+    } else { 
+      for h in &self.hits {
+        if h.paddle_id <= 60 {
+          self.n_hits_cbe += 1;
+          self.tot_edep_cbe += h.get_edep();
+        }
+        else if h.paddle_id <= 108 && h.paddle_id > 60 {
+          self.n_hits_umb += 1;
+          self.tot_edep_umb += h.get_edep();
+        }
+        else {
+          self.n_hits_cor += 1;
+          self.tot_edep_cor += h.get_edep();
+        }
       }
     }
   }
@@ -1151,7 +1168,9 @@ impl TofEvent {
   fn strip_rbevents_py(&mut self) {
     self.strip_rbevents()
   }
-
+  
+  /// Calculate the TOF part of the interesting events mechanism, whcih is
+  /// NHIT (CBE, COR, UMB) and EDEP (CBE, COR, UMB)
   #[pyo3(name="calc_gcu_variables")]
   fn calc_gcu_variables_py(&mut self) {
     self.calc_gcu_variables()
