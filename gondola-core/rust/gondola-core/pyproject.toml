@@ -7,7 +7,7 @@ readme          = "README.md"
 license         = { text = "GPLV3" }
 requires-python = ">=3.11"
 dependencies = [
-    "tqdm>=4.0",    
+    "tqdm>=4.0",
     "numpy>=2.3",
     "matplotlib>=3.10",
     "charmingbeauty>=0.1",
@@ -18,6 +18,7 @@ dependencies = [
     "iminuit>=2",
     "polars>=1.33",
     "pyzmq>=27",
+    "twine>=6.2.0",
 ]
 
 [build-system]
@@ -34,8 +35,8 @@ Documentation = "https://gaps-collab.github.io/gaps-online-software/"
 #features     = ["pyo3/extension-module"]
 #all-features  = true
 features      = ["random","database","advanced-algorithms","pybindings","tof-liftof"]
-python-source = "python"
 module-name   = "gondola.gondola_core"
-
+#python-source = "."
+python-source = "python"
 
 
