@@ -102,9 +102,9 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
   if verification_active {
     // needs analysis engine since it relies on hits 
     run_analysis_engine = true;
-    println!("=> RUnning verfication!");
+    println!("=> Running verfication on board {board_id}!");
   } else {
-    println!("=> Not running verification!");
+    debug!("=> Not running verification!");
   }
   if run_analysis_engine {
     info!("Will run analysis engine!");
