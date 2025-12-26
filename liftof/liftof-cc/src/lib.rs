@@ -493,8 +493,9 @@ pub fn manage_liftof_cc_service(mode : &str) -> TofReturnCode {
 /// # Returns:
 ///
 ///   * A list of rb ids where the process failed
-pub fn ssh_command_rbs(rb_list : &Vec<u8>,
-                       cmd     : Vec<String>) -> Result<Vec<u8>, TofError> {
+pub fn ssh_command_rbs(rb_list         : &Vec<u8>,
+                       cmd             : Vec<String>,
+                       ignore_fail     : bool) -> Result<Vec<u8>, TofError> {
   let mut rb_handles       = Vec::<thread::JoinHandle<_>>::new();
   info!("=> Executing ssh command {:?} on {} RBs!", cmd, rb_list.len());
   let mut children = Vec::<(u8,Child)>::new();
@@ -552,8 +553,10 @@ pub fn ssh_command_rbs(rb_list : &Vec<u8>,
             info!("Execution of command on {} successful!", rb_child.0);
             break;
           } else {
-            error!("Execution of command on {} failed with exit code {:?}!", rb_child.0, status.code());
-            issues.push(rb_child.0);
+            if !ignore_fail {
+              error!("Execution of command on {} failed with exit code {:?}!", rb_child.0, status.code());
+              issues.push(rb_child.0);
+            }
             break;
           }
         }
@@ -577,7 +580,7 @@ pub fn restart_liftof_rb(rb_list : &Vec<u8>) {
                      String::from("restart"),
                      String::from("liftof")];
   println!("=> Restarting liftof-rb on RBs!");
-  match ssh_command_rbs(rb_list, command) {
+  match ssh_command_rbs(rb_list, command, false) {
     Err(err) => error!("Restarting liftof-rb on all RBs failed! {err}"),
     Ok(_)    => ()
   }
@@ -589,7 +592,7 @@ pub fn set_rbs_sma_mode(rb_list : &Vec<u8>) {
                      String::from("-s"),
                      String::from("sma")];
   println!("=> Calling rb-mode on RBs to set SMA mode!");
-  match ssh_command_rbs(rb_list, command) {
+  match ssh_command_rbs(rb_list, command, false) {
     Err(err) => error!("Calling rb-mode on all RBs failed! {err}"),
     Ok(_)    => ()
   }
@@ -598,10 +601,10 @@ pub fn set_rbs_sma_mode(rb_list : &Vec<u8>) {
 /// Restart liftof-rb on RBs
 pub fn rm_liftof_rb_logs(rb_list : &Vec<u8>) {
   let command = vec![String::from("rm"),
-                     String::from("/home/gaps/logs/liftof.log"),
-                     String::from("/home/gaps/logs/liftof.err")];
+                     String::from("/home/gaps/log/liftof.log"),
+                     String::from("/home/gaps/log/liftof.err")];
   println!("=> Deleting Logs on RBs!");
-  match ssh_command_rbs(rb_list, command) {
+  match ssh_command_rbs(rb_list, command, true) {
     Err(err) => debug!("Deleting logs on all RBs failed! {err}"),
     Ok(_)    => ()
   }

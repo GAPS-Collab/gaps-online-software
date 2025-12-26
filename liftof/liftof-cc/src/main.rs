@@ -36,8 +36,6 @@ use std::path::{
 };
 
 use clap::{
-  arg,
-  command,
   Parser
 };
 
@@ -210,7 +208,7 @@ fn main() {
         // check on all rats
         rb_list = get_rbratmap_hardcoded().keys().cloned().collect();
       }
-      match ssh_command_rbs(&rb_list, vec![String::from("date")]) {
+      match ssh_command_rbs(&rb_list, vec![String::from("date")], false) {
         Err(err) => {
           error!("Connecting to RBs over ssh failed! {}",  err);
         }
@@ -240,7 +238,7 @@ fn main() {
       let cmd_args     = vec![String::from("sudo"),
                               String::from("shutdown"),
                               String::from("now")]; 
-      match ssh_command_rbs(&rblist, cmd_args) {
+      match ssh_command_rbs(&rblist, cmd_args, false) {
         Ok(_)    => info!("SSH commands issued successfully!"),
         Err(err) => error!("Issues during ssh commanding! {err}")
       }
@@ -303,7 +301,18 @@ fn main() {
       config = _cfg;
     }
   }
-  
+  // we will also immediatly create a packet out of the config
+  let mut packed_config     = TofPacket::new();
+  packed_config.packet_type = TofPacketType::LiftofSettings;
+  let cfg_file_path         = PathBuf::from(&cfg_file_str);
+  match compress_toml(&cfg_file_path) {
+    Ok(bytes) => {
+      packed_config.payload = bytes;
+    }
+    Err(err) => {
+      error!("Unable to compress LiftofSettings from file {}! {}", cfg_file_str, err);
+    }
+  }
   // now as we have the config, initialize the thread control
   let db_path               = config.db_path.clone();
   // connecting to the database will set the $GONDOLA_DB_URL variable so that the database can be
@@ -313,6 +322,10 @@ fn main() {
   let mut rb_list           = ReadoutBoard::all().expect("Unable to retrieve RB information! Unable to continue, check db_path in the liftof settings (.toml) file and DB integrity!");
   let rb_ignorelist         = config.rb_ignorelist_always.clone();
   let rb_ignorelist_tmp     = config.rb_ignorelist_run.clone();
+  let dead_rb_ids           = config.rb_ignorelist_run.clone();  // if there is rbs which show up
+                                                                 // "dead" but don't even exist, we
+                                                                 // have more thatn a serious
+                                                                 // problem
   for k in 0..rb_ignorelist.len() {
     let bad_rb = rb_ignorelist[k];
     rb_list.retain(|x| x.rb_id != bad_rb);
@@ -386,9 +399,10 @@ fn main() {
   if rb_list.len() > 0 {
     println!(" -- -- {}", rb_list[0].rb_id); 
   }
-  for k in &rb_list {
-    print!("{}", k.rb_id);
-  }
+  //for k in &rb_list.iter().skip(1) {
+  //  print!(" {}", k.rb_id);
+  //}
+  println!("\n -- -- -- -- -- ");
   if rb_ignorelist_tmp.len() > 0 {
     println!("==> For this run, the following RB have been explicitly excluded in the config file");
     println!("{:?}", rb_ignorelist_tmp );
@@ -653,6 +667,7 @@ fn main() {
                                   &tp_to_sink_c,
                                   &te_to_sink,
                                   mtb_link_id_map,
+                                  dead_rb_ids,
                                   thread_control_eb);
      })
     .expect("Failed to spawn event-builder thread!");
@@ -762,7 +777,14 @@ fn main() {
     }
     _ => ()
   }
-  
+ 
+  // We now send the used config over 
+  match tp_to_sink.send(packed_config) {
+    Err(err) => error!("Unable to send LiftofSettings to data sink! {err}"),
+    Ok(_)    => ()
+  }
+
+
   // ---------------------------------------------------------
   // Now we have setup everything and we are ready to go
 
