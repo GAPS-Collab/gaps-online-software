@@ -33,51 +33,18 @@ use std::thread;
 use std::io::Write;
 use std::process::Command;
 use std::path::{
-  Path
+  Path,
+  PathBuf
 };
 
 use chrono::Utc;
 use clap::{
-  arg,
-  command,
   Parser
 };
   
-//use liftof_lib::{
-//  init_env_logger,
-//  LIFTOF_LOGO_SHOW,
-//  LiftofSettings,
-//};
-
 use std::time::{
   Duration,
 };
-
-//use tof_dataclasses::commands::{
-//  TofCommandV2,
-//  TofCommandCode,
-//  TofReturnCode
-//};
-//use tof_dataclasses::serialization::{
-//  Serialization,
-//  Packable
-//};
-//use tof_dataclasses::packets::{
-//  PacketType,
-//  TofPacket
-//};
-//use tof_dataclasses::database::{
-//  connect_to_db,
-//  ReadoutBoard,
-//};
-//use tof_dataclasses::commands::config::{
-//  TriggerConfig,
-//  TOFEventBuilderConfig,
-//  DataPublisherConfig,
-//  TofRunConfig,
-//  TofRBConfig
-//};
-//
 //use telemetry_dataclasses::packets::AckBfsw;
 use gondola_core::prelude::*;
 use gondola_core::init_env_logger;
@@ -164,7 +131,7 @@ fn main() {
   let staging_dir = config.staging_dir; 
   // This is the file we will edit 
   let cfg_file         = format!("{}/next/liftof-config.toml", staging_dir.clone());
-  let next_dir         = format!("{}/next", staging_dir.clone());
+  //let next_dir         = format!("{}/next", staging_dir.clone());
   let current_dir      = format!("{}/current", staging_dir.clone());
   let default_cfg_file = format!("{}/default/liftof-config-default.toml", staging_dir.clone());
   let db_path     = config.db_path.clone();
@@ -348,9 +315,12 @@ fn main() {
                   }
                 }
               }
+              // FIXME - we are mixing several approaches here, the "next" system 
+              // as well as the "upload config diff" system.
               TofCommandCode::ResetConfigWDefault => {
-                info!("Will reset {} with {}", cfg_file, default_cfg_file);
-                match copy_file_rename_liftof(&default_cfg_file, &next_dir) {
+                let this_cfg_file = "/home/gaps/staging/current/liftof-config.toml";
+                info!("Will reset {} with {}", this_cfg_file, default_cfg_file);
+                match copy_file_rename_liftof(&default_cfg_file, &current_dir) {
                   Ok(_)    => {
                     info!("Copy successful!");
                     success = TofReturnCode::Success;
@@ -544,6 +514,140 @@ fn main() {
                         success = TofReturnCode::Success;
                       }
                     }   
+                  }
+                }
+              }
+              // new command codes to execute custom shell scripts 
+              TofCommandCode::RunScriptAlfa => {
+                info!("Will execute run script action Alfa!");
+                let script_path = "/home/gaps/bin/scripts/run-script-alfa.sh";
+                let mut command = Command::new("bash");
+                command.arg(script_path);
+                let output = command.output().expect("Failed to execute script");
+                info!("Script stdout:\n{}", String::from_utf8_lossy(&output.stdout));
+                info!("Script stderr:\n{}", String::from_utf8_lossy(&output.stderr));
+                if output.status.success() {
+                  info!("Script executed successfully!");
+                  success = TofReturnCode::GeneralFail;
+                } else {
+                  error!("Script execution failed with status: {:?}", output.status.code());
+                  success = TofReturnCode::Success;
+                } 
+              }
+              TofCommandCode::RunScriptBravo => {
+                info!("Will execute run script action Bravo!");
+                let script_path = "/home/gaps/bin/scripts/run-script-bravo.sh";
+                let mut command = Command::new("bash");
+                command.arg(script_path);
+                let output = command.output().expect("Failed to execute script");
+                info!("Script stdout:\n{}", String::from_utf8_lossy(&output.stdout));
+                info!("Script stderr:\n{}", String::from_utf8_lossy(&output.stderr));
+                if output.status.success() {
+                  info!("Script executed successfully!");
+                  success = TofReturnCode::GeneralFail;
+                } else {
+                  error!("Script execution failed with status: {:?}", output.status.code());
+                  success = TofReturnCode::Success;
+                } 
+              }
+              TofCommandCode::RunScriptCharlie => {
+                info!("Will execute run script action Charlie!");
+                let script_path = "/home/gaps/bin/scripts/run-script-charlie.sh";
+                let mut command = Command::new("bash");
+                command.arg(script_path);
+                let output = command.output().expect("Failed to execute script");
+                info!("Script stdout:\n{}", String::from_utf8_lossy(&output.stdout));
+                info!("Script stderr:\n{}", String::from_utf8_lossy(&output.stderr));
+                if output.status.success() {
+                  info!("Script executed successfully!");
+                  success = TofReturnCode::GeneralFail;
+                } else {
+                  error!("Script execution failed with status: {:?}", output.status.code());
+                  success = TofReturnCode::Success;
+                } 
+              }
+              TofCommandCode::RunScriptWhiskey => {
+                info!("Will execute run script action Whiskey!");
+                let script_path = "/home/gaps/bin/scripts/run-script-whiskey.sh";
+                let mut command = Command::new("bash");
+                command.arg(script_path);
+                let output = command.output().expect("Failed to execute script");
+                info!("Script stdout:\n{}", String::from_utf8_lossy(&output.stdout));
+                info!("Script stderr:\n{}", String::from_utf8_lossy(&output.stderr));
+                if output.status.success() {
+                  info!("Script executed successfully!");
+                  success = TofReturnCode::GeneralFail;
+                } else {
+                  error!("Script execution failed with status: {:?}", output.status.code());
+                  success = TofReturnCode::Success;
+                } 
+              }
+              TofCommandCode::RunScriptTango => {
+                info!("Will execute run script action Tango!");
+                let script_path = "/home/gaps/bin/scripts/run-script-tango.sh";
+                let mut command = Command::new("bash");
+                command.arg(script_path);
+                let output = command.output().expect("Failed to execute script");
+                info!("Script stdout:\n{}", String::from_utf8_lossy(&output.stdout));
+                info!("Script stderr:\n{}", String::from_utf8_lossy(&output.stderr));
+                if output.status.success() {
+                  info!("Script executed successfully!");
+                  success = TofReturnCode::GeneralFail;
+                } else {
+                  error!("Script execution failed with status: {:?}", output.status.code());
+                  success = TofReturnCode::Success;
+                } 
+              }
+              TofCommandCode::RunScriptFoxtrott => {
+                info!("Will execute run script action Foxtrott!");
+                let script_path = "/home/gaps/bin/scripts/run-script-foxtrott.sh";
+                let mut command = Command::new("bash");
+                command.arg(script_path);
+                let output = command.output().expect("Failed to execute script");
+                info!("Script stdout:\n{}", String::from_utf8_lossy(&output.stdout));
+                info!("Script stderr:\n{}", String::from_utf8_lossy(&output.stderr));
+                if output.status.success() {
+                  info!("Script executed successfully!");
+                  success = TofReturnCode::GeneralFail;
+                } else {
+                  error!("Script execution failed with status: {:?}", output.status.code());
+                  success = TofReturnCode::Success;
+                } 
+              }
+              TofCommandCode::UploadConfigDiff => {
+                info!("Applying received patch to config file");
+                let compressed_diff = cmd.payload.clone();
+                info!("Received compressed diff {:?}", compressed_diff);
+                info!("Using config {}", "/home/gaps/staging/current/liftof-config.toml");
+                match apply_diff_to_file(compressed_diff, "/home/gaps/staging/current/liftof-config.toml") {
+                  Ok(_) => {
+                    success = TofReturnCode::Success;
+                  }
+                  Err(err) => {
+                    error!("Applying the patch failed! {err}");
+                    success = TofReturnCode::GeneralFail;
+                  }
+                }
+              }
+              TofCommandCode::RequestLiftofSettings => {
+                info!("Will stop/restart run to be able to send config file over socket");
+                if !dry_run {
+                  let mut pack     = TofPacket::new();
+                  pack.packet_type = TofPacketType::LiftofSettings;
+                  let current_config = PathBuf::from("/home/gaps/staging/current/liftof-config.toml");
+                  match compress_toml(&current_config) {
+                    Ok(payload) => {
+                      pack.payload = payload;
+                      success = TofReturnCode::Success;
+                    }
+                    Err(err) => {
+                      error!("Unable to compress liftof-settings! {err}");
+                      success = TofReturnCode::GeneralFail;
+                    }
+                  }
+                  match cmd_sender.send(pack.to_bytestream(), 0) {
+                    Ok(_)    => (),
+                    Err(err) => error!("Unable to send Liftof settings! {err}")
                   }
                 }
               }
