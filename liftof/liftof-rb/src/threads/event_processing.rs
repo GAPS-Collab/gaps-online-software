@@ -119,33 +119,34 @@ pub fn event_processing(board_id            : u8,
   // events?
   let mut skipped_events         = 0usize;
   let mut n_events               = 0usize;
-  let mut n_event_id_too_large   = 0usize; 
-  let mut n_event_id_zero        = 0usize;
+  let mut n_event_id_too_large   = 0u32; 
+  let mut n_event_id_zero        = 0u32;
   'main : loop {
     // FIXME - this whole loop needs to be faster, and there 
     // is no interactive commanding anymore.
     if thread_ctrl_check_timer.elapsed().as_secs() >= 6 {
-      if n_event_id_too_large > 0 {
-        error!("We saw {} events with an event id > 42e6 in the last 6 seconds!", n_event_id_too_large);
-        n_event_id_too_large = 0;
-      }
-      if n_event_id_zero > 0 {
-        error!("We saw {} events with an event id == 0 in the last 6 seconds!", n_event_id_zero);
-        n_event_id_zero = 0;
-      }
       match thread_control.lock() {
-        Ok(tc) => {
+        Ok(mut tc) => {
           if tc.stop_flag {
             info!("Received stop signal. Will stop thread!");
             break;
           }
           streamer.calc_crc32   = tc.liftof_settings.rb_settings.calc_crc32;
           deadtime_instead_temp = tc.liftof_settings.rb_settings.drs_deadtime_instead_fpga_temp; 
+          tc.lost_event_ids     = (n_event_id_zero + n_event_id_too_large) as f32 / n_events as f32;
         },
         Err(err) => {
           trace!("Can't acquire lock! {err}");
         },
       }
+      //if n_event_id_too_large > 0 {
+      //  error!("We saw {} events with an event id > 90000 in the last 6 seconds!", n_event_id_too_large);
+      //  //n_event_id_too_large = 0;
+      //}
+      //if n_event_id_zero > 0 {
+      //  error!("We saw {} events with an event id == 0 in the last 6 seconds!", n_event_id_zero);
+      //  //n_event_id_zero = 0;
+      //}
       thread_ctrl_check_timer = Instant::now();
     }
 
@@ -267,7 +268,7 @@ pub fn event_processing(board_id            : u8,
                   }
                   //println!("Got event id {}", event.header.event_id);
                   if event.header.event_id == 0 {
-                    error!("The current event id is 0!");
+                    //error!("The current event id is 0!");
                     //error!("Event {}", event);
                     //event.status = EventStatus::RBEventWacky;
                     n_event_id_zero += 1;
@@ -277,8 +278,9 @@ pub fn event_processing(board_id            : u8,
                     let delta_evid = event.header.event_id as i64 - last_event_id as i64;
                     
                     //if event.header.event_id > 42_000_000u32 {
+                    // 90000 -> at 100Hz, that is 15mins deviation
                     if i64::abs(delta_evid) > 90000 {
-                      error!("The event id deviates more than 90000 event ids from the last event id!");
+                      //error!("The event id deviates more than 90000 event ids from the last event id!");
                       //error!("Event {}", event);
                       //error!("Last Event {}", last_event);
                       //error!("The event id is larger than 42000000");

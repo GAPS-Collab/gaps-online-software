@@ -29,11 +29,7 @@ use signal_hook::consts::signal::{
 
 #[macro_use] extern crate log;
 
-use clap::{
-  arg,
-  command,
-  Parser
-};
+use clap::Parser;
 
 // FIXME - think about using 
 // bounded channels to not 
@@ -69,7 +65,6 @@ use liftof_rb::threads::{
 
 use liftof_rb::api::*;
 use liftof_rb::control::*;
-use tof_control::rb_control::rb_mode::select_sma_mode;
 
 #[derive(Debug, Clone, Parser, PartialEq)]
 pub enum CommandLineCommand {
@@ -307,7 +302,7 @@ fn main() {
           && ltb_cfg.set_ltb_thresholds {
           match connect_to_db_path(&db_path) {
             Err(err) => error!("Unable to connect to db! Can not set LTB thresholds! {err}"),
-            Ok(mut conn) => {
+            Ok(_) => {
               // LTB is connected to RB1
               //match RAT::where_rb1id(&mut conn, rb_id) {
               match rat_id { 
