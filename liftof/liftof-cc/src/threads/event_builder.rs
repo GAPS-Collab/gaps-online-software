@@ -55,37 +55,38 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
                       data_sink      : &Sender<TofPacket>,
                       data_sink_ev   : &Sender<TofEvent>,
                       mtb_link_map   : HashMap<u8,u8>,
+                      dead_rb_ids    : Vec<u8>,
                       thread_control : Arc<Mutex<ThreadControl>>) { 
   // set up the event builder. Since we are now doing settings only at run 
   // start, it is fine to do this outside of the loop
-  let mut send_tev_sum    : bool;
-  let mut send_rbwaveform : bool;
-  let mut send_rbwf_freq  : u32;
-  let mut rbwf_ctr        = 0u64;
+  //let mut send_tev_sum    : bool;
+  //let mut send_rbwaveform : bool;
+  //let mut send_rbwf_freq  : u32;
+  //let mut rbwf_ctr        = 0u64;
   let mut settings        : TofEventBuilderSettings;
   let mut run_id          : u32;
   // this can block it is fine bc it is only 
   // happening once at init
   let mut cali_active : bool;
   // two trigger types are possible, make the time out depending on them 
-  let mut primary_trigger   : TriggerType;
-  let mut secondary_trigger : TriggerType;
+  //let mut primary_trigger   : TriggerType;
+  let mut combo_trigger : TriggerType;
   // these are for debugging as long as we don't have the correct link ids working 
   // these should be +1 for orphans when they are dropped or in case of the link_ids 
   // when the events time out
   let mut weird_orphan_rbids    = HashMap::<u8, usize>::new();
-  let mut weird_rbe_link_ids    = HashMap::<u8, usize>::new();
+  //let mut weird_rbe_link_ids    = HashMap::<u8, usize>::new();
+  let mut dead_rbs    : Option<(&Vec<u8>, &DsiJChRbMapping)> = None;
+  let mut no_expect_dead_rbs    : bool;
   loop {
     match thread_control.lock() {
       Ok(tc) => {
-        send_rbwaveform   = tc.liftof_settings.data_publisher_settings.send_rbwaveform_packets;
-        send_tev_sum      = tc.liftof_settings.data_publisher_settings.send_tof_summary_packets;
-        send_rbwf_freq    = tc.liftof_settings.data_publisher_settings.send_rbwf_every_x_event;
-        settings          = tc.liftof_settings.event_builder_settings.clone();
-        run_id            = tc.run_id;
-        cali_active       = tc.calibration_active;
-        primary_trigger   = tc.liftof_settings.mtb_settings.trigger_type;
-        secondary_trigger = tc.liftof_settings.mtb_settings.global_trigger_type;
+        settings           = tc.liftof_settings.event_builder_settings.clone();
+        run_id             = tc.run_id;
+        cali_active        = tc.calibration_active;
+        //primary_trigger   = tc.liftof_settings.mtb_settings.trigger_type;
+        combo_trigger      = tc.liftof_settings.mtb_settings.global_trigger_type;
+        no_expect_dead_rbs = tc.liftof_settings.event_builder_settings.no_expect_dead_rbs.unwrap_or(false);
       }
       Err(err) => {
         error!("Can't acquire lock for ThreadControl! {err}");
@@ -100,6 +101,13 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
     }
   }
   info!("Will assign run id {} to events!", run_id);
+  let paddles   = TofPaddle::all().unwrap_or(Vec::<TofPaddle>::new());
+  let dsijrbmap = get_dsi_j_ch_rb_map(&paddles); 
+  //let all_rbs   = ReadoutBoard::all().unwrap_or(Vec::<ReadoutBoard>::new()); 
+  //let exprbmap  = get_linkid_rbid_map(&all_rbs);
+  if no_expect_dead_rbs {  
+    dead_rbs = Some((&dead_rb_ids, &dsijrbmap));
+  }
 
   // event caches for assembled events
   let mut heartbeat            = EventBuilderHB::new();
@@ -111,7 +119,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
   // debug
   let mut last_rb_evid         : u32;
   let mut n_rbe_per_te         = 0usize;
-  let mut debug_timer          = Instant::now();
+  //let mut debug_timer          = Instant::now();
   let mut check_tc_update      = Instant::now();
   let daq_reset_cooldown       = Instant::now();
   let reset_daq_flag           = false;
@@ -125,19 +133,25 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
   if let Some(ho) = settings.holdoff {
     // orphans, stfu
     while hb_timer.elapsed().as_secs() < ho as u64 {
-      let _foo = m_trig_ev.try_recv();
-      let _bar = ev_from_rb.try_recv();
+      while !m_trig_ev.is_empty() {
+        let _foo = m_trig_ev.try_recv();
+      }
+      while !ev_from_rb.is_empty() {
+        let _bar = ev_from_rb.try_recv();
+      }
     }
+    println!("=> EvtBldr starting m_trig_ev  len {}", m_trig_ev.len());
+    println!("=> EvtBldr starting ev_from_rb len {}", ev_from_rb.len());
     println!("=> EvtBldr passed holdoff time of {}", ho);
   }
   //------- DEBUG -- Measure the timing of the different parts 
   //------- of the loop
-  let mut mt_loop_time     = Instant::now();
-  let mut avg_mt_loop_time = 0u128;
-  let mut n_iter_mt_loop   = 0usize;
-  let mut rb_loop_time     = Instant::now();
-  let mut avg_rb_loop_time = 0u128;
-  let mut n_iter_rbe_loop  = 0usize;
+  //let mut mt_loop_time     = Instant::now();
+  //let mut avg_mt_loop_time = 0u128;
+  //let mut n_iter_mt_loop   = 0usize;
+  //let mut rb_loop_time     = Instant::now();
+  //let mut avg_rb_loop_time = 0u128;
+  //let mut n_iter_rbe_loop  = 0usize;
   let n_rbe_per_loop_default = settings.n_rbe_per_loop; 
   loop {
     if check_tc_update.elapsed().as_secs() > 2 {
@@ -183,7 +197,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
     }
     n_received = 0;
     while n_received < settings.n_mte_per_loop as usize {
-      mt_loop_time     = Instant::now(); 
+      //mt_loop_time     = Instant::now(); 
       // every iteration, we welcome a new master event
       //mt_loop_time = Instant::now(); 
       //if m_trig_ev.is_empty() {
@@ -203,7 +217,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
           if last_evid != 0 {
             if event.event_id != last_evid + 1 {
               if event.event_id > last_evid {
-                heartbeat.n_mte_skipped += (event.event_id - last_evid - 1) as u64;
+                heartbeat.n_mte_skipped += (event.event_id - last_evid - 1) as u32;
               }
             }
           }
@@ -216,10 +230,10 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
           heartbeat.n_mte_received_tot += 1;
         }
       } // end match Ok(mt)
-      avg_mt_loop_time += mt_loop_time.elapsed().as_nanos();
-      n_iter_mt_loop += 1;
+      //avg_mt_loop_time += mt_loop_time.elapsed().as_nanos();
+      //n_iter_mt_loop += 1;
     } // end getting MTEvents
-    trace!("Debug timer MTE received! {:?}", debug_timer.elapsed());
+    //trace!("Debug timer MTE received! {:?}", debug_timer.elapsed());
     // recycle that variable for the rb events as well
     n_received = 0;
     // The second receiver gets RBEvents from all ReadoutBoards. ReadoutBoard events are 
@@ -228,7 +242,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
     // ALWAYS later than the MTEvents.
     'main: while !ev_from_rb.is_empty() && n_received < settings.n_rbe_per_loop as usize {
       
-      rb_loop_time = Instant::now();
+      //rb_loop_time = Instant::now();
       match ev_from_rb.try_recv() {
         Err(err) => {
           error!("Can't receive RBEvent! Err {err}");
@@ -282,7 +296,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
                     let delta_evid = last_rb_evid - backend_evid;
                     error!("We can't associate event id {} from RB {} with a MTEvent in range {} .. {}. It is {} event ids ahead !", last_rb_evid, rb_ev.header.rb_id, event_id_cache[0], backend_evid, delta_evid);
                     debug!("{}", rb_ev);
-                    error!("Orphan could not be adopted within 5 mins. Kicking them out!");
+                    warn!("Orphan could not be adopted within 5 mins. Kicking them out!");
                     heartbeat.n_rbe_discarded_tot += 1;
                     heartbeat.n_rbe_orphan        += 1;
                     continue 'main
@@ -324,8 +338,8 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
         }
       }
       //thread::sleep(Duration::from_nanos(200)); 
-      avg_rb_loop_time += rb_loop_time.elapsed().as_nanos();
-      n_iter_rbe_loop  += 1;
+      //avg_rb_loop_time += rb_loop_time.elapsed().as_nanos();
+      //n_iter_rbe_loop  += 1;
     }
     // FIXME - timing debugging
     //let debug_timer_elapsed = debug_timer.elapsed().as_secs_f64();
@@ -374,64 +388,78 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
 
     let mut prior_ev_sent = 0u32;
     let mut first_ev_sent = false;
-
-    for idx in 0..event_id_cache.len() {
+    let timeout           = settings.te_timeout_sec as u64;  
+    // For the combo trigger, we can have a different timeout
+    // if it is not set, we use the same timeout as for the primary trigger
+    let combo_timeout = settings.te_timeout_sec_combo.unwrap_or(settings.te_timeout_sec) as u64;
+    let n_iter_max = event_id_cache.len() / 2;
+    for idx in 0..n_iter_max {
       // if there wasn't a first element, size would be 0
       let evid = event_id_cache.pop_front().unwrap();
-      match event_cache.get(&evid) {
+      match event_cache.get_mut(&evid) {
         None => {
           error!("Event id and event caches are misaligned for event id {}, idx {} and sizes {} {}! This is BAD and most likely a BUG!", evid, idx, event_cache.len(), event_id_cache.len());
           continue;
         },
         Some(ev) => {
-          let mut timeout = settings.te_timeout_sec as u64;  
+          let mut ev_timed_out = ev.age() >= timeout;
+          let mut is_combo     = false;
           for trg in &ev.get_trigger_sources() {
-            // the secondary trigger should superseed the primary trigger and only if 
+            // the combo trigger should superseed the primary trigger and only if 
             // we have the secondary trigger, we will apply the other timeout 
-            if trg == &secondary_trigger {
-              if let Some(to) = settings.te_timeout_sec_combo { 
-                timeout = to as u64;
+            if trg == &combo_trigger {
+              ev_timed_out = ev.age() >= combo_timeout;
+              is_combo     = true;
+              break;
+            }
+          }
+          // timed out events should be sent in any case
+          let is_complete = ev.is_complete(dead_rbs);
+          //let mut ready_to_send = ev_timed_out || is_complete;
+          let mut ready_to_send : bool;
+          // mangled events will be treated seperatly
+          if ev_timed_out && !is_complete && !ev.has_any_mangling() {
+            //if !ev.is_complete(dead_rbs) {
+              if is_combo {
+                heartbeat.n_timed_out_combo += 1;
+                //println!("Ev {} timed out! ({} total) Seen rb events {}, expected {} link ids", ev.event_id, heartbeat.n_timed_out_combo, ev.rb_events.len(), ev.get_rb_link_ids().len());
+              } else {
+                heartbeat.n_timed_out += 1;
+                //println!("GAPS Ev {} timed out! ({} total) Seen rb events {}, expected {} link ids! Expected RBs {:?}", ev.event_id, heartbeat.n_timed_out, ev.rb_events.len(), ev.get_rb_link_ids().len(), ev.get_expected_rbs(&exprbmap));
+              }
+              // let's check the rb_link_ids here and let's check which one is missing
+              //for l_id in ev.get_rb_link_ids() {
+              //  if weird_rbe_link_ids.contains_key(&l_id) {
+              //    *weird_rbe_link_ids.get_mut(&l_id).unwrap() += 1;
+              //  } else {
+              //    weird_rbe_link_ids.insert(l_id, 1);
+              //  }
+              //}
+            //}
+          } // else {
+          // we are earlier than our time out, maybe the 
+          // event is already complete
+          ready_to_send = ev_timed_out;
+          match settings.build_strategy {
+            BuildStrategy::WaitForNBoards => {
+              // we will always wait for the expected number of boards, 
+              // except the event times out
+              if ev.rb_events.len() as u8 == settings.wait_nrb {
+                ready_to_send = true;
+              } // else ready_to_send is still false 
+            },
+            BuildStrategy::Adaptive 
+            | BuildStrategy::AdaptiveThorough
+            | BuildStrategy::AdaptiveGreedy
+            | BuildStrategy::Smart 
+            | BuildStrategy::Unknown => {
+              if ev.is_complete(dead_rbs) {
+                //println!("EV HAS {} RBEVENTS", ev.rb_events.len());
+                ready_to_send = true;
               }
             }
           }
-          let ev_timed_out = ev.age() >= timeout;
-          // timed out events should be sent in any case
-          let mut ready_to_send = ev_timed_out;
-          if ev_timed_out {
-            if !ev.is_complete() {
-              heartbeat.n_timed_out += 1;
-              // let's check the rb_link_ids here and let's check which one is missing
-              for l_id in ev.get_rb_link_ids() {
-                if weird_rbe_link_ids.contains_key(&l_id) {
-                  *weird_rbe_link_ids.get_mut(&l_id).unwrap() += 1;
-                } else {
-                  weird_rbe_link_ids.insert(l_id, 1);
-                }
-              }
-            }
-          } else {
-            // we are earlier than our time out, maybe the 
-            // event is already complete
-            match settings.build_strategy {
-              BuildStrategy::WaitForNBoards => {
-                // we will always wait for the expected number of boards, 
-                // except the event times out
-                if ev.rb_events.len() as u8 == settings.wait_nrb {
-                  ready_to_send = true;
-                } // else ready_to_send is still false 
-              },
-              BuildStrategy::Adaptive 
-              | BuildStrategy::AdaptiveThorough
-              | BuildStrategy::AdaptiveGreedy
-              | BuildStrategy::Smart 
-              | BuildStrategy::Unknown => {
-                if ev.is_complete() {
-                  //println!("EV HAS {} RBEVENTS", ev.rb_events.len());
-                  ready_to_send = true;
-                }
-              }
-            }
-          } 
+          //} 
           // this feature tries to sort the events which are getting sent
           // by id. This might lead to timed out events and more resources needed
           if settings.sort_events {
@@ -467,7 +495,11 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
             // we should have an eye on performance though
             //idx_to_remove.push(idx);
             let mut ev_to_send = event_cache.remove(&evid).unwrap();
-            if ev_timed_out {
+            let is_mangled     = ev_to_send.has_any_mangling(); 
+            if is_mangled {
+              heartbeat.data_mangled_ev += 1;
+            }
+            if ev_timed_out && !is_mangled {
               ev_to_send.status = EventStatus::EventTimeOut;
             }
             //if send_rbwaveform {
@@ -492,51 +524,53 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
             // (optionally) produced tof event summary if the 
             // event has isuses
             n_rbe_per_te  += ev_to_send.rb_events.len();
-            if ev_to_send.has_any_mangling() {
-              heartbeat.data_mangled_ev += 1;
-            }
             // sum up lost hits due to drs4 deadtime
-            heartbeat.drs_bsy_lost_hg_hits += ev_to_send.get_lost_hits() as u64;
+            heartbeat.drs_bsy_lost_hg_hits += ev_to_send.get_lost_hits() as u32;
 
             //println!("GOT {} ", ev_to_send.hits.len());
             heartbeat.n_sent += 1;
-            let mut no_write_to_disk = false;
-            let no_send_over_nw  = false; 
-            if send_tev_sum {
-              //let tes  = ev_to_send.get_summary();
-              // FIXME - these might be all zero!
-              //if settings.only_save_interesting {
-              //  no_write_to_disk = true;
-              //  if ev_to_send.n_hits_umb   >= settings.thr_n_hits_umb 
-              //  && ev_to_send.n_hits_cbe   >= settings.thr_n_hits_cbe
-              //  && ev_to_send.n_hits_cor   >= settings.thr_n_hits_cor
-              //  && ev_to_send.tot_edep_umb >= settings.thr_tot_edep_umb
-              //  && ev_to_send.tot_edep_cbe >= settings.thr_tot_edep_cbe
-              //  && ev_to_send.tot_edep_cor >= settings.thr_tot_edep_cor {
-              //    no_write_to_disk = false;
-              //  }
-              //}
-              //for wf in ev_to_send.get_waveforms() {
-              //  println!( "FS {} ", wf);
-              //}
-              //for ev in &ev_to_send.rb_events {
-              //   println!("{:?}", ev.hits);
-              //}
-              // Right now we want version V3 (which should already 
-              // be set), so it saves waveforms 
-              // FIXME - this all should go to the data_publsher
-              ev_to_send.version = ProtocolVersion::V3;
-              //let mut pack = ev_to_send.pack();
-              //pack.no_write_to_disk = no_write_to_disk;
-              match data_sink_ev.send(ev_to_send) {
-                Err(err) => {
-                  error!("Packet sending failed! Err {}", err);
-                }
-                Ok(_)    => {
-                  
-                  debug!("Event with id {} sent!", evid);
-                }
+            if is_combo {
+              heartbeat.n_sent_combo_trigger += 1;
+            } else {
+              heartbeat.n_sent_trigger += 1;
+            }
+            //let mut no_write_to_disk = false;
+            //let no_send_over_nw  = false; 
+            //if send_tev_sum {
+            //let tes  = ev_to_send.get_summary();
+            // FIXME - these might be all zero!
+            //if settings.only_save_interesting {
+            //  no_write_to_disk = true;
+            //  if ev_to_send.n_hits_umb   >= settings.thr_n_hits_umb 
+            //  && ev_to_send.n_hits_cbe   >= settings.thr_n_hits_cbe
+            //  && ev_to_send.n_hits_cor   >= settings.thr_n_hits_cor
+            //  && ev_to_send.tot_edep_umb >= settings.thr_tot_edep_umb
+            //  && ev_to_send.tot_edep_cbe >= settings.thr_tot_edep_cbe
+            //  && ev_to_send.tot_edep_cor >= settings.thr_tot_edep_cor {
+            //    no_write_to_disk = false;
+            //  }
+            //}
+            //for wf in ev_to_send.get_waveforms() {
+            //  println!( "FS {} ", wf);
+            //}
+            //for ev in &ev_to_send.rb_events {
+            //   println!("{:?}", ev.hits);
+            //}
+            // Right now we want version V3 (which should already 
+            // be set), so it saves waveforms 
+            // FIXME - this all should go to the data_publsher
+            ev_to_send.version = ProtocolVersion::V3;
+            //let mut pack = ev_to_send.pack();
+            //pack.no_write_to_disk = no_write_to_disk;
+            match data_sink_ev.send(ev_to_send) {
+              Err(err) => {
+                error!("Packet sending failed! Err {}", err);
               }
+              Ok(_)    => {
+                
+                debug!("Event with id {} sent!", evid);
+              }
+            //}
             }
 
             //if 
@@ -550,22 +584,22 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
     } // end loop over event_id_cache
     if hb_timer.elapsed() >= hb_interval {
       // print the statistics for the weird orphans 
-      println!("=> Weird orphan statistics. Here is a map of rb_id -> N_orphans (which ended up in the gutter)");
-      println!("=> {:?}", weird_orphan_rbids);
-      println!("-- -- -- -- -- -- -- -- -- -- -- --");
+      //println!("=> Weird orphan statistics. Here is a map of rb_id -> N_orphans (which ended up in the gutter)");
+      //println!("=> {:?}", weird_orphan_rbids);
+      //println!("-- -- -- -- -- -- -- -- -- -- -- --");
 
       // make sure the heartbeat has the latest mission elapsed time
       heartbeat.met_seconds         += hb_timer.elapsed().as_secs_f64() as u64;// as usize;
       // get the length of the various caches at this moment in time
-      heartbeat.event_cache_size     = event_cache.len()    as u64;
-      heartbeat.event_id_cache_size  = event_id_cache.len() as u64;
-      heartbeat.mte_receiver_cbc_len = m_trig_ev.len()      as u64;
-      heartbeat.rbe_receiver_cbc_len = ev_from_rb.len()     as u64;
-      heartbeat.tp_sender_cbc_len    = data_sink.len()      as u64;
+      heartbeat.event_cache_size     = event_cache.len()    as u32;
+      heartbeat.event_id_cache_size  = event_id_cache.len() as u32;
+      heartbeat.mte_receiver_cbc_len = m_trig_ev.len()      as u32;
+      heartbeat.rbe_receiver_cbc_len = ev_from_rb.len()     as u32;
+      heartbeat.tp_sender_cbc_len    = data_sink.len()      as u32;
 
       let pack         = heartbeat.pack();
-      println!("Avg mt loop time {}", avg_mt_loop_time as f64/n_iter_mt_loop as f64);
-      println!("Avg rb loop time {}", avg_rb_loop_time as f64/n_iter_rbe_loop as f64);
+      //println!("Avg mt loop time {}", avg_mt_loop_time as f64/n_iter_mt_loop as f64);
+      //println!("Avg rb loop time {}", avg_rb_loop_time as f64/n_iter_rbe_loop as f64);
 
       match data_sink.send(pack) {
         Err(err) => {
@@ -587,11 +621,12 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
       //let expired_sec = settings.rbe_purge_ev_time1.unwrap_or(30) as u64;
       //if ev_from_rb.len() > pl as usize {
       settings.n_rbe_per_loop = n_rbe_per_loop_default;
-      for k in 0..ev_from_rb.capacity().unwrap_or(20000) {
+      for _k in 0..ev_from_rb.capacity().unwrap_or(20000) {
         match ev_from_rb.try_recv() {
           Err(_) => (), 
-          Ok(ev) => {
+          Ok(_ev) => {
             ////FIXME - what to do with these?
+            // We should probalby tell the heartbeat how many we have purged?
             //if ev.creation_time.is_some() {
             //  if ev.creation_time.unwrap().elapsed().as_secs() < expired_sec {
             //    match orphanage.send(ev) {
@@ -624,7 +659,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
       let expired_sec = settings.rbe_purge_ev_time1.unwrap_or(30) as u64;
       if ev_from_rb.len() > pl as usize {
         settings.n_rbe_per_loop = n_rbe_per_loop_default;
-        for k in 0..purge {
+        for _k in 0..purge {
           match ev_from_rb.recv() {
             Err(_) => (), 
             Ok(ev) => {
@@ -747,7 +782,7 @@ pub fn event_builder (m_trig_ev      : &Receiver<TofEvent>,
       // failsafe
       settings.n_rbe_per_loop = 40;
     }
-    heartbeat.n_rbe_per_loop = settings.n_rbe_per_loop as u64;
+    heartbeat.n_rbe_per_loop = settings.n_rbe_per_loop as u32;
   } // end loop
 }  
 

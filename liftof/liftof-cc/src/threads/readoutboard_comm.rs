@@ -83,7 +83,7 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
    Ok(_)    => info!("Subscribed to {:?}!", topic),
   }
   let mut tc_timer = Instant::now();
-  let mut verification_active = false;
+  let verification_active : bool;
   
   let ae_settings         : AnalysisEngineSettings; 
   let mut run_analysis_engine : bool;
