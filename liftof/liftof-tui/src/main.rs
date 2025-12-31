@@ -1,9 +1,9 @@
 //! Interactive display for the tof system for the 
 //! GAPS experiment
 //!
-//!
-//!
-//!
+//! liftof-tui can hook up to any kind of 
+//! stream of tof/telemetry packets
+//! and will show interactive displays
 
 use std::sync::{
     Arc,
@@ -585,16 +585,6 @@ impl<'a> TabbedInterface<'a> {
               _ => ()
             }
           }
-          //ActiveMenu::Trigger => {
-          //  match self.mt_menu.get_active_menu_item() {
-          //    UIMenuItem::Back => {
-          //      self.ui_menu.set_active_menu_item(UIMenuItem::Home);
-          //      self.ui_menu.active_menu_item = MenuItem::Home;
-          //      self.active_menu = ActiveMenu::MainMenu;
-          //    }
-          //    _ => ()
-          //  }
-          //}
           ActiveMenu::Paddles => {
             match self.pd_tab.menu.get_active_menu_item() {
               UIMenuItem::Back => {
@@ -614,16 +604,6 @@ impl<'a> TabbedInterface<'a> {
               _ => ()
             }
           }
-          //ActiveMenu::Monitoring => {
-          //  match self.mo_menu.get_active_menu_item() {
-          //    UIMenuItem::Back => {
-          //      self.ui_menu.set_active_menu_item(UIMenuItem::Home);
-          //      self.ui_menu.active_menu_item = MenuItem::Home;
-          //      self.active_menu = ActiveMenu::MainMenu;
-          //    }
-          //    _ => ()
-          //  }
-          //}
           ActiveMenu::Heartbeats => {
             match self.hb_menu.get_active_menu_item() {
               UIMenuItem::Back => {
@@ -661,15 +641,15 @@ impl<'a> TabbedInterface<'a> {
                 info!("Setting active menu to RBMenu!");
                 self.active_menu = ActiveMenu::RBMenu;
               }
-              UIMenuItem::Trigger => {
-                self.active_menu = ActiveMenu::Trigger;
-              }
+              //UIMenuItem::Trigger => {
+              //  self.active_menu = ActiveMenu::Trigger;
+              //}
               UIMenuItem::Events => {
                 self.active_menu = ActiveMenu::Events;
               }
-              UIMenuItem::Monitoring => {
-                self.active_menu = ActiveMenu::Monitoring;
-              }
+              //UIMenuItem::Monitoring => {
+              //  self.active_menu = ActiveMenu::Monitoring;
+              //}
               UIMenuItem::Paddles => {
                 self.active_menu = ActiveMenu::Paddles;
               }
