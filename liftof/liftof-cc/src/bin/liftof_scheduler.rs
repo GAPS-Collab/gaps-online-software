@@ -304,7 +304,7 @@ fn main() {
                                         String::from("shutdown"),
                                         String::from("now")]; 
                 if !args.dry_run {
-                  match ssh_command_rbs(&cmd_rb_list, cmd_args) {
+                  match ssh_command_rbs(&cmd_rb_list, cmd_args, false) {
                     Err(err) => {
                       error!("SSh-ing into RBs {:?} failed! {err}", cmd_rb_list);
                       success = TofReturnCode::GeneralFail;
@@ -351,7 +351,7 @@ fn main() {
                                         String::from("shutdown"),
                                         String::from("now")]; 
                 if !args.dry_run {
-                  match ssh_command_rbs(&cmd_rb_list, cmd_args) {
+                  match ssh_command_rbs(&cmd_rb_list, cmd_args, false) {
                     Err(err) => {
                       error!("SSh-ing into RBs {:?} failed! {err}", cmd_rb_list);
                       success = TofReturnCode::GeneralFail;
@@ -432,27 +432,27 @@ fn main() {
                   }
                 }
               }
-              TofCommandCode::SetTOFEventBuilderConfig => {
-                info!("Will change tof event builder config for next run!");
-                match TOFEventBuilderConfig::from_bytestream(&cmd.payload, &mut 0) {
-                  Err(err) => error!("Unable to extract TofEventBuilderConfig from command! {err}"),
-                  Ok(tcf)  => {
-                    info!("Received config {}",tcf);
-                    match LiftofSettings::from_toml(&cfg_file) {
-                      Err(err) => {
-                        error!("CRITICAL! Unable to parse .toml settings file! {}", err);
-                        success = TofReturnCode::GeneralFail;
-                      }
-                      Ok(mut config) => {
-                        config.event_builder_settings.from_tofeventbuilderconfig(&tcf);
-                        info!("We changed the event builder settings to be this {}",config.event_builder_settings);
-                        config.to_toml(String::from(cfg_file.clone()));
-                        success = TofReturnCode::Success;
-                      }
-                    }   
-                  }
-                }
-              }
+              //TofCommandCode::SetTOFEventBuilderConfig => {
+              //  info!("Will change tof event builder config for next run!");
+              //  match TOFEventBuilderConfig::from_bytestream(&cmd.payload, &mut 0) {
+              //    Err(err) => error!("Unable to extract TofEventBuilderConfig from command! {err}"),
+              //    Ok(tcf)  => {
+              //      info!("Received config {}",tcf);
+              //      match LiftofSettings::from_toml(&cfg_file) {
+              //        Err(err) => {
+              //          error!("CRITICAL! Unable to parse .toml settings file! {}", err);
+              //          success = TofReturnCode::GeneralFail;
+              //        }
+              //        Ok(mut config) => {
+              //          config.event_builder_settings.from_tofeventbuilderconfig(&tcf);
+              //          info!("We changed the event builder settings to be this {}",config.event_builder_settings);
+              //          config.to_toml(String::from(cfg_file.clone()));
+              //          success = TofReturnCode::Success;
+              //        }
+              //      }   
+              //    }
+              //  }
+              //}
               TofCommandCode::SetTofRunConfig => {
                 info!("Will change tof run config for next run!");
                 match TofRunConfig::from_bytestream(&cmd.payload, &mut 0) {
