@@ -29,43 +29,6 @@ pub enum ActiveMenu {
   Commands,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq)]
-pub enum MenuItem {
-  Home,
-  TofEvents,
-  TofSummary,
-  TofHits,
-  RBWaveform,
-  ReadoutBoards,
-  MasterTrigger,
-  TOFCpu, 
-  Telemetry,
-  Settings,
-  Quit,
-}
-
-
-impl From<MenuItem> for usize {
-  fn from(input: MenuItem) -> usize {
-    match input {
-      MenuItem::Home          => 0,
-      MenuItem::TofEvents     => 1,
-      MenuItem::ReadoutBoards => 2,
-      MenuItem::TofSummary    => 3,
-      MenuItem::RBWaveform    => 4,
-      MenuItem::TofHits       => 5,
-      //MenuItem::Alerts        => 2,
-      //MenuItem::Commands      => 3,
-      //MenuItem::Dashboard     => 4,
-      MenuItem::MasterTrigger => 6,
-      MenuItem::TOFCpu        => 7,
-      MenuItem::Telemetry     => 8,
-      MenuItem::Settings      => 9,
-      MenuItem::Quit          => 10,
-    }   
-  }
-}
-
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum UIMenuItem {
@@ -235,7 +198,7 @@ pub struct MainMenu<'a> {
   pub theme             : ColorTheme,
   pub active_index      : usize,
   pub titles            : Vec<Line<'a>>,
-  pub active_menu_item  : MenuItem,
+  //pub active_menu_item  : MenuItem,
   pub active_menu_item2 : UIMenuItem,
 }
 
@@ -285,7 +248,7 @@ impl MainMenu<'_> {
       theme : theme_cl,
       active_index : 0,
       titles,
-      active_menu_item : MenuItem::Home,
+      //active_menu_item : MenuItem::Home,
       active_menu_item2 : UIMenuItem::Home,
     }
   }
@@ -296,7 +259,7 @@ impl MainMenu<'_> {
 #[derive(Debug, Clone)]
 pub struct RBMenu2<'a>  {
   pub theme             : ColorTheme,
-  pub active_menu_item  : RBMenuItem,
+  //pub active_menu_item  : RBMenuItem,
   pub active_menu_item2 : UIMenuItem,
   pub active_index      : usize, 
   pub titles            : Vec<Line<'a>>,
@@ -372,7 +335,7 @@ impl  RBMenu2<'_> {
       theme,
       active_index : 0,
       titles,
-      active_menu_item : RBMenuItem::Home,
+      //active_menu_item : RBMenuItem::Home,
       active_menu_item2 : UIMenuItem::Home,
     }
   }

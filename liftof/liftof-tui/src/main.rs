@@ -59,7 +59,7 @@ use gondola_core::prelude::*;
 
 use liftof_tui::menu::{
   UIMenuItem,
-  MenuItem,
+  //MenuItem,
   MainMenu,
   TriggerMenu,
   EventMenu,
@@ -579,7 +579,7 @@ impl<'a> TabbedInterface<'a> {
             match self.te_menu.get_active_menu_item() {
               UIMenuItem::Back => {
                 self.ui_menu.set_active_menu_item(UIMenuItem::Home);
-                self.ui_menu.active_menu_item = MenuItem::Home;
+                //self.ui_menu.active_menu_item = MenuItem::Home;
                 self.active_menu = ActiveMenu::MainMenu;
               }
               _ => ()
@@ -608,7 +608,7 @@ impl<'a> TabbedInterface<'a> {
             match self.hb_menu.get_active_menu_item() {
               UIMenuItem::Back => {
                 self.ui_menu.set_active_menu_item(UIMenuItem::Home);
-                self.ui_menu.active_menu_item = MenuItem::Home;
+                //self.ui_menu.active_menu_item = MenuItem::Home;
                 self.active_menu = ActiveMenu::MainMenu;
               }
               _ => ()
@@ -618,7 +618,7 @@ impl<'a> TabbedInterface<'a> {
             match self.rb_menu.get_active_menu_item() {
               UIMenuItem::Back => {
                 self.ui_menu.set_active_menu_item(UIMenuItem::ReadoutBoards);
-                self.ui_menu.active_menu_item = MenuItem::ReadoutBoards;
+                //self.ui_menu.active_menu_item = MenuItem::ReadoutBoards;
                 self.active_menu = ActiveMenu::MainMenu;
               }
               _ => ()
@@ -628,7 +628,7 @@ impl<'a> TabbedInterface<'a> {
             match self.tl_menu.get_active_menu_item() {
               UIMenuItem::Back => {
                 self.ui_menu.set_active_menu_item(UIMenuItem::Telemetry);
-                self.ui_menu.active_menu_item = MenuItem::ReadoutBoards;
+                //self.ui_menu.active_menu_item = MenuItem::ReadoutBoards;
                 self.active_menu = ActiveMenu::MainMenu;
               }
               _ => ()
@@ -745,7 +745,7 @@ impl<'a> TabbedInterface<'a> {
           ActiveMenu::Telemetry => {
             self.tl_menu.next();
             match self.tl_menu.get_active_menu_item() {
-              UIMenuItem::Stream => {
+              UIMenuItem::Back => {
                 self.te_tab.view = TelemetryTabView::Stream; 
               }
               UIMenuItem::MergedEvents => {
@@ -827,7 +827,7 @@ impl<'a> TabbedInterface<'a> {
           ActiveMenu::Telemetry => {
             self.tl_menu.prev();
             match self.tl_menu.get_active_menu_item() {
-              UIMenuItem::Stream => {
+              UIMenuItem::Back => {
                 self.te_tab.view = TelemetryTabView::Stream; 
               }
               UIMenuItem::MergedEvents => {
