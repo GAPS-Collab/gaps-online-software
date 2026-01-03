@@ -810,12 +810,14 @@ pub struct TofEventBuilderSettings {
   /// based on the interesting event parameters
   /// (These are minimum values)
   pub only_save_interesting : bool,
-  pub thr_n_hits_umb        : u8,
-  pub thr_n_hits_cbe        : u8,
-  pub thr_n_hits_cor        : u8,
-  pub thr_tot_edep_umb      : f32,
-  pub thr_tot_edep_cbe      : f32,
-  pub thr_tot_edep_cor      : f32,
+  pub thr_n_hits_umb        : Option<u8>,
+  pub thr_n_hits_cbe        : Option<u8>,
+  pub thr_n_hits_cor        : Option<u8>,
+  pub thr_n_hits_outer      : Option<u8>,
+  pub thr_tot_edep_outer    : Option<f32>,
+  pub thr_tot_edep_umb      : Option<f32>,
+  pub thr_tot_edep_cbe      : Option<f32>,
+  pub thr_tot_edep_cor      : Option<f32>,
   // level 1 purge
   pub rbe_purge_limit1      : Option<u32>,
   pub rbe_purge_limit1_n    : Option<u32>,
@@ -847,12 +849,14 @@ impl TofEventBuilderSettings {
       only_save_interesting : false,
       no_expect_dead_rbs    : None,
       ignore_mtb_link_ids   : None,
-      thr_n_hits_umb        : 0,
-      thr_n_hits_cbe        : 0,
-      thr_n_hits_cor        : 0,
-      thr_tot_edep_umb      : 0.0,
-      thr_tot_edep_cbe      : 0.0,
-      thr_tot_edep_cor      : 0.0,
+      thr_n_hits_umb        : None,
+      thr_n_hits_cbe        : None,
+      thr_n_hits_cor        : None,
+      thr_n_hits_outer      : None,
+      thr_tot_edep_umb      : None,
+      thr_tot_edep_cbe      : None,
+      thr_tot_edep_cor      : None,
+      thr_tot_edep_outer    : None,
       rbe_purge_limit1      : None,
       rbe_purge_limit1_n    : None,
       rbe_purge_ev_time1    : None,
@@ -865,62 +869,62 @@ impl TofEventBuilderSettings {
     }
   }
 
-  pub fn from_tofeventbuilderconfig(&mut self, cfg : &TOFEventBuilderConfig) {
-    if cfg.cachesize.is_some() {
-      self.cachesize = cfg.cachesize.unwrap();
-    }
-    if cfg.n_mte_per_loop.is_some() {
-      self.n_mte_per_loop = cfg.n_mte_per_loop.unwrap();
-    }
-    if cfg.n_rbe_per_loop.is_some() {
-      self.n_rbe_per_loop = cfg.n_rbe_per_loop.unwrap();
-    }
-    if cfg.te_timeout_sec.is_some() {
-      self.te_timeout_sec = cfg.te_timeout_sec.unwrap();
-    }
-    if cfg.te_timeout_sec_combo.is_some() {
-      self.te_timeout_sec_combo = Some(cfg.te_timeout_sec_combo.unwrap());
-    }
-    if cfg.holdoff.is_some() {
-      self.holdoff = Some(cfg.holdoff.unwrap());
-    }
-    if cfg.sort_events.is_some() {
-      self.sort_events = cfg.sort_events.unwrap();
-    }
-    if cfg.build_strategy.is_some() {
-      self.build_strategy = cfg.build_strategy.unwrap();
-    }
-    if cfg.greediness.is_some() {
-      self.greediness = cfg.greediness.unwrap();
-    }
-    if cfg.wait_nrb.is_some() {
-      self.wait_nrb = cfg.wait_nrb.unwrap();
-    }
-    if cfg.hb_send_interval.is_some() {
-      self.hb_send_interval = cfg.hb_send_interval.unwrap();
-    }
-    if cfg.only_save_interesting.is_some() {
-      self.only_save_interesting = cfg.only_save_interesting.unwrap();
-    }
-    if cfg.thr_n_hits_umb.is_some() { 
-      self.thr_n_hits_umb = cfg.thr_n_hits_umb.unwrap();
-    }
-    if cfg.thr_n_hits_cbe.is_some() {      
-      self.thr_n_hits_cbe = cfg.thr_n_hits_cbe.unwrap();
-    }
-    if cfg.thr_n_hits_cor.is_some()   {
-      self.thr_n_hits_cor = cfg.thr_n_hits_cor.unwrap();
-    }
-    if cfg.thr_tot_edep_umb.is_some() {    
-      self.thr_tot_edep_umb = cfg.thr_tot_edep_umb.unwrap();
-    }
-    if cfg.thr_tot_edep_cbe.is_some() {    
-      self.thr_tot_edep_cbe = cfg.thr_tot_edep_cbe.unwrap();
-    }
-    if cfg.thr_tot_edep_cor.is_some() {    
-      self.thr_tot_edep_cor = cfg.thr_tot_edep_cor.unwrap();
-    }
-  }
+  //pub fn from_tofeventbuilderconfig(&mut self, cfg : &TOFEventBuilderConfig) {
+  //  if cfg.cachesize.is_some() {
+  //    self.cachesize = cfg.cachesize.unwrap();
+  //  }
+  //  if cfg.n_mte_per_loop.is_some() {
+  //    self.n_mte_per_loop = cfg.n_mte_per_loop.unwrap();
+  //  }
+  //  if cfg.n_rbe_per_loop.is_some() {
+  //    self.n_rbe_per_loop = cfg.n_rbe_per_loop.unwrap();
+  //  }
+  //  if cfg.te_timeout_sec.is_some() {
+  //    self.te_timeout_sec = cfg.te_timeout_sec.unwrap();
+  //  }
+  //  if cfg.te_timeout_sec_combo.is_some() {
+  //    self.te_timeout_sec_combo = Some(cfg.te_timeout_sec_combo.unwrap());
+  //  }
+  //  if cfg.holdoff.is_some() {
+  //    self.holdoff = Some(cfg.holdoff.unwrap());
+  //  }
+  //  if cfg.sort_events.is_some() {
+  //    self.sort_events = cfg.sort_events.unwrap();
+  //  }
+  //  if cfg.build_strategy.is_some() {
+  //    self.build_strategy = cfg.build_strategy.unwrap();
+  //  }
+  //  if cfg.greediness.is_some() {
+  //    self.greediness = cfg.greediness.unwrap();
+  //  }
+  //  if cfg.wait_nrb.is_some() {
+  //    self.wait_nrb = cfg.wait_nrb.unwrap();
+  //  }
+  //  if cfg.hb_send_interval.is_some() {
+  //    self.hb_send_interval = cfg.hb_send_interval.unwrap();
+  //  }
+  //  if cfg.only_save_interesting.is_some() {
+  //    self.only_save_interesting = cfg.only_save_interesting.unwrap();
+  //  }
+  //  if cfg.thr_n_hits_umb.is_some() { 
+  //    self.thr_n_hits_umb = cfg.thr_n_hits_umb.unwrap();
+  //  }
+  //  if cfg.thr_n_hits_cbe.is_some() {      
+  //    self.thr_n_hits_cbe = cfg.thr_n_hits_cbe.unwrap();
+  //  }
+  //  if cfg.thr_n_hits_cor.is_some()   {
+  //    self.thr_n_hits_cor = cfg.thr_n_hits_cor.unwrap();
+  //  }
+  //  if cfg.thr_tot_edep_umb.is_some() {    
+  //    self.thr_tot_edep_umb = cfg.thr_tot_edep_umb.unwrap();
+  //  }
+  //  if cfg.thr_tot_edep_cbe.is_some() {    
+  //    self.thr_tot_edep_cbe = cfg.thr_tot_edep_cbe.unwrap();
+  //  }
+  //  if cfg.thr_tot_edep_cor.is_some() {    
+  //    self.thr_tot_edep_cor = cfg.thr_tot_edep_cor.unwrap();
+  //  }
+  //}
 }
 
 impl fmt::Display for TofEventBuilderSettings {
