@@ -14,6 +14,8 @@ gondola-core/C++/wheelhouse/*
 liftof/releases/*
 liftof/target/*
 liftof/src/*
+liftof/liftof-cc/target/*
+
 
 analysis/merge_tcfc/.gitignore
 analysis/merge_tcfc/.python-version
