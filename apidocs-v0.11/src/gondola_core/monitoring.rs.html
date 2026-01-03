@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/gondola-core/rust/gondola-core/src/monitoring.rs`."><title>monitoring.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-e56847b5.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="gondola_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.91.1 (ed61e7d7e 2025-11-07)" data-channel="1.91.1" data-search-js="search-e256b49e.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../static.files/storage-e2aeef58.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-6dc2a7f3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">gondola_core/</div>monitoring.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="comment">// This file is part of gaps-online-software and published 
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/gondola-core/rust/gondola-core/src/monitoring.rs`."><title>monitoring.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="gondola_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.92.0 (ded5c06cf 2025-12-08)" data-channel="1.92.0" data-search-js="search-d69d8955.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../static.files/storage-e2aeef58.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-ce535bd0.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">gondola_core/</div>monitoring.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="comment">// This file is part of gaps-online-software and published 
 <a href=#2 id=2 data-nosnippet>2</a>// under the GPLv3 license
 <a href=#3 id=3 data-nosnippet>3</a>
 <a href=#4 id=4 data-nosnippet>4</a></span><span class="kw">pub mod </span>pa_moni_data;
@@ -437,105 +437,141 @@
 <a href=#437 id=437 data-nosnippet>437</a>        }
 <a href=#438 id=438 data-nosnippet>438</a>      }
 <a href=#439 id=439 data-nosnippet>439</a>      
-<a href=#440 id=440 data-nosnippet>440</a>      <span class="doccomment">/// Add an additional (Tof) file to the series 
+<a href=#440 id=440 data-nosnippet>440</a>      <span class="doccomment">/// Add an additional (Telemetry) file to the series 
 <a href=#441 id=441 data-nosnippet>441</a>      ///
 <a href=#442 id=442 data-nosnippet>442</a>      /// # Arguments:
-<a href=#443 id=443 data-nosnippet>443</a>      ///   * filename    : The name of the (caraspace) file to add
-<a href=#444 id=444 data-nosnippet>444</a>      ///   * from_object : Since this adds caraspace files, it is possible 
-<a href=#445 id=445 data-nosnippet>445</a>      ///                   to choose from where to get the information.
-<a href=#446 id=446 data-nosnippet>446</a>      ///                   Either the telemetry packet, or the tofpacket, if 
-<a href=#447 id=447 data-nosnippet>447</a>      ///                   either is present in the frame. When 
-<a href=#448 id=448 data-nosnippet>448</a>      ///                   CRFrameObjectType = Unknown, it will figure it out 
-<a href=#449 id=449 data-nosnippet>449</a>      ///                   automatically, preferring the telemetry since it has
-<a href=#450 id=450 data-nosnippet>450</a>      ///                   the gcu timestamp
-<a href=#451 id=451 data-nosnippet>451</a>      </span><span class="attr">#[pyo3(signature = (filename))]
-<a href=#452 id=452 data-nosnippet>452</a>      </span><span class="kw">fn </span>add_toffile(<span class="kw-2">&amp;mut </span><span class="self">self</span>, filename : String) {
-<a href=#453 id=453 data-nosnippet>453</a>        <span class="kw">let </span>reader = TofPacketReader::new(<span class="kw-2">&amp;</span>filename);
-<a href=#454 id=454 data-nosnippet>454</a>        <span class="kw">for </span>tp <span class="kw">in </span>reader { 
-<a href=#455 id=455 data-nosnippet>455</a>          <span class="kw">if </span>tp.packet_type == &lt;<span class="macro-nonterminal">$class</span>&gt;::TOF_PACKET_TYPE  {
-<a href=#456 id=456 data-nosnippet>456</a>            <span class="kw">match </span>tp.unpack::&lt;<span class="macro-nonterminal">$class</span>&gt;() {
-<a href=#457 id=457 data-nosnippet>457</a>              <span class="prelude-val">Err</span>(err) =&gt; {
-<a href=#458 id=458 data-nosnippet>458</a>                <span class="macro">println!</span>(<span class="string">"Error unpacking! {err}"</span>);
-<a href=#459 id=459 data-nosnippet>459</a>              }
-<a href=#460 id=460 data-nosnippet>460</a>              <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>moni) =&gt; {
-<a href=#461 id=461 data-nosnippet>461</a>                <span class="self">self</span>.add_timestamp(moni.get_timestamp());
-<a href=#462 id=462 data-nosnippet>462</a>                moni.set_timestamp(moni.get_timestamp()); 
-<a href=#463 id=463 data-nosnippet>463</a>                <span class="self">self</span>.add(moni);
-<a href=#464 id=464 data-nosnippet>464</a>                <span class="comment">//self.timestamps.push(gcutime);
-<a href=#465 id=465 data-nosnippet>465</a>              </span>}
-<a href=#466 id=466 data-nosnippet>466</a>            }
-<a href=#467 id=467 data-nosnippet>467</a>          }
-<a href=#468 id=468 data-nosnippet>468</a>        }
-<a href=#469 id=469 data-nosnippet>469</a>      }
-<a href=#470 id=470 data-nosnippet>470</a>
-<a href=#471 id=471 data-nosnippet>471</a>      <span class="doccomment">/// Generate a polars dataframe with monitoring data from the 
-<a href=#472 id=472 data-nosnippet>472</a>      /// given TOF file.
-<a href=#473 id=473 data-nosnippet>473</a>      /// This will load ONLY data of the specific type of the 
-<a href=#474 id=474 data-nosnippet>474</a>      /// MoniSeries itself
-<a href=#475 id=475 data-nosnippet>475</a>      ///
-<a href=#476 id=476 data-nosnippet>476</a>      /// # Arguments:
-<a href=#477 id=477 data-nosnippet>477</a>      ///   * filename : A single .tof.gaps file with monitoring 
-<a href=#478 id=478 data-nosnippet>478</a>      ///                information 
-<a href=#479 id=479 data-nosnippet>479</a>      </span><span class="attr">#[staticmethod]
-<a href=#480 id=480 data-nosnippet>480</a>      </span><span class="kw">fn </span>from_tof_file(filename : String) -&gt; PyResult&lt;PyDataFrame&gt; {
-<a href=#481 id=481 data-nosnippet>481</a>        <span class="kw">let </span><span class="kw-2">mut </span>reader = TofPacketReader::new(<span class="kw-2">&amp;</span>filename);
-<a href=#482 id=482 data-nosnippet>482</a>        <span class="kw">let </span><span class="kw-2">mut </span>series = <span class="self">Self</span>::new();
-<a href=#483 id=483 data-nosnippet>483</a>        <span class="comment">// it would be nice to set the filter here, but I 
-<a href=#484 id=484 data-nosnippet>484</a>        // don't know how that can be done in the macro
-<a href=#485 id=485 data-nosnippet>485</a>        </span>reader.filter  = &lt;<span class="macro-nonterminal">$class</span>&gt;::TOF_PACKET_TYPE;
-<a href=#486 id=486 data-nosnippet>486</a>        <span class="kw">for </span>tp <span class="kw">in </span>reader {
-<a href=#487 id=487 data-nosnippet>487</a>          <span class="kw">if let </span><span class="prelude-val">Ok</span>(moni) =  tp.unpack::&lt;<span class="macro-nonterminal">$class</span>&gt;() {
-<a href=#488 id=488 data-nosnippet>488</a>            series.add(moni);
-<a href=#489 id=489 data-nosnippet>489</a>          }
-<a href=#490 id=490 data-nosnippet>490</a>          <span class="comment">// other packets will get thrown away 
-<a href=#491 id=491 data-nosnippet>491</a>        </span>}
-<a href=#492 id=492 data-nosnippet>492</a>        <span class="kw">match </span>series.get_dataframe() {
-<a href=#493 id=493 data-nosnippet>493</a>          <span class="prelude-val">Ok</span>(df) =&gt; {
-<a href=#494 id=494 data-nosnippet>494</a>            <span class="kw">let </span>pydf = PyDataFrame(df);
-<a href=#495 id=495 data-nosnippet>495</a>            <span class="kw">return </span><span class="prelude-val">Ok</span>(pydf);
-<a href=#496 id=496 data-nosnippet>496</a>          },
-<a href=#497 id=497 data-nosnippet>497</a>          <span class="prelude-val">Err</span>(err) =&gt; {
-<a href=#498 id=498 data-nosnippet>498</a>            <span class="kw">return </span><span class="prelude-val">Err</span>(PyValueError::new_err(err.to_string()));
-<a href=#499 id=499 data-nosnippet>499</a>          }
-<a href=#500 id=500 data-nosnippet>500</a>        }
-<a href=#501 id=501 data-nosnippet>501</a>      }
-<a href=#502 id=502 data-nosnippet>502</a>      
-<a href=#503 id=503 data-nosnippet>503</a>      <span class="attr">#[pyo3(name=<span class="string">"get_var_for_board"</span>)]
-<a href=#504 id=504 data-nosnippet>504</a>      </span><span class="kw">fn </span>get_var_for_board_py(<span class="kw-2">&amp;</span><span class="self">self</span>, varname : <span class="kw-2">&amp;</span>str, rb_id : u8) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;f32&gt;&gt; {
-<a href=#505 id=505 data-nosnippet>505</a>        <span class="self">self</span>.get_var_for_board(varname, <span class="kw-2">&amp;</span>rb_id)
-<a href=#506 id=506 data-nosnippet>506</a>      }
-<a href=#507 id=507 data-nosnippet>507</a>
-<a href=#508 id=508 data-nosnippet>508</a>      <span class="doccomment">/// Reduces the MoniSeries to a single polars data frame
-<a href=#509 id=509 data-nosnippet>509</a>      /// The structure itself will not be changed
-<a href=#510 id=510 data-nosnippet>510</a>      </span><span class="attr">#[pyo3(name=<span class="string">"get_dataframe"</span>)]
-<a href=#511 id=511 data-nosnippet>511</a>      </span><span class="kw">fn </span>get_dataframe_py(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; PyResult&lt;PyDataFrame&gt; {
-<a href=#512 id=512 data-nosnippet>512</a>        <span class="kw">match </span><span class="self">self</span>.get_dataframe() {
-<a href=#513 id=513 data-nosnippet>513</a>          <span class="prelude-val">Ok</span>(df) =&gt; {
-<a href=#514 id=514 data-nosnippet>514</a>            <span class="kw">let </span>pydf = PyDataFrame(df);
-<a href=#515 id=515 data-nosnippet>515</a>            <span class="kw">return </span><span class="prelude-val">Ok</span>(pydf);
-<a href=#516 id=516 data-nosnippet>516</a>          },
-<a href=#517 id=517 data-nosnippet>517</a>          <span class="prelude-val">Err</span>(err) =&gt; {
-<a href=#518 id=518 data-nosnippet>518</a>            <span class="kw">return </span><span class="prelude-val">Err</span>(PyValueError::new_err(err.to_string()));
-<a href=#519 id=519 data-nosnippet>519</a>          }
-<a href=#520 id=520 data-nosnippet>520</a>        }
-<a href=#521 id=521 data-nosnippet>521</a>      }
-<a href=#522 id=522 data-nosnippet>522</a>
-<a href=#523 id=523 data-nosnippet>523</a>      <span class="comment">//fn get_pl_series_py(&amp;self) -&gt; PyResult&lt;PyS
-<a href=#524 id=524 data-nosnippet>524</a>      //fn get_data(&amp;self) -&gt; &amp;HashMap&lt;u8,VecDeque&lt;$class&gt;&gt; {
-<a href=#525 id=525 data-nosnippet>525</a>      //  return &amp;self.data;
-<a href=#526 id=526 data-nosnippet>526</a>      //}
-<a href=#527 id=527 data-nosnippet>527</a>    
-<a href=#528 id=528 data-nosnippet>528</a>      //fn get_data_mut(&amp;mut self) -&gt; &amp;mut HashMap&lt;u8,VecDeque&lt;$class&gt;&gt; {
-<a href=#529 id=529 data-nosnippet>529</a>      //  return &amp;mut self.data;
-<a href=#530 id=530 data-nosnippet>530</a>      //}
-<a href=#531 id=531 data-nosnippet>531</a>     
-<a href=#532 id=532 data-nosnippet>532</a>      //fn get_max_size(&amp;self) -&gt; usize {
-<a href=#533 id=533 data-nosnippet>533</a>      //  return self.max_size;
-<a href=#534 id=534 data-nosnippet>534</a>      //}
-<a href=#535 id=535 data-nosnippet>535</a>    </span>}
-<a href=#536 id=536 data-nosnippet>536</a>    
-<a href=#537 id=537 data-nosnippet>537</a>    <span class="attr">#[cfg(feature=<span class="string">"pybindings"</span>)]
-<a href=#538 id=538 data-nosnippet>538</a>    </span><span class="macro">pythonize_display!</span>(<span class="macro-nonterminal">$name</span>);
-<a href=#539 id=539 data-nosnippet>539</a>  }
-<a href=#540 id=540 data-nosnippet>540</a>}
-<a href=#541 id=541 data-nosnippet>541</a></code></pre></div></section></main></body></html>
+<a href=#443 id=443 data-nosnippet>443</a>      ///   * filename    : The name of the (telemetry) file to add
+<a href=#444 id=444 data-nosnippet>444</a>      </span><span class="kw">fn </span>add_telemetryfile(<span class="kw-2">&amp;mut </span><span class="self">self</span>, filename : String) {
+<a href=#445 id=445 data-nosnippet>445</a>        <span class="kw">let </span>reader = TelemetryPacketReader::new(filename, <span class="bool-val">true</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>);
+<a href=#446 id=446 data-nosnippet>446</a>        <span class="kw">for </span>pack <span class="kw">in </span>reader {
+<a href=#447 id=447 data-nosnippet>447</a>          <span class="kw">if </span>pack.header.packet_type == TelemetryPacketType::AnyTofHK {
+<a href=#448 id=448 data-nosnippet>448</a>            <span class="kw">let </span><span class="kw-2">mut </span>pos = <span class="number">0</span>;
+<a href=#449 id=449 data-nosnippet>449</a>            <span class="comment">// subtract the 2020/1/1 midnight from the gcutime to make 
+<a href=#450 id=450 data-nosnippet>450</a>            // it f32
+<a href=#451 id=451 data-nosnippet>451</a>            </span><span class="kw">let </span>gcutime = pack.header.get_gcutime() <span class="kw">as </span>u64;
+<a href=#452 id=452 data-nosnippet>452</a>            <span class="kw">match </span>TofPacket::from_bytestream(<span class="kw-2">&amp;</span>pack.payload, <span class="kw-2">&amp;mut </span>pos) {
+<a href=#453 id=453 data-nosnippet>453</a>              <span class="prelude-val">Err</span>(err) =&gt; {
+<a href=#454 id=454 data-nosnippet>454</a>                <span class="macro">println!</span>(<span class="string">"Error unpackin! {err}"</span>);
+<a href=#455 id=455 data-nosnippet>455</a>              }
+<a href=#456 id=456 data-nosnippet>456</a>              <span class="prelude-val">Ok</span>(tp) =&gt; {
+<a href=#457 id=457 data-nosnippet>457</a>                <span class="kw">if </span>tp.packet_type == &lt;<span class="macro-nonterminal">$class</span>&gt;::TOF_PACKET_TYPE  {
+<a href=#458 id=458 data-nosnippet>458</a>                  <span class="kw">match </span>tp.unpack::&lt;<span class="macro-nonterminal">$class</span>&gt;() {
+<a href=#459 id=459 data-nosnippet>459</a>                    <span class="prelude-val">Err</span>(err) =&gt; {
+<a href=#460 id=460 data-nosnippet>460</a>                      <span class="macro">println!</span>(<span class="string">"Error unpacking! {err}"</span>);
+<a href=#461 id=461 data-nosnippet>461</a>                    }
+<a href=#462 id=462 data-nosnippet>462</a>                    <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>moni) =&gt; {
+<a href=#463 id=463 data-nosnippet>463</a>                      <span class="self">self</span>.add_timestamp(gcutime);
+<a href=#464 id=464 data-nosnippet>464</a>                      moni.set_timestamp(gcutime - <span class="self">self</span>.get_first_ts()); 
+<a href=#465 id=465 data-nosnippet>465</a>                      <span class="self">self</span>.add(moni);
+<a href=#466 id=466 data-nosnippet>466</a>                      <span class="comment">//self.timestamps.push(gcutime);
+<a href=#467 id=467 data-nosnippet>467</a>                    </span>}
+<a href=#468 id=468 data-nosnippet>468</a>                  }
+<a href=#469 id=469 data-nosnippet>469</a>                }
+<a href=#470 id=470 data-nosnippet>470</a>              }
+<a href=#471 id=471 data-nosnippet>471</a>            } 
+<a href=#472 id=472 data-nosnippet>472</a>          }
+<a href=#473 id=473 data-nosnippet>473</a>        }
+<a href=#474 id=474 data-nosnippet>474</a>      }
+<a href=#475 id=475 data-nosnippet>475</a>      
+<a href=#476 id=476 data-nosnippet>476</a>      <span class="doccomment">/// Add an additional (Tof) file to the series 
+<a href=#477 id=477 data-nosnippet>477</a>      ///
+<a href=#478 id=478 data-nosnippet>478</a>      /// # Arguments:
+<a href=#479 id=479 data-nosnippet>479</a>      ///   * filename    : The name of the (caraspace) file to add
+<a href=#480 id=480 data-nosnippet>480</a>      ///   * from_object : Since this adds caraspace files, it is possible 
+<a href=#481 id=481 data-nosnippet>481</a>      ///                   to choose from where to get the information.
+<a href=#482 id=482 data-nosnippet>482</a>      ///                   Either the telemetry packet, or the tofpacket, if 
+<a href=#483 id=483 data-nosnippet>483</a>      ///                   either is present in the frame. When 
+<a href=#484 id=484 data-nosnippet>484</a>      ///                   CRFrameObjectType = Unknown, it will figure it out 
+<a href=#485 id=485 data-nosnippet>485</a>      ///                   automatically, preferring the telemetry since it has
+<a href=#486 id=486 data-nosnippet>486</a>      ///                   the gcu timestamp
+<a href=#487 id=487 data-nosnippet>487</a>      </span><span class="attr">#[pyo3(signature = (filename))]
+<a href=#488 id=488 data-nosnippet>488</a>      </span><span class="kw">fn </span>add_toffile(<span class="kw-2">&amp;mut </span><span class="self">self</span>, filename : String) {
+<a href=#489 id=489 data-nosnippet>489</a>        <span class="kw">let </span>reader = TofPacketReader::new(<span class="kw-2">&amp;</span>filename);
+<a href=#490 id=490 data-nosnippet>490</a>        <span class="kw">for </span>tp <span class="kw">in </span>reader { 
+<a href=#491 id=491 data-nosnippet>491</a>          <span class="kw">if </span>tp.packet_type == &lt;<span class="macro-nonterminal">$class</span>&gt;::TOF_PACKET_TYPE  {
+<a href=#492 id=492 data-nosnippet>492</a>            <span class="kw">match </span>tp.unpack::&lt;<span class="macro-nonterminal">$class</span>&gt;() {
+<a href=#493 id=493 data-nosnippet>493</a>              <span class="prelude-val">Err</span>(err) =&gt; {
+<a href=#494 id=494 data-nosnippet>494</a>                <span class="macro">println!</span>(<span class="string">"Error unpacking! {err}"</span>);
+<a href=#495 id=495 data-nosnippet>495</a>              }
+<a href=#496 id=496 data-nosnippet>496</a>              <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>moni) =&gt; {
+<a href=#497 id=497 data-nosnippet>497</a>                <span class="self">self</span>.add_timestamp(moni.get_timestamp());
+<a href=#498 id=498 data-nosnippet>498</a>                moni.set_timestamp(moni.get_timestamp()); 
+<a href=#499 id=499 data-nosnippet>499</a>                <span class="self">self</span>.add(moni);
+<a href=#500 id=500 data-nosnippet>500</a>                <span class="comment">//self.timestamps.push(gcutime);
+<a href=#501 id=501 data-nosnippet>501</a>              </span>}
+<a href=#502 id=502 data-nosnippet>502</a>            }
+<a href=#503 id=503 data-nosnippet>503</a>          }
+<a href=#504 id=504 data-nosnippet>504</a>        }
+<a href=#505 id=505 data-nosnippet>505</a>      }
+<a href=#506 id=506 data-nosnippet>506</a>
+<a href=#507 id=507 data-nosnippet>507</a>      <span class="doccomment">/// Generate a polars dataframe with monitoring data from the 
+<a href=#508 id=508 data-nosnippet>508</a>      /// given TOF file.
+<a href=#509 id=509 data-nosnippet>509</a>      /// This will load ONLY data of the specific type of the 
+<a href=#510 id=510 data-nosnippet>510</a>      /// MoniSeries itself
+<a href=#511 id=511 data-nosnippet>511</a>      ///
+<a href=#512 id=512 data-nosnippet>512</a>      /// # Arguments:
+<a href=#513 id=513 data-nosnippet>513</a>      ///   * filename : A single .tof.gaps file with monitoring 
+<a href=#514 id=514 data-nosnippet>514</a>      ///                information 
+<a href=#515 id=515 data-nosnippet>515</a>      </span><span class="attr">#[staticmethod]
+<a href=#516 id=516 data-nosnippet>516</a>      </span><span class="kw">fn </span>from_tof_file(filename : String) -&gt; PyResult&lt;PyDataFrame&gt; {
+<a href=#517 id=517 data-nosnippet>517</a>        <span class="kw">let </span><span class="kw-2">mut </span>reader = TofPacketReader::new(<span class="kw-2">&amp;</span>filename);
+<a href=#518 id=518 data-nosnippet>518</a>        <span class="kw">let </span><span class="kw-2">mut </span>series = <span class="self">Self</span>::new();
+<a href=#519 id=519 data-nosnippet>519</a>        <span class="comment">// it would be nice to set the filter here, but I 
+<a href=#520 id=520 data-nosnippet>520</a>        // don't know how that can be done in the macro
+<a href=#521 id=521 data-nosnippet>521</a>        </span>reader.filter  = &lt;<span class="macro-nonterminal">$class</span>&gt;::TOF_PACKET_TYPE;
+<a href=#522 id=522 data-nosnippet>522</a>        <span class="kw">for </span>tp <span class="kw">in </span>reader {
+<a href=#523 id=523 data-nosnippet>523</a>          <span class="kw">if let </span><span class="prelude-val">Ok</span>(moni) =  tp.unpack::&lt;<span class="macro-nonterminal">$class</span>&gt;() {
+<a href=#524 id=524 data-nosnippet>524</a>            series.add(moni);
+<a href=#525 id=525 data-nosnippet>525</a>          }
+<a href=#526 id=526 data-nosnippet>526</a>          <span class="comment">// other packets will get thrown away 
+<a href=#527 id=527 data-nosnippet>527</a>        </span>}
+<a href=#528 id=528 data-nosnippet>528</a>        <span class="kw">match </span>series.get_dataframe() {
+<a href=#529 id=529 data-nosnippet>529</a>          <span class="prelude-val">Ok</span>(df) =&gt; {
+<a href=#530 id=530 data-nosnippet>530</a>            <span class="kw">let </span>pydf = PyDataFrame(df);
+<a href=#531 id=531 data-nosnippet>531</a>            <span class="kw">return </span><span class="prelude-val">Ok</span>(pydf);
+<a href=#532 id=532 data-nosnippet>532</a>          },
+<a href=#533 id=533 data-nosnippet>533</a>          <span class="prelude-val">Err</span>(err) =&gt; {
+<a href=#534 id=534 data-nosnippet>534</a>            <span class="kw">return </span><span class="prelude-val">Err</span>(PyValueError::new_err(err.to_string()));
+<a href=#535 id=535 data-nosnippet>535</a>          }
+<a href=#536 id=536 data-nosnippet>536</a>        }
+<a href=#537 id=537 data-nosnippet>537</a>      }
+<a href=#538 id=538 data-nosnippet>538</a>      
+<a href=#539 id=539 data-nosnippet>539</a>      <span class="attr">#[pyo3(name=<span class="string">"get_var_for_board"</span>)]
+<a href=#540 id=540 data-nosnippet>540</a>      </span><span class="kw">fn </span>get_var_for_board_py(<span class="kw-2">&amp;</span><span class="self">self</span>, varname : <span class="kw-2">&amp;</span>str, rb_id : u8) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;f32&gt;&gt; {
+<a href=#541 id=541 data-nosnippet>541</a>        <span class="self">self</span>.get_var_for_board(varname, <span class="kw-2">&amp;</span>rb_id)
+<a href=#542 id=542 data-nosnippet>542</a>      }
+<a href=#543 id=543 data-nosnippet>543</a>
+<a href=#544 id=544 data-nosnippet>544</a>      <span class="doccomment">/// Reduces the MoniSeries to a single polars data frame
+<a href=#545 id=545 data-nosnippet>545</a>      /// The structure itself will not be changed
+<a href=#546 id=546 data-nosnippet>546</a>      </span><span class="attr">#[pyo3(name=<span class="string">"get_dataframe"</span>)]
+<a href=#547 id=547 data-nosnippet>547</a>      </span><span class="kw">fn </span>get_dataframe_py(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; PyResult&lt;PyDataFrame&gt; {
+<a href=#548 id=548 data-nosnippet>548</a>        <span class="kw">match </span><span class="self">self</span>.get_dataframe() {
+<a href=#549 id=549 data-nosnippet>549</a>          <span class="prelude-val">Ok</span>(df) =&gt; {
+<a href=#550 id=550 data-nosnippet>550</a>            <span class="kw">let </span>pydf = PyDataFrame(df);
+<a href=#551 id=551 data-nosnippet>551</a>            <span class="kw">return </span><span class="prelude-val">Ok</span>(pydf);
+<a href=#552 id=552 data-nosnippet>552</a>          },
+<a href=#553 id=553 data-nosnippet>553</a>          <span class="prelude-val">Err</span>(err) =&gt; {
+<a href=#554 id=554 data-nosnippet>554</a>            <span class="kw">return </span><span class="prelude-val">Err</span>(PyValueError::new_err(err.to_string()));
+<a href=#555 id=555 data-nosnippet>555</a>          }
+<a href=#556 id=556 data-nosnippet>556</a>        }
+<a href=#557 id=557 data-nosnippet>557</a>      }
+<a href=#558 id=558 data-nosnippet>558</a>
+<a href=#559 id=559 data-nosnippet>559</a>      <span class="comment">//fn get_pl_series_py(&amp;self) -&gt; PyResult&lt;PyS
+<a href=#560 id=560 data-nosnippet>560</a>      //fn get_data(&amp;self) -&gt; &amp;HashMap&lt;u8,VecDeque&lt;$class&gt;&gt; {
+<a href=#561 id=561 data-nosnippet>561</a>      //  return &amp;self.data;
+<a href=#562 id=562 data-nosnippet>562</a>      //}
+<a href=#563 id=563 data-nosnippet>563</a>    
+<a href=#564 id=564 data-nosnippet>564</a>      //fn get_data_mut(&amp;mut self) -&gt; &amp;mut HashMap&lt;u8,VecDeque&lt;$class&gt;&gt; {
+<a href=#565 id=565 data-nosnippet>565</a>      //  return &amp;mut self.data;
+<a href=#566 id=566 data-nosnippet>566</a>      //}
+<a href=#567 id=567 data-nosnippet>567</a>     
+<a href=#568 id=568 data-nosnippet>568</a>      //fn get_max_size(&amp;self) -&gt; usize {
+<a href=#569 id=569 data-nosnippet>569</a>      //  return self.max_size;
+<a href=#570 id=570 data-nosnippet>570</a>      //}
+<a href=#571 id=571 data-nosnippet>571</a>    </span>}
+<a href=#572 id=572 data-nosnippet>572</a>    
+<a href=#573 id=573 data-nosnippet>573</a>    <span class="attr">#[cfg(feature=<span class="string">"pybindings"</span>)]
+<a href=#574 id=574 data-nosnippet>574</a>    </span><span class="macro">pythonize_display!</span>(<span class="macro-nonterminal">$name</span>);
+<a href=#575 id=575 data-nosnippet>575</a>  }
+<a href=#576 id=576 data-nosnippet>576</a>}
+<a href=#577 id=577 data-nosnippet>577</a></code></pre></div></section></main></body></html>

@@ -22,6 +22,7 @@ gondola.io
       CRWriter
       TelemetryPacketReader
       TofPacketReader
+      TofPacketWriter
    
 .. rubric:: Modules
 

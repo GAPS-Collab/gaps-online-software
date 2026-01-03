@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.events &#8212; gondola 0.11.25 documentation</title>
+    <title>gondola.events &#8212; gondola 0.11.45 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=002b87ba"></script>
+    <script src="../_static/documentation_options.js?v=f546f064"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.events';</script>
@@ -110,7 +110,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.11.25 documentation</p>
+    <p class="title logo__title">gondola 0.11.45 documentation</p>
   
 </a></div>
     
@@ -1029,6 +1029,11 @@ bytestream. If desired, this version can read/write RBEvents.</p></li>
 </li>
 </ul>
 <dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.calc_gcu_variables">
+<span class="sig-name descname"><span class="pre">calc_gcu_variables</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.calc_gcu_variables" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.TofEvent.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.copy" title="Link to this definition">#</a></dt>
 <dd><p>Emit a copy of self</p>
@@ -1202,6 +1207,12 @@ measured at ends A and B can not be correlated
 by the assumed speed of light in the paddle</p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.run_id">
+<span class="sig-name descname"><span class="pre">run_id</span></span><a class="headerlink" href="#gondola.events.TofEvent.run_id" title="Link to this definition">#</a></dt>
+<dd><p>The run id</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.TofEvent.set_packed_status_version">
 <em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_packed_status_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pack</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.set_packed_status_version" title="Link to this definition">#</a></dt>
@@ -1220,6 +1231,11 @@ by the assumed speed of light in the paddle</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.TofEvent.strip_packed_rbevents_for_pv3">
 <em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">strip_packed_rbevents_for_pv3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pack</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.strip_packed_rbevents_for_pv3" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.strip_rbevents">
+<span class="sig-name descname"><span class="pre">strip_rbevents</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.strip_rbevents" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1475,6 +1491,7 @@ if multiple trigger conditions are satisfied.</p>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent"><code class="docutils literal notranslate"><span class="pre">TofEvent</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.calc_gcu_variables"><code class="docutils literal notranslate"><span class="pre">TofEvent.calc_gcu_variables()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.copy"><code class="docutils literal notranslate"><span class="pre">TofEvent.copy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.event_id"><code class="docutils literal notranslate"><span class="pre">TofEvent.event_id</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.event_status"><code class="docutils literal notranslate"><span class="pre">TofEvent.event_status</span></code></a></li>
@@ -1503,10 +1520,12 @@ if multiple trigger conditions are satisfied.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.rb_events"><code class="docutils literal notranslate"><span class="pre">TofEvent.rb_events</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.rb_link_ids"><code class="docutils literal notranslate"><span class="pre">TofEvent.rb_link_ids</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.remove_non_causal_hits"><code class="docutils literal notranslate"><span class="pre">TofEvent.remove_non_causal_hits()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.run_id"><code class="docutils literal notranslate"><span class="pre">TofEvent.run_id</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.set_packed_status_version"><code class="docutils literal notranslate"><span class="pre">TofEvent.set_packed_status_version()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.set_timing_offsets"><code class="docutils literal notranslate"><span class="pre">TofEvent.set_timing_offsets()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.status"><code class="docutils literal notranslate"><span class="pre">TofEvent.status</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.strip_packed_rbevents_for_pv3"><code class="docutils literal notranslate"><span class="pre">TofEvent.strip_packed_rbevents_for_pv3()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.strip_rbevents"><code class="docutils literal notranslate"><span class="pre">TofEvent.strip_rbevents()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.timestamp16"><code class="docutils literal notranslate"><span class="pre">TofEvent.timestamp16</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.timestamp32"><code class="docutils literal notranslate"><span class="pre">TofEvent.timestamp32</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.timestamp48"><code class="docutils literal notranslate"><span class="pre">TofEvent.timestamp48</span></code></a></li>

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["CommandTab"]};
+window.SIDEBAR_ITEMS = {"enum":["CommandTabView"],"struct":["CommandTab"]};

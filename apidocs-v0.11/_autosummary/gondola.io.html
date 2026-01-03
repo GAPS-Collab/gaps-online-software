@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.io &#8212; gondola 0.11.25 documentation</title>
+    <title>gondola.io &#8212; gondola 0.11.45 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=002b87ba"></script>
+    <script src="../_static/documentation_options.js?v=f546f064"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.io';</script>
@@ -110,7 +110,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.11.25 documentation</p>
+    <p class="title logo__title">gondola 0.11.45 documentation</p>
   
 </a></div>
     
@@ -380,6 +380,9 @@ obtain various flavors of data used trhoughout GAPS.</p>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#gondola.io.TofPacketReader" title="gondola.io.TofPacketReader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofPacketReader</span></code></a>(filename_or_directory[, filter])</p></td>
 <td><p>Read serialized TofPackets from an existing file or directory</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.io.TofPacketWriter" title="gondola.io.TofPacketWriter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofPacketWriter</span></code></a>(filename, runid)</p></td>
+<td><p>Write TofPackets to disk.</p></td>
 </tr>
 </tbody>
 </table>
@@ -663,6 +666,20 @@ of that reader.</p>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="gondola.io.TofPacketWriter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.io.</span></span><span class="sig-name descname"><span class="pre">TofPacketWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.TofPacketWriter" title="Link to this definition">#</a></dt>
+<dd><p>Write TofPackets to disk.</p>
+<p>Operates sequentially, packets can 
+be added one at a time, then will
+be synced to disk.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.io.TofPacketWriter.add_tof_packet">
+<span class="sig-name descname"><span class="pre">add_tof_packet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.TofPacketWriter.add_tof_packet" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="gondola.io.TelemetryPacketReader">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.io.</span></span><span class="sig-name descname"><span class="pre">TelemetryPacketReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filenames_or_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dedup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.TelemetryPacketReader" title="Link to this definition">#</a></dt>
 <dd><p>Read serialized TelemetryPackets from an existing file</p>
@@ -858,6 +875,10 @@ precise in constricting the time range</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.TofPacketReader.first"><code class="docutils literal notranslate"><span class="pre">TofPacketReader.first</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.TofPacketReader.last"><code class="docutils literal notranslate"><span class="pre">TofPacketReader.last</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.TofPacketReader.rewind"><code class="docutils literal notranslate"><span class="pre">TofPacketReader.rewind()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.TofPacketWriter"><code class="docutils literal notranslate"><span class="pre">TofPacketWriter</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.TofPacketWriter.add_tof_packet"><code class="docutils literal notranslate"><span class="pre">TofPacketWriter.add_tof_packet()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.TelemetryPacketReader"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketReader</span></code></a><ul class="nav section-nav flex-column">

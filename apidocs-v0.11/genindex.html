@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; gondola 0.11.25 documentation</title>
+    <title>Index &#8212; gondola 0.11.45 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=002b87ba"></script>
+    <script src="_static/documentation_options.js?v=f546f064"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
@@ -107,7 +107,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.11.25 documentation</p>
+    <p class="title logo__title">gondola 0.11.45 documentation</p>
   
 </a></div>
     
@@ -387,6 +387,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/gondola.io.html#gondola.io.CRWriter.add_frame">add_frame() (gondola.io.CRWriter method)</a>
 </li>
+      <li><a href="_autosummary/gondola.io.html#gondola.io.TofPacketWriter.add_tof_packet">add_tof_packet() (gondola.io.TofPacketWriter method)</a>
+</li>
       <li><a href="_autosummary/gondola.db.html#gondola.db.ReadoutBoard.all">all() (gondola.db.ReadoutBoard static method)</a>
 
       <ul>
@@ -429,6 +431,8 @@
         <li><a href="_autosummary/gondola.db.html#gondola.db.TrackerStripPedestal.as_dict_by_name">(gondola.db.TrackerStripPedestal static method)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/gondola.calibration.html#gondola.calibration.RBCalibrations.assemble_from_flightcal">assemble_from_flightcal() (gondola.calibration.RBCalibrations static method)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -460,6 +464,8 @@
       <li><a href="_autosummary/gondola.db.html#gondola.db.TofPaddle.cable_len">cable_len (gondola.db.TofPaddle attribute)</a>
 </li>
       <li><a href="_autosummary/gondola.io.html#gondola.io.TelemetryPacketReader.cache_all_packets">cache_all_packets() (gondola.io.TelemetryPacketReader method)</a>
+</li>
+      <li><a href="_autosummary/gondola.events.html#gondola.events.TofEvent.calc_gcu_variables">calc_gcu_variables() (gondola.events.TofEvent method)</a>
 </li>
       <li><a href="_autosummary/gondola.events.html#gondola.events.RBWaveform.calibrate">calibrate() (gondola.events.RBWaveform method)</a>
 </li>
@@ -503,10 +509,10 @@
 </li>
       <li><a href="_autosummary/gondola.events.html#gondola.events.RBWaveform.charge_a_trap">charge_a_trap (gondola.events.RBWaveform attribute)</a>
 </li>
-      <li><a href="_autosummary/gondola.events.html#gondola.events.TofHit.charge_b">charge_b (gondola.events.TofHit attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/gondola.events.html#gondola.events.TofHit.charge_b">charge_b (gondola.events.TofHit attribute)</a>
+</li>
       <li><a href="_autosummary/gondola.events.html#gondola.events.RBWaveform.charge_b_below_500_trap">charge_b_below_500_trap (gondola.events.RBWaveform attribute)</a>
 </li>
       <li><a href="_autosummary/gondola.events.html#gondola.events.RBWaveform.charge_b_trap">charge_b_trap (gondola.events.RBWaveform attribute)</a>
@@ -1581,8 +1587,6 @@
 </li>
       <li><a href="_autosummary/gondola.events.html#gondola.events.RBEventHeader">RBEventHeader (class in gondola.events)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofOperationMode.RBHighThroughput">RBHighThroughput (gondola.tof.TofOperationMode attribute)</a>
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.RBPaddleID">RBPaddleID (class in gondola.tof)</a>
@@ -1593,6 +1597,8 @@
         <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofOperationMode.RBWaveform">(gondola.tof.TofOperationMode attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/gondola.db.html#gondola.db.ReadoutBoard">ReadoutBoard (class in gondola.db)</a>
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.MasterTrigger.realign_packet_id">realign_packet_id() (gondola.tof.MasterTrigger method)</a>
@@ -1608,6 +1614,8 @@
 </li>
       </ul></li>
       <li><a href="_autosummary/gondola.events.html#gondola.events.TofEvent.remove_non_causal_hits">remove_non_causal_hits() (gondola.events.TofEvent method)</a>
+</li>
+      <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofCommandCode.RequestLiftofSettings">RequestLiftofSettings (gondola.tof.TofCommandCode attribute)</a>
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.MasterTrigger.reset_daq">reset_daq() (gondola.tof.MasterTrigger method)</a>
 </li>
@@ -1635,12 +1643,26 @@
         <li><a href="_autosummary/gondola.events.html#gondola.events.TrackerHit.row">(gondola.events.TrackerHit attribute)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/gondola.events.html#gondola.events.TofEvent.run_id">run_id (gondola.events.TofEvent attribute)</a>
+</li>
       <li><a href="_autosummary/gondola.tof.analysis.html#gondola.tof.analysis.TofAnalysis.run_time">run_time (gondola.tof.analysis.TofAnalysis property)</a>
 
       <ul>
         <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofAnalysis.run_time">(gondola.tof.TofAnalysis property)</a>
 </li>
       </ul></li>
+      <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofCommandCode.RunScriptAlfa">RunScriptAlfa (gondola.tof.TofCommandCode attribute)</a>
+</li>
+      <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofCommandCode.RunScriptBravo">RunScriptBravo (gondola.tof.TofCommandCode attribute)</a>
+</li>
+      <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofCommandCode.RunScriptCharlie">RunScriptCharlie (gondola.tof.TofCommandCode attribute)</a>
+</li>
+      <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofCommandCode.RunScriptFoxtrott">RunScriptFoxtrott (gondola.tof.TofCommandCode attribute)</a>
+</li>
+      <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofCommandCode.RunScriptTango">RunScriptTango (gondola.tof.TofCommandCode attribute)</a>
+</li>
+      <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofCommandCode.RunScriptWhiskey">RunScriptWhiskey (gondola.tof.TofCommandCode attribute)</a>
+</li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofRunConfig.runtime">runtime (gondola.tof.TofRunConfig attribute)</a>
 </li>
   </ul></td>
@@ -1743,10 +1765,10 @@
 </li>
       <li><a href="_autosummary/gondola.io.html#gondola.io.CRReader.set_tracker_calibrations_from_fnames">set_tracker_calibrations_from_fnames() (gondola.io.CRReader method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.TriggerConfig.set_trigger_type">set_trigger_type (gondola.tof.TriggerConfig attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.MasterTrigger.set_umb3cube_trigger">set_umb3cube_trigger() (gondola.tof.MasterTrigger method)</a>
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.MasterTrigger.set_umbcorcube_trigger">set_umbcorcube_trigger() (gondola.tof.MasterTrigger method)</a>
@@ -1836,6 +1858,8 @@
 </li>
       </ul></li>
       <li><a href="_autosummary/gondola.events.html#gondola.events.TofEvent.strip_packed_rbevents_for_pv3">strip_packed_rbevents_for_pv3() (gondola.events.TofEvent static method)</a>
+</li>
+      <li><a href="_autosummary/gondola.events.html#gondola.events.TofEvent.strip_rbevents">strip_rbevents() (gondola.events.TofEvent method)</a>
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofCommandCode.SubmitConfig">SubmitConfig (gondola.tof.TofCommandCode attribute)</a>
 </li>
@@ -1957,6 +1981,8 @@
 </li>
       <li><a href="_autosummary/gondola.io.html#gondola.io.TofPacketReader">TofPacketReader (class in gondola.io)</a>
 </li>
+      <li><a href="_autosummary/gondola.io.html#gondola.io.TofPacketWriter">TofPacketWriter (class in gondola.io)</a>
+</li>
       <li><a href="_autosummary/gondola.db.html#gondola.db.TofPaddle">TofPaddle (class in gondola.db)</a>
 </li>
       <li><a href="_autosummary/gondola.db.html#gondola.db.TofPaddleTimingConstant">TofPaddleTimingConstant (class in gondola.db)</a>
@@ -2047,9 +2073,11 @@
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofCommandCode.UnspoolEventCache">UnspoolEventCache (gondola.tof.TofCommandCode attribute)</a>
 </li>
+      <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofCommandCode.UploadConfig">UploadConfig (gondola.tof.TofCommandCode attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofCommandCode.UploadConfig">UploadConfig (gondola.tof.TofCommandCode attribute)</a>
+      <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofCommandCode.UploadConfigDiff">UploadConfigDiff (gondola.tof.TofCommandCode attribute)</a>
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.TriggerConfig.use_combo_trigger">use_combo_trigger (gondola.tof.TriggerConfig attribute)</a>
 </li>

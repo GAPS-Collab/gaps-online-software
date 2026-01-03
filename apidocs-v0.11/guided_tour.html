@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>A guided tour to get you started &#8212; gondola 0.11.25 documentation</title>
+    <title>A guided tour to get you started &#8212; gondola 0.11.45 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=002b87ba"></script>
+    <script src="_static/documentation_options.js?v=f546f064"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'guided_tour';</script>
@@ -110,7 +110,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.11.25 documentation</p>
+    <p class="title logo__title">gondola 0.11.45 documentation</p>
   
 </a></div>
     
@@ -454,8 +454,8 @@ for the TOF (1-160).</p>
 <p>The database contains much more, there are for example it also contains <cite>TrackerStripPedestal</cite>, <cite>TrackerStripTransferFunction</cite>
 and <cite>TrackerStripMask</cite> which are relevant for tracker calibrations.</p>
 </section>
-<section id="calibratons">
-<h2>Calibratons<a class="headerlink" href="#calibratons" title="Link to this heading">#</a></h2>
+<section id="calibrations">
+<h2>Calibrations<a class="headerlink" href="#calibrations" title="Link to this heading">#</a></h2>
 <section id="tof">
 <h3>TOF<a class="headerlink" href="#tof" title="Link to this heading">#</a></h3>
 <p>Readoutboard calibrations can be loaded directly from the files with the following routine</p>
@@ -468,6 +468,38 @@ and <cite>TrackerStripMask</cite> which are relevant for tracker calibrations.</
 </section>
 <section id="tracker">
 <h3>Tracker<a class="headerlink" href="#tracker" title="Link to this heading">#</a></h3>
+</section>
+<section id="monitoring-data-housekeeping">
+<h3>Monitoring data (&quot;Housekeeping&quot;)<a class="headerlink" href="#monitoring-data-housekeeping" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>TOF monitoring data</p></li>
+<li><p>Liftof settings</p></li>
+</ul>
+<p>The general (program) settings for the liftof code as it is running on the instrument, are telemetered down at
+the start of each new run. They are bytecompressed and
+so the bytestream of this packet needs specials treatement.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#! /usr/bin/env poython</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">gondola</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gon</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="n">start_of_run_time</span> <span class="o">=</span> <span class="mi">3600</span> <span class="c1"># e.g. for a run that started and hour in the past</span>
+
+<span class="n">files</span>  <span class="o">=</span> <span class="n">gon</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">grace_get_telemetry_binaries</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_of_run_time</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span> <span class="s1">&#39;/prestaging/live/&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+    <span class="n">reader</span> <span class="o">=</span> <span class="n">gon</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">TelemetryPacketReader</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">pack</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">pack</span><span class="o">.</span><span class="n">packet_type</span> <span class="o">==</span> <span class="n">gon</span><span class="o">.</span><span class="n">packets</span><span class="o">.</span><span class="n">TelemetryPacketType</span><span class="o">.</span><span class="n">AnyTofHK</span><span class="p">:</span>
+            <span class="n">tp</span> <span class="o">=</span> <span class="n">gon</span><span class="o">.</span><span class="n">packets</span><span class="o">.</span><span class="n">TofPacket</span><span class="o">.</span><span class="n">from_bytestream</span><span class="p">(</span><span class="n">pack</span><span class="o">.</span><span class="n">payload</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">tp</span><span class="o">.</span><span class="n">packet_type</span> <span class="o">==</span> <span class="n">gon</span><span class="o">.</span><span class="n">packets</span><span class="o">.</span><span class="n">TofPacketType</span><span class="o">.</span><span class="n">LiftofSettings</span><span class="p">:</span>
+                <span class="nb">print</span> <span class="p">(</span><span class="n">tp</span><span class="p">)</span>
+                <span class="n">lpt</span> <span class="o">=</span> <span class="n">tp</span>
+                <span class="k">break</span>
+<span class="c1"># this is the file decompression, and the config</span>
+<span class="c1"># will be saved in test.toml</span>
+<span class="n">gon</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">decompress_toml</span><span class="p">(</span><span class="n">lpt</span><span class="o">.</span><span class="n">payload</span><span class="p">,</span> <span class="s1">&#39;test.toml&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 </section>
 </section>
 </section>
@@ -526,9 +558,10 @@ and <cite>TrackerStripMask</cite> which are relevant for tracker calibrations.</
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-formats">Data formats</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-read-the-data">How to read the data</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#database-access">Database access</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calibratons">Calibratons</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calibrations">Calibrations</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tof">TOF</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tracker">Tracker</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#monitoring-data-housekeeping">Monitoring data ("Housekeeping")</a></li>
 </ul>
 </li>
 </ul>
