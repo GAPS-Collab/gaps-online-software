@@ -57,12 +57,45 @@ pub struct TelemetryPacketReader {
   /// If ::cache_all_packets is called, this will hold 
   /// all TelemetryPackets sorted by timestamp and 
   /// packet counter
-  pub packet_cache    : Vec<TelemetryPacket> 
+  pub packet_cache    : Vec<TelemetryPacket>,
+  /// Geometry of each TOF paddle
+  /// e.g. paddles 
+  pub tof_paddles     : Arc<HashMap<u8,TofPaddle>>,
+  /// Geometry of each tracker strip
+  pub trk_strips      : Arc<HashMap<u32, TrackerStrip>>,
 }
 
 
 impl TelemetryPacketReader {
   pub fn new(filename_or_directory : String, dedup : bool, start_time : Option<f64>, end_time : Option<f64>) -> Self {
+    #[cfg(feature="database")]
+    let mut paddles  = HashMap::<u8, TofPaddle>::new();
+    #[cfg(not(feature="database"))]
+    let paddles = HashMap::<u8, TofPaddle>::new();
+    #[cfg(feature="database")]
+    let mut strips  = HashMap::<u32, TrackerStrip>::with_capacity(11520);
+    #[cfg(not(feature="database"))]
+    let strips  = HashMap::<u32, TrackerStrip>::with_capacity(11520);
+    #[cfg(feature="database")]
+    match TofPaddle::all_as_dict() {
+      Err(err) => {
+        error!("Unable to retrieve paddle information from DB! {err}");
+      }
+      Ok(pdls) => {
+        paddles   = pdls;         
+      }
+    }
+    #[cfg(feature="database")]
+    match TrackerStrip::all_as_dict() {
+      Err(err) => {
+        error!("Unable to retrieve tracker strip information from DB! {err}");
+        // if strips and paddles do not work, something is utterly fisy
+        //db_loaded = false;
+      }
+      Ok(strips_) => {
+        strips   = strips_;         
+      }
+    }
     let firstfile : String;
     let re = Regex::new(r"RAW(\d{6})_(\d{6})\.bin$").unwrap();
     match list_path_contents_sorted(&filename_or_directory, Some(re)) {
@@ -107,7 +140,9 @@ impl TelemetryPacketReader {
               n_packs_skipped   : 0,
               n_duplicates      : 0,
               dedup_cache       : dedup_cache,
-              packet_cache      : Vec::<TelemetryPacket>::new()
+              packet_cache      : Vec::<TelemetryPacket>::new(),
+              tof_paddles       : Arc::new(paddles),
+              trk_strips        : Arc::new(strips),
             };
             packet_reader
           }
@@ -490,6 +525,12 @@ impl TelemetryPacketReader {
           }
 
           tp.payload = payload;
+          if tp.header.packet_type == TelemetryPacketType::InterestingEvent 
+          || tp.header.packet_type == TelemetryPacketType::BoringEvent 
+          || tp.header.packet_type == TelemetryPacketType::NoGapsTriggerEvent {
+            tp.tof_paddles = self.tof_paddles.clone();
+            tp.trk_strips  = self.trk_strips.clone();
+          }
           self.n_packs_read += 1;
           // check if the packet has been seen already
           if self.dedup {

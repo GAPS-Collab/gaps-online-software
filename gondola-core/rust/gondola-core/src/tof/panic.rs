@@ -28,7 +28,7 @@ impl PanicPacket {
   /// might itself cause a panic, so that this works
   /// all data publsher threads have to cease first 
   pub fn sent(&self) {
-    let bs = self.to_bytestream();
+    let _bs = self.to_bytestream();
   }
 }
 

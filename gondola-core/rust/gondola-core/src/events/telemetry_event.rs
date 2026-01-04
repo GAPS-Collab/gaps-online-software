@@ -356,6 +356,9 @@ impl TelemetryEvent {
     match Self::from_bytestream(&packet.payload, &mut 0) {
       Ok(mut event) => {
         event.header = packet.header.clone();
+        // FIXME - replace with dehydrate
+        #[cfg(feature="database")]
+        event.dehydrate(&packet.tof_paddles, &packet.trk_strips);
         return Ok(event);
       }
       Err(err) => {

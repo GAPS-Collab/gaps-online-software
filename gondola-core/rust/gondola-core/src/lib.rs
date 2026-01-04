@@ -210,9 +210,15 @@ fn tof_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(shutdown_ratpair, m)?)?;
   m.add_function(wrap_pyfunction!(shutdown_rb, m)?)?;
   m.add_function(wrap_pyfunction!(shutdown_tofcpu, m)?)?;
-
-
-
+  m.add_function(wrap_pyfunction!(run_action_alfa, m)?)?;
+  m.add_function(wrap_pyfunction!(run_action_bravo, m)?)?;
+  m.add_function(wrap_pyfunction!(run_action_charlie, m)?)?;
+  m.add_function(wrap_pyfunction!(run_action_whiskey, m)?)?;
+  m.add_function(wrap_pyfunction!(run_action_tango, m)?)?;
+  m.add_function(wrap_pyfunction!(run_action_foxtrott, m)?)?;
+  m.add_function(wrap_pyfunction!(request_liftof_settings, m)?)?;
+  m.add_function(wrap_pyfunction!(restore_default_config, m)?)?;
+  m.add_function(wrap_pyfunction!(apply_settings_diff, m)?)?;
   Ok(())
 }
 
@@ -268,6 +274,9 @@ fn packets_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<TelemetryPacket>()?;
   m.add_class::<TelemetryPacketHeader>()?;
   m.add_class::<TrackerHeader>()?;
+  m.add_class::<PduChannel>()?;
+  m.add_class::<Pac1934>()?;
+  m.add_class::<PduHKPacket>()?;
   m.add_function(wrap_pyfunction!(make_systime,m)?)?;
   Ok(())
 }
@@ -293,6 +302,12 @@ fn io_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(get_datetime, m)?)?;
   m.add_function(wrap_pyfunction!(get_unix_timestamp, m)?)?;
   m.add_function(wrap_pyfunction!(get_unix_timestamp_from_telemetry, m)?)?;
+  // these are the config file manipulators
+  m.add_function(wrap_pyfunction!(apply_diff_to_file_py, m)?)?;
+  m.add_function(wrap_pyfunction!(compress_toml_py, m)?)?;
+  m.add_function(wrap_pyfunction!(decompress_toml_py, m)?)?;
+  m.add_function(wrap_pyfunction!(create_compressed_diff_py, m)?)?;
+
   m.add_class::<CRFrameObject>()?;
   m.add_class::<CRFrameObjectType>()?;
   m.add_class::<CRFrame>()?;
@@ -300,6 +315,7 @@ fn io_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<CRReader>()?;
   m.add_class::<CRWriter>()?;
   m.add_class::<TofPacketReader>()?;
+  m.add_class::<TofPacketWriter>()?;
   m.add_class::<TelemetryPacketReader>()?;
   //m.add_class::<PyDataSource>()?;
   Ok(())

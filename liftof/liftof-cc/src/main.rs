@@ -17,8 +17,6 @@ use std::time::{
   Duration,
 };
 
-//use std::collections::HashMap;
-//use std::io::Write;
 use std::process::{
   Command,
   Stdio,
@@ -38,8 +36,6 @@ use std::path::{
 };
 
 use clap::{
-  arg,
-  command,
   Parser
 };
 
@@ -47,6 +43,7 @@ use crossbeam_channel::{
   Sender,
   Receiver,
   unbounded,
+  bounded,
 };
 
 use spinners::{Spinner, Spinners};
@@ -59,7 +56,9 @@ use gondola_core::io::ipbus::IPBus;
 use liftof_cc::{
   prepare_run,
   calibrate_tof,
+  rm_liftof_rb_logs,
   restart_liftof_rb,
+  set_rbs_sma_mode,
   ssh_command_rbs,
   get_queue,
   delete_file,
@@ -166,6 +165,15 @@ fn init_channels<T>() -> (Sender<T>, Receiver<T>) {
   channels
 }
 
+/// Little helper, just makes sure that all the 
+/// channels are of same type
+fn init_bounded_channels<T>(limit : usize) -> (Sender<T>, Receiver<T>) {
+  let channels : (Sender<T>, Receiver<T>) = bounded(limit); 
+  channels
+}
+
+/*************************************/
+
 /*************************************/
 
 fn main() {
@@ -200,7 +208,7 @@ fn main() {
         // check on all rats
         rb_list = get_rbratmap_hardcoded().keys().cloned().collect();
       }
-      match ssh_command_rbs(&rb_list, vec![String::from("date")]) {
+      match ssh_command_rbs(&rb_list, vec![String::from("date")], false) {
         Err(err) => {
           error!("Connecting to RBs over ssh failed! {}",  err);
         }
@@ -226,11 +234,11 @@ fn main() {
       } else {
         rblist = get_rbratmap_hardcoded().keys().cloned().collect();  
       }
-      info!("Will sort reboot RBs {:?}", rblist);
+      info!("Will soft reboot RBs {:?}", rblist);
       let cmd_args     = vec![String::from("sudo"),
                               String::from("shutdown"),
                               String::from("now")]; 
-      match ssh_command_rbs(&rblist, cmd_args) {
+      match ssh_command_rbs(&rblist, cmd_args, false) {
         Ok(_)    => info!("SSH commands issued successfully!"),
         Err(err) => error!("Issues during ssh commanding! {err}")
       }
@@ -293,7 +301,18 @@ fn main() {
       config = _cfg;
     }
   }
-  
+  // we will also immediatly create a packet out of the config
+  let mut packed_config     = TofPacket::new();
+  packed_config.packet_type = TofPacketType::LiftofSettings;
+  let cfg_file_path         = PathBuf::from(&cfg_file_str);
+  match compress_toml(&cfg_file_path) {
+    Ok(bytes) => {
+      packed_config.payload = bytes;
+    }
+    Err(err) => {
+      error!("Unable to compress LiftofSettings from file {}! {}", cfg_file_str, err);
+    }
+  }
   // now as we have the config, initialize the thread control
   let db_path               = config.db_path.clone();
   // connecting to the database will set the $GONDOLA_DB_URL variable so that the database can be
@@ -303,6 +322,10 @@ fn main() {
   let mut rb_list           = ReadoutBoard::all().expect("Unable to retrieve RB information! Unable to continue, check db_path in the liftof settings (.toml) file and DB integrity!");
   let rb_ignorelist         = config.rb_ignorelist_always.clone();
   let rb_ignorelist_tmp     = config.rb_ignorelist_run.clone();
+  let dead_rb_ids           = config.rb_ignorelist_run.clone();  // if there is rbs which show up
+                                                                 // "dead" but don't even exist, we
+                                                                 // have more thatn a serious
+                                                                 // problem
   for k in 0..rb_ignorelist.len() {
     let bad_rb = rb_ignorelist[k];
     rb_list.retain(|x| x.rb_id != bad_rb);
@@ -373,9 +396,13 @@ fn main() {
   println!("\n\n");
   println!("=> Commencing run start/init procedure...!");
   println!("=> Will use {} readoutboards!", rb_list.len()); 
-  for k in &rb_list {
-    println!(" -- -- {}", k.rb_id);
+  if rb_list.len() > 0 {
+    println!(" -- -- {}", rb_list[0].rb_id); 
   }
+  //for k in &rb_list.iter().skip(1) {
+  //  print!(" {}", k.rb_id);
+  //}
+  println!("\n -- -- -- -- -- ");
   if rb_ignorelist_tmp.len() > 0 {
     println!("==> For this run, the following RB have been explicitly excluded in the config file");
     println!("{:?}", rb_ignorelist_tmp );
@@ -444,7 +471,7 @@ fn main() {
 
   
   // readout boards -> event builder RBEvent transmission 
-  let (ev_to_builder, ev_from_rb)     = init_channels::<RBEvent>();
+  let (ev_to_builder, ev_from_rb)     = init_bounded_channels::<RBEvent>(20000);
   //let (ack_to_cmd_disp, ack_from_rb)  = init_channels::<TofResponse>();   
   
   println!("=> Copying {} to all RBs!", &cfg_file_str );
@@ -630,14 +657,17 @@ fn main() {
   let (master_ev_send, master_ev_rec) = init_channels::<TofEvent>(); 
   let thread_control_eb = Arc::clone(&thread_control);
   let tp_to_sink_c      = tp_to_sink.clone();
+  let orphanage         = ev_to_builder.clone(); 
   let _evtbldr_handle = thread::Builder::new()
     .name("event-builder".into())
     .spawn(move || {
                     event_builder(&master_ev_rec,
                                   &ev_from_rb,
+                                  &orphanage,
                                   &tp_to_sink_c,
                                   &te_to_sink,
                                   mtb_link_id_map,
+                                  dead_rb_ids,
                                   thread_control_eb);
      })
     .expect("Failed to spawn event-builder thread!");
@@ -723,7 +753,9 @@ fn main() {
         }
         Err(err) => error!("Unable to connect to MTB to stop triggers! {err}")
       }
+      rm_liftof_rb_logs(&rb_id_list);
       restart_liftof_rb(&rb_id_list);
+      set_rbs_sma_mode(&rb_id_list);   
       let cc_pub_addr = &config.cmd_dispatcher_settings.cc_server_address;
       init_run_start(cc_pub_addr);
       println!("=> Releasing docking clamps...");
@@ -745,7 +777,14 @@ fn main() {
     }
     _ => ()
   }
-  
+ 
+  // We now send the used config over 
+  match tp_to_sink.send(packed_config) {
+    Err(err) => error!("Unable to send LiftofSettings to data sink! {err}"),
+    Ok(_)    => ()
+  }
+
+
   // ---------------------------------------------------------
   // Now we have setup everything and we are ready to go
 
@@ -821,6 +860,8 @@ fn main() {
       }
       println!("=> Acquired TofDetectorStatus!");
       println!("{}", detector_status);
+      println!("{:?} Good paddles A", detector_status.get_active_paddles_a()); 
+      println!("{:?} Good paddles B", detector_status.get_active_paddles_b()); 
       let pack = detector_status.pack();
       match tp_to_sink.send(pack) {
         Err(err) => error!("Unable to send TofDetectorStatus to data sink! {err}"),

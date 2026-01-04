@@ -176,11 +176,68 @@ impl TofEvent {
   pub fn age(&self) -> u64 {
     self.creation_time.elapsed().as_secs()
   }
-  
+ 
+  /// The expectedd RBs participating in this event as 
+  /// infered from the RB link ids coming from the MTB
+  pub fn get_expected_rbs(&self, mapping : &HashMap<u8,u8>) -> Vec<u8> {
+    let mut expected_rbs = Vec::<u8>::new();
+    for k in self.get_rb_link_ids() {
+      match mapping.get(&k) {
+        None => {
+          error!("Seeing unassociated link id {k}");
+        }
+        Some(rb_id) => {
+          expected_rbs.push(*rb_id);
+        }
+      }
+    }
+    expected_rbs 
+  }
+
   /// Simple check if the event contains as much RBEvents 
   /// as expected from the provided boards masks by the MTB
-  pub fn is_complete(&self) -> bool {
-    self.get_rb_link_ids().len() == self.rb_events.len()
+  pub fn is_complete(&mut self, exclude_rbs : Option<(&Vec<u8>,&DsiJChRbMapping)>) -> bool {
+    if exclude_rbs.is_none() {
+      return self.get_rb_link_ids().len() == self.rb_events.len();
+    } else {
+      let dead_rbs = exclude_rbs.unwrap();
+      let mut n_known_dead = 0usize;
+      let t_hits = self.get_trigger_hits();
+      for h in t_hits {
+        match dead_rbs.1.get(&h.0) {
+          None => {
+            continue;
+          }
+          Some(dsi) => {
+            match dsi.get(&h.1) {
+              None => {
+                continue;
+              }
+              Some(j) => {
+                match j.get(&h.2.0) {
+                  None => {
+                    continue;
+                  }
+                  Some(rb) => {
+                    if dead_rbs.0.contains(&rb) {
+                      n_known_dead += 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } // end loop over trigger hits
+        //  we use <= here, because sometimes, 
+        //  the link ids are wrong, so n_known_dead 
+        //  might be false positive
+      let n_rb_link_ids = self.get_rb_link_ids().len();
+      //if n_rb_link_ids <= self.rb_events.len() + n_known_dead {
+      //  self.status = EventStatus::KnownDeadRB; 
+      //}
+      return n_rb_link_ids <= self.rb_events.len() + n_known_dead;
+    }
   }
   
   /// The number of hits we did not get 
@@ -190,6 +247,8 @@ impl TofEvent {
     for rbev in &self.rb_events {
       if rbev.header.drs_lost_trigger() {
         let mut nhits = rbev.header.get_nchan() as u16;
+        // FIXME - I don't understand this - that would only work if the RB 
+        // sees 2 channels, that is 1 hit (?) Potential bug
         if nhits > 0 {
           nhits -= 1;
         }
@@ -217,23 +276,40 @@ impl TofEvent {
     }
   }
  
-  /// Calculate the infamous "interesting event" (TM Kaliroe) variables 
-  /// for the TOF. 
-  ///
-  /// This is necessary since the GCU is too weak to do math :) 
+  /// Calculate the TOF part of the interesting events mechanism, whcih is
+  /// NHIT (CBE, COR, UMB) and EDEP (CBE, COR, UMB)
   pub fn calc_gcu_variables(&mut self) {
-    for h in &self.hits {
-      if h.paddle_id <= 60 {
-        self.n_hits_cbe += 1;
-        self.tot_edep_cbe += h.get_edep();
+    if self.hits.len() == 0 {
+      for rbev in &self.rb_events {
+        for h in &rbev.hits {
+          if h.paddle_id <= 60 {
+            self.n_hits_cbe += 1;
+            self.tot_edep_cbe += h.get_edep();
+          }
+          else if h.paddle_id <= 108 && h.paddle_id > 60 {
+            self.n_hits_umb += 1;
+            self.tot_edep_umb += h.get_edep();
+          }
+          else {
+            self.n_hits_cor += 1;
+            self.tot_edep_cor += h.get_edep();
+          }
+        }
       }
-      else if h.paddle_id <= 108 && h.paddle_id > 60 {
-        self.n_hits_umb += 1;
-        self.tot_edep_umb += h.get_edep();
-      }
-      else {
-        self.n_hits_cor += 1;
-        self.tot_edep_cor += h.get_edep();
+    } else { 
+      for h in &self.hits {
+        if h.paddle_id <= 60 {
+          self.n_hits_cbe += 1;
+          self.tot_edep_cbe += h.get_edep();
+        }
+        else if h.paddle_id <= 108 && h.paddle_id > 60 {
+          self.n_hits_umb += 1;
+          self.tot_edep_umb += h.get_edep();
+        }
+        else {
+          self.n_hits_cor += 1;
+          self.tot_edep_cor += h.get_edep();
+        }
       }
     }
   }
@@ -375,7 +451,8 @@ impl TofEvent {
       h.event_t0 = t0 + t_shift;
     }
     // start the first hit at 0
-    self.hits.sort_by(|a,b| (a.event_t0).partial_cmp(&b.event_t0).unwrap_or(Ordering::Greater));
+    //self.hits.sort_by(|a,b| (a.event_t0).partial_cmp(&b.event_t0).unwrap_or(Ordering::Greater));
+    self.hits.sort_by(|a,b| (a.event_t0).total_cmp(&b.event_t0));
     let t0_first_hit = self.hits[0].event_t0;
     for h in self.hits.iter_mut() {
       h.event_t0 -= t0_first_hit
@@ -385,20 +462,38 @@ impl TofEvent {
   #[cfg(feature="database")]
   pub fn set_paddles(&mut self, paddles : &HashMap<u8, TofPaddle>) {
     let mut nerror = 0u8;
-    for h in &mut self.hits {
-      match paddles.get(&h.paddle_id) {
-        None => {
-          error!("Got paddle id {} which is not in given map!", h.paddle_id);
-          nerror += 1;
-          continue;
+    if self.hits.len() == 0 {
+      for rbev  in &mut self.rb_events {
+        for h in &mut rbev.hits {
+          match paddles.get(&h.paddle_id) {
+            None => {
+              error!("Got paddle id {} which is not in given map!", h.paddle_id);
+              nerror += 1;
+              continue;
+            }
+            Some(pdl) => {
+              h.set_paddle(pdl);
+            }
+          }
         }
-        Some(pdl) => {
-          h.set_paddle(pdl);
+      }
+    } else {
+      for h in &mut self.hits {
+        match paddles.get(&h.paddle_id) {
+          None => {
+            error!("Got paddle id {} which is not in given map!", h.paddle_id);
+            nerror += 1;
+            continue;
+          }
+          Some(pdl) => {
+            h.set_paddle(pdl);
+          }
         }
       }
     }
     if nerror == 0 {
       self.paddles_set = true;
+      //self.normalize_hit_times();
     }
   }
 
@@ -431,6 +526,18 @@ impl TofEvent {
   pub fn get_missing_paddles_hg(&self, pid_map :   &DsiJChPidMapping) -> Vec<u8> {
     let mut missing = Vec::<u8>::new();
     for th in self.get_trigger_hits() {
+      if !pid_map.contains_key(&th.0) {
+        error!("Can't find {:?} in paddlemap!",th);
+        continue;
+      }
+      if !pid_map.get(&th.0).unwrap().contains_key(&th.1) {
+        error!("Can't find {:?} in paddlemap!",th);
+        continue;
+      }
+      if !pid_map.get(&th.0).unwrap().get(&th.1).unwrap().contains_key(&th.2.0) {
+        error!("Can't find {:?} in paddlemap!",th);
+        continue;
+      }
       let pid = pid_map.get(&th.0).unwrap().get(&th.1).unwrap().get(&th.2.0).unwrap().0;
       let mut found = false;
       for h in &self.hits {
@@ -544,7 +651,7 @@ impl TofEvent {
   }
   
   pub fn get_timestamp48(&self) -> u64 {
-    ((self.timestamp16 as u64) << 32) | self.timestamp32 as u64
+    0x273000000000000 | (((self.timestamp16 as u64) << 32) | self.timestamp32 as u64)
   }
   
   /// Ttotal energy depostion in the TOF - Umbrella
@@ -959,10 +1066,15 @@ impl fmt::Display for TofEvent {
     repr += &(format!("\n  timestamp32      : {}", self.timestamp32)); 
     repr += &(format!("\n  timestamp16      : {}", self.timestamp16)); 
     repr += &(format!("\n   |-> timestamp48 : {}", self.get_timestamp48())); 
+    //repr += &(format!("\n  mt_tiu_gps16     : {}", self.mt_tiu_gps16));
+    //repr += &(format!("\n  mt_tiu_gps32     : {}", self.mt_tiu_gps32)); 
+    //repr += &(format!("\n  mt_timestamp     : {}", self.mt_timestamp));
+    //repr += &(format!("\n  mt_tiu_timestamp : {}", self.mt_tiu_timestamp));
+    //repr += &(format!("\n  gps timestamp    : {}", self.get_mt_timestamp_abs()));
     //repr += &(format!("\n  PrimaryBeta      : {}", self.get_beta())); 
     //repr += &(format!("\n  PrimaryCharge    : {}", self.primary_charge));
     if self.version == ProtocolVersion::V1 {
-      repr += "---- V1 variables ----";
+      repr += "\n ---- V1 variables ----";
       repr += &(format!("\n n_hits_umb   : {}", self.n_hits_umb  )); 
       repr += &(format!("\n n_hits_cbe   : {}", self.n_hits_cbe  )); 
       repr += &(format!("\n n_hits_cor   : {}", self.n_hits_cor  )); 
@@ -1051,7 +1163,19 @@ impl FromRandom for TofEvent {
 #[cfg(feature="pybindings")]
 #[pymethods]
 impl TofEvent {
+   
+  #[pyo3(name="strip_rbevents")]
+  fn strip_rbevents_py(&mut self) {
+    self.strip_rbevents()
+  }
   
+  /// Calculate the TOF part of the interesting events mechanism, whcih is
+  /// NHIT (CBE, COR, UMB) and EDEP (CBE, COR, UMB)
+  #[pyo3(name="calc_gcu_variables")]
+  fn calc_gcu_variables_py(&mut self) {
+    self.calc_gcu_variables()
+  }
+
   /// Emit a copy of self
   fn copy(&self) -> Self {
     self.clone()
@@ -1086,6 +1210,11 @@ impl TofEvent {
     (pids, twindows)
   }
  
+  /// The run id 
+  #[getter]
+  fn get_run_id(&self) -> u16 { 
+    self.run_id
+  }
 
   /// Remove all hits from the event's hit series which 
   /// do NOT obey causality. that is where the timings
@@ -1315,8 +1444,19 @@ impl TofEvent {
       }
     }
   }
-
-
+  
+  #[cfg(feature="database")]
+  #[staticmethod]
+  fn unpack(pack : &TofPacket) -> PyResult<Self> {
+    if pack.packet_type != Self::TOF_PACKET_TYPE {
+      let err_msg = format!("This is a packet of type {}, but we need type {}", pack.packet_type, Self::TOF_PACKET_TYPE);
+      return Err(PyValueError::new_err(err_msg));
+    }
+    let mut pos = 0;
+    let mut ev = Self::from_bytestream(&pack.payload,&mut pos)?; 
+    ev.set_paddles(&pack.tof_paddles);
+    Ok(ev)
+  }
 }
 
 #[cfg(feature="pybindings")]
@@ -1342,6 +1482,12 @@ fn packable_tofeventv0() {
     let fix_time = Instant::now();
     test.creation_time = fix_time;
     data.creation_time = fix_time;
+    for k in &mut data.rb_events {
+      k.creation_time = None;
+    }
+    for k in &mut test.rb_events {
+      k.creation_time = None;
+    }
     for h in &mut test.hits {
       h.paddle_len       = 0.0; 
       h.coax_cable_time  = 0.0; 
@@ -1371,6 +1517,12 @@ fn packable_tofeventv1() {
     let fix_time = Instant::now();
     test.creation_time = fix_time;
     data.creation_time = fix_time;
+    for k in &mut data.rb_events {
+      k.creation_time = None;
+    }
+    for k in &mut test.rb_events {
+      k.creation_time = None;
+    }
     for h in &mut test.hits {
       h.paddle_len       = 0.0; 
       h.coax_cable_time  = 0.0; 
@@ -1400,6 +1552,12 @@ fn packable_tofeventv2() {
     let fix_time = Instant::now();
     test.creation_time = fix_time;
     data.creation_time = fix_time;
+    for k in &mut data.rb_events {
+      k.creation_time = None;
+    }
+    for k in &mut test.rb_events {
+      k.creation_time = None;
+    }
     for h in &mut test.hits {
       h.paddle_len       = 0.0; 
       h.coax_cable_time  = 0.0; 

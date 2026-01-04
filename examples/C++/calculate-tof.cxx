@@ -29,6 +29,7 @@
 
 namespace fs = std::filesystem;
 namespace gt = Gaps::Telemetry;
+namespace g  = gondola;
 
 int main(int argc, char *argv[]){
   spdlog::cfg::load_env_levels();
@@ -122,12 +123,12 @@ int main(int argc, char *argv[]){
         }
         tp = tdata.unwrap();
         u64 pos = 0;
-        auto evdata = TofEvent::from_bytestream(tp.payload, pos);
+        auto evdata = g::TofEvent::from_bytestream(tp.payload, pos);
         if (evdata.is_err()) {
           continue;
         }
         auto ev = evdata.unwrap();
-        for (TofHit const &h : ev.get_hits()) {
+        for (g::TofHit const &h : ev.get_hits()) {
           // calculate tof for a certain paddle combination from 
           // telemetry data
           // for now, just to test, we will check the value of the phase

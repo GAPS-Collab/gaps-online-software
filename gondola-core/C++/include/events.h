@@ -39,6 +39,7 @@
 #endif
 
 namespace r = result;
+namespace gon = gondola;
 
 class RBCalibration;
 
@@ -541,10 +542,11 @@ namespace gondola {
     static auto get_n_rbevents(u32 mask) -> u32;
     /// Get all hits from all rb_events
     auto get_hits() const -> Vec<TofHit>;
+    #ifdef BUILD_CXX_DB
     /// normalize all the hit times, taking the global ch9 
     /// phase into account
-    auto normalize_hit_times() -> void;
-  
+    auto normalize_hit_times(const TofPaddleTimingConstantMap &offsets) -> void;
+    #endif 
     /// string representation for printing
     auto to_string() const -> std::string;
   
@@ -552,12 +554,11 @@ namespace gondola {
      * Get the rb event for a specific board id.
      */
     auto get_rbevent(u8 board_id) const -> const RBEvent&; 
-  
-    /**
-     * Get the rb event for a specific board id.
-     */
+ 
+    /// Get the ids of the readoutboards participating in 
+    /// the event
     auto get_rbids() const -> Vec<u8>;
-  
+
     private:
       /**
        * Check if there are more than one RBEvent per board
@@ -642,7 +643,7 @@ namespace gondola {
     auto set_paddlemap(const Gaps::TofPaddleMap&) -> void;
     /// normalize all the hit times, taking the global ch9 
     /// phase into account
-    auto normalize_hit_times() -> void;
+    auto normalize_hit_times(const TofPaddleTimingConstantMap &offsets) -> void;
     #endif
   
     // combined timestamp

@@ -69,7 +69,8 @@ class TofAnalysis:
             if self.n_events != 0:
                 _repr += f'\n  -- events with extra hits   : {100*self.extra_hits/self.n_events:.2f} %'
         else:
-            _repr += f'\n  -- events with extra hits   : {100*self.extra_hits/self.cuts.nevents:.2f} %'
+            if self.cuts.nevents > 0:
+                _repr += f'\n  -- events with extra hits   : {100*self.extra_hits/self.cuts.nevents:.2f} %'
         
         if not self.cuts.void:
             _repr += '\n  -- -- applied cut:'
@@ -125,6 +126,12 @@ class TofAnalysis:
         }
         for k in range(1,22):
             plots[f'edep_pnl{k}'] = d.histogram.hist1d(self.EDEP_BINS)
+        plots['edep_umb'] = d.histogram.hist1d(self.EDEP_BINS)
+        plots['edep_cbe'] = d.histogram.hist1d(self.EDEP_BINS)
+        plots['edep_cor'] = d.histogram.hist1d(self.EDEP_BINS)
+        plots['umb_vs_cor_edep'] = d.histogram.hist2d((self.EDEP_BINS, self.EDEP_BINS))
+        plots['cbe_vs_cor_edep'] = d.histogram.hist2d((self.EDEP_BINS, self.EDEP_BINS))
+        plots['cbe_vs_umb_edep'] = d.histogram.hist2d((self.EDEP_BINS, self.EDEP_BINS))
         cache = dict()
         for k in plots.keys():
             cache[k] = []
@@ -133,12 +140,19 @@ class TofAnalysis:
 
     def _nhit_plots(self):
         nhit_plots = {
-          'hit'      : d.histogram.hist1d(self.NHIT_BINS),
-          'thit'     : d.histogram.hist1d(self.NHIT_BINS),
-          'rblink'   : d.histogram.hist1d(self.NHIT_BINS),
-          'miss_hit' : d.histogram.hist1d(self.PID_BINS),
+          'hit'        : d.histogram.hist1d(self.NHIT_BINS),
+          'nhit_cbe'   : d.histogram.hist1d(self.NHIT_BINS),
+          'nhit_umb'   : d.histogram.hist1d(self.NHIT_BINS),
+          'nhit_cor'   : d.histogram.hist1d(self.NHIT_BINS),
+          'i_vs_o_nhit': d.histogram.hist2d((self.NHIT_BINS, self.NHIT_BINS)),
+          'umb_vs_cor_nhit': d.histogram.hist2d((self.NHIT_BINS, self.NHIT_BINS)),
+          'cbe_vs_umb_nhit': d.histogram.hist2d((self.NHIT_BINS, self.NHIT_BINS)),
+          'cbe_vs_cor_nhit': d.histogram.hist2d((self.NHIT_BINS, self.NHIT_BINS)),
+          'thit'       : d.histogram.hist1d(self.NHIT_BINS),
+          'rblink'     : d.histogram.hist1d(self.NHIT_BINS),
+          'miss_hit'   : d.histogram.hist1d(self.PID_BINS),
           # these are non causal hits
-          'nc_pdls'  : d.histogram.hist1d(self.PID_BINS),
+          'nc_pdls'    : d.histogram.hist1d(self.PID_BINS),
         }
         return nhit_plots
 
@@ -438,6 +452,14 @@ class TofAnalysis:
         if self._analysis.hit_cache_len >= self.event_cache_size: 
             # hit statistics
             self.nhit_plots['hit'     ].fill(self._analysis.c_hit) 
+            self.nhit_plots['nhit_umb'].fill(self._analysis.c_hit_umb) 
+            self.nhit_plots['nhit_cor'].fill(self._analysis.c_hit_cor) 
+            self.nhit_plots['nhit_cbe'].fill(self._analysis.c_hit_cbe) 
+            outer_n_hit = [self._analysis.c_hit_umb[k] + self._analysis.c_hit_cor[k] for k in range(len(self._analysis.c_hit_cor))]
+            self.nhit_plots['i_vs_o_nhit'].fill((self._analysis.c_hit_cbe, outer_n_hit))
+            self.nhit_plots['umb_vs_cor_nhit'].fill((self._analysis.c_hit_umb, self._analysis.c_hit_cor))
+            self.nhit_plots['cbe_vs_umb_nhit'].fill((self._analysis.c_hit_cbe, self._analysis.c_hit_umb))
+            self.nhit_plots['cbe_vs_cor_nhit'].fill((self._analysis.c_hit_cbe, self._analysis.c_hit_cbe))
             self.nhit_plots['thit'    ].fill(self._analysis.c_thit) 
             self.nhit_plots['rblink'  ].fill(self._analysis.c_rblink) 
             self.nhit_plots['miss_hit'].fill(self._analysis.c_miss_hit) 
@@ -461,9 +483,28 @@ class TofAnalysis:
                     else:
                         self.tmg_plots[k].fill(self._analysis.cache.get_f32_data(k))
                 for k in self.edep_plots:
-                    if k != "edep":
-                        pnl = int(k[8:])
+                    if not k in ['umb_vs_cor_edep', 'cbe_vs_cor_edep', 'cbe_vs_umb_edep', 'edep', 'edep_cor', 'edep_cbe', 'edep_cor']:
+                        try:
+                            pnl = int(k[8:])
+                        except Exception as e:
+                            print (f'(can not get panel edep for {k}')
+                            continue
                         self.edep_plots[k].fill(self._analysis.cache.get_f32_data_panel("edep", pnl))
+                        continue
+                    if k == 'umb_vs_cor_edep':
+                        self.edep_plots[k].fill(\
+                                (self._analysis.cache.get_f32_data("edep_umb"),
+                                self._analysis.cache.get_f32_data("edep_cor")))
+                        continue
+                    if k == 'cbe_vs_cor_edep':
+                        self.edep_plots[k].fill(\
+                                (self._analysis.cache.get_f32_data("edep_cbe"),
+                                self._analysis.cache.get_f32_data("edep_cor")))
+                        continue
+                    if k == 'cbe_vs_umb_edep':
+                        self.edep_plots[k].fill(\
+                                (self._analysis.cache.get_f32_data("edep_cbe"),
+                                self._analysis.cache.get_f32_data("edep_umb")))
                         continue
                     self.edep_plots[k].fill(self._analysis.cache.get_f32_data(k))
                 self._analysis.cache.clear()

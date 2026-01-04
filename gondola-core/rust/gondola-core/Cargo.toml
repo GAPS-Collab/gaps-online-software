@@ -44,11 +44,6 @@ tof-liftof          = ["signal-hook"]
 # define the default features for easy testing 
 default             = ["random", "database", "tof-liftof"]
 
-[dependencies.tof-control]
-version  = "0.9"
-optional = true
-git      = "https://github.com/GAPS-Collab/tof-control.git"
-branch   = "minimal"
 
 [dependencies.pyo3]
 version  = "0.25"
@@ -71,6 +66,13 @@ optional = true
 version  = "0.1"
 optional = true
 
+[dependencies.tof-control]
+version  = "0.9.5"
+optional = true
+git      = "https://github.com/GAPS-Collab/tof-control.git"
+#branch   = "minimal"
+rev      = "23ab243acf48c4c71a994964dee0b612b8cb6132"
+#rev      = "5f63d530fd293cdceede6383ac5b644bbe3deb30"
 
 [dev-dependencies]
 criterion = "0.4"
@@ -78,6 +80,8 @@ criterion = "0.4"
 quickcheck = "1"
 
 [dependencies]
+#similar           = "2"
+diffy             = "0.4"
 comfy-table       = "7.1"
 zmq               = "0.10"
 signal-hook       = { version = "0.3", optional=true}
@@ -105,6 +109,7 @@ ureq              = "2.12" # FIXME - make this a feature
 polars            = { version = "0.51", features = ["lazy"], optional = true }
 pyo3-polars       = { version = "0.24", optional = true }
 env_logger        = "0.10"
+flate2            = "1.1"
 
 # for the database - in case we want to use postgres, 
 # the feature needs to be added here, however, this would

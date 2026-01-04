@@ -11,7 +11,6 @@ import os as _os
 
 __version__ = _gondola_core.get_version()
 
-events     = _gondola_core.events 
 packets    = _gondola_core.packets 
 #io         = _gondola_core.io 
 monitoring = _gondola_core.monitoring 
@@ -21,6 +20,7 @@ algo       = _gondola_core.algo
 #tracker    = _gondola_core.tracker 
 
 # set up the python submodules
+from . import events
 from . import calibration 
 from . import visual
 from . import io
@@ -28,8 +28,6 @@ from . import tof
 from . import db 
 from . import reconstruction 
 from . import tracker
-
-#calibration.RBCalibrations = _gondola_core.calibration.RBCalibrations
 
 __all__ = ['events', 'packets', 'io', 'monitoring', 'stats', 'algo', 'db',
            'calibration', 'visual']

@@ -15,7 +15,6 @@
 #include "spdlog/spdlog.h"
 #include "spdlog/cfg/env.h"
 
-//namespace g = Gaps;
 namespace g = gondola;
 using namespace result;
 
@@ -578,7 +577,7 @@ auto g::TofEvent::get_n_rbevents(u32 mask) -> u32 {
 /**********************************************************/
 
 #ifdef BUILD_CXX_DB
-auto g::TofEvent::normalize_hit_times() -> void {
+auto g::TofEvent::normalize_hit_times(const g::TofPaddleTimingConstantMap &offsets) -> void {
   if (rb_events.size() == 0) {
     return;
   }
@@ -601,6 +600,9 @@ auto g::TofEvent::normalize_hit_times() -> void {
       }
       auto t_shift = 50.0*phase_diff/(2.0*PI);
       h.event_t0 = t0 + t_shift;
+      if (!offsets.empty()) {
+        h.event_t0 -= offsets.at(h.paddle_id);
+      }
     }
   }
 }
@@ -617,7 +619,7 @@ g::TofEvent::TofEvent() {
 
 /**********************************************************/
 
-#ifdef BUILD_CXXDB
+#ifdef BUILD_CXX_DB
 auto g::TofEvent::set_paddlemap(const Gaps::TofPaddleMap& paddlemap) -> void {
   for (auto &ev : rb_events) {
     for (auto &h : ev.hits) {
@@ -1157,10 +1159,16 @@ auto g::TofHit::from_bytestream(const Vec<u8> &bytestream, u64 &pos) -> g::TofHi
  pos += 1; // skip version
  hit.baseline_b     = Gaps::parse_f16(bytestream, pos);
  hit.baseline_b_rms = Gaps::parse_f16(bytestream, pos);
- 
+
  // FIXME checks - packetlength, checksum ?
+ //if (version == 64) {
+ //  pos +=   
+ //}
+ // skip new variables for now
+ pos += 14;
  u16 tail = Gaps::parse_u16(bytestream, pos);
  if (tail != TAIL) {
+   spdlog::error("VERSION {}", version); 
    spdlog::error("TofHit TAIL signature {} is incorrect!", tail);
  }
  return hit; 
@@ -1284,8 +1292,8 @@ auto g::TofEventSummary::get_trigger_sources() const -> Vec<g::TriggerType> {
   return t_types;
 } 
 
-#ifdef BUILD_CXXDB
-auto g::TofEventSummary::normalize_hit_times() -> void {
+#ifdef BUILD_CXX_DB
+auto g::TofEventSummary::normalize_hit_times(const g::TofPaddleTimingConstantMap &offsets) -> void {
   if (hits.size() == 0) {
     return;
   }
@@ -1307,6 +1315,9 @@ auto g::TofEventSummary::normalize_hit_times() -> void {
     }
     auto t_shift = 50.0*phase_diff/(2.0*PI);
     h.event_t0 = t0 + t_shift;
+    if (!offsets.empty()) {
+      h.event_t0 -= offsets.at(h.paddle_id);
+    }
   }
 }
 #endif

@@ -53,7 +53,7 @@ impl SerializationError {
 
 impl fmt::Display for SerializationError {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "<SerializationError : {}>", self.to_string())
+    write!(f, "<SerializationError : {}>", self.as_str())
   }
 }
 

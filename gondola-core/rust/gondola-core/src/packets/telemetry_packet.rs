@@ -12,8 +12,10 @@ use crate::prelude::*;
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "pybindings", pyclass, pyo3(name="TelemetryPacket"))]
 pub struct TelemetryPacket {
-  pub header  : TelemetryPacketHeader,
-  pub payload : Vec<u8>
+  pub header       : TelemetryPacketHeader,
+  pub payload      : Vec<u8>,
+  pub tof_paddles  : Arc<HashMap<u8,  TofPaddle>>, 
+  pub trk_strips   : Arc<HashMap<u32, TrackerStrip>>,
 }
 
 #[cfg(feature="pybindings")]
@@ -63,8 +65,10 @@ impl TelemetryPacket {
 
   pub fn new() -> Self {
     Self {
-      header  : TelemetryPacketHeader::new(),
-      payload : Vec::<u8>::new()
+      header      : TelemetryPacketHeader::new(),
+      payload     : Vec::<u8>::new(),
+      tof_paddles : Arc::new(HashMap::<u8, TofPaddle>::new()),
+      trk_strips  : Arc::new(HashMap::<u32,TrackerStrip>::new()),
     }
   }
  

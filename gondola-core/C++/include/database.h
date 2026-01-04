@@ -142,7 +142,6 @@ namespace Gaps {
 
 // new items shall go directly into the new gondola namespace 
 namespace gondola {
-
   /// The mapping of volume id to hardware id, which is either the strip
   /// identifier or the paddle id 
   auto get_hid_vid_map() -> HashMap<u32, u32>;
@@ -172,7 +171,6 @@ namespace gondola {
   typedef std::map<u32, f32> TofPaddleTimingConstantMap;
 
   auto get_tofpaddletimingconstants(std::string mask_name = "") -> TofPaddleTimingConstantMap;
-
 }
 
 std::ostream& operator<<(std::ostream& os, const Gaps::TofPaddle& paddle);

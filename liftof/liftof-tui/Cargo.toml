@@ -13,6 +13,7 @@ serde_json        = { workspace = true }
 crossbeam-channel = { workspace = true }
 chrono            = { version = "0.4", features = ["serde"] }
 ndhistogram       = "0.10"
+toml              = "0.9"
 
 # tui stuff
 crossterm  = { version = "0.28", features=["serde"]}

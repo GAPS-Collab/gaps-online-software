@@ -83,7 +83,7 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
    Ok(_)    => info!("Subscribed to {:?}!", topic),
   }
   let mut tc_timer = Instant::now();
-  let mut verification_active = false;
+  let verification_active : bool;
   
   let ae_settings         : AnalysisEngineSettings; 
   let mut run_analysis_engine : bool;
@@ -102,9 +102,9 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
   if verification_active {
     // needs analysis engine since it relies on hits 
     run_analysis_engine = true;
-    println!("=> RUnning verfication!");
+    println!("=> Running verfication on board {board_id}!");
   } else {
-    println!("=> Not running verification!");
+    debug!("=> Not running verification!");
   }
   if run_analysis_engine {
     info!("Will run analysis engine!");
@@ -173,6 +173,7 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
                 match tp.unpack::<RBEvent>() {
                   Ok(rbev_) => {
                     event = rbev_;
+                    event.creation_time = Some(Instant::now());
                   } 
                   Err(err) => {
                     error!("Can't unpack RBEvent! {err}");
@@ -189,7 +190,7 @@ pub fn readoutboard_communicator(ev_to_builder       : Sender<RBEvent>,
                                           ae_settings) {
                     Ok(_) => (),
                     Err(err) => {
-                      error!("Unable to analyze waveforms for this event! {err}");
+                      debug!("Unable to analyze waveforms for this event on RB {}! {err}", &rb.rb_id);
                     }
                   }
                 }

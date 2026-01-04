@@ -99,8 +99,8 @@ int main(int argc, char *argv[]){
   //    // THe format will change as well soon.
       case PacketType::TofEvent : {
         usize pos = 0;
-        auto r = TofEvent::from_bytestream(p.payload, pos);
-        TofEvent ev;
+        auto r = g::TofEvent::from_bytestream(p.payload, pos);
+        g::TofEvent ev;
         if (!r.is_ok()) {
           spdlog::warn("Got broken TofEvent!");
           continue;
@@ -112,7 +112,7 @@ int main(int argc, char *argv[]){
           std::cout << ev << std::endl;
         }
         for (auto const &rbid : ev.get_rbids()) {
-          RBEvent rb_event = ev.get_rbevent(rbid);
+          g::RBEvent rb_event = ev.get_rbevent(rbid);
           if (cali.contains(rbid)) {
             // Vec<f32> is a typedef for std::vector<float32>
             Vec<Vec<f32>> volts = cali[rbid].voltages(rb_event, true); // second argument is for spike cleaning
@@ -141,7 +141,7 @@ int main(int argc, char *argv[]){
       }
       case PacketType::MasterTrigger : {
         usize pos = 0;
-        auto mte = MasterTriggerEvent::from_bytestream(p.payload, pos);
+        auto mte = g::MasterTriggerEvent::from_bytestream(p.payload, pos);
         if (verbose) {
           std::cout << mte << std::endl;
         }

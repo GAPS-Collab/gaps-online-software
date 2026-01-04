@@ -10,8 +10,9 @@
 #include "io/telemetry_reader.hpp"
 #include "calibration.h"
 
-namespace nb = nanobind;
-namespace g  = gondola;
+namespace nb  = nanobind;
+namespace g   = gondola;
+namespace gtl = Gaps::Telemetry;
 
 NB_MODULE(gondola_cxx, m) {
 
@@ -147,6 +148,19 @@ NB_MODULE(gondola_cxx, m) {
     .value("TmP64"             , g::TelemetryPacketType::TmP64              )
     .value("TmP96"             , g::TelemetryPacketType::TmP96              )
     .value("TmP214"            , g::TelemetryPacketType::TmP214             )
+    .value("HeatHVLVSettings"  , g::TelemetryPacketType::HeatHVLVSettings   )
+    .value("LabJackSettings"   , g::TelemetryPacketType::LabjackSettings    )
+    .value("SurvivalPacket"    , g::TelemetryPacketType::SurvivalPacket     )
+    .value("GcuMonHKAddendum"  , g::TelemetryPacketType::GcuMonHKAddendum   )
+    .value("TeleMainSettings"  , g::TelemetryPacketType::TeleMainSettings   )
+    .value("PacketStats"       , g::TelemetryPacketType::PacketStats        )
+    .value("DecimationSettings", g::TelemetryPacketType::DecimationSettings )
+    .value("RPiHKP"            , g::TelemetryPacketType::RPiHKP             )
+    .value("GcuEvtBuilderStats", g::TelemetryPacketType::GcuEvtBuilderStats )
+    .value("SipGpsPosition"    , g::TelemetryPacketType::SipGpsPosition     )
+    .value("SipGpsTime"        , g::TelemetryPacketType::SipGpsTime         )
+    .value("SipPressure"       , g::TelemetryPacketType::SipPressure        )
+    .value("RatePacket"        , g::TelemetryPacketType::RatePacket         )
     .value("AnyTrackerHK"      , g::TelemetryPacketType::AnyTrackerHK       );
   
   nb::class_<g::TelemetryPacketHeader>(m, "TelemetryPacketHeader")
@@ -156,15 +170,69 @@ NB_MODULE(gondola_cxx, m) {
     .def_ro("counter"      , &g::TelemetryPacketHeader::counter)
     .def_ro("length"       , &g::TelemetryPacketHeader::length)
     .def_ro("checksum"     , &g::TelemetryPacketHeader::checksum)
-    .def("to_string"       , &g::TelemetryPacketHeader::to_string);
+    .def("to_string"       , &g::TelemetryPacketHeader::to_string)
+    .def("__str__", [](const g::TelemetryPacketHeader& self) {
+        return nb::str("{}").format(self.to_string());
+    })
+    .def("__repr__", [](const g::TelemetryPacketHeader& self) {
+        return nb::str("{}").format(self.to_string());
+    });
 
   nb::class_<g::TelemetryPacket>(m, "TelemetryPacket")
     .def(nb::init<>())
     .def_ro("header"       , &g::TelemetryPacket::header)
     .def_ro("payload"      , &g::TelemetryPacket::payload)
     .def("from_bytestream" , &g::TelemetryPacket::from_bytestream)
-    .def("to_string"       , &g::TelemetryPacket::to_string);
+    .def("to_string"       , &g::TelemetryPacket::to_string)
+    .def("__str__", [](const g::TelemetryPacket& self) {
+        return nb::str("{}").format(self.to_string());
+    })
+    .def("__repr__", [](const g::TelemetryPacket& self) {
+        return nb::str("{}").format(self.to_string());
+    });
+
+  nb::class_<gtl::TrkHeader>(m, "TrkHeader")
+    .def(nb::init<>())
+    .def_static("from_bytestream", &gtl::TrkHeader::from_bytestream)
+    .def("__str__", [](const gtl::TrkHeader& self) {
+        return nb::str("{}").format(self.to_string());
+    })
+    .def("__repr__", [](const gtl::TrkHeader& self) {
+        return nb::str("{}").format(self.to_string());
+    });
   
+    nb::class_<gtl::TrkHit>(m, "TrkHit")
+    .def(nb::init<>())
+    .def("__str__", [](const gtl::TrkHit& self) {
+        return nb::str("{}").format(self.to_string());
+    })
+    .def("__repr__", [](const gtl::TrkHit& self) {
+        return nb::str("{}").format(self.to_string());
+    });
+
+  nb::class_<gtl::TrkEvent>(m, "TrkEvent")
+    .def(nb::init<>())
+    .def_ro("hits"      , &gtl::TrkEvent::hits)
+    .def("__str__", [](const gtl::TrkEvent& self) {
+        return nb::str("{}").format(self.to_string());
+    })
+    .def("__repr__", [](const gtl::TrkEvent& self) {
+        return nb::str("{}").format(self.to_string());
+    });
+
+  nb::class_<gtl::TrkEventPacket>(m, "TrkEventPacket")
+    .def(nb::init<>())
+    .def_ro("events"      , &gtl::TrkEventPacket::events)
+    .def_static("from_bytestream", [](Vec<u8> stream, usize pos) {
+        return gtl::TrkEventPacket::from_bytestream(stream, pos).unwrap();
+    })    
+    .def("__str__", [](const gtl::TrkEventPacket& self) {
+        return nb::str("{}").format(self.to_string());
+    })
+    .def("__repr__", [](const gtl::TrkEventPacket& self) {
+        return nb::str("{}").format(self.to_string());
+    });
+
   nb::class_<g::TelemetryPacketReader>(m, "TelemetryPacketReader")
     .def(nb::init<std::string>())
     .def_prop_ro("filenames"         , &g::TelemetryPacketReader::get_filenames)
@@ -175,6 +243,9 @@ NB_MODULE(gondola_cxx, m) {
     .def("cache_all_packets"         , &g::TelemetryPacketReader::cache_all_packets)
     .def("count_packets"             , &g::TelemetryPacketReader::count_packets)
     .def("rewind"                    , &g::TelemetryPacketReader::rewind);
+  
+  nb::class_<Gaps::Telemetry::MergedEvent>(m, "TelemetryEvent")
+    .def(nb::init<>());
 
   // Spike cleaning functions
   m.def("spike_cleaning_drs4", &g::spike_cleaning_drs4, 

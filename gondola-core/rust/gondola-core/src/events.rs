@@ -199,7 +199,8 @@ impl TriggerType {
     }
     t_types
   }
- pub fn to_u8(&self) -> u8 {
+ 
+  pub fn to_u8(&self) -> u8 {
     match self {
       TriggerType::Unknown => {
         return 0;
@@ -318,6 +319,10 @@ pub enum EventStatus {
   /// If any of the RBEvents have Sync erros, we flag the tof 
   /// event summary to indicate there were issues
   AnyDataMangling        = 16u8,
+  /// RB is missing, but it is expected that is missing
+  /// when we compare the trigger information with the 
+  /// list of known dead rbs
+  KnownDeadRB            = 17u8,
   IncompleteReadout      = 21u8,
   /// This can be used if there is a version
   /// missmatch and we have to hack something
@@ -326,6 +331,8 @@ pub enum EventStatus {
   EventTimeOut           = 23u8,
   /// A RB misses Ch9 data
   NoChannel9             = 24u8,
+  /// A RBReceives a strange event id 
+  RBEventWacky           = 25u8,
   GoodNoCRCOrErrBitCheck = 39u8,
   /// The event status is good, but we did not 
   /// perform any CRC32 check

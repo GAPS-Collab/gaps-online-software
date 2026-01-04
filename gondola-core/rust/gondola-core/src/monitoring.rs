@@ -75,15 +75,12 @@ pub trait MoniData {
     0
   }
 
-  fn set_timestamp(&mut self, ts : u64) {
-  
+  fn set_timestamp(&mut self, _ts : u64) {
   }
   ///// access the internal timestamps as obtained from 
   ///// MoniDat 
   //fn get_timestamps_mut(&mut self) -> &Vec<u64> {
   //}   
-
-
 }
 
 /// A MoniSeries is a collection of (primarily) monitoring
@@ -434,6 +431,73 @@ macro_rules! moniseries {
                     } 
                   }
                 }
+              }
+            }
+          }
+        }
+      }
+      
+      /// Add an additional (Telemetry) file to the series 
+      ///
+      /// # Arguments:
+      ///   * filename    : The name of the (telemetry) file to add
+      fn add_telemetryfile(&mut self, filename : String) {
+        let reader = TelemetryPacketReader::new(filename, true, None, None);
+        for pack in reader {
+          if pack.header.packet_type == TelemetryPacketType::AnyTofHK {
+            let mut pos = 0;
+            // subtract the 2020/1/1 midnight from the gcutime to make 
+            // it f32
+            let gcutime = pack.header.get_gcutime() as u64;
+            match TofPacket::from_bytestream(&pack.payload, &mut pos) {
+              Err(err) => {
+                println!("Error unpackin! {err}");
+              }
+              Ok(tp) => {
+                if tp.packet_type == <$class>::TOF_PACKET_TYPE  {
+                  match tp.unpack::<$class>() {
+                    Err(err) => {
+                      println!("Error unpacking! {err}");
+                    }
+                    Ok(mut moni) => {
+                      self.add_timestamp(gcutime);
+                      moni.set_timestamp(gcutime - self.get_first_ts()); 
+                      self.add(moni);
+                      //self.timestamps.push(gcutime);
+                    }
+                  }
+                }
+              }
+            } 
+          }
+        }
+      }
+      
+      /// Add an additional (Tof) file to the series 
+      ///
+      /// # Arguments:
+      ///   * filename    : The name of the (caraspace) file to add
+      ///   * from_object : Since this adds caraspace files, it is possible 
+      ///                   to choose from where to get the information.
+      ///                   Either the telemetry packet, or the tofpacket, if 
+      ///                   either is present in the frame. When 
+      ///                   CRFrameObjectType = Unknown, it will figure it out 
+      ///                   automatically, preferring the telemetry since it has
+      ///                   the gcu timestamp
+      #[pyo3(signature = (filename))]
+      fn add_toffile(&mut self, filename : String) {
+        let reader = TofPacketReader::new(&filename);
+        for tp in reader { 
+          if tp.packet_type == <$class>::TOF_PACKET_TYPE  {
+            match tp.unpack::<$class>() {
+              Err(err) => {
+                println!("Error unpacking! {err}");
+              }
+              Ok(mut moni) => {
+                self.add_timestamp(moni.get_timestamp());
+                moni.set_timestamp(moni.get_timestamp()); 
+                self.add(moni);
+                //self.timestamps.push(gcutime);
               }
             }
           }

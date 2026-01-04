@@ -100,7 +100,8 @@ pub fn monitoring(board_id          : u8,
   }
   debug!("Setting sleeptime to {} seconds!", sleeptime_sec);
   let sleeptime = Duration::from_secs_f32(sleeptime_sec);
-
+  // the new value of lost rb ids 
+  let mut lost_event_ids = 0f32;
   loop {
     match thread_control.lock() {
       Ok(tc) => {
@@ -109,6 +110,7 @@ pub fn monitoring(board_id          : u8,
           info!("Received stop signal. Will stop thread!");
           break;
         }
+        lost_event_ids = tc.lost_event_ids;
       },
       Err(err) => {
         trace!("Can't acquire lock! {err}");
@@ -117,12 +119,12 @@ pub fn monitoring(board_id          : u8,
 
     // RB monitoring routine
     if rb_moni_timer.elapsed().as_secs_f32() > rb_moni_interval {
-      let moni_dt = get_rb_moni(board_id).unwrap();
+      let mut moni_dt = get_rb_moni(board_id).unwrap();
 
       if verbose {
         println!("{}", moni_dt);
       }
-
+      moni_dt.lost_event_ids = lost_event_ids;
       let tp = moni_dt.pack();
       match tp_sender.try_send(tp) {
         Err(err) => error!("Issue sending RBMoniData {:?}", err),
@@ -134,7 +136,6 @@ pub fn monitoring(board_id          : u8,
     // Preamp monitoring routine
     if pa_moni_timer.elapsed().as_secs_f32() > rb_moni_interval*pa_moni_every_x {
       let moni = get_preamp_moni(board_id).unwrap();
-
       if verbose {
         println!("{}", moni);
       }

@@ -154,7 +154,7 @@ With the help of this database, you can actually do the following:
 The database contains much more, there are for example it also contains `TrackerStripPedestal`, `TrackerStripTransferFunction` 
 and `TrackerStripMask` which are relevant for tracker calibrations. 
 
-Calibratons
+Calibrations
 -----------
 
 TOF
@@ -172,6 +172,41 @@ Readoutboard calibrations can be loaded directly from the files with the followi
 
 Tracker
 ^^^^^^^
+
+
+Monitoring data ("Housekeeping")
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* TOF monitoring data 
+
+* Liftof settings 
+
+The general (program) settings for the liftof code as it is running on the instrument, are telemetered down at 
+the start of each new run. They are bytecompressed and 
+so the bytestream of this packet needs specials treatement.
+
+.. code-block:: python 
+
+  #! /usr/bin/env poython 
+  
+  import gondola as gon 
+  import time
+ 
+  start_of_run_time = 3600 # e.g. for a run that started and hour in the past
+
+  files  = gon.io.grace_get_telemetry_binaries(time.time() - start_of_run_time, time.time(), '/prestaging/live/')
+  for f in files:
+      reader = gon.io.TelemetryPacketReader(f)
+      for pack in reader:
+          if pack.packet_type == gon.packets.TelemetryPacketType.AnyTofHK:
+              tp = gon.packets.TofPacket.from_bytestream(pack.payload, 0)
+              if tp.packet_type == gon.packets.TofPacketType.LiftofSettings:
+                  print (tp)
+                  lpt = tp
+                  break
+  # this is the file decompression, and the config 
+  # will be saved in test.toml
+  gon.io.decompress_toml(lpt.payload, 'test.toml')
 
 
 gaps.live

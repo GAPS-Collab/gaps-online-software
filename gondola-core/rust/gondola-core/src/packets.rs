@@ -12,6 +12,12 @@ pub mod bfsw_ack_packet;
 pub use bfsw_ack_packet::AckBfsw;
 pub mod gps_packet;
 pub use gps_packet::GPSPacket;
+pub mod pdu_packet;
+pub use pdu_packet::{
+  PduChannel,
+  Pac1934,
+  PduHKPacket,
+};
 pub mod tracker;
 pub use tracker::{
   TrackerEventIDEchoPacket,

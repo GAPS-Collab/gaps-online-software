@@ -19,23 +19,6 @@ use crate::api::*;
 
 use gondola_core::prelude::*;
 
-//use tof_dataclasses::events::{DataType};
-//use tof_dataclasses::commands::{TofOperationMode};
-//use tof_dataclasses::commands::config::{
-//  RunConfig
-//};
-////use tof_dataclasses::io::RBEventMemoryStreamer;
-////use tof_dataclasses::packets::TofPacket;
-////use tof_dataclasses::threading::ThreadControl;
-//
-//use liftof_lib::settings::{
-//    RBSettings,
-//    RBBufferStrategy
-//};
-//
-//use liftof_lib::thread_control::ThreadControl;
-
-
 /// Shutdown a run within the runner thread
 fn termination_seqeunce(prog_ev       : &ProgressBar,
                         prog_a        : &ProgressBar,
@@ -84,7 +67,8 @@ fn termination_seqeunce(prog_ev       : &ProgressBar,
 ///  * force_trigger  : Run in forced trigger mode
 ///
 ///
-pub fn runner(run_config              : &Receiver<RunConfig>,
+pub fn runner(rb_id                   : u8,
+              run_config              : &Receiver<RunConfig>,
               bs_sender               : &Sender<Vec<u8>>,
               dtf_to_evproc           : &Sender<DataType>,
               opmode_to_cache         : &Sender<TofOperationMode>,
@@ -99,7 +83,9 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
   let mut evt_cnt      = 0u32;
   let mut delta_events : u64;
   let mut n_events     : u64 = 0;
- 
+
+  let rb_id_str : String =  format!("{rb_id}");
+
   // trigger settings. Per default, we latch to the 
   let mut latch_to_mtb = true;
 
@@ -136,13 +122,17 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
   prog_b.set_position(0);
   prog_ev.set_position(0);
 
-  let mut which_buff  : RamBuffer;
-  let mut buff_size   : usize;
+  let mut which_buff  = RamBuffer::A;
+  let mut buff_size   = 0usize;
+  let mut has_tripped = false;
   // set a default of 2000 events in the cache, 
   // but this will be defined in the run params
   let mut buffer_trip : usize = 2000*EVENT_SIZE;
   let mut uio1_total_size = DATABUF_TOTAL_SIZE;
   let mut uio2_total_size = DATABUF_TOTAL_SIZE;
+  let mut buffer_strategy_timeout = false;
+  let mut buffer_trips_every = 0.0f32;
+  let mut buffer_timer = Instant::now();
   loop {
     match thread_control.lock() {
       Ok(tc) => {
@@ -201,7 +191,11 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
         // deal with the individual settings:
         // first buffer size
         info!("Setting buffer trip value to {}", buffer_trip);
-        buffer_trip = (rc.rb_buff_size as usize)*EVENT_SIZE; 
+        let buff_trip_size = rc.rb_buff_size.unwrap_or(50); 
+        if buff_trip_size == 50 {
+          warn!("Using buffer trip size of 50. This ssems to be a fallback setting");
+        }
+        buffer_trip = (buff_trip_size as usize)*EVENT_SIZE; 
         if (buffer_trip > DATABUF_TOTAL_SIZE) 
         || (buffer_trip > DATABUF_TOTAL_SIZE) {
           error!("Tripsize of {buffer_trip} exceeds buffer sizes of A : {uio1_total_size} or B : {uio2_total_size}. The EVENT_SIZE is {EVENT_SIZE}");
@@ -382,7 +376,7 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
             }
             if evt_cnt == last_evt_cnt {
               thread::sleep(one_milli);
-              trace!("We didn't get an updated event count!");
+              trace!("We did not get an updated event count!");
               continue; // only continue after we see a new event!
             }
           } // end ok
@@ -391,50 +385,76 @@ pub fn runner(run_config              : &Receiver<RunConfig>,
 
       // AT THIS POINT WE KNOW WE HAVE SEEN SOMETHING!!!
       // THIS IS IMPORTANT
-      match ram_buffer_handler(buffer_trip,
-                               &bs_sender) { 
-        Err(err)   => {
-          error!("Can not deal with RAM buffers {err}");
-          continue;
-        }
-        Ok(result) => {
-          which_buff = result.0;
-          buff_size  = result.1;
-          if result.2 { // buffer has tripped
-            // in case we chose a dynamic buffer strategy, 
-            // adapt the buffer size for the next time
-            match settings.rb_buff_strategy {
-              // first case we have a fixed buffer size
-              RBBufferStrategy::NEvents(_) => (),
-              RBBufferStrategy::AdaptToRate(n_secs) => {
-                match get_trigger_rate() {
-                  Err(err) => {
-                    error!("Unable to obtain trigger rate! {err}");
-                    // FIXME - Reasonable default?
-                    buffer_trip = 50;
-                  },
-                  Ok(rate) => {
-                    buffer_trip = rate as usize*n_secs as usize*EVENT_SIZE ;
-                    trace!("Dynamic setting of buffer trip size for rate {} and n_secs {}! Setting buffer trip size to {}",rate, n_secs, buffer_trip);
-                  }
-                }
-              }
+      
+      if buffer_strategy_timeout {
+        if buffer_timer.elapsed().as_secs_f32() > buffer_trips_every {
+          buffer_timer = Instant::now();
+          match ram_buffer_handler(buffer_trip,
+                                   &bs_sender) { 
+            Err(err)   => {
+              error!("Can not deal with RAM buffers {err}");
+              continue;
             }
-            // check again if buffer trip exceeds total size
-            if (buffer_trip > DATABUF_TOTAL_SIZE) 
-            || (buffer_trip > DATABUF_TOTAL_SIZE) {
-              error!("Tripsize of {buffer_trip} exceeds buffer sizes of A : {uio1_total_size} or B : {uio2_total_size}. The EVENT_SIZE is {EVENT_SIZE}");
-              warn!("Will set buffer_trip to {DATABUF_TOTAL_SIZE}");
-              buffer_trip = DATABUF_TOTAL_SIZE;
-            } else {
-              uio1_total_size = buffer_trip;
-              uio2_total_size = buffer_trip;
-            }
-            if show_progress {
-              prog_a.set_length(uio1_total_size as u64);
-              prog_b.set_length(uio2_total_size as u64);
+            Ok(result) => {
+              which_buff = result.0;
+              buff_size  = result.1;
+              has_tripped = result.2;
             }
           }
+        }
+      } else {
+        match ram_buffer_handler(buffer_trip,
+                                 &bs_sender) { 
+          Err(err)   => {
+            error!("Can not deal with RAM buffers {err}");
+            continue;
+          }
+          Ok(result) => {
+            which_buff = result.0;
+            buff_size  = result.1;
+            has_tripped = result.2;
+          }
+        }
+      }
+      if has_tripped { // buffer has tripped
+        // in case we chose a dynamic buffer strategy, 
+        // adapt the buffer size for the next time
+        // FIXME - no unwraps 
+        match settings.rb_buff_strategy.get(&rb_id_str).unwrap() {
+          // first case we have a fixed buffer size
+          RBBufferStrategy::NEvents(_) => (),
+          RBBufferStrategy::NSeconds(n_secs) => {
+            buffer_trip = 1;
+            buffer_strategy_timeout = true;
+            buffer_trips_every = *n_secs;
+          }
+          RBBufferStrategy::ActuallySmart => { 
+            match get_trigger_rate() {
+              Err(err) => {
+                error!("Unable to obtain trigger rate! {err}");
+                // FIXME - Reasonable default?
+                buffer_trip = 50;
+              },
+              Ok(rate) => {
+                buffer_trip = rate as usize*EVENT_SIZE ;
+                trace!("Dynamic setting of buffer trip size for rate {}! Setting buffer trip size to {}",rate, buffer_trip);
+              }
+            }
+          }
+        }
+        // check again if buffer trip exceeds total size
+        if (buffer_trip > DATABUF_TOTAL_SIZE) 
+        || (buffer_trip > DATABUF_TOTAL_SIZE) {
+          error!("Tripsize of {buffer_trip} exceeds buffer sizes of A : {uio1_total_size} or B : {uio2_total_size}. The EVENT_SIZE is {EVENT_SIZE}");
+          warn!("Will set buffer_trip to {DATABUF_TOTAL_SIZE}");
+          buffer_trip = DATABUF_TOTAL_SIZE;
+        } else {
+          uio1_total_size = buffer_trip;
+          uio2_total_size = buffer_trip;
+        }
+        if show_progress {
+          prog_a.set_length(uio1_total_size as u64);
+          prog_b.set_length(uio2_total_size as u64);
         }
       }
       if force_trigger {

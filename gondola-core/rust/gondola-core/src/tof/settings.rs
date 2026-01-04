@@ -403,10 +403,12 @@ pub enum RBBufferStrategy {
   /// Readout and switch the buffers every
   /// x events
   NEvents(u16),
-  /// Adapt to the RB rate and readout the buffers
-  /// so that we get switch them every X seconds.
-  /// (Argument is in seconds
-  AdaptToRate(u16),
+  /// Readout the  buffers every NSeconds
+  /// (Argument is in seconds)
+  NSeconds(f32),
+  /// This will use the measured reate on the actual RB 
+  /// to set a sensitive buffer trip value
+  ActuallySmart, 
 }
 
 impl fmt::Display for RBBufferStrategy {
@@ -419,7 +421,7 @@ impl fmt::Display for RBBufferStrategy {
 
 
 /// Settings for the specific clients on the RBs (liftof-rb)
-#[derive(Debug, Copy, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct RBSettings {
   /// Don't send events if they have issues. Requires
   /// EventStatus::Perfect. This can not work in the
@@ -437,15 +439,6 @@ pub struct RBSettings {
   /// if different from 0, activate RB self trigger 
   /// with fixed rate setting
   pub trigger_fixed_rate            : u32,
-  ///// if different from 0, activate RB self trigger
-  ///// in poisson mode
-  //pub trigger_poisson_rate    : u32,
-  ///// if different from 0, activate RB self trigger 
-  ///// with fixed rate setting
-  //pub trigger_fixed_rate      : u32,
-  /// Either "Physics" or a calibration related 
-  /// data type, e.g. "VoltageCalibration".
-  /// <div class="warning">This might get deprecated in a future version!</div>
   pub data_type                     : DataType,
   /// This allows for different strategies on how to readout 
   /// the RB buffers. The following refers to the NEvent strategy.
@@ -457,7 +450,8 @@ pub struct RBSettings {
   /// For RBBufferStrategy::AdaptToRate(k), readout (and switch) the buffers every
   /// k seconds. The size of the buffer will be determined
   /// automatically depending on the rate.
-  pub rb_buff_strategy               : RBBufferStrategy,
+  /// This can be set for each RB individually
+  pub rb_buff_strategy               : HashMap<String,RBBufferStrategy>,
   /// The general moni interval. Whenever this time in seconds has
   /// passed, the RB will send a RBMoniData packet
   pub rb_moni_interval               : f32,
@@ -473,6 +467,15 @@ pub struct RBSettings {
 
 impl RBSettings {
   pub fn new() -> Self {
+    let mut rb_buff_strategy  = HashMap::<String, RBBufferStrategy>::new();
+    let rb_ids : Vec<u8>  = vec![1,2,3,4,5,6,7,8,9,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,39,40,41,42,46];
+    if rb_ids.len() != 40 {
+      panic!("Something is wrong with the rb ids, we see {} of them!", rb_ids.len());
+    }
+    for k in rb_ids {
+      let key : String = format!("{k}");
+      rb_buff_strategy.insert(key, RBBufferStrategy::ActuallySmart);
+    }
     Self {
       only_perfect_events            : false,
       calc_crc32                     : false,
@@ -480,7 +483,8 @@ impl RBSettings {
       trigger_fixed_rate             : 0,
       trigger_poisson_rate           : 0,
       data_type                      : DataType::Physics,
-      rb_buff_strategy               : RBBufferStrategy::AdaptToRate(5),
+      //rb_buff_strategy               : HashMap::<u8,RBBufferStrategy::AdaptToRate(5)>,
+      rb_buff_strategy               : rb_buff_strategy,
       rb_moni_interval               : 0.0,
       pb_moni_every_x                : 0.0,
       pa_moni_every_x                : 0.0,
@@ -507,7 +511,7 @@ impl RBSettings {
     }
   }
 
-  pub fn get_runconfig(&self) -> RunConfig {
+  pub fn get_runconfig(&self, board_id : u8) -> RunConfig {
     // missing here - run id, nevents, nseconds,
     //
     let mut rcfg              = RunConfig::new();
@@ -516,27 +520,19 @@ impl RBSettings {
     rcfg.trigger_fixed_rate   = self.trigger_fixed_rate;
     rcfg.trigger_poisson_rate = self.trigger_poisson_rate;
     rcfg.data_type            = self.data_type.clone();
-    let buffer_trip : u16;
-    match self.rb_buff_strategy {
+    let key : String = format!("{board_id}");
+    let buffer_strategy = self.rb_buff_strategy.get(&key).unwrap();
+    match buffer_strategy {
       RBBufferStrategy::NEvents(buff_size) => {
-        buffer_trip = buff_size;
+        rcfg.rb_buff_size = Some(*buff_size as u16);
       },
-      RBBufferStrategy::AdaptToRate(_) => {
-        // For now, let's just set the initial value to
-        // 50 FIXME
-        buffer_trip = 50;
-        //match rate = get_trigger_rate() {
-        //  Err(err) {
-        //    error!("Unable to obtain trigger rate!");
-        //    buffer_trip = 50;
-        //  },
-        //  Ok(rate) => {
-        //    buffer_trip = rate*n_secs as u16;
-        //  }
-        //}
+      RBBufferStrategy::NSeconds(interval) => {
+        rcfg.rb_buff_empty_interval = Some(*interval as f32);
+      },
+      RBBufferStrategy::ActuallySmart => {
+        rcfg.rb_buff_strategy_smart = true;
       }
     }
-    rcfg.rb_buff_size         = buffer_trip as u16;
     rcfg
   }
 }
@@ -785,30 +781,55 @@ pythonize!(AnalysisEngineSettings);
 //--------------------------------------------------------------
 
 /// Settings to change the configuration of the TOF Eventbuilder
-#[derive(Debug, Copy, Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct TofEventBuilderSettings {
-  pub cachesize           : u32,
-  pub n_mte_per_loop      : u32,
-  pub n_rbe_per_loop      : u32,
+  pub cachesize             : u32,
+  pub n_mte_per_loop        : u32,
+  pub n_rbe_per_loop        : u32,
   /// The timeout parameter for the TofEvent. If not
   /// complete after this time, send it onwards anyway
-  pub te_timeout_sec      : u32,
+  pub te_timeout_sec        : u32,
+  /// The timeout parameter for the TofEvent, but only 
+  /// for the combo trigger part. 
+  pub te_timeout_sec_combo  : Option<u32>,
+  /// Only do something when holdoff time has passed 
+  pub holdoff               : Option<u32>,
   /// try to sort the events by id (uses more resources)
-  pub sort_events         : bool,
-  pub build_strategy      : BuildStrategy,
-  pub greediness          : u8,
-  pub wait_nrb            : u8,
-  pub hb_send_interval    : u16,
+  pub sort_events           : bool,
+  pub build_strategy        : BuildStrategy,
+  pub greediness            : u8,
+  pub wait_nrb              : u8,
+  pub hb_send_interval      : u16,
+  /// Analyze the trigger hits and check if the hits are expected
+  /// from a known dead RB. if so, then adjust the expectation
+  /// of number of readoutboards by subtracting the number of 
+  /// expected dead boards from the seen rb_link_ids in this event
+  pub no_expect_dead_rbs    : Option<bool>,
+  pub ignore_mtb_link_ids   : Option<Vec<u8>>,
   /// Allows to restrict saving the event to disk
   /// based on the interesting event parameters
   /// (These are minimum values)
   pub only_save_interesting : bool,
-  pub thr_n_hits_umb        : u8,
-  pub thr_n_hits_cbe        : u8,
-  pub thr_n_hits_cor        : u8,
-  pub thr_tot_edep_umb      : f32,
-  pub thr_tot_edep_cbe      : f32,
-  pub thr_tot_edep_cor      : f32,
+  pub thr_n_hits_umb        : Option<u8>,
+  pub thr_n_hits_cbe        : Option<u8>,
+  pub thr_n_hits_cor        : Option<u8>,
+  pub thr_n_hits_outer      : Option<u8>,
+  pub thr_tot_edep_outer    : Option<f32>,
+  pub thr_tot_edep_umb      : Option<f32>,
+  pub thr_tot_edep_cbe      : Option<f32>,
+  pub thr_tot_edep_cor      : Option<f32>,
+  // level 1 purge
+  pub rbe_purge_limit1      : Option<u32>,
+  pub rbe_purge_limit1_n    : Option<u32>,
+  pub rbe_purge_ev_time1    : Option<u32>,
+  // level 2 purge
+  pub rbe_purge_limit2      : Option<u32>,
+  pub rbe_purge_limit2_n    : Option<i32>,
+  pub rbe_purge_ev_time2    : Option<u32>,
+  // level 3 purge
+  pub rbe_purge_limit3      : Option<u32>,
+  pub rbe_purge_limit3_n    : Option<i32>,
+  pub rbe_purge_ev_time3    : Option<u32>,
 }
 
 impl TofEventBuilderSettings {
@@ -818,71 +839,92 @@ impl TofEventBuilderSettings {
       n_mte_per_loop        : 1,
       n_rbe_per_loop        : 40,
       te_timeout_sec        : 30,
+      te_timeout_sec_combo  : Some(30),
+      holdoff               : Some(0),
       sort_events           : false,
       build_strategy        : BuildStrategy::Adaptive,
       greediness            : 3,
       wait_nrb              : 40,
       hb_send_interval      : 30,
       only_save_interesting : false,
-      thr_n_hits_umb        : 0,
-      thr_n_hits_cbe        : 0,
-      thr_n_hits_cor        : 0,
-      thr_tot_edep_umb      : 0.0,
-      thr_tot_edep_cbe      : 0.0,
-      thr_tot_edep_cor      : 0.0,
+      no_expect_dead_rbs    : None,
+      ignore_mtb_link_ids   : None,
+      thr_n_hits_umb        : None,
+      thr_n_hits_cbe        : None,
+      thr_n_hits_cor        : None,
+      thr_n_hits_outer      : None,
+      thr_tot_edep_umb      : None,
+      thr_tot_edep_cbe      : None,
+      thr_tot_edep_cor      : None,
+      thr_tot_edep_outer    : None,
+      rbe_purge_limit1      : None,
+      rbe_purge_limit1_n    : None,
+      rbe_purge_ev_time1    : None,
+      rbe_purge_limit2      : None,
+      rbe_purge_limit2_n    : None,
+      rbe_purge_ev_time2    : None,
+      rbe_purge_limit3      : None,
+      rbe_purge_limit3_n    : None,
+      rbe_purge_ev_time3    : None,
     }
   }
 
-  pub fn from_tofeventbuilderconfig(&mut self, cfg : &TOFEventBuilderConfig) {
-    if cfg.cachesize.is_some() {
-      self.cachesize = cfg.cachesize.unwrap();
-    }
-    if cfg.n_mte_per_loop.is_some() {
-      self.n_mte_per_loop = cfg.n_mte_per_loop.unwrap();
-    }
-    if cfg.n_rbe_per_loop.is_some() {
-      self.n_rbe_per_loop = cfg.n_rbe_per_loop.unwrap();
-    }
-    if cfg.te_timeout_sec.is_some() {
-      self.te_timeout_sec = cfg.te_timeout_sec.unwrap();
-    }
-    if cfg.sort_events.is_some() {
-      self.sort_events = cfg.sort_events.unwrap();
-    }
-    if cfg.build_strategy.is_some() {
-      self.build_strategy = cfg.build_strategy.unwrap();
-    }
-    if cfg.greediness.is_some() {
-      self.greediness = cfg.greediness.unwrap();
-    }
-    if cfg.wait_nrb.is_some() {
-      self.wait_nrb = cfg.wait_nrb.unwrap();
-    }
-    if cfg.hb_send_interval.is_some() {
-      self.hb_send_interval = cfg.hb_send_interval.unwrap();
-    }
-    if cfg.only_save_interesting.is_some() {
-      self.only_save_interesting = cfg.only_save_interesting.unwrap();
-    }
-    if cfg.thr_n_hits_umb.is_some() { 
-      self.thr_n_hits_umb = cfg.thr_n_hits_umb.unwrap();
-    }
-    if cfg.thr_n_hits_cbe.is_some() {      
-      self.thr_n_hits_cbe = cfg.thr_n_hits_cbe.unwrap();
-    }
-    if cfg.thr_n_hits_cor.is_some()   {
-      self.thr_n_hits_cor = cfg.thr_n_hits_cor.unwrap();
-    }
-    if cfg.thr_tot_edep_umb.is_some() {    
-      self.thr_tot_edep_umb = cfg.thr_tot_edep_umb.unwrap();
-    }
-    if cfg.thr_tot_edep_cbe.is_some() {    
-      self.thr_tot_edep_cbe = cfg.thr_tot_edep_cbe.unwrap();
-    }
-    if cfg.thr_tot_edep_cor.is_some() {    
-      self.thr_tot_edep_cor = cfg.thr_tot_edep_cor.unwrap();
-    }
-  }
+  //pub fn from_tofeventbuilderconfig(&mut self, cfg : &TOFEventBuilderConfig) {
+  //  if cfg.cachesize.is_some() {
+  //    self.cachesize = cfg.cachesize.unwrap();
+  //  }
+  //  if cfg.n_mte_per_loop.is_some() {
+  //    self.n_mte_per_loop = cfg.n_mte_per_loop.unwrap();
+  //  }
+  //  if cfg.n_rbe_per_loop.is_some() {
+  //    self.n_rbe_per_loop = cfg.n_rbe_per_loop.unwrap();
+  //  }
+  //  if cfg.te_timeout_sec.is_some() {
+  //    self.te_timeout_sec = cfg.te_timeout_sec.unwrap();
+  //  }
+  //  if cfg.te_timeout_sec_combo.is_some() {
+  //    self.te_timeout_sec_combo = Some(cfg.te_timeout_sec_combo.unwrap());
+  //  }
+  //  if cfg.holdoff.is_some() {
+  //    self.holdoff = Some(cfg.holdoff.unwrap());
+  //  }
+  //  if cfg.sort_events.is_some() {
+  //    self.sort_events = cfg.sort_events.unwrap();
+  //  }
+  //  if cfg.build_strategy.is_some() {
+  //    self.build_strategy = cfg.build_strategy.unwrap();
+  //  }
+  //  if cfg.greediness.is_some() {
+  //    self.greediness = cfg.greediness.unwrap();
+  //  }
+  //  if cfg.wait_nrb.is_some() {
+  //    self.wait_nrb = cfg.wait_nrb.unwrap();
+  //  }
+  //  if cfg.hb_send_interval.is_some() {
+  //    self.hb_send_interval = cfg.hb_send_interval.unwrap();
+  //  }
+  //  if cfg.only_save_interesting.is_some() {
+  //    self.only_save_interesting = cfg.only_save_interesting.unwrap();
+  //  }
+  //  if cfg.thr_n_hits_umb.is_some() { 
+  //    self.thr_n_hits_umb = cfg.thr_n_hits_umb.unwrap();
+  //  }
+  //  if cfg.thr_n_hits_cbe.is_some() {      
+  //    self.thr_n_hits_cbe = cfg.thr_n_hits_cbe.unwrap();
+  //  }
+  //  if cfg.thr_n_hits_cor.is_some()   {
+  //    self.thr_n_hits_cor = cfg.thr_n_hits_cor.unwrap();
+  //  }
+  //  if cfg.thr_tot_edep_umb.is_some() {    
+  //    self.thr_tot_edep_umb = cfg.thr_tot_edep_umb.unwrap();
+  //  }
+  //  if cfg.thr_tot_edep_cbe.is_some() {    
+  //    self.thr_tot_edep_cbe = cfg.thr_tot_edep_cbe.unwrap();
+  //  }
+  //  if cfg.thr_tot_edep_cor.is_some() {    
+  //    self.thr_tot_edep_cor = cfg.thr_tot_edep_cor.unwrap();
+  //  }
+  //}
 }
 
 impl fmt::Display for TofEventBuilderSettings {
@@ -1334,39 +1376,6 @@ impl fmt::Display for LiftofRBConfig {
   }
 }
 
-//#[cfg(feature = "random")]
-//impl FromRandom for LiftofRBConfig {
-//    
-//  fn from_random() -> Self {
-//    let mut cfg = Self::new();
-//    let mut rng  = rand::thread_rng();
-//    cfg.runid                   = rng.gen::<u32>();
-//    cfg.is_active               = rng.gen::<bool>();
-//    cfg.nevents                 = rng.gen::<u32>();
-//    cfg.nseconds                = rng.gen::<u32>();
-//    cfg.tof_op_mode             = TofOperationMode::from_random();
-//    cfg.trigger_poisson_rate    = rng.gen::<u32>();
-//    cfg.trigger_fixed_rate      = rng.gen::<u32>();
-//    cfg.data_type               = DataType::from_random();
-//    cfg.rb_buff_size            = rng.gen::<u16>();
-//    cfg
-//  }
-//}
-//
-//#[cfg(feature = "random")]
-//#[test]
-//fn serialization_runconfig() {
-//  for k in 0..100 {
-//    let cfg  = LiftofRBConfig::from_random();
-//    let test = LiftofRBConfig::from_bytestream(&cfg.to_bytestream(), &mut 0).unwrap();
-//    assert_eq!(cfg, test);
-//
-//    let cfg_json = serde_json::to_string(&cfg).unwrap();
-//    let test_json 
-//      = serde_json::from_str::<LiftofRBConfig>(&cfg_json).unwrap();
-//    assert_eq!(cfg, test_json);
-//  }
-//}
 // #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 // pub struct ChannelMaskSettings {
 //   /// actually apply the below settings
@@ -1525,6 +1534,31 @@ fn write_config_file() {
   let settings = LiftofSettings::new();
   //println!("{}", settings);
   settings.to_toml(String::from("liftof-config-test.toml"));
+}
+
+#[test] 
+fn compress_uncompress_config_file() {
+  write_config_file();
+  let pth         = Path::new("liftof-config-test.toml");
+  let bytestream  = compress_toml(&pth).unwrap();
+  println!("Compressed .toml file to a bytestream of {} bytes!", bytestream.len());
+  let output      = Path::new("liftof-config-decompressed.toml");
+  decompress_toml(&bytestream.as_slice(), output); 
+}
+
+#[test]
+fn diff_config_file_compress_uncompress() {
+  write_config_file();
+  let mut settings = LiftofSettings::new();
+  settings.to_toml(String::from("liftof-config-test.toml"));
+  settings.staging_dir = String::from("/foo/bar");
+  settings.to_toml(String::from("liftof-config-test-changed.toml"));
+  let pth         = Path::new("liftof-config-test.toml");
+  let pth_ch      = Path::new("liftof-config-test-changed.toml");
+  let diff        = create_compressed_diff(&pth, &pth_ch).unwrap();
+  println!("Diff has the size of {} bytes!", diff.len());
+  let output      = Path::new("liftof-config.diff");
+  decompress_toml(&diff.as_slice(), output);
 }
 
 #[test]

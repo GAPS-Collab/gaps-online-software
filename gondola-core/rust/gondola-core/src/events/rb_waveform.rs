@@ -3,8 +3,6 @@
 
 use crate::prelude::*;
 
-use std::mem;
-
 /// Waveform container for Tof waveforms
 /// This holds the waveforms for both 
 /// paddle ends. Fields are available to 
@@ -228,10 +226,6 @@ impl Serialization for RBWaveform {
     -> Result<Self, SerializationError> {
     Self::verify_fixed(stream, pos)?;
     let mut wf           = RBWaveform::new();
-    //if parse_u16(stream, pos) != Self::HEAD {
-    //  error!("The given position {} does not point to a valid header signature of {}", pos, Self::HEAD);
-    //  return Err(SerializationError::HeadInvalid {});
-    //}
     wf.event_id          = parse_u32(stream, pos);
     wf.rb_id             = parse_u8(stream, pos);
     wf.rb_channel_a      = parse_u8(stream, pos);
@@ -252,10 +246,10 @@ impl Serialization for RBWaveform {
     let data_b           = &stream[*pos..*pos+2*NWORDS];
     wf.adc_b             = u8_to_u16(data_b);
     *pos += 2*NWORDS;
-    if parse_u16(stream, pos) != Self::TAIL {
-      error!("The given position {} does not point to a tail signature of {}", pos, Self::TAIL);
-      return Err(SerializationError::TailInvalid);
-    }
+    //if parse_u16(stream, pos) != Self::TAIL {
+      //error!("The given position {} does not point to a tail signature of {}", pos, Self::TAIL);
+      //return Err(SerializationError::TailInvalid);
+    //}
     *pos +=2;
     Ok(wf)
   }
@@ -496,6 +490,17 @@ fn pack_rbwaveform() {
     let wf   = RBWaveform::from_random();
     let test : RBWaveform = wf.pack().unpack().unwrap();
     assert_eq!(wf, test);
+  }
+}
+
+#[test]
+#[cfg(feature="random")]
+fn emit_rbwaveform() {
+  for _ in 0..100 {
+    let ev = RBEvent::from_random();
+    for wf in ev.get_rbwaveforms() {
+      assert_eq!(ev.header.rb_id, wf.rb_id);
+    }
   }
 }
 

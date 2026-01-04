@@ -26,6 +26,7 @@
 
 namespace fs = std::filesystem;
 namespace gt = Gaps::Telemetry;
+namespace g  = gondola;
 
 int main(int argc, char *argv[]){
   spdlog::cfg::load_env_levels();
@@ -136,7 +137,7 @@ int main(int argc, char *argv[]){
         }
         auto tp   = tp_res.unwrap();
         pos       = 0;
-        auto rbwf = RBWaveform::from_bytestream(tp.payload, pos);
+        auto rbwf = g::RBWaveform::from_bytestream(tp.payload, pos);
         std::cout << rbwf.to_string() << std::endl;
         // just for now 
         //exit(0);
@@ -207,7 +208,7 @@ int main(int argc, char *argv[]){
       } else {
         n_trk_hits += m_ev.trk_hits.size();
       }
-      for (TofHit const &h : m_ev.tof_event.hits) {
+      for (g::TofHit const &h : m_ev.tof_event.hits) {
         // do someting with h
         //std::cout << h.to_string() << std::endl;
       }
@@ -221,7 +222,7 @@ int main(int argc, char *argv[]){
       }
       auto tof_pack  = tof_ev_res.unwrap();
       pos = 0;
-      auto tof_event_res = TofEvent::from_bytestream(tof_pack.payload, pos);
+      auto tof_event_res = g::TofEvent::from_bytestream(tof_pack.payload, pos);
       if (!tof_event_res.is_ok()) {
         continue;
       } 

@@ -331,7 +331,10 @@ impl MoniData for MasterTriggerHB {
   fn get_board_id(&self) -> u8 {
     0
   }
-  
+ 
+  fn get_timestamp(&self) -> u64 {
+    self.total_elapsed
+  }
   /*
   fn get_timestamp(&self) -> u64 {
     self.timestamp 

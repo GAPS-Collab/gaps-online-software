@@ -4,6 +4,8 @@
 # its own virtual environment an src folder gets 
 # created
 
+gondola-core/rust/gondola-core/python/gondola/__pycache__/*
+
 # gondola_cxx python bindings for C++ lib 
 gondola-core/C++/dist/*
 gondola-core/C++/gondola_cxx/*
@@ -12,6 +14,8 @@ gondola-core/C++/wheelhouse/*
 liftof/releases/*
 liftof/target/*
 liftof/src/*
+liftof/liftof-cc/target/*
+
 
 analysis/merge_tcfc/.gitignore
 analysis/merge_tcfc/.python-version

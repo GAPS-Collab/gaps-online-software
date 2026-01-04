@@ -91,6 +91,7 @@ fn read_until_footer(bus : &mut IPBus)
 /// * bus       : connected IPBus for UDP comms
 pub fn get_event(bus                     : &mut IPBus)
   -> Option<Result<TofEvent, MasterTriggerError>> {
+  //let mut debug_timer   = Instant::now();
   let mut mte = TofEvent::new();
   let n_daq_words_fixed = 9u32;
   let mut data          : Vec<u32>;
@@ -195,7 +196,7 @@ pub fn get_event(bus                     : &mut IPBus)
       }
     }
   }
-
+  //println!("MTB packet {:?}", data);
   // ---------- FIll the MTBEvent now
   mte.event_id           = data[1];
   mte.mt_timestamp       = data[2];
@@ -205,8 +206,8 @@ pub fn get_event(bus                     : &mut IPBus)
   mte.mt_trigger_sources = ((data[5] & 0xffff0000) >> 16) as u16;
   //mte.get_trigger_sources();
   let rbmask = (data[7] as u64) << 32 | data[6] as u64; 
-  mte.mtb_link_mask  = rbmask;
-  mte.dsi_j_mask     = data[8];
+  mte.mtb_link_mask      = rbmask;
+  mte.dsi_j_mask         = data[8];
   for k in 9..9 + n_hit_words {
     let ltb_hits = data[k as usize];
     // split them up
@@ -223,6 +224,8 @@ pub fn get_event(bus                     : &mut IPBus)
       mte.channel_mask.push(second);
     }
   }
+  // debug 
+  //println!("DEBUG GET_EVENT TOOK : {}", debug_timer.elapsed().as_nanos());
   Some(Ok(mte))
 }
 
@@ -323,7 +326,17 @@ pub fn configure_mtb(bus : &mut IPBus,
   // coming from the TIU  
   let use_fixed_deadtime = settings.use_fixed_deadtime.unwrap_or(false);  
   if use_fixed_deadtime {
-    match MIN_DEADTIME_MODE.set(bus, use_fixed_deadtime as u32) {
+    match MIN_DEADTIME_MODE.set(bus, true as u32) {
+      Err(err) => { 
+        error!("Unable to set MTB in fixed deadtime mode {err}!");
+      }
+      Ok(_)    => {
+        warn!("Ignoring the busy part of the TIU signal from the TIU due to min deadtime setting!");
+        println!("==> MTB in 'Min/fixed deadtime mode'. This will ignore the BUSY part of the TIU signal");
+      }
+    }
+  } else {
+    match MIN_DEADTIME_MODE.set(bus, false as u32) {
       Err(err) => { 
         error!("Unable to set MTB in fixed deadtime mode {err}!");
       }
@@ -333,7 +346,6 @@ pub fn configure_mtb(bus : &mut IPBus,
       }
     }
   }
-
   info!("Settting rb integration window!");
   let int_wind = settings.rb_int_window;
   match set_rb_int_window(bus, int_wind) {
@@ -489,6 +501,11 @@ pub fn configure_mtb(bus : &mut IPBus,
       }
     }
   }
+  
+  //match SWAP_RB_LINK_IDS.set(bus,1) {
+  //  Ok(
+  //}
+
   Ok(())
 }
 
@@ -796,13 +813,19 @@ pub fn master_trigger(mt_address     : &str,
         heartbeat.n_events += 1;
         // we have to make sure some of the fields get properly filled and 
         // "transfer" some of the mt_* fields to the fields which get actually serialzied 
-        let mt_timestamp           = _ev.get_mt_timestamp_abs();
+        let mt_timestamp       = _ev.get_mt_timestamp_abs();
         _ev.timestamp32        = (mt_timestamp  & 0x00000000ffffffff ) as u32;
         _ev.timestamp16        = ((mt_timestamp & 0x0000ffff00000000 ) >> 32) as u16;
         _ev.trigger_sources    = _ev.mt_trigger_sources; // FIXME
         _ev.n_trigger_paddles  = _ev.get_trigger_hits().len() as u8;
-        heartbeat.trigger_type = TriggerType::from((_ev.mt_trigger_sources & 0x00FF) as u8);
-        heartbeat.combo_trig_type = TriggerType::from(((_ev.mt_trigger_sources & 0xFF00) >> 8) as u8);
+        let triggers           = TriggerType::transcode_trigger_sources(_ev.mt_trigger_sources);
+        if triggers.len() == 2 {
+          heartbeat.trigger_type = triggers[0];
+          heartbeat.combo_trig_type = triggers[1];
+        }
+        if triggers.len() == 1 {
+          heartbeat.trigger_type = triggers[0];
+        }
         if !veri_active {
           match mt_sender.send(_ev) {
             Err(err) => {
@@ -1072,7 +1095,31 @@ impl PyMasterTrigger {
       }
     }
   }
+ 
+  #[getter] 
+  fn get_swap_rb_link_ids(&mut self) -> PyResult<bool> {
+    match SWAP_RB_LINK_IDS.get(&mut self.ipbus) {
+      Ok(swap) => {
+        return Ok(swap > 0);
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
   
+  #[setter] 
+  fn set_swap_rb_link_ids(&mut self, swap : u32) -> PyResult<()> {
+    match SWAP_RB_LINK_IDS.set(&mut self.ipbus, swap) {
+      Ok(_) => {
+        return Ok(());
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }
+    }
+  }
+
   #[getter]
   /// Get the lost global trigger rate in Hz
   ///
@@ -1224,7 +1271,7 @@ impl PyMasterTrigger {
       }
   }
  #[setter]
-  fn set_ingore_tiu_busy(&mut self, value : u32) -> PyResult<()> {
+  fn set_ignore_tiu_busy(&mut self, value : u32) -> PyResult<()> {
       match MIN_DEADTIME_MODE.set(&mut self.ipbus, value) {
           Ok(_) => {
               return Ok(());
@@ -2365,8 +2412,8 @@ fn set_track_trigger_is_global(&mut self) -> PyResult<()> {
   }
 
   
-
-  fn get_event(&mut self, read_until_footer : bool, verbose : bool, debug : bool)
+  #[pyo3(name="get_event")]
+  fn get_event_py(&mut self, read_until_footer : bool, verbose : bool, debug : bool)
     -> PyResult<TofEvent> {
     let use_dbg_version = debug;
     if !use_dbg_version {

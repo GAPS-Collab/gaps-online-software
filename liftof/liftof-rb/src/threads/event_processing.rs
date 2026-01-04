@@ -24,27 +24,6 @@ use crossbeam_channel::{
 
 use gondola_core::prelude::*;
 
-
-//use tof_dataclasses::events::DataType;
-//use tof_dataclasses::packets::{
-//  TofPacket,
-//};
-//use tof_dataclasses::io::RBEventMemoryStreamer;
-//use tof_dataclasses::calibrations::RBCalibrations;
-//use tof_dataclasses::events::EventStatus;
-//use tof_dataclasses::commands::{
-//  TofOperationMode,
-//};
-//
-//use tof_dataclasses::events::rb_event::RBPaddleID;
-//
-//use liftof_lib::{
-//  RunStatistics,
-//  //waveform_analysis,
-//};
-//
-//use liftof_lib::thread_control::ThreadControl;
-
 use crate::control::get_deadtime;
 
 ///  Transforms raw bytestream to TofPackets
@@ -138,26 +117,36 @@ pub fn event_processing(board_id            : u8,
   // receive data over bs_recv, we have received 50 more 
   // events. This means we might want to wait for 50 MTE
   // events?
-  let mut skipped_events : usize = 0;
-  let mut n_events = 0usize;
-  
+  let mut skipped_events         = 0usize;
+  let mut n_events               = 0usize;
+  let mut n_event_id_too_large   = 0u32; 
+  let mut n_event_id_zero        = 0u32;
   'main : loop {
     // FIXME - this whole loop needs to be faster, and there 
     // is no interactive commanding anymore.
     if thread_ctrl_check_timer.elapsed().as_secs() >= 6 {
       match thread_control.lock() {
-        Ok(tc) => {
+        Ok(mut tc) => {
           if tc.stop_flag {
             info!("Received stop signal. Will stop thread!");
             break;
           }
           streamer.calc_crc32   = tc.liftof_settings.rb_settings.calc_crc32;
           deadtime_instead_temp = tc.liftof_settings.rb_settings.drs_deadtime_instead_fpga_temp; 
+          tc.lost_event_ids     = (n_event_id_zero + n_event_id_too_large) as f32 / n_events as f32;
         },
         Err(err) => {
           trace!("Can't acquire lock! {err}");
         },
       }
+      //if n_event_id_too_large > 0 {
+      //  error!("We saw {} events with an event id > 90000 in the last 6 seconds!", n_event_id_too_large);
+      //  //n_event_id_too_large = 0;
+      //}
+      //if n_event_id_zero > 0 {
+      //  error!("We saw {} events with an event id == 0 in the last 6 seconds!", n_event_id_zero);
+      //  //n_event_id_zero = 0;
+      //}
       thread_ctrl_check_timer = Instant::now();
     }
 
@@ -226,6 +215,7 @@ pub fn event_processing(board_id            : u8,
         streamer.consume(&mut bytestream);
         let mut packets_in_stream : u32 = 0;
         let mut last_event_id     : u32 = 0;
+        //let mut last_event        : RBEvent = RBEvent::new();
         //println!("Streamer::stream size {}", streamer.stream.len());
         loop {
           if streamer.is_depleted {
@@ -277,6 +267,28 @@ pub fn event_processing(board_id            : u8,
                     }
                   }
                   //println!("Got event id {}", event.header.event_id);
+                  if event.header.event_id == 0 {
+                    //error!("The current event id is 0!");
+                    //error!("Event {}", event);
+                    //event.status = EventStatus::RBEventWacky;
+                    n_event_id_zero += 1;
+                    continue; 
+                  } 
+                  if last_event_id != 0 {
+                    let delta_evid = event.header.event_id as i64 - last_event_id as i64;
+                    
+                    //if event.header.event_id > 42_000_000u32 {
+                    // 90000 -> at 100Hz, that is 15mins deviation
+                    if i64::abs(delta_evid) > 90000 {
+                      //error!("The event id deviates more than 90000 event ids from the last event id!");
+                      //error!("Event {}", event);
+                      //error!("Last Event {}", last_event);
+                      //error!("The event id is larger than 42000000");
+                      //event.status = EventStatus::RBEventWacky;
+                      n_event_id_too_large += 1;
+                      continue;
+                    }
+                  }
                   if last_event_id != 0 {
                     if event.header.event_id != last_event_id + 1 {
                       if event.header.event_id > last_event_id {
@@ -288,26 +300,30 @@ pub fn event_processing(board_id            : u8,
                       }
                     }
                   }
+                  // Now as we are through our sanity checks, the event id should be can use it for 
+                  // reference
                   last_event_id = event.header.event_id;
+                  //last_event    = event.clone();
                   //println!("This event id {}!", last_event_id);
                   event.data_type = data_type;
-                  if verbose {
-                    match stat.lock() {
-                      Err(err) => error!("Unable to acquire lock on shared memory for RunStatisitcis! {err}"),
-                      Ok(mut s) => {
-                        if s.first_evid == 0 {
-                          s.first_evid = event.header.event_id;
-                        }
-                        s.last_evid = event.header.event_id;
-                        if event.status == EventStatus::ChannelIDWrong {
-                          s.n_err_chid_wrong += 1;
-                        }
-                        if event.status == EventStatus::TailWrong {
-                          s.n_err_tail_wrong += 1;
-                        }
-                      }
-                    }
-                  }
+                  // skip for now, since we change event status
+                  //if verbose {
+                  //  match stat.lock() {
+                  //    Err(err) => error!("Unable to acquire lock on shared memory for RunStatisitcis! {err}"),
+                  //    Ok(mut s) => {
+                  //      if s.first_evid == 0 {
+                  //        s.first_evid = event.header.event_id;
+                  //      }
+                  //      s.last_evid = event.header.event_id;
+                  //      if event.status == EventStatus::ChannelIDWrong {
+                  //        s.n_err_chid_wrong += 1;
+                  //      }
+                  //      if event.status == EventStatus::TailWrong {
+                  //        s.n_err_tail_wrong += 1;
+                  //      }
+                  //    }
+                  //  }
+                  //}
                   if event.status != EventStatus::Unknown {
                     if only_perfect_events && event.status != EventStatus::Perfect {
                       info!("Not sending this event, because it's event status is {} and we requested to send only events with EventStatus::Perfect!", event.status);

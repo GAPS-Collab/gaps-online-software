@@ -26,6 +26,8 @@ use ndhistogram::axis::{
   Uniform,
 };
 
+use crate::WaveformCache;
+
 use ratatui::prelude::Stylize;
 use ratatui::{
   //backend::CrosstermBackend,
@@ -137,6 +139,7 @@ pub struct RBTab<'a>  {
   pub alerts             : Arc<Mutex<HashMap<&'a str,TofAlert<'a>>>>,
   alerts_active          : bool,
   moni_old_check         : HashMap<u8,Instant>,
+  waveform_cache         : Box<WaveformCache>
 }
 
 impl RBTab<'_>  {
@@ -145,7 +148,8 @@ impl RBTab<'_>  {
                  rb_receiver  : Receiver<RBEvent>,
                  rbs          : HashMap<u8, ReadoutBoard>,
                  alerts       : Arc<Mutex<HashMap<&'a str,TofAlert<'a>>>>,
-                 theme        : ColorTheme) -> RBTab<'a>  {
+                 theme        : ColorTheme,
+                 wf_cache     : Box<WaveformCache>) -> RBTab<'a>  {
     // check if the alerts are active
     let mut alerts_active = false;
     match alerts.lock() {
@@ -276,6 +280,7 @@ RBTab {
       alerts             : alerts,
       alerts_active      : alerts_active,
       moni_old_check     : moni_old_check,
+      waveform_cache     : wf_cache
     }
   }
   
@@ -300,16 +305,21 @@ RBTab {
         }, 
         Some(_rb_id) => {
           let cali_path = format!("calibrations/RB{:02}.cali.tof.gaps", _rb_id + 1);
-          if fs::metadata(cali_path.clone()).is_ok() {
-            match RBCalibrations::from_file(cali_path.clone(), true) {
-              Err(err) => error!("Unable to load RBCalibration from file {}! {err}", cali_path),
-              Ok(cali) => {
-                self.rb_calibration = cali;
-                self.cali_loaded    = true;
+          match fs::metadata(cali_path.clone()) {
+            Ok(_) => {
+              match RBCalibrations::from_file(cali_path.clone(), true) {
+                Err(err) => error!("Unable to load RBCalibration from file {}! {err}", cali_path),
+                Ok(cali) => {
+                  self.rb_calibration = cali;
+                  self.cali_loaded    = true;
+                }
               }
-            } 
-          } else {
-            self.cali_loaded = false;
+            }
+            Err(err) => {
+              error!("Something is wrong with path {}! {err}", cali_path.clone());
+          
+              self.cali_loaded = false;
+            }
           }
         }
       }
@@ -343,7 +353,11 @@ RBTab {
           ev = _ev;
         }
       }
+    } else {
+      // if the rb_receiver is empty, we might want to try to get waveforms from the 
+      // waveform cache 
     }
+
     if !self.tp_receiver.is_empty() {
       match self.tp_receiver.try_recv() {
         Err(_err) => (),
@@ -407,7 +421,7 @@ RBTab {
               self.moni_queue.add(moni);
               self.n_moni += 1;
               // capture the rate for the global rate window
-              self.global_rates.insert(moni.board_id, format!("{}",moni.rate));
+              self.global_rates.insert(moni.board_id, format!("{}[{:.1}]",moni.rate,100.0*moni.get_lost_event_ids_over_rate()));
                 
               if !self.met_queue_moni.contains_key(&moni.board_id) {
                 // FIXME - make the 1000 (which is queue size) a member
@@ -445,19 +459,51 @@ RBTab {
    
     if ev.header.event_id != 0 && self.rb_selector == ev.header.rb_id {
       for ch in ev.header.get_channels() {
+        let mut wf = RBWaveform::new();
         if self.cali_loaded {
-          let mut nanos = vec![0f32;1024];
-          let mut volts = vec![0f32;1024];
-          self.rb_calibration.nanoseconds(ch as usize + 1, ev.header.stop_cell as usize, 
-                                          &mut nanos);
-          self.rb_calibration.voltages(ch as usize + 1, ev.header.stop_cell as usize, 
-                                       &ev.adc[ch as usize], &mut volts);
-          //let 
-          for k in 0..nanos.len() {
-            let vals = (nanos[k] as f64, volts[k] as f64);
-            self.ch_data[ch as usize][k] = vals;
+          match self.waveform_cache.get(&ev.header.rb_id).unwrap().get(&(ch + 1)).unwrap().lock() {
+            Err(err)  => {
+              error!("Unable to lock waveform cache! {err}");
+            }
+            Ok(mut cache) => {
+              if cache.len() > 0 {
+                wf = cache.pop_front().unwrap();
+              }
+            }
           }
+          let _ = wf.calibrate(&self.rb_calibration); 
+          //let mut nanos = vec![0f32;1024];
+          //let mut volts = vec![0f32;1024];
+          //self.rb_calibration.nanoseconds(ch as usize + 1, ev.header.stop_cell as usize, 
+          //                                &mut nanos);
+          //self.rb_calibration.voltages(ch as usize + 1, ev.header.stop_cell as usize, 
+          //                             &ev.adc[ch as usize], &mut volts);
+          //let 
+          if ev.header.get_rbpaddleid().is_a(ch + 1){
+            for k in 0..wf.voltages_a.len() {
+              let vals = (wf.nanoseconds_a[k] as f64, wf.voltages_a[k] as f64);
+              self.ch_data[ch as usize][k] = vals;
+            }
+          } else {
+            for k in 0..wf.voltages_b.len() {
+              let vals = (wf.nanoseconds_b[k] as f64, wf.voltages_b[k] as f64);
+              self.ch_data[ch as usize][k] = vals;
+            }
+          }
+
+
         } else {
+          if ev.header.get_rbpaddleid().is_a(ch + 1){
+            for k in 0..wf.voltages_a.len() {
+              let vals = (k as f64, wf.adc_a[k] as f64);
+              self.ch_data[ch as usize][k] = vals;
+            }
+          } else {
+            for k in 0..wf.voltages_b.len() {
+              let vals = (k as f64, wf.adc_b[k] as f64);
+              self.ch_data[ch as usize][k] = vals;
+            }
+          }
           for k in 0..ev.adc[ch as usize].len() {
             let vals = (k as f64, ev.adc[ch as usize][k] as f64);
             self.ch_data[ch as usize][k] = vals;
@@ -465,7 +511,6 @@ RBTab {
           //println!("{:?}", self.ch_data[ch as usize]);
         }
       }
-
       self.nch_histo.fill(&(ev.header.get_nchan() as f32));
       self.n_events += 1;
       if self.last_evid != 0 {
@@ -574,6 +619,7 @@ RBTab {
         match self.rbs.get(&self.rb_selector) {
           Some(_rb) => {
             view_string = format!("{}", _rb.to_summary_str());
+            //view_string = format!("{}", _rb);
           }
           None => {
             view_string = format!("No information for RB {} in DB \n or DB not available!", self.rb_selector);
@@ -641,6 +687,55 @@ RBTab {
 
         ch_chunks.append(&mut ch_chunks_2);
         // the waveform plots
+        for ch in 0..8 {
+          match self.waveform_cache.get(&self.rb_selector).unwrap().get(&(ch as u8 + 1)).unwrap().lock() {
+            Err(_)  => {
+              error!("Unable to lock waveform cache!");
+            }
+            Ok(mut cache) => {
+              if cache.len() > 0 {
+                let mut wf = cache.pop_front().unwrap();
+                if wf.rb_id != self.rb_selector {
+                  error!("{} {}", wf.rb_id, self.rb_selector);
+                }
+                if self.cali_loaded { 
+                  let _ = wf.calibrate(&self.rb_calibration); 
+                  //if ev.header.get_rbpaddleid().is_a(ch + 1){
+                  for k in 0..wf.voltages_a.len() {
+                    let vals = (wf.nanoseconds_a[k] as f64, wf.voltages_a[k] as f64);
+                    self.ch_data[wf.rb_channel_a as usize][k] = vals;
+                  }
+                  //} else {
+                  for k in 0..wf.voltages_b.len() {
+                    let vals = (wf.nanoseconds_b[k] as f64, wf.voltages_b[k] as f64);
+                    self.ch_data[wf.rb_channel_b as usize][k] = vals;
+                  }
+                  //}
+                } else {
+                  //if ev.header.get_rbpaddleid().is_a(ch + 1){
+                  for k in 0..wf.adc_a.len() {
+                    let vals = (k as f64, wf.adc_a[k] as f64);
+                    self.ch_data[wf.rb_channel_a as usize][k] = vals;
+                  }
+                  //} else {
+                  for k in 0..wf.adc_b.len() {
+                    let vals = (k as f64, wf.adc_b[k] as f64);
+                    self.ch_data[wf.rb_channel_b as usize][k] = vals;
+                  }
+                  //}
+                  //for k in 0..ev.adc[ch as usize].len() {
+                  //  let vals = (k as f64, ev.adc[ch as usize][k] as f64);
+                  //  self.ch_data[ch as usize][k] = vals;
+                  //}
+                }
+              } else {
+                error!("Empty waveform cache for RB {}", self.rb_selector);
+                //continue;
+              }
+            }
+          } //else {
+        } 
+
         for ch in 0..9 {
           let label          = format!("Ch{}", ch + 1);
           let ch_tc_theme    = self.theme.clone();
@@ -1323,12 +1418,12 @@ RBTab {
         let mut this_row = Vec::<Cell>::new();
         for k in rbids {
           let rb_cell = format!("RB {:02}",k);
-          if self.global_rates[k] == String::from("0") {
+          if self.global_rates[k] == String::from("0[0.0]") {
 
-            this_row.push(Cell::new(rb_cell).style(Style::new().fg(Color::Red).bold()));
+            this_row.push(Cell::new(rb_cell).style(Style::new().fg(Color::Red).bold().underlined().slow_blink()));
             this_row.push(Cell::new(format!("\u{203c} {} Hz", self.global_rates[k])).style(Style::new().fg(Color::Red).bold()));
           } else if self.global_rates[k] == "no data" {
-            this_row.push(Cell::new(rb_cell).style(Style::new().fg(Color::Red).bold()));
+            this_row.push(Cell::new(rb_cell).style(Style::new().fg(Color::Red).bold().underlined().slow_blink()));
             this_row.push(Cell::new(format!("\u{203c} {}", self.global_rates[k])).style(Style::new().fg(Color::Red).bold()));
           } else {
             this_row.push(Cell::new(rb_cell).style(Style::new().fg(Color::Green)));

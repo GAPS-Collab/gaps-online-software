@@ -40,6 +40,9 @@ CRFrame.__name__              = 'CRFrame'
 TofPacketReader               = _gc.io.TofPacketReader
 TofPacketReader.__module__    = __name__ 
 TofPacketReader.__name__      = 'TofPacketReader'
+TofPacketWriter               = _gc.io.TofPacketWriter
+TofPacketWriter.__module__    = __name__ 
+TofPacketWriter.__name__      = 'TofPacketWriter'
 
 TelemetryPacketReader         = _gc.io.TelemetryPacketReader
 TelemetryPacketReader.__module__ = __name__ 
@@ -51,6 +54,12 @@ get_utc_date                  = _gc.io.get_utc_date
 get_datetime                  = _gc.io.get_datetime
 get_rundata_from_file         = _gc.io.get_rundata_from_file
 get_unix_timestamp            = _gc.io.get_unix_timestamp 
+apply_diff_to_file            = _gc.io.apply_diff_to_file 
+compress_toml                 = _gc.io.compress_toml 
+decompress_toml               = _gc.io.decompress_toml
+create_compressed_diff        = _gc.io.create_compressed_diff 
+
+#---------------------------------------------------
 
 def get_ts_from_binfile(fname):
     """ 
@@ -111,6 +120,8 @@ def get_telemetry_binaries(unix_time_start, unix_time_stop,\
         print(f'! No files have been found within {t_start} and {t_stop}!')
     return files
 
+#---------------------------------------------------
+
 def grace_get_telemetry_binaries(unix_time_start, unix_time_stop,\
                                  data_dir='/gaps_binaries/live/raw/ethernet'):
     """
@@ -158,4 +169,20 @@ def grace_get_telemetry_binaries(unix_time_start, unix_time_stop,\
         print(f'! No files have been found within {t_start} and {t_stop}!')
     return files
 
+#---------------------------------------------------
 
+__all__ = [
+    "list_path_contents_sorted",
+    "get_utc_now",               
+    "get_utc_date",              
+    "get_datetime",              
+    "get_rundata_from_file",     
+    "get_unix_timestamp",        
+    "apply_diff_to_file",        
+    "compress_toml",             
+    "decompress_toml",           
+    "create_compressed_diff",    
+    "get_ts_from_binfile",
+    "get_telemetry_binaries",
+    "grace_get_telemetry_binaries"
+]
