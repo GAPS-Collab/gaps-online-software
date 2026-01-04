@@ -131,25 +131,39 @@
 \DoxyCodeLine{00142\ }
 \DoxyCodeLine{00143\ \textcolor{comment}{//\ new\ items\ shall\ go\ directly\ into\ the\ new\ gondola\ namespace\ }}
 \DoxyCodeLine{00144\ namespace\ \mbox{\hyperlink{namespacegondola}{gondola}}\ \{}
-\DoxyCodeLine{00145\ }
-\DoxyCodeLine{00148\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacegondola_a3b25ba3aba0e585295ecefc0701cf7de}{get\_hid\_vid\_map}}()\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{HashMap<u32,\ u32>}};}
-\DoxyCodeLine{00149\ }
-\DoxyCodeLine{00152\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacegondola_ab1c635d648526ddffc8f60a7b9a0a8a6}{get\_vid\_hid\_map}}()\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{HashMap<u32,\ u32>}};\ }
-\DoxyCodeLine{00153\ \}}
-\DoxyCodeLine{00154\ }
-\DoxyCodeLine{00155\ }
-\DoxyCodeLine{00156\ }
-\DoxyCodeLine{00157\ std::ostream\&\ \mbox{\hyperlink{calibration_8h_aeda1597c580e9ea2e8bde99ac6934b9a}{operator<<}}(std::ostream\&\ os,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structGaps_1_1TofPaddle}{Gaps::TofPaddle}}\&\ paddle);}
-\DoxyCodeLine{00158\ }
-\DoxyCodeLine{00159\ std::ostream\&\ \mbox{\hyperlink{calibration_8h_aeda1597c580e9ea2e8bde99ac6934b9a}{operator<<}}(std::ostream\&\ os,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structGaps_1_1TrackerStrip}{Gaps::TrackerStrip}}\&\ strip);}
-\DoxyCodeLine{00160\ }
-\DoxyCodeLine{00161\ std::ostream\&\ \mbox{\hyperlink{calibration_8h_aeda1597c580e9ea2e8bde99ac6934b9a}{operator<<}}(std::ostream\&\ os,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structGaps_1_1TrackerStripMask}{Gaps::TrackerStripMask}}\&\ strip);}
-\DoxyCodeLine{00162\ }
-\DoxyCodeLine{00163\ std::ostream\&\ \mbox{\hyperlink{calibration_8h_aeda1597c580e9ea2e8bde99ac6934b9a}{operator<<}}(std::ostream\&\ os,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{structGaps_1_1TrackerStripPedestal}{Gaps::TrackerStripPedestal}}\&\ strip);}
-\DoxyCodeLine{00164\ }
-\DoxyCodeLine{00165\ }
-\DoxyCodeLine{00166\ }
-\DoxyCodeLine{00167\ }
-\DoxyCodeLine{00168\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00147\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacegondola_a3b25ba3aba0e585295ecefc0701cf7de}{get\_hid\_vid\_map}}()\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{HashMap<u32,\ u32>}};}
+\DoxyCodeLine{00148\ }
+\DoxyCodeLine{00151\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacegondola_ab1c635d648526ddffc8f60a7b9a0a8a6}{get\_vid\_hid\_map}}()\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{HashMap<u32,\ u32>}};\ }
+\DoxyCodeLine{00152\ \ \ }
+\DoxyCodeLine{00157\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structgondola_1_1TofPaddleTimingConstant}{TofPaddleTimingConstant}}\ \{}
+\DoxyCodeLine{00158\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TofPaddleTimingConstant_a41cb1a0e033ce0842cad60d50ad14096}{data\_id}};\ }
+\DoxyCodeLine{00159\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TofPaddleTimingConstant_a6a64ed94e742886fc8a9f62a15d34354}{paddle\_id}}\ ;}
+\DoxyCodeLine{00160\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TofPaddleTimingConstant_a817118a8d9685956025e0eebdd9fd474}{volume\_id}};}
+\DoxyCodeLine{00161\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TofPaddleTimingConstant_aa29a9f705115e6d52d424bec0bb99cd0}{utc\_timestamp\_start}};}
+\DoxyCodeLine{00162\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TofPaddleTimingConstant_a9c980eb9c5630d0f89ba6f4a9eb82992}{utc\_timestamp\_stop}};}
+\DoxyCodeLine{00163\ \ \ \ \ std::string\ \mbox{\hyperlink{structgondola_1_1TofPaddleTimingConstant_a72baac53771b28d396bec1856e006b3b}{name}};\ }
+\DoxyCodeLine{00164\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TofPaddleTimingConstant_a4d985f4589eb40fb225b374faceb57ea}{version}};}
+\DoxyCodeLine{00165\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TofPaddleTimingConstant_aa519abcb2a208c73f6c2e25065192f35}{timing\_constant}};\ }
+\DoxyCodeLine{00166\ \ \ }
+\DoxyCodeLine{00167\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1TofPaddleTimingConstant_a7c831376b34185b56e4fc91b2052aa88}{to\_string}}()\ const\ -\/>\ std::\textcolor{keywordtype}{string};}
+\DoxyCodeLine{00168\ }
+\DoxyCodeLine{00169\ \ \ \};}
+\DoxyCodeLine{00170\ }
+\DoxyCodeLine{00171\ \ \ typedef\ std::map<\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}},\ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}>\ \mbox{\hyperlink{namespacegondola_a1c2c2768738a98e4ab3c0aa6d31d88e0}{TofPaddleTimingConstantMap}};}
+\DoxyCodeLine{00172\ }
+\DoxyCodeLine{00173\ \ \ auto\ get\_tofpaddletimingconstants(std::\textcolor{keywordtype}{string}\ mask\_name\ =\ "{}"{})\ -\/>\ \mbox{\hyperlink{namespacegondola_a1c2c2768738a98e4ab3c0aa6d31d88e0}{TofPaddleTimingConstantMap}};}
+\DoxyCodeLine{00174\ \}}
+\DoxyCodeLine{00175\ }
+\DoxyCodeLine{00176\ std::ostream\&\ operator<<(std::ostream\&\ os,\ const\ \mbox{\hyperlink{namespaceGaps}{Gaps}}::TofPaddle\&\ paddle);}
+\DoxyCodeLine{00177\ }
+\DoxyCodeLine{00178\ std::ostream\&\ operator<<(std::ostream\&\ os,\ const\ \mbox{\hyperlink{namespaceGaps}{Gaps}}::TrackerStrip\&\ strip);}
+\DoxyCodeLine{00179\ }
+\DoxyCodeLine{00180\ std::ostream\&\ operator<<(std::ostream\&\ os,\ const\ \mbox{\hyperlink{namespaceGaps}{Gaps}}::TrackerStripMask\&\ strip);}
+\DoxyCodeLine{00181\ }
+\DoxyCodeLine{00182\ std::ostream\&\ operator<<(std::ostream\&\ os,\ const\ \mbox{\hyperlink{namespaceGaps}{Gaps}}::TrackerStripPedestal\&\ strip);}
+\DoxyCodeLine{00183\ }
+\DoxyCodeLine{00184\ std::ostream\&\ operator<<(std::ostream\&\ os,\ const\ \mbox{\hyperlink{namespacegondola}{gondola}}::TofPaddleTimingConstant\&\ paddle);}
+\DoxyCodeLine{00185\ }
+\DoxyCodeLine{00186\ \textcolor{preprocessor}{\#endif}}
 
 \end{DoxyCode}

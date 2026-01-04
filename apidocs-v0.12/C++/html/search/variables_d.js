@@ -12,12 +12,13 @@ var searchData=
   ['n_5ftof_5fhits_9',['n_tof_hits',['../structGaps_1_1Telemetry_1_1MergedEvent.html#a98d8e2804521987cf8fa8121e76cf273',1,'Gaps::Telemetry::MergedEvent']]],
   ['n_5ftrigger_5fpaddles_10',['n_trigger_paddles',['../structgondola_1_1TofEventSummary.html#aa2cc6620d029f9252afaf87daf77be4a',1,'gondola::TofEventSummary']]],
   ['n_5ftrk_5fhits_11',['n_trk_hits',['../structGaps_1_1Telemetry_1_1MergedEvent.html#ade6865babdc397965f93af427d6a8a92',1,'Gaps::Telemetry::MergedEvent']]],
-  ['nas_5ftemp_12',['nas_temp',['../structPBMoniData.html#a468db626b837765f2e8149681e6201d4',1,'PBMoniData']]],
-  ['nhit_5finner_5ftof_13',['nhit_inner_tof',['../structTofEventHeader.html#a65f64a5e6479abe0cf00241ef124ed2f',1,'TofEventHeader']]],
-  ['nhit_5fouter_5ftof_14',['nhit_outer_tof',['../structTofEventHeader.html#a916d2d4278fe845eabea50e83b77a7ad',1,'TofEventHeader']]],
-  ['noi_5fdata_15',['noi_data',['../structgondola_1_1RBCalibration.html#a6a1ecc8b17d1c8bb310b581649648851',1,'gondola::RBCalibration']]],
-  ['normal_5fx_16',['normal_x',['../structGaps_1_1TofPaddle.html#af6364fccfde30febd1b64ed0122f5fe3',1,'Gaps::TofPaddle']]],
-  ['normal_5fy_17',['normal_y',['../structGaps_1_1TofPaddle.html#a749277dbf19c56925c0d4decc7a1aab6',1,'Gaps::TofPaddle']]],
-  ['normal_5fz_18',['normal_z',['../structGaps_1_1TofPaddle.html#a2f06fa3d7cc0ac6d047396d99d3f06f2',1,'Gaps::TofPaddle']]],
-  ['num_5fhits_19',['num_hits',['../structGaps_1_1Telemetry_1_1TrkMetaData.html#a1ab6ad6cac2c85d7bb3a5b977aa46287',1,'Gaps::Telemetry::TrkMetaData']]]
+  ['name_12',['name',['../structgondola_1_1TofPaddleTimingConstant.html#a72baac53771b28d396bec1856e006b3b',1,'gondola::TofPaddleTimingConstant']]],
+  ['nas_5ftemp_13',['nas_temp',['../structPBMoniData.html#a468db626b837765f2e8149681e6201d4',1,'PBMoniData']]],
+  ['nhit_5finner_5ftof_14',['nhit_inner_tof',['../structTofEventHeader.html#a65f64a5e6479abe0cf00241ef124ed2f',1,'TofEventHeader']]],
+  ['nhit_5fouter_5ftof_15',['nhit_outer_tof',['../structTofEventHeader.html#a916d2d4278fe845eabea50e83b77a7ad',1,'TofEventHeader']]],
+  ['noi_5fdata_16',['noi_data',['../structgondola_1_1RBCalibration.html#a6a1ecc8b17d1c8bb310b581649648851',1,'gondola::RBCalibration']]],
+  ['normal_5fx_17',['normal_x',['../structGaps_1_1TofPaddle.html#af6364fccfde30febd1b64ed0122f5fe3',1,'Gaps::TofPaddle']]],
+  ['normal_5fy_18',['normal_y',['../structGaps_1_1TofPaddle.html#a749277dbf19c56925c0d4decc7a1aab6',1,'Gaps::TofPaddle']]],
+  ['normal_5fz_19',['normal_z',['../structGaps_1_1TofPaddle.html#a2f06fa3d7cc0ac6d047396d99d3f06f2',1,'Gaps::TofPaddle']]],
+  ['num_5fhits_20',['num_hits',['../structGaps_1_1Telemetry_1_1TrkMetaData.html#a1ab6ad6cac2c85d7bb3a5b977aa46287',1,'Gaps::Telemetry::TrkMetaData']]]
 ];

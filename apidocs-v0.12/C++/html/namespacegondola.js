@@ -12,10 +12,12 @@ var namespacegondola =
     [ "TofEvent", "structgondola_1_1TofEvent.html", "structgondola_1_1TofEvent" ],
     [ "TofEventSummary", "structgondola_1_1TofEventSummary.html", "structgondola_1_1TofEventSummary" ],
     [ "TofHit", "structgondola_1_1TofHit.html", "structgondola_1_1TofHit" ],
+    [ "TofPaddleTimingConstant", "structgondola_1_1TofPaddleTimingConstant.html", "structgondola_1_1TofPaddleTimingConstant" ],
     [ "RBCalibrationMap", "namespacegondola.html#ae720591de7c0e9e18619d265295f1ebe", null ],
     [ "TelemetryPacket", "namespacegondola.html#adb061fbe28da00055cd7fb65249a77df", null ],
     [ "TelemetryPacketHeader", "namespacegondola.html#abddc47f5a39ae5245979bc0a1b2cceea", null ],
     [ "TelemetryPacketType", "namespacegondola.html#a1b9982f07cad746b60c39b2d2a71497d", null ],
+    [ "TofPaddleTimingConstantMap", "namespacegondola.html#a1c2c2768738a98e4ab3c0aa6d31d88e0", null ],
     [ "CompressionLevel", "namespacegondola.html#a62baa478e4adaaf6d242f135c1c9f84d", [
       [ "Unknown", "namespacegondola.html#a62baa478e4adaaf6d242f135c1c9f84da88183b946cc5f0e8c96b2e66e1c74a7e", null ],
       [ "None", "namespacegondola.html#a62baa478e4adaaf6d242f135c1c9f84da6adf97f83acf6453d4a6a4b1070f3754", null ]
@@ -66,6 +68,7 @@ var namespacegondola =
       [ "Forced", "namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21adc2eb84d1f952ad0e6b58014aabd616a", null ]
     ] ],
     [ "get_hid_vid_map", "namespacegondola.html#a3b25ba3aba0e585295ecefc0701cf7de", null ],
+    [ "get_tofpaddletimingconstants", "namespacegondola.html#ada24c8b1eefc326eb57c09b7663da004", null ],
     [ "get_vid_hid_map", "namespacegondola.html#ab1c635d648526ddffc8f60a7b9a0a8a6", null ],
     [ "list_path_contents_sorted", "namespacegondola.html#ae1a0adbbbcd177ece4e936813e8ab262", null ],
     [ "load_tof_calibrations", "namespacegondola.html#abbe7c2c301e4f6cdd581d33c97be557d", null ],

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.db &#8212; gondola 0.12.4 documentation</title>
+    <title>gondola.db &#8212; gondola 0.12.6 documentation</title>
   
   
   
@@ -38,13 +38,13 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=cf73996f"></script>
+    <script src="../_static/documentation_options.js?v=eee2e1a2"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.db';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="gondola.gondola_core" href="gondola.gondola_core.html" />
+    <link rel="next" title="gondola.events" href="gondola.events.html" />
     <link rel="prev" title="gondola.calibration" href="gondola.calibration.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="python"/>
@@ -110,7 +110,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.12.4 documentation</p>
+    <p class="title logo__title">gondola 0.12.6 documentation</p>
   
 </a></div>
     
@@ -261,8 +261,12 @@
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="gondola.calibration.html">gondola.calibration</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">gondola.db</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.events.html">gondola.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.gondola_core.html">gondola.gondola_core</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gondola.io.html">gondola.io</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="gondola.io.html">gondola.io</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="gondola.io.streamers.html">gondola.io.streamers</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.reconstruction.html">gondola.reconstruction</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="gondola.tof.html">gondola.tof</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="gondola.tof.analysis.html">gondola.tof.analysis</a></li>
@@ -344,8 +348,29 @@ the database functions in gondola-db</p>
 <p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.TofPaddle" title="gondola.db.TofPaddle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofPaddle</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.ReadoutBoard" title="gondola.db.ReadoutBoard"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReadoutBoard</span></code></a>()</p></td>
+<td><p>A Readoutboard with paddles connected</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.TofPaddle" title="gondola.db.TofPaddle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofPaddle</span></code></a>()</p></td>
 <td><p>A single TOF paddle with 2 ends comnected</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.TofPaddleTimingConstant" title="gondola.db.TofPaddleTimingConstant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofPaddleTimingConstant</span></code></a>()</p></td>
+<td><p>Masking of unusable strips as curated by the tracker team</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.TrackerStrip" title="gondola.db.TrackerStrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerStrip</span></code></a>()</p></td>
+<td><p>A single Tracker strip</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.TrackerStripCmnNoise" title="gondola.db.TrackerStripCmnNoise"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerStripCmnNoise</span></code></a>()</p></td>
+<td><p>Common noise subtraction - pulse channels on the wafers and get the average adc.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerStripMask</span></code>()</p></td>
+<td><p>Masking of unusable strips as curated by the tracker team</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.TrackerStripPedestal" title="gondola.db.TrackerStripPedestal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerStripPedestal</span></code></a>()</p></td>
+<td><p>Measurement of tracker pedestal values for each strip</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.TrackerStripTransferFunction" title="gondola.db.TrackerStripTransferFunction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerStripTransferFunction</span></code></a></p></td>
+<td><p>alias of <a class="reference internal" href="#gondola.db.TrackerStripTransferFunction" title="gondola.db.TrackerStripTransferFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrackerStripTransferFunction</span></code></a></p></td>
 </tr>
 </tbody>
 </table>
@@ -608,6 +633,381 @@ assigned by the simulation</p>
 
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.db.ReadoutBoard">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.db.</span></span><span class="sig-name descname"><span class="pre">ReadoutBoard</span></span><a class="headerlink" href="#gondola.db.ReadoutBoard" title="Link to this definition">#</a></dt>
+<dd><p>A Readoutboard with paddles connected</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.db.ReadoutBoard.all">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.db.ReadoutBoard.all" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.db.ReadoutBoard.all_as_dict">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">all_as_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.db.ReadoutBoard.all_as_dict" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.ReadoutBoard.dsi">
+<span class="sig-name descname"><span class="pre">dsi</span></span><a class="headerlink" href="#gondola.db.ReadoutBoard.dsi" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.ReadoutBoard.j">
+<span class="sig-name descname"><span class="pre">j</span></span><a class="headerlink" href="#gondola.db.ReadoutBoard.j" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.db.ReadoutBoard.load_calibration">
+<span class="sig-name descname"><span class="pre">load_calibration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.db.ReadoutBoard.load_calibration" title="Link to this definition">#</a></dt>
+<dd><p>Load a calibration file for this specific Readoutboard</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.ReadoutBoard.mtb_link_id">
+<span class="sig-name descname"><span class="pre">mtb_link_id</span></span><a class="headerlink" href="#gondola.db.ReadoutBoard.mtb_link_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.ReadoutBoard.paddle12">
+<span class="sig-name descname"><span class="pre">paddle12</span></span><a class="headerlink" href="#gondola.db.ReadoutBoard.paddle12" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.ReadoutBoard.paddle34">
+<span class="sig-name descname"><span class="pre">paddle34</span></span><a class="headerlink" href="#gondola.db.ReadoutBoard.paddle34" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.ReadoutBoard.paddle56">
+<span class="sig-name descname"><span class="pre">paddle56</span></span><a class="headerlink" href="#gondola.db.ReadoutBoard.paddle56" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.ReadoutBoard.paddle78">
+<span class="sig-name descname"><span class="pre">paddle78</span></span><a class="headerlink" href="#gondola.db.ReadoutBoard.paddle78" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.ReadoutBoard.rb_id">
+<span class="sig-name descname"><span class="pre">rb_id</span></span><a class="headerlink" href="#gondola.db.ReadoutBoard.rb_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.db.TofPaddleTimingConstant">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.db.</span></span><span class="sig-name descname"><span class="pre">TofPaddleTimingConstant</span></span><a class="headerlink" href="#gondola.db.TofPaddleTimingConstant" title="Link to this definition">#</a></dt>
+<dd><p>Masking of unusable strips as curated by the tracker team</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.db.TofPaddleTimingConstant.all">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.db.TofPaddleTimingConstant.all" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.db.TofPaddleTimingConstant.all_names">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">all_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.db.TofPaddleTimingConstant.all_names" title="Link to this definition">#</a></dt>
+<dd><p>Get all names for registered datasets. These
+can be used in .as_dict_by_name() to query 
+the db for a set of values</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.db.TofPaddleTimingConstant.as_dict_by_name">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">as_dict_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.db.TofPaddleTimingConstant.as_dict_by_name" title="Link to this definition">#</a></dt>
+<dd><p>Get the TOF paddle timing constants as associated by a specific 
+name</p>
+<dl class="simple">
+<dt># Arguments </dt><dd><ul class="simple">
+<li><p>name : The name the constants are associated with</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddleTimingConstant.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#gondola.db.TofPaddleTimingConstant.name" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddleTimingConstant.paddle_id">
+<span class="sig-name descname"><span class="pre">paddle_id</span></span><a class="headerlink" href="#gondola.db.TofPaddleTimingConstant.paddle_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddleTimingConstant.timing_constant">
+<span class="sig-name descname"><span class="pre">timing_constant</span></span><a class="headerlink" href="#gondola.db.TofPaddleTimingConstant.timing_constant" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddleTimingConstant.utc_timestamp_start">
+<span class="sig-name descname"><span class="pre">utc_timestamp_start</span></span><a class="headerlink" href="#gondola.db.TofPaddleTimingConstant.utc_timestamp_start" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddleTimingConstant.utc_timestamp_stop">
+<span class="sig-name descname"><span class="pre">utc_timestamp_stop</span></span><a class="headerlink" href="#gondola.db.TofPaddleTimingConstant.utc_timestamp_stop" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddleTimingConstant.version">
+<span class="sig-name descname"><span class="pre">version</span></span><a class="headerlink" href="#gondola.db.TofPaddleTimingConstant.version" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddleTimingConstant.volume_id">
+<span class="sig-name descname"><span class="pre">volume_id</span></span><a class="headerlink" href="#gondola.db.TofPaddleTimingConstant.volume_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.db.TrackerStrip">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.db.</span></span><span class="sig-name descname"><span class="pre">TrackerStrip</span></span><a class="headerlink" href="#gondola.db.TrackerStrip" title="Link to this definition">#</a></dt>
+<dd><p>A single Tracker strip</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.db.TrackerStrip.all">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.db.TrackerStrip.all" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.db.TrackerStrip.all_as_dict">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">all_as_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.db.TrackerStrip.all_as_dict" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStrip.channel">
+<span class="sig-name descname"><span class="pre">channel</span></span><a class="headerlink" href="#gondola.db.TrackerStrip.channel" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStrip.coordinates">
+<span class="sig-name descname"><span class="pre">coordinates</span></span><a class="headerlink" href="#gondola.db.TrackerStrip.coordinates" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStrip.detector_coordinates">
+<span class="sig-name descname"><span class="pre">detector_coordinates</span></span><a class="headerlink" href="#gondola.db.TrackerStrip.detector_coordinates" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStrip.global_pos_x_det_l0">
+<span class="sig-name descname"><span class="pre">global_pos_x_det_l0</span></span><a class="headerlink" href="#gondola.db.TrackerStrip.global_pos_x_det_l0" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStrip.global_pos_x_l0">
+<span class="sig-name descname"><span class="pre">global_pos_x_l0</span></span><a class="headerlink" href="#gondola.db.TrackerStrip.global_pos_x_l0" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStrip.global_pos_y_det_l0">
+<span class="sig-name descname"><span class="pre">global_pos_y_det_l0</span></span><a class="headerlink" href="#gondola.db.TrackerStrip.global_pos_y_det_l0" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStrip.global_pos_y_l0">
+<span class="sig-name descname"><span class="pre">global_pos_y_l0</span></span><a class="headerlink" href="#gondola.db.TrackerStrip.global_pos_y_l0" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStrip.global_pos_z_det_l0">
+<span class="sig-name descname"><span class="pre">global_pos_z_det_l0</span></span><a class="headerlink" href="#gondola.db.TrackerStrip.global_pos_z_det_l0" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStrip.global_pos_z_l0">
+<span class="sig-name descname"><span class="pre">global_pos_z_l0</span></span><a class="headerlink" href="#gondola.db.TrackerStrip.global_pos_z_l0" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStrip.layer">
+<span class="sig-name descname"><span class="pre">layer</span></span><a class="headerlink" href="#gondola.db.TrackerStrip.layer" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStrip.module">
+<span class="sig-name descname"><span class="pre">module</span></span><a class="headerlink" href="#gondola.db.TrackerStrip.module" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStrip.principal_x">
+<span class="sig-name descname"><span class="pre">principal_x</span></span><a class="headerlink" href="#gondola.db.TrackerStrip.principal_x" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStrip.principal_y">
+<span class="sig-name descname"><span class="pre">principal_y</span></span><a class="headerlink" href="#gondola.db.TrackerStrip.principal_y" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStrip.principal_z">
+<span class="sig-name descname"><span class="pre">principal_z</span></span><a class="headerlink" href="#gondola.db.TrackerStrip.principal_z" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStrip.row">
+<span class="sig-name descname"><span class="pre">row</span></span><a class="headerlink" href="#gondola.db.TrackerStrip.row" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStrip.strip_id">
+<span class="sig-name descname"><span class="pre">strip_id</span></span><a class="headerlink" href="#gondola.db.TrackerStrip.strip_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStrip.volume_id">
+<span class="sig-name descname"><span class="pre">volume_id</span></span><a class="headerlink" href="#gondola.db.TrackerStrip.volume_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripPedestal">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.db.</span></span><span class="sig-name descname"><span class="pre">TrackerStripPedestal</span></span><a class="headerlink" href="#gondola.db.TrackerStripPedestal" title="Link to this definition">#</a></dt>
+<dd><p>Measurement of tracker pedestal values for each strip</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripPedestal.all">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.db.TrackerStripPedestal.all" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripPedestal.all_names">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">all_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.db.TrackerStripPedestal.all_names" title="Link to this definition">#</a></dt>
+<dd><p>Get all names for registered datasets. These
+can be used in .as_dict_by_name() to query 
+the db for a set of values</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripPedestal.as_dict_by_name">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">as_dict_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.db.TrackerStripPedestal.as_dict_by_name" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripPedestal.is_mean_value">
+<span class="sig-name descname"><span class="pre">is_mean_value</span></span><a class="headerlink" href="#gondola.db.TrackerStripPedestal.is_mean_value" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripPedestal.pedestal_mean">
+<span class="sig-name descname"><span class="pre">pedestal_mean</span></span><a class="headerlink" href="#gondola.db.TrackerStripPedestal.pedestal_mean" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripPedestal.pedestal_sigam">
+<span class="sig-name descname"><span class="pre">pedestal_sigam</span></span><a class="headerlink" href="#gondola.db.TrackerStripPedestal.pedestal_sigam" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripPedestal.strip_id">
+<span class="sig-name descname"><span class="pre">strip_id</span></span><a class="headerlink" href="#gondola.db.TrackerStripPedestal.strip_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripPedestal.utc_timestamp_start">
+<span class="sig-name descname"><span class="pre">utc_timestamp_start</span></span><a class="headerlink" href="#gondola.db.TrackerStripPedestal.utc_timestamp_start" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripPedestal.utc_timestamp_stop">
+<span class="sig-name descname"><span class="pre">utc_timestamp_stop</span></span><a class="headerlink" href="#gondola.db.TrackerStripPedestal.utc_timestamp_stop" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripPedestal.volume_id">
+<span class="sig-name descname"><span class="pre">volume_id</span></span><a class="headerlink" href="#gondola.db.TrackerStripPedestal.volume_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripTransferFunction">
+<span class="sig-prename descclassname"><span class="pre">gondola.db.</span></span><span class="sig-name descname"><span class="pre">TrackerStripTransferFunction</span></span><a class="headerlink" href="#gondola.db.TrackerStripTransferFunction" title="Link to this definition">#</a></dt>
+<dd><p>alias of <a class="reference internal" href="#gondola.db.TrackerStripTransferFunction" title="gondola.db.TrackerStripTransferFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrackerStripTransferFunction</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripCmnNoise">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.db.</span></span><span class="sig-name descname"><span class="pre">TrackerStripCmnNoise</span></span><a class="headerlink" href="#gondola.db.TrackerStripCmnNoise" title="Link to this definition">#</a></dt>
+<dd><p>Common noise subtraction - pulse channels on the wafers and get the average adc. 
+The gain is available as well. Data from Mengjiao's group</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripCmnNoise.all">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.db.TrackerStripCmnNoise.all" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripCmnNoise.all_names">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">all_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.db.TrackerStripCmnNoise.all_names" title="Link to this definition">#</a></dt>
+<dd><p>Get all names for registered datasets. These
+can be used in .as_dict_by_name() to query 
+the db for a set of values</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripCmnNoise.as_dict_by_name">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">as_dict_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.db.TrackerStripCmnNoise.as_dict_by_name" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripCmnNoise.gain">
+<span class="sig-name descname"><span class="pre">gain</span></span><a class="headerlink" href="#gondola.db.TrackerStripCmnNoise.gain" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripCmnNoise.gain_is_mean">
+<span class="sig-name descname"><span class="pre">gain_is_mean</span></span><a class="headerlink" href="#gondola.db.TrackerStripCmnNoise.gain_is_mean" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripCmnNoise.get_common_level">
+<span class="sig-name descname"><span class="pre">get_common_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.db.TrackerStripCmnNoise.get_common_level" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripCmnNoise.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#gondola.db.TrackerStripCmnNoise.name" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripCmnNoise.pulse_avg">
+<span class="sig-name descname"><span class="pre">pulse_avg</span></span><a class="headerlink" href="#gondola.db.TrackerStripCmnNoise.pulse_avg" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripCmnNoise.pulse_cn">
+<span class="sig-name descname"><span class="pre">pulse_cn</span></span><a class="headerlink" href="#gondola.db.TrackerStripCmnNoise.pulse_cn" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripCmnNoise.pulse_is_mean">
+<span class="sig-name descname"><span class="pre">pulse_is_mean</span></span><a class="headerlink" href="#gondola.db.TrackerStripCmnNoise.pulse_is_mean" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripCmnNoise.strip_id">
+<span class="sig-name descname"><span class="pre">strip_id</span></span><a class="headerlink" href="#gondola.db.TrackerStripCmnNoise.strip_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripCmnNoise.utc_timestamp_start">
+<span class="sig-name descname"><span class="pre">utc_timestamp_start</span></span><a class="headerlink" href="#gondola.db.TrackerStripCmnNoise.utc_timestamp_start" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripCmnNoise.utc_timestamp_stop">
+<span class="sig-name descname"><span class="pre">utc_timestamp_stop</span></span><a class="headerlink" href="#gondola.db.TrackerStripCmnNoise.utc_timestamp_stop" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TrackerStripCmnNoise.volume_id">
+<span class="sig-name descname"><span class="pre">volume_id</span></span><a class="headerlink" href="#gondola.db.TrackerStripCmnNoise.volume_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 
 
@@ -630,11 +1030,11 @@ assigned by the simulation</p>
       </div>
     </a>
     <a class="right-next"
-       href="gondola.gondola_core.html"
+       href="gondola.events.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">gondola.gondola_core</p>
+        <p class="prev-next-title">gondola.events</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -694,6 +1094,86 @@ assigned by the simulation</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.sideA_pos"><code class="docutils literal notranslate"><span class="pre">TofPaddle.sideA_pos</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.volume_id"><code class="docutils literal notranslate"><span class="pre">TofPaddle.volume_id</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddle.width"><code class="docutils literal notranslate"><span class="pre">TofPaddle.width</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.ReadoutBoard"><code class="docutils literal notranslate"><span class="pre">ReadoutBoard</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.ReadoutBoard.all"><code class="docutils literal notranslate"><span class="pre">ReadoutBoard.all()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.ReadoutBoard.all_as_dict"><code class="docutils literal notranslate"><span class="pre">ReadoutBoard.all_as_dict()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.ReadoutBoard.dsi"><code class="docutils literal notranslate"><span class="pre">ReadoutBoard.dsi</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.ReadoutBoard.j"><code class="docutils literal notranslate"><span class="pre">ReadoutBoard.j</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.ReadoutBoard.load_calibration"><code class="docutils literal notranslate"><span class="pre">ReadoutBoard.load_calibration()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.ReadoutBoard.mtb_link_id"><code class="docutils literal notranslate"><span class="pre">ReadoutBoard.mtb_link_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.ReadoutBoard.paddle12"><code class="docutils literal notranslate"><span class="pre">ReadoutBoard.paddle12</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.ReadoutBoard.paddle34"><code class="docutils literal notranslate"><span class="pre">ReadoutBoard.paddle34</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.ReadoutBoard.paddle56"><code class="docutils literal notranslate"><span class="pre">ReadoutBoard.paddle56</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.ReadoutBoard.paddle78"><code class="docutils literal notranslate"><span class="pre">ReadoutBoard.paddle78</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.ReadoutBoard.rb_id"><code class="docutils literal notranslate"><span class="pre">ReadoutBoard.rb_id</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddleTimingConstant"><code class="docutils literal notranslate"><span class="pre">TofPaddleTimingConstant</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddleTimingConstant.all"><code class="docutils literal notranslate"><span class="pre">TofPaddleTimingConstant.all()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddleTimingConstant.all_names"><code class="docutils literal notranslate"><span class="pre">TofPaddleTimingConstant.all_names()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddleTimingConstant.as_dict_by_name"><code class="docutils literal notranslate"><span class="pre">TofPaddleTimingConstant.as_dict_by_name()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddleTimingConstant.name"><code class="docutils literal notranslate"><span class="pre">TofPaddleTimingConstant.name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddleTimingConstant.paddle_id"><code class="docutils literal notranslate"><span class="pre">TofPaddleTimingConstant.paddle_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddleTimingConstant.timing_constant"><code class="docutils literal notranslate"><span class="pre">TofPaddleTimingConstant.timing_constant</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddleTimingConstant.utc_timestamp_start"><code class="docutils literal notranslate"><span class="pre">TofPaddleTimingConstant.utc_timestamp_start</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddleTimingConstant.utc_timestamp_stop"><code class="docutils literal notranslate"><span class="pre">TofPaddleTimingConstant.utc_timestamp_stop</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddleTimingConstant.version"><code class="docutils literal notranslate"><span class="pre">TofPaddleTimingConstant.version</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddleTimingConstant.volume_id"><code class="docutils literal notranslate"><span class="pre">TofPaddleTimingConstant.volume_id</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStrip"><code class="docutils literal notranslate"><span class="pre">TrackerStrip</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStrip.all"><code class="docutils literal notranslate"><span class="pre">TrackerStrip.all()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStrip.all_as_dict"><code class="docutils literal notranslate"><span class="pre">TrackerStrip.all_as_dict()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStrip.channel"><code class="docutils literal notranslate"><span class="pre">TrackerStrip.channel</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStrip.coordinates"><code class="docutils literal notranslate"><span class="pre">TrackerStrip.coordinates</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStrip.detector_coordinates"><code class="docutils literal notranslate"><span class="pre">TrackerStrip.detector_coordinates</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStrip.global_pos_x_det_l0"><code class="docutils literal notranslate"><span class="pre">TrackerStrip.global_pos_x_det_l0</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStrip.global_pos_x_l0"><code class="docutils literal notranslate"><span class="pre">TrackerStrip.global_pos_x_l0</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStrip.global_pos_y_det_l0"><code class="docutils literal notranslate"><span class="pre">TrackerStrip.global_pos_y_det_l0</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStrip.global_pos_y_l0"><code class="docutils literal notranslate"><span class="pre">TrackerStrip.global_pos_y_l0</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStrip.global_pos_z_det_l0"><code class="docutils literal notranslate"><span class="pre">TrackerStrip.global_pos_z_det_l0</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStrip.global_pos_z_l0"><code class="docutils literal notranslate"><span class="pre">TrackerStrip.global_pos_z_l0</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStrip.layer"><code class="docutils literal notranslate"><span class="pre">TrackerStrip.layer</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStrip.module"><code class="docutils literal notranslate"><span class="pre">TrackerStrip.module</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStrip.principal_x"><code class="docutils literal notranslate"><span class="pre">TrackerStrip.principal_x</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStrip.principal_y"><code class="docutils literal notranslate"><span class="pre">TrackerStrip.principal_y</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStrip.principal_z"><code class="docutils literal notranslate"><span class="pre">TrackerStrip.principal_z</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStrip.row"><code class="docutils literal notranslate"><span class="pre">TrackerStrip.row</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStrip.strip_id"><code class="docutils literal notranslate"><span class="pre">TrackerStrip.strip_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStrip.volume_id"><code class="docutils literal notranslate"><span class="pre">TrackerStrip.volume_id</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripPedestal"><code class="docutils literal notranslate"><span class="pre">TrackerStripPedestal</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripPedestal.all"><code class="docutils literal notranslate"><span class="pre">TrackerStripPedestal.all()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripPedestal.all_names"><code class="docutils literal notranslate"><span class="pre">TrackerStripPedestal.all_names()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripPedestal.as_dict_by_name"><code class="docutils literal notranslate"><span class="pre">TrackerStripPedestal.as_dict_by_name()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripPedestal.is_mean_value"><code class="docutils literal notranslate"><span class="pre">TrackerStripPedestal.is_mean_value</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripPedestal.pedestal_mean"><code class="docutils literal notranslate"><span class="pre">TrackerStripPedestal.pedestal_mean</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripPedestal.pedestal_sigam"><code class="docutils literal notranslate"><span class="pre">TrackerStripPedestal.pedestal_sigam</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripPedestal.strip_id"><code class="docutils literal notranslate"><span class="pre">TrackerStripPedestal.strip_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripPedestal.utc_timestamp_start"><code class="docutils literal notranslate"><span class="pre">TrackerStripPedestal.utc_timestamp_start</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripPedestal.utc_timestamp_stop"><code class="docutils literal notranslate"><span class="pre">TrackerStripPedestal.utc_timestamp_stop</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripPedestal.volume_id"><code class="docutils literal notranslate"><span class="pre">TrackerStripPedestal.volume_id</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripTransferFunction"><code class="docutils literal notranslate"><span class="pre">TrackerStripTransferFunction</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripCmnNoise"><code class="docutils literal notranslate"><span class="pre">TrackerStripCmnNoise</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripCmnNoise.all"><code class="docutils literal notranslate"><span class="pre">TrackerStripCmnNoise.all()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripCmnNoise.all_names"><code class="docutils literal notranslate"><span class="pre">TrackerStripCmnNoise.all_names()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripCmnNoise.as_dict_by_name"><code class="docutils literal notranslate"><span class="pre">TrackerStripCmnNoise.as_dict_by_name()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripCmnNoise.gain"><code class="docutils literal notranslate"><span class="pre">TrackerStripCmnNoise.gain</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripCmnNoise.gain_is_mean"><code class="docutils literal notranslate"><span class="pre">TrackerStripCmnNoise.gain_is_mean</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripCmnNoise.get_common_level"><code class="docutils literal notranslate"><span class="pre">TrackerStripCmnNoise.get_common_level()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripCmnNoise.name"><code class="docutils literal notranslate"><span class="pre">TrackerStripCmnNoise.name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripCmnNoise.pulse_avg"><code class="docutils literal notranslate"><span class="pre">TrackerStripCmnNoise.pulse_avg</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripCmnNoise.pulse_cn"><code class="docutils literal notranslate"><span class="pre">TrackerStripCmnNoise.pulse_cn</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripCmnNoise.pulse_is_mean"><code class="docutils literal notranslate"><span class="pre">TrackerStripCmnNoise.pulse_is_mean</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripCmnNoise.strip_id"><code class="docutils literal notranslate"><span class="pre">TrackerStripCmnNoise.strip_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripCmnNoise.utc_timestamp_start"><code class="docutils literal notranslate"><span class="pre">TrackerStripCmnNoise.utc_timestamp_start</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripCmnNoise.utc_timestamp_stop"><code class="docutils literal notranslate"><span class="pre">TrackerStripCmnNoise.utc_timestamp_stop</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripCmnNoise.volume_id"><code class="docutils literal notranslate"><span class="pre">TrackerStripCmnNoise.volume_id</span></code></a></li>
 </ul>
 </li>
 </ul>

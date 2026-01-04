@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["rand_vec"],"trait":["FromRandom"]};

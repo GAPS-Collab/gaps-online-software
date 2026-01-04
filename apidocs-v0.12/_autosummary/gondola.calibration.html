@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.calibration &#8212; gondola 0.12.4 documentation</title>
+    <title>gondola.calibration &#8212; gondola 0.12.6 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=cf73996f"></script>
+    <script src="../_static/documentation_options.js?v=eee2e1a2"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.calibration';</script>
@@ -110,7 +110,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.12.4 documentation</p>
+    <p class="title logo__title">gondola 0.12.6 documentation</p>
   
 </a></div>
     
@@ -261,8 +261,12 @@
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">gondola.calibration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.db.html">gondola.db</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.events.html">gondola.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.gondola_core.html">gondola.gondola_core</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gondola.io.html">gondola.io</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="gondola.io.html">gondola.io</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="gondola.io.streamers.html">gondola.io.streamers</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.reconstruction.html">gondola.reconstruction</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="gondola.tof.html">gondola.tof</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="gondola.tof.analysis.html">gondola.tof.analysis</a></li>
@@ -349,6 +353,152 @@
 </tbody>
 </table>
 </div>
+<p class="rubric">Classes</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.calibration.RBCalibrations" title="gondola.calibration.RBCalibrations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RBCalibrations</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.calibration.RBCalibrations">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.calibration.</span></span><span class="sig-name descname"><span class="pre">RBCalibrations</span></span><a class="headerlink" href="#gondola.calibration.RBCalibrations" title="Link to this definition">#</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.assemble_from_flightcal">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">assemble_from_flightcal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fcal_t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fcal_v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.RBCalibrations.assemble_from_flightcal" title="Link to this definition">#</a></dt>
+<dd><p>Re-assemble a RBCalibration from chopped up parts</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.check">
+<span class="sig-name descname"><span class="pre">check</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.RBCalibrations.check" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.d_v">
+<span class="sig-name descname"><span class="pre">d_v</span></span><a class="headerlink" href="#gondola.calibration.RBCalibrations.d_v" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.from_bytestream">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_bytestream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytestream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.RBCalibrations.from_bytestream" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.from_file">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">discard_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.RBCalibrations.from_file" title="Link to this definition">#</a></dt>
+<dd><p>Load the calibration from a file with a 
+TofPacket of type RBCalibration in it</p>
+<p># Arguments:</p>
+<ul class="simple">
+<li><p>filename     : File with a TofPacket of type RBCalibration in it</p></li>
+<li><p>discard_data : Throw away event data after loading</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.from_random">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_random</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.RBCalibrations.from_random" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.from_tofpacket">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_tofpacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.RBCalibrations.from_tofpacket" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.nanoseconds">
+<span class="sig-name descname"><span class="pre">nanoseconds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_cell</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.RBCalibrations.nanoseconds" title="Link to this definition">#</a></dt>
+<dd><p>Apply the timing calibration to a single channel</p>
+<p>This will allocate the array for the waveform 
+time bins (unit is ns)</p>
+<p># Arguments</p>
+<ul class="simple">
+<li><p>channel   : Channel id 1-9</p></li>
+<li><p>stop_cell : This channels stop cell</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.noi_data">
+<span class="sig-name descname"><span class="pre">noi_data</span></span><a class="headerlink" href="#gondola.calibration.RBCalibrations.noi_data" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.pack">
+<span class="sig-name descname"><span class="pre">pack</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.RBCalibrations.pack" title="Link to this definition">#</a></dt>
+<dd><p>Pack self into a TofPacket to be written on disk
+or sent over network</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.passes_timing_checks">
+<span class="sig-name descname"><span class="pre">passes_timing_checks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.RBCalibrations.passes_timing_checks" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.passes_voltage_checks">
+<span class="sig-name descname"><span class="pre">passes_voltage_checks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.RBCalibrations.passes_voltage_checks" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.rb_id">
+<span class="sig-name descname"><span class="pre">rb_id</span></span><a class="headerlink" href="#gondola.calibration.RBCalibrations.rb_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.tbin">
+<span class="sig-name descname"><span class="pre">tbin</span></span><a class="headerlink" href="#gondola.calibration.RBCalibrations.tbin" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.tcal_data">
+<span class="sig-name descname"><span class="pre">tcal_data</span></span><a class="headerlink" href="#gondola.calibration.RBCalibrations.tcal_data" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.v_dips">
+<span class="sig-name descname"><span class="pre">v_dips</span></span><a class="headerlink" href="#gondola.calibration.RBCalibrations.v_dips" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.v_inc">
+<span class="sig-name descname"><span class="pre">v_inc</span></span><a class="headerlink" href="#gondola.calibration.RBCalibrations.v_inc" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.v_offsets">
+<span class="sig-name descname"><span class="pre">v_offsets</span></span><a class="headerlink" href="#gondola.calibration.RBCalibrations.v_offsets" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.vcal_data">
+<span class="sig-name descname"><span class="pre">vcal_data</span></span><a class="headerlink" href="#gondola.calibration.RBCalibrations.vcal_data" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.voltages">
+<span class="sig-name descname"><span class="pre">voltages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_cell</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.RBCalibrations.voltages" title="Link to this definition">#</a></dt>
+<dd><p>Apply the voltage calibration to a single channel 
+FIXME - mixing of naming conventions for the channels</p>
+<p>FIXME - make it return Result&lt;(), CalibrationError&gt;</p>
+<p># Arguments</p>
+<ul class="simple">
+<li><p>channel   : Channel id 1-9</p></li>
+<li><p>stop_cell : This channels stop cell</p></li>
+<li><p>adc       : Uncalibrated channel data</p></li>
+<li><dl class="simple">
+<dt>waveform<span class="classifier">Pre-allocated array to hold </span></dt><dd><p>calibrated waveform data.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="gondola.calibration.load_rb_calibrations">
 <span class="sig-prename descclassname"><span class="pre">gondola.calibration.</span></span><span class="sig-name descname"><span class="pre">load_rb_calibrations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cali_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_event_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.load_rb_calibrations" title="Link to this definition">#</a></dt>
@@ -422,6 +572,29 @@ calibration constants.</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.RBCalibrations"><code class="docutils literal notranslate"><span class="pre">RBCalibrations</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.RBCalibrations.assemble_from_flightcal"><code class="docutils literal notranslate"><span class="pre">RBCalibrations.assemble_from_flightcal()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.RBCalibrations.check"><code class="docutils literal notranslate"><span class="pre">RBCalibrations.check()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.RBCalibrations.d_v"><code class="docutils literal notranslate"><span class="pre">RBCalibrations.d_v</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.RBCalibrations.from_bytestream"><code class="docutils literal notranslate"><span class="pre">RBCalibrations.from_bytestream()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.RBCalibrations.from_file"><code class="docutils literal notranslate"><span class="pre">RBCalibrations.from_file()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.RBCalibrations.from_random"><code class="docutils literal notranslate"><span class="pre">RBCalibrations.from_random()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.RBCalibrations.from_tofpacket"><code class="docutils literal notranslate"><span class="pre">RBCalibrations.from_tofpacket()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.RBCalibrations.nanoseconds"><code class="docutils literal notranslate"><span class="pre">RBCalibrations.nanoseconds()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.RBCalibrations.noi_data"><code class="docutils literal notranslate"><span class="pre">RBCalibrations.noi_data</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.RBCalibrations.pack"><code class="docutils literal notranslate"><span class="pre">RBCalibrations.pack()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.RBCalibrations.passes_timing_checks"><code class="docutils literal notranslate"><span class="pre">RBCalibrations.passes_timing_checks()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.RBCalibrations.passes_voltage_checks"><code class="docutils literal notranslate"><span class="pre">RBCalibrations.passes_voltage_checks()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.RBCalibrations.rb_id"><code class="docutils literal notranslate"><span class="pre">RBCalibrations.rb_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.RBCalibrations.tbin"><code class="docutils literal notranslate"><span class="pre">RBCalibrations.tbin</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.RBCalibrations.tcal_data"><code class="docutils literal notranslate"><span class="pre">RBCalibrations.tcal_data</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.RBCalibrations.v_dips"><code class="docutils literal notranslate"><span class="pre">RBCalibrations.v_dips</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.RBCalibrations.v_inc"><code class="docutils literal notranslate"><span class="pre">RBCalibrations.v_inc</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.RBCalibrations.v_offsets"><code class="docutils literal notranslate"><span class="pre">RBCalibrations.v_offsets</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.RBCalibrations.vcal_data"><code class="docutils literal notranslate"><span class="pre">RBCalibrations.vcal_data</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.RBCalibrations.voltages"><code class="docutils literal notranslate"><span class="pre">RBCalibrations.voltages()</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.load_rb_calibrations"><code class="docutils literal notranslate"><span class="pre">load_rb_calibrations()</span></code></a></li>
 </ul>
   </nav></div>

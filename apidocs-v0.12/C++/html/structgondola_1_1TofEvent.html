@@ -123,8 +123,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a57d68c0ac8f98da93aba370663cb6bc0" id="r_a57d68c0ac8f98da93aba370663cb6bc0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1TofEvent.html#a57d68c0ac8f98da93aba370663cb6bc0">get_hits</a> () <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> -&gt; <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">Vec</a>&lt; <a class="el" href="structgondola_1_1TofHit.html">TofHit</a> &gt;</td></tr>
 <tr class="memdesc:a57d68c0ac8f98da93aba370663cb6bc0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all hits from all rb_events.  <br /></td></tr>
 <tr class="separator:a57d68c0ac8f98da93aba370663cb6bc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acd6123af310fe092b232328c5e0e0382" id="r_acd6123af310fe092b232328c5e0e0382"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1TofEvent.html#acd6123af310fe092b232328c5e0e0382">normalize_hit_times</a> () -&gt; <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">void</a></td></tr>
-<tr class="separator:acd6123af310fe092b232328c5e0e0382"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7346ea2a4a33ffe5a2c2e6100a625b3f" id="r_a7346ea2a4a33ffe5a2c2e6100a625b3f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1TofEvent.html#a7346ea2a4a33ffe5a2c2e6100a625b3f">to_string</a> () <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> -&gt; std::string</td></tr>
 <tr class="memdesc:a7346ea2a4a33ffe5a2c2e6100a625b3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">string representation for printing  <br /></td></tr>
 <tr class="separator:a7346ea2a4a33ffe5a2c2e6100a625b3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -371,25 +369,7 @@ Static Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get the rb event for a specific board id. </p>
-
-</div>
-</div>
-<a id="acd6123af310fe092b232328c5e0e0382" name="acd6123af310fe092b232328c5e0e0382"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acd6123af310fe092b232328c5e0e0382">&#9670;&#160;</a></span>normalize_hit_times()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a> gondola::TofEvent::normalize_hit_times </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> -&gt;  <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">void</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>normalize all the hit times, taking the global ch9 phase into account </p>
+<p>Get the ids of the readoutboards participating in the event </p>
 
 </div>
 </div>

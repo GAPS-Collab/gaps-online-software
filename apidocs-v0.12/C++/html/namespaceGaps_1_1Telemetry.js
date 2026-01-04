@@ -13,6 +13,9 @@ var namespaceGaps_1_1Telemetry =
     [ "TrkMetaData", "structGaps_1_1Telemetry_1_1TrkMetaData.html", "structGaps_1_1Telemetry_1_1TrkMetaData" ],
     [ "BfswPacketType", "namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7", [
       [ "Unknown", "namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a88183b946cc5f0e8c96b2e66e1c74a7e", null ],
+      [ "SipGpsPosition", "namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7ad85e12b96f39b2783d06f69df001b0c0", null ],
+      [ "SipGpsTime", "namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a018fbb8d01faa0bb268ce465738f5499", null ],
+      [ "SipPressure", "namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a29745e313061fb2635274446022b51f8", null ],
       [ "CardHKP", "namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a03b147d4e815a1141e70c967b84c7078", null ],
       [ "CoolingHK", "namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7abe6258f33139d3f656ed32777e3be064", null ],
       [ "PDUHK", "namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a6f44f3023587714a8b55153eab21c599", null ],
@@ -38,8 +41,18 @@ var namespaceGaps_1_1Telemetry =
       [ "TmP38", "namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a0d56068e768f5962d797c5670478468e", null ],
       [ "TmP55", "namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a87150ebdcc6874870c92ae7ccc6a0f6e", null ],
       [ "TmP64", "namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7ac9dda4e6d942ab37fc1729d5ed8e73f4", null ],
+      [ "GcuEvtBuilderStats", "namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a7de42fba23b28a75f40f8a83b19add28", null ],
+      [ "RPiHKP", "namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a763b7dbca83c667401a5aa0006e02edb", null ],
       [ "TmP96", "namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a05066a6687f88e8a23c6a2f86066bbb4", null ],
-      [ "TmP214", "namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a0eb669abecb3b34dadc793ec5e098d8b", null ]
+      [ "LabjackSettings", "namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7aef3076d7d19ab28aed4fa3b5c4566765", null ],
+      [ "HeatHVLVSettings", "namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a77aa9d32dfec92de3ce2677c4442afac", null ],
+      [ "SurvivalPacket", "namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7af6cc65b9a4c2c3fe30bf8fe8e1bb8ef4", null ],
+      [ "GcuMonHKAddendum", "namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7aa657b2ae35a55727ac3ce70fcaf6edad", null ],
+      [ "PacketStats", "namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a1bbdfb884287c82a6240e9810708c7f9", null ],
+      [ "TeleMainSettings", "namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7ad813526ca8e695d7f9d05683fa32f526", null ],
+      [ "DecimationSettings", "namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a863e05d77b13fe3c0a7190499d80dbcc", null ],
+      [ "TmP214", "namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a0eb669abecb3b34dadc793ec5e098d8b", null ],
+      [ "RatePacket", "namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a936e3d7b33fd949eb7904493a5cdd7df", null ]
     ] ],
     [ "bfsw_ptype_to_str", "namespaceGaps_1_1Telemetry.html#ac903eef887c284115fb188cc72bf287f", null ],
     [ "bfsw_ptype_to_u8", "namespaceGaps_1_1Telemetry.html#a77bbbb6b3cce9cad492971b5a0cd96d2", null ]

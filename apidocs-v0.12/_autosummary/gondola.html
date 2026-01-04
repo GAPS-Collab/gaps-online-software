@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola &#8212; gondola 0.12.4 documentation</title>
+    <title>gondola &#8212; gondola 0.12.6 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=cf73996f"></script>
+    <script src="../_static/documentation_options.js?v=eee2e1a2"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola';</script>
@@ -110,7 +110,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.12.4 documentation</p>
+    <p class="title logo__title">gondola 0.12.6 documentation</p>
   
 </a></div>
     
@@ -261,8 +261,12 @@
   <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="gondola.calibration.html">gondola.calibration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.db.html">gondola.db</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.events.html">gondola.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.gondola_core.html">gondola.gondola_core</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gondola.io.html">gondola.io</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="gondola.io.html">gondola.io</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="gondola.io.streamers.html">gondola.io.streamers</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.reconstruction.html">gondola.reconstruction</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="gondola.tof.html">gondola.tof</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="gondola.tof.analysis.html">gondola.tof.analysis</a></li>
@@ -355,22 +359,25 @@
 <tr class="row-even"><td><p><a class="reference internal" href="gondola.db.html#module-gondola.db" title="gondola.db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">db</span></code></a></p></td>
 <td><p>Gondola core database functionality.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="gondola.gondola_core.html#module-gondola.gondola_core" title="gondola.gondola_core"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gondola_core</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="gondola.events.html#module-gondola.events" title="gondola.events"><code class="xref py py-obj docutils literal notranslate"><span class="pre">events</span></code></a></p></td>
+<td><p>Every possible event type in GAPS which is relevant for  &quot;online&quot; analysis</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="gondola.gondola_core.html#module-gondola.gondola_core" title="gondola.gondola_core"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gondola_core</span></code></a></p></td>
 <td><p>Python API to rust version of tof-dataclasses.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="gondola.io.html#module-gondola.io" title="gondola.io"><code class="xref py py-obj docutils literal notranslate"><span class="pre">io</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="gondola.io.html#module-gondola.io" title="gondola.io"><code class="xref py py-obj docutils literal notranslate"><span class="pre">io</span></code></a></p></td>
 <td><p>Gondola I/O system.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="gondola.reconstruction.html#module-gondola.reconstruction" title="gondola.reconstruction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reconstruction</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="gondola.reconstruction.html#module-gondola.reconstruction" title="gondola.reconstruction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reconstruction</span></code></a></p></td>
 <td><p>GAPS first guess &amp; prototype event reconstructions</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="gondola.tof.html#module-gondola.tof" title="gondola.tof"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tof</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="gondola.tof.html#module-gondola.tof" title="gondola.tof"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tof</span></code></a></p></td>
 <td><p>TOF related entities which did not fit anywhere else</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="gondola.tracker.html#module-gondola.tracker" title="gondola.tracker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tracker</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="gondola.tracker.html#module-gondola.tracker" title="gondola.tracker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tracker</span></code></a></p></td>
 <td><p>Tracker related entities which did not fit anywhere else</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="gondola.visual.html#module-gondola.visual" title="gondola.visual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visual</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="gondola.visual.html#module-gondola.visual" title="gondola.visual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">visual</span></code></a></p></td>
 <td><p>Visualizatoin for GAPS data.</p></td>
 </tr>
 </tbody>

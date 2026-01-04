@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["TofCuts"]};
+window.SIDEBAR_ITEMS = {"constant":["NO_LIGHTSPEED_CUTS"],"struct":["TofCuts"]};

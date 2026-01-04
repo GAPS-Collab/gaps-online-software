@@ -9,13 +9,14 @@ var searchData=
   ['tofpacket_6',['TofPacket',['../structTofPacket.html',1,'']]],
   ['tofpacketreader_7',['TofPacketReader',['../classGaps_1_1TofPacketReader.html',1,'Gaps']]],
   ['tofpaddle_8',['TofPaddle',['../structGaps_1_1TofPaddle.html',1,'Gaps']]],
-  ['trackerstrip_9',['TrackerStrip',['../structGaps_1_1TrackerStrip.html',1,'Gaps']]],
-  ['trackerstripmask_10',['TrackerStripMask',['../structGaps_1_1TrackerStripMask.html',1,'Gaps']]],
-  ['trackerstrippedestal_11',['TrackerStripPedestal',['../structGaps_1_1TrackerStripPedestal.html',1,'Gaps']]],
-  ['trkcalibratedhit_12',['TrkCalibratedHit',['../structGaps_1_1Telemetry_1_1TrkCalibratedHit.html',1,'Gaps::Telemetry']]],
-  ['trkevent_13',['TrkEvent',['../structGaps_1_1Telemetry_1_1TrkEvent.html',1,'Gaps::Telemetry']]],
-  ['trkeventpacket_14',['TrkEventPacket',['../structGaps_1_1Telemetry_1_1TrkEventPacket.html',1,'Gaps::Telemetry']]],
-  ['trkheader_15',['TrkHeader',['../structGaps_1_1Telemetry_1_1TrkHeader.html',1,'Gaps::Telemetry']]],
-  ['trkhit_16',['TrkHit',['../structGaps_1_1Telemetry_1_1TrkHit.html',1,'Gaps::Telemetry']]],
-  ['trkmetadata_17',['TrkMetaData',['../structGaps_1_1Telemetry_1_1TrkMetaData.html',1,'Gaps::Telemetry']]]
+  ['tofpaddletimingconstant_9',['TofPaddleTimingConstant',['../structgondola_1_1TofPaddleTimingConstant.html',1,'gondola']]],
+  ['trackerstrip_10',['TrackerStrip',['../structGaps_1_1TrackerStrip.html',1,'Gaps']]],
+  ['trackerstripmask_11',['TrackerStripMask',['../structGaps_1_1TrackerStripMask.html',1,'Gaps']]],
+  ['trackerstrippedestal_12',['TrackerStripPedestal',['../structGaps_1_1TrackerStripPedestal.html',1,'Gaps']]],
+  ['trkcalibratedhit_13',['TrkCalibratedHit',['../structGaps_1_1Telemetry_1_1TrkCalibratedHit.html',1,'Gaps::Telemetry']]],
+  ['trkevent_14',['TrkEvent',['../structGaps_1_1Telemetry_1_1TrkEvent.html',1,'Gaps::Telemetry']]],
+  ['trkeventpacket_15',['TrkEventPacket',['../structGaps_1_1Telemetry_1_1TrkEventPacket.html',1,'Gaps::Telemetry']]],
+  ['trkheader_16',['TrkHeader',['../structGaps_1_1Telemetry_1_1TrkHeader.html',1,'Gaps::Telemetry']]],
+  ['trkhit_17',['TrkHit',['../structGaps_1_1Telemetry_1_1TrkHit.html',1,'Gaps::Telemetry']]],
+  ['trkmetadata_18',['TrkMetaData',['../structGaps_1_1Telemetry_1_1TrkMetaData.html',1,'Gaps::Telemetry']]]
 ];

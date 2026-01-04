@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/gondola-core/rust/gondola-core/src/tof/thread_control.rs`."><title>thread_control.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-aa0817cf.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="gondola_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.90.0 (1159e78c4 2025-09-14)" data-channel="1.90.0" data-search-js="search-fa3e91e5.js" data-settings-js="settings-5514c975.js" ><script src="../../../static.files/storage-68b7e25d.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-eebb9057.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">gondola_core/tof/</div>thread_control.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! Thread control structures as used in the TOF flight software 
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/gondola-core/rust/gondola-core/src/tof/thread_control.rs`."><title>thread_control.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="gondola_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.92.0 (ded5c06cf 2025-12-08)" data-channel="1.92.0" data-search-js="search-d69d8955.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-ce535bd0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">gondola_core/tof/</div>thread_control.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! Thread control structures as used in the TOF flight software 
 <a href=#2 id=2 data-nosnippet>2</a>//! liftof. 
 <a href=#3 id=3 data-nosnippet>3</a></span><span class="comment">// This file is part of gaps-online-software and published 
 <a href=#4 id=4 data-nosnippet>4</a>// under the GPLv3 license
@@ -62,71 +62,74 @@
 <a href=#62 id=62 data-nosnippet>62</a>  <span class="doccomment">/// initiate a MTB DAQ reset (if the queue is behind)
 <a href=#63 id=63 data-nosnippet>63</a>  </span><span class="kw">pub </span>reset_mtb_daq              : bool,
 <a href=#64 id=64 data-nosnippet>64</a>  <span class="kw">pub </span>liftof_settings            : LiftofSettings,
-<a href=#65 id=65 data-nosnippet>65</a>}
-<a href=#66 id=66 data-nosnippet>66</a>
-<a href=#67 id=67 data-nosnippet>67</a><span class="kw">impl </span>ThreadControl {
-<a href=#68 id=68 data-nosnippet>68</a>  <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-<a href=#69 id=69 data-nosnippet>69</a>    <span class="self">Self </span>{
-<a href=#70 id=70 data-nosnippet>70</a>      stop_flag                  : <span class="bool-val">false</span>,
-<a href=#71 id=71 data-nosnippet>71</a>      calibration_active         : <span class="bool-val">false</span>,
-<a href=#72 id=72 data-nosnippet>72</a>      finished_calibrations      : HashMap::&lt;u8,bool&gt;::new(),
-<a href=#73 id=73 data-nosnippet>73</a>      calibrations               : HashMap::&lt;u8, RBCalibrations&gt;::new(),
-<a href=#74 id=74 data-nosnippet>74</a>      sigint_recvd               : <span class="bool-val">false</span>,
-<a href=#75 id=75 data-nosnippet>75</a>      end_all_rb_threads         : <span class="bool-val">false</span>,
-<a href=#76 id=76 data-nosnippet>76</a>      holdoff_mtb_thread         : <span class="bool-val">false</span>,
-<a href=#77 id=77 data-nosnippet>77</a>      thread_cmd_dispatch_active : <span class="bool-val">false</span>,
-<a href=#78 id=78 data-nosnippet>78</a>      thread_data_sink_active    : <span class="bool-val">false</span>,
-<a href=#79 id=79 data-nosnippet>79</a>      thread_runner_active       : <span class="bool-val">false</span>,
-<a href=#80 id=80 data-nosnippet>80</a>      thread_event_bldr_active   : <span class="bool-val">false</span>,
-<a href=#81 id=81 data-nosnippet>81</a>      thread_master_trg_active   : <span class="bool-val">false</span>,
-<a href=#82 id=82 data-nosnippet>82</a>      thread_monitoring_active   : <span class="bool-val">false</span>,
-<a href=#83 id=83 data-nosnippet>83</a>      thread_rbcomm_active       : HashMap::&lt;u8,bool&gt;::new(),
-<a href=#84 id=84 data-nosnippet>84</a>      <span class="comment">// in principle this should always be active
-<a href=#85 id=85 data-nosnippet>85</a>      </span>thread_signal_hdlr_active  : <span class="bool-val">true</span>,
-<a href=#86 id=86 data-nosnippet>86</a>      run_id                     : <span class="number">0</span>,
-<a href=#87 id=87 data-nosnippet>87</a>      n_rbs                      : <span class="number">0</span>,
-<a href=#88 id=88 data-nosnippet>88</a>      <span class="attr">#[cfg(feature = <span class="string">"database"</span>)]
-<a href=#89 id=89 data-nosnippet>89</a>      </span>rb_list                    : Vec::&lt;ReadoutBoard&gt;::new(),
-<a href=#90 id=90 data-nosnippet>90</a>      verification_active        : <span class="bool-val">false</span>,
-<a href=#91 id=91 data-nosnippet>91</a>      detector_status            : TofDetectorStatus::new(),
-<a href=#92 id=92 data-nosnippet>92</a>      write_data_to_disk         : <span class="bool-val">false</span>,
-<a href=#93 id=93 data-nosnippet>93</a>      new_run_start_flag         : <span class="bool-val">false</span>,
-<a href=#94 id=94 data-nosnippet>94</a>      reset_mtb_daq              : <span class="bool-val">false</span>,
-<a href=#95 id=95 data-nosnippet>95</a>      liftof_settings            : LiftofSettings::new(),
-<a href=#96 id=96 data-nosnippet>96</a>    }
-<a href=#97 id=97 data-nosnippet>97</a>  }
-<a href=#98 id=98 data-nosnippet>98</a>}
-<a href=#99 id=99 data-nosnippet>99</a>
-<a href=#100 id=100 data-nosnippet>100</a><span class="kw">impl </span>fmt::Display <span class="kw">for </span>ThreadControl {
-<a href=#101 id=101 data-nosnippet>101</a>  <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
-<a href=#102 id=102 data-nosnippet>102</a>    <span class="kw">let </span><span class="kw-2">mut </span>repr = String::from(<span class="string">"&lt;ThreadControl:"</span>);
-<a href=#103 id=103 data-nosnippet>103</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Run ID         : {}"</span>, <span class="self">self</span>.run_id));
-<a href=#104 id=104 data-nosnippet>104</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  N RBs          : {}"</span>, <span class="self">self</span>.n_rbs));
-<a href=#105 id=105 data-nosnippet>105</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  wr to disk     : {}"</span>, <span class="self">self</span>.write_data_to_disk));
-<a href=#106 id=106 data-nosnippet>106</a>    repr        += <span class="string">"\n    -- reported RB calibration activity:"</span>;
-<a href=#107 id=107 data-nosnippet>107</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  RB cali active : {}"</span>, <span class="self">self</span>.calibration_active));
-<a href=#108 id=108 data-nosnippet>108</a>    <span class="kw">for </span>k <span class="kw">in </span><span class="self">self</span>.finished_calibrations.keys() {
-<a href=#109 id=109 data-nosnippet>109</a>      repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  -- finished  {}  : {}"</span>, k, <span class="self">self</span>.finished_calibrations.get(k).unwrap()));       
-<a href=#110 id=110 data-nosnippet>110</a>    }
-<a href=#111 id=111 data-nosnippet>111</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n    -- verification run: {}"</span>, <span class="self">self</span>.verification_active));
-<a href=#112 id=112 data-nosnippet>112</a>    repr        += <span class="string">"\n    -- program status:"</span>;
-<a href=#113 id=113 data-nosnippet>113</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  stop flag        : {}"</span>, <span class="self">self</span>.stop_flag));
-<a href=#114 id=114 data-nosnippet>114</a>    repr        += <span class="string">"\n    -- reported thread activity:"</span>;
-<a href=#115 id=115 data-nosnippet>115</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  holdoff mtb thr. : {}"</span>, <span class="self">self</span>.holdoff_mtb_thread));
-<a href=#116 id=116 data-nosnippet>116</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  cmd dispatcher   : {}"</span>, <span class="self">self</span>.thread_cmd_dispatch_active));
-<a href=#117 id=117 data-nosnippet>117</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  runner           : {}"</span>, <span class="self">self</span>.thread_runner_active));
-<a href=#118 id=118 data-nosnippet>118</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  data sink        : {}"</span>, <span class="self">self</span>.thread_data_sink_active));
-<a href=#119 id=119 data-nosnippet>119</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  monitoring       : {}"</span>, <span class="self">self</span>.thread_monitoring_active));
-<a href=#120 id=120 data-nosnippet>120</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  evt builder      : {}"</span>, <span class="self">self</span>.thread_event_bldr_active));
-<a href=#121 id=121 data-nosnippet>121</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  master_trigger   : {}"</span>, <span class="self">self</span>.thread_master_trg_active));
-<a href=#122 id=122 data-nosnippet>122</a>    <span class="kw">if </span><span class="self">self</span>.thread_rbcomm_active.len() &gt; <span class="number">0 </span>{
-<a href=#123 id=123 data-nosnippet>123</a>      repr        += <span class="string">"\n -- active RB threads"</span>;
-<a href=#124 id=124 data-nosnippet>124</a>      <span class="kw">for </span>k <span class="kw">in </span><span class="self">self</span>.thread_rbcomm_active.keys() {
-<a href=#125 id=125 data-nosnippet>125</a>        repr      += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n -- -- {} : {}"</span>, k, <span class="self">self</span>.thread_rbcomm_active.get(k).unwrap()));
-<a href=#126 id=126 data-nosnippet>126</a>      }
-<a href=#127 id=127 data-nosnippet>127</a>    }
-<a href=#128 id=128 data-nosnippet>128</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  master trig    : {}&gt;"</span>, <span class="self">self</span>.thread_master_trg_active));
-<a href=#129 id=129 data-nosnippet>129</a>    <span class="macro">write!</span>(f, <span class="string">"{}"</span>, repr)
-<a href=#130 id=130 data-nosnippet>130</a>  }
-<a href=#131 id=131 data-nosnippet>131</a>}
-<a href=#132 id=132 data-nosnippet>132</a></code></pre></div></section></main></body></html>
+<a href=#65 id=65 data-nosnippet>65</a>  <span class="doccomment">/// Have another variable to store bogus event ids on the RBs 
+<a href=#66 id=66 data-nosnippet>66</a>  </span><span class="kw">pub </span>lost_event_ids             : f32,
+<a href=#67 id=67 data-nosnippet>67</a>}
+<a href=#68 id=68 data-nosnippet>68</a>
+<a href=#69 id=69 data-nosnippet>69</a><span class="kw">impl </span>ThreadControl {
+<a href=#70 id=70 data-nosnippet>70</a>  <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+<a href=#71 id=71 data-nosnippet>71</a>    <span class="self">Self </span>{
+<a href=#72 id=72 data-nosnippet>72</a>      stop_flag                  : <span class="bool-val">false</span>,
+<a href=#73 id=73 data-nosnippet>73</a>      calibration_active         : <span class="bool-val">false</span>,
+<a href=#74 id=74 data-nosnippet>74</a>      finished_calibrations      : HashMap::&lt;u8,bool&gt;::new(),
+<a href=#75 id=75 data-nosnippet>75</a>      calibrations               : HashMap::&lt;u8, RBCalibrations&gt;::new(),
+<a href=#76 id=76 data-nosnippet>76</a>      sigint_recvd               : <span class="bool-val">false</span>,
+<a href=#77 id=77 data-nosnippet>77</a>      end_all_rb_threads         : <span class="bool-val">false</span>,
+<a href=#78 id=78 data-nosnippet>78</a>      holdoff_mtb_thread         : <span class="bool-val">false</span>,
+<a href=#79 id=79 data-nosnippet>79</a>      thread_cmd_dispatch_active : <span class="bool-val">false</span>,
+<a href=#80 id=80 data-nosnippet>80</a>      thread_data_sink_active    : <span class="bool-val">false</span>,
+<a href=#81 id=81 data-nosnippet>81</a>      thread_runner_active       : <span class="bool-val">false</span>,
+<a href=#82 id=82 data-nosnippet>82</a>      thread_event_bldr_active   : <span class="bool-val">false</span>,
+<a href=#83 id=83 data-nosnippet>83</a>      thread_master_trg_active   : <span class="bool-val">false</span>,
+<a href=#84 id=84 data-nosnippet>84</a>      thread_monitoring_active   : <span class="bool-val">false</span>,
+<a href=#85 id=85 data-nosnippet>85</a>      thread_rbcomm_active       : HashMap::&lt;u8,bool&gt;::new(),
+<a href=#86 id=86 data-nosnippet>86</a>      <span class="comment">// in principle this should always be active
+<a href=#87 id=87 data-nosnippet>87</a>      </span>thread_signal_hdlr_active  : <span class="bool-val">true</span>,
+<a href=#88 id=88 data-nosnippet>88</a>      run_id                     : <span class="number">0</span>,
+<a href=#89 id=89 data-nosnippet>89</a>      n_rbs                      : <span class="number">0</span>,
+<a href=#90 id=90 data-nosnippet>90</a>      <span class="attr">#[cfg(feature = <span class="string">"database"</span>)]
+<a href=#91 id=91 data-nosnippet>91</a>      </span>rb_list                    : Vec::&lt;ReadoutBoard&gt;::new(),
+<a href=#92 id=92 data-nosnippet>92</a>      verification_active        : <span class="bool-val">false</span>,
+<a href=#93 id=93 data-nosnippet>93</a>      detector_status            : TofDetectorStatus::new(),
+<a href=#94 id=94 data-nosnippet>94</a>      write_data_to_disk         : <span class="bool-val">false</span>,
+<a href=#95 id=95 data-nosnippet>95</a>      new_run_start_flag         : <span class="bool-val">false</span>,
+<a href=#96 id=96 data-nosnippet>96</a>      reset_mtb_daq              : <span class="bool-val">false</span>,
+<a href=#97 id=97 data-nosnippet>97</a>      liftof_settings            : LiftofSettings::new(),
+<a href=#98 id=98 data-nosnippet>98</a>      lost_event_ids             : <span class="number">0.0</span>,
+<a href=#99 id=99 data-nosnippet>99</a>    }
+<a href=#100 id=100 data-nosnippet>100</a>  }
+<a href=#101 id=101 data-nosnippet>101</a>}
+<a href=#102 id=102 data-nosnippet>102</a>
+<a href=#103 id=103 data-nosnippet>103</a><span class="kw">impl </span>fmt::Display <span class="kw">for </span>ThreadControl {
+<a href=#104 id=104 data-nosnippet>104</a>  <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+<a href=#105 id=105 data-nosnippet>105</a>    <span class="kw">let </span><span class="kw-2">mut </span>repr = String::from(<span class="string">"&lt;ThreadControl:"</span>);
+<a href=#106 id=106 data-nosnippet>106</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  Run ID         : {}"</span>, <span class="self">self</span>.run_id));
+<a href=#107 id=107 data-nosnippet>107</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  N RBs          : {}"</span>, <span class="self">self</span>.n_rbs));
+<a href=#108 id=108 data-nosnippet>108</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  wr to disk     : {}"</span>, <span class="self">self</span>.write_data_to_disk));
+<a href=#109 id=109 data-nosnippet>109</a>    repr        += <span class="string">"\n    -- reported RB calibration activity:"</span>;
+<a href=#110 id=110 data-nosnippet>110</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  RB cali active : {}"</span>, <span class="self">self</span>.calibration_active));
+<a href=#111 id=111 data-nosnippet>111</a>    <span class="kw">for </span>k <span class="kw">in </span><span class="self">self</span>.finished_calibrations.keys() {
+<a href=#112 id=112 data-nosnippet>112</a>      repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  -- finished  {}  : {}"</span>, k, <span class="self">self</span>.finished_calibrations.get(k).unwrap()));       
+<a href=#113 id=113 data-nosnippet>113</a>    }
+<a href=#114 id=114 data-nosnippet>114</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n    -- verification run: {}"</span>, <span class="self">self</span>.verification_active));
+<a href=#115 id=115 data-nosnippet>115</a>    repr        += <span class="string">"\n    -- program status:"</span>;
+<a href=#116 id=116 data-nosnippet>116</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  stop flag        : {}"</span>, <span class="self">self</span>.stop_flag));
+<a href=#117 id=117 data-nosnippet>117</a>    repr        += <span class="string">"\n    -- reported thread activity:"</span>;
+<a href=#118 id=118 data-nosnippet>118</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  holdoff mtb thr. : {}"</span>, <span class="self">self</span>.holdoff_mtb_thread));
+<a href=#119 id=119 data-nosnippet>119</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  cmd dispatcher   : {}"</span>, <span class="self">self</span>.thread_cmd_dispatch_active));
+<a href=#120 id=120 data-nosnippet>120</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  runner           : {}"</span>, <span class="self">self</span>.thread_runner_active));
+<a href=#121 id=121 data-nosnippet>121</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  data sink        : {}"</span>, <span class="self">self</span>.thread_data_sink_active));
+<a href=#122 id=122 data-nosnippet>122</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  monitoring       : {}"</span>, <span class="self">self</span>.thread_monitoring_active));
+<a href=#123 id=123 data-nosnippet>123</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  evt builder      : {}"</span>, <span class="self">self</span>.thread_event_bldr_active));
+<a href=#124 id=124 data-nosnippet>124</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  master_trigger   : {}"</span>, <span class="self">self</span>.thread_master_trg_active));
+<a href=#125 id=125 data-nosnippet>125</a>    <span class="kw">if </span><span class="self">self</span>.thread_rbcomm_active.len() &gt; <span class="number">0 </span>{
+<a href=#126 id=126 data-nosnippet>126</a>      repr        += <span class="string">"\n -- active RB threads"</span>;
+<a href=#127 id=127 data-nosnippet>127</a>      <span class="kw">for </span>k <span class="kw">in </span><span class="self">self</span>.thread_rbcomm_active.keys() {
+<a href=#128 id=128 data-nosnippet>128</a>        repr      += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n -- -- {} : {}"</span>, k, <span class="self">self</span>.thread_rbcomm_active.get(k).unwrap()));
+<a href=#129 id=129 data-nosnippet>129</a>      }
+<a href=#130 id=130 data-nosnippet>130</a>    }
+<a href=#131 id=131 data-nosnippet>131</a>    repr        += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n  master trig    : {}&gt;"</span>, <span class="self">self</span>.thread_master_trg_active));
+<a href=#132 id=132 data-nosnippet>132</a>    <span class="macro">write!</span>(f, <span class="string">"{}"</span>, repr)
+<a href=#133 id=133 data-nosnippet>133</a>  }
+<a href=#134 id=134 data-nosnippet>134</a>}
+<a href=#135 id=135 data-nosnippet>135</a></code></pre></div></section></main></body></html>

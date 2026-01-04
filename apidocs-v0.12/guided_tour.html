@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>A guided tour to get you started &#8212; gondola 0.12.4 documentation</title>
+    <title>A guided tour to get you started &#8212; gondola 0.12.6 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=cf73996f"></script>
+    <script src="_static/documentation_options.js?v=eee2e1a2"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'guided_tour';</script>
@@ -110,7 +110,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.12.4 documentation</p>
+    <p class="title logo__title">gondola 0.12.6 documentation</p>
   
 </a></div>
     
@@ -318,8 +318,7 @@
 <h1>A guided tour to get you started<a class="headerlink" href="#a-guided-tour-to-get-you-started" title="Link to this heading">#</a></h1>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>How to get data
-Data are stored (if not locally available to you) on
+<p>Data are stored (if not locally available to you) on
 the <a class="reference external" href="https://uhams02a.phys.hawaii.edu/nextcloud/index.php">Hawaii nextcloud system</a></p>
 </div>
 <section id="data-formats">
@@ -388,6 +387,131 @@ the <cite>SimpleDet library &lt;https://uhhepvcs.phys.hawaii.edu/philipvd/Simple
 <p>lorem ipsum</p>
 </section>
 </section>
+<section id="database-access">
+<h2>Database access<a class="headerlink" href="#database-access" title="Link to this heading">#</a></h2>
+<p><cite>gondola</cite> utilizes an internal sqlite database, which is automatically installed with the library. In fact, upon importing the
+<a href="#id1"><span class="problematic" id="id2">`</span></a>gondola library, it should greet you with somehting like</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Welcome</span> <span class="n">to</span> <span class="n">gondola</span> <span class="n">v0</span><span class="mf">.11.11</span><span class="p">,</span> <span class="n">a</span> <span class="n">software</span> <span class="n">suite</span> <span class="k">for</span> <span class="n">the</span> <span class="err">🎈</span> <span class="n">GAPS</span> <span class="n">experiment</span><span class="err">!</span> <span class="n">Bulld</span> <span class="k">for</span> <span class="err">🐍</span> <span class="k">with</span> <span class="n">the</span> <span class="n">power</span> <span class="n">of</span> <span class="err">🦀!</span> <span class="err">✨</span>
+<span class="o">--</span> <span class="n">The</span> <span class="n">database</span> <span class="n">has</span> <span class="n">been</span> <span class="nb">set</span> <span class="n">to</span> <span class="n">GONDOLA_DB_URL</span> <span class="o">/</span><span class="n">srv</span><span class="o">/</span><span class="n">gaps</span><span class="o">/</span><span class="n">gaps</span><span class="o">-</span><span class="n">online</span><span class="o">-</span><span class="n">software</span><span class="o">/</span><span class="n">gondola</span><span class="o">-</span><span class="n">test</span><span class="o">/</span><span class="n">gondola</span><span class="o">-</span><span class="n">test</span><span class="o">/.</span><span class="n">venv</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="mf">.13</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">gondola</span><span class="o">/</span><span class="n">gaps_flight</span><span class="o">.</span><span class="n">db</span>
+</pre></div>
+</div>
+<p>which should tell you the path to the sqlite database file.</p>
+<p>With the help of this database, you can actually do the following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="kn">import</span><span class="w"> </span><span class="nn">gondola</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gon</span>
+ <span class="n">paddles</span> <span class="o">=</span> <span class="n">gon</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">TofPaddle</span><span class="o">.</span><span class="n">all_as_dict</span><span class="p">()</span> <span class="c1"># dictionary of paddle id -&gt; TofPaddle</span>
+ <span class="nb">print</span><span class="p">(</span><span class="n">paddles</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+ <span class="o">-----&gt;</span>
+   <span class="o">&lt;</span><span class="n">TofPaddle</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">TofPaddle</span><span class="p">:</span>
+<span class="o">**</span> <span class="n">identifiers</span> <span class="o">**</span>
+   <span class="n">pid</span>                <span class="p">:</span> <span class="mi">2</span>
+   <span class="n">vid</span>                <span class="p">:</span> <span class="mi">110000100</span>
+   <span class="n">panel</span> <span class="nb">id</span>           <span class="p">:</span> <span class="mi">1</span>
+  <span class="o">**</span> <span class="n">connedtions</span> <span class="o">**</span>
+   <span class="n">DSI</span><span class="o">/</span><span class="n">J</span><span class="o">/</span><span class="n">CH</span> <span class="p">(</span><span class="n">LG</span><span class="p">)</span> <span class="p">[</span><span class="n">A</span><span class="p">]</span>  <span class="p">:</span> <span class="mi">2</span>  <span class="o">|</span> <span class="mi">3</span> <span class="o">|</span> <span class="mi">09</span>
+   <span class="n">DSI</span><span class="o">/</span><span class="n">J</span><span class="o">/</span><span class="n">CH</span> <span class="p">(</span><span class="n">HG</span><span class="p">)</span> <span class="p">[</span><span class="n">A</span><span class="p">]</span>  <span class="p">:</span> <span class="mi">2</span>  <span class="o">|</span> <span class="mi">3</span> <span class="o">|</span> <span class="mi">05</span>
+   <span class="n">DSI</span><span class="o">/</span><span class="n">J</span><span class="o">/</span><span class="n">CH</span> <span class="p">(</span><span class="n">LG</span><span class="p">)</span> <span class="p">[</span><span class="n">B</span><span class="p">]</span>  <span class="p">:</span> <span class="mi">2</span>  <span class="o">|</span> <span class="mi">3</span> <span class="o">|</span> <span class="mi">10</span>
+   <span class="n">DSI</span><span class="o">/</span><span class="n">J</span><span class="o">/</span><span class="n">CH</span> <span class="p">(</span><span class="n">HG</span><span class="p">)</span> <span class="p">[</span><span class="n">B</span><span class="p">]</span>  <span class="p">:</span> <span class="mi">2</span>  <span class="o">|</span> <span class="mi">3</span> <span class="o">|</span> <span class="mi">06</span>
+   <span class="n">RB</span><span class="o">/</span><span class="n">CH</span>         <span class="p">[</span><span class="n">A</span><span class="p">]</span>  <span class="p">:</span> <span class="mi">16</span> <span class="o">|</span> <span class="mi">5</span>
+   <span class="n">RB</span><span class="o">/</span><span class="n">CH</span>         <span class="p">[</span><span class="n">B</span><span class="p">]</span>  <span class="p">:</span> <span class="mi">16</span> <span class="o">|</span> <span class="mi">6</span>
+   <span class="n">LTB</span><span class="o">/</span><span class="n">CH</span>        <span class="p">[</span><span class="n">A</span><span class="p">]</span>  <span class="p">:</span> <span class="mi">08</span> <span class="o">|</span> <span class="mi">9</span>
+   <span class="n">LTB</span><span class="o">/</span><span class="n">CH</span>        <span class="p">[</span><span class="n">B</span><span class="p">]</span>  <span class="p">:</span> <span class="mi">08</span> <span class="o">|</span> <span class="mi">10</span>
+   <span class="n">PB</span><span class="o">/</span><span class="n">CH</span>         <span class="p">[</span><span class="n">A</span><span class="p">]</span>  <span class="p">:</span> <span class="mi">04</span> <span class="o">|</span> <span class="mi">9</span>
+   <span class="n">PB</span><span class="o">/</span><span class="n">CH</span>         <span class="p">[</span><span class="n">B</span><span class="p">]</span>  <span class="p">:</span> <span class="mi">04</span> <span class="o">|</span> <span class="mi">10</span>
+   <span class="n">MTB</span> <span class="n">Link</span> <span class="n">ID</span>        <span class="p">:</span> <span class="mi">15</span>
+   <span class="n">cable</span> <span class="nb">len</span> <span class="p">[</span><span class="n">cm</span><span class="p">]</span> <span class="p">:</span>
+    <span class="err">↳</span> <span class="mf">330.00</span>
+    <span class="p">(</span><span class="n">Harting</span> <span class="o">-&gt;</span> <span class="n">RB</span><span class="p">)</span>
+   <span class="n">cable</span> <span class="n">times</span> <span class="p">[</span><span class="n">ns</span><span class="p">]</span> <span class="p">(</span><span class="n">JAZ</span><span class="p">)</span> <span class="p">:</span>
+    <span class="err">↳</span> <span class="mf">13.76</span> <span class="mf">13.56</span>
+  <span class="o">**</span> <span class="n">Coordinates</span> <span class="p">(</span><span class="n">L0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">dimensions</span> <span class="o">**</span>
+   <span class="n">length</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="p">[</span><span class="n">mm</span><span class="p">]</span>
+    <span class="err">↳</span> <span class="p">[</span><span class="mf">180.00</span><span class="p">,</span> <span class="mf">16.00</span><span class="p">,</span> <span class="mf">0.63</span><span class="p">]</span>
+   <span class="n">center</span> <span class="p">[</span><span class="n">mm</span><span class="p">]:</span>
+    <span class="err">↳</span> <span class="p">[</span><span class="mf">67.09</span><span class="p">,</span> <span class="mf">0.00</span><span class="p">,</span> <span class="mf">110.39</span><span class="p">]</span>
+   <span class="n">normal</span> <span class="n">vector</span><span class="p">:</span>
+    <span class="err">↳</span> <span class="p">[</span><span class="mf">0.00</span><span class="p">,</span> <span class="mf">0.00</span><span class="p">,</span> <span class="mf">1.00</span><span class="p">]</span>
+   <span class="n">A</span><span class="o">-</span><span class="n">side</span> <span class="p">[</span><span class="n">mm</span><span class="p">]:</span>
+    <span class="err">↳</span> <span class="p">[</span><span class="mf">67.09</span><span class="p">,</span> <span class="mf">90.00</span><span class="p">,</span> <span class="mf">110.39</span><span class="p">]</span><span class="o">&gt;</span>
+   <span class="n">B</span><span class="o">-</span><span class="n">side</span> <span class="p">[</span><span class="n">mm</span><span class="p">]:</span>
+    <span class="err">↳</span> <span class="p">[</span><span class="mf">67.09</span><span class="p">,</span> <span class="o">-</span><span class="mf">90.00</span><span class="p">,</span> <span class="mf">110.39</span><span class="p">]</span><span class="o">&gt;&gt;</span>
+
+<span class="c1"># also in a similar fashion for TrackerStrips</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">gon</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">TrackerStrip</span><span class="o">.</span><span class="n">all_as_dict</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+<span class="o">&lt;</span><span class="n">TrackerStrip</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">TrackerStrip</span> <span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+   <span class="n">vid</span>                <span class="p">:</span> <span class="mi">200050200</span>
+   <span class="n">layer</span>              <span class="p">:</span> <span class="mi">0</span>
+   <span class="n">row</span>                <span class="p">:</span> <span class="mi">0</span>
+   <span class="n">module</span>             <span class="p">:</span> <span class="mi">0</span>
+   <span class="n">channel</span>            <span class="p">:</span> <span class="mi">0</span>
+   <span class="n">strip</span> <span class="n">center</span> <span class="p">[</span><span class="n">mm</span><span class="p">]:</span>
+    <span class="err">↳</span> <span class="p">[</span><span class="o">-</span><span class="mf">58.22</span><span class="p">,</span> <span class="mf">54.56</span><span class="p">,</span> <span class="mf">98.18</span><span class="p">]</span>
+   <span class="n">detector</span> <span class="p">(</span><span class="n">disk</span><span class="p">)</span> <span class="n">center</span> <span class="p">[</span><span class="n">mm</span><span class="p">]:</span>
+    <span class="err">↳</span> <span class="p">[</span><span class="o">-</span><span class="mf">54.56</span><span class="p">,</span> <span class="mf">54.56</span><span class="p">,</span> <span class="mf">98.18</span><span class="p">]</span>
+   <span class="n">strip</span> <span class="n">principal</span> <span class="n">direction</span><span class="p">:</span>
+    <span class="err">↳</span> <span class="p">[</span><span class="mf">0.00</span><span class="p">,</span> <span class="mf">0.00</span><span class="p">,</span> <span class="mf">0.00</span><span class="p">]</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<div class="admonition-interacting-with-simpledet admonition">
+<p class="admonition-title">Interacting with SimpleDet?</p>
+<p>There are 2 special functions in <cite>gondola.db</cite> which produce maps of volume id &lt;-&gt; hardware (the &quot;real&quot; id):
+<cite>gon.db.get_hid_vid_map()</cite> for hardware id -&gt; volume id and <cite>gon.db.get_vid_hid_map()</cite> for
+volume id -&gt; hardware id.  In this context, the hardware id is the strip id (LRMMSS) for the tracker and the paddle id
+for the TOF (1-160).</p>
+</div>
+<p>The database contains much more, there are for example it also contains <cite>TrackerStripPedestal</cite>, <cite>TrackerStripTransferFunction</cite>
+and <cite>TrackerStripMask</cite> which are relevant for tracker calibrations.</p>
+</section>
+<section id="calibrations">
+<h2>Calibrations<a class="headerlink" href="#calibrations" title="Link to this heading">#</a></h2>
+<section id="tof">
+<h3>TOF<a class="headerlink" href="#tof" title="Link to this heading">#</a></h3>
+<p>Readoutboard calibrations can be loaded directly from the files with the following routine</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gondola</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="c1"># creates a dictionary of rb_id -&gt; RBCalibrations</span>
+<span class="n">calib</span> <span class="o">=</span> <span class="n">gon</span><span class="o">.</span><span class="n">calibration</span><span class="o">.</span><span class="n">load_rb_calibrations</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/path/to/your/calibration-directory-with-all-calibration-files&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="tracker">
+<h3>Tracker<a class="headerlink" href="#tracker" title="Link to this heading">#</a></h3>
+</section>
+<section id="monitoring-data-housekeeping">
+<h3>Monitoring data (&quot;Housekeeping&quot;)<a class="headerlink" href="#monitoring-data-housekeeping" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>TOF monitoring data</p></li>
+<li><p>Liftof settings</p></li>
+</ul>
+<p>The general (program) settings for the liftof code as it is running on the instrument, are telemetered down at
+the start of each new run. They are bytecompressed and
+so the bytestream of this packet needs specials treatement.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#! /usr/bin/env poython</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">gondola</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gon</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="n">start_of_run_time</span> <span class="o">=</span> <span class="mi">3600</span> <span class="c1"># e.g. for a run that started and hour in the past</span>
+
+<span class="n">files</span>  <span class="o">=</span> <span class="n">gon</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">grace_get_telemetry_binaries</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_of_run_time</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span> <span class="s1">&#39;/prestaging/live/&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+    <span class="n">reader</span> <span class="o">=</span> <span class="n">gon</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">TelemetryPacketReader</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">pack</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">pack</span><span class="o">.</span><span class="n">packet_type</span> <span class="o">==</span> <span class="n">gon</span><span class="o">.</span><span class="n">packets</span><span class="o">.</span><span class="n">TelemetryPacketType</span><span class="o">.</span><span class="n">AnyTofHK</span><span class="p">:</span>
+            <span class="n">tp</span> <span class="o">=</span> <span class="n">gon</span><span class="o">.</span><span class="n">packets</span><span class="o">.</span><span class="n">TofPacket</span><span class="o">.</span><span class="n">from_bytestream</span><span class="p">(</span><span class="n">pack</span><span class="o">.</span><span class="n">payload</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">tp</span><span class="o">.</span><span class="n">packet_type</span> <span class="o">==</span> <span class="n">gon</span><span class="o">.</span><span class="n">packets</span><span class="o">.</span><span class="n">TofPacketType</span><span class="o">.</span><span class="n">LiftofSettings</span><span class="p">:</span>
+                <span class="nb">print</span> <span class="p">(</span><span class="n">tp</span><span class="p">)</span>
+                <span class="n">lpt</span> <span class="o">=</span> <span class="n">tp</span>
+                <span class="k">break</span>
+<span class="c1"># this is the file decompression, and the config</span>
+<span class="c1"># will be saved in test.toml</span>
+<span class="n">gon</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">decompress_toml</span><span class="p">(</span><span class="n">lpt</span><span class="o">.</span><span class="n">payload</span><span class="p">,</span> <span class="s1">&#39;test.toml&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="gaps-live">
+<h1>gaps.live<a class="headerlink" href="#gaps-live" title="Link to this heading">#</a></h1>
 </section>
 
 
@@ -437,13 +561,25 @@ the <cite>SimpleDet library &lt;https://uhhepvcs.phys.hawaii.edu/philipvd/Simple
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">A guided tour to get you started</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#data-formats">Data formats</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-read-the-data">How to read the data</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#l0-data-binary-merger-of-telemetry-and-tof-disk-data">L0 data - binary merger of telemetry and TOF disk data</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#telemetry-data-bin-files">Telemetry data (".bin") files</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#database-access">Database access</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calibrations">Calibrations</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tof">TOF</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tracker">Tracker</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#monitoring-data-housekeeping">Monitoring data ("Housekeeping")</a></li>
 </ul>
+</li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#gaps-live">gaps.live</a></li>
+</ul>
+
   </nav></div>
 
   <div class="sidebar-secondary-item">

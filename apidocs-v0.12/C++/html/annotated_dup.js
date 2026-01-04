@@ -33,7 +33,8 @@ var annotated_dup =
       [ "TelemetryPacketReader", "structgondola_1_1TelemetryPacketReader.html", "structgondola_1_1TelemetryPacketReader" ],
       [ "TofEvent", "structgondola_1_1TofEvent.html", "structgondola_1_1TofEvent" ],
       [ "TofEventSummary", "structgondola_1_1TofEventSummary.html", "structgondola_1_1TofEventSummary" ],
-      [ "TofHit", "structgondola_1_1TofHit.html", "structgondola_1_1TofHit" ]
+      [ "TofHit", "structgondola_1_1TofHit.html", "structgondola_1_1TofHit" ],
+      [ "TofPaddleTimingConstant", "structgondola_1_1TofPaddleTimingConstant.html", "structgondola_1_1TofPaddleTimingConstant" ]
     ] ],
     [ "std", null, [
       [ "formatter< gondola::EventStatus >", "structstd_1_1formatter_3_01gondola_1_1EventStatus_01_4.html", "structstd_1_1formatter_3_01gondola_1_1EventStatus_01_4" ]

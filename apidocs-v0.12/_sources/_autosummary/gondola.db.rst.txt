@@ -8,5 +8,12 @@ gondola.db
 
    .. autosummary::
    
+      ReadoutBoard
       TofPaddle
+      TofPaddleTimingConstant
+      TrackerStrip
+      TrackerStripCmnNoise
+      TrackerStripMask
+      TrackerStripPedestal
+      TrackerStripTransferFunction
    

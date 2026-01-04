@@ -26,12 +26,16 @@ struct \mbox{\hyperlink{structgondola_1_1TofEvent}{Tof\+Event}}
 struct \mbox{\hyperlink{structgondola_1_1TofEventSummary}{Tof\+Event\+Summary}}
 \item 
 struct \mbox{\hyperlink{structgondola_1_1TofHit}{Tof\+Hit}}
+\item 
+struct \mbox{\hyperlink{structgondola_1_1TofPaddleTimingConstant}{Tof\+Paddle\+Timing\+Constant}}
 \end{DoxyCompactItemize}
 \doxysubsubsection*{Typedefs}
 \begin{DoxyCompactItemize}
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, \mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}} $>$ \mbox{\hyperlink{namespacegondola_ae720591de7c0e9e18619d265295f1ebe}{RBCalibration\+Map}}
 \begin{DoxyCompactList}\small\item\em shortcut for the typically used map of rb\+\_\+id -\/\texorpdfstring{$>$}{>} calibrations \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} $>$ \mbox{\hyperlink{namespacegondola_a1c2c2768738a98e4ab3c0aa6d31d88e0}{Tof\+Paddle\+Timing\+Constant\+Map}}
+\item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} \mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7}{Gaps\+::\+Telemetry\+::\+Bfsw\+Packet\+Type}} \mbox{\hyperlink{namespacegondola_a1b9982f07cad746b60c39b2d2a71497d}{Telemetry\+Packet\+Type}}
 \begin{DoxyCompactList}\small\item\em FIXME -\/ this will be renamed to be the same as in rust. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Packet}{Gaps\+::\+Telemetry\+::\+Packet}} \mbox{\hyperlink{namespacegondola_adb061fbe28da00055cd7fb65249a77df}{Telemetry\+Packet}}
@@ -116,6 +120,8 @@ enum class \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84d}{
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_ab1c635d648526ddffc8f60a7b9a0a8a6}{get\+\_\+vid\+\_\+hid\+\_\+map}} () -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$
 \item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_ada24c8b1eefc326eb57c09b7663da004}{get\+\_\+tofpaddletimingconstants}} (std\+::string mask\+\_\+name="{}"{}) -\/$>$ \mbox{\hyperlink{namespacegondola_a1c2c2768738a98e4ab3c0aa6d31d88e0}{Tof\+Paddle\+Timing\+Constant\+Map}}
+\item 
 std\+::ostream \& \mbox{\hyperlink{namespacegondola_a2eecfb1d930e8ee8c37624b8d7356928}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baa}{gondola\+::\+Event\+Status}} \&status)
 \item 
 std\+::ostream \& \mbox{\hyperlink{namespacegondola_a70a1b591bf58b6e149e2ec815142e4ac}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21}{gondola\+::\+Trigger\+Type}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{t\+\_\+type}})
@@ -180,6 +186,12 @@ shortcut for the typically used map of rb\+\_\+id -\/\texorpdfstring{$>$}{>} cal
 
 
 FIXME -\/ this will be renamed to be the same as in rust. 
+
+\Hypertarget{namespacegondola_a1c2c2768738a98e4ab3c0aa6d31d88e0}\label{namespacegondola_a1c2c2768738a98e4ab3c0aa6d31d88e0} 
+\index{gondola@{gondola}!TofPaddleTimingConstantMap@{TofPaddleTimingConstantMap}}
+\index{TofPaddleTimingConstantMap@{TofPaddleTimingConstantMap}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{TofPaddleTimingConstantMap}{TofPaddleTimingConstantMap}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}$>$ \mbox{\hyperlink{namespacegondola_a1c2c2768738a98e4ab3c0aa6d31d88e0}{gondola\+::\+Tof\+Paddle\+Timing\+Constant\+Map}}}
 
 
 
@@ -398,7 +410,13 @@ Forced&\\
 {\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::get\+\_\+hid\+\_\+vid\+\_\+map (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) -\/$>$  \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$}
 
 The mapping of volume id to hardware id, which is either the strip identifier or the paddle id ~\newline
- \Hypertarget{namespacegondola_ab1c635d648526ddffc8f60a7b9a0a8a6}\label{namespacegondola_ab1c635d648526ddffc8f60a7b9a0a8a6} 
+ \Hypertarget{namespacegondola_ada24c8b1eefc326eb57c09b7663da004}\label{namespacegondola_ada24c8b1eefc326eb57c09b7663da004} 
+\index{gondola@{gondola}!get\_tofpaddletimingconstants@{get\_tofpaddletimingconstants}}
+\index{get\_tofpaddletimingconstants@{get\_tofpaddletimingconstants}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{get\_tofpaddletimingconstants()}{get\_tofpaddletimingconstants()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::get\+\_\+tofpaddletimingconstants (\begin{DoxyParamCaption}\item[{std\+::string}]{mask\+\_\+name = {\ttfamily "{}"{}} }\end{DoxyParamCaption}) -\/$>$  \mbox{\hyperlink{namespacegondola_a1c2c2768738a98e4ab3c0aa6d31d88e0}{Tof\+Paddle\+Timing\+Constant\+Map}}}
+
+\Hypertarget{namespacegondola_ab1c635d648526ddffc8f60a7b9a0a8a6}\label{namespacegondola_ab1c635d648526ddffc8f60a7b9a0a8a6} 
 \index{gondola@{gondola}!get\_vid\_hid\_map@{get\_vid\_hid\_map}}
 \index{get\_vid\_hid\_map@{get\_vid\_hid\_map}!gondola@{gondola}}
 \doxysubsubsection{\texorpdfstring{get\_vid\_hid\_map()}{get\_vid\_hid\_map()}}
@@ -511,7 +529,7 @@ A simple version of the spike cleaning, which does not rely on all channels bein
 \index{gondola@{gondola}!spike\_cleaning\_drs4@{spike\_cleaning\_drs4}}
 \index{spike\_cleaning\_drs4@{spike\_cleaning\_drs4}!gondola@{gondola}}
 \doxysubsubsection{\texorpdfstring{spike\_cleaning\_drs4()}{spike\_cleaning\_drs4()}}
-{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::spike\+\_\+cleaning\+\_\+drs4 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} $>$ $>$ \&}]{wf,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}}]{t\+Cell,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a48d6cd8e4135fb2ff7e7f2dac84089ec}{i32}}}]{spikes\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption}) -\/$>$  \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::spike\+\_\+cleaning\+\_\+drs4 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} $>$ $>$ \&}]{wf,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}}]{t\+Cell,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a48d6cd8e4135fb2ff7e7f2dac84089ec}{i32}}}]{spikes\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}}
 
 The original "{}\+Remove\+Spikes"{} from the DRS4 manual \Hypertarget{namespacegondola_aad98e262d4567278c4414be5db426023}\label{namespacegondola_aad98e262d4567278c4414be5db426023} 
 \index{gondola@{gondola}!spike\_cleaning\_simple@{spike\_cleaning\_simple}}

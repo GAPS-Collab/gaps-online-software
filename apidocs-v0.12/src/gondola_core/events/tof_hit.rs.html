@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/gondola-core/rust/gondola-core/src/events/tof_hit.rs`."><title>tof_hit.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-aa0817cf.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="gondola_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.90.0 (1159e78c4 2025-09-14)" data-channel="1.90.0" data-search-js="search-fa3e91e5.js" data-settings-js="settings-5514c975.js" ><script src="../../../static.files/storage-68b7e25d.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-eebb9057.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">gondola_core/events/</div>tof_hit.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-4"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="comment">// The following file is part of gaps-online-software and published 
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/gondola-core/rust/gondola-core/src/events/tof_hit.rs`."><title>tof_hit.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="gondola_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.92.0 (ded5c06cf 2025-12-08)" data-channel="1.92.0" data-search-js="search-d69d8955.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-ce535bd0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">gondola_core/events/</div>tof_hit.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="comment">// This file is part of gaps-online-software and published 
 <a href=#2 id=2 data-nosnippet>2</a>// under the GPLv3 license
 <a href=#3 id=3 data-nosnippet>3</a>
 <a href=#4 id=4 data-nosnippet>4</a></span><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
@@ -61,7 +61,7 @@
 <a href=#61 id=61 data-nosnippet>61</a>/// A and B are the different ends of the paddle
 <a href=#62 id=62 data-nosnippet>62</a>
 <a href=#63 id=63 data-nosnippet>63</a></span><span class="attr">#[derive(Debug,Copy,Clone,PartialEq)]
-<a href=#64 id=64 data-nosnippet>64</a>#[cfg_attr(feature = <span class="string">"pybindings"</span>, pyclass, pyo3(name=<span class="string">"TofHit2"</span>))]
+<a href=#64 id=64 data-nosnippet>64</a>#[cfg_attr(feature = <span class="string">"pybindings"</span>, pyclass)]
 <a href=#65 id=65 data-nosnippet>65</a></span><span class="kw">pub struct </span>TofHit {
 <a href=#66 id=66 data-nosnippet>66</a>  
 <a href=#67 id=67 data-nosnippet>67</a>  <span class="comment">// We currently have 3 bytes to spare
@@ -838,305 +838,127 @@
 <a href=#838 id=838 data-nosnippet>838</a>  /// * bytestream : 
 <a href=#839 id=839 data-nosnippet>839</a>  </span><span class="kw">fn </span>from_bytestream(stream : <span class="kw-2">&amp;</span>Vec&lt;u8&gt;, pos : <span class="kw-2">&amp;mut </span>usize) 
 <a href=#840 id=840 data-nosnippet>840</a>    -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, SerializationError&gt; {
-<a href=#841 id=841 data-nosnippet>841</a>    <span class="kw">let </span><span class="kw-2">mut </span>pp  = <span class="self">Self</span>::new();
-<a href=#842 id=842 data-nosnippet>842</a>    <span class="self">Self</span>::verify_fixed(stream, pos)<span class="question-mark">?</span>;
-<a href=#843 id=843 data-nosnippet>843</a>    <span class="comment">// since we passed the above test, the packet
-<a href=#844 id=844 data-nosnippet>844</a>    // is valid
-<a href=#845 id=845 data-nosnippet>845</a>    </span>pp.valid          = <span class="bool-val">true</span>;
-<a href=#846 id=846 data-nosnippet>846</a>    pp.paddle_id      = parse_u8(stream, pos);
-<a href=#847 id=847 data-nosnippet>847</a>    pp.time_a         = parse_f16(stream, pos);
-<a href=#848 id=848 data-nosnippet>848</a>    pp.time_b         = parse_f16(stream, pos);
-<a href=#849 id=849 data-nosnippet>849</a>    pp.peak_a         = parse_f16(stream, pos);
-<a href=#850 id=850 data-nosnippet>850</a>    pp.peak_b         = parse_f16(stream, pos);
-<a href=#851 id=851 data-nosnippet>851</a>    pp.charge_a       = parse_f16(stream, pos);
-<a href=#852 id=852 data-nosnippet>852</a>    pp.charge_b       = parse_f16(stream, pos);
-<a href=#853 id=853 data-nosnippet>853</a>    pp.TOT_low_a      = parse_f16(stream, pos);
-<a href=#854 id=854 data-nosnippet>854</a>    pp.baseline_a     = parse_f16(stream, pos);
-<a href=#855 id=855 data-nosnippet>855</a>    pp.baseline_a_rms = parse_f16(stream, pos);
-<a href=#856 id=856 data-nosnippet>856</a>    <span class="kw">let </span><span class="kw-2">mut </span>phase_vec = Vec::&lt;u8&gt;::new();
-<a href=#857 id=857 data-nosnippet>857</a>    phase_vec.push(parse_u8(stream, pos));
-<a href=#858 id=858 data-nosnippet>858</a>    phase_vec.push(parse_u8(stream, pos));
-<a href=#859 id=859 data-nosnippet>859</a>    pp.phase    = parse_f16(<span class="kw-2">&amp;</span>phase_vec, <span class="kw-2">&amp;mut </span><span class="number">0</span>);
-<a href=#860 id=860 data-nosnippet>860</a>    <span class="kw">let </span>version      = ProtocolVersion::from(parse_u8(stream, pos));
-<a href=#861 id=861 data-nosnippet>861</a>    pp.version       = version;
-<a href=#862 id=862 data-nosnippet>862</a>    <span class="kw">match </span>pp.version {
-<a href=#863 id=863 data-nosnippet>863</a>      ProtocolVersion::V1 =&gt; {
-<a href=#864 id=864 data-nosnippet>864</a>      }
-<a href=#865 id=865 data-nosnippet>865</a>      <span class="kw">_ </span>=&gt; ()
-<a href=#866 id=866 data-nosnippet>866</a>    }
-<a href=#867 id=867 data-nosnippet>867</a>    pp.baseline_b      = parse_f16(stream, pos);
-<a href=#868 id=868 data-nosnippet>868</a>    pp.baseline_b_rms  = parse_f16(stream, pos);
-<a href=#869 id=869 data-nosnippet>869</a>    pp.TOT_low_b       = parse_f16(stream, pos);
-<a href=#870 id=870 data-nosnippet>870</a>    pp.TOT_high_a      = parse_f16(stream, pos);
-<a href=#871 id=871 data-nosnippet>871</a>    pp.TOT_high_b      = parse_f16(stream, pos);
-<a href=#872 id=872 data-nosnippet>872</a>    pp.TOT_slp_low_a   = parse_f16(stream, pos);
-<a href=#873 id=873 data-nosnippet>873</a>    pp.TOT_slp_low_b   = parse_f16(stream, pos);
-<a href=#874 id=874 data-nosnippet>874</a>    pp.TOT_slp_high_a  = parse_f16(stream, pos);
-<a href=#875 id=875 data-nosnippet>875</a>    pp.TOT_slp_high_b  = parse_f16(stream, pos);
-<a href=#876 id=876 data-nosnippet>876</a>    <span class="kw-2">*</span>pos += <span class="number">2</span>; <span class="comment">// always have to do this when using verify fixed
-<a href=#877 id=877 data-nosnippet>877</a>    </span><span class="prelude-val">Ok</span>(pp)
-<a href=#878 id=878 data-nosnippet>878</a>  }
-<a href=#879 id=879 data-nosnippet>879</a>}
-<a href=#880 id=880 data-nosnippet>880</a>
-<a href=#881 id=881 data-nosnippet>881</a><span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
-<a href=#882 id=882 data-nosnippet>882</a></span><span class="kw">impl </span>FromRandom <span class="kw">for </span>TofHit {
-<a href=#883 id=883 data-nosnippet>883</a>  <span class="kw">fn </span>from_random() -&gt; TofHit {
-<a href=#884 id=884 data-nosnippet>884</a>    <span class="kw">let </span><span class="kw-2">mut </span>pp  = TofHit::new();
-<a href=#885 id=885 data-nosnippet>885</a>    <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::rng();
-<a href=#886 id=886 data-nosnippet>886</a>    
-<a href=#887 id=887 data-nosnippet>887</a>    pp.paddle_id      = rng.random_range(<span class="number">0</span>..<span class="number">161</span>);
-<a href=#888 id=888 data-nosnippet>888</a>    pp.time_a         = f16::from_f32(rng.random::&lt;f32&gt;());
-<a href=#889 id=889 data-nosnippet>889</a>    pp.time_b         = f16::from_f32(rng.random::&lt;f32&gt;());
-<a href=#890 id=890 data-nosnippet>890</a>    pp.peak_a         = f16::from_f32(rng.random::&lt;f32&gt;());
-<a href=#891 id=891 data-nosnippet>891</a>    pp.peak_b         = f16::from_f32(rng.random::&lt;f32&gt;());
-<a href=#892 id=892 data-nosnippet>892</a>    pp.charge_a       = f16::from_f32(rng.random::&lt;f32&gt;());
-<a href=#893 id=893 data-nosnippet>893</a>    pp.charge_b       = f16::from_f32(rng.random::&lt;f32&gt;());
-<a href=#894 id=894 data-nosnippet>894</a>    pp.version        = ProtocolVersion::from(rng.random::&lt;u8&gt;());
-<a href=#895 id=895 data-nosnippet>895</a>    pp.baseline_a     = f16::from_f32(rng.random::&lt;f32&gt;());
-<a href=#896 id=896 data-nosnippet>896</a>    pp.baseline_a_rms = f16::from_f32(rng.random::&lt;f32&gt;());
-<a href=#897 id=897 data-nosnippet>897</a>    pp.baseline_b     = f16::from_f32(rng.random::&lt;f32&gt;());
-<a href=#898 id=898 data-nosnippet>898</a>    pp.baseline_b_rms = f16::from_f32(rng.random::&lt;f32&gt;());
-<a href=#899 id=899 data-nosnippet>899</a>    pp.phase          = f16::from_f32(rng.random::&lt;f32&gt;());
-<a href=#900 id=900 data-nosnippet>900</a>    pp.TOT_low_a      = f16::from_f32(rng.random::&lt;f32&gt;());
-<a href=#901 id=901 data-nosnippet>901</a>    pp.TOT_low_b      = f16::from_f32(rng.random::&lt;f32&gt;());
-<a href=#902 id=902 data-nosnippet>902</a>    pp.TOT_high_a     = f16::from_f32(rng.random::&lt;f32&gt;());
-<a href=#903 id=903 data-nosnippet>903</a>    pp.TOT_high_b     = f16::from_f32(rng.random::&lt;f32&gt;()); 
-<a href=#904 id=904 data-nosnippet>904</a>    pp.TOT_slp_low_a  = f16::from_f32(rng.random::&lt;f32&gt;());
-<a href=#905 id=905 data-nosnippet>905</a>    pp.TOT_slp_low_b  = f16::from_f32(rng.random::&lt;f32&gt;());
-<a href=#906 id=906 data-nosnippet>906</a>    pp.TOT_slp_high_a = f16::from_f32(rng.random::&lt;f32&gt;()); 
-<a href=#907 id=907 data-nosnippet>907</a>    pp.TOT_slp_high_b = f16::from_f32(rng.random::&lt;f32&gt;()); 
-<a href=#908 id=908 data-nosnippet>908</a>    pp.paddle_len       = <span class="number">0.0</span>; 
-<a href=#909 id=909 data-nosnippet>909</a>    pp.coax_cable_time  = <span class="number">0.0</span>; 
-<a href=#910 id=910 data-nosnippet>910</a>    pp.hart_cable_time  = <span class="number">0.0</span>; 
-<a href=#911 id=911 data-nosnippet>911</a>    pp.x                = <span class="number">0.0</span>; 
-<a href=#912 id=912 data-nosnippet>912</a>    pp.y                = <span class="number">0.0</span>; 
-<a href=#913 id=913 data-nosnippet>913</a>    pp.z                = <span class="number">0.0</span>; 
-<a href=#914 id=914 data-nosnippet>914</a>    pp.event_t0         = <span class="number">0.0</span>; 
-<a href=#915 id=915 data-nosnippet>915</a>    pp
-<a href=#916 id=916 data-nosnippet>916</a>  }
-<a href=#917 id=917 data-nosnippet>917</a>}
-<a href=#918 id=918 data-nosnippet>918</a>
-<a href=#919 id=919 data-nosnippet>919</a><span class="comment">//---------------------------------------------------------------
-<a href=#920 id=920 data-nosnippet>920</a>
-<a href=#921 id=921 data-nosnippet>921</a>//#[cfg(feature="pybindings")]
-<a href=#922 id=922 data-nosnippet>922</a>//#[pyclass]
-<a href=#923 id=923 data-nosnippet>923</a>//#[pyo3(name="TofHit")]
-<a href=#924 id=924 data-nosnippet>924</a>//pub struct PyTofHit {
-<a href=#925 id=925 data-nosnippet>925</a>//  hit : TofHit,
-<a href=#926 id=926 data-nosnippet>926</a>//}
-<a href=#927 id=927 data-nosnippet>927</a>//
-<a href=#928 id=928 data-nosnippet>928</a>//#[cfg(feature="pybindings")]
-<a href=#929 id=929 data-nosnippet>929</a>//#[pymethods]
-<a href=#930 id=930 data-nosnippet>930</a>//impl PyTofHit {
-<a href=#931 id=931 data-nosnippet>931</a>//  //#[new]
-<a href=#932 id=932 data-nosnippet>932</a>//  //fn new() -&gt; Self {
-<a href=#933 id=933 data-nosnippet>933</a>//  //  Self {
-<a href=#934 id=934 data-nosnippet>934</a>//  //    hit : TofHit::new(),
-<a href=#935 id=935 data-nosnippet>935</a>//  //  }
-<a href=#936 id=936 data-nosnippet>936</a>//  //}
-<a href=#937 id=937 data-nosnippet>937</a>//
-<a href=#938 id=938 data-nosnippet>938</a>//  pub fn set_timing_offset(&amp;mut self, offset : f32) {
-<a href=#939 id=939 data-nosnippet>939</a>//    self.hit.timing_offset = offset;
-<a href=#940 id=940 data-nosnippet>940</a>//  }
-<a href=#941 id=941 data-nosnippet>941</a>//
-<a href=#942 id=942 data-nosnippet>942</a>//  /// Calculate the distance to another hit. For this 
-<a href=#943 id=943 data-nosnippet>943</a>//  /// to work, the hit coordinates have had to be 
-<a href=#944 id=944 data-nosnippet>944</a>//  /// determined, so this will only return a 
-<a href=#945 id=945 data-nosnippet>945</a>//  /// propper result after the paddle information 
-<a href=#946 id=946 data-nosnippet>946</a>//  /// is added
-<a href=#947 id=947 data-nosnippet>947</a>//  pub fn distance(&amp;self, other : &amp;PyTofHit) -&gt; f32 {
-<a href=#948 id=948 data-nosnippet>948</a>//    //((self.x - other.x).powi(2) + (self.y - other.y).powi(2) + (self.z - other.z).powi(2)).sqrt()
-<a href=#949 id=949 data-nosnippet>949</a>//    self.hit.distance(&amp;other.hit)
-<a href=#950 id=950 data-nosnippet>950</a>//  }
-<a href=#951 id=951 data-nosnippet>951</a>// 
-<a href=#952 id=952 data-nosnippet>952</a>//  /// Set the length and cable length for the paddle
-<a href=#953 id=953 data-nosnippet>953</a>//  /// FIXME - take gaps_online.db.Paddle as argument
-<a href=#954 id=954 data-nosnippet>954</a>//  fn set_paddle(&amp;mut s1elf, plen : f32, coax_cbl_time : f32, hart_cbl_time : f32 ) {
-<a href=#955 id=955 data-nosnippet>955</a>//    self.hit.paddle_len = plen;
-<a href=#956 id=956 data-nosnippet>956</a>//    self.hit.coax_cable_time = coax_cbl_time;
-<a href=#957 id=957 data-nosnippet>957</a>//    self.hit.hart_cable_time = hart_cbl_time;
-<a href=#958 id=958 data-nosnippet>958</a>//  }
-<a href=#959 id=959 data-nosnippet>959</a>//
-<a href=#960 id=960 data-nosnippet>960</a>//  #[getter]
-<a href=#961 id=961 data-nosnippet>961</a>//  fn x(&amp;self) -&gt; f32 {
-<a href=#962 id=962 data-nosnippet>962</a>//    self.hit.x
-<a href=#963 id=963 data-nosnippet>963</a>//  }
-<a href=#964 id=964 data-nosnippet>964</a>//  
-<a href=#965 id=965 data-nosnippet>965</a>//  #[getter]
-<a href=#966 id=966 data-nosnippet>966</a>//  fn y(&amp;self) -&gt; f32 {
-<a href=#967 id=967 data-nosnippet>967</a>//    self.hit.y
-<a href=#968 id=968 data-nosnippet>968</a>//  }
-<a href=#969 id=969 data-nosnippet>969</a>//
-<a href=#970 id=970 data-nosnippet>970</a>//  #[getter]
-<a href=#971 id=971 data-nosnippet>971</a>//  fn z(&amp;self) -&gt; f32 {
-<a href=#972 id=972 data-nosnippet>972</a>//    self.hit.z
-<a href=#973 id=973 data-nosnippet>973</a>//  }
-<a href=#974 id=974 data-nosnippet>974</a>//
-<a href=#975 id=975 data-nosnippet>975</a>//  #[getter]
-<a href=#976 id=976 data-nosnippet>976</a>//  fn get_t0_uncorrected(&amp;self) -&gt; f32 {
-<a href=#977 id=977 data-nosnippet>977</a>//    self.hit.get_t0_uncorrected()
-<a href=#978 id=978 data-nosnippet>978</a>//  }
-<a href=#979 id=979 data-nosnippet>979</a>//  
-<a href=#980 id=980 data-nosnippet>980</a>//  /// Event t0 is the calculated interaction time based on 
-<a href=#981 id=981 data-nosnippet>981</a>//  /// the RELATIVE phase shifts consdering ALL hits in this
-<a href=#982 id=982 data-nosnippet>982</a>//  /// event. This might be of importance to catch rollovers
-<a href=#983 id=983 data-nosnippet>983</a>//  /// in the phase of channel9. 
-<a href=#984 id=984 data-nosnippet>984</a>//  /// In total, we are restricting ourselves to a time of 
-<a href=#985 id=985 data-nosnippet>985</a>//  /// 50ns per events and adjust the phase in such a way that 
-<a href=#986 id=986 data-nosnippet>986</a>//  /// everything fits into this interval. This will 
-<a href=#987 id=987 data-nosnippet>987</a>//  /// significantly import the beta reconstruction for particles
-<a href=#988 id=988 data-nosnippet>988</a>//  /// which hit the TOF within this timing window.
-<a href=#989 id=989 data-nosnippet>989</a>//  ///
-<a href=#990 id=990 data-nosnippet>990</a>//  /// If a timing offset is set, this will be added
-<a href=#991 id=991 data-nosnippet>991</a>//  #[getter]
-<a href=#992 id=992 data-nosnippet>992</a>//  fn get_event_t0(&amp;self) -&gt; f32 {
-<a href=#993 id=993 data-nosnippet>993</a>//    self.hit.get_t0()
-<a href=#994 id=994 data-nosnippet>994</a>//  }
-<a href=#995 id=995 data-nosnippet>995</a>//
-<a href=#996 id=996 data-nosnippet>996</a>//  #[getter]
-<a href=#997 id=997 data-nosnippet>997</a>//  fn get_obeys_causality(&amp;self) -&gt; bool {
-<a href=#998 id=998 data-nosnippet>998</a>//    self.hit.obeys_causality()
-<a href=#999 id=999 data-nosnippet>999</a>//  }
-<a href=#1000 id=1000 data-nosnippet>1000</a>//
-<a href=#1001 id=1001 data-nosnippet>1001</a>//  #[getter]
-<a href=#1002 id=1002 data-nosnippet>1002</a>//  fn get_coax_cbl_time(&amp;self) -&gt; f32 {
-<a href=#1003 id=1003 data-nosnippet>1003</a>//    self.hit.coax_cable_time
-<a href=#1004 id=1004 data-nosnippet>1004</a>//  }
-<a href=#1005 id=1005 data-nosnippet>1005</a>//
-<a href=#1006 id=1006 data-nosnippet>1006</a>//  #[getter]
-<a href=#1007 id=1007 data-nosnippet>1007</a>//  fn get_hart_cbl_time(&amp;self) -&gt; f32 {
-<a href=#1008 id=1008 data-nosnippet>1008</a>//    self.hit.hart_cable_time
-<a href=#1009 id=1009 data-nosnippet>1009</a>//  }
-<a href=#1010 id=1010 data-nosnippet>1010</a>//
-<a href=#1011 id=1011 data-nosnippet>1011</a>//  /// Reconstructed particle interaction time,
-<a href=#1012 id=1012 data-nosnippet>1012</a>//  /// calculated from the waveforms of the two
-<a href=#1013 id=1013 data-nosnippet>1013</a>//  /// different paddle ends. If the paddle has 
-<a href=#1014 id=1014 data-nosnippet>1014</a>//  /// been set, this takes phase and cable 
-<a href=#1015 id=1015 data-nosnippet>1015</a>//  /// length into account
-<a href=#1016 id=1016 data-nosnippet>1016</a>//  #[getter]
-<a href=#1017 id=1017 data-nosnippet>1017</a>//  fn t0(&amp;self) -&gt; f32 {
-<a href=#1018 id=1018 data-nosnippet>1018</a>//    self.hit.get_t0()
-<a href=#1019 id=1019 data-nosnippet>1019</a>//  }
-<a href=#1020 id=1020 data-nosnippet>1020</a>//
-<a href=#1021 id=1021 data-nosnippet>1021</a>//  #[getter]
-<a href=#1022 id=1022 data-nosnippet>1022</a>//  fn get_phase_delay(&amp;self) -&gt; f32 {
-<a href=#1023 id=1023 data-nosnippet>1023</a>//    self.hit.get_phase_delay()
-<a href=#1024 id=1024 data-nosnippet>1024</a>//  }
-<a href=#1025 id=1025 data-nosnippet>1025</a>//
-<a href=#1026 id=1026 data-nosnippet>1026</a>//  #[getter]
-<a href=#1027 id=1027 data-nosnippet>1027</a>//  fn get_cable_delay(&amp;self) -&gt; f32 {
-<a href=#1028 id=1028 data-nosnippet>1028</a>//    self.hit.get_cable_delay()
-<a href=#1029 id=1029 data-nosnippet>1029</a>//  }
-<a href=#1030 id=1030 data-nosnippet>1030</a>//
-<a href=#1031 id=1031 data-nosnippet>1031</a>//  #[getter]
-<a href=#1032 id=1032 data-nosnippet>1032</a>//  fn version(&amp;self) -&gt; ProtocolVersion {
-<a href=#1033 id=1033 data-nosnippet>1033</a>//    self.hit.version
-<a href=#1034 id=1034 data-nosnippet>1034</a>//  }
-<a href=#1035 id=1035 data-nosnippet>1035</a>//
-<a href=#1036 id=1036 data-nosnippet>1036</a>//  #[getter]
-<a href=#1037 id=1037 data-nosnippet>1037</a>//  fn phase(&amp;self) -&gt; f32 {
-<a href=#1038 id=1038 data-nosnippet>1038</a>//    self.hit.phase.to_f32()
-<a href=#1039 id=1039 data-nosnippet>1039</a>//  }
-<a href=#1040 id=1040 data-nosnippet>1040</a>//
-<a href=#1041 id=1041 data-nosnippet>1041</a>//  #[getter]
-<a href=#1042 id=1042 data-nosnippet>1042</a>//  fn baseline_a(&amp;self) -&gt; f32 {
-<a href=#1043 id=1043 data-nosnippet>1043</a>//    self.hit.baseline_a.to_f32()
-<a href=#1044 id=1044 data-nosnippet>1044</a>//  }
-<a href=#1045 id=1045 data-nosnippet>1045</a>//
-<a href=#1046 id=1046 data-nosnippet>1046</a>//  #[getter]
-<a href=#1047 id=1047 data-nosnippet>1047</a>//  fn baseline_a_rms(&amp;self) -&gt; f32 {
-<a href=#1048 id=1048 data-nosnippet>1048</a>//    self.hit.baseline_a_rms.to_f32()
-<a href=#1049 id=1049 data-nosnippet>1049</a>//  }
-<a href=#1050 id=1050 data-nosnippet>1050</a>//  
-<a href=#1051 id=1051 data-nosnippet>1051</a>//  #[getter]
-<a href=#1052 id=1052 data-nosnippet>1052</a>//  fn baseline_b(&amp;self) -&gt; f32 {
-<a href=#1053 id=1053 data-nosnippet>1053</a>//    self.hit.baseline_b.to_f32()
-<a href=#1054 id=1054 data-nosnippet>1054</a>//  }
-<a href=#1055 id=1055 data-nosnippet>1055</a>//
-<a href=#1056 id=1056 data-nosnippet>1056</a>//  #[getter]
-<a href=#1057 id=1057 data-nosnippet>1057</a>//  fn baseline_b_rms(&amp;self) -&gt; f32 {
-<a href=#1058 id=1058 data-nosnippet>1058</a>//    self.hit.baseline_b_rms.to_f32()
-<a href=#1059 id=1059 data-nosnippet>1059</a>//  }
-<a href=#1060 id=1060 data-nosnippet>1060</a>//
-<a href=#1061 id=1061 data-nosnippet>1061</a>//  #[getter]
-<a href=#1062 id=1062 data-nosnippet>1062</a>//  fn peak_a(&amp;self) -&gt; f32 {
-<a href=#1063 id=1063 data-nosnippet>1063</a>//    self.hit.get_peak_a()
-<a href=#1064 id=1064 data-nosnippet>1064</a>//  }
-<a href=#1065 id=1065 data-nosnippet>1065</a>//  
-<a href=#1066 id=1066 data-nosnippet>1066</a>//  #[getter]
-<a href=#1067 id=1067 data-nosnippet>1067</a>//  fn peak_b(&amp;self) -&gt; f32 {
-<a href=#1068 id=1068 data-nosnippet>1068</a>//    self.hit.get_peak_b()
-<a href=#1069 id=1069 data-nosnippet>1069</a>//  }
-<a href=#1070 id=1070 data-nosnippet>1070</a>//  
-<a href=#1071 id=1071 data-nosnippet>1071</a>//  #[getter]
-<a href=#1072 id=1072 data-nosnippet>1072</a>//  fn charge_a(&amp;self) -&gt; f32 {
-<a href=#1073 id=1073 data-nosnippet>1073</a>//    self.hit.get_charge_a()
-<a href=#1074 id=1074 data-nosnippet>1074</a>//  }
-<a href=#1075 id=1075 data-nosnippet>1075</a>//  
-<a href=#1076 id=1076 data-nosnippet>1076</a>//  #[getter]
-<a href=#1077 id=1077 data-nosnippet>1077</a>//  fn charge_b(&amp;self) -&gt; f32 {
-<a href=#1078 id=1078 data-nosnippet>1078</a>//    self.hit.get_charge_b()
-<a href=#1079 id=1079 data-nosnippet>1079</a>//  }
-<a href=#1080 id=1080 data-nosnippet>1080</a>//
-<a href=#1081 id=1081 data-nosnippet>1081</a>//  #[getter]
-<a href=#1082 id=1082 data-nosnippet>1082</a>//  fn time_a(&amp;self) -&gt; f32 {
-<a href=#1083 id=1083 data-nosnippet>1083</a>//    self.hit.get_time_a()
-<a href=#1084 id=1084 data-nosnippet>1084</a>//  }
-<a href=#1085 id=1085 data-nosnippet>1085</a>//  
-<a href=#1086 id=1086 data-nosnippet>1086</a>//  #[getter]
-<a href=#1087 id=1087 data-nosnippet>1087</a>//  fn time_b(&amp;self) -&gt; f32 {
-<a href=#1088 id=1088 data-nosnippet>1088</a>//    self.hit.get_time_b()
-<a href=#1089 id=1089 data-nosnippet>1089</a>//  }
-<a href=#1090 id=1090 data-nosnippet>1090</a>//
-<a href=#1091 id=1091 data-nosnippet>1091</a>//  /// Reconstructed particle interaction position
-<a href=#1092 id=1092 data-nosnippet>1092</a>//  /// along the long axis of the paddle.
-<a href=#1093 id=1093 data-nosnippet>1093</a>//  /// For the other dimensions, there is no information
-<a href=#1094 id=1094 data-nosnippet>1094</a>//  /// about the position.
-<a href=#1095 id=1095 data-nosnippet>1095</a>//  /// Reconstructed with the waveforms of both paddle ends.
-<a href=#1096 id=1096 data-nosnippet>1096</a>//  #[getter]
-<a href=#1097 id=1097 data-nosnippet>1097</a>//  fn pos(&amp;self) -&gt; f32 {
-<a href=#1098 id=1098 data-nosnippet>1098</a>//    self.hit.get_pos()
-<a href=#1099 id=1099 data-nosnippet>1099</a>//  }
-<a href=#1100 id=1100 data-nosnippet>1100</a>// 
-<a href=#1101 id=1101 data-nosnippet>1101</a>//  /// The paddle id (1-160) of the hit paddle
-<a href=#1102 id=1102 data-nosnippet>1102</a>//  #[getter]
-<a href=#1103 id=1103 data-nosnippet>1103</a>//  fn paddle_id(&amp;self) -&gt; u8 {
-<a href=#1104 id=1104 data-nosnippet>1104</a>//    self.hit.paddle_id
-<a href=#1105 id=1105 data-nosnippet>1105</a>//  }
-<a href=#1106 id=1106 data-nosnippet>1106</a>//
-<a href=#1107 id=1107 data-nosnippet>1107</a>//  #[getter]
-<a href=#1108 id=1108 data-nosnippet>1108</a>//  fn edep(&amp;self) -&gt; f32 {
-<a href=#1109 id=1109 data-nosnippet>1109</a>//    self.hit.get_edep()
-<a href=#1110 id=1110 data-nosnippet>1110</a>//  }
-<a href=#1111 id=1111 data-nosnippet>1111</a>//
-<a href=#1112 id=1112 data-nosnippet>1112</a>//  #[getter]
-<a href=#1113 id=1113 data-nosnippet>1113</a>//  fn get_paddle_len(&amp;self) -&gt; f32 {
-<a href=#1114 id=1114 data-nosnippet>1114</a>//    self.hit.paddle_len
-<a href=#1115 id=1115 data-nosnippet>1115</a>//  }
-<a href=#1116 id=1116 data-nosnippet>1116</a>//
-<a href=#1117 id=1117 data-nosnippet>1117</a>//}
-<a href=#1118 id=1118 data-nosnippet>1118</a>//
-<a href=#1119 id=1119 data-nosnippet>1119</a>//#[cfg(feature="pybindings")]
-<a href=#1120 id=1120 data-nosnippet>1120</a>//impl_pythonize_display!(PyTofHit, |s: &amp;PyTofHit| s.hit.to_string());
-<a href=#1121 id=1121 data-nosnippet>1121</a>
-<a href=#1122 id=1122 data-nosnippet>1122</a>
-<a href=#1123 id=1123 data-nosnippet>1123</a></span><span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
-<a href=#1124 id=1124 data-nosnippet>1124</a>#[test]
-<a href=#1125 id=1125 data-nosnippet>1125</a></span><span class="kw">fn </span>serialization_tofhit() {
-<a href=#1126 id=1126 data-nosnippet>1126</a>  <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">100 </span>{
-<a href=#1127 id=1127 data-nosnippet>1127</a>    <span class="kw">let </span><span class="kw-2">mut </span>pos = <span class="number">0</span>;
-<a href=#1128 id=1128 data-nosnippet>1128</a>    <span class="kw">let </span>data = TofHit::from_random();
-<a href=#1129 id=1129 data-nosnippet>1129</a>    <span class="kw">let </span><span class="kw-2">mut </span>test = TofHit::from_bytestream(<span class="kw-2">&amp;</span>data.to_bytestream(),<span class="kw-2">&amp;mut </span>pos).unwrap();
-<a href=#1130 id=1130 data-nosnippet>1130</a>    <span class="comment">// Manually zero these fields, since comparison with nan will fail and 
-<a href=#1131 id=1131 data-nosnippet>1131</a>    // from_random did not touch these
-<a href=#1132 id=1132 data-nosnippet>1132</a>    </span>test.paddle_len       = <span class="number">0.0</span>; 
-<a href=#1133 id=1133 data-nosnippet>1133</a>    test.coax_cable_time  = <span class="number">0.0</span>; 
-<a href=#1134 id=1134 data-nosnippet>1134</a>    test.hart_cable_time  = <span class="number">0.0</span>; 
-<a href=#1135 id=1135 data-nosnippet>1135</a>    test.x                = <span class="number">0.0</span>; 
-<a href=#1136 id=1136 data-nosnippet>1136</a>    test.y                = <span class="number">0.0</span>; 
-<a href=#1137 id=1137 data-nosnippet>1137</a>    test.z                = <span class="number">0.0</span>; 
-<a href=#1138 id=1138 data-nosnippet>1138</a>    test.event_t0         = <span class="number">0.0</span>;
-<a href=#1139 id=1139 data-nosnippet>1139</a>    <span class="macro">assert_eq!</span>(pos, TofHit::SIZE);
-<a href=#1140 id=1140 data-nosnippet>1140</a>    <span class="macro">assert_eq!</span>(data, test);
-<a href=#1141 id=1141 data-nosnippet>1141</a>  }
-<a href=#1142 id=1142 data-nosnippet>1142</a>}</code></pre></div></section></main></body></html>
+<a href=#841 id=841 data-nosnippet>841</a>    <span class="kw">let </span><span class="kw-2">mut </span>pp             = <span class="self">Self</span>::new();
+<a href=#842 id=842 data-nosnippet>842</a>    <span class="kw">let </span><span class="kw-2">mut </span>version_lt_011 = <span class="bool-val">false</span>;
+<a href=#843 id=843 data-nosnippet>843</a>    <span class="kw">let </span>(size,<span class="kw">_</span>,__)        = <span class="self">Self</span>::guess_size(stream, <span class="kw-2">*</span>pos, <span class="number">28</span>)<span class="question-mark">?</span>;
+<a href=#844 id=844 data-nosnippet>844</a>    <span class="kw">if </span>size == <span class="number">30 </span>{
+<a href=#845 id=845 data-nosnippet>845</a>      version_lt_011 = <span class="bool-val">true</span>;
+<a href=#846 id=846 data-nosnippet>846</a>      <span class="kw">let </span>head      = parse_u16(stream, pos);
+<a href=#847 id=847 data-nosnippet>847</a>      <span class="kw">if </span>head != <span class="self">Self</span>::HEAD {
+<a href=#848 id=848 data-nosnippet>848</a>        <span class="macro">error!</span>(<span class="string">"Decoding of HEAD failed! Got {} instead!"</span>, head);
+<a href=#849 id=849 data-nosnippet>849</a>        <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::HeadInvalid);
+<a href=#850 id=850 data-nosnippet>850</a>      }
+<a href=#851 id=851 data-nosnippet>851</a>    } <span class="kw">else </span>{
+<a href=#852 id=852 data-nosnippet>852</a>      <span class="self">Self</span>::verify_fixed(stream, pos)<span class="question-mark">?</span>;
+<a href=#853 id=853 data-nosnippet>853</a>    }
+<a href=#854 id=854 data-nosnippet>854</a>    <span class="comment">// since we passed the above test, the packet
+<a href=#855 id=855 data-nosnippet>855</a>    // is valid
+<a href=#856 id=856 data-nosnippet>856</a>    </span>pp.valid          = <span class="bool-val">true</span>;
+<a href=#857 id=857 data-nosnippet>857</a>    pp.paddle_id      = parse_u8(stream, pos);
+<a href=#858 id=858 data-nosnippet>858</a>    pp.time_a         = parse_f16(stream, pos);
+<a href=#859 id=859 data-nosnippet>859</a>    pp.time_b         = parse_f16(stream, pos);
+<a href=#860 id=860 data-nosnippet>860</a>    pp.peak_a         = parse_f16(stream, pos);
+<a href=#861 id=861 data-nosnippet>861</a>    pp.peak_b         = parse_f16(stream, pos);
+<a href=#862 id=862 data-nosnippet>862</a>    pp.charge_a       = parse_f16(stream, pos);
+<a href=#863 id=863 data-nosnippet>863</a>    pp.charge_b       = parse_f16(stream, pos);
+<a href=#864 id=864 data-nosnippet>864</a>    pp.TOT_low_a      = parse_f16(stream, pos);
+<a href=#865 id=865 data-nosnippet>865</a>    pp.baseline_a     = parse_f16(stream, pos);
+<a href=#866 id=866 data-nosnippet>866</a>    pp.baseline_a_rms = parse_f16(stream, pos);
+<a href=#867 id=867 data-nosnippet>867</a>    <span class="kw">let </span><span class="kw-2">mut </span>phase_vec = Vec::&lt;u8&gt;::new();
+<a href=#868 id=868 data-nosnippet>868</a>    phase_vec.push(parse_u8(stream, pos));
+<a href=#869 id=869 data-nosnippet>869</a>    phase_vec.push(parse_u8(stream, pos));
+<a href=#870 id=870 data-nosnippet>870</a>    pp.phase          = parse_f16(<span class="kw-2">&amp;</span>phase_vec, <span class="kw-2">&amp;mut </span><span class="number">0</span>);
+<a href=#871 id=871 data-nosnippet>871</a>    <span class="kw">let </span>version       = ProtocolVersion::from(parse_u8(stream, pos));
+<a href=#872 id=872 data-nosnippet>872</a>    pp.version        = version;
+<a href=#873 id=873 data-nosnippet>873</a>    <span class="kw">match </span>pp.version {
+<a href=#874 id=874 data-nosnippet>874</a>      ProtocolVersion::V1 =&gt; {
+<a href=#875 id=875 data-nosnippet>875</a>      }
+<a href=#876 id=876 data-nosnippet>876</a>      <span class="kw">_ </span>=&gt; ()
+<a href=#877 id=877 data-nosnippet>877</a>    }
+<a href=#878 id=878 data-nosnippet>878</a>    pp.baseline_b      = parse_f16(stream, pos);
+<a href=#879 id=879 data-nosnippet>879</a>    pp.baseline_b_rms  = parse_f16(stream, pos);
+<a href=#880 id=880 data-nosnippet>880</a>    <span class="kw">if </span>!version_lt_011 {
+<a href=#881 id=881 data-nosnippet>881</a>      pp.TOT_low_b       = parse_f16(stream, pos);
+<a href=#882 id=882 data-nosnippet>882</a>      pp.TOT_high_a      = parse_f16(stream, pos);
+<a href=#883 id=883 data-nosnippet>883</a>      pp.TOT_high_b      = parse_f16(stream, pos);
+<a href=#884 id=884 data-nosnippet>884</a>      pp.TOT_slp_low_a   = parse_f16(stream, pos);
+<a href=#885 id=885 data-nosnippet>885</a>      pp.TOT_slp_low_b   = parse_f16(stream, pos);
+<a href=#886 id=886 data-nosnippet>886</a>      pp.TOT_slp_high_a  = parse_f16(stream, pos);
+<a href=#887 id=887 data-nosnippet>887</a>      pp.TOT_slp_high_b  = parse_f16(stream, pos);
+<a href=#888 id=888 data-nosnippet>888</a>      <span class="kw-2">*</span>pos += <span class="number">2</span>; <span class="comment">// always have to do this when using verify fixed
+<a href=#889 id=889 data-nosnippet>889</a>    </span>} <span class="kw">else </span>{
+<a href=#890 id=890 data-nosnippet>890</a>      <span class="kw">let </span>tail = parse_u16(stream, pos);
+<a href=#891 id=891 data-nosnippet>891</a>      <span class="kw">if </span>tail != <span class="self">Self</span>::TAIL {
+<a href=#892 id=892 data-nosnippet>892</a>        <span class="macro">error!</span>(<span class="string">"Decoding of TAIL failed for version {}! Got {} instead!"</span>, version, tail);
+<a href=#893 id=893 data-nosnippet>893</a>        <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::TailInvalid);
+<a href=#894 id=894 data-nosnippet>894</a>      }
+<a href=#895 id=895 data-nosnippet>895</a>    }
+<a href=#896 id=896 data-nosnippet>896</a>    <span class="prelude-val">Ok</span>(pp)
+<a href=#897 id=897 data-nosnippet>897</a>  }
+<a href=#898 id=898 data-nosnippet>898</a>}
+<a href=#899 id=899 data-nosnippet>899</a>
+<a href=#900 id=900 data-nosnippet>900</a><span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
+<a href=#901 id=901 data-nosnippet>901</a></span><span class="kw">impl </span>FromRandom <span class="kw">for </span>TofHit {
+<a href=#902 id=902 data-nosnippet>902</a>  <span class="kw">fn </span>from_random() -&gt; TofHit {
+<a href=#903 id=903 data-nosnippet>903</a>    <span class="kw">let </span><span class="kw-2">mut </span>pp  = TofHit::new();
+<a href=#904 id=904 data-nosnippet>904</a>    <span class="kw">let </span><span class="kw-2">mut </span>rng = rand::rng();
+<a href=#905 id=905 data-nosnippet>905</a>    <span class="comment">// randomly create old/new style hits 
+<a href=#906 id=906 data-nosnippet>906</a>    </span><span class="kw">let </span>version_lt_011 = rng.random::&lt;bool&gt;();
+<a href=#907 id=907 data-nosnippet>907</a>        
+<a href=#908 id=908 data-nosnippet>908</a>    pp.paddle_id       = rng.random_range(<span class="number">0</span>..<span class="number">161</span>);
+<a href=#909 id=909 data-nosnippet>909</a>    pp.time_a          = f16::from_f32(rng.random::&lt;f32&gt;());
+<a href=#910 id=910 data-nosnippet>910</a>    pp.time_b          = f16::from_f32(rng.random::&lt;f32&gt;());
+<a href=#911 id=911 data-nosnippet>911</a>    pp.peak_a          = f16::from_f32(rng.random::&lt;f32&gt;());
+<a href=#912 id=912 data-nosnippet>912</a>    pp.peak_b          = f16::from_f32(rng.random::&lt;f32&gt;());
+<a href=#913 id=913 data-nosnippet>913</a>    pp.charge_a        = f16::from_f32(rng.random::&lt;f32&gt;());
+<a href=#914 id=914 data-nosnippet>914</a>    pp.charge_b        = f16::from_f32(rng.random::&lt;f32&gt;());
+<a href=#915 id=915 data-nosnippet>915</a>    pp.version         = ProtocolVersion::from(rng.random::&lt;u8&gt;());
+<a href=#916 id=916 data-nosnippet>916</a>    pp.baseline_a      = f16::from_f32(rng.random::&lt;f32&gt;());
+<a href=#917 id=917 data-nosnippet>917</a>    pp.baseline_a_rms  = f16::from_f32(rng.random::&lt;f32&gt;());
+<a href=#918 id=918 data-nosnippet>918</a>    pp.baseline_b      = f16::from_f32(rng.random::&lt;f32&gt;());
+<a href=#919 id=919 data-nosnippet>919</a>    pp.baseline_b_rms  = f16::from_f32(rng.random::&lt;f32&gt;());
+<a href=#920 id=920 data-nosnippet>920</a>    pp.phase           = f16::from_f32(rng.random::&lt;f32&gt;());
+<a href=#921 id=921 data-nosnippet>921</a>    
+<a href=#922 id=922 data-nosnippet>922</a>    <span class="kw">if </span>!version_lt_011 {
+<a href=#923 id=923 data-nosnippet>923</a>      pp.TOT_low_a      = f16::from_f32(rng.random::&lt;f32&gt;());
+<a href=#924 id=924 data-nosnippet>924</a>      pp.TOT_low_b      = f16::from_f32(rng.random::&lt;f32&gt;());
+<a href=#925 id=925 data-nosnippet>925</a>      pp.TOT_high_a     = f16::from_f32(rng.random::&lt;f32&gt;());
+<a href=#926 id=926 data-nosnippet>926</a>      pp.TOT_high_b     = f16::from_f32(rng.random::&lt;f32&gt;()); 
+<a href=#927 id=927 data-nosnippet>927</a>      pp.TOT_slp_low_a  = f16::from_f32(rng.random::&lt;f32&gt;());
+<a href=#928 id=928 data-nosnippet>928</a>      pp.TOT_slp_low_b  = f16::from_f32(rng.random::&lt;f32&gt;());
+<a href=#929 id=929 data-nosnippet>929</a>      pp.TOT_slp_high_a = f16::from_f32(rng.random::&lt;f32&gt;()); 
+<a href=#930 id=930 data-nosnippet>930</a>      pp.TOT_slp_high_b = f16::from_f32(rng.random::&lt;f32&gt;()); 
+<a href=#931 id=931 data-nosnippet>931</a>    }
+<a href=#932 id=932 data-nosnippet>932</a>    pp.paddle_len       = <span class="number">0.0</span>; 
+<a href=#933 id=933 data-nosnippet>933</a>    pp.coax_cable_time  = <span class="number">0.0</span>; 
+<a href=#934 id=934 data-nosnippet>934</a>    pp.hart_cable_time  = <span class="number">0.0</span>; 
+<a href=#935 id=935 data-nosnippet>935</a>    pp.x                = <span class="number">0.0</span>; 
+<a href=#936 id=936 data-nosnippet>936</a>    pp.y                = <span class="number">0.0</span>; 
+<a href=#937 id=937 data-nosnippet>937</a>    pp.z                = <span class="number">0.0</span>; 
+<a href=#938 id=938 data-nosnippet>938</a>    pp.event_t0         = <span class="number">0.0</span>; 
+<a href=#939 id=939 data-nosnippet>939</a>    pp
+<a href=#940 id=940 data-nosnippet>940</a>  }
+<a href=#941 id=941 data-nosnippet>941</a>}
+<a href=#942 id=942 data-nosnippet>942</a>
+<a href=#943 id=943 data-nosnippet>943</a><span class="comment">//---------------------------------------------------------------
+<a href=#944 id=944 data-nosnippet>944</a>
+<a href=#945 id=945 data-nosnippet>945</a></span><span class="attr">#[cfg(feature = <span class="string">"random"</span>)]
+<a href=#946 id=946 data-nosnippet>946</a>#[test]
+<a href=#947 id=947 data-nosnippet>947</a></span><span class="kw">fn </span>serialization_tofhit() {
+<a href=#948 id=948 data-nosnippet>948</a>  <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">100 </span>{
+<a href=#949 id=949 data-nosnippet>949</a>    <span class="kw">let </span><span class="kw-2">mut </span>pos = <span class="number">0</span>;
+<a href=#950 id=950 data-nosnippet>950</a>    <span class="kw">let </span>data = TofHit::from_random();
+<a href=#951 id=951 data-nosnippet>951</a>    <span class="kw">let </span><span class="kw-2">mut </span>test = TofHit::from_bytestream(<span class="kw-2">&amp;</span>data.to_bytestream(),<span class="kw-2">&amp;mut </span>pos).unwrap();
+<a href=#952 id=952 data-nosnippet>952</a>    <span class="comment">// Manually zero these fields, since comparison with nan will fail and 
+<a href=#953 id=953 data-nosnippet>953</a>    // from_random did not touch these
+<a href=#954 id=954 data-nosnippet>954</a>    </span>test.paddle_len       = <span class="number">0.0</span>; 
+<a href=#955 id=955 data-nosnippet>955</a>    test.coax_cable_time  = <span class="number">0.0</span>; 
+<a href=#956 id=956 data-nosnippet>956</a>    test.hart_cable_time  = <span class="number">0.0</span>; 
+<a href=#957 id=957 data-nosnippet>957</a>    test.x                = <span class="number">0.0</span>; 
+<a href=#958 id=958 data-nosnippet>958</a>    test.y                = <span class="number">0.0</span>; 
+<a href=#959 id=959 data-nosnippet>959</a>    test.z                = <span class="number">0.0</span>; 
+<a href=#960 id=960 data-nosnippet>960</a>    test.event_t0         = <span class="number">0.0</span>;
+<a href=#961 id=961 data-nosnippet>961</a>    <span class="macro">assert_eq!</span>(pos, TofHit::SIZE);
+<a href=#962 id=962 data-nosnippet>962</a>    <span class="macro">assert_eq!</span>(data, test);
+<a href=#963 id=963 data-nosnippet>963</a>  }
+<a href=#964 id=964 data-nosnippet>964</a>}</code></pre></div></section></main></body></html>

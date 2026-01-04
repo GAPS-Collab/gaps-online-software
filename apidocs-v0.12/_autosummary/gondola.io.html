@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.io &#8212; gondola 0.12.4 documentation</title>
+    <title>gondola.io &#8212; gondola 0.12.6 documentation</title>
   
   
   
@@ -38,13 +38,13 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=cf73996f"></script>
+    <script src="../_static/documentation_options.js?v=eee2e1a2"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.io';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="gondola.reconstruction" href="gondola.reconstruction.html" />
+    <link rel="next" title="gondola.io.streamers" href="gondola.io.streamers.html" />
     <link rel="prev" title="gondola.gondola_core" href="gondola.gondola_core.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="python"/>
@@ -110,7 +110,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.12.4 documentation</p>
+    <p class="title logo__title">gondola 0.12.6 documentation</p>
   
 </a></div>
     
@@ -261,8 +261,12 @@
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="gondola.calibration.html">gondola.calibration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.db.html">gondola.db</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.events.html">gondola.events</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.gondola_core.html">gondola.gondola_core</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">gondola.io</a></li>
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">gondola.io</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="gondola.io.streamers.html">gondola.io.streamers</a></li>
+</ul>
+</details></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.reconstruction.html">gondola.reconstruction</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="gondola.tof.html">gondola.tof</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="gondola.tof.analysis.html">gondola.tof.analysis</a></li>
@@ -351,7 +355,7 @@ obtain various flavors of data used trhoughout GAPS.</p>
 <td><p>Get a timestamp from a '.bin' file as written  by telemetry</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#gondola.io.grace_get_telemetry_binaries" title="gondola.io.grace_get_telemetry_binaries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grace_get_telemetry_binaries</span></code></a>(...[, data_dir])</p></td>
-<td><p></p></td>
+<td><p>Get the relevant telemetry data files for time period from a directory.</p></td>
 </tr>
 </tbody>
 </table>
@@ -359,355 +363,150 @@ obtain various flavors of data used trhoughout GAPS.</p>
 <p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.io.CRFrame" title="gondola.io.CRFrame"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CRFrame</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CRFrame</span></code>()</p></td>
 <td><p>The central data container of the  caraspace suite.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.io.CRFrameObject" title="gondola.io.CRFrameObject"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CRFrameObject</span></code></a>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CRFrameObject</span></code>()</p></td>
 <td><p>A Caraspace object, that can be stored within a frame.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.io.CRReader" title="gondola.io.CRReader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CRReader</span></code></a>(filename_or_directory)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CRReader</span></code>(filename_or_directory)</p></td>
 <td><p>Read binaries written through the caraspace i/o system</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.io.CRWriter" title="gondola.io.CRWriter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CRWriter</span></code></a>(filename, run_id[, subrun_id, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">CRWriter</span></code>(filename, run_id[, subrun_id, ...])</p></td>
 <td><p>Write CRFrames to disk.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.io.TelemetryPacketReader" title="gondola.io.TelemetryPacketReader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TelemetryPacketReader</span></code></a>(filenames_or_directory)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TelemetryPacketReader</span></code>(filenames_or_directory)</p></td>
 <td><p>Read serialized TelemetryPackets from an existing file</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.io.TofPacketReader" title="gondola.io.TofPacketReader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofPacketReader</span></code></a>(filename_or_directory[, filter])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofPacketReader</span></code>(filename_or_directory[, filter])</p></td>
 <td><p>Read serialized TofPackets from an existing file or directory</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofPacketWriter</span></code>(filename, runid)</p></td>
+<td><p>Write TofPackets to disk.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<dl class="py class">
-<dt class="sig sig-object py" id="gondola.io.CRFrameObject">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.io.</span></span><span class="sig-name descname"><span class="pre">CRFrameObject</span></span><a class="headerlink" href="#gondola.io.CRFrameObject" title="Link to this definition">#</a></dt>
-<dd><p>A Caraspace object, that can be stored
-within a frame.</p>
-<p>_For the <a href="#id1"><span class="problematic" id="id2">connaiseur_</span></a>: This is basically a 
-TofPacket on <a href="#id3"><span class="problematic" id="id4">steroids_</span></a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="gondola.io.list_path_contents_sorted">
+<span class="sig-prename descclassname"><span class="pre">gondola.io.</span></span><span class="sig-name descname"><span class="pre">list_path_contents_sorted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.list_path_contents_sorted" title="Link to this definition">#</a></dt>
+<dd><p>Get all filenames in the current path sorted by timestamp if available
+If the given path is a file and not a directory, return only that 
+file instead</p>
+<p># Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>input   : name of the target directory</p></li>
+<li><dl class="simple">
+<dt>pattern<span class="classifier">the regex pattern to look for. That the sorting works,</span></dt><dd><p>the pattern needs to return a date for the first
+captured argument and a time for the second captured argument</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
 </dd></dl>
 
-<dl class="py class">
-<dt class="sig sig-object py" id="gondola.io.CRReader">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.io.</span></span><span class="sig-name descname"><span class="pre">CRReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename_or_directory</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.CRReader" title="Link to this definition">#</a></dt>
-<dd><p>Read binaries written through the caraspace i/o system</p>
-<p>The file needs to contain subsequent CRFrames.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="gondola.io.CRReader.count_frames">
-<span class="sig-name descname"><span class="pre">count_frames</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.CRReader.count_frames" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="gondola.io.CRReader.current_filename">
-<span class="sig-name descname"><span class="pre">current_filename</span></span><a class="headerlink" href="#gondola.io.CRReader.current_filename" title="Link to this definition">#</a></dt>
-<dd><p>This is the filename we are currently 
-extracting frames from</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="gondola.io.get_utc_now">
+<span class="sig-prename descclassname"><span class="pre">gondola.io.</span></span><span class="sig-name descname"><span class="pre">get_utc_now</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.get_utc_now" title="Link to this definition">#</a></dt>
+<dd><p>Get a human readable timestamp for NOW</p>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="gondola.io.CRReader.rewind">
-<span class="sig-name descname"><span class="pre">rewind</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.CRReader.rewind" title="Link to this definition">#</a></dt>
-<dd><p>Start the reader from the beginning
-This is equivalent to a re-initialization
-of that reader.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="gondola.io.get_utc_date">
+<span class="sig-prename descclassname"><span class="pre">gondola.io.</span></span><span class="sig-name descname"><span class="pre">get_utc_date</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.get_utc_date" title="Link to this definition">#</a></dt>
+<dd><p>Create date string in YYMMDD format</p>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="gondola.io.CRReader.set_tracker_calibrations_from_fnames">
-<span class="sig-name descname"><span class="pre">set_tracker_calibrations_from_fnames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pedestal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transfer_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmn_noise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.CRReader.set_tracker_calibrations_from_fnames" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
+<dl class="py function">
+<dt class="sig sig-object py" id="gondola.io.get_datetime">
+<span class="sig-prename descclassname"><span class="pre">gondola.io.</span></span><span class="sig-name descname"><span class="pre">get_datetime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tformat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.get_datetime" title="Link to this definition">#</a></dt>
+<dd><p>Retrieve the DateTime object from a string as used in 
+the names of the run files</p>
+<p># Arguments:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>input<span class="classifier">The input string the datetime shall be extracted</span></dt><dd><p>from</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>format<span class="classifier">The format of the date string. Something like </span></dt><dd><p>%y%m%d_%H%M%S</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
 </dd></dl>
 
-<dl class="py class">
-<dt class="sig sig-object py" id="gondola.io.CRWriter">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.io.</span></span><span class="sig-name descname"><span class="pre">CRWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subrun_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.CRWriter" title="Link to this definition">#</a></dt>
-<dd><p>Write CRFrames to disk.</p>
-<p>Operates sequentially, frames can 
-be added one at a time, then will
-be synced to disk.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="gondola.io.CRWriter.add_frame">
-<span class="sig-name descname"><span class="pre">add_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.CRWriter.add_frame" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="gondola.io.CRWriter.set_file_timestamp">
-<span class="sig-name descname"><span class="pre">set_file_timestamp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timestamp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.CRWriter.set_file_timestamp" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="gondola.io.CRWriter.set_mbytes_per_file">
-<span class="sig-name descname"><span class="pre">set_mbytes_per_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fsize</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.CRWriter.set_mbytes_per_file" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="gondola.io.CRFrame">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.io.</span></span><span class="sig-name descname"><span class="pre">CRFrame</span></span><a class="headerlink" href="#gondola.io.CRFrame" title="Link to this definition">#</a></dt>
-<dd><p>The central data container of the 
-caraspace suite.</p>
-<p>A CRFrame can hold multiple CRFrameObjects
-and is basically a little sclerite of 
-the entire skeleton.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="gondola.io.CRFrame.delete">
-<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.CRFrame.delete" title="Link to this definition">#</a></dt>
-<dd><p>Delete a CRFrameObject by this name from the frame</p>
-<p>To delete multiple objects, delete calls can be 
-chained</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="gondola.io.get_rundata_from_file">
+<span class="sig-prename descclassname"><span class="pre">gondola.io.</span></span><span class="sig-name descname"><span class="pre">get_rundata_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.get_rundata_from_file" title="Link to this definition">#</a></dt>
+<dd><p>Get the timestamp from a .tof.gaps file</p>
 <dl class="simple">
 <dt># Arguments:</dt><dd><ul class="simple">
-<li><dl class="simple">
-<dt>name<span class="classifier">The name of the FrameObject to delte </span></dt><dd><p>(must be in index)</p>
-</dd>
-</dl>
-</li>
-</ul>
-</dd>
-<dt># Returns:</dt><dd><p>A complete copy of self, without the given object.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="gondola.io.CRFrame.do_trk_calib">
-<span class="sig-name descname"><span class="pre">do_trk_calib</span></span><a class="headerlink" href="#gondola.io.CRFrame.do_trk_calib" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="gondola.io.CRFrame.get_telemetryevent">
-<span class="sig-name descname"><span class="pre">get_telemetryevent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">always_exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.CRFrame.get_telemetryevent" title="Link to this definition">#</a></dt>
-<dd><p>Get a TelemetryEvent (&quot;MergedEvent&quot;) from the frame</p>
-<p>This automatically unpacks the event</p>
-<dl class="simple">
-<dt># Arugments:</dt><dd><ul class="simple">
-<li><dl class="simple">
-<dt>name<span class="classifier">in case there are multiple telemetry events in the same </span></dt><dd><p>frame, choose the one to return by name. In case there 
-are multiple events and no name is given, a ValueError 
-is raised. In case the one with the given name does not exist,
-a ValueError is raised as well.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>always_exclude<span class="classifier">never return the name given to always_exclude. This can be useful </span></dt><dd><p>in case there are multiple events and no name is given.</p>
-</dd>
-</dl>
-</li>
-</ul>
-</dd>
-<dt># Returns:</dt><dd><dl class="simple">
-<dt>TelemetryEvent -&gt; if a name is given and the corresponding packe</dt><dd><p>packet is found OR no name is given and the 
-frame contains any TelemetryEvent</p>
-</dd>
-<dt>None           -&gt; if no name is given, but the frame does not</dt><dd><p>contain any TelemetryEvent</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="gondola.io.CRFrame.get_telemetrypacket">
-<span class="sig-name descname"><span class="pre">get_telemetrypacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.CRFrame.get_telemetrypacket" title="Link to this definition">#</a></dt>
-<dd><p>Retrieve a TelemetryPacket from a frame</p>
-<dl class="simple">
-<dt># Arguments:</dt><dd><ul class="simple">
-<li><dl class="simple">
-<dt>name<span class="classifier">The name of the packet as it is stored in the </span></dt><dd><p>index</p>
-</dd>
-</dl>
-</li>
+<li><p>fname : Filename of .tof.gaps file</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="gondola.io.CRFrame.get_tofevent">
-<span class="sig-name descname"><span class="pre">get_tofevent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.CRFrame.get_tofevent" title="Link to this definition">#</a></dt>
-<dd><p>Get a tofevent from the frame directly</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="gondola.io.CRFrame.get_tofpacket">
-<span class="sig-name descname"><span class="pre">get_tofpacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.CRFrame.get_tofpacket" title="Link to this definition">#</a></dt>
-<dd><p>Retrieve a TofPacket from a frame</p>
-<dl class="simple">
-<dt># Arguments:</dt><dd><ul class="simple">
+<dl class="py function">
+<dt class="sig sig-object py" id="gondola.io.get_unix_timestamp">
+<span class="sig-prename descclassname"><span class="pre">gondola.io.</span></span><span class="sig-name descname"><span class="pre">get_unix_timestamp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tformat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.get_unix_timestamp" title="Link to this definition">#</a></dt>
+<dd><p>Retrieve the UNIX timestamp from a string as used in 
+the names of the run files</p>
+<p># Arguments:</p>
+<blockquote>
+<div><ul class="simple">
 <li><dl class="simple">
-<dt>name<span class="classifier">The name of the packet as it is stored in the </span></dt><dd><p>index</p>
+<dt>input<span class="classifier">The input string the datetime shall be extracted</span></dt><dd><p>from</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>format<span class="classifier">The format of the date string. Something like </span></dt><dd><p>%y%m%d_%H%M%S</p>
 </dd>
 </dl>
 </li>
 </ul>
-</dd>
-</dl>
+</div></blockquote>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="gondola.io.CRFrame.has">
-<span class="sig-name descname"><span class="pre">has</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.CRFrame.has" title="Link to this definition">#</a></dt>
-<dd><p>Check if the frame contains an object with the given name</p>
-<dl class="simple">
-<dt># Arguments:</dt><dd><ul class="simple">
-<li><p>name : The name of the object as it appears in the index</p></li>
-</ul>
-</dd>
-</dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="gondola.io.apply_diff_to_file">
+<span class="sig-prename descclassname"><span class="pre">gondola.io.</span></span><span class="sig-name descname"><span class="pre">apply_diff_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compressed_bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_file_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.apply_diff_to_file" title="Link to this definition">#</a></dt>
+<dd><p>Applies a diff (patch) from a patch file to an original file,
+writing the result to a new file.</p>
+<p># Arguments
+* <cite>original_file_path</cite> - Path to the original file.
+* <cite>patch_file_path</cite> - Path to the file containing the diff (patch).</p>
+<p># Returns
+<cite>Result&lt;(), io::Error&gt;</cite> indicating success or failure.</p>
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="gondola.io.CRFrame.index">
-<span class="sig-name descname"><span class="pre">index</span></span><a class="headerlink" href="#gondola.io.CRFrame.index" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="gondola.io.CRFrame.put_telemetrypacket">
-<span class="sig-name descname"><span class="pre">put_telemetrypacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.CRFrame.put_telemetrypacket" title="Link to this definition">#</a></dt>
-<dd><p>Add a TelemetryPacket to the frame.</p>
-<dl class="simple">
-<dt># Arguments:</dt><dd><dl class="simple">
-<dt>name<span class="classifier">The name under which we store the TelemetryPacket within the index.</span></dt><dd><p>If None given, use the default name, which is
-&quot;TelemetryPacketType.&lt;ValueOf(TelemetryPacketType)&quot;. This should be used in 
-all cases for which there is only a single TelemetryPacket within 
-the frame.</p>
-</dd>
-</dl>
-</dd>
-</dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="gondola.io.compress_toml">
+<span class="sig-prename descclassname"><span class="pre">gondola.io.</span></span><span class="sig-name descname"><span class="pre">compress_toml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.compress_toml" title="Link to this definition">#</a></dt>
+<dd><p>Create a compressed bytestream out of a .toml file, so that we can pack it and 
+send it as a TofPacket</p>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="gondola.io.CRFrame.put_tofpacket">
-<span class="sig-name descname"><span class="pre">put_tofpacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.CRFrame.put_tofpacket" title="Link to this definition">#</a></dt>
-<dd><p>Add a TofPacket to the frame.</p>
-<dl class="simple">
-<dt># Arguments:</dt><dd><dl class="simple">
-<dt>name<span class="classifier">The name under which we store the TofPacket within the index.</span></dt><dd><p>If None given, use the default name, which is
-&quot;TofPacketType.&lt;ValueOf(TofPacketType)&quot;. This should be used in 
-all cases for which there is only a single TofPacket within 
-the frame.</p>
-</dd>
-</dl>
-</dd>
-</dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="gondola.io.decompress_toml">
+<span class="sig-prename descclassname"><span class="pre">gondola.io.</span></span><span class="sig-name descname"><span class="pre">decompress_toml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compressed_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.decompress_toml" title="Link to this definition">#</a></dt>
+<dd><p>Unpack a bytestream to a .toml file</p>
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="gondola.io.CRFrame.telemetry_event_names">
-<span class="sig-name descname"><span class="pre">telemetry_event_names</span></span><a class="headerlink" href="#gondola.io.CRFrame.telemetry_event_names" title="Link to this definition">#</a></dt>
-<dd><p>A list of TelemetryEvents (fka MergedEvent) in the frame</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="gondola.io.TofPacketReader">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.io.</span></span><span class="sig-name descname"><span class="pre">TofPacketReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename_or_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.TofPacketReader" title="Link to this definition">#</a></dt>
-<dd><p>Read serialized TofPackets from an existing file or directory</p>
-<p>This can read the &quot;TOF stream&quot; files, typically suffixed with .tof.gaps
-These files are typically written by a TofPacketReader instance, e.g. as 
-on the TOF flight computer</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="gondola.io.TofPacketReader.count_packets">
-<span class="sig-name descname"><span class="pre">count_packets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.TofPacketReader.count_packets" title="Link to this definition">#</a></dt>
-<dd><p>Run once over the entire file, skipping most of its content 
-but retrieve the number of packets available.</p>
-<p>After a succesful count, the reader is rewound automatically</p>
-<dl class="simple">
-<dt># Returns:</dt><dd><p>number of packets in the current file or, if multiple files given, 
-all of them.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="gondola.io.TofPacketReader.current_filename">
-<span class="sig-name descname"><span class="pre">current_filename</span></span><a class="headerlink" href="#gondola.io.TofPacketReader.current_filename" title="Link to this definition">#</a></dt>
-<dd><p>This is the filename we are currently 
-extracting frames from</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="gondola.io.TofPacketReader.filenames">
-<span class="sig-name descname"><span class="pre">filenames</span></span><a class="headerlink" href="#gondola.io.TofPacketReader.filenames" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="gondola.io.TofPacketReader.first">
-<span class="sig-name descname"><span class="pre">first</span></span><a class="headerlink" href="#gondola.io.TofPacketReader.first" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="gondola.io.TofPacketReader.last">
-<span class="sig-name descname"><span class="pre">last</span></span><a class="headerlink" href="#gondola.io.TofPacketReader.last" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="gondola.io.TofPacketReader.rewind">
-<span class="sig-name descname"><span class="pre">rewind</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.TofPacketReader.rewind" title="Link to this definition">#</a></dt>
-<dd><p>Start the reader from the beginning
-This is equivalent to a re-initialization
-of that reader.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="gondola.io.TelemetryPacketReader">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.io.</span></span><span class="sig-name descname"><span class="pre">TelemetryPacketReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filenames_or_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dedup</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.TelemetryPacketReader" title="Link to this definition">#</a></dt>
-<dd><p>Read serialized TelemetryPackets from an existing file</p>
-<p>Read GAPS binary files (&quot;Berkeley binaries)</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="gondola.io.TelemetryPacketReader.cache_all_packets">
-<span class="sig-name descname"><span class="pre">cache_all_packets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.TelemetryPacketReader.cache_all_packets" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="gondola.io.TelemetryPacketReader.copy_packet_cache">
-<span class="sig-name descname"><span class="pre">copy_packet_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.TelemetryPacketReader.copy_packet_cache" title="Link to this definition">#</a></dt>
-<dd><p>Retrieve a copy of the internal packet cache.
-This will only yield a meaningful result after 
-a call to .cache_all_packets(). Since the entire
-cache is copied in the processs, this is slow 
-and might only be helpful for debugging.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="gondola.io.TelemetryPacketReader.count_packets">
-<span class="sig-name descname"><span class="pre">count_packets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.TelemetryPacketReader.count_packets" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="gondola.io.TelemetryPacketReader.current_filename">
-<span class="sig-name descname"><span class="pre">current_filename</span></span><a class="headerlink" href="#gondola.io.TelemetryPacketReader.current_filename" title="Link to this definition">#</a></dt>
-<dd><p>This is the filename we are currently 
-extracting frames from</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="gondola.io.TelemetryPacketReader.filenames">
-<span class="sig-name descname"><span class="pre">filenames</span></span><a class="headerlink" href="#gondola.io.TelemetryPacketReader.filenames" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="gondola.io.TelemetryPacketReader.n_duplicates">
-<span class="sig-name descname"><span class="pre">n_duplicates</span></span><a class="headerlink" href="#gondola.io.TelemetryPacketReader.n_duplicates" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="gondola.io.TelemetryPacketReader.rewind">
-<span class="sig-name descname"><span class="pre">rewind</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.TelemetryPacketReader.rewind" title="Link to this definition">#</a></dt>
-<dd><p>Start the reader from the beginning
-This is equivalent to a re-initialization
-of that reader.</p>
-</dd></dl>
-
+<dl class="py function">
+<dt class="sig sig-object py" id="gondola.io.create_compressed_diff">
+<span class="sig-prename descclassname"><span class="pre">gondola.io.</span></span><span class="sig-name descname"><span class="pre">create_compressed_diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.create_compressed_diff" title="Link to this definition">#</a></dt>
+<dd><p>Computes the diff between two files, compresses the diff output, and returns it.</p>
+<p># Arguments
+* <cite>old_path</cite> - Path to the original file
+* <cite>new_path</cite> - Path to the modified file</p>
 </dd></dl>
 
 <dl class="py function">
@@ -745,8 +544,31 @@ by telemetry</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="gondola.io.grace_get_telemetry_binaries">
 <span class="sig-prename descclassname"><span class="pre">gondola.io.</span></span><span class="sig-name descname"><span class="pre">grace_get_telemetry_binaries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unix_time_start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unix_time_stop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/gaps_binaries/live/raw/ethernet'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.io.grace_get_telemetry_binaries" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the relevant telemetry data files for time period from a directory. 
+This function is preferred over get_telemetry_binaries, since it is more 
+precise in constricting the time range</p>
+<dl class="simple">
+<dt># Arguments</dt><dd><ul class="simple">
+<li><p>unix_time_start : seconds since epoch for run start</p></li>
+<li><p>unix_time_end   : seconds since epoch for run end</p></li>
+</ul>
+</dd>
+<dt># Keyword Arguments</dt><dd><ul class="simple">
+<li><p>data_dir        : folder with telemetry binaries ('.bin')</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
+<p class="rubric">Modules</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="gondola.io.streamers.html#module-gondola.io.streamers" title="gondola.io.streamers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">streamers</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </section>
 
 
@@ -769,11 +591,11 @@ by telemetry</p>
       </div>
     </a>
     <a class="right-next"
-       href="gondola.reconstruction.html"
+       href="gondola.io.streamers.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">gondola.reconstruction</p>
+        <p class="prev-next-title">gondola.io.streamers</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -796,53 +618,16 @@ by telemetry</p>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.CRFrameObject"><code class="docutils literal notranslate"><span class="pre">CRFrameObject</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.CRReader"><code class="docutils literal notranslate"><span class="pre">CRReader</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.CRReader.count_frames"><code class="docutils literal notranslate"><span class="pre">CRReader.count_frames()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.CRReader.current_filename"><code class="docutils literal notranslate"><span class="pre">CRReader.current_filename</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.CRReader.rewind"><code class="docutils literal notranslate"><span class="pre">CRReader.rewind()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.CRReader.set_tracker_calibrations_from_fnames"><code class="docutils literal notranslate"><span class="pre">CRReader.set_tracker_calibrations_from_fnames()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.CRWriter"><code class="docutils literal notranslate"><span class="pre">CRWriter</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.CRWriter.add_frame"><code class="docutils literal notranslate"><span class="pre">CRWriter.add_frame()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.CRWriter.set_file_timestamp"><code class="docutils literal notranslate"><span class="pre">CRWriter.set_file_timestamp()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.CRWriter.set_mbytes_per_file"><code class="docutils literal notranslate"><span class="pre">CRWriter.set_mbytes_per_file()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.CRFrame"><code class="docutils literal notranslate"><span class="pre">CRFrame</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.CRFrame.delete"><code class="docutils literal notranslate"><span class="pre">CRFrame.delete()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.CRFrame.do_trk_calib"><code class="docutils literal notranslate"><span class="pre">CRFrame.do_trk_calib</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.CRFrame.get_telemetryevent"><code class="docutils literal notranslate"><span class="pre">CRFrame.get_telemetryevent()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.CRFrame.get_telemetrypacket"><code class="docutils literal notranslate"><span class="pre">CRFrame.get_telemetrypacket()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.CRFrame.get_tofevent"><code class="docutils literal notranslate"><span class="pre">CRFrame.get_tofevent()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.CRFrame.get_tofpacket"><code class="docutils literal notranslate"><span class="pre">CRFrame.get_tofpacket()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.CRFrame.has"><code class="docutils literal notranslate"><span class="pre">CRFrame.has()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.CRFrame.index"><code class="docutils literal notranslate"><span class="pre">CRFrame.index</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.CRFrame.put_telemetrypacket"><code class="docutils literal notranslate"><span class="pre">CRFrame.put_telemetrypacket()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.CRFrame.put_tofpacket"><code class="docutils literal notranslate"><span class="pre">CRFrame.put_tofpacket()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.CRFrame.telemetry_event_names"><code class="docutils literal notranslate"><span class="pre">CRFrame.telemetry_event_names</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.TofPacketReader"><code class="docutils literal notranslate"><span class="pre">TofPacketReader</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.TofPacketReader.count_packets"><code class="docutils literal notranslate"><span class="pre">TofPacketReader.count_packets()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.TofPacketReader.current_filename"><code class="docutils literal notranslate"><span class="pre">TofPacketReader.current_filename</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.TofPacketReader.filenames"><code class="docutils literal notranslate"><span class="pre">TofPacketReader.filenames</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.TofPacketReader.first"><code class="docutils literal notranslate"><span class="pre">TofPacketReader.first</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.TofPacketReader.last"><code class="docutils literal notranslate"><span class="pre">TofPacketReader.last</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.TofPacketReader.rewind"><code class="docutils literal notranslate"><span class="pre">TofPacketReader.rewind()</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.TelemetryPacketReader"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketReader</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.TelemetryPacketReader.cache_all_packets"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketReader.cache_all_packets()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.TelemetryPacketReader.copy_packet_cache"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketReader.copy_packet_cache()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.TelemetryPacketReader.count_packets"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketReader.count_packets()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.TelemetryPacketReader.current_filename"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketReader.current_filename</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.TelemetryPacketReader.filenames"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketReader.filenames</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.TelemetryPacketReader.n_duplicates"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketReader.n_duplicates</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.TelemetryPacketReader.rewind"><code class="docutils literal notranslate"><span class="pre">TelemetryPacketReader.rewind()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.list_path_contents_sorted"><code class="docutils literal notranslate"><span class="pre">list_path_contents_sorted()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.get_utc_now"><code class="docutils literal notranslate"><span class="pre">get_utc_now()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.get_utc_date"><code class="docutils literal notranslate"><span class="pre">get_utc_date()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.get_datetime"><code class="docutils literal notranslate"><span class="pre">get_datetime()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.get_rundata_from_file"><code class="docutils literal notranslate"><span class="pre">get_rundata_from_file()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.get_unix_timestamp"><code class="docutils literal notranslate"><span class="pre">get_unix_timestamp()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.apply_diff_to_file"><code class="docutils literal notranslate"><span class="pre">apply_diff_to_file()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.compress_toml"><code class="docutils literal notranslate"><span class="pre">compress_toml()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.decompress_toml"><code class="docutils literal notranslate"><span class="pre">decompress_toml()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.create_compressed_diff"><code class="docutils literal notranslate"><span class="pre">create_compressed_diff()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.get_ts_from_binfile"><code class="docutils literal notranslate"><span class="pre">get_ts_from_binfile()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.get_telemetry_binaries"><code class="docutils literal notranslate"><span class="pre">get_telemetry_binaries()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.io.grace_get_telemetry_binaries"><code class="docutils literal notranslate"><span class="pre">grace_get_telemetry_binaries()</span></code></a></li>
