@@ -222,16 +222,16 @@
 <a href=#222 id=222 data-nosnippet>222</a>        </span><span class="kw">match </span>settings.tot_threshold_low {
 <a href=#223 id=223 data-nosnippet>223</a>          <span class="prelude-val">Some</span>(thr) =&gt; {
 <a href=#224 id=224 data-nosnippet>224</a>            <span class="kw">let </span>th_low_sl     = time_over_threshold(<span class="kw-2">&amp;</span>voltages, <span class="kw-2">&amp;</span>times, thr); 
-<a href=#225 id=225 data-nosnippet>225</a>            hit.TOT_low_a     = f16::from_f32(th_low_sl.<span class="number">0</span>);
-<a href=#226 id=226 data-nosnippet>226</a>            hit.TOT_slp_low_a = f16::from_f32(th_low_sl.<span class="number">1</span>);
+<a href=#225 id=225 data-nosnippet>225</a>            hit.tot_low_a     = f16::from_f32(th_low_sl.<span class="number">0</span>);
+<a href=#226 id=226 data-nosnippet>226</a>            hit.tot_slp_low_a = f16::from_f32(th_low_sl.<span class="number">1</span>);
 <a href=#227 id=227 data-nosnippet>227</a>          } 
 <a href=#228 id=228 data-nosnippet>228</a>          <span class="prelude-val">None </span>=&gt; () 
 <a href=#229 id=229 data-nosnippet>229</a>        }
 <a href=#230 id=230 data-nosnippet>230</a>        <span class="kw">match </span>settings.tot_threshold_high {
 <a href=#231 id=231 data-nosnippet>231</a>          <span class="prelude-val">Some</span>(thr) =&gt; {
 <a href=#232 id=232 data-nosnippet>232</a>            <span class="kw">let </span>th_high_sl      = time_over_threshold(<span class="kw-2">&amp;</span>voltages, <span class="kw-2">&amp;</span>times, thr); 
-<a href=#233 id=233 data-nosnippet>233</a>            hit.TOT_high_a      = f16::from_f32(th_high_sl.<span class="number">0</span>);
-<a href=#234 id=234 data-nosnippet>234</a>            hit.TOT_slp_high_a  = f16::from_f32(th_high_sl.<span class="number">1</span>);
+<a href=#233 id=233 data-nosnippet>233</a>            hit.tot_high_a      = f16::from_f32(th_high_sl.<span class="number">0</span>);
+<a href=#234 id=234 data-nosnippet>234</a>            hit.tot_slp_high_a  = f16::from_f32(th_high_sl.<span class="number">1</span>);
 <a href=#235 id=235 data-nosnippet>235</a>          } 
 <a href=#236 id=236 data-nosnippet>236</a>          <span class="prelude-val">None </span>=&gt; () 
 <a href=#237 id=237 data-nosnippet>237</a>        }
@@ -249,16 +249,16 @@
 <a href=#249 id=249 data-nosnippet>249</a>        </span><span class="kw">match </span>settings.tot_threshold_low {
 <a href=#250 id=250 data-nosnippet>250</a>          <span class="prelude-val">Some</span>(thr) =&gt; {
 <a href=#251 id=251 data-nosnippet>251</a>            <span class="kw">let </span>th_low_sl   = time_over_threshold(<span class="kw-2">&amp;</span>voltages, <span class="kw-2">&amp;</span>times, thr); 
-<a href=#252 id=252 data-nosnippet>252</a>            hit.TOT_low_b     = f16::from_f32(th_low_sl.<span class="number">0</span>);
-<a href=#253 id=253 data-nosnippet>253</a>            hit.TOT_slp_low_b = f16::from_f32(th_low_sl.<span class="number">1</span>);
+<a href=#252 id=252 data-nosnippet>252</a>            hit.tot_low_b     = f16::from_f32(th_low_sl.<span class="number">0</span>);
+<a href=#253 id=253 data-nosnippet>253</a>            hit.tot_slp_low_b = f16::from_f32(th_low_sl.<span class="number">1</span>);
 <a href=#254 id=254 data-nosnippet>254</a>          } 
 <a href=#255 id=255 data-nosnippet>255</a>          <span class="prelude-val">None </span>=&gt; () 
 <a href=#256 id=256 data-nosnippet>256</a>        }
 <a href=#257 id=257 data-nosnippet>257</a>        <span class="kw">match </span>settings.tot_threshold_high {
 <a href=#258 id=258 data-nosnippet>258</a>          <span class="prelude-val">Some</span>(thr) =&gt; {
 <a href=#259 id=259 data-nosnippet>259</a>            <span class="kw">let </span>th_high_sl  = time_over_threshold(<span class="kw-2">&amp;</span>voltages, <span class="kw-2">&amp;</span>times, thr); 
-<a href=#260 id=260 data-nosnippet>260</a>            hit.TOT_high_b     = f16::from_f32(th_high_sl.<span class="number">0</span>);
-<a href=#261 id=261 data-nosnippet>261</a>            hit.TOT_slp_high_b = f16::from_f32(th_high_sl.<span class="number">1</span>);
+<a href=#260 id=260 data-nosnippet>260</a>            hit.tot_high_b     = f16::from_f32(th_high_sl.<span class="number">0</span>);
+<a href=#261 id=261 data-nosnippet>261</a>            hit.tot_slp_high_b = f16::from_f32(th_high_sl.<span class="number">1</span>);
 <a href=#262 id=262 data-nosnippet>262</a>          } 
 <a href=#263 id=263 data-nosnippet>263</a>          <span class="prelude-val">None </span>=&gt; () 
 <a href=#264 id=264 data-nosnippet>264</a>        }

@@ -83,14 +83,14 @@
 <a href=#83 id=83 data-nosnippet>83</a>  <span class="kw">pub </span>baseline_b_rms : f16,
 <a href=#84 id=84 data-nosnippet>84</a>  <span class="comment">// phase of the sine fit
 <a href=#85 id=85 data-nosnippet>85</a>  </span><span class="kw">pub </span>phase          : f16,
-<a href=#86 id=86 data-nosnippet>86</a>  <span class="kw">pub </span>TOT_low_a      : f16,
-<a href=#87 id=87 data-nosnippet>87</a>  <span class="kw">pub </span>TOT_low_b      : f16,
-<a href=#88 id=88 data-nosnippet>88</a>  <span class="kw">pub </span>TOT_high_a     : f16,
-<a href=#89 id=89 data-nosnippet>89</a>  <span class="kw">pub </span>TOT_high_b     : f16,
-<a href=#90 id=90 data-nosnippet>90</a>  <span class="kw">pub </span>TOT_slp_low_a  : f16,
-<a href=#91 id=91 data-nosnippet>91</a>  <span class="kw">pub </span>TOT_slp_low_b  : f16,
-<a href=#92 id=92 data-nosnippet>92</a>  <span class="kw">pub </span>TOT_slp_high_a : f16, 
-<a href=#93 id=93 data-nosnippet>93</a>  <span class="kw">pub </span>TOT_slp_high_b : f16,
+<a href=#86 id=86 data-nosnippet>86</a>  <span class="kw">pub </span>tot_low_a      : f16,
+<a href=#87 id=87 data-nosnippet>87</a>  <span class="kw">pub </span>tot_low_b      : f16,
+<a href=#88 id=88 data-nosnippet>88</a>  <span class="kw">pub </span>tot_high_a     : f16,
+<a href=#89 id=89 data-nosnippet>89</a>  <span class="kw">pub </span>tot_high_b     : f16,
+<a href=#90 id=90 data-nosnippet>90</a>  <span class="kw">pub </span>tot_slp_low_a  : f16,
+<a href=#91 id=91 data-nosnippet>91</a>  <span class="kw">pub </span>tot_slp_low_b  : f16,
+<a href=#92 id=92 data-nosnippet>92</a>  <span class="kw">pub </span>tot_slp_high_a : f16, 
+<a href=#93 id=93 data-nosnippet>93</a>  <span class="kw">pub </span>tot_slp_high_b : f16,
 <a href=#94 id=94 data-nosnippet>94</a>  <span class="comment">//-------------------------------
 <a href=#95 id=95 data-nosnippet>95</a>  // NON-SERIALIZED FIELDS
 <a href=#96 id=96 data-nosnippet>96</a>  //-------------------------------
@@ -142,14 +142,14 @@
 <a href=#142 id=142 data-nosnippet>142</a>      baseline_b      : f16::from_f32(<span class="number">0.0</span>),
 <a href=#143 id=143 data-nosnippet>143</a>      baseline_b_rms  : f16::from_f32(<span class="number">0.0</span>),
 <a href=#144 id=144 data-nosnippet>144</a>      phase           : f16::from_f32(<span class="number">0.0</span>),
-<a href=#145 id=145 data-nosnippet>145</a>      TOT_low_a       : f16::from_f32(<span class="number">0.0</span>),
-<a href=#146 id=146 data-nosnippet>146</a>      TOT_low_b       : f16::from_f32(<span class="number">0.0</span>),
-<a href=#147 id=147 data-nosnippet>147</a>      TOT_high_a      : f16::from_f32(<span class="number">0.0</span>),
-<a href=#148 id=148 data-nosnippet>148</a>      TOT_high_b      : f16::from_f32(<span class="number">0.0</span>),
-<a href=#149 id=149 data-nosnippet>149</a>      TOT_slp_low_a   : f16::from_f32(<span class="number">0.0</span>),
-<a href=#150 id=150 data-nosnippet>150</a>      TOT_slp_low_b   : f16::from_f32(<span class="number">0.0</span>),
-<a href=#151 id=151 data-nosnippet>151</a>      TOT_slp_high_a  : f16::from_f32(<span class="number">0.0</span>),
-<a href=#152 id=152 data-nosnippet>152</a>      TOT_slp_high_b  : f16::from_f32(<span class="number">0.0</span>),
+<a href=#145 id=145 data-nosnippet>145</a>      tot_low_a       : f16::from_f32(<span class="number">0.0</span>),
+<a href=#146 id=146 data-nosnippet>146</a>      tot_low_b       : f16::from_f32(<span class="number">0.0</span>),
+<a href=#147 id=147 data-nosnippet>147</a>      tot_high_a      : f16::from_f32(<span class="number">0.0</span>),
+<a href=#148 id=148 data-nosnippet>148</a>      tot_high_b      : f16::from_f32(<span class="number">0.0</span>),
+<a href=#149 id=149 data-nosnippet>149</a>      tot_slp_low_a   : f16::from_f32(<span class="number">0.0</span>),
+<a href=#150 id=150 data-nosnippet>150</a>      tot_slp_low_b   : f16::from_f32(<span class="number">0.0</span>),
+<a href=#151 id=151 data-nosnippet>151</a>      tot_slp_high_a  : f16::from_f32(<span class="number">0.0</span>),
+<a href=#152 id=152 data-nosnippet>152</a>      tot_slp_high_b  : f16::from_f32(<span class="number">0.0</span>),
 <a href=#153 id=153 data-nosnippet>153</a>    }
 <a href=#154 id=154 data-nosnippet>154</a>  }
 <a href=#155 id=155 data-nosnippet>155</a>  
@@ -581,34 +581,34 @@
 <a href=#581 id=581 data-nosnippet>581</a>  }
 <a href=#582 id=582 data-nosnippet>582</a>  
 <a href=#583 id=583 data-nosnippet>583</a>  <span class="kw">pub fn </span>get_tot_low_a(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
-<a href=#584 id=584 data-nosnippet>584</a>    <span class="self">self</span>.TOT_low_a.to_f32()
+<a href=#584 id=584 data-nosnippet>584</a>    <span class="self">self</span>.tot_low_a.to_f32()
 <a href=#585 id=585 data-nosnippet>585</a>  }
 <a href=#586 id=586 data-nosnippet>586</a>
 <a href=#587 id=587 data-nosnippet>587</a>  <span class="kw">pub fn </span>get_tot_low_b(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
-<a href=#588 id=588 data-nosnippet>588</a>    <span class="self">self</span>.TOT_low_b.to_f32()
+<a href=#588 id=588 data-nosnippet>588</a>    <span class="self">self</span>.tot_low_b.to_f32()
 <a href=#589 id=589 data-nosnippet>589</a>  }
 <a href=#590 id=590 data-nosnippet>590</a>
 <a href=#591 id=591 data-nosnippet>591</a>  <span class="kw">pub fn </span>get_tot_high_a(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
-<a href=#592 id=592 data-nosnippet>592</a>    <span class="self">self</span>.TOT_high_a.to_f32()
+<a href=#592 id=592 data-nosnippet>592</a>    <span class="self">self</span>.tot_high_a.to_f32()
 <a href=#593 id=593 data-nosnippet>593</a>  }
 <a href=#594 id=594 data-nosnippet>594</a>
 <a href=#595 id=595 data-nosnippet>595</a>  <span class="kw">pub fn </span>get_tot_high_b(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
-<a href=#596 id=596 data-nosnippet>596</a>    <span class="self">self</span>.TOT_high_b.to_f32()
+<a href=#596 id=596 data-nosnippet>596</a>    <span class="self">self</span>.tot_high_b.to_f32()
 <a href=#597 id=597 data-nosnippet>597</a>  }
 <a href=#598 id=598 data-nosnippet>598</a>
 <a href=#599 id=599 data-nosnippet>599</a>  <span class="kw">pub fn </span>get_tot_slp_low_a(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
-<a href=#600 id=600 data-nosnippet>600</a>    <span class="self">self</span>.TOT_slp_low_a.to_f32()
+<a href=#600 id=600 data-nosnippet>600</a>    <span class="self">self</span>.tot_slp_low_a.to_f32()
 <a href=#601 id=601 data-nosnippet>601</a>  }
 <a href=#602 id=602 data-nosnippet>602</a>
 <a href=#603 id=603 data-nosnippet>603</a>  <span class="kw">pub fn </span>get_tot_slp_low_b(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
-<a href=#604 id=604 data-nosnippet>604</a>    <span class="self">self</span>.TOT_slp_low_b.to_f32()
+<a href=#604 id=604 data-nosnippet>604</a>    <span class="self">self</span>.tot_slp_low_b.to_f32()
 <a href=#605 id=605 data-nosnippet>605</a>  }
 <a href=#606 id=606 data-nosnippet>606</a>
 <a href=#607 id=607 data-nosnippet>607</a>  <span class="kw">pub fn </span>get_tot_slp_high_a(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
-<a href=#608 id=608 data-nosnippet>608</a>    <span class="self">self</span>.TOT_slp_high_a.to_f32()
+<a href=#608 id=608 data-nosnippet>608</a>    <span class="self">self</span>.tot_slp_high_a.to_f32()
 <a href=#609 id=609 data-nosnippet>609</a>  }
 <a href=#610 id=610 data-nosnippet>610</a>  <span class="kw">pub fn </span>get_tot_slp_high_b(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
-<a href=#611 id=611 data-nosnippet>611</a>    <span class="self">self</span>.TOT_slp_high_b.to_f32()
+<a href=#611 id=611 data-nosnippet>611</a>    <span class="self">self</span>.tot_slp_high_b.to_f32()
 <a href=#612 id=612 data-nosnippet>612</a>  }
 <a href=#613 id=613 data-nosnippet>613</a>  <span class="kw">pub fn </span>get_peak_a(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
 <a href=#614 id=614 data-nosnippet>614</a>    <span class="self">self</span>.peak_a.to_f32()
@@ -811,20 +811,20 @@
 <a href=#811 id=811 data-nosnippet>811</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.peak_b      .to_le_bytes()); 
 <a href=#812 id=812 data-nosnippet>812</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.charge_a    .to_le_bytes()); 
 <a href=#813 id=813 data-nosnippet>813</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.charge_b    .to_le_bytes()); 
-<a href=#814 id=814 data-nosnippet>814</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.TOT_low_a   .to_le_bytes());
+<a href=#814 id=814 data-nosnippet>814</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.tot_low_a   .to_le_bytes());
 <a href=#815 id=815 data-nosnippet>815</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_a   .to_le_bytes());
 <a href=#816 id=816 data-nosnippet>816</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_a_rms.to_le_bytes());
 <a href=#817 id=817 data-nosnippet>817</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.phase       .to_le_bytes());
 <a href=#818 id=818 data-nosnippet>818</a>    bytestream.push(<span class="self">self</span>.version.to_u8());
 <a href=#819 id=819 data-nosnippet>819</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_b  .to_le_bytes());
 <a href=#820 id=820 data-nosnippet>820</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.baseline_b_rms.to_le_bytes());
-<a href=#821 id=821 data-nosnippet>821</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.TOT_low_b   .to_le_bytes());
-<a href=#822 id=822 data-nosnippet>822</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.TOT_high_a  .to_le_bytes());
-<a href=#823 id=823 data-nosnippet>823</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.TOT_high_b  .to_le_bytes());
-<a href=#824 id=824 data-nosnippet>824</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.TOT_slp_low_a.to_le_bytes());
-<a href=#825 id=825 data-nosnippet>825</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.TOT_slp_low_b.to_le_bytes());
-<a href=#826 id=826 data-nosnippet>826</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.TOT_slp_high_a.to_le_bytes());
-<a href=#827 id=827 data-nosnippet>827</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.TOT_slp_high_b.to_le_bytes());
+<a href=#821 id=821 data-nosnippet>821</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.tot_low_b   .to_le_bytes());
+<a href=#822 id=822 data-nosnippet>822</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.tot_high_a  .to_le_bytes());
+<a href=#823 id=823 data-nosnippet>823</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.tot_high_b  .to_le_bytes());
+<a href=#824 id=824 data-nosnippet>824</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.tot_slp_low_a.to_le_bytes());
+<a href=#825 id=825 data-nosnippet>825</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.tot_slp_low_b.to_le_bytes());
+<a href=#826 id=826 data-nosnippet>826</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.tot_slp_high_a.to_le_bytes());
+<a href=#827 id=827 data-nosnippet>827</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.tot_slp_high_b.to_le_bytes());
 <a href=#828 id=828 data-nosnippet>828</a>    bytestream.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">Self</span>::TAIL       .to_le_bytes()); 
 <a href=#829 id=829 data-nosnippet>829</a>    bytestream
 <a href=#830 id=830 data-nosnippet>830</a>  }
@@ -861,7 +861,7 @@
 <a href=#861 id=861 data-nosnippet>861</a>    pp.peak_b         = parse_f16(stream, pos);
 <a href=#862 id=862 data-nosnippet>862</a>    pp.charge_a       = parse_f16(stream, pos);
 <a href=#863 id=863 data-nosnippet>863</a>    pp.charge_b       = parse_f16(stream, pos);
-<a href=#864 id=864 data-nosnippet>864</a>    pp.TOT_low_a      = parse_f16(stream, pos);
+<a href=#864 id=864 data-nosnippet>864</a>    pp.tot_low_a      = parse_f16(stream, pos);
 <a href=#865 id=865 data-nosnippet>865</a>    pp.baseline_a     = parse_f16(stream, pos);
 <a href=#866 id=866 data-nosnippet>866</a>    pp.baseline_a_rms = parse_f16(stream, pos);
 <a href=#867 id=867 data-nosnippet>867</a>    <span class="kw">let </span><span class="kw-2">mut </span>phase_vec = Vec::&lt;u8&gt;::new();
@@ -878,13 +878,13 @@
 <a href=#878 id=878 data-nosnippet>878</a>    pp.baseline_b      = parse_f16(stream, pos);
 <a href=#879 id=879 data-nosnippet>879</a>    pp.baseline_b_rms  = parse_f16(stream, pos);
 <a href=#880 id=880 data-nosnippet>880</a>    <span class="kw">if </span>!version_lt_011 {
-<a href=#881 id=881 data-nosnippet>881</a>      pp.TOT_low_b       = parse_f16(stream, pos);
-<a href=#882 id=882 data-nosnippet>882</a>      pp.TOT_high_a      = parse_f16(stream, pos);
-<a href=#883 id=883 data-nosnippet>883</a>      pp.TOT_high_b      = parse_f16(stream, pos);
-<a href=#884 id=884 data-nosnippet>884</a>      pp.TOT_slp_low_a   = parse_f16(stream, pos);
-<a href=#885 id=885 data-nosnippet>885</a>      pp.TOT_slp_low_b   = parse_f16(stream, pos);
-<a href=#886 id=886 data-nosnippet>886</a>      pp.TOT_slp_high_a  = parse_f16(stream, pos);
-<a href=#887 id=887 data-nosnippet>887</a>      pp.TOT_slp_high_b  = parse_f16(stream, pos);
+<a href=#881 id=881 data-nosnippet>881</a>      pp.tot_low_b       = parse_f16(stream, pos);
+<a href=#882 id=882 data-nosnippet>882</a>      pp.tot_high_a      = parse_f16(stream, pos);
+<a href=#883 id=883 data-nosnippet>883</a>      pp.tot_high_b      = parse_f16(stream, pos);
+<a href=#884 id=884 data-nosnippet>884</a>      pp.tot_slp_low_a   = parse_f16(stream, pos);
+<a href=#885 id=885 data-nosnippet>885</a>      pp.tot_slp_low_b   = parse_f16(stream, pos);
+<a href=#886 id=886 data-nosnippet>886</a>      pp.tot_slp_high_a  = parse_f16(stream, pos);
+<a href=#887 id=887 data-nosnippet>887</a>      pp.tot_slp_high_b  = parse_f16(stream, pos);
 <a href=#888 id=888 data-nosnippet>888</a>      <span class="kw-2">*</span>pos += <span class="number">2</span>; <span class="comment">// always have to do this when using verify fixed
 <a href=#889 id=889 data-nosnippet>889</a>    </span>} <span class="kw">else </span>{
 <a href=#890 id=890 data-nosnippet>890</a>      <span class="kw">let </span>tail = parse_u16(stream, pos);
@@ -920,14 +920,14 @@
 <a href=#920 id=920 data-nosnippet>920</a>    pp.phase           = f16::from_f32(rng.random::&lt;f32&gt;());
 <a href=#921 id=921 data-nosnippet>921</a>    
 <a href=#922 id=922 data-nosnippet>922</a>    <span class="kw">if </span>!version_lt_011 {
-<a href=#923 id=923 data-nosnippet>923</a>      pp.TOT_low_a      = f16::from_f32(rng.random::&lt;f32&gt;());
-<a href=#924 id=924 data-nosnippet>924</a>      pp.TOT_low_b      = f16::from_f32(rng.random::&lt;f32&gt;());
-<a href=#925 id=925 data-nosnippet>925</a>      pp.TOT_high_a     = f16::from_f32(rng.random::&lt;f32&gt;());
-<a href=#926 id=926 data-nosnippet>926</a>      pp.TOT_high_b     = f16::from_f32(rng.random::&lt;f32&gt;()); 
-<a href=#927 id=927 data-nosnippet>927</a>      pp.TOT_slp_low_a  = f16::from_f32(rng.random::&lt;f32&gt;());
-<a href=#928 id=928 data-nosnippet>928</a>      pp.TOT_slp_low_b  = f16::from_f32(rng.random::&lt;f32&gt;());
-<a href=#929 id=929 data-nosnippet>929</a>      pp.TOT_slp_high_a = f16::from_f32(rng.random::&lt;f32&gt;()); 
-<a href=#930 id=930 data-nosnippet>930</a>      pp.TOT_slp_high_b = f16::from_f32(rng.random::&lt;f32&gt;()); 
+<a href=#923 id=923 data-nosnippet>923</a>      pp.tot_low_a      = f16::from_f32(rng.random::&lt;f32&gt;());
+<a href=#924 id=924 data-nosnippet>924</a>      pp.tot_low_b      = f16::from_f32(rng.random::&lt;f32&gt;());
+<a href=#925 id=925 data-nosnippet>925</a>      pp.tot_high_a     = f16::from_f32(rng.random::&lt;f32&gt;());
+<a href=#926 id=926 data-nosnippet>926</a>      pp.tot_high_b     = f16::from_f32(rng.random::&lt;f32&gt;()); 
+<a href=#927 id=927 data-nosnippet>927</a>      pp.tot_slp_low_a  = f16::from_f32(rng.random::&lt;f32&gt;());
+<a href=#928 id=928 data-nosnippet>928</a>      pp.tot_slp_low_b  = f16::from_f32(rng.random::&lt;f32&gt;());
+<a href=#929 id=929 data-nosnippet>929</a>      pp.tot_slp_high_a = f16::from_f32(rng.random::&lt;f32&gt;()); 
+<a href=#930 id=930 data-nosnippet>930</a>      pp.tot_slp_high_b = f16::from_f32(rng.random::&lt;f32&gt;()); 
 <a href=#931 id=931 data-nosnippet>931</a>    }
 <a href=#932 id=932 data-nosnippet>932</a>    pp.paddle_len       = <span class="number">0.0</span>; 
 <a href=#933 id=933 data-nosnippet>933</a>    pp.coax_cable_time  = <span class="number">0.0</span>; 
