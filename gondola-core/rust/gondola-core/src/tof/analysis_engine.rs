@@ -222,16 +222,16 @@ pub fn waveform_analysis(event         : &mut RBEvent,
         match settings.tot_threshold_low {
           Some(thr) => {
             let th_low_sl     = time_over_threshold(&voltages, &times, thr); 
-            hit.TOT_low_a     = f16::from_f32(th_low_sl.0);
-            hit.TOT_slp_low_a = f16::from_f32(th_low_sl.1);
+            hit.tot_low_a     = f16::from_f32(th_low_sl.0);
+            hit.tot_slp_low_a = f16::from_f32(th_low_sl.1);
           } 
           None => () 
         }
         match settings.tot_threshold_high {
           Some(thr) => {
             let th_high_sl      = time_over_threshold(&voltages, &times, thr); 
-            hit.TOT_high_a      = f16::from_f32(th_high_sl.0);
-            hit.TOT_slp_high_a  = f16::from_f32(th_high_sl.1);
+            hit.tot_high_a      = f16::from_f32(th_high_sl.0);
+            hit.tot_slp_high_a  = f16::from_f32(th_high_sl.1);
           } 
           None => () 
         }
@@ -249,16 +249,16 @@ pub fn waveform_analysis(event         : &mut RBEvent,
         match settings.tot_threshold_low {
           Some(thr) => {
             let th_low_sl   = time_over_threshold(&voltages, &times, thr); 
-            hit.TOT_low_b     = f16::from_f32(th_low_sl.0);
-            hit.TOT_slp_low_b = f16::from_f32(th_low_sl.1);
+            hit.tot_low_b     = f16::from_f32(th_low_sl.0);
+            hit.tot_slp_low_b = f16::from_f32(th_low_sl.1);
           } 
           None => () 
         }
         match settings.tot_threshold_high {
           Some(thr) => {
             let th_high_sl  = time_over_threshold(&voltages, &times, thr); 
-            hit.TOT_high_b     = f16::from_f32(th_high_sl.0);
-            hit.TOT_slp_high_b = f16::from_f32(th_high_sl.1);
+            hit.tot_high_b     = f16::from_f32(th_high_sl.0);
+            hit.tot_slp_high_b = f16::from_f32(th_high_sl.1);
           } 
           None => () 
         }

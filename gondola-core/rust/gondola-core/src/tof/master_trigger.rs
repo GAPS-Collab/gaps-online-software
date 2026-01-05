@@ -43,8 +43,11 @@ use crate::io::ipbus::IPBus;
 use control::*;
 use registers::*;
 
+#[cfg(feature="pybindings")]
 use comfy_table::modifiers::UTF8_ROUND_CORNERS;
+#[cfg(feature="pybindings")]
 use comfy_table::presets::UTF8_FULL;
+#[cfg(feature="pybindings")]
 use comfy_table::*;
 
 /// helper function to parse output for TofBot
@@ -1598,7 +1601,7 @@ fn set_track_trigger_is_global(&mut self) -> PyResult<()> {
   }
 
 
-  fn get_ltb_links_ready(&mut self) -> PyResult<HashMap<u8, u32>> {
+fn get_ltb_links_ready(&mut self) -> PyResult<HashMap<u8, u32>> {
     let registers = [LT_LINK_READY0, LT_LINK_READY1,
                      LT_LINK_READY2, LT_LINK_READY3,
                      LT_LINK_READY4];

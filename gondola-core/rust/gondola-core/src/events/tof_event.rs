@@ -1432,7 +1432,7 @@ impl TofEvent {
 
   #[staticmethod]
   #[pyo3(name = "strip_packed_rbevents_for_pv3")]
-  fn strip_packed_rbevents_for_pv3_py(pack : &mut TofPacket, version : ProtocolVersion) 
+  fn strip_packed_rbevents_for_pv3_py(pack : &mut TofPacket) 
     -> PyResult<()> {
     match Self::strip_packed_rbevents_for_pv3(pack) {
       Err(err) => {

@@ -6,7 +6,6 @@
 
 use crate::prelude::*;
 
-
 /// Get the traces for a set of RBEvents
 ///
 /// This will return a cube of 
@@ -80,7 +79,7 @@ impl RBEvent {
     }
   }
 
-  #[deprecated(since="0.11", note="check seems meaningnless")] 
+  //#[deprecated(since="0.11", note="check seems meaningnless")] 
   pub fn trace_check(&self) -> bool {
     let mut check  = true;
     let mut nchan  = 0usize;

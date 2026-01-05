@@ -48,6 +48,7 @@ pub use run_statistics::RunStatistics;
 use std::collections::VecDeque;
 use std::collections::HashMap;
 
+#[cfg(feature="pybindings")]
 use crate::prelude::*;
 
 #[cfg(feature="pybindings")]

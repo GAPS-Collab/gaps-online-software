@@ -49,15 +49,34 @@ TelemetryPacketReader.__module__ = __name__
 TelemetryPacketReader.__name__  = 'TelemetryPacketReader' 
 
 list_path_contents_sorted     = _gc.io.list_path_contents_sorted
+list_path_contents_sorted.__module__ = __name__
+
 get_utc_now                   = _gc.io.get_utc_timestamp 
+get_utc_now.__module__        =  __name__
+
 get_utc_date                  = _gc.io.get_utc_date
+get_utc_date.__module__       = __name__ 
+
 get_datetime                  = _gc.io.get_datetime
+get_datetime.__module__       = __name__ 
+
 get_rundata_from_file         = _gc.io.get_rundata_from_file
+get_rundata_from_file.__module__ = __name__ 
+
 get_unix_timestamp            = _gc.io.get_unix_timestamp 
+get_unix_timestamp.__module__ = __name__ 
+
 apply_diff_to_file            = _gc.io.apply_diff_to_file 
+apply_diff_to_file.__module__ = __name__ 
+
 compress_toml                 = _gc.io.compress_toml 
+compress_toml.__module__      = __name__ 
+
 decompress_toml               = _gc.io.decompress_toml
+decompress_toml.__module__    = __name__ 
+
 create_compressed_diff        = _gc.io.create_compressed_diff 
+create_compressed_diff.__module__ = __name__ 
 
 #---------------------------------------------------
 
