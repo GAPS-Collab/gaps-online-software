@@ -176,11 +176,6 @@ configure_file(${SETUP_SCRIPT_SOURCE} ${SETUP_SCRIPT_DEST} @ONLY)
 ## Install the generated setup script during installation
 install(FILES ${SETUP_SCRIPT_DEST} DESTINATION ${CMAKE_INSTALL_PREFIX})
 
-## Install the python wrapper for the API
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/python/gaps-online/gaps_online
-        DESTINATION ${INSTALL_PYTHON_DIR}
-)
-
 ## ----------------------------------=---
 ## External dependencies (header only)
 ## ----------------------------------=---
