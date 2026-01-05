@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; gondola 0.11.45 documentation</title>
+    <title>Index &#8212; gondola 0.11.46 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=f546f064"></script>
+    <script src="_static/documentation_options.js?v=29a7b7ef"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
@@ -107,7 +107,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.11.45 documentation</p>
+    <p class="title logo__title">gondola 0.11.46 documentation</p>
   
 </a></div>
     
@@ -385,10 +385,6 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.CRWriter.add_frame">add_frame() (gondola.io.CRWriter method)</a>
-</li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.TofPacketWriter.add_tof_packet">add_tof_packet() (gondola.io.TofPacketWriter method)</a>
-</li>
       <li><a href="_autosummary/gondola.db.html#gondola.db.ReadoutBoard.all">all() (gondola.db.ReadoutBoard static method)</a>
 
       <ul>
@@ -420,6 +416,8 @@
 </li>
       </ul></li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.AnalysisEngineSettings">AnalysisEngineSettings (class in gondola.tof)</a>
+</li>
+      <li><a href="_autosummary/gondola.io.html#gondola.io.apply_diff_to_file">apply_diff_to_file() (in module gondola.io)</a>
 </li>
       <li><a href="_autosummary/gondola.events.html#gondola.events.RBWaveform.apply_spike_filter">apply_spike_filter() (gondola.events.RBWaveform method)</a>
 </li>
@@ -463,8 +461,6 @@
 </li>
       <li><a href="_autosummary/gondola.db.html#gondola.db.TofPaddle.cable_len">cable_len (gondola.db.TofPaddle attribute)</a>
 </li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.TelemetryPacketReader.cache_all_packets">cache_all_packets() (gondola.io.TelemetryPacketReader method)</a>
-</li>
       <li><a href="_autosummary/gondola.events.html#gondola.events.TofEvent.calc_gcu_variables">calc_gcu_variables() (gondola.events.TofEvent method)</a>
 </li>
       <li><a href="_autosummary/gondola.events.html#gondola.events.RBWaveform.calibrate">calibrate() (gondola.events.RBWaveform method)</a>
@@ -501,6 +497,8 @@
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofDetectorStatus.channels256_297">channels256_297 (gondola.tof.TofDetectorStatus attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofDetectorStatus.channels298_319">channels298_319 (gondola.tof.TofDetectorStatus attribute)</a>
 </li>
       <li><a href="_autosummary/gondola.events.html#gondola.events.TofHit.charge_a">charge_a (gondola.events.TofHit attribute)</a>
@@ -509,8 +507,6 @@
 </li>
       <li><a href="_autosummary/gondola.events.html#gondola.events.RBWaveform.charge_a_trap">charge_a_trap (gondola.events.RBWaveform attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/gondola.events.html#gondola.events.TofHit.charge_b">charge_b (gondola.events.TofHit attribute)</a>
 </li>
       <li><a href="_autosummary/gondola.events.html#gondola.events.RBWaveform.charge_b_below_500_trap">charge_b_below_500_trap (gondola.events.RBWaveform attribute)</a>
@@ -531,6 +527,8 @@
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofCommand.command_code">command_code (gondola.tof.TofCommand attribute)</a>
 </li>
+      <li><a href="_autosummary/gondola.io.html#gondola.io.compress_toml">compress_toml() (in module gondola.io)</a>
+</li>
       <li><a href="_autosummary/gondola.db.html#gondola.db.TrackerStrip.coordinates">coordinates (gondola.db.TrackerStrip attribute)</a>
 </li>
       <li><a href="_autosummary/gondola.events.html#gondola.events.TofEvent.copy">copy() (gondola.events.TofEvent method)</a>
@@ -539,34 +537,10 @@
         <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofCuts.copy">(gondola.tof.TofCuts method)</a>
 </li>
       </ul></li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.TelemetryPacketReader.copy_packet_cache">copy_packet_cache() (gondola.io.TelemetryPacketReader method)</a>
-</li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofCuts.cos_theta_acc">cos_theta_acc (gondola.tof.TofCuts attribute)</a>
 </li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.CRReader.count_frames">count_frames() (gondola.io.CRReader method)</a>
+      <li><a href="_autosummary/gondola.io.html#gondola.io.create_compressed_diff">create_compressed_diff() (in module gondola.io)</a>
 </li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.TelemetryPacketReader.count_packets">count_packets() (gondola.io.TelemetryPacketReader method)</a>
-
-      <ul>
-        <li><a href="_autosummary/gondola.io.html#gondola.io.TofPacketReader.count_packets">(gondola.io.TofPacketReader method)</a>
-</li>
-      </ul></li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.CRFrame">CRFrame (class in gondola.io)</a>
-</li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.CRFrameObject">CRFrameObject (class in gondola.io)</a>
-</li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.CRReader">CRReader (class in gondola.io)</a>
-</li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.CRWriter">CRWriter (class in gondola.io)</a>
-</li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.CRReader.current_filename">current_filename (gondola.io.CRReader attribute)</a>
-
-      <ul>
-        <li><a href="_autosummary/gondola.io.html#gondola.io.TelemetryPacketReader.current_filename">(gondola.io.TelemetryPacketReader attribute)</a>
-</li>
-        <li><a href="_autosummary/gondola.io.html#gondola.io.TofPacketReader.current_filename">(gondola.io.TofPacketReader attribute)</a>
-</li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -579,6 +553,8 @@
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofCommandCode.DataRunStop">DataRunStop (gondola.tof.TofCommandCode attribute)</a>
 </li>
+      <li><a href="_autosummary/gondola.io.html#gondola.io.decompress_toml">decompress_toml() (in module gondola.io)</a>
+</li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofOperationMode.Default">Default (gondola.tof.TofOperationMode attribute)</a>
 </li>
       <li><a href="_autosummary/gondola.tof.analysis.html#gondola.tof.analysis.TofAnalysis.define_bins">define_bins() (gondola.tof.analysis.TofAnalysis method)</a>
@@ -589,19 +565,15 @@
         <li><a href="_autosummary/gondola.tracker.analysis.html#gondola.tracker.analysis.TrackerAnalysis.define_bins">(gondola.tracker.analysis.TrackerAnalysis method)</a>
 </li>
       </ul></li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.CRFrame.delete">delete() (gondola.io.CRFrame method)</a>
-</li>
       <li><a href="_autosummary/gondola.db.html#gondola.db.TrackerStrip.detector_coordinates">detector_coordinates (gondola.db.TrackerStrip attribute)</a>
-</li>
-      <li><a href="_autosummary/gondola.reconstruction.html#gondola.reconstruction.FitStatus.DidNotConverge">DidNotConverge (gondola.reconstruction.FitStatus attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/gondola.reconstruction.html#gondola.reconstruction.FitStatus.DidNotConverge">DidNotConverge (gondola.reconstruction.FitStatus attribute)</a>
+</li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.MasterTrigger.disable_cyclic_trig">disable_cyclic_trig() (gondola.tof.MasterTrigger method)</a>
 </li>
       <li><a href="_autosummary/gondola.events.html#gondola.events.TofHit.distance">distance() (gondola.events.TofHit method)</a>
-</li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.CRFrame.do_trk_calib">do_trk_calib (gondola.io.CRFrame attribute)</a>
 </li>
       <li><a href="_autosummary/gondola.db.html#gondola.db.TofPaddle.draw_xy">draw_xy() (gondola.db.TofPaddle method)</a>
 </li>
@@ -681,12 +653,6 @@
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofCuts.fho_must_panel7_acc">fho_must_panel7_acc (gondola.tof.TofCuts attribute)</a>
 </li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.TelemetryPacketReader.filenames">filenames (gondola.io.TelemetryPacketReader attribute)</a>
-
-      <ul>
-        <li><a href="_autosummary/gondola.io.html#gondola.io.TofPacketReader.filenames">(gondola.io.TofPacketReader attribute)</a>
-</li>
-      </ul></li>
       <li><a href="_autosummary/gondola.reconstruction.html#gondola.reconstruction.Reconstruction.fill_histograms">fill_histograms() (gondola.reconstruction.Reconstruction method)</a>
 
       <ul>
@@ -713,8 +679,6 @@
         <li><a href="_autosummary/gondola.tracker.analysis.html#gondola.tracker.analysis.TrackerAnalysis.finish">(gondola.tracker.analysis.TrackerAnalysis method)</a>
 </li>
       </ul></li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.TofPacketReader.first">first (gondola.io.TofPacketReader attribute)</a>
-</li>
       <li><a href="_autosummary/gondola.reconstruction.html#gondola.reconstruction.FitStatus">FitStatus (class in gondola.reconstruction)</a>
 </li>
       <li><a href="_autosummary/gondola.events.html#gondola.events.RBEventHeader.fpga_temp">fpga_temp (gondola.events.RBEventHeader attribute)</a>
@@ -821,6 +785,8 @@
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.MasterTrigger.get_cyclic_trigger_interval">get_cyclic_trigger_interval() (gondola.tof.MasterTrigger method)</a>
 </li>
+      <li><a href="_autosummary/gondola.io.html#gondola.io.get_datetime">get_datetime() (in module gondola.io)</a>
+</li>
       <li><a href="_autosummary/gondola.events.html#gondola.events.TofEvent.get_edep">get_edep (gondola.events.TofEvent attribute)</a>
 </li>
       <li><a href="_autosummary/gondola.events.html#gondola.events.TofEvent.get_edep_cortina">get_edep_cortina (gondola.events.TofEvent attribute)</a>
@@ -875,17 +841,11 @@
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.MasterTrigger.get_rb_event_cnts">get_rb_event_cnts() (gondola.tof.MasterTrigger method)</a>
 </li>
+      <li><a href="_autosummary/gondola.io.html#gondola.io.get_rundata_from_file">get_rundata_from_file() (in module gondola.io)</a>
+</li>
       <li><a href="_autosummary/gondola.io.html#gondola.io.get_telemetry_binaries">get_telemetry_binaries() (in module gondola.io)</a>
 </li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.CRFrame.get_telemetryevent">get_telemetryevent() (gondola.io.CRFrame method)</a>
-</li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.CRFrame.get_telemetrypacket">get_telemetrypacket() (gondola.io.CRFrame method)</a>
-</li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.MasterTrigger.get_tiu_emulation_mode">get_tiu_emulation_mode() (gondola.tof.MasterTrigger method)</a>
-</li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.CRFrame.get_tofevent">get_tofevent() (gondola.io.CRFrame method)</a>
-</li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.CRFrame.get_tofpacket">get_tofpacket() (gondola.io.CRFrame method)</a>
 </li>
       <li><a href="_autosummary/gondola.events.html#gondola.events.RBWaveform.get_tot_a">get_tot_a() (gondola.events.RBWaveform method)</a>
 </li>
@@ -893,19 +853,25 @@
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.MasterTrigger.get_total_tof_thresh">get_total_tof_thresh() (gondola.tof.MasterTrigger method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.MasterTrigger.get_trace_suppression">get_trace_suppression() (gondola.tof.MasterTrigger method)</a>
 </li>
       <li><a href="_autosummary/gondola.events.html#gondola.events.TofEvent.get_triggered_paddles">get_triggered_paddles() (gondola.events.TofEvent method)</a>
 </li>
       <li><a href="_autosummary/gondola.events.html#gondola.events.TelemetryEvent.get_trk_energy">get_trk_energy() (gondola.events.TelemetryEvent static method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/gondola.io.html#gondola.io.get_ts_from_binfile">get_ts_from_binfile() (in module gondola.io)</a>
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.MasterTrigger.get_umbrella_center_thresh">get_umbrella_center_thresh() (gondola.tof.MasterTrigger method)</a>
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.MasterTrigger.get_umbrella_thresh">get_umbrella_thresh() (gondola.tof.MasterTrigger method)</a>
+</li>
+      <li><a href="_autosummary/gondola.io.html#gondola.io.get_unix_timestamp">get_unix_timestamp() (in module gondola.io)</a>
+</li>
+      <li><a href="_autosummary/gondola.io.html#gondola.io.get_utc_date">get_utc_date() (in module gondola.io)</a>
+</li>
+      <li><a href="_autosummary/gondola.io.html#gondola.io.get_utc_now">get_utc_now() (in module gondola.io)</a>
 </li>
       <li><a href="_autosummary/gondola.gondola_core.html#gondola.gondola_core.get_version">get_version() (in module gondola.gondola_core)</a>
 </li>
@@ -1054,8 +1020,6 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/gondola.events.html#gondola.events.TofHit.hart_cbl_time">hart_cbl_time (gondola.events.TofHit attribute)</a>
 </li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.CRFrame.has">has() (gondola.io.CRFrame method)</a>
-</li>
       <li><a href="_autosummary/gondola.events.html#gondola.events.TofEvent.has_any_mangling">has_any_mangling (gondola.events.TofEvent attribute)</a>
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.TriggerConfig.hb_send_interval">hb_send_interval (gondola.tof.TriggerConfig attribute)</a>
@@ -1072,10 +1036,10 @@
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofCuts.hit_cbe_acc">hit_cbe_acc (gondola.tof.TofCuts attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofCuts.hit_cor_acc">hit_cor_acc (gondola.tof.TofCuts attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofCuts.hit_high_edep">hit_high_edep (gondola.tof.TofCuts attribute)</a>
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofCuts.hit_high_edep_acc">hit_high_edep_acc (gondola.tof.TofCuts attribute)</a>
@@ -1103,8 +1067,6 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.MasterTrigger.ignore_tiu_busy">ignore_tiu_busy (gondola.tof.MasterTrigger attribute)</a>
-</li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.CRFrame.index">index (gondola.io.CRFrame attribute)</a>
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.AnalysisEngineSettings.integration_start">integration_start (gondola.tof.AnalysisEngineSettings attribute)</a>
 </li>
@@ -1154,8 +1116,6 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.TofPacketReader.last">last (gondola.io.TofPacketReader attribute)</a>
-</li>
       <li><a href="_autosummary/gondola.db.html#gondola.db.TrackerStrip.layer">layer (gondola.db.TrackerStrip attribute)</a>
 
       <ul>
@@ -1177,6 +1137,8 @@
       <li><a href="_autosummary/gondola.reconstruction.html#gondola.reconstruction.line3d_2pts">line3d_2pts() (in module gondola.reconstruction)</a>
 </li>
       <li><a href="_autosummary/gondola.reconstruction.html#gondola.reconstruction.line_fit">line_fit() (in module gondola.reconstruction)</a>
+</li>
+      <li><a href="_autosummary/gondola.io.html#gondola.io.list_path_contents_sorted">list_path_contents_sorted() (in module gondola.io)</a>
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofCommandCode.Listen">Listen (gondola.tof.TofCommandCode attribute)</a>
 </li>
@@ -1305,8 +1267,6 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.TelemetryPacketReader.n_duplicates">n_duplicates (gondola.io.TelemetryPacketReader attribute)</a>
-</li>
       <li><a href="_autosummary/gondola.tof.analysis.html#gondola.tof.analysis.TofAnalysis.n_events">n_events (gondola.tof.analysis.TofAnalysis property)</a>
 
       <ul>
@@ -1459,10 +1419,10 @@
 </li>
       <li><a href="_autosummary/gondola.db.html#gondola.db.TrackerStripPedestal.pedestal_mean">pedestal_mean (gondola.db.TrackerStripPedestal attribute)</a>
 </li>
-      <li><a href="_autosummary/gondola.db.html#gondola.db.TrackerStripPedestal.pedestal_sigam">pedestal_sigam (gondola.db.TrackerStripPedestal attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="_autosummary/gondola.db.html#gondola.db.TrackerStripPedestal.pedestal_sigam">pedestal_sigam (gondola.db.TrackerStripPedestal attribute)</a>
+</li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.AnalysisEngineSettings.pedestal_thresh">pedestal_thresh (gondola.tof.AnalysisEngineSettings attribute)</a>
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.AnalysisEngineSettings.pedestal_win_bins">pedestal_win_bins (gondola.tof.AnalysisEngineSettings attribute)</a>
@@ -1522,10 +1482,6 @@
       <li><a href="_autosummary/gondola.db.html#gondola.db.TrackerStripCmnNoise.pulse_cn">pulse_cn (gondola.db.TrackerStripCmnNoise attribute)</a>
 </li>
       <li><a href="_autosummary/gondola.db.html#gondola.db.TrackerStripCmnNoise.pulse_is_mean">pulse_is_mean (gondola.db.TrackerStripCmnNoise attribute)</a>
-</li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.CRFrame.put_telemetrypacket">put_telemetrypacket() (gondola.io.CRFrame method)</a>
-</li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.CRFrame.put_tofpacket">put_tofpacket() (gondola.io.CRFrame method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1629,14 +1585,6 @@
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofCommandCode.RestartLiftofRBClients">RestartLiftofRBClients (gondola.tof.TofCommandCode attribute)</a>
 </li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.CRReader.rewind">rewind() (gondola.io.CRReader method)</a>
-
-      <ul>
-        <li><a href="_autosummary/gondola.io.html#gondola.io.TelemetryPacketReader.rewind">(gondola.io.TelemetryPacketReader method)</a>
-</li>
-        <li><a href="_autosummary/gondola.io.html#gondola.io.TofPacketReader.rewind">(gondola.io.TofPacketReader method)</a>
-</li>
-      </ul></li>
       <li><a href="_autosummary/gondola.db.html#gondola.db.TrackerStrip.row">row (gondola.db.TrackerStrip attribute)</a>
 
       <ul>
@@ -1699,8 +1647,6 @@
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.MasterTrigger.set_cyclic_trigger_interval">set_cyclic_trigger_interval() (gondola.tof.MasterTrigger method)</a>
 </li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.CRWriter.set_file_timestamp">set_file_timestamp() (gondola.io.CRWriter method)</a>
-</li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.MasterTrigger.set_gaps422_central_track_trigger">set_gaps422_central_track_trigger() (gondola.tof.MasterTrigger method)</a>
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.MasterTrigger.set_gaps_any_trigger">set_gaps_any_trigger() (gondola.tof.MasterTrigger method)</a>
@@ -1730,8 +1676,6 @@
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.MasterTrigger.set_lt_link_en4">set_lt_link_en4() (gondola.tof.MasterTrigger method)</a>
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.MasterTrigger.set_ltb_ch_mask">set_ltb_ch_mask() (gondola.tof.MasterTrigger method)</a>
-</li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.CRWriter.set_mbytes_per_file">set_mbytes_per_file() (gondola.io.CRWriter method)</a>
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.TriggerConfig.set_mtb_moni_interval">set_mtb_moni_interval (gondola.tof.TriggerConfig attribute)</a>
 </li>
@@ -1763,14 +1707,12 @@
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.MasterTrigger.set_track_trigger_is_global">set_track_trigger_is_global() (gondola.tof.MasterTrigger method)</a>
 </li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.CRReader.set_tracker_calibrations_from_fnames">set_tracker_calibrations_from_fnames() (gondola.io.CRReader method)</a>
-</li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.TriggerConfig.set_trigger_type">set_trigger_type (gondola.tof.TriggerConfig attribute)</a>
+</li>
+      <li><a href="_autosummary/gondola.tof.html#gondola.tof.MasterTrigger.set_umb3cube_trigger">set_umb3cube_trigger() (gondola.tof.MasterTrigger method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="_autosummary/gondola.tof.html#gondola.tof.MasterTrigger.set_umb3cube_trigger">set_umb3cube_trigger() (gondola.tof.MasterTrigger method)</a>
-</li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.MasterTrigger.set_umbcorcube_trigger">set_umbcorcube_trigger() (gondola.tof.MasterTrigger method)</a>
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.MasterTrigger.set_umbcube_trigger">set_umbcube_trigger() (gondola.tof.MasterTrigger method)</a>
@@ -1885,11 +1827,7 @@
 </li>
       <li><a href="_autosummary/gondola.calibration.html#gondola.calibration.RBCalibrations.tcal_data">tcal_data (gondola.calibration.RBCalibrations attribute)</a>
 </li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.CRFrame.telemetry_event_names">telemetry_event_names (gondola.io.CRFrame attribute)</a>
-</li>
       <li><a href="_autosummary/gondola.events.html#gondola.events.TelemetryEvent">TelemetryEvent (class in gondola.events)</a>
-</li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.TelemetryPacketReader">TelemetryPacketReader (class in gondola.io)</a>
 </li>
       <li><a href="_autosummary/gondola.io.streamers.html#gondola.io.streamers.TelemetrySocketReader">TelemetrySocketReader (class in gondola.io.streamers)</a>
 </li>
@@ -1978,10 +1916,6 @@
       <li><a href="_autosummary/gondola.events.html#gondola.events.TofHit">TofHit (class in gondola.events)</a>
 </li>
       <li><a href="_autosummary/gondola.tof.html#gondola.tof.TofOperationMode">TofOperationMode (class in gondola.tof)</a>
-</li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.TofPacketReader">TofPacketReader (class in gondola.io)</a>
-</li>
-      <li><a href="_autosummary/gondola.io.html#gondola.io.TofPacketWriter">TofPacketWriter (class in gondola.io)</a>
 </li>
       <li><a href="_autosummary/gondola.db.html#gondola.db.TofPaddle">TofPaddle (class in gondola.db)</a>
 </li>
