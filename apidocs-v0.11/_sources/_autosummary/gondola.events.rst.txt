@@ -4,10 +4,20 @@ gondola.events
 .. automodule:: gondola.events
 
    
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      strip_id
+   
    .. rubric:: Classes
 
    .. autosummary::
    
+      DataType
+      EventQuality
+      EventStatus
+      LTBThreshold
       RBEvent
       RBEventHeader
       RBWaveform
@@ -15,4 +25,5 @@ gondola.events
       TofEvent
       TofHit
       TrackerHit
+      TriggerType
    

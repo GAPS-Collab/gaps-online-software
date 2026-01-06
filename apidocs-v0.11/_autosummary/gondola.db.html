@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.db &#8212; gondola 0.11.47 documentation</title>
+    <title>gondola.db &#8212; gondola 0.11.50 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=d4d788a9"></script>
+    <script src="../_static/documentation_options.js?v=d456aa22"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.db';</script>
@@ -110,7 +110,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.11.47 documentation</p>
+    <p class="title logo__title">gondola 0.11.50 documentation</p>
   
 </a></div>
     
@@ -345,6 +345,24 @@
 <span id="gondola-db"></span><h1>gondola.db<a class="headerlink" href="#module-gondola.db" title="Link to this heading">#</a></h1>
 <p>Gondola core database functionality. This is a wrapper around 
 the database functions in gondola-db</p>
+<p class="rubric">Functions</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.get_all_rbids_in_db" title="gondola.db.get_all_rbids_in_db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_all_rbids_in_db</span></code></a>()</p></td>
+<td><p>Get all rb ids from paddles which are stored in the  database</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.get_dsi_j_ch_pid_map" title="gondola.db.get_dsi_j_ch_pid_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_dsi_j_ch_pid_map</span></code></a>()</p></td>
+<td><p>Create a mapping of DSI/J(LTB) -&gt; PaddleID</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.get_hid_vid_map" title="gondola.db.get_hid_vid_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_hid_vid_map</span></code></a>()</p></td>
+<td><p>Get a map of hardware id -&gt; volume id  (Paddle id in case of TOF paddke, strip id in case   of tracker strip)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.get_vid_hid_map" title="gondola.db.get_vid_hid_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_vid_hid_map</span></code></a>()</p></td>
+<td><p>Get a map of volume id -&gt; hardware id (Paddle id in case of TOF paddke, strip id in case   of tracker strip)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
@@ -1008,6 +1026,41 @@ the db for a set of values</p>
 
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="gondola.db.get_all_rbids_in_db">
+<span class="sig-prename descclassname"><span class="pre">gondola.db.</span></span><span class="sig-name descname"><span class="pre">get_all_rbids_in_db</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.db.get_all_rbids_in_db" title="Link to this definition">#</a></dt>
+<dd><p>Get all rb ids from paddles which are stored in the 
+database</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gondola.db.get_hid_vid_map">
+<span class="sig-prename descclassname"><span class="pre">gondola.db.</span></span><span class="sig-name descname"><span class="pre">get_hid_vid_map</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.db.get_hid_vid_map" title="Link to this definition">#</a></dt>
+<dd><p>Get a map of hardware id -&gt; volume id 
+(Paddle id in case of TOF paddke, strip id in case</p>
+<blockquote>
+<div><p>of tracker strip)</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gondola.db.get_vid_hid_map">
+<span class="sig-prename descclassname"><span class="pre">gondola.db.</span></span><span class="sig-name descname"><span class="pre">get_vid_hid_map</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.db.get_vid_hid_map" title="Link to this definition">#</a></dt>
+<dd><p>Get a map of volume id -&gt; hardware id
+(Paddle id in case of TOF paddke, strip id in case</p>
+<blockquote>
+<div><p>of tracker strip)</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gondola.db.get_dsi_j_ch_pid_map">
+<span class="sig-prename descclassname"><span class="pre">gondola.db.</span></span><span class="sig-name descname"><span class="pre">get_dsi_j_ch_pid_map</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.db.get_dsi_j_ch_pid_map" title="Link to this definition">#</a></dt>
+<dd><p>Create a mapping of DSI/J(LTB) -&gt; PaddleID</p>
+<p>This will basically tell you for a given LTB hit which paddle has 
+triggered.</p>
+</dd></dl>
+
 </section>
 
 
@@ -1176,6 +1229,10 @@ the db for a set of values</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TrackerStripCmnNoise.volume_id"><code class="docutils literal notranslate"><span class="pre">TrackerStripCmnNoise.volume_id</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.get_all_rbids_in_db"><code class="docutils literal notranslate"><span class="pre">get_all_rbids_in_db()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.get_hid_vid_map"><code class="docutils literal notranslate"><span class="pre">get_hid_vid_map()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.get_vid_hid_map"><code class="docutils literal notranslate"><span class="pre">get_vid_hid_map()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.get_dsi_j_ch_pid_map"><code class="docutils literal notranslate"><span class="pre">get_dsi_j_ch_pid_map()</span></code></a></li>
 </ul>
   </nav></div>
 

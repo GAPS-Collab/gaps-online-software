@@ -4,6 +4,29 @@ gondola.tof
 .. automodule:: gondola.tof
 
    
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      apply_settings_diff
+      enable_verification_run
+      request_liftof_setitngs
+      restart_liftofrb
+      restore_default_config
+      run_action_alfa
+      run_action_bravo
+      run_action_charlie
+      run_action_foxtrott
+      run_action_tango
+      run_action_whiskey
+      shutdown_all_rbs
+      shutdown_rat
+      shutdown_ratpair
+      shutdown_rb
+      shutdown_tofcpu
+      start_run
+      stop_run
+   
    .. rubric:: Classes
 
    .. autosummary::

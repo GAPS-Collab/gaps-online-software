@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.tof &#8212; gondola 0.11.47 documentation</title>
+    <title>gondola.tof &#8212; gondola 0.11.50 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=d4d788a9"></script>
+    <script src="../_static/documentation_options.js?v=d456aa22"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.tof';</script>
@@ -110,7 +110,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.11.47 documentation</p>
+    <p class="title logo__title">gondola 0.11.50 documentation</p>
   
 </a></div>
     
@@ -344,6 +344,66 @@
   <section id="module-gondola.tof">
 <span id="gondola-tof"></span><h1>gondola.tof<a class="headerlink" href="#module-gondola.tof" title="Link to this heading">#</a></h1>
 <p>TOF related entities which did not fit anywhere else</p>
+<p class="rubric">Functions</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_settings_diff</span></code>(default, modified)</p></td>
+<td><p>Apply a config diff</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.tof.enable_verification_run" title="gondola.tof.enable_verification_run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">enable_verification_run</span></code></a>(enabled)</p></td>
+<td><p>Enable verfication runs before every run start</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">request_liftof_setitngs</span></code>()</p></td>
+<td><p>Custom run action foxtrott</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.tof.restart_liftofrb" title="gondola.tof.restart_liftofrb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">restart_liftofrb</span></code></a>(rbs)</p></td>
+<td><p>Restart the liftof-rb clients on the given boards</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">restore_default_config</span></code>()</p></td>
+<td><p>Trigger the start of a new data run with  the next active config</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_action_alfa</span></code>()</p></td>
+<td><p>Custom run action alfa</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_action_bravo</span></code>()</p></td>
+<td><p>Custom run action bravo</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_action_charlie</span></code>()</p></td>
+<td><p>Custom run action charlie</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_action_foxtrott</span></code>()</p></td>
+<td><p>Custom run action foxtrott</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_action_tango</span></code>()</p></td>
+<td><p>Custom run action tango</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_action_whiskey</span></code>()</p></td>
+<td><p>Custom run action whiskey</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.tof.shutdown_all_rbs" title="gondola.tof.shutdown_all_rbs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shutdown_all_rbs</span></code></a>()</p></td>
+<td><p>Send the 'sudo shutdown now' command to ALL RBs</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.tof.shutdown_rat" title="gondola.tof.shutdown_rat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shutdown_rat</span></code></a>(rat)</p></td>
+<td><p>Send the 'sudo shutdown now' command to all RBs in a RAT</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.tof.shutdown_ratpair" title="gondola.tof.shutdown_ratpair"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shutdown_ratpair</span></code></a>(pdu, pduchannel)</p></td>
+<td><p>Send the 'sudo shutdown now' command to all RBs in a RAT</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.tof.shutdown_rb" title="gondola.tof.shutdown_rb"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shutdown_rb</span></code></a>(rb)</p></td>
+<td><p>Send the 'sudo shutdown now' command to a single RB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.tof.shutdown_tofcpu" title="gondola.tof.shutdown_tofcpu"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shutdown_tofcpu</span></code></a>()</p></td>
+<td><p>Send the 'sudo shutdown now command to the TOF main computer (&quot;TOFCPU&quot;)</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.tof.start_run" title="gondola.tof.start_run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">start_run</span></code></a>()</p></td>
+<td><p>Trigger the start of a new data run with  the next active config</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.tof.stop_run" title="gondola.tof.stop_run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stop_run</span></code></a>()</p></td>
+<td><p>Stop the current active run and idle</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
