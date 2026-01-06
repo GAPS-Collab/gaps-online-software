@@ -80,7 +80,7 @@ enable_verification_run.__module__ = __name__
 #enable_verification_run.__name___  = 'enable_verification_run'
 #
 restart_liftofrb    = _gc.tof.restart_liftofrb 
-restart_liftofrb.___module__ = __name__ 
+restart_liftofrb.__module__ = __name__ 
 #restart_liftofrb.__name__ = 'restart_liftofrb'
 #
 shutdown_all_rbs    = _gc.tof.shutdown_all_rbs
