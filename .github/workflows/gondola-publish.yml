@@ -27,7 +27,6 @@ jobs:
         runner: [ubuntu-22.04]
         target: [x86_64]
     runs-on: ${{ matrix.platform.runner }}
-
     steps:
       - uses: actions/checkout@v4
 
