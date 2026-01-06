@@ -38,7 +38,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: --release --out dist --working-directory gondola-core/rust/gondola-core/
+          args: --release --out dist -- --working-directory gondola-core/rust/gondola-core/
           sccache: ${{ !startsWith(github.ref, 'refs/tags/') }}
           manylinux: auto
 
