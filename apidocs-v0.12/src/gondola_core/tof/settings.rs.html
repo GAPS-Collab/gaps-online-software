@@ -1080,9 +1080,9 @@
 <a href=#1080 id=1080 data-nosnippet>1080</a>  /// packet. If a verification run is desired, change this 
 <a href=#1081 id=1081 data-nosnippet>1081</a>  /// number to the number of seconds to do the verification 
 <a href=#1082 id=1082 data-nosnippet>1082</a>  /// run
-<a href=#1083 id=1083 data-nosnippet>1083</a>  </span><span class="attr">#[deprecated(since = <span class="string">"0.11"</span>, note = <span class="string">"Use flag verfication_rnn and runtime instead!"</span>)]
-<a href=#1084 id=1084 data-nosnippet>1084</a>  </span><span class="kw">pub </span>verification_runtime_sec   : <span class="prelude-ty">Option</span>&lt;u32&gt;,
-<a href=#1085 id=1085 data-nosnippet>1085</a>  <span class="doccomment">/// If this is set, don't save anything to disk 
+<a href=#1083 id=1083 data-nosnippet>1083</a>  </span><span class="comment">//#[deprecated(since = "0.11", note = "Use flag verfication_rnn and runtime instead!")]
+<a href=#1084 id=1084 data-nosnippet>1084</a>  //pub verification_runtime_sec   : Option&lt;u32&gt;,
+<a href=#1085 id=1085 data-nosnippet>1085</a>  </span><span class="doccomment">/// If this is set, don't save anything to disk 
 <a href=#1086 id=1086 data-nosnippet>1086</a>  /// and just transmit the TofDetectorStatus packet
 <a href=#1087 id=1087 data-nosnippet>1087</a>  </span><span class="kw">pub </span>verification_run           : <span class="prelude-ty">Option</span>&lt;bool&gt;,
 <a href=#1088 id=1088 data-nosnippet>1088</a>  <span class="doccomment">/// Settings to control the MTB
@@ -1122,7 +1122,7 @@
 <a href=#1122 id=1122 data-nosnippet>1122</a>      run_analysis_engine       : <span class="bool-val">true</span>,
 <a href=#1123 id=1123 data-nosnippet>1123</a>      pre_run_calibration       : <span class="bool-val">false</span>,
 <a href=#1124 id=1124 data-nosnippet>1124</a>      save_cali_wf              : <span class="bool-val">false</span>,
-<a href=#1125 id=1125 data-nosnippet>1125</a>      verification_runtime_sec  : <span class="prelude-val">None</span>, <span class="comment">// no verification run per default
+<a href=#1125 id=1125 data-nosnippet>1125</a>      <span class="comment">//verification_runtime_sec  : None, // no verification run per default
 <a href=#1126 id=1126 data-nosnippet>1126</a>      </span>verification_run          : <span class="prelude-val">None</span>,
 <a href=#1127 id=1127 data-nosnippet>1127</a>      mtb_settings              : MTBSettings::new(),
 <a href=#1128 id=1128 data-nosnippet>1128</a>      event_builder_settings    : TofEventBuilderSettings::new(),
