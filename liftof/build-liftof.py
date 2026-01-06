@@ -48,6 +48,7 @@ def build_for_muslx86_64(binary, njobs=24, clean=False, debug=False):
     release_flag = '--release'
     if debug:
         release_flag = ''
+    #build_cmd = f'CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C link-args=-Wl,-stack_size,0x8000000 -C target-feature=+crt-static" cross build -j {njobs} --target=x86_64-unknown-linux-musl --bin {binary} {release_flag} --all-features'
     build_cmd = f'CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNUEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cross build -j {njobs} --target=x86_64-unknown-linux-musl --bin {binary} {release_flag} --all-features'
     result = sub.run([build_cmd], shell=True)
     if not release_flag:
@@ -68,7 +69,7 @@ def build_for_arm32(binary, njobs=24, clean=False):
     Readoutboards have ARM32 architecture
     """
     os.chdir(f'{binary}')
-    version = '0.11.0'
+    version = '0.11.3'
     if clean:
         sub.run(["cargo clean"], shell=True)
     build_cmd = f'CARGO_TARGET_ARMV7_UNKNOWN_LINUX_MUSLEABI_RUSTFLAGS="-C relocation-model=dynamic-no-pic -C target-feature=+crt-static" cross build -j {njobs} --bin {binary} --target=armv7-unknown-linux-musleabi --all-features --release' 

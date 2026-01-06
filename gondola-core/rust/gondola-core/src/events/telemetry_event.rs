@@ -269,8 +269,11 @@ impl Serialization for TelemetryEvent {
 impl fmt::Display for TelemetryEvent {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut repr     = String::from("<TelemetryEvent:");
+    let mut te = self.tof_event.clone();
+    te.calc_gcu_variables();
     let tof_str  = format!("\n  {}", self.tof_event);
     let mut good_hits = 0;
+    
     if self.version == 0 {
       repr += "\n VERSION 0 NOT SUPPORTED!!";
     } else if self.version == 1 {
@@ -280,8 +283,15 @@ impl fmt::Display for TelemetryEvent {
     }
     repr += &(format!("  {}", self.header));
     repr += "\n  ** ** ** MERGED  ** ** **";
-    repr += &(format!("\n  version         {}", self.version));
-    repr += &(format!("\n  event ID        {}", self.event_id));  
+    repr += &(format!("\n  version      {}", self.version));
+    repr += &(format!("\n  event ID     {}", self.event_id));  
+    repr += "\n  ** ** ** TOF GCU VARIABLES  ** ** **";
+    repr += &(format!("\n  n_hits_umb   {}", te.n_hits_umb));
+    repr += &(format!("\n  n_hits_cbe   {}", te.n_hits_cbe));
+    repr += &(format!("\n  n_hits_cor   {}", te.n_hits_cor));
+    repr += &(format!("\n  tot_edep_umb {}", te.tot_edep_umb));  
+    repr += &(format!("\n  tot_edep_cbe {}", te.tot_edep_cbe));  
+    repr += &(format!("\n  tot_edep_cor {}", te.tot_edep_cor));  
     if self.version == 0 {
       repr += "\n VERSION 0 NOT SUPPORTED!!"; 
     }

@@ -3,13 +3,13 @@
 #
 #    maturin generate-ci github
 #
-name: CI
+name: deploy-to-pypi
 
 on:
   push:
     branches:
-      - main
-      - master
+      - PAKII-0.11
+      - AULEPE-0.12
     tags:
       - '*'
   pull_request:
