@@ -83,14 +83,14 @@ pub struct TofHit {
   pub baseline_b_rms : f16,
   // phase of the sine fit
   pub phase          : f16,
-  pub TOT_low_a      : f16,
-  pub TOT_low_b      : f16,
-  pub TOT_high_a     : f16,
-  pub TOT_high_b     : f16,
-  pub TOT_slp_low_a  : f16,
-  pub TOT_slp_low_b  : f16,
-  pub TOT_slp_high_a : f16, 
-  pub TOT_slp_high_b : f16,
+  pub tot_low_a      : f16,
+  pub tot_low_b      : f16,
+  pub tot_high_a     : f16,
+  pub tot_high_b     : f16,
+  pub tot_slp_low_a  : f16,
+  pub tot_slp_low_b  : f16,
+  pub tot_slp_high_a : f16, 
+  pub tot_slp_high_b : f16,
   //-------------------------------
   // NON-SERIALIZED FIELDS
   //-------------------------------
@@ -142,14 +142,14 @@ impl TofHit {
       baseline_b      : f16::from_f32(0.0),
       baseline_b_rms  : f16::from_f32(0.0),
       phase           : f16::from_f32(0.0),
-      TOT_low_a       : f16::from_f32(0.0),
-      TOT_low_b       : f16::from_f32(0.0),
-      TOT_high_a      : f16::from_f32(0.0),
-      TOT_high_b      : f16::from_f32(0.0),
-      TOT_slp_low_a   : f16::from_f32(0.0),
-      TOT_slp_low_b   : f16::from_f32(0.0),
-      TOT_slp_high_a  : f16::from_f32(0.0),
-      TOT_slp_high_b  : f16::from_f32(0.0),
+      tot_low_a       : f16::from_f32(0.0),
+      tot_low_b       : f16::from_f32(0.0),
+      tot_high_a      : f16::from_f32(0.0),
+      tot_high_b      : f16::from_f32(0.0),
+      tot_slp_low_a   : f16::from_f32(0.0),
+      tot_slp_low_b   : f16::from_f32(0.0),
+      tot_slp_high_a  : f16::from_f32(0.0),
+      tot_slp_high_b  : f16::from_f32(0.0),
     }
   }
   
@@ -581,34 +581,34 @@ impl TofHit {
   }
   
   pub fn get_tot_low_a(&self) -> f32 {
-    self.TOT_low_a.to_f32()
+    self.tot_low_a.to_f32()
   }
 
   pub fn get_tot_low_b(&self) -> f32 {
-    self.TOT_low_b.to_f32()
+    self.tot_low_b.to_f32()
   }
 
   pub fn get_tot_high_a(&self) -> f32 {
-    self.TOT_high_a.to_f32()
+    self.tot_high_a.to_f32()
   }
 
   pub fn get_tot_high_b(&self) -> f32 {
-    self.TOT_high_b.to_f32()
+    self.tot_high_b.to_f32()
   }
 
   pub fn get_tot_slp_low_a(&self) -> f32 {
-    self.TOT_slp_low_a.to_f32()
+    self.tot_slp_low_a.to_f32()
   }
 
   pub fn get_tot_slp_low_b(&self) -> f32 {
-    self.TOT_slp_low_b.to_f32()
+    self.tot_slp_low_b.to_f32()
   }
 
   pub fn get_tot_slp_high_a(&self) -> f32 {
-    self.TOT_slp_high_a.to_f32()
+    self.tot_slp_high_a.to_f32()
   }
   pub fn get_tot_slp_high_b(&self) -> f32 {
-    self.TOT_slp_high_b.to_f32()
+    self.tot_slp_high_b.to_f32()
   }
   pub fn get_peak_a(&self) -> f32 {
     self.peak_a.to_f32()
@@ -811,20 +811,20 @@ impl Serialization for TofHit {
     bytestream.extend_from_slice(&self.peak_b      .to_le_bytes()); 
     bytestream.extend_from_slice(&self.charge_a    .to_le_bytes()); 
     bytestream.extend_from_slice(&self.charge_b    .to_le_bytes()); 
-    bytestream.extend_from_slice(&self.TOT_low_a   .to_le_bytes());
+    bytestream.extend_from_slice(&self.tot_low_a   .to_le_bytes());
     bytestream.extend_from_slice(&self.baseline_a   .to_le_bytes());
     bytestream.extend_from_slice(&self.baseline_a_rms.to_le_bytes());
     bytestream.extend_from_slice(&self.phase       .to_le_bytes());
     bytestream.push(self.version.to_u8());
     bytestream.extend_from_slice(&self.baseline_b  .to_le_bytes());
     bytestream.extend_from_slice(&self.baseline_b_rms.to_le_bytes());
-    bytestream.extend_from_slice(&self.TOT_low_b   .to_le_bytes());
-    bytestream.extend_from_slice(&self.TOT_high_a  .to_le_bytes());
-    bytestream.extend_from_slice(&self.TOT_high_b  .to_le_bytes());
-    bytestream.extend_from_slice(&self.TOT_slp_low_a.to_le_bytes());
-    bytestream.extend_from_slice(&self.TOT_slp_low_b.to_le_bytes());
-    bytestream.extend_from_slice(&self.TOT_slp_high_a.to_le_bytes());
-    bytestream.extend_from_slice(&self.TOT_slp_high_b.to_le_bytes());
+    bytestream.extend_from_slice(&self.tot_low_b   .to_le_bytes());
+    bytestream.extend_from_slice(&self.tot_high_a  .to_le_bytes());
+    bytestream.extend_from_slice(&self.tot_high_b  .to_le_bytes());
+    bytestream.extend_from_slice(&self.tot_slp_low_a.to_le_bytes());
+    bytestream.extend_from_slice(&self.tot_slp_low_b.to_le_bytes());
+    bytestream.extend_from_slice(&self.tot_slp_high_a.to_le_bytes());
+    bytestream.extend_from_slice(&self.tot_slp_high_b.to_le_bytes());
     bytestream.extend_from_slice(&Self::TAIL       .to_le_bytes()); 
     bytestream
   }
@@ -861,7 +861,7 @@ impl Serialization for TofHit {
     pp.peak_b         = parse_f16(stream, pos);
     pp.charge_a       = parse_f16(stream, pos);
     pp.charge_b       = parse_f16(stream, pos);
-    pp.TOT_low_a      = parse_f16(stream, pos);
+    pp.tot_low_a      = parse_f16(stream, pos);
     pp.baseline_a     = parse_f16(stream, pos);
     pp.baseline_a_rms = parse_f16(stream, pos);
     let mut phase_vec = Vec::<u8>::new();
@@ -878,13 +878,13 @@ impl Serialization for TofHit {
     pp.baseline_b      = parse_f16(stream, pos);
     pp.baseline_b_rms  = parse_f16(stream, pos);
     if !version_lt_011 {
-      pp.TOT_low_b       = parse_f16(stream, pos);
-      pp.TOT_high_a      = parse_f16(stream, pos);
-      pp.TOT_high_b      = parse_f16(stream, pos);
-      pp.TOT_slp_low_a   = parse_f16(stream, pos);
-      pp.TOT_slp_low_b   = parse_f16(stream, pos);
-      pp.TOT_slp_high_a  = parse_f16(stream, pos);
-      pp.TOT_slp_high_b  = parse_f16(stream, pos);
+      pp.tot_low_b       = parse_f16(stream, pos);
+      pp.tot_high_a      = parse_f16(stream, pos);
+      pp.tot_high_b      = parse_f16(stream, pos);
+      pp.tot_slp_low_a   = parse_f16(stream, pos);
+      pp.tot_slp_low_b   = parse_f16(stream, pos);
+      pp.tot_slp_high_a  = parse_f16(stream, pos);
+      pp.tot_slp_high_b  = parse_f16(stream, pos);
       *pos += 2; // always have to do this when using verify fixed
     } else {
       let tail = parse_u16(stream, pos);
@@ -920,14 +920,14 @@ impl FromRandom for TofHit {
     pp.phase           = f16::from_f32(rng.random::<f32>());
     
     if !version_lt_011 {
-      pp.TOT_low_a      = f16::from_f32(rng.random::<f32>());
-      pp.TOT_low_b      = f16::from_f32(rng.random::<f32>());
-      pp.TOT_high_a     = f16::from_f32(rng.random::<f32>());
-      pp.TOT_high_b     = f16::from_f32(rng.random::<f32>()); 
-      pp.TOT_slp_low_a  = f16::from_f32(rng.random::<f32>());
-      pp.TOT_slp_low_b  = f16::from_f32(rng.random::<f32>());
-      pp.TOT_slp_high_a = f16::from_f32(rng.random::<f32>()); 
-      pp.TOT_slp_high_b = f16::from_f32(rng.random::<f32>()); 
+      pp.tot_low_a      = f16::from_f32(rng.random::<f32>());
+      pp.tot_low_b      = f16::from_f32(rng.random::<f32>());
+      pp.tot_high_a     = f16::from_f32(rng.random::<f32>());
+      pp.tot_high_b     = f16::from_f32(rng.random::<f32>()); 
+      pp.tot_slp_low_a  = f16::from_f32(rng.random::<f32>());
+      pp.tot_slp_low_b  = f16::from_f32(rng.random::<f32>());
+      pp.tot_slp_high_a = f16::from_f32(rng.random::<f32>()); 
+      pp.tot_slp_high_b = f16::from_f32(rng.random::<f32>()); 
     }
     pp.paddle_len       = 0.0; 
     pp.coax_cable_time  = 0.0; 

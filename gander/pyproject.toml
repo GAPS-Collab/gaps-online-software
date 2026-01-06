@@ -21,7 +21,8 @@ dependencies = [
     "tomli-w>=1.2.0",
     "pyvista>=0.46.3",
     "stpyvista>=0.1.4",
-    "gondola @ file:///home/achim/gaps-online-software/gander/gondola-0.11.7-cp311-abi3-manylinux_2_39_x86_64.whl", 
+    "gondola @ file:///srv/gaps/gaps-online-software/gondola-core/rust/gondola-core/target/wheels/gondola-0.11.15-cp311-abi3-manylinux_2_39_x86_64.whl"
+    #"gondola @ file:///home/achim/gaps-online-software/gander/gondola-0.11.15-cp311-abi3-manylinux_2_39_x86_64.whl", 
 ]
     ##"gondola>=0.11.4",
 readme = "README.md"

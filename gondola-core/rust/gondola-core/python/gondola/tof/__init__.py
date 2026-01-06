@@ -68,47 +68,56 @@ MasterTrigger.__name__   = 'MasterTrigger'
 
 ## command factories
 start_run            = _gc.tof.start_run 
-#start_run.__module__ = __name__
+start_run.__module__ = __name__
 #start_run.__name___  = 'start_run'
 #
 stop_run            = _gc.tof.stop_run 
-#stop_run.__module__ = __name__
+stop_run.__module__ = __name__
 #stop_run.__name___  = 'stop_run'
 #
 enable_verification_run            = _gc.tof.enable_verification_run  
-#enable_verification_run.__module__ = __name__
+enable_verification_run.__module__ = __name__
 #enable_verification_run.__name___  = 'enable_verification_run'
 #
 restart_liftofrb    = _gc.tof.restart_liftofrb 
-#restart_liftofrb.___module__ = __name__ 
+restart_liftofrb.__module__ = __name__ 
 #restart_liftofrb.__name__ = 'restart_liftofrb'
 #
 shutdown_all_rbs    = _gc.tof.shutdown_all_rbs
-#shutdown_all_rbs.__module__ = __name__
+shutdown_all_rbs.__module__ = __name__
 #shutdown_all_rbs.__name__   = 'shutdown_all_rbs'
 #
 shutdown_rat        = _gc.tof.shutdown_rat 
-#shutdown_rat.__module__ = __name__ 
+shutdown_rat.__module__ = __name__ 
 #shutdown_rat.__name__   = 'shutdown_rat' 
 #
 shutdown_ratpair    = _gc.tof.shutdown_ratpair
-#shutdown_ratpair.__module__ = __name__ 
+shutdown_ratpair.__module__ = __name__ 
 #shutdown_ratpair.__name__ = 'shutdown_ratpair' 
 #
 shutdown_rb         = _gc.tof.shutdown_rb 
-#shutdown_rb.__module__  = __name__
+shutdown_rb.__module__  = __name__
 #shutdown_rb.__name__    = 'shutdown_rb' 
 #
 shutdown_tofcpu     = _gc.tof.shutdown_tofcpu 
-#shutdown_tofcpu.__module__ = __name__ 
+shutdown_tofcpu.__module__ = __name__ 
 #shutdown_tofcpu.__name__   = 'shutdown_tofcpu'
 #
 run_action_alfa     = _gc.tof.run_action_alfa 
+run_action_alfa.__module__ = __name__
 run_action_bravo    = _gc.tof.run_action_bravo 
+run_action_bravo.__module__ = __name__
 run_action_charlie  = _gc.tof.run_action_charlie 
+run_action_charlie.__module__ = __name__
 run_action_whiskey  = _gc.tof.run_action_whiskey 
+run_action_whiskey.__module__ =  __name__
 run_action_tango    = _gc.tof.run_action_tango 
+run_action_tango.__module__ = __name__
 run_action_foxtrott = _gc.tof.run_action_foxtrott
+run_action_foxtrott.__module__ = __name__
 request_liftof_setitngs = _gc.tof.request_liftof_settings
+request_liftof_setitngs.__module__ = __name__
 apply_settings_diff     = _gc.tof.apply_settings_diff
+apply_settings_diff.__module__ = __name__
 restore_default_config  = _gc.tof.restore_default_config
+restore_default_config.__module__ = __name__

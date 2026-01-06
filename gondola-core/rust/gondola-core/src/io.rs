@@ -24,12 +24,12 @@ pub use data_source::DataSource;
 pub mod streamers;
 pub use streamers::*;
 
+#[cfg(feature="pybindings")]
+use std::path::PathBuf;
+
 use flate2::Compression;
 use flate2::write::GzEncoder;
 use flate2::read::GzDecoder;
-//use similar::TextDiff;
-use std::path::PathBuf;
-//use patch::Patch;
 use diffy::{
   apply_bytes,
   Patch,

@@ -15,7 +15,7 @@ liftof/releases/*
 liftof/target/*
 liftof/src/*
 liftof/liftof-cc/target/*
-
+liftof/liftof-rb/target/*
 
 analysis/merge_tcfc/.gitignore
 analysis/merge_tcfc/.python-version

@@ -1080,8 +1080,8 @@ pub struct LiftofSettings {
   /// packet. If a verification run is desired, change this 
   /// number to the number of seconds to do the verification 
   /// run
-  #[deprecated(since = "0.11", note = "Use flag verfication_rnn and runtime instead!")]
-  pub verification_runtime_sec   : Option<u32>,
+  //#[deprecated(since = "0.11", note = "Use flag verfication_rnn and runtime instead!")]
+  //pub verification_runtime_sec   : Option<u32>,
   /// If this is set, don't save anything to disk 
   /// and just transmit the TofDetectorStatus packet
   pub verification_run           : Option<bool>,
@@ -1122,7 +1122,7 @@ impl LiftofSettings {
       run_analysis_engine       : true,
       pre_run_calibration       : false,
       save_cali_wf              : false,
-      verification_runtime_sec  : None, // no verification run per default
+      //verification_runtime_sec  : None, // no verification run per default
       verification_run          : None,
       mtb_settings              : MTBSettings::new(),
       event_builder_settings    : TofEventBuilderSettings::new(),

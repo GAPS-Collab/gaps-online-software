@@ -63,6 +63,7 @@ pub mod database;
 // python convention
 pub const VERSION: &str = env!("CARGO_PKG_VERSION"); 
 
+#[cfg(feature="pybindings")]
 use crate::errors::*;
 
 /// A simple helper macro adding an as_str function 

@@ -36,12 +36,19 @@ TofPaddleTimingConstant            = _gc.db.TofPaddleTimingConstant
 TofPaddleTimingConstant.__module__ = __name__ 
 TofPaddleTimingConstant.__name__   = 'TofPaddleTimingConstant'
 get_all_rbids_in_db          = _gc.db.get_all_rbids_in_db
+get_all_rbids_in_db.__module__ = __name__
+
 get_hid_vid_map              = _gc.db.get_hid_vid_map
+get_hid_vid_map.__module__   = __name__ 
+
 get_vid_hid_map              = _gc.db.get_vid_hid_map
+get_vid_hid_map.__module__   = __name__ 
+
 get_dsi_j_ch_pid_map         = _gc.db.get_dsi_j_ch_pid_map
+get_dsi_j_ch_pid_map.__module__ = __name__
 
 __all__ = ['TofPaddle','ReadoutBoard', 'TofPaddleTimingConstant', 'TrackerStrip','TrackerStripPedestal', 'TrackerStripTransferFunction',\
-'TrackerStripCmnNoise']
+'TrackerStripCmnNoise','get_all_rbids_in_db','get_hid_vid_map','get_vid_hid_map','get_dsi_j_ch_pid_map']
 
 #----------------------------------------
 # extend the TofPaddles with a few methods
