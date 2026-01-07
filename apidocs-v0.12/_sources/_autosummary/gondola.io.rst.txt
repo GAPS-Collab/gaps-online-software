@@ -8,9 +8,19 @@ gondola.io
 
    .. autosummary::
    
+      apply_diff_to_file
+      compress_toml
+      create_compressed_diff
+      decompress_toml
+      get_datetime
+      get_rundata_from_file
       get_telemetry_binaries
       get_ts_from_binfile
+      get_unix_timestamp
+      get_utc_date
+      get_utc_now
       grace_get_telemetry_binaries
+      list_path_contents_sorted
    
    .. rubric:: Classes
 

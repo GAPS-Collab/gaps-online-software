@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.events &#8212; gondola 0.12.6 documentation</title>
+    <title>gondola.events &#8212; gondola 0.12.7 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=eee2e1a2"></script>
+    <script src="../_static/documentation_options.js?v=1392dee4"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.events';</script>
@@ -110,7 +110,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.12.6 documentation</p>
+    <p class="title logo__title">gondola 0.12.7 documentation</p>
   
 </a></div>
     
@@ -345,9 +345,30 @@
 <span id="gondola-events"></span><h1>gondola.events<a class="headerlink" href="#module-gondola.events" title="Link to this heading">#</a></h1>
 <p>Every possible event type in GAPS which is relevant for 
 &quot;online&quot; analysis</p>
+<p class="rubric">Functions</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.events.strip_id" title="gondola.events.strip_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">strip_id</span></code></a>(layer, row, module, channel)</p></td>
+<td><p>Calculate an unique identifier for  tracker strips from the position in  the tracker stack</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <p class="rubric">Classes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.events.DataType" title="gondola.events.DataType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataType</span></code></a></p></td>
+<td><p>A generic data type</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.events.EventQuality" title="gondola.events.EventQuality"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EventQuality</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.events.EventStatus" title="gondola.events.EventStatus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EventStatus</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.events.LTBThreshold" title="gondola.events.LTBThreshold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LTBThreshold</span></code></a></p></td>
+<td><p>LTB Thresholds as passed on by the MTB [See also](<a class="reference external" href="https://gaps1.astro.ucla.edu/wiki/gaps/images/gaps/5/52/LTB_Data_Format.pdf">https://gaps1.astro.ucla.edu/wiki/gaps/images/gaps/5/52/LTB_Data_Format.pdf</a>)</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#gondola.events.RBEvent" title="gondola.events.RBEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RBEvent</span></code></a>()</p></td>
 <td><p>Event data for each individual ReadoutBoard (RB)</p></td>
 </tr>
@@ -368,6 +389,9 @@
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#gondola.events.TrackerHit" title="gondola.events.TrackerHit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerHit</span></code></a>()</p></td>
 <td><p>Hit on a tracker strip</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.events.TriggerType" title="gondola.events.TriggerType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriggerType</span></code></a></p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
@@ -1232,7 +1256,7 @@ by the assumed speed of light in the paddle</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.TofEvent.strip_packed_rbevents_for_pv3">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">strip_packed_rbevents_for_pv3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pack</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.strip_packed_rbevents_for_pv3" title="Link to this definition">#</a></dt>
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">strip_packed_rbevents_for_pv3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pack</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.strip_packed_rbevents_for_pv3" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1323,6 +1347,358 @@ if multiple trigger conditions are satisfied.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TelemetryEvent.version">
 <span class="sig-name descname"><span class="pre">version</span></span><a class="headerlink" href="#gondola.events.TelemetryEvent.version" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gondola.events.strip_id">
+<span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">strip_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">layer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.strip_id" title="Link to this definition">#</a></dt>
+<dd><p>Calculate an unique identifier for 
+tracker strips from the position in 
+the tracker stack</p>
+<dl class="simple">
+<dt># Arguments:</dt><dd><ul class="simple">
+<li><p>layer   : tracker layer (0-9)</p></li>
+<li><p>row     : row in layer  (0-6)</p></li>
+<li><p>module  : module in row (0-6)</p></li>
+<li><p>channel : channel in module (0-32)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.events.EventQuality">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">EventQuality</span></span><a class="headerlink" href="#gondola.events.EventQuality" title="Link to this definition">#</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.EventQuality.Diamond">
+<span class="sig-name descname"><span class="pre">Diamond</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventQuality.Diamond</span></em><a class="headerlink" href="#gondola.events.EventQuality.Diamond" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.EventQuality.FourLeafClover">
+<span class="sig-name descname"><span class="pre">FourLeafClover</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventQuality.FourLeafClover</span></em><a class="headerlink" href="#gondola.events.EventQuality.FourLeafClover" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.EventQuality.Gold">
+<span class="sig-name descname"><span class="pre">Gold</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventQuality.Gold</span></em><a class="headerlink" href="#gondola.events.EventQuality.Gold" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.EventQuality.Silver">
+<span class="sig-name descname"><span class="pre">Silver</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventQuality.Silver</span></em><a class="headerlink" href="#gondola.events.EventQuality.Silver" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.EventQuality.Unknown">
+<span class="sig-name descname"><span class="pre">Unknown</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventQuality.Unknown</span></em><a class="headerlink" href="#gondola.events.EventQuality.Unknown" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.EventQuality.from_u8">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_u8</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">byte</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.EventQuality.from_u8" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.events.TriggerType">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">TriggerType</span></span><a class="headerlink" href="#gondola.events.TriggerType" title="Link to this definition">#</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TriggerType.Any">
+<span class="sig-name descname"><span class="pre">Any</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Any</span></em><a class="headerlink" href="#gondola.events.TriggerType.Any" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TriggerType.ConfigurableTrigger">
+<span class="sig-name descname"><span class="pre">ConfigurableTrigger</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.ConfigurableTrigger</span></em><a class="headerlink" href="#gondola.events.TriggerType.ConfigurableTrigger" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TriggerType.CorCubeSide">
+<span class="sig-name descname"><span class="pre">CorCubeSide</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.CorCubeSide</span></em><a class="headerlink" href="#gondola.events.TriggerType.CorCubeSide" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TriggerType.FixedRate">
+<span class="sig-name descname"><span class="pre">FixedRate</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.FixedRate</span></em><a class="headerlink" href="#gondola.events.TriggerType.FixedRate" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TriggerType.Forced">
+<span class="sig-name descname"><span class="pre">Forced</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Forced</span></em><a class="headerlink" href="#gondola.events.TriggerType.Forced" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TriggerType.Gaps">
+<span class="sig-name descname"><span class="pre">Gaps</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Gaps</span></em><a class="headerlink" href="#gondola.events.TriggerType.Gaps" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TriggerType.Gaps1044">
+<span class="sig-name descname"><span class="pre">Gaps1044</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Gaps1044</span></em><a class="headerlink" href="#gondola.events.TriggerType.Gaps1044" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TriggerType.Gaps211">
+<span class="sig-name descname"><span class="pre">Gaps211</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Gaps211</span></em><a class="headerlink" href="#gondola.events.TriggerType.Gaps211" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TriggerType.Gaps422">
+<span class="sig-name descname"><span class="pre">Gaps422</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Gaps422</span></em><a class="headerlink" href="#gondola.events.TriggerType.Gaps422" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TriggerType.Gaps633">
+<span class="sig-name descname"><span class="pre">Gaps633</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Gaps633</span></em><a class="headerlink" href="#gondola.events.TriggerType.Gaps633" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TriggerType.Poisson">
+<span class="sig-name descname"><span class="pre">Poisson</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Poisson</span></em><a class="headerlink" href="#gondola.events.TriggerType.Poisson" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TriggerType.Track">
+<span class="sig-name descname"><span class="pre">Track</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Track</span></em><a class="headerlink" href="#gondola.events.TriggerType.Track" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TriggerType.TrackCentral">
+<span class="sig-name descname"><span class="pre">TrackCentral</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.TrackCentral</span></em><a class="headerlink" href="#gondola.events.TriggerType.TrackCentral" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TriggerType.TrackUmbCentral">
+<span class="sig-name descname"><span class="pre">TrackUmbCentral</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.TrackUmbCentral</span></em><a class="headerlink" href="#gondola.events.TriggerType.TrackUmbCentral" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TriggerType.Umb3Cube">
+<span class="sig-name descname"><span class="pre">Umb3Cube</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Umb3Cube</span></em><a class="headerlink" href="#gondola.events.TriggerType.Umb3Cube" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TriggerType.UmbCorCube">
+<span class="sig-name descname"><span class="pre">UmbCorCube</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.UmbCorCube</span></em><a class="headerlink" href="#gondola.events.TriggerType.UmbCorCube" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TriggerType.UmbCube">
+<span class="sig-name descname"><span class="pre">UmbCube</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.UmbCube</span></em><a class="headerlink" href="#gondola.events.TriggerType.UmbCube" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TriggerType.UmbCubeZ">
+<span class="sig-name descname"><span class="pre">UmbCubeZ</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.UmbCubeZ</span></em><a class="headerlink" href="#gondola.events.TriggerType.UmbCubeZ" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TriggerType.Unknown">
+<span class="sig-name descname"><span class="pre">Unknown</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Unknown</span></em><a class="headerlink" href="#gondola.events.TriggerType.Unknown" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TriggerType.from_u8">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_u8</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">byte</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TriggerType.from_u8" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TriggerType.transcode_trigger_sources">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transcode_trigger_sources</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trigger_sources</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TriggerType.transcode_trigger_sources" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.events.LTBThreshold">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">LTBThreshold</span></span><a class="headerlink" href="#gondola.events.LTBThreshold" title="Link to this definition">#</a></dt>
+<dd><p>LTB Thresholds as passed on by the MTB
+[See also](<a class="reference external" href="https://gaps1.astro.ucla.edu/wiki/gaps/images/gaps/5/52/LTB_Data_Format.pdf">https://gaps1.astro.ucla.edu/wiki/gaps/images/gaps/5/52/LTB_Data_Format.pdf</a>)</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.LTBThreshold.Beta">
+<span class="sig-name descname"><span class="pre">Beta</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">LTBThreshold.Beta</span></em><a class="headerlink" href="#gondola.events.LTBThreshold.Beta" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.LTBThreshold.Hit">
+<span class="sig-name descname"><span class="pre">Hit</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">LTBThreshold.Hit</span></em><a class="headerlink" href="#gondola.events.LTBThreshold.Hit" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.LTBThreshold.NoHit">
+<span class="sig-name descname"><span class="pre">NoHit</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">LTBThreshold.NoHit</span></em><a class="headerlink" href="#gondola.events.LTBThreshold.NoHit" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.LTBThreshold.Unknown">
+<span class="sig-name descname"><span class="pre">Unknown</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">LTBThreshold.Unknown</span></em><a class="headerlink" href="#gondola.events.LTBThreshold.Unknown" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.LTBThreshold.Veto">
+<span class="sig-name descname"><span class="pre">Veto</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">LTBThreshold.Veto</span></em><a class="headerlink" href="#gondola.events.LTBThreshold.Veto" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.LTBThreshold.from_u8">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_u8</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">byte</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.LTBThreshold.from_u8" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.events.EventStatus">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">EventStatus</span></span><a class="headerlink" href="#gondola.events.EventStatus" title="Link to this definition">#</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.EventStatus.AnyDataMangling">
+<span class="sig-name descname"><span class="pre">AnyDataMangling</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.AnyDataMangling</span></em><a class="headerlink" href="#gondola.events.EventStatus.AnyDataMangling" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.EventStatus.CRC32Wrong">
+<span class="sig-name descname"><span class="pre">CRC32Wrong</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.CRC32Wrong</span></em><a class="headerlink" href="#gondola.events.EventStatus.CRC32Wrong" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.EventStatus.CellAndChnSyncErrors">
+<span class="sig-name descname"><span class="pre">CellAndChnSyncErrors</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.CellAndChnSyncErrors</span></em><a class="headerlink" href="#gondola.events.EventStatus.CellAndChnSyncErrors" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.EventStatus.CellSyncErrors">
+<span class="sig-name descname"><span class="pre">CellSyncErrors</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.CellSyncErrors</span></em><a class="headerlink" href="#gondola.events.EventStatus.CellSyncErrors" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.EventStatus.ChannelIDWrong">
+<span class="sig-name descname"><span class="pre">ChannelIDWrong</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.ChannelIDWrong</span></em><a class="headerlink" href="#gondola.events.EventStatus.ChannelIDWrong" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.EventStatus.ChnSyncErrors">
+<span class="sig-name descname"><span class="pre">ChnSyncErrors</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.ChnSyncErrors</span></em><a class="headerlink" href="#gondola.events.EventStatus.ChnSyncErrors" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.EventStatus.EventTimeOut">
+<span class="sig-name descname"><span class="pre">EventTimeOut</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.EventTimeOut</span></em><a class="headerlink" href="#gondola.events.EventStatus.EventTimeOut" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.EventStatus.GoodNoCRCCheck">
+<span class="sig-name descname"><span class="pre">GoodNoCRCCheck</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.GoodNoCRCCheck</span></em><a class="headerlink" href="#gondola.events.EventStatus.GoodNoCRCCheck" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.EventStatus.GoodNoCRCOrErrBitCheck">
+<span class="sig-name descname"><span class="pre">GoodNoCRCOrErrBitCheck</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.GoodNoCRCOrErrBitCheck</span></em><a class="headerlink" href="#gondola.events.EventStatus.GoodNoCRCOrErrBitCheck" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.EventStatus.GoodNoErrBitCheck">
+<span class="sig-name descname"><span class="pre">GoodNoErrBitCheck</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.GoodNoErrBitCheck</span></em><a class="headerlink" href="#gondola.events.EventStatus.GoodNoErrBitCheck" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.EventStatus.IncompatibleData">
+<span class="sig-name descname"><span class="pre">IncompatibleData</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.IncompatibleData</span></em><a class="headerlink" href="#gondola.events.EventStatus.IncompatibleData" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.EventStatus.IncompleteReadout">
+<span class="sig-name descname"><span class="pre">IncompleteReadout</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.IncompleteReadout</span></em><a class="headerlink" href="#gondola.events.EventStatus.IncompleteReadout" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.EventStatus.KnownDeadRB">
+<span class="sig-name descname"><span class="pre">KnownDeadRB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.KnownDeadRB</span></em><a class="headerlink" href="#gondola.events.EventStatus.KnownDeadRB" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.EventStatus.NoChannel9">
+<span class="sig-name descname"><span class="pre">NoChannel9</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.NoChannel9</span></em><a class="headerlink" href="#gondola.events.EventStatus.NoChannel9" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.EventStatus.Perfect">
+<span class="sig-name descname"><span class="pre">Perfect</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.Perfect</span></em><a class="headerlink" href="#gondola.events.EventStatus.Perfect" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.EventStatus.RBEventWacky">
+<span class="sig-name descname"><span class="pre">RBEventWacky</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.RBEventWacky</span></em><a class="headerlink" href="#gondola.events.EventStatus.RBEventWacky" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.EventStatus.TailWrong">
+<span class="sig-name descname"><span class="pre">TailWrong</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.TailWrong</span></em><a class="headerlink" href="#gondola.events.EventStatus.TailWrong" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.EventStatus.Unknown">
+<span class="sig-name descname"><span class="pre">Unknown</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.Unknown</span></em><a class="headerlink" href="#gondola.events.EventStatus.Unknown" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.EventStatus.from_u8">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_u8</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">byte</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.EventStatus.from_u8" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.events.DataType">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">DataType</span></span><a class="headerlink" href="#gondola.events.DataType" title="Link to this definition">#</a></dt>
+<dd><p>A generic data type</p>
+<p>Describe the purpose of the data. This
+is the semantics behind it.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.DataType.MTBTriggerPoisson">
+<span class="sig-name descname"><span class="pre">MTBTriggerPoisson</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataType.MTBTriggerPoisson</span></em><a class="headerlink" href="#gondola.events.DataType.MTBTriggerPoisson" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.DataType.Noi">
+<span class="sig-name descname"><span class="pre">Noi</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataType.Noi</span></em><a class="headerlink" href="#gondola.events.DataType.Noi" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.DataType.Physics">
+<span class="sig-name descname"><span class="pre">Physics</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataType.Physics</span></em><a class="headerlink" href="#gondola.events.DataType.Physics" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.DataType.RBTriggerPeriodic">
+<span class="sig-name descname"><span class="pre">RBTriggerPeriodic</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataType.RBTriggerPeriodic</span></em><a class="headerlink" href="#gondola.events.DataType.RBTriggerPeriodic" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.DataType.RBTriggerPoisson">
+<span class="sig-name descname"><span class="pre">RBTriggerPoisson</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataType.RBTriggerPoisson</span></em><a class="headerlink" href="#gondola.events.DataType.RBTriggerPoisson" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.DataType.TimingCalibration">
+<span class="sig-name descname"><span class="pre">TimingCalibration</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataType.TimingCalibration</span></em><a class="headerlink" href="#gondola.events.DataType.TimingCalibration" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.DataType.Unknown">
+<span class="sig-name descname"><span class="pre">Unknown</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataType.Unknown</span></em><a class="headerlink" href="#gondola.events.DataType.Unknown" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.DataType.VoltageCalibration">
+<span class="sig-name descname"><span class="pre">VoltageCalibration</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataType.VoltageCalibration</span></em><a class="headerlink" href="#gondola.events.DataType.VoltageCalibration" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.DataType.from_u8">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_u8</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">byte</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.DataType.from_u8" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1546,6 +1922,83 @@ if multiple trigger conditions are satisfied.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.tracker"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.tracker</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.tracker_pointcloud"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.tracker_pointcloud</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.version"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.version</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.strip_id"><code class="docutils literal notranslate"><span class="pre">strip_id()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventQuality"><code class="docutils literal notranslate"><span class="pre">EventQuality</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventQuality.Diamond"><code class="docutils literal notranslate"><span class="pre">EventQuality.Diamond</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventQuality.FourLeafClover"><code class="docutils literal notranslate"><span class="pre">EventQuality.FourLeafClover</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventQuality.Gold"><code class="docutils literal notranslate"><span class="pre">EventQuality.Gold</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventQuality.Silver"><code class="docutils literal notranslate"><span class="pre">EventQuality.Silver</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventQuality.Unknown"><code class="docutils literal notranslate"><span class="pre">EventQuality.Unknown</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventQuality.from_u8"><code class="docutils literal notranslate"><span class="pre">EventQuality.from_u8()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TriggerType"><code class="docutils literal notranslate"><span class="pre">TriggerType</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TriggerType.Any"><code class="docutils literal notranslate"><span class="pre">TriggerType.Any</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TriggerType.ConfigurableTrigger"><code class="docutils literal notranslate"><span class="pre">TriggerType.ConfigurableTrigger</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TriggerType.CorCubeSide"><code class="docutils literal notranslate"><span class="pre">TriggerType.CorCubeSide</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TriggerType.FixedRate"><code class="docutils literal notranslate"><span class="pre">TriggerType.FixedRate</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TriggerType.Forced"><code class="docutils literal notranslate"><span class="pre">TriggerType.Forced</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TriggerType.Gaps"><code class="docutils literal notranslate"><span class="pre">TriggerType.Gaps</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TriggerType.Gaps1044"><code class="docutils literal notranslate"><span class="pre">TriggerType.Gaps1044</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TriggerType.Gaps211"><code class="docutils literal notranslate"><span class="pre">TriggerType.Gaps211</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TriggerType.Gaps422"><code class="docutils literal notranslate"><span class="pre">TriggerType.Gaps422</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TriggerType.Gaps633"><code class="docutils literal notranslate"><span class="pre">TriggerType.Gaps633</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TriggerType.Poisson"><code class="docutils literal notranslate"><span class="pre">TriggerType.Poisson</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TriggerType.Track"><code class="docutils literal notranslate"><span class="pre">TriggerType.Track</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TriggerType.TrackCentral"><code class="docutils literal notranslate"><span class="pre">TriggerType.TrackCentral</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TriggerType.TrackUmbCentral"><code class="docutils literal notranslate"><span class="pre">TriggerType.TrackUmbCentral</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TriggerType.Umb3Cube"><code class="docutils literal notranslate"><span class="pre">TriggerType.Umb3Cube</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TriggerType.UmbCorCube"><code class="docutils literal notranslate"><span class="pre">TriggerType.UmbCorCube</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TriggerType.UmbCube"><code class="docutils literal notranslate"><span class="pre">TriggerType.UmbCube</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TriggerType.UmbCubeZ"><code class="docutils literal notranslate"><span class="pre">TriggerType.UmbCubeZ</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TriggerType.Unknown"><code class="docutils literal notranslate"><span class="pre">TriggerType.Unknown</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TriggerType.from_u8"><code class="docutils literal notranslate"><span class="pre">TriggerType.from_u8()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TriggerType.transcode_trigger_sources"><code class="docutils literal notranslate"><span class="pre">TriggerType.transcode_trigger_sources()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.LTBThreshold"><code class="docutils literal notranslate"><span class="pre">LTBThreshold</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.LTBThreshold.Beta"><code class="docutils literal notranslate"><span class="pre">LTBThreshold.Beta</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.LTBThreshold.Hit"><code class="docutils literal notranslate"><span class="pre">LTBThreshold.Hit</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.LTBThreshold.NoHit"><code class="docutils literal notranslate"><span class="pre">LTBThreshold.NoHit</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.LTBThreshold.Unknown"><code class="docutils literal notranslate"><span class="pre">LTBThreshold.Unknown</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.LTBThreshold.Veto"><code class="docutils literal notranslate"><span class="pre">LTBThreshold.Veto</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.LTBThreshold.from_u8"><code class="docutils literal notranslate"><span class="pre">LTBThreshold.from_u8()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventStatus"><code class="docutils literal notranslate"><span class="pre">EventStatus</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventStatus.AnyDataMangling"><code class="docutils literal notranslate"><span class="pre">EventStatus.AnyDataMangling</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventStatus.CRC32Wrong"><code class="docutils literal notranslate"><span class="pre">EventStatus.CRC32Wrong</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventStatus.CellAndChnSyncErrors"><code class="docutils literal notranslate"><span class="pre">EventStatus.CellAndChnSyncErrors</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventStatus.CellSyncErrors"><code class="docutils literal notranslate"><span class="pre">EventStatus.CellSyncErrors</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventStatus.ChannelIDWrong"><code class="docutils literal notranslate"><span class="pre">EventStatus.ChannelIDWrong</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventStatus.ChnSyncErrors"><code class="docutils literal notranslate"><span class="pre">EventStatus.ChnSyncErrors</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventStatus.EventTimeOut"><code class="docutils literal notranslate"><span class="pre">EventStatus.EventTimeOut</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventStatus.GoodNoCRCCheck"><code class="docutils literal notranslate"><span class="pre">EventStatus.GoodNoCRCCheck</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventStatus.GoodNoCRCOrErrBitCheck"><code class="docutils literal notranslate"><span class="pre">EventStatus.GoodNoCRCOrErrBitCheck</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventStatus.GoodNoErrBitCheck"><code class="docutils literal notranslate"><span class="pre">EventStatus.GoodNoErrBitCheck</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventStatus.IncompatibleData"><code class="docutils literal notranslate"><span class="pre">EventStatus.IncompatibleData</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventStatus.IncompleteReadout"><code class="docutils literal notranslate"><span class="pre">EventStatus.IncompleteReadout</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventStatus.KnownDeadRB"><code class="docutils literal notranslate"><span class="pre">EventStatus.KnownDeadRB</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventStatus.NoChannel9"><code class="docutils literal notranslate"><span class="pre">EventStatus.NoChannel9</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventStatus.Perfect"><code class="docutils literal notranslate"><span class="pre">EventStatus.Perfect</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventStatus.RBEventWacky"><code class="docutils literal notranslate"><span class="pre">EventStatus.RBEventWacky</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventStatus.TailWrong"><code class="docutils literal notranslate"><span class="pre">EventStatus.TailWrong</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventStatus.Unknown"><code class="docutils literal notranslate"><span class="pre">EventStatus.Unknown</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventStatus.from_u8"><code class="docutils literal notranslate"><span class="pre">EventStatus.from_u8()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.DataType"><code class="docutils literal notranslate"><span class="pre">DataType</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.DataType.MTBTriggerPoisson"><code class="docutils literal notranslate"><span class="pre">DataType.MTBTriggerPoisson</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.DataType.Noi"><code class="docutils literal notranslate"><span class="pre">DataType.Noi</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.DataType.Physics"><code class="docutils literal notranslate"><span class="pre">DataType.Physics</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.DataType.RBTriggerPeriodic"><code class="docutils literal notranslate"><span class="pre">DataType.RBTriggerPeriodic</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.DataType.RBTriggerPoisson"><code class="docutils literal notranslate"><span class="pre">DataType.RBTriggerPoisson</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.DataType.TimingCalibration"><code class="docutils literal notranslate"><span class="pre">DataType.TimingCalibration</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.DataType.Unknown"><code class="docutils literal notranslate"><span class="pre">DataType.Unknown</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.DataType.VoltageCalibration"><code class="docutils literal notranslate"><span class="pre">DataType.VoltageCalibration</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.DataType.from_u8"><code class="docutils literal notranslate"><span class="pre">DataType.from_u8()</span></code></a></li>
 </ul>
 </li>
 </ul>

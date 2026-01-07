@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.io &#8212; gondola 0.12.6 documentation</title>
+    <title>gondola.io &#8212; gondola 0.12.7 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=eee2e1a2"></script>
+    <script src="../_static/documentation_options.js?v=1392dee4"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.io';</script>
@@ -110,7 +110,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.12.6 documentation</p>
+    <p class="title logo__title">gondola 0.12.7 documentation</p>
   
 </a></div>
     
@@ -348,14 +348,44 @@ obtain various flavors of data used trhoughout GAPS.</p>
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.io.apply_diff_to_file" title="gondola.io.apply_diff_to_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_diff_to_file</span></code></a>(compressed_bytes, ...)</p></td>
+<td><p>Applies a diff (patch) from a patch file to an original file, writing the result to a new file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.io.compress_toml" title="gondola.io.compress_toml"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compress_toml</span></code></a>(file_path)</p></td>
+<td><p>Create a compressed bytestream out of a .toml file, so that we can pack it and  send it as a TofPacket</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.io.create_compressed_diff" title="gondola.io.create_compressed_diff"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_compressed_diff</span></code></a>(old_path, new_path)</p></td>
+<td><p>Computes the diff between two files, compresses the diff output, and returns it.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.io.decompress_toml" title="gondola.io.decompress_toml"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decompress_toml</span></code></a>(compressed_data, output_path)</p></td>
+<td><p>Unpack a bytestream to a .toml file</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.io.get_datetime" title="gondola.io.get_datetime"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_datetime</span></code></a>(input[, tformat])</p></td>
+<td><p>Retrieve the DateTime object from a string as used in  the names of the run files</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.io.get_rundata_from_file" title="gondola.io.get_rundata_from_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rundata_from_file</span></code></a>(fname[, pattern])</p></td>
+<td><p>Get the timestamp from a .tof.gaps file</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#gondola.io.get_telemetry_binaries" title="gondola.io.get_telemetry_binaries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_telemetry_binaries</span></code></a>(unix_time_start, ...)</p></td>
 <td><p>Get the relevant telemetry data files for time period from a directory</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#gondola.io.get_ts_from_binfile" title="gondola.io.get_ts_from_binfile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_ts_from_binfile</span></code></a>(fname)</p></td>
 <td><p>Get a timestamp from a '.bin' file as written  by telemetry</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.io.grace_get_telemetry_binaries" title="gondola.io.grace_get_telemetry_binaries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grace_get_telemetry_binaries</span></code></a>(...[, data_dir])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.io.get_unix_timestamp" title="gondola.io.get_unix_timestamp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_unix_timestamp</span></code></a>(input[, tformat])</p></td>
+<td><p>Retrieve the UNIX timestamp from a string as used in  the names of the run files</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.io.get_utc_date" title="gondola.io.get_utc_date"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_utc_date</span></code></a>()</p></td>
+<td><p>Create date string in YYMMDD format</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.io.get_utc_now" title="gondola.io.get_utc_now"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_utc_now</span></code></a>()</p></td>
+<td><p>Get a human readable timestamp for NOW</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.io.grace_get_telemetry_binaries" title="gondola.io.grace_get_telemetry_binaries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grace_get_telemetry_binaries</span></code></a>(...[, data_dir])</p></td>
 <td><p>Get the relevant telemetry data files for time period from a directory.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.io.list_path_contents_sorted" title="gondola.io.list_path_contents_sorted"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list_path_contents_sorted</span></code></a>(input[, pattern])</p></td>
+<td><p>Get all filenames in the current path sorted by timestamp if available If the given path is a file and not a directory, return only that  file instead</p></td>
 </tr>
 </tbody>
 </table>
