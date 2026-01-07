@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Polars Eager cookbook"><title>polars::docs::eager - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-aa0817cf.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="polars" data-themes="" data-resource-suffix="" data-rustdoc-version="1.90.0 (1159e78c4 2025-09-14)" data-channel="1.90.0" data-search-js="search-fa3e91e5.js" data-settings-js="settings-5514c975.js" ><script src="../../../static.files/storage-68b7e25d.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../../static.files/main-eebb9057.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../polars/index.html">polars</a><span class="version">0.46.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Module eager</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#polars-eager-cookbook" title="Polars Eager cookbook">Polars Eager cookbook</a><ul><li><a href="#tree-of-contents" title="Tree Of Contents">Tree Of Contents</a></li><li><a href="#creation-of-data-structures" title="Creation of data structures">Creation of data structures</a></li><li><a href="#arithmetic" title="Arithmetic">Arithmetic</a></li><li><a href="#comparisons" title="Comparisons">Comparisons</a></li><li><a href="#apply-functions-closures" title="Apply functions/ closures">Apply functions/ closures</a></li><li><a href="#filter" title="Filter">Filter</a></li><li><a href="#sort" title="Sort">Sort</a></li><li><a href="#joins" title="Joins">Joins</a></li><li><a href="#groupby" title="Groupby">Groupby</a></li><li><a href="#unpivot" title="Unpivot">Unpivot</a></li><li><a href="#explode" title="Explode">Explode</a></li><li><a href="#io" title="IO">IO</a></li></ul></li><li><a href="#various" title="Various">Various</a><ul><li><a href="#replace-nan-with-missing" title="Replace NaN with Missing.">Replace NaN with Missing.</a></li><li><a href="#extracting-data" title="Extracting data">Extracting data</a></li></ul></li></ul></section><div id="rustdoc-modnav"><h2><a href="../index.html">In polars::<wbr>docs</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../index.html">polars</a>::<wbr><a href="../index.html">docs</a></div><h1>Module <span>eager</span><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../src/polars/docs/eager.rs.html#1-730">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="polars-eager-cookbook"><a class="doc-anchor" href="#polars-eager-cookbook">§</a>Polars Eager cookbook</h2>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Polars Eager cookbook"><title>polars::docs::eager - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="polars" data-themes="" data-resource-suffix="" data-rustdoc-version="1.92.0 (ded5c06cf 2025-12-08)" data-channel="1.92.0" data-search-js="search-d69d8955.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../../static.files/main-ce535bd0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">Module eager</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../polars/index.html">polars</a><span class="version">0.46.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Module eager</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#polars-eager-cookbook" title="Polars Eager cookbook">Polars Eager cookbook</a><ul><li><a href="#tree-of-contents" title="Tree Of Contents">Tree Of Contents</a></li><li><a href="#creation-of-data-structures" title="Creation of data structures">Creation of data structures</a></li><li><a href="#arithmetic" title="Arithmetic">Arithmetic</a></li><li><a href="#comparisons" title="Comparisons">Comparisons</a></li><li><a href="#apply-functions-closures" title="Apply functions/ closures">Apply functions/ closures</a></li><li><a href="#filter" title="Filter">Filter</a></li><li><a href="#sort" title="Sort">Sort</a></li><li><a href="#joins" title="Joins">Joins</a></li><li><a href="#groupby" title="Groupby">Groupby</a></li><li><a href="#unpivot" title="Unpivot">Unpivot</a></li><li><a href="#explode" title="Explode">Explode</a></li><li><a href="#io" title="IO">IO</a></li></ul></li><li><a href="#various" title="Various">Various</a><ul><li><a href="#replace-nan-with-missing" title="Replace NaN with Missing.">Replace NaN with Missing.</a></li><li><a href="#extracting-data" title="Extracting data">Extracting data</a></li></ul></li></ul></section><div id="rustdoc-modnav"><h2><a href="../index.html">In polars::<wbr>docs</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../index.html">polars</a>::<wbr><a href="../index.html">docs</a></div><h1>Module <span>eager</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../src/polars/docs/eager.rs.html#1-730">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="polars-eager-cookbook"><a class="doc-anchor" href="#polars-eager-cookbook">§</a>Polars Eager cookbook</h2>
 <p>This page should serve as a cookbook to quickly get you started with most fundamental operations
 executed on a <a href="../../prelude/struct.ChunkedArray.html" title="struct polars::prelude::ChunkedArray"><code>ChunkedArray</code></a>, <a href="../../prelude/struct.Series.html" title="struct polars::prelude::Series"><code>Series</code></a> or <a href="../../prelude/struct.DataFrame.html" title="struct polars::prelude::DataFrame"><code>DataFrame</code></a>.</p>
 <h3 id="tree-of-contents"><a class="doc-anchor" href="#tree-of-contents">§</a>Tree Of Contents</h3>
@@ -56,8 +56,7 @@ executed on a <a href="../../prelude/struct.ChunkedArray.html" title="struct pol
 <span class="kw">for </span>value <span class="kw">in </span><span class="number">0</span>..<span class="number">10 </span>{
     builder.append_value(value);
 }
-<span class="kw">let </span>ca = builder.finish();</code></pre></div>
-<h4 id="series"><a class="doc-anchor" href="#series">§</a>Series</h4>
+<span class="kw">let </span>ca = builder.finish();</code></pre></div><h4 id="series"><a class="doc-anchor" href="#series">§</a>Series</h4>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>polars::prelude::<span class="kw-2">*</span>;
 
 <span class="comment">// use iterators
@@ -71,8 +70,7 @@ executed on a <a href="../../prelude/struct.ChunkedArray.html" title="struct pol
 <span class="kw">let </span>s = ca.into_series();
 
 <span class="comment">// into a Column
-</span><span class="kw">let </span>s = s.into_column();</code></pre></div>
-<h4 id="dataframe"><a class="doc-anchor" href="#dataframe">§</a>DataFrame</h4>
+</span><span class="kw">let </span>s = s.into_column();</code></pre></div><h4 id="dataframe"><a class="doc-anchor" href="#dataframe">§</a>DataFrame</h4>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>polars::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>polars::df;
 
@@ -86,8 +84,7 @@ executed on a <a href="../../prelude/struct.ChunkedArray.html" title="struct pol
 <span class="comment">// from a Vec&lt;Column&gt;
 </span><span class="kw">let </span>c1 = Column::new(<span class="string">"names"</span>.into(), <span class="kw-2">&amp;</span>[<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">"c"</span>]);
 <span class="kw">let </span>c2 = Column::new(<span class="string">"values"</span>.into(), <span class="kw-2">&amp;</span>[<span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="number">3</span>)]);
-<span class="kw">let </span>df = DataFrame::new(<span class="macro">vec!</span>[c1, c2])<span class="question-mark">?</span>;</code></pre></div>
-<h3 id="arithmetic"><a class="doc-anchor" href="#arithmetic">§</a>Arithmetic</h3>
+<span class="kw">let </span>df = DataFrame::new(<span class="macro">vec!</span>[c1, c2])<span class="question-mark">?</span>;</code></pre></div><h3 id="arithmetic"><a class="doc-anchor" href="#arithmetic">§</a>Arithmetic</h3>
 <p>Arithmetic can be done on both <a href="../../prelude/struct.Series.html" title="struct polars::prelude::Series"><code>Series</code></a> and <a href="../../prelude/struct.ChunkedArray.html" title="struct polars::prelude::ChunkedArray"><code>ChunkedArray</code></a>. The most notable difference is that
 a <a href="../../prelude/struct.Series.html" title="struct polars::prelude::Series"><code>Series</code></a> coerces the data to match the underlying data types.</p>
 
@@ -131,8 +128,7 @@ such operations directly.</p>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>ca = UInt32Chunked::new(<span class="string">"foo"</span>.into(), <span class="kw-2">&amp;</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]);
 
 <span class="comment">// 1 / ca
-</span><span class="kw">let </span>divide_one_by_ca = ca.apply_values(|rhs| <span class="number">1 </span>/ rhs);</code></pre></div>
-<h3 id="comparisons"><a class="doc-anchor" href="#comparisons">§</a>Comparisons</h3>
+</span><span class="kw">let </span>divide_one_by_ca = ca.apply_values(|rhs| <span class="number">1 </span>/ rhs);</code></pre></div><h3 id="comparisons"><a class="doc-anchor" href="#comparisons">§</a>Comparisons</h3>
 <p><a href="../../prelude/struct.Series.html" title="struct polars::prelude::Series"><code>Series</code></a> and <a href="../../prelude/struct.ChunkedArray.html" title="struct polars::prelude::ChunkedArray"><code>ChunkedArray</code></a> can be used in comparison operations to create <em>boolean</em> masks/predicates.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>polars::prelude::<span class="kw-2">*</span>;
@@ -205,8 +201,7 @@ such operations directly.</p>
          <span class="prelude-val">Some</span>(value) =&gt; value &lt; <span class="number">10</span>,
          <span class="prelude-val">None </span>=&gt; <span class="bool-val">false
 </span>}}).collect();
-</code></pre></div>
-<h3 id="apply-functions-closures"><a class="doc-anchor" href="#apply-functions-closures">§</a>Apply functions/ closures</h3>
+</code></pre></div><h3 id="apply-functions-closures"><a class="doc-anchor" href="#apply-functions-closures">§</a>Apply functions/ closures</h3>
 <p>See all possible <a href="../../prelude/trait.ChunkApply.html" title="trait polars::prelude::ChunkApply">apply methods here</a>.</p>
 <h4 id="series--chunkedarrays"><a class="doc-anchor" href="#series--chunkedarrays">§</a>Series / ChunkedArrays</h4>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>polars::prelude::<span class="kw-2">*</span>;
@@ -219,8 +214,7 @@ s.i32()<span class="question-mark">?</span>.apply_values(|value| value * <span c
 <span class="comment">// count string lengths
 </span><span class="kw">let </span>s = Series::new(<span class="string">"foo"</span>.into(), <span class="kw-2">&amp;</span>[<span class="string">"foo"</span>, <span class="string">"bar"</span>, <span class="string">"foobar"</span>]);
 unary_elementwise_values::&lt;StringType, UInt64Type, <span class="kw">_</span>&gt;(s.str()<span class="question-mark">?</span>, |str_val| str_val.len() <span class="kw">as </span>u64);
-</code></pre></div>
-<h4 id="multiple-columns"><a class="doc-anchor" href="#multiple-columns">§</a>Multiple columns</h4>
+</code></pre></div><h4 id="multiple-columns"><a class="doc-anchor" href="#multiple-columns">§</a>Multiple columns</h4>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>polars::prelude::<span class="kw-2">*</span>;
 <span class="kw">fn </span>my_black_box_function(a: f32, b: f32) -&gt; f32 {
     <span class="comment">// do something
@@ -245,8 +239,7 @@ unary_elementwise_values::&lt;StringType, UInt64Type, <span class="kw">_</span>&
         }
         <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">"unexpected dtypes"</span>),
     }
-}</code></pre></div>
-<h4 id="dataframe-1"><a class="doc-anchor" href="#dataframe-1">§</a>DataFrame</h4>
+}</code></pre></div><h4 id="dataframe-1"><a class="doc-anchor" href="#dataframe-1">§</a>DataFrame</h4>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>polars::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>polars::df;
 
@@ -263,8 +256,7 @@ unary_elementwise_values::&lt;StringType, UInt64Type, <span class="kw">_</span>&
 </span>df.try_apply(<span class="string">"letters"</span>, |s: <span class="kw-2">&amp;</span>Series| {
     <span class="prelude-val">Ok</span>(s.str()<span class="question-mark">?</span>.to_uppercase())
 });
-</code></pre></div>
-<h3 id="filter"><a class="doc-anchor" href="#filter">§</a>Filter</h3>
+</code></pre></div><h3 id="filter"><a class="doc-anchor" href="#filter">§</a>Filter</h3>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>polars::prelude::<span class="kw-2">*</span>;
 
 <span class="comment">// create a mask to filter out null values
@@ -278,8 +270,7 @@ unary_elementwise_values::&lt;StringType, UInt64Type, <span class="kw">_</span>&
 
 <span class="comment">// apply the filter on a DataFrame
 </span><span class="kw">let </span>filtered_df = df.filter(<span class="kw-2">&amp;</span>mask)<span class="question-mark">?</span>;
-</code></pre></div>
-<h3 id="sort"><a class="doc-anchor" href="#sort">§</a>Sort</h3>
+</code></pre></div><h3 id="sort"><a class="doc-anchor" href="#sort">§</a>Sort</h3>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>polars::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>polars::df;
 
@@ -312,8 +303,7 @@ unary_elementwise_values::&lt;StringType, UInt64Type, <span class="kw">_</span>&
 // │ 2   ┆ "a" │
 // │ 3   ┆ "b" │
 // ╰─────┴─────╯
-</span></code></pre></div>
-<h3 id="joins"><a class="doc-anchor" href="#joins">§</a>Joins</h3>
+</span></code></pre></div><h3 id="joins"><a class="doc-anchor" href="#joins">§</a>Joins</h3>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>polars::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>polars::df;
 
@@ -336,8 +326,7 @@ temp.full_join(<span class="kw-2">&amp;</span>rain, [<span class="string">"days"
 
 <span class="comment">// join on multiple columns
 </span>temp.join(<span class="kw-2">&amp;</span>rain, <span class="macro">vec!</span>[<span class="string">"days"</span>, <span class="string">"other"</span>], <span class="macro">vec!</span>[<span class="string">"days"</span>, <span class="string">"other"</span>], JoinArgs::new(JoinType::Left), <span class="prelude-val">None</span>);
-</code></pre></div>
-<h3 id="groupby"><a class="doc-anchor" href="#groupby">§</a>Groupby</h3>
+</code></pre></div><h3 id="groupby"><a class="doc-anchor" href="#groupby">§</a>Groupby</h3>
 <p>Note that Polars lazy is a lot more powerful in and more performant in group_by operations.
 In lazy a myriad of aggregations can be combined from expressions.</p>
 <p>See more in:</p>
@@ -352,8 +341,7 @@ In lazy a myriad of aggregations can be combined from expressions.</p>
     </span>.select([<span class="string">"foo"</span>])
     .sum();
 
-</code></pre></div>
-<h4 id="pivot"><a class="doc-anchor" href="#pivot">§</a>Pivot</h4>
+</code></pre></div><h4 id="pivot"><a class="doc-anchor" href="#pivot">§</a>Pivot</h4>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>polars::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>polars::df;
 
@@ -384,8 +372,7 @@ In lazy a myriad of aggregations can be combined from expressions.</p>
 // +-----+------+------+------+------+------+
 // | "C" | 2    | null | null | null | null |
 // +-----+------+------+------+------+------+!
-</span></code></pre></div>
-<h3 id="unpivot"><a class="doc-anchor" href="#unpivot">§</a>Unpivot</h3>
+</span></code></pre></div><h3 id="unpivot"><a class="doc-anchor" href="#unpivot">§</a>Unpivot</h3>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>polars::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>polars::df;
 
@@ -418,8 +405,7 @@ In lazy a myriad of aggregations can be combined from expressions.</p>
 // +-----+-----+----------+-------+
 // | "a" | 5   | "D"      | 6     |
 // +-----+-----+----------+-------+
-</span></code></pre></div>
-<h3 id="explode"><a class="doc-anchor" href="#explode">§</a>Explode</h3>
+</span></code></pre></div><h3 id="explode"><a class="doc-anchor" href="#explode">§</a>Explode</h3>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>polars::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>polars::df;
 
@@ -460,14 +446,12 @@ In lazy a myriad of aggregations can be combined from expressions.</p>
 // +-----+-----+-----+
 // | 2   | 3   | 1   |
 // +-----+-----+-----+
-</span></code></pre></div>
-<h3 id="io"><a class="doc-anchor" href="#io">§</a>IO</h3><h4 id="read-csv"><a class="doc-anchor" href="#read-csv">§</a>Read CSV</h4>
+</span></code></pre></div><h3 id="io"><a class="doc-anchor" href="#io">§</a>IO</h3><h4 id="read-csv"><a class="doc-anchor" href="#read-csv">§</a>Read CSV</h4>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>polars::prelude::<span class="kw-2">*</span>;
 
 <span class="comment">// read from path
 </span><span class="kw">let </span><span class="kw-2">mut </span>file = std::fs::File::open(<span class="string">"iris.csv"</span>)<span class="question-mark">?</span>;
-<span class="kw">let </span>df = CsvReader::new(file).finish()<span class="question-mark">?</span>;</code></pre></div>
-<h4 id="write-csv"><a class="doc-anchor" href="#write-csv">§</a>Write CSV</h4>
+<span class="kw">let </span>df = CsvReader::new(file).finish()<span class="question-mark">?</span>;</code></pre></div><h4 id="write-csv"><a class="doc-anchor" href="#write-csv">§</a>Write CSV</h4>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>polars::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::fs::File;
 
@@ -478,8 +462,7 @@ In lazy a myriad of aggregations can be combined from expressions.</p>
 </span>CsvWriter::new(<span class="kw-2">&amp;mut </span>file)
     .include_header(<span class="bool-val">true</span>)
     .with_separator(<span class="string">b','</span>)
-    .finish(df);</code></pre></div>
-<h4 id="read-ipc"><a class="doc-anchor" href="#read-ipc">§</a>Read IPC</h4>
+    .finish(df);</code></pre></div><h4 id="read-ipc"><a class="doc-anchor" href="#read-ipc">§</a>Read IPC</h4>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>polars::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::fs::File;
 
@@ -488,8 +471,7 @@ In lazy a myriad of aggregations can be combined from expressions.</p>
 
 <span class="comment">// read to DataFrame
 </span><span class="kw">let </span>df = IpcReader::new(file)
-   .finish()<span class="question-mark">?</span>;</code></pre></div>
-<h4 id="write-ipc"><a class="doc-anchor" href="#write-ipc">§</a>Write IPC</h4>
+   .finish()<span class="question-mark">?</span>;</code></pre></div><h4 id="write-ipc"><a class="doc-anchor" href="#write-ipc">§</a>Write IPC</h4>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>polars::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::fs::File;
 
@@ -498,8 +480,7 @@ In lazy a myriad of aggregations can be combined from expressions.</p>
 
 <span class="comment">// write DataFrame to file
 </span>IpcWriter::new(<span class="kw-2">&amp;mut </span>file)
-    .finish(df)</code></pre></div>
-<h4 id="read-parquet"><a class="doc-anchor" href="#read-parquet">§</a>Read Parquet</h4>
+    .finish(df)</code></pre></div><h4 id="read-parquet"><a class="doc-anchor" href="#read-parquet">§</a>Read Parquet</h4>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>polars::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::fs::File;
 
@@ -507,8 +488,7 @@ In lazy a myriad of aggregations can be combined from expressions.</p>
 </span><span class="kw">let </span>file = File::open(<span class="string">"some_file.parquet"</span>).unwrap();
 
 <span class="comment">// read to DataFrame
-</span><span class="kw">let </span>df = ParquetReader::new(file).finish()<span class="question-mark">?</span>;</code></pre></div>
-<h4 id="write-parquet"><a class="doc-anchor" href="#write-parquet">§</a>Write Parquet</h4>
+</span><span class="kw">let </span>df = ParquetReader::new(file).finish()<span class="question-mark">?</span>;</code></pre></div><h4 id="write-parquet"><a class="doc-anchor" href="#write-parquet">§</a>Write Parquet</h4>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>polars::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::fs::File;
 
@@ -516,11 +496,10 @@ In lazy a myriad of aggregations can be combined from expressions.</p>
 </span><span class="kw">let </span>file = File::create(<span class="string">"example.parquet"</span>).expect(<span class="string">"could not create file"</span>);
 
 ParquetWriter::new(file)
-    .finish(df)</code></pre></div>
-<h2 id="various"><a class="doc-anchor" href="#various">§</a>Various</h2><h3 id="replace-nan-with-missing"><a class="doc-anchor" href="#replace-nan-with-missing">§</a>Replace NaN with Missing.</h3>
+    .finish(df)</code></pre></div><h2 id="various"><a class="doc-anchor" href="#various">§</a>Various</h2><h3 id="replace-nan-with-missing"><a class="doc-anchor" href="#replace-nan-with-missing">§</a>Replace NaN with Missing.</h3>
 <p>The floating point <a href="https://en.wikipedia.org/wiki/NaN">Not a Number: NaN</a> is conceptually different
 than missing data in Polars. In the snippet below we show how we can replace <a href="https://doc.rust-lang.org/std/primitive.f64.html#associatedconstant.NAN"><code>NaN</code></a> values with
-missing values, by setting them to <a href="https://doc.rust-lang.org/1.90.0/core/option/enum.Option.html#variant.None" title="variant core::option::Option::None"><code>None</code></a>.</p>
+missing values, by setting them to <a href="https://doc.rust-lang.org/1.92.0/core/option/enum.Option.html#variant.None" title="variant core::option::Option::None"><code>None</code></a>.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>polars::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>polars::df;
@@ -543,10 +522,9 @@ missing values, by setting them to <a href="https://doc.rust-lang.org/1.90.0/cor
         })<span class="question-mark">?</span>;
     }
     <span class="prelude-val">Ok</span>(df)
-}</code></pre></div>
-<h3 id="extracting-data"><a class="doc-anchor" href="#extracting-data">§</a>Extracting data</h3>
+}</code></pre></div><h3 id="extracting-data"><a class="doc-anchor" href="#extracting-data">§</a>Extracting data</h3>
 <p>To iterate over the values of a <a href="../../prelude/struct.Series.html" title="struct polars::prelude::Series"><code>Series</code></a>, or to convert the <a href="../../prelude/struct.Series.html" title="struct polars::prelude::Series"><code>Series</code></a> into another structure
-such as a <a href="https://doc.rust-lang.org/1.90.0/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec"><code>Vec&lt;T&gt;</code></a>, we must first downcast to a data type aware <a href="../../prelude/struct.ChunkedArray.html" title="struct polars::prelude::ChunkedArray"><code>ChunkedArray&lt;T&gt;</code></a>.</p>
+such as a <a href="https://doc.rust-lang.org/1.92.0/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec"><code>Vec&lt;T&gt;</code></a>, we must first downcast to a data type aware <a href="../../prelude/struct.ChunkedArray.html" title="struct polars::prelude::ChunkedArray"><code>ChunkedArray&lt;T&gt;</code></a>.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>polars::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>polars::df;
@@ -569,5 +547,4 @@ such as a <a href="https://doc.rust-lang.org/1.90.0/alloc/vec/struct.Vec.html" t
     <span class="kw">let </span>to_vec_no_options: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = ca.into_no_null_iter().collect();
 
     <span class="prelude-val">Ok</span>(())
-}</code></pre></div>
-</div></details></section></div></main></body></html>
+}</code></pre></div></div></details></section></div></main></body></html>

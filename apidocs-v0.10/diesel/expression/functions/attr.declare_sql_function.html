@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Declare a sql function for use in your code."><title>declare_sql_function in diesel::expression::functions - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-aa0817cf.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="diesel" data-themes="" data-resource-suffix="" data-rustdoc-version="1.90.0 (1159e78c4 2025-09-14)" data-channel="1.90.0" data-search-js="search-fa3e91e5.js" data-settings-js="settings-5514c975.js" ><script src="../../../static.files/storage-68b7e25d.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../../static.files/main-eebb9057.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc attr"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../diesel/index.html">diesel</a><span class="version">2.3.2</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">declare_<wbr>sql_<wbr>function</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#adding-doc-comments" title="Adding Doc Comments">Adding Doc Comments</a></li><li><a href="#special-attributes" title="Special Attributes">Special Attributes</a></li><li><a href="#sql-functions-without-arguments" title="SQL Functions without Arguments">SQL Functions without Arguments</a></li><li><a href="#use-with-sqlite" title="Use with SQLite">Use with SQLite</a><ul><li><a href="#panics" title="Panics">Panics</a></li><li><a href="#custom-aggregate-functions" title="Custom Aggregate Functions">Custom Aggregate Functions</a></li><li><a href="#variadic-functions" title="Variadic functions">Variadic functions</a></li><li><a href="#helper-types-generation" title="Helper types generation">Helper types generation</a></li></ul></li></ul></section><div id="rustdoc-modnav"><h2><a href="index.html">In diesel::<wbr>expression::<wbr>functions</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../index.html">diesel</a>::<wbr><a href="../index.html">expression</a>::<wbr><a href="index.html">functions</a></div><h1>Attribute Macro <span class="attr">declare_sql_function</span><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../src/diesel_derives/lib.rs.html#2318-2321">Source</a> </span></div><pre class="rust item-decl"><code>#[declare_sql_function]</code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Declare a sql function for use in your code.</p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Declare a sql function for use in your code."><title>declare_sql_function in diesel::expression::functions - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="diesel" data-themes="" data-resource-suffix="" data-rustdoc-version="1.92.0 (ded5c06cf 2025-12-08)" data-channel="1.92.0" data-search-js="search-d69d8955.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../../static.files/main-ce535bd0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc attr"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">declare_sql_function</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../diesel/index.html">diesel</a><span class="version">2.3.5</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">declare_<wbr>sql_<wbr>function</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#adding-doc-comments" title="Adding Doc Comments">Adding Doc Comments</a></li><li><a href="#special-attributes" title="Special Attributes">Special Attributes</a></li><li><a href="#sql-functions-without-arguments" title="SQL Functions without Arguments">SQL Functions without Arguments</a></li><li><a href="#use-with-sqlite" title="Use with SQLite">Use with SQLite</a><ul><li><a href="#panics" title="Panics">Panics</a></li><li><a href="#custom-aggregate-functions" title="Custom Aggregate Functions">Custom Aggregate Functions</a></li><li><a href="#variadic-functions" title="Variadic functions">Variadic functions</a></li><li><a href="#helper-types-generation" title="Helper types generation">Helper types generation</a></li></ul></li></ul></section><div id="rustdoc-modnav"><h2><a href="index.html">In diesel::<wbr>expression::<wbr>functions</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../index.html">diesel</a>::<wbr><a href="../index.html">expression</a>::<wbr><a href="index.html">functions</a></div><h1>Attribute Macro <span class="attr">declare_<wbr>sql_<wbr>function</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../src/diesel_derives/lib.rs.html#2318-2321">Source</a> </span></div><pre class="rust item-decl"><code>#[declare_sql_function]</code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Declare a sql function for use in your code.</p>
 <p>Diesel only provides support for a very small number of SQL functions.
 This macro enables you to add additional functions from the SQL standard,
 as well as any custom functions your application might have.</p>
@@ -39,8 +39,7 @@ information, refer to the <code>Helper types generation</code> section.</p>
 <span class="kw">let </span>target_name = <span class="string">"diesel"</span>;
 crates.filter(canon_crate_name(name).eq(canon_crate_name(target_name)));
 <span class="comment">// This will generate the following SQL
-// SELECT * FROM crates WHERE canon_crate_name(crates.name) = canon_crate_name($1)</span></code></pre></div>
-<h2 id="special-attributes"><a class="doc-anchor" href="#special-attributes">§</a>Special Attributes</h2>
+// SELECT * FROM crates WHERE canon_crate_name(crates.name) = canon_crate_name($1)</span></code></pre></div><h2 id="special-attributes"><a class="doc-anchor" href="#special-attributes">§</a>Special Attributes</h2>
 <p>There are a handful of special attributes that Diesel will recognize. They
 are:</p>
 <ul>
@@ -76,8 +75,7 @@ function accepts.</li>
     </span><span class="kw">fn </span>sum&lt;ST: Foldable&gt;(expr: ST) -&gt; ST::Sum;
 }
 
-crates.select(sum(id));</code></pre></div>
-<h2 id="sql-functions-without-arguments"><a class="doc-anchor" href="#sql-functions-without-arguments">§</a>SQL Functions without Arguments</h2>
+crates.select(sum(id));</code></pre></div><h2 id="sql-functions-without-arguments"><a class="doc-anchor" href="#sql-functions-without-arguments">§</a>SQL Functions without Arguments</h2>
 <p>A common example is ordering a query using the <code>RANDOM()</code> sql function,
 which can be implemented using <code>define_sql_function!</code> like this:</p>
 
@@ -86,8 +84,7 @@ which can be implemented using <code>define_sql_function!</code> like this:</p>
     <span class="kw">fn </span>random() -&gt; Text;
 }
 
-crates.order(random());</code></pre></div>
-<h2 id="use-with-sqlite"><a class="doc-anchor" href="#use-with-sqlite">§</a>Use with SQLite</h2>
+crates.order(random());</code></pre></div><h2 id="use-with-sqlite"><a class="doc-anchor" href="#use-with-sqlite">§</a>Use with SQLite</h2>
 <p>On most backends, the implementation of the function is defined in a
 migration using <code>CREATE FUNCTION</code>. On SQLite, the function is implemented in
 Rust instead. You must call <code>register_impl</code> or
@@ -109,8 +106,7 @@ SQLite doesn’t support generic functions and variadic functions.</p>
 add_mul_utils::register_impl(connection, |x: i32, y: i32, z: f64| (x + y) <span class="kw">as </span>f64 * z)<span class="question-mark">?</span>;
 
 <span class="kw">let </span>result = select(add_mul(<span class="number">1</span>, <span class="number">2</span>, <span class="number">1.5</span>)).get_result::&lt;f64&gt;(connection)<span class="question-mark">?</span>;
-<span class="macro">assert_eq!</span>(<span class="number">4.5</span>, result);</code></pre></div>
-<h3 id="panics"><a class="doc-anchor" href="#panics">§</a>Panics</h3>
+<span class="macro">assert_eq!</span>(<span class="number">4.5</span>, result);</code></pre></div><h3 id="panics"><a class="doc-anchor" href="#panics">§</a>Panics</h3>
 <p>If an implementation of the custom function panics and unwinding is enabled, the panic is
 caught and the function returns to libsqlite with an error. It can’t propagate the panics due
 to the FFI boundary.</p>
@@ -197,8 +193,7 @@ trait as a type parameter as shown in the examples below.</p>
     }
 
     <span class="prelude-val">Ok</span>(())
-}</code></pre></div>
-<h3 id="variadic-functions"><a class="doc-anchor" href="#variadic-functions">§</a>Variadic functions</h3>
+}</code></pre></div><h3 id="variadic-functions"><a class="doc-anchor" href="#variadic-functions">§</a>Variadic functions</h3>
 <p>Since Rust does not support variadic functions, the SQL variadic functions are
 handled differently. For example, consider the variadic function <code>json_array</code>.
 To add support for it, you can use the <code>#[variadic]</code> attribute:</p>
@@ -253,8 +248,7 @@ to repeat, you would write:</p>
     </span><span class="kw">fn </span>foo_2&lt;A, B1, C1, B2, C2&gt;(a: A, b_1: B1, c_1: C1, b_2: B2, c_2: C2) -&gt; Text;
 
     ...
-}</code></pre></div>
-<h4 id="controlling-the-generation-of-variadic-function-variants"><a class="doc-anchor" href="#controlling-the-generation-of-variadic-function-variants">§</a>Controlling the generation of variadic function variants</h4>
+}</code></pre></div><h4 id="controlling-the-generation-of-variadic-function-variants"><a class="doc-anchor" href="#controlling-the-generation-of-variadic-function-variants">§</a>Controlling the generation of variadic function variants</h4>
 <p>By default, only variants with 0, 1, and 2 repetitions of variadic arguments are generated. To
 generate more variants, set the <code>DIESEL_VARIADIC_FUNCTION_ARGS</code> environment variable to the
 desired number of variants.</p>
@@ -279,5 +273,4 @@ placed in the <code>return_type_helpers</code> module:</p>
     <span class="attr">#[skip_return_type_helper]
     </span><span class="kw">fn </span>f();
 }
-</code></pre></div>
-</div></details></section></div></main></body></html>
+</code></pre></div></div></details></section></div></main></body></html>

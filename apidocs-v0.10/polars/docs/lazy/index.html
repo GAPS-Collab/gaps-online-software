@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Polars Lazy cookbook"><title>polars::docs::lazy - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-aa0817cf.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="polars" data-themes="" data-resource-suffix="" data-rustdoc-version="1.90.0 (1159e78c4 2025-09-14)" data-channel="1.90.0" data-search-js="search-fa3e91e5.js" data-settings-js="settings-5514c975.js" ><script src="../../../static.files/storage-68b7e25d.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../../static.files/main-eebb9057.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-32bb7600.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../polars/index.html">polars</a><span class="version">0.46.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Module lazy</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#polars-lazy-cookbook" title="Polars Lazy cookbook">Polars Lazy cookbook</a><ul><li><a href="#tree-of-contents" title="Tree Of Contents">Tree Of Contents</a></li><li><a href="#start-a-lazy-computation" title="Start a lazy computation">Start a lazy computation</a></li><li><a href="#filter" title="Filter">Filter</a></li><li><a href="#sort" title="Sort">Sort</a></li><li><a href="#groupby" title="Groupby">Groupby</a></li><li><a href="#joins" title="Joins">Joins</a></li><li><a href="#conditionally-apply" title="Conditionally apply">Conditionally apply</a></li></ul></li><li><a href="#black-box-function" title="Black box function">Black box function</a></li></ul></section><div id="rustdoc-modnav"><h2><a href="../index.html">In polars::<wbr>docs</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../index.html">polars</a>::<wbr><a href="../index.html">docs</a></div><h1>Module <span>lazy</span><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../src/polars/docs/lazy.rs.html#1-287">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="polars-lazy-cookbook"><a class="doc-anchor" href="#polars-lazy-cookbook">§</a>Polars Lazy cookbook</h2>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Polars Lazy cookbook"><title>polars::docs::lazy - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="polars" data-themes="" data-resource-suffix="" data-rustdoc-version="1.92.0 (ded5c06cf 2025-12-08)" data-channel="1.92.0" data-search-js="search-d69d8955.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../../static.files/main-ce535bd0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">Module lazy</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../polars/index.html">polars</a><span class="version">0.46.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Module lazy</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#polars-lazy-cookbook" title="Polars Lazy cookbook">Polars Lazy cookbook</a><ul><li><a href="#tree-of-contents" title="Tree Of Contents">Tree Of Contents</a></li><li><a href="#start-a-lazy-computation" title="Start a lazy computation">Start a lazy computation</a></li><li><a href="#filter" title="Filter">Filter</a></li><li><a href="#sort" title="Sort">Sort</a></li><li><a href="#groupby" title="Groupby">Groupby</a></li><li><a href="#joins" title="Joins">Joins</a></li><li><a href="#conditionally-apply" title="Conditionally apply">Conditionally apply</a></li></ul></li><li><a href="#black-box-function" title="Black box function">Black box function</a></li></ul></section><div id="rustdoc-modnav"><h2><a href="../index.html">In polars::<wbr>docs</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../index.html">polars</a>::<wbr><a href="../index.html">docs</a></div><h1>Module <span>lazy</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../src/polars/docs/lazy.rs.html#1-287">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="polars-lazy-cookbook"><a class="doc-anchor" href="#polars-lazy-cookbook">§</a>Polars Lazy cookbook</h2>
 <p>This page should serve as a cookbook to quickly get you started with Polars’ query engine.
 The lazy API allows you to create complex well performing queries on top of Polars eager.</p>
 <h3 id="tree-of-contents"><a class="doc-anchor" href="#tree-of-contents">§</a>Tree Of Contents</h3>
@@ -29,8 +29,7 @@ The lazy API allows you to create complex well performing queries on top of Pola
 
 <span class="comment">// scan a parquet file lazily
 </span><span class="kw">let </span>lf: LazyFrame = LazyFrame::scan_parquet(<span class="string">"some_path"</span>, Default::default())<span class="question-mark">?</span>;
-</code></pre></div>
-<h3 id="filter"><a class="doc-anchor" href="#filter">§</a>Filter</h3>
+</code></pre></div><h3 id="filter"><a class="doc-anchor" href="#filter">§</a>Filter</h3>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>polars::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>polars::df;
 
@@ -52,8 +51,7 @@ The lazy API allows you to create complex well performing queries on top of Pola
 // ╞═════╪═════╡
 // │ 3   ┆ "c" │
 // ╰─────┴─────╯
-</span></code></pre></div>
-<h3 id="sort"><a class="doc-anchor" href="#sort">§</a>Sort</h3>
+</span></code></pre></div><h3 id="sort"><a class="doc-anchor" href="#sort">§</a>Sort</h3>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>polars::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>polars::df;
 
@@ -78,8 +76,7 @@ The lazy API allows you to create complex well performing queries on top of Pola
 // │ 2   ┆ "a" │
 // │ 3   ┆ "b" │
 // ╰─────┴─────╯
-</span></code></pre></div>
-<h3 id="groupby"><a class="doc-anchor" href="#groupby">§</a>Groupby</h3>
+</span></code></pre></div><h3 id="groupby"><a class="doc-anchor" href="#groupby">§</a>Groupby</h3>
 <p>This example is from the polars <a href="https://docs.pola.rs/user-guide/concepts/expressions-and-contexts/#group_by-and-aggregations">user guide</a>.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>polars::prelude::<span class="kw-2">*</span>;
@@ -91,8 +88,7 @@ The lazy API allows you to create complex well performing queries on top of Pola
     </span>.group_by([col(<span class="string">"comment_karma"</span>)])
     .agg([col(<span class="string">"name"</span>).n_unique().alias(<span class="string">"unique_names"</span>), col(<span class="string">"link_karma"</span>).max()])
     <span class="comment">// take only 100 rows.
-    </span>.fetch(<span class="number">100</span>)<span class="question-mark">?</span>;</code></pre></div>
-<h3 id="joins"><a class="doc-anchor" href="#joins">§</a>Joins</h3>
+    </span>.fetch(<span class="number">100</span>)<span class="question-mark">?</span>;</code></pre></div><h3 id="joins"><a class="doc-anchor" href="#joins">§</a>Joins</h3>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>polars::prelude::<span class="kw-2">*</span>;
 <span class="kw">use </span>polars::df;
 <span class="kw">let </span>df_a = <span class="macro">df!</span>[
@@ -141,8 +137,7 @@ The lazy API allows you to create complex well performing queries on top of Pola
     .force_parallel(<span class="bool-val">true</span>)
     .finish()
     .collect()<span class="question-mark">?</span>;
-</code></pre></div>
-<h3 id="conditionally-apply"><a class="doc-anchor" href="#conditionally-apply">§</a>Conditionally apply</h3>
+</code></pre></div><h3 id="conditionally-apply"><a class="doc-anchor" href="#conditionally-apply">§</a>Conditionally apply</h3>
 <p>If we want to create a new column based on some condition, we can use the <a href="../../prelude/struct.Then.html#method.when" title="method polars::prelude::Then::when"><code>when</code></a>/<a href="../../prelude/struct.When.html#method.then" title="method polars::prelude::When::then"><code>then</code></a>/<a href="../../prelude/struct.Then.html#method.otherwise" title="method polars::prelude::Then::otherwise"><code>otherwise</code></a> expressions.</p>
 <ul>
 <li><a href="../../prelude/struct.Then.html#method.when" title="method polars::prelude::Then::when"><code>when</code></a> - accepts a predicate expression</li>
@@ -182,8 +177,7 @@ The lazy API allows you to create complex well performing queries on top of Pola
 // │ 8     ┆ "foo" ┆ "bar" ┆ "foo"      │
 // │ 9     ┆ "foo" ┆ "bar" ┆ "foo"      │
 // ╰───────┴───────┴───────┴────────────╯
-</span></code></pre></div>
-<h2 id="black-box-function"><a class="doc-anchor" href="#black-box-function">§</a>Black box function</h2>
+</span></code></pre></div><h2 id="black-box-function"><a class="doc-anchor" href="#black-box-function">§</a>Black box function</h2>
 <p>The expression API should be expressive enough for most of what you want to achieve, but it can happen
 that you need to pass the values to an external function you do not control. The snippet below
 shows how we use the <a href="crate::datatypes::DataType::Struct"><code>Struct</code></a> datatype to be able to apply a function over multiple inputs.</p>
@@ -224,5 +218,4 @@ shows how we use the <a href="crate::datatypes::DataType::Struct"><code>Struct</
     )])
     .collect()
 }
-</code></pre></div>
-</div></details></section></div></main></body></html>
+</code></pre></div></div></details></section></div></main></body></html>
