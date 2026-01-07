@@ -46,7 +46,8 @@ jobs:
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          print_hash: true
+          print-hash: true
+          packages-dir: gondola-core/rust/gondola-core/dist
 
 ##jobs:
 ##  linux:
