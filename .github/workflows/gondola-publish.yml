@@ -19,13 +19,12 @@ permissions:
   contents: read
   id-token: write
 
-
 jobs:
   build-and-publish:
     strategy:
       matrix:
-        runner: [ubuntu-22.04,ubuntu-latest]
-        target: [x86_64,aarch64]
+        runner: [ubuntu-22.04,ubuntu-latest,macos-13]
+        target: [x86_64]
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
