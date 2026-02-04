@@ -69,7 +69,7 @@ var NAVTREEINDEX =
 "structGaps_1_1Telemetry_1_1Cooling.html#ab891e633844b5232edd3dce42eaf2031",
 "structGaps_1_1TofPaddle.html#aec51c65a14ab98d389e95cdc70bb047b",
 "structTofEvent.html#a3c9e87e032c8be8d733964957c68d623",
-"telemetry__dataclasses_8hpp.html#a3567431f12c1aa2d8da946e149b62aa7a77aa9d32dfec92de3ce2677c4442afac"
+"telemetry__dataclasses_8hpp.html#a3567431f12c1aa2d8da946e149b62aa7a7de42fba23b28a75f40f8a83b19add28"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

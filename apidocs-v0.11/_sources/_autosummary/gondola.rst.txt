@@ -21,6 +21,7 @@
    events
    gondola_core
    io
+   packets
    reconstruction
    tof
    tracker

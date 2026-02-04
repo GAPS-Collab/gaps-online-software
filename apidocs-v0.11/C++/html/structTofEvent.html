@@ -123,8 +123,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8e536d009511c598a3093a34a0723fea" id="r_a8e536d009511c598a3093a34a0723fea"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTofEvent.html#a8e536d009511c598a3093a34a0723fea">get_hits</a> () <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> -&gt; <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">Vec</a>&lt; <a class="el" href="structTofHit.html">TofHit</a> &gt;</td></tr>
 <tr class="memdesc:a8e536d009511c598a3093a34a0723fea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get all hits from all rb_events.  <br /></td></tr>
 <tr class="separator:a8e536d009511c598a3093a34a0723fea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae26790ed1e8d5c9cb331c202fa22b17c" id="r_ae26790ed1e8d5c9cb331c202fa22b17c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTofEvent.html#ae26790ed1e8d5c9cb331c202fa22b17c">normalize_hit_times</a> (<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="namespacegondola.html#a1c2c2768738a98e4ab3c0aa6d31d88e0">gon::TofPaddleTimingConstantMap</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">paddle_offsets</a>=<a class="el" href="namespacegondola.html#a1c2c2768738a98e4ab3c0aa6d31d88e0">gon::TofPaddleTimingConstantMap</a>()) -&gt; <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">void</a></td></tr>
-<tr class="separator:ae26790ed1e8d5c9cb331c202fa22b17c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afbbe0d613404a4dd3b53b99bf8a51d11" id="r_afbbe0d613404a4dd3b53b99bf8a51d11"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTofEvent.html#afbbe0d613404a4dd3b53b99bf8a51d11">to_string</a> () <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> -&gt; std::string</td></tr>
 <tr class="memdesc:afbbe0d613404a4dd3b53b99bf8a51d11"><td class="mdescLeft">&#160;</td><td class="mdescRight">string representation for printing  <br /></td></tr>
 <tr class="separator:afbbe0d613404a4dd3b53b99bf8a51d11"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -372,25 +370,6 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Get the rb event for a specific board id. </p>
-
-</div>
-</div>
-<a id="ae26790ed1e8d5c9cb331c202fa22b17c" name="ae26790ed1e8d5c9cb331c202fa22b17c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae26790ed1e8d5c9cb331c202fa22b17c">&#9670;&#160;</a></span>normalize_hit_times()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a> TofEvent::normalize_hit_times </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="namespacegondola.html#a1c2c2768738a98e4ab3c0aa6d31d88e0">gon::TofPaddleTimingConstantMap</a> &amp;&#160;</td>
-          <td class="paramname"><em>paddle_offsets</em> = <code><a class="el" href="namespacegondola.html#a1c2c2768738a98e4ab3c0aa6d31d88e0">gon::TofPaddleTimingConstantMap</a>()</code></td><td>)</td>
-          <td> -&gt;  <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">void</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>normalize all the hit times, taking the global ch9 phase into account </p>
 
 </div>
 </div>

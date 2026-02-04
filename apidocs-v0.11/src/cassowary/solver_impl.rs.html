@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cassowary-0.3.0/src/solver_impl.rs`."><title>solver_impl.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="cassowary" data-themes="" data-resource-suffix="" data-rustdoc-version="1.92.0 (ded5c06cf 2025-12-08)" data-channel="1.92.0" data-search-js="search-d69d8955.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../static.files/storage-e2aeef58.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-ce535bd0.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">cassowary/</div>solver_impl.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>{
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/cassowary-0.3.0/src/solver_impl.rs`."><title>solver_impl.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="cassowary" data-themes="" data-resource-suffix="" data-rustdoc-version="1.93.0 (254b59607 2026-01-19)" data-channel="1.93.0" data-search-js="search-9e2438ea.js" data-stringdex-js="stringdex-a3946164.js" data-settings-js="settings-c38705f0.js" ><script src="../../static.files/storage-e2aeef58.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-a410ff4d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">cassowary/</div>solver_impl.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>{
 <a href=#2 id=2 data-nosnippet>2</a>    Symbol,
 <a href=#3 id=3 data-nosnippet>3</a>    SymbolType,
 <a href=#4 id=4 data-nosnippet>4</a>    Constraint,
@@ -119,7 +119,7 @@
 <a href=#119 id=119 data-nosnippet>119</a>        } <span class="kw">else </span>{
 <a href=#120 id=120 data-nosnippet>120</a>            row.solve_for_symbol(subject);
 <a href=#121 id=121 data-nosnippet>121</a>            <span class="self">self</span>.substitute(subject, <span class="kw-2">&amp;</span>row);
-<a href=#122 id=122 data-nosnippet>122</a>            <span class="kw">if </span>subject.type_() == SymbolType::External &amp;&amp; row.constant != <span class="number">0.0 </span>{
+<a href=#122 id=122 data-nosnippet>122</a>            <span class="kw">if </span>subject.type_() == SymbolType::External &amp;&amp; row.<span class="macro">constant !</span>= <span class="number">0.0 </span>{
 <a href=#123 id=123 data-nosnippet>123</a>                <span class="kw">let </span>v = <span class="self">self</span>.var_for_symbol[<span class="kw-2">&amp;</span>subject];
 <a href=#124 id=124 data-nosnippet>124</a>                <span class="self">self</span>.var_changed(v);
 <a href=#125 id=125 data-nosnippet>125</a>            }
@@ -265,7 +265,7 @@
 <a href=#265 id=265 data-nosnippet>265</a>                <span class="kw">for </span>(symbol, row) <span class="kw">in </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.rows {
 <a href=#266 id=266 data-nosnippet>266</a>                    <span class="kw">let </span>coeff = row.coefficient_for(info_tag_marker);
 <a href=#267 id=267 data-nosnippet>267</a>                    <span class="kw">let </span>diff = delta * coeff;
-<a href=#268 id=268 data-nosnippet>268</a>                    <span class="kw">if </span>diff != <span class="number">0.0 </span>&amp;&amp; symbol.type_() == SymbolType::External {
+<a href=#268 id=268 data-nosnippet>268</a>                    <span class="kw">if </span><span class="macro">diff !</span>= <span class="number">0.0 </span>&amp;&amp; symbol.type_() == SymbolType::External {
 <a href=#269 id=269 data-nosnippet>269</a>                        <span class="kw">let </span>v = <span class="self">self</span>.var_for_symbol[symbol];
 <a href=#270 id=270 data-nosnippet>270</a>                        <span class="comment">// inline var_changed - borrow checker workaround
 <a href=#271 id=271 data-nosnippet>271</a>                        </span><span class="kw">if </span><span class="self">self</span>.should_clear_changes {
@@ -274,7 +274,7 @@
 <a href=#274 id=274 data-nosnippet>274</a>                        }
 <a href=#275 id=275 data-nosnippet>275</a>                        <span class="self">self</span>.changed.insert(v);
 <a href=#276 id=276 data-nosnippet>276</a>                    }
-<a href=#277 id=277 data-nosnippet>277</a>                    <span class="kw">if </span>coeff != <span class="number">0.0 </span>&amp;&amp;
+<a href=#277 id=277 data-nosnippet>277</a>                    <span class="kw">if </span><span class="macro">coeff !</span>= <span class="number">0.0 </span>&amp;&amp;
 <a href=#278 id=278 data-nosnippet>278</a>                        row.add(diff) &lt; <span class="number">0.0 </span>&amp;&amp;
 <a href=#279 id=279 data-nosnippet>279</a>                        symbol.type_() != SymbolType::External
 <a href=#280 id=280 data-nosnippet>280</a>                    {
@@ -311,7 +311,7 @@
 <a href=#311 id=311 data-nosnippet>311</a>            <span class="kw">if let </span><span class="prelude-val">Some</span>(var_data) = <span class="self">self</span>.var_data.get_mut(<span class="kw-2">&amp;</span>v) {
 <a href=#312 id=312 data-nosnippet>312</a>                <span class="kw">let </span>new_value = <span class="self">self</span>.rows.get(<span class="kw-2">&amp;</span>var_data.<span class="number">1</span>).map(|r| r.constant).unwrap_or(<span class="number">0.0</span>);
 <a href=#313 id=313 data-nosnippet>313</a>                <span class="kw">let </span>old_value = var_data.<span class="number">0</span>;
-<a href=#314 id=314 data-nosnippet>314</a>                <span class="kw">if </span>old_value != new_value {
+<a href=#314 id=314 data-nosnippet>314</a>                <span class="kw">if </span><span class="macro">old_value !</span>= new_value {
 <a href=#315 id=315 data-nosnippet>315</a>                    <span class="self">self</span>.public_changes.push((v, new_value));
 <a href=#316 id=316 data-nosnippet>316</a>                    var_data.<span class="number">0 </span>= new_value;
 <a href=#317 id=317 data-nosnippet>317</a>                }
@@ -562,7 +562,7 @@
 <a href=#562 id=562 data-nosnippet>562</a>            <span class="comment">// pivot the entering symbol into the basis
 <a href=#563 id=563 data-nosnippet>563</a>            </span>row.solve_for_symbols(leaving, entering);
 <a href=#564 id=564 data-nosnippet>564</a>            <span class="self">self</span>.substitute(entering, <span class="kw-2">&amp;</span>row);
-<a href=#565 id=565 data-nosnippet>565</a>            <span class="kw">if </span>entering.type_() == SymbolType::External &amp;&amp; row.constant != <span class="number">0.0 </span>{
+<a href=#565 id=565 data-nosnippet>565</a>            <span class="kw">if </span>entering.type_() == SymbolType::External &amp;&amp; row.<span class="macro">constant !</span>= <span class="number">0.0 </span>{
 <a href=#566 id=566 data-nosnippet>566</a>                <span class="kw">let </span>v = <span class="self">self</span>.var_for_symbol[<span class="kw-2">&amp;</span>entering];
 <a href=#567 id=567 data-nosnippet>567</a>                <span class="self">self</span>.var_changed(v);
 <a href=#568 id=568 data-nosnippet>568</a>            }
@@ -597,7 +597,7 @@
 <a href=#597 id=597 data-nosnippet>597</a>                <span class="comment">// pivot the entering symbol into the basis
 <a href=#598 id=598 data-nosnippet>598</a>                </span>row.solve_for_symbols(leaving, entering);
 <a href=#599 id=599 data-nosnippet>599</a>                <span class="self">self</span>.substitute(entering, <span class="kw-2">&amp;</span>row);
-<a href=#600 id=600 data-nosnippet>600</a>                <span class="kw">if </span>entering.type_() == SymbolType::External &amp;&amp; row.constant != <span class="number">0.0 </span>{
+<a href=#600 id=600 data-nosnippet>600</a>                <span class="kw">if </span>entering.type_() == SymbolType::External &amp;&amp; row.<span class="macro">constant !</span>= <span class="number">0.0 </span>{
 <a href=#601 id=601 data-nosnippet>601</a>                    <span class="kw">let </span>v = <span class="self">self</span>.var_for_symbol[<span class="kw-2">&amp;</span>entering];
 <a href=#602 id=602 data-nosnippet>602</a>                    <span class="self">self</span>.var_changed(v);
 <a href=#603 id=603 data-nosnippet>603</a>                }
@@ -734,7 +734,7 @@
 <a href=#734 id=734 data-nosnippet>734</a>            .or(second)
 <a href=#735 id=735 data-nosnippet>735</a>            .or(third)
 <a href=#736 id=736 data-nosnippet>736</a>            .and_then(|s| {
-<a href=#737 id=737 data-nosnippet>737</a>                <span class="kw">if </span>s.type_() == SymbolType::External &amp;&amp; <span class="self">self</span>.rows[<span class="kw-2">&amp;</span>s].constant != <span class="number">0.0 </span>{
+<a href=#737 id=737 data-nosnippet>737</a>                <span class="kw">if </span>s.type_() == SymbolType::External &amp;&amp; <span class="self">self</span>.rows[<span class="kw-2">&amp;</span>s].<span class="macro">constant !</span>= <span class="number">0.0 </span>{
 <a href=#738 id=738 data-nosnippet>738</a>                    <span class="kw">let </span>v = <span class="self">self</span>.var_for_symbol[<span class="kw-2">&amp;</span>s];
 <a href=#739 id=739 data-nosnippet>739</a>                    <span class="self">self</span>.var_changed(v);
 <a href=#740 id=740 data-nosnippet>740</a>                }
@@ -781,4 +781,5 @@
 <a href=#781 id=781 data-nosnippet>781</a>            <span class="self">self</span>.rows.get(<span class="kw-2">&amp;</span>s.<span class="number">1</span>).map(|r| r.constant)
 <a href=#782 id=782 data-nosnippet>782</a>        }).unwrap_or(<span class="number">0.0</span>)
 <a href=#783 id=783 data-nosnippet>783</a>    }
-<a href=#784 id=784 data-nosnippet>784</a>}</code></pre></div></section></main></body></html>
+<a href=#784 id=784 data-nosnippet>784</a>}
+</code></pre></div></section></main></body></html>

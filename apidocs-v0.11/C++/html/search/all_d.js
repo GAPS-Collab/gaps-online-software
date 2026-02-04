@@ -16,7 +16,7 @@ var searchData=
   ['n_5ftrigger_5fpaddles_13',['n_trigger_paddles',['../structTofEventSummary.html#aa3587b9819d57488a264b78e0fdb630e',1,'TofEventSummary']]],
   ['n_5ftrk_5fhits_14',['n_trk_hits',['../structGaps_1_1Telemetry_1_1MergedEvent.html#ade6865babdc397965f93af427d6a8a92',1,'Gaps::Telemetry::MergedEvent']]],
   ['name_15',['name',['../structgondola_1_1TofPaddleTimingConstant.html#a72baac53771b28d396bec1856e006b3b',1,'gondola::TofPaddleTimingConstant']]],
-  ['nanoseconds_16',['nanoseconds',['../structgondola_1_1RBCalibration.html#ae040e341099dc47539a89791e3b95abd',1,'gondola::RBCalibration::nanoseconds(const RBEvent &amp;event, const u8 channel) const'],['../structgondola_1_1RBCalibration.html#a207e61bc09f90bfae8f7f14f61a3066b',1,'gondola::RBCalibration::nanoseconds(const RBEvent &amp;event) const']]],
+  ['nanoseconds_16',['nanoseconds',['../structgondola_1_1RBCalibration.html#a207e61bc09f90bfae8f7f14f61a3066b',1,'gondola::RBCalibration::nanoseconds(const RBEvent &amp;event) const'],['../structgondola_1_1RBCalibration.html#ae040e341099dc47539a89791e3b95abd',1,'gondola::RBCalibration::nanoseconds(const RBEvent &amp;event, const u8 channel) const']]],
   ['nas_5ftemp_17',['nas_temp',['../structPBMoniData.html#a468db626b837765f2e8149681e6201d4',1,'PBMoniData']]],
   ['nb_5fmodule_18',['NB_MODULE',['../gondola__core_8cxx.html#accc81d6dd00b80e2e71706cae5f6ad6f',1,'gondola_core.cxx']]],
   ['nchn_19',['NCHN',['../events_8h.html#a68c7ec06e4b37cff650691a741abe1ac',1,'events.h']]],
@@ -29,8 +29,7 @@ var searchData=
   ['normal_5fx_26',['normal_x',['../structGaps_1_1TofPaddle.html#af6364fccfde30febd1b64ed0122f5fe3',1,'Gaps::TofPaddle']]],
   ['normal_5fy_27',['normal_y',['../structGaps_1_1TofPaddle.html#a749277dbf19c56925c0d4decc7a1aab6',1,'Gaps::TofPaddle']]],
   ['normal_5fz_28',['normal_z',['../structGaps_1_1TofPaddle.html#a2f06fa3d7cc0ac6d047396d99d3f06f2',1,'Gaps::TofPaddle']]],
-  ['normalize_5fhit_5ftimes_29',['normalize_hit_times',['../structTofEvent.html#ae26790ed1e8d5c9cb331c202fa22b17c',1,'TofEvent']]],
-  ['notofdataevent_30',['NoTofDataEvent',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a853ccc9f2032abb9d46425b422483e41',1,'Gaps::Telemetry']]],
-  ['num_5fhits_31',['num_hits',['../structGaps_1_1Telemetry_1_1TrkMetaData.html#a1ab6ad6cac2c85d7bb3a5b977aa46287',1,'Gaps::Telemetry::TrkMetaData']]],
-  ['nwords_32',['NWORDS',['../events_8h.html#a3cd2baa6a4e5edb7a622ad2d706cac13',1,'events.h']]]
+  ['notofdataevent_29',['NoTofDataEvent',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a853ccc9f2032abb9d46425b422483e41',1,'Gaps::Telemetry']]],
+  ['num_5fhits_30',['num_hits',['../structGaps_1_1Telemetry_1_1TrkMetaData.html#a1ab6ad6cac2c85d7bb3a5b977aa46287',1,'Gaps::Telemetry::TrkMetaData']]],
+  ['nwords_31',['NWORDS',['../events_8h.html#a3cd2baa6a4e5edb7a622ad2d706cac13',1,'events.h']]]
 ];

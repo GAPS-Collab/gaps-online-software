@@ -1,6 +1,5 @@
 var NAVTREEINDEX5 =
 {
-"telemetry__dataclasses_8hpp.html#a3567431f12c1aa2d8da946e149b62aa7a77aa9d32dfec92de3ce2677c4442afac":[5,0,1,0,0,15,11,33],
 "telemetry__dataclasses_8hpp.html#a3567431f12c1aa2d8da946e149b62aa7a7de42fba23b28a75f40f8a83b19add28":[5,0,1,0,0,15,11,29],
 "telemetry__dataclasses_8hpp.html#a3567431f12c1aa2d8da946e149b62aa7a809a59ac536e0b86400daa219166044d":[5,0,1,0,0,15,11,10],
 "telemetry__dataclasses_8hpp.html#a3567431f12c1aa2d8da946e149b62aa7a853ccc9f2032abb9d46425b422483e41":[5,0,1,0,0,15,11,20],

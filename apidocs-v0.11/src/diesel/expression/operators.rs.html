@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/diesel-2.3.5/src/expression/operators.rs`."><title>operators.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="diesel" data-themes="" data-resource-suffix="" data-rustdoc-version="1.92.0 (ded5c06cf 2025-12-08)" data-channel="1.92.0" data-search-js="search-d69d8955.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-ce535bd0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">diesel/expression/</div>operators.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="attr">#[macro_export]
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/diesel-2.3.6/src/expression/operators.rs`."><title>operators.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="diesel" data-themes="" data-resource-suffix="" data-rustdoc-version="1.93.0 (254b59607 2026-01-19)" data-channel="1.93.0" data-search-js="search-9e2438ea.js" data-stringdex-js="stringdex-a3946164.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-a410ff4d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">diesel/expression/</div>operators.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="attr">#[macro_export]
 <a href=#2 id=2 data-nosnippet>2</a>#[doc(hidden)]
 <a href=#3 id=3 data-nosnippet>3</a></span><span class="macro">macro_rules!</span> __diesel_operator_body {
 <a href=#4 id=4 data-nosnippet>4</a>    (
@@ -11,8 +11,8 @@
 <a href=#11 id=11 data-nosnippet>11</a>        backend_ty_params = <span class="macro-nonterminal">$backend_ty_params</span>:tt,
 <a href=#12 id=12 data-nosnippet>12</a>        backend_ty = <span class="macro-nonterminal">$backend_ty</span>:ty,
 <a href=#13 id=13 data-nosnippet>13</a>    ) =&gt; {
-<a href=#14 id=14 data-nosnippet>14</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_operator_body!</span> {
-<a href=#15 id=15 data-nosnippet>15</a>            <span class="macro-nonterminal">notation </span>= <span class="macro-nonterminal">$notation</span>,
+<a href=#14 id=14 data-nosnippet>14</a>        <span class="macro-nonterminal">$crate::__diesel_operator_body</span>! {
+<a href=#15 id=15 data-nosnippet>15</a>            notation = <span class="macro-nonterminal">$notation</span>,
 <a href=#16 id=16 data-nosnippet>16</a>            struct_name = <span class="macro-nonterminal">$name</span>,
 <a href=#17 id=17 data-nosnippet>17</a>            operator = <span class="macro-nonterminal">$operator</span>,
 <a href=#18 id=18 data-nosnippet>18</a>            return_ty = (ST),
@@ -35,8 +35,8 @@
 <a href=#35 id=35 data-nosnippet>35</a>        backend_ty_params = <span class="macro-nonterminal">$backend_ty_params</span>:tt,
 <a href=#36 id=36 data-nosnippet>36</a>        backend_ty = <span class="macro-nonterminal">$backend_ty</span>:ty,
 <a href=#37 id=37 data-nosnippet>37</a>    ) =&gt; {
-<a href=#38 id=38 data-nosnippet>38</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_operator_body!</span> {
-<a href=#39 id=39 data-nosnippet>39</a>            <span class="macro-nonterminal">notation </span>= <span class="macro-nonterminal">$notation</span>,
+<a href=#38 id=38 data-nosnippet>38</a>        <span class="macro-nonterminal">$crate::__diesel_operator_body</span>! {
+<a href=#39 id=39 data-nosnippet>39</a>            notation = <span class="macro-nonterminal">$notation</span>,
 <a href=#40 id=40 data-nosnippet>40</a>            struct_name = <span class="macro-nonterminal">$name</span>,
 <a href=#41 id=41 data-nosnippet>41</a>            operator = <span class="macro-nonterminal">$operator</span>,
 <a href=#42 id=42 data-nosnippet>42</a>            return_ty = ($(<span class="macro-nonterminal">$return_ty</span>)<span class="kw-2">*</span>),
@@ -80,7 +80,7 @@
 <a href=#80 id=80 data-nosnippet>80</a>            }
 <a href=#81 id=81 data-nosnippet>81</a>        }
 <a href=#82 id=82 data-nosnippet>82</a>
-<a href=#83 id=83 data-nosnippet>83</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::impl_selectable_expression!</span>(<span class="macro-nonterminal">$name</span>&lt;$(<span class="macro-nonterminal">$ty_param</span>),+&gt;);
+<a href=#83 id=83 data-nosnippet>83</a>        <span class="macro-nonterminal">$crate::impl_selectable_expression</span>!(<span class="macro-nonterminal">$name</span>&lt;$(<span class="macro-nonterminal">$ty_param</span>),+&gt;);
 <a href=#84 id=84 data-nosnippet>84</a>
 <a href=#85 id=85 data-nosnippet>85</a>        <span class="kw">impl</span>&lt;$(<span class="macro-nonterminal">$ty_param</span>,)+ $(<span class="macro-nonterminal">$expression_ty_params</span>,)<span class="kw-2">*</span>&gt; <span class="macro-nonterminal">$crate::expression::Expression </span><span class="kw">for </span><span class="macro-nonterminal">$name</span>&lt;$(<span class="macro-nonterminal">$ty_param</span>,)+&gt; <span class="kw">where
 <a href=#86 id=86 data-nosnippet>86</a>            </span>$(<span class="macro-nonterminal">$expression_bounds</span>)*
@@ -98,8 +98,8 @@
 <a href=#98 id=98 data-nosnippet>98</a>                <span class="kw-2">mut </span>out: <span class="macro-nonterminal">$crate::query_builder::AstPass</span>&lt;<span class="lifetime">'_</span>, <span class="lifetime">'b</span>, <span class="macro-nonterminal">$backend_ty</span>&gt;
 <a href=#99 id=99 data-nosnippet>99</a>            ) -&gt; <span class="macro-nonterminal">$crate::result::QueryResult</span>&lt;()&gt;
 <a href=#100 id=100 data-nosnippet>100</a>            {
-<a href=#101 id=101 data-nosnippet>101</a>                <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_operator_to_sql!</span>(
-<a href=#102 id=102 data-nosnippet>102</a>                    <span class="macro-nonterminal">notation </span>= <span class="macro-nonterminal">$notation</span>,
+<a href=#101 id=101 data-nosnippet>101</a>                <span class="macro-nonterminal">$crate::__diesel_operator_to_sql</span>!(
+<a href=#102 id=102 data-nosnippet>102</a>                    notation = <span class="macro-nonterminal">$notation</span>,
 <a href=#103 id=103 data-nosnippet>103</a>                    operator_expr = out.push_sql(<span class="macro-nonterminal">$operator</span>),
 <a href=#104 id=104 data-nosnippet>104</a>                    field_exprs = ($(<span class="self">self</span>.<span class="macro-nonterminal">$field_name</span>.walk_ast(out.reborrow())<span class="question-mark">?</span>),+),
 <a href=#105 id=105 data-nosnippet>105</a>                );
@@ -234,16 +234,16 @@
 <a href=#234 id=234 data-nosnippet>234</a></span><span class="attr">#[macro_export]
 <a href=#235 id=235 data-nosnippet>235</a></span><span class="macro">macro_rules!</span> infix_operator {
 <a href=#236 id=236 data-nosnippet>236</a>    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$operator</span>:expr) =&gt; {
-<a href=#237 id=237 data-nosnippet>237</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::infix_operator!</span>(<span class="macro-nonterminal">$name</span>, <span class="macro-nonterminal">$operator</span>, <span class="macro-nonterminal">$crate::sql_types::Bool</span>);
+<a href=#237 id=237 data-nosnippet>237</a>        <span class="macro-nonterminal">$crate::infix_operator</span>!(<span class="macro-nonterminal">$name</span>, <span class="macro-nonterminal">$operator</span>, <span class="macro-nonterminal">$crate::sql_types::Bool</span>);
 <a href=#238 id=238 data-nosnippet>238</a>    };
 <a href=#239 id=239 data-nosnippet>239</a>
 <a href=#240 id=240 data-nosnippet>240</a>    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$operator</span>:expr, backend: <span class="macro-nonterminal">$backend</span>:ty) =&gt; {
-<a href=#241 id=241 data-nosnippet>241</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::infix_operator!</span>(<span class="macro-nonterminal">$name</span>, <span class="macro-nonterminal">$operator</span>, <span class="macro-nonterminal">$crate::sql_types::Bool</span>, backend: <span class="macro-nonterminal">$backend</span>);
+<a href=#241 id=241 data-nosnippet>241</a>        <span class="macro-nonterminal">$crate::infix_operator</span>!(<span class="macro-nonterminal">$name</span>, <span class="macro-nonterminal">$operator</span>, <span class="macro-nonterminal">$crate::sql_types::Bool</span>, backend: <span class="macro-nonterminal">$backend</span>);
 <a href=#242 id=242 data-nosnippet>242</a>    };
 <a href=#243 id=243 data-nosnippet>243</a>
 <a href=#244 id=244 data-nosnippet>244</a>    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$operator</span>:expr, $(<span class="macro-nonterminal">$return_ty</span>:tt)::<span class="kw-2">*</span>) =&gt; {
-<a href=#245 id=245 data-nosnippet>245</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_infix_operator!</span>(
-<a href=#246 id=246 data-nosnippet>246</a>            <span class="macro-nonterminal">name </span>= <span class="macro-nonterminal">$name</span>,
+<a href=#245 id=245 data-nosnippet>245</a>        <span class="macro-nonterminal">$crate::__diesel_infix_operator</span>!(
+<a href=#246 id=246 data-nosnippet>246</a>            name = <span class="macro-nonterminal">$name</span>,
 <a href=#247 id=247 data-nosnippet>247</a>            operator = <span class="macro-nonterminal">$operator</span>,
 <a href=#248 id=248 data-nosnippet>248</a>            return_ty = NullableBasedOnArgs ($(<span class="macro-nonterminal">$return_ty</span>)::<span class="kw-2">*</span>),
 <a href=#249 id=249 data-nosnippet>249</a>            backend_ty_params = (DB,),
@@ -252,8 +252,8 @@
 <a href=#252 id=252 data-nosnippet>252</a>    };
 <a href=#253 id=253 data-nosnippet>253</a>
 <a href=#254 id=254 data-nosnippet>254</a>    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$operator</span>:expr, $(<span class="macro-nonterminal">$return_ty</span>:tt)::<span class="kw-2">*</span>, backend: <span class="macro-nonterminal">$backend</span>:ty) =&gt; {
-<a href=#255 id=255 data-nosnippet>255</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_infix_operator!</span>(
-<a href=#256 id=256 data-nosnippet>256</a>            <span class="macro-nonterminal">name </span>= <span class="macro-nonterminal">$name</span>,
+<a href=#255 id=255 data-nosnippet>255</a>        <span class="macro-nonterminal">$crate::__diesel_infix_operator</span>!(
+<a href=#256 id=256 data-nosnippet>256</a>            name = <span class="macro-nonterminal">$name</span>,
 <a href=#257 id=257 data-nosnippet>257</a>            operator = <span class="macro-nonterminal">$operator</span>,
 <a href=#258 id=258 data-nosnippet>258</a>            return_ty = NullableBasedOnArgs ($(<span class="macro-nonterminal">$return_ty</span>)::<span class="kw-2">*</span>),
 <a href=#259 id=259 data-nosnippet>259</a>            backend_ty_params = (),
@@ -266,8 +266,8 @@
 <a href=#266 id=266 data-nosnippet>266</a>#[doc(hidden)]
 <a href=#267 id=267 data-nosnippet>267</a></span><span class="macro">macro_rules!</span> __diesel_infix_operator {
 <a href=#268 id=268 data-nosnippet>268</a>    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$operator</span>:expr, ConstantNullability $(<span class="macro-nonterminal">$return_ty</span>:tt)::<span class="kw-2">*</span>) =&gt; {
-<a href=#269 id=269 data-nosnippet>269</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_infix_operator!</span>(
-<a href=#270 id=270 data-nosnippet>270</a>            <span class="macro-nonterminal">name </span>= <span class="macro-nonterminal">$name</span>,
+<a href=#269 id=269 data-nosnippet>269</a>        <span class="macro-nonterminal">$crate::__diesel_infix_operator</span>!(
+<a href=#270 id=270 data-nosnippet>270</a>            name = <span class="macro-nonterminal">$name</span>,
 <a href=#271 id=271 data-nosnippet>271</a>            operator = <span class="macro-nonterminal">$operator</span>,
 <a href=#272 id=272 data-nosnippet>272</a>            return_ty = ($(<span class="macro-nonterminal">$return_ty</span>)::<span class="kw-2">*</span>),
 <a href=#273 id=273 data-nosnippet>273</a>            backend_ty_params = (DB,),
@@ -275,8 +275,8 @@
 <a href=#275 id=275 data-nosnippet>275</a>        );
 <a href=#276 id=276 data-nosnippet>276</a>    };
 <a href=#277 id=277 data-nosnippet>277</a>    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$operator</span>:expr, __diesel_internal_SameResultAsInput, backend: <span class="macro-nonterminal">$backend</span>:ty) =&gt; {
-<a href=#278 id=278 data-nosnippet>278</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_infix_operator!</span>(
-<a href=#279 id=279 data-nosnippet>279</a>            <span class="macro-nonterminal">name </span>= <span class="macro-nonterminal">$name</span>,
+<a href=#278 id=278 data-nosnippet>278</a>        <span class="macro-nonterminal">$crate::__diesel_infix_operator</span>!(
+<a href=#279 id=279 data-nosnippet>279</a>            name = <span class="macro-nonterminal">$name</span>,
 <a href=#280 id=280 data-nosnippet>280</a>            operator = <span class="macro-nonterminal">$operator</span>,
 <a href=#281 id=281 data-nosnippet>281</a>            return_ty = (&lt;T <span class="kw">as </span><span class="macro-nonterminal">$crate::expression::Expression</span>&gt;::SqlType),
 <a href=#282 id=282 data-nosnippet>282</a>            backend_ty_params = (),
@@ -284,8 +284,8 @@
 <a href=#284 id=284 data-nosnippet>284</a>        );
 <a href=#285 id=285 data-nosnippet>285</a>    };
 <a href=#286 id=286 data-nosnippet>286</a>    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$operator</span>:expr, ConstantNullability $(<span class="macro-nonterminal">$return_ty</span>:tt)::<span class="kw-2">*</span>, backend: <span class="macro-nonterminal">$backend</span>:ty) =&gt; {
-<a href=#287 id=287 data-nosnippet>287</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_infix_operator!</span>(
-<a href=#288 id=288 data-nosnippet>288</a>            <span class="macro-nonterminal">name </span>= <span class="macro-nonterminal">$name</span>,
+<a href=#287 id=287 data-nosnippet>287</a>        <span class="macro-nonterminal">$crate::__diesel_infix_operator</span>!(
+<a href=#288 id=288 data-nosnippet>288</a>            name = <span class="macro-nonterminal">$name</span>,
 <a href=#289 id=289 data-nosnippet>289</a>            operator = <span class="macro-nonterminal">$operator</span>,
 <a href=#290 id=290 data-nosnippet>290</a>            return_ty = ($(<span class="macro-nonterminal">$return_ty</span>)::<span class="kw-2">*</span>),
 <a href=#291 id=291 data-nosnippet>291</a>            backend_ty_params = (),
@@ -300,8 +300,8 @@
 <a href=#300 id=300 data-nosnippet>300</a>        backend_ty_params = <span class="macro-nonterminal">$backend_ty_params</span>:tt,
 <a href=#301 id=301 data-nosnippet>301</a>        backend_ty = <span class="macro-nonterminal">$backend_ty</span>:ty,
 <a href=#302 id=302 data-nosnippet>302</a>    ) =&gt; {
-<a href=#303 id=303 data-nosnippet>303</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_infix_operator!</span>(
-<a href=#304 id=304 data-nosnippet>304</a>            <span class="macro-nonterminal">name </span>= <span class="macro-nonterminal">$name</span>,
+<a href=#303 id=303 data-nosnippet>303</a>        <span class="macro-nonterminal">$crate::__diesel_infix_operator</span>!(
+<a href=#304 id=304 data-nosnippet>304</a>            name = <span class="macro-nonterminal">$name</span>,
 <a href=#305 id=305 data-nosnippet>305</a>            operator = <span class="macro-nonterminal">$operator</span>,
 <a href=#306 id=306 data-nosnippet>306</a>            return_ty = (
 <a href=#307 id=307 data-nosnippet>307</a>                <span class="macro-nonterminal">$crate::sql_types::is_nullable::MaybeNullable</span>&lt;
@@ -337,8 +337,8 @@
 <a href=#337 id=337 data-nosnippet>337</a>        backend_ty_params = <span class="macro-nonterminal">$backend_ty_params</span>:tt,
 <a href=#338 id=338 data-nosnippet>338</a>        backend_ty = <span class="macro-nonterminal">$backend_ty</span>:ty,
 <a href=#339 id=339 data-nosnippet>339</a>    ) =&gt; {
-<a href=#340 id=340 data-nosnippet>340</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_infix_operator!</span>(
-<a href=#341 id=341 data-nosnippet>341</a>            <span class="macro-nonterminal">name </span>= <span class="macro-nonterminal">$name</span>,
+<a href=#340 id=340 data-nosnippet>340</a>        <span class="macro-nonterminal">$crate::__diesel_infix_operator</span>!(
+<a href=#341 id=341 data-nosnippet>341</a>            name = <span class="macro-nonterminal">$name</span>,
 <a href=#342 id=342 data-nosnippet>342</a>            operator = <span class="macro-nonterminal">$operator</span>,
 <a href=#343 id=343 data-nosnippet>343</a>            return_ty = ($(<span class="macro-nonterminal">$return_ty</span>)+),
 <a href=#344 id=344 data-nosnippet>344</a>            expression_bounds = (),
@@ -355,8 +355,8 @@
 <a href=#355 id=355 data-nosnippet>355</a>        backend_ty_params = <span class="macro-nonterminal">$backend_ty_params</span>:tt,
 <a href=#356 id=356 data-nosnippet>356</a>        backend_ty = <span class="macro-nonterminal">$backend_ty</span>:ty,
 <a href=#357 id=357 data-nosnippet>357</a>    ) =&gt; {
-<a href=#358 id=358 data-nosnippet>358</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_operator_body!</span>(
-<a href=#359 id=359 data-nosnippet>359</a>            <span class="macro-nonterminal">notation </span>= infix,
+<a href=#358 id=358 data-nosnippet>358</a>        <span class="macro-nonterminal">$crate::__diesel_operator_body</span>!(
+<a href=#359 id=359 data-nosnippet>359</a>            notation = infix,
 <a href=#360 id=360 data-nosnippet>360</a>            struct_name = <span class="macro-nonterminal">$name</span>,
 <a href=#361 id=361 data-nosnippet>361</a>            operator = <span class="macro-nonterminal">$operator</span>,
 <a href=#362 id=362 data-nosnippet>362</a>            return_ty = ($(<span class="macro-nonterminal">$return_ty</span>)+),
@@ -382,7 +382,7 @@
 <a href=#382 id=382 data-nosnippet>382</a>#[doc(hidden)]
 <a href=#383 id=383 data-nosnippet>383</a></span><span class="macro">macro_rules!</span> diesel_infix_operator {
 <a href=#384 id=384 data-nosnippet>384</a>    ($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) =&gt; {
-<a href=#385 id=385 data-nosnippet>385</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::infix_operator!</span>($(<span class="macro-nonterminal">$args</span>)<span class="kw-2">*</span>);
+<a href=#385 id=385 data-nosnippet>385</a>        <span class="macro-nonterminal">$crate::infix_operator</span>!($(<span class="macro-nonterminal">$args</span>)<span class="kw-2">*</span>);
 <a href=#386 id=386 data-nosnippet>386</a>    }
 <a href=#387 id=387 data-nosnippet>387</a>}
 <a href=#388 id=388 data-nosnippet>388</a>
@@ -395,23 +395,23 @@
 <a href=#395 id=395 data-nosnippet>395</a></span><span class="attr">#[macro_export]
 <a href=#396 id=396 data-nosnippet>396</a></span><span class="macro">macro_rules!</span> postfix_operator {
 <a href=#397 id=397 data-nosnippet>397</a>    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$operator</span>:expr) =&gt; {
-<a href=#398 id=398 data-nosnippet>398</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::postfix_operator!</span>(<span class="macro-nonterminal">$name</span>, <span class="macro-nonterminal">$operator</span>, <span class="macro-nonterminal">$crate::sql_types::Bool</span>);
+<a href=#398 id=398 data-nosnippet>398</a>        <span class="macro-nonterminal">$crate::postfix_operator</span>!(<span class="macro-nonterminal">$name</span>, <span class="macro-nonterminal">$operator</span>, <span class="macro-nonterminal">$crate::sql_types::Bool</span>);
 <a href=#399 id=399 data-nosnippet>399</a>    };
 <a href=#400 id=400 data-nosnippet>400</a>
 <a href=#401 id=401 data-nosnippet>401</a>    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$operator</span>:expr, backend: <span class="macro-nonterminal">$backend</span>:ty) =&gt; {
-<a href=#402 id=402 data-nosnippet>402</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::postfix_operator!</span>(<span class="macro-nonterminal">$name</span>, <span class="macro-nonterminal">$operator</span>, <span class="macro-nonterminal">$crate::sql_types::Bool</span>, backend: <span class="macro-nonterminal">$backend</span>);
+<a href=#402 id=402 data-nosnippet>402</a>        <span class="macro-nonterminal">$crate::postfix_operator</span>!(<span class="macro-nonterminal">$name</span>, <span class="macro-nonterminal">$operator</span>, <span class="macro-nonterminal">$crate::sql_types::Bool</span>, backend: <span class="macro-nonterminal">$backend</span>);
 <a href=#403 id=403 data-nosnippet>403</a>    };
 <a href=#404 id=404 data-nosnippet>404</a>
 <a href=#405 id=405 data-nosnippet>405</a>    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$operator</span>:expr, ConditionalNullability $(<span class="macro-nonterminal">$return_ty</span>:tt)::<span class="kw-2">*</span>) =&gt; {
-<a href=#406 id=406 data-nosnippet>406</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::postfix_operator!</span>(
-<a href=#407 id=407 data-nosnippet>407</a>            <span class="macro-nonterminal">name </span>= <span class="macro-nonterminal">$name</span>,
+<a href=#406 id=406 data-nosnippet>406</a>        <span class="macro-nonterminal">$crate::postfix_operator</span>!(
+<a href=#407 id=407 data-nosnippet>407</a>            name = <span class="macro-nonterminal">$name</span>,
 <a href=#408 id=408 data-nosnippet>408</a>            operator = <span class="macro-nonterminal">$operator</span>,
 <a href=#409 id=409 data-nosnippet>409</a>            return_ty = NullableBasedOnArgs ($(<span class="macro-nonterminal">$return_ty</span>)::<span class="kw-2">*</span>),
 <a href=#410 id=410 data-nosnippet>410</a>        );
 <a href=#411 id=411 data-nosnippet>411</a>    };
 <a href=#412 id=412 data-nosnippet>412</a>
 <a href=#413 id=413 data-nosnippet>413</a>    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$operator</span>:expr, ConditionalNullability $(<span class="macro-nonterminal">$return_ty</span>:tt)::<span class="kw-2">*</span>, backend: <span class="macro-nonterminal">$backend</span>:ty) =&gt; {
-<a href=#414 id=414 data-nosnippet>414</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::postfix_operator!</span>(
+<a href=#414 id=414 data-nosnippet>414</a>        <span class="macro-nonterminal">$crate::postfix_operator</span>!(
 <a href=#415 id=415 data-nosnippet>415</a>            <span class="macro-nonterminal">$name</span>,
 <a href=#416 id=416 data-nosnippet>416</a>            <span class="macro-nonterminal">$operator</span>,
 <a href=#417 id=417 data-nosnippet>417</a>            return_ty = NullableBasedOnArgs ($(<span class="macro-nonterminal">$return_ty</span>)::<span class="kw-2">*</span>),
@@ -420,8 +420,8 @@
 <a href=#420 id=420 data-nosnippet>420</a>    };
 <a href=#421 id=421 data-nosnippet>421</a>
 <a href=#422 id=422 data-nosnippet>422</a>    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$operator</span>:expr, return_ty = NullableBasedOnArgs(<span class="macro-nonterminal">$return_ty</span>:ty)) =&gt; {
-<a href=#423 id=423 data-nosnippet>423</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_operator_body!</span>(
-<a href=#424 id=424 data-nosnippet>424</a>            <span class="macro-nonterminal">notation </span>= postfix,
+<a href=#423 id=423 data-nosnippet>423</a>        <span class="macro-nonterminal">$crate::__diesel_operator_body</span>!(
+<a href=#424 id=424 data-nosnippet>424</a>            notation = postfix,
 <a href=#425 id=425 data-nosnippet>425</a>            struct_name = <span class="macro-nonterminal">$name</span>,
 <a href=#426 id=426 data-nosnippet>426</a>            operator = <span class="macro-nonterminal">$operator</span>,
 <a href=#427 id=427 data-nosnippet>427</a>            return_ty = (
@@ -447,8 +447,8 @@
 <a href=#447 id=447 data-nosnippet>447</a>    };
 <a href=#448 id=448 data-nosnippet>448</a>
 <a href=#449 id=449 data-nosnippet>449</a>    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$operator</span>:expr, return_ty = NullableBasedOnArgs(<span class="macro-nonterminal">$return_ty</span>:ty), backend: <span class="macro-nonterminal">$backend</span>:ty) =&gt; {
-<a href=#450 id=450 data-nosnippet>450</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_operator_body!</span>(
-<a href=#451 id=451 data-nosnippet>451</a>            <span class="macro-nonterminal">notation </span>= postfix,
+<a href=#450 id=450 data-nosnippet>450</a>        <span class="macro-nonterminal">$crate::__diesel_operator_body</span>!(
+<a href=#451 id=451 data-nosnippet>451</a>            notation = postfix,
 <a href=#452 id=452 data-nosnippet>452</a>            struct_name = <span class="macro-nonterminal">$name</span>,
 <a href=#453 id=453 data-nosnippet>453</a>            operator = <span class="macro-nonterminal">$operator</span>,
 <a href=#454 id=454 data-nosnippet>454</a>            return_ty = (
@@ -477,8 +477,8 @@
 <a href=#477 id=477 data-nosnippet>477</a>    };
 <a href=#478 id=478 data-nosnippet>478</a>
 <a href=#479 id=479 data-nosnippet>479</a>    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$operator</span>:expr, <span class="macro-nonterminal">$return_ty</span>:ty) =&gt; {
-<a href=#480 id=480 data-nosnippet>480</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_operator_body!</span>(
-<a href=#481 id=481 data-nosnippet>481</a>            <span class="macro-nonterminal">notation </span>= postfix,
+<a href=#480 id=480 data-nosnippet>480</a>        <span class="macro-nonterminal">$crate::__diesel_operator_body</span>!(
+<a href=#481 id=481 data-nosnippet>481</a>            notation = postfix,
 <a href=#482 id=482 data-nosnippet>482</a>            struct_name = <span class="macro-nonterminal">$name</span>,
 <a href=#483 id=483 data-nosnippet>483</a>            operator = <span class="macro-nonterminal">$operator</span>,
 <a href=#484 id=484 data-nosnippet>484</a>            return_ty = (<span class="macro-nonterminal">$return_ty</span>),
@@ -490,8 +490,8 @@
 <a href=#490 id=490 data-nosnippet>490</a>    };
 <a href=#491 id=491 data-nosnippet>491</a>
 <a href=#492 id=492 data-nosnippet>492</a>    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$operator</span>:expr, <span class="macro-nonterminal">$return_ty</span>:ty, backend: <span class="macro-nonterminal">$backend</span>:ty) =&gt; {
-<a href=#493 id=493 data-nosnippet>493</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_operator_body!</span>(
-<a href=#494 id=494 data-nosnippet>494</a>            <span class="macro-nonterminal">notation </span>= postfix,
+<a href=#493 id=493 data-nosnippet>493</a>        <span class="macro-nonterminal">$crate::__diesel_operator_body</span>!(
+<a href=#494 id=494 data-nosnippet>494</a>            notation = postfix,
 <a href=#495 id=495 data-nosnippet>495</a>            struct_name = <span class="macro-nonterminal">$name</span>,
 <a href=#496 id=496 data-nosnippet>496</a>            operator = <span class="macro-nonterminal">$operator</span>,
 <a href=#497 id=497 data-nosnippet>497</a>            return_ty = (<span class="macro-nonterminal">$return_ty</span>),
@@ -509,7 +509,7 @@
 <a href=#509 id=509 data-nosnippet>509</a>#[doc(hidden)]
 <a href=#510 id=510 data-nosnippet>510</a></span><span class="macro">macro_rules!</span> diesel_postfix_operator {
 <a href=#511 id=511 data-nosnippet>511</a>    ($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) =&gt; {
-<a href=#512 id=512 data-nosnippet>512</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::postfix_operator!</span>($(<span class="macro-nonterminal">$args</span>)<span class="kw-2">*</span>);
+<a href=#512 id=512 data-nosnippet>512</a>        <span class="macro-nonterminal">$crate::postfix_operator</span>!($(<span class="macro-nonterminal">$args</span>)<span class="kw-2">*</span>);
 <a href=#513 id=513 data-nosnippet>513</a>    }
 <a href=#514 id=514 data-nosnippet>514</a>}
 <a href=#515 id=515 data-nosnippet>515</a>
@@ -522,16 +522,16 @@
 <a href=#522 id=522 data-nosnippet>522</a></span><span class="attr">#[macro_export]
 <a href=#523 id=523 data-nosnippet>523</a></span><span class="macro">macro_rules!</span> prefix_operator {
 <a href=#524 id=524 data-nosnippet>524</a>    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$operator</span>:expr) =&gt; {
-<a href=#525 id=525 data-nosnippet>525</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::prefix_operator!</span>(<span class="macro-nonterminal">$name</span>, <span class="macro-nonterminal">$operator</span>, <span class="macro-nonterminal">$crate::sql_types::Bool</span>);
+<a href=#525 id=525 data-nosnippet>525</a>        <span class="macro-nonterminal">$crate::prefix_operator</span>!(<span class="macro-nonterminal">$name</span>, <span class="macro-nonterminal">$operator</span>, <span class="macro-nonterminal">$crate::sql_types::Bool</span>);
 <a href=#526 id=526 data-nosnippet>526</a>    };
 <a href=#527 id=527 data-nosnippet>527</a>
 <a href=#528 id=528 data-nosnippet>528</a>    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$operator</span>:expr, backend: <span class="macro-nonterminal">$backend</span>:ty) =&gt; {
-<a href=#529 id=529 data-nosnippet>529</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::prefix_operator!</span>(<span class="macro-nonterminal">$name</span>, <span class="macro-nonterminal">$operator</span>, <span class="macro-nonterminal">$crate::sql_types::Bool</span>, backend: <span class="macro-nonterminal">$backend</span>);
+<a href=#529 id=529 data-nosnippet>529</a>        <span class="macro-nonterminal">$crate::prefix_operator</span>!(<span class="macro-nonterminal">$name</span>, <span class="macro-nonterminal">$operator</span>, <span class="macro-nonterminal">$crate::sql_types::Bool</span>, backend: <span class="macro-nonterminal">$backend</span>);
 <a href=#530 id=530 data-nosnippet>530</a>    };
 <a href=#531 id=531 data-nosnippet>531</a>
 <a href=#532 id=532 data-nosnippet>532</a>    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$operator</span>:expr, <span class="macro-nonterminal">$return_ty</span>:ty) =&gt; {
-<a href=#533 id=533 data-nosnippet>533</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_operator_body!</span>(
-<a href=#534 id=534 data-nosnippet>534</a>            <span class="macro-nonterminal">notation </span>= prefix,
+<a href=#533 id=533 data-nosnippet>533</a>        <span class="macro-nonterminal">$crate::__diesel_operator_body</span>!(
+<a href=#534 id=534 data-nosnippet>534</a>            notation = prefix,
 <a href=#535 id=535 data-nosnippet>535</a>            struct_name = <span class="macro-nonterminal">$name</span>,
 <a href=#536 id=536 data-nosnippet>536</a>            operator = <span class="macro-nonterminal">$operator</span>,
 <a href=#537 id=537 data-nosnippet>537</a>            return_ty = (
@@ -558,8 +558,8 @@
 <a href=#558 id=558 data-nosnippet>558</a>    };
 <a href=#559 id=559 data-nosnippet>559</a>
 <a href=#560 id=560 data-nosnippet>560</a>    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$operator</span>:expr, <span class="macro-nonterminal">$return_ty</span>:ty, backend: <span class="macro-nonterminal">$backend</span>:ty) =&gt; {
-<a href=#561 id=561 data-nosnippet>561</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_operator_body!</span>(
-<a href=#562 id=562 data-nosnippet>562</a>            <span class="macro-nonterminal">notation </span>= prefix,
+<a href=#561 id=561 data-nosnippet>561</a>        <span class="macro-nonterminal">$crate::__diesel_operator_body</span>!(
+<a href=#562 id=562 data-nosnippet>562</a>            notation = prefix,
 <a href=#563 id=563 data-nosnippet>563</a>            struct_name = <span class="macro-nonterminal">$name</span>,
 <a href=#564 id=564 data-nosnippet>564</a>            operator = <span class="macro-nonterminal">$operator</span>,
 <a href=#565 id=565 data-nosnippet>565</a>            return_ty = (
@@ -592,7 +592,7 @@
 <a href=#592 id=592 data-nosnippet>592</a>#[doc(hidden)]
 <a href=#593 id=593 data-nosnippet>593</a></span><span class="macro">macro_rules!</span> diesel_prefix_operator {
 <a href=#594 id=594 data-nosnippet>594</a>    ($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) =&gt; {
-<a href=#595 id=595 data-nosnippet>595</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::prefix_operator!</span>($(<span class="macro-nonterminal">$args</span>)<span class="kw-2">*</span>);
+<a href=#595 id=595 data-nosnippet>595</a>        <span class="macro-nonterminal">$crate::prefix_operator</span>!($(<span class="macro-nonterminal">$args</span>)<span class="kw-2">*</span>);
 <a href=#596 id=596 data-nosnippet>596</a>    }
 <a href=#597 id=597 data-nosnippet>597</a>}
 <a href=#598 id=598 data-nosnippet>598</a>
@@ -839,4 +839,5 @@
 <a href=#839 id=839 data-nosnippet>839</a><span class="kw">impl</span>&lt;T, DB&gt; LikeIsAllowedForType&lt;<span class="kw">crate</span>::sql_types::Nullable&lt;T&gt;&gt; <span class="kw">for </span>DB <span class="kw">where
 <a href=#840 id=840 data-nosnippet>840</a>    </span>DB: Backend + LikeIsAllowedForType&lt;T&gt;
 <a href=#841 id=841 data-nosnippet>841</a>{
-<a href=#842 id=842 data-nosnippet>842</a>}</code></pre></div></section></main></body></html>
+<a href=#842 id=842 data-nosnippet>842</a>}
+</code></pre></div></section></main></body></html>
