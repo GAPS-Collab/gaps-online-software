@@ -577,9 +577,11 @@ struct TofEvent {
   static auto get_n_rbevents(u32 mask) -> u32;
   /// Get all hits from all rb_events
   auto get_hits() const -> Vec<TofHit>;
+  #ifdef BUILD_CXX_DB
   /// normalize all the hit times, taking the global ch9 
   /// phase into account
   auto normalize_hit_times(const gon::TofPaddleTimingConstantMap &paddle_offsets = gon::TofPaddleTimingConstantMap()) -> void;
+  #endif
 
   /// string representation for printing
   auto to_string() const -> std::string;

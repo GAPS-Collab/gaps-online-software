@@ -11,13 +11,10 @@ import os as _os
 
 __version__ = _gondola_core.get_version()
 
-packets    = _gondola_core.packets 
-#io         = _gondola_core.io 
+# FIXME - these are not included in the documentation
 monitoring = _gondola_core.monitoring 
 stats      = _gondola_core.stats 
 algo       = _gondola_core.algo 
-#db         = _gondola_core.db 
-#tracker    = _gondola_core.tracker 
 
 # set up the python submodules
 from . import events
@@ -28,6 +25,7 @@ from . import tof
 from . import db 
 from . import reconstruction 
 from . import tracker
+from . import packets 
 
 __all__ = ['events', 'packets', 'io', 'monitoring', 'stats', 'algo', 'db',
            'calibration', 'visual']

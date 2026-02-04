@@ -1,6 +1,6 @@
 """
-Gondola core database functionality. This is a wrapper around 
-the database functions in gondola-db
+Gondola (in-flight) database. The database holds geometry, calibration and 
+detector status data
 """
 
 from . import _gondola_core as _gc  

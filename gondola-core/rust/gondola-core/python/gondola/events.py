@@ -21,23 +21,25 @@ RBWaveform               =  _gondola_core.events.RBWaveform
 RBWaveform.__module__    = __name__
 RBWaveform.__name__      = 'RBWaveform'
 
-TofEvent          =  _gondola_core.events.TofEvent           
-TofEvent.__module__ = __name__ 
-TofEvent.__name__ = 'TofEvent' 
-TelemetryEvent    =  _gondola_core.events.TelemetryEvent     
+TofEvent                  =  _gondola_core.events.TofEvent           
+TofEvent.__module__       = __name__ 
+TofEvent.__name__         = 'TofEvent' 
+TelemetryEvent            =  _gondola_core.events.TelemetryEvent     
 TelemetryEvent.__module__ = __name__ 
-TelemetryEvent.__name__ = 'TelemetryEvent' 
+TelemetryEvent.__name__   = 'TelemetryEvent' 
+
 # functions 
-strip_id          =  _gondola_core.events.strip_id           
-strip_id.__module__ = __name__
+strip_id                  =  _gondola_core.events.strip_id           
+strip_id.__module__       = __name__
+
 # enums
-EventQuality      =  _gondola_core.events.EventQuality       
-EventQuality.__module__ = __name__ 
-TriggerType       =  _gondola_core.events.TriggerType        
-TriggerType.__module__  = __name__ 
-LTBThreshold      =  _gondola_core.events.LTBThreshold       
-LTBThreshold.__module__ = __name__ 
-EventStatus       =  _gondola_core.events.EventStatus        
-EventStatus.__module__  = __name__
-DataType          =  _gondola_core.events.DataType           
-DataType.__module__     = __name__
+EventQuality              =  _gondola_core.events.EventQuality       
+EventQuality.__module__   = __name__ 
+TriggerType               =  _gondola_core.events.TriggerType        
+TriggerType.__module__    = __name__ 
+LTBThreshold              =  _gondola_core.events.LTBThreshold       
+LTBThreshold.__module__   = __name__ 
+EventStatus               =  _gondola_core.events.EventStatus        
+EventStatus.__module__    = __name__
+DataType                  =  _gondola_core.events.DataType           
+DataType.__module__       = __name__
