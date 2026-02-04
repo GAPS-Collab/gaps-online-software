@@ -1,6 +1,9 @@
 #ifndef TOFEVENTS_H_INCLUDED
 #define TOFEVENTS_H_INCLUDED
 
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
+
 /**
  * Tof event classes. An event is basically anything with an 
  * event id.

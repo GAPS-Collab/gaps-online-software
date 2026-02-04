@@ -1,3 +1,6 @@
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
+
 #include<numeric>
 #include<sstream>
 #include<format>
@@ -39,12 +42,8 @@ const u16 LTB_CHANNELS[8] = {
     LTB_CH7
 };
 
-
-/**
- * Helper to get adc data from Vec<u8>
- *
- */
-Vec<u16> u8_to_u16(const Vec<u8> &vec_u8) {
+/// Helper to get adc data from Vec<u8>
+auto u8_to_u16(const Vec<u8> &vec_u8) -> Vec<u16> {
   Vec<u16> vec_u16;
   vec_u16.reserve(vec_u8.size() / sizeof(u16));
   for (size_t i = 0; i < vec_u8.size(); i += sizeof(u16)) {
@@ -73,7 +72,7 @@ RBEventHeader::RBEventHeader() {
 
 /*************************************/
 
-std::string RBEventHeader::to_string() const {
+auto RBEventHeader::to_string() const -> std::string {
   auto sfit = get_sine_fit();
   std::string repr = "<RBEventHeader";
   repr += "\n  rb id          " + std::to_string(rb_id)                 ;
@@ -102,7 +101,7 @@ std::string RBEventHeader::to_string() const {
 
 /*************************************/
 
-Vec<u8> RBEventHeader::get_channels() const {
+auto RBEventHeader::get_channels() const -> Vec<u8> {
   Vec<u8>  channels = Vec<u8>();
   for (u8 k=0;k<9;k++) {
     if ((channel_mask & (1 << k)) > 0) {
@@ -114,7 +113,7 @@ Vec<u8> RBEventHeader::get_channels() const {
 
 /*************************************/
 
-u8 RBEventHeader::get_nchan() const {
+auto RBEventHeader::get_nchan() const -> u8 {
   return get_channels().size(); 
 }
 
@@ -153,13 +152,13 @@ auto RBEventHeader::from_bytestream(const Vec<u8> &stream, u64 &pos)\
 
 /*************************************/
 
-bool RBEventHeader::has_ch9() const {
+auto RBEventHeader::has_ch9() const -> bool {
   return (channel_mask & 512) > 0;
 }
 
 /*************************************/
   
-f32 RBEventHeader::get_fpga_temp() const {
+auto RBEventHeader::get_fpga_temp() const -> f32 {
   f32 zynq_temp = (((fpga_temp & 4095) * 503.975) / 4096.0) - 273.15;
   //f32 temp = (fpga_temp * 503.975/4096) - 273.15;
   return zynq_temp;
@@ -167,49 +166,49 @@ f32 RBEventHeader::get_fpga_temp() const {
 
 /*************************************/
 
-bool RBEventHeader::is_event_fragment() const {
+auto RBEventHeader::is_event_fragment() const -> bool {
   return (status_byte & 1) > 0;
 }
 
 /*************************************/
 
-bool RBEventHeader::drs_lost_trigger() const {
+auto RBEventHeader::drs_lost_trigger() const -> bool {
   return ((status_byte >> 1) & 1) > 0;
 }
 
 /*************************************/
 
-bool RBEventHeader::lost_lock() const {
+auto RBEventHeader::lost_lock() const -> bool {
   return ((status_byte >> 2) & 1) > 0;
 }
 
 /*************************************/
 
-bool RBEventHeader::lost_lock_last_sec() const {
+auto RBEventHeader::lost_lock_last_sec() const -> bool {
   return ((status_byte >> 3) & 1) > 0;
 }
 
 /*************************************/
 
-bool RBEventHeader::is_locked() const {
+auto RBEventHeader::is_locked() const -> bool {
   return !(lost_lock());
 }
 
 /*************************************/
 
-bool RBEventHeader::is_locked_last_sec() const {
+auto RBEventHeader::is_locked_last_sec() const -> bool {
   return !(lost_lock_last_sec());
 }
 
 /*************************************/
 
-u64 RBEventHeader::get_timestamp48() const {
+auto RBEventHeader::get_timestamp48() const -> u64 {
   return ((u64)timestamp16 << 32) | (u64)timestamp32;
 }
 
 /*************************************/
 
-Vec<u8> RBEventHeader::get_active_data_channels() const {
+auto RBEventHeader::get_active_data_channels() const -> Vec<u8> {
   Vec<u8> active_channels;
   for (auto const &ch : {1,2,3,4,5,6,7,8} ) {
     if ((channel_mask & (u8)pow(2, ch - 1)) == (u8)pow(2,ch - 1)) active_channels.push_back(ch);
@@ -220,14 +219,14 @@ Vec<u8> RBEventHeader::get_active_data_channels() const {
 
 /*************************************/
 
-u8 RBEventHeader::get_n_datachan() const {
+auto RBEventHeader::get_n_datachan() const -> u8 {
   Vec<u8> active_channels = get_active_data_channels();
   return (u8)active_channels.size();
 }
 
 /*************************************/
 
-std::array<f32, 3> RBEventHeader::get_sine_fit() const {
+auto RBEventHeader::get_sine_fit() const -> std::array<f32, 3> {
   f32 u16_MAX = 65535;
   f32 amp    = (20.0 * ch9_amp   /u16_MAX) - 10.0;
   f32 freq   = (20.0 * ch9_freq  /u16_MAX) - 10.0;
@@ -251,11 +250,10 @@ RBEvent::RBEvent() {
 
 /**********************************************************/
 
-std::string RBEvent::to_string() const {
+auto RBEvent::to_string() const -> std::string {
   std::string repr = "<RBEvent\n";
   std::stringstream ss;
   ss << status;
-  //repr += "  data type : " + ss.str(); 
   repr += "  status    : " + ss.str() + "\n";
   repr += header.to_string();
   repr += "\n";
@@ -280,7 +278,6 @@ std::string RBEvent::to_string() const {
   return repr;
 }
 
-
 /**********************************************************/
 
 bool RBEvent::channel_check(u8 channel) const {
@@ -303,10 +300,14 @@ const Vec<u16>& RBEvent::get_channel_adc(u8 channel) const {
   }
   return adc[channel -1]; 
 }
+
+/*************************************/
   
 const Vec<u16>& RBEvent::get_channel_by_label(u8 channel) const {
   return adc[channel - 1];
 }
+
+/*************************************/
 
 const Vec<u16>& RBEvent::get_channel_by_id(u8 channel) const {
   return adc[channel];
@@ -1128,7 +1129,7 @@ f32 TofHit::get_t_avg() const {
 
 /// combine the slow timestamp with 
 /// the fast to get the full
-f64 TofHit::get_timestamp48() const {
+auto TofHit::get_timestamp48() const -> f64 {
   f64 ts48 = timestamp16 << 16 | timestamp32;
   return ts48;
 }
@@ -1145,8 +1146,8 @@ auto TofHit::get_edep() const -> f32 {
 }
 #endif
 
-TofHit TofHit::from_bytestream(const Vec<u8> &bytestream,
-                               u64 &pos) {
+auto TofHit::from_bytestream(const Vec<u8> &bytestream,
+                               u64 &pos) -> TofHit {
  TofHit hit = TofHit();
  u16 maybe_header = Gaps::parse_u16(bytestream, pos);
  if (maybe_header != hit.HEAD) {
@@ -1174,7 +1175,7 @@ TofHit TofHit::from_bytestream(const Vec<u8> &bytestream,
  pos += 1; // skip version
  hit.baseline_b     = Gaps::parse_f16(bytestream, pos);
  hit.baseline_b_rms = Gaps::parse_f16(bytestream, pos);
-
+ 
  // FIXME checks - packetlength, checksum ?
  //if (version == 64) {
  //  pos +=   
@@ -1185,6 +1186,7 @@ TofHit TofHit::from_bytestream(const Vec<u8> &bytestream,
  if (tail != TAIL) {
    spdlog::error("VERSION {}", version); 
    spdlog::error("TofHit TAIL signature {} is incorrect!", tail);
+   exit(1);
  }
  return hit; 
 }
