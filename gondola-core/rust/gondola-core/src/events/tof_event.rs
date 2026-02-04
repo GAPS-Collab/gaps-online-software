@@ -1330,7 +1330,7 @@ impl TofEvent {
   /// Utilizes Philip's formula based on 
   /// peak height
   #[getter]
-  #[pyo3(name="get_edep_umbrella")]
+  #[pyo3(name="edep_umb")]
   pub fn get_edep_umbrella_py(&self) -> f32 {
     self.get_edep_umbrella()
   }
@@ -1340,7 +1340,7 @@ impl TofEvent {
   /// Utilizes Philip's formula based on 
   /// peak height
   #[getter]
-  #[pyo3(name="get_edep_cube")]
+  #[pyo3(name="edep_cbe")]
   pub fn get_edep_cube_py(&self) -> f32 {
     self.get_edep_cube()
   }
@@ -1350,7 +1350,7 @@ impl TofEvent {
   /// Utilizes Philip's formula based on 
   /// peak height
   #[getter]
-  #[pyo3(name="get_edep_cortina")]
+  #[pyo3(name="edep_cor")]
   pub fn get_edep_cortina_py(&self) -> f32 {
     self.get_edep_cortina()
   }
@@ -1360,7 +1360,7 @@ impl TofEvent {
   /// Utilizes Philip's formula based on 
   /// peak height
   #[getter]
-  #[pyo3(name="get_edep")]
+  #[pyo3(name="edep")]
   pub fn get_edep_py(&self) -> f32 {
     self.get_edep()
   }

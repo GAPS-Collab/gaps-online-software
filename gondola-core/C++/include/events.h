@@ -17,7 +17,6 @@
  *  under the GPLv3 license
  *  
  */
-
 #ifndef TOFEVENTS_H_INCLUDED
 #define TOFEVENTS_H_INCLUDED
 

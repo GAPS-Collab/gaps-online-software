@@ -63,6 +63,8 @@ pub struct Pac1934 {
   ctrl            : i32,
   acc_count       : i32,
   channels        : [PduChannel; 4],
+  // FIXME - this might not get de serialized 
+  // properly
   channel_dis     : i32,
   neg_pwr         : i32,
   slow            : i32,
@@ -138,6 +140,7 @@ impl Pac1934 {
       let vpower_d     = parse_u8(stream, pos) as u64;
       ch.vpower        = (vpower_a << 24 | vpower_b << 16 | vpower_c << 8 | vpower_d) as i32;
     }
+    pac.channel_dis     = parse_u8(stream, pos) as i32;
     pac.neg_pwr         = parse_u8(stream, pos) as i32;
     pac.slow            = parse_u8(stream, pos) as i32;
     pac.ctrl_act        = parse_u8(stream, pos) as i32;
