@@ -39,8 +39,8 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="../_static/documentation_options.js?v=1392dee4"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.calibration';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -364,10 +364,10 @@
 </div>
 <dl class="py class">
 <dt class="sig sig-object py" id="gondola.calibration.RBCalibrations">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.calibration.</span></span><span class="sig-name descname"><span class="pre">RBCalibrations</span></span><a class="headerlink" href="#gondola.calibration.RBCalibrations" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.calibration.</span></span><span class="sig-name descname"><span class="pre">RBCalibrations</span></span><a class="headerlink" href="#gondola.calibration.RBCalibrations" title="Link to this definition">#</a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.assemble_from_flightcal">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">assemble_from_flightcal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fcal_t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fcal_v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.RBCalibrations.assemble_from_flightcal" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">assemble_from_flightcal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fcal_t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fcal_v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.RBCalibrations.assemble_from_flightcal" title="Link to this definition">#</a></dt>
 <dd><p>Re-assemble a RBCalibration from chopped up parts</p>
 </dd></dl>
 
@@ -383,12 +383,12 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.from_bytestream">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_bytestream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytestream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.RBCalibrations.from_bytestream" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_bytestream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytestream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.RBCalibrations.from_bytestream" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.from_file">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">discard_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.RBCalibrations.from_file" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">discard_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.RBCalibrations.from_file" title="Link to this definition">#</a></dt>
 <dd><p>Load the calibration from a file with a 
 TofPacket of type RBCalibration in it</p>
 <p># Arguments:</p>
@@ -400,12 +400,12 @@ TofPacket of type RBCalibration in it</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.from_random">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_random</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.RBCalibrations.from_random" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_random</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.RBCalibrations.from_random" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.calibration.RBCalibrations.from_tofpacket">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_tofpacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.RBCalibrations.from_tofpacket" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_tofpacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.RBCalibrations.from_tofpacket" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -642,7 +642,7 @@ calibration constants.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>

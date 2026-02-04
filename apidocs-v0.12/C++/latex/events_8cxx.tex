@@ -29,8 +29,8 @@ namespace \mbox{\hyperlink{namespacegondola}{gondola}}
 \doxysubsubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} $>$ \mbox{\hyperlink{events_8cxx_acdfa4e09f0f996878f87b2e645212093}{u8\+\_\+to\+\_\+u16}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{vec\+\_\+u8}})
-\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{events_8cxx_a1c10b6194055c6cc7c772ebd2fa4648c}{u8\+\_\+to\+\_\+u16}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{vec\+\_\+u8}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} $>$
+\begin{DoxyCompactList}\small\item\em Helper to get adc data from Vec$<$u8$>$ \end{DoxyCompactList}\item 
 std\+::ostream \& \mbox{\hyperlink{namespacegondola_a9de221b8ccf9c0782f0790897ff063c5}{gondola\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_ac61bd1b8e62eab79a1089be6ecc1ca3d}{gondola\+::\+Event\+Quality}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{qual}})
 \item 
 std\+::ostream \& \mbox{\hyperlink{namespacegondola_a9086a1522bf1269d1824786811a08141}{gondola\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84d}{gondola\+::\+Compression\+Level}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{level}})
@@ -79,13 +79,17 @@ std\+::ostream \& \mbox{\hyperlink{namespacegondola_ad142b09b980b0577047b677bd07
 
 
 \doxysubsection{Function Documentation}
-\Hypertarget{events_8cxx_acdfa4e09f0f996878f87b2e645212093}\label{events_8cxx_acdfa4e09f0f996878f87b2e645212093} 
+\Hypertarget{events_8cxx_a1c10b6194055c6cc7c772ebd2fa4648c}\label{events_8cxx_a1c10b6194055c6cc7c772ebd2fa4648c} 
 \index{events.cxx@{events.cxx}!u8\_to\_u16@{u8\_to\_u16}}
 \index{u8\_to\_u16@{u8\_to\_u16}!events.cxx@{events.cxx}}
 \doxysubsubsection{\texorpdfstring{u8\_to\_u16()}{u8\_to\_u16()}}
-{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} $>$ u8\+\_\+to\+\_\+u16 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{vec\+\_\+u8 }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} u8\+\_\+to\+\_\+u16 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{vec\+\_\+u8 }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}$>$ }
+
+
 
 Helper to get adc data from Vec$<$u8$>$ 
+
+
 
 \doxysubsection{Variable Documentation}
 \Hypertarget{events_8cxx_a0cf7e1f9e13dbe1db99b385adfee4f2e}\label{events_8cxx_a0cf7e1f9e13dbe1db99b385adfee4f2e} 

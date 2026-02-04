@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/safe_arch-0.7.4/src/x86_x64/m256i_.rs`."><title>m256i_.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="safe_arch" data-themes="" data-resource-suffix="" data-rustdoc-version="1.92.0 (ded5c06cf 2025-12-08)" data-channel="1.92.0" data-search-js="search-d69d8955.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-ce535bd0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">safe_arch/x86_x64/</div>m256i_.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! This module is for the `m256i` wrapper type, its bonus methods, and all
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/safe_arch-0.7.4/src/x86_x64/m256i_.rs`."><title>m256i_.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="safe_arch" data-themes="" data-resource-suffix="" data-rustdoc-version="1.93.0 (254b59607 2026-01-19)" data-channel="1.93.0" data-search-js="search-9e2438ea.js" data-stringdex-js="stringdex-a3946164.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-a410ff4d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">safe_arch/x86_x64/</div>m256i_.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! This module is for the `m256i` wrapper type, its bonus methods, and all
 <a href=#2 id=2 data-nosnippet>2</a>//! necessary trait impls.
 <a href=#3 id=3 data-nosnippet>3</a>//!
 <a href=#4 id=4 data-nosnippet>4</a>//! Intrinsics should _not_ be in this module! They should all be free-functions
@@ -226,7 +226,7 @@
 <a href=#226 id=226 data-nosnippet>226</a>  </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; core::fmt::Result {
 <a href=#227 id=227 data-nosnippet>227</a>    <span class="macro">write!</span>(f, <span class="string">"m256i("</span>)<span class="question-mark">?</span>;
 <a href=#228 id=228 data-nosnippet>228</a>    <span class="kw">for </span>(i, int) <span class="kw">in </span>&lt;[i32; <span class="number">8</span>]&gt;::from(<span class="kw-2">*</span><span class="self">self</span>).iter().enumerate() {
-<a href=#229 id=229 data-nosnippet>229</a>      <span class="kw">if </span>i != <span class="number">0 </span>{
+<a href=#229 id=229 data-nosnippet>229</a>      <span class="kw">if </span><span class="macro">i !</span>= <span class="number">0 </span>{
 <a href=#230 id=230 data-nosnippet>230</a>        <span class="macro">write!</span>(f, <span class="string">", "</span>)<span class="question-mark">?</span>;
 <a href=#231 id=231 data-nosnippet>231</a>      }
 <a href=#232 id=232 data-nosnippet>232</a>      Debug::fmt(int, f)<span class="question-mark">?</span>;
@@ -245,7 +245,7 @@
 <a href=#245 id=245 data-nosnippet>245</a>  </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; core::fmt::Result {
 <a href=#246 id=246 data-nosnippet>246</a>    <span class="macro">write!</span>(f, <span class="string">"("</span>)<span class="question-mark">?</span>;
 <a href=#247 id=247 data-nosnippet>247</a>    <span class="kw">for </span>(i, int) <span class="kw">in </span>&lt;[i32; <span class="number">8</span>]&gt;::from(<span class="kw-2">*</span><span class="self">self</span>).iter().enumerate() {
-<a href=#248 id=248 data-nosnippet>248</a>      <span class="kw">if </span>i != <span class="number">0 </span>{
+<a href=#248 id=248 data-nosnippet>248</a>      <span class="kw">if </span><span class="macro">i !</span>= <span class="number">0 </span>{
 <a href=#249 id=249 data-nosnippet>249</a>        <span class="macro">write!</span>(f, <span class="string">", "</span>)<span class="question-mark">?</span>;
 <a href=#250 id=250 data-nosnippet>250</a>      }
 <a href=#251 id=251 data-nosnippet>251</a>      Display::fmt(int, f)<span class="question-mark">?</span>;
@@ -264,7 +264,7 @@
 <a href=#264 id=264 data-nosnippet>264</a>  </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; core::fmt::Result {
 <a href=#265 id=265 data-nosnippet>265</a>    <span class="macro">write!</span>(f, <span class="string">"("</span>)<span class="question-mark">?</span>;
 <a href=#266 id=266 data-nosnippet>266</a>    <span class="kw">for </span>(i, int) <span class="kw">in </span>&lt;[i32; <span class="number">8</span>]&gt;::from(<span class="kw-2">*</span><span class="self">self</span>).iter().enumerate() {
-<a href=#267 id=267 data-nosnippet>267</a>      <span class="kw">if </span>i != <span class="number">0 </span>{
+<a href=#267 id=267 data-nosnippet>267</a>      <span class="kw">if </span><span class="macro">i !</span>= <span class="number">0 </span>{
 <a href=#268 id=268 data-nosnippet>268</a>        <span class="macro">write!</span>(f, <span class="string">", "</span>)<span class="question-mark">?</span>;
 <a href=#269 id=269 data-nosnippet>269</a>      }
 <a href=#270 id=270 data-nosnippet>270</a>      Binary::fmt(int, f)<span class="question-mark">?</span>;
@@ -283,7 +283,7 @@
 <a href=#283 id=283 data-nosnippet>283</a>  </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; core::fmt::Result {
 <a href=#284 id=284 data-nosnippet>284</a>    <span class="macro">write!</span>(f, <span class="string">"("</span>)<span class="question-mark">?</span>;
 <a href=#285 id=285 data-nosnippet>285</a>    <span class="kw">for </span>(i, int) <span class="kw">in </span>&lt;[i32; <span class="number">8</span>]&gt;::from(<span class="kw-2">*</span><span class="self">self</span>).iter().enumerate() {
-<a href=#286 id=286 data-nosnippet>286</a>      <span class="kw">if </span>i != <span class="number">0 </span>{
+<a href=#286 id=286 data-nosnippet>286</a>      <span class="kw">if </span><span class="macro">i !</span>= <span class="number">0 </span>{
 <a href=#287 id=287 data-nosnippet>287</a>        <span class="macro">write!</span>(f, <span class="string">", "</span>)<span class="question-mark">?</span>;
 <a href=#288 id=288 data-nosnippet>288</a>      }
 <a href=#289 id=289 data-nosnippet>289</a>      LowerExp::fmt(int, f)<span class="question-mark">?</span>;
@@ -302,7 +302,7 @@
 <a href=#302 id=302 data-nosnippet>302</a>  </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; core::fmt::Result {
 <a href=#303 id=303 data-nosnippet>303</a>    <span class="macro">write!</span>(f, <span class="string">"("</span>)<span class="question-mark">?</span>;
 <a href=#304 id=304 data-nosnippet>304</a>    <span class="kw">for </span>(i, int) <span class="kw">in </span>&lt;[i32; <span class="number">8</span>]&gt;::from(<span class="kw-2">*</span><span class="self">self</span>).iter().enumerate() {
-<a href=#305 id=305 data-nosnippet>305</a>      <span class="kw">if </span>i != <span class="number">0 </span>{
+<a href=#305 id=305 data-nosnippet>305</a>      <span class="kw">if </span><span class="macro">i !</span>= <span class="number">0 </span>{
 <a href=#306 id=306 data-nosnippet>306</a>        <span class="macro">write!</span>(f, <span class="string">", "</span>)<span class="question-mark">?</span>;
 <a href=#307 id=307 data-nosnippet>307</a>      }
 <a href=#308 id=308 data-nosnippet>308</a>      UpperExp::fmt(int, f)<span class="question-mark">?</span>;
@@ -321,7 +321,7 @@
 <a href=#321 id=321 data-nosnippet>321</a>  </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; core::fmt::Result {
 <a href=#322 id=322 data-nosnippet>322</a>    <span class="macro">write!</span>(f, <span class="string">"("</span>)<span class="question-mark">?</span>;
 <a href=#323 id=323 data-nosnippet>323</a>    <span class="kw">for </span>(i, int) <span class="kw">in </span>&lt;[i32; <span class="number">8</span>]&gt;::from(<span class="kw-2">*</span><span class="self">self</span>).iter().enumerate() {
-<a href=#324 id=324 data-nosnippet>324</a>      <span class="kw">if </span>i != <span class="number">0 </span>{
+<a href=#324 id=324 data-nosnippet>324</a>      <span class="kw">if </span><span class="macro">i !</span>= <span class="number">0 </span>{
 <a href=#325 id=325 data-nosnippet>325</a>        <span class="macro">write!</span>(f, <span class="string">", "</span>)<span class="question-mark">?</span>;
 <a href=#326 id=326 data-nosnippet>326</a>      }
 <a href=#327 id=327 data-nosnippet>327</a>      LowerHex::fmt(int, f)<span class="question-mark">?</span>;
@@ -340,7 +340,7 @@
 <a href=#340 id=340 data-nosnippet>340</a>  </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; core::fmt::Result {
 <a href=#341 id=341 data-nosnippet>341</a>    <span class="macro">write!</span>(f, <span class="string">"("</span>)<span class="question-mark">?</span>;
 <a href=#342 id=342 data-nosnippet>342</a>    <span class="kw">for </span>(i, int) <span class="kw">in </span>&lt;[i32; <span class="number">8</span>]&gt;::from(<span class="kw-2">*</span><span class="self">self</span>).iter().enumerate() {
-<a href=#343 id=343 data-nosnippet>343</a>      <span class="kw">if </span>i != <span class="number">0 </span>{
+<a href=#343 id=343 data-nosnippet>343</a>      <span class="kw">if </span><span class="macro">i !</span>= <span class="number">0 </span>{
 <a href=#344 id=344 data-nosnippet>344</a>        <span class="macro">write!</span>(f, <span class="string">", "</span>)<span class="question-mark">?</span>;
 <a href=#345 id=345 data-nosnippet>345</a>      }
 <a href=#346 id=346 data-nosnippet>346</a>      UpperHex::fmt(int, f)<span class="question-mark">?</span>;
@@ -359,11 +359,12 @@
 <a href=#359 id=359 data-nosnippet>359</a>  </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; core::fmt::Result {
 <a href=#360 id=360 data-nosnippet>360</a>    <span class="macro">write!</span>(f, <span class="string">"("</span>)<span class="question-mark">?</span>;
 <a href=#361 id=361 data-nosnippet>361</a>    <span class="kw">for </span>(i, int) <span class="kw">in </span>&lt;[i32; <span class="number">8</span>]&gt;::from(<span class="kw-2">*</span><span class="self">self</span>).iter().enumerate() {
-<a href=#362 id=362 data-nosnippet>362</a>      <span class="kw">if </span>i != <span class="number">0 </span>{
+<a href=#362 id=362 data-nosnippet>362</a>      <span class="kw">if </span><span class="macro">i !</span>= <span class="number">0 </span>{
 <a href=#363 id=363 data-nosnippet>363</a>        <span class="macro">write!</span>(f, <span class="string">", "</span>)<span class="question-mark">?</span>;
 <a href=#364 id=364 data-nosnippet>364</a>      }
 <a href=#365 id=365 data-nosnippet>365</a>      Octal::fmt(int, f)<span class="question-mark">?</span>;
 <a href=#366 id=366 data-nosnippet>366</a>    }
 <a href=#367 id=367 data-nosnippet>367</a>    <span class="macro">write!</span>(f, <span class="string">")"</span>)
 <a href=#368 id=368 data-nosnippet>368</a>  }
-<a href=#369 id=369 data-nosnippet>369</a>}</code></pre></div></section></main></body></html>
+<a href=#369 id=369 data-nosnippet>369</a>}
+</code></pre></div></section></main></body></html>

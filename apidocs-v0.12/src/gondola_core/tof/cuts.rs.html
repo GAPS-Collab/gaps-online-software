@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/gondola-core/rust/gondola-core/src/tof/cuts.rs`."><title>cuts.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="gondola_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.92.0 (ded5c06cf 2025-12-08)" data-channel="1.92.0" data-search-js="search-d69d8955.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-ce535bd0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">gondola_core/tof/</div>cuts.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-4"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="comment">// This file is part of gaps-online-software and published 
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/gondola-core/rust/gondola-core/src/tof/cuts.rs`."><title>cuts.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="gondola_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.93.0 (254b59607 2026-01-19)" data-channel="1.93.0" data-search-js="search-9e2438ea.js" data-stringdex-js="stringdex-a3946164.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-a410ff4d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">gondola_core/tof/</div>cuts.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-4"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="comment">// This file is part of gaps-online-software and published 
 <a href=#2 id=2 data-nosnippet>2</a>// under the GPLv3 license
 <a href=#3 id=3 data-nosnippet>3</a>
 <a href=#4 id=4 data-nosnippet>4</a></span><span class="kw">use </span>std::ops::AddAssign; 
@@ -177,58 +177,58 @@
 <a href=#177 id=177 data-nosnippet>177</a>  ///
 <a href=#178 id=178 data-nosnippet>178</a>  /// Void cuts will automatically be comptaible
 <a href=#179 id=179 data-nosnippet>179</a>  </span><span class="kw">pub fn </span>is_compatible(<span class="kw-2">&amp;</span><span class="self">self</span>, other : <span class="kw-2">&amp;</span>TofCuts) -&gt; bool {
-<a href=#180 id=180 data-nosnippet>180</a>    <span class="kw">if </span><span class="self">self</span>.only_causal_hits != other.only_causal_hits {
+<a href=#180 id=180 data-nosnippet>180</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">only_causal_hits !</span>= other.only_causal_hits {
 <a href=#181 id=181 data-nosnippet>181</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#182 id=182 data-nosnippet>182</a>    }
-<a href=#183 id=183 data-nosnippet>183</a>    <span class="kw">if </span><span class="self">self</span>.min_hit_cor  != other.min_hit_cor {
+<a href=#183 id=183 data-nosnippet>183</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">min_hit_cor  !</span>= other.min_hit_cor {
 <a href=#184 id=184 data-nosnippet>184</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#185 id=185 data-nosnippet>185</a>    }
-<a href=#186 id=186 data-nosnippet>186</a>    <span class="kw">if </span><span class="self">self</span>.min_hit_cbe  != other.min_hit_cbe {
+<a href=#186 id=186 data-nosnippet>186</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">min_hit_cbe  !</span>= other.min_hit_cbe {
 <a href=#187 id=187 data-nosnippet>187</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#188 id=188 data-nosnippet>188</a>    }
-<a href=#189 id=189 data-nosnippet>189</a>    <span class="kw">if </span><span class="self">self</span>.min_hit_umb  != other.min_hit_umb {
+<a href=#189 id=189 data-nosnippet>189</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">min_hit_umb  !</span>= other.min_hit_umb {
 <a href=#190 id=190 data-nosnippet>190</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#191 id=191 data-nosnippet>191</a>    }
-<a href=#192 id=192 data-nosnippet>192</a>    <span class="kw">if </span><span class="self">self</span>.max_hit_cor  != other.max_hit_cor {
+<a href=#192 id=192 data-nosnippet>192</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">max_hit_cor  !</span>= other.max_hit_cor {
 <a href=#193 id=193 data-nosnippet>193</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#194 id=194 data-nosnippet>194</a>    }
-<a href=#195 id=195 data-nosnippet>195</a>    <span class="kw">if </span><span class="self">self</span>.max_hit_cbe  != other.max_hit_cbe {
+<a href=#195 id=195 data-nosnippet>195</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">max_hit_cbe  !</span>= other.max_hit_cbe {
 <a href=#196 id=196 data-nosnippet>196</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#197 id=197 data-nosnippet>197</a>    }
-<a href=#198 id=198 data-nosnippet>198</a>    <span class="kw">if </span><span class="self">self</span>.max_hit_umb  != other.max_hit_umb {
+<a href=#198 id=198 data-nosnippet>198</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">max_hit_umb  !</span>= other.max_hit_umb {
 <a href=#199 id=199 data-nosnippet>199</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#200 id=200 data-nosnippet>200</a>    }
-<a href=#201 id=201 data-nosnippet>201</a>    <span class="kw">if </span><span class="self">self</span>.min_hit_all  != other.min_hit_all {
+<a href=#201 id=201 data-nosnippet>201</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">min_hit_all  !</span>= other.min_hit_all {
 <a href=#202 id=202 data-nosnippet>202</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#203 id=203 data-nosnippet>203</a>    }
-<a href=#204 id=204 data-nosnippet>204</a>    <span class="kw">if </span><span class="self">self</span>.max_hit_all  != other.max_hit_all {
+<a href=#204 id=204 data-nosnippet>204</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">max_hit_all  !</span>= other.max_hit_all {
 <a href=#205 id=205 data-nosnippet>205</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#206 id=206 data-nosnippet>206</a>    }
-<a href=#207 id=207 data-nosnippet>207</a>    <span class="kw">if </span><span class="self">self</span>.ls_cleaning_t_err != other.ls_cleaning_t_err {
+<a href=#207 id=207 data-nosnippet>207</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">ls_cleaning_t_err !</span>= other.ls_cleaning_t_err {
 <a href=#208 id=208 data-nosnippet>208</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#209 id=209 data-nosnippet>209</a>    }
-<a href=#210 id=210 data-nosnippet>210</a>    <span class="kw">if </span><span class="self">self</span>.fh_must_be_umb != other.fh_must_be_umb {
+<a href=#210 id=210 data-nosnippet>210</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">fh_must_be_umb !</span>= other.fh_must_be_umb {
 <a href=#211 id=211 data-nosnippet>211</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#212 id=212 data-nosnippet>212</a>    } 
-<a href=#213 id=213 data-nosnippet>213</a>    <span class="kw">if </span><span class="self">self</span>.thru_going != other.thru_going {
+<a href=#213 id=213 data-nosnippet>213</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">thru_going !</span>= other.thru_going {
 <a href=#214 id=214 data-nosnippet>214</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#215 id=215 data-nosnippet>215</a>    }
-<a href=#216 id=216 data-nosnippet>216</a>    <span class="kw">if </span><span class="self">self</span>.fhi_not_bot != other.fhi_not_bot {
+<a href=#216 id=216 data-nosnippet>216</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">fhi_not_bot !</span>= other.fhi_not_bot {
 <a href=#217 id=217 data-nosnippet>217</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#218 id=218 data-nosnippet>218</a>    }
-<a href=#219 id=219 data-nosnippet>219</a>    <span class="kw">if </span><span class="self">self</span>.min_cos_theta != other.min_cos_theta {
+<a href=#219 id=219 data-nosnippet>219</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">min_cos_theta !</span>= other.min_cos_theta {
 <a href=#220 id=220 data-nosnippet>220</a>      <span class="kw">return </span><span class="bool-val">false</span>; 
 <a href=#221 id=221 data-nosnippet>221</a>    }
-<a href=#222 id=222 data-nosnippet>222</a>    <span class="kw">if </span><span class="self">self</span>.max_cos_theta != other.max_cos_theta {
+<a href=#222 id=222 data-nosnippet>222</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">max_cos_theta !</span>= other.max_cos_theta {
 <a href=#223 id=223 data-nosnippet>223</a>      <span class="kw">return </span><span class="bool-val">false</span>; 
 <a href=#224 id=224 data-nosnippet>224</a>    }
-<a href=#225 id=225 data-nosnippet>225</a>    <span class="kw">if </span><span class="self">self</span>.fho_must_panel7 != other.fho_must_panel7 {
+<a href=#225 id=225 data-nosnippet>225</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">fho_must_panel7 !</span>= other.fho_must_panel7 {
 <a href=#226 id=226 data-nosnippet>226</a>      <span class="kw">return </span><span class="bool-val">false</span>; 
 <a href=#227 id=227 data-nosnippet>227</a>    }
-<a href=#228 id=228 data-nosnippet>228</a>    <span class="kw">if </span><span class="self">self</span>.lh_must_panel2 != other.lh_must_panel2 {
+<a href=#228 id=228 data-nosnippet>228</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">lh_must_panel2 !</span>= other.lh_must_panel2 {
 <a href=#229 id=229 data-nosnippet>229</a>      <span class="kw">return </span><span class="bool-val">false</span>; 
 <a href=#230 id=230 data-nosnippet>230</a>    }
-<a href=#231 id=231 data-nosnippet>231</a>    <span class="kw">if </span><span class="self">self</span>.hit_high_edep != other.hit_high_edep { 
+<a href=#231 id=231 data-nosnippet>231</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">hit_high_edep !</span>= other.hit_high_edep { 
 <a href=#232 id=232 data-nosnippet>232</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#233 id=233 data-nosnippet>233</a>    }
 <a href=#234 id=234 data-nosnippet>234</a>    <span class="bool-val">true
@@ -255,49 +255,49 @@
 <a href=#255 id=255 data-nosnippet>255</a>  }
 <a href=#256 id=256 data-nosnippet>256</a>    
 <a href=#257 id=257 data-nosnippet>257</a>  <span class="kw">pub fn </span>is_void(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-<a href=#258 id=258 data-nosnippet>258</a>    <span class="kw">if </span><span class="self">self</span>.min_hit_cor      != <span class="number">0 </span>{
+<a href=#258 id=258 data-nosnippet>258</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">min_hit_cor      !</span>= <span class="number">0 </span>{
 <a href=#259 id=259 data-nosnippet>259</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#260 id=260 data-nosnippet>260</a>    }
-<a href=#261 id=261 data-nosnippet>261</a>    <span class="kw">if </span><span class="self">self</span>.min_hit_cbe      != <span class="number">0 </span>{
+<a href=#261 id=261 data-nosnippet>261</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">min_hit_cbe      !</span>= <span class="number">0 </span>{
 <a href=#262 id=262 data-nosnippet>262</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#263 id=263 data-nosnippet>263</a>    }
-<a href=#264 id=264 data-nosnippet>264</a>    <span class="kw">if </span><span class="self">self</span>.min_hit_umb      != <span class="number">0 </span>{
+<a href=#264 id=264 data-nosnippet>264</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">min_hit_umb      !</span>= <span class="number">0 </span>{
 <a href=#265 id=265 data-nosnippet>265</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#266 id=266 data-nosnippet>266</a>    }
-<a href=#267 id=267 data-nosnippet>267</a>    <span class="kw">if </span><span class="self">self</span>.max_hit_cor      != <span class="number">161 </span>{
+<a href=#267 id=267 data-nosnippet>267</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">max_hit_cor      !</span>= <span class="number">161 </span>{
 <a href=#268 id=268 data-nosnippet>268</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#269 id=269 data-nosnippet>269</a>    }
-<a href=#270 id=270 data-nosnippet>270</a>    <span class="kw">if </span><span class="self">self</span>.max_hit_cbe      != <span class="number">161 </span>{
+<a href=#270 id=270 data-nosnippet>270</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">max_hit_cbe      !</span>= <span class="number">161 </span>{
 <a href=#271 id=271 data-nosnippet>271</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#272 id=272 data-nosnippet>272</a>    }
-<a href=#273 id=273 data-nosnippet>273</a>    <span class="kw">if </span><span class="self">self</span>.max_hit_umb      != <span class="number">161 </span>{
+<a href=#273 id=273 data-nosnippet>273</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">max_hit_umb      !</span>= <span class="number">161 </span>{
 <a href=#274 id=274 data-nosnippet>274</a>      <span class="kw">return </span><span class="bool-val">false</span>;  
 <a href=#275 id=275 data-nosnippet>275</a>    }
-<a href=#276 id=276 data-nosnippet>276</a>    <span class="kw">if </span><span class="self">self</span>.min_hit_all      != <span class="number">0 </span>{
+<a href=#276 id=276 data-nosnippet>276</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">min_hit_all      !</span>= <span class="number">0 </span>{
 <a href=#277 id=277 data-nosnippet>277</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#278 id=278 data-nosnippet>278</a>    }
-<a href=#279 id=279 data-nosnippet>279</a>    <span class="kw">if </span><span class="self">self</span>.max_hit_all      != <span class="number">161 </span>{
+<a href=#279 id=279 data-nosnippet>279</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">max_hit_all      !</span>= <span class="number">161 </span>{
 <a href=#280 id=280 data-nosnippet>280</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#281 id=281 data-nosnippet>281</a>    }
 <a href=#282 id=282 data-nosnippet>282</a>    <span class="kw">if </span><span class="self">self</span>.only_causal_hits {
 <a href=#283 id=283 data-nosnippet>283</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#284 id=284 data-nosnippet>284</a>    }
-<a href=#285 id=285 data-nosnippet>285</a>    <span class="kw">if </span><span class="self">self</span>.ls_cleaning_t_err != NO_LIGHTSPEED_CUTS {
+<a href=#285 id=285 data-nosnippet>285</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">ls_cleaning_t_err !</span>= NO_LIGHTSPEED_CUTS {
 <a href=#286 id=286 data-nosnippet>286</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#287 id=287 data-nosnippet>287</a>    }
-<a href=#288 id=288 data-nosnippet>288</a>    <span class="kw">if </span><span class="self">self</span>.fh_must_be_umb != <span class="bool-val">false </span>{
+<a href=#288 id=288 data-nosnippet>288</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">fh_must_be_umb !</span>= <span class="bool-val">false </span>{
 <a href=#289 id=289 data-nosnippet>289</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#290 id=290 data-nosnippet>290</a>    }
-<a href=#291 id=291 data-nosnippet>291</a>    <span class="kw">if </span><span class="self">self</span>.thru_going != <span class="bool-val">false </span>{
+<a href=#291 id=291 data-nosnippet>291</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">thru_going !</span>= <span class="bool-val">false </span>{
 <a href=#292 id=292 data-nosnippet>292</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#293 id=293 data-nosnippet>293</a>    }
-<a href=#294 id=294 data-nosnippet>294</a>    <span class="kw">if </span><span class="self">self</span>.fhi_not_bot != <span class="bool-val">false </span>{
+<a href=#294 id=294 data-nosnippet>294</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">fhi_not_bot !</span>= <span class="bool-val">false </span>{
 <a href=#295 id=295 data-nosnippet>295</a>      <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#296 id=296 data-nosnippet>296</a>    }
-<a href=#297 id=297 data-nosnippet>297</a>    <span class="kw">if </span><span class="self">self</span>.min_cos_theta != <span class="number">0.0 </span>{
+<a href=#297 id=297 data-nosnippet>297</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">min_cos_theta !</span>= <span class="number">0.0 </span>{
 <a href=#298 id=298 data-nosnippet>298</a>      <span class="kw">return </span><span class="bool-val">false</span>; 
 <a href=#299 id=299 data-nosnippet>299</a>    }
-<a href=#300 id=300 data-nosnippet>300</a>    <span class="kw">if </span><span class="self">self</span>.max_cos_theta != <span class="number">1.0 </span>{
+<a href=#300 id=300 data-nosnippet>300</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">max_cos_theta !</span>= <span class="number">1.0 </span>{
 <a href=#301 id=301 data-nosnippet>301</a>      <span class="kw">return </span><span class="bool-val">false</span>; 
 <a href=#302 id=302 data-nosnippet>302</a>    }
 <a href=#303 id=303 data-nosnippet>303</a>    <span class="kw">if </span><span class="self">self</span>.fho_must_panel7 {
@@ -412,7 +412,7 @@
 <a href=#412 id=412 data-nosnippet>412</a>      <span class="kw">let </span>rm_pids = ev.remove_non_causal_hits();
 <a href=#413 id=413 data-nosnippet>413</a>      <span class="self">self</span>.hits_rmvd_csl  += rm_pids.len() <span class="kw">as </span>u64;
 <a href=#414 id=414 data-nosnippet>414</a>    }
-<a href=#415 id=415 data-nosnippet>415</a>    <span class="kw">if </span><span class="self">self</span>.ls_cleaning_t_err != NO_LIGHTSPEED_CUTS {
+<a href=#415 id=415 data-nosnippet>415</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">ls_cleaning_t_err !</span>= NO_LIGHTSPEED_CUTS {
 <a href=#416 id=416 data-nosnippet>416</a>      <span class="comment">// FIXME - change type of ls_cleaning_t_err to f32
 <a href=#417 id=417 data-nosnippet>417</a>      </span><span class="kw">let </span>rm_pids_ls       = ev.lightspeed_cleaning(<span class="self">self</span>.ls_cleaning_t_err <span class="kw">as </span>f32);
 <a href=#418 id=418 data-nosnippet>418</a>      <span class="self">self</span>.hits_rmvd_ls   += rm_pids_ls.<span class="number">0</span>.len() <span class="kw">as </span>u64;
@@ -450,8 +450,8 @@
 <a href=#450 id=450 data-nosnippet>450</a>    </span><span class="kw">if </span><span class="self">self</span>.fh_must_be_umb 
 <a href=#451 id=451 data-nosnippet>451</a>      || <span class="self">self</span>.thru_going 
 <a href=#452 id=452 data-nosnippet>452</a>      || <span class="self">self</span>.fhi_not_bot 
-<a href=#453 id=453 data-nosnippet>453</a>      || (<span class="self">self</span>.min_cos_theta != <span class="number">0.0</span>) 
-<a href=#454 id=454 data-nosnippet>454</a>      || (<span class="self">self</span>.max_cos_theta != <span class="number">1.0</span>) 
+<a href=#453 id=453 data-nosnippet>453</a>      || (<span class="self">self</span>.<span class="macro">min_cos_theta !</span>= <span class="number">0.0</span>) 
+<a href=#454 id=454 data-nosnippet>454</a>      || (<span class="self">self</span>.<span class="macro">max_cos_theta !</span>= <span class="number">1.0</span>) 
 <a href=#455 id=455 data-nosnippet>455</a>      || <span class="self">self</span>.fho_must_panel7 
 <a href=#456 id=456 data-nosnippet>456</a>      || <span class="self">self</span>.lh_must_panel2 
 <a href=#457 id=457 data-nosnippet>457</a>      || <span class="self">self</span>.hit_high_edep {
@@ -501,7 +501,7 @@
 <a href=#501 id=501 data-nosnippet>501</a>      } <span class="kw">else </span>{
 <a href=#502 id=502 data-nosnippet>502</a>        <span class="self">self</span>.fhi_not_bot_acc += <span class="number">1</span>;
 <a href=#503 id=503 data-nosnippet>503</a>      } 
-<a href=#504 id=504 data-nosnippet>504</a>      <span class="kw">if </span><span class="self">self</span>.min_cos_theta != <span class="number">0.0 </span>|| <span class="self">self</span>.max_cos_theta != <span class="number">1.0 </span>{
+<a href=#504 id=504 data-nosnippet>504</a>      <span class="kw">if </span><span class="self">self</span>.<span class="macro">min_cos_theta !</span>= <span class="number">0.0 </span>|| <span class="self">self</span>.<span class="macro">max_cos_theta !</span>= <span class="number">1.0 </span>{
 <a href=#505 id=505 data-nosnippet>505</a>        <span class="kw">let </span>dist = hits_inner[<span class="number">0</span>].distance(hits_outer[<span class="number">0</span>])/<span class="number">1000.0</span>;
 <a href=#506 id=506 data-nosnippet>506</a>        <span class="kw">let </span>cos_theta = f32::abs(hits_inner[<span class="number">0</span>].z - hits_outer[<span class="number">0</span>].z)/(<span class="number">1000.0</span><span class="kw-2">*</span>dist);  
 <a href=#507 id=507 data-nosnippet>507</a>        <span class="kw">if </span>!((<span class="self">self</span>.min_cos_theta &lt;= cos_theta) &amp;&amp; (cos_theta &lt;= <span class="self">self</span>.max_cos_theta)) {
@@ -558,7 +558,7 @@
 <a href=#558 id=558 data-nosnippet>558</a>        repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Removed {:.2} % of hits due to causality cut!"</span>, <span class="number">100.0</span><span class="kw-2">*</span><span class="self">self</span>.hits_rmvd_csl <span class="kw">as </span>f64/<span class="self">self</span>.hits_total <span class="kw">as </span>f64));
 <a href=#559 id=559 data-nosnippet>559</a>      }
 <a href=#560 id=560 data-nosnippet>560</a>    }
-<a href=#561 id=561 data-nosnippet>561</a>    <span class="kw">if </span><span class="self">self</span>.ls_cleaning_t_err != NO_LIGHTSPEED_CUTS {
+<a href=#561 id=561 data-nosnippet>561</a>    <span class="kw">if </span><span class="self">self</span>.<span class="macro">ls_cleaning_t_err !</span>= NO_LIGHTSPEED_CUTS {
 <a href=#562 id=562 data-nosnippet>562</a>      <span class="kw">if </span><span class="self">self</span>.hits_total &gt; <span class="number">0 </span>{
 <a href=#563 id=563 data-nosnippet>563</a>        repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n Removed {:.2} % of hits due to lightspeed cut!"</span>, <span class="number">100.0</span><span class="kw-2">*</span>(<span class="self">self</span>.hits_rmvd_ls <span class="kw">as </span>f64)/<span class="self">self</span>.hits_total <span class="kw">as </span>f64));
 <a href=#564 id=564 data-nosnippet>564</a>      }
@@ -609,7 +609,7 @@
 <a href=#609 id=609 data-nosnippet>609</a>        repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n -- removes non-causal hits!"</span>));
 <a href=#610 id=610 data-nosnippet>610</a>      }
 <a href=#611 id=611 data-nosnippet>611</a>      <span class="comment">// FIXME - 1e9 is a magic value
-<a href=#612 id=612 data-nosnippet>612</a>      </span><span class="kw">if </span><span class="self">self</span>.ls_cleaning_t_err != NO_LIGHTSPEED_CUTS {
+<a href=#612 id=612 data-nosnippet>612</a>      </span><span class="kw">if </span><span class="self">self</span>.<span class="macro">ls_cleaning_t_err !</span>= NO_LIGHTSPEED_CUTS {
 <a href=#613 id=613 data-nosnippet>613</a>        repr += <span class="string">"\n -- removes hits which are not correlated with the first hit!"</span>;
 <a href=#614 id=614 data-nosnippet>614</a>        repr += <span class="kw-2">&amp;</span>(<span class="macro">format!</span>(<span class="string">"\n --   assumed timing error {}"</span>, <span class="self">self</span>.ls_cleaning_t_err));
 <a href=#615 id=615 data-nosnippet>615</a>      }
@@ -1079,4 +1079,5 @@
 <a href=#1079 id=1079 data-nosnippet>1079</a>
 <a href=#1080 id=1080 data-nosnippet>1080</a><span class="attr">#[cfg(feature=<span class="string">"pybindings"</span>)]
 <a href=#1081 id=1081 data-nosnippet>1081</a></span><span class="macro">pythonize!</span>(TofCuts);
-<a href=#1082 id=1082 data-nosnippet>1082</a></code></pre></div></section></main></body></html>
+<a href=#1082 id=1082 data-nosnippet>1082</a>
+</code></pre></div></section></main></body></html>

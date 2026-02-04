@@ -39,8 +39,8 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="../_static/documentation_options.js?v=1392dee4"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.events';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -398,7 +398,7 @@
 </div>
 <dl class="py class">
 <dt class="sig sig-object py" id="gondola.events.TofHit">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">TofHit</span></span><a class="headerlink" href="#gondola.events.TofHit" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">TofHit</span></span><a class="headerlink" href="#gondola.events.TofHit" title="Link to this definition">#</a></dt>
 <dd><p>An extracted hit from a TofPaddle, as extracted by the 
 online software and provided algorithm
 (in v0.11 algorithm is provided by J.Zweerink)</p>
@@ -646,7 +646,7 @@ or ch9 phase shift</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gondola.events.TrackerHit">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">TrackerHit</span></span><a class="headerlink" href="#gondola.events.TrackerHit" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">TrackerHit</span></span><a class="headerlink" href="#gondola.events.TrackerHit" title="Link to this definition">#</a></dt>
 <dd><p>Hit on a tracker strip</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TrackerHit.adc">
@@ -714,7 +714,7 @@ pedestal should be subtracted</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gondola.events.RBEventHeader">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">RBEventHeader</span></span><a class="headerlink" href="#gondola.events.RBEventHeader" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">RBEventHeader</span></span><a class="headerlink" href="#gondola.events.RBEventHeader" title="Link to this definition">#</a></dt>
 <dd><p>The RBEvent header gets generated once per event
 per RB. 
 Contains information about event id, timestamps,
@@ -798,21 +798,21 @@ etc.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gondola.events.RBEvent">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">RBEvent</span></span><a class="headerlink" href="#gondola.events.RBEvent" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">RBEvent</span></span><a class="headerlink" href="#gondola.events.RBEvent" title="Link to this definition">#</a></dt>
 <dd><p>Event data for each individual ReadoutBoard (RB)</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.RBEvent.from_bytestream">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_bytestream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytestream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBEvent.from_bytestream" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_bytestream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytestream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBEvent.from_bytestream" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.RBEvent.from_random">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_random</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBEvent.from_random" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_random</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBEvent.from_random" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.RBEvent.from_tofpacket">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_tofpacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBEvent.from_tofpacket" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_tofpacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBEvent.from_tofpacket" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -858,7 +858,7 @@ or sent over network</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gondola.events.RBWaveform">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">RBWaveform</span></span><a class="headerlink" href="#gondola.events.RBWaveform" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">RBWaveform</span></span><a class="headerlink" href="#gondola.events.RBWaveform" title="Link to this definition">#</a></dt>
 <dd><p>Waveform container for Tof waveforms
 This holds the waveforms for both 
 paddle ends. Fields are available to 
@@ -913,17 +913,17 @@ to millivolts and nanoseconds</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.RBWaveform.from_bytestream">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_bytestream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytestream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBWaveform.from_bytestream" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_bytestream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytestream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBWaveform.from_bytestream" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.RBWaveform.from_random">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_random</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBWaveform.from_random" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_random</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBWaveform.from_random" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.RBWaveform.from_tofpacket">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_tofpacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBWaveform.from_tofpacket" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_tofpacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.RBWaveform.from_tofpacket" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1026,7 +1026,7 @@ or sent over network</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gondola.events.TofEvent">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">TofEvent</span></span><a class="headerlink" href="#gondola.events.TofEvent" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">TofEvent</span></span><a class="headerlink" href="#gondola.events.TofEvent" title="Link to this definition">#</a></dt>
 <dd><p>Main event class for the TOF. This will be sent over telemetry and be 
 written to disk</p>
 <p>CHANGELOG: v0.11 (gondola-core): Merges TofEvent, TofEventSummary and 
@@ -1077,17 +1077,17 @@ NHIT (CBE, COR, UMB) and EDEP (CBE, COR, UMB)</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.TofEvent.from_bytestream">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_bytestream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytestream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.from_bytestream" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_bytestream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytestream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.from_bytestream" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.TofEvent.from_random">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_random</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.from_random" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_random</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.from_random" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.TofEvent.from_tofpacket">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_tofpacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.from_tofpacket" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_tofpacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.from_tofpacket" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1241,7 +1241,7 @@ by the assumed speed of light in the paddle</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.TofEvent.set_packed_status_version">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_packed_status_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pack</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.set_packed_status_version" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">set_packed_status_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pack</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.set_packed_status_version" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1256,7 +1256,7 @@ by the assumed speed of light in the paddle</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.TofEvent.strip_packed_rbevents_for_pv3">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">strip_packed_rbevents_for_pv3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pack</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.strip_packed_rbevents_for_pv3" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">strip_packed_rbevents_for_pv3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pack</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.strip_packed_rbevents_for_pv3" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1294,7 +1294,7 @@ if multiple trigger conditions are satisfied.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.TofEvent.unpack">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">unpack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pack</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.unpack" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">unpack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pack</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.unpack" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1306,7 +1306,7 @@ if multiple trigger conditions are satisfied.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gondola.events.TelemetryEvent">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">TelemetryEvent</span></span><a class="headerlink" href="#gondola.events.TelemetryEvent" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">TelemetryEvent</span></span><a class="headerlink" href="#gondola.events.TelemetryEvent" title="Link to this definition">#</a></dt>
 <dd><dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TelemetryEvent.event_id">
 <span class="sig-name descname"><span class="pre">event_id</span></span><a class="headerlink" href="#gondola.events.TelemetryEvent.event_id" title="Link to this definition">#</a></dt>
@@ -1314,14 +1314,14 @@ if multiple trigger conditions are satisfied.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.TelemetryEvent.from_telemetrypacket">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_telemetrypacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TelemetryEvent.from_telemetrypacket" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_telemetrypacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TelemetryEvent.from_telemetrypacket" title="Link to this definition">#</a></dt>
 <dd><p>Populate a merged event from a TelemetryPacket.</p>
 <p>Telemetry packet type should be 90 (MergedEvent)</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.TelemetryEvent.get_trk_energy">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_trk_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TelemetryEvent.get_trk_energy" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">get_trk_energy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TelemetryEvent.get_trk_energy" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1370,335 +1370,335 @@ the tracker stack</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gondola.events.EventQuality">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">EventQuality</span></span><a class="headerlink" href="#gondola.events.EventQuality" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">EventQuality</span></span><a class="headerlink" href="#gondola.events.EventQuality" title="Link to this definition">#</a></dt>
 <dd><dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.EventQuality.Diamond">
-<span class="sig-name descname"><span class="pre">Diamond</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventQuality.Diamond</span></em><a class="headerlink" href="#gondola.events.EventQuality.Diamond" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Diamond</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventQuality.Diamond</span></span><a class="headerlink" href="#gondola.events.EventQuality.Diamond" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.EventQuality.FourLeafClover">
-<span class="sig-name descname"><span class="pre">FourLeafClover</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventQuality.FourLeafClover</span></em><a class="headerlink" href="#gondola.events.EventQuality.FourLeafClover" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">FourLeafClover</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventQuality.FourLeafClover</span></span><a class="headerlink" href="#gondola.events.EventQuality.FourLeafClover" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.EventQuality.Gold">
-<span class="sig-name descname"><span class="pre">Gold</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventQuality.Gold</span></em><a class="headerlink" href="#gondola.events.EventQuality.Gold" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Gold</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventQuality.Gold</span></span><a class="headerlink" href="#gondola.events.EventQuality.Gold" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.EventQuality.Silver">
-<span class="sig-name descname"><span class="pre">Silver</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventQuality.Silver</span></em><a class="headerlink" href="#gondola.events.EventQuality.Silver" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Silver</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventQuality.Silver</span></span><a class="headerlink" href="#gondola.events.EventQuality.Silver" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.EventQuality.Unknown">
-<span class="sig-name descname"><span class="pre">Unknown</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventQuality.Unknown</span></em><a class="headerlink" href="#gondola.events.EventQuality.Unknown" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Unknown</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventQuality.Unknown</span></span><a class="headerlink" href="#gondola.events.EventQuality.Unknown" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.EventQuality.from_u8">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_u8</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">byte</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.EventQuality.from_u8" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_u8</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">byte</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.EventQuality.from_u8" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gondola.events.TriggerType">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">TriggerType</span></span><a class="headerlink" href="#gondola.events.TriggerType" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">TriggerType</span></span><a class="headerlink" href="#gondola.events.TriggerType" title="Link to this definition">#</a></dt>
 <dd><dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TriggerType.Any">
-<span class="sig-name descname"><span class="pre">Any</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Any</span></em><a class="headerlink" href="#gondola.events.TriggerType.Any" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Any</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Any</span></span><a class="headerlink" href="#gondola.events.TriggerType.Any" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TriggerType.ConfigurableTrigger">
-<span class="sig-name descname"><span class="pre">ConfigurableTrigger</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.ConfigurableTrigger</span></em><a class="headerlink" href="#gondola.events.TriggerType.ConfigurableTrigger" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">ConfigurableTrigger</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.ConfigurableTrigger</span></span><a class="headerlink" href="#gondola.events.TriggerType.ConfigurableTrigger" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TriggerType.CorCubeSide">
-<span class="sig-name descname"><span class="pre">CorCubeSide</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.CorCubeSide</span></em><a class="headerlink" href="#gondola.events.TriggerType.CorCubeSide" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">CorCubeSide</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.CorCubeSide</span></span><a class="headerlink" href="#gondola.events.TriggerType.CorCubeSide" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TriggerType.FixedRate">
-<span class="sig-name descname"><span class="pre">FixedRate</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.FixedRate</span></em><a class="headerlink" href="#gondola.events.TriggerType.FixedRate" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">FixedRate</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.FixedRate</span></span><a class="headerlink" href="#gondola.events.TriggerType.FixedRate" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TriggerType.Forced">
-<span class="sig-name descname"><span class="pre">Forced</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Forced</span></em><a class="headerlink" href="#gondola.events.TriggerType.Forced" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Forced</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Forced</span></span><a class="headerlink" href="#gondola.events.TriggerType.Forced" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TriggerType.Gaps">
-<span class="sig-name descname"><span class="pre">Gaps</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Gaps</span></em><a class="headerlink" href="#gondola.events.TriggerType.Gaps" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Gaps</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Gaps</span></span><a class="headerlink" href="#gondola.events.TriggerType.Gaps" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TriggerType.Gaps1044">
-<span class="sig-name descname"><span class="pre">Gaps1044</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Gaps1044</span></em><a class="headerlink" href="#gondola.events.TriggerType.Gaps1044" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Gaps1044</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Gaps1044</span></span><a class="headerlink" href="#gondola.events.TriggerType.Gaps1044" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TriggerType.Gaps211">
-<span class="sig-name descname"><span class="pre">Gaps211</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Gaps211</span></em><a class="headerlink" href="#gondola.events.TriggerType.Gaps211" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Gaps211</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Gaps211</span></span><a class="headerlink" href="#gondola.events.TriggerType.Gaps211" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TriggerType.Gaps422">
-<span class="sig-name descname"><span class="pre">Gaps422</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Gaps422</span></em><a class="headerlink" href="#gondola.events.TriggerType.Gaps422" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Gaps422</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Gaps422</span></span><a class="headerlink" href="#gondola.events.TriggerType.Gaps422" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TriggerType.Gaps633">
-<span class="sig-name descname"><span class="pre">Gaps633</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Gaps633</span></em><a class="headerlink" href="#gondola.events.TriggerType.Gaps633" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Gaps633</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Gaps633</span></span><a class="headerlink" href="#gondola.events.TriggerType.Gaps633" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TriggerType.Poisson">
-<span class="sig-name descname"><span class="pre">Poisson</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Poisson</span></em><a class="headerlink" href="#gondola.events.TriggerType.Poisson" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Poisson</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Poisson</span></span><a class="headerlink" href="#gondola.events.TriggerType.Poisson" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TriggerType.Track">
-<span class="sig-name descname"><span class="pre">Track</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Track</span></em><a class="headerlink" href="#gondola.events.TriggerType.Track" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Track</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Track</span></span><a class="headerlink" href="#gondola.events.TriggerType.Track" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TriggerType.TrackCentral">
-<span class="sig-name descname"><span class="pre">TrackCentral</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.TrackCentral</span></em><a class="headerlink" href="#gondola.events.TriggerType.TrackCentral" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">TrackCentral</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.TrackCentral</span></span><a class="headerlink" href="#gondola.events.TriggerType.TrackCentral" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TriggerType.TrackUmbCentral">
-<span class="sig-name descname"><span class="pre">TrackUmbCentral</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.TrackUmbCentral</span></em><a class="headerlink" href="#gondola.events.TriggerType.TrackUmbCentral" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">TrackUmbCentral</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.TrackUmbCentral</span></span><a class="headerlink" href="#gondola.events.TriggerType.TrackUmbCentral" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TriggerType.Umb3Cube">
-<span class="sig-name descname"><span class="pre">Umb3Cube</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Umb3Cube</span></em><a class="headerlink" href="#gondola.events.TriggerType.Umb3Cube" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Umb3Cube</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Umb3Cube</span></span><a class="headerlink" href="#gondola.events.TriggerType.Umb3Cube" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TriggerType.UmbCorCube">
-<span class="sig-name descname"><span class="pre">UmbCorCube</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.UmbCorCube</span></em><a class="headerlink" href="#gondola.events.TriggerType.UmbCorCube" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">UmbCorCube</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.UmbCorCube</span></span><a class="headerlink" href="#gondola.events.TriggerType.UmbCorCube" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TriggerType.UmbCube">
-<span class="sig-name descname"><span class="pre">UmbCube</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.UmbCube</span></em><a class="headerlink" href="#gondola.events.TriggerType.UmbCube" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">UmbCube</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.UmbCube</span></span><a class="headerlink" href="#gondola.events.TriggerType.UmbCube" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TriggerType.UmbCubeZ">
-<span class="sig-name descname"><span class="pre">UmbCubeZ</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.UmbCubeZ</span></em><a class="headerlink" href="#gondola.events.TriggerType.UmbCubeZ" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">UmbCubeZ</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.UmbCubeZ</span></span><a class="headerlink" href="#gondola.events.TriggerType.UmbCubeZ" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TriggerType.Unknown">
-<span class="sig-name descname"><span class="pre">Unknown</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Unknown</span></em><a class="headerlink" href="#gondola.events.TriggerType.Unknown" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Unknown</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">TriggerType.Unknown</span></span><a class="headerlink" href="#gondola.events.TriggerType.Unknown" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.TriggerType.from_u8">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_u8</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">byte</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TriggerType.from_u8" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_u8</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">byte</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TriggerType.from_u8" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.TriggerType.transcode_trigger_sources">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">transcode_trigger_sources</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trigger_sources</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TriggerType.transcode_trigger_sources" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">transcode_trigger_sources</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trigger_sources</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TriggerType.transcode_trigger_sources" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gondola.events.LTBThreshold">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">LTBThreshold</span></span><a class="headerlink" href="#gondola.events.LTBThreshold" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">LTBThreshold</span></span><a class="headerlink" href="#gondola.events.LTBThreshold" title="Link to this definition">#</a></dt>
 <dd><p>LTB Thresholds as passed on by the MTB
 [See also](<a class="reference external" href="https://gaps1.astro.ucla.edu/wiki/gaps/images/gaps/5/52/LTB_Data_Format.pdf">https://gaps1.astro.ucla.edu/wiki/gaps/images/gaps/5/52/LTB_Data_Format.pdf</a>)</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.LTBThreshold.Beta">
-<span class="sig-name descname"><span class="pre">Beta</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">LTBThreshold.Beta</span></em><a class="headerlink" href="#gondola.events.LTBThreshold.Beta" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Beta</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">LTBThreshold.Beta</span></span><a class="headerlink" href="#gondola.events.LTBThreshold.Beta" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.LTBThreshold.Hit">
-<span class="sig-name descname"><span class="pre">Hit</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">LTBThreshold.Hit</span></em><a class="headerlink" href="#gondola.events.LTBThreshold.Hit" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Hit</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">LTBThreshold.Hit</span></span><a class="headerlink" href="#gondola.events.LTBThreshold.Hit" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.LTBThreshold.NoHit">
-<span class="sig-name descname"><span class="pre">NoHit</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">LTBThreshold.NoHit</span></em><a class="headerlink" href="#gondola.events.LTBThreshold.NoHit" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">NoHit</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">LTBThreshold.NoHit</span></span><a class="headerlink" href="#gondola.events.LTBThreshold.NoHit" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.LTBThreshold.Unknown">
-<span class="sig-name descname"><span class="pre">Unknown</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">LTBThreshold.Unknown</span></em><a class="headerlink" href="#gondola.events.LTBThreshold.Unknown" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Unknown</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">LTBThreshold.Unknown</span></span><a class="headerlink" href="#gondola.events.LTBThreshold.Unknown" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.LTBThreshold.Veto">
-<span class="sig-name descname"><span class="pre">Veto</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">LTBThreshold.Veto</span></em><a class="headerlink" href="#gondola.events.LTBThreshold.Veto" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Veto</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">LTBThreshold.Veto</span></span><a class="headerlink" href="#gondola.events.LTBThreshold.Veto" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.LTBThreshold.from_u8">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_u8</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">byte</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.LTBThreshold.from_u8" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_u8</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">byte</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.LTBThreshold.from_u8" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gondola.events.EventStatus">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">EventStatus</span></span><a class="headerlink" href="#gondola.events.EventStatus" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">EventStatus</span></span><a class="headerlink" href="#gondola.events.EventStatus" title="Link to this definition">#</a></dt>
 <dd><dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.EventStatus.AnyDataMangling">
-<span class="sig-name descname"><span class="pre">AnyDataMangling</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.AnyDataMangling</span></em><a class="headerlink" href="#gondola.events.EventStatus.AnyDataMangling" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">AnyDataMangling</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.AnyDataMangling</span></span><a class="headerlink" href="#gondola.events.EventStatus.AnyDataMangling" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.EventStatus.CRC32Wrong">
-<span class="sig-name descname"><span class="pre">CRC32Wrong</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.CRC32Wrong</span></em><a class="headerlink" href="#gondola.events.EventStatus.CRC32Wrong" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">CRC32Wrong</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.CRC32Wrong</span></span><a class="headerlink" href="#gondola.events.EventStatus.CRC32Wrong" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.EventStatus.CellAndChnSyncErrors">
-<span class="sig-name descname"><span class="pre">CellAndChnSyncErrors</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.CellAndChnSyncErrors</span></em><a class="headerlink" href="#gondola.events.EventStatus.CellAndChnSyncErrors" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">CellAndChnSyncErrors</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.CellAndChnSyncErrors</span></span><a class="headerlink" href="#gondola.events.EventStatus.CellAndChnSyncErrors" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.EventStatus.CellSyncErrors">
-<span class="sig-name descname"><span class="pre">CellSyncErrors</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.CellSyncErrors</span></em><a class="headerlink" href="#gondola.events.EventStatus.CellSyncErrors" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">CellSyncErrors</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.CellSyncErrors</span></span><a class="headerlink" href="#gondola.events.EventStatus.CellSyncErrors" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.EventStatus.ChannelIDWrong">
-<span class="sig-name descname"><span class="pre">ChannelIDWrong</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.ChannelIDWrong</span></em><a class="headerlink" href="#gondola.events.EventStatus.ChannelIDWrong" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">ChannelIDWrong</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.ChannelIDWrong</span></span><a class="headerlink" href="#gondola.events.EventStatus.ChannelIDWrong" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.EventStatus.ChnSyncErrors">
-<span class="sig-name descname"><span class="pre">ChnSyncErrors</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.ChnSyncErrors</span></em><a class="headerlink" href="#gondola.events.EventStatus.ChnSyncErrors" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">ChnSyncErrors</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.ChnSyncErrors</span></span><a class="headerlink" href="#gondola.events.EventStatus.ChnSyncErrors" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.EventStatus.EventTimeOut">
-<span class="sig-name descname"><span class="pre">EventTimeOut</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.EventTimeOut</span></em><a class="headerlink" href="#gondola.events.EventStatus.EventTimeOut" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">EventTimeOut</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.EventTimeOut</span></span><a class="headerlink" href="#gondola.events.EventStatus.EventTimeOut" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.EventStatus.GoodNoCRCCheck">
-<span class="sig-name descname"><span class="pre">GoodNoCRCCheck</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.GoodNoCRCCheck</span></em><a class="headerlink" href="#gondola.events.EventStatus.GoodNoCRCCheck" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">GoodNoCRCCheck</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.GoodNoCRCCheck</span></span><a class="headerlink" href="#gondola.events.EventStatus.GoodNoCRCCheck" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.EventStatus.GoodNoCRCOrErrBitCheck">
-<span class="sig-name descname"><span class="pre">GoodNoCRCOrErrBitCheck</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.GoodNoCRCOrErrBitCheck</span></em><a class="headerlink" href="#gondola.events.EventStatus.GoodNoCRCOrErrBitCheck" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">GoodNoCRCOrErrBitCheck</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.GoodNoCRCOrErrBitCheck</span></span><a class="headerlink" href="#gondola.events.EventStatus.GoodNoCRCOrErrBitCheck" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.EventStatus.GoodNoErrBitCheck">
-<span class="sig-name descname"><span class="pre">GoodNoErrBitCheck</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.GoodNoErrBitCheck</span></em><a class="headerlink" href="#gondola.events.EventStatus.GoodNoErrBitCheck" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">GoodNoErrBitCheck</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.GoodNoErrBitCheck</span></span><a class="headerlink" href="#gondola.events.EventStatus.GoodNoErrBitCheck" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.EventStatus.IncompatibleData">
-<span class="sig-name descname"><span class="pre">IncompatibleData</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.IncompatibleData</span></em><a class="headerlink" href="#gondola.events.EventStatus.IncompatibleData" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">IncompatibleData</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.IncompatibleData</span></span><a class="headerlink" href="#gondola.events.EventStatus.IncompatibleData" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.EventStatus.IncompleteReadout">
-<span class="sig-name descname"><span class="pre">IncompleteReadout</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.IncompleteReadout</span></em><a class="headerlink" href="#gondola.events.EventStatus.IncompleteReadout" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">IncompleteReadout</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.IncompleteReadout</span></span><a class="headerlink" href="#gondola.events.EventStatus.IncompleteReadout" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.EventStatus.KnownDeadRB">
-<span class="sig-name descname"><span class="pre">KnownDeadRB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.KnownDeadRB</span></em><a class="headerlink" href="#gondola.events.EventStatus.KnownDeadRB" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">KnownDeadRB</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.KnownDeadRB</span></span><a class="headerlink" href="#gondola.events.EventStatus.KnownDeadRB" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.EventStatus.NoChannel9">
-<span class="sig-name descname"><span class="pre">NoChannel9</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.NoChannel9</span></em><a class="headerlink" href="#gondola.events.EventStatus.NoChannel9" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">NoChannel9</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.NoChannel9</span></span><a class="headerlink" href="#gondola.events.EventStatus.NoChannel9" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.EventStatus.Perfect">
-<span class="sig-name descname"><span class="pre">Perfect</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.Perfect</span></em><a class="headerlink" href="#gondola.events.EventStatus.Perfect" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Perfect</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.Perfect</span></span><a class="headerlink" href="#gondola.events.EventStatus.Perfect" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.EventStatus.RBEventWacky">
-<span class="sig-name descname"><span class="pre">RBEventWacky</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.RBEventWacky</span></em><a class="headerlink" href="#gondola.events.EventStatus.RBEventWacky" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">RBEventWacky</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.RBEventWacky</span></span><a class="headerlink" href="#gondola.events.EventStatus.RBEventWacky" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.EventStatus.TailWrong">
-<span class="sig-name descname"><span class="pre">TailWrong</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.TailWrong</span></em><a class="headerlink" href="#gondola.events.EventStatus.TailWrong" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">TailWrong</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.TailWrong</span></span><a class="headerlink" href="#gondola.events.EventStatus.TailWrong" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.EventStatus.Unknown">
-<span class="sig-name descname"><span class="pre">Unknown</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.Unknown</span></em><a class="headerlink" href="#gondola.events.EventStatus.Unknown" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Unknown</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">EventStatus.Unknown</span></span><a class="headerlink" href="#gondola.events.EventStatus.Unknown" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.EventStatus.from_u8">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_u8</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">byte</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.EventStatus.from_u8" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_u8</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">byte</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.EventStatus.from_u8" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gondola.events.DataType">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">DataType</span></span><a class="headerlink" href="#gondola.events.DataType" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">DataType</span></span><a class="headerlink" href="#gondola.events.DataType" title="Link to this definition">#</a></dt>
 <dd><p>A generic data type</p>
 <p>Describe the purpose of the data. This
 is the semantics behind it.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.DataType.MTBTriggerPoisson">
-<span class="sig-name descname"><span class="pre">MTBTriggerPoisson</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataType.MTBTriggerPoisson</span></em><a class="headerlink" href="#gondola.events.DataType.MTBTriggerPoisson" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">MTBTriggerPoisson</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataType.MTBTriggerPoisson</span></span><a class="headerlink" href="#gondola.events.DataType.MTBTriggerPoisson" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.DataType.Noi">
-<span class="sig-name descname"><span class="pre">Noi</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataType.Noi</span></em><a class="headerlink" href="#gondola.events.DataType.Noi" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Noi</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataType.Noi</span></span><a class="headerlink" href="#gondola.events.DataType.Noi" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.DataType.Physics">
-<span class="sig-name descname"><span class="pre">Physics</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataType.Physics</span></em><a class="headerlink" href="#gondola.events.DataType.Physics" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Physics</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataType.Physics</span></span><a class="headerlink" href="#gondola.events.DataType.Physics" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.DataType.RBTriggerPeriodic">
-<span class="sig-name descname"><span class="pre">RBTriggerPeriodic</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataType.RBTriggerPeriodic</span></em><a class="headerlink" href="#gondola.events.DataType.RBTriggerPeriodic" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">RBTriggerPeriodic</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataType.RBTriggerPeriodic</span></span><a class="headerlink" href="#gondola.events.DataType.RBTriggerPeriodic" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.DataType.RBTriggerPoisson">
-<span class="sig-name descname"><span class="pre">RBTriggerPoisson</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataType.RBTriggerPoisson</span></em><a class="headerlink" href="#gondola.events.DataType.RBTriggerPoisson" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">RBTriggerPoisson</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataType.RBTriggerPoisson</span></span><a class="headerlink" href="#gondola.events.DataType.RBTriggerPoisson" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.DataType.TimingCalibration">
-<span class="sig-name descname"><span class="pre">TimingCalibration</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataType.TimingCalibration</span></em><a class="headerlink" href="#gondola.events.DataType.TimingCalibration" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">TimingCalibration</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataType.TimingCalibration</span></span><a class="headerlink" href="#gondola.events.DataType.TimingCalibration" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.DataType.Unknown">
-<span class="sig-name descname"><span class="pre">Unknown</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataType.Unknown</span></em><a class="headerlink" href="#gondola.events.DataType.Unknown" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Unknown</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataType.Unknown</span></span><a class="headerlink" href="#gondola.events.DataType.Unknown" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.DataType.VoltageCalibration">
-<span class="sig-name descname"><span class="pre">VoltageCalibration</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataType.VoltageCalibration</span></em><a class="headerlink" href="#gondola.events.DataType.VoltageCalibration" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">VoltageCalibration</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">DataType.VoltageCalibration</span></span><a class="headerlink" href="#gondola.events.DataType.VoltageCalibration" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.DataType.from_u8">
-<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_u8</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">byte</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.DataType.from_u8" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_u8</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">byte</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.DataType.from_u8" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -2047,7 +2047,7 @@ is the semantics behind it.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>

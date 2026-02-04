@@ -39,8 +39,8 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="../_static/documentation_options.js?v=1392dee4"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.tof.analysis';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -357,7 +357,7 @@
 </div>
 <dl class="py class">
 <dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.tof.analysis.</span></span><span class="sig-name descname"><span class="pre">TofAnalysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">skip_mangled=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_timeout=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_analysis=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbins=90</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cuts=&lt;TofCuts:</span> <span class="pre">&lt;TofCuts:</span> <span class="pre">(void)&gt;&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_offsets=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pid_inner=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pid_outer=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active=False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.tof.analysis.</span></span><span class="sig-name descname"><span class="pre">TofAnalysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">skip_mangled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_analysis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">90</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cuts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;TofCuts:</span> <span class="pre">&lt;TofCuts:</span> <span class="pre">(void)&gt;&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_offsets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pid_inner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pid_outer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis" title="Link to this definition">#</a></dt>
 <dd><p>A container (yeah I know, don't like it either) to keep a 
 bunch of plots together.</p>
 <p>This does have some use as a pre-compiled analysis for 
@@ -380,32 +380,32 @@ seen events, cut efficiencies, etc.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.occupancy">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">occupancy</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.occupancy" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">occupancy</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.occupancy" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.occupancy_t">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">occupancy_t</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.occupancy_t" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">occupancy_t</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.occupancy_t" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.n_events">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_events</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.n_events" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">n_events</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.n_events" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.rate">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rate</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.rate" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rate</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.rate" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.rate_nocut">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rate_nocut</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.rate_nocut" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">rate_nocut</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.rate_nocut" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.run_time">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">run_time</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.run_time" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">run_time</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.run_time" title="Link to this definition">#</a></dt>
 <dd><p>Get run time from last - first event in seconds</p>
 </dd></dl>
 
@@ -419,7 +419,7 @@ been changed</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">skip_mangled=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_timeout=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_analysis=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbins=90</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cuts=&lt;TofCuts:</span> <span class="pre">&lt;TofCuts:</span> <span class="pre">(void)&gt;&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_offsets=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pid_inner=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pid_outer=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active=False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.__init__" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">skip_mangled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta_analysis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">90</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cuts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;TofCuts:</span> <span class="pre">&lt;TofCuts:</span> <span class="pre">(void)&gt;&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_offsets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pid_inner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pid_outer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.__init__" title="Link to this definition">#</a></dt>
 <dd><p>Start a new TofAnalysis. This will add create histograms for 
 'interesting' variables and count mangled and timed out 
 events. While not complete, this can provide a conciese, 
@@ -456,37 +456,37 @@ instead.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.no_hitmiss">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">no_hitmiss</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.no_hitmiss" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">no_hitmiss</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.no_hitmiss" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.one_hitmiss">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">one_hitmiss</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.one_hitmiss" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">one_hitmiss</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.one_hitmiss" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.two_hitmiss">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">two_hitmiss</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.two_hitmiss" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">two_hitmiss</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.two_hitmiss" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.extra_hits">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">extra_hits</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.extra_hits" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">extra_hits</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.extra_hits" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.n_mangled_frac">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_mangled_frac</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.n_mangled_frac" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">n_mangled_frac</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.n_mangled_frac" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.n_timed_out_frac">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">n_timed_out_frac</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.n_timed_out_frac" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">n_timed_out_frac</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.n_timed_out_frac" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="gondola.tof.analysis.TofAnalysis.event_stati">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">event_stati</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.event_stati" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">event_stati</span></span><a class="headerlink" href="#gondola.tof.analysis.TofAnalysis.event_stati" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -633,7 +633,7 @@ instead.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>

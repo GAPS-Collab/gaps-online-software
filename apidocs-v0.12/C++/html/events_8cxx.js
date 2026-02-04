@@ -12,7 +12,7 @@ var events_8cxx =
     [ "operator<<", "events_8cxx.html#ad142b09b980b0577047b677bd0750252", null ],
     [ "operator<<", "events_8cxx.html#a46b0240dcaddd2703faa7a239ae7e686", null ],
     [ "operator<<", "events_8cxx.html#a70a1b591bf58b6e149e2ec815142e4ac", null ],
-    [ "u8_to_u16", "events_8cxx.html#acdfa4e09f0f996878f87b2e645212093", null ],
+    [ "u8_to_u16", "events_8cxx.html#a1c10b6194055c6cc7c772ebd2fa4648c", null ],
     [ "LTB_CH0", "events_8cxx.html#a0cf7e1f9e13dbe1db99b385adfee4f2e", null ],
     [ "LTB_CH1", "events_8cxx.html#a1b99a0fc8ba941f78112521f915e4512", null ],
     [ "LTB_CH2", "events_8cxx.html#a6310f7e8478886d2de265fe59229f81a", null ],

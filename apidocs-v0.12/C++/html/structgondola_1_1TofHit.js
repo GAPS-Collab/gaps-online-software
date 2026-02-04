@@ -9,7 +9,7 @@ var structgondola_1_1TofHit =
     [ "get_t_avg", "structgondola_1_1TofHit.html#ad48101b6e5f39e4f34878150a4d9304d", null ],
     [ "get_time_a", "structgondola_1_1TofHit.html#ad5c68d0fb41d13edde22fe199f2dc3d7", null ],
     [ "get_time_b", "structgondola_1_1TofHit.html#af97bd18ed4e8a4be163a4e35e0a2c39b", null ],
-    [ "get_timestamp48", "structgondola_1_1TofHit.html#a58c19156d989f6635cea48264a5bdeec", null ],
+    [ "get_timestamp48", "structgondola_1_1TofHit.html#a9ade98a4514a988221771f11de295985", null ],
     [ "get_x_pos", "structgondola_1_1TofHit.html#ad80954f3ed8a015ab6854fa4e751deac", null ],
     [ "set_paddle_len", "structgondola_1_1TofHit.html#aed83c72add3ace3a7948285b73fa61e9", null ],
     [ "to_string", "structgondola_1_1TofHit.html#a2d6afbbbe4ba5751eed4241dbdd66915", null ],

@@ -39,8 +39,8 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="../_static/documentation_options.js?v=1392dee4"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.reconstruction';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -376,20 +376,20 @@
 </div>
 <dl class="py class">
 <dt class="sig sig-object py" id="gondola.reconstruction.FitStatus">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.reconstruction.</span></span><span class="sig-name descname"><span class="pre">FitStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.reconstruction.FitStatus" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.reconstruction.</span></span><span class="sig-name descname"><span class="pre">FitStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.reconstruction.FitStatus" title="Link to this definition">#</a></dt>
 <dd><dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.reconstruction.FitStatus.Unknown">
-<span class="sig-name descname"><span class="pre">Unknown</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#gondola.reconstruction.FitStatus.Unknown" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Unknown</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></span><a class="headerlink" href="#gondola.reconstruction.FitStatus.Unknown" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.reconstruction.FitStatus.DidNotConverge">
-<span class="sig-name descname"><span class="pre">DidNotConverge</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#gondola.reconstruction.FitStatus.DidNotConverge" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">DidNotConverge</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></span><a class="headerlink" href="#gondola.reconstruction.FitStatus.DidNotConverge" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.reconstruction.FitStatus.Success">
-<span class="sig-name descname"><span class="pre">Success</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">42</span></em><a class="headerlink" href="#gondola.reconstruction.FitStatus.Success" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">Success</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">42</span></span><a class="headerlink" href="#gondola.reconstruction.FitStatus.Success" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -414,7 +414,7 @@ the anchor point and 3 for the direction</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gondola.reconstruction.LeastSquares">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.reconstruction.</span></span><span class="sig-name descname"><span class="pre">LeastSquares</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_err</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_err</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.reconstruction.LeastSquares" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.reconstruction.</span></span><span class="sig-name descname"><span class="pre">LeastSquares</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_err</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_err</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.reconstruction.LeastSquares" title="Link to this definition">#</a></dt>
 <dd><p>Generic least-squares cost function with error.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.reconstruction.LeastSquares.__init__">
@@ -441,7 +441,7 @@ have been used. Return the line with the best chi2.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gondola.reconstruction.Reconstruction">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gondola.reconstruction.</span></span><span class="sig-name descname"><span class="pre">Reconstruction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.reconstruction.Reconstruction" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.reconstruction.</span></span><span class="sig-name descname"><span class="pre">Reconstruction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.reconstruction.Reconstruction" title="Link to this definition">#</a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="gondola.reconstruction.Reconstruction.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.reconstruction.Reconstruction.__init__" title="Link to this definition">#</a></dt>
@@ -579,7 +579,7 @@ have been used. Return the line with the best chi2.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>

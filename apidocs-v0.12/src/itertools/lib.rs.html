@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/itertools-0.13.0/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="itertools" data-themes="" data-resource-suffix="" data-rustdoc-version="1.92.0 (ded5c06cf 2025-12-08)" data-channel="1.92.0" data-search-js="search-d69d8955.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../static.files/storage-e2aeef58.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-ce535bd0.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">itertools/</div>lib.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-4"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="attr">#![warn(missing_docs, clippy::default_numeric_fallback)]
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/itertools-0.13.0/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="itertools" data-themes="" data-resource-suffix="" data-rustdoc-version="1.93.0 (254b59607 2026-01-19)" data-channel="1.93.0" data-search-js="search-9e2438ea.js" data-stringdex-js="stringdex-a3946164.js" data-settings-js="settings-c38705f0.js" ><script src="../../static.files/storage-e2aeef58.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-a410ff4d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">itertools/</div>lib.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-4"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="attr">#![warn(missing_docs, clippy::default_numeric_fallback)]
 <a href=#2 id=2 data-nosnippet>2</a>#![crate_name = <span class="string">"itertools"</span>]
 <a href=#3 id=3 data-nosnippet>3</a>#![cfg_attr(not(feature = <span class="string">"use_std"</span>), no_std)]
 <a href=#4 id=4 data-nosnippet>4</a>
@@ -256,7 +256,7 @@
 <a href=#256 id=256 data-nosnippet>256</a>        <span class="macro-nonterminal">$I
 <a href=#257 id=257 data-nosnippet>257</a>    </span>);
 <a href=#258 id=258 data-nosnippet>258</a>    (@flatten <span class="macro-nonterminal">$I</span>:expr, <span class="macro-nonterminal">$J</span>:expr, $(<span class="macro-nonterminal">$K</span>:expr,)<span class="kw-2">*</span>) =&gt; (
-<a href=#259 id=259 data-nosnippet>259</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::iproduct!</span>(@<span class="macro-nonterminal">flatten $crate::cons_tuples</span>(<span class="macro-nonterminal">$</span><span class="macro">crate::iproduct!</span>(<span class="macro-nonterminal">$I</span>, <span class="macro-nonterminal">$J</span>)), $(<span class="macro-nonterminal">$K</span>,)<span class="kw-2">*</span>)
+<a href=#259 id=259 data-nosnippet>259</a>        <span class="macro-nonterminal">$crate::iproduct</span>!(@flatten <span class="macro-nonterminal">$crate::cons_tuples</span>(<span class="macro-nonterminal">$crate::iproduct</span>!(<span class="macro-nonterminal">$I</span>, <span class="macro-nonterminal">$J</span>)), $(<span class="macro-nonterminal">$K</span>,)<span class="kw-2">*</span>)
 <a href=#260 id=260 data-nosnippet>260</a>    );
 <a href=#261 id=261 data-nosnippet>261</a>    () =&gt; (
 <a href=#262 id=262 data-nosnippet>262</a>        <span class="macro-nonterminal">$crate::__std_iter::once</span>(())
@@ -271,7 +271,7 @@
 <a href=#271 id=271 data-nosnippet>271</a>        )
 <a href=#272 id=272 data-nosnippet>272</a>    );
 <a href=#273 id=273 data-nosnippet>273</a>    (<span class="macro-nonterminal">$I</span>:expr, <span class="macro-nonterminal">$J</span>:expr, $(<span class="macro-nonterminal">$K</span>:expr),+ $(,)<span class="question-mark">?</span>) =&gt; (
-<a href=#274 id=274 data-nosnippet>274</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::iproduct!</span>(@<span class="macro-nonterminal">flatten $</span><span class="macro">crate::iproduct!</span>(<span class="macro-nonterminal">$I</span>, <span class="macro-nonterminal">$J</span>), $(<span class="macro-nonterminal">$K</span>,)+)
+<a href=#274 id=274 data-nosnippet>274</a>        <span class="macro-nonterminal">$crate::iproduct</span>!(@flatten <span class="macro-nonterminal">$crate::iproduct</span>!(<span class="macro-nonterminal">$I</span>, <span class="macro-nonterminal">$J</span>), $(<span class="macro-nonterminal">$K</span>,)+)
 <a href=#275 id=275 data-nosnippet>275</a>    );
 <a href=#276 id=276 data-nosnippet>276</a>}
 <a href=#277 id=277 data-nosnippet>277</a>
@@ -320,7 +320,7 @@
 <a href=#320 id=320 data-nosnippet>320</a>
 <a href=#321 id=321 data-nosnippet>321</a>    <span class="comment">// The "b" identifier is a different identifier on each recursion level thanks to hygiene.
 <a href=#322 id=322 data-nosnippet>322</a>    </span>( @closure <span class="macro-nonterminal">$p</span>:pat =&gt; ( $(<span class="macro-nonterminal">$tup</span>:tt)* ) , <span class="macro-nonterminal">$_iter</span>:expr $( , <span class="macro-nonterminal">$tail</span>:expr )* ) =&gt; {
-<a href=#323 id=323 data-nosnippet>323</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::izip!</span>(@<span class="macro-nonterminal">closure </span>(<span class="macro-nonterminal">$p</span>, b) =&gt; ( $(<span class="macro-nonterminal">$tup</span>)<span class="kw-2">*</span>, b ) $( , <span class="macro-nonterminal">$tail </span>)<span class="kw-2">*</span>)
+<a href=#323 id=323 data-nosnippet>323</a>        <span class="macro-nonterminal">$crate::izip</span>!(@closure (<span class="macro-nonterminal">$p</span>, b) =&gt; ( $(<span class="macro-nonterminal">$tup</span>)<span class="kw-2">*</span>, b ) $( , <span class="macro-nonterminal">$tail </span>)<span class="kw-2">*</span>)
 <a href=#324 id=324 data-nosnippet>324</a>    };
 <a href=#325 id=325 data-nosnippet>325</a>
 <a href=#326 id=326 data-nosnippet>326</a>    <span class="comment">// unary
@@ -330,18 +330,18 @@
 <a href=#330 id=330 data-nosnippet>330</a>
 <a href=#331 id=331 data-nosnippet>331</a>    <span class="comment">// binary
 <a href=#332 id=332 data-nosnippet>332</a>    </span>(<span class="macro-nonterminal">$first</span>:expr, <span class="macro-nonterminal">$second</span>:expr $(,)<span class="kw-2">*</span>) =&gt; {
-<a href=#333 id=333 data-nosnippet>333</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::izip!</span>(<span class="macro-nonterminal">$first</span>)
+<a href=#333 id=333 data-nosnippet>333</a>        <span class="macro-nonterminal">$crate::izip</span>!(<span class="macro-nonterminal">$first</span>)
 <a href=#334 id=334 data-nosnippet>334</a>            .zip(<span class="macro-nonterminal">$second</span>)
 <a href=#335 id=335 data-nosnippet>335</a>    };
 <a href=#336 id=336 data-nosnippet>336</a>
 <a href=#337 id=337 data-nosnippet>337</a>    <span class="comment">// n-ary where n &gt; 2
 <a href=#338 id=338 data-nosnippet>338</a>    </span>( <span class="macro-nonterminal">$first</span>:expr $( , <span class="macro-nonterminal">$rest</span>:expr )* $(,)* ) =&gt; {
-<a href=#339 id=339 data-nosnippet>339</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::izip!</span>(<span class="macro-nonterminal">$first</span>)
+<a href=#339 id=339 data-nosnippet>339</a>        <span class="macro-nonterminal">$crate::izip</span>!(<span class="macro-nonterminal">$first</span>)
 <a href=#340 id=340 data-nosnippet>340</a>            $(
 <a href=#341 id=341 data-nosnippet>341</a>                .zip(<span class="macro-nonterminal">$rest</span>)
 <a href=#342 id=342 data-nosnippet>342</a>            )*
 <a href=#343 id=343 data-nosnippet>343</a>            .map(
-<a href=#344 id=344 data-nosnippet>344</a>                <span class="macro-nonterminal">$</span><span class="macro">crate::izip!</span>(@<span class="macro-nonterminal">closure </span>a =&gt; (a) $( , <span class="macro-nonterminal">$rest </span>)<span class="kw-2">*</span>)
+<a href=#344 id=344 data-nosnippet>344</a>                <span class="macro-nonterminal">$crate::izip</span>!(@closure a =&gt; (a) $( , <span class="macro-nonterminal">$rest </span>)<span class="kw-2">*</span>)
 <a href=#345 id=345 data-nosnippet>345</a>            )
 <a href=#346 id=346 data-nosnippet>346</a>    };
 <a href=#347 id=347 data-nosnippet>347</a>}
@@ -724,7 +724,7 @@
 <a href=#724 id=724 data-nosnippet>724</a>    <span class="kw">where
 <a href=#725 id=725 data-nosnippet>725</a>        </span><span class="self">Self</span>: Sized,
 <a href=#726 id=726 data-nosnippet>726</a>    {
-<a href=#727 id=727 data-nosnippet>727</a>        <span class="macro">assert!</span>(size != <span class="number">0</span>);
+<a href=#727 id=727 data-nosnippet>727</a>        <span class="macro">assert!</span>(<span class="macro">size !</span>= <span class="number">0</span>);
 <a href=#728 id=728 data-nosnippet>728</a>        groupbylazy::new_chunks(<span class="self">self</span>, size)
 <a href=#729 id=729 data-nosnippet>729</a>    }
 <a href=#730 id=730 data-nosnippet>730</a>
@@ -2112,7 +2112,7 @@
 <a href=#2112 id=2112 data-nosnippet>2112</a>        <span class="self">Self</span>::Item: PartialEq,
 <a href=#2113 id=2113 data-nosnippet>2113</a>    {
 <a href=#2114 id=2114 data-nosnippet>2114</a>        <span class="kw">let </span>first = <span class="self">self</span>.next().ok_or(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
-<a href=#2115 id=2115 data-nosnippet>2115</a>        <span class="kw">let </span>other = <span class="self">self</span>.find(|x| x != <span class="kw-2">&amp;</span>first);
+<a href=#2115 id=2115 data-nosnippet>2115</a>        <span class="kw">let </span>other = <span class="self">self</span>.find(|x| <span class="macro">x !</span>= <span class="kw-2">&amp;</span>first);
 <a href=#2116 id=2116 data-nosnippet>2116</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>(other) = other {
 <a href=#2117 id=2117 data-nosnippet>2117</a>            <span class="prelude-val">Err</span>(<span class="prelude-val">Some</span>((first, other)))
 <a href=#2118 id=2118 data-nosnippet>2118</a>        } <span class="kw">else </span>{
@@ -4362,4 +4362,5 @@
 <a href=#4362 id=4362 data-nosnippet>4362</a>            <span class="self">Self</span>::Done(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
 <a href=#4363 id=4363 data-nosnippet>4363</a>        }
 <a href=#4364 id=4364 data-nosnippet>4364</a>    }
-<a href=#4365 id=4365 data-nosnippet>4365</a>}</code></pre></div></section></main></body></html>
+<a href=#4365 id=4365 data-nosnippet>4365</a>}
+</code></pre></div></section></main></body></html>

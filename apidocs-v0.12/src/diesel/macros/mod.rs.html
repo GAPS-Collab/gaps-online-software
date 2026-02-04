@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/diesel-2.3.5/src/macros/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="diesel" data-themes="" data-resource-suffix="" data-rustdoc-version="1.92.0 (ded5c06cf 2025-12-08)" data-channel="1.92.0" data-search-js="search-d69d8955.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-ce535bd0.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">diesel/macros/</div>mod.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>prelude {
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/diesel-2.3.6/src/macros/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="diesel" data-themes="" data-resource-suffix="" data-rustdoc-version="1.93.0 (254b59607 2026-01-19)" data-channel="1.93.0" data-search-js="search-9e2438ea.js" data-stringdex-js="stringdex-a3946164.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-a410ff4d.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">diesel/macros/</div>mod.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>prelude {
 <a href=#2 id=2 data-nosnippet>2</a>    <span class="attr">#[cfg_attr(
 <a href=#3 id=3 data-nosnippet>3</a>        any(feature = <span class="string">"huge-tables"</span>, feature = <span class="string">"large-tables"</span>),
 <a href=#4 id=4 data-nosnippet>4</a>        allow(deprecated)
@@ -81,8 +81,8 @@
 <a href=#81 id=81 data-nosnippet>81</a></span><span class="attr">#[macro_export]
 <a href=#82 id=82 data-nosnippet>82</a></span><span class="macro">macro_rules!</span> joinable {
 <a href=#83 id=83 data-nosnippet>83</a>    ($(<span class="macro-nonterminal">$child</span>:ident)::* -&gt; $(<span class="macro-nonterminal">$parent</span>:ident)::* (<span class="macro-nonterminal">$source</span>:ident)) =&gt; {
-<a href=#84 id=84 data-nosnippet>84</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::joinable_inner!</span>($(<span class="macro-nonterminal">$child</span>)::* ::table =&gt; $(<span class="macro-nonterminal">$parent</span>)::* ::table : ($(<span class="macro-nonterminal">$child</span>)::* ::<span class="macro-nonterminal">$source </span>= $(<span class="macro-nonterminal">$parent</span>)::* ::table));
-<a href=#85 id=85 data-nosnippet>85</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::joinable_inner!</span>($(<span class="macro-nonterminal">$parent</span>)::* ::table =&gt; $(<span class="macro-nonterminal">$child</span>)::* ::table : ($(<span class="macro-nonterminal">$child</span>)::* ::<span class="macro-nonterminal">$source </span>= $(<span class="macro-nonterminal">$parent</span>)::* ::table));
+<a href=#84 id=84 data-nosnippet>84</a>        <span class="macro-nonterminal">$crate::joinable_inner</span>!($(<span class="macro-nonterminal">$child</span>)::* ::table =&gt; $(<span class="macro-nonterminal">$parent</span>)::* ::table : ($(<span class="macro-nonterminal">$child</span>)::* ::<span class="macro-nonterminal">$source </span>= $(<span class="macro-nonterminal">$parent</span>)::* ::table));
+<a href=#85 id=85 data-nosnippet>85</a>        <span class="macro-nonterminal">$crate::joinable_inner</span>!($(<span class="macro-nonterminal">$parent</span>)::* ::table =&gt; $(<span class="macro-nonterminal">$child</span>)::* ::table : ($(<span class="macro-nonterminal">$child</span>)::* ::<span class="macro-nonterminal">$source </span>= $(<span class="macro-nonterminal">$parent</span>)::* ::table));
 <a href=#86 id=86 data-nosnippet>86</a>    }
 <a href=#87 id=87 data-nosnippet>87</a>}
 <a href=#88 id=88 data-nosnippet>88</a>
@@ -90,8 +90,8 @@
 <a href=#90 id=90 data-nosnippet>90</a>#[doc(hidden)]
 <a href=#91 id=91 data-nosnippet>91</a></span><span class="macro">macro_rules!</span> joinable_inner {
 <a href=#92 id=92 data-nosnippet>92</a>    (<span class="macro-nonterminal">$left_table</span>:path =&gt; <span class="macro-nonterminal">$right_table</span>:path : (<span class="macro-nonterminal">$foreign_key</span>:path = <span class="macro-nonterminal">$parent_table</span>:path)) =&gt; {
-<a href=#93 id=93 data-nosnippet>93</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::joinable_inner!</span>(
-<a href=#94 id=94 data-nosnippet>94</a>            <span class="macro-nonterminal">left_table_ty </span>= <span class="macro-nonterminal">$left_table</span>,
+<a href=#93 id=93 data-nosnippet>93</a>        <span class="macro-nonterminal">$crate::joinable_inner</span>!(
+<a href=#94 id=94 data-nosnippet>94</a>            left_table_ty = <span class="macro-nonterminal">$left_table</span>,
 <a href=#95 id=95 data-nosnippet>95</a>            right_table_ty = <span class="macro-nonterminal">$right_table</span>,
 <a href=#96 id=96 data-nosnippet>96</a>            right_table_expr = <span class="macro-nonterminal">$right_table</span>,
 <a href=#97 id=97 data-nosnippet>97</a>            foreign_key = <span class="macro-nonterminal">$foreign_key</span>,
@@ -117,7 +117,7 @@
 <a href=#117 id=117 data-nosnippet>117</a>            &gt;;
 <a href=#118 id=118 data-nosnippet>118</a>
 <a href=#119 id=119 data-nosnippet>119</a>            <span class="kw">fn </span>join_target(rhs: <span class="macro-nonterminal">$right_table_ty</span>) -&gt; (<span class="self">Self</span>::FromClause, <span class="self">Self</span>::OnClause) {
-<a href=#120 id=120 data-nosnippet>120</a>                <span class="kw">use </span><span class="macro-nonterminal">$</span><span class="kw">crate</span>::{<span class="macro-nonterminal">ExpressionMethods</span>, NullableExpressionMethods};
+<a href=#120 id=120 data-nosnippet>120</a>                <span class="kw">use </span><span class="macro-nonterminal">$crate</span>::{ExpressionMethods, NullableExpressionMethods};
 <a href=#121 id=121 data-nosnippet>121</a>
 <a href=#122 id=122 data-nosnippet>122</a>                (
 <a href=#123 id=123 data-nosnippet>123</a>                    rhs,
@@ -212,9 +212,9 @@
 <a href=#212 id=212 data-nosnippet>212</a>        $(
 <a href=#213 id=213 data-nosnippet>213</a>            <span class="kw">impl </span><span class="macro-nonterminal">$crate::query_source::TableNotEqual</span>&lt;<span class="macro-nonterminal">$left_mod::table</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$right_mod::table </span>{}
 <a href=#214 id=214 data-nosnippet>214</a>            <span class="kw">impl </span><span class="macro-nonterminal">$crate::query_source::TableNotEqual</span>&lt;<span class="macro-nonterminal">$right_mod::table</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$left_mod::table </span>{}
-<a href=#215 id=215 data-nosnippet>215</a>            <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_internal_backend_specific_allow_tables_to_appear_in_same_query!</span>(<span class="macro-nonterminal">$left_mod</span>, <span class="macro-nonterminal">$right_mod</span>);
+<a href=#215 id=215 data-nosnippet>215</a>            <span class="macro-nonterminal">$crate::__diesel_internal_backend_specific_allow_tables_to_appear_in_same_query</span>!(<span class="macro-nonterminal">$left_mod</span>, <span class="macro-nonterminal">$right_mod</span>);
 <a href=#216 id=216 data-nosnippet>216</a>        )+
-<a href=#217 id=217 data-nosnippet>217</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::allow_tables_to_appear_in_same_query!</span>($(<span class="macro-nonterminal">$right_mod</span>,)+);
+<a href=#217 id=217 data-nosnippet>217</a>        <span class="macro-nonterminal">$crate::allow_tables_to_appear_in_same_query</span>!($(<span class="macro-nonterminal">$right_mod</span>,)+);
 <a href=#218 id=218 data-nosnippet>218</a>    };
 <a href=#219 id=219 data-nosnippet>219</a>
 <a href=#220 id=220 data-nosnippet>220</a>    (<span class="macro-nonterminal">$last_table</span>:ident,) =&gt; {};
@@ -289,8 +289,8 @@
 <a href=#289 id=289 data-nosnippet>289</a>        left = [$(<span class="macro-nonterminal">$left_path</span>:tt)::+],
 <a href=#290 id=290 data-nosnippet>290</a>        $(<span class="macro-nonterminal">$right_path</span>:tt)::+
 <a href=#291 id=291 data-nosnippet>291</a>    ) =&gt; {
-<a href=#292 id=292 data-nosnippet>292</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_impl_allow_in_same_group_by_clause!</span> {
-<a href=#293 id=293 data-nosnippet>293</a>            <span class="macro-nonterminal">left </span>= [$(<span class="macro-nonterminal">$left_path</span>)+],
+<a href=#292 id=292 data-nosnippet>292</a>        <span class="macro-nonterminal">$crate::__diesel_impl_allow_in_same_group_by_clause</span>! {
+<a href=#293 id=293 data-nosnippet>293</a>            left = [$(<span class="macro-nonterminal">$left_path</span>)+],
 <a href=#294 id=294 data-nosnippet>294</a>            right = [$(<span class="macro-nonterminal">$right_path</span>)+],
 <a href=#295 id=295 data-nosnippet>295</a>            left_tbl = [],
 <a href=#296 id=296 data-nosnippet>296</a>            left_path = [],
@@ -301,14 +301,14 @@
 <a href=#301 id=301 data-nosnippet>301</a>        $(<span class="macro-nonterminal">$right_path</span>:tt)::+,
 <a href=#302 id=302 data-nosnippet>302</a>        $(<span class="macro-nonterminal">$other</span>:tt)*
 <a href=#303 id=303 data-nosnippet>303</a>    ) =&gt; {
-<a href=#304 id=304 data-nosnippet>304</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_impl_allow_in_same_group_by_clause!</span> {
-<a href=#305 id=305 data-nosnippet>305</a>            <span class="macro-nonterminal">left </span>= [$(<span class="macro-nonterminal">$left_path</span>)+],
+<a href=#304 id=304 data-nosnippet>304</a>        <span class="macro-nonterminal">$crate::__diesel_impl_allow_in_same_group_by_clause</span>! {
+<a href=#305 id=305 data-nosnippet>305</a>            left = [$(<span class="macro-nonterminal">$left_path</span>)+],
 <a href=#306 id=306 data-nosnippet>306</a>            right = [$(<span class="macro-nonterminal">$right_path</span>)+],
 <a href=#307 id=307 data-nosnippet>307</a>            left_tbl = [],
 <a href=#308 id=308 data-nosnippet>308</a>            left_path = [],
 <a href=#309 id=309 data-nosnippet>309</a>        }
-<a href=#310 id=310 data-nosnippet>310</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_impl_allow_in_same_group_by_clause!</span> {
-<a href=#311 id=311 data-nosnippet>311</a>            <span class="macro-nonterminal">left </span>= [$(<span class="macro-nonterminal">$left_path</span>)::+],
+<a href=#310 id=310 data-nosnippet>310</a>        <span class="macro-nonterminal">$crate::__diesel_impl_allow_in_same_group_by_clause</span>! {
+<a href=#311 id=311 data-nosnippet>311</a>            left = [$(<span class="macro-nonterminal">$left_path</span>)::+],
 <a href=#312 id=312 data-nosnippet>312</a>            $(<span class="macro-nonterminal">$other</span>)*
 <a href=#313 id=313 data-nosnippet>313</a>        }
 <a href=#314 id=314 data-nosnippet>314</a>    };
@@ -318,8 +318,8 @@
 <a href=#318 id=318 data-nosnippet>318</a>        left_tbl = [$(<span class="macro-nonterminal">$left_tbl</span>:tt)<span class="question-mark">?</span>],
 <a href=#319 id=319 data-nosnippet>319</a>        left_path = [$(<span class="macro-nonterminal">$left_out_path</span>:tt)<span class="kw-2">*</span>],
 <a href=#320 id=320 data-nosnippet>320</a>    ) =&gt; {
-<a href=#321 id=321 data-nosnippet>321</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_impl_allow_in_same_group_by_clause!</span> {
-<a href=#322 id=322 data-nosnippet>322</a>            <span class="macro-nonterminal">left </span>= [$(<span class="macro-nonterminal">$left_path</span>)+],
+<a href=#321 id=321 data-nosnippet>321</a>        <span class="macro-nonterminal">$crate::__diesel_impl_allow_in_same_group_by_clause</span>! {
+<a href=#322 id=322 data-nosnippet>322</a>            left = [$(<span class="macro-nonterminal">$left_path</span>)+],
 <a href=#323 id=323 data-nosnippet>323</a>            right = [$(<span class="macro-nonterminal">$right_path</span>)<span class="kw-2">*</span>],
 <a href=#324 id=324 data-nosnippet>324</a>            left_tbl = [<span class="macro-nonterminal">$left_path_p1</span>],
 <a href=#325 id=325 data-nosnippet>325</a>            left_path = [$(<span class="macro-nonterminal">$left_out_path</span>)* $(<span class="macro-nonterminal">$left_tbl</span>)<span class="question-mark">?</span>],
@@ -331,8 +331,8 @@
 <a href=#331 id=331 data-nosnippet>331</a>        left_tbl = [$(<span class="macro-nonterminal">$left_tbl</span>:tt)<span class="question-mark">?</span>],
 <a href=#332 id=332 data-nosnippet>332</a>        left_path = [$(<span class="macro-nonterminal">$left_out_path</span>:tt)<span class="kw-2">*</span>],
 <a href=#333 id=333 data-nosnippet>333</a>    ) =&gt; {
-<a href=#334 id=334 data-nosnippet>334</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_impl_allow_in_same_group_by_clause!</span> {
-<a href=#335 id=335 data-nosnippet>335</a>            <span class="macro-nonterminal">left </span>= [<span class="macro-nonterminal">$left_col</span>],
+<a href=#334 id=334 data-nosnippet>334</a>        <span class="macro-nonterminal">$crate::__diesel_impl_allow_in_same_group_by_clause</span>! {
+<a href=#335 id=335 data-nosnippet>335</a>            left = [<span class="macro-nonterminal">$left_col</span>],
 <a href=#336 id=336 data-nosnippet>336</a>            right = [$(<span class="macro-nonterminal">$right_path</span>)<span class="kw-2">*</span>],
 <a href=#337 id=337 data-nosnippet>337</a>            left_tbl = [$(<span class="macro-nonterminal">$left_tbl</span>)<span class="question-mark">?</span>],
 <a href=#338 id=338 data-nosnippet>338</a>            left_path = [$(<span class="macro-nonterminal">$left_out_path</span>)<span class="kw-2">*</span>],
@@ -348,8 +348,8 @@
 <a href=#348 id=348 data-nosnippet>348</a>        right_tbl = [$(<span class="macro-nonterminal">$right_tbl</span>:tt)<span class="question-mark">?</span>],
 <a href=#349 id=349 data-nosnippet>349</a>        right_path = [$(<span class="macro-nonterminal">$right_out_path</span>:tt)<span class="kw-2">*</span>],
 <a href=#350 id=350 data-nosnippet>350</a>    ) =&gt; {
-<a href=#351 id=351 data-nosnippet>351</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_impl_allow_in_same_group_by_clause!</span> {
-<a href=#352 id=352 data-nosnippet>352</a>            <span class="macro-nonterminal">left </span>= [<span class="macro-nonterminal">$left_col</span>],
+<a href=#351 id=351 data-nosnippet>351</a>        <span class="macro-nonterminal">$crate::__diesel_impl_allow_in_same_group_by_clause</span>! {
+<a href=#352 id=352 data-nosnippet>352</a>            left = [<span class="macro-nonterminal">$left_col</span>],
 <a href=#353 id=353 data-nosnippet>353</a>            right = [$(<span class="macro-nonterminal">$right_path</span>)+],
 <a href=#354 id=354 data-nosnippet>354</a>            left_tbl = [$(<span class="macro-nonterminal">$left_tbl</span>)<span class="question-mark">?</span>],
 <a href=#355 id=355 data-nosnippet>355</a>            left_path = [$(<span class="macro-nonterminal">$left_out_path</span>)<span class="kw-2">*</span>],
@@ -365,7 +365,7 @@
 <a href=#365 id=365 data-nosnippet>365</a>        right_tbl = [<span class="macro-nonterminal">$right_tbl</span>:tt],
 <a href=#366 id=366 data-nosnippet>366</a>        right_path = [$(<span class="macro-nonterminal">$right_begin</span>:tt)<span class="kw-2">*</span>],
 <a href=#367 id=367 data-nosnippet>367</a>    ) =&gt; {
-<a href=#368 id=368 data-nosnippet>368</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::static_cond!</span> {
+<a href=#368 id=368 data-nosnippet>368</a>        <span class="macro-nonterminal">$crate::static_cond</span>! {
 <a href=#369 id=369 data-nosnippet>369</a>            <span class="kw">if </span><span class="macro-nonterminal">$left_tbl </span>!= <span class="macro-nonterminal">$right_tbl </span>{
 <a href=#370 id=370 data-nosnippet>370</a>                <span class="kw">impl </span><span class="macro-nonterminal">$crate::expression::IsContainedInGroupBy</span>&lt;$(<span class="macro-nonterminal">$left_begin </span>::)* <span class="macro-nonterminal">$left_tbl </span>:: <span class="macro-nonterminal">$left_col</span>&gt; <span class="kw">for </span>$(<span class="macro-nonterminal">$right_begin </span>::)* <span class="macro-nonterminal">$right_tbl </span>:: <span class="macro-nonterminal">$right_col </span>{
 <a href=#371 id=371 data-nosnippet>371</a>                    <span class="kw">type </span>Output = <span class="macro-nonterminal">$crate::expression::is_contained_in_group_by::No</span>;
@@ -436,18 +436,18 @@
 <a href=#436 id=436 data-nosnippet>436</a></span><span class="attr">#[macro_export]
 <a href=#437 id=437 data-nosnippet>437</a></span><span class="macro">macro_rules!</span> allow_columns_to_appear_in_same_group_by_clause {
 <a href=#438 id=438 data-nosnippet>438</a>    ($(<span class="macro-nonterminal">$left_path</span>:tt)::+, $(<span class="macro-nonterminal">$right_path</span>:tt)::+ $(,)<span class="question-mark">?</span>) =&gt; {
-<a href=#439 id=439 data-nosnippet>439</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_impl_allow_in_same_group_by_clause!</span> {
-<a href=#440 id=440 data-nosnippet>440</a>            <span class="macro-nonterminal">left </span>= [$(<span class="macro-nonterminal">$left_path</span>)::+],
+<a href=#439 id=439 data-nosnippet>439</a>        <span class="macro-nonterminal">$crate::__diesel_impl_allow_in_same_group_by_clause</span>! {
+<a href=#440 id=440 data-nosnippet>440</a>            left = [$(<span class="macro-nonterminal">$left_path</span>)::+],
 <a href=#441 id=441 data-nosnippet>441</a>            $(<span class="macro-nonterminal">$right_path</span>)::+,
 <a href=#442 id=442 data-nosnippet>442</a>        }
 <a href=#443 id=443 data-nosnippet>443</a>    };
 <a href=#444 id=444 data-nosnippet>444</a>    ($(<span class="macro-nonterminal">$left_path</span>:tt)::+, $(<span class="macro-nonterminal">$right_path</span>:tt)::+, $(<span class="macro-nonterminal">$other</span>: tt)<span class="kw-2">*</span>) =&gt; {
-<a href=#445 id=445 data-nosnippet>445</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::__diesel_impl_allow_in_same_group_by_clause!</span> {
-<a href=#446 id=446 data-nosnippet>446</a>            <span class="macro-nonterminal">left </span>= [$(<span class="macro-nonterminal">$left_path</span>)::+],
+<a href=#445 id=445 data-nosnippet>445</a>        <span class="macro-nonterminal">$crate::__diesel_impl_allow_in_same_group_by_clause</span>! {
+<a href=#446 id=446 data-nosnippet>446</a>            left = [$(<span class="macro-nonterminal">$left_path</span>)::+],
 <a href=#447 id=447 data-nosnippet>447</a>            $(<span class="macro-nonterminal">$right_path</span>)::+,
 <a href=#448 id=448 data-nosnippet>448</a>            $(<span class="macro-nonterminal">$other</span>)*
 <a href=#449 id=449 data-nosnippet>449</a>        }
-<a href=#450 id=450 data-nosnippet>450</a>        <span class="macro-nonterminal">$</span><span class="macro">crate::allow_columns_to_appear_in_same_group_by_clause!</span> {
+<a href=#450 id=450 data-nosnippet>450</a>        <span class="macro-nonterminal">$crate::allow_columns_to_appear_in_same_group_by_clause</span>! {
 <a href=#451 id=451 data-nosnippet>451</a>            $(<span class="macro-nonterminal">$right_path</span>)::+,
 <a href=#452 id=452 data-nosnippet>452</a>            $(<span class="macro-nonterminal">$other</span>)*
 <a href=#453 id=453 data-nosnippet>453</a>        }
@@ -678,4 +678,5 @@
 <a href=#678 id=678 data-nosnippet>678</a>        <span class="comment">// allow mixing all variants
 <a href=#679 id=679 data-nosnippet>679</a>        </span><span class="macro">allow_columns_to_appear_in_same_group_by_clause!</span>(c_d, <span class="self">self</span>::b::a, a::e,);
 <a href=#680 id=680 data-nosnippet>680</a>    }
-<a href=#681 id=681 data-nosnippet>681</a>}</code></pre></div></section></main></body></html>
+<a href=#681 id=681 data-nosnippet>681</a>}
+</code></pre></div></section></main></body></html>
