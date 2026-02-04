@@ -374,8 +374,11 @@ auto g::RBEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
   }
   // Decode the hits
   for (u8 k=0;k<nhits;k++) {
-    auto hit = g::TofHit::from_bytestream(stream, pos);
-    event.hits.push_back(hit);
+    auto maybe_hit = g::TofHit::from_bytestream(stream, pos);
+    if (maybe_hit.is_ok()) {
+      auto hit = maybe_hit.unwrap();
+      event.hits.push_back(hit);
+    }
   }
   u16 tail = Gaps::parse_u16(stream, pos);
   if (tail != RBEvent::TAIL) {
@@ -1050,6 +1053,8 @@ f32 g::TofHit::get_time_b() const {
   }
 }
 
+/*************************************/
+
 f32 g::TofHit::get_peak_a() const {
   if (version == Gaps::ProtocolVersion::Unknown) {
     f32 prec = 0.2;
@@ -1058,6 +1063,8 @@ f32 g::TofHit::get_peak_a() const {
     return peak_a_f32;
   }
 }
+
+/*************************************/
 
 f32 g::TofHit::get_peak_b() const {
   if (version == Gaps::ProtocolVersion::Unknown) {
@@ -1068,6 +1075,8 @@ f32 g::TofHit::get_peak_b() const {
   }
 }
 
+/*************************************/
+
 f32 g::TofHit::get_charge_a() const {
   if (version == Gaps::ProtocolVersion::Unknown) {
     f32 prec = 0.01; //pC
@@ -1076,6 +1085,8 @@ f32 g::TofHit::get_charge_a() const {
     return charge_a_f32;
   }
 }
+
+/*************************************/
 
 f32 g::TofHit::get_charge_b() const {
   if (version == Gaps::ProtocolVersion::Unknown) {
@@ -1086,10 +1097,63 @@ f32 g::TofHit::get_charge_b() const {
   }
 }
 
-f32 g::TofHit::get_charge_min_i() const {
+/*************************************/
+
+// time-over-threshold variables 
+auto g::TofHit::get_tot_low_a() const -> f32 {
+  return tot_low_a; 
+}
+
+/*************************************/
+
+auto g::TofHit::get_tot_low_b() const -> f32 {
+  return tot_low_b; 
+}
+
+/*************************************/
+
+auto g::TofHit::get_tot_high_a() const -> f32 {
+  return tot_high_a;
+}
+
+/*************************************/
+
+auto g::TofHit::get_tot_high_b() const -> f32 {
+  return tot_high_b; 
+}
+
+/*************************************/
+
+auto g::TofHit::get_tot_slp_low_a() const -> f32 {
+  return tot_slp_low_a;
+}
+
+/*************************************/
+
+auto g::TofHit::get_tot_slp_low_b() const -> f32 {
+  return tot_slp_low_b;
+}
+
+/*************************************/
+
+auto g::TofHit::get_tot_slp_high_a() const -> f32 {
+  return tot_slp_high_a;
+}
+
+/*************************************/
+
+auto g::TofHit::get_tot_slp_high_b() const -> f32 {
+  return tot_slp_high_b;
+}
+
+/*************************************/
+
+auto g::TofHit::get_charge_min_i() const -> f32 {
   f32 prec = 0.002;// minI
   return prec*charge_min_i - 10;
 }
+
+/*************************************/
 
 f32 g::TofHit::get_x_pos() const {
   // FIXME - check if it is really in the middle
@@ -1130,17 +1194,21 @@ auto g::TofHit::get_edep() const -> f32 {
 }
 #endif
 
-auto g::TofHit::from_bytestream(const Vec<u8> &bytestream, u64 &pos) -> g::TofHit {
+auto g::TofHit::from_bytestream(const Vec<u8> &bytestream, u64 &pos) 
+ -> r::Result<g::TofHit,Gaps::IOError> {
  auto hit = g::TofHit();
  u16 maybe_header = Gaps::parse_u16(bytestream, pos);
- if (maybe_header != hit.HEAD) {
-   //log_error("Can not find HEADER at presumed position. Maybe give a different value for start_pos?");
-   return hit;
+ if (maybe_header != TofHit::HEAD) {
+   auto message = std::format("Decoding of HEAD failed! Got {} instead!", maybe_header);
+   auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongHeaderBytes, message);
+   return Err(err);
  }
  // UPDATE - get version byte first!
  u64 ver_pos            = pos + 21; // version byte is at position 23
  if (bytestream.size() <= ver_pos) {
-   return hit;
+   auto message = std::format("Currently, reading older data without the hit time-over-threshold variables is not supported!");
+   auto err = Gaps::IOError(Gaps::IOError::ErrorKind::UnsupportedProtocolVersion, message);
+   return Err(err);
  }
  u8  version        = Gaps::parse_u8(bytestream, ver_pos);
  hit.version        = (Gaps::ProtocolVersion) version;
@@ -1151,27 +1219,30 @@ auto g::TofHit::from_bytestream(const Vec<u8> &bytestream, u64 &pos) -> g::TofHi
  hit.peak_b_f32     = Gaps::parse_f16(bytestream, pos); 
  hit.charge_a_f32   = Gaps::parse_f16(bytestream, pos); 
  hit.charge_b_f32   = Gaps::parse_f16(bytestream, pos); 
- hit.charge_min_i   = Gaps::parse_u16(bytestream, pos); 
+ // this is one of the new saturation variables 
+ hit.tot_low_a      = Gaps::parse_f16(bytestream, pos);
+ //hit.charge_min_i   = Gaps::parse_u16(bytestream, pos); 
  hit.baseline_a     = Gaps::parse_f16(bytestream, pos);
  hit.baseline_a_rms = Gaps::parse_f16(bytestream, pos);
  hit.phase          = Gaps::parse_f16(bytestream, pos);
- pos += 1; // skip version
+ pos += 1; // skip version - it has already been read
  hit.baseline_b     = Gaps::parse_f16(bytestream, pos);
  hit.baseline_b_rms = Gaps::parse_f16(bytestream, pos);
- 
- // FIXME checks - packetlength, checksum ?
- //if (version == 64) {
- //  pos +=   
- //}
- // skip new variables for now
- pos += 14;
+ // new saturation variables 
+ hit.tot_low_b      = Gaps::parse_f16(bytestream, pos);
+ hit.tot_high_a     = Gaps::parse_f16(bytestream, pos);
+ hit.tot_high_b     = Gaps::parse_f16(bytestream, pos);
+ hit.tot_slp_low_a  = Gaps::parse_f16(bytestream, pos);
+ hit.tot_slp_low_b  = Gaps::parse_f16(bytestream, pos);
+ hit.tot_slp_high_a = Gaps::parse_f16(bytestream, pos);
+ hit.tot_slp_high_b = Gaps::parse_f16(bytestream, pos);
+ //------------------------------
  u16 tail = Gaps::parse_u16(bytestream, pos);
  if (tail != TAIL) {
    spdlog::error("VERSION {}", version); 
    spdlog::error("TofHit TAIL signature {} is incorrect!", tail);
-   exit(1);
  }
- return hit; 
+ return Ok(hit); 
 }
 
 auto g::TofHit::to_string() const -> std::string {
@@ -1187,17 +1258,21 @@ auto g::TofHit::to_string() const -> std::string {
   }
   repr += "\n  _________";
   repr += "\n  ##  Peak:";
-  repr += std::format("\n  >> time       A | B  : {} {}", get_time_a(), get_time_b());
+  repr += std::format("\n  >> time       A | B  : {:.2f} {:.2f}", get_time_a(), get_time_b());
   //repr += "\n  >>  time   A | B  : "     + std::to_string(get_time_a()      )
   //     +  " " + std::to_string(get_time_b());
-  repr += std::format("\n  >> height     A | B  : {} {}",get_peak_a(), get_peak_b());
-  repr += std::format("\n  >> charge     A | B  : {} {}",get_charge_a(), get_charge_b());
-  repr += std::format("\n  >> baseline   A | B  : {} {}",baseline_a, baseline_b);
-  repr += std::format("\n  >> base. rms  A | B  : {} {}",baseline_a_rms, baseline_b_rms);
-  //repr += "\n  >>  height A | B  : "     + std::to_string(get_peak_a()      )
-  //     +  " " + std::to_string(get_time_a());
-  //repr += "\n  >>  charge A | B  : "     + std::to_string(get_charge_a()    )
-  //     +  " " + std::to_string(get_time_b());
+  repr += std::format("\n  >> height     A | B  : {:.2f} {:.2f}",get_peak_a(), get_peak_b());
+  repr += std::format("\n  >> charge     A | B  : {:.2f} {:.2f}",get_charge_a(), get_charge_b());
+  repr += std::format("\n  >> baseline   A | B  : {:.2f} {:.2f}",baseline_a, baseline_b);
+  repr += std::format("\n  >> base. rms  A | B  : {:.2f} {:.2f}",baseline_a_rms, baseline_b_rms);
+  // saturation variabes 
+  repr += "\n  ** time over threshold information";
+  repr += std::format("\n  >> Lo TOT     A | B  : {:.2f} {:.2f}",get_tot_low_a(), get_tot_low_b());  
+  repr += std::format("\n  >> Hi TOT     A | B  : {:.2f} {:.2f}",get_tot_high_a(), get_tot_high_b());  
+  repr += std::format("\n  >> Lo Slope   A | B  : {:.2f} {:.2f}",get_tot_slp_low_a(), get_tot_slp_low_b()); 
+  repr += std::format("\n  >> Hi Slope   A | B  : {:.2f} {:.2f}",get_tot_slp_high_a(), get_tot_slp_high_b());  
+  // -------------------
+  
   if ( version == Gaps::ProtocolVersion::Unknown) {
     repr += "\n  >>  charge min_I  : "     + std::to_string(get_charge_min_i());
     repr += "\n  cntr ETX          : "     + std::to_string(ctr_etx           );
@@ -1422,8 +1497,11 @@ auto g::TofEventSummary::from_bytestream(const Vec<u8> &stream, u64 &pos)
   tes.mtb_link_mask     = Gaps::parse_u64(stream, pos);
   u16 nhits             = Gaps::parse_u16(stream, pos);
   for (u16 k=0; k<nhits; k++) {
-    auto h = g::TofHit::from_bytestream(stream, pos);
-    tes.hits.push_back(h);
+    auto maybe_h = g::TofHit::from_bytestream(stream, pos);
+    if (maybe_h.is_ok()) {
+      auto h = maybe_h.unwrap();
+      tes.hits.push_back(h);
+    }
   }
   u16 tail = Gaps::parse_u16(stream, pos);
   if (tail != g::TofEventSummary::TAIL) {

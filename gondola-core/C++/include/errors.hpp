@@ -14,7 +14,8 @@ namespace Gaps {
         WrongPacketType,
         WrongHeaderBytes,
         WrongTailBytes,
-        EventHeaderCorrupt
+        EventHeaderCorrupt,
+        UnsupportedProtocolVersion
       };
      
       IOError(ErrorKind kind, std::string reason = ""):
