@@ -2,8 +2,15 @@
 
 ![build-docs-badge](https://github.com/GAPS-Collab/gaps-online-software/workflows/BuildBot/badge.svg)
 
-This is version AULEPE-0.12. [Aulepe are sailfish!](https://en.wikipedia.org/wiki/Sailfish).
-![Aulepe](resources/assets/aulepe_luma.png)
+<table>
+  <tr>
+    <td>
+      <h3>VERSION AULEPE-0.12</h3>
+      <a href="https://en.wikipedia.org/wiki/Sailfish">Aulepe are sailfish!</a>
+    </td>
+    <td><img src="resources/assets/aulepe_luma.png" width="100%"></td>
+  </tr>
+</table>
 
 >[!NOTE] 
 >The fastest non-airborne species is actually not the Cheetah! Marine life can be even faster. While the sailfish seems to be a little less fast then the [fastest non-airborne animal on the planet (Black Marlin with speeds up to 80MpH)](https://en.wikipedia.org/wiki/Fastest_animals). Thus the Black Marlin is faster than a Cheetah.
