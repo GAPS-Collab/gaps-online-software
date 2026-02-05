@@ -8,7 +8,8 @@ var classGaps_1_1IOError =
       [ "WrongPacketType", "classGaps_1_1IOError.html#aef5d09096037b3efe50862e2b52a9872a332c27e37d34b4727f6023e6210a1b88", null ],
       [ "WrongHeaderBytes", "classGaps_1_1IOError.html#aef5d09096037b3efe50862e2b52a9872aad32eacf390a76aeb96d7b02aaa1704d", null ],
       [ "WrongTailBytes", "classGaps_1_1IOError.html#aef5d09096037b3efe50862e2b52a9872a288ce6c63e5e376ff77b0a0f8c44bd1e", null ],
-      [ "EventHeaderCorrupt", "classGaps_1_1IOError.html#aef5d09096037b3efe50862e2b52a9872aea8fdf52eb835a70c796c9105add11b9", null ]
+      [ "EventHeaderCorrupt", "classGaps_1_1IOError.html#aef5d09096037b3efe50862e2b52a9872aea8fdf52eb835a70c796c9105add11b9", null ],
+      [ "UnsupportedProtocolVersion", "classGaps_1_1IOError.html#aef5d09096037b3efe50862e2b52a9872afb626a076fbe74b96622376c090f4954", null ]
     ] ],
     [ "IOError", "classGaps_1_1IOError.html#af4acdf9e0ef65cc786cfc9f9ddb96942", null ],
     [ "kind", "classGaps_1_1IOError.html#a6661071ac1a1f46031920fa4a8e46045", null ],

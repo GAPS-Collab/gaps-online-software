@@ -1,5 +1,7 @@
 var NAVTREEINDEX1 =
 {
+"functions_vars_i.html":[4,3,2,8],
+"functions_vars_j.html":[4,3,2,9],
 "functions_vars_k.html":[4,3,2,10],
 "functions_vars_l.html":[4,3,2,11],
 "functions_vars_m.html":[4,3,2,12],
@@ -29,8 +31,8 @@ var NAVTREEINDEX1 =
 "gondola__core_8cxx.html":[5,0,1,0,1,0],
 "gondola__core_8cxx.html#accc81d6dd00b80e2e71706cae5f6ad6f":[5,0,1,0,1,0,0],
 "hierarchy.html":[4,2],
-"index.html":[],
 "index.html":[0],
+"index.html":[],
 "io_8cxx.html":[5,0,1,0,2,4],
 "io_8cxx.html#a8d5c0194dba1a90894ab97be23eae59d":[5,0,1,0,2,4,0],
 "io_8cxx.html#ac1e99a2056c4ab31e465dfff756d0291":[5,0,1,0,2,4,3],
@@ -247,7 +249,5 @@ var NAVTREEINDEX1 =
 "serialization_8cxx.html#a161589e260d7887722decb470b42f95c":[5,0,1,0,2,9,0],
 "serialization_8cxx.html#a6ec24b72b5348677acd90433c37ba46f":[5,0,1,0,2,9,1],
 "serialization_8cxx.html#ac3f19bd80ce3201df674d2b44ae5e58a":[5,0,1,0,2,9,2],
-"serialization_8h.html":[5,0,1,0,0,13],
-"serialization_8h.html#a290d89031e6e17707975ed5decaf905f":[5,0,1,0,0,13,3],
-"serialization_8h.html#a418729628f5742c30ae2aa01ee19d7c2":[5,0,1,0,0,13,2]
+"serialization_8h.html":[5,0,1,0,0,13]
 };
