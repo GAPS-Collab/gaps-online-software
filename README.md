@@ -1,10 +1,8 @@
-# gaps-online-software
+# gaps-online-software 
 
 ![build-docs-badge](https://github.com/GAPS-Collab/gaps-online-software/workflows/BuildBot/badge.svg)
 
-## Version AULEPE-0.12
-
-<img src="resources/assets/aulepe_luma.png" align="right" width="100%"><a href="https://en.wikipedia.org/wiki/Sailfish">Aulepe are sailfish!</a>
+This is Version AULEPE-0.12 <a href="https://en.wikipedia.org/wiki/Sailfish">Aulepe are sailfish!</a><img src="resources/assets/aulepe_luma.png" align="right" width="10%">
 <br clear="right"/>
 
 >[!NOTE] 
@@ -20,45 +18,21 @@
 
 The documentation supports different release versions of the code and is hosted on github-pages.
 
-[API-docs](https://gaps-collab.github.io/gaps-online-software/)
+[software documentation](https://gaps-collab.github.io/gaps-online-software/)
 
-## installation
+## Installation
 
-<<<<<<< HEAD
-* rust toolchain - to compile `liftof` flight software suite as well as
-  `tof-dataclasses` and `telemetry-dataclasses` 
-* `cmake` is used as a build system
-*  a number of C++ libraries are pulled from github during installation.
-* The C++ API uses the C++20 standard and thus wants gcc-13 or later.
-* We highly recommend the excellent [rye](https://rye.astral.sh/) to deal with 
-  python installations, however, the developer has announced that rye is succeeded by 
-  uv, so in the future we will migrate  
-=======
 ### Installation of the python library 
 
 The python code is called `gondola` and hosted on [pypi](https://pypi.org/project/gondola/) and can 
-be installed with `uv/rye/pip` and friends.
->>>>>>> PAKII-0.11
+be installed with `uv/pip`.
 
-### software repository
+## From source
+
+### Software repository
 
 The code is organized in a public github repository at 
 * [github](https://github.com/GAPS-Collab/gaps-online-software)
-
-### Clone the repository wit submodules
-
-We are using git submodules to pull in some of the dependencies.
-To automatically check them out when clone te repository, use
-`git clone --recurse-submodules`
-
-## prerequisites
-
-* rust toolchain - to compile `liftof` flight software suite as well as the 
-  core library `gondola-core` with the pybindings. Rust edtion 2024 is 
-  required
-* `cmake` is used as a build system for the C++ part.
-* The C++ API uses the C++20 standard and thus wants gcc-13 or later.
-* Doxygen to build the C++ documentation locally.
 
 ### Branches and how to get updates
 
@@ -68,21 +42,24 @@ You can switch branches with `git checkout <branch>`. To get updates, use `git p
 
 Usually, each branch has a specific purpose, everything with version numbers < 1.0.0 will be unstable, meaning there is no guarantee for code to work even after a pull.
 The branches following the naming scheme "FISHNAME-X.X" are dedicated to specific tasks, 
-e.g. the NTS campaign. Please see the dedicated README for the specific branch.
+e.g. the NTS campaign, during flight I (0.11) or after flight I (>=0.12). Please see the dedicated README for the specific branch.
 
-<<<<<<< HEAD
-We are following a git-flow model, which is e.g. described [here](https://www.gitkraken.com/learn/git/git-flow). This means that `main` should point to the latest release, however, it has to be considered that until
-we are at version < 1.0.0, there are no "official" releases. Instead, the main branch will point to the 
-most stable and useful version at the time for the sake of convenience.
-=======
-The `main` branch will be the latest development branch or that what is considered useful for the specific
-purpose at the time and the last release branch will follow the 
-main branch closely.  
+### Clone the repository wit submodules
 
-Pre-releases will happen on an irregular timeline and are associated with specific git tags.
->>>>>>> PAKII-0.11
+We are using git submodules to pull in some of the dependencies.
+To automatically check them out when clone te repository, use
+`git clone --recurse-submodules`
 
-### Build system (C++)
+### Prerequisites for compilation from source
+
+* rust toolchain - to compile `liftof` flight software suite as well as the 
+  core library `gondola-core` with the pybindings. Rust edtion 2024 is 
+  required
+* `cmake` is used as a build system for the C++ part.
+* The C++ API uses the C++20 standard and thus wants gcc-13 or later.
+* Doxygen to build the C++ documentation locally.
+
+### Building the C++ implementation of the `gondola-core` library
 
 The installation uses `cmake`. Create a build directory and execute
 `cmake <gaps-online-software source directory> --install-prefix <install_dir>`
@@ -111,30 +88,7 @@ Example code on how to use them can be found in
 
 [More detailed installation instructions can be found in INSTALL.MD](INSTALL.md)
 
-## software components
-
-The software includes (<src> is the original source directory of `gaps-online-software`:
-
-- dataclasses for the time-of-flight system (`<src>/tof/dataclasses`) available for rust 
-  and C++/PYTHON
-- dataclasses to read the telemetry stream (`<src>/telemetry/dataclasses`) available for rust/Python
-- software for the tof flight computer as well as the readoutboards in 
-  `<src>/tof/liftof` written in rust. This has several components:
-  - `liftof-rb` - code to be run on the readoutboards. This has to be cross-compiled for 
-    the ARM32 architechture. This can be done with the [`cross`](https://github.com/cross-rs/cross) project.  
-    Helper scripts for that are provided, it does need a docker installation.
-  - `liftof-cc` - code to be run on the tof computer. This is Command&Control code, which collects the data 
-    from the MTB and the readoutboards, analyses and packages them and answers to commands from the flight 
-    computer
-  - `liftof-lib` - common functionality for all `liftof` code, factored out
-  - `liftof-tui` - an interactive tui ("terminal user interface") which allows a live view of waveforms and 
-                   other tof related quantities in the terminal.
-- A database system : `<src>/gaps_db` written in Python/django it uses a `sqlite` backend and is basically the 
-                      translation of Sydney's paddle spreadsheet. The db can be used by `liftof` as well 
-                      as python analysis code.
-- A live eventviewer : `<src>/event-viewer` This currently only shows the tracker in a 2d projection.
-
-## A note about testing
+## Running the tests (rust only)
 
 `cargo` provides unit and integration tests. Without going into further detail here,
 please note that some care is needed that all tests are run when using `cargo test`. 
@@ -146,12 +100,12 @@ In general, there is
 The command `cargo test --features=random -- list` will list all tests. Further usefule
 is the addition of the `--no-capture` flag, e.g. `cargo test --features=random -- --no-captuer` in case the output of the tests shall be printed as well.
 
-## getting help
+## Getting help
 
 Please see the README.md in the individual subfolders. 
 
-## maintainer
+## Maintainer
 
 * A. Stoessl <stoessl@hawaii.edu>
 
-* G. Tytus <gtytus@hawaii.it>
+* G. Tytus <gtytus@hawaii.edu>
