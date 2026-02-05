@@ -87,20 +87,28 @@ NB_MODULE(gondola_cxx, m) {
     .def("to_string", &g::CRFrame::to_string);
 
   // events  
-  nb::class_<TofHit>(m, "TofHit")
+  nb::class_<g::TofHit>(m, "TofHit")
     .def(nb::init<>())
-    .def_ro("version"      , &TofHit::version)
-    .def_prop_ro("time_a"  , &TofHit::get_time_a)
-    .def_prop_ro("time_b"  , &TofHit::get_time_b)
-    .def_prop_ro("charge_a", &TofHit::get_charge_a)
-    .def_prop_ro("charge_b", &TofHit::get_charge_b)
-    .def_prop_ro("peak_a"  , &TofHit::get_peak_a)
-    .def_prop_ro("peak_b"  , &TofHit::get_peak_b)
-    .def_prop_ro("edep"    , &TofHit::get_edep)
-    .def_ro("event_t0"     , &TofHit::event_t0)
-    .def_ro("paddle_id"    , &TofHit::paddle_id)
-    .def("to_string", &TofHit::to_string)
-    .def("__repr__", [](TofHit &h) {
+    .def_ro("version"        , &g::TofHit::version)
+    .def_prop_ro("time_a"    , &g::TofHit::get_time_a)
+    .def_prop_ro("time_b"    , &g::TofHit::get_time_b)
+    .def_prop_ro("charge_a"  , &g::TofHit::get_charge_a)
+    .def_prop_ro("charge_b"  , &g::TofHit::get_charge_b)
+    .def_prop_ro("peak_a"    , &g::TofHit::get_peak_a)
+    .def_prop_ro("peak_b"    , &g::TofHit::get_peak_b)
+    .def_prop_ro("edep"      , &g::TofHit::get_edep)
+    .def_prop_ro("tot_low_a" , &g::TofHit::get_tot_low_a)
+    .def_prop_ro("tot_low_b" , &g::TofHit::get_tot_low_b)
+    .def_prop_ro("tot_high_a", &g::TofHit::get_tot_high_a)
+    .def_prop_ro("tot_high_b", &g::TofHit::get_tot_high_b)
+    .def_prop_ro("slp_low_a" , &g::TofHit::get_tot_slp_low_a)
+    .def_prop_ro("slp_low_b" , &g::TofHit::get_tot_slp_low_b)
+    .def_prop_ro("slp_high_a", &g::TofHit::get_tot_slp_high_a)
+    .def_prop_ro("slp_high_b", &g::TofHit::get_tot_slp_high_b)
+    .def_ro("event_t0"       , &g::TofHit::event_t0)
+    .def_ro("paddle_id"      , &g::TofHit::paddle_id)
+    .def("to_string"         , &g::TofHit::to_string)
+    .def("__repr__", [](g::TofHit &h) {
       return "<NBWrapper" + h.to_string() + ">";
     }); 
   
@@ -109,14 +117,23 @@ NB_MODULE(gondola_cxx, m) {
     .def_ro("event_id"     , &TofEventHeader::event_id)
     .def("to_string"       , &TofEventHeader::to_string);
 
-  nb::class_<TofEvent>(m, "TofEvent")
+  nb::class_<g::TofEvent>(m, "TofEvent")
     .def(nb::init<>())
-    .def_static("from_tofpacket",&TofEvent::from_tofpacket) 
-    .def("normalize_hit_times", &TofEvent::normalize_hit_times)
-    .def_prop_ro("hits"    , &TofEvent::get_hits)
-    .def_ro("header"       , &TofEvent::header)
-    .def_prop_ro("rb_ids"  , &TofEvent::get_rbids)
-    .def("to_string"       , &TofEvent::to_string);
+    .def_static("from_tofpacket", &g::TofEvent::from_tofpacket) 
+    .def("normalize_hit_times"  , &g::TofEvent::normalize_hit_times)
+    .def_prop_ro("hits"         , &g::TofEvent::get_hits)
+    .def_ro("header"            , &g::TofEvent::header)
+    .def_prop_ro("rb_ids"       , &g::TofEvent::get_rbids)
+    .def("to_string"            , &g::TofEvent::to_string);
+  
+  nb::class_<g::TofEventSummary>(m, "TofEventSummary")
+    .def(nb::init<>())
+    .def_static("from_tofpacket", &g::TofEventSummary::from_tofpacket) 
+    //.def("normalize_hit_times"  , &g::TofEvent::normalize_hit_times)
+    //.def_prop_ro("hits"         , &g::TofEvent::get_hits)
+    //.def_ro("header"            , &g::TofEvent::header)
+    //.def_prop_ro("rb_ids"       , &g::TofEvent::get_rbids)
+    .def("to_string"            , &g::TofEventSummary::to_string);
 
   //---------------------------------------------------------
   // Telemetry packets & reader
@@ -245,7 +262,21 @@ NB_MODULE(gondola_cxx, m) {
     .def("rewind"                    , &g::TelemetryPacketReader::rewind);
   
   nb::class_<Gaps::Telemetry::MergedEvent>(m, "TelemetryEvent")
-    .def(nb::init<>());
+    .def(nb::init<>())
+    .def_static("from_bytestream", [](Vec<u8> stream, usize pos) {
+      auto data = gtl::MergedEvent::from_bytestream(stream, pos);
+      if (data.is_ok()) {
+        return data.unwrap();
+      }  
+      throw nb::value_error("Error when unpacking TelemetryEvent!");
+      //return gtl::MergedEvent::from_bytestream(stream, pos).unwrap();
+    })
+    .def("__str__", [](const gtl::MergedEvent& self) {
+        return nb::str("{}").format(self.to_string());
+    })
+    .def("__repr__", [](const gtl::MergedEvent& self) {
+        return nb::str("{}").format(self.to_string());
+    });
 
   // Spike cleaning functions
   m.def("spike_cleaning_drs4", &g::spike_cleaning_drs4, 

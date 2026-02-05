@@ -1,11 +1,11 @@
 # this is only to be used with scikit
 cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
-project(gondola_cxx VERSION 0.11 LANGUAGES C CXX)
+project(gondola_cxx VERSION 0.12 LANGUAGES C CXX)
 
 
-find_package(Python 3.8 COMPONENTS Interpreter Development.Module REQUIRED)
+find_package(Python 3.11 COMPONENTS Interpreter Development.Module REQUIRED)
 
-find_package(GapsOnlineSoftware 0.11 EXACT REQUIRED)
+find_package(GapsOnlineSoftware 0.12 EXACT REQUIRED)
 
 set (ABS_PATH /srv/gaps/gaps-online-software) 
 # this is stupid!
