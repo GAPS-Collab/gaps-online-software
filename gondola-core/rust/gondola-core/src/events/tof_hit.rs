@@ -59,7 +59,6 @@ impl fmt::Display for Peak {
 /// on the paddle can be attempted.
 ///
 /// A and B are the different ends of the paddle
-
 #[derive(Debug,Copy,Clone,PartialEq)]
 #[cfg_attr(feature = "pybindings", pyclass)]
 pub struct TofHit {

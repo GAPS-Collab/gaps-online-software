@@ -2,7 +2,7 @@
 
 ![build-docs-badge](https://github.com/GAPS-Collab/gaps-online-software/workflows/BuildBot/badge.svg)
 
-This is Version AULEPE-0.12 <a href="https://en.wikipedia.org/wiki/Sailfish">Aulepe are sailfish!</a><img src="resources/assets/aulepe_luma.png" align="right" width="10%">
+This is Version AULEPE-0.12 <a href="https://en.wikipedia.org/wiki/Sailfish">Aulepe are sailfish!</a><img src="resources/assets/aulepe_luma.png" align="right" width="15%">
 <br clear="right"/>
 
 >[!NOTE] 
