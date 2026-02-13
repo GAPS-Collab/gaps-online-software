@@ -12,10 +12,10 @@ var searchData=
   ['io_2ecxx_9',['io.cxx',['../io_8cxx.html',1,'']]],
   ['io_2ehpp_10',['io.hpp',['../io_8hpp.html',1,'']]],
   ['ioerror_11',['ioerror',['../classGaps_1_1IOError.html#af4acdf9e0ef65cc786cfc9f9ddb96942',1,'Gaps::IOError::IOError()'],['../classGaps_1_1IOError.html',1,'Gaps::IOError']]],
-  ['is_5fevent_5ffragment_12',['is_event_fragment',['../structRBEventHeader.html#a80d3642f8d4dd7bfa5e6f6ebef3766d6',1,'RBEventHeader']]],
+  ['is_5fevent_5ffragment_12',['is_event_fragment',['../structRBEventHeader.html#ae351a8aad227656a019f3feda843b574',1,'RBEventHeader']]],
   ['is_5fexhausted_13',['is_exhausted',['../structgondola_1_1TelemetryPacketReader.html#a16cf37c876f8496252347f8c21939b2f',1,'gondola::TelemetryPacketReader::is_exhausted()'],['../classGaps_1_1TofPacketReader.html#a8aca7f3a4a9658a11040279899e5db6f',1,'Gaps::TofPacketReader::is_exhausted()'],['../structgondola_1_1CRReader.html#ad5439dcba3fe2eb69daf07815d7630be',1,'gondola::CRReader::is_exhausted() const -&gt; bool']]],
   ['is_5ffrom_5ftelemetry_14',['is_from_telemetry',['../structgondola_1_1CRReader.html#ad5e490135ee09200d6551ecf505e64ac',1,'gondola::CRReader']]],
-  ['is_5flocked_15',['is_locked',['../structRBEventHeader.html#a7314b19600b586e001833d231f3921da',1,'RBEventHeader']]],
-  ['is_5flocked_5flast_5fsec_16',['is_locked_last_sec',['../structRBEventHeader.html#abe97e5457e0dc321d9b41bf7021b0c88',1,'RBEventHeader']]],
+  ['is_5flocked_15',['is_locked',['../structRBEventHeader.html#a78f8f8fbb38400047d26ceef3b6dd240',1,'RBEventHeader']]],
+  ['is_5flocked_5flast_5fsec_16',['is_locked_last_sec',['../structRBEventHeader.html#a12843b457968527d3478a508e4518aab',1,'RBEventHeader']]],
   ['is_5fmean_5fvalue_17',['is_mean_value',['../structGaps_1_1TrackerStripPedestal.html#a69383529aae6c203477ab843e10e90ce',1,'Gaps::TrackerStripPedestal']]]
 ];

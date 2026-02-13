@@ -9,7 +9,7 @@ var structTofHit =
     [ "get_t_avg", "structTofHit.html#a3ac633ed64db66af1e035d9bf016067e", null ],
     [ "get_time_a", "structTofHit.html#a1889c7c37536bdff40cce6cc2a73f9e1", null ],
     [ "get_time_b", "structTofHit.html#aaa3703b86f2d6a82f6573f580c7112ef", null ],
-    [ "get_timestamp48", "structTofHit.html#a0e754d21dd5f47f7e9c3196099b3b229", null ],
+    [ "get_timestamp48", "structTofHit.html#aed4219d73bcc4fdd778d557a6b1ba831", null ],
     [ "get_x_pos", "structTofHit.html#a18773f90e7883a76866e39cba5505880", null ],
     [ "set_paddle_len", "structTofHit.html#aea570005131df3d3077d25512df181e2", null ],
     [ "to_string", "structTofHit.html#a5c8592b1e52c6f585a18fe782daaca5f", null ],
