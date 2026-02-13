@@ -1192,11 +1192,11 @@ auto g::TofHit::get_timestamp48() const -> f64 {
 /// attenuation function as used in pgaps
 auto g::TofHit::get_edep() const -> f32 {
   f32 x0    = get_x_pos();
-  f32 att_a = (std::exp(3.9-0.00126*( x0+(10.0*paddle_len/2.)))+22.15)/ (std::exp(3.9)+22.15);
-  f32 att_b = (std::exp(3.9-0.00126*(-x0+(10.0*paddle_len/2.)))+22.15)/ (std::exp(3.9)+22.15);
-  //f32 att_a = (std::exp(3.9-0.00126*( x0            ))+22.15)/ (std::exp(3.9)+22.15);
-  //f32 att_b = (std::exp(3.9-0.00126*(10.0*paddle_len - x0))+22.15)/ (std::exp(3.9)+22.15);
-  std::cout << "Att A, Att B, x0 " << att_a << " " << att_b << " " << x0 << std::endl;
+  //f32 att_a = (std::exp(3.9-0.00126*( x0+(10.0*paddle_len/2.)))+22.15)/ (std::exp(3.9)+22.15);
+  //f32 att_b = (std::exp(3.9-0.00126*(-x0+(10.0*paddle_len/2.)))+22.15)/ (std::exp(3.9)+22.15);
+  f32 att_a = (std::exp(3.9-0.00126*( x0            ))+22.15)/ (std::exp(3.9)+22.15);
+  f32 att_b = (std::exp(3.9-0.00126*(10.0*paddle_len - x0))+22.15)/ (std::exp(3.9)+22.15);
+  //std::cout << "Att A, Att B, x0 " << att_a << " " << att_b << " " << x0 << std::endl;
   f32 edep  = 0.0159 * (get_peak_a()/att_a + get_peak_b()/att_b) / 2.; // vertical muon peak @ 0.97 MeV
   return edep; 
 }
