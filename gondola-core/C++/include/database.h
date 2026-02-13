@@ -1,6 +1,8 @@
 #ifndef GOS_DB_HEADER_INCLUDED
 #define GOS_DB_HEADER_INCLUDED
 
+#include <memory> 
+
 #include "tof_typedefs.h"
 #include "sqlite_orm.h"
 
@@ -60,6 +62,8 @@ namespace Gaps {
   };
   /// A map of paddle id -> TofPaddle
   typedef std::map<u8,  TofPaddle> TofPaddleMap;
+  /// Shared ptr to TofPaddleMap 
+  typedef std::shared_ptr<TofPaddleMap> TofPaddleMapPtr;
   /// A map of RBID, RBCh -> TofPaddle
   typedef std::map<u8, std::map<u8, std::tuple<u8, TofPaddleEnd>>> RbIdChannelPaddleIdMap;
   /// A map of DSI,J -> TofPaddle
