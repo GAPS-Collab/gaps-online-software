@@ -1,6 +1,7 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
+#include <nanobind/stl/shared_ptr.h>
 
 #include "version.h"
 #include "sd_legacy.hpp" 
@@ -97,6 +98,9 @@ NB_MODULE(gondola_cxx, m) {
     .def_prop_ro("peak_a"    , &g::TofHit::get_peak_a)
     .def_prop_ro("peak_b"    , &g::TofHit::get_peak_b)
     .def_prop_ro("edep"      , &g::TofHit::get_edep)
+    .def_prop_ro("x0"        , &g::TofHit::get_x_pos)
+    .def_prop_ro("t0_uncorr" , &g::TofHit::get_t0_relative)
+    .def_prop_ro("obeys_causality", &g::TofHit::obeys_causality)
     .def_prop_ro("tot_low_a" , &g::TofHit::get_tot_low_a)
     .def_prop_ro("tot_low_b" , &g::TofHit::get_tot_low_b)
     .def_prop_ro("tot_high_a", &g::TofHit::get_tot_high_a)
@@ -105,6 +109,7 @@ NB_MODULE(gondola_cxx, m) {
     .def_prop_ro("slp_low_b" , &g::TofHit::get_tot_slp_low_b)
     .def_prop_ro("slp_high_a", &g::TofHit::get_tot_slp_high_a)
     .def_prop_ro("slp_high_b", &g::TofHit::get_tot_slp_high_b)
+    .def_ro("paddle_len"     , &g::TofHit::paddle_len)
     .def_ro("event_t0"       , &g::TofHit::event_t0)
     .def_ro("paddle_id"      , &g::TofHit::paddle_id)
     .def("to_string"         , &g::TofHit::to_string)
@@ -131,7 +136,7 @@ NB_MODULE(gondola_cxx, m) {
     .def_static("from_tofpacket", &g::TofEventSummary::from_tofpacket) 
     //.def("normalize_hit_times"  , &g::TofEvent::normalize_hit_times)
     //.def_prop_ro("hits"         , &g::TofEvent::get_hits)
-    //.def_ro("header"            , &g::TofEvent::header)
+    .def_ro("hits"              , &g::TofEventSummary::hits)
     //.def_prop_ro("rb_ids"       , &g::TofEvent::get_rbids)
     .def("to_string"            , &g::TofEventSummary::to_string);
 
@@ -197,10 +202,15 @@ NB_MODULE(gondola_cxx, m) {
 
   nb::class_<g::TelemetryPacket>(m, "TelemetryPacket")
     .def(nb::init<>())
-    .def_ro("header"       , &g::TelemetryPacket::header)
-    .def_ro("payload"      , &g::TelemetryPacket::payload)
-    .def("from_bytestream" , &g::TelemetryPacket::from_bytestream)
-    .def("to_string"       , &g::TelemetryPacket::to_string)
+    .def_ro("header"          , &g::TelemetryPacket::header)
+    .def_ro("payload"         , &g::TelemetryPacket::payload)
+    .def_prop_ro("is_event_packet" , &g::TelemetryPacket::is_event_packet)
+    .def("get_paddle_len"     , [](const g::TelemetryPacket& self, u8 pid) {
+      auto paddle = self.paddles->at(pid);
+      return paddle.length;
+    })
+    .def("from_bytestream"    , &g::TelemetryPacket::from_bytestream)
+    .def("to_string"          , &g::TelemetryPacket::to_string)
     .def("__str__", [](const g::TelemetryPacket& self) {
         return nb::str("{}").format(self.to_string());
     })
@@ -259,10 +269,21 @@ NB_MODULE(gondola_cxx, m) {
     .def("print_packet_index"        , &g::TelemetryPacketReader::print_packet_index)
     .def("cache_all_packets"         , &g::TelemetryPacketReader::cache_all_packets)
     .def("count_packets"             , &g::TelemetryPacketReader::count_packets)
+    .def("get_paddle_len"     , [](const g::TelemetryPacketReader& self, u8 pid) {
+      auto paddle = self.paddles->at(pid);
+      return paddle.length;
+    })
     .def("rewind"                    , &g::TelemetryPacketReader::rewind);
   
   nb::class_<Gaps::Telemetry::MergedEvent>(m, "TelemetryEvent")
     .def(nb::init<>())
+    .def_static("from_telemetrypacket", [](Gaps::Telemetry::Packet &pack) {
+      auto data = gtl::MergedEvent::from_telemetrypacket(pack);
+      if (data.is_ok()) {
+        return data.unwrap();
+      }  
+      throw nb::value_error("Error when unpacking TelemetryEvent!");
+    })
     .def_static("from_bytestream", [](Vec<u8> stream, usize pos) {
       auto data = gtl::MergedEvent::from_bytestream(stream, pos);
       if (data.is_ok()) {
@@ -271,6 +292,7 @@ NB_MODULE(gondola_cxx, m) {
       throw nb::value_error("Error when unpacking TelemetryEvent!");
       //return gtl::MergedEvent::from_bytestream(stream, pos).unwrap();
     })
+    .def_ro("tof"                , &gtl::MergedEvent::tof_event)
     .def("__str__", [](const gtl::MergedEvent& self) {
         return nb::str("{}").format(self.to_string());
     })
