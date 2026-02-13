@@ -354,7 +354,7 @@ impl TofHit {
   
   /// Elena's energy deposition based on peak height
   #[getter]
-  #[pyo3(name="edep")]
+  #[pyo3(name="edep_att")]
   fn get_edep_att_py(&self) -> f32 {
     self.get_edep_att()
   }
