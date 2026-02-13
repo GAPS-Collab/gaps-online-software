@@ -541,15 +541,44 @@ namespace gondola {
   struct TofEvent {
     static constexpr u16 HEAD = 0xAAAA;
     static constexpr u16 TAIL = 0x5555;
-  
-    EventStatus status;
+ 
+    Gaps::ProtocolVersion version ;
+    EventStatus status            ;
+    EventQuality          quality ;
+    u16         trigger_sources   ;
+    /// the number of triggered paddles coming
+    /// from the MTB directly. This might NOT be
+    /// the same as the number of hits!
+    u8          n_trigger_paddles ;
+    u32         event_id          ;
+    u16         run_id            ;
+    u32         timestamp32       ;
+    u16         timestamp16       ;
+    // deprecated, won't get serialized
+    //u16         primary_beta      ;
+    //u16         primary_charge    ;
+
+    u16         drs_dead_lost_hits;
+    u32         dsi_j_mask        ;
+    Vec<u16>    channel_mask      ;
+    u64         mtb_link_mask     ;
+
+    // flight computer event variable packet
+    u8          n_hits_umb        ;
+    u8          n_hits_cbe        ;
+    u8          n_hits_cor        ;
+    f32         tot_edep_umb      ;
+    f32         tot_edep_cbe      ;
+    f32         tot_edep_cor      ;
     TofEventHeader header;
     MasterTriggerEvent mt_event;
-  
+
     /// A container holding the individual events from all RBs with 
     /// triggers in this event  
-    Vec<RBEvent>      rb_events;
-  
+    Vec<RBEvent>      rb_events = {};
+    Vec<TofHit>       hits      = {};
+
+
     TofEvent();
   
     /**
