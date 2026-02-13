@@ -269,6 +269,10 @@ namespace gondola {
     auto get_charge_min_i() const -> f32;
     auto get_x_pos()        const -> f32;
     auto get_t_avg()        const -> f32;
+    /// If the two reconstructed pulse times are not related to each other by the paddle length,
+    /// meaning that they can't be caused by the same event, we dub this hit as "not following
+    /// causality"
+    auto obeys_causality()  const -> bool; 
     /// get the interaction time of the particle,
     /// not accounting for cable len and global phase
     auto get_t0_relative()  const -> f32;
