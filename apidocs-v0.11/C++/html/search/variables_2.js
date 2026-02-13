@@ -6,7 +6,7 @@ var searchData=
   ['ch9_5ffreq_3',['ch9_freq',['../structRBEventHeader.html#a83dfb3ab40a6ca3fca361300cb2c13b6',1,'RBEventHeader']]],
   ['ch9_5fphase_4',['ch9_phase',['../structRBEventHeader.html#af10f670a68b26bac8a455324b91c78b8',1,'RBEventHeader']]],
   ['channel_5',['channel',['../structGaps_1_1TrackerStrip.html#a7829b06ca0cc16c42c63eb5b1362d605',1,'Gaps::TrackerStrip::channel'],['../structGaps_1_1Telemetry_1_1TrkHit.html#a66d9aeac678e22a99c39d8cd6b834dd2',1,'Gaps::Telemetry::TrkHit::channel']]],
-  ['channel_5fmask_6',['channel_mask',['../structRBEventHeader.html#aeee5dbdd9077bcb7a0056924b274f611',1,'RBEventHeader::channel_mask'],['../structMasterTriggerEvent.html#a1093aa4c8ebdec7e23d60579fd8fd5c0',1,'MasterTriggerEvent::channel_mask'],['../structTofEventSummary.html#a670b432e27608cb174111f302ac61516',1,'TofEventSummary::channel_mask']]],
+  ['channel_5fmask_6',['channel_mask',['../structRBEventHeader.html#aeee5dbdd9077bcb7a0056924b274f611',1,'RBEventHeader::channel_mask'],['../structMasterTriggerEvent.html#a1093aa4c8ebdec7e23d60579fd8fd5c0',1,'MasterTriggerEvent::channel_mask'],['../structTofEvent.html#a633cad5d7979ce3477ba8e3d698956c3',1,'TofEvent::channel_mask'],['../structTofEventSummary.html#a670b432e27608cb174111f302ac61516',1,'TofEventSummary::channel_mask']]],
   ['checksum_7',['checksum',['../structGaps_1_1Telemetry_1_1PacketHeader.html#a516c17f56d986c678242955a735f22b3',1,'Gaps::Telemetry::PacketHeader']]],
   ['coax_5fcable_5ftime_8',['coax_cable_time',['../structGaps_1_1TofPaddle.html#a7ce6b387e1542f38386cec05d9d2e822',1,'Gaps::TofPaddle']]],
   ['coax_5fcbl_5ftime_9',['coax_cbl_time',['../structTofHit.html#aa27595c071206c15ead67351ed07628a',1,'TofHit']]],

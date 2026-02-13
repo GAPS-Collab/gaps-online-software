@@ -10,7 +10,8 @@ var searchData=
   ['sippressure_7',['SipPressure',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a29745e313061fb2635274446022b51f8',1,'Gaps::Telemetry']]],
   ['startvalidationrun_8',['StartValidationRun',['../commands_8h.html#ad6d9706eb4e1aa6ed956444c5cd2a3b5a5497710f622f618ff38118b7d8b29656',1,'commands.h']]],
   ['streamanyevent_9',['StreamAnyEvent',['../commands_8h.html#ad6d9706eb4e1aa6ed956444c5cd2a3b5ad05712d903c22c0e3d0e3e21c7777031',1,'commands.h']]],
-  ['streamtooshort_10',['StreamTooShort',['../classGaps_1_1IOError.html#aef5d09096037b3efe50862e2b52a9872a7700d8c06be44e20cc35c7b67bb196a6',1,'Gaps::IOError']]],
-  ['success_11',['Success',['../commands_8h.html#aee4b019262fd08438aee34c463daaad3a505a83f220c02df2f85c3810cd9ceb38',1,'commands.h']]],
-  ['survivalpacket_12',['SurvivalPacket',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7af6cc65b9a4c2c3fe30bf8fe8e1bb8ef4',1,'Gaps::Telemetry']]]
+  ['streamtoolong_10',['StreamTooLong',['../classGaps_1_1IOError.html#aef5d09096037b3efe50862e2b52a9872a13f7dd88a736896765373ad7d8ad76b0',1,'Gaps::IOError']]],
+  ['streamtooshort_11',['StreamTooShort',['../classGaps_1_1IOError.html#aef5d09096037b3efe50862e2b52a9872a7700d8c06be44e20cc35c7b67bb196a6',1,'Gaps::IOError']]],
+  ['success_12',['Success',['../commands_8h.html#aee4b019262fd08438aee34c463daaad3a505a83f220c02df2f85c3810cd9ceb38',1,'commands.h']]],
+  ['survivalpacket_13',['SurvivalPacket',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7af6cc65b9a4c2c3fe30bf8fe8e1bb8ef4',1,'Gaps::Telemetry']]]
 ];

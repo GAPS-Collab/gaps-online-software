@@ -19,7 +19,7 @@ var searchData=
   ['ch9_5fphase_16',['ch9_phase',['../structRBEventHeader.html#af10f670a68b26bac8a455324b91c78b8',1,'RBEventHeader']]],
   ['changelog_17',['CHANGELOG',['../index.html#autotoc_md5',1,'']]],
   ['channel_18',['channel',['../structGaps_1_1Telemetry_1_1TrkHit.html#a66d9aeac678e22a99c39d8cd6b834dd2',1,'Gaps::Telemetry::TrkHit::channel'],['../structGaps_1_1TrackerStrip.html#a7829b06ca0cc16c42c63eb5b1362d605',1,'Gaps::TrackerStrip::channel']]],
-  ['channel_5fmask_19',['channel_mask',['../structRBEventHeader.html#aeee5dbdd9077bcb7a0056924b274f611',1,'RBEventHeader::channel_mask'],['../structMasterTriggerEvent.html#a1093aa4c8ebdec7e23d60579fd8fd5c0',1,'MasterTriggerEvent::channel_mask'],['../structTofEventSummary.html#a670b432e27608cb174111f302ac61516',1,'TofEventSummary::channel_mask']]],
+  ['channel_5fmask_19',['channel_mask',['../structRBEventHeader.html#aeee5dbdd9077bcb7a0056924b274f611',1,'RBEventHeader::channel_mask'],['../structMasterTriggerEvent.html#a1093aa4c8ebdec7e23d60579fd8fd5c0',1,'MasterTriggerEvent::channel_mask'],['../structTofEvent.html#a633cad5d7979ce3477ba8e3d698956c3',1,'TofEvent::channel_mask'],['../structTofEventSummary.html#a670b432e27608cb174111f302ac61516',1,'TofEventSummary::channel_mask']]],
   ['channelidwrong_20',['ChannelIDWrong',['../events_8h.html#a097b60adc604ef5a27f55edda6360293ae47816a3c64358b80c028dc88edcab3c',1,'events.h']]],
   ['checksum_21',['checksum',['../structGaps_1_1Telemetry_1_1PacketHeader.html#a516c17f56d986c678242955a735f22b3',1,'Gaps::Telemetry::PacketHeader']]],
   ['chnsyncerrors_22',['ChnSyncErrors',['../events_8h.html#a097b60adc604ef5a27f55edda6360293a99ef53b53786cbe479e9a7075a2492df',1,'events.h']]],

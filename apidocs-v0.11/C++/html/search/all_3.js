@@ -19,12 +19,12 @@ var searchData=
   ['drs_5favdd_5fcurrent_16',['drs_avdd_current',['../structRBMoniData.html#a8a281efd433166d8b214d70d57d8b63f',1,'RBMoniData']]],
   ['drs_5favdd_5fpower_17',['drs_avdd_power',['../structRBMoniData.html#ae44113bde57af43f6bac150fa0b7db6f',1,'RBMoniData']]],
   ['drs_5favdd_5fvoltage_18',['drs_avdd_voltage',['../structRBMoniData.html#ab3cf1ee816df4e302d4b7e72a5026758',1,'RBMoniData']]],
-  ['drs_5fdead_5flost_5fhits_19',['drs_dead_lost_hits',['../structTofEventSummary.html#a2122d50c1680c446b571f4f421af5131',1,'TofEventSummary']]],
+  ['drs_5fdead_5flost_5fhits_19',['drs_dead_lost_hits',['../structTofEventSummary.html#a2122d50c1680c446b571f4f421af5131',1,'TofEventSummary::drs_dead_lost_hits'],['../structTofEvent.html#a9b6ceb780c1a193654fd2fa9c7df85dc',1,'TofEvent::drs_dead_lost_hits']]],
   ['drs_5fdvdd_5fcurrent_20',['drs_dvdd_current',['../structRBMoniData.html#ac7c2b0f45daa1ef6320d3cc858b60847',1,'RBMoniData']]],
   ['drs_5fdvdd_5fpower_21',['drs_dvdd_power',['../structRBMoniData.html#a888bef9190dba4d8478f4e15a4c33e22',1,'RBMoniData']]],
   ['drs_5fdvdd_5fvoltage_22',['drs_dvdd_voltage',['../structRBMoniData.html#af9b36ce65a4c08fc4c96f0e3d0e28597',1,'RBMoniData']]],
   ['drs_5flost_5ftrigger_23',['drs_lost_trigger',['../structRBEventHeader.html#a936427b3423004ffd32a22380ef9373e',1,'RBEventHeader']]],
   ['dsi_24',['dsi',['../structGaps_1_1TofPaddle.html#a877747357aa71fb67291a15c38d61d9d',1,'Gaps::TofPaddle']]],
-  ['dsi_5fj_5fmask_25',['dsi_j_mask',['../structMasterTriggerEvent.html#acc050262f6d08b8b2a2c80ca59a0a849',1,'MasterTriggerEvent::dsi_j_mask'],['../structTofEventSummary.html#a9a9b3563bf4d3d2b2f6cf2d3452f226e',1,'TofEventSummary::dsi_j_mask']]],
+  ['dsi_5fj_5fmask_25',['dsi_j_mask',['../structMasterTriggerEvent.html#acc050262f6d08b8b2a2c80ca59a0a849',1,'MasterTriggerEvent::dsi_j_mask'],['../structTofEvent.html#a93a5e3ed22294fd87b5feb815baa573f',1,'TofEvent::dsi_j_mask'],['../structTofEventSummary.html#a9a9b3563bf4d3d2b2f6cf2d3452f226e',1,'TofEventSummary::dsi_j_mask']]],
   ['dsijchnpaddleidmap_26',['DsiJChnPaddleIdMap',['../namespaceGaps.html#ac562c67ce894d03edeecb6332caa86ac',1,'Gaps']]]
 ];

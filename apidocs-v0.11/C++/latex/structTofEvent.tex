@@ -41,13 +41,51 @@ Collaboration diagram for Tof\+Event\+:
 \doxysubsubsection*{Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
+\mbox{\hyperlink{namespaceGaps_af99376041829a6c93b2b635455d73910}{Gaps\+::\+Protocol\+Version}} \mbox{\hyperlink{structTofEvent_a561aae271fbed52fe6cda181e1cb9ac3}{version}}
+\item 
 \mbox{\hyperlink{events_8h_a097b60adc604ef5a27f55edda6360293}{Event\+Status}} \mbox{\hyperlink{structTofEvent_aa8c91b83d5d41aa29711cf65240614b0}{status}}
+\item 
+\mbox{\hyperlink{events_8h_a808d9c1673ae5415c054bc8e143af749}{Event\+Quality}} \mbox{\hyperlink{structTofEvent_a45a531680e727eebdf125b5008287eda}{quality}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structTofEvent_af9dde1bbda7672b13e7c700294ca9832}{trigger\+\_\+sources}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structTofEvent_aecd6332d836aa176d3694b135652cceb}{n\+\_\+trigger\+\_\+paddles}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structTofEvent_a5b4af5047cd74182eb8a8ee282bff85f}{run\+\_\+id}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{structTofEvent_a8d60cd8cb0529cf796331347e2c72e9a}{event\+\_\+id}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structTofEvent_a0d3b41d501c6097180bcb9a4f8aae49a}{n\+\_\+hits\+\_\+umb}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structTofEvent_a252735a8afe5cfdb2e2b4463ba5fe2b8}{n\+\_\+hits\+\_\+cbe}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structTofEvent_aaddb05716017021bf5f7fc04e19fb96b}{n\+\_\+hits\+\_\+cor}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structTofEvent_a8942a827c03a31427f0add2956cec7a8}{tot\+\_\+edep\+\_\+umb}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structTofEvent_a4fe8bc7dad3166655fec2523b5576932}{tot\+\_\+edep\+\_\+cbe}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structTofEvent_ae8ae3dc37aad22d7259494bb508d80f1}{tot\+\_\+edep\+\_\+cor}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{structTofEvent_a962e138f0806b8318172bf06a8abe61c}{timestamp32}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structTofEvent_aed0cb1d43d83ef53463fe58ee49a6927}{timestamp16}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structTofEvent_a9b6ceb780c1a193654fd2fa9c7df85dc}{drs\+\_\+dead\+\_\+lost\+\_\+hits}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{structTofEvent_a93a5e3ed22294fd87b5feb815baa573f}{dsi\+\_\+j\+\_\+mask}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} $>$ \mbox{\hyperlink{structTofEvent_a633cad5d7979ce3477ba8e3d698956c3}{channel\+\_\+mask}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \mbox{\hyperlink{structTofEvent_a41d23857f972c5e0718e799485de1086}{mtb\+\_\+link\+\_\+mask}}
 \item 
 \mbox{\hyperlink{structTofEventHeader}{Tof\+Event\+Header}} \mbox{\hyperlink{structTofEvent_ab20b5b48686e44372fd292a704f2c19a}{header}}
 \item 
 \mbox{\hyperlink{structMasterTriggerEvent}{Master\+Trigger\+Event}} \mbox{\hyperlink{structTofEvent_a48e8654d0430e19f81d0c1553de6d3cd}{mt\+\_\+event}}
 \item 
-\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{structRBEvent}{RBEvent}} $>$ \mbox{\hyperlink{structTofEvent_a577628b0f2d6beacc40f6bad1adc135a}{rb\+\_\+events}}
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{structRBEvent}{RBEvent}} $>$ \mbox{\hyperlink{structTofEvent_a577628b0f2d6beacc40f6bad1adc135a}{rb\+\_\+events}} = \{\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{structTofHit}{Tof\+Hit}} $>$ \mbox{\hyperlink{structTofEvent_a7ad6ec0cb91fc991d15fd57b2bcc3742}{hits}} = \{\}
 \end{DoxyCompactItemize}
 \doxysubsubsection*{Static Public Attributes}
 \begin{DoxyCompactItemize}
@@ -156,6 +194,30 @@ string representation for printing
 
 
 \doxysubsection{Member Data Documentation}
+\Hypertarget{structTofEvent_a633cad5d7979ce3477ba8e3d698956c3}\label{structTofEvent_a633cad5d7979ce3477ba8e3d698956c3} 
+\index{TofEvent@{TofEvent}!channel\_mask@{channel\_mask}}
+\index{channel\_mask@{channel\_mask}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{channel\_mask}{channel\_mask}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}$>$ Tof\+Event\+::channel\+\_\+mask}
+
+\Hypertarget{structTofEvent_a9b6ceb780c1a193654fd2fa9c7df85dc}\label{structTofEvent_a9b6ceb780c1a193654fd2fa9c7df85dc} 
+\index{TofEvent@{TofEvent}!drs\_dead\_lost\_hits@{drs\_dead\_lost\_hits}}
+\index{drs\_dead\_lost\_hits@{drs\_dead\_lost\_hits}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{drs\_dead\_lost\_hits}{drs\_dead\_lost\_hits}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Tof\+Event\+::drs\+\_\+dead\+\_\+lost\+\_\+hits}
+
+\Hypertarget{structTofEvent_a93a5e3ed22294fd87b5feb815baa573f}\label{structTofEvent_a93a5e3ed22294fd87b5feb815baa573f} 
+\index{TofEvent@{TofEvent}!dsi\_j\_mask@{dsi\_j\_mask}}
+\index{dsi\_j\_mask@{dsi\_j\_mask}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{dsi\_j\_mask}{dsi\_j\_mask}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} Tof\+Event\+::dsi\+\_\+j\+\_\+mask}
+
+\Hypertarget{structTofEvent_a8d60cd8cb0529cf796331347e2c72e9a}\label{structTofEvent_a8d60cd8cb0529cf796331347e2c72e9a} 
+\index{TofEvent@{TofEvent}!event\_id@{event\_id}}
+\index{event\_id@{event\_id}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{event\_id}{event\_id}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} Tof\+Event\+::event\+\_\+id}
+
 \Hypertarget{structTofEvent_a6761856655fb9d74ed6962d09e839275}\label{structTofEvent_a6761856655fb9d74ed6962d09e839275} 
 \index{TofEvent@{TofEvent}!HEAD@{HEAD}}
 \index{HEAD@{HEAD}!TofEvent@{TofEvent}}
@@ -168,20 +230,68 @@ string representation for printing
 \doxysubsubsection{\texorpdfstring{header}{header}}
 {\footnotesize\ttfamily \mbox{\hyperlink{structTofEventHeader}{Tof\+Event\+Header}} Tof\+Event\+::header}
 
+\Hypertarget{structTofEvent_a7ad6ec0cb91fc991d15fd57b2bcc3742}\label{structTofEvent_a7ad6ec0cb91fc991d15fd57b2bcc3742} 
+\index{TofEvent@{TofEvent}!hits@{hits}}
+\index{hits@{hits}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{hits}{hits}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{structTofHit}{Tof\+Hit}}$>$ Tof\+Event\+::hits = \{\}}
+
 \Hypertarget{structTofEvent_a48e8654d0430e19f81d0c1553de6d3cd}\label{structTofEvent_a48e8654d0430e19f81d0c1553de6d3cd} 
 \index{TofEvent@{TofEvent}!mt\_event@{mt\_event}}
 \index{mt\_event@{mt\_event}!TofEvent@{TofEvent}}
 \doxysubsubsection{\texorpdfstring{mt\_event}{mt\_event}}
 {\footnotesize\ttfamily \mbox{\hyperlink{structMasterTriggerEvent}{Master\+Trigger\+Event}} Tof\+Event\+::mt\+\_\+event}
 
+\Hypertarget{structTofEvent_a41d23857f972c5e0718e799485de1086}\label{structTofEvent_a41d23857f972c5e0718e799485de1086} 
+\index{TofEvent@{TofEvent}!mtb\_link\_mask@{mtb\_link\_mask}}
+\index{mtb\_link\_mask@{mtb\_link\_mask}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{mtb\_link\_mask}{mtb\_link\_mask}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} Tof\+Event\+::mtb\+\_\+link\+\_\+mask}
+
+\Hypertarget{structTofEvent_a252735a8afe5cfdb2e2b4463ba5fe2b8}\label{structTofEvent_a252735a8afe5cfdb2e2b4463ba5fe2b8} 
+\index{TofEvent@{TofEvent}!n\_hits\_cbe@{n\_hits\_cbe}}
+\index{n\_hits\_cbe@{n\_hits\_cbe}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{n\_hits\_cbe}{n\_hits\_cbe}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} Tof\+Event\+::n\+\_\+hits\+\_\+cbe}
+
+\Hypertarget{structTofEvent_aaddb05716017021bf5f7fc04e19fb96b}\label{structTofEvent_aaddb05716017021bf5f7fc04e19fb96b} 
+\index{TofEvent@{TofEvent}!n\_hits\_cor@{n\_hits\_cor}}
+\index{n\_hits\_cor@{n\_hits\_cor}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{n\_hits\_cor}{n\_hits\_cor}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} Tof\+Event\+::n\+\_\+hits\+\_\+cor}
+
+\Hypertarget{structTofEvent_a0d3b41d501c6097180bcb9a4f8aae49a}\label{structTofEvent_a0d3b41d501c6097180bcb9a4f8aae49a} 
+\index{TofEvent@{TofEvent}!n\_hits\_umb@{n\_hits\_umb}}
+\index{n\_hits\_umb@{n\_hits\_umb}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{n\_hits\_umb}{n\_hits\_umb}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} Tof\+Event\+::n\+\_\+hits\+\_\+umb}
+
+\Hypertarget{structTofEvent_aecd6332d836aa176d3694b135652cceb}\label{structTofEvent_aecd6332d836aa176d3694b135652cceb} 
+\index{TofEvent@{TofEvent}!n\_trigger\_paddles@{n\_trigger\_paddles}}
+\index{n\_trigger\_paddles@{n\_trigger\_paddles}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{n\_trigger\_paddles}{n\_trigger\_paddles}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} Tof\+Event\+::n\+\_\+trigger\+\_\+paddles}
+
+the number of triggered paddles coming from the MTB directly. This might NOT be the same as the number of hits! \Hypertarget{structTofEvent_a45a531680e727eebdf125b5008287eda}\label{structTofEvent_a45a531680e727eebdf125b5008287eda} 
+\index{TofEvent@{TofEvent}!quality@{quality}}
+\index{quality@{quality}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{quality}{quality}}
+{\footnotesize\ttfamily \mbox{\hyperlink{events_8h_a808d9c1673ae5415c054bc8e143af749}{Event\+Quality}} Tof\+Event\+::quality}
+
 \Hypertarget{structTofEvent_a577628b0f2d6beacc40f6bad1adc135a}\label{structTofEvent_a577628b0f2d6beacc40f6bad1adc135a} 
 \index{TofEvent@{TofEvent}!rb\_events@{rb\_events}}
 \index{rb\_events@{rb\_events}!TofEvent@{TofEvent}}
 \doxysubsubsection{\texorpdfstring{rb\_events}{rb\_events}}
-{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{structRBEvent}{RBEvent}}$>$ Tof\+Event\+::rb\+\_\+events}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{structRBEvent}{RBEvent}}$>$ Tof\+Event\+::rb\+\_\+events = \{\}}
 
 A container holding the individual events from all RBs with triggers in this event ~\newline
- \Hypertarget{structTofEvent_aa8c91b83d5d41aa29711cf65240614b0}\label{structTofEvent_aa8c91b83d5d41aa29711cf65240614b0} 
+ \Hypertarget{structTofEvent_a5b4af5047cd74182eb8a8ee282bff85f}\label{structTofEvent_a5b4af5047cd74182eb8a8ee282bff85f} 
+\index{TofEvent@{TofEvent}!run\_id@{run\_id}}
+\index{run\_id@{run\_id}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{run\_id}{run\_id}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Tof\+Event\+::run\+\_\+id}
+
+\Hypertarget{structTofEvent_aa8c91b83d5d41aa29711cf65240614b0}\label{structTofEvent_aa8c91b83d5d41aa29711cf65240614b0} 
 \index{TofEvent@{TofEvent}!status@{status}}
 \index{status@{status}!TofEvent@{TofEvent}}
 \doxysubsubsection{\texorpdfstring{status}{status}}
@@ -192,6 +302,48 @@ A container holding the individual events from all RBs with triggers in this eve
 \index{TAIL@{TAIL}!TofEvent@{TofEvent}}
 \doxysubsubsection{\texorpdfstring{TAIL}{TAIL}}
 {\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Tof\+Event\+::\+TAIL = 0x5555\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+\Hypertarget{structTofEvent_aed0cb1d43d83ef53463fe58ee49a6927}\label{structTofEvent_aed0cb1d43d83ef53463fe58ee49a6927} 
+\index{TofEvent@{TofEvent}!timestamp16@{timestamp16}}
+\index{timestamp16@{timestamp16}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{timestamp16}{timestamp16}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Tof\+Event\+::timestamp16}
+
+\Hypertarget{structTofEvent_a962e138f0806b8318172bf06a8abe61c}\label{structTofEvent_a962e138f0806b8318172bf06a8abe61c} 
+\index{TofEvent@{TofEvent}!timestamp32@{timestamp32}}
+\index{timestamp32@{timestamp32}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{timestamp32}{timestamp32}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} Tof\+Event\+::timestamp32}
+
+\Hypertarget{structTofEvent_a4fe8bc7dad3166655fec2523b5576932}\label{structTofEvent_a4fe8bc7dad3166655fec2523b5576932} 
+\index{TofEvent@{TofEvent}!tot\_edep\_cbe@{tot\_edep\_cbe}}
+\index{tot\_edep\_cbe@{tot\_edep\_cbe}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{tot\_edep\_cbe}{tot\_edep\_cbe}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} Tof\+Event\+::tot\+\_\+edep\+\_\+cbe}
+
+\Hypertarget{structTofEvent_ae8ae3dc37aad22d7259494bb508d80f1}\label{structTofEvent_ae8ae3dc37aad22d7259494bb508d80f1} 
+\index{TofEvent@{TofEvent}!tot\_edep\_cor@{tot\_edep\_cor}}
+\index{tot\_edep\_cor@{tot\_edep\_cor}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{tot\_edep\_cor}{tot\_edep\_cor}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} Tof\+Event\+::tot\+\_\+edep\+\_\+cor}
+
+\Hypertarget{structTofEvent_a8942a827c03a31427f0add2956cec7a8}\label{structTofEvent_a8942a827c03a31427f0add2956cec7a8} 
+\index{TofEvent@{TofEvent}!tot\_edep\_umb@{tot\_edep\_umb}}
+\index{tot\_edep\_umb@{tot\_edep\_umb}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{tot\_edep\_umb}{tot\_edep\_umb}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} Tof\+Event\+::tot\+\_\+edep\+\_\+umb}
+
+\Hypertarget{structTofEvent_af9dde1bbda7672b13e7c700294ca9832}\label{structTofEvent_af9dde1bbda7672b13e7c700294ca9832} 
+\index{TofEvent@{TofEvent}!trigger\_sources@{trigger\_sources}}
+\index{trigger\_sources@{trigger\_sources}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{trigger\_sources}{trigger\_sources}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Tof\+Event\+::trigger\+\_\+sources}
+
+\Hypertarget{structTofEvent_a561aae271fbed52fe6cda181e1cb9ac3}\label{structTofEvent_a561aae271fbed52fe6cda181e1cb9ac3} 
+\index{TofEvent@{TofEvent}!version@{version}}
+\index{version@{version}!TofEvent@{TofEvent}}
+\doxysubsubsection{\texorpdfstring{version}{version}}
+{\footnotesize\ttfamily \mbox{\hyperlink{namespaceGaps_af99376041829a6c93b2b635455d73910}{Gaps\+::\+Protocol\+Version}} Tof\+Event\+::version}
 
 
 
