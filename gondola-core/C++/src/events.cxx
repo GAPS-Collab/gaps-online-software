@@ -662,62 +662,106 @@ auto TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
   -> Result<TofEvent, g::IOError> {
   spdlog::cfg::load_env_levels();
   TofEvent event = TofEvent();
-  // FIXME - we need more of these checks
-  // update expected_size as we go
-  usize expected_size = 2 // header
-      + 2 // compression & quality
-      + TofEventHeader::SIZE
-      //MasterTriggerEvent can have variable size
-      //+ MasterTriggerEvent::SIZE
-      + 4; // size for hits & rbevents
-  if (stream.size() - pos < expected_size) {
-    spdlog::error("Incomplete readout! Expecting at least {} bytes, but only got {}", expected_size, stream.size());
-    event.status = EventStatus::IncompleteReadout;
-    auto message = std::format("TofEvent can not be parsed from a vector with size {}, when {} bytes are expected!", stream.size(), expected_size);
-    auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
-    return Err(err);
-  }
   spdlog::debug("Start decoding at pos ",pos);
   u16 head = Gaps::parse_u16(stream, pos);
   if (head != TofEvent::HEAD)  {
     spdlog::error("No header signature found!");  
-    event.status = EventStatus::IncompleteReadout;
     auto message = std::format("TofEvent has incorrect header!");
     auto err = g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, message);
     return Err(err);
   }
-  // for now skip quality and compression level
-  pos += 2;
-  auto header      = TofEventHeader::from_bytestream(stream, pos);
-  if (!header.is_ok()) {
-    auto msg = std::format("TofEventHeader corrup!");
-    spdlog::error(msg);
-    auto err = g::IOError(g::IOError::ErrorKind::EventHeaderCorrupt);
-    return Err(err);
+  u8 status_version_u8     = Gaps::parse_u8(stream, pos);
+  event.status             = static_cast<EventStatus>(status_version_u8 & 0x3f);
+  event.version            = (Gaps::ProtocolVersion)(status_version_u8 & 0xc0);
+  event.trigger_sources    = Gaps::parse_u16(stream, pos);
+  event.n_trigger_paddles  = Gaps::parse_u8(stream, pos);
+  event.event_id           = Gaps::parse_u32(stream, pos);
+  if (event.version == Gaps::ProtocolVersion::V1
+    || event.version == Gaps::ProtocolVersion::V3) {
+    event.n_hits_umb       = Gaps::parse_u8(stream, pos); 
+    event.n_hits_cbe       = Gaps::parse_u8(stream, pos); 
+    event.n_hits_cor       = Gaps::parse_u8(stream, pos); 
+    event.tot_edep_umb     = Gaps::parse_f32(stream, pos); 
+    event.tot_edep_cbe     = Gaps::parse_f32(stream, pos); 
+    event.tot_edep_cor     = Gaps::parse_f32(stream, pos); 
   }
-  event.header = header.unwrap();
-  event.mt_event    = MasterTriggerEvent::from_bytestream(stream, pos);
-  //pos += 45; // for now skip master trigger event
-  u32 mask          = Gaps::parse_u32(stream, pos);
-  u32 n_rbevents    = get_n_rbevents(mask);
-  for (u32 k=0; k< n_rbevents; k++) {
-    RBEvent rb_event = RBEvent::from_bytestream(stream, pos);
-    event.rb_events.push_back(rb_event);
-    if (rb_event.status == EventStatus::IncompleteReadout) {
-      event.status = EventStatus::IncompleteReadout;
+  event.quality            = static_cast<EventQuality>(Gaps::parse_u8(stream, pos));
+  event.timestamp32        = Gaps::parse_u32(stream, pos);
+  event.timestamp16        = Gaps::parse_u16(stream, pos);
+  event.run_id             = Gaps::parse_u16(stream, pos);
+  event.drs_dead_lost_hits = Gaps::parse_u16(stream, pos);
+  event.dsi_j_mask         = Gaps::parse_u32(stream, pos);
+  u8 n_channel_masks       = Gaps::parse_u8(stream, pos);
+  while (n_channel_masks > 0) {
+    event.channel_mask.push_back(Gaps::parse_u16(stream, pos));
+    n_channel_masks -= 1;
+  }
+  event.mtb_link_mask      = Gaps::parse_u64(stream, pos);
+  u16 nhits                = Gaps::parse_u16(stream, pos);
+  if (nhits > 160) {
+    spdlog::error("There are way too many hits in this event (more than 160)!");  
+    auto message = std::format("TofEvent has too many hits (more than paddles)!");
+    auto err = g::IOError(g::IOError::ErrorKind::StreamTooLong, message);
+    return Err(err);
+  } 
+  while (nhits > 0) {
+    event.hits.push_back(TofHit::from_bytestream(stream, pos));
+    nhits -= 1;
+  }
+  if (event.version == Gaps::ProtocolVersion::V2 
+    || event.version == Gaps::ProtocolVersion::V3) {
+    u8 n_rb_events = Gaps::parse_u8(stream, pos);
+    while (n_rb_events > 0) {
+      event.rb_events.push_back(RBEvent::from_bytestream(stream, pos));
+      n_rb_events -= 1;
     }
   }
-
-  //  event.compression_level = CompressionLevel::from_u8(&parse_u8(stream, pos));
-  //  event.quality           = EventQuality::from_u8(&parse_u8(stream, pos));
+  u16 tail = Gaps::parse_u16(stream, pos);
+  if (tail != TofEvent::TAIL) {
+    auto message = std::format("Decoding of TAIL failed! Got {} instead!", tail);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongTailBytes, message);
+    return Err(err);
+  }
   return Ok(event);
+  //}
+  
+
+  //// for now skip quality and compression level
+  //pos += 2;
+  //auto header      = TofEventHeader::from_bytestream(stream, pos);
+  //if (!header.is_ok()) {
+  //  auto msg = std::format("TofEventHeader corrup!");
+  //  spdlog::error(msg);
+  //  auto err = g::IOError(g::IOError::ErrorKind::EventHeaderCorrupt);
+  //  return Err(err);
+  //}
+  //event.header = header.unwrap();
+  //event.mt_event    = MasterTriggerEvent::from_bytestream(stream, pos);
+  ////pos += 45; // for now skip master trigger event
+  //u32 mask          = Gaps::parse_u32(stream, pos);
+  //u32 n_rbevents    = get_n_rbevents(mask);
+  //for (u32 k=0; k< n_rbevents; k++) {
+  //  RBEvent rb_event = RBEvent::from_bytestream(stream, pos);
+  //  event.rb_events.push_back(rb_event);
+  //  if (rb_event.status == EventStatus::IncompleteReadout) {
+  //    event.status = EventStatus::IncompleteReadout;
+  //  }
+  //}
+
+  ////  event.compression_level = CompressionLevel::from_u8(&parse_u8(stream, pos));
+  ////  event.quality           = EventQuality::from_u8(&parse_u8(stream, pos));
+  //return Ok(event);
 }
   
 /**********************************************************/
 
 TofEvent TofEvent::from_tofpacket(const TofPacket &packet) {
   TofEvent event;
-  if (packet.packet_type != PacketType::TofEvent) {
+  if (packet.packet_type == PacketType::TofEvent) {
+    spdlog::error("Gondola v0.11 can not read TofEvents from prior the 25/26 Antarctic season. anymore. If you desire to read them, please use v0.10 instead");
+    return event;
+  }
+  if (packet.packet_type != PacketType::TofEventSummary) {
     spdlog::error("Wrong packet type! {}", packet_type_to_string(packet.packet_type));
     return event;
   } 
@@ -1000,11 +1044,62 @@ Vec<TofHit> TofEvent::get_hits() const {
 }
 
 std::string TofEvent::to_string() const {
-  std::string repr = "<TofEvent\n";
-  repr += "  " + header.to_string()   + "\n";
-  repr += "  " + mt_event.to_string() + "\n";
-  repr += ".. .. ..\n";
-  repr += "  n RBEvents    : " + std::to_string(rb_events.size() )     ;
+  std::string repr = std::format("<TofEvent (version {})", Gaps::pversion_to_string(version));
+  //repr += &(format!("\n  EventID          : {}", self.event_id));
+  //repr += &(format!("\n  RunID            : {}", self.run_id));
+  //repr += &(format!("\n  EventStatus      : {}", self.status));
+  //repr += &(format!("\n  TriggerSources   : {:?}", self.get_trigger_sources()));
+  //repr += &(format!("\n  NTrigPaddles     : {}", self.n_trigger_paddles));
+  //repr += &(format!("\n  DRS dead hits    : {}", self.drs_dead_lost_hits));
+  //repr += &(format!("\n  timestamp32      : {}", self.timestamp32)); 
+  //repr += &(format!("\n  timestamp16      : {}", self.timestamp16)); 
+  //repr += &(format!("\n   |-> timestamp48 : {}", self.get_timestamp48())); 
+  ////repr += &(format!("\n  mt_tiu_gps16     : {}", self.mt_tiu_gps16));
+  ////repr += &(format!("\n  mt_tiu_gps32     : {}", self.mt_tiu_gps32)); 
+  ////repr += &(format!("\n  mt_timestamp     : {}", self.mt_timestamp));
+  ////repr += &(format!("\n  mt_tiu_timestamp : {}", self.mt_tiu_timestamp));
+  ////repr += &(format!("\n  gps timestamp    : {}", self.get_mt_timestamp_abs()));
+  ////repr += &(format!("\n  PrimaryBeta      : {}", self.get_beta())); 
+  ////repr += &(format!("\n  PrimaryCharge    : {}", self.primary_charge));
+  //if self.version == ProtocolVersion::V1 {
+  //  repr += "\n ---- V1 variables ----";
+  //  repr += &(format!("\n n_hits_umb   : {}", self.n_hits_umb  )); 
+  //  repr += &(format!("\n n_hits_cbe   : {}", self.n_hits_cbe  )); 
+  //  repr += &(format!("\n n_hits_cor   : {}", self.n_hits_cor  )); 
+  //  repr += &(format!("\n tot_edep_umb : {}", self.tot_edep_umb)); 
+  //  repr += &(format!("\n tot_edep_cbe : {}", self.tot_edep_cbe)); 
+  //  repr += &(format!("\n tot_edep_cor : {}", self.tot_edep_cor)); 
+  //}
+  //repr += &(format!("\n  ** ** TRIGGER HITS (DSI/J/CH) [{} LTBS] ** **", self.dsi_j_mask.count_ones()));
+  //for k in self.get_trigger_hits() {
+  //  repr += &(format!("\n  => {}/{}/({},{}) ({}) ", k.0, k.1, k.2.0, k.2.1, k.3));
+  //}
+  //repr += "\n  ** ** MTB LINK IDs ** **";
+  //let mut mtblink_str = String::from("\n  => ");
+  //for k in self.get_rb_link_ids() {
+  //  mtblink_str += &(format!("{} ", k))
+  //}
+  //repr += &mtblink_str;
+  //repr += &(format!("\n  == Trigger hits {}, expected RBEvents {}",
+  //        self.get_trigger_hits().len(),
+  //        self.get_rb_link_ids().len()));
+  //repr += &String::from("\n  ** ** ** HITS ** ** **");
+  //for h in &self.hits {
+  //  repr += &(format!("\n  {}", h));
+  //}
+  //if self.rb_events.len() > 0 {
+  //  repr += &format!("\n -- has {} RBEvents with waveforms!", self.rb_events.len());
+  //  repr += "\n -- -- boards: ";
+  //  for b in &self.rb_events {
+  //    repr += &format!("{} ", b.header.rb_id);
+  //  }
+  //}
+  //repr += ">";
+  //std::string repr = "<TofEvent\n";
+  ////repr += "  " + header.to_string()   + "\n";
+  ////repr += "  " + mt_event.to_string() + "\n";
+  //repr += ".. .. ..\n";
+  //repr += "  n RBEvents    : " + std::to_string(rb_events.size() )     ;
   return repr;
 }
 
