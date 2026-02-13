@@ -5,6 +5,7 @@
 //! avoid pulling in the dependency
 //!
 
+#include <memory>
 #include "tof_typedefs.h"
 #include "result/result.h"
 #include "events.h"
@@ -83,13 +84,20 @@ namespace Gaps {
     };
 
     struct Packet {
+      auto to_string() const -> std::string;
+      auto is_event_packet() const -> bool;
+      
+      static auto from_bytestream(Vec<u8> const &stream, usize &pos) -> Packet;
+       
       PacketHeader header;
       Vec<u8> payload;
-      auto to_string() const -> std::string;
-      static auto from_bytestream(Vec<u8> const &stream, usize &pos) -> Packet;
+      #ifdef BUILD_CXX_DB
+      /// The map of all paddles. This is needed later on to look up properties 
+      /// of the TOF paddles when we are unpacking events 
+      Gaps::TofPaddleMapPtr paddles;
+      #endif 
     };
    
-
     struct TrkHeader {
        static constexpr u16 SIZE = 17; 
        static constexpr u16 HEAD = 0x90eb;
@@ -214,20 +222,11 @@ namespace Gaps {
        auto to_string() const -> std::string;
        
        static auto from_bytestream(Vec<u8> const &stream, usize &pos)
-        -> r::Result<Cooling, Gaps::IOError>;
+        -> r::Result<Cooling, Gaps::IOError>;   
     };
 
     /// The actual merged event sent over telemetry 
     struct MergedEvent {
-     // bfsw::header header;
-     // uint8_t flags0 {0};
-     // uint64_t row_flags {0};
-     // uint32_t event_id {0xffffffff};
-     // uint8_t num_tof_hits {0};
-     // std::vector<uint8_t> tof_data;
-     // std::vector<tracker_hit> tracker_hits;
-     // std::vector<uint64_t> tracker_oscillators;
-      
       PacketHeader    header         = PacketHeader();
       u8              version        = 0;
       u8              flags0         = 0;
@@ -246,7 +245,11 @@ namespace Gaps {
       Vec<u64>        tracker_oscillators = Vec<u64>(10,0) ;
     
       auto to_string() const -> std::string;
+
       static auto from_bytestream(Vec<u8> const &stream, usize &pos)
+        -> r::Result<MergedEvent, Gaps::IOError>;
+      
+      static auto from_telemetrypacket(Packet const &packet) 
         -> r::Result<MergedEvent, Gaps::IOError>;
     };
   }

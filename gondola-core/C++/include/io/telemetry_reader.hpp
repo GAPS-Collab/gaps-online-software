@@ -9,6 +9,9 @@
 #include "tof_typedefs.h"
 #include "telemetry_dataclasses.hpp"
 #include "io.hpp"
+#ifdef BUILD_CXX_DB
+#include "database.h"
+#endif 
 
 namespace gondola {
 
@@ -59,6 +62,12 @@ namespace gondola {
 
     /// Restart the reading of packets from the beginning of the underlying buffers 
     auto rewind() -> void;
+    
+    #ifdef BUILD_CXX_DB 
+    /// The map of all paddles. This is needed later on to look up properties 
+    /// of the TOF paddles when we are unpacking events 
+    Gaps::TofPaddleMapPtr paddles = nullptr; 
+    #endif 
 
     private:
       /// Indicate if the reader has run out of 
@@ -108,9 +117,9 @@ namespace gondola {
       HashMap<TelemetryPacketType, u64> packet_index_;
       /// This is only used in cached mode and will contain the whole file 
       /// deserialized as packets 
-      Vec<TelemetryPacket> packet_cache_ = {};
+      Vec<TelemetryPacket> packet_cache_  = {};
       /// An indicator set internally during the caching process 
-      bool in_caching_ = false; 
+      bool in_caching_ = false;
   };
 }
 

@@ -85,8 +85,7 @@ auto gtl::PacketHeader::to_bytestream() const -> Vec<u8> {
   bytes.insert(bytes.end(),ts_byt.begin(), ts_byt.end());
   bytes.insert(bytes.end(),co_byt.begin(), co_byt.end());
   bytes.insert(bytes.end(),le_byt.begin(), le_byt.end());
-  bytes.insert(bytes.end(),ch_byt.begin(), ch_byt.end()); 
-  
+  bytes.insert(bytes.end(),ch_byt.begin(), ch_byt.end());  
   return bytes;
 }
 
@@ -135,6 +134,14 @@ auto  gtl::Packet::from_bytestream(Vec<u8> const &stream,
   packet.payload = std::move(payload);
   return packet;
 }
+
+auto gtl::Packet::is_event_packet() const -> bool {
+  return header.ptype == gtl::BfswPacketType::InterestingEvent   || 
+         header.ptype == gtl::BfswPacketType::BoringEvent        || 
+         header.ptype == gtl::BfswPacketType::NoGapsTriggerEvent || 
+         header.ptype == gtl::BfswPacketType::NoTofDataEvent;      
+}
+
 
 auto gtl::Packet::to_string() const -> std::string {
   std::string repr = "<TelemetryPacket:";
@@ -484,6 +491,18 @@ auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
   }
   return Ok(evt);
 }  
+      
+auto gtl::MergedEvent::from_telemetrypacket(Packet const &packet) 
+  -> r::Result<MergedEvent, Gaps::IOError> {
+  usize pos = 0;
+  auto  res = gtl::MergedEvent::from_bytestream(packet.payload, pos);
+  if (res.is_err()) {
+    return res;
+  }  
+  auto ev = res.unwrap();
+  ev.tof_event.set_paddlemap(*packet.paddles);
+  return Ok(ev); 
+}
 
 auto gtl::Cooling::to_string() const -> std::string {
   std::string repr = "<Cooling";
