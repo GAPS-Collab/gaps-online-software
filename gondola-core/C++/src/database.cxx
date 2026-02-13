@@ -1,4 +1,4 @@
-#ifdef BUILD_CXXDB
+#ifdef BUILD_CXX_DB
 #include <cmath>
 #include <cstdlib>
 #include <format>
