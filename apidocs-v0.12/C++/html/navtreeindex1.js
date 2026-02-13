@@ -1,5 +1,7 @@
 var NAVTREEINDEX1 =
 {
+"functions_vars_f.html":[4,3,2,5],
+"functions_vars_g.html":[4,3,2,6],
 "functions_vars_h.html":[4,3,2,7],
 "functions_vars_i.html":[4,3,2,8],
 "functions_vars_j.html":[4,3,2,9],
@@ -247,7 +249,5 @@ var NAVTREEINDEX1 =
 "sd__legacy_8hpp_source.html":[5,0,1,0,0,11],
 "sd__legacy__linkdef_8hpp.html":[5,0,1,0,0,12],
 "sd__legacy__linkdef_8hpp_source.html":[5,0,1,0,0,12],
-"serialization_8cxx.html":[5,0,1,0,2,9],
-"serialization_8cxx.html#a161589e260d7887722decb470b42f95c":[5,0,1,0,2,9,0],
-"serialization_8cxx.html#a6ec24b72b5348677acd90433c37ba46f":[5,0,1,0,2,9,1]
+"serialization_8cxx.html":[5,0,1,0,2,9]
 };

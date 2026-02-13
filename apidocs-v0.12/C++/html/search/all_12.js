@@ -40,12 +40,13 @@ var searchData=
   ['status_5fversion_37',['status_version',['../structGaps_1_1Telemetry_1_1TofMetaData.html#afe0fb7a588c76739d7b895c3efca9ea7',1,'Gaps::Telemetry::TofMetaData']]],
   ['stop_5fcell_38',['stop_cell',['../structgondola_1_1RBEventHeader.html#a4b7e2b1f911f992c4f7dd030c9091f09',1,'gondola::RBEventHeader::stop_cell'],['../structgondola_1_1RBWaveform.html#ae864eb8d95798eeedc43316f489d0ad1',1,'gondola::RBWaveform::stop_cell']]],
   ['streamanyevent_39',['StreamAnyEvent',['../commands_8h.html#ad6d9706eb4e1aa6ed956444c5cd2a3b5ad05712d903c22c0e3d0e3e21c7777031',1,'commands.h']]],
-  ['streamtooshort_40',['StreamTooShort',['../classGaps_1_1IOError.html#aef5d09096037b3efe50862e2b52a9872a7700d8c06be44e20cc35c7b67bb196a6',1,'Gaps::IOError']]],
-  ['string_41',['String',['../tof__typedefs_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff',1,'tof_typedefs.h']]],
-  ['strip_5fid_42',['strip_id',['../structGaps_1_1TrackerStripPedestal.html#aca13ac1203f15345a15b02ec1b2023fd',1,'Gaps::TrackerStripPedestal::strip_id'],['../structGaps_1_1Telemetry_1_1TrkCalibratedHit.html#a61072e6c7a5837ddb82586977c7390a0',1,'Gaps::Telemetry::TrkCalibratedHit::strip_id'],['../structGaps_1_1TrackerStrip.html#afaa320d3de4eda8511d99f09a332bcbc',1,'Gaps::TrackerStrip::strip_id'],['../structGaps_1_1TrackerStripMask.html#a75cea43b16f4702e7e0656da23b4c233',1,'Gaps::TrackerStripMask::strip_id']]],
-  ['success_43',['Success',['../commands_8h.html#aee4b019262fd08438aee34c463daaad3a505a83f220c02df2f85c3810cd9ceb38',1,'commands.h']]],
-  ['survivalpacket_44',['SurvivalPacket',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7af6cc65b9a4c2c3fe30bf8fe8e1bb8ef4',1,'Gaps::Telemetry']]],
-  ['sync_45',['sync',['../structGaps_1_1Telemetry_1_1TrkHeader.html#aec86f70dc83552644ed1a90653863157',1,'Gaps::Telemetry::TrkHeader::sync'],['../structGaps_1_1Telemetry_1_1PacketHeader.html#ae08b78f8e0bb397be1a2796f69d59caa',1,'Gaps::Telemetry::PacketHeader::sync']]],
-  ['sys_5fid_46',['sys_id',['../structGaps_1_1Telemetry_1_1TrkHeader.html#a761e8eabe4c6b6655ecc4a515ca71678',1,'Gaps::Telemetry::TrkHeader']]],
-  ['sys_5ftime_47',['sys_time',['../structGaps_1_1Telemetry_1_1TrkHeader.html#ac1157e0c2a03d8a75920184f5e29dcf6',1,'Gaps::Telemetry::TrkHeader']]]
+  ['streamtoolong_40',['StreamTooLong',['../classGaps_1_1IOError.html#aef5d09096037b3efe50862e2b52a9872a13f7dd88a736896765373ad7d8ad76b0',1,'Gaps::IOError']]],
+  ['streamtooshort_41',['StreamTooShort',['../classGaps_1_1IOError.html#aef5d09096037b3efe50862e2b52a9872a7700d8c06be44e20cc35c7b67bb196a6',1,'Gaps::IOError']]],
+  ['string_42',['String',['../tof__typedefs_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff',1,'tof_typedefs.h']]],
+  ['strip_5fid_43',['strip_id',['../structGaps_1_1TrackerStripMask.html#a75cea43b16f4702e7e0656da23b4c233',1,'Gaps::TrackerStripMask::strip_id'],['../structGaps_1_1TrackerStripPedestal.html#aca13ac1203f15345a15b02ec1b2023fd',1,'Gaps::TrackerStripPedestal::strip_id'],['../structGaps_1_1Telemetry_1_1TrkCalibratedHit.html#a61072e6c7a5837ddb82586977c7390a0',1,'Gaps::Telemetry::TrkCalibratedHit::strip_id'],['../structGaps_1_1TrackerStrip.html#afaa320d3de4eda8511d99f09a332bcbc',1,'Gaps::TrackerStrip::strip_id']]],
+  ['success_44',['Success',['../commands_8h.html#aee4b019262fd08438aee34c463daaad3a505a83f220c02df2f85c3810cd9ceb38',1,'commands.h']]],
+  ['survivalpacket_45',['SurvivalPacket',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7af6cc65b9a4c2c3fe30bf8fe8e1bb8ef4',1,'Gaps::Telemetry']]],
+  ['sync_46',['sync',['../structGaps_1_1Telemetry_1_1PacketHeader.html#ae08b78f8e0bb397be1a2796f69d59caa',1,'Gaps::Telemetry::PacketHeader::sync'],['../structGaps_1_1Telemetry_1_1TrkHeader.html#aec86f70dc83552644ed1a90653863157',1,'Gaps::Telemetry::TrkHeader::sync']]],
+  ['sys_5fid_47',['sys_id',['../structGaps_1_1Telemetry_1_1TrkHeader.html#a761e8eabe4c6b6655ecc4a515ca71678',1,'Gaps::Telemetry::TrkHeader']]],
+  ['sys_5ftime_48',['sys_time',['../structGaps_1_1Telemetry_1_1TrkHeader.html#ac1157e0c2a03d8a75920184f5e29dcf6',1,'Gaps::Telemetry::TrkHeader']]]
 ];
