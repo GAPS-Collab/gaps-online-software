@@ -28,6 +28,8 @@ Collaboration diagram for Gaps\+::Telemetry\+::Merged\+Event\+:
 \begin{DoxyCompactItemize}
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_aa8620c44973659b3db75d3ca905b7720}{from\+\_\+bytestream}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{stream}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}}) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent}{Merged\+Event}}, \mbox{\hyperlink{classGaps_1_1IOError}{Gaps\+::\+IOError}} $>$
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent_ac8dd3e46bf05cc351b24a544aac48d4c}{from\+\_\+telemetrypacket}} (\mbox{\hyperlink{structGaps_1_1Telemetry_1_1Packet}{Packet}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{packet}}) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent}{Merged\+Event}}, \mbox{\hyperlink{classGaps_1_1IOError}{Gaps\+::\+IOError}} $>$
 \end{DoxyCompactItemize}
 \doxysubsubsection*{Public Attributes}
 \begin{DoxyCompactItemize}
@@ -75,6 +77,12 @@ The actual merged event sent over telemetry.
 \index{from\_bytestream@{from\_bytestream}!Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}}
 \doxysubsubsection{\texorpdfstring{from\_bytestream()}{from\_bytestream()}}
 {\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} Gaps\+::\+Telemetry\+::\+Merged\+Event\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&}]{stream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&}]{pos }\end{DoxyParamCaption}) -\/$>$ r\+::\+Result$<$\mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent}{Merged\+Event}}, \mbox{\hyperlink{classGaps_1_1IOError}{Gaps\+::\+IOError}}$>$\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{structGaps_1_1Telemetry_1_1MergedEvent_ac8dd3e46bf05cc351b24a544aac48d4c}\label{structGaps_1_1Telemetry_1_1MergedEvent_ac8dd3e46bf05cc351b24a544aac48d4c} 
+\index{Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}!from\_telemetrypacket@{from\_telemetrypacket}}
+\index{from\_telemetrypacket@{from\_telemetrypacket}!Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}}
+\doxysubsubsection{\texorpdfstring{from\_telemetrypacket()}{from\_telemetrypacket()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} Gaps\+::\+Telemetry\+::\+Merged\+Event\+::from\+\_\+telemetrypacket (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structGaps_1_1Telemetry_1_1Packet}{Packet}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&}]{packet }\end{DoxyParamCaption}) -\/$>$ r\+::\+Result$<$\mbox{\hyperlink{structGaps_1_1Telemetry_1_1MergedEvent}{Merged\+Event}}, \mbox{\hyperlink{classGaps_1_1IOError}{Gaps\+::\+IOError}}$>$\hspace{0.3cm}{\ttfamily [static]}}
 
 \Hypertarget{structGaps_1_1Telemetry_1_1MergedEvent_a52e74d2a0e00fe11d6ec0cee88324586}\label{structGaps_1_1Telemetry_1_1MergedEvent_a52e74d2a0e00fe11d6ec0cee88324586} 
 \index{Gaps::Telemetry::MergedEvent@{Gaps::Telemetry::MergedEvent}!to\_string@{to\_string}}

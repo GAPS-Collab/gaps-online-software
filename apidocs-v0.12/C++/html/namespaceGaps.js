@@ -10,6 +10,7 @@ var namespaceGaps =
     [ "DsiJChnPaddleIdMap", "namespaceGaps.html#ac562c67ce894d03edeecb6332caa86ac", null ],
     [ "RbIdChannelPaddleIdMap", "namespaceGaps.html#a5d656056027834e42a559636af22f086", null ],
     [ "TofPaddleMap", "namespaceGaps.html#a84fb383b1df4955afc6ea35a9b15ff44", null ],
+    [ "TofPaddleMapPtr", "namespaceGaps.html#a7a85a7cae5335dbd5b3ef8d6154867a1", null ],
     [ "TrkStripMap", "namespaceGaps.html#aa4fc4eae2e6dcffb30da7c6d1a3e3e64", null ],
     [ "TrkStripMaskMap", "namespaceGaps.html#ab973cc2b0495c49012fb17667010ef42", null ],
     [ "TrkStripPedMap", "namespaceGaps.html#afdf1ea5d924eac5baad0144da1280503", null ],

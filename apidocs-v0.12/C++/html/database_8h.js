@@ -8,6 +8,7 @@ var database_8h =
     [ "DsiJChnPaddleIdMap", "database_8h.html#ac562c67ce894d03edeecb6332caa86ac", null ],
     [ "RbIdChannelPaddleIdMap", "database_8h.html#a5d656056027834e42a559636af22f086", null ],
     [ "TofPaddleMap", "database_8h.html#a84fb383b1df4955afc6ea35a9b15ff44", null ],
+    [ "TofPaddleMapPtr", "database_8h.html#a7a85a7cae5335dbd5b3ef8d6154867a1", null ],
     [ "TofPaddleTimingConstantMap", "database_8h.html#a1c2c2768738a98e4ab3c0aa6d31d88e0", null ],
     [ "TrkStripMap", "database_8h.html#aa4fc4eae2e6dcffb30da7c6d1a3e3e64", null ],
     [ "TrkStripMaskMap", "database_8h.html#ab973cc2b0495c49012fb17667010ef42", null ],

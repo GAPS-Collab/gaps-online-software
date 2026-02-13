@@ -19,6 +19,7 @@ var structgondola_1_1TofHit =
     [ "get_tot_slp_low_a", "structgondola_1_1TofHit.html#a20c6ff38f9cc1bb8ef4eeee934c5bf49", null ],
     [ "get_tot_slp_low_b", "structgondola_1_1TofHit.html#a24b5811d4f20f7a95b08a92e93e2fba0", null ],
     [ "get_x_pos", "structgondola_1_1TofHit.html#ad80954f3ed8a015ab6854fa4e751deac", null ],
+    [ "obeys_causality", "structgondola_1_1TofHit.html#ab10a77371c2af49e68b9dc082ab1edba", null ],
     [ "set_paddle_len", "structgondola_1_1TofHit.html#aed83c72add3ace3a7948285b73fa61e9", null ],
     [ "to_string", "structgondola_1_1TofHit.html#a2d6afbbbe4ba5751eed4241dbdd66915", null ],
     [ "baseline_a", "structgondola_1_1TofHit.html#a948319242243d19f27c8fc6f251a94a6", null ],

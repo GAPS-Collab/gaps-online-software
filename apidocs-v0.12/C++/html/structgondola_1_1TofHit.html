@@ -124,6 +124,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad80954f3ed8a015ab6854fa4e751deac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad48101b6e5f39e4f34878150a4d9304d" id="r_ad48101b6e5f39e4f34878150a4d9304d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1TofHit.html#ad48101b6e5f39e4f34878150a4d9304d">get_t_avg</a> () <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> -&gt; <a class="el" href="tof__typedefs_8h.html#a5f6906312a689f27d70e9d086649d3fd">f32</a></td></tr>
 <tr class="separator:ad48101b6e5f39e4f34878150a4d9304d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab10a77371c2af49e68b9dc082ab1edba" id="r_ab10a77371c2af49e68b9dc082ab1edba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1TofHit.html#ab10a77371c2af49e68b9dc082ab1edba">obeys_causality</a> () <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> -&gt; <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">bool</a></td></tr>
+<tr class="separator:ab10a77371c2af49e68b9dc082ab1edba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b17224c907026ea21ab14ff7a2fbdd8" id="r_a3b17224c907026ea21ab14ff7a2fbdd8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1TofHit.html#a3b17224c907026ea21ab14ff7a2fbdd8">get_t0_relative</a> () <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> -&gt; <a class="el" href="tof__typedefs_8h.html#a5f6906312a689f27d70e9d086649d3fd">f32</a></td></tr>
 <tr class="separator:a3b17224c907026ea21ab14ff7a2fbdd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9ade98a4514a988221771f11de295985" id="r_a9ade98a4514a988221771f11de295985"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1TofHit.html#a9ade98a4514a988221771f11de295985">get_timestamp48</a> () <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> -&gt; <a class="el" href="tof__typedefs_8h.html#a94dab5770726ccbef8c7d026cfbdf8e5">f64</a></td></tr>
@@ -566,6 +568,25 @@ Static Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab10a77371c2af49e68b9dc082ab1edba" name="ab10a77371c2af49e68b9dc082ab1edba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab10a77371c2af49e68b9dc082ab1edba">&#9670;&#160;</a></span>obeys_causality()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a> gondola::TofHit::obeys_causality </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const -&gt; <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">bool</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>If the two reconstructed pulse times are not related to each other by the paddle length, meaning that they can't be caused by the same event, we dub this hit as "not following
+causality" </p>
 
 </div>
 </div>

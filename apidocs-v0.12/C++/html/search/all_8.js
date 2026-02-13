@@ -13,9 +13,10 @@ var searchData=
   ['io_2ehpp_10',['io.hpp',['../io_8hpp.html',1,'']]],
   ['ioerror_11',['ioerror',['../classGaps_1_1IOError.html#af4acdf9e0ef65cc786cfc9f9ddb96942',1,'Gaps::IOError::IOError()'],['../classGaps_1_1IOError.html',1,'Gaps::IOError']]],
   ['is_5fevent_5ffragment_12',['is_event_fragment',['../structgondola_1_1RBEventHeader.html#a435a6d837823f920932830c313fa5117',1,'gondola::RBEventHeader']]],
-  ['is_5fexhausted_13',['is_exhausted',['../structgondola_1_1TelemetryPacketReader.html#a16cf37c876f8496252347f8c21939b2f',1,'gondola::TelemetryPacketReader::is_exhausted()'],['../classGaps_1_1TofPacketReader.html#a8aca7f3a4a9658a11040279899e5db6f',1,'Gaps::TofPacketReader::is_exhausted()'],['../structgondola_1_1CRReader.html#ad5439dcba3fe2eb69daf07815d7630be',1,'gondola::CRReader::is_exhausted() const -&gt; bool']]],
-  ['is_5ffrom_5ftelemetry_14',['is_from_telemetry',['../structgondola_1_1CRReader.html#ad5e490135ee09200d6551ecf505e64ac',1,'gondola::CRReader']]],
-  ['is_5flocked_15',['is_locked',['../structgondola_1_1RBEventHeader.html#a6b707ca1f4a53886c91b5035dcc0ebab',1,'gondola::RBEventHeader']]],
-  ['is_5flocked_5flast_5fsec_16',['is_locked_last_sec',['../structgondola_1_1RBEventHeader.html#a812ffbae6aae1269f074dc578b747bcf',1,'gondola::RBEventHeader']]],
-  ['is_5fmean_5fvalue_17',['is_mean_value',['../structGaps_1_1TrackerStripPedestal.html#a69383529aae6c203477ab843e10e90ce',1,'Gaps::TrackerStripPedestal']]]
+  ['is_5fevent_5fpacket_13',['is_event_packet',['../structGaps_1_1Telemetry_1_1Packet.html#a11ab3bb6123bf0e8776c1e862bcc07c8',1,'Gaps::Telemetry::Packet']]],
+  ['is_5fexhausted_14',['is_exhausted',['../structgondola_1_1TelemetryPacketReader.html#a16cf37c876f8496252347f8c21939b2f',1,'gondola::TelemetryPacketReader::is_exhausted()'],['../classGaps_1_1TofPacketReader.html#a8aca7f3a4a9658a11040279899e5db6f',1,'Gaps::TofPacketReader::is_exhausted()'],['../structgondola_1_1CRReader.html#ad5439dcba3fe2eb69daf07815d7630be',1,'gondola::CRReader::is_exhausted() const -&gt; bool']]],
+  ['is_5ffrom_5ftelemetry_15',['is_from_telemetry',['../structgondola_1_1CRReader.html#ad5e490135ee09200d6551ecf505e64ac',1,'gondola::CRReader']]],
+  ['is_5flocked_16',['is_locked',['../structgondola_1_1RBEventHeader.html#a6b707ca1f4a53886c91b5035dcc0ebab',1,'gondola::RBEventHeader']]],
+  ['is_5flocked_5flast_5fsec_17',['is_locked_last_sec',['../structgondola_1_1RBEventHeader.html#a812ffbae6aae1269f074dc578b747bcf',1,'gondola::RBEventHeader']]],
+  ['is_5fmean_5fvalue_18',['is_mean_value',['../structGaps_1_1TrackerStripPedestal.html#a69383529aae6c203477ab843e10e90ce',1,'Gaps::TrackerStripPedestal']]]
 ];

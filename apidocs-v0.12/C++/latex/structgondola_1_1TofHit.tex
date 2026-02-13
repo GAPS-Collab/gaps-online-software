@@ -25,6 +25,8 @@
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TofHit_ad48101b6e5f39e4f34878150a4d9304d}{get\+\_\+t\+\_\+avg}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}
 \item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TofHit_ab10a77371c2af49e68b9dc082ab1edba}{obeys\+\_\+causality}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}}
+\item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TofHit_a3b17224c907026ea21ab14ff7a2fbdd8}{get\+\_\+t0\+\_\+relative}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TofHit_a9ade98a4514a988221771f11de295985}{get\+\_\+timestamp48}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a94dab5770726ccbef8c7d026cfbdf8e5}{f64}}
@@ -224,7 +226,13 @@ the slope of the waveform at the point of the intersection of the lower threshol
 \doxysubsubsection{\texorpdfstring{get\_x\_pos()}{get\_x\_pos()}}
 {\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tof\+Hit\+::get\+\_\+x\+\_\+pos (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}}
 
-\Hypertarget{structgondola_1_1TofHit_aed83c72add3ace3a7948285b73fa61e9}\label{structgondola_1_1TofHit_aed83c72add3ace3a7948285b73fa61e9} 
+\Hypertarget{structgondola_1_1TofHit_ab10a77371c2af49e68b9dc082ab1edba}\label{structgondola_1_1TofHit_ab10a77371c2af49e68b9dc082ab1edba} 
+\index{gondola::TofHit@{gondola::TofHit}!obeys\_causality@{obeys\_causality}}
+\index{obeys\_causality@{obeys\_causality}!gondola::TofHit@{gondola::TofHit}}
+\doxysubsubsection{\texorpdfstring{obeys\_causality()}{obeys\_causality()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tof\+Hit\+::obeys\+\_\+causality (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}}}
+
+If the two reconstructed pulse times are not related to each other by the paddle length, meaning that they can\textquotesingle{}t be caused by the same event, we dub this hit as "{}not following causality"{} \Hypertarget{structgondola_1_1TofHit_aed83c72add3ace3a7948285b73fa61e9}\label{structgondola_1_1TofHit_aed83c72add3ace3a7948285b73fa61e9} 
 \index{gondola::TofHit@{gondola::TofHit}!set\_paddle\_len@{set\_paddle\_len}}
 \index{set\_paddle\_len@{set\_paddle\_len}!gondola::TofHit@{gondola::TofHit}}
 \doxysubsubsection{\texorpdfstring{set\_paddle\_len()}{set\_paddle\_len()}}

@@ -101,7 +101,8 @@ $(document).ready(function(){initNavTree('database_8h.html',''); initResizable()
   <div class="headertitle"><div class="title">database.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="tof__typedefs_8h_source.html">tof_typedefs.h</a>&quot;</code><br />
+<div class="textblock"><code>#include &lt;memory&gt;</code><br />
+<code>#include &quot;<a class="el" href="tof__typedefs_8h_source.html">tof_typedefs.h</a>&quot;</code><br />
 <code>#include &quot;sqlite_orm.h&quot;</code><br />
 <code>#include &lt;map&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
@@ -109,22 +110,24 @@ Include dependency graph for database.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="database_8h__incl.png" border="0" usemap="#a_2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2include_2database_8h" alt=""/></div>
 <map name="a_2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2include_2database_8h" id="a_2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2include_2database_8h">
-<area shape="rect" title=" " alt="" coords="74,5,291,75"/>
-<area shape="rect" href="tof__typedefs_8h.html" title=" " alt="" coords="125,123,241,148"/>
-<area shape="poly" title=" " alt="" coords="185,75,185,109,180,109,180,75"/>
-<area shape="rect" title=" " alt="" coords="5,196,56,221"/>
-<area shape="poly" title=" " alt="" coords="154,77,52,188,48,184,150,73"/>
-<area shape="rect" title=" " alt="" coords="265,123,367,148"/>
-<area shape="poly" title=" " alt="" coords="232,73,290,112,286,117,229,77"/>
-<area shape="rect" title=" " alt="" coords="81,196,143,221"/>
-<area shape="poly" title=" " alt="" coords="173,150,135,188,131,184,169,146"/>
-<area shape="poly" title=" " alt="" coords="159,150,69,193,67,188,157,146"/>
-<area shape="rect" title=" " alt="" coords="167,196,238,221"/>
-<area shape="poly" title=" " alt="" coords="189,148,198,182,193,184,183,149"/>
-<area shape="rect" title=" " alt="" coords="263,196,321,221"/>
-<area shape="poly" title=" " alt="" coords="202,146,264,186,261,191,199,150"/>
-<area shape="rect" title=" " alt="" coords="345,196,412,221"/>
-<area shape="poly" title=" " alt="" coords="215,146,335,189,333,194,213,151"/>
+<area shape="rect" title=" " alt="" coords="59,5,277,75"/>
+<area shape="rect" title=" " alt="" coords="5,123,83,148"/>
+<area shape="poly" title=" " alt="" coords="125,77,72,116,69,112,122,73"/>
+<area shape="rect" href="tof__typedefs_8h.html" title=" " alt="" coords="158,123,274,148"/>
+<area shape="poly" title=" " alt="" coords="188,74,206,109,201,112,183,76"/>
+<area shape="rect" title=" " alt="" coords="57,196,108,221"/>
+<area shape="poly" title=" " alt="" coords="153,76,97,185,92,183,148,74"/>
+<area shape="rect" title=" " alt="" coords="298,123,401,148"/>
+<area shape="poly" title=" " alt="" coords="235,72,316,114,313,118,232,77"/>
+<area shape="rect" title=" " alt="" coords="133,196,195,221"/>
+<area shape="poly" title=" " alt="" coords="210,150,183,186,178,183,205,147"/>
+<area shape="poly" title=" " alt="" coords="196,150,118,192,115,187,193,146"/>
+<area shape="rect" title=" " alt="" coords="219,196,290,221"/>
+<area shape="poly" title=" " alt="" coords="225,147,244,183,240,185,220,150"/>
+<area shape="rect" title=" " alt="" coords="315,196,373,221"/>
+<area shape="poly" title=" " alt="" coords="238,146,312,187,310,191,235,150"/>
+<area shape="rect" title=" " alt="" coords="397,196,464,221"/>
+<area shape="poly" title=" " alt="" coords="251,145,385,190,384,195,250,151"/>
 </map>
 </div>
 </div>
@@ -155,6 +158,9 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a84fb383b1df4955afc6ea35a9b15ff44" id="r_a84fb383b1df4955afc6ea35a9b15ff44"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">typedef</a> std::map&lt; <a class="el" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a>, <a class="el" href="structGaps_1_1TofPaddle.html">TofPaddle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGaps.html#a84fb383b1df4955afc6ea35a9b15ff44">Gaps::TofPaddleMap</a></td></tr>
 <tr class="memdesc:a84fb383b1df4955afc6ea35a9b15ff44"><td class="mdescLeft">&#160;</td><td class="mdescRight">A map of paddle id -&gt; <a class="el" href="structGaps_1_1TofPaddle.html">TofPaddle</a>.  <br /></td></tr>
 <tr class="separator:a84fb383b1df4955afc6ea35a9b15ff44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a85a7cae5335dbd5b3ef8d6154867a1" id="r_a7a85a7cae5335dbd5b3ef8d6154867a1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">typedef</a> std::shared_ptr&lt; <a class="el" href="namespaceGaps.html#a84fb383b1df4955afc6ea35a9b15ff44">TofPaddleMap</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGaps.html#a7a85a7cae5335dbd5b3ef8d6154867a1">Gaps::TofPaddleMapPtr</a></td></tr>
+<tr class="memdesc:a7a85a7cae5335dbd5b3ef8d6154867a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shared ptr to TofPaddleMap.  <br /></td></tr>
+<tr class="separator:a7a85a7cae5335dbd5b3ef8d6154867a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5d656056027834e42a559636af22f086" id="r_a5d656056027834e42a559636af22f086"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">typedef</a> std::map&lt; <a class="el" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a>, std::map&lt; <a class="el" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a>, std::tuple&lt; <a class="el" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a>, <a class="el" href="namespaceGaps.html#a900b25ea53c4b01b14e10492303daa9c">TofPaddleEnd</a> &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceGaps.html#a5d656056027834e42a559636af22f086">Gaps::RbIdChannelPaddleIdMap</a></td></tr>
 <tr class="memdesc:a5d656056027834e42a559636af22f086"><td class="mdescLeft">&#160;</td><td class="mdescRight">A map of RBID, RBCh -&gt; <a class="el" href="structGaps_1_1TofPaddle.html">TofPaddle</a>.  <br /></td></tr>
 <tr class="separator:a5d656056027834e42a559636af22f086"><td class="memSeparator" colspan="2">&#160;</td></tr>
