@@ -585,8 +585,6 @@ namespace gondola {
     auto set_paddlemap(const Gaps::TofPaddleMap&) -> void;
     #endif
       
-    [[deprecated("RBMissingHit is deprecated")]]
-    static auto get_n_rbmissinghits(u32 mask) -> u32;
     static auto get_n_rbevents(u32 mask) -> u32;
     /// Get all hits from all rb_events
     auto get_hits() const -> Vec<TofHit>;
