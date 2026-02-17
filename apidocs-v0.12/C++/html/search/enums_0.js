@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['bfswpackettype_0',['BfswPacketType',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7',1,'Gaps::Telemetry']]]
+  ['compressionlevel_0',['CompressionLevel',['../namespacegondola.html#a62baa478e4adaaf6d242f135c1c9f84d',1,'gondola']]],
+  ['crframeobjecttype_1',['CRFrameObjectType',['../namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68',1,'gondola']]]
 ];

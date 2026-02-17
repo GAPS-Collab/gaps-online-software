@@ -1,0 +1,197 @@
+\doxysection{gondola\+::Telemetry\+Event Struct Reference}
+\hypertarget{structgondola_1_1TelemetryEvent}{}\label{structgondola_1_1TelemetryEvent}\index{gondola::TelemetryEvent@{gondola::TelemetryEvent}}
+
+
+The actual merged event sent over telemetry.  
+
+
+
+
+{\ttfamily \#include $<$telemetry\+\_\+dataclasses.\+hpp$>$}
+
+
+
+Collaboration diagram for gondola\+::Telemetry\+Event\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structgondola_1_1TelemetryEvent__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TelemetryEvent_ab63cf8fd14c7af05f4190aac42fc34d8}{to\+\_\+string}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ std\+::string
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a172a34f10a104c79cd12dfce20edb850}{from\+\_\+bytestream}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{stream}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}}) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{structgondola_1_1TelemetryEvent}{Telemetry\+Event}}, \mbox{\hyperlink{classgondola_1_1IOError}{IOError}} $>$
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TelemetryEvent_aec5eae35e2b2a9ff020237664971ddac}{from\+\_\+telemetrypacket}} (\mbox{\hyperlink{structgondola_1_1TelemetryPacket}{Telemetry\+Packet}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{packet}}) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{structgondola_1_1TelemetryEvent}{Telemetry\+Event}}, \mbox{\hyperlink{classgondola_1_1IOError}{IOError}} $>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structgondola_1_1TelemetryPacketHeader}{Telemetry\+Packet\+Header}} \mbox{\hyperlink{structgondola_1_1TelemetryEvent_aeea7ea2452b34c0a4e715f198f801ffe}{header}} = \mbox{\hyperlink{structgondola_1_1TelemetryPacketHeader}{Telemetry\+Packet\+Header}}()
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structgondola_1_1TelemetryEvent_aac36a9f8a68d798a7d7baa889660f1c3}{version}} = 0
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a3280f397f70eae02f09c508951f74963}{flags0}} = 0
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a675ada8e83e8810bc68089b07123d3db}{flags1}} = 0
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a0fe3025c15921b47dff7a701fd1413ae}{row\+\_\+flags}} = \{\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a702b3e3b82ee020f57cd2c692677abd4}{creation\+\_\+time}} = 0
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{structgondola_1_1TelemetryEvent_ade7af5914399f3bf63c46d20d2a1f59e}{event\+\_\+id}} = 0
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a1c605f615168d231eb789987e770d934}{n\+\_\+tof\+\_\+hits}} = 0
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a3f24ad42c6a1ebc1835b9ef96fcc8e08}{n\+\_\+trk\+\_\+hits}} = 0
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{structgondola_1_1TrkEvent}{Trk\+Event}} $>$ \mbox{\hyperlink{structgondola_1_1TelemetryEvent_af466059d0e78dff3afa38564fff33442}{tracker\+\_\+events}} = \{\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{structgondola_1_1TrkHit}{Trk\+Hit}} $>$ \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a8280aedcddbd7577c48ff7a8f0336fdb}{trk\+\_\+hits}} = \{\}
+\item 
+\mbox{\hyperlink{structgondola_1_1TofEventSummary}{Tof\+Event\+Summary}} \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a89623b54267194807666ac4c9de112c5}{tof\+\_\+event}} = \mbox{\hyperlink{structgondola_1_1TofEventSummary}{Tof\+Event\+Summary}}()
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a8f4ba4a6fa3ec18da67415249a4286cc}{raw\+\_\+data}} = \{\}
+\item 
+\mbox{\hyperlink{structgondola_1_1TofMetaData}{Tof\+Meta\+Data}} \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a4d7c200e43e7a3e190cb975f103d90d7}{tof\+\_\+meta}}
+\item 
+\mbox{\hyperlink{structgondola_1_1TrkMetaData}{Trk\+Meta\+Data}} \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a2cf14fdcdc6c8e973b85913a7fd916ad}{tracker\+\_\+meta}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} $>$ \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a4fa5ed8dacb20a2f3f008d26d224a564}{tracker\+\_\+oscillators}} = \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}$>$(10,0)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+The actual merged event sent over telemetry. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structgondola_1_1TelemetryEvent_a172a34f10a104c79cd12dfce20edb850}\label{structgondola_1_1TelemetryEvent_a172a34f10a104c79cd12dfce20edb850} 
+\index{gondola::TelemetryEvent@{gondola::TelemetryEvent}!from\_bytestream@{from\_bytestream}}
+\index{from\_bytestream@{from\_bytestream}!gondola::TelemetryEvent@{gondola::TelemetryEvent}}
+\doxysubsubsection{\texorpdfstring{from\_bytestream()}{from\_bytestream()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Telemetry\+Event\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&}]{stream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&}]{pos }\end{DoxyParamCaption}) -\/$>$ r\+::\+Result$<$\mbox{\hyperlink{structgondola_1_1TelemetryEvent}{Telemetry\+Event}}, \mbox{\hyperlink{classgondola_1_1IOError}{IOError}}$>$\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{structgondola_1_1TelemetryEvent_aec5eae35e2b2a9ff020237664971ddac}\label{structgondola_1_1TelemetryEvent_aec5eae35e2b2a9ff020237664971ddac} 
+\index{gondola::TelemetryEvent@{gondola::TelemetryEvent}!from\_telemetrypacket@{from\_telemetrypacket}}
+\index{from\_telemetrypacket@{from\_telemetrypacket}!gondola::TelemetryEvent@{gondola::TelemetryEvent}}
+\doxysubsubsection{\texorpdfstring{from\_telemetrypacket()}{from\_telemetrypacket()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Telemetry\+Event\+::from\+\_\+telemetrypacket (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structgondola_1_1TelemetryPacket}{Telemetry\+Packet}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&}]{packet }\end{DoxyParamCaption}) -\/$>$ r\+::\+Result$<$\mbox{\hyperlink{structgondola_1_1TelemetryEvent}{Telemetry\+Event}}, \mbox{\hyperlink{classgondola_1_1IOError}{IOError}}$>$\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{structgondola_1_1TelemetryEvent_ab63cf8fd14c7af05f4190aac42fc34d8}\label{structgondola_1_1TelemetryEvent_ab63cf8fd14c7af05f4190aac42fc34d8} 
+\index{gondola::TelemetryEvent@{gondola::TelemetryEvent}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!gondola::TelemetryEvent@{gondola::TelemetryEvent}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Telemetry\+Event\+::to\+\_\+string (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ std\+::string}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structgondola_1_1TelemetryEvent_a702b3e3b82ee020f57cd2c692677abd4}\label{structgondola_1_1TelemetryEvent_a702b3e3b82ee020f57cd2c692677abd4} 
+\index{gondola::TelemetryEvent@{gondola::TelemetryEvent}!creation\_time@{creation\_time}}
+\index{creation\_time@{creation\_time}!gondola::TelemetryEvent@{gondola::TelemetryEvent}}
+\doxysubsubsection{\texorpdfstring{creation\_time}{creation\_time}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} gondola\+::\+Telemetry\+Event\+::creation\+\_\+time = 0}
+
+\Hypertarget{structgondola_1_1TelemetryEvent_ade7af5914399f3bf63c46d20d2a1f59e}\label{structgondola_1_1TelemetryEvent_ade7af5914399f3bf63c46d20d2a1f59e} 
+\index{gondola::TelemetryEvent@{gondola::TelemetryEvent}!event\_id@{event\_id}}
+\index{event\_id@{event\_id}!gondola::TelemetryEvent@{gondola::TelemetryEvent}}
+\doxysubsubsection{\texorpdfstring{event\_id}{event\_id}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} gondola\+::\+Telemetry\+Event\+::event\+\_\+id = 0}
+
+\Hypertarget{structgondola_1_1TelemetryEvent_a3280f397f70eae02f09c508951f74963}\label{structgondola_1_1TelemetryEvent_a3280f397f70eae02f09c508951f74963} 
+\index{gondola::TelemetryEvent@{gondola::TelemetryEvent}!flags0@{flags0}}
+\index{flags0@{flags0}!gondola::TelemetryEvent@{gondola::TelemetryEvent}}
+\doxysubsubsection{\texorpdfstring{flags0}{flags0}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} gondola\+::\+Telemetry\+Event\+::flags0 = 0}
+
+\Hypertarget{structgondola_1_1TelemetryEvent_a675ada8e83e8810bc68089b07123d3db}\label{structgondola_1_1TelemetryEvent_a675ada8e83e8810bc68089b07123d3db} 
+\index{gondola::TelemetryEvent@{gondola::TelemetryEvent}!flags1@{flags1}}
+\index{flags1@{flags1}!gondola::TelemetryEvent@{gondola::TelemetryEvent}}
+\doxysubsubsection{\texorpdfstring{flags1}{flags1}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} gondola\+::\+Telemetry\+Event\+::flags1 = 0}
+
+\Hypertarget{structgondola_1_1TelemetryEvent_aeea7ea2452b34c0a4e715f198f801ffe}\label{structgondola_1_1TelemetryEvent_aeea7ea2452b34c0a4e715f198f801ffe} 
+\index{gondola::TelemetryEvent@{gondola::TelemetryEvent}!header@{header}}
+\index{header@{header}!gondola::TelemetryEvent@{gondola::TelemetryEvent}}
+\doxysubsubsection{\texorpdfstring{header}{header}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structgondola_1_1TelemetryPacketHeader}{Telemetry\+Packet\+Header}} gondola\+::\+Telemetry\+Event\+::header = \mbox{\hyperlink{structgondola_1_1TelemetryPacketHeader}{Telemetry\+Packet\+Header}}()}
+
+\Hypertarget{structgondola_1_1TelemetryEvent_a1c605f615168d231eb789987e770d934}\label{structgondola_1_1TelemetryEvent_a1c605f615168d231eb789987e770d934} 
+\index{gondola::TelemetryEvent@{gondola::TelemetryEvent}!n\_tof\_hits@{n\_tof\_hits}}
+\index{n\_tof\_hits@{n\_tof\_hits}!gondola::TelemetryEvent@{gondola::TelemetryEvent}}
+\doxysubsubsection{\texorpdfstring{n\_tof\_hits}{n\_tof\_hits}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} gondola\+::\+Telemetry\+Event\+::n\+\_\+tof\+\_\+hits = 0}
+
+\Hypertarget{structgondola_1_1TelemetryEvent_a3f24ad42c6a1ebc1835b9ef96fcc8e08}\label{structgondola_1_1TelemetryEvent_a3f24ad42c6a1ebc1835b9ef96fcc8e08} 
+\index{gondola::TelemetryEvent@{gondola::TelemetryEvent}!n\_trk\_hits@{n\_trk\_hits}}
+\index{n\_trk\_hits@{n\_trk\_hits}!gondola::TelemetryEvent@{gondola::TelemetryEvent}}
+\doxysubsubsection{\texorpdfstring{n\_trk\_hits}{n\_trk\_hits}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Telemetry\+Event\+::n\+\_\+trk\+\_\+hits = 0}
+
+\Hypertarget{structgondola_1_1TelemetryEvent_a8f4ba4a6fa3ec18da67415249a4286cc}\label{structgondola_1_1TelemetryEvent_a8f4ba4a6fa3ec18da67415249a4286cc} 
+\index{gondola::TelemetryEvent@{gondola::TelemetryEvent}!raw\_data@{raw\_data}}
+\index{raw\_data@{raw\_data}!gondola::TelemetryEvent@{gondola::TelemetryEvent}}
+\doxysubsubsection{\texorpdfstring{raw\_data}{raw\_data}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}$>$ gondola\+::\+Telemetry\+Event\+::raw\+\_\+data = \{\}}
+
+\Hypertarget{structgondola_1_1TelemetryEvent_a0fe3025c15921b47dff7a701fd1413ae}\label{structgondola_1_1TelemetryEvent_a0fe3025c15921b47dff7a701fd1413ae} 
+\index{gondola::TelemetryEvent@{gondola::TelemetryEvent}!row\_flags@{row\_flags}}
+\index{row\_flags@{row\_flags}!gondola::TelemetryEvent@{gondola::TelemetryEvent}}
+\doxysubsubsection{\texorpdfstring{row\_flags}{row\_flags}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}$>$ gondola\+::\+Telemetry\+Event\+::row\+\_\+flags = \{\}}
+
+\Hypertarget{structgondola_1_1TelemetryEvent_a89623b54267194807666ac4c9de112c5}\label{structgondola_1_1TelemetryEvent_a89623b54267194807666ac4c9de112c5} 
+\index{gondola::TelemetryEvent@{gondola::TelemetryEvent}!tof\_event@{tof\_event}}
+\index{tof\_event@{tof\_event}!gondola::TelemetryEvent@{gondola::TelemetryEvent}}
+\doxysubsubsection{\texorpdfstring{tof\_event}{tof\_event}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structgondola_1_1TofEventSummary}{Tof\+Event\+Summary}} gondola\+::\+Telemetry\+Event\+::tof\+\_\+event = \mbox{\hyperlink{structgondola_1_1TofEventSummary}{Tof\+Event\+Summary}}()}
+
+\Hypertarget{structgondola_1_1TelemetryEvent_a4d7c200e43e7a3e190cb975f103d90d7}\label{structgondola_1_1TelemetryEvent_a4d7c200e43e7a3e190cb975f103d90d7} 
+\index{gondola::TelemetryEvent@{gondola::TelemetryEvent}!tof\_meta@{tof\_meta}}
+\index{tof\_meta@{tof\_meta}!gondola::TelemetryEvent@{gondola::TelemetryEvent}}
+\doxysubsubsection{\texorpdfstring{tof\_meta}{tof\_meta}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structgondola_1_1TofMetaData}{Tof\+Meta\+Data}} gondola\+::\+Telemetry\+Event\+::tof\+\_\+meta}
+
+\Hypertarget{structgondola_1_1TelemetryEvent_af466059d0e78dff3afa38564fff33442}\label{structgondola_1_1TelemetryEvent_af466059d0e78dff3afa38564fff33442} 
+\index{gondola::TelemetryEvent@{gondola::TelemetryEvent}!tracker\_events@{tracker\_events}}
+\index{tracker\_events@{tracker\_events}!gondola::TelemetryEvent@{gondola::TelemetryEvent}}
+\doxysubsubsection{\texorpdfstring{tracker\_events}{tracker\_events}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{structgondola_1_1TrkEvent}{Trk\+Event}}$>$ gondola\+::\+Telemetry\+Event\+::tracker\+\_\+events = \{\}}
+
+\Hypertarget{structgondola_1_1TelemetryEvent_a2cf14fdcdc6c8e973b85913a7fd916ad}\label{structgondola_1_1TelemetryEvent_a2cf14fdcdc6c8e973b85913a7fd916ad} 
+\index{gondola::TelemetryEvent@{gondola::TelemetryEvent}!tracker\_meta@{tracker\_meta}}
+\index{tracker\_meta@{tracker\_meta}!gondola::TelemetryEvent@{gondola::TelemetryEvent}}
+\doxysubsubsection{\texorpdfstring{tracker\_meta}{tracker\_meta}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structgondola_1_1TrkMetaData}{Trk\+Meta\+Data}} gondola\+::\+Telemetry\+Event\+::tracker\+\_\+meta}
+
+\Hypertarget{structgondola_1_1TelemetryEvent_a4fa5ed8dacb20a2f3f008d26d224a564}\label{structgondola_1_1TelemetryEvent_a4fa5ed8dacb20a2f3f008d26d224a564} 
+\index{gondola::TelemetryEvent@{gondola::TelemetryEvent}!tracker\_oscillators@{tracker\_oscillators}}
+\index{tracker\_oscillators@{tracker\_oscillators}!gondola::TelemetryEvent@{gondola::TelemetryEvent}}
+\doxysubsubsection{\texorpdfstring{tracker\_oscillators}{tracker\_oscillators}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}$>$ gondola\+::\+Telemetry\+Event\+::tracker\+\_\+oscillators = \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}$>$(10,0)}
+
+\Hypertarget{structgondola_1_1TelemetryEvent_a8280aedcddbd7577c48ff7a8f0336fdb}\label{structgondola_1_1TelemetryEvent_a8280aedcddbd7577c48ff7a8f0336fdb} 
+\index{gondola::TelemetryEvent@{gondola::TelemetryEvent}!trk\_hits@{trk\_hits}}
+\index{trk\_hits@{trk\_hits}!gondola::TelemetryEvent@{gondola::TelemetryEvent}}
+\doxysubsubsection{\texorpdfstring{trk\_hits}{trk\_hits}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{structgondola_1_1TrkHit}{Trk\+Hit}}$>$ gondola\+::\+Telemetry\+Event\+::trk\+\_\+hits = \{\}}
+
+\Hypertarget{structgondola_1_1TelemetryEvent_aac36a9f8a68d798a7d7baa889660f1c3}\label{structgondola_1_1TelemetryEvent_aac36a9f8a68d798a7d7baa889660f1c3} 
+\index{gondola::TelemetryEvent@{gondola::TelemetryEvent}!version@{version}}
+\index{version@{version}!gondola::TelemetryEvent@{gondola::TelemetryEvent}}
+\doxysubsubsection{\texorpdfstring{version}{version}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} gondola\+::\+Telemetry\+Event\+::version = 0}
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/\mbox{\hyperlink{telemetry__dataclasses_8hpp}{telemetry\+\_\+dataclasses.\+hpp}}\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/\mbox{\hyperlink{telemetry__dataclasses_8cxx}{telemetry\+\_\+dataclasses.\+cxx}}\end{DoxyCompactItemize}

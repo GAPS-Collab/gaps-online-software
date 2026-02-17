@@ -21,5 +21,6 @@ var events_8cxx =
     [ "LTB_CH5", "events_8cxx.html#a323d60d7047aae18761e97d628181d68", null ],
     [ "LTB_CH6", "events_8cxx.html#a06fa3d542f01496f50b46b1bdc10bd83", null ],
     [ "LTB_CH7", "events_8cxx.html#a3e53025bb5e0673d65b6e85c82d244a0", null ],
-    [ "LTB_CHANNELS", "events_8cxx.html#a3d60db15337aed0c3fcb524a20f8abd4", null ]
+    [ "LTB_CHANNELS", "events_8cxx.html#a3d60db15337aed0c3fcb524a20f8abd4", null ],
+    [ "PHYSICAL_CHANNELS", "events_8cxx.html#a48d93d6f519ee267a8dcd6131f857306", null ]
 ];

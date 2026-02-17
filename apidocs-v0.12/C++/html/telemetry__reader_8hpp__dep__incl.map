@@ -1,13 +1,14 @@
 <map id="/home/runner/work/gaps&#45;online&#45;software/gaps&#45;online&#45;software/gondola&#45;core/C++/include/io/telemetry_reader.hpp" name="/home/runner/work/gaps&#45;online&#45;software/gaps&#45;online&#45;software/gondola&#45;core/C++/include/io/telemetry_reader.hpp">
-<area shape="rect" id="Node000001" title=" " alt="" coords="217,5,442,89"/>
-<area shape="rect" id="Node000002" href="$caraspace_8hpp.html" title=" " alt="" coords="210,137,449,207"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="332,103,332,137,327,137,327,103"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="278,5,503,89"/>
+<area shape="rect" id="Node000002" href="$caraspace_8hpp.html" title=" " alt="" coords="193,137,431,207"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="359,103,336,139,331,136,355,100"/>
 <area shape="rect" id="Node000003" href="$gondola__core_8cxx.html" title=" " alt="" coords="5,255,200,339"/>
-<area shape="poly" id="edge5_Node000001_Node000003" title=" " alt="" coords="247,99,199,139,176,167,155,198,123,256,119,253,151,195,172,164,195,135,244,95"/>
-<area shape="rect" id="Node000005" href="$telemetry__reader_8cxx.html" title=" " alt="" coords="459,262,715,331"/>
-<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="412,95,463,135,522,199,567,260,562,263,518,203,460,139,409,99"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="257,215,180,257,177,252,254,211"/>
+<area shape="poly" id="edge5_Node000001_Node000003" title=" " alt="" coords="266,87,221,110,182,139,159,166,141,196,116,255,111,253,136,193,155,163,178,135,219,105,264,82"/>
 <area shape="rect" id="Node000004" href="$caraspace_8cxx.html" title=" " alt="" coords="224,262,435,331"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="332,220,332,262,327,262,327,220"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="413,210,517,259,515,264,411,215"/>
+<area shape="poly" id="edge6_Node000001_Node000004" title=" " alt="" coords="431,100,443,125,452,152,454,181,446,208,424,239,395,264,391,260,420,236,442,206,448,180,447,153,438,127,426,102"/>
+<area shape="rect" id="Node000005" href="$telemetry__reader_8cxx.html" title=" " alt="" coords="459,262,715,331"/>
+<area shape="poly" id="edge7_Node000001_Node000005" title=" " alt="" coords="437,98,467,136,564,260,559,263,463,139,432,102"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="245,216,174,257,171,252,242,211"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="321,220,327,261,322,262,316,220"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="401,210,512,259,510,264,398,215"/>
 </map>

@@ -26,7 +26,7 @@
 \DoxyCodeLine{00023\ \ \ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68}{CRFrameObjectType}}\ :\ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \{}
 \DoxyCodeLine{00024\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a88183b946cc5f0e8c96b2e66e1c74a7e}{Unknown}}\ \ \ \ \ \ \ \ \ \ \ =\ 0,}
 \DoxyCodeLine{00025\ \ \ \ \ \mbox{\hyperlink{structTofPacket}{TofPacket}}\ \ \ \ \ \ \ \ \ =\ 10,}
-\DoxyCodeLine{00026\ \ \ \ \ \mbox{\hyperlink{structGaps_1_1Telemetry_1_1Packet}{TelemetryPacket}}\ \ \ =\ 20,}
+\DoxyCodeLine{00026\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryPacket}{TelemetryPacket}}\ \ \ =\ 20,}
 \DoxyCodeLine{00027\ \ \ \};}
 \DoxyCodeLine{00028\ }
 \DoxyCodeLine{00029\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structgondola_1_1CRFrameObject}{CRFrameObject}}\ \{}
@@ -59,8 +59,8 @@
 \DoxyCodeLine{00058\ }
 \DoxyCodeLine{00059\ \ \ \ \ auto\ put\_fobject(\mbox{\hyperlink{structgondola_1_1CRFrameObject}{CRFrameObject}}\ const\ \&fobj,\ std::\textcolor{keywordtype}{string})\ -\/>\ \textcolor{keywordtype}{void};\ }
 \DoxyCodeLine{00060\ }
-\DoxyCodeLine{00062\ \ \ \ \ auto\ get\_tofpacket(std::\textcolor{keywordtype}{string}\ name)\ -\/>\ result::Result<\mbox{\hyperlink{structTofPacket}{TofPacket}},\mbox{\hyperlink{namespaceGaps}{Gaps}}::IOError>;}
-\DoxyCodeLine{00063\ \ \ \ \ auto\ get\_telemetrypacket(std::\textcolor{keywordtype}{string}\ name)\ -\/>\ \mbox{\hyperlink{namespaceGaps}{Gaps}}::Telemetry::Packet;}
+\DoxyCodeLine{00062\ \ \ \ \ auto\ get\_tofpacket(std::\textcolor{keywordtype}{string}\ name)\ -\/>\ result::Result<\mbox{\hyperlink{structTofPacket}{TofPacket}},\mbox{\hyperlink{classgondola_1_1IOError}{IOError}}>;}
+\DoxyCodeLine{00063\ \ \ \ \ auto\ get\_telemetrypacket(std::\textcolor{keywordtype}{string}\ name)\ -\/>\ \mbox{\hyperlink{structgondola_1_1TelemetryPacket}{TelemetryPacket}};}
 \DoxyCodeLine{00064\ \ \ \};}
 \DoxyCodeLine{00065\ }
 \DoxyCodeLine{00066\ \ \ struct\ \mbox{\hyperlink{structgondola_1_1CRReader}{CRReader}}\ \{}
@@ -77,7 +77,7 @@
 \DoxyCodeLine{00095\ }
 \DoxyCodeLine{00097\ \ \ \ \ auto\ is\_from\_telemetry()\ const\ -\/>\ \textcolor{keywordtype}{bool};}
 \DoxyCodeLine{00098\ }
-\DoxyCodeLine{00102\ \ \ \ \ auto\ get\_telemetry\_packet\_index()\ const\ -\/>\ const\ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{HashMap}}<\mbox{\hyperlink{namespaceGaps_1_1Telemetry_a3567431f12c1aa2d8da946e149b62aa7}{TelemetryPacketType}},\ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}>\ \&;}
+\DoxyCodeLine{00102\ \ \ \ \ auto\ get\_telemetry\_packet\_index()\ const\ -\/>\ const\ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{HashMap}}<\mbox{\hyperlink{namespacegondola_a598dae982e3c16cd23a9e57c72d39ced}{TelemetryPacketType}},\ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}>\ \&;}
 \DoxyCodeLine{00103\ }
 \DoxyCodeLine{00111\ \ \ \ \ auto\ cache\_telemetry\_first()\ -\/>\ \textcolor{keywordtype}{void};}
 \DoxyCodeLine{00112\ }

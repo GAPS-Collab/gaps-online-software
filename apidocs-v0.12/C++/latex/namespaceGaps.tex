@@ -1,16 +1,7 @@
 \doxysection{Gaps Namespace Reference}
 \hypertarget{namespaceGaps}{}\label{namespaceGaps}\index{Gaps@{Gaps}}
-\doxysubsubsection*{Namespaces}
-\begin{DoxyCompactItemize}
-\item 
-namespace \mbox{\hyperlink{namespaceGaps_1_1Telemetry}{Telemetry}}
-\end{DoxyCompactItemize}
 \doxysubsubsection*{Classes}
 \begin{DoxyCompactItemize}
-\item 
-class \mbox{\hyperlink{classGaps_1_1IOError}{IOError}}
-\item 
-class \mbox{\hyperlink{classGaps_1_1TofPacketReader}{Tof\+Packet\+Reader}}
 \item 
 struct \mbox{\hyperlink{structGaps_1_1TofPaddle}{Tof\+Paddle}}
 \item 
@@ -44,12 +35,6 @@ enum class \mbox{\hyperlink{namespaceGaps_a900b25ea53c4b01b14e10492303daa9c}{Tof
 , \mbox{\hyperlink{namespaceGaps_a900b25ea53c4b01b14e10492303daa9ca7fc56270e7a70fa81a5935b72eacbe29}{A}} = -\/1
 , \mbox{\hyperlink{namespaceGaps_a900b25ea53c4b01b14e10492303daa9ca9d5ed678fe57bcca610140957afab571}{B}} = 1
  \}
-\item 
-enum class \mbox{\hyperlink{namespaceGaps_af99376041829a6c93b2b635455d73910}{Protocol\+Version}} \+: u8 \{ \mbox{\hyperlink{namespaceGaps_af99376041829a6c93b2b635455d73910a88183b946cc5f0e8c96b2e66e1c74a7e}{Unknown}} = PROTOCOLVERSION\+\_\+\+UNKNOWN
-, \mbox{\hyperlink{namespaceGaps_af99376041829a6c93b2b635455d73910ab4daca084ad9eabfc8de231929477ed6}{V1}} = PROTOCOLVERSION\+\_\+\+V1
-, \mbox{\hyperlink{namespaceGaps_af99376041829a6c93b2b635455d73910aec765f1adc3b4253f2d3b131a4a8618f}{V2}} = PROTOCOLVERSION\+\_\+\+V2
-, \mbox{\hyperlink{namespaceGaps_af99376041829a6c93b2b635455d73910ad5b50b8cf96bcc8aba90f306f5e6189c}{V3}} = PROTOCOLVERSION\+\_\+\+V3
- \}
 \end{DoxyCompactItemize}
 \doxysubsubsection*{Functions}
 \begin{DoxyCompactItemize}
@@ -67,35 +52,8 @@ enum class \mbox{\hyperlink{namespaceGaps_af99376041829a6c93b2b635455d73910}{Pro
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespaceGaps_aa891e85254e13812609ce1e8bcbc014a}{get\+\_\+trackerstripmasks}} (std\+::string mask\+\_\+name="{}"{}) -\/$>$ \mbox{\hyperlink{namespaceGaps_ab973cc2b0495c49012fb17667010ef42}{Trk\+Strip\+Mask\+Map}}
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespaceGaps_a9f34404b09be3f6fd69f8e09d2c045d2}{get\+\_\+trackerstrippedestals}} () -\/$>$ \mbox{\hyperlink{namespaceGaps_afdf1ea5d924eac5baad0144da1280503}{Trk\+Strip\+Ped\+Map}}
-\item 
-{\footnotesize template$<$\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typename}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{T}} $>$ }\\\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{T}} $>$ \mbox{\hyperlink{namespaceGaps_a1abc8354f5db84adaa571b27c783a38f}{slice}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{T}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{vec}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{start}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{end}})
-\item 
-\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}} \mbox{\hyperlink{namespaceGaps_a13cb72078c0645adb57076cc5697b9a1}{parse\+\_\+bool}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}})
-\item 
-\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{namespaceGaps_af02b80458f7649651a342344e3b103ee}{parse\+\_\+u8}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}})
-\begin{DoxyCompactList}\small\item\em get an unsigned char from a vector of bytes, advancing pos by 1 \end{DoxyCompactList}\item 
-\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{namespaceGaps_a8d5ee03930328391169c3f11a9b06e8e}{parse\+\_\+u16}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}})
-\begin{DoxyCompactList}\small\item\em get an unsigned short from a vector of bytes, advancing pos by 2 \end{DoxyCompactList}\item 
-\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{namespaceGaps_adbed3ea3f57b77872fd060984c65e4be}{parse\+\_\+f16}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}})
-\item 
-\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{namespaceGaps_ac09d7b4a66f0df27a63af339dd6d7ea8}{parse\+\_\+u32}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}})
-\begin{DoxyCompactList}\small\item\em get an unsigned 32bit int from a vector of bytes, advancing pos by 4 \end{DoxyCompactList}\item 
-\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \mbox{\hyperlink{namespaceGaps_aa913722aa6668823951e07f44b8698d6}{parse\+\_\+u64}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}})
-\begin{DoxyCompactList}\small\item\em get an unsigned long64 from a vector of bytes, advancing pos by 8 \end{DoxyCompactList}\item 
-\mbox{\hyperlink{tof__typedefs_8h_a48d6cd8e4135fb2ff7e7f2dac84089ec}{i32}} \mbox{\hyperlink{namespaceGaps_a2fa35da8776bb053ebdb6f9da7ea245e}{parse\+\_\+i32}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}})
-\begin{DoxyCompactList}\small\item\em get a signed 32bit int from a vector of bytes, advancing pos by 4 \end{DoxyCompactList}\item 
-\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{namespaceGaps_aa324d073f3fec42714ed7f1dfa9528ce}{parse\+\_\+f32}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}})
-\begin{DoxyCompactList}\small\item\em get a signed float32 from a vector of bytes, advancning pos by 4 \end{DoxyCompactList}\item 
-\mbox{\hyperlink{tof__typedefs_8h_a94dab5770726ccbef8c7d026cfbdf8e5}{f64}} \mbox{\hyperlink{namespaceGaps_a75bc2048681872469a0e8164a07eb145}{parse\+\_\+f64}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}})
-\begin{DoxyCompactList}\small\item\em get a signed long float (64) from a vector of bytes, advancing pos by 8 \end{DoxyCompactList}\item 
-std\+::string \mbox{\hyperlink{namespaceGaps_abaf57ec43250a61eb58cc3fd3b68848a}{parse\+\_\+string}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}})
-\item 
-std\+::string \mbox{\hyperlink{namespaceGaps_a0b7fccda874dd2f4275f12622fb6b3f1}{pversion\+\_\+to\+\_\+string}} (\mbox{\hyperlink{namespaceGaps_af99376041829a6c93b2b635455d73910}{Protocol\+Version}} version)
 \end{DoxyCompactItemize}
 
-
-\doxysubsection{Detailed Description}
-Bascially a re-\/write of some bfsw stuff to avoid pulling in the dependency 
 
 \doxysubsection{Typedef Documentation}
 \Hypertarget{namespaceGaps_ac562c67ce894d03edeecb6332caa86ac}\label{namespaceGaps_ac562c67ce894d03edeecb6332caa86ac} 
@@ -163,30 +121,6 @@ A map of strip identifier (layer-\/row-\/module-\/channel -\/\texorpdfstring{$>$
 
 
 \doxysubsection{Enumeration Type Documentation}
-\Hypertarget{namespaceGaps_af99376041829a6c93b2b635455d73910}\label{namespaceGaps_af99376041829a6c93b2b635455d73910} 
-\index{Gaps@{Gaps}!ProtocolVersion@{ProtocolVersion}}
-\index{ProtocolVersion@{ProtocolVersion}!Gaps@{Gaps}}
-\doxysubsubsection{\texorpdfstring{ProtocolVersion}{ProtocolVersion}}
-{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{enum}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{class}} \mbox{\hyperlink{namespaceGaps_af99376041829a6c93b2b635455d73910}{Gaps\+::\+Protocol\+Version}} \+: \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\hspace{0.3cm}{\ttfamily [strong]}}
-
-\begin{DoxyEnumFields}{Enumerator}
-\raisebox{\heightof{T}}[0pt][0pt]{\index{Unknown@{Unknown}!Gaps@{Gaps}}\index{Gaps@{Gaps}!Unknown@{Unknown}}}\Hypertarget{namespaceGaps_af99376041829a6c93b2b635455d73910a88183b946cc5f0e8c96b2e66e1c74a7e}\label{namespaceGaps_af99376041829a6c93b2b635455d73910a88183b946cc5f0e8c96b2e66e1c74a7e} 
-Unknown&\\
-\hline
-
-\raisebox{\heightof{T}}[0pt][0pt]{\index{V1@{V1}!Gaps@{Gaps}}\index{Gaps@{Gaps}!V1@{V1}}}\Hypertarget{namespaceGaps_af99376041829a6c93b2b635455d73910ab4daca084ad9eabfc8de231929477ed6}\label{namespaceGaps_af99376041829a6c93b2b635455d73910ab4daca084ad9eabfc8de231929477ed6} 
-V1&\\
-\hline
-
-\raisebox{\heightof{T}}[0pt][0pt]{\index{V2@{V2}!Gaps@{Gaps}}\index{Gaps@{Gaps}!V2@{V2}}}\Hypertarget{namespaceGaps_af99376041829a6c93b2b635455d73910aec765f1adc3b4253f2d3b131a4a8618f}\label{namespaceGaps_af99376041829a6c93b2b635455d73910aec765f1adc3b4253f2d3b131a4a8618f} 
-V2&\\
-\hline
-
-\raisebox{\heightof{T}}[0pt][0pt]{\index{V3@{V3}!Gaps@{Gaps}}\index{Gaps@{Gaps}!V3@{V3}}}\Hypertarget{namespaceGaps_af99376041829a6c93b2b635455d73910ad5b50b8cf96bcc8aba90f306f5e6189c}\label{namespaceGaps_af99376041829a6c93b2b635455d73910ad5b50b8cf96bcc8aba90f306f5e6189c} 
-V3&\\
-\hline
-
-\end{DoxyEnumFields}
 \Hypertarget{namespaceGaps_a900b25ea53c4b01b14e10492303daa9c}\label{namespaceGaps_a900b25ea53c4b01b14e10492303daa9c} 
 \index{Gaps@{Gaps}!TofPaddleEnd@{TofPaddleEnd}}
 \index{TofPaddleEnd@{TofPaddleEnd}!Gaps@{Gaps}}
@@ -271,107 +205,4 @@ Get a paddle from the database.
 
 
 Retrieve all tracker strips from the database. 
-
-\Hypertarget{namespaceGaps_a13cb72078c0645adb57076cc5697b9a1}\label{namespaceGaps_a13cb72078c0645adb57076cc5697b9a1} 
-\index{Gaps@{Gaps}!parse\_bool@{parse\_bool}}
-\index{parse\_bool@{parse\_bool}!Gaps@{Gaps}}
-\doxysubsubsection{\texorpdfstring{parse\_bool()}{parse\_bool()}}
-{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}} Gaps\+::parse\+\_\+bool (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{bytestream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&}]{pos }\end{DoxyParamCaption})}
-
-\Hypertarget{namespaceGaps_adbed3ea3f57b77872fd060984c65e4be}\label{namespaceGaps_adbed3ea3f57b77872fd060984c65e4be} 
-\index{Gaps@{Gaps}!parse\_f16@{parse\_f16}}
-\index{parse\_f16@{parse\_f16}!Gaps@{Gaps}}
-\doxysubsubsection{\texorpdfstring{parse\_f16()}{parse\_f16()}}
-{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} Gaps\+::parse\+\_\+f16 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{bytestream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&}]{pos }\end{DoxyParamCaption})}
-
-get a f16 ("{}half float"{}) from a vector of bytes, advancing pos by 2
-
-NOTE -\/ this will actually convert the result to the more common f32 directly \Hypertarget{namespaceGaps_aa324d073f3fec42714ed7f1dfa9528ce}\label{namespaceGaps_aa324d073f3fec42714ed7f1dfa9528ce} 
-\index{Gaps@{Gaps}!parse\_f32@{parse\_f32}}
-\index{parse\_f32@{parse\_f32}!Gaps@{Gaps}}
-\doxysubsubsection{\texorpdfstring{parse\_f32()}{parse\_f32()}}
-{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} Gaps\+::parse\+\_\+f32 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{bytestream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&}]{pos }\end{DoxyParamCaption})}
-
-
-
-get a signed float32 from a vector of bytes, advancning pos by 4 
-
-\Hypertarget{namespaceGaps_a75bc2048681872469a0e8164a07eb145}\label{namespaceGaps_a75bc2048681872469a0e8164a07eb145} 
-\index{Gaps@{Gaps}!parse\_f64@{parse\_f64}}
-\index{parse\_f64@{parse\_f64}!Gaps@{Gaps}}
-\doxysubsubsection{\texorpdfstring{parse\_f64()}{parse\_f64()}}
-{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a94dab5770726ccbef8c7d026cfbdf8e5}{f64}} Gaps\+::parse\+\_\+f64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{bytestream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&}]{pos }\end{DoxyParamCaption})}
-
-
-
-get a signed long float (64) from a vector of bytes, advancing pos by 8 
-
-\Hypertarget{namespaceGaps_a2fa35da8776bb053ebdb6f9da7ea245e}\label{namespaceGaps_a2fa35da8776bb053ebdb6f9da7ea245e} 
-\index{Gaps@{Gaps}!parse\_i32@{parse\_i32}}
-\index{parse\_i32@{parse\_i32}!Gaps@{Gaps}}
-\doxysubsubsection{\texorpdfstring{parse\_i32()}{parse\_i32()}}
-{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a48d6cd8e4135fb2ff7e7f2dac84089ec}{i32}} Gaps\+::parse\+\_\+i32 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{bytestream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&}]{pos }\end{DoxyParamCaption})}
-
-
-
-get a signed 32bit int from a vector of bytes, advancing pos by 4 
-
-\Hypertarget{namespaceGaps_abaf57ec43250a61eb58cc3fd3b68848a}\label{namespaceGaps_abaf57ec43250a61eb58cc3fd3b68848a} 
-\index{Gaps@{Gaps}!parse\_string@{parse\_string}}
-\index{parse\_string@{parse\_string}!Gaps@{Gaps}}
-\doxysubsubsection{\texorpdfstring{parse\_string()}{parse\_string()}}
-{\footnotesize\ttfamily std\+::string Gaps\+::parse\+\_\+string (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{bytestream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&}]{pos }\end{DoxyParamCaption})}
-
-custom string parser. This is only used for CRFrame\textquotesingle{}s index. The actual byte content of the string needs to be prefixed with its 16bit length \Hypertarget{namespaceGaps_a8d5ee03930328391169c3f11a9b06e8e}\label{namespaceGaps_a8d5ee03930328391169c3f11a9b06e8e} 
-\index{Gaps@{Gaps}!parse\_u16@{parse\_u16}}
-\index{parse\_u16@{parse\_u16}!Gaps@{Gaps}}
-\doxysubsubsection{\texorpdfstring{parse\_u16()}{parse\_u16()}}
-{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} Gaps\+::parse\+\_\+u16 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{bytestream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&}]{pos }\end{DoxyParamCaption})}
-
-
-
-get an unsigned short from a vector of bytes, advancing pos by 2 
-
-\Hypertarget{namespaceGaps_ac09d7b4a66f0df27a63af339dd6d7ea8}\label{namespaceGaps_ac09d7b4a66f0df27a63af339dd6d7ea8} 
-\index{Gaps@{Gaps}!parse\_u32@{parse\_u32}}
-\index{parse\_u32@{parse\_u32}!Gaps@{Gaps}}
-\doxysubsubsection{\texorpdfstring{parse\_u32()}{parse\_u32()}}
-{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} Gaps\+::parse\+\_\+u32 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{bytestream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&}]{pos }\end{DoxyParamCaption})}
-
-
-
-get an unsigned 32bit int from a vector of bytes, advancing pos by 4 
-
-\Hypertarget{namespaceGaps_aa913722aa6668823951e07f44b8698d6}\label{namespaceGaps_aa913722aa6668823951e07f44b8698d6} 
-\index{Gaps@{Gaps}!parse\_u64@{parse\_u64}}
-\index{parse\_u64@{parse\_u64}!Gaps@{Gaps}}
-\doxysubsubsection{\texorpdfstring{parse\_u64()}{parse\_u64()}}
-{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} Gaps\+::parse\+\_\+u64 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{bytestream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&}]{pos }\end{DoxyParamCaption})}
-
-
-
-get an unsigned long64 from a vector of bytes, advancing pos by 8 
-
-\Hypertarget{namespaceGaps_af02b80458f7649651a342344e3b103ee}\label{namespaceGaps_af02b80458f7649651a342344e3b103ee} 
-\index{Gaps@{Gaps}!parse\_u8@{parse\_u8}}
-\index{parse\_u8@{parse\_u8}!Gaps@{Gaps}}
-\doxysubsubsection{\texorpdfstring{parse\_u8()}{parse\_u8()}}
-{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} Gaps\+::parse\+\_\+u8 (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{bytestream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&}]{pos }\end{DoxyParamCaption})}
-
-
-
-get an unsigned char from a vector of bytes, advancing pos by 1 
-
-\Hypertarget{namespaceGaps_a0b7fccda874dd2f4275f12622fb6b3f1}\label{namespaceGaps_a0b7fccda874dd2f4275f12622fb6b3f1} 
-\index{Gaps@{Gaps}!pversion\_to\_string@{pversion\_to\_string}}
-\index{pversion\_to\_string@{pversion\_to\_string}!Gaps@{Gaps}}
-\doxysubsubsection{\texorpdfstring{pversion\_to\_string()}{pversion\_to\_string()}}
-{\footnotesize\ttfamily std\+::string Gaps\+::pversion\+\_\+to\+\_\+string (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{namespaceGaps_af99376041829a6c93b2b635455d73910}{Gaps\+::\+Protocol\+Version}}}]{version }\end{DoxyParamCaption})}
-
-\Hypertarget{namespaceGaps_a1abc8354f5db84adaa571b27c783a38f}\label{namespaceGaps_a1abc8354f5db84adaa571b27c783a38f} 
-\index{Gaps@{Gaps}!slice@{slice}}
-\index{slice@{slice}!Gaps@{Gaps}}
-\doxysubsubsection{\texorpdfstring{slice()}{slice()}}
-{\footnotesize\ttfamily template$<$\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typename}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{T}} $>$ \\
-\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{T}} $>$ Gaps\+::slice (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{T}} $>$ \&}]{vec,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}}]{start,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}}]{end }\end{DoxyParamCaption})}
 

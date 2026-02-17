@@ -1,4 +1,4 @@
 var errors_8hpp =
 [
-    [ "Gaps::IOError", "classGaps_1_1IOError.html", "classGaps_1_1IOError" ]
+    [ "gondola::IOError", "classgondola_1_1IOError.html", "classgondola_1_1IOError" ]
 ];

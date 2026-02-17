@@ -1,0 +1,26 @@
+var structgondola_1_1Cooling =
+[
+    [ "to_string", "structgondola_1_1Cooling.html#a9a7083ccafc703120c6ab97ab57d2f12", null ],
+    [ "fpga_board_i_in", "structgondola_1_1Cooling.html#a6b5842f1211dd0816572cb458d43f7ae", null ],
+    [ "fpga_board_p", "structgondola_1_1Cooling.html#a2d0ddf12cdbe5456fd602565b17e3e81", null ],
+    [ "fpga_board_t", "structgondola_1_1Cooling.html#a637fa3bfd654af0028991a3495dda164", null ],
+    [ "fpga_board_v_in", "structgondola_1_1Cooling.html#ae647ced54bcaf882845dc789f5a965c1", null ],
+    [ "frame_counter", "structgondola_1_1Cooling.html#a80b035024fe5f741b358f6988450f727", null ],
+    [ "header", "structgondola_1_1Cooling.html#aeeec83a2c6f23933f102836798ae831b", null ],
+    [ "last_cmd", "structgondola_1_1Cooling.html#a8d43406cb20576f0c6f627cbb363c867", null ],
+    [ "pw_board1_t", "structgondola_1_1Cooling.html#a6b5bdf2fcaf834ed5cbde76992f3e9f0", null ],
+    [ "pw_board2_t", "structgondola_1_1Cooling.html#a433df66f026755b9da6ed85fab262f71", null ],
+    [ "rh_current", "structgondola_1_1Cooling.html#ac7f22ee1e59db52e6fccfbcb8672087d", null ],
+    [ "rh_off", "structgondola_1_1Cooling.html#a51884dc1c8252dcd0d900a4c6ba4d3c2", null ],
+    [ "rh_on", "structgondola_1_1Cooling.html#aca70e7adff91e85069fe82cb210b5194", null ],
+    [ "rsv_t", "structgondola_1_1Cooling.html#a07f3ddd531a68cc2971c3c67cf015bd1", null ],
+    [ "rtd", "structgondola_1_1Cooling.html#aaaaa061ba89f3378008fd754e9d4feea", null ],
+    [ "rx_byte_num", "structgondola_1_1Cooling.html#ac49e968c527d58c67985d57ecd5e6c47", null ],
+    [ "rx_cmd_num", "structgondola_1_1Cooling.html#a1aa791fee21b3931a5aae14d6698e612", null ],
+    [ "sh1_time_left", "structgondola_1_1Cooling.html#a81d7ad95b2bcdc2d34e5cb5034fefca4", null ],
+    [ "sh2_time_left", "structgondola_1_1Cooling.html#a6aed1edcc693d398ed5c1f0fbc32d6cf", null ],
+    [ "sh3_time_left", "structgondola_1_1Cooling.html#a42ded780183f44be6bef852a48f07da9", null ],
+    [ "sh_current", "structgondola_1_1Cooling.html#aa5848034580e2ba00cda2c1296e9ea43", null ],
+    [ "status_1", "structgondola_1_1Cooling.html#ad97dfd4d9ad9b4bbca3faefd0ff289a1", null ],
+    [ "status_2", "structgondola_1_1Cooling.html#aab7cc135255ab750ae06bb2773ee0b4a", null ]
+];

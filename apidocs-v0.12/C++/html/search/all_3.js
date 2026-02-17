@@ -1,8 +1,8 @@
 var searchData=
 [
   ['d_5fv_0',['d_v',['../structgondola_1_1RBCalibration.html#ae9453fdf6f109582f60f07c1b8845b6e',1,'gondola::RBCalibration']]],
-  ['daq_5fcount_1',['daq_count',['../structGaps_1_1Telemetry_1_1TrkHeader.html#acb3ec4e4bd7cfb4f8ef6f928a91b6a08',1,'Gaps::Telemetry::TrkHeader']]],
-  ['daq_5fheader_2',['daq_header',['../structGaps_1_1Telemetry_1_1TrkEventPacket.html#aaae46f85f76cc3f58cf2128aa4e38d6a',1,'Gaps::Telemetry::TrkEventPacket']]],
+  ['daq_5fcount_1',['daq_count',['../structgondola_1_1TrkHeader.html#af7812a4424fa5a91ac82a6156004cdde',1,'gondola::TrkHeader']]],
+  ['daq_5fheader_2',['daq_header',['../structgondola_1_1TrkEventPacket.html#a0def2945c40282d8e1f91cf88e9c6c50',1,'gondola::TrkEventPacket']]],
   ['daq_5fqueue_5flen_3',['daq_queue_len',['../structMtbMoniData.html#a2fbc46d27b4cbc2cad27e6d7cace6c1d',1,'MtbMoniData']]],
   ['data_5fid_4',['data_id',['../structgondola_1_1TofPaddleTimingConstant.html#a41cb1a0e033ce0842cad60d50ad14096',1,'gondola::TofPaddleTimingConstant']]],
   ['data_5ftype_5',['data_type',['../structgondola_1_1RBEvent.html#adba2e4f9471df2fd1b5c49aa3887cbb4',1,'gondola::RBEvent']]],
@@ -10,8 +10,8 @@ var searchData=
   ['database_2eh_7',['database.h',['../database_8h.html',1,'']]],
   ['datarunend_8',['DataRunEnd',['../commands_8h.html#ad6d9706eb4e1aa6ed956444c5cd2a3b5a8e31559789ff4a8ed253a3989cf0569b',1,'commands.h']]],
   ['datarunstart_9',['DataRunStart',['../commands_8h.html#ad6d9706eb4e1aa6ed956444c5cd2a3b5a6c501bfa3e8a998879abc522e2e696d9',1,'commands.h']]],
-  ['decimationsettings_10',['DecimationSettings',['../namespaceGaps_1_1Telemetry.html#a3567431f12c1aa2d8da946e149b62aa7a863e05d77b13fe3c0a7190499d80dbcc',1,'Gaps::Telemetry']]],
-  ['decode_5fid_11',['decode_id',['../structGaps_1_1Telemetry_1_1TrkHit.html#a1a858df8f51244eb07aef9082426bc24',1,'Gaps::Telemetry::TrkHit']]],
+  ['decimationsettings_10',['DecimationSettings',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39ceda863e05d77b13fe3c0a7190499d80dbcc',1,'gondola']]],
+  ['decode_5fid_11',['decode_id',['../structgondola_1_1TrkHit.html#ad161438cd176eecc3462e866875abac2',1,'gondola::TrkHit']]],
   ['diamond_12',['Diamond',['../namespacegondola.html#ac61bd1b8e62eab79a1089be6ecc1ca3da8f7671185d590914ac21c7511767b699',1,'gondola']]],
   ['disable_5feventdata_13',['disable_eventdata',['../structgondola_1_1RBCalibration.html#ac14745aee1e64dd8df1fe5a0398cd8be',1,'gondola::RBCalibration']]],
   ['disk_5fusage_14',['disk_usage',['../structCPUMoniData.html#a5b5ab609b4349130762f9af889a7cbcb',1,'CPUMoniData']]],

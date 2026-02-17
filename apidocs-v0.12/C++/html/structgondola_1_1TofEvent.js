@@ -2,14 +2,17 @@ var structgondola_1_1TofEvent =
 [
     [ "TofEvent", "structgondola_1_1TofEvent.html#a472db40fd776f3517c095b83ed69b96d", null ],
     [ "get_hits", "structgondola_1_1TofEvent.html#a57d68c0ac8f98da93aba370663cb6bc0", null ],
+    [ "get_rb_link_ids", "structgondola_1_1TofEvent.html#a6c451847988c3cb35fc9a446b1c135e7", null ],
     [ "get_rbevent", "structgondola_1_1TofEvent.html#a630903c288fc7d96a16fe4a3b9ab9cc8", null ],
     [ "get_rbids", "structgondola_1_1TofEvent.html#a1e3f10a2576215b86efd38b3be586a59", null ],
+    [ "get_timestamp48", "structgondola_1_1TofEvent.html#ad1a9133dd50d10f37ad2465f685ebd88", null ],
+    [ "get_trigger_hits", "structgondola_1_1TofEvent.html#a62848f7f2cee60cfba9909c6875fa977", null ],
+    [ "get_trigger_sources", "structgondola_1_1TofEvent.html#a0d2750b1e4a05c404d26e4525500d4af", null ],
     [ "to_string", "structgondola_1_1TofEvent.html#a7346ea2a4a33ffe5a2c2e6100a625b3f", null ],
     [ "channel_mask", "structgondola_1_1TofEvent.html#ae3ebafe20044ee6ccced77eaf60c2242", null ],
     [ "drs_dead_lost_hits", "structgondola_1_1TofEvent.html#a981d1e93066e6b07e4bbbf6d7b921738", null ],
     [ "dsi_j_mask", "structgondola_1_1TofEvent.html#af4bf37090b00118f5c6ff18fbb2542b9", null ],
     [ "event_id", "structgondola_1_1TofEvent.html#aed36eda570a458ca55274a32d9d9f3ce", null ],
-    [ "header", "structgondola_1_1TofEvent.html#a70b283f94774bef38c31b23cf283464e", null ],
     [ "hits", "structgondola_1_1TofEvent.html#a6582a153cdb5cc6d2c06f5a6390d5fed", null ],
     [ "mt_event", "structgondola_1_1TofEvent.html#abe4d42aeb75db2ad112d590741b6889c", null ],
     [ "mtb_link_mask", "structgondola_1_1TofEvent.html#ae9026f0e498aa7b24847862c1f5a6851", null ],
@@ -27,5 +30,5 @@ var structgondola_1_1TofEvent =
     [ "tot_edep_cor", "structgondola_1_1TofEvent.html#a00dc63f1263775b9e8ba1dd193f29163", null ],
     [ "tot_edep_umb", "structgondola_1_1TofEvent.html#a548d162033ba5a7db441756583a0a250", null ],
     [ "trigger_sources", "structgondola_1_1TofEvent.html#a7f4a94294974e868faac339ae6e1bc5e", null ],
-    [ "version", "structgondola_1_1TofEvent.html#a2b686fb58d818fd81335d3b3c1abcb00", null ]
+    [ "version", "structgondola_1_1TofEvent.html#aa8aeba73b3348c9a697707fb671bb711", null ]
 ];

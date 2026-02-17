@@ -1,0 +1,244 @@
+\doxysection{gondola\+::Cooling Struct Reference}
+\hypertarget{structgondola_1_1Cooling}{}\label{structgondola_1_1Cooling}\index{gondola::Cooling@{gondola::Cooling}}
+
+
+{\ttfamily \#include $<$telemetry\+\_\+dataclasses.\+hpp$>$}
+
+
+
+Collaboration diagram for gondola\+::Cooling\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=222pt]{structgondola_1_1Cooling__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1Cooling_a9a7083ccafc703120c6ab97ab57d2f12}{to\+\_\+string}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ std\+::string
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1Cooling_ada4b1e9f2fda798158d9445de4fc33ac}{from\+\_\+bytestream}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{stream}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}}) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{structgondola_1_1Cooling}{Cooling}}, \mbox{\hyperlink{classgondola_1_1IOError}{IOError}} $>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structgondola_1_1TelemetryPacketHeader}{Telemetry\+Packet\+Header}} \mbox{\hyperlink{structgondola_1_1Cooling_aeeec83a2c6f23933f102836798ae831b}{header}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{structgondola_1_1Cooling_a80b035024fe5f741b358f6988450f727}{frame\+\_\+counter}} \{0xffffffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structgondola_1_1Cooling_ad97dfd4d9ad9b4bbca3faefd0ff289a1}{status\+\_\+1}} \{0xff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structgondola_1_1Cooling_aab7cc135255ab750ae06bb2773ee0b4a}{status\+\_\+2}} \{0xff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structgondola_1_1Cooling_ac49e968c527d58c67985d57ecd5e6c47}{rx\+\_\+byte\+\_\+num}} \{0xff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structgondola_1_1Cooling_a1aa791fee21b3931a5aae14d6698e612}{rx\+\_\+cmd\+\_\+num}} \{0xff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \mbox{\hyperlink{structgondola_1_1Cooling_a8d43406cb20576f0c6f627cbb363c867}{last\+\_\+cmd}} \{0xffffffffffffffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1Cooling_a07f3ddd531a68cc2971c3c67cf015bd1}{rsv\+\_\+t}} \{0xffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1Cooling_aca70e7adff91e85069fe82cb210b5194}{rh\+\_\+on}} \{0xffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1Cooling_a51884dc1c8252dcd0d900a4c6ba4d3c2}{rh\+\_\+off}} \{0xffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1Cooling_ae647ced54bcaf882845dc789f5a965c1}{fpga\+\_\+board\+\_\+v\+\_\+in}} \{0xffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1Cooling_a6b5842f1211dd0816572cb458d43f7ae}{fpga\+\_\+board\+\_\+i\+\_\+in}} \{0xffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1Cooling_a637fa3bfd654af0028991a3495dda164}{fpga\+\_\+board\+\_\+t}} \{0xffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1Cooling_a2d0ddf12cdbe5456fd602565b17e3e81}{fpga\+\_\+board\+\_\+p}} \{0xffff\}
+\item 
+std\+::array$<$ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}, 64 $>$ \mbox{\hyperlink{structgondola_1_1Cooling_aaaaa061ba89f3378008fd754e9d4feea}{rtd}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1Cooling_aa5848034580e2ba00cda2c1296e9ea43}{sh\+\_\+current}} \{0xffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1Cooling_ac7f22ee1e59db52e6fccfbcb8672087d}{rh\+\_\+current}} \{0xffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1Cooling_a6b5bdf2fcaf834ed5cbde76992f3e9f0}{pw\+\_\+board1\+\_\+t}} \{0xffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1Cooling_a433df66f026755b9da6ed85fab262f71}{pw\+\_\+board2\+\_\+t}} \{0xffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1Cooling_a81d7ad95b2bcdc2d34e5cb5034fefca4}{sh1\+\_\+time\+\_\+left}} \{0xffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1Cooling_a6aed1edcc693d398ed5c1f0fbc32d6cf}{sh2\+\_\+time\+\_\+left}} \{0xffff\}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1Cooling_a42ded780183f44be6bef852a48f07da9}{sh3\+\_\+time\+\_\+left}} \{0xffff\}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1Cooling_ac2e3d2b980419408856e683326a1cb36}{SIZE}} = 105
+\begin{DoxyCompactList}\small\item\em size with packet header \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structgondola_1_1Cooling_ada4b1e9f2fda798158d9445de4fc33ac}\label{structgondola_1_1Cooling_ada4b1e9f2fda798158d9445de4fc33ac} 
+\index{gondola::Cooling@{gondola::Cooling}!from\_bytestream@{from\_bytestream}}
+\index{from\_bytestream@{from\_bytestream}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{from\_bytestream()}{from\_bytestream()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Cooling\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&}]{stream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&}]{pos }\end{DoxyParamCaption}) -\/$>$ r\+::\+Result$<$\mbox{\hyperlink{structgondola_1_1Cooling}{Cooling}}, \mbox{\hyperlink{classgondola_1_1IOError}{IOError}}$>$\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{structgondola_1_1Cooling_a9a7083ccafc703120c6ab97ab57d2f12}\label{structgondola_1_1Cooling_a9a7083ccafc703120c6ab97ab57d2f12} 
+\index{gondola::Cooling@{gondola::Cooling}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Cooling\+::to\+\_\+string (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ std\+::string}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structgondola_1_1Cooling_a6b5842f1211dd0816572cb458d43f7ae}\label{structgondola_1_1Cooling_a6b5842f1211dd0816572cb458d43f7ae} 
+\index{gondola::Cooling@{gondola::Cooling}!fpga\_board\_i\_in@{fpga\_board\_i\_in}}
+\index{fpga\_board\_i\_in@{fpga\_board\_i\_in}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{fpga\_board\_i\_in}{fpga\_board\_i\_in}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Cooling\+::fpga\+\_\+board\+\_\+i\+\_\+in \{0xffff\}}
+
+\Hypertarget{structgondola_1_1Cooling_a2d0ddf12cdbe5456fd602565b17e3e81}\label{structgondola_1_1Cooling_a2d0ddf12cdbe5456fd602565b17e3e81} 
+\index{gondola::Cooling@{gondola::Cooling}!fpga\_board\_p@{fpga\_board\_p}}
+\index{fpga\_board\_p@{fpga\_board\_p}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{fpga\_board\_p}{fpga\_board\_p}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Cooling\+::fpga\+\_\+board\+\_\+p \{0xffff\}}
+
+\Hypertarget{structgondola_1_1Cooling_a637fa3bfd654af0028991a3495dda164}\label{structgondola_1_1Cooling_a637fa3bfd654af0028991a3495dda164} 
+\index{gondola::Cooling@{gondola::Cooling}!fpga\_board\_t@{fpga\_board\_t}}
+\index{fpga\_board\_t@{fpga\_board\_t}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{fpga\_board\_t}{fpga\_board\_t}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Cooling\+::fpga\+\_\+board\+\_\+t \{0xffff\}}
+
+\Hypertarget{structgondola_1_1Cooling_ae647ced54bcaf882845dc789f5a965c1}\label{structgondola_1_1Cooling_ae647ced54bcaf882845dc789f5a965c1} 
+\index{gondola::Cooling@{gondola::Cooling}!fpga\_board\_v\_in@{fpga\_board\_v\_in}}
+\index{fpga\_board\_v\_in@{fpga\_board\_v\_in}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{fpga\_board\_v\_in}{fpga\_board\_v\_in}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Cooling\+::fpga\+\_\+board\+\_\+v\+\_\+in \{0xffff\}}
+
+\Hypertarget{structgondola_1_1Cooling_a80b035024fe5f741b358f6988450f727}\label{structgondola_1_1Cooling_a80b035024fe5f741b358f6988450f727} 
+\index{gondola::Cooling@{gondola::Cooling}!frame\_counter@{frame\_counter}}
+\index{frame\_counter@{frame\_counter}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{frame\_counter}{frame\_counter}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} gondola\+::\+Cooling\+::frame\+\_\+counter \{0xffffffff\}}
+
+\Hypertarget{structgondola_1_1Cooling_aeeec83a2c6f23933f102836798ae831b}\label{structgondola_1_1Cooling_aeeec83a2c6f23933f102836798ae831b} 
+\index{gondola::Cooling@{gondola::Cooling}!header@{header}}
+\index{header@{header}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{header}{header}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structgondola_1_1TelemetryPacketHeader}{Telemetry\+Packet\+Header}} gondola\+::\+Cooling\+::header}
+
+\Hypertarget{structgondola_1_1Cooling_a8d43406cb20576f0c6f627cbb363c867}\label{structgondola_1_1Cooling_a8d43406cb20576f0c6f627cbb363c867} 
+\index{gondola::Cooling@{gondola::Cooling}!last\_cmd@{last\_cmd}}
+\index{last\_cmd@{last\_cmd}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{last\_cmd}{last\_cmd}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} gondola\+::\+Cooling\+::last\+\_\+cmd \{0xffffffffffffffff\}}
+
+\Hypertarget{structgondola_1_1Cooling_a6b5bdf2fcaf834ed5cbde76992f3e9f0}\label{structgondola_1_1Cooling_a6b5bdf2fcaf834ed5cbde76992f3e9f0} 
+\index{gondola::Cooling@{gondola::Cooling}!pw\_board1\_t@{pw\_board1\_t}}
+\index{pw\_board1\_t@{pw\_board1\_t}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{pw\_board1\_t}{pw\_board1\_t}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Cooling\+::pw\+\_\+board1\+\_\+t \{0xffff\}}
+
+\Hypertarget{structgondola_1_1Cooling_a433df66f026755b9da6ed85fab262f71}\label{structgondola_1_1Cooling_a433df66f026755b9da6ed85fab262f71} 
+\index{gondola::Cooling@{gondola::Cooling}!pw\_board2\_t@{pw\_board2\_t}}
+\index{pw\_board2\_t@{pw\_board2\_t}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{pw\_board2\_t}{pw\_board2\_t}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Cooling\+::pw\+\_\+board2\+\_\+t \{0xffff\}}
+
+\Hypertarget{structgondola_1_1Cooling_ac7f22ee1e59db52e6fccfbcb8672087d}\label{structgondola_1_1Cooling_ac7f22ee1e59db52e6fccfbcb8672087d} 
+\index{gondola::Cooling@{gondola::Cooling}!rh\_current@{rh\_current}}
+\index{rh\_current@{rh\_current}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{rh\_current}{rh\_current}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Cooling\+::rh\+\_\+current \{0xffff\}}
+
+\Hypertarget{structgondola_1_1Cooling_a51884dc1c8252dcd0d900a4c6ba4d3c2}\label{structgondola_1_1Cooling_a51884dc1c8252dcd0d900a4c6ba4d3c2} 
+\index{gondola::Cooling@{gondola::Cooling}!rh\_off@{rh\_off}}
+\index{rh\_off@{rh\_off}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{rh\_off}{rh\_off}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Cooling\+::rh\+\_\+off \{0xffff\}}
+
+\Hypertarget{structgondola_1_1Cooling_aca70e7adff91e85069fe82cb210b5194}\label{structgondola_1_1Cooling_aca70e7adff91e85069fe82cb210b5194} 
+\index{gondola::Cooling@{gondola::Cooling}!rh\_on@{rh\_on}}
+\index{rh\_on@{rh\_on}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{rh\_on}{rh\_on}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Cooling\+::rh\+\_\+on \{0xffff\}}
+
+\Hypertarget{structgondola_1_1Cooling_a07f3ddd531a68cc2971c3c67cf015bd1}\label{structgondola_1_1Cooling_a07f3ddd531a68cc2971c3c67cf015bd1} 
+\index{gondola::Cooling@{gondola::Cooling}!rsv\_t@{rsv\_t}}
+\index{rsv\_t@{rsv\_t}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{rsv\_t}{rsv\_t}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Cooling\+::rsv\+\_\+t \{0xffff\}}
+
+\Hypertarget{structgondola_1_1Cooling_aaaaa061ba89f3378008fd754e9d4feea}\label{structgondola_1_1Cooling_aaaaa061ba89f3378008fd754e9d4feea} 
+\index{gondola::Cooling@{gondola::Cooling}!rtd@{rtd}}
+\index{rtd@{rtd}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{rtd}{rtd}}
+{\footnotesize\ttfamily std\+::array$<$\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}, 64$>$ gondola\+::\+Cooling\+::rtd}
+
+\Hypertarget{structgondola_1_1Cooling_ac49e968c527d58c67985d57ecd5e6c47}\label{structgondola_1_1Cooling_ac49e968c527d58c67985d57ecd5e6c47} 
+\index{gondola::Cooling@{gondola::Cooling}!rx\_byte\_num@{rx\_byte\_num}}
+\index{rx\_byte\_num@{rx\_byte\_num}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{rx\_byte\_num}{rx\_byte\_num}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} gondola\+::\+Cooling\+::rx\+\_\+byte\+\_\+num \{0xff\}}
+
+\Hypertarget{structgondola_1_1Cooling_a1aa791fee21b3931a5aae14d6698e612}\label{structgondola_1_1Cooling_a1aa791fee21b3931a5aae14d6698e612} 
+\index{gondola::Cooling@{gondola::Cooling}!rx\_cmd\_num@{rx\_cmd\_num}}
+\index{rx\_cmd\_num@{rx\_cmd\_num}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{rx\_cmd\_num}{rx\_cmd\_num}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} gondola\+::\+Cooling\+::rx\+\_\+cmd\+\_\+num \{0xff\}}
+
+\Hypertarget{structgondola_1_1Cooling_a81d7ad95b2bcdc2d34e5cb5034fefca4}\label{structgondola_1_1Cooling_a81d7ad95b2bcdc2d34e5cb5034fefca4} 
+\index{gondola::Cooling@{gondola::Cooling}!sh1\_time\_left@{sh1\_time\_left}}
+\index{sh1\_time\_left@{sh1\_time\_left}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{sh1\_time\_left}{sh1\_time\_left}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Cooling\+::sh1\+\_\+time\+\_\+left \{0xffff\}}
+
+\Hypertarget{structgondola_1_1Cooling_a6aed1edcc693d398ed5c1f0fbc32d6cf}\label{structgondola_1_1Cooling_a6aed1edcc693d398ed5c1f0fbc32d6cf} 
+\index{gondola::Cooling@{gondola::Cooling}!sh2\_time\_left@{sh2\_time\_left}}
+\index{sh2\_time\_left@{sh2\_time\_left}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{sh2\_time\_left}{sh2\_time\_left}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Cooling\+::sh2\+\_\+time\+\_\+left \{0xffff\}}
+
+\Hypertarget{structgondola_1_1Cooling_a42ded780183f44be6bef852a48f07da9}\label{structgondola_1_1Cooling_a42ded780183f44be6bef852a48f07da9} 
+\index{gondola::Cooling@{gondola::Cooling}!sh3\_time\_left@{sh3\_time\_left}}
+\index{sh3\_time\_left@{sh3\_time\_left}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{sh3\_time\_left}{sh3\_time\_left}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Cooling\+::sh3\+\_\+time\+\_\+left \{0xffff\}}
+
+\Hypertarget{structgondola_1_1Cooling_aa5848034580e2ba00cda2c1296e9ea43}\label{structgondola_1_1Cooling_aa5848034580e2ba00cda2c1296e9ea43} 
+\index{gondola::Cooling@{gondola::Cooling}!sh\_current@{sh\_current}}
+\index{sh\_current@{sh\_current}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{sh\_current}{sh\_current}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Cooling\+::sh\+\_\+current \{0xffff\}}
+
+\Hypertarget{structgondola_1_1Cooling_ac2e3d2b980419408856e683326a1cb36}\label{structgondola_1_1Cooling_ac2e3d2b980419408856e683326a1cb36} 
+\index{gondola::Cooling@{gondola::Cooling}!SIZE@{SIZE}}
+\index{SIZE@{SIZE}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{SIZE}{SIZE}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Cooling\+::\+SIZE = 105\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+size with packet header 
+
+\Hypertarget{structgondola_1_1Cooling_ad97dfd4d9ad9b4bbca3faefd0ff289a1}\label{structgondola_1_1Cooling_ad97dfd4d9ad9b4bbca3faefd0ff289a1} 
+\index{gondola::Cooling@{gondola::Cooling}!status\_1@{status\_1}}
+\index{status\_1@{status\_1}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{status\_1}{status\_1}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} gondola\+::\+Cooling\+::status\+\_\+1 \{0xff\}}
+
+\Hypertarget{structgondola_1_1Cooling_aab7cc135255ab750ae06bb2773ee0b4a}\label{structgondola_1_1Cooling_aab7cc135255ab750ae06bb2773ee0b4a} 
+\index{gondola::Cooling@{gondola::Cooling}!status\_2@{status\_2}}
+\index{status\_2@{status\_2}!gondola::Cooling@{gondola::Cooling}}
+\doxysubsubsection{\texorpdfstring{status\_2}{status\_2}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} gondola\+::\+Cooling\+::status\+\_\+2 \{0xff\}}
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/\mbox{\hyperlink{telemetry__dataclasses_8hpp}{telemetry\+\_\+dataclasses.\+hpp}}\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/\mbox{\hyperlink{telemetry__dataclasses_8cxx}{telemetry\+\_\+dataclasses.\+cxx}}\end{DoxyCompactItemize}

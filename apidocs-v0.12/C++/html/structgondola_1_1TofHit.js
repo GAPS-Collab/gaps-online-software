@@ -2,11 +2,9 @@ var structgondola_1_1TofHit =
 [
     [ "get_charge_a", "structgondola_1_1TofHit.html#a4ec818317e010f61b902fb905eb908b7", null ],
     [ "get_charge_b", "structgondola_1_1TofHit.html#a411d49095ac5f75d1a8031e7e2b8c6f1", null ],
-    [ "get_charge_min_i", "structgondola_1_1TofHit.html#aeeb105cd592b64554943106fa2364f72", null ],
     [ "get_peak_a", "structgondola_1_1TofHit.html#abd0d82e6058dc3ae7b2d219fea251a04", null ],
     [ "get_peak_b", "structgondola_1_1TofHit.html#a9c890efdb14088fc0117dd015b536739", null ],
     [ "get_t0_relative", "structgondola_1_1TofHit.html#a3b17224c907026ea21ab14ff7a2fbdd8", null ],
-    [ "get_t_avg", "structgondola_1_1TofHit.html#ad48101b6e5f39e4f34878150a4d9304d", null ],
     [ "get_time_a", "structgondola_1_1TofHit.html#ad5c68d0fb41d13edde22fe199f2dc3d7", null ],
     [ "get_time_b", "structgondola_1_1TofHit.html#af97bd18ed4e8a4be163a4e35e0a2c39b", null ],
     [ "get_timestamp48", "structgondola_1_1TofHit.html#a9ade98a4514a988221771f11de295985", null ],
@@ -26,7 +24,6 @@ var structgondola_1_1TofHit =
     [ "baseline_a_rms", "structgondola_1_1TofHit.html#a3685c82a69b1fa5337c6d6de23fa772f", null ],
     [ "baseline_b", "structgondola_1_1TofHit.html#a4f89a88cc04bd16c156d737acbe710fa", null ],
     [ "baseline_b_rms", "structgondola_1_1TofHit.html#a972e854f3a4962ba1cce9d5e8dd7c118", null ],
-    [ "broken", "structgondola_1_1TofHit.html#a785eede809bd1d105095a2236a9c757e", null ],
     [ "coax_cbl_time", "structgondola_1_1TofHit.html#af6091af290e37f29719aafc688f0febe", null ],
     [ "ctr_etx", "structgondola_1_1TofHit.html#a469f5da9286a585fe86235fa80b7bdd0", null ],
     [ "event_t0", "structgondola_1_1TofHit.html#a4b8a41fc8bed5d1078c12977cc07fda1", null ],
@@ -37,5 +34,5 @@ var structgondola_1_1TofHit =
     [ "tail", "structgondola_1_1TofHit.html#aa9d901afff1a2e399b01f0f19e755a1b", null ],
     [ "timestamp16", "structgondola_1_1TofHit.html#a7e7efcfa3035b8304ef983ca601eb412", null ],
     [ "timestamp32", "structgondola_1_1TofHit.html#ae1fd9ac50a31c3c88082cc14b93df429", null ],
-    [ "version", "structgondola_1_1TofHit.html#a66833c58aa932e3503529de12fa5b24a", null ]
+    [ "version", "structgondola_1_1TofHit.html#a6076aeaa8c64e990f21748c31a250ee4", null ]
 ];

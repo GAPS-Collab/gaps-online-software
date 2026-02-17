@@ -1,0 +1,77 @@
+\doxysection{gondola\+::Telemetry\+Packet Struct Reference}
+\hypertarget{structgondola_1_1TelemetryPacket}{}\label{structgondola_1_1TelemetryPacket}\index{gondola::TelemetryPacket@{gondola::TelemetryPacket}}
+
+
+{\ttfamily \#include $<$telemetry\+\_\+dataclasses.\+hpp$>$}
+
+
+
+Collaboration diagram for gondola\+::Telemetry\+Packet\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=222pt]{structgondola_1_1TelemetryPacket__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TelemetryPacket_a24413f5a866a6248c292aa41016488cf}{to\+\_\+string}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ std\+::string
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TelemetryPacket_a039f12a19b160a410fc24ec61e36218e}{is\+\_\+event\+\_\+packet}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TelemetryPacket_af02b95de6847c075c73bf2951774b7aa}{from\+\_\+bytestream}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{stream}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}}) -\/$>$ \mbox{\hyperlink{structgondola_1_1TelemetryPacket}{Telemetry\+Packet}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structgondola_1_1TelemetryPacketHeader}{Telemetry\+Packet\+Header}} \mbox{\hyperlink{structgondola_1_1TelemetryPacket_a4e3ac98e36c40cafe46281910db6757f}{header}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{structgondola_1_1TelemetryPacket_ac939a6dd619c94ea83d56441c564a5fc}{payload}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structgondola_1_1TelemetryPacket_af02b95de6847c075c73bf2951774b7aa}\label{structgondola_1_1TelemetryPacket_af02b95de6847c075c73bf2951774b7aa} 
+\index{gondola::TelemetryPacket@{gondola::TelemetryPacket}!from\_bytestream@{from\_bytestream}}
+\index{from\_bytestream@{from\_bytestream}!gondola::TelemetryPacket@{gondola::TelemetryPacket}}
+\doxysubsubsection{\texorpdfstring{from\_bytestream()}{from\_bytestream()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Telemetry\+Packet\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&}]{stream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&}]{pos }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{structgondola_1_1TelemetryPacket}{Telemetry\+Packet}}\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{structgondola_1_1TelemetryPacket_a039f12a19b160a410fc24ec61e36218e}\label{structgondola_1_1TelemetryPacket_a039f12a19b160a410fc24ec61e36218e} 
+\index{gondola::TelemetryPacket@{gondola::TelemetryPacket}!is\_event\_packet@{is\_event\_packet}}
+\index{is\_event\_packet@{is\_event\_packet}!gondola::TelemetryPacket@{gondola::TelemetryPacket}}
+\doxysubsubsection{\texorpdfstring{is\_event\_packet()}{is\_event\_packet()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Telemetry\+Packet\+::is\+\_\+event\+\_\+packet (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}}}
+
+\Hypertarget{structgondola_1_1TelemetryPacket_a24413f5a866a6248c292aa41016488cf}\label{structgondola_1_1TelemetryPacket_a24413f5a866a6248c292aa41016488cf} 
+\index{gondola::TelemetryPacket@{gondola::TelemetryPacket}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!gondola::TelemetryPacket@{gondola::TelemetryPacket}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Telemetry\+Packet\+::to\+\_\+string (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ std\+::string}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structgondola_1_1TelemetryPacket_a4e3ac98e36c40cafe46281910db6757f}\label{structgondola_1_1TelemetryPacket_a4e3ac98e36c40cafe46281910db6757f} 
+\index{gondola::TelemetryPacket@{gondola::TelemetryPacket}!header@{header}}
+\index{header@{header}!gondola::TelemetryPacket@{gondola::TelemetryPacket}}
+\doxysubsubsection{\texorpdfstring{header}{header}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structgondola_1_1TelemetryPacketHeader}{Telemetry\+Packet\+Header}} gondola\+::\+Telemetry\+Packet\+::header}
+
+\Hypertarget{structgondola_1_1TelemetryPacket_ac939a6dd619c94ea83d56441c564a5fc}\label{structgondola_1_1TelemetryPacket_ac939a6dd619c94ea83d56441c564a5fc} 
+\index{gondola::TelemetryPacket@{gondola::TelemetryPacket}!payload@{payload}}
+\index{payload@{payload}!gondola::TelemetryPacket@{gondola::TelemetryPacket}}
+\doxysubsubsection{\texorpdfstring{payload}{payload}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}$>$ gondola\+::\+Telemetry\+Packet\+::payload}
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/\mbox{\hyperlink{telemetry__dataclasses_8hpp}{telemetry\+\_\+dataclasses.\+hpp}}\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/\mbox{\hyperlink{telemetry__dataclasses_8cxx}{telemetry\+\_\+dataclasses.\+cxx}}\end{DoxyCompactItemize}

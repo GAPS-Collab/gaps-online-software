@@ -1,8 +1,8 @@
 var searchData=
 [
   ['d_5fv_0',['d_v',['../structgondola_1_1RBCalibration.html#ae9453fdf6f109582f60f07c1b8845b6e',1,'gondola::RBCalibration']]],
-  ['daq_5fcount_1',['daq_count',['../structGaps_1_1Telemetry_1_1TrkHeader.html#acb3ec4e4bd7cfb4f8ef6f928a91b6a08',1,'Gaps::Telemetry::TrkHeader']]],
-  ['daq_5fheader_2',['daq_header',['../structGaps_1_1Telemetry_1_1TrkEventPacket.html#aaae46f85f76cc3f58cf2128aa4e38d6a',1,'Gaps::Telemetry::TrkEventPacket']]],
+  ['daq_5fcount_1',['daq_count',['../structgondola_1_1TrkHeader.html#af7812a4424fa5a91ac82a6156004cdde',1,'gondola::TrkHeader']]],
+  ['daq_5fheader_2',['daq_header',['../structgondola_1_1TrkEventPacket.html#a0def2945c40282d8e1f91cf88e9c6c50',1,'gondola::TrkEventPacket']]],
   ['daq_5fqueue_5flen_3',['daq_queue_len',['../structMtbMoniData.html#a2fbc46d27b4cbc2cad27e6d7cace6c1d',1,'MtbMoniData']]],
   ['data_5fid_4',['data_id',['../structgondola_1_1TofPaddleTimingConstant.html#a41cb1a0e033ce0842cad60d50ad14096',1,'gondola::TofPaddleTimingConstant']]],
   ['data_5ftype_5',['data_type',['../structgondola_1_1RBEvent.html#adba2e4f9471df2fd1b5c49aa3887cbb4',1,'gondola::RBEvent']]],

@@ -6,7 +6,7 @@ var structgondola_1_1TelemetryPacketReader =
     [ "cache_all_packets", "structgondola_1_1TelemetryPacketReader.html#adf7dd2adf0d5b771941f6b604e50b8b1", null ],
     [ "count_packets", "structgondola_1_1TelemetryPacketReader.html#a4ac18e3e88c5c9d83901668b170b48c3", null ],
     [ "get_filenames", "structgondola_1_1TelemetryPacketReader.html#aeab4c103035559c98ade8313f5650958", null ],
-    [ "get_next_packet", "structgondola_1_1TelemetryPacketReader.html#a51f8d07aa658c56d2ddd5054b7a85806", null ],
+    [ "get_next_packet", "structgondola_1_1TelemetryPacketReader.html#a5558408ce1d37718d82db9438184b6c7", null ],
     [ "get_packet_index", "structgondola_1_1TelemetryPacketReader.html#a6008e84c1ee2b9ab5b92ec4a4b564fb6", null ],
     [ "is_exhausted", "structgondola_1_1TelemetryPacketReader.html#a16cf37c876f8496252347f8c21939b2f", null ],
     [ "print_packet_index", "structgondola_1_1TelemetryPacketReader.html#a8c859d9bd436871196abae1261b880b4", null ],

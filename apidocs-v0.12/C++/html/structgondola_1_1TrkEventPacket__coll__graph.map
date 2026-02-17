@@ -1,0 +1,7 @@
+<map id="gondola::TrkEventPacket" name="gondola::TrkEventPacket">
+<area shape="rect" id="Node000001" title=" " alt="" coords="106,108,286,133"/>
+<area shape="rect" id="Node000002" href="$structgondola_1_1TelemetryPacketHeader.html" title=" " alt="" coords="5,5,195,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="131,53,186,106,182,110,127,57"/>
+<area shape="rect" id="Node000003" href="$structgondola_1_1TrkHeader.html" title=" " alt="" coords="219,13,367,38"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="273,49,210,110,206,106,270,46"/>
+</map>
