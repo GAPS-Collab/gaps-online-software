@@ -646,12 +646,12 @@ auto g::TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
   }
   u8 status_version_u8     = g::parse_u8(stream, pos);
   event.status             = static_cast<EventStatus>(status_version_u8 & 0x3f);
-  event.version            = (Gaps::ProtocolVersion)(status_version_u8 & 0xc0);
+  event.version            = (g::ProtocolVersion)(status_version_u8 & 0xc0);
   event.trigger_sources    = g::parse_u16(stream, pos);
   event.n_trigger_paddles  = g::parse_u8(stream, pos);
   event.event_id           = g::parse_u32(stream, pos);
-  if (event.version == Gaps::ProtocolVersion::V1
-    || event.version == Gaps::ProtocolVersion::V3) {
+  if (event.version == g::ProtocolVersion::V1
+    || event.version == g::ProtocolVersion::V3) {
     event.n_hits_umb       = g::parse_u8(stream, pos); 
     event.n_hits_cbe       = g::parse_u8(stream, pos); 
     event.n_hits_cor       = g::parse_u8(stream, pos); 
@@ -687,8 +687,8 @@ auto g::TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
       return Err(hit_res.unwrap_err());
     }
   }
-  if (event.version == Gaps::ProtocolVersion::V2 
-    || event.version == Gaps::ProtocolVersion::V3) {
+  if (event.version == g::ProtocolVersion::V2 
+    || event.version == g::ProtocolVersion::V3) {
     u8 n_rb_events = g::parse_u8(stream, pos);
     while (n_rb_events > 0) {
       event.rb_events.push_back(RBEvent::from_bytestream(stream, pos));
@@ -1007,7 +1007,7 @@ auto g::TofEvent::to_string() const -> std::string {
   repr += std::format("\n  timestamp32      : {}", timestamp32); 
   repr += std::format("\n  timestamp16      : {}", timestamp16); 
   //repr += std::format("\n   |-> timestamp48 : {}", get_timestamp48()); 
-  if (version == Gaps::ProtocolVersion::V1) {
+  if (version == g::ProtocolVersion::V1) {
     repr += "\n ---- V1 variables ----";
     repr += std::format("\n n_hits_umb   : {}", n_hits_umb  );   
     repr += std::format("\n n_hits_cbe   : {}", n_hits_cbe  );   
@@ -1237,7 +1237,7 @@ auto g::TofHit::from_bytestream(const Vec<u8> &bytestream, u64 &pos)
    return Err(err);
  }
  u8  version        = g::parse_u8(bytestream, ver_pos);
- hit.version        = (Gaps::ProtocolVersion) version;
+ hit.version        = (g::ProtocolVersion) version;
  hit.paddle_id      = bytestream[pos]; pos+=1;
  hit.time_a_f32     = g::parse_f16(bytestream, pos); 
  hit.time_b_f32     = g::parse_f16(bytestream, pos); 
@@ -1272,12 +1272,12 @@ auto g::TofHit::from_bytestream(const Vec<u8> &bytestream, u64 &pos)
 }
 
 auto g::TofHit::to_string() const -> std::string {
-  std::string vstr = Gaps::pversion_to_string(version);
+  std::string vstr = g::pversion_to_string(version);
   std::string repr = std::format("<TofHit ({})", vstr);
   //repr += std::format("\n -- format test {:.2f}", get_time_a() );
   repr += "\n  paddle ID         : "     + std::to_string(paddle_id         );
   repr += "\n  paddle len        : "     + std::to_string(paddle_len         );
-  if (version == Gaps::ProtocolVersion::Unknown) {
+  if (version == g::ProtocolVersion::Unknown) {
     repr += "\n  timestamp32       : "     + std::to_string(timestamp32       );
     repr += "\n  timestamp16       : "     + std::to_string(timestamp16       );
     repr += "\n   |-> timestamp48  : "     + std::to_string(get_timestamp48() ); 
@@ -1486,11 +1486,11 @@ auto g::TofEventSummary::from_bytestream(const Vec<u8> &stream, u64 &pos)
   TofEventSummary tes;
   u8 status_version_u8  = g::parse_u8(stream, pos);
   tes.status            = static_cast<EventStatus>(status_version_u8 & 0x3f);
-  tes.version           = (Gaps::ProtocolVersion)(status_version_u8 & 0xc0);
+  tes.version           = (g::ProtocolVersion)(status_version_u8 & 0xc0);
   tes.trigger_sources   = g::parse_u16(stream, pos);
   tes.n_trigger_paddles = g::parse_u8(stream, pos);
   tes.event_id          = g::parse_u32(stream, pos);
-  if (tes.version == Gaps::ProtocolVersion::V1) {
+  if (tes.version == g::ProtocolVersion::V1) {
     tes.n_hits_umb      = g::parse_u8(stream, pos);
     tes.n_hits_cbe      = g::parse_u8(stream, pos);
     tes.n_hits_cor      = g::parse_u8(stream, pos);

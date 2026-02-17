@@ -37,6 +37,7 @@
 #endif
 
 namespace r = result;
+namespace g = gondola;
 
 class RBCalibration;
 
@@ -234,7 +235,7 @@ namespace gondola {
     u8   paddle_id;
   
     // new variables for V1
-    Gaps::ProtocolVersion version;
+    g::ProtocolVersion version;
     f32 baseline_a;
     f32 baseline_a_rms;
     f32 baseline_b;
@@ -520,7 +521,7 @@ namespace gondola {
     static constexpr u16 HEAD = 0xAAAA;
     static constexpr u16 TAIL = 0x5555;
  
-    Gaps::ProtocolVersion version ;
+    g::ProtocolVersion    version ;
     EventStatus status            ;
     EventQuality          quality ;
     u16         trigger_sources   ;
@@ -655,7 +656,7 @@ namespace gondola {
     static constexpr u16 HEAD = 0xAAAA;
     static constexpr u16 TAIL = 0x5555;
   
-    Gaps::ProtocolVersion version ;
+    g::ProtocolVersion    version ;
     EventStatus status            ; 
     u8          quality           ; 
     u16         trigger_sources   ; 

@@ -3,7 +3,7 @@
 
 #include "tof_typedefs.h"
 
-namespace Gaps {
+namespace gondola {
 
   static const u8 PROTOCOLVERSION_UNKNOWN = 0;
   static const u8 PROTOCOLVERSION_V1      = 64;
@@ -21,6 +21,6 @@ namespace Gaps {
 }
 
 
-std::ostream& operator<<(std::ostream& os, const Gaps::ProtocolVersion& version);
+std::ostream& operator<<(std::ostream& os, const gondola::ProtocolVersion& version);
 
 #endif

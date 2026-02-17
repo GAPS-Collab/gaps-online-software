@@ -2,22 +2,24 @@
 
 #include "version.h"
 
-std::string Gaps::pversion_to_string(Gaps::ProtocolVersion version) {
+namespace g = gondola;
+
+std::string g::pversion_to_string(g::ProtocolVersion version) {
   std::string repr = "<ProtocolVersion: ";
   switch (version) {
-    case Gaps::ProtocolVersion::Unknown : { 
+    case g::ProtocolVersion::Unknown : { 
       repr += "Unknown>";
       break;
     }
-    case Gaps::ProtocolVersion::V1 : { 
+    case g::ProtocolVersion::V1 : { 
       repr += "V1>";
       break;
     }
-    case Gaps::ProtocolVersion::V2 : { 
+    case g::ProtocolVersion::V2 : { 
       repr += "V2>";
       break;
     }
-    case Gaps::ProtocolVersion::V3 : { 
+    case g::ProtocolVersion::V3 : { 
       repr += "V3>";
       break;
     }
@@ -25,8 +27,8 @@ std::string Gaps::pversion_to_string(Gaps::ProtocolVersion version) {
   return repr;
 }
 
-std::ostream& operator<<(std::ostream& os, const Gaps::ProtocolVersion& version) {
-  os << Gaps::pversion_to_string(version);
+std::ostream& operator<<(std::ostream& os, const g::ProtocolVersion& version) {
+  os << g::pversion_to_string(version);
   return os;
 }
 
