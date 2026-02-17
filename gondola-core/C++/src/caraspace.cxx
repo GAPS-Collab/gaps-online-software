@@ -10,11 +10,10 @@
 #include "io/parsers.h"
 #include "caraspace.hpp"
 #include "io.hpp"
-//#include "io/telemetry_reader.hpp"
+#include "io/telemetry_reader.hpp"
 
 namespace g    = gondola;
 namespace fs   = std::filesystem;
-namespace gtel = Gaps::Telemetry;
 
 using namespace result;
 
@@ -184,8 +183,8 @@ auto g::CRFrame::get_tofpacket(std::string name)
   return Ok(tp);
 }
 
-gtel::Packet g::CRFrame::get_telemetrypacket(std::string name) {
-  gtel::Packet tp;
+g::Packet g::CRFrame::get_telemetrypacket(std::string name) {
+  g::Packet tp;
   usize pos = 0;
   CRFrameObjectType dtype = CRFrameObjectType::Unknown;
   if (index.contains(name)) {
@@ -198,7 +197,7 @@ gtel::Packet g::CRFrame::get_telemetrypacket(std::string name) {
     auto f_obj = CRFrameObject::from_bytestream(bytestorage, pos);
     //std::cout << f_obj.to_string() << std::endl;
     pos        = 0;
-    tp         = gtel::Packet::from_bytestream(f_obj.payload, pos); 
+    tp         = g::Packet::from_bytestream(f_obj.payload, pos); 
     //std::cout << tp.to_string() << std::endl;
   } else {
     spdlog::error("Trying to get TofPacket {}  however, that is of type {}", name, static_cast<u8>(dtype)); 
@@ -363,23 +362,23 @@ g::CRFrame g::CRReader::get_next_frame() {
     f_obj.payload = payload;
     std::string obj_name = "TelemetryPacketType::Unknown";
     switch (packet.header.ptype) {
-      case Gaps::Telemetry::BfswPacketType::BoringEvent : {
+      case g::BfswPacketType::BoringEvent : {
         obj_name = "TelemetryPacketType.BoringEvent";
         break;
       } 
-      case Gaps::Telemetry::BfswPacketType::InterestingEvent : {
+      case g::BfswPacketType::InterestingEvent : {
         obj_name = "TelemetryPacketType.InterestingEvent";
         break;
       } 
-      case Gaps::Telemetry::BfswPacketType::NoGapsTriggerEvent : {
+      case g::BfswPacketType::NoGapsTriggerEvent : {
         obj_name = "TelemetryPacketType.NoGapsTriggerEvent";
         break;
       } 
-      case Gaps::Telemetry::BfswPacketType::NoTofDataEvent : {
+      case g::BfswPacketType::NoTofDataEvent : {
         obj_name = "TelemetryPacketType.NoTofDataEvent";
         break;
       }
-      case Gaps::Telemetry::BfswPacketType::Tracker : {
+      case g::BfswPacketType::Tracker : {
         obj_name = "TelemetryPacketType.Tracker";
       }
       default : {

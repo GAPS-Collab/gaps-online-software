@@ -4,7 +4,6 @@
 #include "telemetry_dataclasses.hpp"
 #include "io/parsers.h"
 
-namespace gtl = Gaps::Telemetry;
 namespace g   = gondola;
 
 // make it more look like rust
@@ -13,54 +12,54 @@ using namespace result;
 //----------------------------------------
 
 /// FIXME - this is obviously incomplete
-u8 gtl::bfsw_ptype_to_u8(gtl::BfswPacketType pt) {
+u8 g::bfsw_ptype_to_u8(g::BfswPacketType pt) {
   switch (pt) {
-    case gtl::BfswPacketType::Unknown:
+    case g::BfswPacketType::Unknown:
       return 0;
-    case gtl::BfswPacketType::Tracker:
+    case g::BfswPacketType::Tracker:
       return 80;
-    case gtl::BfswPacketType::BoringEvent:
+    case g::BfswPacketType::BoringEvent:
       return 90;
-    case gtl::BfswPacketType::RBWaveform:
+    case g::BfswPacketType::RBWaveform:
       return 91;
-    case gtl::BfswPacketType::InterestingEvent:
+    case g::BfswPacketType::InterestingEvent:
       return 190;
-    case gtl::BfswPacketType::NoGapsTriggerEvent:
+    case g::BfswPacketType::NoGapsTriggerEvent:
       return 191;
-    case gtl::BfswPacketType::NoTofDataEvent:
+    case g::BfswPacketType::NoTofDataEvent:
       return 192;
     default:
       return 0;
   }
 }
 
-std::string gtl::bfsw_ptype_to_str(gtl::BfswPacketType pt) {
+std::string g::bfsw_ptype_to_str(g::BfswPacketType pt) {
   switch (pt) {
-      case gtl::BfswPacketType::Unknown:
+      case g::BfswPacketType::Unknown:
       return "Unknown";
-    case gtl::BfswPacketType::Tracker:
+    case g::BfswPacketType::Tracker:
       return "Tracker";
-    case gtl::BfswPacketType::BoringEvent:
+    case g::BfswPacketType::BoringEvent:
       return "BoringEvent";
-    case gtl::BfswPacketType::RBWaveform:
+    case g::BfswPacketType::RBWaveform:
       return "RBWaveform";
-    case gtl::BfswPacketType::InterestingEvent:
+    case g::BfswPacketType::InterestingEvent:
       return "InterestingEvent";
-    case gtl::BfswPacketType::NoGapsTriggerEvent:
+    case g::BfswPacketType::NoGapsTriggerEvent:
       return "NoGapsTriggerEvent";
-    case gtl::BfswPacketType::NoTofDataEvent:
+    case g::BfswPacketType::NoTofDataEvent:
       return "NoTofDataEvent";
-    case gtl::BfswPacketType::CoolingHK:
+    case g::BfswPacketType::CoolingHK:
       return "CoolingHK";
-    case gtl::BfswPacketType::CardHKP:
+    case g::BfswPacketType::CardHKP:
       return "CardHKP";
-    case gtl::BfswPacketType::PDUHK:
+    case g::BfswPacketType::PDUHK:
       return "PDUHK";
-    case gtl::BfswPacketType::AnyTofHK:
+    case g::BfswPacketType::AnyTofHK:
       return "AnyTofHK";
-    case gtl::BfswPacketType::LabJackHK:
+    case g::BfswPacketType::LabJackHK:
       return "LabJackHK";
-    case gtl::BfswPacketType::TrackerDAQCntr:
+    case g::BfswPacketType::TrackerDAQCntr:
       return "TrackerDAQCntr";
     default:
       return std::format("Unknown/NotImplemented ({})", (int)pt) ;
@@ -69,13 +68,13 @@ std::string gtl::bfsw_ptype_to_str(gtl::BfswPacketType pt) {
 
 //----------------------------------------
 
-f64 gtl::PacketHeader::get_gcutime() const {
+f64 g::PacketHeader::get_gcutime() const {
   return timestamp * 0.064 + 1631030675.0;
 };
 
 //----------------------------------------
 
-auto gtl::PacketHeader::to_bytestream() const -> Vec<u8> {
+auto g::PacketHeader::to_bytestream() const -> Vec<u8> {
   Vec<u8> bytes{0xeb, 0x90};
   bytes.push_back((u8)ptype);
   auto ts_byt = gondola::to_le_bytes(timestamp);
@@ -89,21 +88,21 @@ auto gtl::PacketHeader::to_bytestream() const -> Vec<u8> {
   return bytes;
 }
 
-auto  gtl::PacketHeader::from_bytestream(Vec<u8> const &stream, usize &pos)
+auto  g::PacketHeader::from_bytestream(Vec<u8> const &stream, usize &pos)
   -> Result<PacketHeader, g::IOError> {
-  gtl::PacketHeader ph;
-  if (stream.size() < pos + gtl::PacketHeader::SIZE) {
-    spdlog::error("The telemetry header is too short! ({} bytes when {} are expected!", stream.size(), gtl::PacketHeader::SIZE);
-    pos += gtl::PacketHeader::SIZE;
+  g::PacketHeader ph;
+  if (stream.size() < pos + g::PacketHeader::SIZE) {
+    spdlog::error("The telemetry header is too short! ({} bytes when {} are expected!", stream.size(), g::PacketHeader::SIZE);
+    pos += g::PacketHeader::SIZE;
     return Ok(ph);
   }
-  if (g::parse_u16(stream, pos) != gtl::PacketHeader::HEAD) {
-    spdlog::error("The given position {} does not point to a valid header signature of {}", pos-2 ,gtl::PacketHeader::HEAD);
-    pos += gtl::PacketHeader::SIZE - 2;
+  if (g::parse_u16(stream, pos) != g::PacketHeader::HEAD) {
+    spdlog::error("The given position {} does not point to a valid header signature of {}", pos-2 ,g::PacketHeader::HEAD);
+    pos += g::PacketHeader::SIZE - 2;
     return Ok(ph);
   }
   ph.sync      = PacketHeader::HEAD;
-  ph.ptype     = static_cast<gtl::BfswPacketType>(g::parse_u8 (stream, pos));
+  ph.ptype     = static_cast<g::BfswPacketType>(g::parse_u8 (stream, pos));
   ph.timestamp = g::parse_u32(stream, pos);
   ph.counter   = g::parse_u16(stream, pos);
   ph.length    = g::parse_u16(stream, pos);
@@ -111,7 +110,7 @@ auto  gtl::PacketHeader::from_bytestream(Vec<u8> const &stream, usize &pos)
   return Ok(ph);
 }
 
-auto gtl::PacketHeader::to_string() const -> std::string {
+auto g::PacketHeader::to_string() const -> std::string {
   std::string repr = "<PacketHeader:";
   repr += std::format("\n  Header      : {}" ,sync);
   repr += std::format("\n  Packet Type : {}" ,bfsw_ptype_to_str(ptype));
@@ -124,10 +123,10 @@ auto gtl::PacketHeader::to_string() const -> std::string {
 
 //----------------------------------------
 
-auto  gtl::Packet::from_bytestream(Vec<u8> const &stream,
-                                   usize &pos) -> gtl::Packet {
-  gtl::Packet packet;
-  auto header = gtl::PacketHeader::from_bytestream(stream, pos).unwrap();
+auto  g::Packet::from_bytestream(Vec<u8> const &stream,
+                                   usize &pos) -> g::Packet {
+  g::Packet packet;
+  auto header = g::PacketHeader::from_bytestream(stream, pos).unwrap();
   // FIXME
   packet.header  = header;
   auto payload   = g::slice(stream, pos, pos + header.length);
@@ -135,15 +134,15 @@ auto  gtl::Packet::from_bytestream(Vec<u8> const &stream,
   return packet;
 }
 
-auto gtl::Packet::is_event_packet() const -> bool {
-  return header.ptype == gtl::BfswPacketType::InterestingEvent   || 
-         header.ptype == gtl::BfswPacketType::BoringEvent        || 
-         header.ptype == gtl::BfswPacketType::NoGapsTriggerEvent || 
-         header.ptype == gtl::BfswPacketType::NoTofDataEvent;      
+auto g::Packet::is_event_packet() const -> bool {
+  return header.ptype == g::BfswPacketType::InterestingEvent   || 
+         header.ptype == g::BfswPacketType::BoringEvent        || 
+         header.ptype == g::BfswPacketType::NoGapsTriggerEvent || 
+         header.ptype == g::BfswPacketType::NoTofDataEvent;      
 }
 
 
-auto gtl::Packet::to_string() const -> std::string {
+auto g::Packet::to_string() const -> std::string {
   std::string repr = "<TelemetryPacket:";
   repr += std::format("{}", header.to_string());
   repr += "\n --------";
@@ -153,7 +152,7 @@ auto gtl::Packet::to_string() const -> std::string {
 
 //----------------------------------------
 
-auto gtl::TrkHeader::to_string() const -> std::string {
+auto g::TrkHeader::to_string() const -> std::string {
   std::string repr = "<TrkHeader:";
   repr += std::format("\n  sync     : {}", sync);
   repr += std::format("\n  crc      : {}", crc);
@@ -166,11 +165,11 @@ auto gtl::TrkHeader::to_string() const -> std::string {
   return repr;
 }
 
-auto gtl::TrkHeader::from_bytestream(Vec<u8> const &stream, usize &pos) 
+auto g::TrkHeader::from_bytestream(Vec<u8> const &stream, usize &pos) 
   -> r::Result<TrkHeader, g::IOError> {
   auto header = TrkHeader();
-  if (stream.size() - pos < gtl::TrkHeader::SIZE) {
-    std::string message = std::format("Stream is too short for a trkheader packet. We got a stream of size {} when expectinog {} bytes!", stream.size() - pos, gtl::Cooling::SIZE);
+  if (stream.size() - pos < g::TrkHeader::SIZE) {
+    std::string message = std::format("Stream is too short for a trkheader packet. We got a stream of size {} when expectinog {} bytes!", stream.size() - pos, g::Cooling::SIZE);
     auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
     return Err(err);
   } 
@@ -190,7 +189,7 @@ auto gtl::TrkHeader::from_bytestream(Vec<u8> const &stream, usize &pos)
 
 //----------------------------------------
 
-auto gtl::TrkHit::decode_id(u32 hw_id) -> Vec<u32> {
+auto g::TrkHit::decode_id(u32 hw_id) -> Vec<u32> {
   Vec<u32> result;
   u32 remaining_number = hw_id;
   u32 channel          = remaining_number % 100;
@@ -203,7 +202,7 @@ auto gtl::TrkHit::decode_id(u32 hw_id) -> Vec<u32> {
   return {layer, row, mod, channel};
 }
 
-auto gtl::TrkHit::to_string() const -> std::string {
+auto g::TrkHit::to_string() const -> std::string {
   std::string repr = "<TrackerHit:";
   repr += std::format("\n  Layer      : {}", layer);
   repr += std::format("\n  Row        : {}", row);
@@ -217,7 +216,7 @@ auto gtl::TrkHit::to_string() const -> std::string {
 
 //----------------------------------------
 
-auto gtl::TrkEvent::to_string() const -> std::string {
+auto g::TrkEvent::to_string() const -> std::string {
   std::string repr = "<TrackerEvent:";
   repr += std::format("\n  layer         : {}" ,layer);
   repr += std::format("\n  flags1        : {}" ,flags1);
@@ -231,7 +230,7 @@ auto gtl::TrkEvent::to_string() const -> std::string {
 
 //----------------------------------------
 
-auto gtl::TrkEventPacket::to_string() const -> std::string {
+auto g::TrkEventPacket::to_string() const -> std::string {
   auto repr = std::string("<TrkEventPacket:");
   repr     += std::format("\n  pkt header {}", header.to_string());
   repr     += std::format("\n  trk header {}", daq_header.to_string());
@@ -244,7 +243,7 @@ auto gtl::TrkEventPacket::to_string() const -> std::string {
   return repr;
 }
 
-auto gtl::TrkEventPacket::from_bytestream(Vec<u8> const &stream, usize &pos)
+auto g::TrkEventPacket::from_bytestream(Vec<u8> const &stream, usize &pos)
   -> r::Result<TrkEventPacket, g::IOError> {
   TrkEventPacket packet;
   //auto packet_header = PacketHeader::from_bytestream(stream, pos);
@@ -278,7 +277,7 @@ auto gtl::TrkEventPacket::from_bytestream(Vec<u8> const &stream, usize &pos)
       auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
       return Err(err);
     }
-    gtl::TrkEvent trk_event;
+    g::TrkEvent trk_event;
     trk_event.layer = packet.daq_header.sys_id;
     u8 n_hits          = g::parse_u8(stream, pos);
     trk_event.flags1   = g::parse_u8(stream, pos);
@@ -330,7 +329,7 @@ auto gtl::TrkEventPacket::from_bytestream(Vec<u8> const &stream, usize &pos)
 
 /// FIXME - direct copy from bfsw, don't like it. 
 /// Replace with parse_u16 etc methods. 
-gtl::TofMetaData gtl::TofMetaData::from_bytestream(Vec<u8> const &bytes, usize &pos) {
+g::TofMetaData g::TofMetaData::from_bytestream(Vec<u8> const &bytes, usize &pos) {
   auto tm = TofMetaData();
   if(bytes.size() < 17) {
      return tm;
@@ -352,7 +351,7 @@ gtl::TofMetaData gtl::TofMetaData::from_bytestream(Vec<u8> const &bytes, usize &
   return tm;
 }
 
-auto gtl::TofMetaData::to_string() const -> std::string {
+auto g::TofMetaData::to_string() const -> std::string {
   std::string repr = "<TofMetaData";
   repr += std::format("\n  EventID      : {}" ,event_id);
   repr += std::format("\n  Version      : {}" ,status_version);
@@ -369,7 +368,7 @@ auto gtl::TofMetaData::to_string() const -> std::string {
 
 //----------------------------------------
 
-auto gtl::MergedEvent::to_string() const -> std::string {
+auto g::MergedEvent::to_string() const -> std::string {
   std::string repr = "<MergedEvent";
   repr += std::format("\n  Header : {}", header.to_string());
   repr += std::format("\n  Creation Time : {}" , creation_time);
@@ -392,7 +391,7 @@ auto gtl::MergedEvent::to_string() const -> std::string {
   return repr;
 }
 
-auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos) 
+auto g::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos) 
     -> r::Result<MergedEvent, g::IOError> {
   // check if it has at least the fix part
   if (stream.size() < pos + 18) {
@@ -492,10 +491,10 @@ auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
   return Ok(evt);
 }  
       
-auto gtl::MergedEvent::from_telemetrypacket(Packet const &packet) 
+auto g::MergedEvent::from_telemetrypacket(Packet const &packet) 
   -> r::Result<MergedEvent, g::IOError> {
   usize pos = 0;
-  auto  res = gtl::MergedEvent::from_bytestream(packet.payload, pos);
+  auto  res = g::MergedEvent::from_bytestream(packet.payload, pos);
   if (res.is_err()) {
     return res;
   }  
@@ -504,7 +503,7 @@ auto gtl::MergedEvent::from_telemetrypacket(Packet const &packet)
   return Ok(ev); 
 }
 
-auto gtl::Cooling::to_string() const -> std::string {
+auto g::Cooling::to_string() const -> std::string {
   std::string repr = "<Cooling";
   repr += std::format("\n  frame_counter : {}", frame_counter);
   repr += std::format("\n  status_1      : {}", status_1);
@@ -530,10 +529,10 @@ auto gtl::Cooling::to_string() const -> std::string {
   return repr;
 }
 
-auto gtl::Cooling::from_bytestream(Vec<u8> const &stream, usize &pos) -> r::Result<Cooling, g::IOError> {
+auto g::Cooling::from_bytestream(Vec<u8> const &stream, usize &pos) -> r::Result<Cooling, g::IOError> {
   auto cln = Cooling();
-  if (stream.size() - pos < gtl::Cooling::SIZE) {
-    std::string message = std::format("Stream is too short for a cooling packet. We got a streamof size {} when expectinog {} bytes!", stream.size() - pos, gtl::Cooling::SIZE);
+  if (stream.size() - pos < g::Cooling::SIZE) {
+    std::string message = std::format("Stream is too short for a cooling packet. We got a streamof size {} when expectinog {} bytes!", stream.size() - pos, g::Cooling::SIZE);
     auto err = g::IOError(g::IOError::ErrorKind::WrongDelimiter, message);
     return Err(err);
   }

@@ -60,7 +60,7 @@ namespace gondola {
 
     /// extract a tofpacket if this frame object is of the correct type
     auto get_tofpacket(std::string name) -> result::Result<TofPacket,gondola::IOError>;
-    auto get_telemetrypacket(std::string name) -> Gaps::Telemetry::Packet;
+    auto get_telemetrypacket(std::string name) -> Packet;
   };
 
   struct CRReader {

@@ -28,7 +28,6 @@
 #include "caraspace.hpp"
 
 namespace fs = std::filesystem;
-namespace gt = Gaps::Telemetry;
 namespace g  = gondola;
 
 int main(int argc, char *argv[]){
@@ -104,7 +103,7 @@ int main(int argc, char *argv[]){
       ++n_frames_processed;
       ++n_frames_processed_file;
 
-      gt::Packet pack;
+      g::Packet pack;
       if (frame.index.contains(tel_ev_nogaps)) {
         pack = frame.get_telemetrypacket(tel_ev_nogaps);
       } else if (frame.index.contains(tel_ev_boring)) {
@@ -142,7 +141,7 @@ int main(int argc, char *argv[]){
       //  std::cout << pack.to_string() << std::endl;
       //}
       //usize pos = 0;
-      //auto result = gt::MergedEvent::from_bytestream(pack.payload, pos);
+      //auto result = g::MergedEvent::from_bytestream(pack.payload, pos);
       //// in case of errors, we just move on
       //if (result.is_err()) {
       //  std::string message = result.unwrap_err().reason;
@@ -163,7 +162,7 @@ int main(int argc, char *argv[]){
       //  // for now, just to test, we will check the value of the phase
       //  phases.push_back(h.phase);      
       //}
-      //for (gt::TrkHit const &h : m_ev.trk_hits) {
+      //for (g::TrkHit const &h : m_ev.trk_hits) {
       //  std::cout << h.to_string() << std::endl;
       //}
 

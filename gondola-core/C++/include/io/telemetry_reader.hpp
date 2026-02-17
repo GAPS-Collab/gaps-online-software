@@ -16,9 +16,9 @@
 namespace gondola {
 
   /// FIXME - this will be renamed to be the same as in rust
-  typedef Gaps::Telemetry::BfswPacketType TelemetryPacketType;
-  typedef Gaps::Telemetry::Packet         TelemetryPacket;
-  typedef Gaps::Telemetry::PacketHeader   TelemetryPacketHeader;
+  typedef BfswPacketType TelemetryPacketType;
+  typedef Packet         TelemetryPacket;
+  typedef PacketHeader   TelemetryPacketHeader;
 
   /// Read serialized TelemetryPackets from an existing file
   ///
@@ -33,7 +33,7 @@ namespace gondola {
     
     auto get_filenames() const -> Vec<std::string>; 
     
-    auto get_next_packet() -> Gaps::Telemetry::Packet; 
+    auto get_next_packet() -> Packet; 
 
     /// count the packets within the Telemetry fiel 
     auto count_packets() -> u64;

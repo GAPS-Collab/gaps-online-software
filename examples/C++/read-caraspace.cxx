@@ -25,7 +25,6 @@
 #include "caraspace.hpp"
 
 namespace fs = std::filesystem;
-namespace gt = Gaps::Telemetry;
 namespace g  = gondola;
 
 int main(int argc, char *argv[]){
@@ -125,7 +124,7 @@ int main(int argc, char *argv[]){
       ++n_frames_processed;
       ++n_frames_processed_file;
 
-      gt::Packet pack;
+      g::Packet pack;
       // check for RBWaveform 
       if (frame.index.contains(rbwf_name)) {
         auto pack = frame.get_telemetrypacket(rbwf_name);
@@ -163,7 +162,7 @@ int main(int argc, char *argv[]){
       //  pack = frame.get_telemetrypacket(cooling_name);
       //  std::cout << pack.to_string() << std::endl;
       //  usize pos = 0;
-      //  auto cooling = gt::Cooling::from_bytestream(pack.payload, pos);
+      //  auto cooling = g::Cooling::from_bytestream(pack.payload, pos);
       //  if (cooling.is_ok()) {
       //    std::cout << cooling.unwrap().to_string() << std::endl;
       //  } else {
@@ -178,7 +177,7 @@ int main(int argc, char *argv[]){
         std::cout << pack.to_string() << std::endl;
       }
       usize pos = 0;
-      auto result = gt::MergedEvent::from_bytestream(pack.payload, pos);
+      auto result = g::MergedEvent::from_bytestream(pack.payload, pos);
       // in case of errors, we just move on
       if (result.is_err()) {
         std::string message = result.unwrap_err().reason;
@@ -190,7 +189,7 @@ int main(int argc, char *argv[]){
 
       auto m_ev = result.unwrap();
       //std::cout << m_ev.tof_event.to_string() << std::endl;
-      for (gt::TrkHit const &h : m_ev.trk_hits) {
+      for (g::TrkHit const &h : m_ev.trk_hits) {
         auto strip_id = Gaps::TrackerStrip::create_id(h.layer, h.row, h.module, h.channel);
         //if (trk_mask[strip_id]) {
         //  // only count active strips
@@ -243,7 +242,7 @@ int main(int argc, char *argv[]){
     if (reader.is_from_telemetry()) {
       std::cout << "-- Index of seen telemetry packets" << std::endl;
       for (auto const &pair : reader.get_telemetry_packet_index()) {
-        std::cout << "-- -- " << Gaps::Telemetry::bfsw_ptype_to_str(pair.first) << " -> " << pair.second << std::endl;
+        std::cout << "-- -- " << g::bfsw_ptype_to_str(pair.first) << " -> " << pair.second << std::endl;
       }
     } 
   } 

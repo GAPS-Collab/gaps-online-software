@@ -123,8 +123,8 @@ auto g::TelemetryPacketReader::get_packet_index() const -> const HashMap<Telemet
 
 //--------------------------------------------------------------------------
 
-auto g::TelemetryPacketReader::get_next_packet() -> Gaps::Telemetry::Packet {
-  auto packet = Gaps::Telemetry::Packet();
+auto g::TelemetryPacketReader::get_next_packet() -> g::Packet {
+  auto packet = g::Packet();
   if (packet_cache_.size() > 0 && !in_caching_) { // packets have been cached, return those
     packet = packet_cache_.back();
     packet_cache_.pop_back();
@@ -171,7 +171,7 @@ auto g::TelemetryPacketReader::get_next_packet() -> Gaps::Telemetry::Packet {
         stream_file_.read(reinterpret_cast<char*>(buffer_data.data()), p_size);
         payload.insert(payload.end(), buffer_data.begin(), buffer_data.end());
         pos = 0;
-        auto packet = Gaps::Telemetry::Packet::from_bytestream(payload, pos);
+        auto packet = g::Packet::from_bytestream(payload, pos);
         ++n_packs_read_;
         register_packet_type_(packet.header.ptype);
         #ifdef BUILD_CXX_DB 
@@ -197,7 +197,7 @@ auto g::TelemetryPacketReader::is_exhausted() const -> bool {
 
 auto g::TelemetryPacketReader::print_packet_index() const -> void {
   for (auto const &pair : packet_index_) {
-    std::cout << " -- " << Gaps::Telemetry::bfsw_ptype_to_str(pair.first) << " -> " << pair.second << std::endl;
+    std::cout << " -- " << g::bfsw_ptype_to_str(pair.first) << " -> " << pair.second << std::endl;
   }
 }
 
