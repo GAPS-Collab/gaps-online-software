@@ -118,6 +118,27 @@ NB_MODULE(gondola_cxx, m) {
     .def_prop_ro("rb_ids"  , &TofEvent::get_rbids)
     .def("to_string"       , &TofEvent::to_string);
 
+  nb::class_<TofEventSummary>(m, "TofEventSummary")
+    .def(nb::init<>())
+    .def_static("from_tofpacket",   &TofEventSummary::from_tofpacket) 
+    //.def("normalize_hit_times"  , TofEvent::normalize_hit_times)
+    .def_ro("hits"                , &TofEventSummary::hits)
+    .def_prop_ro("trigger_hits"   , [](TofEventSummary &self) {
+      auto thits        = self.get_trigger_hits();
+      Vec<Vec<int>> thits_py = {};
+      for (auto const &h : thits) {
+        Vec<int> h_py    = {};
+        h_py.push_back((int)std::get<0>(h));
+        h_py.push_back((int)std::get<1>(h));
+        h_py.push_back((int)std::get<2>(h));
+        h_py.push_back((int)std::get<3>(h));
+        thits_py.push_back(h_py);
+      } 
+      return thits_py;
+    })
+    .def_prop_ro("trigger_sources", &TofEventSummary::get_trigger_sources)
+    .def("to_string"              , &TofEventSummary::to_string);
+
   //---------------------------------------------------------
   // Telemetry packets & reader
   nb::enum_<g::TelemetryPacketType>(m, "TelemetryPacketType")
@@ -244,8 +265,25 @@ NB_MODULE(gondola_cxx, m) {
     .def("count_packets"             , &g::TelemetryPacketReader::count_packets)
     .def("rewind"                    , &g::TelemetryPacketReader::rewind);
   
+
   nb::class_<Gaps::Telemetry::MergedEvent>(m, "TelemetryEvent")
-    .def(nb::init<>());
+    .def(nb::init<>())
+    .def_static("from_bytestream", [](Vec<u8> stream, usize pos) {
+      auto data = Gaps::Telemetry::MergedEvent::from_bytestream(stream, pos);
+      if (data.is_ok()) {
+        return data.unwrap();
+      }  
+      throw nb::value_error("Error when unpacking TelemetryEvent!");
+      //return g::TelemetryEvent::from_bytestream(stream, pos).unwrap();
+    })
+    .def_ro("tof"                , &Gaps::Telemetry::MergedEvent::tof_event)
+    .def("__str__", [](const Gaps::Telemetry::MergedEvent& self) {
+        return nb::str("{}").format(self.to_string());
+    })
+    .def("__repr__", [](const Gaps::Telemetry::MergedEvent& self) {
+        return nb::str("{}").format(self.to_string());
+    });
+
 
   // Spike cleaning functions
   m.def("spike_cleaning_drs4", &g::spike_cleaning_drs4, 

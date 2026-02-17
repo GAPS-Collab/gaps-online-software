@@ -883,13 +883,11 @@ Vec<u8> MasterTriggerEvent::get_rb_link_ids() const {
 }
     
 Vec<std::tuple<u8, u8, u8, LTBThreshold>> MasterTriggerEvent::get_trigger_hits() const {
-
-  auto hits = Vec<std::tuple<u8,u8,u8,LTBThreshold>>(); 
-  //let n_masks_needed = self.dsi_j_mask.count_ones() / 2 + self.dsi_j_mask.count_ones() % 2;
+  auto hits = Vec<std::tuple<u8,u8,u8, LTBThreshold>>(); 
   auto dsi_j_mask_bits = std::bitset<32>(dsi_j_mask);
   u32 n_masks_needed   = dsi_j_mask_bits.count();
   if (channel_mask.size() < n_masks_needed) {
-    spdlog::error("We need {} hit masks, but only have {}! This is bad!", n_masks_needed, channel_mask.size());
+    spdlog::error("We need {} hit masks, but only have {}! This is bad!", n_masks_needed,  channel_mask.size());
     return hits;
   }
   u8 n_mask = 0;
@@ -916,13 +914,9 @@ Vec<std::tuple<u8, u8, u8, LTBThreshold>> MasterTriggerEvent::get_trigger_hits()
       u32 channels = channel_mask[n_mask]; 
       for (u8 i=0;i<8; i++) {
         u32 ch  = LTB_CHANNELS[i];
-        u32 chn = i + 1; 
-        //for (i,ch) in LTB_CHANNELS.iter().enumerate() {
-        //let chn = ch + 1;
-        //println!("i,ch {}, {}", i, ch);
-        u32 thresh_bits = (u8)(channels & (ch) >> (i*2));
-        //println!("thresh_bits {}", thresh_bits);
-        if (thresh_bits > 0) { // hit over threshold
+        u32 chn = 2*i + 1; 
+        int thresh_bits = (int)((channels & ch) >> (i*2));
+        if (thresh_bits > 0 && thresh_bits < 255 ) { // hit over threshold
           hits.push_back(std::make_tuple(dsi, j, chn, (LTBThreshold)(thresh_bits)));
         }
       }
@@ -931,7 +925,6 @@ Vec<std::tuple<u8, u8, u8, LTBThreshold>> MasterTriggerEvent::get_trigger_hits()
   }
   return hits;
 }
-
 
 /*************************************/
 
@@ -1437,8 +1430,7 @@ auto TofEventSummary::normalize_hit_times(const gon::TofPaddleTimingConstantMap 
 
 
 Vec<std::tuple<u8, u8, u8, LTBThreshold>> TofEventSummary::get_trigger_hits() const {
-  auto hits = Vec<std::tuple<u8,u8,u8,LTBThreshold>>(); 
-  //let n_masks_needed = self.dsi_j_mask.count_ones() / 2 + self.dsi_j_mask.count_ones() % 2;
+  auto hits = Vec<std::tuple<u8,u8,u8, LTBThreshold>>(); 
   auto dsi_j_mask_bits = std::bitset<32>(dsi_j_mask);
   u32 n_masks_needed   = dsi_j_mask_bits.count();
   if (channel_mask.size() < n_masks_needed) {
@@ -1466,17 +1458,12 @@ Vec<std::tuple<u8, u8, u8, LTBThreshold>> TofEventSummary::get_trigger_hits() co
         dsi = 5;
         j   = k - 20 + 1;
       } 
-      //println!("n_mask {n_mask}");
       u32 channels = channel_mask[n_mask]; 
       for (u8 i=0;i<8; i++) {
         u32 ch  = LTB_CHANNELS[i];
-        u32 chn = i + 1; 
-        //for (i,ch) in LTB_CHANNELS.iter().enumerate() {
-        //let chn = ch + 1;
-        //println!("i,ch {}, {}", i, ch);
-        u32 thresh_bits = (u8)(channels & (ch) >> (i*2));
-        //println!("thresh_bits {}", thresh_bits);
-        if (thresh_bits > 0) { // hit over threshold
+        u32 chn = 2*i + 1; 
+        int thresh_bits = (int)((channels & ch) >> (i*2));
+        if (thresh_bits > 0 && thresh_bits < 255 ) { // hit over threshold
           hits.push_back(std::make_tuple(dsi, j, chn, (LTBThreshold)(thresh_bits)));
         }
       }
