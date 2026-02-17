@@ -690,7 +690,7 @@ auto g::TofEvent::get_trigger_hits() const
       u32 channels = channel_mask[n_mask]; 
       for (u8 i=0;i<8; i++) {
         u32 ch  = LTB_CHANNELS[i];
-        u32 chn = i + 1; 
+        u32 chn = 2*i + 1; 
         int thresh_bits = (int)((channels & ch) >> (i*2));
         if (thresh_bits > 0 && thresh_bits < 255 ) { // hit over threshold
           hits.push_back(std::make_tuple(dsi, j, chn, (LTBThreshold)(thresh_bits)));
@@ -969,11 +969,11 @@ Vec<std::tuple<u8, u8, u8, g::LTBThreshold>> g::MasterTriggerEvent::get_trigger_
       u32 channels = channel_mask[n_mask]; 
       for (u8 i=0;i<8; i++) {
         u32 ch  = LTB_CHANNELS[i];
-        u32 chn = i + 1; 
+        u32 chn = 2*i + 1; 
         //for (i,ch) in LTB_CHANNELS.iter().enumerate() {
         //let chn = ch + 1;
         //println!("i,ch {}, {}", i, ch);
-        u32 thresh_bits = (u8)(channels & (ch) >> (i*2));
+        u32 thresh_bits = (u8)((channels & ch) >> (i*2));
         //println!("thresh_bits {}", thresh_bits);
         if (thresh_bits > 0) { // hit over threshold
           hits.push_back(std::make_tuple(dsi, j, chn, (LTBThreshold)(thresh_bits)));
@@ -1550,7 +1550,7 @@ auto g::TofEventSummary::get_trigger_hits() const -> Vec<std::tuple<u8,u8,u8, g:
       u32 channels = channel_mask[n_mask]; 
       for (u8 i=0;i<8; i++) {
         u32 ch  = LTB_CHANNELS[i];
-        u32 chn = i + 1; 
+        u32 chn = 2*i + 1; 
         int thresh_bits = (int)((channels & ch) >> (i*2));
         if (thresh_bits > 0 && thresh_bits < 255 ) { // hit over threshold
           hits.push_back(std::make_tuple(dsi, j, chn, (LTBThreshold)(thresh_bits)));
