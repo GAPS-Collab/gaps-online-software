@@ -43,6 +43,13 @@ NB_MODULE(gondola_cxx, m) {
     .value("RBEventPayload"    , PacketType::RBEventPayload     )
     .value("RBEventMemoryView" , PacketType::RBEventMemoryView  )
     .value("RBCalibration"     , PacketType::RBCalibration      );
+  
+  nb::enum_<g::LTBThreshold>(m, "LTBThreshold")
+    .value("NoHit"   , g::LTBThreshold::NoHit)
+    .value("Hit"     , g::LTBThreshold::Hit)
+    .value("Beta"    , g::LTBThreshold::Beta)
+    .value("Veto"    , g::LTBThreshold::Veto) 
+    .value("Unknown" , g::LTBThreshold::Unknown);
 
   nb::class_<TofPacket>(m, "TofPacket")
     .def(nb::init<>())
@@ -119,19 +126,41 @@ NB_MODULE(gondola_cxx, m) {
   nb::class_<g::TofEvent>(m, "TofEvent")
     .def(nb::init<>())
     .def_static("from_tofpacket", &g::TofEvent::from_tofpacket) 
+    .def_ro("dsi_j_mask"        , &g::TofEvent::dsi_j_mask)
     .def("normalize_hit_times"  , &g::TofEvent::normalize_hit_times)
     .def_prop_ro("hits"         , &g::TofEvent::get_hits)
     .def_prop_ro("rb_ids"       , &g::TofEvent::get_rbids)
+    .def_prop_ro("timestamp48"  , &g::TofEvent::get_timestamp48)
+    .def_prop_ro("rb_link_ids"  , &g::TofEvent::get_rb_link_ids) 
+    .def_prop_ro("trigger_hits" , &g::TofEvent::get_trigger_hits) 
+    .def_prop_ro("trigger_sources", &g::TofEvent::get_trigger_sources)
     .def("to_string"            , &g::TofEvent::to_string);
   
   nb::class_<g::TofEventSummary>(m, "TofEventSummary")
     .def(nb::init<>())
     .def_static("from_tofpacket", &g::TofEventSummary::from_tofpacket) 
+    .def_ro("dsi_j_mask"        , &g::TofEventSummary::dsi_j_mask)
     //.def("normalize_hit_times"  , &g::TofEvent::normalize_hit_times)
     //.def_prop_ro("hits"         , &g::TofEvent::get_hits)
-    .def_ro("hits"              , &g::TofEventSummary::hits)
-    //.def_prop_ro("rb_ids"       , &g::TofEvent::get_rbids)
-    .def("to_string"            , &g::TofEventSummary::to_string);
+    .def_ro("hits"                , &g::TofEventSummary::hits)
+    .def_prop_ro("timestamp48"    , &g::TofEventSummary::get_timestamp48)
+    .def_prop_ro("rb_link_ids"    , &g::TofEventSummary::get_rb_link_ids) 
+    .def_prop_ro("trigger_hits"   , &g::TofEventSummary::get_trigger_hits) 
+    .def_prop_ro("trigger_hits"   , [](g::TofEventSummary &self) {
+      auto thits        = self.get_trigger_hits();
+      Vec<Vec<int>> thits_py = {};
+      for (auto const &h : thits) {
+        Vec<int> h_py    = {};
+        h_py.push_back((int)std::get<0>(h));
+        h_py.push_back((int)std::get<1>(h));
+        h_py.push_back((int)std::get<2>(h));
+        h_py.push_back((int)std::get<3>(h));
+        thits_py.push_back(h_py);
+      } 
+      return thits_py;
+    })
+    .def_prop_ro("trigger_sources", &g::TofEventSummary::get_trigger_sources)
+    .def("to_string"              , &g::TofEventSummary::to_string);
 
   //---------------------------------------------------------
   // Telemetry packets & reader

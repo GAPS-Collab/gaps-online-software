@@ -41,6 +41,17 @@ const u16 LTB_CHANNELS[8] = {
     LTB_CH7
 };
 
+const Vec<Vec<u8>> PHYSICAL_CHANNELS = {
+  {1,2},
+  {3,4},
+  {5,6},
+  {7,8},
+  {9,10},
+  {11,12},
+  {13,14},
+  {15,16}
+};
+
 /// Helper to get adc data from Vec<u8>
 auto u8_to_u16(const Vec<u8> &vec_u8) -> Vec<u16> {
   Vec<u16> vec_u16;
@@ -609,6 +620,99 @@ auto g::TofEvent::normalize_hit_times(const g::TofPaddleTimingConstantMap &offse
   }
 }
 #endif
+
+/**********************************************************/
+
+auto g::TofEvent::get_timestamp48() const -> u64 {
+  return ((u64)timestamp16 << 32) | (u64)timestamp32;
+}
+
+/*************************************/
+
+auto g::TofEvent::get_trigger_sources() const -> Vec<g::TriggerType> {
+  auto t_types = Vec<g::TriggerType>();
+  u16 gaps_trigger = (trigger_sources >> 5 & 0x1) == 1;
+  if (gaps_trigger) {
+    t_types.push_back(g::TriggerType::Gaps);
+  }
+  u16 any_trigger    = (trigger_sources >> 6 & 0x1) == 1;
+  if (any_trigger) {
+    t_types.push_back(g::TriggerType::Any);
+  }
+  u16 forced_trigger = (trigger_sources >> 7 & 0x1) == 1;
+  if (forced_trigger) {
+    t_types.push_back(g::TriggerType::Forced);
+  }
+  u16 track_trigger  = (trigger_sources >> 8 & 0x1) == 1;
+  if (track_trigger) {
+    t_types.push_back(g::TriggerType::Track);
+  }
+  u16 central_track_trigger
+                     = (trigger_sources >> 9 & 0x1) == 1;
+  if (central_track_trigger) {
+    t_types.push_back(g::TriggerType::TrackCentral);
+  }
+  return t_types;
+} 
+
+/**********************************************************/
+    
+auto g::TofEvent::get_trigger_hits() const
+  -> Vec<std::tuple<u8, u8, u8, g::LTBThreshold>> {
+  auto hits = Vec<std::tuple<u8,u8,u8, g::LTBThreshold>>(); 
+  auto dsi_j_mask_bits = std::bitset<32>(dsi_j_mask);
+  u32 n_masks_needed   = dsi_j_mask_bits.count();
+  if (channel_mask.size() < n_masks_needed) {
+    spdlog::error("We need {} hit masks, but only have {}! This is bad!", n_masks_needed,  channel_mask.size());
+    return hits;
+  }
+  u8 n_mask = 0;
+  for (u8 k=0;k<32;k++) {
+    if ((u32)((dsi_j_mask >> k) & 0x1) == 1) {
+      u8 dsi = 0;
+      u8 j   = 0;
+      if (k < 5) {
+        dsi = 1;
+        j   = k  + 1;
+      } else if (k < 10) {
+        dsi = 2;
+        j   = k  - 5 + 1;
+      } else if (k < 15) {
+        dsi = 3;
+        j   = k - 10 + 1;
+      } else if (k < 20) {
+        dsi = 4;
+        j   = k - 15 + 1;
+      } else if (k < 25) {
+        dsi = 5;
+        j   = k - 20 + 1;
+      } 
+      u32 channels = channel_mask[n_mask]; 
+      for (u8 i=0;i<8; i++) {
+        u32 ch  = LTB_CHANNELS[i];
+        u32 chn = i + 1; 
+        int thresh_bits = (int)((channels & ch) >> (i*2));
+        if (thresh_bits > 0 && thresh_bits < 255 ) { // hit over threshold
+          hits.push_back(std::make_tuple(dsi, j, chn, (LTBThreshold)(thresh_bits)));
+        }
+      }
+      n_mask += 1;
+    }
+  }
+  return hits;
+}
+
+/**********************************************************/
+
+auto g::TofEvent::get_rb_link_ids() const -> Vec<u8> {
+  auto links = Vec<u8>();
+  for (u8 k=0;k<64;k++) {
+    if (((u64)(mtb_link_mask >> k) & (u64)0x1) == 1) {
+      links.push_back(k);
+    }
+  }
+  return links;
+}
 
 /**********************************************************/
 
@@ -1416,7 +1520,6 @@ auto g::TofEventSummary::normalize_hit_times(const g::TofPaddleTimingConstantMap
 
 auto g::TofEventSummary::get_trigger_hits() const -> Vec<std::tuple<u8,u8,u8, g::LTBThreshold>> {
   auto hits = Vec<std::tuple<u8,u8,u8, g::LTBThreshold>>(); 
-  //let n_masks_needed = self.dsi_j_mask.count_ones() / 2 + self.dsi_j_mask.count_ones() % 2;
   auto dsi_j_mask_bits = std::bitset<32>(dsi_j_mask);
   u32 n_masks_needed   = dsi_j_mask_bits.count();
   if (channel_mask.size() < n_masks_needed) {
@@ -1444,17 +1547,12 @@ auto g::TofEventSummary::get_trigger_hits() const -> Vec<std::tuple<u8,u8,u8, g:
         dsi = 5;
         j   = k - 20 + 1;
       } 
-      //println!("n_mask {n_mask}");
       u32 channels = channel_mask[n_mask]; 
       for (u8 i=0;i<8; i++) {
         u32 ch  = LTB_CHANNELS[i];
         u32 chn = i + 1; 
-        //for (i,ch) in LTB_CHANNELS.iter().enumerate() {
-        //let chn = ch + 1;
-        //println!("i,ch {}, {}", i, ch);
-        u32 thresh_bits = (u8)(channels & (ch) >> (i*2));
-        //println!("thresh_bits {}", thresh_bits);
-        if (thresh_bits > 0) { // hit over threshold
+        int thresh_bits = (int)((channels & ch) >> (i*2));
+        if (thresh_bits > 0 && thresh_bits < 255 ) { // hit over threshold
           hits.push_back(std::make_tuple(dsi, j, chn, (LTBThreshold)(thresh_bits)));
         }
       }

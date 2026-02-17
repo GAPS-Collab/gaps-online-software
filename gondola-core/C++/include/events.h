@@ -556,7 +556,6 @@ namespace gondola {
     Vec<RBEvent>      rb_events = {};
     Vec<TofHit>       hits      = {};
 
-
     TofEvent();
   
     /**
@@ -611,6 +610,27 @@ namespace gondola {
     /// Get the ids of the readoutboards participating in 
     /// the event
     auto get_rbids() const -> Vec<u8>;
+    
+    // combined timestamp
+    auto get_timestamp48() const -> u64;
+   
+    auto get_rb_link_ids() const -> Vec<u8>;
+    
+    /// Get the combination of triggered DSI/J/CH on 
+    /// the MTB which formed the trigger. This does 
+    /// not include further hits which fall into the 
+    /// integration window. For those, se rb_link_mask
+    ///
+    /// The returned values follow the TOF convention
+    /// to start with 1, so that we can use them to 
+    /// look up LTB ids in the db.
+    ///
+    /// # Returns
+    ///
+    ///   Vec<(hit)> where hit is (DSI, J, CH) 
+    auto get_trigger_hits() const -> Vec<std::tuple<u8, u8, u8, LTBThreshold>>;
+    /// Get the trigger sources from trigger source byte
+    auto get_trigger_sources() const -> Vec<TriggerType>; 
 
     private:
       /**
