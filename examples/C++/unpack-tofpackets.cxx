@@ -59,7 +59,7 @@ int main(int argc, char *argv[]){
   }
 
   // Setup a "TofPacketReader", 
-  auto reader = Gaps::TofPacketReader(fname); 
+  auto reader = g::TofPacketReader(fname); 
 
   u32 n_rbcalib = 0;
   u32 n_rbmoni  = 0;

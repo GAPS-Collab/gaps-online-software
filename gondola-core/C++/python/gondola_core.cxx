@@ -17,11 +17,11 @@ namespace gtl = Gaps::Telemetry;
 
 NB_MODULE(gondola_cxx, m) {
 
-  nb::enum_<Gaps::ProtocolVersion>(m, "ProtocolVersion") 
-    .value("Unknown"           , Gaps::ProtocolVersion::Unknown)
-    .value("V1"                , Gaps::ProtocolVersion::V1)
-    .value("V2"                , Gaps::ProtocolVersion::V2)
-    .value("V3"                , Gaps::ProtocolVersion::V3); 
+  nb::enum_<g::ProtocolVersion>(m, "ProtocolVersion") 
+    .value("Unknown"           , g::ProtocolVersion::Unknown)
+    .value("V1"                , g::ProtocolVersion::V1)
+    .value("V2"                , g::ProtocolVersion::V2)
+    .value("V3"                , g::ProtocolVersion::V3); 
 
   // packets 
   nb::enum_<PacketType>(m, "TofPacketType")
@@ -55,16 +55,16 @@ NB_MODULE(gondola_cxx, m) {
   // io 
   m.def("list_path_contents_sorted", &gondola::list_path_contents_sorted);
   
-  nb::class_<Gaps::TofPacketReader>(m, "TofPacketReader")
+  nb::class_<g::TofPacketReader>(m, "TofPacketReader")
     .def(nb::init<std::string>())
     //.def("rewind", &Gaps::TofPacketReader::rewind)
-    .def("get_next_packet", [](Gaps::TofPacketReader &r) {
+    .def("get_next_packet", [](g::TofPacketReader &r) {
       return r.get_next_packet().unwrap();
     })
-    .def_prop_ro("filename", &Gaps::TofPacketReader::get_filename);
+    .def_prop_ro("filename", &g::TofPacketReader::get_filename);
 
   #ifdef BUILD_WITH_ROOT
-  m.def("read_sd_legacy_example",&gondola::read_sd_legacy_example); 
+  m.def("read_sd_legacy_example",&g::read_sd_legacy_example); 
   #endif 
   // caraspace
   nb::enum_<g::CRFrameObjectType>(m, "CRFrameObjectType")

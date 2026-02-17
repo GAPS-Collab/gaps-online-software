@@ -89,7 +89,7 @@ Vec<u32> get_event_ids_from_raw_stream(const Vec<u8> &bytestream, u64 &pos) {
 
 /***************************************************/
 
-Gaps::TofPacketReader::TofPacketReader() {
+g::TofPacketReader::TofPacketReader() {
   // here it is exhausted because we did not 
   // set a file yet
   exhausted_  = true;
@@ -98,7 +98,7 @@ Gaps::TofPacketReader::TofPacketReader() {
 
 /***************************************************/
 
-void Gaps::TofPacketReader::set_filename(String filename) {
+void g::TofPacketReader::set_filename(String filename) {
   if (fs::exists(filename)) {
     filename_  = filename;
     exhausted_ = false;
@@ -117,25 +117,25 @@ void Gaps::TofPacketReader::set_filename(String filename) {
 
 /***************************************************/
 
-Gaps::TofPacketReader::TofPacketReader(String filename) : Gaps::TofPacketReader() {
+g::TofPacketReader::TofPacketReader(String filename) : g::TofPacketReader() {
   set_filename(filename);
 }
 
 /***************************************************/
 
-auto Gaps::TofPacketReader::is_exhausted() const -> bool{
+auto g::TofPacketReader::is_exhausted() const -> bool{
   return exhausted_;
 }
 
 /***************************************************/
 
-auto Gaps::TofPacketReader::n_packets_read() const -> usize {
+auto g::TofPacketReader::n_packets_read() const -> usize {
   return n_packets_read_;
 }
 
 /***************************************************/
 
-auto Gaps::TofPacketReader::get_next_packet() -> Result<TofPacket, g::IOError> {
+auto g::TofPacketReader::get_next_packet() -> Result<TofPacket, g::IOError> {
   while (true) {
     if (stream_file_.eof()) {
       exhausted_ = true;
@@ -170,7 +170,7 @@ auto Gaps::TofPacketReader::get_next_packet() -> Result<TofPacket, g::IOError> {
 
 /***************************************************/
 
-String Gaps::TofPacketReader::get_filename() const {
+String g::TofPacketReader::get_filename() const {
   return filename_;
 }
 

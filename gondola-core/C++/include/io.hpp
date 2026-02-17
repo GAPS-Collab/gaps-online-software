@@ -37,7 +37,7 @@ namespace gondola {
   auto list_path_contents_sorted(const std::string& input, bool use_telemetry_re = false) -> Vec<std::string>;
 } 
 
-namespace Gaps {
+namespace gondola {
 
   /// Read serialized TofPackets from 
   /// a file and emit them as packets

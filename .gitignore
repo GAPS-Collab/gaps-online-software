@@ -6,6 +6,10 @@
 
 gondola-core/rust/gondola-core/python/gondola/__pycache__/*
 
+# duplicate version of the DB. It will be copied during the building 
+# process. (This is because we have to ship the db with the python package)
+gondola-core/rust/gondola-core/python/gondola/gaps_flight.db
+
 # gondola_cxx python bindings for C++ lib 
 gondola-core/C++/dist/*
 gondola-core/C++/gondola_cxx/*
