@@ -135,7 +135,7 @@ auto Gaps::TofPacketReader::n_packets_read() const -> usize {
 
 /***************************************************/
 
-auto Gaps::TofPacketReader::get_next_packet() -> Result<TofPacket, Gaps::IOError> {
+auto Gaps::TofPacketReader::get_next_packet() -> Result<TofPacket, g::IOError> {
   while (true) {
     if (stream_file_.eof()) {
       exhausted_ = true;

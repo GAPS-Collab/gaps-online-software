@@ -100,7 +100,7 @@ struct TofPacket {
   /// Transcode the bytestream into the respective 
   /// TofPacket
   static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos) 
-    -> r::Result<TofPacket, Gaps::IOError>;
+    -> r::Result<TofPacket, gondola::IOError>;
 
   /// A representative representation of the TofPacket 
   /// very usefule for debugging

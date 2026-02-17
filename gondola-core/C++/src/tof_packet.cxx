@@ -91,17 +91,17 @@ TofPacket::TofPacket() {
 /**************************************************/
 
 auto TofPacket::from_bytestream(const Vec<u8> &bytestream, u64 &pos) 
-  -> Result<TofPacket, Gaps::IOError> { 
+  -> Result<TofPacket, g::IOError> { 
   TofPacket packet = TofPacket();
   if (bytestream.size() <= pos + 2) {
     auto message = std::format("Bytestream is too short!");
-    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::StreamTooShort, message);
+    auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
     return Err(err);
   }
   u16 head = g::parse_u16(bytestream, pos);
   if (head != TofPacket::HEAD) {
     auto message = std::format("Decoding of HEAD failed! Got {} instead!", head);
-    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongHeaderBytes, message);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, message);
     pos -= 2; // rewind position so that client knows we did not 
               // parse anything
     /// print out the next/pre 5 bytes
@@ -129,7 +129,7 @@ auto TofPacket::from_bytestream(const Vec<u8> &bytestream, u64 &pos)
   u16 tail = g::parse_u16(bytestream, pos);
   if (tail != TofPacket::TAIL) {
     auto message = std::format("Decoding of TAIL failed! Got {} instead!", tail);
-    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongTailBytes, message);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongTailBytes, message);
     return Err(err);
   }
   return Ok(packet);

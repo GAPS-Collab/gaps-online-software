@@ -51,7 +51,7 @@ namespace Gaps {
       /// typically ending in ".tof.gaps"
       void set_filename(String filename);
       /// Walk over the file and return the next packet
-      auto get_next_packet() -> r::Result<TofPacket, Gaps::IOError>;
+      auto get_next_packet() -> r::Result<TofPacket, gondola::IOError>;
       /// Return the filename we assigned
       auto get_filename() const -> std::string;
       /// All packets have been read from the file. 

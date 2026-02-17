@@ -119,11 +119,11 @@ auto g::RBEventHeader::get_nchan() const -> u8 {
 /*************************************/
 
 auto g::RBEventHeader::from_bytestream(const Vec<u8> &stream, u64 &pos)\
-  -> Result<RBEventHeader, Gaps::IOError> {
+  -> Result<RBEventHeader, g::IOError> {
   //Gaps::set_loglevel(Gaps::LOGLEVEL::info);
   if (stream.size() < RBEventHeader::SIZE) {
     auto message = std::format("RBEventHeader can not be parsed from a string with size {}, when {} bytes are expected!", stream.size(), RBEventHeader::SIZE);
-    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::StreamTooShort, message);
+    auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
     return Err(err);
   }
   RBEventHeader header;
@@ -633,7 +633,7 @@ auto g::TofEvent::set_paddlemap(const Gaps::TofPaddleMap& paddlemap) -> void {
 /**********************************************************/
 
 auto g::TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
-  -> Result<TofEvent, Gaps::IOError> {
+  -> Result<TofEvent, g::IOError> {
   spdlog::cfg::load_env_levels();
   TofEvent event = TofEvent();
   spdlog::debug("Start decoding at pos ",pos);
@@ -641,7 +641,7 @@ auto g::TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
   if (head != TofEvent::HEAD)  {
     spdlog::error("No header signature found!");  
     auto message = std::format("TofEvent has incorrect header!");
-    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongHeaderBytes, message);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, message);
     return Err(err);
   }
   u8 status_version_u8     = g::parse_u8(stream, pos);
@@ -675,7 +675,7 @@ auto g::TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
   if (nhits > 160) {
     spdlog::error("There are way too many hits in this event (more than 160)!");  
     auto message = std::format("TofEvent has too many hits (more than paddles)!");
-    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::StreamTooLong, message);
+    auto err = g::IOError(g::IOError::ErrorKind::StreamTooLong, message);
     return Err(err);
   } 
   while (nhits > 0) {\
@@ -698,7 +698,7 @@ auto g::TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
   u16 tail = g::parse_u16(stream, pos);
   if (tail != TofEvent::TAIL) {
     auto message = std::format("Decoding of TAIL failed! Got {} instead!", tail);
-    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongTailBytes, message);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongTailBytes, message);
     return Err(err);
   }
   return Ok(event);
@@ -1221,19 +1221,19 @@ auto g::TofHit::get_edep() const -> f32 {
 #endif
 
 auto g::TofHit::from_bytestream(const Vec<u8> &bytestream, u64 &pos) 
- -> r::Result<g::TofHit,Gaps::IOError> {
+ -> r::Result<g::TofHit,g::IOError> {
  auto hit = g::TofHit();
  u16 maybe_header = g::parse_u16(bytestream, pos);
  if (maybe_header != TofHit::HEAD) {
    auto message = std::format("Decoding of HEAD failed! Got {} instead!", maybe_header);
-   auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongHeaderBytes, message);
+   auto err = g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, message);
    return Err(err);
  }
  // UPDATE - get version byte first!
  u64 ver_pos            = pos + 21; // version byte is at position 23
  if (bytestream.size() <= ver_pos) {
    auto message = std::format("Currently, reading older data without the hit time-over-threshold variables is not supported!");
-   auto err = Gaps::IOError(Gaps::IOError::ErrorKind::UnsupportedProtocolVersion, message);
+   auto err = g::IOError(g::IOError::ErrorKind::UnsupportedProtocolVersion, message);
    return Err(err);
  }
  u8  version        = g::parse_u8(bytestream, ver_pos);
@@ -1476,11 +1476,11 @@ auto g::TofEventSummary::get_rb_link_ids() const -> Vec<u8> {
 
 
 auto g::TofEventSummary::from_bytestream(const Vec<u8> &stream, u64 &pos) 
-  -> Result<g::TofEventSummary, Gaps::IOError> {
+  -> Result<g::TofEventSummary, g::IOError> {
   u16 head = g::parse_u16(stream, pos);
   if (head != TofEventSummary::HEAD) {
     auto message = std::format("Decoding of HEAD failed! Got {} instead!", head);
-    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongHeaderBytes, message);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, message);
     return Err(err);
   }
   TofEventSummary tes;
@@ -1522,19 +1522,19 @@ auto g::TofEventSummary::from_bytestream(const Vec<u8> &stream, u64 &pos)
   u16 tail = g::parse_u16(stream, pos);
   if (tail != g::TofEventSummary::TAIL) {
     auto message = std::format("Decoding of TAIL failed! Got {} instead!", tail);
-    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongTailBytes, message);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongTailBytes, message);
     return Err(err);
   }
   return Ok(tes);
 }
 
 auto g::TofEventSummary::from_tofpacket(const TofPacket &packet) 
-  -> Result<TofEventSummary, Gaps::IOError> {
+  -> Result<TofEventSummary, g::IOError> {
   TofEventSummary event;
   if (packet.packet_type != PacketType::TofEventSummary) {
     auto message = std::format("Wrong packet type! {}", packet_type_to_string(packet.packet_type));
     spdlog::error(message);
-    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongPacketType, message);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongPacketType, message);
     return Err(err);
   } 
   u64 _pos = 0;

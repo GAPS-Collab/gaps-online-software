@@ -203,7 +203,7 @@ namespace gondola {
     RBEventHeader();
    
     static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos)
-      -> r::Result<RBEventHeader, Gaps::IOError>;
+      -> r::Result<RBEventHeader, g::IOError>;
   
     auto get_channels()             const -> Vec<u8>;
     auto get_nchan()                const -> u8;
@@ -316,7 +316,7 @@ namespace gondola {
     #endif
   
     static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos)
-      -> r::Result<TofHit,Gaps::IOError>;
+      -> r::Result<TofHit,g::IOError>;
    
     // String representation for printing
     auto to_string() const -> std::string;
@@ -571,7 +571,7 @@ namespace gondola {
      *
      */
     static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos)
-      -> r::Result<TofEvent, Gaps::IOError>;
+      -> r::Result<TofEvent, g::IOError>;
   
     /**
      * Factory function for TofEvents.
@@ -687,8 +687,8 @@ namespace gondola {
     f32         tot_edep_cor      ;
     
     static auto from_tofpacket(const TofPacket &packet)          
-      -> r::Result<TofEventSummary, Gaps::IOError>;
-    static auto from_bytestream(const Vec<u8> &stream, u64 &pos) -> r::Result<TofEventSummary, Gaps::IOError> ;
+      -> r::Result<TofEventSummary, g::IOError>;
+    static auto from_bytestream(const Vec<u8> &stream, u64 &pos) -> r::Result<TofEventSummary, g::IOError> ;
     
     #ifdef BUILD_CXX_DB
     /// set a TofPaddle, that is enrich every tofhit with information

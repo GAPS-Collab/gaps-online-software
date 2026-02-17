@@ -151,7 +151,7 @@ auto g::CRFrame::from_bytestream(Vec<u8> stream, usize &pos)
 }
 
 auto g::CRFrame::get_tofpacket(std::string name)
-  -> Result<TofPacket,Gaps::IOError> {
+  -> Result<TofPacket,g::IOError> {
   TofPacket tp;
   //let mut lookup : (usize, CRFrameObjectType);
   usize pos = 0;
@@ -162,7 +162,7 @@ auto g::CRFrame::get_tofpacket(std::string name)
   } else {
      spdlog::debug("Unable to find TofPacket {} in frame!", name);
      std::string msg = std::format("Can't find TofPacket {} in frame!", name);
-     auto err = Gaps::IOError(Gaps::IOError::ErrorKind::PacketNotFound, msg);
+     auto err = g::IOError(g::IOError::ErrorKind::PacketNotFound, msg);
      return Err(err);
   }
   if (dtype == g::CRFrameObjectType::TofPacket) {
@@ -178,7 +178,7 @@ auto g::CRFrame::get_tofpacket(std::string name)
   } else {
     std::string msg = std::format("Trying to get TofPacket {}, but it is of type {}", name, (int)static_cast<u8>(dtype));
     SPDLOG_DEBUG(msg);
-    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongPacketType, msg);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongPacketType, msg);
     return Err(err);
   }
   return Ok(tp);

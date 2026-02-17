@@ -80,7 +80,7 @@ namespace Gaps {
       auto to_string()     const -> std::string;
       auto to_bytestream() const -> Vec<u8>;
       static auto from_bytestream(Vec<u8> const &stream, usize &pos)
-        -> r::Result<PacketHeader, Gaps::IOError>;
+        -> r::Result<PacketHeader, gondola::IOError>;
     };
 
     struct Packet {
@@ -114,7 +114,7 @@ namespace Gaps {
        auto to_string() const -> std::string;
        
        static auto from_bytestream(Vec<u8> const &stream, usize &pos)
-         -> r::Result<TrkHeader, Gaps::IOError>;
+         -> r::Result<TrkHeader, gondola::IOError>;
     };
 
     struct TrkHit {
@@ -159,7 +159,7 @@ namespace Gaps {
       
       auto to_string() const -> std::string;
       static auto from_bytestream(Vec<u8> const &stream, usize &pos)
-        -> r::Result<TrkEventPacket, Gaps::IOError>;
+        -> r::Result<TrkEventPacket, gondola::IOError>;
     };
      
     struct TofMetaData {
@@ -222,7 +222,7 @@ namespace Gaps {
        auto to_string() const -> std::string;
        
        static auto from_bytestream(Vec<u8> const &stream, usize &pos)
-        -> r::Result<Cooling, Gaps::IOError>;   
+        -> r::Result<Cooling, gondola::IOError>;   
     };
 
     /// The actual merged event sent over telemetry 
@@ -247,10 +247,10 @@ namespace Gaps {
       auto to_string() const -> std::string;
 
       static auto from_bytestream(Vec<u8> const &stream, usize &pos)
-        -> r::Result<MergedEvent, Gaps::IOError>;
+        -> r::Result<MergedEvent, gondola::IOError>;
       
       static auto from_telemetrypacket(Packet const &packet) 
-        -> r::Result<MergedEvent, Gaps::IOError>;
+        -> r::Result<MergedEvent, gondola::IOError>;
     };
   }
 }

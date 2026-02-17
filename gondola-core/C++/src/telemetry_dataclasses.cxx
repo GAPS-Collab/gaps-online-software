@@ -90,7 +90,7 @@ auto gtl::PacketHeader::to_bytestream() const -> Vec<u8> {
 }
 
 auto  gtl::PacketHeader::from_bytestream(Vec<u8> const &stream, usize &pos)
-  -> Result<PacketHeader, Gaps::IOError> {
+  -> Result<PacketHeader, g::IOError> {
   gtl::PacketHeader ph;
   if (stream.size() < pos + gtl::PacketHeader::SIZE) {
     spdlog::error("The telemetry header is too short! ({} bytes when {} are expected!", stream.size(), gtl::PacketHeader::SIZE);
@@ -167,11 +167,11 @@ auto gtl::TrkHeader::to_string() const -> std::string {
 }
 
 auto gtl::TrkHeader::from_bytestream(Vec<u8> const &stream, usize &pos) 
-  -> r::Result<TrkHeader, Gaps::IOError> {
+  -> r::Result<TrkHeader, g::IOError> {
   auto header = TrkHeader();
   if (stream.size() - pos < gtl::TrkHeader::SIZE) {
     std::string message = std::format("Stream is too short for a trkheader packet. We got a stream of size {} when expectinog {} bytes!", stream.size() - pos, gtl::Cooling::SIZE);
-    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::StreamTooShort, message);
+    auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
     return Err(err);
   } 
   header.sync   = g::parse_u16(stream, pos);
@@ -245,7 +245,7 @@ auto gtl::TrkEventPacket::to_string() const -> std::string {
 }
 
 auto gtl::TrkEventPacket::from_bytestream(Vec<u8> const &stream, usize &pos)
-  -> r::Result<TrkEventPacket, Gaps::IOError> {
+  -> r::Result<TrkEventPacket, g::IOError> {
   TrkEventPacket packet;
   //auto packet_header = PacketHeader::from_bytestream(stream, pos);
   //if (packet_header.is_ok()) {
@@ -275,7 +275,7 @@ auto gtl::TrkEventPacket::from_bytestream(Vec<u8> const &stream, usize &pos)
     if (pos + event_header_size > stream.size()) { 
       std::string message("Unable to read more TrackerEvents! Stream is too short!");
       //spdlog::error("{}",packet.to_string());
-      auto err = Gaps::IOError(Gaps::IOError::ErrorKind::StreamTooShort, message);
+      auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
       return Err(err);
     }
     gtl::TrkEvent trk_event;
@@ -294,7 +294,7 @@ auto gtl::TrkEventPacket::from_bytestream(Vec<u8> const &stream, usize &pos)
     if ((pos + (3*n_hits)) > stream.size()) {
       auto message =  std::format("Unable to read all {} tracker hits! Stream is too short!", n_hits);
       //spdlog::error("{}",packet.to_string());
-      auto err = Gaps::IOError(Gaps::IOError::ErrorKind::StreamTooShort, message);
+      auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
       return Err(err);
     }
     for (u8 j = 0; j<n_hits; j++) {
@@ -320,7 +320,7 @@ auto gtl::TrkEventPacket::from_bytestream(Vec<u8> const &stream, usize &pos)
   if (packet.events.size() > 170) {
     std::string message = std::format("There seem to be more than 170 events (!) in the tracker. This is nonsense!");
     spdlog::error("{}",message);
-    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::TooManyTrkEvents, message);
+    auto err = g::IOError(g::IOError::ErrorKind::TooManyTrkEvents, message);
     return Err(err); 
   }
   return Ok(packet);
@@ -393,12 +393,12 @@ auto gtl::MergedEvent::to_string() const -> std::string {
 }
 
 auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos) 
-    -> r::Result<MergedEvent, Gaps::IOError> {
+    -> r::Result<MergedEvent, g::IOError> {
   // check if it has at least the fix part
   if (stream.size() < pos + 18) {
     std::string message = std::format("Stream does not contain enough bytes to parse MergedEvent event id and basic information! Packet might be broken(?)");
     spdlog::error("{}",message);
-    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::StreamTooShort, message);
+    auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
     return Err(err);
   }
   
@@ -427,7 +427,7 @@ auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
     //spdlog::error("{}", evt.to_string());
     std::string message = std::format("Stream does not contain enough TOF bytes! We expect {} when the remaing size is only {}", num_tof_bytes, stream.size() - pos);
     spdlog::error("{}",message);
-    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::StreamTooShort, message);
+    auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
     return Err(err);
   }
   auto tof_data = g::slice(stream, pos, pos + num_tof_bytes);
@@ -447,7 +447,7 @@ auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
   if(tracker_delim != 0xbb) {
     std::string message = std::format("Incorrect tracker delmiter flag ({})!", tracker_delim);
     spdlog::error("{}",message);
-    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongDelimiter, message);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongDelimiter, message);
     return Err(err);
   }
   evt.n_trk_hits = g::parse_u16(stream, pos); 
@@ -466,7 +466,7 @@ auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
   if(osci_delim != 0xcc) {
     std::string message = std::format("Incorrect osci delmiter flag ({})!", osci_delim);
     spdlog::error("{}",message);
-    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongDelimiter, message);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongDelimiter, message);
     return Err(err);
   }
   u8 osc_flags = g::parse_u8(stream, pos);
@@ -479,7 +479,7 @@ auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
   if (pos + 6*oscillator_idx.size() > stream.size()) {
     std::string message = std::format("Stream does not contain enough bytes for {} trk oscillators!! Only {} bytes left!", oscillator_idx.size(), stream.size() - pos);
     spdlog::error("{}",message);
-    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::StreamTooShort, message);
+    auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
     return Err(err);
   }
   for(auto idx : oscillator_idx) {
@@ -493,7 +493,7 @@ auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
 }  
       
 auto gtl::MergedEvent::from_telemetrypacket(Packet const &packet) 
-  -> r::Result<MergedEvent, Gaps::IOError> {
+  -> r::Result<MergedEvent, g::IOError> {
   usize pos = 0;
   auto  res = gtl::MergedEvent::from_bytestream(packet.payload, pos);
   if (res.is_err()) {
@@ -530,17 +530,17 @@ auto gtl::Cooling::to_string() const -> std::string {
   return repr;
 }
 
-auto gtl::Cooling::from_bytestream(Vec<u8> const &stream, usize &pos) -> r::Result<Cooling, Gaps::IOError> {
+auto gtl::Cooling::from_bytestream(Vec<u8> const &stream, usize &pos) -> r::Result<Cooling, g::IOError> {
   auto cln = Cooling();
   if (stream.size() - pos < gtl::Cooling::SIZE) {
     std::string message = std::format("Stream is too short for a cooling packet. We got a streamof size {} when expectinog {} bytes!", stream.size() - pos, gtl::Cooling::SIZE);
-    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongDelimiter, message);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongDelimiter, message);
     return Err(err);
   }
   auto start_byte = g::parse_u8(stream, pos);
   if (start_byte != 0x1e) {
     std::string message = std::format("Start byte for cooling packet incorrect! Got {} instead of 0x1e", start_byte);
-    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongDelimiter, message);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongDelimiter, message);
     return Err(err);
   } 
   cln.rtd.fill(0xffff);
@@ -576,7 +576,7 @@ auto gtl::Cooling::from_bytestream(Vec<u8> const &stream, usize &pos) -> r::Resu
   auto stop_byte = g::parse_u8(stream,pos);
   if (stop_byte != 0x0a) {
     std::string message = std::format("Stop byte for cooling packet incorrect! Got {} instead of 0x0a", stop_byte);
-    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongDelimiter, message);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongDelimiter, message);
     return Err(err);
   } 
   return Ok(cln);

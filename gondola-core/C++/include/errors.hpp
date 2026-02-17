@@ -2,7 +2,7 @@
 #define GO_ERRORS_H_INCLUDED
 
 
-namespace Gaps {
+namespace gondola {
   class IOError {
     public:
    
