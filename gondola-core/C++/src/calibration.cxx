@@ -615,16 +615,14 @@ auto g::RBCalibration::from_file(const String &filename, bool discard_events) ->
   }
   // This should exactly contain a single RBCalibration in a 
   // TofPacket
-  auto stream = get_bytestream_from_file(filename); 
-  u64 pos     = 0;
-  auto pack   = TofPacket::from_bytestream(stream, pos);
+  auto reader = Gaps::TofPacketReader(filename);
+  auto pack   = reader.get_next_packet();
   if (pack.is_err()) {
     spdlog::error("Got a TofPacket from the file, but it seems corrupt! {}", pack.unwrap_err().reason);
     spdlog::error("Returning emtpy calibration!");
     return RBCalibration();
   }
-  pos = 0;
-  //auto cali_pack = get_tofpackets(filename)[0];
+  usize pos = 0;
   return RBCalibration::from_bytestream(pack.unwrap().payload, pos, discard_events);
 }
 

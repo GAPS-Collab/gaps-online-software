@@ -52,11 +52,4 @@ auto search_for_2byte_marker(const Vec<u8> &bytestream,
 auto get_2byte_markers_indices(const Vec<u8> &bytestream, u8 marker)
   -> Vec<u32>;
 
-// file i/o
-/***********************************************/
-
-[[deprecated("Unused/not useful deemed feature")]]
-Vec<u8> get_bytestream_from_file(const std::string &filename);
-
-
 #endif

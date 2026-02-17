@@ -37,43 +37,6 @@ namespace gondola {
   auto list_path_contents_sorted(const std::string& input, bool use_telemetry_re = false) -> Vec<std::string>;
 } 
 
-/**
- * Extract TofPackets from a stream of binary data 
- *
- * @param bytestream : Binary TofPacket data.
- * @param start_pos  : Byte position to start searching from in bytestream
- * @param filter     : Only get TofPackets of this type. If set to 
- *                     PacketType::Unknown, get all packets
- */
-Vec<TofPacket> get_tofpackets(const Vec<u8> &bytestream, u64 start_pos, PacketType filter=PacketType::Unknown);
-
-/**
- * Extract TofPackets from a file on disk
- *
- * @param bytestream : Binary TofPacket data.
- * @param start_pos  : Byte position to start searching from in bytestream
- * @param filter     : Only get TofPackets of this type. If set to 
- *                     PacketType::Unknown, get all packets
- */
-Vec<TofPacket> get_tofpackets(const String filename, PacketType filter = PacketType::Unknown);
-
-/**
- * Directly gets TofEvents from a stream with tofpackets, assuming all
- * packets are actually TofEvents. Other packets will be discarded.
- *
- * @param bytestream : Binary TofPacket data.
- * @param start_pos  : Byte position to start searching from in bytestream
- */
-Vec<gondola::TofEvent> unpack_tofevents_from_tofpackets(const Vec<u8> &bytestream, u64 start_pos);
-
-/**
- * Directly gets TofEvents from a stream with tofpackets, assuming all
- * packets are actually TofEvents. Other packets will be discarded
- *
- * @param filename : Binary file with TofPacket data.
- */
-Vec<gondola::TofEvent> unpack_tofevents_from_tofpackets(const String filename);
-
 namespace Gaps {
 
   /// Read serialized TofPackets from 
