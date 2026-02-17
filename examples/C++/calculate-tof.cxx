@@ -103,7 +103,7 @@ int main(int argc, char *argv[]){
       ++n_frames_processed;
       ++n_frames_processed_file;
 
-      g::Packet pack;
+      g::TelemetryPacket pack;
       if (frame.index.contains(tel_ev_nogaps)) {
         pack = frame.get_telemetrypacket(tel_ev_nogaps);
       } else if (frame.index.contains(tel_ev_boring)) {

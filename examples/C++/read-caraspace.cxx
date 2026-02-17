@@ -124,7 +124,7 @@ int main(int argc, char *argv[]){
       ++n_frames_processed;
       ++n_frames_processed_file;
 
-      g::Packet pack;
+      g::TelemetryPacket pack;
       // check for RBWaveform 
       if (frame.index.contains(rbwf_name)) {
         auto pack = frame.get_telemetrypacket(rbwf_name);
@@ -177,7 +177,7 @@ int main(int argc, char *argv[]){
         std::cout << pack.to_string() << std::endl;
       }
       usize pos = 0;
-      auto result = g::MergedEvent::from_bytestream(pack.payload, pos);
+      auto result = g::TelemetryEvent::from_bytestream(pack.payload, pos);
       // in case of errors, we just move on
       if (result.is_err()) {
         std::string message = result.unwrap_err().reason;

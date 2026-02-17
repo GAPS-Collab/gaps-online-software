@@ -15,11 +15,6 @@
 
 namespace gondola {
 
-  /// FIXME - this will be renamed to be the same as in rust
-  typedef BfswPacketType TelemetryPacketType;
-  typedef Packet         TelemetryPacket;
-  typedef PacketHeader   TelemetryPacketHeader;
-
   /// Read serialized TelemetryPackets from an existing file
   ///
   /// Read GAPS binary files ("Berkeley binaries)
@@ -33,7 +28,7 @@ namespace gondola {
     
     auto get_filenames() const -> Vec<std::string>; 
     
-    auto get_next_packet() -> Packet; 
+    auto get_next_packet() -> TelemetryPacket; 
 
     /// count the packets within the Telemetry fiel 
     auto count_packets() -> u64;

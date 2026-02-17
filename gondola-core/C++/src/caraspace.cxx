@@ -183,8 +183,8 @@ auto g::CRFrame::get_tofpacket(std::string name)
   return Ok(tp);
 }
 
-g::Packet g::CRFrame::get_telemetrypacket(std::string name) {
-  g::Packet tp;
+g::TelemetryPacket g::CRFrame::get_telemetrypacket(std::string name) {
+  g::TelemetryPacket tp;
   usize pos = 0;
   CRFrameObjectType dtype = CRFrameObjectType::Unknown;
   if (index.contains(name)) {
@@ -197,7 +197,7 @@ g::Packet g::CRFrame::get_telemetrypacket(std::string name) {
     auto f_obj = CRFrameObject::from_bytestream(bytestorage, pos);
     //std::cout << f_obj.to_string() << std::endl;
     pos        = 0;
-    tp         = g::Packet::from_bytestream(f_obj.payload, pos); 
+    tp         = g::TelemetryPacket::from_bytestream(f_obj.payload, pos); 
     //std::cout << tp.to_string() << std::endl;
   } else {
     spdlog::error("Trying to get TofPacket {}  however, that is of type {}", name, static_cast<u8>(dtype)); 
@@ -362,23 +362,23 @@ g::CRFrame g::CRReader::get_next_frame() {
     f_obj.payload = payload;
     std::string obj_name = "TelemetryPacketType::Unknown";
     switch (packet.header.ptype) {
-      case g::BfswPacketType::BoringEvent : {
+      case g::TelemetryPacketType::BoringEvent : {
         obj_name = "TelemetryPacketType.BoringEvent";
         break;
       } 
-      case g::BfswPacketType::InterestingEvent : {
+      case g::TelemetryPacketType::InterestingEvent : {
         obj_name = "TelemetryPacketType.InterestingEvent";
         break;
       } 
-      case g::BfswPacketType::NoGapsTriggerEvent : {
+      case g::TelemetryPacketType::NoGapsTriggerEvent : {
         obj_name = "TelemetryPacketType.NoGapsTriggerEvent";
         break;
       } 
-      case g::BfswPacketType::NoTofDataEvent : {
+      case g::TelemetryPacketType::NoTofDataEvent : {
         obj_name = "TelemetryPacketType.NoTofDataEvent";
         break;
       }
-      case g::BfswPacketType::Tracker : {
+      case g::TelemetryPacketType::Tracker : {
         obj_name = "TelemetryPacketType.Tracker";
       }
       default : {

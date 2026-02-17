@@ -117,14 +117,14 @@ auto g::TelemetryPacketReader::cache_all_packets() -> void {
 
 //--------------------------------------------------------------------------
 
-auto g::TelemetryPacketReader::get_packet_index() const -> const HashMap<TelemetryPacketType, u64>& {
+auto g::TelemetryPacketReader::get_packet_index() const -> const HashMap<g::TelemetryPacketType, u64>& {
   return packet_index_;
 }
 
 //--------------------------------------------------------------------------
 
-auto g::TelemetryPacketReader::get_next_packet() -> g::Packet {
-  auto packet = g::Packet();
+auto g::TelemetryPacketReader::get_next_packet() -> g::TelemetryPacket {
+  auto packet = g::TelemetryPacket();
   if (packet_cache_.size() > 0 && !in_caching_) { // packets have been cached, return those
     packet = packet_cache_.back();
     packet_cache_.pop_back();
@@ -171,7 +171,7 @@ auto g::TelemetryPacketReader::get_next_packet() -> g::Packet {
         stream_file_.read(reinterpret_cast<char*>(buffer_data.data()), p_size);
         payload.insert(payload.end(), buffer_data.begin(), buffer_data.end());
         pos = 0;
-        auto packet = g::Packet::from_bytestream(payload, pos);
+        auto packet = g::TelemetryPacket::from_bytestream(payload, pos);
         ++n_packs_read_;
         register_packet_type_(packet.header.ptype);
         #ifdef BUILD_CXX_DB 

@@ -7,12 +7,6 @@
 
 #include "tof_typedefs.h" 
 
-namespace Gaps {
-  namespace Telemetry {
-    class MergedEvent;
-  }
-}
-
 namespace gondola {
   auto read_sd_legacy_example() -> void; 
   
@@ -21,7 +15,6 @@ namespace gondola {
   struct SDRootReader {
   
   };
-
 }
 
 typedef i32 CFitStatusType;
@@ -111,8 +104,8 @@ class CEventRec : public CEventBase {
   // Populate a CEventRec object from a 
   // MergedEvent
   public:
-    static auto from_telemetry(Gaps::Telemetry::MergedEvent const &event) -> CEventRec;
-    auto to_telemetry(HashMap<u32, u32> const &hid_vid_map) -> Gaps::Telemetry::MergedEvent;
+    static auto from_telemetry(gondola::MergedEvent const &event) -> CEventRec;
+    auto to_telemetry(HashMap<u32, u32> const &hid_vid_map) -> gondola::MergedEvent;
 
   public:
     CEventRec() {}

@@ -15,7 +15,7 @@ namespace r = result;
 
 namespace gondola {
 
-  enum class BfswPacketType : u8 {
+  enum class TelemetryPacketType : u8 {
     Unknown            = 0,
     SipGpsPosition     = 20,
     SipGpsTime         = 21,
@@ -61,34 +61,34 @@ namespace gondola {
     RatePacket         = 219,
   };
 
-  auto bfsw_ptype_to_u8(BfswPacketType pt) -> u8;
-  auto bfsw_ptype_to_str(BfswPacketType pt) -> std::string;
+  auto bfsw_ptype_to_u8(TelemetryPacketType pt) -> u8;
+  auto bfsw_ptype_to_str(TelemetryPacketType pt) -> std::string;
 
-  struct PacketHeader {
+  struct TelemetryPacketHeader {
     static constexpr u16 SIZE = 13; 
     static constexpr u16 HEAD = 0x90eb;
 
-    u16             sync     {0};
-    BfswPacketType  ptype    {BfswPacketType::Unknown};
-    u32             timestamp{0};
-    u16             counter  {0};
-    u16             length   {0};
-    u16             checksum {0};
+    u16                  sync     {0};
+    TelemetryPacketType  ptype    {TelemetryPacketType::Unknown};
+    u32                  timestamp{0};
+    u16                  counter  {0};
+    u16                  length   {0};
+    u16                  checksum {0};
   
     auto get_gcutime()   const -> f64;
     auto to_string()     const -> std::string;
     auto to_bytestream() const -> Vec<u8>;
     static auto from_bytestream(Vec<u8> const &stream, usize &pos)
-      -> r::Result<PacketHeader, IOError>;
+      -> r::Result<TelemetryPacketHeader, IOError>;
   };
 
-  struct Packet {
+  struct TelemetryPacket {
     auto to_string() const -> std::string;
     auto is_event_packet() const -> bool;
     
-    static auto from_bytestream(Vec<u8> const &stream, usize &pos) -> Packet;
+    static auto from_bytestream(Vec<u8> const &stream, usize &pos) -> TelemetryPacket;
      
-    PacketHeader header;
+    TelemetryPacketHeader header;
     Vec<u8> payload;
     #ifdef BUILD_CXX_DB
     /// The map of all paddles. This is needed later on to look up properties 
@@ -150,11 +150,11 @@ namespace gondola {
   };
   
   struct TrkEventPacket {
-    PacketHeader  header;
-    TrkHeader     daq_header;
-    Vec<TrkEvent> events;
-    u16           run_id;
-    u8            run_id_old;
+    TelemetryPacketHeader  header;
+    TrkHeader              daq_header;
+    Vec<TrkEvent>          events;
+    u16                    run_id;
+    u8                     run_id_old;
     
     auto to_string() const -> std::string;
     static auto from_bytestream(Vec<u8> const &stream, usize &pos)
@@ -195,7 +195,7 @@ namespace gondola {
      /// size with packet header
      static constexpr u16 SIZE = 105; 
   
-     PacketHeader header;
+     TelemetryPacketHeader header;
      u32 frame_counter   {0xffffffff};
      u8  status_1        {0xff};
      u8  status_2        {0xff};
@@ -225,8 +225,8 @@ namespace gondola {
   };
 
   /// The actual merged event sent over telemetry 
-  struct MergedEvent {
-    PacketHeader    header         = PacketHeader();
+  struct TelemetryEvent {
+    TelemetryPacketHeader header   = TelemetryPacketHeader();
     u8              version        = 0;
     u8              flags0         = 0;
     u8              flags1         = 0;
@@ -246,10 +246,10 @@ namespace gondola {
     auto to_string() const -> std::string;
 
     static auto from_bytestream(Vec<u8> const &stream, usize &pos)
-      -> r::Result<MergedEvent, IOError>;
+      -> r::Result<TelemetryEvent, IOError>;
     
-    static auto from_telemetrypacket(Packet const &packet) 
-      -> r::Result<MergedEvent, IOError>;
+    static auto from_telemetrypacket(TelemetryPacket const &packet) 
+      -> r::Result<TelemetryEvent, IOError>;
   };  
 }
 

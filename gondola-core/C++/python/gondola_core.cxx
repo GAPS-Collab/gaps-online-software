@@ -13,7 +13,6 @@
 
 namespace nb  = nanobind;
 namespace g   = gondola;
-namespace gtl = Gaps::Telemetry;
 
 NB_MODULE(gondola_cxx, m) {
 
@@ -212,45 +211,45 @@ NB_MODULE(gondola_cxx, m) {
         return nb::str("{}").format(self.to_string());
     });
 
-  nb::class_<gtl::TrkHeader>(m, "TrkHeader")
+  nb::class_<g::TrkHeader>(m, "TrkHeader")
     .def(nb::init<>())
-    .def_static("from_bytestream", &gtl::TrkHeader::from_bytestream)
-    .def("__str__", [](const gtl::TrkHeader& self) {
+    .def_static("from_bytestream", &g::TrkHeader::from_bytestream)
+    .def("__str__", [](const g::TrkHeader& self) {
         return nb::str("{}").format(self.to_string());
     })
-    .def("__repr__", [](const gtl::TrkHeader& self) {
+    .def("__repr__", [](const g::TrkHeader& self) {
         return nb::str("{}").format(self.to_string());
     });
   
-    nb::class_<gtl::TrkHit>(m, "TrkHit")
+    nb::class_<g::TrkHit>(m, "TrkHit")
     .def(nb::init<>())
-    .def("__str__", [](const gtl::TrkHit& self) {
+    .def("__str__", [](const g::TrkHit& self) {
         return nb::str("{}").format(self.to_string());
     })
-    .def("__repr__", [](const gtl::TrkHit& self) {
+    .def("__repr__", [](const g::TrkHit& self) {
         return nb::str("{}").format(self.to_string());
     });
 
-  nb::class_<gtl::TrkEvent>(m, "TrkEvent")
+  nb::class_<g::TrkEvent>(m, "TrkEvent")
     .def(nb::init<>())
-    .def_ro("hits"      , &gtl::TrkEvent::hits)
-    .def("__str__", [](const gtl::TrkEvent& self) {
+    .def_ro("hits"      , &g::TrkEvent::hits)
+    .def("__str__", [](const g::TrkEvent& self) {
         return nb::str("{}").format(self.to_string());
     })
-    .def("__repr__", [](const gtl::TrkEvent& self) {
+    .def("__repr__", [](const g::TrkEvent& self) {
         return nb::str("{}").format(self.to_string());
     });
 
-  nb::class_<gtl::TrkEventPacket>(m, "TrkEventPacket")
+  nb::class_<g::TrkEventPacket>(m, "TrkEventPacket")
     .def(nb::init<>())
-    .def_ro("events"      , &gtl::TrkEventPacket::events)
+    .def_ro("events"      , &g::TrkEventPacket::events)
     .def_static("from_bytestream", [](Vec<u8> stream, usize pos) {
-        return gtl::TrkEventPacket::from_bytestream(stream, pos).unwrap();
+        return g::TrkEventPacket::from_bytestream(stream, pos).unwrap();
     })    
-    .def("__str__", [](const gtl::TrkEventPacket& self) {
+    .def("__str__", [](const g::TrkEventPacket& self) {
         return nb::str("{}").format(self.to_string());
     })
-    .def("__repr__", [](const gtl::TrkEventPacket& self) {
+    .def("__repr__", [](const g::TrkEventPacket& self) {
         return nb::str("{}").format(self.to_string());
     });
 
@@ -269,28 +268,28 @@ NB_MODULE(gondola_cxx, m) {
     })
     .def("rewind"                    , &g::TelemetryPacketReader::rewind);
   
-  nb::class_<Gaps::Telemetry::MergedEvent>(m, "TelemetryEvent")
+  nb::class_<g::TelemetryEvent>(m, "TelemetryEvent")
     .def(nb::init<>())
-    .def_static("from_telemetrypacket", [](Gaps::Telemetry::Packet &pack) {
-      auto data = gtl::MergedEvent::from_telemetrypacket(pack);
+    .def_static("from_telemetrypacket", [](g::TelemetryPacket &pack) {
+      auto data = g::TelemetryEvent::from_telemetrypacket(pack);
       if (data.is_ok()) {
         return data.unwrap();
       }  
       throw nb::value_error("Error when unpacking TelemetryEvent!");
     })
     .def_static("from_bytestream", [](Vec<u8> stream, usize pos) {
-      auto data = gtl::MergedEvent::from_bytestream(stream, pos);
+      auto data = g::TelemetryEvent::from_bytestream(stream, pos);
       if (data.is_ok()) {
         return data.unwrap();
       }  
       throw nb::value_error("Error when unpacking TelemetryEvent!");
-      //return gtl::MergedEvent::from_bytestream(stream, pos).unwrap();
+      //return g::TelemetryEvent::from_bytestream(stream, pos).unwrap();
     })
-    .def_ro("tof"                , &gtl::MergedEvent::tof_event)
-    .def("__str__", [](const gtl::MergedEvent& self) {
+    .def_ro("tof"                , &g::TelemetryEvent::tof_event)
+    .def("__str__", [](const g::TelemetryEvent& self) {
         return nb::str("{}").format(self.to_string());
     })
-    .def("__repr__", [](const gtl::MergedEvent& self) {
+    .def("__repr__", [](const g::TelemetryEvent& self) {
         return nb::str("{}").format(self.to_string());
     });
 
