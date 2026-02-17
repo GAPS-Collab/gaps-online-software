@@ -1097,67 +1097,37 @@ auto g::TofHit::get_t0()          const -> f32 {
 /*************************************/
 
 f32 g::TofHit::get_time_a() const {
- if (version == Gaps::ProtocolVersion::Unknown) {
-   f32 prec = 0.004;
-   return prec*time_a;
- } else {
-   return time_a_f32;
- }
+  return time_a_f32;
 }
 
 /*************************************/
 
 f32 g::TofHit::get_time_b() const {
-  if (version == Gaps::ProtocolVersion::Unknown) {
-    f32 prec = 0.004;//ns
-    return prec*time_b;
-  } else {
-    return time_b_f32;
-  }
+  return time_b_f32;
 }
 
 /*************************************/
 
 f32 g::TofHit::get_peak_a() const {
-  if (version == Gaps::ProtocolVersion::Unknown) {
-    f32 prec = 0.2;
-    return prec*peak_a;
-  } else {
-    return peak_a_f32;
-  }
+  return peak_a_f32;
 }
 
 /*************************************/
 
 f32 g::TofHit::get_peak_b() const {
-  if (version == Gaps::ProtocolVersion::Unknown) {
-    f32 prec = 0.2;
-    return prec*peak_b;
-  } else {
-    return peak_b_f32;
-  }
+  return peak_b_f32;
 }
 
 /*************************************/
 
 f32 g::TofHit::get_charge_a() const {
-  if (version == Gaps::ProtocolVersion::Unknown) {
-    f32 prec = 0.01; //pC
-    return prec*charge_a - 50;
-  } else {
-    return charge_a_f32;
-  }
+  return charge_a_f32;
 }
 
 /*************************************/
 
 f32 g::TofHit::get_charge_b() const {
-  if (version == Gaps::ProtocolVersion::Unknown) {
-    f32 prec = 0.01;
-    return prec*charge_b - 50;
-  } else {
-    return charge_b_f32;
-  }
+  return charge_b_f32;
 }
 
 /*************************************/
@@ -1211,36 +1181,22 @@ auto g::TofHit::get_tot_slp_high_b() const -> f32 {
 
 /*************************************/
 
-auto g::TofHit::get_charge_min_i() const -> f32 {
-  f32 prec = 0.002;// minI
-  return prec*charge_min_i - 10;
+f32 g::TofHit::get_x_pos() const {
+  return (time_a_f32 - get_t0_relative())*C_LIGHT_PADDLE*10.0; // 10 for cm->mm 
 }
 
 /*************************************/
-
-f32 g::TofHit::get_x_pos() const {
-  // FIXME - check if it is really in the middle
-  if (version == Gaps::ProtocolVersion::Unknown) {
-    f32 prec = 0.005; //cm
-    return prec*x_pos - 163.8;
-  } else {
-    return (time_a_f32 - get_t0_relative())*C_LIGHT_PADDLE*10.0; // 10 for cm->mm 
-  }
-}
 
 auto g::TofHit::obeys_causality() const -> bool {
   return 10.0*paddle_len/(10.0*C_LIGHT_PADDLE) - std::abs(time_a_f32 - time_b_f32) > 0.0
   && get_t0_relative() > 0.0;
 }
 
+/*************************************/
+
 f32 g::TofHit::get_t0_relative() const {
   // FIXME - we should just consistently make the paddle len in mm!
   return 0.5*(time_a_f32 + time_b_f32 - (10.0*paddle_len/(10.0*C_LIGHT_PADDLE)));
-}
-
-f32 g::TofHit::get_t_avg() const {
-  f32 prec = 0.004;//ps
-  return prec*t_average;
 }
 
 /// combine the slow timestamp with 
@@ -1344,19 +1300,9 @@ auto g::TofHit::to_string() const -> std::string {
   repr += std::format("\n  >> Hi Slope   A | B  : {:.2f} {:.2f}",get_tot_slp_high_a(), get_tot_slp_high_b());  
   // -------------------
   
-  if ( version == Gaps::ProtocolVersion::Unknown) {
-    repr += "\n  >>  charge min_I  : "     + std::to_string(get_charge_min_i());
-    repr += "\n  cntr ETX          : "     + std::to_string(ctr_etx           );
-    repr += "\n  broken (?depr)    : "     + std::to_string(broken            );
-  }
-  repr += "\n  >> in pad. pos   : "     + std::to_string(get_x_pos()       );
-  if (version == Gaps::ProtocolVersion::Unknown) {
-    repr += "\n  >> t_avg         : "     + std::to_string(get_t_avg()       );
-  } else {
-    #ifdef BUILD_CXXDB
-    repr += "\n  >> t0            : "     + std::to_string(get_t0()       );
-    #endif
-  }
+  #ifdef BUILD_CXXDB
+  repr += "\n  >> t0            : "     + std::to_string(get_t0()       );
+  #endif
   repr += ">";
   return repr;
 }

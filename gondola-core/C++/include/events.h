@@ -234,8 +234,6 @@ namespace gondola {
     static constexpr u16 TAIL = 0xF0F;
   
     u8   paddle_id;
-    // deprecated
-    bool broken;
   
     // new variables for V1
     Gaps::ProtocolVersion version;
@@ -266,9 +264,7 @@ namespace gondola {
     auto get_peak_b()       const -> f32;
     auto get_charge_a()     const -> f32;
     auto get_charge_b()     const -> f32;
-    auto get_charge_min_i() const -> f32;
     auto get_x_pos()        const -> f32;
-    auto get_t_avg()        const -> f32;
     /// If the two reconstructed pulse times are not related to each other by the paddle length,
     /// meaning that they can't be caused by the same event, we dub this hit as "not following
     /// causality"
@@ -327,21 +323,6 @@ namespace gondola {
     auto to_string() const -> std::string;
     
     private:
-      // we keep this private, since 
-      // the user should use the getters
-      // to get the values converted 
-      // back to f32
-      // deprecated, but kept for compatibility
-      u16 time_a;
-      u16 time_b;
-      u16 peak_a;
-      u16 peak_b;
-      u16 charge_a;
-      u16 charge_b;
-      u16 charge_min_i;
-      u16 x_pos;
-      u16 t_average;
-      
       f32 time_a_f32   = 0;
       f32 time_b_f32   = 0;
       f32 peak_a_f32   = 0;
@@ -360,7 +341,6 @@ namespace gondola {
       f32 tot_slp_low_b  = 0;
       f32 tot_slp_high_a = 0;
       f32 tot_slp_high_b = 0;
-
   };
   
   /// A complete event for a single readout board 
