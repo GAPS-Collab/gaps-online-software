@@ -614,7 +614,6 @@ auto g::TofEvent::normalize_hit_times(const g::TofPaddleTimingConstantMap &offse
 
 g::TofEvent::TofEvent() {
   status       = g::EventStatus::IncompleteReadout;
-  header       = TofEventHeader();
   mt_event     = g::MasterTriggerEvent();
   rb_events    = Vec<g::RBEvent>();
 }

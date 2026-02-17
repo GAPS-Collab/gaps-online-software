@@ -27,7 +27,6 @@ if (BUILD_CXX_BINDINGS)
   set(GONDOLA_LIBRARY_SHARED GondolaCore CACHE INTERNAL "gondola-core C++ shared library" FORCE)
   add_library(${GONDOLA_LIBRARY_SHARED} SHARED
               C++/src/tof_packet.cxx
-              C++/src/tof_event_header.cxx
               C++/src/calibration.cxx
               C++/src/serialization.cxx
               C++/src/parsers.cxx

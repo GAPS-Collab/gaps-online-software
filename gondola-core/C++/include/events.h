@@ -29,7 +29,6 @@
 #include "tof_typedefs.h"
 #include "packets/monitoring.h"
 #include "packets/tof_packet.h"
-#include "events/tof_event_header.hpp"
 #include "calibration.h"
 #include "version.h"
 #include "errors.hpp"
@@ -38,7 +37,6 @@
 #endif
 
 namespace r = result;
-namespace gon = gondola;
 
 class RBCalibration;
 
@@ -550,7 +548,6 @@ namespace gondola {
     f32         tot_edep_umb      ;
     f32         tot_edep_cbe      ;
     f32         tot_edep_cor      ;
-    TofEventHeader header;
     MasterTriggerEvent mt_event;
 
     /// A container holding the individual events from all RBs with 

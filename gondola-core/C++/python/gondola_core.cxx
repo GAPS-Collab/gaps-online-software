@@ -117,17 +117,11 @@ NB_MODULE(gondola_cxx, m) {
       return "<NBWrapper" + h.to_string() + ">";
     }); 
   
-  nb::class_<TofEventHeader>(m, "TofEventHeader")
-    .def(nb::init<>())
-    .def_ro("event_id"     , &TofEventHeader::event_id)
-    .def("to_string"       , &TofEventHeader::to_string);
-
   nb::class_<g::TofEvent>(m, "TofEvent")
     .def(nb::init<>())
     .def_static("from_tofpacket", &g::TofEvent::from_tofpacket) 
     .def("normalize_hit_times"  , &g::TofEvent::normalize_hit_times)
     .def_prop_ro("hits"         , &g::TofEvent::get_hits)
-    .def_ro("header"            , &g::TofEvent::header)
     .def_prop_ro("rb_ids"       , &g::TofEvent::get_rbids)
     .def("to_string"            , &g::TofEvent::to_string);
   
