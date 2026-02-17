@@ -127,22 +127,22 @@ auto g::RBEventHeader::from_bytestream(const Vec<u8> &stream, u64 &pos)\
     return Err(err);
   }
   RBEventHeader header;
-  u16 head                  = Gaps::parse_u16(stream, pos);
+  u16 head                  = g::parse_u16(stream, pos);
   if (head != RBEventHeader::HEAD) {
     spdlog::error("[RBEventHeader::from_bytestream] Header signature {} invalid!", head);
   }
-  header.rb_id               = Gaps::parse_u8(stream , pos);  
-  header.event_id            = Gaps::parse_u32(stream, pos);  
-  header.channel_mask        = Gaps::parse_u16(stream, pos);   
-  header.status_byte         = Gaps::parse_u8(stream , pos); 
-  header.stop_cell           = Gaps::parse_u16(stream, pos);  
-  header.ch9_amp             = Gaps::parse_u16(stream, pos);  
-  header.ch9_freq            = Gaps::parse_u16(stream, pos);  
-  header.ch9_phase           = Gaps::parse_u32(stream, pos);  
-  header.fpga_temp           = Gaps::parse_u16(stream, pos);  
-  header.timestamp32         = Gaps::parse_u32(stream, pos);
-  header.timestamp16         = Gaps::parse_u16(stream, pos);
-  u16 tail                   = Gaps::parse_u16(stream, pos);
+  header.rb_id               = g::parse_u8(stream , pos);  
+  header.event_id            = g::parse_u32(stream, pos);  
+  header.channel_mask        = g::parse_u16(stream, pos);   
+  header.status_byte         = g::parse_u8(stream , pos); 
+  header.stop_cell           = g::parse_u16(stream, pos);  
+  header.ch9_amp             = g::parse_u16(stream, pos);  
+  header.ch9_freq            = g::parse_u16(stream, pos);  
+  header.ch9_phase           = g::parse_u32(stream, pos);  
+  header.fpga_temp           = g::parse_u16(stream, pos);  
+  header.timestamp32         = g::parse_u32(stream, pos);
+  header.timestamp16         = g::parse_u16(stream, pos);
+  u16 tail                   = g::parse_u16(stream, pos);
   if (tail != RBEventHeader::TAIL) {
     spdlog::error("Tail signature incorrect! Got tail {}", tail);
   }
@@ -336,19 +336,19 @@ auto g::RBEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
   -> RBEvent {
   RBEvent event = RBEvent();
   spdlog::debug("Start decoding at pos {}", pos);
-  u16 head = Gaps::parse_u16(stream, pos);
+  u16 head = g::parse_u16(stream, pos);
   if (head != RBEvent::HEAD)  {
     spdlog::error("[RBEvent::from_bytestream] Header signature invalid!");  
     event.status = EventStatus::IncompleteReadout;
     return event;
   }
-  event.data_type = Gaps::parse_u8(stream, pos);
-  //event.status    = Gaps::parse_u8(stream, pos);
+  event.data_type = g::parse_u8(stream, pos);
+  //event.status    = g::parse_u8(stream, pos);
   // FIXME - this can fail. Write a custom casting method that doesn't
   event.status    = static_cast<EventStatus>(stream[pos]); pos+=1; 
   // hits are below when readking out hit vector
   // FIXME
-  u8 nhits        = Gaps::parse_u8(stream, pos);
+  u8 nhits        = g::parse_u8(stream, pos);
   //spdlog::info("{}", event.data_type);
   //spdlog::info("{}", event.status);
   auto header     = RBEventHeader::from_bytestream(stream, pos);
@@ -380,7 +380,7 @@ auto g::RBEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
       event.hits.push_back(hit);
     }
   }
-  u16 tail = Gaps::parse_u16(stream, pos);
+  u16 tail = g::parse_u16(stream, pos);
   if (tail != RBEvent::TAIL) {
     spdlog::error("After parsing the event, we found an invalid tail signature {}", tail);
   }
@@ -638,41 +638,41 @@ auto g::TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
   spdlog::cfg::load_env_levels();
   TofEvent event = TofEvent();
   spdlog::debug("Start decoding at pos ",pos);
-  u16 head = Gaps::parse_u16(stream, pos);
+  u16 head = g::parse_u16(stream, pos);
   if (head != TofEvent::HEAD)  {
     spdlog::error("No header signature found!");  
     auto message = std::format("TofEvent has incorrect header!");
     auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongHeaderBytes, message);
     return Err(err);
   }
-  u8 status_version_u8     = Gaps::parse_u8(stream, pos);
+  u8 status_version_u8     = g::parse_u8(stream, pos);
   event.status             = static_cast<EventStatus>(status_version_u8 & 0x3f);
   event.version            = (Gaps::ProtocolVersion)(status_version_u8 & 0xc0);
-  event.trigger_sources    = Gaps::parse_u16(stream, pos);
-  event.n_trigger_paddles  = Gaps::parse_u8(stream, pos);
-  event.event_id           = Gaps::parse_u32(stream, pos);
+  event.trigger_sources    = g::parse_u16(stream, pos);
+  event.n_trigger_paddles  = g::parse_u8(stream, pos);
+  event.event_id           = g::parse_u32(stream, pos);
   if (event.version == Gaps::ProtocolVersion::V1
     || event.version == Gaps::ProtocolVersion::V3) {
-    event.n_hits_umb       = Gaps::parse_u8(stream, pos); 
-    event.n_hits_cbe       = Gaps::parse_u8(stream, pos); 
-    event.n_hits_cor       = Gaps::parse_u8(stream, pos); 
-    event.tot_edep_umb     = Gaps::parse_f32(stream, pos); 
-    event.tot_edep_cbe     = Gaps::parse_f32(stream, pos); 
-    event.tot_edep_cor     = Gaps::parse_f32(stream, pos); 
+    event.n_hits_umb       = g::parse_u8(stream, pos); 
+    event.n_hits_cbe       = g::parse_u8(stream, pos); 
+    event.n_hits_cor       = g::parse_u8(stream, pos); 
+    event.tot_edep_umb     = g::parse_f32(stream, pos); 
+    event.tot_edep_cbe     = g::parse_f32(stream, pos); 
+    event.tot_edep_cor     = g::parse_f32(stream, pos); 
   }
-  event.quality            = static_cast<g::EventQuality>(Gaps::parse_u8(stream, pos));
-  event.timestamp32        = Gaps::parse_u32(stream, pos);
-  event.timestamp16        = Gaps::parse_u16(stream, pos);
-  event.run_id             = Gaps::parse_u16(stream, pos);
-  event.drs_dead_lost_hits = Gaps::parse_u16(stream, pos);
-  event.dsi_j_mask         = Gaps::parse_u32(stream, pos);
-  u8 n_channel_masks       = Gaps::parse_u8(stream, pos);
+  event.quality            = static_cast<g::EventQuality>(g::parse_u8(stream, pos));
+  event.timestamp32        = g::parse_u32(stream, pos);
+  event.timestamp16        = g::parse_u16(stream, pos);
+  event.run_id             = g::parse_u16(stream, pos);
+  event.drs_dead_lost_hits = g::parse_u16(stream, pos);
+  event.dsi_j_mask         = g::parse_u32(stream, pos);
+  u8 n_channel_masks       = g::parse_u8(stream, pos);
   while (n_channel_masks > 0) {
-    event.channel_mask.push_back(Gaps::parse_u16(stream, pos));
+    event.channel_mask.push_back(g::parse_u16(stream, pos));
     n_channel_masks -= 1;
   }
-  event.mtb_link_mask      = Gaps::parse_u64(stream, pos);
-  u16 nhits                = Gaps::parse_u16(stream, pos);
+  event.mtb_link_mask      = g::parse_u64(stream, pos);
+  u16 nhits                = g::parse_u16(stream, pos);
   if (nhits > 160) {
     spdlog::error("There are way too many hits in this event (more than 160)!");  
     auto message = std::format("TofEvent has too many hits (more than paddles)!");
@@ -690,13 +690,13 @@ auto g::TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
   }
   if (event.version == Gaps::ProtocolVersion::V2 
     || event.version == Gaps::ProtocolVersion::V3) {
-    u8 n_rb_events = Gaps::parse_u8(stream, pos);
+    u8 n_rb_events = g::parse_u8(stream, pos);
     while (n_rb_events > 0) {
       event.rb_events.push_back(RBEvent::from_bytestream(stream, pos));
       n_rb_events -= 1;
     }
   }
-  u16 tail = Gaps::parse_u16(stream, pos);
+  u16 tail = g::parse_u16(stream, pos);
   if (tail != TofEvent::TAIL) {
     auto message = std::format("Decoding of TAIL failed! Got {} instead!", tail);
     auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongTailBytes, message);
@@ -908,45 +908,45 @@ g::MasterTriggerEvent g::MasterTriggerEvent::from_bytestream(const Vec<u8> &byte
   //  return event;
   //}
   
-  u16 header = Gaps::parse_u16(bytestream, pos);
+  u16 header = g::parse_u16(bytestream, pos);
   if (header != g::MasterTriggerEvent::HEAD) {
     spdlog::error("Wrong header signature!");
     return event;
   }
-  event.event_status   = (EventStatus)Gaps::parse_u8 (bytestream, pos);
-  event.event_id       = Gaps::parse_u32(bytestream, pos);
-  event.timestamp      = Gaps::parse_u32(bytestream, pos);
-  event.tiu_timestamp  = Gaps::parse_u32(bytestream, pos);
-  event.tiu_gps32      = Gaps::parse_u32(bytestream, pos);
-  event.tiu_gps16      = Gaps::parse_u16(bytestream, pos);
-  event.crc            = Gaps::parse_u32(bytestream, pos);
-  event.trigger_source = Gaps::parse_u16(bytestream, pos);
-  event.dsi_j_mask     = Gaps::parse_u32(bytestream, pos);
-  u8 n_channel_masks   = Gaps::parse_u8 (bytestream, pos);
+  event.event_status   = (EventStatus)g::parse_u8 (bytestream, pos);
+  event.event_id       = g::parse_u32(bytestream, pos);
+  event.timestamp      = g::parse_u32(bytestream, pos);
+  event.tiu_timestamp  = g::parse_u32(bytestream, pos);
+  event.tiu_gps32      = g::parse_u32(bytestream, pos);
+  event.tiu_gps16      = g::parse_u16(bytestream, pos);
+  event.crc            = g::parse_u32(bytestream, pos);
+  event.trigger_source = g::parse_u16(bytestream, pos);
+  event.dsi_j_mask     = g::parse_u32(bytestream, pos);
+  u8 n_channel_masks   = g::parse_u8 (bytestream, pos);
   for (u8 k=0;k<n_channel_masks;k++) {
   //for _ in 0..n_channel_masks {
-    event.channel_mask.push_back(Gaps::parse_u16(bytestream, pos));
+    event.channel_mask.push_back(g::parse_u16(bytestream, pos));
   }
-  event.mtb_link_mask  = Gaps::parse_u64(bytestream, pos);
+  event.mtb_link_mask  = g::parse_u64(bytestream, pos);
 
   // just search the next footer and don't fill the deprecated fields
   //bool has_ended = false;
   //u64 tail_pos = search_for_2byte_marker(bytestream,0x55,has_ended,pos);   
-  u16 tail = Gaps::parse_u16(bytestream, pos);
+  u16 tail = g::parse_u16(bytestream, pos);
   if (tail != g::MasterTriggerEvent::TAIL) {
     spdlog::error("Invalid tail signature!");
   }
-  //event.n_paddles          = Gaps::parse_u8 (bytestream, pos);
+  //event.n_paddles          = g::parse_u8 (bytestream, pos);
 
-  //event.set_board_mask(Gaps::parse_u3h2(bytestream, pos));
+  //event.set_board_mask(g::parse_u3h2(bytestream, pos));
   //// FIXME
   //for (usize k=0;k<n_ltbs;k++) {
-  //  u32 hitmask = Gaps::parse_u32(bytestream, pos);
+  //  u32 hitmask = g::parse_u32(bytestream, pos);
   //  event.set_hit_mask(k, hitmask);
   //}
-  //event.crc = Gaps::parse_u32(bytestream, pos);
-  //u8 tail_a = Gaps::parse_u8 (bytestream, pos);
-  //u8 tail_b = Gaps::parse_u8 (bytestream, pos);
+  //event.crc = g::parse_u32(bytestream, pos);
+  //u8 tail_a = g::parse_u8 (bytestream, pos);
+  //u8 tail_b = g::parse_u8 (bytestream, pos);
   //if (tail_a == 85 && tail_b == 85) {
   //  log_debug("Correct tail found!");
   //}
@@ -1268,7 +1268,7 @@ auto g::TofHit::get_edep() const -> f32 {
 auto g::TofHit::from_bytestream(const Vec<u8> &bytestream, u64 &pos) 
  -> r::Result<g::TofHit,Gaps::IOError> {
  auto hit = g::TofHit();
- u16 maybe_header = Gaps::parse_u16(bytestream, pos);
+ u16 maybe_header = g::parse_u16(bytestream, pos);
  if (maybe_header != TofHit::HEAD) {
    auto message = std::format("Decoding of HEAD failed! Got {} instead!", maybe_header);
    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongHeaderBytes, message);
@@ -1281,34 +1281,34 @@ auto g::TofHit::from_bytestream(const Vec<u8> &bytestream, u64 &pos)
    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::UnsupportedProtocolVersion, message);
    return Err(err);
  }
- u8  version        = Gaps::parse_u8(bytestream, ver_pos);
+ u8  version        = g::parse_u8(bytestream, ver_pos);
  hit.version        = (Gaps::ProtocolVersion) version;
  hit.paddle_id      = bytestream[pos]; pos+=1;
- hit.time_a_f32     = Gaps::parse_f16(bytestream, pos); 
- hit.time_b_f32     = Gaps::parse_f16(bytestream, pos); 
- hit.peak_a_f32     = Gaps::parse_f16(bytestream, pos); 
- hit.peak_b_f32     = Gaps::parse_f16(bytestream, pos); 
- hit.charge_a_f32   = Gaps::parse_f16(bytestream, pos); 
- hit.charge_b_f32   = Gaps::parse_f16(bytestream, pos); 
+ hit.time_a_f32     = g::parse_f16(bytestream, pos); 
+ hit.time_b_f32     = g::parse_f16(bytestream, pos); 
+ hit.peak_a_f32     = g::parse_f16(bytestream, pos); 
+ hit.peak_b_f32     = g::parse_f16(bytestream, pos); 
+ hit.charge_a_f32   = g::parse_f16(bytestream, pos); 
+ hit.charge_b_f32   = g::parse_f16(bytestream, pos); 
  // this is one of the new saturation variables 
- hit.tot_low_a      = Gaps::parse_f16(bytestream, pos);
- //hit.charge_min_i   = Gaps::parse_u16(bytestream, pos); 
- hit.baseline_a     = Gaps::parse_f16(bytestream, pos);
- hit.baseline_a_rms = Gaps::parse_f16(bytestream, pos);
- hit.phase          = Gaps::parse_f16(bytestream, pos);
+ hit.tot_low_a      = g::parse_f16(bytestream, pos);
+ //hit.charge_min_i   = g::parse_u16(bytestream, pos); 
+ hit.baseline_a     = g::parse_f16(bytestream, pos);
+ hit.baseline_a_rms = g::parse_f16(bytestream, pos);
+ hit.phase          = g::parse_f16(bytestream, pos);
  pos += 1; // skip version - it has already been read
- hit.baseline_b     = Gaps::parse_f16(bytestream, pos);
- hit.baseline_b_rms = Gaps::parse_f16(bytestream, pos);
+ hit.baseline_b     = g::parse_f16(bytestream, pos);
+ hit.baseline_b_rms = g::parse_f16(bytestream, pos);
  // new saturation variables 
- hit.tot_low_b      = Gaps::parse_f16(bytestream, pos);
- hit.tot_high_a     = Gaps::parse_f16(bytestream, pos);
- hit.tot_high_b     = Gaps::parse_f16(bytestream, pos);
- hit.tot_slp_low_a  = Gaps::parse_f16(bytestream, pos);
- hit.tot_slp_low_b  = Gaps::parse_f16(bytestream, pos);
- hit.tot_slp_high_a = Gaps::parse_f16(bytestream, pos);
- hit.tot_slp_high_b = Gaps::parse_f16(bytestream, pos);
+ hit.tot_low_b      = g::parse_f16(bytestream, pos);
+ hit.tot_high_a     = g::parse_f16(bytestream, pos);
+ hit.tot_high_b     = g::parse_f16(bytestream, pos);
+ hit.tot_slp_low_a  = g::parse_f16(bytestream, pos);
+ hit.tot_slp_low_b  = g::parse_f16(bytestream, pos);
+ hit.tot_slp_high_a = g::parse_f16(bytestream, pos);
+ hit.tot_slp_high_b = g::parse_f16(bytestream, pos);
  //------------------------------
- u16 tail = Gaps::parse_u16(bytestream, pos);
+ u16 tail = g::parse_u16(bytestream, pos);
  if (tail != TAIL) {
    spdlog::error("VERSION {}", version); 
    spdlog::error("TofHit TAIL signature {} is incorrect!", tail);
@@ -1364,16 +1364,16 @@ auto g::TofHit::to_string() const -> std::string {
 g::RBWaveform g::RBWaveform::from_bytestream(const Vec<u8> &stream,
                                        u64 &pos) {
   RBWaveform wf = RBWaveform();
-  u16 head = Gaps::parse_u16(stream, pos);
+  u16 head = g::parse_u16(stream, pos);
   if (head != RBWaveform::HEAD)  {
     //log_error("[RBEvent::from_bytestream] Header signature invalid!");  
     return wf;
   }
-  wf.event_id     = Gaps::parse_u32(stream, pos);
-  wf.rb_id        = Gaps::parse_u8(stream, pos);
-  wf.rb_channel_a = Gaps::parse_u8(stream, pos); 
-  wf.rb_channel_b = Gaps::parse_u8(stream, pos);
-  wf.stop_cell    = Gaps::parse_u16(stream, pos);
+  wf.event_id     = g::parse_u32(stream, pos);
+  wf.rb_id        = g::parse_u8(stream, pos);
+  wf.rb_channel_a = g::parse_u8(stream, pos); 
+  wf.rb_channel_b = g::parse_u8(stream, pos);
+  wf.stop_cell    = g::parse_u16(stream, pos);
   Vec<u8>::const_iterator start = stream.begin() + pos;
   Vec<u8>::const_iterator end   = stream.begin() + pos + 2*NWORDS;    // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
   Vec<u8> data_a(start, end);
@@ -1383,7 +1383,7 @@ g::RBWaveform g::RBWaveform::from_bytestream(const Vec<u8> &stream,
   end   = stream.begin() + pos + 2*NWORDS;
   Vec<u8> data_b(start, end);
   wf.adc_b = u8_to_u16(data_b);
-  u16 tail   = Gaps::parse_u16(stream, pos);
+  u16 tail   = g::parse_u16(stream, pos);
   if (tail != RBWaveform::TAIL) {
     spdlog::error("After parsing, we found an invalid tail signature {}", tail);
   }
@@ -1532,41 +1532,41 @@ auto g::TofEventSummary::get_rb_link_ids() const -> Vec<u8> {
 
 auto g::TofEventSummary::from_bytestream(const Vec<u8> &stream, u64 &pos) 
   -> Result<g::TofEventSummary, Gaps::IOError> {
-  u16 head = Gaps::parse_u16(stream, pos);
+  u16 head = g::parse_u16(stream, pos);
   if (head != TofEventSummary::HEAD) {
     auto message = std::format("Decoding of HEAD failed! Got {} instead!", head);
     auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongHeaderBytes, message);
     return Err(err);
   }
   TofEventSummary tes;
-  u8 status_version_u8  = Gaps::parse_u8(stream, pos);
+  u8 status_version_u8  = g::parse_u8(stream, pos);
   tes.status            = static_cast<EventStatus>(status_version_u8 & 0x3f);
   tes.version           = (Gaps::ProtocolVersion)(status_version_u8 & 0xc0);
-  tes.trigger_sources   = Gaps::parse_u16(stream, pos);
-  tes.n_trigger_paddles = Gaps::parse_u8(stream, pos);
-  tes.event_id          = Gaps::parse_u32(stream, pos);
+  tes.trigger_sources   = g::parse_u16(stream, pos);
+  tes.n_trigger_paddles = g::parse_u8(stream, pos);
+  tes.event_id          = g::parse_u32(stream, pos);
   if (tes.version == Gaps::ProtocolVersion::V1) {
-    tes.n_hits_umb      = Gaps::parse_u8(stream, pos);
-    tes.n_hits_cbe      = Gaps::parse_u8(stream, pos);
-    tes.n_hits_cor      = Gaps::parse_u8(stream, pos);
-    tes.tot_edep_umb    = Gaps::parse_f32(stream, pos);
-    tes.tot_edep_cbe    = Gaps::parse_f32(stream, pos);
-    tes.tot_edep_cor    = Gaps::parse_f32(stream, pos);
+    tes.n_hits_umb      = g::parse_u8(stream, pos);
+    tes.n_hits_cbe      = g::parse_u8(stream, pos);
+    tes.n_hits_cor      = g::parse_u8(stream, pos);
+    tes.tot_edep_umb    = g::parse_f32(stream, pos);
+    tes.tot_edep_cbe    = g::parse_f32(stream, pos);
+    tes.tot_edep_cor    = g::parse_f32(stream, pos);
   } 
-  tes.quality           = Gaps::parse_u8(stream, pos);
-  tes.timestamp32       = Gaps::parse_u32(stream, pos);
-  tes.timestamp16       = Gaps::parse_u16(stream, pos);
-  tes.run_id            = Gaps::parse_u16(stream, pos);
-  //tes.primary_beta      = Gaps::parse_u16(stream, pos); 
-  //tes.primary_charge    = Gaps::parse_u16(stream, pos); 
-  tes.drs_dead_lost_hits = Gaps::parse_u16(stream, pos);
-  tes.dsi_j_mask        = Gaps::parse_u32(stream, pos);
-  u8 n_channel_masks    = Gaps::parse_u8(stream, pos);
+  tes.quality           = g::parse_u8(stream, pos);
+  tes.timestamp32       = g::parse_u32(stream, pos);
+  tes.timestamp16       = g::parse_u16(stream, pos);
+  tes.run_id            = g::parse_u16(stream, pos);
+  //tes.primary_beta      = g::parse_u16(stream, pos); 
+  //tes.primary_charge    = g::parse_u16(stream, pos); 
+  tes.drs_dead_lost_hits = g::parse_u16(stream, pos);
+  tes.dsi_j_mask        = g::parse_u32(stream, pos);
+  u8 n_channel_masks    = g::parse_u8(stream, pos);
   for (u8 k=0;k<n_channel_masks;k++) {
-    tes.channel_mask.push_back(Gaps::parse_u16(stream, pos));
+    tes.channel_mask.push_back(g::parse_u16(stream, pos));
   }
-  tes.mtb_link_mask     = Gaps::parse_u64(stream, pos);
-  u16 nhits             = Gaps::parse_u16(stream, pos);
+  tes.mtb_link_mask     = g::parse_u64(stream, pos);
+  u16 nhits             = g::parse_u16(stream, pos);
   for (u16 k=0; k<nhits; k++) {
     auto maybe_h = g::TofHit::from_bytestream(stream, pos);
     if (maybe_h.is_ok()) {
@@ -1574,7 +1574,7 @@ auto g::TofEventSummary::from_bytestream(const Vec<u8> &stream, u64 &pos)
       tes.hits.push_back(h);
     }
   }
-  u16 tail = Gaps::parse_u16(stream, pos);
+  u16 tail = g::parse_u16(stream, pos);
   if (tail != g::TofEventSummary::TAIL) {
     auto message = std::format("Decoding of TAIL failed! Got {} instead!", tail);
     auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongTailBytes, message);

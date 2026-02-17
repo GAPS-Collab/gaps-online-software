@@ -9,11 +9,14 @@
 #include "io.hpp"
 
 using namespace result;
+
+namespace g = gondola;
+
 namespace fs = std::filesystem;
 
 /***************************************************/
 
-auto gondola::list_path_contents_sorted(const std::string& input, bool use_telemetry_re) -> Vec<std::string> {
+auto g::list_path_contents_sorted(const std::string& input, bool use_telemetry_re) -> Vec<std::string> {
   fs::path path(input);
   Vec<std::string> result;
   Vec<std::string> dirty_fnames;
@@ -77,7 +80,7 @@ Vec<u32> get_event_ids_from_raw_stream(const Vec<u8> &bytestream, u64 &pos) {
   while (!has_ended) { 
     pos = search_for_2byte_marker(bytestream, 0xAA, has_ended, pos);  
     pos += 22;
-    event_id = Gaps::parse_u32(bytestream, pos);
+    event_id = g::parse_u32(bytestream, pos);
     event_ids.push_back(event_id);
     pos += 18530 - 22 - 4;
   }
@@ -140,21 +143,21 @@ Vec<TofPacket> get_tofpackets(const String filename, PacketType filter) {
 
 /***************************************************/
 
-Vec<gondola::TofEvent> unpack_tofevents_from_tofpackets(const Vec<u8> &bytestream, u64 start_pos) {
-  auto events = Vec<gondola::TofEvent>();
+Vec<g::TofEvent> unpack_tofevents_from_tofpackets(const Vec<u8> &bytestream, u64 start_pos) {
+  auto events = Vec<g::TofEvent>();
   u64 pos  = start_pos;
   // just make sure in the beginning they
   // are not the same
   u64 last_pos = start_pos += 1;
   TofPacket packet;
-  gondola::TofEvent event;
+  g::TofEvent event;
   while (true) {
     last_pos = pos;
     packet = TofPacket::from_bytestream(bytestream, pos).unwrap();
     //if (n_packets == 100) {break;}
     if (pos != last_pos) {
       if (packet.packet_type == PacketType::TofEvent) {
-        event = gondola::TofEvent::from_tofpacket(packet);
+        event = g::TofEvent::from_tofpacket(packet);
         events.push_back(event);
       }
     } else {
@@ -167,8 +170,8 @@ Vec<gondola::TofEvent> unpack_tofevents_from_tofpackets(const Vec<u8> &bytestrea
 
 /***************************************************/
 
-auto unpack_tofevents_from_tofpackets(const String filename) -> Vec<gondola::TofEvent> {
-  auto events = Vec<gondola::TofEvent>();
+auto unpack_tofevents_from_tofpackets(const String filename) -> Vec<g::TofEvent> {
+  auto events = Vec<g::TofEvent>();
   auto stream = get_bytestream_from_file(filename); 
   spdlog::debug("Read {} bytes from {}", stream.size(), filename);
   bool has_ended = false;
@@ -246,7 +249,7 @@ auto Gaps::TofPacketReader::get_next_packet() -> Result<TofPacket, Gaps::IOError
         bytestream buffer = bytestream(4);
         stream_file_.read(reinterpret_cast<char*>(buffer.data()), 4);
         usize pos = 0;
-        u32 p_size       = Gaps::parse_u32(buffer, pos);
+        u32 p_size       = g::parse_u32(buffer, pos);
         TofPacket packet;
         packet.packet_type  = static_cast<PacketType>(packet_type);
         packet.payload_size = p_size;

@@ -164,7 +164,7 @@ auto g::TelemetryPacketReader::get_next_packet() -> Gaps::Telemetry::Packet {
         usize pos   = 7;
         // reminder! The size is the size including the 13bytes header, so we 
         // need to subtrackt that 
-        u16 p_size  = Gaps::parse_u16(buffer, pos) - 13;
+        u16 p_size  = g::parse_u16(buffer, pos) - 13;
         payload.insert(payload.end(), buffer.begin(), buffer.end());
         // now we just need to append p_size bytes
         Vec<u8> buffer_data = bytestream(p_size);

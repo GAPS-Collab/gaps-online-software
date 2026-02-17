@@ -19,7 +19,7 @@
 #include "io.hpp"
 
 namespace fs = std::filesystem;
-namespace go = gondola;
+namespace g  = gondola;
 
 auto extract_rbid(const String& filename) -> u8 {
   std::regex pattern(R"(RB(\d{2})_\d+_\d+UTC\.cali\.tof\.gaps$)"); // Match "RB" followed by digits, an underscore, and more digits
@@ -39,7 +39,7 @@ auto extract_rbid(const String& filename) -> u8 {
 /// A simple version of the spike cleaning, which does not rely on 
 /// all channels being present and can work independently on each 
 /// channel
-void go::spike_cleaning_simple(Vec<Vec<f32>> &wf, bool calibrated) {
+void g::spike_cleaning_simple(Vec<Vec<f32>> &wf, bool calibrated) {
 //    # TODO: make robust (symmetric, doubles, fixed/estimated spike height)
 //    thresh = 360
 //    if vcaldone:
@@ -103,7 +103,7 @@ void go::spike_cleaning_simple(Vec<Vec<f32>> &wf, bool calibrated) {
 /// A simple version of the spike cleaning, which does not rely on 
 /// all channels being present and can work independently on each 
 /// channel
-auto go::spike_cleaning_all(Vec<Vec<f32>> &wf, bool calibrated) -> void {
+auto g::spike_cleaning_all(Vec<Vec<f32>> &wf, bool calibrated) -> void {
 //    # TODO: make robust (symmetric, doubles, fixed/estimated spike height)
 //    thresh = 360
 //    if vcaldone:
@@ -278,7 +278,7 @@ auto go::spike_cleaning_all(Vec<Vec<f32>> &wf, bool calibrated) -> void {
 
 /************************************************/
 
-auto go::spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]) -> void {
+auto g::spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]) -> void {
   // Validate input dimensions
   if (wf.empty() || wf.size() != NCHN) {
     spdlog::error("spike_cleaning_drs4: Expected {} channels, got {}", NCHN, wf.size());
@@ -445,9 +445,9 @@ auto go::spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]) -> void
 }
 
 /************************************************/
-bool go::RBCalibration::serialize_event_data;
+bool g::RBCalibration::serialize_event_data;
 
-go::RBCalibration::RBCalibration() {
+g::RBCalibration::RBCalibration() {
   RBCalibration::serialize_event_data = true;
   rb_id = 0;
   for (usize ch=0;ch<NCHN;ch++) {
@@ -460,13 +460,13 @@ go::RBCalibration::RBCalibration() {
 
 /************************************************/
 
-auto go::RBCalibration::disable_eventdata() -> void {
+auto g::RBCalibration::disable_eventdata() -> void {
   RBCalibration::serialize_event_data = false;
 }
 
 /************************************************/
 
-Vec<Vec<f32>> go::RBCalibration::voltages(const RBEvent &event,
+Vec<Vec<f32>> g::RBCalibration::voltages(const RBEvent &event,
                                           bool spike_cleaning) const {
   Vec<Vec<f32>> all_ch_voltages;
   for (u8 ch=1;ch<NCHN+1;ch++) {
@@ -488,7 +488,7 @@ Vec<Vec<f32>> go::RBCalibration::voltages(const RBEvent &event,
 
 /************************************************/
   
-Vec<Vec<f32>> go::RBCalibration::nanoseconds (const RBEvent &event) const {
+Vec<Vec<f32>> g::RBCalibration::nanoseconds (const RBEvent &event) const {
   Vec<Vec<f32>> all_ch_nanoseconds;
   for (u8 ch=1;ch<NCHN+1;ch++) {
     all_ch_nanoseconds.push_back(nanoseconds(event, ch));
@@ -498,7 +498,7 @@ Vec<Vec<f32>> go::RBCalibration::nanoseconds (const RBEvent &event) const {
 
 /************************************************/
 
-Vec<f32> go::RBCalibration::voltages(const RBEvent &event, const u8 channel) const {
+Vec<f32> g::RBCalibration::voltages(const RBEvent &event, const u8 channel) const {
   Vec<f32> voltages = Vec<f32>(NWORDS,0);
   if (!(channel_check(channel))) {
     return voltages;
@@ -520,7 +520,7 @@ Vec<f32> go::RBCalibration::voltages(const RBEvent &event, const u8 channel) con
 
 /************************************************/
 
-Vec<f32> go::RBCalibration::nanoseconds(const RBEvent &event, const u8 channel) const {
+Vec<f32> g::RBCalibration::nanoseconds(const RBEvent &event, const u8 channel) const {
   Vec<f32> nanoseconds = Vec<f32>(NWORDS,0);
   if (!(channel_check(channel))) {
     return nanoseconds;
@@ -533,39 +533,39 @@ Vec<f32> go::RBCalibration::nanoseconds(const RBEvent &event, const u8 channel) 
 
 /************************************************/
 
-auto go::RBCalibration::from_bytestream(const Vec<u8> &stream,
+auto g::RBCalibration::from_bytestream(const Vec<u8> &stream,
                                     u64 &pos,
                                     bool discard_events) -> RBCalibration {
   //::set_pattern("[%^%l%$] [%s - %!:%#] [%Y-%m-%d %H:%M:%S] -- %v");
   RBCalibration calibration = RBCalibration();
   spdlog::debug("Start decoding at pos {}",pos);
-  u16 head = Gaps::parse_u16(stream, pos);
+  u16 head = g::parse_u16(stream, pos);
   if (head != RBCalibration::HEAD)  {
     spdlog::error("No header signature found!");  
     return calibration;
   }
   calibration.rb_id         = stream[pos]; pos += 1;
-  calibration.d_v           = Gaps::parse_f32(stream, pos);
-  calibration.timestamp     = Gaps::parse_u32(stream, pos);
-  bool serialize_event_data = Gaps::parse_bool(stream, pos);
+  calibration.d_v           = g::parse_f32(stream, pos);
+  calibration.timestamp     = g::parse_u32(stream, pos);
+  bool serialize_event_data = g::parse_bool(stream, pos);
   serialize_event_data 
       = serialize_event_data && RBCalibration::serialize_event_data;  
   f32 value;
   for (usize ch=0; ch<NCHN; ch++) {
     for (usize k=0; k<NWORDS; k++) {
-      value = Gaps::parse_f32(stream, pos);
+      value = g::parse_f32(stream, pos);
       calibration.v_offsets[ch][k] = value;
-      value = Gaps::parse_f32(stream, pos);
+      value = g::parse_f32(stream, pos);
       calibration.v_dips[ch][k] = value;
-      value = Gaps::parse_f32(stream, pos);
+      value = g::parse_f32(stream, pos);
       calibration.v_incs[ch][k] = value;
-      value = Gaps::parse_f32(stream, pos);
+      value = g::parse_f32(stream, pos);
       calibration.t_bin[ch][k]  = value;
     }
   }
   // FIXME - streamline this
   serialize_event_data = !discard_events;
-  u16 n_noi = Gaps::parse_u16(stream, pos);
+  u16 n_noi = g::parse_u16(stream, pos);
   if (serialize_event_data) {
     //log_info("Decoding " << n_noi << " no input data events..");
     for (u16 k=0; k<n_noi; k++) {
@@ -579,7 +579,7 @@ auto go::RBCalibration::from_bytestream(const Vec<u8> &stream,
     // FIXME - this number should not be hardcoded!
     pos += n_noi * 18469;
   }
-  u16 n_vcal = Gaps::parse_u16(stream, pos);
+  u16 n_vcal = g::parse_u16(stream, pos);
   if (serialize_event_data) {
     //log_info("Decoding " << n_vcal << " VCAL data events...");
     for (u16 k=0; k<n_vcal; k++) {
@@ -589,7 +589,7 @@ auto go::RBCalibration::from_bytestream(const Vec<u8> &stream,
   } else {
     pos += n_vcal * 18469;
   }
-  u16 n_tcal = Gaps::parse_u16(stream, pos);
+  u16 n_tcal = g::parse_u16(stream, pos);
   if (serialize_event_data) {
     //log_info("Decoding " << n_tcal << " TCAL data events...");
     for (u16 k=0; k<n_tcal; k++) {
@@ -599,7 +599,7 @@ auto go::RBCalibration::from_bytestream(const Vec<u8> &stream,
   } else {
     pos += n_tcal * 18469;
   }
-  u16 tail = Gaps::parse_u16(stream, pos);
+  u16 tail = g::parse_u16(stream, pos);
   if (tail != RBEvent::TAIL) {
     spdlog::error("After parsing, we found an invalid tail signature {}", tail);
   }
@@ -609,7 +609,7 @@ auto go::RBCalibration::from_bytestream(const Vec<u8> &stream,
 /************************************************/
 
 // FIXME - this has to return Result
-auto go::RBCalibration::from_file(const String &filename, bool discard_events) -> RBCalibration {
+auto g::RBCalibration::from_file(const String &filename, bool discard_events) -> RBCalibration {
   if (!fs::exists(filename)) {
     spdlog::critical("Can't open {}! (it does not exist)");
   }
@@ -630,7 +630,7 @@ auto go::RBCalibration::from_file(const String &filename, bool discard_events) -
 
 /************************************************/
 
-auto go::RBCalibration::channel_check(u8 channel) const -> bool {
+auto g::RBCalibration::channel_check(u8 channel) const -> bool {
   if (channel == 0) {
     spdlog::error("Remember, channels start at 1. 0 does not exist!");
     return false;
@@ -644,7 +644,7 @@ auto go::RBCalibration::channel_check(u8 channel) const -> bool {
 
 /************************************************/
 
-auto go::RBCalibration::to_string() const -> std::string {
+auto g::RBCalibration::to_string() const -> std::string {
   std::string repr = "<ReadoutboardCalibration:";  
   repr += "\n RB             : " + std::to_string(rb_id);
   bool has_data = false;
@@ -672,8 +672,8 @@ auto go::RBCalibration::to_string() const -> std::string {
 
 //------------------------------------------------
 
-go::RBCalibrationMap go::load_tof_calibrations(std::string const &pathname) {
-  std::map<u8, go::RBCalibration> cali;
+g::RBCalibrationMap g::load_tof_calibrations(std::string const &pathname) {
+  std::map<u8, g::RBCalibration> cali;
   fs::path path(pathname);
   if (!fs::exists(path)) {
     spdlog::error("Path {} does not exist, unable to load RBCalibration!", pathname);
@@ -685,7 +685,7 @@ go::RBCalibrationMap go::load_tof_calibrations(std::string const &pathname) {
         std::string filename = entry.path().string();
         u8 rbid = extract_rbid(filename);
         std::cout << "Reading " << filename << " for RB " << (int)rbid << std::endl;
-        auto rb_cali = go::RBCalibration::from_file(filename);
+        auto rb_cali = g::RBCalibration::from_file(filename);
         cali.insert(std::make_pair(rbid, rb_cali));
       }
     }
@@ -695,7 +695,7 @@ go::RBCalibrationMap go::load_tof_calibrations(std::string const &pathname) {
 
 //------------------------------------------------
 
-std::ostream& operator<<(std::ostream& os, const go::RBCalibration& cali){ 
+std::ostream& operator<<(std::ostream& os, const g::RBCalibration& cali){ 
   os << cali.to_string();
   return os;
 }

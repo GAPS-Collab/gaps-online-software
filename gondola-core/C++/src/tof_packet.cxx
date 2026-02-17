@@ -6,7 +6,7 @@
 #include "serialization.h"
 #include "io/parsers.h"
 
-namespace g = Gaps;
+namespace g = gondola;
 using namespace result;
 
 auto packet_type_to_string(const PacketType pt) -> std::string {
@@ -95,13 +95,13 @@ auto TofPacket::from_bytestream(const Vec<u8> &bytestream, u64 &pos)
   TofPacket packet = TofPacket();
   if (bytestream.size() <= pos + 2) {
     auto message = std::format("Bytestream is too short!");
-    auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
+    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::StreamTooShort, message);
     return Err(err);
   }
-  u16 head = Gaps::parse_u16(bytestream, pos);
+  u16 head = g::parse_u16(bytestream, pos);
   if (head != TofPacket::HEAD) {
     auto message = std::format("Decoding of HEAD failed! Got {} instead!", head);
-    auto err = g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, message);
+    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongHeaderBytes, message);
     pos -= 2; // rewind position so that client knows we did not 
               // parse anything
     /// print out the next/pre 5 bytes
@@ -119,17 +119,17 @@ auto TofPacket::from_bytestream(const Vec<u8> &bytestream, u64 &pos)
   }
   packet.head = head;
   packet.packet_type  = static_cast<PacketType>(bytestream[pos]); pos+=1;
-  packet.payload_size = Gaps::parse_u32(bytestream, pos);
+  packet.payload_size = g::parse_u32(bytestream, pos);
   spdlog::debug("Found TofPacket of type {} with {} bytes payload!", packet_type_to_string(packet.packet_type), packet.payload_size);
   usize payload_end = pos + packet.payload_size;
   Vec<u8> packet_bytestream(bytestream.begin()+ pos,
                             bytestream.begin()+ payload_end)  ;
   packet.payload = packet_bytestream;
   pos += packet.payload_size;
-  u16 tail = Gaps::parse_u16(bytestream, pos);
+  u16 tail = g::parse_u16(bytestream, pos);
   if (tail != TofPacket::TAIL) {
     auto message = std::format("Decoding of TAIL failed! Got {} instead!", tail);
-    auto err = g::IOError(g::IOError::ErrorKind::WrongTailBytes, message);
+    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongTailBytes, message);
     return Err(err);
   }
   return Ok(packet);

@@ -44,25 +44,25 @@ g::CRFrameObject g::CRFrameObject::from_bytestream(Vec<u8> stream, usize &pos) {
     return f_obj;
     //return Err(CRSerializationError::HeadInvalid {});
   }
-  auto head = Gaps::parse_u16(stream, pos);
+  auto head = g::parse_u16(stream, pos);
   if (head != HEAD) {
     //FIXME - throws linker error - but why?
     //spdlog::error("CRFrameObject doesn't start with HEAD signature of {}!", HEAD);
     return f_obj;
   }
   
-  f_obj.version     = Gaps::parse_u8(stream, pos);
-  f_obj.ftype       = static_cast<g::CRFrameObjectType>(Gaps::parse_u8(stream, pos));
-  auto payload_size = Gaps::parse_u32(stream, pos);
+  f_obj.version     = g::parse_u8(stream, pos);
+  f_obj.ftype       = static_cast<g::CRFrameObjectType>(g::parse_u8(stream, pos));
+  auto payload_size = g::parse_u32(stream, pos);
   pos += payload_size; 
-  auto tail = Gaps::parse_u16(stream, pos);
+  auto tail = g::parse_u16(stream, pos);
   if (tail != CRFrameObject::TAIL) {
     spdlog::error("Packet does not end with CRTAIL signature");
     return f_obj;
   }
   pos -= 2; // for tail parsing
   pos -= payload_size;
-  auto buffer   = Gaps::slice(stream, pos, pos + payload_size ); 
+  auto buffer   = g::slice(stream, pos, pos + payload_size ); 
   f_obj.payload = buffer; 
   return f_obj;
 }
@@ -93,11 +93,11 @@ std::string g::CRFrameObject::to_string() {
 
 std::map<std::string, std::tuple<u64, g::CRFrameObjectType>> g::CRFrame::parse_index(Vec<u8> stream, usize &pos) {
   std::map<std::string, std::tuple<u64, g::CRFrameObjectType>> index;
-  u8 idx_size        = Gaps::parse_u8(stream, pos);
+  u8 idx_size        = g::parse_u8(stream, pos);
   for (u8 k=0; k<idx_size; k++) {
-    std::string name = Gaps::parse_string(stream, pos);
-    u64 obj_pos      = Gaps::parse_u64(stream, pos);
-    g::CRFrameObjectType obj_t = static_cast<g::CRFrameObjectType>(Gaps::parse_u8(stream, pos));
+    std::string name = g::parse_string(stream, pos);
+    u64 obj_pos      = g::parse_u64(stream, pos);
+    g::CRFrameObjectType obj_t = static_cast<g::CRFrameObjectType>(g::parse_u8(stream, pos));
     auto value = std::tuple<u64, g::CRFrameObjectType>(obj_pos, obj_t);
     index.insert(std::make_pair(name, value));
   }
@@ -126,22 +126,22 @@ auto g::CRFrame::from_bytestream(Vec<u8> stream, usize &pos)
    -> g::CRFrame {
   CRFrame frame;
   // FIXME - error checking
-  u16 head  = Gaps::parse_u16(stream, pos);
+  u16 head  = g::parse_u16(stream, pos);
   if (head != CRFrame::HEAD) {
     spdlog::error("CRFrame doesn't start with HEAD signature of {}!", CRFrame::HEAD);
     return frame;
   }
-  u64 fr_size = Gaps::parse_u64(stream, pos); 
+  u64 fr_size = g::parse_u64(stream, pos); 
   pos += fr_size - 2; // count from the beginning
   //std::cout << "fr size : " << fr_size << std::endl;
-  u16 tail  = Gaps::parse_u16(stream, pos);
+  u16 tail  = g::parse_u16(stream, pos);
   if (tail != CRFrame::TAIL) {
     spdlog::error("CRFrame doesn't conclude with TAIL signature of {}!", CRFrame::TAIL);
     return frame;
   }
   // now go back and get the content
   pos -= fr_size - 2; // wind back, accounting for tail
-  u64 size = Gaps::parse_u64(stream, pos); // account for size
+  u64 size = g::parse_u64(stream, pos); // account for size
   //std::cout << "size : " << size << std::endl;
   frame.index       = parse_index(stream, pos);
   Vec<u8> packet_bytestream(stream.begin()+ pos,
@@ -412,7 +412,7 @@ g::CRFrame g::CRReader::get_next_frame() {
           stream_file_.read(reinterpret_cast<char*>(buffer.data()), 8);
           usize pos = 0;
           //u64 p_size;
-          u64 p_size       = Gaps::parse_u64(buffer, pos);
+          u64 p_size       = g::parse_u64(buffer, pos);
           payload.insert(payload.end(), buffer.begin(), buffer.end());
           buffer = bytestream(p_size);
           stream_file_.read(reinterpret_cast<char*>(buffer.data()), p_size);
@@ -422,7 +422,7 @@ g::CRFrame g::CRReader::get_next_frame() {
           //auto frame = g::CRFrame::from_bytestream(payload, pos_in_frame);
           auto frame = CRFrame();
           frame.index = CRFrame::parse_index(buffer, pos_in_frame);
-          buffer = Gaps::slice(buffer, pos_in_frame, p_size); 
+          buffer = g::slice(buffer, pos_in_frame, p_size); 
           frame.bytestorage = std::move(buffer);
           n_packets_read_++;
           return frame;

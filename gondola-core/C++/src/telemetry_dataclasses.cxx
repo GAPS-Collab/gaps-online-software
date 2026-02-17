@@ -5,7 +5,7 @@
 #include "io/parsers.h"
 
 namespace gtl = Gaps::Telemetry;
-namespace g   = Gaps;
+namespace g   = gondola;
 
 // make it more look like rust
 using namespace result;
@@ -90,24 +90,24 @@ auto gtl::PacketHeader::to_bytestream() const -> Vec<u8> {
 }
 
 auto  gtl::PacketHeader::from_bytestream(Vec<u8> const &stream, usize &pos)
-  -> Result<PacketHeader, g::IOError> {
+  -> Result<PacketHeader, Gaps::IOError> {
   gtl::PacketHeader ph;
   if (stream.size() < pos + gtl::PacketHeader::SIZE) {
     spdlog::error("The telemetry header is too short! ({} bytes when {} are expected!", stream.size(), gtl::PacketHeader::SIZE);
     pos += gtl::PacketHeader::SIZE;
     return Ok(ph);
   }
-  if (parse_u16(stream, pos) != gtl::PacketHeader::HEAD) {
+  if (g::parse_u16(stream, pos) != gtl::PacketHeader::HEAD) {
     spdlog::error("The given position {} does not point to a valid header signature of {}", pos-2 ,gtl::PacketHeader::HEAD);
     pos += gtl::PacketHeader::SIZE - 2;
     return Ok(ph);
   }
   ph.sync      = PacketHeader::HEAD;
-  ph.ptype     = static_cast<gtl::BfswPacketType>(parse_u8 (stream, pos));
-  ph.timestamp = parse_u32(stream, pos);
-  ph.counter   = parse_u16(stream, pos);
-  ph.length    = parse_u16(stream, pos);
-  ph.checksum  = parse_u16(stream, pos);
+  ph.ptype     = static_cast<gtl::BfswPacketType>(g::parse_u8 (stream, pos));
+  ph.timestamp = g::parse_u32(stream, pos);
+  ph.counter   = g::parse_u16(stream, pos);
+  ph.length    = g::parse_u16(stream, pos);
+  ph.checksum  = g::parse_u16(stream, pos);
   return Ok(ph);
 }
 
@@ -130,7 +130,7 @@ auto  gtl::Packet::from_bytestream(Vec<u8> const &stream,
   auto header = gtl::PacketHeader::from_bytestream(stream, pos).unwrap();
   // FIXME
   packet.header  = header;
-  auto payload   = Gaps::slice(stream, pos, pos + header.length);
+  auto payload   = g::slice(stream, pos, pos + header.length);
   packet.payload = std::move(payload);
   return packet;
 }
@@ -171,20 +171,20 @@ auto gtl::TrkHeader::from_bytestream(Vec<u8> const &stream, usize &pos)
   auto header = TrkHeader();
   if (stream.size() - pos < gtl::TrkHeader::SIZE) {
     std::string message = std::format("Stream is too short for a trkheader packet. We got a stream of size {} when expectinog {} bytes!", stream.size() - pos, gtl::Cooling::SIZE);
-    auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
+    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::StreamTooShort, message);
     return Err(err);
   } 
-  header.sync   = parse_u16(stream, pos);
-  header.crc    = parse_u16(stream, pos);
-  header.sys_id = parse_u8(stream, pos);
-  header.packet_id = parse_u8(stream, pos); 
-  header.length    = parse_u16(stream, pos);
-  header.daq_count = parse_u16(stream, pos);
-  u32 lower        = parse_u32(stream, pos);
-  u16 upper        = parse_u16(stream, pos);
+  header.sync   = g::parse_u16(stream, pos);
+  header.crc    = g::parse_u16(stream, pos);
+  header.sys_id = g::parse_u8(stream, pos);
+  header.packet_id = g::parse_u8(stream, pos); 
+  header.length    = g::parse_u16(stream, pos);
+  header.daq_count = g::parse_u16(stream, pos);
+  u32 lower        = g::parse_u32(stream, pos);
+  u16 upper        = g::parse_u16(stream, pos);
   u64 sys_time     = (static_cast<u64>(upper) << 32) | static_cast<u64>(lower);
   header.sys_time  = sys_time;
-  header.version   = parse_u8(stream, pos);
+  header.version   = g::parse_u8(stream, pos);
   return Ok(header);
 } 
 
@@ -261,9 +261,9 @@ auto gtl::TrkEventPacket::from_bytestream(Vec<u8> const &stream, usize &pos)
     return Err(trk_header.unwrap_err());
   }
   if (packet.daq_header.version >= 5) {
-    packet.run_id = Gaps::parse_u16(stream, pos);
+    packet.run_id = g::parse_u16(stream, pos);
   } else {
-    packet.run_id_old = Gaps::parse_u8(stream, pos);
+    packet.run_id_old = g::parse_u8(stream, pos);
   }
   // now read the events
   const size_t event_header_size = 12;
@@ -275,16 +275,16 @@ auto gtl::TrkEventPacket::from_bytestream(Vec<u8> const &stream, usize &pos)
     if (pos + event_header_size > stream.size()) { 
       std::string message("Unable to read more TrackerEvents! Stream is too short!");
       //spdlog::error("{}",packet.to_string());
-      auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
+      auto err = Gaps::IOError(Gaps::IOError::ErrorKind::StreamTooShort, message);
       return Err(err);
     }
     gtl::TrkEvent trk_event;
     trk_event.layer = packet.daq_header.sys_id;
-    u8 n_hits = parse_u8(stream, pos);
-    trk_event.flags1   = parse_u8(stream, pos);
-    trk_event.event_id = parse_u32(stream, pos);
-    u32 lower          = parse_u32(stream, pos);
-    u16 upper          = parse_u16(stream, pos);
+    u8 n_hits          = g::parse_u8(stream, pos);
+    trk_event.flags1   = g::parse_u8(stream, pos);
+    trk_event.event_id = g::parse_u32(stream, pos);
+    u32 lower          = g::parse_u32(stream, pos);
+    u16 upper          = g::parse_u16(stream, pos);
     u64 systime        = (static_cast<uint64_t>(upper) << 32) | lower;
     trk_event.event_time = systime;
     if (n_hits > 192) {
@@ -294,13 +294,13 @@ auto gtl::TrkEventPacket::from_bytestream(Vec<u8> const &stream, usize &pos)
     if ((pos + (3*n_hits)) > stream.size()) {
       auto message =  std::format("Unable to read all {} tracker hits! Stream is too short!", n_hits);
       //spdlog::error("{}",packet.to_string());
-      auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
+      auto err = Gaps::IOError(Gaps::IOError::ErrorKind::StreamTooShort, message);
       return Err(err);
     }
     for (u8 j = 0; j<n_hits; j++) {
-      u8 h0 = parse_u8(stream, pos);
-      u8 h1 = parse_u8(stream, pos);
-      u8 h2 = parse_u8(stream, pos);
+      u8 h0 = g::parse_u8(stream, pos);
+      u8 h1 = g::parse_u8(stream, pos);
+      u8 h2 = g::parse_u8(stream, pos);
       u8  asic_event_code = h2 >> 6;
       u8  channel = h0 & 0b11111;
       u8  module = h0 >> 5;
@@ -320,7 +320,7 @@ auto gtl::TrkEventPacket::from_bytestream(Vec<u8> const &stream, usize &pos)
   if (packet.events.size() > 170) {
     std::string message = std::format("There seem to be more than 170 events (!) in the tracker. This is nonsense!");
     spdlog::error("{}",message);
-    auto err = g::IOError(g::IOError::ErrorKind::TooManyTrkEvents, message);
+    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::TooManyTrkEvents, message);
     return Err(err); 
   }
   return Ok(packet);
@@ -393,44 +393,44 @@ auto gtl::MergedEvent::to_string() const -> std::string {
 }
 
 auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos) 
-    -> r::Result<MergedEvent, g::IOError> {
+    -> r::Result<MergedEvent, Gaps::IOError> {
   // check if it has at least the fix part
   if (stream.size() < pos + 18) {
     std::string message = std::format("Stream does not contain enough bytes to parse MergedEvent event id and basic information! Packet might be broken(?)");
     spdlog::error("{}",message);
-    auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
+    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::StreamTooShort, message);
     return Err(err);
   }
   
   auto evt     = MergedEvent();
   //evt.header   = PacketHeader::from_bytestream(stream, pos);
-  evt.version   = parse_u8(stream, pos);
-  evt.flags0    = parse_u8(stream, pos);
+  evt.version  = g::parse_u8(stream, pos);
+  evt.flags0   = g::parse_u8(stream, pos);
   if (evt.version == 1) {
     for (u8 k=0; k<8; k++) {
-      evt.row_flags.push_back(parse_u8(stream, pos)); 
+      evt.row_flags.push_back(g::parse_u8(stream, pos)); 
     }
   } else {
-    evt.flags1   = parse_u8(stream, pos);
+    evt.flags1   = g::parse_u8(stream, pos);
   }
 
-  evt.event_id   = parse_u32(stream, pos);
-  evt.n_tof_hits = parse_u8(stream, pos);
+  evt.event_id   = g::parse_u32(stream, pos);
+  evt.n_tof_hits = g::parse_u8(stream, pos);
   // FIXME - only for version 1, version 0
   // does still have a tof delimiter
   //if (tof_delim != 0xAA) {
   //  log_error("Got incorrect Tof delimiter flag of " << (int)tof_delim);
   //  return evt;
   //}
-  u16 num_tof_bytes = parse_u16(stream, pos);
+  u16 num_tof_bytes = g::parse_u16(stream, pos);
   if (stream.size() < pos + num_tof_bytes) {
     //spdlog::error("{}", evt.to_string());
     std::string message = std::format("Stream does not contain enough TOF bytes! We expect {} when the remaing size is only {}", num_tof_bytes, stream.size() - pos);
     spdlog::error("{}",message);
-    auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
+    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::StreamTooShort, message);
     return Err(err);
   }
-  auto tof_data = Gaps::slice(stream, pos, pos + num_tof_bytes);
+  auto tof_data = g::slice(stream, pos, pos + num_tof_bytes);
   if (tof_data.size() > 0) {
     usize tpos = 0;
     auto tof_packet = TofPacket::from_bytestream(tof_data, tpos);
@@ -442,18 +442,18 @@ auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
     }
   }
   pos += num_tof_bytes;
-  u8 tracker_delim = parse_u8(stream, pos);
+  u8 tracker_delim = g::parse_u8(stream, pos);
 
   if(tracker_delim != 0xbb) {
     std::string message = std::format("Incorrect tracker delmiter flag ({})!", tracker_delim);
     spdlog::error("{}",message);
-    auto err = g::IOError(g::IOError::ErrorKind::WrongDelimiter, message);
+    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongDelimiter, message);
     return Err(err);
   }
-  evt.n_trk_hits = parse_u16(stream, pos); 
+  evt.n_trk_hits = g::parse_u16(stream, pos); 
   for(u16 j = 0; j < evt.n_trk_hits; ++j) {
-    u16 strip_id = parse_u16(stream, pos);
-    u16 adc      = parse_u16(stream, pos);
+    u16 strip_id = g::parse_u16(stream, pos);
+    u16 adc      = g::parse_u16(stream, pos);
     TrkHit hit;
     hit.channel = strip_id & 0b11111;
     hit.module  = (strip_id >> 5) & 0b111;
@@ -462,14 +462,14 @@ auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
     hit.adc     = adc;
     evt.trk_hits.push_back(hit);
   }
-  u8 osci_delim = parse_u8(stream, pos);
+  u8 osci_delim = g::parse_u8(stream, pos);
   if(osci_delim != 0xcc) {
     std::string message = std::format("Incorrect osci delmiter flag ({})!", osci_delim);
     spdlog::error("{}",message);
-    auto err = g::IOError(g::IOError::ErrorKind::WrongDelimiter, message);
+    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongDelimiter, message);
     return Err(err);
   }
-  u8 osc_flags = parse_u8(stream, pos);
+  u8 osc_flags = g::parse_u8(stream, pos);
   Vec<u8> oscillator_idx;
   for(u8 j = 0; j < 8; ++j) {
     if((osc_flags >> j) & 0b1) {
@@ -479,12 +479,12 @@ auto gtl::MergedEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
   if (pos + 6*oscillator_idx.size() > stream.size()) {
     std::string message = std::format("Stream does not contain enough bytes for {} trk oscillators!! Only {} bytes left!", oscillator_idx.size(), stream.size() - pos);
     spdlog::error("{}",message);
-    auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
+    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::StreamTooShort, message);
     return Err(err);
   }
   for(auto idx : oscillator_idx) {
-    u32 lower = parse_u32(stream, pos);
-    u16 upper = parse_u16(stream, pos);
+    u32 lower = g::parse_u32(stream, pos);
+    u16 upper = g::parse_u16(stream, pos);
     //std::cout << (int)idx << " pos " << pos << " size " << stream.size() << std::endl;
     u64 osc = (static_cast<uint64_t>(upper) << 32) | lower;
     evt.tracker_oscillators[idx] = osc;
@@ -530,53 +530,53 @@ auto gtl::Cooling::to_string() const -> std::string {
   return repr;
 }
 
-auto gtl::Cooling::from_bytestream(Vec<u8> const &stream, usize &pos) -> r::Result<Cooling, g::IOError> {
+auto gtl::Cooling::from_bytestream(Vec<u8> const &stream, usize &pos) -> r::Result<Cooling, Gaps::IOError> {
   auto cln = Cooling();
   if (stream.size() - pos < gtl::Cooling::SIZE) {
     std::string message = std::format("Stream is too short for a cooling packet. We got a streamof size {} when expectinog {} bytes!", stream.size() - pos, gtl::Cooling::SIZE);
-    auto err = g::IOError(g::IOError::ErrorKind::WrongDelimiter, message);
+    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongDelimiter, message);
     return Err(err);
   }
-  auto start_byte = parse_u8(stream, pos);
+  auto start_byte = g::parse_u8(stream, pos);
   if (start_byte != 0x1e) {
     std::string message = std::format("Start byte for cooling packet incorrect! Got {} instead of 0x1e", start_byte);
-    auto err = g::IOError(g::IOError::ErrorKind::WrongDelimiter, message);
+    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongDelimiter, message);
     return Err(err);
   } 
   cln.rtd.fill(0xffff);
-  cln.frame_counter   = 0xffffff & parse_u32(stream, pos);
+  cln.frame_counter   = 0xffffff & g::parse_u32(stream, pos);
   pos -= 1;
-  cln.status_1        = parse_u8(stream, pos);  
-  cln.status_2        = parse_u8(stream, pos);  
-  cln.rx_byte_num     = parse_u8(stream, pos);  
-  cln.rx_cmd_num      = parse_u8(stream, pos);  
-  cln.last_cmd        = 0xffffffffffffff & parse_u64(stream, pos); 
+  cln.status_1        = g::parse_u8(stream, pos);  
+  cln.status_2        = g::parse_u8(stream, pos);  
+  cln.rx_byte_num     = g::parse_u8(stream, pos);  
+  cln.rx_cmd_num      = g::parse_u8(stream, pos);  
+  cln.last_cmd        = 0xffffffffffffff & g::parse_u64(stream, pos); 
   pos -= 1;
-  cln.rsv_t           = parse_u16(stream, pos);
-  cln.rh_on           = parse_u16(stream, pos);
-  cln.rh_off          = parse_u16(stream, pos);
-  cln.fpga_board_v_in = parse_u16(stream, pos);
-  cln.fpga_board_i_in = parse_u16(stream, pos);
+  cln.rsv_t           = g::parse_u16(stream, pos);
+  cln.rh_on           = g::parse_u16(stream, pos);
+  cln.rh_off          = g::parse_u16(stream, pos);
+  cln.fpga_board_v_in = g::parse_u16(stream, pos);
+  cln.fpga_board_i_in = g::parse_u16(stream, pos);
   pos += 2;
-  cln.fpga_board_t        = parse_u16(stream, pos);
-  cln.fpga_board_p        = parse_u16(stream, pos);
+  cln.fpga_board_t    = g::parse_u16(stream, pos);
+  cln.fpga_board_p    = g::parse_u16(stream, pos);
   pos += 6;
   //std::cout << cln.rtd.size() << std::endl;
   for(usize k=0; k < cln.rtd.size(); k++) {
-    cln.rtd[k] = parse_u16(stream, pos); 
+    cln.rtd[k] = g::parse_u16(stream, pos); 
   }
-  cln.sh_current      = parse_u16(stream, pos);
-  cln.rh_current      = parse_u16(stream, pos);
-  cln.pw_board1_t     = parse_u16(stream, pos);
-  cln.pw_board2_t     = parse_u16(stream, pos);
-  cln.sh1_time_left   = parse_u16(stream, pos);
-  cln.sh2_time_left   = parse_u16(stream, pos);
-  cln.sh3_time_left   = parse_u16(stream, pos);
+  cln.sh_current    = g::parse_u16(stream, pos);
+  cln.rh_current    = g::parse_u16(stream, pos);
+  cln.pw_board1_t   = g::parse_u16(stream, pos);
+  cln.pw_board2_t   = g::parse_u16(stream, pos);
+  cln.sh1_time_left = g::parse_u16(stream, pos);
+  cln.sh2_time_left = g::parse_u16(stream, pos);
+  cln.sh3_time_left = g::parse_u16(stream, pos);
   pos += 2; //spare
-  auto stop_byte = parse_u8(stream,pos);
+  auto stop_byte = g::parse_u8(stream,pos);
   if (stop_byte != 0x0a) {
     std::string message = std::format("Stop byte for cooling packet incorrect! Got {} instead of 0x0a", stop_byte);
-    auto err = g::IOError(g::IOError::ErrorKind::WrongDelimiter, message);
+    auto err = Gaps::IOError(Gaps::IOError::ErrorKind::WrongDelimiter, message);
     return Err(err);
   } 
   return Ok(cln);

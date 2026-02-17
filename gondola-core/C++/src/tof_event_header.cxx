@@ -4,43 +4,44 @@
 #include "events/tof_event_header.hpp"
 #include "io/parsers.h"
 
+namespace g = gondola;
+
 using namespace result;
-namespace g = Gaps;
 
 auto TofEventHeader::from_bytestream(const Vec<u8> &stream, u64 &pos) 
-  -> Result<TofEventHeader, g::IOError> {
+  -> r::Result<TofEventHeader, Gaps::IOError> {
   SPDLOG_TRACE("Start decoding at pos {}", pos);
-  u16 head = Gaps::parse_u16(stream, pos);
+  u16 head = g::parse_u16(stream, pos);
   if (head != TofEventHeader::HEAD)  {
     auto msg = std::format("No header signature found!");
     spdlog::error(msg);
-    return Err(g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, msg));
+    return Err(Gaps::IOError(Gaps::IOError::ErrorKind::WrongHeaderBytes, msg));
   }
   TofEventHeader header      = TofEventHeader();
-  header.run_id              = Gaps::parse_u32(stream, pos);
-  header.event_id            = Gaps::parse_u32(stream, pos);
-  header.timestamp32         = Gaps::parse_u32(stream, pos);
-  header.timestamp16         = Gaps::parse_u16(stream, pos);
-  header.primary_beta        = Gaps::parse_u16(stream, pos);
-  header.primary_beta_unc    = Gaps::parse_u16(stream, pos);
-  header.primary_charge      = Gaps::parse_u16(stream, pos);
-  header.primary_charge_unc  = Gaps::parse_u16(stream, pos);
-  header.primary_outer_tof_x = Gaps::parse_u16(stream, pos);
-  header.primary_outer_tof_y = Gaps::parse_u16(stream, pos);
-  header.primary_outer_tof_z = Gaps::parse_u16(stream, pos);
-  header.primary_inner_tof_x = Gaps::parse_u16(stream, pos);
-  header.primary_inner_tof_y = Gaps::parse_u16(stream, pos);
-  header.primary_inner_tof_z = Gaps::parse_u16(stream, pos); 
-  header.nhit_outer_tof      = Gaps::parse_u8(stream, pos);
-  header.nhit_inner_tof      = Gaps::parse_u8(stream, pos);
-  header.trigger_info        = Gaps::parse_u8(stream, pos);
-  header.ctr_etx             = Gaps::parse_u8(stream, pos);
-  header.n_paddles           = Gaps::parse_u8(stream, pos); 
-  u16 tail                   = Gaps::parse_u16(stream, pos);
+  header.run_id              = g::parse_u32(stream, pos);
+  header.event_id            = g::parse_u32(stream, pos);
+  header.timestamp32         = g::parse_u32(stream, pos);
+  header.timestamp16         = g::parse_u16(stream, pos);
+  header.primary_beta        = g::parse_u16(stream, pos);
+  header.primary_beta_unc    = g::parse_u16(stream, pos);
+  header.primary_charge      = g::parse_u16(stream, pos);
+  header.primary_charge_unc  = g::parse_u16(stream, pos);
+  header.primary_outer_tof_x = g::parse_u16(stream, pos);
+  header.primary_outer_tof_y = g::parse_u16(stream, pos);
+  header.primary_outer_tof_z = g::parse_u16(stream, pos);
+  header.primary_inner_tof_x = g::parse_u16(stream, pos);
+  header.primary_inner_tof_y = g::parse_u16(stream, pos);
+  header.primary_inner_tof_z = g::parse_u16(stream, pos); 
+  header.nhit_outer_tof      = g::parse_u8(stream, pos);
+  header.nhit_inner_tof      = g::parse_u8(stream, pos);
+  header.trigger_info        = g::parse_u8(stream, pos);
+  header.ctr_etx             = g::parse_u8(stream, pos);
+  header.n_paddles           = g::parse_u8(stream, pos); 
+  u16 tail                   = g::parse_u16(stream, pos);
   if (tail != TAIL) {
     auto msg = std::format("No tail signature found! Got {} instead.", tail);
     spdlog::error(msg);
-    return Err(g::IOError(g::IOError::ErrorKind::WrongTailBytes, msg));
+    return Err(Gaps::IOError(Gaps::IOError::ErrorKind::WrongTailBytes, msg));
   }
   return Ok(header);
 } 

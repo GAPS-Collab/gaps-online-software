@@ -6,6 +6,8 @@
 #include "packets/monitoring.h"
 #include "io/parsers.h"
 
+namespace g = gondola;
+
 LTBMoniData::LTBMoniData() {
   board_id          = 0;
   trenz_temp        = 0;
@@ -16,17 +18,17 @@ LTBMoniData::LTBMoniData() {
 LTBMoniData LTBMoniData::from_bytestream(const Vec<u8> &stream,
                                          usize &pos) {
   auto moni = LTBMoniData();
-  u16 head          = Gaps::parse_u16(stream, pos);
+  u16 head          = g::parse_u16(stream, pos);
   if (head != LTBMoniData::HEAD) {
     spdlog::error("No header signature (0xAAAA) found for decoding of LTBMoniData!");   
   }
-  moni.board_id    = Gaps::parse_u8(stream, pos);
-  moni.trenz_temp  = Gaps::parse_f32(stream, pos);
-  moni.ltb_temp    = Gaps::parse_f32(stream, pos);
+  moni.board_id    = g::parse_u8(stream, pos);
+  moni.trenz_temp  = g::parse_f32(stream, pos);
+  moni.ltb_temp    = g::parse_f32(stream, pos);
   for (usize k=0;k<3;k++) {
-    moni.thresh[k] = Gaps::parse_f32(stream, pos);
+    moni.thresh[k] = g::parse_f32(stream, pos);
   }
-  u16 tail         = Gaps::parse_u16(stream, pos);
+  u16 tail         = g::parse_u16(stream, pos);
   if (tail != LTBMoniData::TAIL) {
     spdlog::error("No tail signature (0x5555) found for decoding of LTBMoniData!");   
   }
@@ -93,49 +95,49 @@ RBMoniData RBMoniData::from_bytestream(const Vec<u8> &payload,
                                        usize &pos) {
   //usize pos = start_pos; 
   RBMoniData moni   = RBMoniData();
-  u16 head          = Gaps::parse_u16(payload, pos);
+  u16 head          = g::parse_u16(payload, pos);
   if (head != RBMoniData::HEAD) {
     spdlog::error("No header signature (0xAAAA) found for decoding of RBMoniData!");   
   }
-  moni.board_id          = Gaps::parse_u8(payload, pos);  
-  moni.rate              = Gaps::parse_u16(payload, pos);  
-  moni.tmp_drs           = Gaps::parse_f32(payload, pos);  
-  moni.tmp_clk           = Gaps::parse_f32(payload, pos);  
-  moni.tmp_adc           = Gaps::parse_f32(payload, pos);  
-  moni.tmp_zynq          = Gaps::parse_f32(payload, pos);  
-  moni.tmp_lis3mdltr     = Gaps::parse_f32(payload, pos);  
-  moni.tmp_bm280         = Gaps::parse_f32(payload, pos);  
-  moni.pressure          = Gaps::parse_f32(payload, pos);  
-  moni.humidity          = Gaps::parse_f32(payload, pos);  
-  moni.mag_x             = Gaps::parse_f32(payload, pos);  
-  moni.mag_y             = Gaps::parse_f32(payload, pos);  
-  moni.mag_z             = Gaps::parse_f32(payload, pos);  
-  moni.mag_tot           = Gaps::parse_f32(payload, pos);  
-  moni.drs_dvdd_voltage  = Gaps::parse_f32(payload, pos);  
-  moni.drs_dvdd_current  = Gaps::parse_f32(payload, pos);  
-  moni.drs_dvdd_power    = Gaps::parse_f32(payload, pos);  
-  moni.p3v3_voltage      = Gaps::parse_f32(payload, pos);  
-  moni.p3v3_current      = Gaps::parse_f32(payload, pos);  
-  moni.p3v3_power        = Gaps::parse_f32(payload, pos);  
-  moni.zynq_voltage      = Gaps::parse_f32(payload, pos);  
-  moni.zynq_current      = Gaps::parse_f32(payload, pos);  
-  moni.zynq_power        = Gaps::parse_f32(payload, pos);  
-  moni.p3v5_voltage      = Gaps::parse_f32(payload, pos);  
-  moni.p3v5_current      = Gaps::parse_f32(payload, pos);  
-  moni.p3v5_power        = Gaps::parse_f32(payload, pos);  
-  moni.adc_dvdd_voltage  = Gaps::parse_f32(payload, pos);  
-  moni.adc_dvdd_current  = Gaps::parse_f32(payload, pos);  
-  moni.adc_dvdd_power    = Gaps::parse_f32(payload, pos);  
-  moni.adc_avdd_voltage  = Gaps::parse_f32(payload, pos);  
-  moni.adc_avdd_current  = Gaps::parse_f32(payload, pos);  
-  moni.adc_avdd_power    = Gaps::parse_f32(payload, pos);  
-  moni.drs_avdd_voltage  = Gaps::parse_f32(payload, pos);  
-  moni.drs_avdd_current  = Gaps::parse_f32(payload, pos);  
-  moni.drs_avdd_power    = Gaps::parse_f32(payload, pos);  
-  moni.n1v5_voltage      = Gaps::parse_f32(payload, pos);  
-  moni.n1v5_current      = Gaps::parse_f32(payload, pos);  
-  moni.n1v5_power        = Gaps::parse_f32(payload, pos);  
-  u16 tail               = Gaps::parse_u16(payload, pos);
+  moni.board_id          = g::parse_u8(payload, pos);  
+  moni.rate              = g::parse_u16(payload, pos);  
+  moni.tmp_drs           = g::parse_f32(payload, pos);  
+  moni.tmp_clk           = g::parse_f32(payload, pos);  
+  moni.tmp_adc           = g::parse_f32(payload, pos);  
+  moni.tmp_zynq          = g::parse_f32(payload, pos);  
+  moni.tmp_lis3mdltr     = g::parse_f32(payload, pos);  
+  moni.tmp_bm280         = g::parse_f32(payload, pos);  
+  moni.pressure          = g::parse_f32(payload, pos);  
+  moni.humidity          = g::parse_f32(payload, pos);  
+  moni.mag_x             = g::parse_f32(payload, pos);  
+  moni.mag_y             = g::parse_f32(payload, pos);  
+  moni.mag_z             = g::parse_f32(payload, pos);  
+  moni.mag_tot           = g::parse_f32(payload, pos);  
+  moni.drs_dvdd_voltage  = g::parse_f32(payload, pos);  
+  moni.drs_dvdd_current  = g::parse_f32(payload, pos);  
+  moni.drs_dvdd_power    = g::parse_f32(payload, pos);  
+  moni.p3v3_voltage      = g::parse_f32(payload, pos);  
+  moni.p3v3_current      = g::parse_f32(payload, pos);  
+  moni.p3v3_power        = g::parse_f32(payload, pos);  
+  moni.zynq_voltage      = g::parse_f32(payload, pos);  
+  moni.zynq_current      = g::parse_f32(payload, pos);  
+  moni.zynq_power        = g::parse_f32(payload, pos);  
+  moni.p3v5_voltage      = g::parse_f32(payload, pos);  
+  moni.p3v5_current      = g::parse_f32(payload, pos);  
+  moni.p3v5_power        = g::parse_f32(payload, pos);  
+  moni.adc_dvdd_voltage  = g::parse_f32(payload, pos);  
+  moni.adc_dvdd_current  = g::parse_f32(payload, pos);  
+  moni.adc_dvdd_power    = g::parse_f32(payload, pos);  
+  moni.adc_avdd_voltage  = g::parse_f32(payload, pos);  
+  moni.adc_avdd_current  = g::parse_f32(payload, pos);  
+  moni.adc_avdd_power    = g::parse_f32(payload, pos);  
+  moni.drs_avdd_voltage  = g::parse_f32(payload, pos);  
+  moni.drs_avdd_current  = g::parse_f32(payload, pos);  
+  moni.drs_avdd_power    = g::parse_f32(payload, pos);  
+  moni.n1v5_voltage      = g::parse_f32(payload, pos);  
+  moni.n1v5_current      = g::parse_f32(payload, pos);  
+  moni.n1v5_power        = g::parse_f32(payload, pos);  
+  u16 tail               = g::parse_u16(payload, pos);
   if (tail != RBMoniData::TAIL) {
     spdlog::error("No tail signature (0x5555) found for decoding of RBMoniData!");   
   }
@@ -203,34 +205,34 @@ PBMoniData::PBMoniData() {
 PBMoniData PBMoniData::from_bytestream(const Vec<u8> &stream,
                                        usize &pos) {
   auto moni = PBMoniData();
-  u16 head             = Gaps::parse_u16(stream, pos);
+  u16 head             = g::parse_u16(stream, pos);
   if (head != PBMoniData::HEAD) {
     spdlog::error("No header signature (0xAAAA) found for decoding of PBMoniData!");   
   }
-  moni.board_id         = Gaps::parse_u8(stream, pos);
+  moni.board_id         = g::parse_u8(stream, pos);
   for (auto k : {0,1,2}) {
-    moni.p3v6_preamp_vcp[k]  = Gaps::parse_f32(stream, pos);
+    moni.p3v6_preamp_vcp[k]  = g::parse_f32(stream, pos);
   }
   for (auto k : {0,1,2}) {
-    moni.n1v6_preamp_vcp[k]  = Gaps::parse_f32(stream, pos);
+    moni.n1v6_preamp_vcp[k]  = g::parse_f32(stream, pos);
   }
   for (auto k : {0,1,2}) {
-    moni.p3v4f_ltb_vcp[k]    = Gaps::parse_f32(stream, pos);
+    moni.p3v4f_ltb_vcp[k]    = g::parse_f32(stream, pos);
   }
   for (auto k : {0,1,2}) {
-    moni.p3v4d_ltb_vcp[k]    = Gaps::parse_f32(stream, pos);
+    moni.p3v4d_ltb_vcp[k]    = g::parse_f32(stream, pos);
   }
   for (auto k : {0,1,2}) {
-    moni.p3v6_ltb_vcp[k]     = Gaps::parse_f32(stream, pos);
+    moni.p3v6_ltb_vcp[k]     = g::parse_f32(stream, pos);
   }
   for (auto k : {0,1,2}) {
-    moni.n1v6_ltb_vcp[k]     = Gaps::parse_f32(stream, pos);
+    moni.n1v6_ltb_vcp[k]     = g::parse_f32(stream, pos);
   }
-  moni.pds_temp         = Gaps::parse_f32(stream, pos);
-  moni.pas_temp         = Gaps::parse_f32(stream, pos);
-  moni.nas_temp         = Gaps::parse_f32(stream, pos);
-  moni.shv_temp         = Gaps::parse_f32(stream, pos);
-  u16 tail              = Gaps::parse_u16(stream, pos);
+  moni.pds_temp         = g::parse_f32(stream, pos);
+  moni.pas_temp         = g::parse_f32(stream, pos);
+  moni.nas_temp         = g::parse_f32(stream, pos);
+  moni.shv_temp         = g::parse_f32(stream, pos);
+  u16 tail              = g::parse_u16(stream, pos);
   if (tail != PBMoniData::TAIL) {
     spdlog::error("No tail signature (0x5555) found for decoding of PBMoniData!");   
   }
@@ -262,18 +264,18 @@ PAMoniData::PAMoniData() {
 PAMoniData PAMoniData::from_bytestream(const Vec<u8> &stream,
                                        usize &pos) {
   auto moni            = PAMoniData();
-  u16 head             = Gaps::parse_u16(stream, pos);
+  u16 head             = g::parse_u16(stream, pos);
   if (head != PAMoniData::HEAD) {
     spdlog::error("No header signature (0xAAAA) found for decoding of PAMoniData!");   
   }
-  moni.board_id        = Gaps::parse_u8(stream, pos);
+  moni.board_id        = g::parse_u8(stream, pos);
   for (usize k=0;k<16;k++) {
-    moni.temps[k]      = Gaps::parse_f32(stream, pos);
+    moni.temps[k]      = g::parse_f32(stream, pos);
   }
   for (usize k=0;k<16;k++) {
-    moni.biases[k]     = Gaps::parse_f32(stream, pos);  
+    moni.biases[k]     = g::parse_f32(stream, pos);  
   }
-  u16 tail             = Gaps::parse_u16(stream, pos);
+  u16 tail             = g::parse_u16(stream, pos);
   if (tail != PAMoniData::TAIL) {
     spdlog::error("No tail signature (0x5555) found for decoding of PAMoniData!");   
   }
@@ -308,21 +310,21 @@ MtbMoniData::MtbMoniData() {
 MtbMoniData MtbMoniData::from_bytestream(const Vec<u8> &payload,
                                          usize& pos) {
   auto moni = MtbMoniData();
-  u16 head          = Gaps::parse_u16(payload, pos);
+  u16 head          = g::parse_u16(payload, pos);
   if (head != MtbMoniData::HEAD) {
     spdlog::error("No header signature (0xAAAA) found for decoding of MtbMoniData!");   
   }
-  moni.tiu_busy_len  = Gaps::parse_u32(payload, pos);
-  moni.tiu_status    = Gaps::parse_u8( payload, pos);
-  moni.prescale_pc   = Gaps::parse_u8( payload, pos);
-  moni.daq_queue_len = Gaps::parse_u16(payload, pos);
-  moni.fpga_temp     = Gaps::parse_u16(payload, pos);
-  moni.fpga_vccint   = Gaps::parse_u16(payload, pos);
-  moni.fpga_vccaux   = Gaps::parse_u16(payload, pos);
-  moni.fpga_vccbram  = Gaps::parse_u16(payload, pos);
-  moni.rate          = Gaps::parse_u16(payload, pos);
-  moni.lost_rate     = Gaps::parse_u16(payload, pos);
-  u16 tail           = Gaps::parse_u16(payload, pos);
+  moni.tiu_busy_len  = g::parse_u32(payload, pos);
+  moni.tiu_status    = g::parse_u8( payload, pos);
+  moni.prescale_pc   = g::parse_u8( payload, pos);
+  moni.daq_queue_len = g::parse_u16(payload, pos);
+  moni.fpga_temp     = g::parse_u16(payload, pos);
+  moni.fpga_vccint   = g::parse_u16(payload, pos);
+  moni.fpga_vccaux   = g::parse_u16(payload, pos);
+  moni.fpga_vccbram  = g::parse_u16(payload, pos);
+  moni.rate          = g::parse_u16(payload, pos);
+  moni.lost_rate     = g::parse_u16(payload, pos);
+  u16 tail           = g::parse_u16(payload, pos);
   if (tail != MtbMoniData::TAIL) {
     spdlog::error("No tail signature (0x5555) found for decoding of MtbMoniData!");   
   }
@@ -398,20 +400,20 @@ CPUMoniData::CPUMoniData() {
 CPUMoniData CPUMoniData::from_bytestream(const Vec<u8> &stream,
                                                usize &pos) {
   auto moni = CPUMoniData();
-  u16 head  = Gaps::parse_u16(stream, pos);
+  u16 head  = g::parse_u16(stream, pos);
   if (head != CPUMoniData::HEAD) {
     spdlog::error("No header signature (0xAAAA) found for decoding of CPUMoniData!");   
   }
-  moni.uptime        = Gaps::parse_u32(stream, pos); 
-  moni.disk_usage    = Gaps::parse_u8(stream, pos); 
+  moni.uptime        = g::parse_u32(stream, pos); 
+  moni.disk_usage    = g::parse_u8(stream, pos); 
   for (usize k : {0,1,2,3}) {
-    moni.cpu_freq[k] = Gaps::parse_u32(stream, pos);
+    moni.cpu_freq[k] = g::parse_u32(stream, pos);
   }
-  moni.cpu_temp   = Gaps::parse_f32(stream, pos);
-  moni.cpu0_temp  = Gaps::parse_f32(stream, pos);
-  moni.cpu1_temp  = Gaps::parse_f32(stream, pos);
-  moni.mb_temp    = Gaps::parse_f32(stream, pos);
-  u16 tail  = Gaps::parse_u16(stream, pos);
+  moni.cpu_temp   = g::parse_f32(stream, pos);
+  moni.cpu0_temp  = g::parse_f32(stream, pos);
+  moni.cpu1_temp  = g::parse_f32(stream, pos);
+  moni.mb_temp    = g::parse_f32(stream, pos);
+  u16 tail  = g::parse_u16(stream, pos);
   if (tail != CPUMoniData::TAIL) {
     spdlog::error("No tail signature (0x5555) found for decoding of CPUMoniData!");   
   }

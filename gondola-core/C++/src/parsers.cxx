@@ -4,53 +4,10 @@
  
 #include "io/parsers.h"
 
-auto gondola::to_le_bytes(u16 number) -> Vec<u8> {
-  Vec<u8> bytes;
-  bytes.push_back(static_cast<u8>(number & 0xFF));        // Low byte
-  bytes.push_back(static_cast<u8>((number >> 8) & 0xFF)); // High byte
-  return bytes;
-}
+namespace g = gondola; 
 
-auto gondola::to_le_bytes(u32 number) -> Vec<u8> {
-  Vec<u8> bytes;
-  bytes.push_back(static_cast<u8>((number >> 0) & 0xFF));
-  bytes.push_back(static_cast<u8>((number >> 8) & 0xFF));
-  bytes.push_back(static_cast<u8>((number >> 16) & 0xFF));
-  bytes.push_back(static_cast<u8>((number >> 24) & 0xFF));
-  return bytes;
-}
-
-
-bool Gaps::parse_bool(const Vec<u8> &bytestream,
-                      usize &pos) {
-  u8 value = bytestream[pos];
-  pos += 1;
-  return value > 0;
-}
-
-/***********************************************/
-
-u8 Gaps::parse_u8(const Vec<u8> &bytestream,
-                  u64 &pos) {
-  u8 value = bytestream[pos];
-  pos += 1;
-  return value;
-}
-
-/***********************************************/
-
-u16 Gaps::parse_u16(const Vec<u8> &bytestream,
-                    u64 &pos) {
-  u16 value = (u16)(
-        ((bytestream[pos+1] & 0xFF) << 8)
-      |  (bytestream[pos]));
-  pos += 2;
-  return value;
-}
-
-/***********************************************/
-
-u32 leading_zeros(u16 x) {
+//lil' helpa
+auto leading_zeros(u16 x) -> u32  {
   u32 c = 0;
   u16 msb = 1 << 15;
   for (u8 k=0;k<16;k++) {
@@ -66,8 +23,7 @@ u32 leading_zeros(u16 x) {
   return c;
 }
 
-//lil' helpa
-f32 u32tof32(u32 val) {
+auto u32tof32(u32 val) -> f32 {
   f32 result;
   Vec<u8> bytes = Vec<u8>();
   bytes.push_back(0);
@@ -84,10 +40,58 @@ f32 u32tof32(u32 val) {
 
 /***********************************************/
 
+auto g::to_le_bytes(u16 number) -> Vec<u8> {
+  Vec<u8> bytes;
+  bytes.push_back(static_cast<u8>(number & 0xFF));        // Low byte
+  bytes.push_back(static_cast<u8>((number >> 8) & 0xFF)); // High byte
+  return bytes;
+}
 
-f32 Gaps::parse_f16(const Vec<u8> &bytestream,
-                    usize &pos) {
-  u16 bits = Gaps::parse_u16(bytestream, pos);
+/***********************************************/
+
+auto g::to_le_bytes(u32 number) -> Vec<u8> {
+  Vec<u8> bytes;
+  bytes.push_back(static_cast<u8>((number >> 0) & 0xFF));
+  bytes.push_back(static_cast<u8>((number >> 8) & 0xFF));
+  bytes.push_back(static_cast<u8>((number >> 16) & 0xFF));
+  bytes.push_back(static_cast<u8>((number >> 24) & 0xFF));
+  return bytes;
+}
+
+/***********************************************/
+
+auto g::parse_bool(const Vec<u8> &bytestream,
+                   usize &pos) -> bool {
+  u8 value = bytestream[pos];
+  pos += 1;
+  return value > 0;
+}
+
+/***********************************************/
+
+auto g::parse_u8(const Vec<u8> &bytestream,
+                 u64 &pos) -> u8 {
+  u8 value = bytestream[pos];
+  pos += 1;
+  return value;
+}
+
+/***********************************************/
+
+auto g::parse_u16(const Vec<u8> &bytestream,
+                  u64 &pos) -> u16 {
+  u16 value = (u16)(
+        ((bytestream[pos+1] & 0xFF) << 8)
+      |  (bytestream[pos]));
+  pos += 2;
+  return value;
+}
+
+/***********************************************/
+
+auto g::parse_f16(const Vec<u8> &bytestream,
+                  usize &pos) -> f32 {
+  u16 bits = g::parse_u16(bytestream, pos);
   #ifdef __FLT16_MANT_DIG__
   union {
     u16      bytes;
@@ -100,7 +104,7 @@ f32 Gaps::parse_f16(const Vec<u8> &bytestream,
   //  // Check for signed zero
   //  // TODO: Replace mem::transmute with from_bits() once from_bits is const-stabilized
   f32 result;
-  //Vec<u8> bytes = Gaps::slice(bytestream,pos,pos+2); 
+  //Vec<u8> bytes = g::slice(bytestream,pos,pos+2); 
   // Copy the bytes into a float variable using type punning
   if ((bits & 0x7FFF) == 0) {
     u32 bits_u32 = (u32)bits << 16;
@@ -157,8 +161,8 @@ f32 Gaps::parse_f16(const Vec<u8> &bytestream,
 
 /***********************************************/
 
-u32 Gaps::parse_u32(const Vec<u8> &bytestream,
-                    u64 &pos) {
+auto g::parse_u32(const Vec<u8> &bytestream,
+                  u64 &pos) -> u32 {
   u32 value = (u32)(
          ((u32)(bytestream[pos+3]) << 24)
       |  ((u32)(bytestream[pos+2]) << 16)
@@ -170,8 +174,8 @@ u32 Gaps::parse_u32(const Vec<u8> &bytestream,
 
 /***********************************************/
 
-u64 Gaps::parse_u64(const Vec<u8> &bytestream,
-                    usize &pos) {
+auto g::parse_u64(const Vec<u8> &bytestream,
+                  usize &pos) -> u64 {
   u64 value = (u64)(
          ((u64)(bytestream[pos+7]) << 56)
       |  ((u64)(bytestream[pos+6]) << 48)
@@ -187,8 +191,8 @@ u64 Gaps::parse_u64(const Vec<u8> &bytestream,
 
 /***********************************************/
 
-i32 Gaps::parse_i32(const Vec<u8> &bytestream,
-                    usize &pos) {
+auto g::parse_i32(const Vec<u8> &bytestream,
+                  usize &pos) -> i32 {
   i32 result = 0;
   // Assuming little-endian byte order (LSB first)
   for (int i = 0; i < 4; ++i) {
@@ -200,10 +204,10 @@ i32 Gaps::parse_i32(const Vec<u8> &bytestream,
 
 /***********************************************/
 
-f32 Gaps::parse_f32(const Vec<u8> &bytestream,
-                    usize &pos) {
+auto g::parse_f32(const Vec<u8> &bytestream,
+                  usize &pos) -> f32 {
   f32 result;
-  Vec<u8> bytes = Gaps::slice(bytestream,pos,pos+4); 
+  Vec<u8> bytes = g::slice(bytestream,pos,pos+4); 
   // Copy the bytes into a float variable using type punning
   std::memcpy(&result, bytes.data(), sizeof(f32));
   pos += 4;
@@ -212,10 +216,10 @@ f32 Gaps::parse_f32(const Vec<u8> &bytestream,
 
 /***********************************************/
 
-f64 Gaps::parse_f64(const Vec<u8> &bytestream,
-                    usize &pos) {
+auto g::parse_f64(const Vec<u8> &bytestream,
+                  usize &pos) -> f64 {
   f64 result;
-  Vec<u8> bytes = Gaps::slice(bytestream,pos,pos+8); 
+  Vec<u8> bytes = g::slice(bytestream,pos,pos+8); 
   // Copy the bytes into a float variable using type punning
   std::memcpy(&result, bytes.data(), sizeof(f64));
   pos += 8;
@@ -224,11 +228,10 @@ f64 Gaps::parse_f64(const Vec<u8> &bytestream,
 
 /***********************************************/
 
-std::string Gaps::parse_string(const Vec<u8> &bytestream,
-                               usize &pos) {
-  //std::string result;
-  u16 size = Gaps::parse_u16(bytestream, pos);
-  Vec<u8> bytes = Gaps::slice(bytestream,pos,pos+size); 
+auto g::parse_string(const Vec<u8> &bytestream,
+                            usize &pos) -> std::string {
+  u16 size = g::parse_u16(bytestream, pos);
+  Vec<u8> bytes = g::slice(bytestream,pos,pos+size); 
   std::string result(bytes.begin(), bytes.end());
   //std::memcpy(&result, bytes.data(), sizeof(f64));
   pos += size;
