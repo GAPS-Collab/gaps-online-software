@@ -718,7 +718,7 @@ auto g::TofEvent::get_rb_link_ids() const -> Vec<u8> {
 
 g::TofEvent::TofEvent() {
   status       = g::EventStatus::IncompleteReadout;
-  mt_event     = g::MasterTriggerEvent();
+  //mt_event     = g::MasterTriggerEvent();
   rb_events    = Vec<g::RBEvent>();
 }
 
@@ -854,241 +854,241 @@ bool g::TofEvent::passed_consistency_check() {
 /**********************************************************/
 
   
-u64 g::MasterTriggerEvent::get_timestamp_gps48() const {
-  return (((u64)tiu_gps16 << 32) | (u64) tiu_gps32); 
-}
+//u64 g::MasterTriggerEvent::get_timestamp_gps48() const {
+//  return (((u64)tiu_gps16 << 32) | (u64) tiu_gps32); 
+//}
+//
+///*************************************/
+//
+//auto g::MasterTriggerEvent::get_timestamp_gps() const -> u32 {
+//  return tiu_gps32;
+//}
+//
+///*************************************/
+//
+//u64 g::MasterTriggerEvent::get_timestamp_abs48() const {
+//  u64 gps       = (u64)get_timestamp_gps();
+//  u64 ts        = (u64)timestamp;
+//  if (ts < (u64)tiu_timestamp) {
+//    // it has wrapped
+//    ts +=  4294967295 + 1; // u32::MAX + 1
+//  }
+//  u64 gps_mult = 100000000 * gps; 
+//  u64 ts_abs = gps_mult + ts - (u64)tiu_timestamp;
+//  return ts_abs;
+//}
+//
+///*************************************/
+//
+//Vec<g::TriggerType> g::MasterTriggerEvent::get_trigger_sources() const {
+//  auto t_types = Vec<g::TriggerType>();
+//  u16 gaps_trigger = (trigger_source >> 5 & 0x1) == 1;
+//  if (gaps_trigger) {
+//    t_types.push_back(g::TriggerType::Gaps);
+//  }
+//  u16 any_trigger    = (trigger_source >> 6 & 0x1) == 1;
+//  if (any_trigger) {
+//    t_types.push_back(g::TriggerType::Any);
+//  }
+//  u16 forced_trigger = (trigger_source >> 7 & 0x1) == 1;
+//  if (forced_trigger) {
+//    t_types.push_back(g::TriggerType::Forced);
+//  }
+//  u16 track_trigger  = (trigger_source >> 8 & 0x1) == 1;
+//  if (track_trigger) {
+//    t_types.push_back(g::TriggerType::Track);
+//  }
+//  u16 central_track_trigger
+//                     = (trigger_source >> 9 & 0x1) == 1;
+//  if (central_track_trigger) {
+//    t_types.push_back(g::TriggerType::TrackCentral);
+//  }
+//  return t_types;
+//} 
+//
+///**********************************************************/
+//
+//g::MasterTriggerEvent::MasterTriggerEvent() {
+//  event_id       = 0; 
+//  timestamp      = 0; 
+//  tiu_timestamp  = 0; 
+//  tiu_gps32      = 0; 
+//  tiu_gps16      = 0; 
+//  crc            = 0;
+//  trigger_source = 0;
+//  dsi_j_mask     = 0;
+//  channel_mask   = Vec<u16>();
+//  mtb_link_mask  = 0;
+//}  
+//
+///**********************************************************/
+//  
+//auto g::MasterTriggerEvent::get_rb_link_ids() const -> Vec<u8> {
+//  auto links = Vec<u8>();
+//  for (u8 k=0;k<64;k++) {
+//    if (((u64)(mtb_link_mask >> k) & (u64)0x1) == 1) {
+//      links.push_back(k);
+//    }
+//  }
+//  return links;
+//}
+//
+///**********************************************************/
+//    
+//Vec<std::tuple<u8, u8, u8, g::LTBThreshold>> g::MasterTriggerEvent::get_trigger_hits() const {
+//
+//  auto hits = Vec<std::tuple<u8,u8,u8,g::LTBThreshold>>(); 
+//  //let n_masks_needed = self.dsi_j_mask.count_ones() / 2 + self.dsi_j_mask.count_ones() % 2;
+//  auto dsi_j_mask_bits = std::bitset<32>(dsi_j_mask);
+//  u32 n_masks_needed   = dsi_j_mask_bits.count();
+//  if (channel_mask.size() < n_masks_needed) {
+//    spdlog::error("We need {} hit masks, but only have {}! This is bad!", n_masks_needed, channel_mask.size());
+//    return hits;
+//  }
+//  u8 n_mask = 0;
+//  for (u8 k=0;k<32;k++) {
+//    if ((u32)((dsi_j_mask >> k) & 0x1) == 1) {
+//      u8 dsi = 0;
+//      u8 j   = 0;
+//      if (k < 5) {
+//        dsi = 1;
+//        j   = k  + 1;
+//      } else if (k < 10) {
+//        dsi = 2;
+//        j   = k  - 5 + 1;
+//      } else if (k < 15) {
+//        dsi = 3;
+//        j   = k - 10 + 1;
+//      } else if (k < 20) {
+//        dsi = 4;
+//        j   = k - 15 + 1;
+//      } else if (k < 25) {
+//        dsi = 5;
+//        j   = k - 20 + 1;
+//      } 
+//      u32 channels = channel_mask[n_mask]; 
+//      for (u8 i=0;i<8; i++) {
+//        u32 ch  = LTB_CHANNELS[i];
+//        u32 chn = 2*i + 1; 
+//        //for (i,ch) in LTB_CHANNELS.iter().enumerate() {
+//        //let chn = ch + 1;
+//        //println!("i,ch {}, {}", i, ch);
+//        u32 thresh_bits = (u8)((channels & ch) >> (i*2));
+//        //println!("thresh_bits {}", thresh_bits);
+//        if (thresh_bits > 0) { // hit over threshold
+//          hits.push_back(std::make_tuple(dsi, j, chn, (LTBThreshold)(thresh_bits)));
+//        }
+//      }
+//      n_mask += 1;
+//    }
+//  }
+//  return hits;
+//}
+//
+//
+///*************************************/
+//
+//g::MasterTriggerEvent g::MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream,
+//                                                          u64 &pos) {
+//
+//  g::MasterTriggerEvent event;
+//  
+//  // HACK - we make this compatible with the old data, 
+//  // but old data won't be useful
+//  //usize n_ltbs = 20;
+//  //// now we have to figure out if we have 20 or 25 
+//  //// LTBS
+//  //usize packet_size = MasterTriggerEvent::get_packet_size(bytestream,
+//  //                                                        pos);
+//  //if (packet_size == MasterTriggerEvent::SIZE_LTB20) {
+//  //  n_ltbs = 20;
+//  //  event = MasterTriggerEvent(n_ltbs);
+//  //} else if (packet_size == MasterTriggerEvent::SIZE_LTB25) {
+//  //  n_ltbs = 25;
+//  //  event = MasterTriggerEvent(n_ltbs);
+//  //} else {
+//  //  log_error("Size matches neither 20 nor 25 LTBs!");
+//  //  return event;
+//  //}
+//  
+//  u16 header = g::parse_u16(bytestream, pos);
+//  if (header != g::MasterTriggerEvent::HEAD) {
+//    spdlog::error("Wrong header signature!");
+//    return event;
+//  }
+//  event.event_status   = (EventStatus)g::parse_u8 (bytestream, pos);
+//  event.event_id       = g::parse_u32(bytestream, pos);
+//  event.timestamp      = g::parse_u32(bytestream, pos);
+//  event.tiu_timestamp  = g::parse_u32(bytestream, pos);
+//  event.tiu_gps32      = g::parse_u32(bytestream, pos);
+//  event.tiu_gps16      = g::parse_u16(bytestream, pos);
+//  event.crc            = g::parse_u32(bytestream, pos);
+//  event.trigger_source = g::parse_u16(bytestream, pos);
+//  event.dsi_j_mask     = g::parse_u32(bytestream, pos);
+//  u8 n_channel_masks   = g::parse_u8 (bytestream, pos);
+//  for (u8 k=0;k<n_channel_masks;k++) {
+//  //for _ in 0..n_channel_masks {
+//    event.channel_mask.push_back(g::parse_u16(bytestream, pos));
+//  }
+//  event.mtb_link_mask  = g::parse_u64(bytestream, pos);
+//
+//  // just search the next footer and don't fill the deprecated fields
+//  //bool has_ended = false;
+//  //u64 tail_pos = search_for_2byte_marker(bytestream,0x55,has_ended,pos);   
+//  u16 tail = g::parse_u16(bytestream, pos);
+//  if (tail != g::MasterTriggerEvent::TAIL) {
+//    spdlog::error("Invalid tail signature!");
+//  }
+//  //event.n_paddles          = g::parse_u8 (bytestream, pos);
+//
+//  //event.set_board_mask(g::parse_u3h2(bytestream, pos));
+//  //// FIXME
+//  //for (usize k=0;k<n_ltbs;k++) {
+//  //  u32 hitmask = g::parse_u32(bytestream, pos);
+//  //  event.set_hit_mask(k, hitmask);
+//  //}
+//  //event.crc = g::parse_u32(bytestream, pos);
+//  //u8 tail_a = g::parse_u8 (bytestream, pos);
+//  //u8 tail_b = g::parse_u8 (bytestream, pos);
+//  //if (tail_a == 85 && tail_b == 85) {
+//  //  log_debug("Correct tail found!");
+//  //}
+//  //else if (tail_a == 85 && tail_b == 5) {
+//  //  log_warn("Tail for version 0.6.0/0.6.1 found");
+//  //} else {
+//  //  log_error("Tail is messed up. See comment for version 0.6.0/0.6.1 in CHANGELOG! We got " << tail_a << " " << tail_b << " but were expecting 85 5");
+//  //}
+//  return event;
+//}
+//
+//auto g::MasterTriggerEvent::to_string() const -> std::string {
+//  std::string repr = "<MasterTriggerEvent";
+//  repr += std::format("\n  event_status  : {}",(u8)event_status ); 
+//  repr += std::format("\n  event_id      : {}",event_id     ); 
+//  repr += std::format("\n  timestamp     : {}",timestamp    ); 
+//  repr += std::format("\n  tiu_timestamp : {}",tiu_timestamp); 
+//  repr += std::format("\n  tiu_gps32     : {}",tiu_gps32    ); 
+//  repr += std::format("\n  tiu_gps16     : {}",tiu_gps16    ); 
+//  repr += std::format("\n  crc           : {}",crc          );
+//  repr += "\n** Trigger Sources **";
+//  for (const auto &ts : get_trigger_sources()) {
+//    repr += std::format("\n -- {}", (u8)ts);
+//  }
+//  repr += "\n** Trigger Hits **";
+//  for (const auto &h : get_trigger_hits()) {
+//    repr += std::format("\n -- {} {} {} {}", std::get<0>(h), std::get<1>(h), std::get<2>(h), (u8)std::get<3>(h));
+//  }
+//  repr += "\n** MTB Link IDs **";
+//  for (const u8 &lid : get_rb_link_ids()) {
+//    repr += std::format("\n -- {}", lid);
+//  }
+//  repr += ">";
+//  return repr;
+//}
 
 /*************************************/
 
-auto g::MasterTriggerEvent::get_timestamp_gps() const -> u32 {
-  return tiu_gps32;
-}
-
-/*************************************/
-
-u64 g::MasterTriggerEvent::get_timestamp_abs48() const {
-  u64 gps       = (u64)get_timestamp_gps();
-  u64 ts        = (u64)timestamp;
-  if (ts < (u64)tiu_timestamp) {
-    // it has wrapped
-    ts +=  4294967295 + 1; // u32::MAX + 1
-  }
-  u64 gps_mult = 100000000 * gps; 
-  u64 ts_abs = gps_mult + ts - (u64)tiu_timestamp;
-  return ts_abs;
-}
-
-/*************************************/
-
-Vec<g::TriggerType> g::MasterTriggerEvent::get_trigger_sources() const {
-  auto t_types = Vec<g::TriggerType>();
-  u16 gaps_trigger = (trigger_source >> 5 & 0x1) == 1;
-  if (gaps_trigger) {
-    t_types.push_back(g::TriggerType::Gaps);
-  }
-  u16 any_trigger    = (trigger_source >> 6 & 0x1) == 1;
-  if (any_trigger) {
-    t_types.push_back(g::TriggerType::Any);
-  }
-  u16 forced_trigger = (trigger_source >> 7 & 0x1) == 1;
-  if (forced_trigger) {
-    t_types.push_back(g::TriggerType::Forced);
-  }
-  u16 track_trigger  = (trigger_source >> 8 & 0x1) == 1;
-  if (track_trigger) {
-    t_types.push_back(g::TriggerType::Track);
-  }
-  u16 central_track_trigger
-                     = (trigger_source >> 9 & 0x1) == 1;
-  if (central_track_trigger) {
-    t_types.push_back(g::TriggerType::TrackCentral);
-  }
-  return t_types;
-} 
-
-/**********************************************************/
-
-g::MasterTriggerEvent::MasterTriggerEvent() {
-  event_id       = 0; 
-  timestamp      = 0; 
-  tiu_timestamp  = 0; 
-  tiu_gps32      = 0; 
-  tiu_gps16      = 0; 
-  crc            = 0;
-  trigger_source = 0;
-  dsi_j_mask     = 0;
-  channel_mask   = Vec<u16>();
-  mtb_link_mask  = 0;
-}  
-
-/**********************************************************/
-  
-auto g::MasterTriggerEvent::get_rb_link_ids() const -> Vec<u8> {
-  auto links = Vec<u8>();
-  for (u8 k=0;k<64;k++) {
-    if (((u64)(mtb_link_mask >> k) & (u64)0x1) == 1) {
-      links.push_back(k);
-    }
-  }
-  return links;
-}
-
-/**********************************************************/
-    
-Vec<std::tuple<u8, u8, u8, g::LTBThreshold>> g::MasterTriggerEvent::get_trigger_hits() const {
-
-  auto hits = Vec<std::tuple<u8,u8,u8,g::LTBThreshold>>(); 
-  //let n_masks_needed = self.dsi_j_mask.count_ones() / 2 + self.dsi_j_mask.count_ones() % 2;
-  auto dsi_j_mask_bits = std::bitset<32>(dsi_j_mask);
-  u32 n_masks_needed   = dsi_j_mask_bits.count();
-  if (channel_mask.size() < n_masks_needed) {
-    spdlog::error("We need {} hit masks, but only have {}! This is bad!", n_masks_needed, channel_mask.size());
-    return hits;
-  }
-  u8 n_mask = 0;
-  for (u8 k=0;k<32;k++) {
-    if ((u32)((dsi_j_mask >> k) & 0x1) == 1) {
-      u8 dsi = 0;
-      u8 j   = 0;
-      if (k < 5) {
-        dsi = 1;
-        j   = k  + 1;
-      } else if (k < 10) {
-        dsi = 2;
-        j   = k  - 5 + 1;
-      } else if (k < 15) {
-        dsi = 3;
-        j   = k - 10 + 1;
-      } else if (k < 20) {
-        dsi = 4;
-        j   = k - 15 + 1;
-      } else if (k < 25) {
-        dsi = 5;
-        j   = k - 20 + 1;
-      } 
-      u32 channels = channel_mask[n_mask]; 
-      for (u8 i=0;i<8; i++) {
-        u32 ch  = LTB_CHANNELS[i];
-        u32 chn = 2*i + 1; 
-        //for (i,ch) in LTB_CHANNELS.iter().enumerate() {
-        //let chn = ch + 1;
-        //println!("i,ch {}, {}", i, ch);
-        u32 thresh_bits = (u8)((channels & ch) >> (i*2));
-        //println!("thresh_bits {}", thresh_bits);
-        if (thresh_bits > 0) { // hit over threshold
-          hits.push_back(std::make_tuple(dsi, j, chn, (LTBThreshold)(thresh_bits)));
-        }
-      }
-      n_mask += 1;
-    }
-  }
-  return hits;
-}
-
-
-/*************************************/
-
-g::MasterTriggerEvent g::MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream,
-                                                          u64 &pos) {
-
-  g::MasterTriggerEvent event;
-  
-  // HACK - we make this compatible with the old data, 
-  // but old data won't be useful
-  //usize n_ltbs = 20;
-  //// now we have to figure out if we have 20 or 25 
-  //// LTBS
-  //usize packet_size = MasterTriggerEvent::get_packet_size(bytestream,
-  //                                                        pos);
-  //if (packet_size == MasterTriggerEvent::SIZE_LTB20) {
-  //  n_ltbs = 20;
-  //  event = MasterTriggerEvent(n_ltbs);
-  //} else if (packet_size == MasterTriggerEvent::SIZE_LTB25) {
-  //  n_ltbs = 25;
-  //  event = MasterTriggerEvent(n_ltbs);
-  //} else {
-  //  log_error("Size matches neither 20 nor 25 LTBs!");
-  //  return event;
-  //}
-  
-  u16 header = g::parse_u16(bytestream, pos);
-  if (header != g::MasterTriggerEvent::HEAD) {
-    spdlog::error("Wrong header signature!");
-    return event;
-  }
-  event.event_status   = (EventStatus)g::parse_u8 (bytestream, pos);
-  event.event_id       = g::parse_u32(bytestream, pos);
-  event.timestamp      = g::parse_u32(bytestream, pos);
-  event.tiu_timestamp  = g::parse_u32(bytestream, pos);
-  event.tiu_gps32      = g::parse_u32(bytestream, pos);
-  event.tiu_gps16      = g::parse_u16(bytestream, pos);
-  event.crc            = g::parse_u32(bytestream, pos);
-  event.trigger_source = g::parse_u16(bytestream, pos);
-  event.dsi_j_mask     = g::parse_u32(bytestream, pos);
-  u8 n_channel_masks   = g::parse_u8 (bytestream, pos);
-  for (u8 k=0;k<n_channel_masks;k++) {
-  //for _ in 0..n_channel_masks {
-    event.channel_mask.push_back(g::parse_u16(bytestream, pos));
-  }
-  event.mtb_link_mask  = g::parse_u64(bytestream, pos);
-
-  // just search the next footer and don't fill the deprecated fields
-  //bool has_ended = false;
-  //u64 tail_pos = search_for_2byte_marker(bytestream,0x55,has_ended,pos);   
-  u16 tail = g::parse_u16(bytestream, pos);
-  if (tail != g::MasterTriggerEvent::TAIL) {
-    spdlog::error("Invalid tail signature!");
-  }
-  //event.n_paddles          = g::parse_u8 (bytestream, pos);
-
-  //event.set_board_mask(g::parse_u3h2(bytestream, pos));
-  //// FIXME
-  //for (usize k=0;k<n_ltbs;k++) {
-  //  u32 hitmask = g::parse_u32(bytestream, pos);
-  //  event.set_hit_mask(k, hitmask);
-  //}
-  //event.crc = g::parse_u32(bytestream, pos);
-  //u8 tail_a = g::parse_u8 (bytestream, pos);
-  //u8 tail_b = g::parse_u8 (bytestream, pos);
-  //if (tail_a == 85 && tail_b == 85) {
-  //  log_debug("Correct tail found!");
-  //}
-  //else if (tail_a == 85 && tail_b == 5) {
-  //  log_warn("Tail for version 0.6.0/0.6.1 found");
-  //} else {
-  //  log_error("Tail is messed up. See comment for version 0.6.0/0.6.1 in CHANGELOG! We got " << tail_a << " " << tail_b << " but were expecting 85 5");
-  //}
-  return event;
-}
-
-auto g::MasterTriggerEvent::to_string() const -> std::string {
-  std::string repr = "<MasterTriggerEvent";
-  repr += std::format("\n  event_status  : {}",(u8)event_status ); 
-  repr += std::format("\n  event_id      : {}",event_id     ); 
-  repr += std::format("\n  timestamp     : {}",timestamp    ); 
-  repr += std::format("\n  tiu_timestamp : {}",tiu_timestamp); 
-  repr += std::format("\n  tiu_gps32     : {}",tiu_gps32    ); 
-  repr += std::format("\n  tiu_gps16     : {}",tiu_gps16    ); 
-  repr += std::format("\n  crc           : {}",crc          );
-  repr += "\n** Trigger Sources **";
-  for (const auto &ts : get_trigger_sources()) {
-    repr += std::format("\n -- {}", (u8)ts);
-  }
-  repr += "\n** Trigger Hits **";
-  for (const auto &h : get_trigger_hits()) {
-    repr += std::format("\n -- {} {} {} {}", std::get<0>(h), std::get<1>(h), std::get<2>(h), (u8)std::get<3>(h));
-  }
-  repr += "\n** MTB Link IDs **";
-  for (const u8 &lid : get_rb_link_ids()) {
-    repr += std::format("\n -- {}", lid);
-  }
-  repr += ">";
-  return repr;
-}
-
-/*************************************/
-
-Vec<g::TofHit> g::TofEvent::get_hits() const {
+auto g::TofEvent::get_hits() const -> Vec<g::TofHit> {
   Vec<g::TofHit> hits;
   for (auto &rb : rb_events) {
     for (auto &h : rb.hits) {
@@ -1693,10 +1693,10 @@ namespace gondola {
     return os;
   }
   
-  std::ostream& operator<<(std::ostream& os, const g::MasterTriggerEvent& mt) {
-    os << mt.to_string();
-    return os;
-  }
+  //std::ostream& operator<<(std::ostream& os, const g::MasterTriggerEvent& mt) {
+  //  os << mt.to_string();
+  //  return os;
+  //}
   
   std::ostream& operator<<(std::ostream& os, const g::TofEvent& te) {
     os << te.to_string();

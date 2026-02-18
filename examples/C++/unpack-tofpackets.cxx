@@ -139,15 +139,6 @@ int main(int argc, char *argv[]){
         n_rbmoni++;
         break;
       }
-      case PacketType::MasterTrigger : {
-        usize pos = 0;
-        auto mte = g::MasterTriggerEvent::from_bytestream(p.payload, pos);
-        if (verbose) {
-          std::cout << mte << std::endl;
-        }
-        n_mte++;
-        break;
-      }
     /*case PacketType::TOFCmpMoni : {
         usize pos = 0;
         auto tcmoni = TofCmpMoniData::from_bytestream(p.payload, pos);
