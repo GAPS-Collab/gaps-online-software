@@ -12,6 +12,9 @@ use crate::prelude::*;
 #[repr(u8)]
 pub enum TelemetryPacketType {
   Unknown            = 0,
+  SipGpsPosition     = 20,
+  SipGpsTime         = 21,
+  SipPressure        = 22,
   CardHKP            = 30,
   CoolingHK          = 40,
   PDUHK              = 50,
