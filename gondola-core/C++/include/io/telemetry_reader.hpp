@@ -61,7 +61,7 @@ namespace gondola {
     #ifdef BUILD_CXX_DB 
     /// The map of all paddles. This is needed later on to look up properties 
     /// of the TOF paddles when we are unpacking events 
-    Gaps::TofPaddleMapPtr paddles = nullptr; 
+    TofPaddleMapPtr paddles = nullptr; 
     #endif 
 
     private:

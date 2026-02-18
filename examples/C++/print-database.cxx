@@ -21,6 +21,8 @@
 #include "calibration.h"
 #include "database.h"
 
+namespace g = gondola;
+
 int main(int argc, char *argv[]){
   spdlog::cfg::load_env_levels();
     
@@ -34,14 +36,14 @@ int main(int argc, char *argv[]){
     exit(EXIT_SUCCESS);
   }
   
-  auto paddles = Gaps::get_tofpaddles();
+  auto paddles = g::get_tofpaddles();
   for (auto const &p : paddles) {
     std::cout << "************* PADDLE " << (int)p.first << "***********" << std::endl;
     std::cout << p.second << std::endl;
     std::cout << "\n\n" << std::endl;
   }
 
-  auto strips = Gaps::get_trackerstrips();
+  auto strips = g::get_trackerstrips();
   for (auto const &strip : strips) {
     std::cout << "************* Strip " << (int)strip.first << "***********" << std::endl;
     std::cout << strip.second << std::endl;

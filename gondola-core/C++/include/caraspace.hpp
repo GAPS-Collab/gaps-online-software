@@ -112,7 +112,7 @@ namespace gondola {
 
   private:  
     #ifdef BUILD_CXXDB
-    Gaps::TofPaddleMap paddles_          ; 
+    TofPaddleMap paddles_          ; 
     #endif 
     bool               exhausted_        ;
     usize              n_packets_read_   ;

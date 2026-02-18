@@ -131,7 +131,7 @@ auto g::RBEventHeader::get_nchan() const -> u8 {
 
 auto g::RBEventHeader::from_bytestream(const Vec<u8> &stream, u64 &pos)\
   -> Result<RBEventHeader, g::IOError> {
-  //Gaps::set_loglevel(Gaps::LOGLEVEL::info);
+  //g::set_loglevel(g::LOGLEVEL::info);
   if (stream.size() < RBEventHeader::SIZE) {
     auto message = std::format("RBEventHeader can not be parsed from a string with size {}, when {} bytes are expected!", stream.size(), RBEventHeader::SIZE);
     auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
@@ -725,7 +725,7 @@ g::TofEvent::TofEvent() {
 /**********************************************************/
 
 #ifdef BUILD_CXX_DB
-auto g::TofEvent::set_paddlemap(const Gaps::TofPaddleMap& paddlemap) -> void {
+auto g::TofEvent::set_paddlemap(const g::TofPaddleMap& paddlemap) -> void {
   for (auto &ev : rb_events) {
     for (auto &h : ev.hits) {
       h.set_paddle(paddlemap.at(h.paddle_id));
@@ -1164,7 +1164,7 @@ void g::TofHit::set_paddle_len(f32 paddle_len) {
 /*************************************/
 
 #ifdef BUILD_CXXDB
-auto g::TofHit::set_paddle(const Gaps::TofPaddle& paddle) -> void {
+auto g::TofHit::set_paddle(const g::TofPaddle& paddle) -> void {
   paddle_len    = paddle.length;
   coax_cbl_time = paddle.coax_cable_time; 
   hart_cbl_time = paddle.harting_cable_time;
@@ -1644,7 +1644,7 @@ u64 g::TofEventSummary::get_timestamp48() const {
 }
 
 #ifdef BUILD_CXXDB
-auto g::TofEventSummary::set_paddlemap(const Gaps::TofPaddleMap& paddlemap) -> void {
+auto g::TofEventSummary::set_paddlemap(const g::TofPaddleMap& paddlemap) -> void {
   for (auto &h : hits) {
     h.set_paddle(paddlemap.at(h.paddle_id));
   }

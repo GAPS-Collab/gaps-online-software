@@ -8,7 +8,7 @@
 
 #include <map>
 
-namespace Gaps {
+namespace gondola {
   
   enum class TofPaddleEnd : i16 {
     Unknown                = 0,
@@ -142,10 +142,7 @@ namespace Gaps {
   typedef std::map<u32, TrackerStripPedestal> TrkStripPedMap;
   
   auto get_trackerstrippedestals() -> TrkStripPedMap;
-}
 
-// new items shall go directly into the new gondola namespace 
-namespace gondola {
   /// The mapping of volume id to hardware id, which is either the strip
   /// identifier or the paddle id 
   auto get_hid_vid_map() -> HashMap<u32, u32>;
@@ -177,13 +174,13 @@ namespace gondola {
   auto get_tofpaddletimingconstants(std::string mask_name = "") -> TofPaddleTimingConstantMap;
 }
 
-std::ostream& operator<<(std::ostream& os, const Gaps::TofPaddle& paddle);
+std::ostream& operator<<(std::ostream& os, const gondola::TofPaddle& paddle);
 
-std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStrip& strip);
+std::ostream& operator<<(std::ostream& os, const gondola::TrackerStrip& strip);
 
-std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStripMask& strip);
+std::ostream& operator<<(std::ostream& os, const gondola::TrackerStripMask& strip);
 
-std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStripPedestal& strip);
+std::ostream& operator<<(std::ostream& os, const gondola::TrackerStripPedestal& strip);
 
 std::ostream& operator<<(std::ostream& os, const gondola::TofPaddleTimingConstant& paddle);
 

@@ -190,7 +190,7 @@ int main(int argc, char *argv[]){
       auto m_ev = result.unwrap();
       //std::cout << m_ev.tof_event.to_string() << std::endl;
       for (g::TrkHit const &h : m_ev.trk_hits) {
-        auto strip_id = Gaps::TrackerStrip::create_id(h.layer, h.row, h.module, h.channel);
+        auto strip_id = g::TrackerStrip::create_id(h.layer, h.row, h.module, h.channel);
         //if (trk_mask[strip_id]) {
         //  // only count active strips
         //  ++n_trk_hits;

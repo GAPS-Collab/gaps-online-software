@@ -308,7 +308,7 @@ namespace gondola {
     void set_paddle_len(f32 paddle_len);
   
     #if BUILD_CXX_DB
-    auto set_paddle(const Gaps::TofPaddle& paddle) -> void;
+    auto set_paddle(const g::TofPaddle& paddle) -> void;
     auto get_phase_delay() const -> f32;
     auto get_cable_delay() const -> f32;
     auto get_t0()          const -> f32;
@@ -588,7 +588,7 @@ namespace gondola {
     #ifdef BUILD_CXX_DB
     /// set a TofPaddle, that is enrich every tofhit with information
     /// about the corresponding paddle
-    auto set_paddlemap(const Gaps::TofPaddleMap&) -> void;
+    auto set_paddlemap(const g::TofPaddleMap&) -> void;
     #endif
       
     static auto get_n_rbevents(u32 mask) -> u32;
@@ -713,7 +713,7 @@ namespace gondola {
     #ifdef BUILD_CXX_DB
     /// set a TofPaddle, that is enrich every tofhit with information
     /// about the corresponding paddle
-    auto set_paddlemap(const Gaps::TofPaddleMap&) -> void;
+    auto set_paddlemap(const g::TofPaddleMap&) -> void;
     /// normalize all the hit times, taking the global ch9 
     /// phase into account
     auto normalize_hit_times(const TofPaddleTimingConstantMap &offsets) -> void;

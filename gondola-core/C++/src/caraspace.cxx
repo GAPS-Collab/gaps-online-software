@@ -217,7 +217,7 @@ g::CRReader::CRReader() :
   telly_reader_ = std::unique_ptr<TelemetryPacketReader>(new TelemetryPacketReader());
   #ifdef BUILD_CXX_DB
   spdlog::info("Will load tofpaddles from DB for this reader!");
-  paddles_ = Gaps::get_tofpaddles();
+  paddles_ = g::get_tofpaddles();
   #endif 
 };
 

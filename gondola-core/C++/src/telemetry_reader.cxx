@@ -42,7 +42,7 @@ g::TelemetryPacketReader::TelemetryPacketReader() :
                                                     file_idx_       (0) {
   #ifdef BUILD_CXX_DB
   spdlog::info("Will load tofpaddles from DB for this reader!");
-  paddles = std::make_shared<Gaps::TofPaddleMap>(Gaps::get_tofpaddles());
+  paddles = std::make_shared<g::TofPaddleMap>(g::get_tofpaddles());
   #endif 
 };
 

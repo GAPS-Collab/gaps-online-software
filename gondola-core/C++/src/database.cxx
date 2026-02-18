@@ -8,8 +8,9 @@
 #include "database.h"
 
 using namespace sqlite_orm;
+namespace g = gondola;
 
-auto Gaps::TofPaddle::to_string() const -> std::string {
+auto g::TofPaddle::to_string() const -> std::string {
   auto repr = std::string("<TofPaddle: ");
   repr += std::format("\n  paddle_id           : {} ", paddle_id        );
   repr += std::format("\n  volume_id           : {} ", volume_id        );  
@@ -48,7 +49,7 @@ auto Gaps::TofPaddle::to_string() const -> std::string {
   return repr;
 }
 
-auto Gaps::TrackerStrip::to_string() const -> std::string {
+auto g::TrackerStrip::to_string() const -> std::string {
   auto repr = std::string("<TrackerStrip: ");
   repr += std::format("\n  StripID            : {}", strip_id   );
   repr += std::format("\n  VolumeID           : {}", volume_id  );  
@@ -65,18 +66,18 @@ auto Gaps::TrackerStrip::to_string() const -> std::string {
   return repr;
 }
 
-auto Gaps::TrackerStrip::create_id() const -> u32 {
-  return Gaps::TrackerStrip::create_id(layer, row, module, channel);
+auto g::TrackerStrip::create_id() const -> u32 {
+  return g::TrackerStrip::create_id(layer, row, module, channel);
 }; 
 
-auto Gaps::TrackerStrip::create_id(u32 layer, u32 row, u32 module, u32 channel) -> u32 {
+auto g::TrackerStrip::create_id(u32 layer, u32 row, u32 module, u32 channel) -> u32 {
   return channel + module*100 + row*10000 + layer*100000;
 };
 
-auto Gaps::get_tofpaddles() -> std::map<u8, Gaps::TofPaddle> {
+auto g::get_tofpaddles() -> std::map<u8, g::TofPaddle> {
   // FIXME - find a better name for the database variable
   //         env name
-  auto paddle_map = std::map<u8, Gaps::TofPaddle>();
+  auto paddle_map = std::map<u8, g::TofPaddle>();
   auto db_path = std::getenv("GONDOLA_DB_URL");
   if (db_path == nullptr) {
     spdlog::error("Unable to retrieve database! The GONDOLA_DB_URL shell variable is not set. Did you load the setup-env.sh shell?");
@@ -85,48 +86,48 @@ auto Gaps::get_tofpaddles() -> std::map<u8, Gaps::TofPaddle> {
   std::string dbname(db_path);
   auto storage = make_storage(dbname,
     make_table("tof_db_paddle",
-      make_column("paddle_id"        , &Gaps::TofPaddle::paddle_id, primary_key()        ),
-      make_column("volume_id"        , &Gaps::TofPaddle::volume_id        ),  
-      make_column("panel_id"         , &Gaps::TofPaddle::panel_id         ), 
-      make_column("mtb_link_id"      , &Gaps::TofPaddle::mtb_link_id      ), 
-      make_column("rb_id"            , &Gaps::TofPaddle::rb_id            ), 
-      make_column("rb_chA"           , &Gaps::TofPaddle::rb_chA           ), 
-      make_column("rb_chB"           , &Gaps::TofPaddle::rb_chB           ), 
-      make_column("ltb_id"           , &Gaps::TofPaddle::ltb_id           ),         
-      make_column("ltb_chA"          , &Gaps::TofPaddle::ltb_chA          ),         
-      make_column("ltb_chB"          , &Gaps::TofPaddle::ltb_chB          ),         
-      make_column("pb_id"            , &Gaps::TofPaddle::pb_id            ),         
-      make_column("pb_chA"           , &Gaps::TofPaddle::pb_chA           ),         
-      make_column("pb_chB"           , &Gaps::TofPaddle::pb_chB           ),         
-      make_column("cable_len"        , &Gaps::TofPaddle::cable_len        ),         
-      make_column("dsi"              , &Gaps::TofPaddle::dsi              ),         
-      make_column("j_rb"             , &Gaps::TofPaddle::j_rb             ),         
-      make_column("j_ltb"            , &Gaps::TofPaddle::j_ltb            ),         
-      make_column("height"           , &Gaps::TofPaddle::height           ),         
-      make_column("width"            , &Gaps::TofPaddle::width            ),         
-      make_column("length"           , &Gaps::TofPaddle::length           ),         
-      make_column("normal_x"         , &Gaps::TofPaddle::normal_x         ),         
-      make_column("normal_y"         , &Gaps::TofPaddle::normal_y         ),         
-      make_column("normal_z"         , &Gaps::TofPaddle::normal_z         ),         
-      make_column("global_pos_x_l0"  , &Gaps::TofPaddle::global_pos_x_l0  ),         
-      make_column("global_pos_y_l0"  , &Gaps::TofPaddle::global_pos_y_l0  ),         
-      make_column("global_pos_z_l0"  , &Gaps::TofPaddle::global_pos_z_l0  ),         
-      make_column("global_pos_x_l0_A", &Gaps::TofPaddle::global_pos_x_l0_A),          
-      make_column("global_pos_y_l0_A", &Gaps::TofPaddle::global_pos_y_l0_A),          
-      make_column("global_pos_z_l0_A", &Gaps::TofPaddle::global_pos_z_l0_A),          
-      make_column("global_pos_x_l0_B", &Gaps::TofPaddle::global_pos_x_l0_B),          
-      make_column("global_pos_y_l0_B", &Gaps::TofPaddle::global_pos_y_l0_B),          
-      make_column("global_pos_z_l0_B", &Gaps::TofPaddle::global_pos_z_l0_B),          
-      make_column("coax_cable_time"  , &Gaps::TofPaddle::coax_cable_time),          
-      make_column("harting_cable_time", &Gaps::TofPaddle::harting_cable_time)));          
-  auto paddles = storage.get_all<Gaps::TofPaddle>();
+      make_column("paddle_id"        , &g::TofPaddle::paddle_id, primary_key()        ),
+      make_column("volume_id"        , &g::TofPaddle::volume_id        ),  
+      make_column("panel_id"         , &g::TofPaddle::panel_id         ), 
+      make_column("mtb_link_id"      , &g::TofPaddle::mtb_link_id      ), 
+      make_column("rb_id"            , &g::TofPaddle::rb_id            ), 
+      make_column("rb_chA"           , &g::TofPaddle::rb_chA           ), 
+      make_column("rb_chB"           , &g::TofPaddle::rb_chB           ), 
+      make_column("ltb_id"           , &g::TofPaddle::ltb_id           ),         
+      make_column("ltb_chA"          , &g::TofPaddle::ltb_chA          ),         
+      make_column("ltb_chB"          , &g::TofPaddle::ltb_chB          ),         
+      make_column("pb_id"            , &g::TofPaddle::pb_id            ),         
+      make_column("pb_chA"           , &g::TofPaddle::pb_chA           ),         
+      make_column("pb_chB"           , &g::TofPaddle::pb_chB           ),         
+      make_column("cable_len"        , &g::TofPaddle::cable_len        ),         
+      make_column("dsi"              , &g::TofPaddle::dsi              ),         
+      make_column("j_rb"             , &g::TofPaddle::j_rb             ),         
+      make_column("j_ltb"            , &g::TofPaddle::j_ltb            ),         
+      make_column("height"           , &g::TofPaddle::height           ),         
+      make_column("width"            , &g::TofPaddle::width            ),         
+      make_column("length"           , &g::TofPaddle::length           ),         
+      make_column("normal_x"         , &g::TofPaddle::normal_x         ),         
+      make_column("normal_y"         , &g::TofPaddle::normal_y         ),         
+      make_column("normal_z"         , &g::TofPaddle::normal_z         ),         
+      make_column("global_pos_x_l0"  , &g::TofPaddle::global_pos_x_l0  ),         
+      make_column("global_pos_y_l0"  , &g::TofPaddle::global_pos_y_l0  ),         
+      make_column("global_pos_z_l0"  , &g::TofPaddle::global_pos_z_l0  ),         
+      make_column("global_pos_x_l0_A", &g::TofPaddle::global_pos_x_l0_A),          
+      make_column("global_pos_y_l0_A", &g::TofPaddle::global_pos_y_l0_A),          
+      make_column("global_pos_z_l0_A", &g::TofPaddle::global_pos_z_l0_A),          
+      make_column("global_pos_x_l0_B", &g::TofPaddle::global_pos_x_l0_B),          
+      make_column("global_pos_y_l0_B", &g::TofPaddle::global_pos_y_l0_B),          
+      make_column("global_pos_z_l0_B", &g::TofPaddle::global_pos_z_l0_B),          
+      make_column("coax_cable_time"  , &g::TofPaddle::coax_cable_time),          
+      make_column("harting_cable_time", &g::TofPaddle::harting_cable_time)));          
+  auto paddles = storage.get_all<g::TofPaddle>();
   for (auto p : paddles) {
     paddle_map.insert({p.paddle_id, p});
   }  
   return paddle_map;
 }
 
-auto Gaps::get_rb_id_paddles() -> RbIdChannelPaddleIdMap {
+auto g::get_rb_id_paddles() -> RbIdChannelPaddleIdMap {
   RbIdChannelPaddleIdMap map;
   for (u8 rb_id=1; rb_id<50; rb_id++) {
     auto ch_map = std::map<u8, std::tuple<u8, TofPaddleEnd>>();
@@ -134,13 +135,13 @@ auto Gaps::get_rb_id_paddles() -> RbIdChannelPaddleIdMap {
   }
   auto paddles = get_tofpaddles();
   for (auto const &pdl : paddles) {
-    map[pdl.second.rb_id].insert(std::make_pair(pdl.second.rb_chA, std::make_tuple(pdl.second.paddle_id, Gaps::TofPaddleEnd::A)));
-    map[pdl.second.rb_id].insert(std::make_pair(pdl.second.rb_chB, std::make_tuple(pdl.second.paddle_id, Gaps::TofPaddleEnd::B)));
+    map[pdl.second.rb_id].insert(std::make_pair(pdl.second.rb_chA, std::make_tuple(pdl.second.paddle_id, g::TofPaddleEnd::A)));
+    map[pdl.second.rb_id].insert(std::make_pair(pdl.second.rb_chB, std::make_tuple(pdl.second.paddle_id, g::TofPaddleEnd::B)));
   }
   return map;
 };
 
-auto Gaps::get_dsi_j_paddles() -> DsiJChnPaddleIdMap {
+auto g::get_dsi_j_paddles() -> DsiJChnPaddleIdMap {
   DsiJChnPaddleIdMap map;
   for (u8 dsi=1; dsi<6; dsi++) {
     //auto j_map = TofPaddleMap();
@@ -161,10 +162,10 @@ auto Gaps::get_dsi_j_paddles() -> DsiJChnPaddleIdMap {
 };
 
 
-auto Gaps::get_trackerstrips() -> std::map<u32, Gaps::TrackerStrip> {
+auto g::get_trackerstrips() -> std::map<u32, g::TrackerStrip> {
   // FIXME - find a better name for the database variable
   //         env name
-  auto strip_map = std::map<u32, Gaps::TrackerStrip>();
+  auto strip_map = std::map<u32, g::TrackerStrip>();
   auto db_path = std::getenv("GONDOLA_DB_URL");
   if (db_path == nullptr) {
     spdlog::error("Unable to retrieve database! The GONDOLA_DB_URL shell variable is not set. Did you load the setup-env.sh shell?");
@@ -173,30 +174,30 @@ auto Gaps::get_trackerstrips() -> std::map<u32, Gaps::TrackerStrip> {
   std::string dbname(db_path);
   auto storage = make_storage(dbname,
     make_table("tof_db_trackerstrip",
-      make_column("strip_id"           , &Gaps::TrackerStrip::strip_id, primary_key()),
-      make_column("layer"              , &Gaps::TrackerStrip::layer), 
-      make_column("row"                , &Gaps::TrackerStrip::row), 
-      make_column("module"             , &Gaps::TrackerStrip::module), 
-      make_column("channel"            , &Gaps::TrackerStrip::channel),  
-      make_column("global_pos_x_l0"    , &Gaps::TrackerStrip::global_pos_x_l0),
-      make_column("global_pos_y_l0"    , &Gaps::TrackerStrip::global_pos_y_l0),
-      make_column("global_pos_z_l0"    , &Gaps::TrackerStrip::global_pos_z_l0),
-      make_column("global_pos_x_det_l0", &Gaps::TrackerStrip::global_pos_x_det_l0),
-      make_column("global_pos_y_det_l0", &Gaps::TrackerStrip::global_pos_y_det_l0),
-      make_column("global_pos_z_det_l0", &Gaps::TrackerStrip::global_pos_z_det_l0),
-      make_column("principal_x"        , &Gaps::TrackerStrip::principal_x),
-      make_column("principal_y"        , &Gaps::TrackerStrip::principal_y),
-      make_column("principal_z"        , &Gaps::TrackerStrip::principal_z),
-      make_column("volume_id"          , &Gaps::TrackerStrip::volume_id)));  
+      make_column("strip_id"           , &g::TrackerStrip::strip_id, primary_key()),
+      make_column("layer"              , &g::TrackerStrip::layer), 
+      make_column("row"                , &g::TrackerStrip::row), 
+      make_column("module"             , &g::TrackerStrip::module), 
+      make_column("channel"            , &g::TrackerStrip::channel),  
+      make_column("global_pos_x_l0"    , &g::TrackerStrip::global_pos_x_l0),
+      make_column("global_pos_y_l0"    , &g::TrackerStrip::global_pos_y_l0),
+      make_column("global_pos_z_l0"    , &g::TrackerStrip::global_pos_z_l0),
+      make_column("global_pos_x_det_l0", &g::TrackerStrip::global_pos_x_det_l0),
+      make_column("global_pos_y_det_l0", &g::TrackerStrip::global_pos_y_det_l0),
+      make_column("global_pos_z_det_l0", &g::TrackerStrip::global_pos_z_det_l0),
+      make_column("principal_x"        , &g::TrackerStrip::principal_x),
+      make_column("principal_y"        , &g::TrackerStrip::principal_y),
+      make_column("principal_z"        , &g::TrackerStrip::principal_z),
+      make_column("volume_id"          , &g::TrackerStrip::volume_id)));  
   
-  auto strips = storage.get_all<Gaps::TrackerStrip>();
+  auto strips = storage.get_all<g::TrackerStrip>();
   for (auto const &strip : strips) {
     strip_map.insert({strip.strip_id, strip});
   }  
   return strip_map;
 }
 
-auto Gaps::TofPaddle::get_principal() const -> Vec<f32> {
+auto g::TofPaddle::get_principal() const -> Vec<f32> {
   Vec<f32> pr(3,0);
   pr[0] = global_pos_x_l0_B - global_pos_x_l0_A;
   pr[1] = global_pos_y_l0_B - global_pos_y_l0_A;
@@ -210,7 +211,7 @@ auto Gaps::TofPaddle::get_principal() const -> Vec<f32> {
   return pr; 
 }
   
-auto Gaps::TrackerStripMask::to_string() const -> std::string {
+auto g::TrackerStripMask::to_string() const -> std::string {
   std::string repr = "<TrackerStripMask:";
   repr += std::format("\n strip id        : {}",  strip_id );
   repr += std::format("\n volume id       : {}",  volume_id);
@@ -220,8 +221,8 @@ auto Gaps::TrackerStripMask::to_string() const -> std::string {
   return repr;
 }
 
-auto Gaps::get_trackerstripmasks(std::string mask_name) -> Gaps::TrkStripMaskMap {
-  Gaps::TrkStripMaskMap mask_map;
+auto g::get_trackerstripmasks(std::string mask_name) -> g::TrkStripMaskMap {
+  g::TrkStripMaskMap mask_map;
   auto db_path = std::getenv("GONDOLA_DB_URL");
   if (db_path == nullptr) {
     spdlog::error("Unable to retrieve database! The GONDOLA_DB_URL shell variable is not set. Did you load the setup-env.sh shell?");
@@ -230,13 +231,13 @@ auto Gaps::get_trackerstripmasks(std::string mask_name) -> Gaps::TrkStripMaskMap
   std::string dbname(db_path);
   auto storage = make_storage(dbname,
     make_table("tof_db_trackerstripmask",
-      make_column("strip_id"             , &Gaps::TrackerStripMask::strip_id, primary_key()),
-      make_column("volume_id"            , &Gaps::TrackerStripMask::volume_id),  
-      make_column("utc_timestamp"        , &Gaps::TrackerStripMask::utc_timestamp),
-      make_column("mask_name"            , &Gaps::TrackerStripMask::mask_name),
-      make_column("active"               , &Gaps::TrackerStripMask::active)));  
+      make_column("strip_id"             , &g::TrackerStripMask::strip_id, primary_key()),
+      make_column("volume_id"            , &g::TrackerStripMask::volume_id),  
+      make_column("utc_timestamp"        , &g::TrackerStripMask::utc_timestamp),
+      make_column("mask_name"            , &g::TrackerStripMask::mask_name),
+      make_column("active"               , &g::TrackerStripMask::active)));  
   
-  auto masks = storage.get_all<Gaps::TrackerStripMask>();
+  auto masks = storage.get_all<g::TrackerStripMask>();
   for (auto const &m : masks) {
     if (mask_name != "") {
       if (m.mask_name != mask_name) {
@@ -248,7 +249,7 @@ auto Gaps::get_trackerstripmasks(std::string mask_name) -> Gaps::TrkStripMaskMap
   return mask_map;
 }
 
-auto Gaps::TrackerStripPedestal::to_string() const -> std::string {
+auto g::TrackerStripPedestal::to_string() const -> std::string {
   std::string repr = "<TrackerStripPedestal:";
   repr += std::format("\n strip id        : {}",  strip_id );
   repr += std::format("\n volume id       : {}",  volume_id);
@@ -259,8 +260,8 @@ auto Gaps::TrackerStripPedestal::to_string() const -> std::string {
   return repr;
 }
 
-auto Gaps::get_trackerstrippedestals() -> Gaps::TrkStripPedMap {
-  Gaps::TrkStripPedMap ped_map;
+auto g::get_trackerstrippedestals() -> g::TrkStripPedMap {
+  g::TrkStripPedMap ped_map;
   auto db_path = std::getenv("GONDOLA_DB_URL");
   if (db_path == nullptr) {
     spdlog::error("Unable to retrieve database! The GONDOLA_DB_URL shell variable is not set. Did you load the setup-env.sh shell?");
@@ -269,21 +270,21 @@ auto Gaps::get_trackerstrippedestals() -> Gaps::TrkStripPedMap {
   std::string dbname(db_path);
   auto storage = make_storage(dbname,
     make_table("tof_db_trackerstrippedestal",
-      make_column("strip_id"             , &Gaps::TrackerStripPedestal::strip_id, primary_key()),
-      make_column("volume_id"            , &Gaps::TrackerStripPedestal::volume_id),  
-      make_column("utc_timestamp"        , &Gaps::TrackerStripPedestal::utc_timestamp),
-      make_column("pedestal_mean"        , &Gaps::TrackerStripPedestal::pedestal_mean),
-      make_column("pedestal_sigma"       , &Gaps::TrackerStripPedestal::pedestal_sigma),
-      make_column("is_mean_value"        , &Gaps::TrackerStripPedestal::is_mean_value)));  
+      make_column("strip_id"             , &g::TrackerStripPedestal::strip_id, primary_key()),
+      make_column("volume_id"            , &g::TrackerStripPedestal::volume_id),  
+      make_column("utc_timestamp"        , &g::TrackerStripPedestal::utc_timestamp),
+      make_column("pedestal_mean"        , &g::TrackerStripPedestal::pedestal_mean),
+      make_column("pedestal_sigma"       , &g::TrackerStripPedestal::pedestal_sigma),
+      make_column("is_mean_value"        , &g::TrackerStripPedestal::is_mean_value)));  
   
-  auto pedestals = storage.get_all<Gaps::TrackerStripPedestal>();
+  auto pedestals = storage.get_all<g::TrackerStripPedestal>();
   for (auto const &m : pedestals) {
     ped_map.insert({m.strip_id, m});
   }  
   return ped_map;
 }
 
-auto Gaps::get_module_position(u8 layer, u8 row, u8 mod, const Gaps::TrkStripMap& strips) -> Vec<f32> {
+auto g::get_module_position(u8 layer, u8 row, u8 mod, const g::TrkStripMap& strips) -> Vec<f32> {
   auto det_0  = strips.at(TrackerStrip::create_id(layer, row, mod, 0));
   auto det_1  = strips.at(TrackerStrip::create_id(layer, row, mod, 8));
   auto det_2  = strips.at(TrackerStrip::create_id(layer, row, mod, 16));
@@ -302,10 +303,10 @@ auto Gaps::get_module_position(u8 layer, u8 row, u8 mod, const Gaps::TrkStripMap
   return result;
 }
 
-auto gondola::get_hid_vid_map() -> HashMap<u32, u32> {
+auto g::get_hid_vid_map() -> HashMap<u32, u32> {
   auto map = HashMap<u32, u32>();
-  auto paddles = Gaps::get_tofpaddles();
-  auto strips  = Gaps::get_trackerstrips();
+  auto paddles = g::get_tofpaddles();
+  auto strips  = g::get_trackerstrips();
   for (const auto& p : paddles) {
     map.insert(std::make_pair(p.first, p.second.volume_id));  
   }
@@ -315,10 +316,10 @@ auto gondola::get_hid_vid_map() -> HashMap<u32, u32> {
   return map;
 }
 
-auto gondola::get_vid_hid_map() -> HashMap<u32, u32> {
+auto g::get_vid_hid_map() -> HashMap<u32, u32> {
   auto map = HashMap<u32, u32>();
-  auto paddles = Gaps::get_tofpaddles();
-  auto strips  = Gaps::get_trackerstrips();
+  auto paddles = g::get_tofpaddles();
+  auto strips  = g::get_trackerstrips();
   for (const auto& p : paddles) {
     map.insert(std::make_pair(p.second.volume_id, p.first));  
   }
@@ -330,7 +331,7 @@ auto gondola::get_vid_hid_map() -> HashMap<u32, u32> {
 
 //--------------------------------------------------------------
 
-auto gondola::TofPaddleTimingConstant::to_string() const -> std::string {
+auto g::TofPaddleTimingConstant::to_string() const -> std::string {
   std::string repr = "<TofPaddleTimingConstant:";
   repr += std::format("\n paddle id             : {}",  paddle_id );
   repr += std::format("\n volume id             : {}",  volume_id);
@@ -344,8 +345,8 @@ auto gondola::TofPaddleTimingConstant::to_string() const -> std::string {
 
 //--------------------------------------------------------------
 
-auto gondola::get_tofpaddletimingconstants(std::string name) -> gondola::TofPaddleTimingConstantMap {
-  gondola::TofPaddleTimingConstantMap tmg_map;
+auto g::get_tofpaddletimingconstants(std::string name) -> g::TofPaddleTimingConstantMap {
+  g::TofPaddleTimingConstantMap tmg_map;
   auto db_path = std::getenv("GONDOLA_DB_URL");
   if (db_path == nullptr) {
     spdlog::error("Unable to retrieve database! The GONDOLA_DB_URL shell variable is not set. Did you load the setup-env.sh shell?");
@@ -354,16 +355,16 @@ auto gondola::get_tofpaddletimingconstants(std::string name) -> gondola::TofPadd
   std::string dbname(db_path);
   auto storage = make_storage(dbname,
     make_table("tof_db_tofpaddletimingconstant",
-      make_column("data_id"              , &gondola::TofPaddleTimingConstant::data_id, primary_key()),
-      make_column("paddle_id"            , &gondola::TofPaddleTimingConstant::paddle_id),
-      make_column("volume_id"            , &gondola::TofPaddleTimingConstant::volume_id),  
-      make_column("utc_timestamp_start"  , &gondola::TofPaddleTimingConstant::utc_timestamp_start),
-      make_column("utc_timestamp_stop"   , &gondola::TofPaddleTimingConstant::utc_timestamp_stop),
-      make_column("name"                 , &gondola::TofPaddleTimingConstant::name),
-      make_column("version"              , &gondola::TofPaddleTimingConstant::version),
-      make_column("timing_constant"      , &gondola::TofPaddleTimingConstant::timing_constant)));  
+      make_column("data_id"              , &g::TofPaddleTimingConstant::data_id, primary_key()),
+      make_column("paddle_id"            , &g::TofPaddleTimingConstant::paddle_id),
+      make_column("volume_id"            , &g::TofPaddleTimingConstant::volume_id),  
+      make_column("utc_timestamp_start"  , &g::TofPaddleTimingConstant::utc_timestamp_start),
+      make_column("utc_timestamp_stop"   , &g::TofPaddleTimingConstant::utc_timestamp_stop),
+      make_column("name"                 , &g::TofPaddleTimingConstant::name),
+      make_column("version"              , &g::TofPaddleTimingConstant::version),
+      make_column("timing_constant"      , &g::TofPaddleTimingConstant::timing_constant)));  
   
-  auto tcs = storage.get_all<gondola::TofPaddleTimingConstant>();
+  auto tcs = storage.get_all<g::TofPaddleTimingConstant>();
   for (auto const &tc : tcs) {
     if (name != "") {
       if (tc.name != name) {
@@ -377,27 +378,27 @@ auto gondola::get_tofpaddletimingconstants(std::string name) -> gondola::TofPadd
 
 //--------------------------------------------------------------
 
-std::ostream& operator<<(std::ostream& os, const Gaps::TofPaddle& tp) {
+std::ostream& operator<<(std::ostream& os, const g::TofPaddle& tp) {
   os << tp.to_string();
   return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStrip& ts) {
+std::ostream& operator<<(std::ostream& os, const g::TrackerStrip& ts) {
   os << ts.to_string();
   return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStripMask& ts) {
+std::ostream& operator<<(std::ostream& os, const g::TrackerStripMask& ts) {
   os << ts.to_string();
   return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const Gaps::TrackerStripPedestal& ts) {
+std::ostream& operator<<(std::ostream& os, const g::TrackerStripPedestal& ts) {
   os << ts.to_string();
   return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const gondola::TofPaddleTimingConstant& tc) {
+std::ostream& operator<<(std::ostream& os, const g::TofPaddleTimingConstant& tc) {
   os << tc.to_string();
   return os;
 }
