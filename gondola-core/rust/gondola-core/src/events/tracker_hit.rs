@@ -2,7 +2,6 @@
 // This file is part of gaps-online-software and published 
 // under the GPLv3 license
 
-
 use crate::prelude::*;
 
 /// Hit on a tracker strip
@@ -15,6 +14,10 @@ pub struct TrackerHit {
   pub channel         : u16,
   pub adc             : u16,
   pub oscillator      : u64,
+  /// In BFSW, there are two versions of the tracker hit, 
+  /// tracker_hit and tracker::hit. The latter has 
+  /// an extra ASIC event code field. Let's unify those here
+  pub asic_event_code : u8,
 
   // not getting serialized
   /// calibrated energy
@@ -37,6 +40,7 @@ impl TrackerHit {
       channel         : 0,
       adc             : 0,
       oscillator      : 0,
+      asic_event_code : 0,
       energy          : 0.0,
       x               : 0.0,
       y               : 0.0,
@@ -73,7 +77,8 @@ impl fmt::Display for TrackerHit {
     let mut repr = String::from("<TrackerHit:");
     repr += &(format!("\n  Layer, Row, Module, Channel : {} {} {} {}" ,self.layer, self.row, self.module, self.channel));
     repr += &(format!("\n  ADC           : {}" ,self.adc));
-    repr += &(format!("\n  Oscillator    : {}",self.oscillator));
+    repr += &(format!("\n  Oscillator    : {}" ,self.oscillator));
+    repr += &(format!("\n  ASIC Evt code : {}" ,self.asic_event_code)); 
     if self.has_coordinates {
       repr += &(format!("\n -- coordinates x : {} , y : {} , z {}", self.x, self.y, self.z));
     } else {
@@ -128,7 +133,12 @@ impl TrackerHit {
   fn get_oscillator(&self) -> u64 {
     self.oscillator
   }
-  
+ 
+  #[getter] 
+  fn get_asic_event_code(&self) -> u8 {
+    self.asic_event_code
+  }
+
   #[getter]
   fn get_energy(&self) -> f32 {
     self.energy
