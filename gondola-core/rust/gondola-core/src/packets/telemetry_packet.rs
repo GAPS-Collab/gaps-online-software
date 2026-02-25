@@ -109,6 +109,7 @@ impl Serialization for TelemetryPacket {
     let mut tpacket: TelemetryPacket = TelemetryPacket::new();
     let header: TelemetryPacketHeader  = TelemetryPacketHeader::from_bytestream(stream, pos)?;
     tpacket.header = header;
+    // to note here: The payload does not contain the payload for the header, it was just parsed
     tpacket.payload = stream[*pos..*pos + header.length as usize - TelemetryPacketHeader::SIZE].to_vec();
     Ok(tpacket)
   }

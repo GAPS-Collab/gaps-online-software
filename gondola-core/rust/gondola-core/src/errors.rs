@@ -24,7 +24,9 @@ pub enum SerializationError {
   Disconnected,
   ObjectNotFound,
   UnsupportedVersion,
-  WrongProtocolVersion
+  WrongProtocolVersion,
+  TooManyTrackerEvents,
+  TooManyTrackerHits
 }
 
 impl SerializationError { 
@@ -34,7 +36,7 @@ impl SerializationError {
       SerializationError::HeadInvalid              => "HeadInvalid",     
       SerializationError::TrackerDelimiterInvalid  => "TrackerDelimiterInvalid",
       SerializationError::TofDelimiterInvalid      => "TofDelimiterInvalid",
-      SerializationError::StreamTooShort           => "StreamTooLong",
+      SerializationError::StreamTooShort           => "StreamTooShort",
       SerializationError::StreamTooLong            => "StreamTooLong",
       SerializationError::ValueNotFound            => "ValueNotFound",
       SerializationError::EventFragment            => "EventFragment",
@@ -47,6 +49,8 @@ impl SerializationError {
       SerializationError::ObjectNotFound           => "ObjectNotFound",
       SerializationError::UnsupportedVersion       => "UnsupportedVersion",
       SerializationError::WrongProtocolVersion     => "WrongProtoclVersion",
+      SerializationError::TooManyTrackerEvents     => "TooManyTrackerEvents", 
+      SerializationError::TooManyTrackerHits       => "TooManyTrackerHits"
     }
   }
 }
