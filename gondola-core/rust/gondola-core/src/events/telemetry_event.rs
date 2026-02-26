@@ -48,7 +48,18 @@ impl TelemetryEvent {
       h.set_coordinates(trk_strips);
     }
   }
- 
+  
+  /// Delete tracker hits (e.g. in case they are supposed to 
+  /// be replaced by packet type 80 tracker hits)
+  pub fn delete_all_tracker_hits(&mut self) {
+    self.tracker_hits.clear();
+  }
+
+  /// Add tracker hits (e.g. hits from packet type 80)
+  pub fn add_tracker_hits(&mut self, hits:  &Vec<TrackerHit>) {
+    self.tracker_hits.extend_from_slice(hits);
+  }
+
   #[cfg(feature="database")]
   pub fn mask_strips(&mut self, masks : &HashMap<u32, TrackerStripMask>) {
     let mut clean_hits = Vec::<TrackerHit>::with_capacity(self.tracker_hits.len());
@@ -356,6 +367,19 @@ impl TelemetryEvent {
       pts.push(pt);
     }
     pts
+  }
+  
+  /// Add tracker hits to the merged event (e.g. with hits from packet type 80
+  #[pyo3(name="add_tracker_hits")]
+  pub fn add_tracker_hits_py(&mut self, hits:  Vec<TrackerHit>) {
+    self.tracker_hits.extend_from_slice(&hits);
+  }
+  
+  /// Delete tracker hits (e.g. in case they are supposed to 
+  /// be replaced by packet type 80 tracker hits)
+  #[pyo3(name="delete_all_tracker_hits")]
+  pub fn delete_all_tracker_hits_py(&mut self) {
+    self.tracker_hits.clear();
   }
 
   /// Populate a merged event from a TelemetryPacket.

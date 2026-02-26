@@ -7,7 +7,7 @@
 use crate::prelude::*;
 
 /// A header 
-#[derive(Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 #[cfg_attr(feature="pybindings", pyclass)]
 pub struct TrackerHeader {
   pub sync        : u16,

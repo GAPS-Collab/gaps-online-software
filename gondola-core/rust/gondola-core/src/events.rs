@@ -22,6 +22,12 @@ pub use rb_event::{
 pub mod tracker_hit;
 pub use tracker_hit::TrackerHit;
 
+pub mod tracker_daq_event;
+pub use tracker_daq_event::TrackerDAQEvent;
+
+pub mod tracker_daq_event_packet;
+pub use tracker_daq_event_packet::TrackerDAQEventPacket;
+
 pub mod telemetry_event;
 pub use telemetry_event::TelemetryEvent;
 

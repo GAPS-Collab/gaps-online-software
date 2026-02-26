@@ -5,7 +5,7 @@
 use crate::prelude::*;
 
 /// Hit on a tracker strip
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 #[cfg_attr(feature="pybindings", pyclass)]
 pub struct TrackerHit {
   pub layer           : u16,

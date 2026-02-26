@@ -5,28 +5,35 @@ Every possible event type in GAPS which is relevant for
 
 from . import _gondola_core 
 
-TofHit                   =  _gondola_core.events.TofHit             
-TofHit.__module__        = __name__
-TofHit.__name__          = 'TofHit'
-TrackerHit               =  _gondola_core.events.TrackerHit         
-TrackerHit.__module__    = __name__ 
-TrackerHit.__name__      = 'TrackerHit'
-RBEventHeader            =  _gondola_core.events.RBEventHeader      
-RBEventHeader.__module__ = __name__ 
-RBEventHeader.__name__   = 'RBEventHeader' 
-RBEvent                  =  _gondola_core.events.RBEvent    
-RBEvent.__module__       = __name__ 
-RBEvent.__name__         = 'RBEvent'
-RBWaveform               =  _gondola_core.events.RBWaveform    
-RBWaveform.__module__    = __name__
-RBWaveform.__name__      = 'RBWaveform'
+TofHit                           =  _gondola_core.events.TofHit             
+TofHit.__module__                = __name__
+TofHit.__name__                  = 'TofHit'
+TrackerHit                       =  _gondola_core.events.TrackerHit         
+TrackerHit.__module__            = __name__ 
+TrackerHit.__name__              = 'TrackerHit'
+RBEventHeader                    =  _gondola_core.events.RBEventHeader      
+RBEventHeader.__module__         = __name__ 
+RBEventHeader.__name__           = 'RBEventHeader' 
+RBEvent                          =  _gondola_core.events.RBEvent    
+RBEvent.__module__               = __name__ 
+RBEvent.__name__                 = 'RBEvent'
+RBWaveform                       =  _gondola_core.events.RBWaveform    
+RBWaveform.__module__            = __name__
+RBWaveform.__name__              = 'RBWaveform'
 
-TofEvent                  =  _gondola_core.events.TofEvent           
-TofEvent.__module__       = __name__ 
-TofEvent.__name__         = 'TofEvent' 
-TelemetryEvent            =  _gondola_core.events.TelemetryEvent     
-TelemetryEvent.__module__ = __name__ 
-TelemetryEvent.__name__   = 'TelemetryEvent' 
+TofEvent                         =  _gondola_core.events.TofEvent           
+TofEvent.__module__              = __name__ 
+TofEvent.__name__                = 'TofEvent' 
+TelemetryEvent                   =  _gondola_core.events.TelemetryEvent     
+TelemetryEvent.__module__        = __name__ 
+TelemetryEvent.__name__          = 'TelemetryEvent' 
+TrackerDAQEvent                  = _gondola_core.events.TrackerDAQEvent 
+TrackerDAQEvent.__module__       = __name__ 
+TrackerDAQEvent.__name__         = 'TrackerDAQEvent' 
+TrackerDAQEventPacket            = _gondola_core.events.TrackerDAQEventPacket
+TrackerDAQEventPacket.__module__ = __name__ 
+TrackerDAQEventPacket.__name__   = 'TrackerDAQEventPacket'
+
 
 # functions 
 strip_id                  =  _gondola_core.events.strip_id           
