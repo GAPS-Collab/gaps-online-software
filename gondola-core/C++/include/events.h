@@ -256,19 +256,27 @@ struct TofHit  {
   u8 ctr_etx;
   u16 tail = 0xF0F; 
 
-  auto get_time_a()       const -> f32;
-  auto get_time_b()       const -> f32;
-  auto get_peak_a()       const -> f32;
-  auto get_peak_b()       const -> f32;
-  auto get_charge_a()     const -> f32;
-  auto get_charge_b()     const -> f32;
-  auto get_charge_min_i() const -> f32;
-  auto get_x_pos()        const -> f32;
-  auto get_t_avg()        const -> f32;
+  auto get_time_a()         const -> f32;
+  auto get_time_b()         const -> f32;
+  auto get_peak_a()         const -> f32;
+  auto get_peak_b()         const -> f32;
+  auto get_charge_a()       const -> f32;
+  auto get_charge_b()       const -> f32;
+  auto get_tot_low_a()      const -> f32;
+  auto get_tot_low_b()      const -> f32;
+  auto get_tot_high_a()     const -> f32;
+  auto get_tot_high_b()     const -> f32;
+  auto get_tot_slp_low_a()  const -> f32;
+  auto get_tot_slp_low_b()  const -> f32;
+  auto get_tot_slp_high_a() const -> f32;
+  auto get_tot_slp_high_b() const -> f32;
+  auto get_charge_min_i()   const -> f32;
+  auto get_x_pos()          const -> f32;
+  auto get_t_avg()          const -> f32;
   /// get the interaction time of the particle,
   /// not accounting for cable len and global phase
-  auto get_t0_relative()  const -> f32;
-  auto get_timestamp48()  const -> f64;
+  auto get_t0_relative()    const -> f32;
+  auto get_timestamp48()    const -> f64;
 
   /// The paddle length will not be in the packet,
   /// but has to be added after the fact
@@ -300,6 +308,16 @@ struct TofHit  {
     u16 peak_b;
     u16 charge_a;
     u16 charge_b;
+    // New variables added to TOFHit for 2025/26 flight. JAZ
+    u16 tot_low_a;
+    u16 tot_low_b;
+    u16 tot_high_a;
+    u16 tot_high_b;
+    u16 tot_slp_low_a;
+    u16 tot_slp_low_b;
+    u16 tot_slp_high_a;
+    u16 tot_slp_high_b;
+
     u16 charge_min_i;
     u16 x_pos;
     u16 t_average;
@@ -310,6 +328,15 @@ struct TofHit  {
     f32 peak_b_f32   = 0;
     f32 charge_a_f32 = 0;
     f32 charge_b_f32 = 0;
+    // New variables added to TOFHit for 2025/26 flight. JAZ
+    f32 tot_low_a_f32       = 0;
+    f32 tot_low_b_f32       = 0;
+    f32 tot_high_a_f32      = 0;
+    f32 tot_high_b_f32      = 0;
+    f32 tot_slp_low_a_f32   = 0;
+    f32 tot_slp_low_b_f32   = 0;
+    f32 tot_slp_high_a_f32  = 0;
+    f32 tot_slp_high_b_f32  = 0;
 };
 
 /**

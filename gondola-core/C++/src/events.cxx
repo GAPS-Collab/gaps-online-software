@@ -1197,6 +1197,78 @@ f32 TofHit::get_charge_b() const {
   }
 }
 
+f32 TofHit::get_tot_low_a() const {
+ if (version == Gaps::ProtocolVersion::Unknown) {
+   f32 prec = 0.004;
+   return prec*tot_low_a;
+ } else {
+   return tot_low_a_f32;
+ }
+}
+
+f32 TofHit::get_tot_low_b() const {
+  if (version == Gaps::ProtocolVersion::Unknown) {
+    f32 prec = 0.004;//ns
+    return prec*tot_low_b;
+  } else {
+    return tot_low_b_f32;
+  }
+}
+
+f32 TofHit::get_tot_high_a() const {
+ if (version == Gaps::ProtocolVersion::Unknown) {
+   f32 prec = 0.004;
+   return prec*tot_high_a;
+ } else {
+   return tot_high_a_f32;
+ }
+}
+
+f32 TofHit::get_tot_high_b() const {
+  if (version == Gaps::ProtocolVersion::Unknown) {
+    f32 prec = 0.004;//ns
+    return prec*tot_high_b;
+  } else {
+    return tot_high_b_f32;
+  }
+}
+
+f32 TofHit::get_tot_slp_low_a() const {
+ if (version == Gaps::ProtocolVersion::Unknown) {
+   f32 prec = 0.004;
+   return prec*tot_slp_low_a;
+ } else {
+   return tot_slp_low_a_f32;
+ }
+}
+
+f32 TofHit::get_tot_slp_low_b() const {
+  if (version == Gaps::ProtocolVersion::Unknown) {
+    f32 prec = 0.004;//ns
+    return prec*tot_slp_low_b;
+  } else {
+    return tot_slp_low_b_f32;
+  }
+}
+
+f32 TofHit::get_tot_slp_high_a() const {
+ if (version == Gaps::ProtocolVersion::Unknown) {
+   f32 prec = 0.004;
+   return prec*tot_slp_high_a;
+ } else {
+   return tot_slp_high_a_f32;
+ }
+}
+
+f32 TofHit::get_tot_slp_high_b() const {
+  if (version == Gaps::ProtocolVersion::Unknown) {
+    f32 prec = 0.004;//ns
+    return prec*tot_slp_high_b;
+  } else {
+    return tot_slp_high_b_f32;
+  }
+}
+
 f32 TofHit::get_charge_min_i() const {
   f32 prec = 0.002;// minI
   return prec*charge_min_i - 10;
@@ -1263,20 +1335,27 @@ auto TofHit::from_bytestream(const Vec<u8> &bytestream,
  hit.peak_b_f32     = Gaps::parse_f16(bytestream, pos); 
  hit.charge_a_f32   = Gaps::parse_f16(bytestream, pos); 
  hit.charge_b_f32   = Gaps::parse_f16(bytestream, pos); 
- hit.charge_min_i   = Gaps::parse_u16(bytestream, pos); 
+ hit.tot_low_a_f32  = Gaps::parse_f16(bytestream, pos); 
  hit.baseline_a     = Gaps::parse_f16(bytestream, pos);
  hit.baseline_a_rms = Gaps::parse_f16(bytestream, pos);
  hit.phase          = Gaps::parse_f16(bytestream, pos);
  pos += 1; // skip version
  hit.baseline_b     = Gaps::parse_f16(bytestream, pos);
  hit.baseline_b_rms = Gaps::parse_f16(bytestream, pos);
+ hit.tot_low_b_f32  = Gaps::parse_f16(bytestream, pos); 
+ hit.tot_high_a_f32 = Gaps::parse_f16(bytestream, pos); 
+ hit.tot_high_b_f32 = Gaps::parse_f16(bytestream, pos); 
+ hit.tot_slp_low_a_f32  = Gaps::parse_f16(bytestream, pos); 
+ hit.tot_slp_low_b_f32  = Gaps::parse_f16(bytestream, pos); 
+ hit.tot_slp_high_a_f32 = Gaps::parse_f16(bytestream, pos); 
+ hit.tot_slp_high_b_f32 = Gaps::parse_f16(bytestream, pos); 
  
  // FIXME checks - packetlength, checksum ?
  //if (version == 64) {
  //  pos +=   
  //}
  // skip new variables for now
- pos += 14;
+ //pos += 10;
  u16 tail = Gaps::parse_u16(bytestream, pos);
  if (tail != TAIL) {
    spdlog::error("VERSION {}", version); 
