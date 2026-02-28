@@ -1,3 +1,5 @@
+#ifndef EVENTGAPS
+#define EVENTGAPS
 /* ROOT Stuff for plotting traces */
 #include <TDirectory.h>
 #include <TGraph.h>
@@ -12,8 +14,6 @@
 #include <legacy.h>
 #include "./constants.h"
 
-#ifndef EVENTGAPS
-#define EVENTGAPS
 
 #define ERRVAL		(999999999)
 
@@ -30,6 +30,8 @@
 enum THRTYPE { CONSTANT, CFD_ELEC, CFD_SIMPLE, PCONSTANT, PCFD };
 
 //double Pulse(double *x, double *par);
+
+using namespace GAPS;
 
 class EventGAPS {
 
@@ -49,6 +51,7 @@ public:
   void    SetPaddleMap(struct PaddleInfo *pad, struct SiPMInfo *sipm);
   
   // Stuff related to the actual data
+  void    FillEventValues(struct EventInfo *evt);
   void    AnalyzePedestals(float Ped_begin, float Ped_win);
   void    SetThreshold(float PmtThreshold);
   void    SetCFDFraction(float CFDS_frac);
@@ -122,6 +125,9 @@ private:
   float   QInt[NTOT];                 // Pulse charge value
   float   TDC[NTOT];                  // TDC value (CFD method)
   float   TDC_Cor[NTOT];              // Corrected TDC value (CFD method)
+
+  float   TotLo[NPAD][2];             // TOT values (lo threshold)
+  float   TotHi[NPAD][2];             // TOT values (hi threshold)
   
   bool    IsHit[NPAD];                // Do we have Hit info?
   int     Hits[NPAD];                 // Hit mask for paddle 
@@ -143,6 +149,8 @@ private:
   TH1D    *Charge_cut[NTOT];           // Charge (cut) histograms
   TH1D    *tdcCFD[NTOT];               // TDC histograms
   
+  TH1D    *totLo[NTOT][2];             // TOT (lo) histograms
+  TH1D    *totHi[NTOT][2];             // TOT (hi) histograms
   TH2D    *QEnd2End[NPAD];             // End 2 End charge 
   TH1I    *HitMask[NPAD];              // Hit mask of paddle
   TH1D    *tDiff[NPAD];                // tdc diff of paddle ends
@@ -160,11 +168,7 @@ private:
   TProfile *QvPositionB[NPAD];         // Q vs position - End B
   TH1I    *FirstPaddle;
   TH1F    *FirstTime;
-  TH1F    *FirstTimeBad;
-  TH1F    *BetaDist1;
-  TH1F    *BetaDist2;
-  TH1F    *BetaDist3;
-  TH1F    *BetaDist4;
+  TH1F    *BetaDist;
   TH1I    *NPaddlesCube;
   TH1I    *NPaddlesUmbrella;
   TH1I    *NPaddlesCortina;
@@ -177,8 +181,6 @@ private:
   TH1F    *H_OffCorW[NCORT][NCUBS]; // 8 Cube, 10 Cortina paddles
   
   // MEMBER FUNCTIONS
-  void    Message(const char *s);           // Print out messages as needed
-  // Stuff related to the peaks
 };
 
 #endif

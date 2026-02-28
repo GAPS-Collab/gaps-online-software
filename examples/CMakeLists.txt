@@ -32,6 +32,40 @@ endforeach()
 
 # sd-legacy reader needs ROOT
 if (BUILD_CXX_WITH_ROOT)
+  set(example "analyzeGAPS")
+  add_executable(${example}
+    ${CMAKE_CURRENT_SOURCE_DIR}/C++/${example}.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/C++/../../analysis/zweerink/src/EventGAPS.cpp
+  )
+  set_property(TARGET ${example} PROPERTY CXX_STANDARD 20)
+  target_include_directories(${example} 
+                            SYSTEM PUBLIC
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../analysis/zweerink/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/result/
+                            $<$<BOOL:${BUILD_CXX_DB}>:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/sqlite_orm/include/sqlite_orm>
+                            $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_INCLUDE_DIRS}>
+  
+  )
+  target_include_directories(${example}
+                             PUBLIC
+                               ${CMAKE_CURRENT_SOURCE_DIR}/../gondola-core/C++/include
+  )                          
+  target_link_libraries(${example}
+                        PRIVATE
+                        ${GONDOLA_LIBRARY_SHARED}
+                        $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARY_SHARED}>
+  )
+  install(TARGETS ${example}
+          DESTINATION ${INSTALL_EXAMPLES_DIR}
+  )
+
+    
+endif()
+
+# sd-legacy reader needs ROOT
+if (BUILD_CXX_WITH_ROOT)
   set(example "sd-legacy-reader")
   add_executable(${example}
     ${CMAKE_CURRENT_SOURCE_DIR}/C++/${example}.cxx
@@ -61,6 +95,7 @@ if (BUILD_CXX_WITH_ROOT)
 
     
 endif()
+
 #
 #if (BUILD_CXXDB)
 #  # no longer just a paddle example, but also has tracker strips now

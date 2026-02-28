@@ -80,69 +80,22 @@ int main(int argc, char *argv[]){
   }
   auto fname   = result["file"].as<std::string>();
   bool verbose = result["verbose"].as<bool>();
+
   // -> Gaps relevant code starts here
  
   read_events();  // List of event numbers to plot
 
+  // Read in the specified calibration files
   auto calname = result["calibration"].as<std::string>();
-  gondola::RBCalibration cali[NRB]; // "cali" stores values for one RB
-
-  // To read calibration data from individual binary files, when -c is
-  // given with the directory of the calibration files. Since the
-  // calibration files for each RB change with each calibration run,
-  // this code reads the list of calibration files in the directory,
-  // determines the RB number and copies the string into the relevant
-  // array position. For RBs with no calibration file, the length of
-  // the entry will be 0. We then use read the calibrations for all
-  // RBs with files.
-  bool RB_Calibrated[NRB] = { false };
-  std::string cnames[NRB];
+  std::map<u8,gondola::RBCalibration> cali;
   if (calname != "") {
-    char pname[500], line[500];
-    snprintf(pname,450, "ls %s/RB*.cali.tof.gaps", calname.c_str());
-    FILE *fp = popen(pname, "r");
-    while (fscanf(fp,"%s", line) != EOF) {
-      std::string c_name(line);          // Calib file found
-      int position = c_name.find("RB");  // Find "RB" in the name
-      std::string rbstr = c_name.substr(position+2, 2); // Extract RB num
-      int rbnum = atoi(rbstr.data());    // Convert to integer
-      //printf("%s %d %s\n", rbstr.c_str(), rbnum, line);
-      cnames[rbnum] = c_name;            // Copy to proper place in array
-    }
-    pclose(fp);
-    // Print out the calibration filenames as a sanity check
-    //for (int i=0; i<NRB; i++) {
-    //printf("%d: %lu %s\n", i, cnames[i].size(), cnames[i].c_str());
-    //}
-    
-    for (int i=1; i<NRB; i++) {
-      if (cnames[i].size() > 4) { // RB has a calibration file
-	std::string f_str = cnames[i];
-	//spdlog::info("Extracting RB data from file {}", f_str);
-	
-	// Read the packets from the file
-	//if ( std::filesystem::exists(f_str) ) {
-	//printf("%s file exists\n", f_str.c_str() );
-	//}
-	// Before proceeding, check that the file exists. 
-	struct stat buffer; 
-	if ( stat(f_str.c_str(), &buffer) != -1 ) {
-	  auto packet = get_tofpackets(f_str);
-	  spdlog::info("We loaded {} packets from {}", packet.size(), f_str);
-	  // Loop over the packets (should only be 1) and read into storage
-	  for (auto const &p : packet) {
-	    //int ctr=0;
-	    if (p.packet_type == PacketType::RBCalibration) {
-	      // Should have the one calibration tofpacket stored in "packet".
-	      usize pos = 0;
-	      cali[i] = gondola::RBCalibration::from_bytestream(p.payload, pos); 
-	    }
-	  }
-	}
-      } //else {printf("File does not exist: %s\n", f_str.c_str());}
-    }
+    // obviously here we have to get all the calibration files,           
+    // but for the sake of the example let's use only one                
+    // Ultimatly, they will be stored in the stream.                 
+    spdlog::info("Will use calibrations from {}", calname);
+    cali = gondola::load_tof_calibrations(calname);
   }
-
+  
   // Some useful variables (some initialized to default values)
   // but overwritten from file (if it exists)
   float Ped_low   = 350;
@@ -194,10 +147,6 @@ int main(int argc, char *argv[]){
   x_sc_hi =  500.0;    // in ns
   y_sc_lo =  -20.0;    // in mV
   y_sc_hi =   40.0;    // in mV
-  //y_sc_lo = -500.0;    // in mV
-  //y_sc_hi = 1500.0;    // in mV
-  //x_sc_lo =  -9999;    // in ns
-  //x_sc_hi =  -9999;    // in ns
 
   float factor = 1.0;
   x_scr_lo =   50.0;    // in ns                                          
@@ -213,98 +162,72 @@ int main(int argc, char *argv[]){
     // there will be a more generic way to unpack TofPackets in the future
     // for now we have to use the packet_type field
     switch (p.packet_type) {
-      case PacketType::RBCalibration : {
-	// if you have the packet payload, the second argument 
-	// (position in stream) will always be 0
-	//
-	// pos keeps track of the current position in bytestream, 
-	// thus passed by reference so we need an rvalue
-	//
-	// the usize is a typedef from tof_typedefs.h and used
-	// to make the rust and C++ code look more similar, so that 
-	// is easier to compare them.
-	usize pos = 0;
-	auto cali = gondola::RBCalibration::from_bytestream(p.payload, pos);
-	if (verbose) {
-	  std::cout << cali << std::endl;
-	}
-	n_rbcalib++;
+    case PacketType::RBCalibration : {
+      // if you have the packet payload, the second argument 
+      // (position in stream) will always be 0
+      //
+      // pos keeps track of the current position in bytestream, 
+      // thus passed by reference so we need an rvalue
+      //
+      // the usize is a typedef from tof_typedefs.h and used
+      // to make the rust and C++ code look more similar, so that 
+      // is easier to compare them.
+      usize pos = 0;
+      auto cali = gondola::RBCalibration::from_bytestream(p.payload, pos);
+      if (verbose) {
+	std::cout << cali << std::endl;
+      }
+      n_rbcalib++;
       break;
     }
-      // this only works for the data I combined
-      // recently, NOT for the "stream" kind of data
-      // THe format will change as well soon.
-      case PacketType::TofEvent : {
-
-	usize pos = 0;
-	//std::vector<GAPS::Waveform> wave;
-	//wave.reserve(NTOT); // Number of SiPMs
-	//wch9.reserve(NRB);  // Number of RBs
-	usize ch_start;
-	int nrbs=0;
-	// Delete any waveforms 
-	for (int i=0;i<NTOT;i++) wave[i] = NULL;
-	for (int i=0;i<NRB;i++)  wch9[i] = NULL;
-	//for(int c=0;c<NTOT;c++) 
-	// if ( wave[c] != NULL ) { delete wave[c]; wave[c] = NULL; }
-	//for(int c=0;c<NRB;c++) 
-	//  if ( wch9[c] != NULL ) { delete wch9[c]; wch9[c] = NULL; }
+      
+    // this only works for the data I combined
+    // recently, NOT for the "stream" kind of data
+    // THe format will change as well soon.
+    case PacketType::TofEvent : 
+    case PacketType::TofEventSummary : {
+      
+      usize pos = 0;
+      usize ch_start;
+      int nrbs=0;
+      // Delete any waveforms 
+      for (int i=0;i<NTOT;i++) wave[i] = NULL;
+      for (int i=0;i<NRB;i++)  wch9[i] = NULL;
+      
+      auto ev_res = TofEvent::from_bytestream(p.payload, pos);
+      TofEvent ev;
+      if (ev_res.is_ok()) {
+	ev = ev_res.unwrap();
+      }
+      //unsigned long int evt_ctr = ev.mt_event.event_id;
+      unsigned long int evt_ctr = ev.event_id;
+      printf("%ld.", evt_ctr); fflush(stdout);
+      
+      // Now, let's plot the data to see what it looks like
+      int PLOT_EVENT = event_flag(evt_ctr);
+      if (PLOT_EVENT) {
 	
-	
-    auto ev_res = TofEvent::from_bytestream(p.payload, pos);
-	TofEvent ev;
-    if (ev_res.is_ok()) {
-      ev = ev_res.unwrap();
-    }
-    unsigned long int evt_ctr = ev.mt_event.event_id;
-	printf("%ld.", evt_ctr); fflush(stdout);
-	// Now, let's plot the data to see what it looks like
-	int PLOT_EVENT = event_flag(evt_ctr);
-	//ch_start = 0;
-	if (PLOT_EVENT) {
-
 	for (auto const &rbid : ev.get_rbids()) {
 	  RBEvent rb_event = ev.get_rbevent(rbid);
 	  if (verbose) {
 	    std::cout << rb_event << std::endl;
           }
-	  //printf(" %d (%d)\n", rbid, rb_event.header.channel_mask);
 	  int ch_mask = rb_event.header.channel_mask;
 	  // Now that we know the RBID, we can set the starting ch_no
 	  // Eventually we will use a function to map RB_ch to GAPS_ch
 	  ch_start = (rbid-1)*NCH; // first RB is #1
-	  //printf("Event %ld: RB %d: start %ld\n", evt_ctr, rbid, ch_start);
-
+	  
 	  Vec<Vec<f32>> volts;
 	  Vec<Vec<f32>> times;
-	  //if ((calname != "") && rbid < 44 ){
-	  //if ((calname != "") && cali.rb_id == rbid ){
 	  if (calname != "") { // For combined data all boards calibrated
-	  /*if (calname != "" &&  // For combined data all boards calibrated
-	      ( rbid==3  || rbid==14 || rbid==15 || rbid==32 || // Umb-cen
-		rbid==16 || rbid==25 || rbid==44 || rbid==46 || // cube-top
-		rbid==1  || rbid==11 || rbid==41 || rbid==42 ) ) {// cube-bot
-	  */
-	  /*if (calname != "" &&  // For combined data all boards calibrated
-              ( rbid==17  || rbid==19 || rbid==13 || rbid==20 || 
-                rbid==26) ) {// RBs with strange 
-          */
-	 // if (calname != "" &&  // For combined data all boards calibrated
-         //     ( rbid==13 || rbid==20 || 
-         //       rbid==26) ) {// RBs with strange 
-
-
-
-
 	    nrbs++;
 	    // Vec<f32> is a typedef for std::vector<float32>
-	    //printf(" %d (%d)", rbid, rb_event.header.channel_mask);
 	    volts = cali[rbid].voltages(rb_event, true); // second argument is for spike cleaning
 	    // (C++ implementation causes a segfault sometimes when "true"
 	    times = cali[rbid].nanoseconds(rb_event);
 	    // volts and times are now ch 0-8 with the waveforms
 	    // for this event.
-
+	    
 	    // First, store the waveform for channel 9
 	    Vec<f64> ch9_volts(volts[8].begin(), volts[8].end());
 	    Vec<f64> ch9_times(times[8].begin(), times[8].end());
@@ -313,11 +236,9 @@ int main(int argc, char *argv[]){
 	    wch9[rbid]->SetPedRange(100);
 	    wch9[rbid]->CalcPedestalRange(); 
 	    float ch9RMS = wch9[rbid]->GetPedsigma();
-	    //printf(" %d(%.1f)", rbid, ch9RMS);
 	    
 	    // Now, deal with all the SiPM data
 	    for(int c=0;c<NCH;c++) {
-	      //bool e = (ch_mask & (1 << c) > 0 ? true : false);
 	      unsigned int inEvent = ch_mask & (1 << c);
 	      if (inEvent > 0 ) {
 		Vec<f64> ch_volts(volts[c].begin(), volts[c].end());
@@ -336,118 +257,110 @@ int main(int argc, char *argv[]){
 		if (wave[cw]->GetPedsigma() < 60.6) {
 		  wave[cw]->FindPeaks(Qwin_low, Qwin_size);
 		  wave[cw]->FindTdc(0, CFD_SIMPLE);
-		  //wave[cw]->FindTdc(0, CONSTANT);
-		  //printf("%ld: %ld - %7.3f\n",evt_ctr,cw,wave[cw]->GetTdcs(0));
 		}
-		//if (c==0) printf("%ld(%.2f) ", cw, wave[cw]->GetPedestal());
 	      } // Only for channels in ch_mask for this RB
 	    }
 	  }
 	}
 	
 	n_chan = NTOT;
-	// Now, let's plot the data to see what it looks like
-	//int PLOT_EVENT = event_flag(evt_ctr);
-	//ch_start = 0;
-	//if (PLOT_EVENT) {
-	  //printf(".%ld", evt_ctr); fflush(stdout);
-	  //plotrb(n_chan, ch_start);
-	  plotall(n_chan, nrbs);
-	  
-	  if (plot_flag != FINISH) {
-	    while (gui_wait() != NEXT) {
-	      switch (mainWin.status) {
-	      case QUIT : {
-		return (0);
-		break;
-	      }
-	      case SELECT : {
-		int chan=atoi(mainWin.GetText());
-		if (chan < 0 || chan >= n_chan) {
-		  std::cout << " Ch must be between 0 and " <<
-		    n_chan-1 << std::endl;
-		} else {
-		  plot_flag = SELECT;
-		  plot_ch = chan;
-		  plotall(n_chan, nrbs);
-		}
-		break;
-	      }
-	      case ALLCH : {
-		plot_flag = ALLCH;
+	
+	plotall(n_chan, nrbs);
+	
+	if (plot_flag != FINISH) {
+	  while (gui_wait() != NEXT) {
+	    switch (mainWin.status) {
+	    case QUIT : {
+	      return (0);
+	      break;
+	    }
+	    case SELECT : {
+	      int chan=atoi(mainWin.GetText());
+	      if (chan < 0 || chan >= n_chan) {
+		std::cout << " Ch must be between 0 and " <<
+		  n_chan-1 << std::endl;
+	      } else {
+		plot_flag = SELECT;
+		plot_ch = chan;
 		plotall(n_chan, nrbs);
-		break;
 	      }
-	      case PRINT : {
-		cm->Print("histo.pdf");
-		break;
-	      }
-	      case FINISH : {
-		plot_flag = FINISH;
-		break;
-	      }
-	      case RESTRICT : {
-		restrict_range = (restrict_range == 1 ? 0 : 1);
-		break;
-	      }
-	      case FIT : {
-		for (int c = 0; c < n_chan; c++) {
-		  if (plot_flag == ALLCH ||
-		      (plot_flag == SELECT && plot_ch == c)) {
-		    cm->cd(c+1);
-		    //wave[c]->FindPeaks(L.pulse_lo[c],L.pulse_win[c]);
-		    //if (wave[c]->GetNumPeaks() > 0)
-		    // wave[c]->PlotFit();
-		  }
+	      break;
+	    }
+	    case ALLCH : {
+	      plot_flag = ALLCH;
+	      plotall(n_chan, nrbs);
+	      break;
+	    }
+	    case PRINT : {
+	      cm->Print("histo.pdf");
+	      break;
+	    }
+	    case FINISH : {
+	      plot_flag = FINISH;
+	      break;
+	    }
+	    case RESTRICT : {
+	      restrict_range = (restrict_range == 1 ? 0 : 1);
+	      break;
+	    }
+	    case FIT : {
+	      for (int c = 0; c < n_chan; c++) {
+		if (plot_flag == ALLCH ||
+		    (plot_flag == SELECT && plot_ch == c)) {
+		  cm->cd(c+1);
+		  //wave[c]->FindPeaks(L.pulse_lo[c],L.pulse_win[c]);
+		  //if (wave[c]->GetNumPeaks() > 0)
+		  // wave[c]->PlotFit();
 		}
-		cm->Update();
-		break;
 	      }
-	      }
-	    }		  
-	  } // Move on to the next RB
-	} 
-	for (int i=0;i<NTOT;i++) //{delete wave[i]; wave[i] = NULL;}
-	  if ( wave[i] != NULL ) { delete wave[i]; wave[i] = NULL; }
-	for (int i=0;i<NRB;i++)  //{delete wch9[i]; wch9[i] = NULL;}
-	  if ( wch9[i] != NULL ) { delete wch9[i]; wch9[i] = NULL; }
-	n_tofevents++;
-        break;
+	      cm->Update();
+	      break;
+	    }
+	    }
+	  }		  
+	} // Move on to the next RB
+      } 
+      for (int i=0;i<NTOT;i++) 
+	if ( wave[i] != NULL ) { delete wave[i]; wave[i] = NULL; }
+      for (int i=0;i<NRB;i++)  
+	if ( wch9[i] != NULL ) { delete wch9[i]; wch9[i] = NULL; }
+      n_tofevents++;
+      break;
+    }
+    case PacketType::RBMoni : {
+      usize pos = 0;
+      auto moni = RBMoniData::from_bytestream(p.payload, pos);
+      if (verbose) {
+	std::cout << moni << std::endl;
       }
-      case PacketType::RBMoni : {
-        usize pos = 0;
-        auto moni = RBMoniData::from_bytestream(p.payload, pos);
-        if (verbose) {
-          std::cout << moni << std::endl;
-        }
-        n_rbmoni++;
-        break;
+      n_rbmoni++;
+      break;
+    }
+    case PacketType::MasterTrigger : {
+      usize pos = 0;
+      auto mte = MasterTriggerEvent::from_bytestream(p.payload, pos);
+      if (verbose) {
+	std::cout << mte << std::endl;
       }
-      case PacketType::MasterTrigger : {
-        usize pos = 0;
-        auto mte = MasterTriggerEvent::from_bytestream(p.payload, pos);
-        if (verbose) {
-          std::cout << mte << std::endl;
-        }
-        n_mte++;
-        break;
+      n_mte++;
+      break;
+    }
+    case PacketType::MTBMoni : {
+      usize pos = 0;
+      auto mtbmoni = MtbMoniData::from_bytestream(p.payload, pos);
+      if (verbose) {
+	std::cout << mtbmoni << std::endl;
       }
-      case PacketType::MTBMoni : {
-        usize pos = 0;
-        auto mtbmoni = MtbMoniData::from_bytestream(p.payload, pos);
-        if (verbose) {
-          std::cout << mtbmoni << std::endl;
-        }
-        n_mtbmoni++;
-        break;
+      n_mtbmoni++;
+      break;
+    }
+    default : {
+      if (verbose) {
+	std::cout << "-- nothing to do for " << p.packet_type << " --" << std::endl;
       }
-      default : {
-        if (verbose) {
-          std::cout << "-- nothing to do for " << p.packet_type << " --" << std::endl;
-        }
-        n_unknown++;
-        break;
-      }
+      n_unknown++;
+      break;
+    }
     }
   }
   
@@ -460,7 +373,7 @@ int main(int argc, char *argv[]){
   std::cout << "-- -- TofCmpMoniData    : " << n_tcmoni  << "\t (packets) " <<  std::endl;
   std::cout << "-- -- MtbMoniData       : " << n_mtbmoni << "\t (packets) " <<  std::endl;
   std::cout << "-- -- undecoded         : " << n_unknown << "\t (packets) " <<  std::endl;
-
+  
   spdlog::info("Finished");
   return EXIT_SUCCESS;
 }

@@ -71,15 +71,19 @@ int main(int argc, char *argv[]){
     fnames[nfiles++] = fname;
   }
 
-  // Print out the filenames as a sanity check
-  //std::cout << fnames[0] << std::endl;
-  //for(int k=1;k<nfiles;k++) std::cout << fnames[k] << std::endl;
-  //return (0);
-  
   // -> Gaps relevant code starts here
   auto calname = result["calibration"].as<std::string>();
-  gondola::RBCalibration cali[NRB]; // "cali" stores values for one RB
+  std::map<u8,gondola::RBCalibration> cali;
+  if (calname != "") {
+    // obviously here we have to get all the calibration files,           
+    // but for the sake of the example let's use only one                
+    // Ultimatly, they will be stored in the stream.                 
+    spdlog::info("Will use calibrations from {}", calname);
+    cali = gondola::load_tof_calibrations(calname);
+  }
 
+  /*
+  gondola::RBCalibration cali[NRB]; // "cali" stores values for one RB
   // To read calibration data from individual binary files, when -c is
   // given with the directory of the calibration files. Since the
   // calibration files for each RB change with each calibration run,
@@ -133,7 +137,7 @@ int main(int argc, char *argv[]){
 	}
       }
     }
-  }
+  } */
 
   // Some useful variables (some initialized to default values)
   // but overwritten from file (if it exists)
@@ -243,7 +247,8 @@ int main(int argc, char *argv[]){
       // this only works for the data I combined
       // recently, NOT for the "stream" kind of data
       // THe format will change as well soon.
-      case PacketType::TofEvent : {
+      case PacketType::TofEvent : 
+      case PacketType::TofEventSummary : {
 
         usize pos = 0;
 	// We need a structure to hold the waveforms for an event. We
@@ -261,7 +266,8 @@ int main(int argc, char *argv[]){
       continue;
     }
     auto ev = ev_res.unwrap();
-    unsigned long int evt_ctr = ev.mt_event.event_id;
+    //unsigned long int evt_ctr = ev.mt_event.event_id;
+    unsigned long int evt_ctr = ev.event_id;
 	if (verbose) {
           //std::cout << ev << std::endl;
 	}
@@ -274,20 +280,6 @@ int main(int argc, char *argv[]){
 	  printf(" %ld %ld %d %d\n", evt_ctr, evt_ctr,
 		 ev.header.timestamp32, ev.header.n_paddles);
 	}
-	/*for (int k=0;k<NRB;k++) {
-	  if (k%9==0) printf("\n");
-	  int n = ev.rb_events[k].header.rb_id;
-	  printf(" %3d(%3d)", n, ev.rb_events[k].header.channel_mask);
-	}*/
-	//Vec<std::tuple<u8,u8,u8>> ltbmap = ev.mt_event.get_dsi_j_ch();
-	//std::cout << get<0>(ltbmap[1]) << get<1>(ltbmap[2])
-	//	  << get<2>(ltbmap[1]) << std::endl;
-	//for (auto const& ltbmapi : ltbmap) {
-	//std::cout << std::get<1>(ltbmapi) <<" "<< std::get<2>(ltbmapi)<<" ";
-	  //for (auto k = std::begin(ltbmap); k != std::end(ltbmap); ++k) {
-	  //  std::cout << std::get<1>(*k) << " "<< std::get<2>(*k)<< " ";
-	//}
-	//printf(" %3d(%3d)", k, ev.mt_event.board_mask[k]);
 	
 	for (auto const &rbid : ev.get_rbids()) {
 	  RBEvent rb_event = ev.get_rbevent(rbid);
@@ -305,7 +297,8 @@ int main(int argc, char *argv[]){
 	  Vec<Vec<f32>> times;
 	  //if ((calname != "") && cali.rb_id == rbid ){
 	  //if (calname != "") { // For combined data all boards calibrated
-	  if (RB_Calibrated[rbid]) { // Have cali data for this RBID
+          if (cali.contains(rbid)) {
+	    //if (RB_Calibrated[rbid]) { // Have cali data for this RBID
 	    // Vec<f32> is a typedef for std::vector<float32>
 	    volts = cali[rbid].voltages(rb_event, true); //second argument is for spike cleaning
 	    // (C++ implementation causes a segfault sometimes when "true"
@@ -318,52 +311,11 @@ int main(int argc, char *argv[]){
 	    // Before making waveforms, lets calculate the ch9
 	    // phase. For now, if we have ch9 data for this RB, we
 	    // want to analyze it.
-	    if (0) {
-	      printf("Phase: %d %d(%d) %u %u %u %d - ",
-		     rb_event.header.event_id, rbid,
-		     rb_event.header.rb_id,
-		     rb_event.header.ch9_amp,
-		     rb_event.header.ch9_freq, rb_event.header.ch9_phase,
-		     rb_event.header.stop_cell);
-	    }
 	    Phi[rbid] = FitSine(ch9_volts,ch9_times);
-	    //printf("Fhase: %d - %7.4f\n", rbid, Phi[rbid]);
-
-	    if (pr_evt) {
-	      //std::cout << "Type " << p.packet_type;
-	      //printf(" %d %d %d %d\n", hdr->counter, mev.event_id,
-	      //       hdr->timestamp, rb_event.n_trigger_paddles);
-	      //printf(" %ld %ld %d %ld\n", evt_ctr, evt_ctr,
-	      //	   ev.header.timestamp32, rb_event.hits.size());
-	      auto sfit = rb_event.header.get_sine_fit();
-	      //for (int j=0; j<3; j++) printf(" %7.4f",sfit[j]); printf("\n");
-	      for (int i=0; i<rb_event.hits.size(); i++) {
-                printf("%3d",rb_event.hits[i].paddle_id);
-                printf(" %7.2f %7.2f %7.2f %7.2f %6.2f %6.2f",
-		  rb_event.hits[i].get_time_a(), rb_event.hits[i].get_time_b(),
-		  rb_event.hits[i].get_peak_a(), rb_event.hits[i].get_peak_b(),
-		  rb_event.hits[i].get_charge_a(),
-		  rb_event.hits[i].get_charge_b());
-                printf(" %7.4f %5.2f %5.2f %4.2f %4.2f\n",
-		  //sfit[2], rb_event.hits[i].baseline_a,
-		  Phi[rbid], rb_event.hits[i].baseline_a,
-		  rb_event.hits[i].baseline_b, rb_event.hits[i].baseline_a_rms,
-		  rb_event.hits[i].baseline_b_rms);
-	      }
-	    }
 
 	    // Now, initialize the ch9 Waveform for this RB. 
 	    wch9[rbid] = new GAPS::Waveform(ch9_volts.data(),
 					    ch9_times.data(), rbid,0);
-	    /*
-	    double av1=0.0, av2=0.0;
-	    for (int k=0;k<5;k++) {
-	      av1 += ch9_times.data()[8+k];
-	      av2 += ch9_times.data()[998+k];
-	    }
-	    printf("Ch9 %d : %.3f - %.3f %d\n", rbid, av1/5.0, av2/5.0,
-	    rb_event.header.stop_cell); */
-	    //printf(" %d %d", rbid, rb_event.header.stop_cell);
 	    
 	    // Now, deal with all the SiPM data
 	    for(int c=0;c<NCH;c++) {
@@ -374,21 +326,11 @@ int main(int argc, char *argv[]){
 		Vec<f64> ch_times(times[c].begin(), times[c].end());
 		wave[cw] = new GAPS::Waveform(ch_volts.data(),
 					      ch_times.data(), cw,0);
-		/*
-		av1=0; av2=0;
-		for (int k=0;k<5;k++) {
-		  av1 += ch_times.data()[8+k];
-		  av2 += ch_times.data()[998+k];
-		}
-		printf("\tRB %d %ld : %.3f - %.3f\n",rbid,cw,av1/5.0,av2/5.0);
-		*/
 	      }
 	    }
 	  }
 	}
-	//printf("\n");
 
-	//if ( evt_ctr>2989817 && evt_ctr<2989917 ) {
 	// Now that we have the waveforms in place, analyze the event.
 	Event.InitializeVariables(evt_ctr);
 	Event.InitializeWaveforms(wave, wch9);
@@ -424,9 +366,10 @@ int main(int argc, char *argv[]){
 	n_tofevents++;
         break;
       }
-      case PacketType::TofEventSummary : {
+	/*case PacketType::TofEventSummary : {
         usize pos = 0;
-        auto tes_res = TofEventSummary::from_bytestream(p.payload, pos);
+        auto tes_res = TofEvent::from_bytestream(p.payload, pos);
+        //auto tes_res = TofEventSummary::from_bytestream(p.payload, pos);
         if (!tes_res.is_ok()) {
           spdlog::error("Unable to unpack TofEventSummary!");
           continue;
@@ -438,7 +381,7 @@ int main(int argc, char *argv[]){
         }
         n_tes++;
         break;
-      }
+      } */
       case PacketType::RBMoni : {
         usize pos = 0;
         auto moni = RBMoniData::from_bytestream(p.payload, pos);
