@@ -69,7 +69,7 @@ var NAVTREEINDEX =
 "structGaps_1_1Telemetry_1_1Cooling.html#ab19ff509dddfe24b14f9fe3fdd97c697",
 "structGaps_1_1TofPaddle.html#adc8f64157c41f156fb6c1083f6cc2ccc",
 "structTofEvent.html",
-"structstd_1_1formatter_3_01EventStatus_01_4.html#a5ed71d9e6af5d57a187cf2d63264a351"
+"structgondola_1_1TofPaddleTimingConstant.html#a9c980eb9c5630d0f89ba6f4a9eb82992"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

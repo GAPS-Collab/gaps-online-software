@@ -1,5 +1,13 @@
 var NAVTREEINDEX5 =
 {
+"structgondola_1_1TofPaddleTimingConstant.html#a9c980eb9c5630d0f89ba6f4a9eb82992":[4,0,1,5,6],
+"structgondola_1_1TofPaddleTimingConstant.html#a9c980eb9c5630d0f89ba6f4a9eb82992":[2,0,1,5,6],
+"structgondola_1_1TofPaddleTimingConstant.html#aa29a9f705115e6d52d424bec0bb99cd0":[4,0,1,5,5],
+"structgondola_1_1TofPaddleTimingConstant.html#aa29a9f705115e6d52d424bec0bb99cd0":[2,0,1,5,5],
+"structgondola_1_1TofPaddleTimingConstant.html#aa519abcb2a208c73f6c2e25065192f35":[4,0,1,5,4],
+"structgondola_1_1TofPaddleTimingConstant.html#aa519abcb2a208c73f6c2e25065192f35":[2,0,1,5,4],
+"structstd_1_1formatter_3_01EventStatus_01_4.html":[4,0,2,0],
+"structstd_1_1formatter_3_01EventStatus_01_4.html#a113bf7897cf3fda81ec506174b044d38":[4,0,2,0,1],
 "structstd_1_1formatter_3_01EventStatus_01_4.html#a5ed71d9e6af5d57a187cf2d63264a351":[4,0,2,0,0],
 "telemetry__dataclasses_8cxx.html":[5,0,1,0,2,10],
 "telemetry__dataclasses_8hpp.html":[5,0,1,0,0,15],
