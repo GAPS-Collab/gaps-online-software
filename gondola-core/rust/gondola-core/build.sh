@@ -1,5 +1,8 @@
 #! /bin/sh 
 
+# ALTERNATIVE! BUILD WITH zig 
+maturin build --release --zig
+
 # FIXME - change python-source in pyproject.toml, otherwise it won't built with 
 #         the maturin docker container
 

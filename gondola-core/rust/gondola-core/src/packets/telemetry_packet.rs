@@ -43,8 +43,8 @@ impl TelemetryPacket {
 
   /// Check if this is either any of the different merged event 
   /// types 
-  #[pyo3(name="is_event_packet")]
   #[getter]
+  #[pyo3(name="is_event_packet")]
   fn is_event_packet_py(&self) -> bool {
     self.is_event_packet()
   }

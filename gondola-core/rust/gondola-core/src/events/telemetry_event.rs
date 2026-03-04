@@ -6,6 +6,7 @@
 use crate::prelude::*;
 
 #[cfg_attr(feature="pybindings", pyclass)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct TelemetryEvent {
   pub header              : TelemetryPacketHeader,
   pub creation_time       : u64,
@@ -16,7 +17,9 @@ pub struct TelemetryEvent {
   pub raw_data            : Vec<u8>,
   pub flags0              : u8,
   pub flags1              : u8,
-  pub version             : u8
+  pub version             : u8,
+  pub osc_flags           : u8,
+  pub oscillator_idx      : Vec<u8>,
 }
 
 impl TelemetryEvent {
@@ -37,6 +40,8 @@ impl TelemetryEvent {
       flags0              : 0,
       flags1              : 1,
       version             : 0, 
+      osc_flags           : 0,
+      oscillator_idx      : Vec::<u8>::new(),
     }
   }
 
@@ -209,7 +214,7 @@ impl Serialization for TelemetryEvent {
    let num_tof_bytes = parse_u16(stream, pos) as usize;
     //println!("Num TOF bytes : {}", num_tof_bytes);
     if stream.len() < *pos+num_tof_bytes {
-      error!("Not enough bytes for TOF packet! Expected {}, seen {}", *pos+num_tof_bytes as usize, stream.len());
+      error!("Not enough bytes for TOF packet with {} bytes! Only {} bytes remaining in input", num_tof_bytes, stream.len() - *pos);
       return Err(SerializationError::StreamTooShort); 
     }
     let pos_before = *pos;
@@ -232,6 +237,7 @@ impl Serialization for TelemetryEvent {
     if version == 1 {
       let num_trk_hits = parse_u16(stream, pos);
       if (*pos + (num_trk_hits as usize)*4 ) > stream.len() {
+        error!("Not enough bytes ({}) for {} tracker hits!", stream.len(), num_trk_hits);
         return Err(SerializationError::StreamTooShort);
       }
       for _ in 0..num_trk_hits { 
@@ -250,22 +256,25 @@ impl Serialization for TelemetryEvent {
       if oscillators_delimiter != 0xcc {
         return Err(SerializationError::HeadInvalid);
       }
-      let osc_flags = parse_u8(stream, pos);
+      me.osc_flags = parse_u8(stream, pos);
       let mut oscillator_idx = Vec::<u8>::new();
       for j in 0..8 {
-        if (osc_flags >> j & 0b1) > 0 {
+        if (me.osc_flags >> j & 0b1) > 0 {
           oscillator_idx.push(j)
         }
       }
       if (*pos + oscillator_idx.len()*6) > stream.len() {
+        error!("Not enough bytes to parse tracker oscillators!");
         return Err(SerializationError::StreamTooShort);
       }
       for idx in oscillator_idx.iter() {
         let lower = parse_u32(stream, pos);
         let upper = parse_u16(stream, pos);
         let osc : u64 = (upper as u64) << 32 | (lower as u64);
+        //println!("FROM: IDX {}, LOWER {}, UPPER {}, OSC {}", idx, lower, upper, osc);
         me.tracker_oscillators[*idx as usize] = osc;
       }
+      me.oscillator_idx = oscillator_idx;
     } else if version == 0 {
       error!("Unsupported {version}!");
       return Err(SerializationError::UnsupportedVersion);
@@ -274,6 +283,51 @@ impl Serialization for TelemetryEvent {
       return Err(SerializationError::UnsupportedVersion);
     } 
     Ok(me)
+  }
+  
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut stream = Vec::<u8>::new();
+    stream.push(self.version);
+    stream.push(self.flags0);
+    if self.version == 0 {
+      stream.push(self.flags1);
+    } else {
+      stream.extend_from_slice(&[0u8;8]);
+    }
+    stream.extend_from_slice(&self.event_id.to_le_bytes());
+    stream.push(0xaa); // tof delimiter
+    let tof           = self.tof_event.pack();
+    let tof_bytes     = tof.to_bytestream();
+    let num_tof_bytes = tof_bytes.len() as u16;
+    error!("Will write {} bytes for tef event to stream!", num_tof_bytes);
+    stream.extend_from_slice(&num_tof_bytes.to_le_bytes());
+    stream.extend_from_slice(&tof_bytes);
+    stream.push(0xbb);
+    stream.extend_from_slice(&(self.tracker_hits.len() as u16).to_le_bytes());
+    for h in &self.tracker_hits { 
+      let mut strip_id: u16 = 0;
+
+      // Shift each value to its respective position and OR them together
+      strip_id |= (h.channel as u16) & 0b11111;       // Bits 0-4
+      strip_id |= ((h.module as u16) & 0b111) << 5;   // Bits 5-7
+      strip_id |= ((h.row as u16) & 0b111) << 8;      // Bits 8-10
+      strip_id |= ((h.layer as u16) & 0b1111) << 11; 
+      stream.extend_from_slice(&strip_id.to_le_bytes());
+      stream.extend_from_slice(&h.adc.to_le_bytes());
+    }
+    stream.push(0xcc); // oscillators delimiter
+    stream.push(self.osc_flags);
+    for idx in &self.oscillator_idx { 
+    //for osc in &self.tracker_oscillators {
+      //deconstruct the timestamps    
+      let osc   = self.tracker_oscillators[*idx as usize];
+      let upper = ((osc >> 32) & (u16::MAX as u64)) as u16;
+      let lower = (osc & (u32::MAX as u64)) as u32; 
+      //println!("TO: OSC {}, upper {}, lower {}", osc, upper, lower);
+      stream.extend_from_slice(&lower.to_le_bytes());
+      stream.extend_from_slice(&upper.to_le_bytes());
+    }
+    return stream;
   }
 }
 
@@ -329,7 +383,19 @@ impl TelemetryEvent {
   fn version_py(&self) -> u8 {
     self.version
   }
+ 
+  #[getter] 
+  #[pyo3(name="flags0")]
+  fn flags0_py(&self) -> u8 {
+    self.flags0
+  }
   
+  #[getter] 
+  #[pyo3(name="flags1")]
+  fn flags1_py(&self) -> u8 {
+    self.flags1
+  }
+
   #[staticmethod]
   #[pyo3(name = "get_trk_energy")]
   fn get_trk_energy_py(adc : f32, tf : &TrackerStripTransferFunction) -> f32 {
@@ -417,8 +483,89 @@ impl TelemetryEvent {
 //                              pedestals   : &HashMap<u32, TrackerStripPedestal>,
 //                              transfer_fn : &HashMap<u32, TrackerStripTransferFunction>) {
 //  }
+}
 
+#[cfg(feature="random")]
+impl FromRandom for TelemetryEvent {
 
+  fn from_random() -> Self {
+    let mut rng    = rand::rng();
+    let mut ev     = Self::new();
+    ev.tof_event   = TofEvent::from_random();
+    //let n_trk_hits = rng.random::<u8>();
+    let n_trk_hits = 1u8;
+    for _ in 0..n_trk_hits {
+      let mut h = TrackerHit::from_random();
+      h.oscillator = 0;
+      h.asic_event_code = 0;
+      ev.tracker_hits.push(h);
+    }
+    //ev.creation_time      = rng.random::<u64>();
+    ev.creation_time      = 0;
+    ev.event_id           = rng.random::<u32>();
+    ev.flags0             = 3;
+    ev.flags1             = 1;
+    ev.version            = 1;
+    // tracker oscillators are one by layer - set 
+    // layers active by random choice 
+    for idx in 0..10usize {
+      let active = rng.random::<bool>();
+      if idx < 8 && active {
+        ev.osc_flags = ev.osc_flags | (0b1 << idx);
+        let osc  = rng.random::<u64>() & 0x0000FFFFFFFFFFFF;
+        ev.tracker_oscillators[idx] = osc;
+        ev.oscillator_idx.push(idx as u8);
+        //ev.tracker_oscillators[idx] = u32::MAX as u64 + 1;
+      }
+    }
+    return ev;
+  }
+}
+
+#[test]
+#[cfg(feature="random")]
+fn serialize_deserialize_telemetryevent() {
+  for _ in 0..10 {
+    let mut ev        = TelemetryEvent::from_random();  
+    let bytes         = ev.to_bytestream();
+    let mut test      = TelemetryEvent::from_bytestream(&bytes, &mut 0).unwrap();
+    let creation_time = Instant::now();
+    ev.tof_event.creation_time   = creation_time;
+    test.tof_event.creation_time = creation_time;
+    ev.tof_event.rb_events.clear();
+    test.tof_event.rb_events.clear();
+    for h in &mut ev.tof_event.hits {
+      h.coax_cable_time = 0.0;
+      h.hart_cable_time = 0.0;
+      h.event_t0 = 0.0;
+      h.paddle_len = 0.0;
+      h.x = 0.0; 
+      h.y = 0.0; 
+      h.z = 0.0; 
+    }
+    for h in &mut test.tof_event.hits {
+      h.coax_cable_time = 0.0;
+      h.hart_cable_time = 0.0;
+      h.event_t0 = 0.0;
+      h.paddle_len = 0.0;
+      h.x = 0.0; 
+      h.y = 0.0; 
+      h.z = 0.0; 
+    }
+    assert_eq!(ev.header             , test.header); 
+    assert_eq!(ev.creation_time      , test.creation_time); 
+    assert_eq!(ev.event_id           , test.event_id); 
+    assert_eq!(ev.osc_flags          , test.osc_flags); 
+    assert_eq!(ev.tracker_oscillators, test.tracker_oscillators); 
+    assert_eq!(ev.raw_data           , test.raw_data); 
+    assert_eq!(ev.flags0             , test.flags0); 
+    assert_eq!(ev.flags1             , test.flags1); 
+    assert_eq!(ev.version            , test.version); 
+    assert_eq!(ev.oscillator_idx     , test.oscillator_idx); 
+    assert_eq!(ev.tracker_hits       , test.tracker_hits); 
+    assert_eq!(ev.tof_event          , test.tof_event); 
+    //assert_eq!(ev, test);
+  }
 }
 
 #[cfg(feature="pybindings")]

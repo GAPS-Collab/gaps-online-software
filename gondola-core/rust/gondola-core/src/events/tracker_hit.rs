@@ -160,6 +160,28 @@ impl TrackerHit {
   }
 }
 
+#[cfg(feature="random")]
+impl FromRandom for TrackerHit {
+  fn from_random() -> Self {
+    let mut rng       = rand::rng();
+    Self {
+      layer           : rng.random_range(0..9),
+      row             : rng.random_range(0..6),
+      module          : rng.random_range(0..6),
+      channel         : rng.random_range(0..32),
+      adc             : rng.random::<u16>(),
+      oscillator      : rng.random::<u64>(),
+      asic_event_code : rng.random::<u8>(),
+      energy          : 0.0, 
+      x               : 0.0,
+      y               : 0.0,
+      z               : 0.0,
+      has_coordinates : false,
+      adc_pedestal    : 0,
+    }
+  }
+}
+
 #[cfg(feature="pybindings")]
 pythonize!(TrackerHit);
 
