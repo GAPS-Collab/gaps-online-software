@@ -326,6 +326,28 @@ impl CRFrame {
     Ok(cr_object)
   }
 
+  /// A check if the frame contains anything which is a telemetrypacket. 
+  /// This can be used to check if we can get the time of the telemetrypacket 
+  /// directly
+  pub fn get_first_gcutime(&self) -> Option<f64> {
+    let mut times = Vec::<f64>::new();
+    for k in self.index.keys() {
+      let f_obj_idx = self.index.get(k).unwrap();
+      if f_obj_idx.1 == CRFrameObjectType::TelemetryPacket { 
+        // offset of 8 for serialzied CRFrameObject 
+        let ts = TelemetryPacket::get_gcutime_unpacked(&self.bytestorage[f_obj_idx.0 as usize + 8..].to_vec()); 
+        if ts.is_ok() {
+          times.push(ts.unwrap());
+        }
+      }
+    }
+    if times.len() > 0 {
+      let min_time = times.iter().min_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
+      return Some(*min_time);
+    }
+    None
+  }
+
   pub fn get<T : Serialization + Frameable>(&self, name : &str) -> Result<T, SerializationError> {
     
     //let mut lookup : (usize, CRFrameObjectType);

@@ -78,5 +78,18 @@ pub trait TelemetryPackable {
     TelemetryPacketType::BoringEvent,
     TelemetryPacketType::InterestingEvent,
     TelemetryPacketType::NoTofDataEvent];
+  
+  ///// Everything which is supposed to be packed in a TelemetryPacket, 
+  ///// needs a TelemetryPacketHeader  
+  //fn get_telemetry_header(&self) -> TelemetryPacketHeader;
+  //
+  ///// Wrap myself in a TelemetryPacket
+  //fn pack(&self) -> TelemetryPacket 
+  //  where Self: Serialization {
+  //  let mut tp     = TelemetryPacket::new();
+  //  tp.header      = self.get_telemetry_header();
+  //  tp.payload     = self.to_bytestream();
+  //  tp
+  //}
 }
 

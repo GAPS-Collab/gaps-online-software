@@ -22,6 +22,12 @@ pub struct TelemetryPacket {
 #[pymethods]
 impl TelemetryPacket {
 
+  #[staticmethod]
+  #[pyo3(name="get_gcutime_unpacked")]
+  fn get_gcutime_unpacked_py(stream : Vec<u8>) -> PyResult<f64> {
+    Ok(Self::get_gcutime_unpacked(&stream)?)
+  }
+
   /// Get a zero copy view of the payload 
   /// Might be mostly useful for debugging purposes
   #[getter]
@@ -95,6 +101,21 @@ impl TelemetryPacket {
     let unpacked : T = T::from_bytestream(&self.payload, &mut 0)?;
     Ok(unpacked)
   }
+
+  /// Get the gcutime from a packet without unpacking the full thing
+  pub fn get_gcutime_unpacked(stream : &Vec<u8>) -> Result<f64, SerializationError> {
+    // it starts with the serialized header and the packet byte, 
+    // and then the timestamp is 32 bit. So we need to jump 3 bytes 
+    // and then read 4 
+    if stream.len() < 7 {
+      error!("Can get gcutime from a bytestream shorter than 7 bytes!");
+      return Err(SerializationError::StreamTooShort);
+    }
+    let mut pos = 3usize;
+    let ts = parse_u32(stream, &mut pos);
+    Ok(TelemetryPacketHeader::convert_telemetry_header_ts(ts))
+  }
+
 } 
 
 impl Serialization for TelemetryPacket {

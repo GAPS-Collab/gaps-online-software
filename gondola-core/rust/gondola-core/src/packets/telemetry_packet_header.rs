@@ -52,9 +52,17 @@ impl TelemetryPacketHeader {
     header
   }
 
+  /// To save space, the timestamp in the telemetry header is 
+  /// shortened to 32bit. Re-hydrate it to be a proper 64bit
+  /// timestamp in unix time
+  pub fn convert_telemetry_header_ts(timestamp : u32) -> f64 {
+    (timestamp as f64) * 0.064 + 1631030675.0
+  }
+  
   /// Blatent copy of bfsw's timestamp_to_double
   pub fn get_gcutime(&self) -> f64 {
-    (self.timestamp as f64) * 0.064 + 1631030675.0
+    //(self.timestamp as f64) * 0.064 + 1631030675.0
+    Self::convert_telemetry_header_ts(self.timestamp)
   }
 }
 
@@ -63,7 +71,16 @@ impl TelemetryPacketHeader {
 #[cfg(feature="pybindings")]
 #[pymethods]
 impl TelemetryPacketHeader {
-  
+ 
+  /// To save space, the timestamp in the telemetry header is 
+  /// shortened to 32bit. Re-hydrate it to be a proper 64bit
+  /// timestamp in unix time
+  #[staticmethod]
+  #[pyo3(name="convert_telemetry_header_ts")]
+  fn convert_telemetry_header_ts_py(timestamp : u32) -> f64 {
+    Self::convert_telemetry_header_ts(timestamp)
+  }
+
   #[getter]
   fn gcutime(&self) -> f64 {
     self.get_gcutime()

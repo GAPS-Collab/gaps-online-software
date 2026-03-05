@@ -45,6 +45,15 @@ impl TelemetryEvent {
     }
   }
 
+  fn pack(&self) -> TelemetryPacket {
+    let mut tp = TelemetryPacket::new();
+    // this is bad, but currently I am not 
+    // sure how to make this better
+    tp.header  = self.header.clone();
+    tp.payload = self.to_bytestream();
+    tp
+  }
+
   /// Restore position information from database
   #[cfg(feature="database")]
   pub fn dehydrate(&mut self, tof_paddles : &HashMap<u8,TofPaddle>, trk_strips : &HashMap<u32, TrackerStrip>) {
@@ -299,7 +308,7 @@ impl Serialization for TelemetryEvent {
     let tof           = self.tof_event.pack();
     let tof_bytes     = tof.to_bytestream();
     let num_tof_bytes = tof_bytes.len() as u16;
-    error!("Will write {} bytes for tef event to stream!", num_tof_bytes);
+    debug!("Will write {} bytes for tef event to stream!", num_tof_bytes);
     stream.extend_from_slice(&num_tof_bytes.to_le_bytes());
     stream.extend_from_slice(&tof_bytes);
     stream.push(0xbb);
@@ -467,6 +476,10 @@ impl TelemetryEvent {
     }
   }
 
+  #[pyo3(name="pack")]
+  fn pack_py(&self) -> TelemetryPacket {
+    self.pack()
+  }
 //  #[cfg(feature="database")]
 //  #[pyo3(name="mask_strips")]
 //  pub fn mask_strips_py(&mut self, masks : &HashMap<u32, TrackerStripMask>) {
