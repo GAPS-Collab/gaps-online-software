@@ -57,6 +57,9 @@ get_utc_now.__module__        =  __name__
 get_utc_date                  = _gc.io.get_utc_date
 get_utc_date.__module__       = __name__ 
 
+get_utc_timestamp_from_unix            = _gc.io.get_utc_timestamp_from_unix 
+get_utc_timestamp_from_unix.__module__ = __name__
+
 get_datetime                  = _gc.io.get_datetime
 get_datetime.__module__       = __name__ 
 

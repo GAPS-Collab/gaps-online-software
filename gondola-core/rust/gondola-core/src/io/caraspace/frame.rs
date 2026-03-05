@@ -480,6 +480,16 @@ impl CRFrame {
   fn telemetry_event_names(&self) -> Vec<&str> {
     self.get_telemetry_event_names() 
   }
+  
+  /// In case the frame contains at least one telemetrypacket, 
+  /// return the smallest of all gcutimes from all packets in the 
+  /// frame. 
+  ///
+  /// If there is no telemetrypacket in the frame, return None
+  #[pyo3(name="get_first_gcutime")]
+  pub fn get_first_gcutime_py(&self) -> Option<f64> {
+    self.get_first_gcutime()
+  }
 
   /// Add a TelemetryPacket to the frame. 
   ///
@@ -616,7 +626,7 @@ impl CRFrame {
       }
       Ok(mut event) => {
         event.header  = packet.header;  
-        event.dehydrate(&self.tof_paddles, &self.trk_strips);
+        event.hydrate(&self.tof_paddles, &self.trk_strips);
         if self.do_trk_calib {
           event.mask_strips(&self.trk_masks);
           event.calibrate_tracker(self.subtract_trk_cmn, 

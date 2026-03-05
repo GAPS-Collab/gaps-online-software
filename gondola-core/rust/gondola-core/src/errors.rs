@@ -26,7 +26,8 @@ pub enum SerializationError {
   UnsupportedVersion,
   WrongProtocolVersion,
   TooManyTrackerEvents,
-  TooManyTrackerHits
+  TooManyTrackerHits,
+  DoesNotExist
 }
 
 impl SerializationError { 
@@ -50,7 +51,8 @@ impl SerializationError {
       SerializationError::UnsupportedVersion       => "UnsupportedVersion",
       SerializationError::WrongProtocolVersion     => "WrongProtoclVersion",
       SerializationError::TooManyTrackerEvents     => "TooManyTrackerEvents", 
-      SerializationError::TooManyTrackerHits       => "TooManyTrackerHits"
+      SerializationError::TooManyTrackerHits       => "TooManyTrackerHits",
+      SerializationError::DoesNotExist             => "DoesNotExist"
     }
   }
 }

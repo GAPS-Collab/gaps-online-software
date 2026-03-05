@@ -56,7 +56,7 @@ impl TelemetryEvent {
 
   /// Restore position information from database
   #[cfg(feature="database")]
-  pub fn dehydrate(&mut self, tof_paddles : &HashMap<u8,TofPaddle>, trk_strips : &HashMap<u32, TrackerStrip>) {
+  pub fn hydrate(&mut self, tof_paddles : &HashMap<u8,TofPaddle>, trk_strips : &HashMap<u32, TrackerStrip>) {
     self.tof_event.set_paddles(tof_paddles);
     for h in &mut self.tracker_hits {  
       h.set_coordinates(trk_strips);
@@ -203,7 +203,7 @@ impl Serialization for TelemetryEvent {
     let version      = parse_u8(stream, pos);
     me.version       = version;
     //println!("_version {}", _version);
-    me.flags0         = parse_u8(stream, pos);
+    me.flags0        = parse_u8(stream, pos);
     // skip a bunch of Alex newly implemented things
     // FIXME
     if version == 0 {
@@ -220,7 +220,7 @@ impl Serialization for TelemetryEvent {
       error!("Not able to parse merged event!");
       return Err(SerializationError::StreamTooShort);
     }
-   let num_tof_bytes = parse_u16(stream, pos) as usize;
+    let num_tof_bytes = parse_u16(stream, pos) as usize;
     //println!("Num TOF bytes : {}", num_tof_bytes);
     if stream.len() < *pos+num_tof_bytes {
       error!("Not enough bytes for TOF packet with {} bytes! Only {} bytes remaining in input", num_tof_bytes, stream.len() - *pos);
@@ -467,7 +467,7 @@ impl TelemetryEvent {
         event.header = packet.header.clone();
         // FIXME - replace with dehydrate
         #[cfg(feature="database")]
-        event.dehydrate(&packet.tof_paddles, &packet.trk_strips);
+        event.hydrate(&packet.tof_paddles, &packet.trk_strips);
         return Ok(event);
       }
       Err(err) => {

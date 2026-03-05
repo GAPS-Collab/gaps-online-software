@@ -27,6 +27,31 @@ impl TelemetryPacket {
   fn get_gcutime_unpacked_py(stream : Vec<u8>) -> PyResult<f64> {
     Ok(Self::get_gcutime_unpacked(&stream)?)
   }
+  
+  /// In case this is any type of event packet which has a tof event, we can 
+  /// also get the GPS time (as long as it is assigned) 
+  /// 
+  /// # Arguments:
+  ///   * stream : A complete byte sequence for a telemetry packet including the header
+  #[pyo3(name="get_gpstime")]
+  fn get_gpstime_py(&self) -> PyResult<u64> {
+    let gpstime_opt = self.get_gpstime();
+    match gpstime_opt {
+      Some(gpstime_res) => {
+        match gpstime_res { 
+          Ok(gpstime) => {
+            return Ok(gpstime);
+          }
+          Err(err) => {
+            return Err(PyValueError::new_err(err.to_string()));
+          }
+        }
+      }
+      None => {
+        return Err(PyValueError::new_err("This packet does not seem to contain a GPS time!")); 
+      }
+    }
+  }
 
   /// Get a zero copy view of the payload 
   /// Might be mostly useful for debugging purposes
@@ -100,6 +125,38 @@ impl TelemetryPacket {
     }
     let unpacked : T = T::from_bytestream(&self.payload, &mut 0)?;
     Ok(unpacked)
+  }
+
+  /// In case this is any type of event packet which has a tof event, we can 
+  /// also get the GPS time (as long as it is assigned) 
+  /// 
+  /// # Arguments:
+  ///   * stream : A complete byte sequence for a telemetry packet including the header
+  pub fn get_gpstime(&self) -> Option<Result<u64, SerializationError>> {
+    // first we have to jump the entire telemetry header, which is 13 bytes 
+    // then in the TelemetryEvent 
+    // version (1byte)
+    // flags0  (1byte)
+    // -- only for version 1 supported 
+    // + 8byte
+    // event id (4byte)
+    // tof dl   (1byte)
+    // tof nby  (2byte)
+    // ------ TofPacket 2 + 1 + 4 overhead (7byte) 
+    // TofEvent 2 + 1 + 2 + 1 
+    // ==> All in all 42 bytes, yay! 
+    // CHANGE: Make it not static, so don't include the 
+    // header
+    // FIXME - this needs to check if this is really a good packet 
+    if self.payload.len() < 35 {
+      return Some(Err(SerializationError::StreamTooShort));
+    }
+    //let mut pos = 42usize;
+    let mut pos = 29usize;
+    let ts32 = parse_u32(&self.payload, &mut pos);
+    let ts16 = parse_u16(&self.payload, &mut pos);
+    let ts   = 0x273000000000000 | (((ts16 as u64) << 32) | ts32 as u64);
+    return Some(Ok(ts));
   }
 
   /// Get the gcutime from a packet without unpacking the full thing

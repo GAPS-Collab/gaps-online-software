@@ -303,6 +303,7 @@ fn io_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(get_utc_date, m)?)?;
   m.add_function(wrap_pyfunction!(get_rundata_from_file, m)?)?;
   m.add_function(wrap_pyfunction!(get_datetime, m)?)?;
+  m.add_function(wrap_pyfunction!(get_utc_timestamp_from_unix, m)?)?;
   m.add_function(wrap_pyfunction!(get_unix_timestamp, m)?)?;
   m.add_function(wrap_pyfunction!(get_unix_timestamp_from_telemetry, m)?)?;
   // these are the config file manipulators

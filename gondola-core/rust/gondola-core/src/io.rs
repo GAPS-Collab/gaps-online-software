@@ -158,6 +158,26 @@ pub fn get_utc_timestamp() -> String {
   timestamp_str
 }
 
+//----------------------------------------------------------
+
+/// Convert a unix time to human readable timestamp 
+#[cfg_attr(feature="pybindings", pyfunction)]
+pub fn get_utc_timestamp_from_unix(unix_time : f64) -> Option<String> {
+  // Separate whole seconds and fractional seconds for precision
+  let seconds = unix_time.trunc() as i64;
+  let nanoseconds = (unix_time.fract() * 1_000_000_000.0) as u32;
+
+  // Create a DateTime object in UTC
+  // Returns None if the timestamp is out of range
+  if let Some(dt) = Utc.timestamp_opt(seconds, nanoseconds).single() {
+    Some(dt.format("%y%m%d_%H%M%S").to_string())
+  } else {
+    None
+  }
+}
+
+//----------------------------------------------------------
+
 /// Retrieve the utc timestamp from any telemetry (binary) file 
 #[cfg_attr(feature="pybindings", pyfunction)]
 pub fn get_unix_timestamp_from_telemetry(fname : &str) -> Option<u64> { 

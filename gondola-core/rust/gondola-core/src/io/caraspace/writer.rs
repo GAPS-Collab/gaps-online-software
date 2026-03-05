@@ -65,7 +65,7 @@ impl CRWriter {
       filename = format!("{}{}", file_path, get_runfilename(run_id, 0, None, timestamp, false));
     }
     let path     = Path::new(&filename); 
-    println!("Writing to file {filename}");
+    //println!("Writing to file {filename}");
     file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
     file_name = filename;
     Self {
