@@ -47,6 +47,9 @@ TofPacketWriter.__name__      = 'TofPacketWriter'
 TelemetryPacketReader         = _gc.io.TelemetryPacketReader
 TelemetryPacketReader.__module__ = __name__ 
 TelemetryPacketReader.__name__  = 'TelemetryPacketReader' 
+TelemetryPacketWriter            = _gc.io.TelemetryPacketWriter
+TelemetryPacketWriter.__module__ = __name__ 
+TelemetryPacketWriter.__name__   = 'TelemetryPacketWriter' 
 
 list_path_contents_sorted     = _gc.io.list_path_contents_sorted
 list_path_contents_sorted.__module__ = __name__
@@ -80,6 +83,9 @@ decompress_toml.__module__    = __name__
 
 create_compressed_diff        = _gc.io.create_compressed_diff 
 create_compressed_diff.__module__ = __name__ 
+
+get_unix_timestamp_from_telemetry = _gc.io.get_unix_timestamp_from_telemetry 
+get_unix_timestamp_from_telemetry.__module__ = __name__ 
 
 #---------------------------------------------------
 

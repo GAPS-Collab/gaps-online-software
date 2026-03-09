@@ -19,10 +19,13 @@ pub mod tof_writer;
 pub use tof_writer::TofPacketWriter;
 pub mod telemetry_reader;
 pub use telemetry_reader::TelemetryPacketReader;
+pub mod telemetry_writer;
+pub use telemetry_writer::TelemetryPacketWriter;
 pub mod data_source;
 pub use data_source::DataSource;
 pub mod streamers;
 pub use streamers::*;
+
 
 #[cfg(feature="pybindings")]
 use std::path::PathBuf;
@@ -45,7 +48,7 @@ pub enum FileType {
   Unknown,
   /// Calibration file for specific RB with id
   CalibrationFile(u8),
-  /// A regular run file with TofEvents
+  /// A regular run file with TofEvents (tof only)
   RunFile(u32),
   /// A file created from a file with TofEvents which 
   /// contains only TofEventSummary

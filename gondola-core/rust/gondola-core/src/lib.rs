@@ -321,6 +321,7 @@ fn io_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<TofPacketReader>()?;
   m.add_class::<TofPacketWriter>()?;
   m.add_class::<TelemetryPacketReader>()?;
+  m.add_class::<TelemetryPacketWriter>()?;
   //m.add_class::<PyDataSource>()?;
   Ok(())
 }
