@@ -15,7 +15,8 @@ SKIP_PACKETS = [go.packets.TelemetryPacketType.InterestingEvent,
                 go.packets.TelemetryPacketType.BoringEvent,
                 go.packets.TelemetryPacketType.NoGapsTriggerEvent,
                 go.packets.TelemetryPacketType.NoTofDataEvent,
-                go.packets.TelemetryPacketType.Tracker]
+                go.packets.TelemetryPacketType.Tracker,
+                go.packets.TelemetryPacketType.RBWaveform]
 
 if __name__ == '__main__':
     import argparse
