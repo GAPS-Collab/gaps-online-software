@@ -28,14 +28,55 @@ impl TelemetryPacket {
     Ok(Self::get_gcutime_unpacked(&stream)?)
   }
   
+  /// For a packet of any merged event type, retrieve the run id from 
+  /// the TOF part 
+  #[pyo3(name="get_runid")]
+  fn get_runid_py(&self) -> PyResult<u16> {
+    let runid_opt = self.get_runid();
+    match runid_opt {
+      Some(runid_res) => {
+        match runid_res { 
+          Ok(runid) => {
+            return Ok(runid);
+          }
+          Err(err) => {
+            return Err(PyValueError::new_err(err.to_string()));
+          }
+        }
+      }
+      None => {
+        return Err(PyValueError::new_err("This packet does not seem to contain a (useful) runid!")); 
+      }
+    }
+  }
+
+  /// For a packet of type 80 (tracker standalooe) retrieve the GPS time from 
+  /// the tracker header 
+  #[pyo3(name="get_gpstime_tracker")]
+  fn get_gpstime_tracker_py(&self) -> PyResult<u64> {
+    let gpstime_opt = self.get_gpstime_tracker();
+    match gpstime_opt {
+      Some(gpstime_res) => {
+        match gpstime_res { 
+          Ok(gpstime) => {
+            return Ok(gpstime);
+          }
+          Err(err) => {
+            return Err(PyValueError::new_err(err.to_string()));
+          }
+        }
+      }
+      None => {
+        return Err(PyValueError::new_err("This packet does not seem to contain a GPS time!")); 
+      }
+    }
+  }
+  
   /// In case this is any type of event packet which has a tof event, we can 
   /// also get the GPS time (as long as it is assigned) 
-  /// 
-  /// # Arguments:
-  ///   * stream : A complete byte sequence for a telemetry packet including the header
-  #[pyo3(name="get_gpstime")]
-  fn get_gpstime_py(&self) -> PyResult<u64> {
-    let gpstime_opt = self.get_gpstime();
+  #[pyo3(name="get_gpstime_tof")]
+  fn get_gpstime_tof_py(&self) -> PyResult<u64> {
+    let gpstime_opt = self.get_gpstime_tof();
     match gpstime_opt {
       Some(gpstime_res) => {
         match gpstime_res { 
@@ -127,13 +168,51 @@ impl TelemetryPacket {
     Ok(unpacked)
   }
 
+  /// For a packet of any merged event type, retrieve the run id from 
+  /// the TOF part 
+  pub fn get_runid(&self) -> Option<Result<u16, SerializationError>> {
+    if !self.is_event_packet() {
+      return None;
+    }
+    if self.header.packet_type == TelemetryPacketType::NoTofDataEvent {
+      return None;
+    }
+    // the run id is right after the timestamp (6 byte) 
+    // and is 2 bytes long 
+    if self.payload.len() < 37 {
+      return Some(Err(SerializationError::StreamTooShort));
+    }
+    let mut pos   = 41usize;
+    let runid = parse_u16(&self.payload, &mut pos);
+    return Some(Ok(runid));
+  }
+
+  /// For a packet of type 80 (tracker standalooe) retrieve the GPS time from 
+  /// the tracker header 
+  pub fn get_gpstime_tracker(&self) -> Option<Result<u64, SerializationError>> {
+    if self.header.packet_type != TelemetryPacketType::Tracker {
+      return None;
+    }
+    // the tracker header with the gps time is the first 
+    let mut pos = 10usize; // skip the first bytes in the TrackerHeader
+    if self.payload.len() < 16 { 
+      return Some(Err(SerializationError::StreamTooShort));
+    }
+    let lower = parse_u32(&self.payload, &mut pos);
+    let upper = parse_u16(&self.payload, &mut pos);
+    let ts    = make_systime(lower, upper);
+    return Some(Ok(ts));
+  }
+
   /// In case this is any type of event packet which has a tof event, we can 
   /// also get the GPS time (as long as it is assigned) 
-  /// 
-  /// # Arguments:
-  ///   * stream : A complete byte sequence for a telemetry packet including the header
-  pub fn get_gpstime(&self) -> Option<Result<u64, SerializationError>> {
-    // first we have to jump the entire telemetry header, which is 13 bytes 
+  pub fn get_gpstime_tof(&self) -> Option<Result<u64, SerializationError>> {
+    if !self.is_event_packet() {
+      return None;
+    }
+    if self.header.packet_type == TelemetryPacketType::NoTofDataEvent {
+      return None;
+    }
     // then in the TelemetryEvent 
     // version (1byte)
     // flags0  (1byte)
@@ -142,17 +221,16 @@ impl TelemetryPacket {
     // event id (4byte)
     // tof dl   (1byte)
     // tof nby  (2byte)
+    // -> 17 byte
     // ------ TofPacket 2 + 1 + 4 overhead (7byte) 
-    // TofEvent 2 + 1 + 2 + 1 
-    // ==> All in all 42 bytes, yay! 
-    // CHANGE: Make it not static, so don't include the 
-    // header
-    // FIXME - this needs to check if this is really a good packet 
-    if self.payload.len() < 35 {
+    // -> 24 byte 
+    // TofEvent 2 + 1 + 2 + 1 + 4 + 1 
+    // -> 35 byte 
+    if self.payload.len() < 41 {
       return Some(Err(SerializationError::StreamTooShort));
     }
     //let mut pos = 42usize;
-    let mut pos = 29usize;
+    let mut pos = 35usize;
     let ts32 = parse_u32(&self.payload, &mut pos);
     let ts16 = parse_u16(&self.payload, &mut pos);
     let ts   = 0x273000000000000 | (((ts16 as u64) << 32) | ts32 as u64);
