@@ -253,10 +253,10 @@ impl Serialization for TelemetryEvent {
         let mut hit  = TrackerHit::new();
         let strip_id = parse_u16(stream, pos);
         let adc      = parse_u16(stream, pos);
-        hit.channel  = strip_id & 0b11111;
-        hit.module   = (strip_id >> 5) & 0b111;
-        hit.row      = (strip_id >> 8) & 0b111;
-        hit.layer    = (strip_id >> 11) & 0b1111;
+        hit.channel  = (strip_id & 0b11111) as u8;
+        hit.module   = ((strip_id >> 5) & 0b111) as u8;
+        hit.row      = ((strip_id >> 8) & 0b111) as u8;
+        hit.layer    = ((strip_id >> 11) & 0b1111) as u8;
         hit.adc      = adc;
         me.tracker_hits.push(hit);
       }
@@ -504,6 +504,7 @@ impl FromRandom for TelemetryEvent {
   fn from_random() -> Self {
     let mut rng    = rand::rng();
     let mut ev     = Self::new();
+    ev.header      = TelemetryPacketHeader::from_random();
     ev.tof_event   = TofEvent::from_random();
     //let n_trk_hits = rng.random::<u8>();
     let n_trk_hits = 1u8;
@@ -565,7 +566,8 @@ fn serialize_deserialize_telemetryevent() {
       h.y = 0.0; 
       h.z = 0.0; 
     }
-    assert_eq!(ev.header             , test.header); 
+    // the header will not be the same, since it is not  
+    // deserialized with from_bytestream, but just attached 
     assert_eq!(ev.creation_time      , test.creation_time); 
     assert_eq!(ev.event_id           , test.event_id); 
     assert_eq!(ev.osc_flags          , test.osc_flags); 

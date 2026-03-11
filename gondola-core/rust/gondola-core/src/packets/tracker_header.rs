@@ -42,7 +42,7 @@ impl Serialization for TrackerHeader {
   fn from_bytestream(stream: &Vec<u8>,
                      pos: &mut usize)
     -> Result<Self, SerializationError> {
-    if stream.len() <= Self::SIZE {
+    if stream.len() < Self::SIZE {
       error!("Unable to decode TrackerHeader!"); 
       return Err(SerializationError::StreamTooShort);
     }
@@ -59,6 +59,22 @@ impl Serialization for TrackerHeader {
     h.version     = parse_u8 (stream, pos);
     Ok(h)
   }
+  
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut stream = Vec::<u8>::new();
+    stream.extend_from_slice(&self.sync.to_le_bytes());
+    stream.extend_from_slice(&self.crc.to_le_bytes());
+    stream.push(self.sys_id);
+    stream.push(self.packet_id);
+    stream.extend_from_slice(&self.length.to_le_bytes());
+    stream.extend_from_slice(&self.daq_count.to_le_bytes());
+    let lower = (self.sys_time & u32::MAX as u64) as u32;
+    let upper = (self.sys_time >> 32) as u16;
+    stream.extend_from_slice(&lower.to_le_bytes());
+    stream.extend_from_slice(&upper.to_le_bytes());
+    stream.push(self.version);
+    stream
+  }
 }
 
 impl fmt::Display for TrackerHeader {
@@ -72,6 +88,25 @@ impl fmt::Display for TrackerHeader {
     repr    += &(format!("\n  Sys Time : {}", self.sys_time));
     repr    += &(format!("\n  Version  : {}>", self.version));
     write!(f, "{}", repr)
+  }
+}
+
+#[cfg(feature="random")]
+impl FromRandom for TrackerHeader {
+
+  fn from_random() -> Self {
+    let mut rng = rand::rng();
+    let mut h   = Self::new();
+    h.sync      = rng.random::<u16>();
+    h.crc       = rng.random::<u16>();
+    h.sys_id    = rng.random::<u8>();
+    h.packet_id = rng.random::<u8>();
+    h.length    = rng.random::<u16>();
+    h.daq_count = rng.random::<u16>();
+    h.sys_time  = rng.random::<u64>() & (u64::pow(2,48) - 1); 
+    h.version   = 5; // only do version 5 for now, 
+                     // that is for GAPSI
+    h
   }
 }
 
@@ -122,8 +157,18 @@ impl TrackerHeader {
   }
 }
 
-
-
 #[cfg(feature="pybindings")]
 pythonize!(TrackerHeader);
+
+#[test]
+#[cfg(feature="random")]
+fn serialize_deserialize_trackerheader() {
+  for _ in 0..10 {
+    let h = TrackerHeader::from_random();
+    let stream = h.to_bytestream();
+    let test   = TrackerHeader::from_bytestream(&stream, &mut 0).unwrap();
+    assert_eq!(h, test);
+  }
+}
+
 

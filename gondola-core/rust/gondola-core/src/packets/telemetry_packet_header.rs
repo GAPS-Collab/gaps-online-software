@@ -167,5 +167,34 @@ impl fmt::Display for TelemetryPacketHeader {
   }
 }
 
+#[cfg(feature="random")]
+impl FromRandom for TelemetryPacketHeader {
+
+  fn from_random() -> Self {
+    let mut h     = Self::new();
+    let mut rng   = rand::rng(); 
+    h.sync        = 0x90eb;
+    h.packet_type = TelemetryPacketType::from_random();
+    h.timestamp   = rng.random::<u32>();
+    h.counter     = rng.random::<u16>();
+    h.length      = rng.random::<u16>();
+    h.checksum    = rng.random::<u16>();
+    h
+  }
+}
+
 #[cfg(feature="pybindings")]
 pythonize!(TelemetryPacketHeader);
+
+#[test]
+#[cfg(feature="random")]
+fn serialize_deserialize_telemetrypacketheader() {
+  for _ in 0..10 {
+    let h = TelemetryPacketHeader::from_random();
+    let stream = h.to_bytestream();
+    let test   = TelemetryPacketHeader::from_bytestream(&stream, &mut 0);
+    assert_eq!(h,test.unwrap());
+  }
+}
+
+

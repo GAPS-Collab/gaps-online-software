@@ -8,10 +8,10 @@ use crate::prelude::*;
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[cfg_attr(feature="pybindings", pyclass)]
 pub struct TrackerHit {
-  pub layer           : u16,
-  pub row             : u16,
-  pub module          : u16,
-  pub channel         : u16,
+  pub layer           : u8,
+  pub row             : u8,
+  pub module          : u8,
+  pub channel         : u8,
   pub adc             : u16,
   pub oscillator      : u64,
   /// In BFSW, there are two versions of the tracker hit, 
@@ -52,10 +52,10 @@ impl TrackerHit {
  
   /// Calculate the strip id from layer, module, row and channel
   pub fn get_stripid(&self) -> u32 {
-    crate::events::strip_id(self.layer   as u8, 
-                            self.row     as u8,
-                            self.module  as u8,
-                            self.channel as u8)
+    crate::events::strip_id(self.layer  , 
+                            self.row    ,
+                            self.module ,
+                            self.channel)
   }
 
  #[cfg(feature="database")]
@@ -105,22 +105,22 @@ impl TrackerHit {
   }
 
   #[getter]
-  fn get_layer(&self) -> u16 {
+  fn get_layer(&self) -> u8 {
     self.layer
   }
 
   #[getter]
-  fn get_row(&self) -> u16 {
+  fn get_row(&self) -> u8 {
     self.row
   }
 
   #[getter]
-  fn get_module(&self) -> u16 {
+  fn get_module(&self) -> u8 {
     self.module
   }
 
   #[getter]
-  fn get_channel(&self) -> u16 {
+  fn get_channel(&self) -> u8 {
     self.channel
   }
 
@@ -169,9 +169,9 @@ impl FromRandom for TrackerHit {
       row             : rng.random_range(0..6),
       module          : rng.random_range(0..6),
       channel         : rng.random_range(0..32),
-      adc             : rng.random::<u16>(),
+      adc             : rng.random::<u16>() & 0x7ff,
       oscillator      : rng.random::<u64>(),
-      asic_event_code : rng.random::<u8>(),
+      asic_event_code : rng.random_range(0..4),
       energy          : 0.0, 
       x               : 0.0,
       y               : 0.0,

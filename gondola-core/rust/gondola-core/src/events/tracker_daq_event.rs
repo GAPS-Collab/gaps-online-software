@@ -56,33 +56,57 @@ impl fmt::Display for TrackerDAQEvent {
 }
 
 
-impl Serialization for TrackerDAQEvent { 
-  fn from_bytestream(stream: &Vec<u8>,
-                     pos: &mut usize)
-    -> Result<Self, SerializationError> {
-    let mut ev  = Self::new();
-    ev.event_time32 = parse_u32(stream, pos);
-    ev.event_time16 = parse_u16(stream, pos);
-    ev.layer        = parse_u8(stream, pos);
-    let n_hits      = parse_u8(stream, pos);
+//impl Serialization for TrackerDAQEvent { 
+//  fn from_bytestream(stream: &Vec<u8>,
+//                     pos: &mut usize)
+//    -> Result<Self, SerializationError> {
+//    let mut ev  = Self::new();
+//    ev.event_time32 = parse_u32(stream, pos);
+//    ev.event_time16 = parse_u16(stream, pos);
+//    ev.layer        = parse_u8(stream, pos);
+//    let n_hits      = parse_u8(stream, pos);
+//    for _ in 0..n_hits {
+//      // in this version of the TrackerHit, it has 
+//      // 6 bytes
+//      if stream.len() < *pos + 6 {
+//        error!("Expected to get 6 more bytes for the hit, but the input stream is too short!");
+//        return Err(SerializationError::StreamTooShort);
+//      }
+//      let mut h = TrackerHit::new();
+//      h.row             = parse_u8(stream, pos) as u16;
+//      h.module          = parse_u8(stream, pos) as u16;
+//      h.channel         = parse_u8(stream, pos) as u16;
+//      h.adc             = parse_u16(stream, pos);
+//      h.asic_event_code = parse_u8(stream, pos);
+//      ev.hits.push(h);
+//    }
+//    Ok(ev)
+//  }
+//}
+
+#[cfg(feature="random")]
+impl FromRandom for TrackerDAQEvent {
+
+  fn from_random() -> Self {
+    let mut ev      = Self::new();
+    let mut rng     = rand::rng();
+    ev.layer        = rng.random::<u8>();
+    ev.flags1       = rng.random::<u8>();
+    ev.event_id     = rng.random::<u32>(); 
+    ev.event_time16 = rng.random::<u16>();
+    ev.event_time32 = rng.random::<u32>();
+    ev.hits         = Vec::<TrackerHit>::new();
+    let n_hits : u8 = rng.random_range(0..25);
     for _ in 0..n_hits {
-      // in this version of the TrackerHit, it has 
-      // 6 bytes
-      if stream.len() < *pos + 6 {
-        error!("Expected to get 6 more bytes for the hit, but the input stream is too short!");
-        return Err(SerializationError::StreamTooShort);
-      }
-      let mut h = TrackerHit::new();
-      h.row             = parse_u8(stream, pos) as u16;
-      h.module          = parse_u8(stream, pos) as u16;
-      h.channel         = parse_u8(stream, pos) as u16;
-      h.adc             = parse_u16(stream, pos);
-      h.asic_event_code = parse_u8(stream, pos);
-      ev.hits.push(h);
+      let mut h = TrackerHit::from_random();
+      // the layer is not set here 
+      h.layer = 0;
+      ev.hits.push(h);   
     }
-    Ok(ev)
+    ev
   }
 }
+
 
 #[cfg(feature="pybindings")]
 #[pymethods]

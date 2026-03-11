@@ -5,7 +5,6 @@
 // This file is part of gaps-online-software and published 
 // under the GPLv3 license
 
-
 use crate::prelude::*;
 
 /// Tracker stand-alone complete event information from up-to multiple
@@ -13,6 +12,7 @@ use crate::prelude::*;
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature="pybindings", pyclass)]
 pub struct TrackerDAQEventPacket {
+  pub header     : TelemetryPacketHeader,
   pub daq_header : TrackerHeader,
   pub events     : Vec<TrackerDAQEvent>,
   pub run_id     : u16,
@@ -27,6 +27,7 @@ impl TrackerDAQEventPacket {
 
   pub fn new() -> Self {
     Self {
+      header     : TelemetryPacketHeader::new(),
       daq_header : TrackerHeader::new(),
       events     : Vec::<TrackerDAQEvent>::new(),
       run_id     : 0,
@@ -75,12 +76,12 @@ impl TrackerDAQEventPacket {
     }
     hits
   }
+}
 
-  /// Populate a tracker event from a TelemetryPacket.
-  ///
-  /// Telemetry packet type should be 80 (Tracker)
-  pub fn from_bytestream(stream : &Vec<u8>,
-                         pos    : &mut usize)
+impl Serialization for TrackerDAQEventPacket { 
+
+  fn from_bytestream(stream : &Vec<u8>,
+                     pos    : &mut usize)
     -> Result<Self, SerializationError> {
     let mut ev    = Self::new();
     ev.daq_header = TrackerHeader::from_bytestream(stream, pos)?; 
@@ -107,6 +108,9 @@ impl TrackerDAQEventPacket {
       } 
       if *pos + event_header_size > stream.len() { 
         error!("Unable to read more TrackerEvents! Stream is too short!");
+        println!("{}", ev); 
+        println!("pos {} , stream {}",pos, stream.len());
+        println!("Unable to read more TrackerEvents! Stream is too short!");
         return Err(SerializationError::StreamTooShort);
       }
       
@@ -123,6 +127,7 @@ impl TrackerDAQEventPacket {
       } 
       if (*pos + (3*(n_hits as usize))) > stream.len() {
         error!("Unable to read all {} tracker hits! Stream is too short!", n_hits);
+        println!("Unable to read all {} tracker hits! Stream is too short!", n_hits);
         return Err(SerializationError::StreamTooShort);
       }
       for _ in 0..n_hits {
@@ -133,13 +138,14 @@ impl TrackerDAQEventPacket {
         let channel = h0 & 0b11111;
         let module = h0 >> 5;
         let row = h1 & 0b111;
-        let adc : u16 = ((h2 & 0b00111111) << 5) as u16 | (h1 >> 3) as u16;
-
+        let h2_adc = (h2 & 0b00111111) << 5;
+        let h1_adc = h1 >> 3;
+        let adc : u16 = ((h2 as u16 & 0b00111111) << 5) | (h1 >> 3) as u16;
         let mut hit = TrackerHit::new();
-        hit.channel = channel as u16;
-        hit.module  = module  as u16;
-        hit.row     = row     as u16;
-        hit.adc     = adc     as u16;
+        hit.channel = channel;
+        hit.module  = module ;
+        hit.row     = row    ;
+        hit.adc     = adc    ;
         hit.asic_event_code   = asic_event_code;
         daq_event.hits.push(hit);
         ev.n_hits += 1; 
@@ -147,6 +153,33 @@ impl TrackerDAQEventPacket {
       ev.events.push(daq_event);
     }
   }
+  
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut stream = self.daq_header.to_bytestream();
+    stream.extend_from_slice(&self.run_id.to_le_bytes());
+    for ev in &self.events {
+      stream.push(ev.hits.len() as u8);
+      stream.push(ev.flags1);
+      stream.extend_from_slice(&ev.event_id.to_le_bytes());
+      stream.extend_from_slice(&ev.event_time32.to_le_bytes());
+      stream.extend_from_slice(&ev.event_time16.to_le_bytes()); 
+      for h in &ev.hits {
+        let h0 = ((h.module << 5) | (h.channel & 0b11111)) as u8;
+        let h1_adc = h.adc & 0b11111;
+        let h2_adc = h.adc >> 5;
+        let h1 = ((h1_adc << 3) as u8) | (h.row as u8 & 0b111);
+        let h2 = (h.asic_event_code << 6) as u16 | h2_adc;
+        stream.push(h0);
+        stream.push(h1);
+        stream.push(h2 as u8);
+      }
+    }
+    stream
+  }
+}
+
+impl TelemetryPackable for TrackerDAQEventPacket {
+  const TEL_PACKET_TYPE : TelemetryPacketType = TelemetryPacketType::Tracker;
 }
 
 impl fmt::Display for TrackerDAQEventPacket {
@@ -163,6 +196,50 @@ impl fmt::Display for TrackerDAQEventPacket {
   }
 }
 
+#[cfg(feature="random")]
+impl FromRandom for TrackerDAQEventPacket {
+
+  fn from_random() -> Self {
+    let mut packet    = Self::new();
+    let mut rng       = rand::rng();
+    packet.header     = TelemetryPacketHeader::from_random();
+    packet.daq_header = TrackerHeader::from_random();
+    packet.events     = Vec::<TrackerDAQEvent>::new();
+    packet.run_id     = rng.random::<u16>();
+    //packet.run_id_old = rng.random::<u8>();
+    let n_events : u8 = rng.random_range(0..6);
+    for _ in 0..n_events {
+      let mut ev = TrackerDAQEvent::from_random();
+      ev.layer   = packet.daq_header.sys_id;
+      for h in &mut ev.hits {
+        //h.adc = h.adc & 0b11111;
+        h.oscillator = 0;
+      }
+      packet.events.push(ev);
+    }
+    packet
+  }
+}
+
+#[test]
+#[cfg(feature="random")]
+fn serialize_deserialize_trackerdaqeventpacket() {
+  for _ in 0..100 {
+    let packet = TrackerDAQEventPacket::from_random();  
+    let stream = packet.to_bytestream();
+    let test   = TrackerDAQEventPacket::from_bytestream(&stream, &mut 0).unwrap();
+    assert_eq!(packet.run_id    , test.run_id); 
+    assert_eq!(packet.run_id_old, test.run_id_old); 
+    assert_eq!(packet.events.len(),   test.events.len());
+    assert_eq!(packet.daq_header, test.daq_header);
+    println!("Have {} events!", packet.events.len());
+    for k in 0..packet.events.len() {
+      assert_eq!(packet.events[k],test.events[k]);
+    }
+    println!("-- Success! --");
+  }
+} 
+
 #[cfg(feature="pybindings")]
 #[pymethods]
 impl TrackerDAQEventPacket {
@@ -170,13 +247,19 @@ impl TrackerDAQEventPacket {
   #[staticmethod]
   fn from_telemetrypacket(packet : TelemetryPacket) -> PyResult<Self> {
     match Self::from_bytestream(&packet.payload, &mut 0) {
-      Ok(event) => {
+      Ok(mut event) => {
+        event.header  = packet.header.clone();
         return Ok(event);
       }
       Err(err) => {
         return Err(PyValueError::new_err(err.to_string()));
       }  
     }
+  }
+
+  #[getter] 
+  fn get_gcutime(&self) -> f64 {
+    self.header.get_gcutime() 
   }
 
   #[getter]
