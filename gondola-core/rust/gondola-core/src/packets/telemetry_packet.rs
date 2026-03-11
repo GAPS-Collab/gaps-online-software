@@ -121,6 +121,21 @@ impl TelemetryPacket {
     self.is_event_packet()
   }
 
+  /// Check if this packet is a complete run configuration 
+  /// send by the TOF system
+  #[getter] 
+  #[pyo3(name="is_tof_toml_packet")]
+  fn is_tof_toml_packet_py(&self) -> bool {
+    if self.header.packet_type == TelemetryPacketType::AnyTofHK {
+      // check the TOF packet type 
+      // (self.payload contains a TOF packet) 
+      let tof_packet_type = TofPacketType::from(parse_u8(&self.payload, &mut 2));
+      return tof_packet_type == TofPacketType::LiftofSettings;
+    }
+    false
+  }
+
+
   #[pyo3(name="to_bytestream")]
   fn to_bytestream_py(&self) -> Vec<u8> {
     self.to_bytestream()

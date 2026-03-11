@@ -10,6 +10,14 @@ import importlib as _importlib
 import os as _os 
 
 __version__ = _gondola_core.get_version()
+get_version_major = _gondola_core.get_version_major
+get_version_major.__module__ = __name__ 
+
+get_version_minor = _gondola_core.get_version_minor
+get_version_minor.__module__ = __name__ 
+
+get_version_patch = _gondola_core.get_version_patch
+get_version_patch.__module__ = __name__
 
 # FIXME - these are not included in the documentation
 monitoring = _gondola_core.monitoring 

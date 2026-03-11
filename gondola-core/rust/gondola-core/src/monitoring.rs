@@ -99,6 +99,8 @@ pub trait MoniSeries<T>
  
   fn get_max_size(&self) -> usize;
 
+  fn set_max_size(&mut self, size : usize);
+
   fn get_timestamps(&self) -> &Vec<u64>;
 
   fn add_timestamp(&mut self, ts : u64);
@@ -301,6 +303,10 @@ macro_rules! moniseries {
       fn get_max_size(&self) -> usize {
         return self.max_size;
       }
+      
+      fn set_max_size(&mut self, size : usize) {
+        self.max_size = size;
+      }
   
       fn add_timestamp(&mut self, ts : u64) {
         self.timestamps.push(ts);
@@ -330,6 +336,13 @@ macro_rules! moniseries {
       fn get_max_size_py(&self) -> usize {
         self.get_max_size()
       }
+
+      #[setter]
+      #[pyo3(name="max_size")] 
+      fn set_max_size_py(&mut self, size : usize) {
+        self.set_max_size(size);
+      }
+      
 
       #[getter]
       #[pyo3(name="get_first_ts")]

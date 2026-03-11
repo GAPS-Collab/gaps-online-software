@@ -35,6 +35,25 @@ impl TrackerDAQEventPacket {
       n_hits     : 0,
     }
   }
+ 
+  /// Create a telemetrypacket 
+  pub fn pack(&self) -> TelemetryPacket {
+    let mut tp = TelemetryPacket::new();
+    tp.header  = self.header.clone();
+    tp.payload = self.to_bytestream();
+    tp
+  }
+
+  /// Remove a single TrackerDAQEvent from the 
+  /// associated list of events 
+  ///
+  /// # Arguments:
+  ///   * evid : Event ID of the event in the 
+  ///            list of associated events to 
+  ///            be removed
+  pub fn remove_event(&mut self,evid : u32) {
+    self.events.retain(|x| x.event_id != evid);
+  }
 
   /// Get all hits from all daq boxes participating 
   /// in this event 
@@ -138,8 +157,6 @@ impl Serialization for TrackerDAQEventPacket {
         let channel = h0 & 0b11111;
         let module = h0 >> 5;
         let row = h1 & 0b111;
-        let h2_adc = (h2 & 0b00111111) << 5;
-        let h1_adc = h1 >> 3;
         let adc : u16 = ((h2 as u16 & 0b00111111) << 5) | (h1 >> 3) as u16;
         let mut hit = TrackerHit::new();
         hit.channel = channel;
@@ -176,6 +193,7 @@ impl Serialization for TrackerDAQEventPacket {
     }
     stream
   }
+  
 }
 
 impl TelemetryPackable for TrackerDAQEventPacket {
@@ -255,6 +273,25 @@ impl TrackerDAQEventPacket {
         return Err(PyValueError::new_err(err.to_string()));
       }  
     }
+  }
+
+  /// Create a telemetry packet to be send or 
+  /// written to disk
+  #[pyo3(name="pack")]
+  fn pack_py(&self) -> TelemetryPacket {
+    self.pack()
+  }
+
+  /// Remove a single TrackerDAQEvent from the 
+  /// associated list of events 
+  ///
+  /// # Arguments:
+  ///   * evid : Event ID of the event in the 
+  ///            list of associated events to 
+  ///            be removed
+  #[pyo3(name="remove_event")]
+  fn remove_event_py(&mut self, evid : u32) {
+    self.remove_event(evid);
   }
 
   #[getter] 

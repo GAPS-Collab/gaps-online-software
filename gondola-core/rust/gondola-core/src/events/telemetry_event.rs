@@ -20,6 +20,8 @@ pub struct TelemetryEvent {
   pub version             : u8,
   pub osc_flags           : u8,
   pub oscillator_idx      : Vec<u8>,
+  // this is for re-merging and does not get serialized to disk 
+  pub expected_tr_hits    : u8,
 }
 
 impl TelemetryEvent {
@@ -42,6 +44,7 @@ impl TelemetryEvent {
       version             : 0, 
       osc_flags           : 0,
       oscillator_idx      : Vec::<u8>::new(),
+      expected_tr_hits    : 0,
     }
   }
 
@@ -291,6 +294,7 @@ impl Serialization for TelemetryEvent {
       error!("Unsuported version {version}!");
       return Err(SerializationError::UnsupportedVersion);
     } 
+    me.expected_tr_hits = me.tracker_hits.len() as u8;
     Ok(me)
   }
   
@@ -386,6 +390,18 @@ impl fmt::Display for TelemetryEvent {
 #[cfg(feature="pybindings")]
 #[pymethods]
 impl TelemetryEvent {
+
+  #[getter]
+  #[pyo3(name="exptected_tracker_hits")]
+  fn excpected_trk_hits_py(&self) -> u8 {
+    self.expected_tr_hits
+  }
+
+  #[getter]
+  #[pyo3(name="has_at_least_expected_trk_hits")]
+  fn has_at_least_expected_trk_hits(&self) -> bool {
+    return self.tracker_hits.len() as u8 >= self.expected_tr_hits
+  }
 
   #[getter]
   #[pyo3(name="version")]
