@@ -396,6 +396,7 @@ fn db_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(get_hid_vid_map, m)?)?;
   m.add_function(wrap_pyfunction!(get_vid_hid_map, m)?)?;
   m.add_function(wrap_pyfunction!(get_dsi_j_ch_pid_map_py, m)?)?;
+  m.add_function(wrap_pyfunction!(get_rbid_pbchannel_pid_map_py, m)?)?;
   Ok(())
 }
 

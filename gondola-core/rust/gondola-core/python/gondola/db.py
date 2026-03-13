@@ -47,6 +47,9 @@ get_vid_hid_map.__module__   = __name__
 get_dsi_j_ch_pid_map         = _gc.db.get_dsi_j_ch_pid_map
 get_dsi_j_ch_pid_map.__module__ = __name__
 
+get_rbid_pbchannel_pid_map   = _gc.db.get_rbid_pbchannel_pid_map 
+get_rbid_pbchannel_pid_map.__module__ = __name__
+
 __all__ = ['TofPaddle','ReadoutBoard', 'TofPaddleTimingConstant', 'TrackerStrip','TrackerStripPedestal', 'TrackerStripTransferFunction',\
 'TrackerStripCmnNoise','get_all_rbids_in_db','get_hid_vid_map','get_vid_hid_map','get_dsi_j_ch_pid_map']
 

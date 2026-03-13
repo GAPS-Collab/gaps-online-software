@@ -108,6 +108,23 @@ pub fn get_dsi_j_ch_rb_map(paddles : &Vec<TofPaddle>) -> DsiJChRbMapping {
 
 //---------------------------------------------------------------------
 
+pub fn get_rbid_pbchannel_pid_map(paddles : &Vec<TofPaddle>) -> (RbChPidMapping, RbChPidMapping) {
+  let mut map_a = RbChPidMapping::new();
+  let mut map_b = RbChPidMapping::new();
+  //let mut rb_to_pb = HashMap::<u8,u8>::new();
+  for pdl in paddles {
+    let mut pbch_to_pid = HashMap::<u8,u8>::new();
+    pbch_to_pid.insert(pdl.pb_chA as u8, pdl.paddle_id as u8); 
+    map_a.insert(pdl.rb_id as u8, pbch_to_pid.clone());
+    pbch_to_pid.clear();
+    pbch_to_pid.insert(pdl.pb_chB as u8, pdl.paddle_id as u8); 
+    map_b.insert(pdl.rb_id as u8, pbch_to_pid.clone()); 
+  }
+  return (map_a, map_b)
+}
+
+//---------------------------------------------------------------------
+
 /// Create a mapping of DSI/J(LTB) -> RBID
 ///
 /// This will basically tell you for a given LTB hit which rb has 
@@ -118,6 +135,33 @@ pub fn get_dsi_j_ch_rb_map(paddles : &Vec<TofPaddle>) -> DsiJChRbMapping {
 pub fn get_dsi_j_ch_rb_map_py() -> Option<DsiJChRbMapping> {
   if let Some(paddles) = TofPaddle::all() {
     return Some(get_dsi_j_ch_rb_map(&paddles));
+  } else {
+    return None;
+  }
+}
+
+//---------------------------------------------------------------------
+
+/// Create a mapping of RB/PB Channel -> PaddleID
+///
+/// Find out to which paddle ends the sipms are connected 
+/// on the powerboard. 
+/// Per each RAT, there is one RB which controls the 
+/// PB (powerboard). For a given RB id, find out which 
+/// PB is in the same RAT and return the connected 
+/// paddle id
+///
+/// # Returns:
+///   * tuple(dict (rb_id, dict(pb_ch, pid)),..) 
+///     The returned tuple contains two dictionaries. 
+///     The first is for paddle end A, the second for 
+///     paddle end B
+#[cfg(feature="pybindings")]
+#[pyfunction]
+#[pyo3(name="get_rbid_pbchannel_pid_map")]
+pub fn get_rbid_pbchannel_pid_map_py() -> Option<(RbChPidMapping, RbChPidMapping)> {
+  if let Some(paddles) = TofPaddle::all() {
+    return Some(get_rbid_pbchannel_pid_map(&paddles));
   } else {
     return None;
   }
