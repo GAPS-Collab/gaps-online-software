@@ -35,12 +35,43 @@ impl TrackerDAQEventPacket {
       n_hits     : 0,
     }
   }
- 
+
+  /// Return an empty shell, that is all 
+  /// information except the actual events
+  ///
+  /// Ben Drowned...
+  pub fn emit_empty(&self) -> Self {
+    Self {
+      header     : self.header.clone(),
+      daq_header : self.daq_header.clone(),
+      events     : Vec::<TrackerDAQEvent>::new(),
+      run_id     : self.run_id,
+      run_id_old : self.run_id_old,
+      n_hits     : self.n_hits,
+    } 
+  }
+
+  /// Adds a TrackerDAQEvent 
+  pub fn add_event(&mut self, ev : TrackerDAQEvent) {
+    self.events.push(ev);
+  }
+
+
+  /// Remove all the TrackerDAQEvents in 
+  /// the event list
+  pub fn clear_events(&mut self) {
+    self.events.clear();
+  }
+
   /// Create a telemetrypacket 
   pub fn pack(&self) -> TelemetryPacket {
     let mut tp = TelemetryPacket::new();
     tp.header  = self.header.clone();
     tp.payload = self.to_bytestream();
+    // update the length, since the packet contents 
+    // might have changed
+    tp.header.length = TelemetryPacketHeader::SIZE as u16 + tp.payload.len() as u16;
+    // FIXME - we need to update the checksum
     tp
   }
 
@@ -250,11 +281,54 @@ fn serialize_deserialize_trackerdaqeventpacket() {
     assert_eq!(packet.run_id_old, test.run_id_old); 
     assert_eq!(packet.events.len(),   test.events.len());
     assert_eq!(packet.daq_header, test.daq_header);
-    println!("Have {} events!", packet.events.len());
+    //println!("Have {} events!", packet.events.len());
     for k in 0..packet.events.len() {
       assert_eq!(packet.events[k],test.events[k]);
     }
-    println!("-- Success! --");
+    //println!("-- Success! --");
+  }
+} 
+
+#[test]
+#[cfg(feature="random")]
+fn serialize_deserialize_trackerdaqemptyeventpacket() {
+  for _ in 0..100 {
+    let pre_packet = TrackerDAQEventPacket::from_random(); 
+    let packet = pre_packet.emit_empty();
+    let stream = packet.to_bytestream();
+    let test   = TrackerDAQEventPacket::from_bytestream(&stream, &mut 0).unwrap();
+    assert_eq!(packet.run_id    , test.run_id); 
+    assert_eq!(packet.run_id_old, test.run_id_old); 
+    assert_eq!(packet.events.len(),   test.events.len());
+    assert_eq!(packet.daq_header, test.daq_header);
+    //println!("Have {} events!", packet.events.len());
+    for k in 0..packet.events.len() {
+      assert_eq!(packet.events[k],test.events[k]);
+    }
+    //println!("-- Success! --");
+  }
+} 
+
+#[test]
+#[cfg(feature="random")]
+fn serialize_deserialize_trackerdaqmodifyeventpacket() {
+  for _ in 0..100 {
+    let pre_packet = TrackerDAQEventPacket::from_random(); 
+    let mut packet = pre_packet.emit_empty();
+    if pre_packet.events.len() > 0 {
+      packet.add_event(pre_packet.events[0].clone());
+    }
+    let stream = packet.to_bytestream();
+    let test   = TrackerDAQEventPacket::from_bytestream(&stream, &mut 0).unwrap();
+    assert_eq!(packet.run_id    , test.run_id); 
+    assert_eq!(packet.run_id_old, test.run_id_old); 
+    assert_eq!(packet.events.len(),   test.events.len());
+    assert_eq!(packet.daq_header, test.daq_header);
+    //println!("Have {} events!", packet.events.len());
+    for k in 0..packet.events.len() {
+      assert_eq!(packet.events[k],test.events[k]);
+    }
+    //println!("-- Success! --");
   }
 } 
 
@@ -273,6 +347,38 @@ impl TrackerDAQEventPacket {
         return Err(PyValueError::new_err(err.to_string()));
       }  
     }
+  }
+  
+
+  #[pyo3(name="to_bytestream")]
+  fn to_bytestream_py(&self) -> Vec<u8> {
+    self.to_bytestream()
+  }
+ 
+  #[staticmethod]
+  #[pyo3(name="from_bytestream")]
+  fn from_bytestream_py(stream : Vec<u8>,
+                        pos    : usize) -> PyResult<Self> {
+    let mut position = pos;
+    Ok(Self::from_bytestream(&stream, &mut position).unwrap())
+  }
+
+
+  /// Modify the event and add another TrackerDAQEvent
+  ///
+  /// WARNING: This is an advanced feature. Usually, There
+  /// is no reason to alter events
+  #[pyo3(name="add_event")]
+  fn add_event_py(&mut self, ev : TrackerDAQEvent) {
+    self.add_event(ev);
+  }
+
+  /// Create an empty copy of myself. 
+  ///
+  /// Empty in this context means no events 
+  #[pyo3(name="emit_empty")]
+  fn emit_empty_py(&self) -> Self {
+    self.emit_empty()
   }
 
   /// Create a telemetry packet to be send or 
