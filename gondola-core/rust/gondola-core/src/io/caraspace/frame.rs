@@ -192,6 +192,27 @@ impl CRFrame {
     }
   }
 
+  pub fn get_telemetrypacket_gcutime_range(&self) -> Option<(f64,f64,f64)> {
+    let mut times = Vec::<f64>::new();
+    for k in self.index.keys() {
+      let f_obj_idx = self.index.get(k).unwrap();
+      if f_obj_idx.1 == CRFrameObjectType::TelemetryPacket { 
+        // offset of 8 for serialzied CRFrameObject 
+        let ts = TelemetryPacket::get_gcutime_unpacked(&self.bytestorage[f_obj_idx.0 as usize + 8..].to_vec()); 
+        if ts.is_ok() {
+          times.push(ts.unwrap());
+        }
+      }
+    }
+    if times.len() > 0 {
+      let min_time = times.iter().min_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
+      let max_time = times.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
+      let delta    = max_time - min_time;
+      return Some((*min_time,*max_time,delta));
+    }
+    None
+  }
+
   pub fn serialize_index(&self) -> Vec<u8> {
     let mut s_index  = Vec::<u8>::new();
     // more than 255 frame items are not supported
@@ -330,22 +351,8 @@ impl CRFrame {
   /// This can be used to check if we can get the time of the telemetrypacket 
   /// directly
   pub fn get_first_gcutime(&self) -> Option<f64> {
-    let mut times = Vec::<f64>::new();
-    for k in self.index.keys() {
-      let f_obj_idx = self.index.get(k).unwrap();
-      if f_obj_idx.1 == CRFrameObjectType::TelemetryPacket { 
-        // offset of 8 for serialzied CRFrameObject 
-        let ts = TelemetryPacket::get_gcutime_unpacked(&self.bytestorage[f_obj_idx.0 as usize + 8..].to_vec()); 
-        if ts.is_ok() {
-          times.push(ts.unwrap());
-        }
-      }
-    }
-    if times.len() > 0 {
-      let min_time = times.iter().min_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
-      return Some(*min_time);
-    }
-    None
+    let times = self.get_telemetrypacket_gcutime_range()?; 
+    Some(times.0)
   }
 
   pub fn get<T : Serialization + Frameable>(&self, name : &str) -> Result<T, SerializationError> {
@@ -460,7 +467,7 @@ impl CRFrame {
   /// # Returns:
   ///   A complete copy of self, without the given object.
   #[pyo3(name="delete")]
-  pub fn delete_py(&self, name : &str) -> PyResult<Self> {
+  fn delete_py(&self, name : &str) -> PyResult<Self> {
     if !self.has(name) {
       let msg = format!("Frame does not contain {}", name);
       return Err(PyKeyError::new_err(msg));
@@ -487,9 +494,20 @@ impl CRFrame {
   ///
   /// If there is no telemetrypacket in the frame, return None
   #[pyo3(name="get_first_gcutime")]
-  pub fn get_first_gcutime_py(&self) -> Option<f64> {
+  fn get_first_gcutime_py(&self) -> Option<f64> {
     self.get_first_gcutime()
   }
+ 
+  #[getter] 
+  fn get_n_objects(&self) -> usize {
+    self.index.len()
+  }
+
+  #[pyo3(name="get_telemetrypacket_gcutime_range")]
+  fn get_telemetrypacket_gcutime_range_py(&self) -> Option<(f64,f64,f64)> {
+    self.get_telemetrypacket_gcutime_range()
+  }
+
 
   /// Add a TelemetryPacket to the frame. 
   ///
