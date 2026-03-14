@@ -352,6 +352,12 @@ fn monitoring_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<RBMoniDataSeries>()?;
   m.add_class::<CPUMoniData>()?;
   m.add_class::<CPUMoniDataSeries>()?;
+  m.add_class::<SipPresMoniData>()?;
+  m.add_class::<SipPresMoniDataSeries>()?;
+  m.add_class::<SipPosMoniData>()?;
+  m.add_class::<SipPosMoniDataSeries>()?;
+  m.add_class::<SipTimeMoniData>()?;
+  m.add_class::<SipTimeMoniDataSeries>()?;
   m.add_class::<RunStatistics>()?;
   Ok(())
 }

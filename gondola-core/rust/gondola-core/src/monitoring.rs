@@ -45,6 +45,24 @@ pub use heartbeats::{
 pub mod run_statistics;
 pub use run_statistics::RunStatistics;
 
+pub mod sip_position;
+pub use sip_position::{
+  SipPosMoniData,
+  SipPosMoniDataSeries
+};
+
+pub mod sip_pressure;
+pub use sip_pressure::{
+  SipPresMoniData,
+  SipPresMoniDataSeries,
+};
+
+pub mod sip_time;
+pub use sip_time::{
+  SipTimeMoniData,
+  SipTimeMoniDataSeries
+};
+
 use std::collections::VecDeque;
 use std::collections::HashMap;
 
@@ -241,124 +259,272 @@ pub trait MoniSeries<T>
 
 //--------------------------------------------------
 
+#[macro_export]
+macro_rules! moniseries_general {
+  ($name : ident, $class:ty) => {
+     use std::collections::VecDeque;
+     use std::collections::HashMap;
+
+     use crate::monitoring::MoniSeries;
+
+     #[cfg_attr(feature="pybindings",pyclass)]
+     #[derive(Debug, Clone, PartialEq)]
+     pub struct $name {
+       data        : HashMap<u8, VecDeque<$class>>,
+       max_size    : usize,
+       timestamps  : Vec<u64>,
+     }
+     
+     impl $name {
+       pub fn new() -> Self {
+         Self {
+           data       : HashMap::<u8, VecDeque<$class>>::new(),
+           max_size   : 10000,
+           timestamps : Vec::<u64>::new()
+         }
+       }
+     } 
+     
+     impl Default for $name {
+       fn default() -> Self {
+         Self::new()
+       }
+     }
+     
+     impl fmt::Display for $name {
+       fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+         write!(f, "<{} : {} boards>", stringify!($name), self.data.len())
+       }
+     }
+     
+     impl MoniSeries<$class> for $name {
+   
+       fn get_first_ts(&self) -> u64 {
+         if self.timestamps.len() == 0 {
+           return 0;
+         } else {
+           self.timestamps[0]
+         }
+       }
+
+       fn get_data(&self) -> &HashMap<u8,VecDeque<$class>> {
+         return &self.data;
+       }
+     
+       fn get_data_mut(&mut self) -> &mut HashMap<u8,VecDeque<$class>> {
+         return &mut self.data;
+       }
+      
+       fn get_max_size(&self) -> usize {
+         return self.max_size;
+       }
+       
+       fn set_max_size(&mut self, size : usize) {
+         self.max_size = size;
+       }
+  
+       fn add_timestamp(&mut self, ts : u64) {
+         self.timestamps.push(ts);
+       }
+
+       fn get_timestamps(&self) -> &Vec<u64> {
+         //if self.timestamps.len() == 0 {
+         //  let mut timestamps = Vec::<u64>::new();
+         //  for k in self.
+         //} 
+         return &self.timestamps;
+       }
+     }
+  
+     #[cfg(feature="pybindings")]
+     #[pymethods]
+     impl $name {
+       #[new]
+       fn new_py() -> Self {
+         Self::new() 
+       }
+   
+       /// The maximum size of the series. If more data 
+       /// are added, data from the front will be removed 
+       #[getter]
+       #[pyo3(name="max_size")]
+       fn get_max_size_py(&self) -> usize {
+         self.get_max_size()
+       }
+
+       #[setter]
+       #[pyo3(name="max_size")] 
+       fn set_max_size_py(&mut self, size : usize) {
+         self.set_max_size(size);
+       }
+       
+
+       #[getter]
+       #[pyo3(name="get_first_ts")]
+       fn get_first_ts_py(&self) -> u64 {
+         self.get_first_ts()
+       }
+
+       /// If monitoring is retrieved from telemetry, we 
+       /// save the gcu timestamp of the packet, wich 
+       /// herein can be accessed.
+       #[getter] 
+       #[pyo3(name="timestamps")] 
+       fn get_timestamps_py(&self) -> Vec<u64> {
+         warn!("This returns a full copy and is a performance bottleneck!");
+         return self.timestamps.clone();
+       }
+
+       #[pyo3(name="get_var_for_board")]
+       fn get_var_for_board_py(&self, varname : &str, rb_id : u8) -> Option<Vec<f32>> {
+         self.get_var_for_board(varname, &rb_id)
+       }
+
+       /// Reduces the MoniSeries to a single polars data frame
+       /// The structure itself will not be changed
+       #[pyo3(name="get_dataframe")]
+       fn get_dataframe_py(&self) -> PyResult<PyDataFrame> {
+         match self.get_dataframe() {
+           Ok(df) => {
+             let pydf = PyDataFrame(df);
+             return Ok(pydf);
+           },
+           Err(err) => {
+             return Err(PyValueError::new_err(err.to_string()));
+           }
+         }
+       }
+ 
+     }
+     #[cfg(feature="pybindings")]
+     pythonize_display!($name);
+  }
+}
+
 /// Implements the moniseries trait for a MoniData 
 /// type of class
 #[macro_export]
 macro_rules! moniseries {
   ($name : ident, $class:ty) => {
     
-    use std::collections::VecDeque;
-    use std::collections::HashMap;
+    moniseries_general!($name, $class);
+    //use std::collections::VecDeque;
+    //use std::collections::HashMap;
 
-    use crate::monitoring::MoniSeries;
+    //use crate::monitoring::MoniSeries;
 
-    #[cfg_attr(feature="pybindings",pyclass)]
-    #[derive(Debug, Clone, PartialEq)]
-    pub struct $name {
-      data        : HashMap<u8, VecDeque<$class>>,
-      max_size    : usize,
-      timestamps  : Vec<u64>,
-    }
-    
-    impl $name {
-      pub fn new() -> Self {
-        Self {
-          data       : HashMap::<u8, VecDeque<$class>>::new(),
-          max_size   : 10000,
-          timestamps : Vec::<u64>::new()
-        }
-      }
-    } 
-    
-    impl Default for $name {
-      fn default() -> Self {
-        Self::new()
-      }
-    }
-    
-    impl fmt::Display for $name {
-      fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "<{} : {} boards>", stringify!($name), self.data.len())
-      }
-    }
-    
-    impl MoniSeries<$class> for $name {
+    //#[cfg_attr(feature="pybindings",pyclass)]
+    //#[derive(Debug, Clone, PartialEq)]
+    //pub struct $name {
+    //  data        : HashMap<u8, VecDeque<$class>>,
+    //  max_size    : usize,
+    //  timestamps  : Vec<u64>,
+    //}
+    //
+    //impl $name {
+    //  pub fn new() -> Self {
+    //    Self {
+    //      data       : HashMap::<u8, VecDeque<$class>>::new(),
+    //      max_size   : 10000,
+    //      timestamps : Vec::<u64>::new()
+    //    }
+    //  }
+    //} 
+    //
+    //impl Default for $name {
+    //  fn default() -> Self {
+    //    Self::new()
+    //  }
+    //}
+    //
+    //impl fmt::Display for $name {
+    //  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    //    write!(f, "<{} : {} boards>", stringify!($name), self.data.len())
+    //  }
+    //}
+    //
+    //impl MoniSeries<$class> for $name {
    
-      fn get_first_ts(&self) -> u64 {
-        if self.timestamps.len() == 0 {
-          return 0;
-        } else {
-          self.timestamps[0]
-        }
-      }
+    //  fn get_first_ts(&self) -> u64 {
+    //    if self.timestamps.len() == 0 {
+    //      return 0;
+    //    } else {
+    //      self.timestamps[0]
+    //    }
+    //  }
 
-      fn get_data(&self) -> &HashMap<u8,VecDeque<$class>> {
-        return &self.data;
-      }
+    //  fn get_data(&self) -> &HashMap<u8,VecDeque<$class>> {
+    //    return &self.data;
+    //  }
+    //
+    //  fn get_data_mut(&mut self) -> &mut HashMap<u8,VecDeque<$class>> {
+    //    return &mut self.data;
+    //  }
+    // 
+    //  fn get_max_size(&self) -> usize {
+    //    return self.max_size;
+    //  }
+    //  
+    //  fn set_max_size(&mut self, size : usize) {
+    //    self.max_size = size;
+    //  }
+  
+    //  fn add_timestamp(&mut self, ts : u64) {
+    //    self.timestamps.push(ts);
+    //  }
+
+    //  fn get_timestamps(&self) -> &Vec<u64> {
+    //    //if self.timestamps.len() == 0 {
+    //    //  let mut timestamps = Vec::<u64>::new();
+    //    //  for k in self.
+    //    //} 
+    //    return &self.timestamps;
+    //  }
+    //}
+  
+    //#[cfg(feature="pybindings")]
+    //#[pymethods]
+    //impl $name {
+    //  #[new]
+    //  fn new_py() -> Self {
+    //    Self::new() 
+    //  }
+   
+    //  /// The maximum size of the series. If more data 
+    //  /// are added, data from the front will be removed 
+    //  #[getter]
+    //  #[pyo3(name="max_size")]
+    //  fn get_max_size_py(&self) -> usize {
+    //    self.get_max_size()
+    //  }
+
+    //  #[setter]
+    //  #[pyo3(name="max_size")] 
+    //  fn set_max_size_py(&mut self, size : usize) {
+    //    self.set_max_size(size);
+    //  }
+    //  
+
+    //  #[getter]
+    //  #[pyo3(name="get_first_ts")]
+    //  fn get_first_ts_py(&self) -> u64 {
+    //    self.get_first_ts()
+    //  }
+
+    //  /// If monitoring is retrieved from telemetry, we 
+    //  /// save the gcu timestamp of the packet, wich 
+    //  /// herein can be accessed.
+    //  #[getter] 
+    //  #[pyo3(name="timestamps")] 
+    //  fn get_timestamps_py(&self) -> Vec<u64> {
+    //    warn!("This returns a full copy and is a performance bottleneck!");
+    //    return self.timestamps.clone();
+    //  }
     
-      fn get_data_mut(&mut self) -> &mut HashMap<u8,VecDeque<$class>> {
-        return &mut self.data;
-      }
-     
-      fn get_max_size(&self) -> usize {
-        return self.max_size;
-      }
-      
-      fn set_max_size(&mut self, size : usize) {
-        self.max_size = size;
-      }
-  
-      fn add_timestamp(&mut self, ts : u64) {
-        self.timestamps.push(ts);
-      }
 
-      fn get_timestamps(&self) -> &Vec<u64> {
-        //if self.timestamps.len() == 0 {
-        //  let mut timestamps = Vec::<u64>::new();
-        //  for k in self.
-        //} 
-        return &self.timestamps;
-      }
-    }
-  
     #[cfg(feature="pybindings")]
     #[pymethods]
     impl $name {
-      #[new]
-      fn new_py() -> Self {
-        Self::new() 
-      }
-   
-      /// The maximum size of the series. If more data 
-      /// are added, data from the front will be removed 
-      #[getter]
-      #[pyo3(name="max_size")]
-      fn get_max_size_py(&self) -> usize {
-        self.get_max_size()
-      }
-
-      #[setter]
-      #[pyo3(name="max_size")] 
-      fn set_max_size_py(&mut self, size : usize) {
-        self.set_max_size(size);
-      }
-      
-
-      #[getter]
-      #[pyo3(name="get_first_ts")]
-      fn get_first_ts_py(&self) -> u64 {
-        self.get_first_ts()
-      }
-
-      /// If monitoring is retrieved from telemetry, we 
-      /// save the gcu timestamp of the packet, wich 
-      /// herein can be accessed.
-      #[getter] 
-      #[pyo3(name="timestamps")] 
-      fn get_timestamps_py(&self) -> Vec<u64> {
-        warn!("This returns a full copy and is a performance bottleneck!");
-        return self.timestamps.clone();
-      }
 
       /// Add an additional (Caraspace) file to the series 
       ///
@@ -550,42 +716,148 @@ macro_rules! moniseries {
         }
       }
       
-      #[pyo3(name="get_var_for_board")]
-      fn get_var_for_board_py(&self, varname : &str, rb_id : u8) -> Option<Vec<f32>> {
-        self.get_var_for_board(varname, &rb_id)
-      }
+      //#[pyo3(name="get_var_for_board")]
+      //fn get_var_for_board_py(&self, varname : &str, rb_id : u8) -> Option<Vec<f32>> {
+      //  self.get_var_for_board(varname, &rb_id)
+      //}
 
-      /// Reduces the MoniSeries to a single polars data frame
-      /// The structure itself will not be changed
-      #[pyo3(name="get_dataframe")]
-      fn get_dataframe_py(&self) -> PyResult<PyDataFrame> {
-        match self.get_dataframe() {
-          Ok(df) => {
-            let pydf = PyDataFrame(df);
-            return Ok(pydf);
-          },
-          Err(err) => {
-            return Err(PyValueError::new_err(err.to_string()));
+      ///// Reduces the MoniSeries to a single polars data frame
+      ///// The structure itself will not be changed
+      //#[pyo3(name="get_dataframe")]
+      //fn get_dataframe_py(&self) -> PyResult<PyDataFrame> {
+      //  match self.get_dataframe() {
+      //    Ok(df) => {
+      //      let pydf = PyDataFrame(df);
+      //      return Ok(pydf);
+      //    },
+      //    Err(err) => {
+      //      return Err(PyValueError::new_err(err.to_string()));
+      //    }
+      //  }
+      //}
+
+      ////fn get_pl_series_py(&self) -> PyResult<PyS
+      ////fn get_data(&self) -> &HashMap<u8,VecDeque<$class>> {
+      ////  return &self.data;
+      ////}
+    
+      ////fn get_data_mut(&mut self) -> &mut HashMap<u8,VecDeque<$class>> {
+      ////  return &mut self.data;
+      ////}
+     
+      ////fn get_max_size(&self) -> usize {
+      ////  return self.max_size;
+      ////}
+    }
+    
+    //#[cfg(feature="pybindings")]
+    //pythonize_display!($name);
+  }
+}
+
+// ------------------------------------------------
+
+// baiscally the same macro, but for data coming 
+// from telemetry 
+
+/// Implements the moniseries trait for a MoniData 
+/// type of class
+#[macro_export]
+macro_rules! moniseries_telemetry {
+  ($name : ident, $class:ty) => {
+    
+    moniseries_general!($name, $class);
+
+    #[cfg(feature="pybindings")]
+    #[pymethods]
+    impl $name {
+
+      /// Add an additional (Caraspace) file to the series 
+      ///
+      /// # Arguments:
+      ///   * filename    : The name of the (caraspace) file to add
+      ///   * from_object : Since this adds caraspace files, it is possible 
+      ///                   to choose from where to get the information.
+      ///                   Either the telemetry packet, or the tofpacket, if 
+      ///                   either is present in the frame. When 
+      ///                   CRFrameObjectType = Unknown, it will figure it out 
+      ///                   automatically, preferring the telemetry since it has
+      ///                   the gcu timestamp
+      #[pyo3(signature = (filename, from_object = CRFrameObjectType::TelemetryPacket))]
+      fn add_crfile(&mut self, filename : String, from_object : CRFrameObjectType) {
+        let reader = CRReader::new(filename).expect("Unable to open file!");
+        // now we have a problem - from which frame should we get it?
+        // if we get it from the dedicated TOF stream it will be much 
+        // faster (if that is available) since it will be it's own 
+        // presence in the frame
+        //let address = &source.clone();
+        //let mut try_from_telly = false;
+        let tel_source    = "TelemetryPacketType.AnyTofHK";
+        for frame in reader {
+          match from_object { 
+            CRFrameObjectType::TelemetryPacket | CRFrameObjectType::Unknown => {
+              if frame.has(tel_source) {
+                let hk_res = frame.get::<TelemetryPacket>(tel_source);
+                match hk_res {
+                  Err(err) => {
+                    println!("Error unpacking! {err}");
+                  }
+                  Ok(hk) => {
+                    if hk.header.packet_type != <$class>::TEL_PACKET_TYPE  {
+                      // this is not the packet you are looking for 
+                      continue;
+                    }   
+                    let mut pos = 0;
+                    // subtract the 2020/1/1 midnight from the gcutime to make 
+                    // it f32
+                    let gcutime = hk.header.get_gcutime() as u64;
+                    match <$class>::from_bytestream(&hk.payload, &mut pos) {
+                      Err(err) => {
+                        println!("Error unpackin! {err}");
+                      }
+                      Ok(mut moni) => {
+                        self.add_timestamp(gcutime);
+                        moni.set_timestamp(gcutime - self.get_first_ts()); 
+                        self.add(moni);
+                        //self.timestamps.push(gcutime);
+                      }
+                    } 
+                  }
+                }
+              }
+            }
+            _ => ()
           }
         }
       }
-
-      //fn get_pl_series_py(&self) -> PyResult<PyS
-      //fn get_data(&self) -> &HashMap<u8,VecDeque<$class>> {
-      //  return &self.data;
-      //}
-    
-      //fn get_data_mut(&mut self) -> &mut HashMap<u8,VecDeque<$class>> {
-      //  return &mut self.data;
-      //}
-     
-      //fn get_max_size(&self) -> usize {
-      //  return self.max_size;
-      //}
+      
+      /// Add an additional (Telemetry) file to the series 
+      ///
+      /// # Arguments:
+      ///   * filename    : The name of the (telemetry) file to add
+      fn add_telemetryfile(&mut self, filename : String) {
+        let reader = TelemetryPacketReader::new(filename, true, None, None);
+        for pack in reader {
+          if pack.header.packet_type == <$class>::TEL_PACKET_TYPE {
+            let mut pos = 0;
+            // subtract the 2020/1/1 midnight from the gcutime to make 
+            // it f32
+            let gcutime = pack.header.get_gcutime() as u64;
+            match <$class>::from_bytestream(&pack.payload, &mut pos) {
+              Err(err) => {
+                println!("Error unpackin! {err}");
+              }
+              Ok(mut moni) => {
+                self.add_timestamp(gcutime);
+                moni.set_timestamp(gcutime - self.get_first_ts()); 
+                self.add(moni);
+              }
+            }
+          }
+        }
+      }
     }
-    
-    #[cfg(feature="pybindings")]
-    pythonize_display!($name);
   }
 }
+
 
