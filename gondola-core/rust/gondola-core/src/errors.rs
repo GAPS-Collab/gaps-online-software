@@ -8,6 +8,7 @@ use crate::prelude::*;
 #[repr(u8)]
 pub enum SerializationError {
   //HeaderNotFound,
+  Unknown,
   TailInvalid,
   HeadInvalid,
   TrackerDelimiterInvalid,
@@ -33,6 +34,7 @@ pub enum SerializationError {
 impl SerializationError { 
   pub fn as_str(&self) -> &str {
     match self {
+      SerializationError::Unknown                  => "Unknown",
       SerializationError::TailInvalid              => "TailInvalid", 
       SerializationError::HeadInvalid              => "HeadInvalid",     
       SerializationError::TrackerDelimiterInvalid  => "TrackerDelimiterInvalid",
