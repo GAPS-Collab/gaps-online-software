@@ -63,6 +63,12 @@ pub use sip_time::{
   SipTimeMoniDataSeries
 };
 
+pub mod gcu_ev_stats;
+pub use gcu_ev_stats::{
+  GcuEvBldStatsMoniData,
+  GcuEvBldStatsMoniDataSeries
+};
+
 use std::collections::VecDeque;
 use std::collections::HashMap;
 

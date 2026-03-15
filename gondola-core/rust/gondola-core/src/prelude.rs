@@ -169,6 +169,8 @@ pub use crate::pythonize_display;
 #[cfg(feature="pybindings")]
 pub use crate::pythonize_monidata;
 pub use crate::moniseries;
+pub use crate::moniseries_general;
+pub use crate::moniseries_telemetry;
 #[cfg(feature="pybindings")]
 pub use crate::pythonize_error;
 
