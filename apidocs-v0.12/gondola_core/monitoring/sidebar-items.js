@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["cpu_moni_data","heartbeats","ltb_moni_data","mtb_moni_data","pa_moni_data","pb_moni_data","rb_moni_data","run_statistics"],"trait":["MoniData","MoniSeries"]};
+window.SIDEBAR_ITEMS = {"mod":["cpu_moni_data","gcu_ev_stats","heartbeats","ltb_moni_data","mtb_moni_data","pa_moni_data","pb_moni_data","rb_moni_data","run_statistics","sip_position","sip_pressure","sip_time"],"trait":["MoniData","MoniSeries"]};

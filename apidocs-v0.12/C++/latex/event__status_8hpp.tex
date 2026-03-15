@@ -1,0 +1,59 @@
+\doxysection{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/events/event\+\_\+status.hpp File Reference}
+\hypertarget{event__status_8hpp}{}\label{event__status_8hpp}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/events/event\_status.hpp@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/events/event\_status.hpp}}
+{\ttfamily \#include $<$format$>$}\newline
+{\ttfamily \#include "{}gondola.\+hpp"{}}\newline
+Include dependency graph for event\+\_\+status.\+hpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{event__status_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{event__status_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structstd_1_1formatter_3_01gondola_1_1EventStatus_01_4}{std\+::formatter$<$ gondola\+::\+Event\+Status $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacegondola}{gondola}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baa}{gondola\+::\+Event\+Status}} \+: u8 \{ \newline
+\mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa88183b946cc5f0e8c96b2e66e1c74a7e}{gondola\+::\+Unknown}} = 0
+, \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa1b8508e116432ac1383a292c6a0d05c1}{gondola\+::\+Crc32\+Wrong}} = 10
+, \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaaec81a5026e321b3f9ff2f610e52d532e}{gondola\+::\+Tail\+Wrong}} = 11
+, \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaae47816a3c64358b80c028dc88edcab3c}{gondola\+::\+Channel\+IDWrong}} = 12
+, \newline
+\mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa89db10b7258e552827a62fd8d1e4309e}{gondola\+::\+Cell\+Sync\+Errors}} = 13
+, \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa99ef53b53786cbe479e9a7075a2492df}{gondola\+::\+Chn\+Sync\+Errors}} = 14
+, \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa4d9a974c1af3b5418f3b61dbd735bc14}{gondola\+::\+Cell\+And\+Chn\+Sync\+Errors}} = 15
+, \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa914a42ba7d6f75029e02b8c5e8a80016}{gondola\+::\+Any\+Data\+Mangling}} = 16
+, \newline
+\mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaae0a530b3e7e74423e454a99e3c6d0b69}{gondola\+::\+Incomplete\+Readout}} = 21
+, \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaaba59a6fba632d1543589d766abc636df}{gondola\+::\+Incompatible\+Data}} = 22
+, \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa44ce38fea2e8223bad3229cd0eac17da}{gondola\+::\+Event\+Time\+Out}} = 23
+, \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa5c7a66b675c172f368c8331b20c68c45}{gondola\+::\+Good\+No\+CRCOr\+Err\+Bit\+Check}} = 39
+, \newline
+\mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa3a4bcec2a877d364580a1a753dd0d1c8}{gondola\+::\+Good\+No\+CRCCheck}} = 40
+, \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa69a7cfda8af8a54154e556f4d766926c}{gondola\+::\+Good\+No\+Err\+Bit\+Check}} = 41
+, \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa56cdd7e9e3cef1974f4075c03a80332d}{gondola\+::\+Perfect}} = 42
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacegondola_accbe4d2d1e3b9822ec059c62f1fd9744}{gondola\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baa}{Event\+Status}} \&status)
+\end{DoxyCompactItemize}

@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['a_0',['A',['../namespaceGaps.html#a900b25ea53c4b01b14e10492303daa9ca7fc56270e7a70fa81a5935b72eacbe29',1,'Gaps']]],
+  ['a_0',['A',['../namespacegondola.html#a044b95c22747f96dac042c1b3bcacf77a7fc56270e7a70fa81a5935b72eacbe29',1,'gondola']]],
   ['ack_1',['Ack',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39cedab25d8b2099e52bb9300aca6661601b8b',1,'gondola']]],
-  ['active_2',['active',['../structGaps_1_1TrackerStripMask.html#af87a664d9ea88cb8772eda82006cad91',1,'Gaps::TrackerStripMask']]],
+  ['active_2',['active',['../structgondola_1_1TrackerStripMask.html#acc288609b461cb708f940e0985bbab91',1,'gondola::TrackerStripMask']]],
   ['adc_3',['adc',['../structgondola_1_1RBEvent.html#abf95a887ae0756207426180718583624',1,'gondola::RBEvent::adc'],['../structgondola_1_1TrkHit.html#aeeba12ee28854810dcc9ecb2dcde1f1e',1,'gondola::TrkHit::adc'],['../structgondola_1_1TrkCalibratedHit.html#af2da95799454a387f18105568d223935',1,'gondola::TrkCalibratedHit::adc']]],
   ['adc_5fa_4',['adc_a',['../structgondola_1_1RBWaveform.html#a593a5a66ed29068cabae6374504aef4c',1,'gondola::RBWaveform']]],
   ['adc_5favdd_5fcurrent_5',['adc_avdd_current',['../structRBMoniData.html#aaa3ab0ffa3f670681b2771df183875f2',1,'RBMoniData']]],
@@ -17,6 +17,6 @@ var searchData=
   ['anytofhk_14',['AnyTofHK',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39ceda1d633e18b49ad6ab196ff08b21e0a052',1,'gondola']]],
   ['anytrackerhk_15',['AnyTrackerHK',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39cedac44f8f7d9b9f501fe9278cd56521f28a',1,'gondola']]],
   ['api_20software_20documentation_16',['gaps-online-software C++ API software documentation',['../index.html',1,'']]],
-  ['arguments_17',['Arguments',['../namespacegondola.html#autotoc_md3',1,'']]],
+  ['arguments_17',['Arguments',['../namespacegondola.html#autotoc_md2',1,'']]],
   ['asic_5fevent_5fcode_18',['asic_event_code',['../structgondola_1_1TrkHit.html#ae6b6120eb7a3dc0750e139e13e82ff2d',1,'gondola::TrkHit']]]
 ];

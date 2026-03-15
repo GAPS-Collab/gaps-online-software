@@ -1,7 +1,7 @@
 var structgondola_1_1TofEvent =
 [
     [ "TofEvent", "structgondola_1_1TofEvent.html#a472db40fd776f3517c095b83ed69b96d", null ],
-    [ "get_hits", "structgondola_1_1TofEvent.html#a57d68c0ac8f98da93aba370663cb6bc0", null ],
+    [ "get_hits", "structgondola_1_1TofEvent.html#aa33d8845699a6059b887d2b1171ffeb7", null ],
     [ "get_rb_link_ids", "structgondola_1_1TofEvent.html#a6c451847988c3cb35fc9a446b1c135e7", null ],
     [ "get_rbevent", "structgondola_1_1TofEvent.html#a630903c288fc7d96a16fe4a3b9ab9cc8", null ],
     [ "get_rbids", "structgondola_1_1TofEvent.html#a1e3f10a2576215b86efd38b3be586a59", null ],
@@ -14,7 +14,6 @@ var structgondola_1_1TofEvent =
     [ "dsi_j_mask", "structgondola_1_1TofEvent.html#af4bf37090b00118f5c6ff18fbb2542b9", null ],
     [ "event_id", "structgondola_1_1TofEvent.html#aed36eda570a458ca55274a32d9d9f3ce", null ],
     [ "hits", "structgondola_1_1TofEvent.html#a6582a153cdb5cc6d2c06f5a6390d5fed", null ],
-    [ "mt_event", "structgondola_1_1TofEvent.html#abe4d42aeb75db2ad112d590741b6889c", null ],
     [ "mtb_link_mask", "structgondola_1_1TofEvent.html#ae9026f0e498aa7b24847862c1f5a6851", null ],
     [ "n_hits_cbe", "structgondola_1_1TofEvent.html#af40ea46d8d8b32d33c9b440c338592b0", null ],
     [ "n_hits_cor", "structgondola_1_1TofEvent.html#a68cc2fb0e10cbebab5bd54593f91bf99", null ],
@@ -30,5 +29,5 @@ var structgondola_1_1TofEvent =
     [ "tot_edep_cor", "structgondola_1_1TofEvent.html#a00dc63f1263775b9e8ba1dd193f29163", null ],
     [ "tot_edep_umb", "structgondola_1_1TofEvent.html#a548d162033ba5a7db441756583a0a250", null ],
     [ "trigger_sources", "structgondola_1_1TofEvent.html#a7f4a94294974e868faac339ae6e1bc5e", null ],
-    [ "version", "structgondola_1_1TofEvent.html#aa8aeba73b3348c9a697707fb671bb711", null ]
+    [ "version", "structgondola_1_1TofEvent.html#a3129fe724c08723654817fa76f3cd5e6", null ]
 ];

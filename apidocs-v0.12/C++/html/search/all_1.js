@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['b_0',['B',['../namespaceGaps.html#a900b25ea53c4b01b14e10492303daa9ca9d5ed678fe57bcca610140957afab571',1,'Gaps']]],
+  ['b_0',['B',['../namespacegondola.html#a044b95c22747f96dac042c1b3bcacf77a9d5ed678fe57bcca610140957afab571',1,'gondola']]],
   ['baseline_5fa_1',['baseline_a',['../structgondola_1_1TofHit.html#a948319242243d19f27c8fc6f251a94a6',1,'gondola::TofHit']]],
   ['baseline_5fa_5frms_2',['baseline_a_rms',['../structgondola_1_1TofHit.html#a3685c82a69b1fa5337c6d6de23fa772f',1,'gondola::TofHit']]],
   ['baseline_5fb_3',['baseline_b',['../structgondola_1_1TofHit.html#a4f89a88cc04bd16c156d737acbe710fa',1,'gondola::TofHit']]],

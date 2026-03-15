@@ -1,0 +1,36 @@
+\doxysection{trigger.\+hpp}
+\hypertarget{trigger_8hpp_source}{}\label{trigger_8hpp_source}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/events/trigger.hpp@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/events/trigger.hpp}}
+\mbox{\hyperlink{trigger_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#pragma\ once\ }}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <format>}}
+\DoxyCodeLine{00006\ \ \ }
+\DoxyCodeLine{00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacegondola}{gondola}}\ \{}
+\DoxyCodeLine{00008\ \ \ }
+\DoxyCodeLine{00009\ \ \ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580}{LTBThreshold}}\ :\ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \{}
+\DoxyCodeLine{00010\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580af8246e1e45d89414e8bf56ffe1680a54}{NoHit}}\ \ \ =\ 0,}
+\DoxyCodeLine{00012\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580aebfe5e1791db03c4cd6ab95801e0977d}{Hit}}\ \ \ \ \ =\ 1,}
+\DoxyCodeLine{00014\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580a0b87d66b88c72957dfea8c9605016442}{Beta}}\ \ \ \ =\ 2,}
+\DoxyCodeLine{00016\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580a98865aa73ddbf0657187d430de3c38bc}{Veto}}\ \ \ \ =\ 3,}
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a88183b946cc5f0e8c96b2e66e1c74a7e}{Unknown}}\ =\ 255,}
+\DoxyCodeLine{00020\ \ \ \};}
+\DoxyCodeLine{00021\ \ \ }
+\DoxyCodeLine{00022\ \ \ std::ostream\&\ \mbox{\hyperlink{namespacegondola_a9086a1522bf1269d1824786811a08141}{operator<<}}(std::ostream\&\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580}{gondola::LTBThreshold}}\&\ thresh);}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \ \ }
+\DoxyCodeLine{00028\ \ \ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21}{TriggerType}}\ :\ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a88183b946cc5f0e8c96b2e66e1c74a7e}{Unknown}}\ \ \ \ \ \ =\ 0,}
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21aed36a1ef76a59ee3f15180e0441188ad}{Any}}\ \ \ \ \ \ \ \ \ \ =\ 1,}
+\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21a92ea731d3af6677905303c88689f5d55}{Track}}\ \ \ \ \ \ \ \ =\ 2,}
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21abc421fa7f533c3d639eeebfd29fdf499}{TrackCentral}}\ =\ 3,}
+\DoxyCodeLine{00034\ \ \ \ \ \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21a41d31d862aea788d0c2b86ac6df3c0ae}{Gaps}}\ \ \ \ \ \ \ \ \ =\ 4,}
+\DoxyCodeLine{00036\ \ \ \ \ \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21adff200b0bb8d3c69fbd54cb43664cd7e}{Poisson}}\ \ \ \ \ \ =\ 100,}
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21adc2eb84d1f952ad0e6b58014aabd616a}{Forced}}\ \ \ \ \ \ \ =\ 101,\ }
+\DoxyCodeLine{00038\ \ \ \};}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \ \ std::ostream\&\ \mbox{\hyperlink{namespacegondola_a9086a1522bf1269d1824786811a08141}{operator<<}}(std::ostream\&\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}},\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21}{gondola::TriggerType}}\&\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{t\_type}});}
+\DoxyCodeLine{00041\ \}}
+
+\end{DoxyCode}

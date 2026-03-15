@@ -18,5 +18,5 @@ var searchData=
   ['is_5ffrom_5ftelemetry_15',['is_from_telemetry',['../structgondola_1_1CRReader.html#ad5e490135ee09200d6551ecf505e64ac',1,'gondola::CRReader']]],
   ['is_5flocked_16',['is_locked',['../structgondola_1_1RBEventHeader.html#a6b707ca1f4a53886c91b5035dcc0ebab',1,'gondola::RBEventHeader']]],
   ['is_5flocked_5flast_5fsec_17',['is_locked_last_sec',['../structgondola_1_1RBEventHeader.html#a812ffbae6aae1269f074dc578b747bcf',1,'gondola::RBEventHeader']]],
-  ['is_5fmean_5fvalue_18',['is_mean_value',['../structGaps_1_1TrackerStripPedestal.html#a69383529aae6c203477ab843e10e90ce',1,'Gaps::TrackerStripPedestal']]]
+  ['is_5fmean_5fvalue_18',['is_mean_value',['../structgondola_1_1TrackerStripPedestal.html#aefc1a9fb445dc7add66d85db9c45bd08',1,'gondola::TrackerStripPedestal']]]
 ];

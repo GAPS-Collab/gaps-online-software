@@ -34,5 +34,5 @@ var structgondola_1_1TofHit =
     [ "tail", "structgondola_1_1TofHit.html#aa9d901afff1a2e399b01f0f19e755a1b", null ],
     [ "timestamp16", "structgondola_1_1TofHit.html#a7e7efcfa3035b8304ef983ca601eb412", null ],
     [ "timestamp32", "structgondola_1_1TofHit.html#ae1fd9ac50a31c3c88082cc14b93df429", null ],
-    [ "version", "structgondola_1_1TofHit.html#a6076aeaa8c64e990f21748c31a250ee4", null ]
+    [ "version", "structgondola_1_1TofHit.html#a2ed1a8badb379f13a3aee6d71a57f76b", null ]
 ];

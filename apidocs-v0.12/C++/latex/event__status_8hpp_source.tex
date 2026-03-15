@@ -1,0 +1,50 @@
+\doxysection{event\+\_\+status.\+hpp}
+\hypertarget{event__status_8hpp_source}{}\label{event__status_8hpp_source}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/events/event\_status.hpp@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/events/event\_status.hpp}}
+\mbox{\hyperlink{event__status_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#pragma\ once\ }}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <format>}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gondola_8hpp}{gondola.hpp}}"{}}}
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacegondola}{gondola}}\ \{\ }
+\DoxyCodeLine{00009\ \ \ }
+\DoxyCodeLine{00014\ \ \ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baa}{EventStatus}}\ :\ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a88183b946cc5f0e8c96b2e66e1c74a7e}{Unknown}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ \ 0,}
+\DoxyCodeLine{00016\ \ \ \ \ \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa1b8508e116432ac1383a292c6a0d05c1}{Crc32Wrong}}\ \ \ \ \ \ \ \ \ \ \ \ \ =\ 10,}
+\DoxyCodeLine{00017\ \ \ \ \ \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaaec81a5026e321b3f9ff2f610e52d532e}{TailWrong}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 11,}
+\DoxyCodeLine{00018\ \ \ \ \ \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaae47816a3c64358b80c028dc88edcab3c}{ChannelIDWrong}}\ \ \ \ \ \ \ \ \ =\ 12,\ }
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa89db10b7258e552827a62fd8d1e4309e}{CellSyncErrors}}\ \ \ \ \ \ \ \ \ =\ 13,}
+\DoxyCodeLine{00020\ \ \ \ \ \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa99ef53b53786cbe479e9a7075a2492df}{ChnSyncErrors}}\ \ \ \ \ \ \ \ \ \ =\ 14,}
+\DoxyCodeLine{00021\ \ \ \ \ \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa4d9a974c1af3b5418f3b61dbd735bc14}{CellAndChnSyncErrors}}\ \ \ =\ 15,}
+\DoxyCodeLine{00022\ \ \ \ \ \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa914a42ba7d6f75029e02b8c5e8a80016}{AnyDataMangling}}\ \ \ \ \ \ \ \ =\ 16,}
+\DoxyCodeLine{00023\ \ \ \ \ \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaae0a530b3e7e74423e454a99e3c6d0b69}{IncompleteReadout}}\ \ \ \ \ \ =\ 21,}
+\DoxyCodeLine{00024\ \ \ \ \ \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaaba59a6fba632d1543589d766abc636df}{IncompatibleData}}\ \ \ \ \ \ \ =\ 22,}
+\DoxyCodeLine{00025\ \ \ \ \ \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa44ce38fea2e8223bad3229cd0eac17da}{EventTimeOut}}\ \ \ \ \ \ \ \ \ \ \ =\ 23,}
+\DoxyCodeLine{00026\ \ \ \ \ \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa5c7a66b675c172f368c8331b20c68c45}{GoodNoCRCOrErrBitCheck}}\ =\ 39,}
+\DoxyCodeLine{00029\ \ \ \ \ \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa3a4bcec2a877d364580a1a753dd0d1c8}{GoodNoCRCCheck}}\ \ \ \ \ \ \ \ \ =\ 40,}
+\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa69a7cfda8af8a54154e556f4d766926c}{GoodNoErrBitCheck}}\ \ \ \ \ \ =\ 41,}
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa56cdd7e9e3cef1974f4075c03a80332d}{Perfect}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 42,\ }
+\DoxyCodeLine{00034\ \ \ \};}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \ \ std::ostream\&\ \mbox{\hyperlink{namespacegondola_a9086a1522bf1269d1824786811a08141}{operator<<}}(std::ostream\&\ os,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baa}{EventStatus}}\&\ status);}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \}\ }
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00041\ \textcolor{keyword}{struct\ }std::formatter<\mbox{\hyperlink{namespacegondola}{gondola}}::EventStatus>\ :\ std::formatter<std::string>\ \{}
+\DoxyCodeLine{00042\ \ \ \textcolor{comment}{//\ Parse\ format\ specifiers\ (default\ implementation)}}
+\DoxyCodeLine{00043\ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structstd_1_1formatter_3_01gondola_1_1EventStatus_01_4_a214eb4e7981e34b5a133ecab36114d34}{parse}}(std::format\_parse\_context\&\ ctx)\ \{}
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ctx.begin();}
+\DoxyCodeLine{00045\ \ \ \}}
+\DoxyCodeLine{00046\ \ \ }
+\DoxyCodeLine{00047\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structstd_1_1formatter_3_01gondola_1_1EventStatus_01_4_a305ff04496350dffade082a7a4ade716}{format}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baa}{gondola::EventStatus}}\&\ status,\ \textcolor{keyword}{auto}\&\ ctx)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ std::ostringstream\ oss;}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ oss\ <<\ status;\ \ \textcolor{comment}{//\ Use\ the\ <<\ operator\ to\ convert\ enum\ to\ string}}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::format\_to(ctx.out(),\ \textcolor{stringliteral}{"{}\{\}"{}},\ oss.str());}
+\DoxyCodeLine{00051\ \ \ \}}
+\DoxyCodeLine{00052\ \};}
+\DoxyCodeLine{00053\ }
+
+\end{DoxyCode}

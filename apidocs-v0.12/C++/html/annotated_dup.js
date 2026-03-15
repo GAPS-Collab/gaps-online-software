@@ -1,18 +1,11 @@
 var annotated_dup =
 [
-    [ "Gaps", "namespaceGaps.html", [
-      [ "TofPaddle", "structGaps_1_1TofPaddle.html", "structGaps_1_1TofPaddle" ],
-      [ "TrackerStrip", "structGaps_1_1TrackerStrip.html", "structGaps_1_1TrackerStrip" ],
-      [ "TrackerStripMask", "structGaps_1_1TrackerStripMask.html", "structGaps_1_1TrackerStripMask" ],
-      [ "TrackerStripPedestal", "structGaps_1_1TrackerStripPedestal.html", "structGaps_1_1TrackerStripPedestal" ]
-    ] ],
     [ "gondola", "namespacegondola.html", [
       [ "Cooling", "structgondola_1_1Cooling.html", "structgondola_1_1Cooling" ],
       [ "CRFrame", "structgondola_1_1CRFrame.html", "structgondola_1_1CRFrame" ],
       [ "CRFrameObject", "structgondola_1_1CRFrameObject.html", "structgondola_1_1CRFrameObject" ],
       [ "CRReader", "structgondola_1_1CRReader.html", "structgondola_1_1CRReader" ],
       [ "IOError", "classgondola_1_1IOError.html", "classgondola_1_1IOError" ],
-      [ "MasterTriggerEvent", "structgondola_1_1MasterTriggerEvent.html", "structgondola_1_1MasterTriggerEvent" ],
       [ "RBCalibration", "structgondola_1_1RBCalibration.html", "structgondola_1_1RBCalibration" ],
       [ "RBEvent", "structgondola_1_1RBEvent.html", "structgondola_1_1RBEvent" ],
       [ "RBEventHeader", "structgondola_1_1RBEventHeader.html", "structgondola_1_1RBEventHeader" ],
@@ -26,7 +19,11 @@ var annotated_dup =
       [ "TofHit", "structgondola_1_1TofHit.html", "structgondola_1_1TofHit" ],
       [ "TofMetaData", "structgondola_1_1TofMetaData.html", "structgondola_1_1TofMetaData" ],
       [ "TofPacketReader", "classgondola_1_1TofPacketReader.html", "classgondola_1_1TofPacketReader" ],
+      [ "TofPaddle", "structgondola_1_1TofPaddle.html", "structgondola_1_1TofPaddle" ],
       [ "TofPaddleTimingConstant", "structgondola_1_1TofPaddleTimingConstant.html", "structgondola_1_1TofPaddleTimingConstant" ],
+      [ "TrackerStrip", "structgondola_1_1TrackerStrip.html", "structgondola_1_1TrackerStrip" ],
+      [ "TrackerStripMask", "structgondola_1_1TrackerStripMask.html", "structgondola_1_1TrackerStripMask" ],
+      [ "TrackerStripPedestal", "structgondola_1_1TrackerStripPedestal.html", "structgondola_1_1TrackerStripPedestal" ],
       [ "TrkCalibratedHit", "structgondola_1_1TrkCalibratedHit.html", "structgondola_1_1TrkCalibratedHit" ],
       [ "TrkEvent", "structgondola_1_1TrkEvent.html", "structgondola_1_1TrkEvent" ],
       [ "TrkEventPacket", "structgondola_1_1TrkEventPacket.html", "structgondola_1_1TrkEventPacket" ],

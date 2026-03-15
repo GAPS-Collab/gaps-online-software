@@ -1,0 +1,14 @@
+gondola.algo
+============
+
+.. automodule:: gondola.algo
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      fit_sine_simple
+      get_max_value_idx
+      interpolate_time
+   

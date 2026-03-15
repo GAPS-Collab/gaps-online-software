@@ -2,7 +2,7 @@
 \hypertarget{structgondola_1_1TofHit}{}\label{structgondola_1_1TofHit}\index{gondola::TofHit@{gondola::TofHit}}
 
 
-{\ttfamily \#include $<$events.\+h$>$}
+{\ttfamily \#include $<$tof\+\_\+hit.\+hpp$>$}
 
 \doxysubsubsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
@@ -50,14 +50,14 @@
 \doxysubsubsection*{Static Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TofHit_a004bf17039dcb7e37f9a3808ad2ec4c6}{from\+\_\+bytestream}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}}, \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}}) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{structgondola_1_1TofHit}{Tof\+Hit}}, \mbox{\hyperlink{classgondola_1_1IOError}{g\+::\+IOError}} $>$
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TofHit_a72ae7a90aeba7c1dbf7c542c5f2eab32}{from\+\_\+bytestream}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}}, \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}}) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{structgondola_1_1TofHit}{Tof\+Hit}}, \mbox{\hyperlink{classgondola_1_1IOError}{IOError}} $>$
 \end{DoxyCompactItemize}
 \doxysubsubsection*{Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structgondola_1_1TofHit_afdf78983ce30ba2fca09781bf3096724}{paddle\+\_\+id}}
 \item 
-\mbox{\hyperlink{namespacegondola_af998b820a54bca400c19e03948e82c28}{g\+::\+Protocol\+Version}} \mbox{\hyperlink{structgondola_1_1TofHit_a6076aeaa8c64e990f21748c31a250ee4}{version}}
+\mbox{\hyperlink{namespacegondola_af998b820a54bca400c19e03948e82c28}{Protocol\+Version}} \mbox{\hyperlink{structgondola_1_1TofHit_a2ed1a8badb379f13a3aee6d71a57f76b}{version}}
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1TofHit_a948319242243d19f27c8fc6f251a94a6}{baseline\+\_\+a}}
 \item 
@@ -100,11 +100,11 @@ Reconstructed waveform peak information
 There should be one \doxylink{structgondola_1_1TofHit}{Tof\+Hit} per reconstructed peak 
 
 \doxysubsection{Member Function Documentation}
-\Hypertarget{structgondola_1_1TofHit_a004bf17039dcb7e37f9a3808ad2ec4c6}\label{structgondola_1_1TofHit_a004bf17039dcb7e37f9a3808ad2ec4c6} 
+\Hypertarget{structgondola_1_1TofHit_a72ae7a90aeba7c1dbf7c542c5f2eab32}\label{structgondola_1_1TofHit_a72ae7a90aeba7c1dbf7c542c5f2eab32} 
 \index{gondola::TofHit@{gondola::TofHit}!from\_bytestream@{from\_bytestream}}
 \index{from\_bytestream@{from\_bytestream}!gondola::TofHit@{gondola::TofHit}}
 \doxysubsubsection{\texorpdfstring{from\_bytestream()}{from\_bytestream()}}
-{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tof\+Hit\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{bytestream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \&}]{pos }\end{DoxyParamCaption}) -\/$>$ r\+::\+Result$<$\mbox{\hyperlink{structgondola_1_1TofHit}{Tof\+Hit}},\mbox{\hyperlink{classgondola_1_1IOError}{g\+::\+IOError}}$>$\hspace{0.3cm}{\ttfamily [static]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tof\+Hit\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{bytestream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \&}]{pos }\end{DoxyParamCaption}) -\/$>$ r\+::\+Result$<$\mbox{\hyperlink{structgondola_1_1TofHit}{Tof\+Hit}},\mbox{\hyperlink{classgondola_1_1IOError}{IOError}}$>$\hspace{0.3cm}{\ttfamily [static]}}
 
 \Hypertarget{structgondola_1_1TofHit_a4ec818317e010f61b902fb905eb908b7}\label{structgondola_1_1TofHit_a4ec818317e010f61b902fb905eb908b7} 
 \index{gondola::TofHit@{gondola::TofHit}!get\_charge\_a@{get\_charge\_a}}
@@ -325,15 +325,15 @@ The paddle length will not be in the packet, but has to be added after the fact 
 \doxysubsubsection{\texorpdfstring{timestamp32}{timestamp32}}
 {\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} gondola\+::\+Tof\+Hit\+::timestamp32}
 
-\Hypertarget{structgondola_1_1TofHit_a6076aeaa8c64e990f21748c31a250ee4}\label{structgondola_1_1TofHit_a6076aeaa8c64e990f21748c31a250ee4} 
+\Hypertarget{structgondola_1_1TofHit_a2ed1a8badb379f13a3aee6d71a57f76b}\label{structgondola_1_1TofHit_a2ed1a8badb379f13a3aee6d71a57f76b} 
 \index{gondola::TofHit@{gondola::TofHit}!version@{version}}
 \index{version@{version}!gondola::TofHit@{gondola::TofHit}}
 \doxysubsubsection{\texorpdfstring{version}{version}}
-{\footnotesize\ttfamily \mbox{\hyperlink{namespacegondola_af998b820a54bca400c19e03948e82c28}{g\+::\+Protocol\+Version}} gondola\+::\+Tof\+Hit\+::version}
+{\footnotesize\ttfamily \mbox{\hyperlink{namespacegondola_af998b820a54bca400c19e03948e82c28}{Protocol\+Version}} gondola\+::\+Tof\+Hit\+::version}
 
 
 
 The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/\mbox{\hyperlink{events_8h}{events.\+h}}\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/events/\mbox{\hyperlink{tof__hit_8hpp}{tof\+\_\+hit.\+hpp}}\item 
 /home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/\mbox{\hyperlink{events_8cxx}{events.\+cxx}}\end{DoxyCompactItemize}

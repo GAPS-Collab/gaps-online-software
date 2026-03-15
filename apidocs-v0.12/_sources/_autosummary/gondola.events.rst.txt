@@ -24,6 +24,8 @@ gondola.events
       TelemetryEvent
       TofEvent
       TofHit
+      TrackerDAQEvent
+      TrackerDAQEventPacket
       TrackerHit
       TriggerType
    

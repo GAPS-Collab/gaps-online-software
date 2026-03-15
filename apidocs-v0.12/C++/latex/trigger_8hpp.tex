@@ -1,0 +1,54 @@
+\doxysection{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/events/trigger.hpp File Reference}
+\hypertarget{trigger_8hpp}{}\label{trigger_8hpp}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/events/trigger.hpp@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/events/trigger.hpp}}
+{\ttfamily \#include $<$format$>$}\newline
+Include dependency graph for trigger.\+hpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=222pt]{trigger_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{trigger_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacegondola}{gondola}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580}{gondola\+::\+LTBThreshold}} \+: u8 \{ \newline
+\mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580af8246e1e45d89414e8bf56ffe1680a54}{gondola\+::\+No\+Hit}} = 0
+, \mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580aebfe5e1791db03c4cd6ab95801e0977d}{gondola\+::\+Hit}} = 1
+, \mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580a0b87d66b88c72957dfea8c9605016442}{gondola\+::\+Beta}} = 2
+, \mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580a98865aa73ddbf0657187d430de3c38bc}{gondola\+::\+Veto}} = 3
+, \newline
+\mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580a88183b946cc5f0e8c96b2e66e1c74a7e}{gondola\+::\+Unknown}} = 255
+ \}
+\item 
+enum class \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21}{gondola\+::\+Trigger\+Type}} \+: u8 \{ \newline
+\mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21a88183b946cc5f0e8c96b2e66e1c74a7e}{gondola\+::\+Unknown}} = 0
+, \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21aed36a1ef76a59ee3f15180e0441188ad}{gondola\+::\+Any}} = 1
+, \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21a92ea731d3af6677905303c88689f5d55}{gondola\+::\+Track}} = 2
+, \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21abc421fa7f533c3d639eeebfd29fdf499}{gondola\+::\+Track\+Central}} = 3
+, \newline
+\mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21a41d31d862aea788d0c2b86ac6df3c0ae}{gondola\+::\+Gaps}} = 4
+, \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21adff200b0bb8d3c69fbd54cb43664cd7e}{gondola\+::\+Poisson}} = 100
+, \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21adc2eb84d1f952ad0e6b58014aabd616a}{gondola\+::\+Forced}} = 101
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacegondola_a95d0c48f85317911ad997722c25219b6}{gondola\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580}{gondola\+::\+LTBThreshold}} \&thresh)
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacegondola_a70a1b591bf58b6e149e2ec815142e4ac}{gondola\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21}{gondola\+::\+Trigger\+Type}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{t\+\_\+type}})
+\end{DoxyCompactItemize}

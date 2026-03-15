@@ -1,8 +1,8 @@
 var searchData=
 [
   ['last_5fcmd_0',['last_cmd',['../structgondola_1_1Cooling.html#a8d43406cb20576f0c6f627cbb363c867',1,'gondola::Cooling']]],
-  ['layer_1',['layer',['../structGaps_1_1TrackerStrip.html#a3870e34601f3c5fc972d0230e9fb89a7',1,'Gaps::TrackerStrip::layer'],['../structgondola_1_1TrkEvent.html#a8e8c8cb0e8cb6a0d6ff48020f8a4d891',1,'gondola::TrkEvent::layer'],['../structgondola_1_1TrkHit.html#a63b3d1cca6e54885361fb05ee9c544ce',1,'gondola::TrkHit::layer']]],
-  ['length_2',['length',['../structGaps_1_1TofPaddle.html#a164f8b86717faed4da3a6da5b810a573',1,'Gaps::TofPaddle::length'],['../structgondola_1_1TelemetryPacketHeader.html#ac38db1f991a7ace4a29e9d3865440600',1,'gondola::TelemetryPacketHeader::length'],['../structgondola_1_1TrkHeader.html#a523182fd9f3086f41dbab6ff794e2267',1,'gondola::TrkHeader::length']]],
+  ['layer_1',['layer',['../structgondola_1_1TrackerStrip.html#acc87b57574773cf8ddf59c276c9f5532',1,'gondola::TrackerStrip::layer'],['../structgondola_1_1TrkEvent.html#a8e8c8cb0e8cb6a0d6ff48020f8a4d891',1,'gondola::TrkEvent::layer'],['../structgondola_1_1TrkHit.html#a63b3d1cca6e54885361fb05ee9c544ce',1,'gondola::TrkHit::layer']]],
+  ['length_2',['length',['../structgondola_1_1TofPaddle.html#af84465d3a74473a1a5373869120c222d',1,'gondola::TofPaddle::length'],['../structgondola_1_1TelemetryPacketHeader.html#ac38db1f991a7ace4a29e9d3865440600',1,'gondola::TelemetryPacketHeader::length'],['../structgondola_1_1TrkHeader.html#a523182fd9f3086f41dbab6ff794e2267',1,'gondola::TrkHeader::length']]],
   ['lost_5frate_3',['lost_rate',['../structMtbMoniData.html#abba4d3381025b75e808794a37b30db54',1,'MtbMoniData']]],
   ['ltb_5fch0_4',['LTB_CH0',['../events_8cxx.html#a0cf7e1f9e13dbe1db99b385adfee4f2e',1,'events.cxx']]],
   ['ltb_5fch1_5',['LTB_CH1',['../events_8cxx.html#a1b99a0fc8ba941f78112521f915e4512',1,'events.cxx']]],
@@ -12,9 +12,9 @@ var searchData=
   ['ltb_5fch5_9',['LTB_CH5',['../events_8cxx.html#a323d60d7047aae18761e97d628181d68',1,'events.cxx']]],
   ['ltb_5fch6_10',['LTB_CH6',['../events_8cxx.html#a06fa3d542f01496f50b46b1bdc10bd83',1,'events.cxx']]],
   ['ltb_5fch7_11',['LTB_CH7',['../events_8cxx.html#a3e53025bb5e0673d65b6e85c82d244a0',1,'events.cxx']]],
-  ['ltb_5fcha_12',['ltb_chA',['../structGaps_1_1TofPaddle.html#aa036d50799abdc9a254b0319063250ea',1,'Gaps::TofPaddle']]],
+  ['ltb_5fcha_12',['ltb_chA',['../structgondola_1_1TofPaddle.html#a5466308953be34cae657e27e91d01b05',1,'gondola::TofPaddle']]],
   ['ltb_5fchannels_13',['LTB_CHANNELS',['../events_8cxx.html#a3d60db15337aed0c3fcb524a20f8abd4',1,'events.cxx']]],
-  ['ltb_5fchb_14',['ltb_chB',['../structGaps_1_1TofPaddle.html#a9bdc429804ce85c9fa14e290f81eeb51',1,'Gaps::TofPaddle']]],
-  ['ltb_5fid_15',['ltb_id',['../structGaps_1_1TofPaddle.html#ab59fbe63cc69a3113cb5488c0b6d84d7',1,'Gaps::TofPaddle']]],
+  ['ltb_5fchb_14',['ltb_chB',['../structgondola_1_1TofPaddle.html#a46a87cbbcba6ca5d043b4a5380fa567c',1,'gondola::TofPaddle']]],
+  ['ltb_5fid_15',['ltb_id',['../structgondola_1_1TofPaddle.html#a796dc0486bf1de0b580d322c4a679bc6',1,'gondola::TofPaddle']]],
   ['ltb_5ftemp_16',['ltb_temp',['../structLTBMoniData.html#ac199b000bf352fb3c6c8e970569c8d9d',1,'LTBMoniData']]]
 ];

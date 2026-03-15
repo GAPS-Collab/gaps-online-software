@@ -2,7 +2,12 @@
 \hypertarget{structgondola_1_1RBWaveform}{}\label{structgondola_1_1RBWaveform}\index{gondola::RBWaveform@{gondola::RBWaveform}}
 
 
-{\ttfamily \#include $<$events.\+h$>$}
+A representation of a pair of waveforms from a single paddle.  
+
+
+
+
+{\ttfamily \#include $<$rb\+\_\+waveform.\+hpp$>$}
 
 \doxysubsubsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
@@ -18,19 +23,21 @@
 \begin{DoxyCompactItemize}
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{structgondola_1_1RBWaveform_a4d6957060cf6bb6d93d122f2918642c6}{event\+\_\+id}}
-\item 
+\begin{DoxyCompactList}\small\item\em The event id this waveform has been part of. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structgondola_1_1RBWaveform_a650c6d324d09edcfab44bbb38eea6eed}{rb\+\_\+id}}
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structgondola_1_1RBWaveform_ab480fd48a28ef4be7e0129ae3d759913}{rb\+\_\+channel\+\_\+a}}
-\item 
+\begin{DoxyCompactList}\small\item\em The RB channel ID for the channel connected to the A-\/side ~\newline
+ \end{DoxyCompactList}\item 
 \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structgondola_1_1RBWaveform_ae7eb6171de1699528539766620eef91a}{rb\+\_\+channel\+\_\+b}}
-\item 
+\begin{DoxyCompactList}\small\item\em The RB channel ID for the channel connected to the B-\/side ~\newline
+ \end{DoxyCompactList}\item 
 \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1RBWaveform_ae864eb8d95798eeedc43316f489d0ad1}{stop\+\_\+cell}}
-\item 
+\begin{DoxyCompactList}\small\item\em Trigger stop cell for DRS (Domino Ring Sampler) \end{DoxyCompactList}\item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} $>$ \mbox{\hyperlink{structgondola_1_1RBWaveform_a593a5a66ed29068cabae6374504aef4c}{adc\+\_\+a}}
-\item 
+\begin{DoxyCompactList}\small\item\em Actual ADC values (uncalibrated) for connected paddle A-\/side. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} $>$ \mbox{\hyperlink{structgondola_1_1RBWaveform_a2400cd0bc903d094955a770bedf3698b}{adc\+\_\+b}}
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Actual ADC values (uncalibrated) for connected paddle B-\/side. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsubsection*{Static Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
@@ -41,14 +48,7 @@
 
 
 \doxysubsection{Detailed Description}
-A part of a \doxylink{structgondola_1_1TofEvent}{Tof\+Event}
-\begin{DoxyItemize}
-\item a single waveform
-\end{DoxyItemize}
-
-That is a waveform for a specific channel for a specific id.
-
-Each paddle has 2 waveforms 
+A representation of a pair of waveforms from a single paddle. 
 
 \doxysubsection{Member Function Documentation}
 \Hypertarget{structgondola_1_1RBWaveform_aac46918188805abeb788e543bd61bf4b}\label{structgondola_1_1RBWaveform_aac46918188805abeb788e543bd61bf4b} 
@@ -72,17 +72,29 @@ Each paddle has 2 waveforms
 \doxysubsubsection{\texorpdfstring{adc\_a}{adc\_a}}
 {\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}$>$ gondola\+::\+RBWaveform\+::adc\+\_\+a}
 
+
+
+Actual ADC values (uncalibrated) for connected paddle A-\/side. 
+
 \Hypertarget{structgondola_1_1RBWaveform_a2400cd0bc903d094955a770bedf3698b}\label{structgondola_1_1RBWaveform_a2400cd0bc903d094955a770bedf3698b} 
 \index{gondola::RBWaveform@{gondola::RBWaveform}!adc\_b@{adc\_b}}
 \index{adc\_b@{adc\_b}!gondola::RBWaveform@{gondola::RBWaveform}}
 \doxysubsubsection{\texorpdfstring{adc\_b}{adc\_b}}
 {\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}$>$ gondola\+::\+RBWaveform\+::adc\+\_\+b}
 
+
+
+Actual ADC values (uncalibrated) for connected paddle B-\/side. 
+
 \Hypertarget{structgondola_1_1RBWaveform_a4d6957060cf6bb6d93d122f2918642c6}\label{structgondola_1_1RBWaveform_a4d6957060cf6bb6d93d122f2918642c6} 
 \index{gondola::RBWaveform@{gondola::RBWaveform}!event\_id@{event\_id}}
 \index{event\_id@{event\_id}!gondola::RBWaveform@{gondola::RBWaveform}}
 \doxysubsubsection{\texorpdfstring{event\_id}{event\_id}}
 {\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} gondola\+::\+RBWaveform\+::event\+\_\+id}
+
+
+
+The event id this waveform has been part of. 
 
 \Hypertarget{structgondola_1_1RBWaveform_a8ce3dda74512484b5e0aae36aca3b89a}\label{structgondola_1_1RBWaveform_a8ce3dda74512484b5e0aae36aca3b89a} 
 \index{gondola::RBWaveform@{gondola::RBWaveform}!HEAD@{HEAD}}
@@ -96,11 +108,21 @@ Each paddle has 2 waveforms
 \doxysubsubsection{\texorpdfstring{rb\_channel\_a}{rb\_channel\_a}}
 {\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} gondola\+::\+RBWaveform\+::rb\+\_\+channel\+\_\+a}
 
+
+
+The RB channel ID for the channel connected to the A-\/side ~\newline
+ 
+
 \Hypertarget{structgondola_1_1RBWaveform_ae7eb6171de1699528539766620eef91a}\label{structgondola_1_1RBWaveform_ae7eb6171de1699528539766620eef91a} 
 \index{gondola::RBWaveform@{gondola::RBWaveform}!rb\_channel\_b@{rb\_channel\_b}}
 \index{rb\_channel\_b@{rb\_channel\_b}!gondola::RBWaveform@{gondola::RBWaveform}}
 \doxysubsubsection{\texorpdfstring{rb\_channel\_b}{rb\_channel\_b}}
 {\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} gondola\+::\+RBWaveform\+::rb\+\_\+channel\+\_\+b}
+
+
+
+The RB channel ID for the channel connected to the B-\/side ~\newline
+ 
 
 \Hypertarget{structgondola_1_1RBWaveform_a650c6d324d09edcfab44bbb38eea6eed}\label{structgondola_1_1RBWaveform_a650c6d324d09edcfab44bbb38eea6eed} 
 \index{gondola::RBWaveform@{gondola::RBWaveform}!rb\_id@{rb\_id}}
@@ -108,11 +130,16 @@ Each paddle has 2 waveforms
 \doxysubsubsection{\texorpdfstring{rb\_id}{rb\_id}}
 {\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} gondola\+::\+RBWaveform\+::rb\+\_\+id}
 
-\Hypertarget{structgondola_1_1RBWaveform_ae864eb8d95798eeedc43316f489d0ad1}\label{structgondola_1_1RBWaveform_ae864eb8d95798eeedc43316f489d0ad1} 
+The internal RB identifier number for the RB which recorded this waveform ~\newline
+ \Hypertarget{structgondola_1_1RBWaveform_ae864eb8d95798eeedc43316f489d0ad1}\label{structgondola_1_1RBWaveform_ae864eb8d95798eeedc43316f489d0ad1} 
 \index{gondola::RBWaveform@{gondola::RBWaveform}!stop\_cell@{stop\_cell}}
 \index{stop\_cell@{stop\_cell}!gondola::RBWaveform@{gondola::RBWaveform}}
 \doxysubsubsection{\texorpdfstring{stop\_cell}{stop\_cell}}
 {\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+RBWaveform\+::stop\+\_\+cell}
+
+
+
+Trigger stop cell for DRS (Domino Ring Sampler) 
 
 \Hypertarget{structgondola_1_1RBWaveform_afc62fc9bb73efb906be9772ef99a8514}\label{structgondola_1_1RBWaveform_afc62fc9bb73efb906be9772ef99a8514} 
 \index{gondola::RBWaveform@{gondola::RBWaveform}!TAIL@{TAIL}}
@@ -124,5 +151,5 @@ Each paddle has 2 waveforms
 
 The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/\mbox{\hyperlink{events_8h}{events.\+h}}\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/events/\mbox{\hyperlink{rb__waveform_8hpp}{rb\+\_\+waveform.\+hpp}}\item 
 /home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/\mbox{\hyperlink{events_8cxx}{events.\+cxx}}\end{DoxyCompactItemize}

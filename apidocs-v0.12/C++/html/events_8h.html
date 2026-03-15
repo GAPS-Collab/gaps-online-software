@@ -111,6 +111,13 @@ $(document).ready(function(){initNavTree('events_8h.html',''); initResizable(); 
 <code>#include &quot;<a class="el" href="tof__typedefs_8h_source.html">tof_typedefs.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="monitoring_8h_source.html">packets/monitoring.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="tof__packet_8h_source.html">packets/tof_packet.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="rb__event__header_8hpp_source.html">events/rb_event_header.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="tof__hit_8hpp_source.html">events/tof_hit.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="rb__event_8hpp_source.html">events/rb_event.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="event__status_8hpp_source.html">events/event_status.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="event__quality_8hpp_source.html">events/event_quality.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="rb__waveform_8hpp_source.html">events/rb_waveform.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="tof__event_8hpp_source.html">events/tof_event.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="calibration_8h_source.html">calibration.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="version_8h_source.html">version.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="errors_8hpp_source.html">errors.hpp</a>&quot;</code><br />
@@ -119,68 +126,124 @@ Include dependency graph for events.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="events_8h__incl.png" border="0" usemap="#a_2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2include_2events_8h" alt=""/></div>
 <map name="a_2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2include_2events_8h" id="a_2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2include_2events_8h">
-<area shape="rect" title="Tof event classes." alt="" coords="443,5,644,75"/>
+<area shape="rect" title="Tof event classes." alt="" coords="1483,5,1684,75"/>
 <area shape="rect" title=" " alt="" coords="5,123,60,148"/>
-<area shape="poly" title=" " alt="" coords="443,60,273,88,80,125,74,127,73,121,79,120,272,83,442,54"/>
-<area shape="rect" title=" " alt="" coords="519,196,575,221"/>
-<area shape="poly" title=" " alt="" coords="547,75,549,182,544,182,541,75"/>
-<area shape="rect" title=" " alt="" coords="175,123,242,148"/>
-<area shape="poly" title=" " alt="" coords="443,72,256,124,255,118,442,67"/>
-<area shape="rect" title=" " alt="" coords="42,343,154,368"/>
-<area shape="poly" title=" " alt="" coords="443,54,363,65,281,80,211,100,184,112,165,125,146,147,131,173,111,229,102,285,100,329,95,329,97,284,106,228,126,170,141,144,162,121,181,107,209,95,280,75,362,59,442,49"/>
-<area shape="rect" href="tof__typedefs_8h.html" title=" " alt="" coords="1007,343,1123,368"/>
-<area shape="poly" title=" " alt="" coords="645,50,780,69,930,99,1001,119,1064,141,1114,166,1147,194,1156,213,1158,232,1154,251,1145,271,1119,306,1091,335,1087,331,1115,303,1140,268,1149,250,1153,232,1151,214,1143,198,1111,170,1062,146,1000,124,929,105,779,75,644,55"/>
-<area shape="rect" href="monitoring_8h.html" title=" " alt="" coords="581,123,740,148"/>
-<area shape="poly" title=" " alt="" coords="587,73,637,112,634,116,584,77"/>
-<area shape="rect" href="tof__packet_8h.html" title=" " alt="" coords="136,269,292,295"/>
-<area shape="poly" title=" " alt="" coords="443,63,376,87,343,104,313,125,283,156,258,192,225,258,220,255,253,189,278,152,310,121,340,100,373,83,441,58"/>
-<area shape="rect" href="errors_8hpp.html" title=" " alt="" coords="279,343,367,368"/>
-<area shape="poly" title=" " alt="" coords="522,76,341,333,337,330,518,73"/>
-<area shape="rect" href="calibration_8h.html" title="ReadoutBoard calibration C++ implementation for RBCalibration class." alt="" coords="1208,269,1311,295"/>
-<area shape="poly" title=" " alt="" coords="644,40,782,45,939,58,1014,69,1081,82,1137,99,1178,121,1207,151,1227,187,1251,255,1246,257,1222,189,1203,154,1175,125,1135,104,1080,87,1013,74,938,64,782,51,644,45"/>
-<area shape="rect" href="version_8h.html" title=" " alt="" coords="1050,196,1133,221"/>
-<area shape="poly" title=" " alt="" coords="645,69,1041,189,1040,195,644,75"/>
-<area shape="rect" title=" " alt="" coords="656,416,719,441"/>
-<area shape="poly" title=" " alt="" coords="1007,370,733,422,732,416,1006,365"/>
-<area shape="rect" title=" " alt="" coords="1141,416,1191,441"/>
-<area shape="poly" title=" " alt="" coords="1082,366,1140,406,1137,410,1079,370"/>
-<area shape="rect" title=" " alt="" coords="1029,416,1100,441"/>
-<area shape="poly" title=" " alt="" coords="1067,368,1067,402,1062,402,1062,368"/>
-<area shape="rect" title=" " alt="" coords="1223,416,1282,441"/>
-<area shape="poly" title=" " alt="" coords="1096,366,1211,409,1210,414,1094,371"/>
-<area shape="rect" title=" " alt="" coords="503,416,570,441"/>
-<area shape="poly" title=" " alt="" coords="1007,367,584,424,583,418,1006,362"/>
-<area shape="poly" title=" " alt="" coords="644,150,579,191,576,186,641,146"/>
-<area shape="poly" title=" " alt="" coords="741,145,808,160,884,184,960,219,996,241,1028,267,1049,297,1061,328,1056,330,1044,299,1024,271,992,246,958,223,882,188,807,165,740,150"/>
-<area shape="rect" href="serialization_8h.html" title=" " alt="" coords="603,196,718,221"/>
-<area shape="poly" title=" " alt="" coords="663,148,663,182,658,182,658,148"/>
-<area shape="poly" title=" " alt="" coords="718,206,778,209,849,218,924,236,960,250,994,267,1029,296,1054,329,1049,332,1025,300,991,272,958,255,922,242,848,223,778,214,718,211"/>
-<area shape="poly" title=" " alt="" coords="603,222,483,246,433,259,408,271,404,282,408,293,430,321,457,345,488,365,520,382,586,405,643,418,642,424,584,410,518,387,485,370,454,350,427,325,404,296,398,282,404,268,431,254,482,241,602,217"/>
-<area shape="poly" title=" " alt="" coords="699,193,729,195,740,200,745,209,742,216,734,221,713,225,712,220,732,216,738,213,739,209,737,204,728,200,699,199"/>
-<area shape="rect" title=" " alt="" coords="621,269,701,295"/>
-<area shape="poly" title=" " alt="" coords="663,222,663,256,658,256,658,222"/>
-<area shape="rect" title=" " alt="" coords="725,269,799,295"/>
-<area shape="poly" title=" " alt="" coords="678,219,736,259,733,263,675,224"/>
-<area shape="rect" title=" " alt="" coords="823,269,882,295"/>
-<area shape="poly" title=" " alt="" coords="692,219,811,263,809,268,691,224"/>
-<area shape="rect" title=" " alt="" coords="906,269,981,295"/>
-<area shape="poly" title=" " alt="" coords="707,219,893,265,892,271,705,224"/>
-<area shape="rect" title=" " alt="" coords="418,269,493,295"/>
-<area shape="poly" title=" " alt="" coords="629,224,502,267,501,262,627,219"/>
-<area shape="rect" title=" " alt="" coords="517,269,597,295"/>
-<area shape="poly" title=" " alt="" coords="645,224,587,263,584,259,642,219"/>
-<area shape="poly" title=" " alt="" coords="604,222,299,270,299,265,603,216"/>
-<area shape="poly" title=" " alt="" coords="197,297,130,338,127,333,194,292"/>
-<area shape="poly" title=" " alt="" coords="292,287,993,345,993,351,292,292"/>
-<area shape="poly" title=" " alt="" coords="220,294,237,331,251,350,269,366,318,376,421,391,642,419,642,425,421,397,317,382,266,370,247,354,233,333,215,296"/>
-<area shape="poly" title=" " alt="" coords="214,295,212,331,216,350,225,366,243,379,270,390,341,406,420,417,490,422,489,428,419,422,340,412,268,395,240,384,221,370,211,352,207,331,209,295"/>
-<area shape="poly" title=" " alt="" coords="233,292,295,333,292,337,230,297"/>
-<area shape="poly" title=" " alt="" coords="1261,269,1259,239,1249,199,1230,158,1216,140,1199,125,1159,104,1103,87,1036,74,960,63,801,50,658,45,658,40,801,45,960,58,1036,69,1105,82,1161,99,1202,120,1220,137,1234,156,1254,198,1264,238,1266,269"/>
-<area shape="poly" title=" " alt="" coords="1229,297,1110,340,1108,335,1227,292"/>
-<area shape="poly" title=" " alt="" coords="1249,297,1202,334,1170,354,1136,370,1082,389,1025,403,913,421,811,429,732,431,732,425,810,424,912,416,1024,397,1080,383,1134,366,1168,350,1199,330,1245,293"/>
-<area shape="poly" title=" " alt="" coords="1254,297,1183,406,1179,403,1249,294"/>
-<area shape="poly" title=" " alt="" coords="1261,295,1256,402,1251,402,1256,295"/>
-<area shape="poly" title=" " alt="" coords="1095,222,1095,255,1090,295,1078,331,1073,329,1085,294,1089,255,1089,222"/>
+<area shape="poly" title=" " alt="" coords="1482,43,1234,45,886,55,690,65,486,80,280,100,80,125,74,126,73,121,79,120,280,94,485,75,689,60,886,50,1234,39,1482,38"/>
+<area shape="rect" title=" " alt="" coords="529,196,585,221"/>
+<area shape="poly" title=" " alt="" coords="1482,47,1257,56,984,72,741,95,656,109,607,125,593,137,582,152,566,184,562,182,577,149,589,133,605,120,654,104,740,90,983,67,1256,51,1482,42"/>
+<area shape="rect" title=" " alt="" coords="2371,269,2438,295"/>
+<area shape="poly" title=" " alt="" coords="1684,45,1944,64,2265,96,2418,116,2549,139,2646,165,2678,179,2697,194,2703,209,2697,223,2681,236,2656,248,2591,264,2517,275,2452,281,2451,275,2517,270,2590,259,2654,243,2678,232,2693,220,2698,209,2693,198,2675,184,2644,170,2548,144,2417,121,2265,101,1944,69,1684,50"/>
+<area shape="rect" title=" " alt="" coords="1215,343,1327,368"/>
+<area shape="poly" title=" " alt="" coords="1483,69,1430,92,1381,125,1359,148,1340,174,1310,231,1290,286,1279,330,1274,329,1285,284,1305,229,1335,171,1355,144,1378,121,1427,87,1481,64"/>
+<area shape="rect" href="tof__typedefs_8h.html" title=" " alt="" coords="1495,343,1611,368"/>
+<area shape="poly" title=" " alt="" coords="1684,38,1990,42,2177,51,2361,65,2526,88,2595,102,2652,120,2696,140,2723,164,2730,177,2732,192,2728,207,2719,223,2691,254,2662,274,2632,285,2601,290,2532,291,2493,292,2450,297,2334,315,2215,328,1981,346,1775,354,1625,357,1625,351,1775,349,1981,341,2214,323,2333,309,2450,292,2493,287,2532,286,2601,284,2631,280,2659,269,2687,250,2715,220,2723,205,2727,191,2725,179,2719,167,2693,145,2651,125,2594,108,2525,93,2361,71,2176,56,1990,48,1684,43"/>
+<area shape="rect" href="monitoring_8h.html" title=" " alt="" coords="619,123,777,148"/>
+<area shape="poly" title=" " alt="" coords="1482,55,806,125,791,127,791,122,806,120,1482,49"/>
+<area shape="rect" href="tof__packet_8h.html" title=" " alt="" coords="773,269,929,295"/>
+<area shape="poly" title=" " alt="" coords="1482,48,1364,60,1223,86,1149,105,1075,130,1004,161,937,198,900,229,870,260,866,257,896,225,934,194,1001,156,1073,125,1147,100,1222,81,1364,55,1482,43"/>
+<area shape="rect" href="errors_8hpp.html" title=" " alt="" coords="970,343,1058,368"/>
+<area shape="poly" title=" " alt="" coords="1483,44,1310,49,1084,61,831,86,702,103,577,125,503,136,436,142,319,150,268,161,219,182,172,218,126,271,121,282,125,293,141,303,168,312,251,327,362,338,491,345,755,352,956,352,956,357,755,357,490,351,362,343,251,332,167,317,139,308,121,296,115,282,121,268,168,214,216,178,266,156,318,145,436,136,502,131,576,120,702,98,830,80,1084,56,1310,44,1483,39"/>
+<area shape="rect" href="rb__event__header_8hpp.html" title=" " alt="" coords="964,196,1171,221"/>
+<area shape="poly" title=" " alt="" coords="1483,54,1342,78,1265,98,1191,125,1136,156,1092,189,1089,185,1133,151,1189,120,1263,93,1341,73,1482,48"/>
+<area shape="rect" href="tof__hit_8hpp.html" title=" " alt="" coords="1399,196,1539,221"/>
+<area shape="poly" title=" " alt="" coords="1584,75,1577,112,1560,150,1537,174,1510,192,1507,187,1533,170,1556,146,1572,111,1579,74"/>
+<area shape="rect" href="version_8h.html" title=" " alt="" coords="1595,269,1678,295"/>
+<area shape="poly" title=" " alt="" coords="1685,53,1805,75,1936,106,1997,125,2050,146,2093,169,2121,194,2127,208,2124,221,2113,232,2095,241,2044,255,1977,266,1824,279,1692,283,1692,278,1824,273,1976,261,2043,250,2093,236,2110,227,2119,218,2122,209,2117,198,2090,173,2048,150,1995,130,1934,111,1804,80,1684,59"/>
+<area shape="rect" href="rb__event_8hpp.html" title=" " alt="" coords="1391,123,1546,148"/>
+<area shape="poly" title=" " alt="" coords="1535,77,1488,115,1485,111,1532,73"/>
+<area shape="rect" href="event__status_8hpp.html" title=" " alt="" coords="1665,196,1848,221"/>
+<area shape="poly" title=" " alt="" coords="1620,73,1737,185,1733,188,1617,77"/>
+<area shape="rect" href="event__quality_8hpp.html" title=" " alt="" coords="2499,196,2684,221"/>
+<area shape="poly" title=" " alt="" coords="1685,42,1817,50,1983,64,2165,87,2347,120,2460,153,2553,188,2551,193,2458,158,2345,125,2165,92,1983,69,1817,55,1684,48"/>
+<area shape="rect" href="rb__waveform_8hpp.html" title=" " alt="" coords="1923,196,2107,221"/>
+<area shape="poly" title=" " alt="" coords="1671,72,1974,189,1972,194,1669,77"/>
+<area shape="rect" href="tof__event_8hpp.html" title=" " alt="" coords="2174,123,2334,148"/>
+<area shape="poly" title=" " alt="" coords="1684,53,2161,118,2160,124,1684,58"/>
+<area shape="rect" href="calibration_8h.html" title="ReadoutBoard calibration C++ implementation for RBCalibration class." alt="" coords="2784,269,2887,295"/>
+<area shape="poly" title=" " alt="" coords="1684,39,1959,43,2303,54,2468,65,2611,79,2720,97,2757,108,2781,121,2806,151,2820,187,2828,224,2831,256,2826,256,2822,225,2815,189,2801,153,2778,125,2755,113,2719,102,2611,84,2468,70,2302,60,1959,48,1684,44"/>
+<area shape="rect" title=" " alt="" coords="1289,416,1352,441"/>
+<area shape="poly" title=" " alt="" coords="1516,371,1366,416,1364,411,1515,365"/>
+<area shape="rect" title=" " alt="" coords="2347,416,2398,441"/>
+<area shape="poly" title=" " alt="" coords="1611,359,2334,421,2333,427,1611,364"/>
+<area shape="rect" title=" " alt="" coords="1517,416,1588,441"/>
+<area shape="poly" title=" " alt="" coords="1555,368,1555,402,1550,402,1550,368"/>
+<area shape="rect" title=" " alt="" coords="2458,416,2517,441"/>
+<area shape="poly" title=" " alt="" coords="1611,357,1950,375,2178,392,2410,413,2445,418,2444,423,2410,419,2178,397,1950,380,1611,362"/>
+<area shape="rect" title=" " alt="" coords="917,416,983,441"/>
+<area shape="poly" title=" " alt="" coords="1495,366,997,424,997,419,1494,361"/>
+<area shape="poly" title=" " alt="" coords="676,150,593,192,591,187,674,146"/>
+<area shape="poly" title=" " alt="" coords="729,146,828,180,952,219,1099,256,1245,290,1482,338,1481,343,1244,295,1097,262,951,224,826,185,728,151"/>
+<area shape="rect" href="serialization_8h.html" title=" " alt="" coords="609,196,723,221"/>
+<area shape="poly" title=" " alt="" coords="695,149,679,185,674,183,690,147"/>
+<area shape="poly" title=" " alt="" coords="724,218,1152,292,1481,341,1481,347,1151,297,723,223"/>
+<area shape="poly" title=" " alt="" coords="679,220,714,254,762,292,834,336,912,365,1012,390,1113,407,1276,423,1275,428,1112,412,1011,396,911,371,831,341,759,297,711,258,675,223"/>
+<area shape="poly" title=" " alt="" coords="704,193,735,195,746,200,750,209,747,216,740,221,718,225,717,220,738,216,743,213,745,209,742,204,733,200,704,199"/>
+<area shape="rect" title=" " alt="" coords="519,269,599,295"/>
+<area shape="poly" title=" " alt="" coords="650,224,590,264,587,259,647,219"/>
+<area shape="rect" title=" " alt="" coords="623,269,698,295"/>
+<area shape="poly" title=" " alt="" coords="668,222,665,256,660,256,662,221"/>
+<area shape="rect" title=" " alt="" coords="135,269,194,295"/>
+<area shape="poly" title=" " alt="" coords="609,222,597,224,489,237,404,245,318,254,208,272,207,267,317,249,403,239,489,232,596,219,608,217"/>
+<area shape="rect" title=" " alt="" coords="218,269,293,295"/>
+<area shape="poly" title=" " alt="" coords="609,222,307,272,306,267,608,217"/>
+<area shape="rect" title=" " alt="" coords="317,269,391,295"/>
+<area shape="poly" title=" " alt="" coords="616,224,406,272,405,266,615,219"/>
+<area shape="rect" title=" " alt="" coords="415,269,495,295"/>
+<area shape="poly" title=" " alt="" coords="633,224,503,267,501,262,631,219"/>
+<area shape="poly" title=" " alt="" coords="697,219,809,262,808,267,695,224"/>
+<area shape="poly" title=" " alt="" coords="919,292,1202,340,1201,345,918,297"/>
+<area shape="poly" title=" " alt="" coords="930,289,1481,344,1481,349,929,294"/>
+<area shape="poly" title=" " alt="" coords="864,293,903,330,930,349,959,366,1043,394,1131,412,1211,421,1276,424,1275,430,1211,426,1130,417,1042,400,957,370,927,354,900,334,860,297"/>
+<area shape="poly" title=" " alt="" coords="861,294,908,366,935,403,931,406,904,370,856,296"/>
+<area shape="poly" title=" " alt="" coords="879,292,976,335,974,339,876,297"/>
+<area shape="poly" title=" " alt="" coords="1085,219,1245,332,1242,337,1082,224"/>
+<area shape="poly" title=" " alt="" coords="1065,223,1025,331,1020,329,1060,221"/>
+<area shape="rect" href="gondola_8hpp.html" title=" " alt="" coords="1417,269,1520,295"/>
+<area shape="poly" title=" " alt="" coords="1132,219,1404,267,1403,272,1131,224"/>
+<area shape="poly" title=" " alt="" coords="1484,293,1530,331,1527,336,1480,297"/>
+<area shape="poly" title=" " alt="" coords="1417,294,1072,348,1071,342,1417,289"/>
+<area shape="poly" title=" " alt="" coords="1454,224,1300,336,1297,332,1451,219"/>
+<area shape="poly" title=" " alt="" coords="1433,224,1064,341,1062,336,1432,219"/>
+<area shape="poly" title=" " alt="" coords="1471,222,1471,256,1466,256,1466,222"/>
+<area shape="rect" href="database_8h.html" title=" " alt="" coords="2249,269,2344,295"/>
+<area shape="poly" title=" " alt="" coords="1539,213,2236,273,2235,278,1539,219"/>
+<area shape="poly" title=" " alt="" coords="1497,219,1598,261,1596,266,1495,224"/>
+<area shape="poly" title=" " alt="" coords="2249,295,2230,297,2060,317,1891,332,1624,352,1624,347,1891,327,2060,311,2230,292,2249,289"/>
+<area shape="poly" title=" " alt="" coords="2311,293,2331,314,2350,341,2363,372,2371,402,2365,403,2358,374,2345,344,2327,318,2307,297"/>
+<area shape="rect" title=" " alt="" coords="2258,343,2335,368"/>
+<area shape="poly" title=" " alt="" coords="2299,295,2299,329,2294,329,2294,295"/>
+<area shape="rect" title=" " alt="" coords="2131,343,2233,368"/>
+<area shape="poly" title=" " alt="" coords="2280,297,2214,338,2211,333,2277,292"/>
+<area shape="poly" title=" " alt="" coords="1625,297,1579,336,1575,331,1621,293"/>
+<area shape="poly" title=" " alt="" coords="1488,120,1538,81,1542,86,1491,124"/>
+<area shape="poly" title=" " alt="" coords="1447,150,1414,171,1380,198,1350,232,1324,268,1285,332,1281,329,1319,265,1346,228,1376,194,1411,166,1445,146"/>
+<area shape="poly" title=" " alt="" coords="1391,143,1269,150,1131,161,1013,177,974,187,953,198,944,213,941,230,943,248,950,266,971,302,995,331,991,334,967,305,945,268,938,249,936,230,939,211,950,194,972,182,1012,172,1130,156,1268,144,1391,137"/>
+<area shape="poly" title=" " alt="" coords="1405,151,1146,196,1145,191,1404,145"/>
+<area shape="poly" title=" " alt="" coords="1443,150,1420,164,1399,180,1386,200,1385,210,1388,220,1407,243,1431,261,1428,265,1403,247,1384,223,1380,210,1381,198,1395,177,1417,159,1441,146"/>
+<area shape="poly" title=" " alt="" coords="1471,148,1471,182,1466,182,1466,148"/>
+<area shape="poly" title=" " alt="" coords="1492,146,1576,187,1653,219,1733,237,1816,252,1979,270,2125,278,2236,279,2236,285,2125,283,1979,275,1815,257,1732,243,1652,224,1574,192,1490,151"/>
+<area shape="poly" title=" " alt="" coords="1488,146,1552,194,1618,257,1615,261,1548,198,1484,150"/>
+<area shape="poly" title=" " alt="" coords="1516,145,1697,190,1696,195,1514,151"/>
+<area shape="poly" title=" " alt="" coords="1849,215,2120,240,2356,267,2358,267,2357,272,2355,272,2120,245,1848,220"/>
+<area shape="poly" title=" " alt="" coords="1711,224,1529,269,1528,263,1710,219"/>
+<area shape="poly" title=" " alt="" coords="2562,224,2449,267,2447,262,2560,219"/>
+<area shape="poly" title=" " alt="" coords="2088,219,2356,267,2358,267,2357,272,2355,272,2087,224"/>
+<area shape="poly" title=" " alt="" coords="1923,224,1721,250,1584,272,1558,284,1532,297,1433,326,1342,345,1340,340,1432,321,1530,292,1556,279,1583,267,1721,244,1923,218"/>
+<area shape="poly" title=" " alt="" coords="2253,149,2235,187,2221,207,2202,224,2152,242,2065,261,1820,297,1551,329,1341,350,1341,345,1551,323,1820,292,2064,255,2151,237,2199,219,2217,203,2231,184,2248,147"/>
+<area shape="poly" title=" " alt="" coords="2174,142,1831,161,1610,177,1386,199,1132,234,925,270,924,264,1132,229,1386,193,1609,172,1830,155,2173,137"/>
+<area shape="poly" title=" " alt="" coords="2174,147,2049,165,1980,180,1912,198,1887,211,1860,224,1770,246,1698,255,1625,260,1534,271,1533,265,1625,255,1698,250,1769,241,1858,219,1884,206,1910,194,1979,175,2049,160,2173,141"/>
+<area shape="poly" title=" " alt="" coords="2260,148,2292,255,2287,257,2255,149"/>
+<area shape="poly" title=" " alt="" coords="2248,150,2215,188,2191,208,2164,224,2125,237,2072,248,1941,265,1803,276,1692,281,1691,276,1803,271,1940,260,2071,243,2123,232,2162,219,2188,203,2211,184,2244,147"/>
+<area shape="poly" title=" " alt="" coords="2174,151,1851,197,1850,191,2174,145"/>
+<area shape="poly" title=" " alt="" coords="2309,145,2524,190,2523,196,2308,151"/>
+<area shape="rect" href="trigger_8hpp.html" title=" " alt="" coords="2335,196,2475,221"/>
+<area shape="poly" title=" " alt="" coords="2279,146,2369,188,2366,192,2277,150"/>
+<area shape="poly" title=" " alt="" coords="2407,222,2407,256,2402,256,2402,222"/>
+<area shape="poly" title=" " alt="" coords="2839,269,2843,239,2840,199,2827,158,2816,140,2802,125,2779,113,2743,102,2635,84,2492,70,2327,60,1980,48,1698,44,1698,39,1980,43,2327,54,2492,65,2636,79,2744,97,2781,108,2805,121,2820,137,2832,156,2845,198,2848,239,2845,269"/>
+<area shape="poly" title=" " alt="" coords="2784,295,2765,297,2431,325,2103,343,1821,352,1624,356,1624,351,1821,347,2103,337,2431,320,2764,292,2783,290"/>
+<area shape="poly" title=" " alt="" coords="2784,297,2593,334,2471,354,2348,371,2111,393,1927,402,1742,408,1505,419,1366,427,1366,422,1505,413,1742,402,1927,397,2111,388,2347,365,2470,349,2592,328,2783,292"/>
+<area shape="poly" title=" " alt="" coords="2807,297,2714,331,2597,371,2412,421,2411,416,2596,365,2712,326,2805,292"/>
+<area shape="poly" title=" " alt="" coords="2825,297,2784,333,2756,353,2726,370,2675,391,2622,406,2531,425,2530,419,2621,401,2673,386,2724,366,2753,349,2780,329,2822,293"/>
 </map>
 </div>
 </div><div class="textblock"><div class="dynheader">
@@ -188,16 +251,18 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
 <div class="center"><img src="events_8h__dep__incl.png" border="0" usemap="#a_2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2include_2events_8hdep" alt=""/></div>
 <map name="a_2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2include_2events_8hdep" id="a_2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2include_2events_8hdep">
-<area shape="rect" title="Tof event classes." alt="" coords="343,5,544,75"/>
+<area shape="rect" title="Tof event classes." alt="" coords="564,5,765,75"/>
 <area shape="rect" href="calibration_8h.html" title="ReadoutBoard calibration C++ implementation for RBCalibration class." alt="" coords="53,130,279,199"/>
-<area shape="poly" title=" " alt="" coords="348,82,235,132,233,127,346,78"/>
+<area shape="poly" title=" " alt="" coords="551,69,316,125,280,134,279,129,315,120,550,64"/>
+<area shape="rect" href="rb__event_8hpp.html" title=" " alt="" coords="782,123,971,207"/>
+<area shape="poly" title=" " alt="" coords="728,79,799,120,796,125,725,84"/>
 <area shape="rect" href="io_8hpp.html" title=" " alt="" coords="572,130,757,199"/>
-<area shape="poly" title=" " alt="" coords="517,79,605,127,602,132,514,84"/>
+<area shape="poly" title=" " alt="" coords="667,88,667,130,662,130,662,88"/>
 <area shape="rect" href="telemetry__dataclasses_8hpp.html" title=" " alt="" coords="339,123,548,207"/>
-<area shape="poly" title=" " alt="" coords="446,88,446,123,441,123,441,88"/>
-<area shape="rect" href="events_8cxx.html" title=" " alt="" coords="781,130,969,199"/>
-<area shape="poly" title=" " alt="" coords="558,64,662,89,771,120,792,127,791,133,769,125,660,94,557,69"/>
-<area shape="poly" title=" " alt="" coords="262,122,374,72,377,77,264,127"/>
+<area shape="poly" title=" " alt="" coords="593,84,518,125,516,120,590,79"/>
+<area shape="rect" href="events_8cxx.html" title=" " alt="" coords="996,130,1184,199"/>
+<area shape="poly" title=" " alt="" coords="779,65,879,90,984,120,1005,127,1004,132,982,125,878,95,778,70"/>
+<area shape="poly" title=" " alt="" coords="292,132,339,120,563,65,564,70,340,125,293,137"/>
 <area shape="rect" href="caraspace_8hpp.html" title=" " alt="" coords="708,387,947,456"/>
 <area shape="poly" title=" " alt="" coords="90,209,67,231,50,256,39,279,34,299,37,318,49,337,61,345,80,353,140,367,221,380,316,390,523,405,708,414,708,419,523,410,316,395,220,385,139,373,79,358,58,350,45,341,32,319,29,299,34,277,45,253,63,227,87,205"/>
 <area shape="rect" href="gondola__core_8cxx.html" title=" " alt="" coords="501,504,695,588"/>
@@ -209,6 +274,7 @@ This graph shows which files directly or indirectly include this file:</div>
 <area shape="poly" title=" " alt="" coords="917,459,1029,509,1027,514,914,464"/>
 <area shape="rect" href="telemetry__reader_8cxx.html" title=" " alt="" coords="719,511,975,581"/>
 <area shape="poly" title=" " alt="" coords="837,469,844,511,839,511,832,470"/>
+<area shape="poly" title=" " alt="" coords="801,118,729,77,732,72,804,113"/>
 <area shape="poly" title=" " alt="" coords="659,214,608,504,602,503,654,213"/>
 <area shape="poly" title=" " alt="" coords="759,201,770,204,809,209,859,211,975,211,1034,214,1087,220,1132,232,1149,241,1163,253,1182,283,1190,317,1190,353,1184,389,1159,458,1129,513,1124,510,1154,455,1179,387,1185,352,1185,318,1177,285,1159,256,1146,246,1130,237,1086,225,1034,219,975,217,858,217,808,215,769,209,757,206"/>
 <area shape="poly" title=" " alt="" coords="572,206,561,209,485,227,424,234,363,242,286,257,260,265,259,259,285,252,362,236,423,229,484,221,560,204,570,201"/>
@@ -232,20 +298,6 @@ This graph shows which files directly or indirectly include this file:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstd_1_1formatter_3_01gondola_1_1EventStatus_01_4.html">std::formatter&lt; gondola::EventStatus &gt;</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1RBEventHeader.html">gondola::RBEventHeader</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1TofHit.html">gondola::TofHit</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1RBEvent.html">gondola::RBEvent</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1MasterTriggerEvent.html">gondola::MasterTriggerEvent</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1TofEvent.html">gondola::TofEvent</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1RBWaveform.html">gondola::RBWaveform</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1TofEventSummary.html">gondola::TofEventSummary</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -267,102 +319,26 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr class="memitem:ae4efa4080cf89476f85e917971613baa" id="r_ae4efa4080cf89476f85e917971613baa"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baa">gondola::EventStatus</a> : u8 { <br />
-&#160;&#160;<a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaa88183b946cc5f0e8c96b2e66e1c74a7e">gondola::Unknown</a> = EVENTSTATUS_UNKNOWN
-, <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaa1b8508e116432ac1383a292c6a0d05c1">gondola::Crc32Wrong</a> = EVENTSTATUS_CRC32WRONG
-, <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaaec81a5026e321b3f9ff2f610e52d532e">gondola::TailWrong</a> = EVENTSTATUS_TAILWRONG
-, <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaae47816a3c64358b80c028dc88edcab3c">gondola::ChannelIDWrong</a> = EVENTSTATUS_CHIDWRONG
-, <br />
-&#160;&#160;<a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaa89db10b7258e552827a62fd8d1e4309e">gondola::CellSyncErrors</a> = EVENTSTATUS_CELLSYNCERR
-, <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaa99ef53b53786cbe479e9a7075a2492df">gondola::ChnSyncErrors</a> = EVENTSTATUS_CHNSYNCERR
-, <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaa4d9a974c1af3b5418f3b61dbd735bc14">gondola::CellAndChnSyncErrors</a> = EVENTSTATUS_CELLANDCHNSYNCERR
-, <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaa914a42ba7d6f75029e02b8c5e8a80016">gondola::AnyDataMangling</a> = EVENTSTATUS_ANYDATAMANGLING
-, <br />
-&#160;&#160;<a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaaba59a6fba632d1543589d766abc636df">gondola::IncompatibleData</a> = EVENTSTATUS_INCOMPATIBLEDATA
-, <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaa44ce38fea2e8223bad3229cd0eac17da">gondola::EventTimeOut</a> = EVENTSTATUS_EVENTTIMEOUT
-, <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaa5c7a66b675c172f368c8331b20c68c45">gondola::GoodNoCRCOrErrBitCheck</a> = EVENTSTATUS_GOODNOCRCORERRBITCHECK
-, <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaa3a4bcec2a877d364580a1a753dd0d1c8">gondola::GoodNoCRCCheck</a> = EVENTSTATUS_GOODNOCRCCHECK
-, <br />
-&#160;&#160;<a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaa69a7cfda8af8a54154e556f4d766926c">gondola::GoodNoErrBitCheck</a> = EVENTSTATUS_GOODNOERRBITCHECK
-, <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaae0a530b3e7e74423e454a99e3c6d0b69">gondola::IncompleteReadout</a> = EVENTSTATUS_INCOMPLETEREADOUT
-, <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baaa56cdd7e9e3cef1974f4075c03a80332d">gondola::Perfect</a> = EVENTSTATUS_PERFECT
-<br />
- }</td></tr>
-<tr class="separator:ae4efa4080cf89476f85e917971613baa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac91e1b082fd02305f77ee3d0338ff21" id="r_aac91e1b082fd02305f77ee3d0338ff21"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21">gondola::TriggerType</a> : u8 { <br />
-&#160;&#160;<a class="el" href="namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21a88183b946cc5f0e8c96b2e66e1c74a7e">gondola::Unknown</a> = TRIGGERTYPE_UNKNOWN
-, <a class="el" href="namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21a41d31d862aea788d0c2b86ac6df3c0ae">gondola::Gaps</a> = TRIGGERTYPE_GAPS
-, <a class="el" href="namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21aed36a1ef76a59ee3f15180e0441188ad">gondola::Any</a> = TRIGGERTYPE_ANY
-, <a class="el" href="namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21a92ea731d3af6677905303c88689f5d55">gondola::Track</a> = TRIGGERTYPE_TRACK
-, <br />
-&#160;&#160;<a class="el" href="namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21abc421fa7f533c3d639eeebfd29fdf499">gondola::TrackCentral</a> = TRIGGERTYPE_TRACKCENTRAL
-, <a class="el" href="namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21adff200b0bb8d3c69fbd54cb43664cd7e">gondola::Poisson</a> = TRIGGERTYPE_POISSON
-, <a class="el" href="namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21adc2eb84d1f952ad0e6b58014aabd616a">gondola::Forced</a> = TRIGGERTYPE_FORCED
-<br />
- }</td></tr>
-<tr class="separator:aac91e1b082fd02305f77ee3d0338ff21"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3e679dd5cf65b9be26ead6c7555f2580" id="r_a3e679dd5cf65b9be26ead6c7555f2580"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a3e679dd5cf65b9be26ead6c7555f2580">gondola::LTBThreshold</a> : u8 { <br />
-&#160;&#160;<a class="el" href="namespacegondola.html#a3e679dd5cf65b9be26ead6c7555f2580af8246e1e45d89414e8bf56ffe1680a54">gondola::NoHit</a> = LTBTHRESHOLD_NOHIT
-, <a class="el" href="namespacegondola.html#a3e679dd5cf65b9be26ead6c7555f2580aebfe5e1791db03c4cd6ab95801e0977d">gondola::Hit</a> = LTBTHRESHOLD_HIT
-, <a class="el" href="namespacegondola.html#a3e679dd5cf65b9be26ead6c7555f2580a0b87d66b88c72957dfea8c9605016442">gondola::Beta</a> = LTBTHRESHOLD_BETA
-, <a class="el" href="namespacegondola.html#a3e679dd5cf65b9be26ead6c7555f2580a98865aa73ddbf0657187d430de3c38bc">gondola::Veto</a> = LTBTHRESHOLD_VETO
-, <br />
-&#160;&#160;<a class="el" href="namespacegondola.html#a3e679dd5cf65b9be26ead6c7555f2580a88183b946cc5f0e8c96b2e66e1c74a7e">gondola::Unknown</a> = LTBTHRESHOLD_UNKNOWN
-<br />
- }</td></tr>
-<tr class="separator:a3e679dd5cf65b9be26ead6c7555f2580"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac61bd1b8e62eab79a1089be6ecc1ca3d" id="r_ac61bd1b8e62eab79a1089be6ecc1ca3d"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#ac61bd1b8e62eab79a1089be6ecc1ca3d">gondola::EventQuality</a> : u8 { <br />
-&#160;&#160;<a class="el" href="namespacegondola.html#ac61bd1b8e62eab79a1089be6ecc1ca3da88183b946cc5f0e8c96b2e66e1c74a7e">gondola::Unknown</a> = EVENT_QUALITY_UNKNOWN
-, <a class="el" href="namespacegondola.html#ac61bd1b8e62eab79a1089be6ecc1ca3daf96e345fdc19cbd4cf15256c251a39a0">gondola::Silver</a> = EVENT_QUALITY_SILVER
-, <a class="el" href="namespacegondola.html#ac61bd1b8e62eab79a1089be6ecc1ca3da9768feb3fdb1f267b06093bc572952dd">gondola::Gold</a> = EVENT_QUALITY_GOLD
-, <a class="el" href="namespacegondola.html#ac61bd1b8e62eab79a1089be6ecc1ca3da8f7671185d590914ac21c7511767b699">gondola::Diamond</a> = EVENT_QUALITY_DIAMOND
-, <br />
-&#160;&#160;<a class="el" href="namespacegondola.html#ac61bd1b8e62eab79a1089be6ecc1ca3da62cf3c3f187eab330ce1a7ecac59b539">gondola::FourLeafClover</a> = EVENT_QUALITY_FOURLEAFCLOVER
-<br />
- }</td></tr>
-<tr class="separator:ac61bd1b8e62eab79a1089be6ecc1ca3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a62baa478e4adaaf6d242f135c1c9f84d" id="r_a62baa478e4adaaf6d242f135c1c9f84d"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a62baa478e4adaaf6d242f135c1c9f84d">gondola::CompressionLevel</a> : u8 { <a class="el" href="namespacegondola.html#a62baa478e4adaaf6d242f135c1c9f84da88183b946cc5f0e8c96b2e66e1c74a7e">gondola::Unknown</a> = COMPRESSION_LEVEL_UNKNOWN
-, <a class="el" href="namespacegondola.html#a62baa478e4adaaf6d242f135c1c9f84da6adf97f83acf6453d4a6a4b1070f3754">gondola::None</a> = COMPRESSION_LEVEL_NONE
+<tr class="memitem:a62baa478e4adaaf6d242f135c1c9f84d" id="r_a62baa478e4adaaf6d242f135c1c9f84d"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a62baa478e4adaaf6d242f135c1c9f84d">gondola::CompressionLevel</a> : u8 { <a class="el" href="namespacegondola.html#a62baa478e4adaaf6d242f135c1c9f84da88183b946cc5f0e8c96b2e66e1c74a7e">gondola::Unknown</a> = 0
+, <a class="el" href="namespacegondola.html#a62baa478e4adaaf6d242f135c1c9f84da6adf97f83acf6453d4a6a4b1070f3754">gondola::None</a> = 10
  }</td></tr>
 <tr class="separator:a62baa478e4adaaf6d242f135c1c9f84d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a2eecfb1d930e8ee8c37624b8d7356928" id="r_a2eecfb1d930e8ee8c37624b8d7356928"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a2eecfb1d930e8ee8c37624b8d7356928">gondola::operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="namespacegondola.html#ae4efa4080cf89476f85e917971613baa">gondola::EventStatus</a> &amp;status)</td></tr>
-<tr class="separator:a2eecfb1d930e8ee8c37624b8d7356928"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a70a1b591bf58b6e149e2ec815142e4ac" id="r_a70a1b591bf58b6e149e2ec815142e4ac"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a70a1b591bf58b6e149e2ec815142e4ac">gondola::operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21">gondola::TriggerType</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">t_type</a>)</td></tr>
-<tr class="separator:a70a1b591bf58b6e149e2ec815142e4ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a95d0c48f85317911ad997722c25219b6" id="r_a95d0c48f85317911ad997722c25219b6"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a95d0c48f85317911ad997722c25219b6">gondola::operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="namespacegondola.html#a3e679dd5cf65b9be26ead6c7555f2580">gondola::LTBThreshold</a> &amp;thresh)</td></tr>
-<tr class="separator:a95d0c48f85317911ad997722c25219b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9de221b8ccf9c0782f0790897ff063c5" id="r_a9de221b8ccf9c0782f0790897ff063c5"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a9de221b8ccf9c0782f0790897ff063c5">gondola::operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="namespacegondola.html#ac61bd1b8e62eab79a1089be6ecc1ca3d">gondola::EventQuality</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">qual</a>)</td></tr>
-<tr class="separator:a9de221b8ccf9c0782f0790897ff063c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9086a1522bf1269d1824786811a08141" id="r_a9086a1522bf1269d1824786811a08141"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a9086a1522bf1269d1824786811a08141">gondola::operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="namespacegondola.html#a62baa478e4adaaf6d242f135c1c9f84d">gondola::CompressionLevel</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">level</a>)</td></tr>
 <tr class="separator:a9086a1522bf1269d1824786811a08141"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a46b0240dcaddd2703faa7a239ae7e686" id="r_a46b0240dcaddd2703faa7a239ae7e686"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a46b0240dcaddd2703faa7a239ae7e686">gondola::operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1TofHit.html">gondola::TofHit</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">pad</a>)</td></tr>
-<tr class="separator:a46b0240dcaddd2703faa7a239ae7e686"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af7a52fb6dd43dfd349044a3baee18d6d" id="r_af7a52fb6dd43dfd349044a3baee18d6d"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#af7a52fb6dd43dfd349044a3baee18d6d">gondola::operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1MasterTriggerEvent.html">gondola::MasterTriggerEvent</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">mt</a>)</td></tr>
-<tr class="separator:af7a52fb6dd43dfd349044a3baee18d6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6878be1debdc1d7832f0e68faa4be862" id="r_a6878be1debdc1d7832f0e68faa4be862"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a6878be1debdc1d7832f0e68faa4be862">gondola::operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1TofEvent.html">gondola::TofEvent</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">et</a>)</td></tr>
-<tr class="separator:a6878be1debdc1d7832f0e68faa4be862"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aba7a0abca261a73c5b085036ea3d85c9" id="r_aba7a0abca261a73c5b085036ea3d85c9"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#aba7a0abca261a73c5b085036ea3d85c9">gondola::operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1RBEvent.html">gondola::RBEvent</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">re</a>)</td></tr>
-<tr class="separator:aba7a0abca261a73c5b085036ea3d85c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a801130bb64dc4827fdc3f24f8c8894eb" id="r_a801130bb64dc4827fdc3f24f8c8894eb"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a801130bb64dc4827fdc3f24f8c8894eb">gondola::operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1RBEventHeader.html">gondola::RBEventHeader</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">rh</a>)</td></tr>
-<tr class="separator:a801130bb64dc4827fdc3f24f8c8894eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac9cb0b91c67a4b60151e456492a27d37" id="r_ac9cb0b91c67a4b60151e456492a27d37"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#ac9cb0b91c67a4b60151e456492a27d37">gondola::operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1RBWaveform.html">gondola::RBWaveform</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">rh</a>)</td></tr>
-<tr class="separator:ac9cb0b91c67a4b60151e456492a27d37"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad142b09b980b0577047b677bd0750252" id="r_ad142b09b980b0577047b677bd0750252"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#ad142b09b980b0577047b677bd0750252">gondola::operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1TofEventSummary.html">gondola::TofEventSummary</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">tes</a>)</td></tr>
 <tr class="separator:ad142b09b980b0577047b677bd0750252"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Tof event classes. </p>
 <p>An event is basically anything with an event id.</p><ul>
-<li>events for individual readoutboards<ul>
+<li><p class="startli">events for individual readoutboards</p><ul>
 <li>RBEventHeader : header information of event</li>
 <li>RBEvent : contains header + active channels</li>
 <li>RBWaveform : A single waveform - this is for the telemetry stream, since larger packets would be too big</li>
 </ul>
-</li>
-<li><p class="startli">events for the MasterTriggerBoard</p>
 <p class="startli">For actual flight code, see the rust project</p>
 <p class="startli">This file is part of gaps-online-software and published under the GPLv3 license </p>
 </li>

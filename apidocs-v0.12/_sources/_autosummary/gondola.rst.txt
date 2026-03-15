@@ -8,6 +8,9 @@
 
    .. autosummary::
    
+      get_version_major
+      get_version_minor
+      get_version_patch
       init_database
    
 .. rubric:: Modules
@@ -16,12 +19,16 @@
    :toctree:
    :recursive:
 
+   algo
    calibration
    db
    events
    gondola_core
    io
+   monitoring
+   packets
    reconstruction
+   stats
    tof
    tracker
    visual

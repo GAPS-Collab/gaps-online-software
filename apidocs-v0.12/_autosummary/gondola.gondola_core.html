@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.gondola_core &#8212; gondola 0.12.7 documentation</title>
+    <title>gondola.gondola_core &#8212; gondola 0.12.10 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=1392dee4"></script>
+    <script src="../_static/documentation_options.js?v=419a0d18"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.gondola_core';</script>
@@ -110,7 +110,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.12.7 documentation</p>
+    <p class="title logo__title">gondola 0.12.10 documentation</p>
   
 </a></div>
     
@@ -259,6 +259,7 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="gondola.algo.html">gondola.algo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.calibration.html">gondola.calibration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.db.html">gondola.db</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.events.html">gondola.events</a></li>
@@ -267,7 +268,10 @@
 <li class="toctree-l2"><a class="reference internal" href="gondola.io.streamers.html">gondola.io.streamers</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.monitoring.html">gondola.monitoring</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.packets.html">gondola.packets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.reconstruction.html">gondola.reconstruction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.stats.html">gondola.stats</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="gondola.tof.html">gondola.tof</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="gondola.tof.analysis.html">gondola.tof.analysis</a></li>
 </ul>
@@ -360,6 +364,21 @@ functions</p>
 <span class="sig-prename descclassname"><span class="pre">gondola.gondola_core.</span></span><span class="sig-name descname"><span class="pre">get_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.gondola_core.get_version" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="gondola.gondola_core.get_version_major">
+<span class="sig-prename descclassname"><span class="pre">gondola.gondola_core.</span></span><span class="sig-name descname"><span class="pre">get_version_major</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.gondola_core.get_version_major" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gondola.gondola_core.get_version_minor">
+<span class="sig-prename descclassname"><span class="pre">gondola.gondola_core.</span></span><span class="sig-name descname"><span class="pre">get_version_minor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.gondola_core.get_version_minor" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gondola.gondola_core.get_version_patch">
+<span class="sig-prename descclassname"><span class="pre">gondola.gondola_core.</span></span><span class="sig-name descname"><span class="pre">get_version_patch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.gondola_core.get_version_patch" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
 </section>
 
 
@@ -410,6 +429,9 @@ functions</p>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.gondola_core.get_version"><code class="docutils literal notranslate"><span class="pre">get_version()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.gondola_core.get_version_major"><code class="docutils literal notranslate"><span class="pre">get_version_major()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.gondola_core.get_version_minor"><code class="docutils literal notranslate"><span class="pre">get_version_minor()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.gondola_core.get_version_patch"><code class="docutils literal notranslate"><span class="pre">get_version_patch()</span></code></a></li>
 </ul>
   </nav></div>
 

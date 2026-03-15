@@ -1,0 +1,44 @@
+<map id="/home/runner/work/gaps&#45;online&#45;software/gaps&#45;online&#45;software/gondola&#45;core/C++/include/events/rb_waveform.hpp" name="/home/runner/work/gaps&#45;online&#45;software/gaps&#45;online&#45;software/gondola&#45;core/C++/include/events/rb_waveform.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="570,5,759,89"/>
+<area shape="rect" id="Node000002" href="$events_8h.html" title="Tof event classes." alt="" coords="564,137,765,207"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="667,103,667,137,662,137,662,103"/>
+<area shape="rect" id="Node000003" href="$calibration_8h.html" title="ReadoutBoard calibration C++ implementation for RBCalibration class." alt="" coords="53,262,279,331"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="551,201,316,257,280,266,279,261,315,252,550,196"/>
+<area shape="rect" id="Node000009" href="$rb__event_8hpp.html" title=" " alt="" coords="782,255,971,339"/>
+<area shape="poly" id="edge10_Node000002_Node000009" title=" " alt="" coords="728,211,799,252,796,257,725,216"/>
+<area shape="rect" id="Node000010" href="$io_8hpp.html" title=" " alt="" coords="572,262,757,331"/>
+<area shape="poly" id="edge12_Node000002_Node000010" title=" " alt="" coords="667,220,667,262,662,262,662,220"/>
+<area shape="rect" id="Node000013" href="$telemetry__dataclasses_8hpp.html" title=" " alt="" coords="339,255,548,339"/>
+<area shape="poly" id="edge22_Node000002_Node000013" title=" " alt="" coords="593,216,518,257,516,252,590,211"/>
+<area shape="rect" id="Node000015" href="$events_8cxx.html" title=" " alt="" coords="996,262,1184,331"/>
+<area shape="poly" id="edge27_Node000002_Node000015" title=" " alt="" coords="779,197,879,222,984,252,1005,259,1004,264,982,257,878,227,778,202"/>
+<area shape="poly" id="edge7_Node000003_Node000002" title=" " alt="" coords="292,264,339,252,563,197,564,202,340,257,293,269"/>
+<area shape="rect" id="Node000004" href="$caraspace_8hpp.html" title=" " alt="" coords="708,519,947,588"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="90,341,67,363,50,388,39,411,34,431,37,450,49,469,61,477,80,485,140,499,221,512,316,522,523,537,708,546,708,551,523,542,316,527,220,517,139,505,79,490,58,482,45,473,32,451,29,431,34,409,45,385,63,359,87,337"/>
+<area shape="rect" id="Node000005" href="$gondola__core_8cxx.html" title=" " alt="" coords="501,636,695,720"/>
+<area shape="poly" id="edge8_Node000003_Node000005" title=" " alt="" coords="75,341,49,362,29,388,16,417,9,445,9,471,14,496,24,520,40,543,86,586,117,602,159,617,268,641,390,657,500,668,500,673,389,663,267,646,158,622,114,607,83,590,36,546,20,523,9,498,3,472,4,444,11,416,25,385,45,358,71,337"/>
+<area shape="rect" id="Node000008" href="$calibration_8cxx.html" title=" " alt="" coords="59,394,273,463"/>
+<area shape="poly" id="edge9_Node000003_Node000008" title=" " alt="" coords="169,345,169,394,163,394,163,345"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="754,597,676,638,673,634,751,592"/>
+<area shape="rect" id="Node000006" href="$caraspace_8cxx.html" title=" " alt="" coords="999,643,1210,713"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="917,591,1029,641,1027,646,914,596"/>
+<area shape="rect" id="Node000007" href="$telemetry__reader_8cxx.html" title=" " alt="" coords="719,643,975,713"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="837,601,844,643,839,643,832,602"/>
+<area shape="poly" id="edge11_Node000009_Node000002" title=" " alt="" coords="801,250,729,209,732,204,804,245"/>
+<area shape="poly" id="edge18_Node000010_Node000005" title=" " alt="" coords="659,346,608,636,602,635,654,345"/>
+<area shape="poly" id="edge20_Node000010_Node000006" title=" " alt="" coords="759,333,770,336,809,341,859,343,975,343,1034,346,1087,352,1132,364,1149,373,1163,385,1182,415,1190,449,1190,485,1184,521,1159,590,1129,645,1124,642,1154,587,1179,519,1185,484,1185,450,1177,417,1159,388,1146,378,1130,369,1086,357,1034,351,975,349,858,349,808,347,769,341,757,338"/>
+<area shape="poly" id="edge19_Node000010_Node000008" title=" " alt="" coords="572,338,561,341,485,359,424,366,363,374,286,389,260,397,259,391,285,384,362,368,423,361,484,353,560,336,570,333"/>
+<area shape="rect" id="Node000011" href="$telemetry__reader_8hpp.html" title=" " alt="" coords="715,387,940,471"/>
+<area shape="poly" id="edge13_Node000010_Node000011" title=" " alt="" coords="719,338,777,384,774,389,716,342"/>
+<area shape="rect" id="Node000012" href="$io_8cxx.html" title=" " alt="" coords="965,394,1149,463"/>
+<area shape="poly" id="edge21_Node000010_Node000012" title=" " alt="" coords="762,333,771,336,862,360,953,384,974,391,973,396,952,389,861,365,769,341,761,338"/>
+<area shape="poly" id="edge14_Node000011_Node000004" title=" " alt="" coords="830,484,830,519,825,519,825,484"/>
+<area shape="poly" id="edge15_Node000011_Node000005" title=" " alt="" coords="746,480,698,521,653,579,620,637,615,634,649,576,695,517,743,476"/>
+<area shape="poly" id="edge16_Node000011_Node000006" title=" " alt="" coords="925,475,984,517,1015,547,1043,580,1086,642,1082,645,1039,584,1011,551,980,521,922,480"/>
+<area shape="poly" id="edge17_Node000011_Node000007" title=" " alt="" coords="927,477,946,495,962,517,970,536,972,553,969,570,962,589,939,621,910,645,907,641,935,617,957,587,964,569,967,553,965,538,957,520,942,499,923,481"/>
+<area shape="poly" id="edge23_Node000013_Node000004" title=" " alt="" coords="536,343,603,384,655,426,705,469,775,516,772,521,702,473,651,430,600,389,534,348"/>
+<area shape="poly" id="edge25_Node000013_Node000005" title=" " alt="" coords="326,333,292,341,253,347,217,347,155,343,127,343,101,349,75,363,49,388,37,409,33,428,37,448,49,469,93,519,145,561,203,594,265,620,328,640,390,654,501,669,500,675,389,659,327,645,263,625,200,599,142,565,89,523,45,472,32,450,28,428,32,407,45,385,72,359,99,344,127,338,155,337,218,342,252,342,291,336,325,328"/>
+<area shape="poly" id="edge24_Node000013_Node000011" title=" " alt="" coords="562,336,715,388,713,393,560,341"/>
+<area shape="rect" id="Node000014" href="$telemetry__dataclasses_8cxx.html" title=" " alt="" coords="297,394,589,463"/>
+<area shape="poly" id="edge26_Node000013_Node000014" title=" " alt="" coords="446,353,446,394,441,394,441,353"/>
+</map>

@@ -20,12 +20,12 @@ var searchData=
   ['drs_5favdd_5fcurrent_17',['drs_avdd_current',['../structRBMoniData.html#a8a281efd433166d8b214d70d57d8b63f',1,'RBMoniData']]],
   ['drs_5favdd_5fpower_18',['drs_avdd_power',['../structRBMoniData.html#ae44113bde57af43f6bac150fa0b7db6f',1,'RBMoniData']]],
   ['drs_5favdd_5fvoltage_19',['drs_avdd_voltage',['../structRBMoniData.html#ab3cf1ee816df4e302d4b7e72a5026758',1,'RBMoniData']]],
-  ['drs_5fdead_5flost_5fhits_20',['drs_dead_lost_hits',['../structgondola_1_1TofEventSummary.html#a988ac3fe001dfa162bb7156030816d7b',1,'gondola::TofEventSummary::drs_dead_lost_hits'],['../structgondola_1_1TofEvent.html#a981d1e93066e6b07e4bbbf6d7b921738',1,'gondola::TofEvent::drs_dead_lost_hits']]],
+  ['drs_5fdead_5flost_5fhits_20',['drs_dead_lost_hits',['../structgondola_1_1TofEvent.html#a981d1e93066e6b07e4bbbf6d7b921738',1,'gondola::TofEvent::drs_dead_lost_hits'],['../structgondola_1_1TofEventSummary.html#a988ac3fe001dfa162bb7156030816d7b',1,'gondola::TofEventSummary::drs_dead_lost_hits']]],
   ['drs_5fdvdd_5fcurrent_21',['drs_dvdd_current',['../structRBMoniData.html#ac7c2b0f45daa1ef6320d3cc858b60847',1,'RBMoniData']]],
   ['drs_5fdvdd_5fpower_22',['drs_dvdd_power',['../structRBMoniData.html#a888bef9190dba4d8478f4e15a4c33e22',1,'RBMoniData']]],
   ['drs_5fdvdd_5fvoltage_23',['drs_dvdd_voltage',['../structRBMoniData.html#af9b36ce65a4c08fc4c96f0e3d0e28597',1,'RBMoniData']]],
   ['drs_5flost_5ftrigger_24',['drs_lost_trigger',['../structgondola_1_1RBEventHeader.html#aaaf454be2325ae149c3ea67faf3c9cd8',1,'gondola::RBEventHeader']]],
-  ['dsi_25',['dsi',['../structGaps_1_1TofPaddle.html#a877747357aa71fb67291a15c38d61d9d',1,'Gaps::TofPaddle']]],
-  ['dsi_5fj_5fmask_26',['dsi_j_mask',['../structgondola_1_1MasterTriggerEvent.html#a2476a3c506d36d8314bb48e27d5fd301',1,'gondola::MasterTriggerEvent::dsi_j_mask'],['../structgondola_1_1TofEvent.html#af4bf37090b00118f5c6ff18fbb2542b9',1,'gondola::TofEvent::dsi_j_mask'],['../structgondola_1_1TofEventSummary.html#a8ce0f34b21f5c54ad5ce458b7812aa84',1,'gondola::TofEventSummary::dsi_j_mask']]],
-  ['dsijchnpaddleidmap_27',['DsiJChnPaddleIdMap',['../namespaceGaps.html#ac562c67ce894d03edeecb6332caa86ac',1,'Gaps']]]
+  ['dsi_25',['dsi',['../structgondola_1_1TofPaddle.html#a8caa26597d27b43873390681c4e06350',1,'gondola::TofPaddle']]],
+  ['dsi_5fj_5fmask_26',['dsi_j_mask',['../structgondola_1_1TofEventSummary.html#a8ce0f34b21f5c54ad5ce458b7812aa84',1,'gondola::TofEventSummary::dsi_j_mask'],['../structgondola_1_1TofEvent.html#af4bf37090b00118f5c6ff18fbb2542b9',1,'gondola::TofEvent::dsi_j_mask']]],
+  ['dsijchnpaddleidmap_27',['DsiJChnPaddleIdMap',['../namespacegondola.html#a770bde374c96a3200b922ace0d70e09b',1,'gondola']]]
 ];

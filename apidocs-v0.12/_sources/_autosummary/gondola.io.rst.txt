@@ -17,8 +17,10 @@ gondola.io
       get_telemetry_binaries
       get_ts_from_binfile
       get_unix_timestamp
+      get_unix_timestamp_from_telemetry
       get_utc_date
       get_utc_now
+      get_utc_timestamp_from_unix
       grace_get_telemetry_binaries
       list_path_contents_sorted
    
@@ -31,6 +33,7 @@ gondola.io
       CRReader
       CRWriter
       TelemetryPacketReader
+      TelemetryPacketWriter
       TofPacketReader
       TofPacketWriter
    

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.events &#8212; gondola 0.12.7 documentation</title>
+    <title>gondola.events &#8212; gondola 0.12.10 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=1392dee4"></script>
+    <script src="../_static/documentation_options.js?v=419a0d18"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.events';</script>
@@ -110,7 +110,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.12.7 documentation</p>
+    <p class="title logo__title">gondola 0.12.10 documentation</p>
   
 </a></div>
     
@@ -259,6 +259,7 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="gondola.algo.html">gondola.algo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.calibration.html">gondola.calibration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.db.html">gondola.db</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">gondola.events</a></li>
@@ -267,7 +268,10 @@
 <li class="toctree-l2"><a class="reference internal" href="gondola.io.streamers.html">gondola.io.streamers</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.monitoring.html">gondola.monitoring</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.packets.html">gondola.packets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.reconstruction.html">gondola.reconstruction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.stats.html">gondola.stats</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="gondola.tof.html">gondola.tof</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="gondola.tof.analysis.html">gondola.tof.analysis</a></li>
 </ul>
@@ -386,6 +390,12 @@
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#gondola.events.TofHit" title="gondola.events.TofHit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofHit</span></code></a>()</p></td>
 <td><p>An extracted hit from a TofPaddle, as extracted by the  online software and provided algorithm (in v0.11 algorithm is provided by J.Zweerink)</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.events.TrackerDAQEvent" title="gondola.events.TrackerDAQEvent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerDAQEvent</span></code></a>()</p></td>
+<td><p>Each individual DAQ box of the tracker records its hit individually  and then the event needs to be assemlbed.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.events.TrackerDAQEventPacket" title="gondola.events.TrackerDAQEventPacket"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerDAQEventPacket</span></code></a>()</p></td>
+<td><p>Tracker stand-alone complete event information from up-to multiple DAQ boxes as used in TelemetryPacketType::Tracker (80)</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#gondola.events.TrackerHit" title="gondola.events.TrackerHit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerHit</span></code></a>()</p></td>
 <td><p>Hit on a tracker strip</p></td>
@@ -506,6 +516,12 @@ is added</p>
 <dt class="sig sig-object py" id="gondola.events.TofHit.edep">
 <span class="sig-name descname"><span class="pre">edep</span></span><a class="headerlink" href="#gondola.events.TofHit.edep" title="Link to this definition">#</a></dt>
 <dd><p>Philip's energy deposition based on peak height</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.edep_att">
+<span class="sig-name descname"><span class="pre">edep_att</span></span><a class="headerlink" href="#gondola.events.TofHit.edep_att" title="Link to this definition">#</a></dt>
+<dd><p>Elena's energy deposition based on peak height</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -651,6 +667,11 @@ or ch9 phase shift</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TrackerHit.adc">
 <span class="sig-name descname"><span class="pre">adc</span></span><a class="headerlink" href="#gondola.events.TrackerHit.adc" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TrackerHit.asic_event_code">
+<span class="sig-name descname"><span class="pre">asic_event_code</span></span><a class="headerlink" href="#gondola.events.TrackerHit.asic_event_code" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1066,6 +1087,38 @@ NHIT (CBE, COR, UMB) and EDEP (CBE, COR, UMB)</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.edep">
+<span class="sig-name descname"><span class="pre">edep</span></span><a class="headerlink" href="#gondola.events.TofEvent.edep" title="Link to this definition">#</a></dt>
+<dd><p>Total energy depostion in the complete TOF</p>
+<p>Utilizes Philip's formula based on 
+peak height</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.edep_cbe">
+<span class="sig-name descname"><span class="pre">edep_cbe</span></span><a class="headerlink" href="#gondola.events.TofEvent.edep_cbe" title="Link to this definition">#</a></dt>
+<dd><p>Total energy depostion in the Cube</p>
+<p>Utilizes Philip's formula based on 
+peak height</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.edep_cor">
+<span class="sig-name descname"><span class="pre">edep_cor</span></span><a class="headerlink" href="#gondola.events.TofEvent.edep_cor" title="Link to this definition">#</a></dt>
+<dd><p>Total energy depostion in the Cortina</p>
+<p>Utilizes Philip's formula based on 
+peak height</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.edep_umb">
+<span class="sig-name descname"><span class="pre">edep_umb</span></span><a class="headerlink" href="#gondola.events.TofEvent.edep_umb" title="Link to this definition">#</a></dt>
+<dd><p>Total energy depostion in the Umbrella</p>
+<p>Utilizes Philip's formula based on 
+peak height</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TofEvent.event_id">
 <span class="sig-name descname"><span class="pre">event_id</span></span><a class="headerlink" href="#gondola.events.TofEvent.event_id" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -1089,38 +1142,6 @@ NHIT (CBE, COR, UMB) and EDEP (CBE, COR, UMB)</p>
 <dt class="sig sig-object py" id="gondola.events.TofEvent.from_tofpacket">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_tofpacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.from_tofpacket" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="gondola.events.TofEvent.get_edep">
-<span class="sig-name descname"><span class="pre">get_edep</span></span><a class="headerlink" href="#gondola.events.TofEvent.get_edep" title="Link to this definition">#</a></dt>
-<dd><p>Total energy depostion in the complete TOF</p>
-<p>Utilizes Philip's formula based on 
-peak height</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="gondola.events.TofEvent.get_edep_cortina">
-<span class="sig-name descname"><span class="pre">get_edep_cortina</span></span><a class="headerlink" href="#gondola.events.TofEvent.get_edep_cortina" title="Link to this definition">#</a></dt>
-<dd><p>Total energy depostion in the Cortina</p>
-<p>Utilizes Philip's formula based on 
-peak height</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="gondola.events.TofEvent.get_edep_cube">
-<span class="sig-name descname"><span class="pre">get_edep_cube</span></span><a class="headerlink" href="#gondola.events.TofEvent.get_edep_cube" title="Link to this definition">#</a></dt>
-<dd><p>Total energy depostion in the Cube</p>
-<p>Utilizes Philip's formula based on 
-peak height</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="gondola.events.TofEvent.get_edep_umbrella">
-<span class="sig-name descname"><span class="pre">get_edep_umbrella</span></span><a class="headerlink" href="#gondola.events.TofEvent.get_edep_umbrella" title="Link to this definition">#</a></dt>
-<dd><p>Total energy depostion in the Umbrella</p>
-<p>Utilizes Philip's formula based on 
-peak height</p>
-</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.TofEvent.get_missing_paddles_hg">
@@ -1307,9 +1328,37 @@ if multiple trigger conditions are satisfied.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="gondola.events.TelemetryEvent">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">TelemetryEvent</span></span><a class="headerlink" href="#gondola.events.TelemetryEvent" title="Link to this definition">#</a></dt>
-<dd><dl class="py attribute">
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TelemetryEvent.add_tracker_hits">
+<span class="sig-name descname"><span class="pre">add_tracker_hits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TelemetryEvent.add_tracker_hits" title="Link to this definition">#</a></dt>
+<dd><p>Add tracker hits to the merged event (e.g. with hits from packet type 80</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TelemetryEvent.delete_all_tracker_hits">
+<span class="sig-name descname"><span class="pre">delete_all_tracker_hits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TelemetryEvent.delete_all_tracker_hits" title="Link to this definition">#</a></dt>
+<dd><p>Delete tracker hits (e.g. in case they are supposed to 
+be replaced by packet type 80 tracker hits)</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TelemetryEvent.event_id">
 <span class="sig-name descname"><span class="pre">event_id</span></span><a class="headerlink" href="#gondola.events.TelemetryEvent.event_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TelemetryEvent.exptected_tracker_hits">
+<span class="sig-name descname"><span class="pre">exptected_tracker_hits</span></span><a class="headerlink" href="#gondola.events.TelemetryEvent.exptected_tracker_hits" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TelemetryEvent.flags0">
+<span class="sig-name descname"><span class="pre">flags0</span></span><a class="headerlink" href="#gondola.events.TelemetryEvent.flags0" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TelemetryEvent.flags1">
+<span class="sig-name descname"><span class="pre">flags1</span></span><a class="headerlink" href="#gondola.events.TelemetryEvent.flags1" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1325,8 +1374,18 @@ if multiple trigger conditions are satisfied.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TelemetryEvent.has_at_least_expected_trk_hits">
+<span class="sig-name descname"><span class="pre">has_at_least_expected_trk_hits</span></span><a class="headerlink" href="#gondola.events.TelemetryEvent.has_at_least_expected_trk_hits" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TelemetryEvent.header">
 <span class="sig-name descname"><span class="pre">header</span></span><a class="headerlink" href="#gondola.events.TelemetryEvent.header" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TelemetryEvent.pack">
+<span class="sig-name descname"><span class="pre">pack</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TelemetryEvent.pack" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1347,6 +1406,148 @@ if multiple trigger conditions are satisfied.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TelemetryEvent.version">
 <span class="sig-name descname"><span class="pre">version</span></span><a class="headerlink" href="#gondola.events.TelemetryEvent.version" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.events.TrackerDAQEvent">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">TrackerDAQEvent</span></span><a class="headerlink" href="#gondola.events.TrackerDAQEvent" title="Link to this definition">#</a></dt>
+<dd><p>Each individual DAQ box of the tracker records its hit individually 
+and then the event needs to be assemlbed.</p>
+<p>During flight, this will be part of the &quot;TrackerPacket&quot; type 80</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TrackerDAQEvent.event_id">
+<span class="sig-name descname"><span class="pre">event_id</span></span><a class="headerlink" href="#gondola.events.TrackerDAQEvent.event_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TrackerDAQEvent.event_time">
+<span class="sig-name descname"><span class="pre">event_time</span></span><a class="headerlink" href="#gondola.events.TrackerDAQEvent.event_time" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TrackerDAQEvent.flags1">
+<span class="sig-name descname"><span class="pre">flags1</span></span><a class="headerlink" href="#gondola.events.TrackerDAQEvent.flags1" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TrackerDAQEvent.hits">
+<span class="sig-name descname"><span class="pre">hits</span></span><a class="headerlink" href="#gondola.events.TrackerDAQEvent.hits" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TrackerDAQEvent.layer">
+<span class="sig-name descname"><span class="pre">layer</span></span><a class="headerlink" href="#gondola.events.TrackerDAQEvent.layer" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.events.TrackerDAQEventPacket">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">TrackerDAQEventPacket</span></span><a class="headerlink" href="#gondola.events.TrackerDAQEventPacket" title="Link to this definition">#</a></dt>
+<dd><p>Tracker stand-alone complete event information from up-to multiple
+DAQ boxes as used in TelemetryPacketType::Tracker (80)</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TrackerDAQEventPacket.add_event">
+<span class="sig-name descname"><span class="pre">add_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ev</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TrackerDAQEventPacket.add_event" title="Link to this definition">#</a></dt>
+<dd><p>Modify the event and add another TrackerDAQEvent</p>
+<p>WARNING: This is an advanced feature. Usually, There
+is no reason to alter events</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TrackerDAQEventPacket.emit_empty">
+<span class="sig-name descname"><span class="pre">emit_empty</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TrackerDAQEventPacket.emit_empty" title="Link to this definition">#</a></dt>
+<dd><p>Create an empty copy of myself.</p>
+<p>Empty in this context means no events</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TrackerDAQEventPacket.event_ids">
+<span class="sig-name descname"><span class="pre">event_ids</span></span><a class="headerlink" href="#gondola.events.TrackerDAQEventPacket.event_ids" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TrackerDAQEventPacket.events">
+<span class="sig-name descname"><span class="pre">events</span></span><a class="headerlink" href="#gondola.events.TrackerDAQEventPacket.events" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TrackerDAQEventPacket.from_bytestream">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_bytestream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TrackerDAQEventPacket.from_bytestream" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TrackerDAQEventPacket.from_telemetrypacket">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_telemetrypacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TrackerDAQEventPacket.from_telemetrypacket" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TrackerDAQEventPacket.gcutime">
+<span class="sig-name descname"><span class="pre">gcutime</span></span><a class="headerlink" href="#gondola.events.TrackerDAQEventPacket.gcutime" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TrackerDAQEventPacket.get_event_for_evid">
+<span class="sig-name descname"><span class="pre">get_event_for_evid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TrackerDAQEventPacket.get_event_for_evid" title="Link to this definition">#</a></dt>
+<dd><p>Get a copy specific TrackerDAQEvent for a given event id</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TrackerDAQEventPacket.get_hits_for_evid">
+<span class="sig-name descname"><span class="pre">get_hits_for_evid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TrackerDAQEventPacket.get_hits_for_evid" title="Link to this definition">#</a></dt>
+<dd><p>Return all tracker hits which belong to a certain event id</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TrackerDAQEventPacket.header">
+<span class="sig-name descname"><span class="pre">header</span></span><a class="headerlink" href="#gondola.events.TrackerDAQEventPacket.header" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TrackerDAQEventPacket.nhits">
+<span class="sig-name descname"><span class="pre">nhits</span></span><a class="headerlink" href="#gondola.events.TrackerDAQEventPacket.nhits" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TrackerDAQEventPacket.pack">
+<span class="sig-name descname"><span class="pre">pack</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TrackerDAQEventPacket.pack" title="Link to this definition">#</a></dt>
+<dd><p>Create a telemetry packet to be send or 
+written to disk</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TrackerDAQEventPacket.remove_event">
+<span class="sig-name descname"><span class="pre">remove_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evid</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TrackerDAQEventPacket.remove_event" title="Link to this definition">#</a></dt>
+<dd><p>Remove a single TrackerDAQEvent from the 
+associated list of events</p>
+<dl class="simple">
+<dt># Arguments:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>evid<span class="classifier">Event ID of the event in the </span></dt><dd><p>list of associated events to 
+be removed</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TrackerDAQEventPacket.run_id">
+<span class="sig-name descname"><span class="pre">run_id</span></span><a class="headerlink" href="#gondola.events.TrackerDAQEventPacket.run_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TrackerDAQEventPacket.run_id_old">
+<span class="sig-name descname"><span class="pre">run_id_old</span></span><a class="headerlink" href="#gondola.events.TrackerDAQEventPacket.run_id_old" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TrackerDAQEventPacket.to_bytestream">
+<span class="sig-name descname"><span class="pre">to_bytestream</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TrackerDAQEventPacket.to_bytestream" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1771,6 +1972,7 @@ is the semantics behind it.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.coax_cbl_time"><code class="docutils literal notranslate"><span class="pre">TofHit.coax_cbl_time</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.distance"><code class="docutils literal notranslate"><span class="pre">TofHit.distance()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.edep"><code class="docutils literal notranslate"><span class="pre">TofHit.edep</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.edep_att"><code class="docutils literal notranslate"><span class="pre">TofHit.edep_att</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.event_t0"><code class="docutils literal notranslate"><span class="pre">TofHit.event_t0</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.hart_cbl_time"><code class="docutils literal notranslate"><span class="pre">TofHit.hart_cbl_time</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.obeys_causality"><code class="docutils literal notranslate"><span class="pre">TofHit.obeys_causality()</span></code></a></li>
@@ -1794,6 +1996,7 @@ is the semantics behind it.</p>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerHit"><code class="docutils literal notranslate"><span class="pre">TrackerHit</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerHit.adc"><code class="docutils literal notranslate"><span class="pre">TrackerHit.adc</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerHit.asic_event_code"><code class="docutils literal notranslate"><span class="pre">TrackerHit.asic_event_code</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerHit.channel"><code class="docutils literal notranslate"><span class="pre">TrackerHit.channel</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerHit.energy"><code class="docutils literal notranslate"><span class="pre">TrackerHit.energy</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerHit.layer"><code class="docutils literal notranslate"><span class="pre">TrackerHit.layer</span></code></a></li>
@@ -1871,15 +2074,15 @@ is the semantics behind it.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent"><code class="docutils literal notranslate"><span class="pre">TofEvent</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.calc_gcu_variables"><code class="docutils literal notranslate"><span class="pre">TofEvent.calc_gcu_variables()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.copy"><code class="docutils literal notranslate"><span class="pre">TofEvent.copy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.edep"><code class="docutils literal notranslate"><span class="pre">TofEvent.edep</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.edep_cbe"><code class="docutils literal notranslate"><span class="pre">TofEvent.edep_cbe</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.edep_cor"><code class="docutils literal notranslate"><span class="pre">TofEvent.edep_cor</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.edep_umb"><code class="docutils literal notranslate"><span class="pre">TofEvent.edep_umb</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.event_id"><code class="docutils literal notranslate"><span class="pre">TofEvent.event_id</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.event_status"><code class="docutils literal notranslate"><span class="pre">TofEvent.event_status</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.from_bytestream"><code class="docutils literal notranslate"><span class="pre">TofEvent.from_bytestream()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.from_random"><code class="docutils literal notranslate"><span class="pre">TofEvent.from_random()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.from_tofpacket"><code class="docutils literal notranslate"><span class="pre">TofEvent.from_tofpacket()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.get_edep"><code class="docutils literal notranslate"><span class="pre">TofEvent.get_edep</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.get_edep_cortina"><code class="docutils literal notranslate"><span class="pre">TofEvent.get_edep_cortina</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.get_edep_cube"><code class="docutils literal notranslate"><span class="pre">TofEvent.get_edep_cube</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.get_edep_umbrella"><code class="docutils literal notranslate"><span class="pre">TofEvent.get_edep_umbrella</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.get_missing_paddles_hg"><code class="docutils literal notranslate"><span class="pre">TofEvent.get_missing_paddles_hg()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.get_triggered_paddles"><code class="docutils literal notranslate"><span class="pre">TofEvent.get_triggered_paddles()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.has_any_mangling"><code class="docutils literal notranslate"><span class="pre">TofEvent.has_any_mangling</span></code></a></li>
@@ -1914,14 +2117,48 @@ is the semantics behind it.</p>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.add_tracker_hits"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.add_tracker_hits()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.delete_all_tracker_hits"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.delete_all_tracker_hits()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.event_id"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.event_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.exptected_tracker_hits"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.exptected_tracker_hits</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.flags0"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.flags0</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.flags1"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.flags1</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.from_telemetrypacket"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.from_telemetrypacket()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.get_trk_energy"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.get_trk_energy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.has_at_least_expected_trk_hits"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.has_at_least_expected_trk_hits</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.header"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.header</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.pack"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.pack()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.tof"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.tof</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.tracker"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.tracker</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.tracker_pointcloud"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.tracker_pointcloud</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.version"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.version</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerDAQEvent"><code class="docutils literal notranslate"><span class="pre">TrackerDAQEvent</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerDAQEvent.event_id"><code class="docutils literal notranslate"><span class="pre">TrackerDAQEvent.event_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerDAQEvent.event_time"><code class="docutils literal notranslate"><span class="pre">TrackerDAQEvent.event_time</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerDAQEvent.flags1"><code class="docutils literal notranslate"><span class="pre">TrackerDAQEvent.flags1</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerDAQEvent.hits"><code class="docutils literal notranslate"><span class="pre">TrackerDAQEvent.hits</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerDAQEvent.layer"><code class="docutils literal notranslate"><span class="pre">TrackerDAQEvent.layer</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerDAQEventPacket"><code class="docutils literal notranslate"><span class="pre">TrackerDAQEventPacket</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerDAQEventPacket.add_event"><code class="docutils literal notranslate"><span class="pre">TrackerDAQEventPacket.add_event()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerDAQEventPacket.emit_empty"><code class="docutils literal notranslate"><span class="pre">TrackerDAQEventPacket.emit_empty()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerDAQEventPacket.event_ids"><code class="docutils literal notranslate"><span class="pre">TrackerDAQEventPacket.event_ids</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerDAQEventPacket.events"><code class="docutils literal notranslate"><span class="pre">TrackerDAQEventPacket.events</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerDAQEventPacket.from_bytestream"><code class="docutils literal notranslate"><span class="pre">TrackerDAQEventPacket.from_bytestream()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerDAQEventPacket.from_telemetrypacket"><code class="docutils literal notranslate"><span class="pre">TrackerDAQEventPacket.from_telemetrypacket()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerDAQEventPacket.gcutime"><code class="docutils literal notranslate"><span class="pre">TrackerDAQEventPacket.gcutime</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerDAQEventPacket.get_event_for_evid"><code class="docutils literal notranslate"><span class="pre">TrackerDAQEventPacket.get_event_for_evid()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerDAQEventPacket.get_hits_for_evid"><code class="docutils literal notranslate"><span class="pre">TrackerDAQEventPacket.get_hits_for_evid()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerDAQEventPacket.header"><code class="docutils literal notranslate"><span class="pre">TrackerDAQEventPacket.header</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerDAQEventPacket.nhits"><code class="docutils literal notranslate"><span class="pre">TrackerDAQEventPacket.nhits</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerDAQEventPacket.pack"><code class="docutils literal notranslate"><span class="pre">TrackerDAQEventPacket.pack()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerDAQEventPacket.remove_event"><code class="docutils literal notranslate"><span class="pre">TrackerDAQEventPacket.remove_event()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerDAQEventPacket.run_id"><code class="docutils literal notranslate"><span class="pre">TrackerDAQEventPacket.run_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerDAQEventPacket.run_id_old"><code class="docutils literal notranslate"><span class="pre">TrackerDAQEventPacket.run_id_old</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerDAQEventPacket.to_bytestream"><code class="docutils literal notranslate"><span class="pre">TrackerDAQEventPacket.to_bytestream()</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.strip_id"><code class="docutils literal notranslate"><span class="pre">strip_id()</span></code></a></li>

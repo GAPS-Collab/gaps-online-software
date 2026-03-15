@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/gondola-core/rust/gondola-core/src/prelude.rs`."><title>prelude.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-ca0dd0c4.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="gondola_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.93.1 (01f6ddf75 2026-02-11)" data-channel="1.93.1" data-search-js="search-9e2438ea.js" data-stringdex-js="stringdex-a3946164.js" data-settings-js="settings-c38705f0.js" ><script src="../../static.files/storage-e2aeef58.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-a410ff4d.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">gondola_core/</div>prelude.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="comment">// This file is part of gaps-online-software and published 
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/gondola-core/rust/gondola-core/src/prelude.rs`."><title>prelude.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-77263533.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="gondola_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.94.0 (4a4ef493e 2026-03-02)" data-channel="1.94.0" data-search-js="search-9e2438ea.js" data-stringdex-js="stringdex-b897f86f.js" data-settings-js="settings-c38705f0.js" ><script src="../../static.files/storage-e2aeef58.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-7bab91a1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-ffcac47a.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">gondola_core/</div>prelude.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="comment">// This file is part of gaps-online-software and published 
 <a href=#2 id=2 data-nosnippet>2</a>// under the GPLv3 license
 <a href=#3 id=3 data-nosnippet>3</a>
 <a href=#4 id=4 data-nosnippet>4</a></span><span class="kw">pub use </span>std::sync::Arc;
@@ -169,65 +169,67 @@
 <a href=#169 id=169 data-nosnippet>169</a><span class="attr">#[cfg(feature=<span class="string">"pybindings"</span>)]
 <a href=#170 id=170 data-nosnippet>170</a></span><span class="kw">pub use </span><span class="kw">crate</span>::pythonize_monidata;
 <a href=#171 id=171 data-nosnippet>171</a><span class="kw">pub use </span><span class="kw">crate</span>::moniseries;
-<a href=#172 id=172 data-nosnippet>172</a><span class="attr">#[cfg(feature=<span class="string">"pybindings"</span>)]
-<a href=#173 id=173 data-nosnippet>173</a></span><span class="kw">pub use </span><span class="kw">crate</span>::pythonize_error;
-<a href=#174 id=174 data-nosnippet>174</a>
-<a href=#175 id=175 data-nosnippet>175</a><span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
-<a href=#176 id=176 data-nosnippet>176</a></span><span class="kw">pub use </span><span class="kw">crate</span>::random::FromRandom;
-<a href=#177 id=177 data-nosnippet>177</a>
-<a href=#178 id=178 data-nosnippet>178</a><span class="kw">pub use </span><span class="kw">crate</span>::version::ProtocolVersion;
-<a href=#179 id=179 data-nosnippet>179</a><span class="kw">pub use </span><span class="kw">crate</span>::constants::<span class="kw-2">*</span>;
-<a href=#180 id=180 data-nosnippet>180</a><span class="kw">pub use </span><span class="kw">crate</span>::errors::<span class="kw-2">*</span>;
-<a href=#181 id=181 data-nosnippet>181</a><span class="kw">pub use </span><span class="kw">crate</span>::io::<span class="kw-2">*</span>;
-<a href=#182 id=182 data-nosnippet>182</a><span class="kw">pub use </span><span class="kw">crate</span>::io::parsers::<span class="kw-2">*</span>;
-<a href=#183 id=183 data-nosnippet>183</a><span class="kw">pub use </span><span class="kw">crate</span>::io::caraspace::<span class="kw-2">*</span>;
-<a href=#184 id=184 data-nosnippet>184</a><span class="kw">pub use </span><span class="kw">crate</span>::io::serialization::<span class="kw-2">*</span>;
-<a href=#185 id=185 data-nosnippet>185</a><span class="kw">pub use </span><span class="kw">crate</span>::events::<span class="kw-2">*</span>;
-<a href=#186 id=186 data-nosnippet>186</a><span class="kw">pub use </span><span class="kw">crate</span>::packets::<span class="kw-2">*</span>;
-<a href=#187 id=187 data-nosnippet>187</a><span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
-<a href=#188 id=188 data-nosnippet>188</a></span><span class="kw">pub use </span><span class="kw">crate</span>::database::<span class="kw-2">*</span>;
-<a href=#189 id=189 data-nosnippet>189</a><span class="comment">//#[cfg(not(feature="database"))]
-<a href=#190 id=190 data-nosnippet>190</a>//pub use crate::TrackerStrip;
-<a href=#191 id=191 data-nosnippet>191</a>//#[cfg(not(feature="database"))]
-<a href=#192 id=192 data-nosnippet>192</a>//pub use crate::TofPaddle;
-<a href=#193 id=193 data-nosnippet>193</a>
-<a href=#194 id=194 data-nosnippet>194</a></span><span class="kw">pub use </span><span class="kw">crate</span>::calibration::tof::<span class="kw-2">*</span>;
-<a href=#195 id=195 data-nosnippet>195</a><span class="kw">pub use </span><span class="kw">crate</span>::monitoring::<span class="kw-2">*</span>;
-<a href=#196 id=196 data-nosnippet>196</a><span class="kw">pub use </span><span class="kw">crate</span>::tof::<span class="kw-2">*</span>;
-<a href=#197 id=197 data-nosnippet>197</a><span class="kw">pub use </span><span class="kw">crate</span>::tracker::<span class="kw-2">*</span>;
-<a href=#198 id=198 data-nosnippet>198</a><span class="kw">pub use </span><span class="kw">crate</span>::tof::algorithms::<span class="kw-2">*</span>;
-<a href=#199 id=199 data-nosnippet>199</a><span class="comment">//pub use crate::algorithms::*;
-<a href=#200 id=200 data-nosnippet>200</a>
-<a href=#201 id=201 data-nosnippet>201</a></span><span class="kw">pub use </span><span class="kw">crate</span>::packets::{
-<a href=#202 id=202 data-nosnippet>202</a>  TofPacket,
-<a href=#203 id=203 data-nosnippet>203</a>  TofPackable,
-<a href=#204 id=204 data-nosnippet>204</a>  TofPacketType
-<a href=#205 id=205 data-nosnippet>205</a>};
-<a href=#206 id=206 data-nosnippet>206</a>
-<a href=#207 id=207 data-nosnippet>207</a><span class="kw">pub use </span><span class="kw">crate</span>::io::parsers::{
-<a href=#208 id=208 data-nosnippet>208</a>  parse_u8,
-<a href=#209 id=209 data-nosnippet>209</a>  parse_u16,
-<a href=#210 id=210 data-nosnippet>210</a>  parse_u32,
-<a href=#211 id=211 data-nosnippet>211</a>  parse_u64,
-<a href=#212 id=212 data-nosnippet>212</a>  parse_string,
-<a href=#213 id=213 data-nosnippet>213</a>  u8_to_u16,
-<a href=#214 id=214 data-nosnippet>214</a>};
-<a href=#215 id=215 data-nosnippet>215</a>
-<a href=#216 id=216 data-nosnippet>216</a><span class="kw">pub use </span><span class="kw">crate</span>::constants::{
-<a href=#217 id=217 data-nosnippet>217</a>  NWORDS,
-<a href=#218 id=218 data-nosnippet>218</a>  NCHN
-<a href=#219 id=219 data-nosnippet>219</a>};
-<a href=#220 id=220 data-nosnippet>220</a>
-<a href=#221 id=221 data-nosnippet>221</a><span class="kw">pub use </span><span class="kw">crate</span>::errors::{
-<a href=#222 id=222 data-nosnippet>222</a>  SerializationError,
-<a href=#223 id=223 data-nosnippet>223</a>  AnalysisError,
-<a href=#224 id=224 data-nosnippet>224</a>  UserError
-<a href=#225 id=225 data-nosnippet>225</a>};
-<a href=#226 id=226 data-nosnippet>226</a>
-<a href=#227 id=227 data-nosnippet>227</a><span class="comment">// macro to avoid boring enum boilerplate
-<a href=#228 id=228 data-nosnippet>228</a></span><span class="kw">pub use </span><span class="kw">crate</span>::expand_and_test_enum;
-<a href=#229 id=229 data-nosnippet>229</a><span class="kw">pub use </span><span class="kw">crate</span>::reader;
-<a href=#230 id=230 data-nosnippet>230</a>
-<a href=#231 id=231 data-nosnippet>231</a>
+<a href=#172 id=172 data-nosnippet>172</a><span class="kw">pub use </span><span class="kw">crate</span>::moniseries_general;
+<a href=#173 id=173 data-nosnippet>173</a><span class="kw">pub use </span><span class="kw">crate</span>::moniseries_telemetry;
+<a href=#174 id=174 data-nosnippet>174</a><span class="attr">#[cfg(feature=<span class="string">"pybindings"</span>)]
+<a href=#175 id=175 data-nosnippet>175</a></span><span class="kw">pub use </span><span class="kw">crate</span>::pythonize_error;
+<a href=#176 id=176 data-nosnippet>176</a>
+<a href=#177 id=177 data-nosnippet>177</a><span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
+<a href=#178 id=178 data-nosnippet>178</a></span><span class="kw">pub use </span><span class="kw">crate</span>::random::FromRandom;
+<a href=#179 id=179 data-nosnippet>179</a>
+<a href=#180 id=180 data-nosnippet>180</a><span class="kw">pub use </span><span class="kw">crate</span>::version::ProtocolVersion;
+<a href=#181 id=181 data-nosnippet>181</a><span class="kw">pub use </span><span class="kw">crate</span>::constants::<span class="kw-2">*</span>;
+<a href=#182 id=182 data-nosnippet>182</a><span class="kw">pub use </span><span class="kw">crate</span>::errors::<span class="kw-2">*</span>;
+<a href=#183 id=183 data-nosnippet>183</a><span class="kw">pub use </span><span class="kw">crate</span>::io::<span class="kw-2">*</span>;
+<a href=#184 id=184 data-nosnippet>184</a><span class="kw">pub use </span><span class="kw">crate</span>::io::parsers::<span class="kw-2">*</span>;
+<a href=#185 id=185 data-nosnippet>185</a><span class="kw">pub use </span><span class="kw">crate</span>::io::caraspace::<span class="kw-2">*</span>;
+<a href=#186 id=186 data-nosnippet>186</a><span class="kw">pub use </span><span class="kw">crate</span>::io::serialization::<span class="kw-2">*</span>;
+<a href=#187 id=187 data-nosnippet>187</a><span class="kw">pub use </span><span class="kw">crate</span>::events::<span class="kw-2">*</span>;
+<a href=#188 id=188 data-nosnippet>188</a><span class="kw">pub use </span><span class="kw">crate</span>::packets::<span class="kw-2">*</span>;
+<a href=#189 id=189 data-nosnippet>189</a><span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
+<a href=#190 id=190 data-nosnippet>190</a></span><span class="kw">pub use </span><span class="kw">crate</span>::database::<span class="kw-2">*</span>;
+<a href=#191 id=191 data-nosnippet>191</a><span class="comment">//#[cfg(not(feature="database"))]
+<a href=#192 id=192 data-nosnippet>192</a>//pub use crate::TrackerStrip;
+<a href=#193 id=193 data-nosnippet>193</a>//#[cfg(not(feature="database"))]
+<a href=#194 id=194 data-nosnippet>194</a>//pub use crate::TofPaddle;
+<a href=#195 id=195 data-nosnippet>195</a>
+<a href=#196 id=196 data-nosnippet>196</a></span><span class="kw">pub use </span><span class="kw">crate</span>::calibration::tof::<span class="kw-2">*</span>;
+<a href=#197 id=197 data-nosnippet>197</a><span class="kw">pub use </span><span class="kw">crate</span>::monitoring::<span class="kw-2">*</span>;
+<a href=#198 id=198 data-nosnippet>198</a><span class="kw">pub use </span><span class="kw">crate</span>::tof::<span class="kw-2">*</span>;
+<a href=#199 id=199 data-nosnippet>199</a><span class="kw">pub use </span><span class="kw">crate</span>::tracker::<span class="kw-2">*</span>;
+<a href=#200 id=200 data-nosnippet>200</a><span class="kw">pub use </span><span class="kw">crate</span>::tof::algorithms::<span class="kw-2">*</span>;
+<a href=#201 id=201 data-nosnippet>201</a><span class="comment">//pub use crate::algorithms::*;
+<a href=#202 id=202 data-nosnippet>202</a>
+<a href=#203 id=203 data-nosnippet>203</a></span><span class="kw">pub use </span><span class="kw">crate</span>::packets::{
+<a href=#204 id=204 data-nosnippet>204</a>  TofPacket,
+<a href=#205 id=205 data-nosnippet>205</a>  TofPackable,
+<a href=#206 id=206 data-nosnippet>206</a>  TofPacketType
+<a href=#207 id=207 data-nosnippet>207</a>};
+<a href=#208 id=208 data-nosnippet>208</a>
+<a href=#209 id=209 data-nosnippet>209</a><span class="kw">pub use </span><span class="kw">crate</span>::io::parsers::{
+<a href=#210 id=210 data-nosnippet>210</a>  parse_u8,
+<a href=#211 id=211 data-nosnippet>211</a>  parse_u16,
+<a href=#212 id=212 data-nosnippet>212</a>  parse_u32,
+<a href=#213 id=213 data-nosnippet>213</a>  parse_u64,
+<a href=#214 id=214 data-nosnippet>214</a>  parse_string,
+<a href=#215 id=215 data-nosnippet>215</a>  u8_to_u16,
+<a href=#216 id=216 data-nosnippet>216</a>};
+<a href=#217 id=217 data-nosnippet>217</a>
+<a href=#218 id=218 data-nosnippet>218</a><span class="kw">pub use </span><span class="kw">crate</span>::constants::{
+<a href=#219 id=219 data-nosnippet>219</a>  NWORDS,
+<a href=#220 id=220 data-nosnippet>220</a>  NCHN
+<a href=#221 id=221 data-nosnippet>221</a>};
+<a href=#222 id=222 data-nosnippet>222</a>
+<a href=#223 id=223 data-nosnippet>223</a><span class="kw">pub use </span><span class="kw">crate</span>::errors::{
+<a href=#224 id=224 data-nosnippet>224</a>  SerializationError,
+<a href=#225 id=225 data-nosnippet>225</a>  AnalysisError,
+<a href=#226 id=226 data-nosnippet>226</a>  UserError
+<a href=#227 id=227 data-nosnippet>227</a>};
+<a href=#228 id=228 data-nosnippet>228</a>
+<a href=#229 id=229 data-nosnippet>229</a><span class="comment">// macro to avoid boring enum boilerplate
+<a href=#230 id=230 data-nosnippet>230</a></span><span class="kw">pub use </span><span class="kw">crate</span>::expand_and_test_enum;
+<a href=#231 id=231 data-nosnippet>231</a><span class="kw">pub use </span><span class="kw">crate</span>::reader;
 <a href=#232 id=232 data-nosnippet>232</a>
+<a href=#233 id=233 data-nosnippet>233</a>
+<a href=#234 id=234 data-nosnippet>234</a>
 </code></pre></div></section></main></body></html>

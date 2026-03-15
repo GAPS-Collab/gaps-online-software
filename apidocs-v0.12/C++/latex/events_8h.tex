@@ -12,6 +12,13 @@ Tof event classes.
 {\ttfamily \#include "{}tof\+\_\+typedefs.\+h"{}}\newline
 {\ttfamily \#include "{}packets/monitoring.\+h"{}}\newline
 {\ttfamily \#include "{}packets/tof\+\_\+packet.\+h"{}}\newline
+{\ttfamily \#include "{}events/rb\+\_\+event\+\_\+header.\+hpp"{}}\newline
+{\ttfamily \#include "{}events/tof\+\_\+hit.\+hpp"{}}\newline
+{\ttfamily \#include "{}events/rb\+\_\+event.\+hpp"{}}\newline
+{\ttfamily \#include "{}events/event\+\_\+status.\+hpp"{}}\newline
+{\ttfamily \#include "{}events/event\+\_\+quality.\+hpp"{}}\newline
+{\ttfamily \#include "{}events/rb\+\_\+waveform.\+hpp"{}}\newline
+{\ttfamily \#include "{}events/tof\+\_\+event.\+hpp"{}}\newline
 {\ttfamily \#include "{}calibration.\+h"{}}\newline
 {\ttfamily \#include "{}version.\+h"{}}\newline
 {\ttfamily \#include "{}errors.\+hpp"{}}\newline
@@ -34,20 +41,6 @@ This graph shows which files directly or indirectly include this file\+:
 \doxysubsubsection*{Classes}
 \begin{DoxyCompactItemize}
 \item 
-struct \mbox{\hyperlink{structstd_1_1formatter_3_01gondola_1_1EventStatus_01_4}{std\+::formatter$<$ gondola\+::\+Event\+Status $>$}}
-\item 
-struct \mbox{\hyperlink{structgondola_1_1RBEventHeader}{gondola\+::\+RBEvent\+Header}}
-\item 
-struct \mbox{\hyperlink{structgondola_1_1TofHit}{gondola\+::\+Tof\+Hit}}
-\item 
-struct \mbox{\hyperlink{structgondola_1_1RBEvent}{gondola\+::\+RBEvent}}
-\item 
-struct \mbox{\hyperlink{structgondola_1_1MasterTriggerEvent}{gondola\+::\+Master\+Trigger\+Event}}
-\item 
-struct \mbox{\hyperlink{structgondola_1_1TofEvent}{gondola\+::\+Tof\+Event}}
-\item 
-struct \mbox{\hyperlink{structgondola_1_1RBWaveform}{gondola\+::\+RBWaveform}}
-\item 
 struct \mbox{\hyperlink{structgondola_1_1TofEventSummary}{gondola\+::\+Tof\+Event\+Summary}}
 \end{DoxyCompactItemize}
 \doxysubsubsection*{Namespaces}
@@ -69,84 +62,14 @@ namespace \mbox{\hyperlink{namespacegondola}{gondola}}
 \doxysubsubsection*{Enumerations}
 \begin{DoxyCompactItemize}
 \item 
-enum class \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baa}{gondola\+::\+Event\+Status}} \+: u8 \{ \newline
-\mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa88183b946cc5f0e8c96b2e66e1c74a7e}{gondola\+::\+Unknown}} = EVENTSTATUS\+\_\+\+UNKNOWN
-, \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa1b8508e116432ac1383a292c6a0d05c1}{gondola\+::\+Crc32\+Wrong}} = EVENTSTATUS\+\_\+\+CRC32\+WRONG
-, \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaaec81a5026e321b3f9ff2f610e52d532e}{gondola\+::\+Tail\+Wrong}} = EVENTSTATUS\+\_\+\+TAILWRONG
-, \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaae47816a3c64358b80c028dc88edcab3c}{gondola\+::\+Channel\+IDWrong}} = EVENTSTATUS\+\_\+\+CHIDWRONG
-, \newline
-\mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa89db10b7258e552827a62fd8d1e4309e}{gondola\+::\+Cell\+Sync\+Errors}} = EVENTSTATUS\+\_\+\+CELLSYNCERR
-, \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa99ef53b53786cbe479e9a7075a2492df}{gondola\+::\+Chn\+Sync\+Errors}} = EVENTSTATUS\+\_\+\+CHNSYNCERR
-, \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa4d9a974c1af3b5418f3b61dbd735bc14}{gondola\+::\+Cell\+And\+Chn\+Sync\+Errors}} = EVENTSTATUS\+\_\+\+CELLANDCHNSYNCERR
-, \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa914a42ba7d6f75029e02b8c5e8a80016}{gondola\+::\+Any\+Data\+Mangling}} = EVENTSTATUS\+\_\+\+ANYDATAMANGLING
-, \newline
-\mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaaba59a6fba632d1543589d766abc636df}{gondola\+::\+Incompatible\+Data}} = EVENTSTATUS\+\_\+\+INCOMPATIBLEDATA
-, \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa44ce38fea2e8223bad3229cd0eac17da}{gondola\+::\+Event\+Time\+Out}} = EVENTSTATUS\+\_\+\+EVENTTIMEOUT
-, \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa5c7a66b675c172f368c8331b20c68c45}{gondola\+::\+Good\+No\+CRCOr\+Err\+Bit\+Check}} = EVENTSTATUS\+\_\+\+GOODNOCRCORERRBITCHECK
-, \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa3a4bcec2a877d364580a1a753dd0d1c8}{gondola\+::\+Good\+No\+CRCCheck}} = EVENTSTATUS\+\_\+\+GOODNOCRCCHECK
-, \newline
-\mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa69a7cfda8af8a54154e556f4d766926c}{gondola\+::\+Good\+No\+Err\+Bit\+Check}} = EVENTSTATUS\+\_\+\+GOODNOERRBITCHECK
-, \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaae0a530b3e7e74423e454a99e3c6d0b69}{gondola\+::\+Incomplete\+Readout}} = EVENTSTATUS\+\_\+\+INCOMPLETEREADOUT
-, \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa56cdd7e9e3cef1974f4075c03a80332d}{gondola\+::\+Perfect}} = EVENTSTATUS\+\_\+\+PERFECT
- \}
-\item 
-enum class \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21}{gondola\+::\+Trigger\+Type}} \+: u8 \{ \newline
-\mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21a88183b946cc5f0e8c96b2e66e1c74a7e}{gondola\+::\+Unknown}} = TRIGGERTYPE\+\_\+\+UNKNOWN
-, \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21a41d31d862aea788d0c2b86ac6df3c0ae}{gondola\+::\+Gaps}} = TRIGGERTYPE\+\_\+\+GAPS
-, \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21aed36a1ef76a59ee3f15180e0441188ad}{gondola\+::\+Any}} = TRIGGERTYPE\+\_\+\+ANY
-, \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21a92ea731d3af6677905303c88689f5d55}{gondola\+::\+Track}} = TRIGGERTYPE\+\_\+\+TRACK
-, \newline
-\mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21abc421fa7f533c3d639eeebfd29fdf499}{gondola\+::\+Track\+Central}} = TRIGGERTYPE\+\_\+\+TRACKCENTRAL
-, \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21adff200b0bb8d3c69fbd54cb43664cd7e}{gondola\+::\+Poisson}} = TRIGGERTYPE\+\_\+\+POISSON
-, \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21adc2eb84d1f952ad0e6b58014aabd616a}{gondola\+::\+Forced}} = TRIGGERTYPE\+\_\+\+FORCED
- \}
-\item 
-enum class \mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580}{gondola\+::\+LTBThreshold}} \+: u8 \{ \newline
-\mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580af8246e1e45d89414e8bf56ffe1680a54}{gondola\+::\+No\+Hit}} = LTBTHRESHOLD\+\_\+\+NOHIT
-, \mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580aebfe5e1791db03c4cd6ab95801e0977d}{gondola\+::\+Hit}} = LTBTHRESHOLD\+\_\+\+HIT
-, \mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580a0b87d66b88c72957dfea8c9605016442}{gondola\+::\+Beta}} = LTBTHRESHOLD\+\_\+\+BETA
-, \mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580a98865aa73ddbf0657187d430de3c38bc}{gondola\+::\+Veto}} = LTBTHRESHOLD\+\_\+\+VETO
-, \newline
-\mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580a88183b946cc5f0e8c96b2e66e1c74a7e}{gondola\+::\+Unknown}} = LTBTHRESHOLD\+\_\+\+UNKNOWN
- \}
-\item 
-enum class \mbox{\hyperlink{namespacegondola_ac61bd1b8e62eab79a1089be6ecc1ca3d}{gondola\+::\+Event\+Quality}} \+: u8 \{ \newline
-\mbox{\hyperlink{namespacegondola_ac61bd1b8e62eab79a1089be6ecc1ca3da88183b946cc5f0e8c96b2e66e1c74a7e}{gondola\+::\+Unknown}} = EVENT\+\_\+\+QUALITY\+\_\+\+UNKNOWN
-, \mbox{\hyperlink{namespacegondola_ac61bd1b8e62eab79a1089be6ecc1ca3daf96e345fdc19cbd4cf15256c251a39a0}{gondola\+::\+Silver}} = EVENT\+\_\+\+QUALITY\+\_\+\+SILVER
-, \mbox{\hyperlink{namespacegondola_ac61bd1b8e62eab79a1089be6ecc1ca3da9768feb3fdb1f267b06093bc572952dd}{gondola\+::\+Gold}} = EVENT\+\_\+\+QUALITY\+\_\+\+GOLD
-, \mbox{\hyperlink{namespacegondola_ac61bd1b8e62eab79a1089be6ecc1ca3da8f7671185d590914ac21c7511767b699}{gondola\+::\+Diamond}} = EVENT\+\_\+\+QUALITY\+\_\+\+DIAMOND
-, \newline
-\mbox{\hyperlink{namespacegondola_ac61bd1b8e62eab79a1089be6ecc1ca3da62cf3c3f187eab330ce1a7ecac59b539}{gondola\+::\+Four\+Leaf\+Clover}} = EVENT\+\_\+\+QUALITY\+\_\+\+FOURLEAFCLOVER
- \}
-\item 
-enum class \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84d}{gondola\+::\+Compression\+Level}} \+: u8 \{ \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84da88183b946cc5f0e8c96b2e66e1c74a7e}{gondola\+::\+Unknown}} = COMPRESSION\+\_\+\+LEVEL\+\_\+\+UNKNOWN
-, \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84da6adf97f83acf6453d4a6a4b1070f3754}{gondola\+::\+None}} = COMPRESSION\+\_\+\+LEVEL\+\_\+\+NONE
+enum class \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84d}{gondola\+::\+Compression\+Level}} \+: u8 \{ \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84da88183b946cc5f0e8c96b2e66e1c74a7e}{gondola\+::\+Unknown}} = 0
+, \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84da6adf97f83acf6453d4a6a4b1070f3754}{gondola\+::\+None}} = 10
  \}
 \end{DoxyCompactItemize}
 \doxysubsubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-std\+::ostream \& \mbox{\hyperlink{namespacegondola_a2eecfb1d930e8ee8c37624b8d7356928}{gondola\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baa}{gondola\+::\+Event\+Status}} \&status)
-\item 
-std\+::ostream \& \mbox{\hyperlink{namespacegondola_a70a1b591bf58b6e149e2ec815142e4ac}{gondola\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21}{gondola\+::\+Trigger\+Type}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{t\+\_\+type}})
-\item 
-std\+::ostream \& \mbox{\hyperlink{namespacegondola_a95d0c48f85317911ad997722c25219b6}{gondola\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580}{gondola\+::\+LTBThreshold}} \&thresh)
-\item 
-std\+::ostream \& \mbox{\hyperlink{namespacegondola_a9de221b8ccf9c0782f0790897ff063c5}{gondola\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_ac61bd1b8e62eab79a1089be6ecc1ca3d}{gondola\+::\+Event\+Quality}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{qual}})
-\item 
 std\+::ostream \& \mbox{\hyperlink{namespacegondola_a9086a1522bf1269d1824786811a08141}{gondola\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84d}{gondola\+::\+Compression\+Level}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{level}})
-\item 
-std\+::ostream \& \mbox{\hyperlink{namespacegondola_a46b0240dcaddd2703faa7a239ae7e686}{gondola\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1TofHit}{gondola\+::\+Tof\+Hit}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pad}})
-\item 
-std\+::ostream \& \mbox{\hyperlink{namespacegondola_af7a52fb6dd43dfd349044a3baee18d6d}{gondola\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1MasterTriggerEvent}{gondola\+::\+Master\+Trigger\+Event}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{mt}})
-\item 
-std\+::ostream \& \mbox{\hyperlink{namespacegondola_a6878be1debdc1d7832f0e68faa4be862}{gondola\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1TofEvent}{gondola\+::\+Tof\+Event}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{et}})
-\item 
-std\+::ostream \& \mbox{\hyperlink{namespacegondola_aba7a0abca261a73c5b085036ea3d85c9}{gondola\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1RBEvent}{gondola\+::\+RBEvent}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{re}})
-\item 
-std\+::ostream \& \mbox{\hyperlink{namespacegondola_a801130bb64dc4827fdc3f24f8c8894eb}{gondola\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1RBEventHeader}{gondola\+::\+RBEvent\+Header}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{rh}})
-\item 
-std\+::ostream \& \mbox{\hyperlink{namespacegondola_ac9cb0b91c67a4b60151e456492a27d37}{gondola\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1RBWaveform}{gondola\+::\+RBWaveform}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{rh}})
 \item 
 std\+::ostream \& \mbox{\hyperlink{namespacegondola_ad142b09b980b0577047b677bd0750252}{gondola\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1TofEventSummary}{gondola\+::\+Tof\+Event\+Summary}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{tes}})
 \end{DoxyCompactItemize}
@@ -163,7 +86,6 @@ An event is basically anything with an event id.
 \item RBEvent \+: contains header + active channels
 \item RBWaveform \+: A single waveform -\/ this is for the telemetry stream, since larger packets would be too big
 \end{DoxyItemize}
-\item events for the Master\+Trigger\+Board
 
 For actual flight code, see the rust project
 

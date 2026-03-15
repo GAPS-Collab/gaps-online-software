@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['width_0',['width',['../structGaps_1_1TofPaddle.html#a54276b75afdf041e59d2db3eaf132806',1,'Gaps::TofPaddle']]]
+  ['width_0',['width',['../structgondola_1_1TofPaddle.html#abf9e6e5acf88b219ac032a27b2e76bbd',1,'gondola::TofPaddle']]]
 ];

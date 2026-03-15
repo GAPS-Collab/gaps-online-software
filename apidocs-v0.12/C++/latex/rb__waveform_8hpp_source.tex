@@ -1,0 +1,32 @@
+\doxysection{rb\+\_\+waveform.\+hpp}
+\hypertarget{rb__waveform_8hpp_source}{}\label{rb__waveform_8hpp_source}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/events/rb\_waveform.hpp@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/events/rb\_waveform.hpp}}
+\mbox{\hyperlink{rb__waveform_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#pragma\ once\ }}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ "{}result/result.h"{}}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ <format>}}
+\DoxyCodeLine{00007\ \ \ }
+\DoxyCodeLine{00008\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacegondola}{gondola}}\ \{}
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00011\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structgondola_1_1RBWaveform}{RBWaveform}}\ \{}
+\DoxyCodeLine{00012\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structgondola_1_1RBWaveform_a8ce3dda74512484b5e0aae36aca3b89a}{HEAD}}\ =\ 0xAAAA;}
+\DoxyCodeLine{00013\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structgondola_1_1RBWaveform_afc62fc9bb73efb906be9772ef99a8514}{TAIL}}\ =\ 0x5555;}
+\DoxyCodeLine{00014\ \ }
+\DoxyCodeLine{00016\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}\ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1RBWaveform_a4d6957060cf6bb6d93d122f2918642c6}{event\_id}}\ \ \ \ \ ;}
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1RBWaveform_a650c6d324d09edcfab44bbb38eea6eed}{rb\_id}}\ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00021\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1RBWaveform_ab480fd48a28ef4be7e0129ae3d759913}{rb\_channel\_a}}\ ;\ }
+\DoxyCodeLine{00023\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1RBWaveform_ae7eb6171de1699528539766620eef91a}{rb\_channel\_b}}\ ;}
+\DoxyCodeLine{00025\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1RBWaveform_ae864eb8d95798eeedc43316f489d0ad1}{stop\_cell}}\ \ \ \ ;}
+\DoxyCodeLine{00027\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u16>}}\ \ \mbox{\hyperlink{structgondola_1_1RBWaveform_a593a5a66ed29068cabae6374504aef4c}{adc\_a}}\ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00029\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u16>}}\ \ \mbox{\hyperlink{structgondola_1_1RBWaveform_a2400cd0bc903d094955a770bedf3698b}{adc\_b}}\ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00030\ \ \ \ \ }
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1RBWaveform_aac46918188805abeb788e543bd61bf4b}{from\_bytestream}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u8>}}\ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}},\ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}\ \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}})\ -\/>\ \mbox{\hyperlink{structgondola_1_1RBWaveform}{RBWaveform}};}
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1RBWaveform_a4389be7a9e5889b5c366d1e46f276a5a}{to\_string}}()\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ -\/>\ std::\textcolor{keywordtype}{string};}
+\DoxyCodeLine{00033\ \ \ \};}
+\DoxyCodeLine{00034\ \ \ }
+\DoxyCodeLine{00035\ \ \ std::\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{ostream}}\&\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{operator}}<<(std::\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{ostream}}\&\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}},\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ \mbox{\hyperlink{namespacegondola}{gondola}}::\mbox{\hyperlink{structgondola_1_1RBWaveform}{RBWaveform}}\&\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{rh}});}
+\DoxyCodeLine{00036\ \}}
+
+\end{DoxyCode}

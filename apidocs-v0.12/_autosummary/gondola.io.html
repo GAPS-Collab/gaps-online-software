@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.io &#8212; gondola 0.12.7 documentation</title>
+    <title>gondola.io &#8212; gondola 0.12.10 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../_static/documentation_options.js?v=1392dee4"></script>
+    <script src="../_static/documentation_options.js?v=419a0d18"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.io';</script>
@@ -110,7 +110,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.12.7 documentation</p>
+    <p class="title logo__title">gondola 0.12.10 documentation</p>
   
 </a></div>
     
@@ -259,6 +259,7 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="gondola.algo.html">gondola.algo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.calibration.html">gondola.calibration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.db.html">gondola.db</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.events.html">gondola.events</a></li>
@@ -267,7 +268,10 @@
 <li class="toctree-l2"><a class="reference internal" href="gondola.io.streamers.html">gondola.io.streamers</a></li>
 </ul>
 </details></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.monitoring.html">gondola.monitoring</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.packets.html">gondola.packets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.reconstruction.html">gondola.reconstruction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.stats.html">gondola.stats</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="gondola.tof.html">gondola.tof</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="gondola.tof.analysis.html">gondola.tof.analysis</a></li>
 </ul>
@@ -375,11 +379,17 @@ obtain various flavors of data used trhoughout GAPS.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#gondola.io.get_unix_timestamp" title="gondola.io.get_unix_timestamp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_unix_timestamp</span></code></a>(input[, tformat])</p></td>
 <td><p>Retrieve the UNIX timestamp from a string as used in  the names of the run files</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.io.get_utc_date" title="gondola.io.get_utc_date"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_utc_date</span></code></a>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_unix_timestamp_from_telemetry</span></code>(fname)</p></td>
+<td><p>Retrieve the utc timestamp from any telemetry (binary) file</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.io.get_utc_date" title="gondola.io.get_utc_date"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_utc_date</span></code></a>()</p></td>
 <td><p>Create date string in YYMMDD format</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.io.get_utc_now" title="gondola.io.get_utc_now"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_utc_now</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.io.get_utc_now" title="gondola.io.get_utc_now"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_utc_now</span></code></a>()</p></td>
 <td><p>Get a human readable timestamp for NOW</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_utc_timestamp_from_unix</span></code>(unix_time)</p></td>
+<td><p>Convert a unix time to human readable timestamp</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#gondola.io.grace_get_telemetry_binaries" title="gondola.io.grace_get_telemetry_binaries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grace_get_telemetry_binaries</span></code></a>(...[, data_dir])</p></td>
 <td><p>Get the relevant telemetry data files for time period from a directory.</p></td>
@@ -408,10 +418,13 @@ obtain various flavors of data used trhoughout GAPS.</p>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TelemetryPacketReader</span></code>(filenames_or_directory)</p></td>
 <td><p>Read serialized TelemetryPackets from an existing file</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofPacketReader</span></code>(filename_or_directory[, filter])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TelemetryPacketWriter</span></code>(filepath, packet)</p></td>
+<td><p>Write TelemetryPackets to disk.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofPacketReader</span></code>(filename_or_directory[, filter])</p></td>
 <td><p>Read serialized TofPackets from an existing file or directory</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofPacketWriter</span></code>(filename, runid)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofPacketWriter</span></code>(filename, runid)</p></td>
 <td><p>Write TofPackets to disk.</p></td>
 </tr>
 </tbody>

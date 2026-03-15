@@ -2,24 +2,14 @@
 \hypertarget{structgondola_1_1TofEvent}{}\label{structgondola_1_1TofEvent}\index{gondola::TofEvent@{gondola::TofEvent}}
 
 
-{\ttfamily \#include $<$events.\+h$>$}
+{\ttfamily \#include $<$tof\+\_\+event.\+hpp$>$}
 
-
-
-Collaboration diagram for gondola\+::Tof\+Event\+:
-\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=236pt]{structgondola_1_1TofEvent__coll__graph}
-\end{center}
-\end{figure}
 \doxysubsubsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
 \mbox{\hyperlink{structgondola_1_1TofEvent_a472db40fd776f3517c095b83ed69b96d}{Tof\+Event}} ()
 \item 
-\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TofEvent_a57d68c0ac8f98da93aba370663cb6bc0}{get\+\_\+hits}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{structgondola_1_1TofHit}{Tof\+Hit}} $>$
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TofEvent_aa33d8845699a6059b887d2b1171ffeb7}{get\+\_\+hits}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{structgondola_1_1TofHit}{Tof\+Hit}} $>$
 \begin{DoxyCompactList}\small\item\em Get all hits from all rb\+\_\+events. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TofEvent_a7346ea2a4a33ffe5a2c2e6100a625b3f}{to\+\_\+string}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ std\+::string
 \begin{DoxyCompactList}\small\item\em string representation for printing \end{DoxyCompactList}\item 
@@ -38,7 +28,7 @@ Collaboration diagram for gondola\+::Tof\+Event\+:
 \doxysubsubsection*{Static Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TofEvent_a9cf3cbd24de57296e4ef090a0fa9defa}{from\+\_\+bytestream}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}}, \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}}) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{structgondola_1_1TofEvent}{Tof\+Event}}, \mbox{\hyperlink{classgondola_1_1IOError}{g\+::\+IOError}} $>$
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TofEvent_a9a4684a5d13afc4ceeb988ff14f86615}{from\+\_\+bytestream}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}}, \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}}) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{structgondola_1_1TofEvent}{Tof\+Event}}, \mbox{\hyperlink{classgondola_1_1IOError}{IOError}} $>$
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TofEvent_aa769958e9f999affd6605ac89e46a845}{from\+\_\+tofpacket}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structTofPacket}{Tof\+Packet}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{packet}}) -\/$>$ \mbox{\hyperlink{structgondola_1_1TofEvent}{Tof\+Event}}
 \item 
@@ -47,7 +37,7 @@ Collaboration diagram for gondola\+::Tof\+Event\+:
 \doxysubsubsection*{Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\hyperlink{namespacegondola_af998b820a54bca400c19e03948e82c28}{g\+::\+Protocol\+Version}} \mbox{\hyperlink{structgondola_1_1TofEvent_aa8aeba73b3348c9a697707fb671bb711}{version}}
+\mbox{\hyperlink{namespacegondola_af998b820a54bca400c19e03948e82c28}{Protocol\+Version}} \mbox{\hyperlink{structgondola_1_1TofEvent_a3129fe724c08723654817fa76f3cd5e6}{version}}
 \item 
 \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baa}{Event\+Status}} \mbox{\hyperlink{structgondola_1_1TofEvent_a8c11f7473434ec4d75847455454ce7cb}{status}}
 \item 
@@ -85,8 +75,6 @@ Collaboration diagram for gondola\+::Tof\+Event\+:
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1TofEvent_a00dc63f1263775b9e8ba1dd193f29163}{tot\+\_\+edep\+\_\+cor}}
 \item 
-\mbox{\hyperlink{structgondola_1_1MasterTriggerEvent}{Master\+Trigger\+Event}} \mbox{\hyperlink{structgondola_1_1TofEvent_abe4d42aeb75db2ad112d590741b6889c}{mt\+\_\+event}}
-\item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{structgondola_1_1RBEvent}{RBEvent}} $>$ \mbox{\hyperlink{structgondola_1_1TofEvent_a53d802f90336536a0b2fe1fa84d3722b}{rb\+\_\+events}} = \{\}
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{structgondola_1_1TofHit}{Tof\+Hit}} $>$ \mbox{\hyperlink{structgondola_1_1TofEvent_a6582a153cdb5cc6d2c06f5a6390d5fed}{hits}} = \{\}
@@ -103,7 +91,7 @@ Collaboration diagram for gondola\+::Tof\+Event\+:
 \doxysubsection{Detailed Description}
 A container accounting for a "{}complete"{} event of the Tof including\+:
 \begin{DoxyItemize}
-\item A \doxylink{structgondola_1_1MasterTriggerEvent}{Master\+Trigger\+Event}
+\item A Master\+Trigger\+Event
 \item Possible monitoring data for readoutboards
 \item A number of Readoutboardevents (each with header and the number of active channels)
 \item A number of Missing\+Hits. These are such where the MTB claims we should see data in one of the RBs, but we do not have any. 
@@ -119,11 +107,11 @@ A container accounting for a "{}complete"{} event of the Tof including\+:
 
 
 \doxysubsection{Member Function Documentation}
-\Hypertarget{structgondola_1_1TofEvent_a9cf3cbd24de57296e4ef090a0fa9defa}\label{structgondola_1_1TofEvent_a9cf3cbd24de57296e4ef090a0fa9defa} 
+\Hypertarget{structgondola_1_1TofEvent_a9a4684a5d13afc4ceeb988ff14f86615}\label{structgondola_1_1TofEvent_a9a4684a5d13afc4ceeb988ff14f86615} 
 \index{gondola::TofEvent@{gondola::TofEvent}!from\_bytestream@{from\_bytestream}}
 \index{from\_bytestream@{from\_bytestream}!gondola::TofEvent@{gondola::TofEvent}}
 \doxysubsubsection{\texorpdfstring{from\_bytestream()}{from\_bytestream()}}
-{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tof\+Event\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{bytestream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \&}]{pos }\end{DoxyParamCaption}) -\/$>$ r\+::\+Result$<$\mbox{\hyperlink{structgondola_1_1TofEvent}{Tof\+Event}}, \mbox{\hyperlink{classgondola_1_1IOError}{g\+::\+IOError}}$>$\hspace{0.3cm}{\ttfamily [static]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tof\+Event\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{bytestream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \&}]{pos }\end{DoxyParamCaption}) -\/$>$ r\+::\+Result$<$\mbox{\hyperlink{structgondola_1_1TofEvent}{Tof\+Event}}, \mbox{\hyperlink{classgondola_1_1IOError}{IOError}}$>$\hspace{0.3cm}{\ttfamily [static]}}
 
 Factory function for Tof\+Events.
 
@@ -151,17 +139,19 @@ Unpack the \doxylink{structTofPacket}{Tof\+Packet}, return an empty event in cas
 {\em packet} & \doxylink{structTofPacket}{Tof\+Packet} with Packet\+Type\+::\+Tof\+Packet \\
 \hline
 \end{DoxyParams}
-\Hypertarget{structgondola_1_1TofEvent_a57d68c0ac8f98da93aba370663cb6bc0}\label{structgondola_1_1TofEvent_a57d68c0ac8f98da93aba370663cb6bc0} 
+\Hypertarget{structgondola_1_1TofEvent_aa33d8845699a6059b887d2b1171ffeb7}\label{structgondola_1_1TofEvent_aa33d8845699a6059b887d2b1171ffeb7} 
 \index{gondola::TofEvent@{gondola::TofEvent}!get\_hits@{get\_hits}}
 \index{get\_hits@{get\_hits}!gondola::TofEvent@{gondola::TofEvent}}
 \doxysubsubsection{\texorpdfstring{get\_hits()}{get\_hits()}}
-{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{structgondola_1_1TofHit}{g\+::\+Tof\+Hit}} $>$ gondola\+::\+Tof\+Event\+::get\+\_\+hits (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{structgondola_1_1TofHit}{Tof\+Hit}}$>$}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tof\+Event\+::get\+\_\+hits (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{structgondola_1_1TofHit}{Tof\+Hit}}$>$}
 
 
 
 Get all hits from all rb\+\_\+events. 
 
-\Hypertarget{structgondola_1_1TofEvent_a0b5c003aa09b7d6bcb98bc5a90c59b5b}\label{structgondola_1_1TofEvent_a0b5c003aa09b7d6bcb98bc5a90c59b5b} 
+\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}/
+
+\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}/ \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}/ \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}/ \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}/ \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}/ \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}/ \Hypertarget{structgondola_1_1TofEvent_a0b5c003aa09b7d6bcb98bc5a90c59b5b}\label{structgondola_1_1TofEvent_a0b5c003aa09b7d6bcb98bc5a90c59b5b} 
 \index{gondola::TofEvent@{gondola::TofEvent}!get\_n\_rbevents@{get\_n\_rbevents}}
 \index{get\_n\_rbevents@{get\_n\_rbevents}!gondola::TofEvent@{gondola::TofEvent}}
 \doxysubsubsection{\texorpdfstring{get\_n\_rbevents()}{get\_n\_rbevents()}}
@@ -260,12 +250,6 @@ string representation for printing
 \doxysubsubsection{\texorpdfstring{hits}{hits}}
 {\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{structgondola_1_1TofHit}{Tof\+Hit}}$>$ gondola\+::\+Tof\+Event\+::hits = \{\}}
 
-\Hypertarget{structgondola_1_1TofEvent_abe4d42aeb75db2ad112d590741b6889c}\label{structgondola_1_1TofEvent_abe4d42aeb75db2ad112d590741b6889c} 
-\index{gondola::TofEvent@{gondola::TofEvent}!mt\_event@{mt\_event}}
-\index{mt\_event@{mt\_event}!gondola::TofEvent@{gondola::TofEvent}}
-\doxysubsubsection{\texorpdfstring{mt\_event}{mt\_event}}
-{\footnotesize\ttfamily \mbox{\hyperlink{structgondola_1_1MasterTriggerEvent}{Master\+Trigger\+Event}} gondola\+::\+Tof\+Event\+::mt\+\_\+event}
-
 \Hypertarget{structgondola_1_1TofEvent_ae9026f0e498aa7b24847862c1f5a6851}\label{structgondola_1_1TofEvent_ae9026f0e498aa7b24847862c1f5a6851} 
 \index{gondola::TofEvent@{gondola::TofEvent}!mtb\_link\_mask@{mtb\_link\_mask}}
 \index{mtb\_link\_mask@{mtb\_link\_mask}!gondola::TofEvent@{gondola::TofEvent}}
@@ -363,15 +347,15 @@ A container holding the individual events from all RBs with triggers in this eve
 \doxysubsubsection{\texorpdfstring{trigger\_sources}{trigger\_sources}}
 {\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Tof\+Event\+::trigger\+\_\+sources}
 
-\Hypertarget{structgondola_1_1TofEvent_aa8aeba73b3348c9a697707fb671bb711}\label{structgondola_1_1TofEvent_aa8aeba73b3348c9a697707fb671bb711} 
+\Hypertarget{structgondola_1_1TofEvent_a3129fe724c08723654817fa76f3cd5e6}\label{structgondola_1_1TofEvent_a3129fe724c08723654817fa76f3cd5e6} 
 \index{gondola::TofEvent@{gondola::TofEvent}!version@{version}}
 \index{version@{version}!gondola::TofEvent@{gondola::TofEvent}}
 \doxysubsubsection{\texorpdfstring{version}{version}}
-{\footnotesize\ttfamily \mbox{\hyperlink{namespacegondola_af998b820a54bca400c19e03948e82c28}{g\+::\+Protocol\+Version}} gondola\+::\+Tof\+Event\+::version}
+{\footnotesize\ttfamily \mbox{\hyperlink{namespacegondola_af998b820a54bca400c19e03948e82c28}{Protocol\+Version}} gondola\+::\+Tof\+Event\+::version}
 
 
 
 The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/\mbox{\hyperlink{events_8h}{events.\+h}}\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/events/\mbox{\hyperlink{tof__event_8hpp}{tof\+\_\+event.\+hpp}}\item 
 /home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/\mbox{\hyperlink{events_8cxx}{events.\+cxx}}\end{DoxyCompactItemize}

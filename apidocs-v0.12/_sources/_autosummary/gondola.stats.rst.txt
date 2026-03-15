@@ -1,0 +1,13 @@
+gondola.stats
+=============
+
+.. automodule:: gondola.stats
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      gamma_pdf
+      mean
+   
