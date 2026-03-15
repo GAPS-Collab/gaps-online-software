@@ -358,6 +358,8 @@ fn monitoring_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<SipPosMoniDataSeries>()?;
   m.add_class::<SipTimeMoniData>()?;
   m.add_class::<SipTimeMoniDataSeries>()?;
+  m.add_class::<GcuEvBldStatsMoniData>()?;
+  m.add_class::<GcuEvBldStatsMoniDataSeries>()?;
   m.add_class::<RunStatistics>()?;
   Ok(())
 }
@@ -367,8 +369,10 @@ fn monitoring_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
 #[pyo3(name = "stats")]
 fn stats_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   //use crate::io::*;
-  use crate::stats::py_gamma_pdf;
-  m.add_function(wrap_pyfunction!(py_gamma_pdf, m)?)?;
+  use crate::stats::gamma_pdf_py;
+  use crate::stats::mean_py;
+  m.add_function(wrap_pyfunction!(gamma_pdf_py, m)?)?;
+  m.add_function(wrap_pyfunction!(mean_py, m)?)?;
   Ok(())
 }
 

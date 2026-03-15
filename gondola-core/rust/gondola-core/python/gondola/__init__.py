@@ -19,12 +19,11 @@ get_version_minor.__module__ = __name__
 get_version_patch = _gondola_core.get_version_patch
 get_version_patch.__module__ = __name__
 
-# FIXME - these are not included in the documentation
-monitoring = _gondola_core.monitoring 
-stats      = _gondola_core.stats 
-algo       = _gondola_core.algo 
-
 # set up the python submodules
+# the python wrappers are needed to define 
+# __module__ on each rust created class, 
+# otherwise the documnetation won't work
+from . import algo
 from . import events
 from . import calibration 
 from . import visual
@@ -34,9 +33,11 @@ from . import db
 from . import reconstruction 
 from . import tracker
 from . import packets 
+from . import monitoring
+from . import stats
 
 __all__ = ['events', 'packets', 'io', 'monitoring', 'stats', 'algo', 'db',
-           'calibration', 'visual']
+           'calibration', 'visual','tracker', 'reconstruction', 'tof']
 
 # clean up the namespace, module still available as hidden through _gondola_core
 del gondola_core

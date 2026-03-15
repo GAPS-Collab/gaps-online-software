@@ -7,12 +7,12 @@ use crate::prelude::*;
 
 /// Return the index of the maximum value in an 
 /// array of floats. 
-///
-/// Protip: f32 does not obey Ord, because of NaN, 
-///         so this is done "by hand"
+/// This works also for numbers which don't implement 
+/// Ord, only PartialOrd is required.
 ///
 /// # Arguments:
-///
+///   * start_idx  : start the search within the input array-like at this index 
+///   * n_idx      : restrict the search to the last index of start_idx + n_idx 
 ///
 pub fn get_max_value_idx<T : std::cmp::PartialOrd + std::fmt::Display + Copy>(values    : &[T],
          start_idx : usize,
@@ -71,6 +71,15 @@ pub fn time_over_threshold(voltages : &Vec<f32>, times : &Vec<f32>,threshold : f
 
 //---------------------------------------------------
 
+/// Return the index of the maximum value in an 
+/// array of floats. 
+/// This works also for numbers which don't implement 
+/// Ord, only PartialOrd is required.
+///
+/// # Arguments:
+///   * start_idx  : start the search within the input array-like at this index 
+///   * n_idx      : restrict the search to the last index of start_idx + n_idx 
+///
 #[cfg(feature="pybindings")]
 #[pyfunction]
 #[pyo3(name="get_max_value_idx")]

@@ -129,7 +129,7 @@ pub fn gamma_pdf(xs : &[f32], shape : f64, scale : f64) -> Vec<f32> {
 #[cfg(feature="pybindings")]
 #[pyfunction]
 #[pyo3(name="gamma_pdf")]
-pub fn py_gamma_pdf<'_py>(xs    : Bound<'_py,PyArray1<f32>>,
+pub fn gamma_pdf_py<'_py>(xs    : Bound<'_py,PyArray1<f32>>,
                           shape : f64,
                           scale : f64) -> Vec<f32> {
   let ys : Vec::<f32>;
@@ -142,7 +142,7 @@ pub fn py_gamma_pdf<'_py>(xs    : Bound<'_py,PyArray1<f32>>,
 #[cfg(feature="pybindings")]
 #[pyfunction]
 #[pyo3(name="mean")]
-pub fn py_mean<'_py>(xs    : Bound<'_py,PyArray1<f32>>) -> f32 { 
+pub fn mean_py<'_py>(xs    : Bound<'_py,PyArray1<f32>>) -> f32 { 
   let mean_val : f32;
   unsafe {
     mean_val = mean(xs.as_slice().unwrap());

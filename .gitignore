@@ -5,6 +5,8 @@
 # created
 
 gondola-core/rust/gondola-core/python/gondola/__pycache__/*
+# build artefacts for python lib
+gondola-core/rust/gondola-core/dist/* 
 
 # duplicate version of the DB. It will be copied during the building 
 # process. (This is because we have to ship the db with the python package)
