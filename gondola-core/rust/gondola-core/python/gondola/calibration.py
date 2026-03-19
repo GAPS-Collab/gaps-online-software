@@ -11,6 +11,10 @@ RBCalibrations = _gondola_core.calibration.RBCalibrations
 RBCalibrations.__module__ = __name__ 
 RBCalibrations.__name__   = 'RBCalibrations'
 
+TrackerOnlineCalibration = _gondola_core.tracker.TrackerOnlineCalibration 
+TrackerOnlineCalibration.__module__ = __name__ 
+TrackerOnlineCalibration.__name__   = 'TrackerOnlineCalibration'
+
 ## convenience functions
 def load_rb_calibrations(cali_dir : Path, load_event_data = False):
     """

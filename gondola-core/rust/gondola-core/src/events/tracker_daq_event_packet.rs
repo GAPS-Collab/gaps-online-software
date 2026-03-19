@@ -126,6 +126,18 @@ impl TrackerDAQEventPacket {
     }
     hits
   }
+  
+  pub fn from_telemetrypacket(packet : &TelemetryPacket) -> Result<Self, SerializationError> {
+    match Self::from_bytestream(&packet.payload, &mut 0) {
+      Ok(mut event) => {
+        event.header  = packet.header.clone();
+        return Ok(event);
+      }
+      Err(err) => {
+        return Err(err);
+      }  
+    }
+  }
 }
 
 impl Serialization for TrackerDAQEventPacket { 
@@ -337,7 +349,8 @@ fn serialize_deserialize_trackerdaqmodifyeventpacket() {
 impl TrackerDAQEventPacket {
  
   #[staticmethod]
-  fn from_telemetrypacket(packet : TelemetryPacket) -> PyResult<Self> {
+  #[pyo3(name="from_telemetrypacket")]
+  fn from_telemetrypacket_py(packet : TelemetryPacket) -> PyResult<Self> {
     match Self::from_bytestream(&packet.payload, &mut 0) {
       Ok(mut event) => {
         event.header  = packet.header.clone();

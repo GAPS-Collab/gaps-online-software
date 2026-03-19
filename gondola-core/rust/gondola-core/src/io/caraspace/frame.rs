@@ -192,6 +192,32 @@ impl CRFrame {
     }
   }
 
+  // FIXME - this needs to return references with lifetimes, not 
+  // cloning the hits
+  pub fn get_tracker_hitseries(&self, source : TrackerHitSource) 
+    -> Result<Vec<TrackerHit>, SerializationError> {
+    let mut hits = Vec::<TrackerHit>::new();
+    match source {
+      TrackerHitSource::TelemetryEvent |
+      TrackerHitSource::Unknown => {
+      }
+      TrackerHitSource::TrackerPacket => {
+        for k in self.index.keys() {
+          if k.contains("Tracker") {
+            let pack = self.get::<TelemetryPacket>(k)?;
+            let trk  = TrackerDAQEventPacket::from_telemetrypacket(&pack)?;
+            for ev in trk.events {
+              for h in ev.hits {
+                hits.push(h.clone());
+              }
+            }
+          }
+        }
+      }
+    }
+    Ok(hits) 
+  }
+
   pub fn get_telemetrypacket_gcutime_range(&self) -> Option<(f64,f64,f64)> {
     let mut times = Vec::<f64>::new();
     for k in self.index.keys() {
@@ -676,7 +702,15 @@ impl CRFrame {
   fn do_trk_calib_py(&self) -> bool {
     self.do_trk_calib
   }
+
+  #[pyo3(name="get_tracker_hitseries")]
+  fn get_tracker_hitseries_py(&self) -> Vec<TrackerHit> {
+    self.get_tracker_hitseries(TrackerHitSource::TrackerPacket).unwrap()
+  }
+
 }
+
+
 
 #[cfg(feature="pybindings")]
 pythonize!(CRFrame);
