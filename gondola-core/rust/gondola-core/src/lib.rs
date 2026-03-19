@@ -233,6 +233,7 @@ fn tracker_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   use crate::tracker::*;
   //m.add_function(wrap_pyfunction!(mt_event_get_timestamp_abs48,m)?)?;
   m.add_function(wrap_pyfunction!(strip_lines, m)?)?;
+  m.add_class::<TrackerOnlineCalibration>()?;
   Ok(())
 }
 
@@ -403,8 +404,10 @@ fn db_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<TrackerStripCmnNoise>()?;
   m.add_class::<TofPaddleTimingConstant>()?;
   m.add_function(wrap_pyfunction!(get_all_rbids_in_db, m)?)?;
+  m.add_function(wrap_pyfunction!(get_all_pbids_in_db, m)?)?;
   m.add_function(wrap_pyfunction!(get_hid_vid_map, m)?)?;
   m.add_function(wrap_pyfunction!(get_vid_hid_map, m)?)?;
+  m.add_function(wrap_pyfunction!(get_rbids_for_pbid, m)?)?;
   m.add_function(wrap_pyfunction!(get_dsi_j_ch_pid_map_py, m)?)?;
   m.add_function(wrap_pyfunction!(get_rbid_pbchannel_pid_map_py, m)?)?;
   Ok(())

@@ -35,8 +35,12 @@ TrackerStripCmnNoise.__name__    = 'TrackerStripCmnNoise'
 TofPaddleTimingConstant            = _gc.db.TofPaddleTimingConstant 
 TofPaddleTimingConstant.__module__ = __name__ 
 TofPaddleTimingConstant.__name__   = 'TofPaddleTimingConstant'
-get_all_rbids_in_db          = _gc.db.get_all_rbids_in_db
-get_all_rbids_in_db.__module__ = __name__
+get_all_rbids_in_db                = _gc.db.get_all_rbids_in_db
+get_all_rbids_in_db.__module__     = __name__
+get_all_pbids_in_db                = _gc.db.get_all_pbids_in_db
+get_all_pbids_in_db.__module__     = __name__
+get_rbids_for_pbid                 = _gc.db.get_rbids_for_pbid
+get_rbids_for_pbid.__module__      = __name__ 
 
 get_hid_vid_map              = _gc.db.get_hid_vid_map
 get_hid_vid_map.__module__   = __name__ 

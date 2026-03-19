@@ -283,7 +283,7 @@ macro_rules! moniseries_general {
      
      impl $name {
        pub fn new() -> Self {
-         Self {
+        Self {
            data       : HashMap::<u8, VecDeque<$class>>::new(),
            max_size   : 10000,
            timestamps : Vec::<u64>::new()
@@ -367,7 +367,7 @@ macro_rules! moniseries_general {
 
        #[getter]
        #[pyo3(name="get_first_ts")]
-       fn get_first_ts_py(&self) -> u64 {
+       pub fn get_first_ts_py(&self) -> u64 {
          self.get_first_ts()
        }
 
@@ -399,8 +399,7 @@ macro_rules! moniseries_general {
              return Err(PyValueError::new_err(err.to_string()));
            }
          }
-       }
- 
+       } 
      }
      #[cfg(feature="pybindings")]
      pythonize_display!($name);
@@ -526,7 +525,6 @@ macro_rules! moniseries {
     //    warn!("This returns a full copy and is a performance bottleneck!");
     //    return self.timestamps.clone();
     //  }
-    
 
     #[cfg(feature="pybindings")]
     #[pymethods]

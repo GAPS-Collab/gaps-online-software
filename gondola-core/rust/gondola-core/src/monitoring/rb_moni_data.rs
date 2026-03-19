@@ -724,7 +724,7 @@ impl RBMoniData {
 moniseries!(RBMoniDataSeries, RBMoniData);
 
 #[cfg(feature="pybindings")]
-pythonize_packable!(RBMoniData);
+pythonize_packable_no_new!(RBMoniData);
 
 #[cfg(feature="pybindings")]
 pythonize_monidata!(RBMoniData);

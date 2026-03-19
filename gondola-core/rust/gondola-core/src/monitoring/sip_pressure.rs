@@ -143,3 +143,6 @@ impl TelemetryPackable for SipPresMoniData {
 
 moniseries_telemetry!(SipPresMoniDataSeries, SipPresMoniData);
 
+#[cfg(feature="pybindings")]
+pythonize_monidata!(SipPresMoniData);
+

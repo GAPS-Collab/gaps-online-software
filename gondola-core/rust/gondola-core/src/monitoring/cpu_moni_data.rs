@@ -247,7 +247,7 @@ impl CPUMoniData {
 moniseries!(CPUMoniDataSeries, CPUMoniData);
 
 #[cfg(feature="pybindings")]
-pythonize_packable!(CPUMoniData);
+pythonize_packable_no_new!(CPUMoniData);
 
 #[cfg(feature="pybindings")]
 pythonize_monidata!(CPUMoniData);

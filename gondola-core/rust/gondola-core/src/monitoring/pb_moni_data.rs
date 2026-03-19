@@ -356,7 +356,7 @@ impl FromRandom for PBMoniData {
 moniseries!(PBMoniDataSeries, PBMoniData);
 
 #[cfg(feature="pybindings")]
-pythonize_packable!(PBMoniData);
+pythonize_packable_no_new!(PBMoniData);
 
 #[cfg(feature="pybindings")]
 pythonize_monidata!(PBMoniData);

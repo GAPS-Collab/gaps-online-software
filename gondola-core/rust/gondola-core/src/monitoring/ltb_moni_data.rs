@@ -196,7 +196,7 @@ impl LTBMoniData {
 moniseries!(LTBMoniDataSeries, LTBMoniData);
 
 #[cfg(feature="pybindings")]
-pythonize_packable!(LTBMoniData);
+pythonize_packable_no_new!(LTBMoniData);
 
 #[cfg(feature="pybindings")]
 pythonize_monidata!(LTBMoniData);

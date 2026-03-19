@@ -148,3 +148,6 @@ impl TelemetryPackable for SipTimeMoniData {
 
 moniseries_telemetry!(SipTimeMoniDataSeries, SipTimeMoniData);
 
+#[cfg(feature="pybindings")]
+pythonize_monidata!(SipTimeMoniData);
+

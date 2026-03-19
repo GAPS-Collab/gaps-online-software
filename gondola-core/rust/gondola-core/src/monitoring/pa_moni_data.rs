@@ -272,13 +272,13 @@ impl FromRandom for PAMoniData {
 
 //----------------------------------------
 
-moniseries!(PAMoniDataSeries, PAMoniData);
-
 #[cfg(feature="pybindings")]
-pythonize_packable!(PAMoniData);
+pythonize_packable_no_new!(PAMoniData);
 
 #[cfg(feature="pybindings")]
 pythonize_monidata!(PAMoniData);
+
+moniseries!(PAMoniDataSeries, PAMoniData);
 
 //----------------------------------------
 

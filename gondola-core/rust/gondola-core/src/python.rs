@@ -86,6 +86,11 @@ macro_rules! pythonize_monidata {
 
     #[pymethods]
     impl $pyclass {
+      
+      #[new]
+      fn new_py() -> Self {
+        Self::new()
+      }
     
       #[getter]
       #[pyo3(name="board_id")]

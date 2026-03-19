@@ -173,7 +173,7 @@ impl DataSinkHB {
 #[cfg(feature="pybindings")]
 pythonize_monidata!(DataSinkHB);
 #[cfg(feature="pybindings")]
-pythonize_packable!(DataSinkHB);
+pythonize_packable_no_new!(DataSinkHB);
 
 //--------------------------------------------------------------
 

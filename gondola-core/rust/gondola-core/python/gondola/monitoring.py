@@ -44,42 +44,42 @@ SipTimeMoniData                       = _gondola_core.monitoring.SipTimeMoniData
 SipTimeMoniData.__module__            = __name__
 
 # The corresponding moni series
-CPUMoniDataSeries                           = _gondola_core.monitoring.CPUMoniData        
+CPUMoniDataSeries                           = _gondola_core.monitoring.CPUMoniDataSeries        
 CPUMoniDataSeries.__module__                = __name__
 
-DataSinkHBSeries                            = _gondola_core.monitoring.DataSinkHB 
+DataSinkHBSeries                            = _gondola_core.monitoring.DataSinkHBSeries 
 DataSinkHBSeries.__module__                 = __name__
 
-EventBuilderHBSeries                        = _gondola_core.monitoring.EventBuilderHB 
+EventBuilderHBSeries                        = _gondola_core.monitoring.EventBuilderHBSeries 
 EventBuilderHBSeries.__module__             = __name__
 
-GcuEvBldStatsMoniDataSeries                 = _gondola_core.monitoring.GcuEvBldStatsMoniData
+GcuEvBldStatsMoniDataSeries                 = _gondola_core.monitoring.GcuEvBldStatsMoniDataSeries
 GcuEvBldStatsMoniDataSeries.__module__      = __name__
 
-LTBMoniDataSeries                           = _gondola_core.monitoring.LTBMoniData 
+LTBMoniDataSeries                           = _gondola_core.monitoring.LTBMoniDataSeries 
 LTBMoniDataSeries.__module__                = __name__
 
-MasterTriggerHBSeries                       = _gondola_core.monitoring.MasterTriggerHB 
+MasterTriggerHBSeries                       = _gondola_core.monitoring.MasterTriggerHBSeries 
 MasterTriggerHBSeries.__module__            = __name__
 
-MtbMoniDataSeries                           = _gondola_core.monitoring.MtbMoniData 
+MtbMoniDataSeries                           = _gondola_core.monitoring.MtbMoniDataSeries 
 MtbMoniDataSeries.__module__                = __name__
 
-PAMoniDataSeries                            = _gondola_core.monitoring.PAMoniData 
+PAMoniDataSeries                            = _gondola_core.monitoring.PAMoniDataSeries 
 PAMoniDataSeries.__module__                 = __name__ 
 
-PBMoniDataSeries                            = _gondola_core.monitoring.PBMoniData 
+PBMoniDataSeries                            = _gondola_core.monitoring.PBMoniDataSeries 
 PBMoniDataSeries.__module__                 = __name__
 
-RBMoniDataSeries                            = _gondola_core.monitoring.PBMoniData 
+RBMoniDataSeries                            = _gondola_core.monitoring.PBMoniDataSeries 
 RBMoniDataSeries.__module__                 = __name__
 
-SipPosMoniDataSeries                        = _gondola_core.monitoring.SipPosMoniData 
+SipPosMoniDataSeries                        = _gondola_core.monitoring.SipPosMoniDataSeries 
 SipPosMoniDataSeries.__module__             = __name__ 
 
-SipPresMoniDataSeries                       = _gondola_core.monitoring.SipPresMoniData 
+SipPresMoniDataSeries                       = _gondola_core.monitoring.SipPresMoniDataSeries 
 SipPresMoniDataSeries.__module__            = __name__ 
 
-SipTimeMoniDataSeries                       = _gondola_core.monitoring.SipTimeMoniData 
+SipTimeMoniDataSeries                       = _gondola_core.monitoring.SipTimeMoniDataSeries 
 SipTimeMoniDataSeries.__module__            = __name__
 

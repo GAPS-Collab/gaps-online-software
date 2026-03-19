@@ -352,7 +352,7 @@ impl MtbMoniData {
 moniseries!(MtbMoniDataSeries, MtbMoniData);
 
 #[cfg(feature="pybindings")]
-pythonize_packable!(MtbMoniData);
+pythonize_packable_no_new!(MtbMoniData);
 
 #[cfg(feature="pybindings")]
 pythonize_monidata!(MtbMoniData);
