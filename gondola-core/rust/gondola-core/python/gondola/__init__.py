@@ -50,10 +50,20 @@ def init_database():
         _os.environ['GONDOLA_DB_URL'] = str(db_path) 
         return db_path
 
+def init_tracker_cal():
+    """
+    Returns the path to the data file used for the tracker online (in-flight) 
+    calibration as it has been done on the GAPS instrument during flight
+    """
+    with _importlib.resources.path("gondola", "tracker_cal") as cal_path:
+        _os.environ['GONDOLA_TRK_ONLINE_CAL'] = str(cal_path) 
+        return cal_path
+
 #----------------------------------
 # Initializing 
 
 init_database() 
+init_tracker_cal()
 
 print (f'Welcome to gondola v{__version__}, a software suite for the \U0001F388 GAPS experiment! Bulld for \U0001F40D with the power of \U0001F980! \u2728')
 print (f' -- The database has been set to GONDOLA_DB_URL {_os.environ["GONDOLA_DB_URL"]}')
