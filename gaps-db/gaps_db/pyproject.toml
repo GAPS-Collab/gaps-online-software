@@ -1,17 +1,14 @@
 [project]
-name = "scripts"
+name = "gaps-db"
 version = "0.1.0"
 description = "Add your description here"
 authors = [
     { name = "Achim Stoessl", email = "achim.stoessl@gmail.com" }
 ]
 dependencies = [
-    "django>=5.1.1",
-    "polars>=1.6.0",
-    "numpy>=2.1.1",
-    "fastexcel>=0.11.6",
+    "django>=5.1.2",
+    "numpy>=2.1.2",
     "matplotlib>=3.9.2",
-    "ipython>=9.0.2",
     "tqdm>=4.67.1",
 ]
 readme = "README.md"
@@ -29,4 +26,4 @@ dev-dependencies = []
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/scripts"]
+packages = ["src/gaps_db"]

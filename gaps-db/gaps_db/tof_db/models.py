@@ -95,7 +95,7 @@ class TofPaddleTimingConstant(models.Model):
             tc.paddle_id       = int(k['paddle_id']) 
             vid                = int(k['volume_id'])
             if vid != all_paddles[tc.paddle_id].volume_id:
-                print (f'Error - vid mismatch for paddle {tc.paddle_id} {tc.volume_id} vs {k["volume_id"]}')
+                print (f'Error - vid mismatch for paddle {tc.paddle_id} {vid} (.json) vs {all_paddles[tc.paddle_id].volume_id}')
                 #print (k) 
                 #print (all_paddles[tc.paddle_id])
                 if not no_fail_on_vid_check:

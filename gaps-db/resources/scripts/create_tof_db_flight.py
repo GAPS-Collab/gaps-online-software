@@ -86,6 +86,15 @@ if __name__ == '__main__':
             rat = m.RAT()
             rat.rat_id = row[0]
             rat.pb_id  = row[1]
+            # FIXME - update. There is a note in the spreadsheet
+            # about the replacement of the powerboards. 
+            # on 08/07/2024 2 powerboards have been replaced 
+            # PB19 has been replaced with PB1 
+            # PB12 has been replaced with PB10
+            if rat.pb_id == 19:
+                rat.pb_id = 1 
+            if rat.pb_id == 12:
+                rat.pb_id = 10
             # yes, rb2 comes first in the spreadsheet!
             rat.rb2_id = row[2]
             rat.rb1_id = row[3]
@@ -188,6 +197,18 @@ if __name__ == '__main__':
             paddle.ltb_id              = int(ltb_nmb_ch[0]) 
             paddle.rb_id               = int(rb_nmb_ch[0])
             paddle.pb_id               = int(pb_nmb_ch[0])
+            # FIXME - update. There is a note in the spreadsheet
+            # about the replacement of the powerboards. 
+            # on 08/07/2024 2 powerboards have been replaced 
+            # PB19 has been replaced with PB1 
+            # PB12 has been replaced with PB10
+            #
+            # see a similar comment for the RAT table 
+            if paddle.pb_id == 19:
+                paddle.pb_id = 1 
+            if paddle.pb_id == 12:
+                paddle.pb_id = 10
+
             if paddle_end == 'A':
                 paddle.ltb_chA         = int(ltb_nmb_ch[1])
                 paddle.rb_chA          = int(rb_nmb_ch[1])
