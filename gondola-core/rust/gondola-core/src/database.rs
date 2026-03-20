@@ -108,19 +108,67 @@ pub fn get_dsi_j_ch_rb_map(paddles : &Vec<TofPaddle>) -> DsiJChRbMapping {
 
 //---------------------------------------------------------------------
 
-pub fn get_rbid_pbchannel_pid_map(paddles : &Vec<TofPaddle>) -> (RbChPidMapping, RbChPidMapping) {
-  let mut map_a = RbChPidMapping::new();
-  let mut map_b = RbChPidMapping::new();
-  //let mut rb_to_pb = HashMap::<u8,u8>::new();
-  for pdl in paddles {
-    let mut pbch_to_pid = HashMap::<u8,u8>::new();
-    pbch_to_pid.insert(pdl.pb_chA as u8, pdl.paddle_id as u8); 
-    map_a.insert(pdl.rb_id as u8, pbch_to_pid.clone());
-    pbch_to_pid.clear();
-    pbch_to_pid.insert(pdl.pb_chB as u8, pdl.paddle_id as u8); 
-    map_b.insert(pdl.rb_id as u8, pbch_to_pid.clone()); 
+/// Get a mapping of which pb controls paddles connected to which RB
+#[cfg_attr(feature="pybindings", pyfunction)]
+pub fn get_rbids_for_pbid(pbid : u8) -> Option<(u8, u8)> {
+  let mut conn = connect_to_db().ok()?;
+  let rats = RAT::all(&mut conn)?;
+  for rat in rats {
+    if rat.pb_id as u8 == pbid {
+      return Some((rat.rb1_id as u8, rat.rb2_id as u8));
+    }
   }
-  return (map_a, map_b)
+  None
+}
+
+pub fn get_rbid_pbchannel_pid_map(paddles : &Vec<TofPaddle>) -> Option<(RbChPidMapping, RbChPidMapping)> {
+  let mut map_a    = RbChPidMapping::new();
+  let mut map_b    = RbChPidMapping::new();
+  let mut map_a_rb = RbChPidMapping::new();
+  let mut map_b_rb = RbChPidMapping::new();
+
+  //let all_rbs       = get_all_rbids_in_db()?; 
+  //let pbch_to_pid_a = HashMap::<u8,u8>::new(); 
+  //let pbch_to_pid_b = HashMap::<u8,u8>::new(); 
+  //let all_pbs       = get_all_pbids_in_db()?;
+  // first we fill the maps with the pb id instead of the rb id, then we 
+  // translate that later
+  for pdl in paddles {
+    if pdl.pb_id == 19 {
+      println!("{}", pdl);
+    }
+    if map_a.contains_key(&(pdl.pb_id as u8)) {
+      map_a.get_mut(&(pdl.pb_id as u8)).unwrap().insert(pdl.pb_chA as u8, pdl.paddle_id as u8);
+    } else {
+      let mut ch_map = HashMap::<u8,u8>::new();
+      ch_map.insert(pdl.pb_chA as u8, pdl.paddle_id as u8);
+      map_a.insert(pdl.pb_id as u8, ch_map);
+    }
+    if map_b.contains_key(&(pdl.pb_id as u8)) {
+      map_b.get_mut(&(pdl.pb_id as u8)).unwrap().insert(pdl.pb_chA as u8, pdl.paddle_id as u8);
+    } else {
+      let mut ch_map = HashMap::<u8,u8>::new();
+      ch_map.insert(pdl.pb_chB as u8, pdl.paddle_id as u8);
+      map_b.insert(pdl.pb_id as u8, ch_map);
+    }
+  }
+  for k in map_a.keys() {
+    match get_rbids_for_pbid(*k) {
+      Some(rbid) => {
+        map_a_rb.insert(rbid.0, map_a[k].clone()); 
+        map_a_rb.insert(rbid.1, map_a[k].clone()); 
+      }
+      None => {
+        println!("Can not get rb ids for pb id {}!", k);
+      }
+    }
+  }
+  for k in map_b.keys() {
+    let rbid = get_rbids_for_pbid(*k).unwrap();
+    map_b_rb.insert(rbid.0, map_b[k].clone()); 
+    map_b_rb.insert(rbid.1, map_b[k].clone()); 
+  }
+  return Some((map_a_rb, map_b_rb))
 }
 
 //---------------------------------------------------------------------
@@ -139,6 +187,9 @@ pub fn get_dsi_j_ch_rb_map_py() -> Option<DsiJChRbMapping> {
     return None;
   }
 }
+
+
+
 
 //---------------------------------------------------------------------
 
@@ -161,7 +212,7 @@ pub fn get_dsi_j_ch_rb_map_py() -> Option<DsiJChRbMapping> {
 #[pyo3(name="get_rbid_pbchannel_pid_map")]
 pub fn get_rbid_pbchannel_pid_map_py() -> Option<(RbChPidMapping, RbChPidMapping)> {
   if let Some(paddles) = TofPaddle::all() {
-    return Some(get_rbid_pbchannel_pid_map(&paddles));
+    return Some(get_rbid_pbchannel_pid_map(&paddles).unwrap());
   } else {
     return None;
   }
@@ -324,6 +375,24 @@ pub fn get_all_rbids_in_db() -> Option<Vec<u8>> {
     }
     Some(paddles) => {
       let mut rbids : Vec<u8> = paddles.iter().map(|p| p.rb_id as u8).collect();
+      rbids.sort();
+      rbids.dedup();
+      return Some(rbids);
+    }
+  }
+}
+
+//---------------------------------------------------------------------
+
+#[cfg_attr(feature="pybindings", pyfunction)]
+pub fn get_all_pbids_in_db() -> Option<Vec<u8>> {
+  match TofPaddle::all() {
+    None => {
+      error!("Can not load paddles from DB! Did you load the setup-env.sh shell?");
+      return None;
+    }
+    Some(paddles) => {
+      let mut rbids : Vec<u8> = paddles.iter().map(|p| p.pb_id as u8).collect();
       rbids.sort();
       rbids.dedup();
       return Some(rbids);

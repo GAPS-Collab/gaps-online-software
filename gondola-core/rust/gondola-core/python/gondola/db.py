@@ -22,7 +22,7 @@ TrackerStrip.__module__      = __name__
 TrackerStrip.__name__        = 'TrackerStrip' 
 TrackerStripMask             = _gc.db.TrackerStripMask 
 TrackerStripMask.__module__  = __name__ 
-TrackerStrip.__name__        = 'TrackerStrip' 
+TrackerStripMask.__name__    = 'TrackerStripMask'
 TrackerStripPedestal         = _gc.db.TrackerStripPedestal 
 TrackerStripPedestal.__module__ = __name__ 
 TrackerStripPedestal.__name__   = 'TrackerStripPedestal' 
@@ -35,10 +35,14 @@ TrackerStripCmnNoise.__name__    = 'TrackerStripCmnNoise'
 TofPaddleTimingConstant            = _gc.db.TofPaddleTimingConstant 
 TofPaddleTimingConstant.__module__ = __name__ 
 TofPaddleTimingConstant.__name__   = 'TofPaddleTimingConstant'
+
+# mappings 
 get_all_rbids_in_db                = _gc.db.get_all_rbids_in_db
 get_all_rbids_in_db.__module__     = __name__
+
 get_all_pbids_in_db                = _gc.db.get_all_pbids_in_db
 get_all_pbids_in_db.__module__     = __name__
+
 get_rbids_for_pbid                 = _gc.db.get_rbids_for_pbid
 get_rbids_for_pbid.__module__      = __name__ 
 
@@ -54,8 +58,21 @@ get_dsi_j_ch_pid_map.__module__ = __name__
 get_rbid_pbchannel_pid_map   = _gc.db.get_rbid_pbchannel_pid_map 
 get_rbid_pbchannel_pid_map.__module__ = __name__
 
-__all__ = ['TofPaddle','ReadoutBoard', 'TofPaddleTimingConstant', 'TrackerStrip','TrackerStripPedestal', 'TrackerStripTransferFunction',\
-'TrackerStripCmnNoise','get_all_rbids_in_db','get_hid_vid_map','get_vid_hid_map','get_dsi_j_ch_pid_map']
+__all__ = ['TofPaddle',\
+           'ReadoutBoard',\
+           'TofPaddleTimingConstant',\
+           'TrackerStrip',\
+           'TrackerStripPedestal',\
+           'TrackerStripTransferFunction',\
+           'TrackerStripCmnNoise',\
+           'TrackerStripMask',\
+           'get_all_rbids_in_db',\
+           'get_all_pbids_in_db',\
+           'get_hid_vid_map',\
+           'get_vid_hid_map',\
+           'get_dsi_j_ch_pid_map',\
+           'get_rbids_for_pbid'\
+           'get_rbid_pbchannel_pid_map']
 
 #----------------------------------------
 # extend the TofPaddles with a few methods
