@@ -534,7 +534,15 @@ pub fn find_peaks_zscore(nanoseconds    : &Vec<f32>,
 
 //---------------------------------------------------
 
-/// Sine fit without using external libraries
+/// Simple, analystyc line fit to fit a a sine function
+/// (e.g. as to TOF ch 9 sine wave data)
+///
+/// # Arguments: 
+///   * volts : y-values 
+///   * times : x-values 
+///
+/// # Returns:
+///   tuple  : ( amplitude, frequency, phase)
 pub fn fit_sine_simple<T>(volts: &[T], times: &[T]) -> (f32, f32, f32) 
   where T: Float + NumAssign + NumAssignOps + NumOps + Copy + NumCast + FloatConst {
   let start_bin = 20;
@@ -618,6 +626,15 @@ pub fn fit_sine_simple<T>(volts: &[T], times: &[T]) -> (f32, f32, f32)
   (amp, freq, phi)
 }
 
+/// Simple, analystyc line fit to fit a a sine function
+/// (e.g. as to TOF ch 9 sine wave data)
+///
+/// # Arguments: 
+///   * volts : y-values 
+///   * times : x-values 
+///
+/// # Returns:
+///   tuple  : ( amplitude, frequency, phase)
 #[cfg(feature="pybindings")]
 #[pyfunction]
 #[pyo3(name="fit_sine_simple")]

@@ -634,6 +634,14 @@ fn prop_roll_then_unroll_gives_original() {
 
 //-----------------------------------------------
 
+/// DRS4 calibration routine for the TOF readoutboards.
+///
+/// Translate adc per bin to voltage (mV) over time 
+/// (nanoseconds) 
+///
+/// This bascially calibrates the capacitor array of 
+/// the DRS4 chip and produces a number of calibration 
+/// constants.
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature="pybindings", pyclass)]
 pub struct RBCalibrations {

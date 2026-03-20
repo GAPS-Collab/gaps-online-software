@@ -1,5 +1,18 @@
 """
 Monitoring and Housekeeping data structures 
+
+For each set of monitoring parameters, there 
+exists
+1) an individual set of parameters, taken at 
+   a specific point in time ("MoniData") 
+2) a collection of these points ("MoniDataSeries") 
+
+The single set of parameters ("MoniData") can be 
+obtained from Tof/TelemetryPackets. 
+
+The series allow to load such packets from entire files
+and specifically allows to translate the read data to 
+polars dataframes.
 """
 
 from . import _gondola_core 

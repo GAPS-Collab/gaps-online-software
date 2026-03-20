@@ -419,18 +419,27 @@ fn get_version() -> &'static str {
   return VERSION;
 }
 
+/// Major version of the package 
+/// from the version string
+/// (Major.Minor.Patch)
 #[cfg(feature="pybindings")]
 #[pyfunction]
 fn get_version_major() -> u8 {
   return VERSION_MAJ.parse().unwrap();
 }
 
+/// Minor version of the package 
+/// from the version string
+/// (Major.Minor.Patch)
 #[cfg(feature="pybindings")]
 #[pyfunction]
 fn get_version_minor() -> u8 {
   return VERSION_MIN.parse().unwrap();
 }
 
+/// Patch level of the package 
+/// from the version string
+/// (Major.Minor.Patch)
 #[cfg(feature="pybindings")]
 #[pyfunction]
 fn get_version_patch() -> u8 {

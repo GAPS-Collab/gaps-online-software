@@ -139,7 +139,12 @@ expand_and_test_enum!(EventQuality, test_eventquality_repr);
 
 //--------------------------------------------
 
-// Need serde here, so that we can add it to the liftof configs
+/// The type of trigger which has fired at time of 
+/// recoring a specific event. 
+///
+/// The GAPS main trigger system allows to record 
+/// events based on different conditions
+/// simulataneously. 
 #[derive(Debug, Copy, Clone, PartialEq,FromRepr, AsRefStr, EnumIter, serde::Serialize, serde::Deserialize)]
 #[repr(u8)]
 #[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
@@ -147,8 +152,13 @@ pub enum TriggerType {
   Unknown         = 0u8,
   /// -> 1-10 "pysics" triggers
   Any             = 1u8,
+  /// 1 hit on outer (UMB + COR) and inner (CBE) TOF
   Track           = 2u8,
   TrackCentral    = 3u8,
+  /// The "default" antiparticle trigger. It requires 
+  /// 8 hits in total, 4 on the inner, 4 on the outer TOF.
+  /// 2 of the hits have to cross
+  /// the second LTB threshold "beta"
   Gaps            = 4u8,
   Gaps633         = 5u8, 
   Gaps422         = 6u8,

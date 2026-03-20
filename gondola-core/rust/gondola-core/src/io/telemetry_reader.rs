@@ -187,7 +187,7 @@ impl TelemetryPacketReader {
     self.dedup_cache = dedup_cache;
   }
 
-  /// Preview the number of frames in this reader
+  /// Loop over all packets available to this reader and count them by type
   pub fn count_packets(&mut self) -> (usize, usize, HashMap<TelemetryPacketType,usize>) {
     let _ = self.rewind();
     self.clear_dedup_cache();
@@ -663,7 +663,8 @@ impl TelemetryPacketReader {
   fn get_n_duplicates(&self) -> usize {
     self.n_duplicates
   }
-
+  
+  /// Loop over all packets available to this reader and count them by type
   #[pyo3(name = "count_packets")]
   fn count_packets_py(&mut self) -> (usize,usize,HashMap<TelemetryPacketType,usize>) {
     self.count_packets()
@@ -731,11 +732,6 @@ impl TelemetryPacketReader {
       Ok(_) => Ok(())
     }
   }
-
-  //#[pyo3(name="count_packets")]
-  //fn count_packets_py(&mut self) -> usize {
-  //  self.count_packets()
-  //}
 
   fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
     slf 

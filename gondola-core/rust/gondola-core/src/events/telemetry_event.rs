@@ -5,6 +5,18 @@
 
 use crate::prelude::*;
 
+/// The basic event type as sent over telemetry, often 
+/// also dubbed as "merged event".
+///
+/// This event type contains tof as well as tracker 
+/// hits, and comes in several flavors, depending 
+/// on the suspected signalness of the online system
+/// determined by a specific algorith.
+/// For that, please see the TelemetryPacketHeader, 
+/// which identifiers these different flavors. 
+///
+/// For most purposes, this event is the to-go data 
+/// to start any analysis.
 #[cfg_attr(feature="pybindings", pyclass)]
 #[derive(Debug, Clone, PartialEq)]
 pub struct TelemetryEvent {
