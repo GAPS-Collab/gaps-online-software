@@ -1,4 +1,4 @@
-/**
+/*
  * Binary to illustrate how to read GAPS L0 file with the
  * caraspace library.
  * To use this example, the code has to be build with
@@ -24,7 +24,6 @@
 #include "database.h"
 #include "caraspace.hpp"
 
-//#include "../../analysis/zweerink/include/constants.h"
 #include "constants.h"
 #include "EventGAPS.h"
 void GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm);
@@ -35,10 +34,9 @@ namespace gt = Gaps::Telemetry;
 int main(int argc, char *argv[]){
   spdlog::cfg::load_env_levels();
     
-  cxxopts::Options options("read-caraspace", "Read GAPS L0 (caraspace) files. These files contain ALL information, including the TOF disk (waveform) stream and ALL telemetry packets");
+  cxxopts::Options options("analyzeGAPS", "Read GAPS L0 (caraspace) or GAPS .bin files. These files contain ALL information, including the TOF disk (waveform) stream and ALL telemetry packets");
   options.add_options()
   ("h,help", "Print help")
-  //("c,calibration", "Folder with binary calibration files for each RB", cxxopts::value<std::string>()->default_value(""))
   ("file", "A Caraspace file", cxxopts::value<std::string>())
   ("directory", "A directory containing .gaps (caraspace) files, e.g. L0 Gaps files", cxxopts::value<std::string>())
   ("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
@@ -84,6 +82,7 @@ int main(int argc, char *argv[]){
 
   std::string cooling_name   = "TelemetryPacketType.CoolingHK";
   std::string rbwf_name      = "TelemetryPacketType.RBWaveform";
+  std::string anyTofHK       = "TelemetryPacketType.AnyTofHK";
 
   // First, we want to store information about the SiPM channels and          
   // paddle relationships for analysis purpose. Read all that info            
@@ -96,10 +95,8 @@ int main(int argc, char *argv[]){
   // initial values                                                           
   auto Event = EventGAPS();
   Event.SetPaddleMap(&PadInfo, &SipmInfo);
-  //Event.SetThreshold(CThresh);                                              
-  //Event.SetCFDFraction(CFDS_frac);                                          
   Event.InitializeHistograms();
-  Event.OffsetHistograms(true);
+  Event.OffsetHistograms(false);
 
   u64 n_frames_processed  = 0;
   u64 n_telemetry_errors  = 0;
@@ -111,10 +108,9 @@ int main(int argc, char *argv[]){
   u64 n_interest          = 0;
   u64 n_notof             = 0;
 
-  auto start = std::chrono::high_resolution_clock::now();
+  u64 n_cooling           = 0;
 
-  //auto trk_mask = Gaps::get_trackerstripmasks();
-  //auto trk_ped  = Gaps::get_trackerstrippedestals();
+  auto start = std::chrono::high_resolution_clock::now();
 
   // as an example, count tracker hits
   u64 n_trk_hits        = 0;
@@ -153,8 +149,20 @@ int main(int argc, char *argv[]){
         pos       = 0;
 	auto rbwf = RBWaveform::from_bytestream(tp.payload, pos);
         std::cout << rbwf.to_string() << std::endl;
-        // just for now                                       
-        //exit(0);
+      }
+
+      if (frame.index.contains(anyTofHK)) {
+        auto pack = frame.get_telemetrypacket(anyTofHK);
+        //usize pos = 0;
+        //auto tp_res   = TofPacket::from_bytestream(pack.payload, pos);
+        //if (!tp_res.is_ok()) {
+         //spdlog::error("Can't get tofpacket f/ ToFHK from telemetrypacket!");
+	//continue;
+        //}
+	//auto tp   = tp_res.unwrap();
+	// pos       = 0;
+	//auto rbwf = RBWaveform::from_bytestream(tp.payload, pos);
+        std::cout << "Found TOF HK packet" << std::endl;
       }
 
       if (frame.index.contains(tel_ev_nogaps)) {
@@ -177,9 +185,11 @@ int main(int argc, char *argv[]){
         continue;
       }
 
-      //if (frame.index.contains(cooling_name)) {
-      //  pack = frame.get_telemetrypacket(cooling_name);
-      //  std::cout << pack.to_string() << std::endl;
+      if (frame.index.contains(cooling_name)) {
+        pack = frame.get_telemetrypacket(cooling_name);
+        ++n_cooling;
+        printf("Found Cooling\n");
+        std::cout << pack.to_string() << std::endl;
       //  usize pos = 0;
       //  auto cooling = gt::Cooling::from_bytestream(pack.payload, pos);
       //  if (cooling.is_ok()) {
@@ -188,7 +198,7 @@ int main(int argc, char *argv[]){
       //    std::cout << cooling.unwrap_err().reason << std::endl;
       //  }
       //  //std::exit(1);
-      //}
+      }
 
       if (verbose) {
         std::cout << "---- TELEMETRY -----" << std::endl;
@@ -218,15 +228,12 @@ int main(int argc, char *argv[]){
 	//}
           //std::cout << h.to_string() << std::endl;
       }
-      //printf("%d %d %d: %d TRK - ", (int)m_ev.header.counter,
-      //     (int)m_ev.header.ptype, m_ev.event_id, (int)m_ev.trk_hits.size());
       if (m_ev.trk_hits.size() == 0) {
         ++n_evt_no_trk_hits;
       } else {
         n_trk_hits += m_ev.trk_hits.size();
       }
       
-      //printf("%d TOF\n", (int)m_ev.tof_event.hits.size());
       struct EventInfo EvtInfo;
       // First, initialize all the event values properly              
       for (int i=0;i<NPAD;i++) {
@@ -284,8 +291,6 @@ int main(int argc, char *argv[]){
 	Event.FillChannelHistos(0);
 	Event.FillPaddleHistos();
 	Event.FillOffsetHistos();
-	// do someting with h
-        //std::cout << h.to_string() << std::endl;
       }
       
       if (n_frames_processed % 1000 == 0) {

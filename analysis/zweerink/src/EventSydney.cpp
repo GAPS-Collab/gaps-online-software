@@ -358,24 +358,11 @@ void EventGAPS::InitializeHistograms(void) {
   FirstTime = new TH1F("First Hit Time", "", 300, 10.5, 160.5);
   FirstTime->GetXaxis()->SetTitle("First Hit Time");
   FirstTime->GetYaxis()->SetTitle("Counts");
-  // Earliest Paddle hit time
-  FirstTimeBad = new TH1F("First Hit Time (Bad", "", 300, 10.5, 160.5);
-  FirstTimeBad->GetXaxis()->SetTitle("First Hit Time");
-  FirstTimeBad->GetYaxis()->SetTitle("Counts");
 
   // Distribution of Beta
-  BetaDist1 = new TH1F("Beta6 Distribution", "", 560, -0.05, 5.55);
-  BetaDist1->GetXaxis()->SetTitle("Beta Value");
-  BetaDist1->GetYaxis()->SetTitle("Counts");
-  BetaDist2 = new TH1F("Beta7 Distribution", "", 560, -0.05, 5.55);
-  BetaDist2->GetXaxis()->SetTitle("Beta Value");
-  BetaDist2->GetYaxis()->SetTitle("Counts");
-  BetaDist3 = new TH1F("Beta18 Distribution", "", 560, -0.05, 5.55);
-  BetaDist3->GetXaxis()->SetTitle("Beta Value");
-  BetaDist3->GetYaxis()->SetTitle("Counts");
-  BetaDist4 = new TH1F("Beta19 Distribution", "", 560, -0.05, 5.55);
-  BetaDist4->GetXaxis()->SetTitle("Beta Value");
-  BetaDist4->GetYaxis()->SetTitle("Counts");
+  BetaDist = new TH1F("Beta Distribution", "", 560, -0.05, 5.55);
+  BetaDist->GetXaxis()->SetTitle("Beta Value");
+  BetaDist->GetYaxis()->SetTitle("Counts");
 
   // Histograms comparing the charge measured at both ends of the paddle.
   for (int b = 0; b < NPAD; b++) {
@@ -560,11 +547,7 @@ void EventGAPS::WriteHistograms() {
   //TDCdir->cd();
   FirstPaddle->Write();
   FirstTime->Write();
-  FirstTimeBad->Write();
-  BetaDist1->Write();
-  BetaDist2->Write();
-  BetaDist3->Write();
-  BetaDist4->Write();
+  BetaDist->Write();
   for (int j = 0; j < 2; j++) {Ch9Good[j]->Write(); Ch9Bad[j]->Write();}
   for (int j = start; j < max_paddle; j++) HitTime[j]->Write();
   for (int j = start; j < max_paddle; j++) Ch9Shift[j]->Write();
@@ -1003,17 +986,12 @@ void EventGAPS::FillPaddleHistos(void) {
 	      if (beta > 1.0) {
 		Ch9Bad[i-6]->Fill(TShift[RB[Paddle_A[EarlyPaddle]]],
 				  TShift[RB[Paddle_A[i]]]);
-		FirstTimeBad->Fill(EarlyTime);
 	      } else { 
 		Ch9Good[i-6]->Fill(TShift[RB[Paddle_A[EarlyPaddle]]],
 				TShift[RB[Paddle_A[i]]]);
 		FirstTime->Fill(EarlyTime);
 	      }
 	    }
-	    if (beta>0 && i==6) BetaDist1->Fill(beta); 
-	    if (beta>0 && i==7) BetaDist2->Fill(beta); 
-	    if (beta>0 && i==8) BetaDist3->Fill(beta); 
-	    if (beta>0 && i==9) BetaDist4->Fill(beta); 
 	    if ( 1 && (i==5||i==6||i==18||i==19) && beta > 1.1 ) {
 	      printf("Fast: %ld %d - %5.2f %6.2f %6.2f\n",evtno,i,beta,
 	       HitT[i], HitT[EarlyPaddle]);
@@ -1034,7 +1012,7 @@ void EventGAPS::FillPaddleHistos(void) {
       }
     }
   }
-  //if (beta > 0) BetaDist1->Fill(beta); // Only when beta was calculated
+  if (beta > 0) BetaDist->Fill(beta); // Only when beta was calculated
   NPaddlesCube->Fill(NPadCube);
   NPaddlesUmbrella->Fill(NPadUmbrella);
   NPaddlesCortina->Fill(NPadCortina);
@@ -1042,9 +1020,4 @@ void EventGAPS::FillPaddleHistos(void) {
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 
-//==================END OF PEAK STUFF======================
-
-void EventGAPS::Message(const char *s) {
-  //cerr << s << endl;
-}
 
