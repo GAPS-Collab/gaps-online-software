@@ -483,7 +483,7 @@ void GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm) {
   
   float coax, harting;
   // One last task: Get cable timings 
-  snprintf(fname, 500, "%s/%s/paddle_cable.json", srcdir, codedir);
+  snprintf(fname, 500, "%s/%s/Jeff_paddle_cable.json", srcdir, codedir);
   fp = fopen(fname, "r");
   if ( fscanf(fp, "%s", label) != EOF ) { // Read in first "{"
     while (fscanf(fp,"%*[^-0-9]%d  %*[^-0-9]%f  %*[^-0-9]%f ",
