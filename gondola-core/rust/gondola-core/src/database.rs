@@ -237,42 +237,63 @@ pub fn get_dsi_j_ch_pid_map_py() -> Option<DsiJChPidMapping> {
 
 //---------------------------------------------------------------------
 
-/// Get a map of hardware id -> volume id 
-/// (Paddle id in case of TOF paddke, strip id in case 
-///  of tracker strip)
+/// Map the detector ids ("hardware" ids) to volume ids as used in the 
+/// simulation 
+///
+/// Get the map first and then query it 
+/// 
+/// ```
+/// m = gondola.db.get_hid_vid_maps() 
+/// print (m[0][160]) # volume id for paddle 160
+/// ```  
+/// 
+/// # Returns: 
+///   * tuple (dict,dict) : Two maps, the first for the tof, the second 
+///                         for the tracker 
 #[cfg_attr(feature="pybindings", pyfunction)]
-pub fn get_hid_vid_map() -> Option<HashMap<u32, u64>> {
+pub fn get_hid_vid_maps() -> Option<(HashMap<u32, u64>, HashMap<u32, u64>)> {
   // FIXME - error catching
   let pdls   = TofPaddle::all_as_dict().unwrap(); 
   let strips = TrackerStrip::all_as_dict().unwrap();
-  let mut hid_vid_map = HashMap::<u32, u64>::new();
+  let mut hid_vid_map_tof = HashMap::<u32, u64>::new();
+  let mut hid_vid_map_trk = HashMap::<u32, u64>::new();  
   for k in pdls.keys() {
-    hid_vid_map.insert(*k as u32, pdls[k].volume_id as u64);
+    hid_vid_map_tof.insert(*k as u32, pdls[k].volume_id as u64);
   }
   for k in strips.keys() {
-    hid_vid_map.insert(*k as u32,strips[k].volume_id as u64);
+    hid_vid_map_trk.insert(*k as u32,strips[k].volume_id as u64);
   }
-  Some(hid_vid_map)
+  Some((hid_vid_map_tof, hid_vid_map_trk))
 }
 
 //---------------------------------------------------------------------
 
-/// Get a map of volume id -> hardware id
-/// (Paddle id in case of TOF paddke, strip id in case 
-///  of tracker strip)
+/// Map the volume id as it is used in the simulation to the actual 
+/// ("hardware") detector ids
+///
+/// Get the map first and then query it 
+/// ```
+/// m = gondola.db.get_vid_hid_maps() 
+/// print (m[0][100000000]) # tof paddle 1
+/// ```  
+/// 
+/// # Returns: 
+///   * tuple (dict,dict) : Two maps, the first for the tof, the second 
+///                         for the tracker 
 #[cfg_attr(feature="pybindings", pyfunction)]
-pub fn get_vid_hid_map() -> Option<HashMap<u64, u32>> {
+pub fn get_vid_hid_maps() -> Option<(HashMap<u64, u32>, HashMap<u64,u32>)> {
   // FIXME - error catching
   let pdls   = TofPaddle::all_as_dict().unwrap(); 
   let strips = TrackerStrip::all_as_dict().unwrap();
-  let mut vid_hid_map = HashMap::<u64, u32>::new();
+  let mut vid_hid_map_tof = HashMap::<u64, u32>::new();
+  let mut vid_hid_map_trk = HashMap::<u64, u32>::new();
   for k in pdls.keys() {
-    vid_hid_map.insert(pdls[k].volume_id as u64, *k as u32);
+    vid_hid_map_tof.insert(pdls[k].volume_id as u64, *k as u32);
   }
   for k in strips.keys() {
-    vid_hid_map.insert(strips[k].volume_id as u64, *k);
+    vid_hid_map_trk.insert(strips[k].volume_id as u64, *k);
   }
-  Some(vid_hid_map)
+  Some((vid_hid_map_tof, vid_hid_map_trk))
 }
 
 //---------------------------------------------------------------------

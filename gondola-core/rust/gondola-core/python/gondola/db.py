@@ -46,11 +46,11 @@ get_all_pbids_in_db.__module__     = __name__
 get_rbids_for_pbid                 = _gc.db.get_rbids_for_pbid
 get_rbids_for_pbid.__module__      = __name__ 
 
-get_hid_vid_map              = _gc.db.get_hid_vid_map
-get_hid_vid_map.__module__   = __name__ 
+get_hid_vid_maps              = _gc.db.get_hid_vid_maps
+get_hid_vid_maps.__module__   = __name__ 
 
-get_vid_hid_map              = _gc.db.get_vid_hid_map
-get_vid_hid_map.__module__   = __name__ 
+get_vid_hid_maps              = _gc.db.get_vid_hid_maps
+get_vid_hid_maps.__module__   = __name__ 
 
 get_dsi_j_ch_pid_map         = _gc.db.get_dsi_j_ch_pid_map
 get_dsi_j_ch_pid_map.__module__ = __name__

@@ -1,6 +1,6 @@
 [package]
 name = "gondola-core"
-version = "0.12.13"
+version = "0.12.15"
 edition = "2024"
 
 [lib]
@@ -46,16 +46,16 @@ default             = ["random", "database", "tof-liftof"]
 
 
 [dependencies.pyo3]
-version  = "0.25"
+version  = "0.26"
 features = ["extension-module", "multiple-pymethods", "abi3-py311", "chrono"]
 optional = true
 
 [dependencies.pyo3-log]
-version = "0.12"
+version = "0.13"
 optional = true
 
 [dependencies.numpy]
-version = "0.25"
+version = "0.26"
 optional = true
 
 [dependencies.serde-pickle]
@@ -106,8 +106,8 @@ crossbeam-channel = "0.5"
 statistical       = "1.0"  # FIXME - replace this with our own implementation
 toml              = "0.8"
 ureq              = "2.12" # FIXME - make this a feature
-polars            = { version = "0.51", features = ["lazy"], optional = true }
-pyo3-polars       = { version = "0.24", optional = true }
+polars            = { version = "0.52", features = ["lazy", "timezones"], optional = true }
+pyo3-polars       = { version = "0.25", features = ["dtype-full"], optional = true }
 env_logger        = "0.10"
 flate2            = "1.1"
 
