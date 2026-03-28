@@ -4,8 +4,10 @@
 
 use crate::prelude::*;
 
+use pyo3::basic::CompareOp;
+
 /// Hit on a tracker strip
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone)]
 #[cfg_attr(feature="pybindings", pyclass)]
 pub struct TrackerHit {
   pub layer           : u8,
@@ -61,7 +63,7 @@ impl TrackerHit {
  #[cfg(feature="database")]
  pub fn set_coordinates(&mut self, strip_map : &HashMap<u32, TrackerStrip>) {
    match strip_map.get(&self.get_stripid()) {
-     None  => error!("Can not get strip for strip id {}" , self.get_stripid()),
+     None  => debug!("Can not get strip for strip id {}" , self.get_stripid()),
      Some(strip) => { 
        self.x = strip.global_pos_x_l0;
        self.y = strip.global_pos_y_l0;
@@ -71,6 +73,19 @@ impl TrackerHit {
    }
  }
 }
+
+impl PartialEq for TrackerHit {
+  fn eq(&self, other: &TrackerHit) -> bool {
+    self.layer              ==  other.layer           
+    && self.row             ==  other.row            
+    && self.module          ==  other.module         
+    && self.channel         ==  other.channel        
+    && self.adc             ==  other.adc            
+    && self.oscillator      ==  other.oscillator     
+    && self.asic_event_code ==  other.asic_event_code
+  }
+}
+
 
 impl fmt::Display for TrackerHit {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -158,6 +173,15 @@ impl TrackerHit {
   fn get_z(&self) -> f32 {
     self.z
   }
+    
+  // This handles Python's == and != (and others if you wish)
+  fn __richcmp__(&self, other: &Self, op: CompareOp) -> PyResult<bool> {
+    match op {
+      CompareOp::Eq => Ok(self == other),
+      CompareOp::Ne => Ok(self != other),
+      _ => Ok(false), // Or return an error for unsupported ops like < or >
+    }
+  }
 }
 
 #[cfg(feature="random")]
@@ -181,6 +205,7 @@ impl FromRandom for TrackerHit {
     }
   }
 }
+
 
 #[cfg(feature="pybindings")]
 pythonize!(TrackerHit);
