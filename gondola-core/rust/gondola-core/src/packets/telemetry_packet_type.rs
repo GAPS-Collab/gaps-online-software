@@ -21,7 +21,7 @@ pub enum TelemetryPacketType {
   MPPTHK             = 55,
   Tracker            = 80,
   TrackerDAQCntr     = 81,
-  GPS                = 82,
+  TrackerGps         = 82,
   TrkTempLeak        = 83,
   TrkDAQCal0         = 84,
   TrkDAQCal1         = 85,
