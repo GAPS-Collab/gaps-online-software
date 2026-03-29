@@ -610,6 +610,11 @@ impl TofPaddle {
   pub fn sideA_pos(&self) -> (f32,f32,f32) {
     (self.global_pos_x_l0_A, self.global_pos_y_l0_A, self.global_pos_z_l0_A)
   }
+  
+  #[allow(non_snake_case)]
+  pub fn sideB_pos(&self) -> (f32,f32,f32) {
+    (self.global_pos_x_l0_B, self.global_pos_y_l0_B, self.global_pos_z_l0_B)
+  }
 
   ///Convert DSI and J connection to the actual 
   ///slot they are plugged in on the MTB (0-24)
@@ -854,6 +859,14 @@ impl TofPaddle {
   #[allow(non_snake_case)]
   pub fn sideA_pos_py(&self) -> (f32,f32,f32) {
     (self.global_pos_x_l0_A, self.global_pos_y_l0_A, self.global_pos_z_l0_A)
+  }
+  
+  /// The position of the SiPm at the B-side 
+  #[getter]
+  #[pyo3(name="sideB_pos")]
+  #[allow(non_snake_case)]
+  pub fn sideB_pos_py(&self) -> (f32,f32,f32) {
+    (self.global_pos_x_l0_B, self.global_pos_y_l0_B, self.global_pos_z_l0_B)
   }
 
   ///Convert DSI and J connection to the actual 
