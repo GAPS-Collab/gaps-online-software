@@ -34,7 +34,7 @@ impl TrackerOnlineCalibration {
       }
       Ok(file) => {
         let reader = BufReader::new(file);
-        let mut data = Vec::new();
+        //let mut data = Vec::new();
 
         // Use .skip(5) to bypass the header lines
         for line in reader.lines().skip(5) {
@@ -71,11 +71,11 @@ impl TrackerOnlineCalibration {
           tf.pol_d3_2   = row[17]; 
           tf.pol_d3_3   = row[18]; 
           let pedestal  = row[19];
-          let is_pulsed = row[20] > 0.0;
+          let is_puls   = row[20] > 0.0;
           cali.tf_map.insert(strip_id, tf);
-          cali.pulser_map.insert(strip_id, is_pulsed);
+          cali.pulser_map.insert(strip_id, is_puls);
           cali.ped_map.insert(strip_id, pedestal as f32);
-          data.push(row);
+          //data.push(row);
         }
       }
     }
@@ -89,8 +89,12 @@ impl TrackerOnlineCalibration {
     let mut adc : f32 = hit.adc as f32 - self.ped_map[&strip_id];
     if adc > 1500.0 {
       adc = 1500.0;
-    }
+    } 
     hit.energy = scale*self.tf_map[&strip_id].transfer_fn(adc);
+  }
+
+  pub fn is_pulsed(&self, hit : &TrackerHit) -> bool {
+    self.pulser_map[&hit.get_stripid()] 
   }
 } 
 
@@ -106,6 +110,11 @@ impl TrackerOnlineCalibration {
   #[pyo3(name="calibrate")]
   fn calibrate_py(&self, hit : &mut TrackerHit) {
     self.calibrate(hit);
+  }
+
+  #[pyo3(name="is_pulsed")]
+  fn is_pulsed_py(&self, hit : &TrackerHit) -> bool {
+    self.is_pulsed(hit)
   }
 
   #[staticmethod]
