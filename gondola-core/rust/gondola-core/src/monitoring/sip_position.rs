@@ -3,7 +3,6 @@
 
 use crate::prelude::*;
 
-
 // Sip (CSBF provided GPS position data
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[cfg_attr(feature="pybindings", pyclass)] 

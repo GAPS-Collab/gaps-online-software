@@ -69,6 +69,12 @@ pub use gcu_ev_stats::{
   GcuEvBldStatsMoniDataSeries
 };
 
+pub mod tracker_gps;
+pub use tracker_gps::{
+  TrackerGpsMoniData,
+  TrackerGpsMoniDataSeries
+}; 
+
 use std::collections::VecDeque;
 use std::collections::HashMap;
 
@@ -366,7 +372,7 @@ macro_rules! moniseries_general {
        
 
        #[getter]
-       #[pyo3(name="get_first_ts")]
+       #[pyo3(name="first_ts")]
        pub fn get_first_ts_py(&self) -> u64 {
          self.get_first_ts()
        }
@@ -617,6 +623,7 @@ macro_rules! moniseries {
                 }
               }
             }
+            _ => () // do nothing for other types
           }
         }
       }

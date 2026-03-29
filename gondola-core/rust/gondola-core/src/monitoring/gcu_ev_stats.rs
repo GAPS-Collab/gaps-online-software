@@ -225,3 +225,9 @@ impl TelemetryPackable for GcuEvBldStatsMoniData {
 
 moniseries_telemetry!(GcuEvBldStatsMoniDataSeries, GcuEvBldStatsMoniData);
 
+#[cfg(feature="pybindings")]
+pythonize_monidata!(GcuEvBldStatsMoniData);
+
+#[cfg(feature="pybindings")]
+pythonize_telemetry_only!(GcuEvBldStatsMoniData);
+

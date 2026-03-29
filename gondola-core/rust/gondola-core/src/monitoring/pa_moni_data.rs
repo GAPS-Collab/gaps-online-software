@@ -3,7 +3,6 @@
 
 use crate::prelude::*;
 
-
 #[cfg(feature="tofcontrol")]
 use tof_control::helper::pa_type::{
   PATemp,
