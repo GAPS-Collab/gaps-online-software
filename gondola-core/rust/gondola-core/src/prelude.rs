@@ -173,6 +173,8 @@ pub use crate::moniseries_general;
 pub use crate::moniseries_telemetry;
 #[cfg(feature="pybindings")]
 pub use crate::pythonize_error;
+#[cfg(feature="pybindings")]
+pub use crate::pythonize_telemetry_only;
 
 #[cfg(feature="random")]
 pub use crate::random::FromRandom;

@@ -80,6 +80,33 @@ macro_rules! pythonize_telemetry {
   }
 }
 
+//---------------------------------------
+
+#[macro_export]
+macro_rules! pythonize_telemetry_only {
+  ($pyclass:ty) => {
+    
+    #[pymethods]
+    impl $pyclass {
+      /// Unpack Self from a TelemetryPacket.
+      #[staticmethod]
+      fn from_telemetrypacket(packet : TelemetryPacket) -> PyResult<Self> {
+        //if packet.telemetry_header.packet_type !=
+        match Self::from_bytestream(&packet.payload, &mut 0) {
+          Ok(tl) => {
+            return Ok(tl);
+          }
+          Err(err) => {
+            return Err(PyValueError::new_err(err.to_string()));
+          }  
+        }
+      } 
+    }
+  }
+}
+
+//---------------------------------------
+
 #[macro_export]
 macro_rules! pythonize_monidata {
   ($pyclass:ty) => {
