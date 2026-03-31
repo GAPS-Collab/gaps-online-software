@@ -87,6 +87,19 @@ diesel::table! {
   }
 }
 
+diesel::table! { 
+  use diesel::sql_types::*;
+  use crate::database::TrackerCalibrationFileType; 
+  calibration_files (id) {
+    id             -> Integer,
+    #[sql_name = "type"]
+    file_type      -> Integer,
+    path           -> Text,
+    from_timestamp -> Integer,
+    to_timestamp   -> Integer 
+  }
+}
+
 diesel::table! {
   django_session (session_key) {
       session_key -> Text,

@@ -7,7 +7,22 @@
 
 use crate::prelude::*;
 
+use std::fs::File;
+use std::io::{self, BufRead, BufReader};
+use std::path::Path;
+
 use diesel::prelude::*;
+use diesel::FromSqlRow;
+use diesel::AsExpression;
+use diesel::serialize;
+use diesel::deserialize;
+use diesel::sqlite::Sqlite;
+use diesel::deserialize::FromSql;
+use diesel::serialize::Output;
+use diesel::sql_types::Integer;
+use diesel::serialize::ToSql;
+use diesel::backend::Backend;
+
 mod schema;
     
 use schema::tof_db_rat::dsl::*;
@@ -19,6 +34,87 @@ pub type DsiJChRbMapping = HashMap<u8, HashMap<u8, HashMap<u8, u8>>>;
 /// RB ID and RB Ch to paddle ID mapping 
 pub type RbChPidMapping = HashMap<u8, HashMap<u8, u8>>;
 
+//--------------------------------------------------------------
+
+/// Describe the contents of a byte sequence ("packet") typicially 
+/// crafted for telemetry. The numbers are defined by the 'bfsw'
+/// software package.
+#[derive(Debug, Hash, Eq, PartialEq, Clone, Copy, FromRepr, AsRefStr, EnumIter,AsExpression, FromSqlRow)]
+#[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
+#[diesel(sql_type = Integer)]
+pub enum TrackerCalibrationFileType {
+  Unknown        = 0,
+  Pedestal       = 200,
+  TransferFn     = 201,
+  ChannelMask    = 202,
+  PulsedChannels = 203,
+  Gains          = 204,
+}
+
+impl ToSql<Integer, Sqlite> for TrackerCalibrationFileType {
+  fn to_sql<'b>(&'b self, out: &mut Output<'b, '_, Sqlite>) -> serialize::Result {
+    out.set_value(*self as i32);
+    Ok(serialize::IsNull::No)
+  }
+}
+
+impl FromSql<Integer, Sqlite> for TrackerCalibrationFileType {
+  fn from_sql(bytes: <Sqlite as Backend>::RawValue<'_>) -> deserialize::Result<Self> {
+    let v = i32::from_sql(bytes)?;
+    match v {
+      0   => Ok(TrackerCalibrationFileType::Unknown),
+      200 => Ok(TrackerCalibrationFileType::Pedestal),
+      201 => Ok(TrackerCalibrationFileType::TransferFn),
+      202 => Ok(TrackerCalibrationFileType::ChannelMask),
+      203 => Ok(TrackerCalibrationFileType::PulsedChannels),
+      204 => Ok(TrackerCalibrationFileType::Gains),
+      _ => {
+        error!("Unable to understand type {v}");
+        return Err("Unrecognized calibration file type".into());
+      }
+    }
+  }
+}
+
+impl fmt::Display for TrackerCalibrationFileType {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<TrackerCalFileType::");
+    match self {
+      Self::Unknown        => { repr += "Unknown>";}
+      Self::Pedestal       => { repr += "Pedestal>";}
+      Self::TransferFn     => { repr += "TransferFn>";}
+      Self::ChannelMask    => { repr += "ChannelMask>";}
+      Self::PulsedChannels => { repr += "PulsedChannels>";}
+      Self::Gains          => { repr += "Gains>";}
+    }
+    write!(f, "{}", repr)
+  }
+}
+
+//expand_and_test_enum!(TrackerCalibrationFileType, test_telemetrypackettype_repr);
+
+//--------------------------------------------------------------
+
+/// This loads the calbration DB for SimpleDet as provided by Elan
+#[cfg_attr(feature="pybindings", pyfunction)]
+pub fn load_calibration_db_elena(db_path : &str) -> Option<Vec<TrackerCalibrationFile>> {
+  use schema::calibration_files::dsl::*;
+  info!("Will load SD calibration DB from {}", db_path);
+  let mut conn = SqliteConnection::establish(db_path).ok()?;
+  match calibration_files.load::<TrackerCalibrationFile>(&mut conn) {
+    Err(err) => {
+      error!("Unable to load tracker calibration files from db! {err}");
+      return None;
+    }
+    Ok(pdls) => {
+      return Some(pdls);
+    }
+  }
+}
+
+//--------------------------------------------------------------
+
+
 /// Connect to a database at a given location
 pub fn connect_to_db_path(db_path : &str) -> Result<diesel::SqliteConnection, ConnectionError> {
   info!("Will set GONDOLA_DB_URL to {}", db_path);
@@ -29,6 +125,8 @@ pub fn connect_to_db_path(db_path : &str) -> Result<diesel::SqliteConnection, Co
   }
   SqliteConnection::establish(db_path)
 }
+
+//---------------------------------------------------------------------
 
 /// Connect to the default database at the standard location
 pub fn connect_to_db() -> Result<diesel::SqliteConnection, ConnectionError>  {
@@ -2206,6 +2304,102 @@ impl TrackerStripMask {
       }
     }
   }
+
+  /// Create a channel maks from a pulse file to mask all pulsed channels
+  ///
+  /// This is not the regular mask file, but will mask additional strips which 
+  /// have been re-purposed
+  pub fn parse_from_pulse_file<P: AsRef<Path>>(path: P) -> io::Result<Vec<Self>> {
+    let file = File::open(path)?;
+    let reader = BufReader::new(file);
+    let mut results = Vec::new(); 
+    for line in reader.lines() {
+      let line = line?;
+      let parts: Vec<&str> = line.split_whitespace().collect();
+      if parts.len() == 6 {
+        let layer     = parts[0].parse::<u32>()
+          .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
+        let row       = parts[1].parse::<u32>()
+          .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
+        let module    = parts[2].parse::<u32>()
+          .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
+        let channel   = parts[3].parse::<u32>()
+          .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
+        let pulse_chn = parts[4].parse::<i32>()
+          .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
+        let pulse_avg = parts[5].parse::<f32>()
+          .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
+        results.push((layer, row, module, channel, pulse_chn, pulse_avg));
+      }
+    }
+    let mut masks = Vec::<Self>::new();
+    for k in results {
+      let layer     = k.0; 
+      let row       = k.1;
+      let module    = k.2;
+      let channel   = k.3;
+      let p_channel = k.4;
+      let p_avg     = k.5;
+
+      let mut strip = TrackerStrip::new();
+      strip.module  = module as i32;
+      strip.row     = row    as i32;
+      strip.layer   = layer  as i32;
+      let mut active = false;
+      if p_channel < 0 || p_channel as u32 != channel {
+        active = true;
+      }
+      let mut mask  = TrackerStripMask::new();
+      mask.strip_id = strip.get_stripid() as i32; 
+      mask.active   = active;
+      masks.push(mask);
+    }
+    Ok(masks)
+  }
+
+  pub fn parse_from_file<P: AsRef<Path>>(path: P) -> io::Result<Vec<Self>> {
+    let file = File::open(path)?;
+    let reader = BufReader::new(file);
+    let mut results = Vec::new(); 
+    for line in reader.lines() {
+      let line = line?;
+      let parts: Vec<&str> = line.split_whitespace().collect();
+      if parts.len() == 2 {
+        // Parse the first number as a standard decimal
+        let index = parts[0].parse::<u32>()
+          .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
+  
+        // Parse the second number as Hex. 
+        // We strip the "0x" prefix before parsing.
+        let hex_str = parts[1].trim_start_matches("0x");
+        let value = u32::from_str_radix(hex_str, 16)
+          .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
+  
+        results.push((index, value));
+      }
+    }
+    let mut masks = Vec::<Self>::new();
+    for k in results {
+      let layer     = (k.0 / 100) % 10; 
+      let row       = (k.0 / 10) % 10;  
+      let module    = k.0 % 10;         
+      let active_ch = k.1;
+
+      let mut strip = TrackerStrip::new();
+      strip.module  = module as i32;
+      strip.row     = row    as i32;
+      strip.layer   = layer  as i32;
+      for n in 0..32 {
+        let active    = ( active_ch >> n) & 0x1;
+        strip.channel = n;
+        let mut mask  = TrackerStripMask::new();
+        mask.strip_id = strip.get_stripid() as i32; 
+        mask.active  = active > 0;
+        masks.push(mask);
+      }
+    }
+    Ok(masks)
+  }
 }
 
 impl Default for TrackerStripMask {
@@ -2238,6 +2432,34 @@ impl TrackerStripMask {
     Self::all()
   } 
   
+  /// Create a channel maks from a pulse file to mask all pulsed channels
+  ///
+  /// This is not the regular mask file, but will mask additional strips which 
+  /// have been re-purposed
+  #[staticmethod]
+  #[pyo3(name="parse_from_pulse_file")]
+  pub fn parse_from_pulse_file_py(fname : &str) -> Option<Vec<Self>> {
+    let masks = Self::parse_from_pulse_file(fname);
+    if masks.is_ok() {
+      return Some(masks.unwrap());
+    } else {
+      error!("An error occured when parsing {}", fname);
+      return None;
+    }
+  }
+
+  #[staticmethod]
+  #[pyo3(name="parse_from_file")]
+  fn parse_from_file_py(fname : &str) -> Option<Vec<Self>> {
+    let masks = Self::parse_from_file(fname);
+    if masks.is_ok() {
+      return Some(masks.unwrap());
+    } else {
+      error!("An error occured when parsing {}", fname);
+      return None;
+    }
+  }
+
   #[staticmethod]
   #[pyo3(name="all_names")]
   /// Get all names for registered datasets. These
@@ -3210,6 +3432,83 @@ impl TrackerStripCmnNoise {
 
 #[cfg(feature="pybindings")]
 pythonize!(TrackerStripCmnNoise);
+
+//-------------------------------------------------
+
+#[derive(Debug,Queryable, Selectable)]
+#[diesel(table_name = schema::calibration_files)]
+#[diesel(primary_key(id))]
+#[allow(non_snake_case)]
+#[cfg_attr(feature="pybindings", pyclass)]
+pub struct TrackerCalibrationFile {
+  pub id                        : i32, 
+  pub file_type                 : TrackerCalibrationFileType,
+  pub path                      : String, 
+  pub from_timestamp            : i32, 
+  pub to_timestamp              : i32, 
+}
+
+impl TrackerCalibrationFile {
+  pub fn new() -> Self {
+    Self {
+      id             : 0,
+      file_type      : TrackerCalibrationFileType::Unknown,
+      path           : String::from(""),
+      from_timestamp : 0,
+      to_timestamp   : 0, 
+    }
+  }
+}
+
+impl Default for TrackerCalibrationFile {
+  fn default() -> Self {
+    Self::new()
+  }
+}
+
+impl fmt::Display for TrackerCalibrationFile  {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<TrackerCalibrationFile:");
+    repr += &(format!("\n id        : {}", self.id));
+    repr += &(format!("\n file_type : {}", self.file_type));
+    repr += &(format!("\n path      : {}", self.path));
+    repr += &(format!("\n from ts   : {} [{}]", self.from_timestamp, get_utc_timestamp_from_unix(self.from_timestamp as f64).unwrap()));
+    repr += &(format!("\n to   ts   : {} [{}]", self.to_timestamp,   get_utc_timestamp_from_unix(self.to_timestamp as f64).unwrap()));
+    write!(f, "{}", repr)
+  }
+}
+
+#[cfg(feature="pybindings")]
+pythonize!(TrackerCalibrationFile);
+
+#[pymethods]
+impl TrackerCalibrationFile {
+      
+  #[getter]
+  fn get_id(&self) -> i32 {
+    self.id
+  }
+
+  #[getter]
+  fn get_file_type(&self) -> TrackerCalibrationFileType {
+    self.file_type
+  }
+
+#[getter]
+  fn get_path(&self) -> String {
+    self.path.clone()
+  }
+
+#[getter]
+  fn get_from_timestamp(&self) -> i32 {
+    self.from_timestamp
+  }
+
+#[getter]
+  fn get_to_timestamp(&self) -> i32 {
+    self.to_timestamp
+  }
+}
 
 //-------------------------------------------------
 

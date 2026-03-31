@@ -55,6 +55,7 @@ pub mod tof;
 pub mod tracker;
 pub mod monitoring;
 pub mod stats;
+pub mod physics;
 #[cfg(feature="pybindings")]
 pub mod python;
 #[cfg(feature="database")]
@@ -251,6 +252,10 @@ fn calibration_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
 #[pyo3(name = "events")]
 fn events_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   use crate::events::*;
+  m.add_class::<McHit>()?;
+  m.add_class::<McEvent>()?;
+  m.add_class::<McTrack>()?;
+  m.add_class::<McTree>()?;
   m.add_class::<TofHit>()?;
   m.add_class::<TrackerHit>()?;
   m.add_class::<RBEventHeader>()?;
@@ -359,6 +364,8 @@ fn monitoring_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<SipPosMoniDataSeries>()?;
   m.add_class::<SipTimeMoniData>()?;
   m.add_class::<SipTimeMoniDataSeries>()?;
+  m.add_class::<TrackerGpsMoniData>()?;
+  m.add_class::<TrackerGpsMoniDataSeries>()?;
   m.add_class::<GcuEvBldStatsMoniData>()?;
   m.add_class::<GcuEvBldStatsMoniDataSeries>()?;
   m.add_class::<RunStatistics>()?;
@@ -395,21 +402,26 @@ fn algo_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
 #[pyo3(name = "db")]
 fn db_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   use crate::database::*;
-  m.add_class::<TofPaddle>()?;
   m.add_class::<ReadoutBoard>()?;
+  m.add_class::<RAT>()?;
+  m.add_class::<TofPaddle>()?;
   m.add_class::<TrackerStrip>()?;
   m.add_class::<TrackerStripMask>()?;
   m.add_class::<TrackerStripPedestal>()?;
   m.add_class::<TrackerStripTransferFunction>()?;
   m.add_class::<TrackerStripCmnNoise>()?;
   m.add_class::<TofPaddleTimingConstant>()?;
+  m.add_class::<TrackerCalibrationFile>()?;
+  m.add_class::<TrackerCalibrationFileType>()?;
+  m.add_function(wrap_pyfunction!(load_calibration_db_elena, m)?)?;
   m.add_function(wrap_pyfunction!(get_all_rbids_in_db, m)?)?;
   m.add_function(wrap_pyfunction!(get_all_pbids_in_db, m)?)?;
-  m.add_function(wrap_pyfunction!(get_hid_vid_map, m)?)?;
-  m.add_function(wrap_pyfunction!(get_vid_hid_map, m)?)?;
+  m.add_function(wrap_pyfunction!(get_hid_vid_maps, m)?)?;
+  m.add_function(wrap_pyfunction!(get_vid_hid_maps, m)?)?;
   m.add_function(wrap_pyfunction!(get_rbids_for_pbid, m)?)?;
   m.add_function(wrap_pyfunction!(get_dsi_j_ch_pid_map_py, m)?)?;
   m.add_function(wrap_pyfunction!(get_rbid_pbchannel_pid_map_py, m)?)?;
+  m.add_function(wrap_pyfunction!(load_calibration_db_elena, m)?)?;
   Ok(())
 }
 
