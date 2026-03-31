@@ -75,6 +75,15 @@ pub fn parse_u32<T: AsRef<[u8]>>(stream : &T, pos : &mut usize) -> u32 {
   value
 }
 
+/// Get a i32 from a vector of bytes and advance 
+/// a position marker by 4
+pub fn parse_i32<T: AsRef<[u8]>>(stream : &T, pos : &mut usize) -> i32 {
+  let bs = stream.as_ref();
+  let value = i32::from_le_bytes([bs[*pos], bs[*pos+1], bs[*pos+2], bs[*pos+3]]);
+  *pos += 4;
+  value
+}
+
 /// Get a u64 from a vector of bytes and advance 
 /// a position marker by 8
 pub fn parse_u64<T: AsRef<[u8]>>(stream : &T, pos : &mut usize) -> u64 {
