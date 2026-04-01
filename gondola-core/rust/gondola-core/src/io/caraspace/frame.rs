@@ -15,6 +15,7 @@ pub enum CRFrameObjectType {
   Unknown          =  0u8,
   TofPacket        = 10u8,
   TelemetryPacket  = 20u8,
+  McTree           = 30u8,
 }
 
 expand_and_test_enum!(CRFrameObjectType, test_crframeobjecttype_repr);
@@ -611,7 +612,12 @@ impl CRFrame {
     let packet    = self.get::<TelemetryPacket>(name).unwrap();
     Ok(packet)
   }
- 
+
+  fn get_mctree(&mut self, name : &str) -> PyResult<McEvent> {
+    let event = self.get::<McEvent>(name).unwrap();
+    Ok(event)
+  }
+
   /// Get a tofevent from the frame directly
   fn get_tofevent(&mut self, name : &str) -> PyResult<TofEvent> {
     let packet    = self.get::<TofPacket>(name).unwrap();

@@ -31,6 +31,18 @@ pub use tracker_daq_event_packet::TrackerDAQEventPacket;
 pub mod telemetry_event;
 pub use telemetry_event::TelemetryEvent;
 
+pub mod mc_hit;
+pub use mc_hit::McHit;
+
+pub mod mc_track;
+pub use mc_track::McTrack;
+
+pub mod mc_event;
+pub use mc_event::McEvent;
+
+pub mod mc_tree;
+pub use mc_tree::McTree;
+
 use std::fmt;
 
 use strum_macros::{

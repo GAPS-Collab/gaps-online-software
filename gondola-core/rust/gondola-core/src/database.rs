@@ -2339,7 +2339,9 @@ impl TrackerStripMask {
       let module    = k.2;
       let channel   = k.3;
       let p_channel = k.4;
-      let p_avg     = k.5;
+      // discard for this - we don't need to know 
+      // this when just creating the mask
+      //let p_avg     = k.5;
 
       let mut strip = TrackerStrip::new();
       strip.module  = module as i32;
