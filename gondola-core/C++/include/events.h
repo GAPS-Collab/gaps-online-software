@@ -43,7 +43,7 @@
 #endif
 
 namespace r = result;
-namespace g = gondola;
+//namespace g = gondola;
 
 class RBCalibration;
 
@@ -164,7 +164,7 @@ namespace gondola {
     static constexpr u16 HEAD = 0xAAAA;
     static constexpr u16 TAIL = 0x5555;
   
-    g::ProtocolVersion    version ;
+    gondola::ProtocolVersion    version ;
     EventStatus status            ; 
     u8          quality           ; 
     u16         trigger_sources   ; 
@@ -195,13 +195,13 @@ namespace gondola {
     f32         tot_edep_cor      ;
     
     static auto from_tofpacket(const TofPacket &packet)          
-      -> r::Result<TofEventSummary, g::IOError>;
-    static auto from_bytestream(const Vec<u8> &stream, u64 &pos) -> r::Result<TofEventSummary, g::IOError> ;
+      -> r::Result<TofEventSummary, gondola::IOError>;
+    static auto from_bytestream(const Vec<u8> &stream, u64 &pos) -> r::Result<TofEventSummary, gondola::IOError> ;
     
     #ifdef BUILD_CXX_DB
     /// set a TofPaddle, that is enrich every tofhit with information
     /// about the corresponding paddle
-    auto set_paddlemap(const g::TofPaddleMap&) -> void;
+    auto set_paddlemap(const gondola::TofPaddleMap&) -> void;
     /// normalize all the hit times, taking the global ch9 
     /// phase into account
     auto normalize_hit_times(const TofPaddleTimingConstantMap &offsets) -> void;
