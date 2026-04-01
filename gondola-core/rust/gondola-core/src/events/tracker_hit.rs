@@ -76,13 +76,17 @@ impl TrackerHit {
 
 impl PartialEq for TrackerHit {
   fn eq(&self, other: &TrackerHit) -> bool {
+    // we can only compare fields here which 
+    // are always set, merged events do 
+    // not have the asic event code 
+    // populated
     self.layer              ==  other.layer           
     && self.row             ==  other.row            
     && self.module          ==  other.module         
     && self.channel         ==  other.channel        
     && self.adc             ==  other.adc            
     && self.oscillator      ==  other.oscillator     
-    && self.asic_event_code ==  other.asic_event_code
+    //&& self.asic_event_code ==  other.asic_event_code
   }
 }
 

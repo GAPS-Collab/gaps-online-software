@@ -202,9 +202,10 @@ impl Serialization for TrackerDAQEventPacket {
         let row = h1 & 0b111;
         let adc : u16 = ((h2 as u16 & 0b00111111) << 5) | (h1 >> 3) as u16;
         let mut hit = TrackerHit::new();
-        hit.channel = channel;
-        hit.module  = module ;
+        hit.layer   = daq_event.layer - 128;
         hit.row     = row    ;
+        hit.module  = module ;
+        hit.channel = channel;
         hit.adc     = adc    ;
         hit.asic_event_code   = asic_event_code;
         daq_event.hits.push(hit);
