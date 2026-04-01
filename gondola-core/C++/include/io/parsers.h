@@ -11,6 +11,18 @@ namespace gondola {
   /// Reverse-parse a u32 a la rust's built in 
   /// u32::to_le_bytes
   auto to_le_bytes(u32 number) -> Vec<u8>;
+  
+  /// Reverse-parse a u64 a la rust's built in 
+  /// u64::to_le_bytes
+  auto to_le_bytes(u64 number) -> Vec<u8>;
+  
+  /// Reverse-parse a f32 a la rust's built in 
+  /// f32::to_le_bytes
+  auto to_le_bytes(f32 number) -> Vec<u8>;
+  
+  /// Reverse-parse a i32 a la rust's built in 
+  /// f32::to_le_bytes
+  auto to_le_bytes(i32 number) -> Vec<u8>;
 
   template<typename T>
   Vec<T> slice(const Vec<T>& vec, usize start, usize end) {
