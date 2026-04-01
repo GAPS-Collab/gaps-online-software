@@ -56,6 +56,9 @@ SipPresMoniData.__module__            = __name__
 SipTimeMoniData                       = _gondola_core.monitoring.SipTimeMoniData 
 SipTimeMoniData.__module__            = __name__
 
+TrackerGpsMoniData                    = _gondola_core.monitoring.TrackerGpsMoniData 
+TrackerGpsMoniData.__module__         = __name__ 
+
 # The corresponding moni series
 CPUMoniDataSeries                           = _gondola_core.monitoring.CPUMoniDataSeries        
 CPUMoniDataSeries.__module__                = __name__
@@ -95,4 +98,7 @@ SipPresMoniDataSeries.__module__            = __name__
 
 SipTimeMoniDataSeries                       = _gondola_core.monitoring.SipTimeMoniDataSeries 
 SipTimeMoniDataSeries.__module__            = __name__
+
+TrackerGpsMoniDataSeries                    = _gondola_core.monitoring.TrackerGpsMoniDataSeries 
+TrackerGpsMoniDataSeries.__module__         = __name__ 
 

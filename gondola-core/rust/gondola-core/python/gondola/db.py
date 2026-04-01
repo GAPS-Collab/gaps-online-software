@@ -35,6 +35,12 @@ TrackerStripCmnNoise.__name__    = 'TrackerStripCmnNoise'
 TofPaddleTimingConstant            = _gc.db.TofPaddleTimingConstant 
 TofPaddleTimingConstant.__module__ = __name__ 
 TofPaddleTimingConstant.__name__   = 'TofPaddleTimingConstant'
+TrackerCalibrationFile             = _gc.db.TrackerCalibrationFile 
+TrackerCalibrationFile.__module__  = __name__ 
+TrackerCalibrationFile.__name__    = 'TrackerCalibrationFile'
+TrackerCalibrationFileType             = _gc.db.TrackerCalibrationFileType 
+TrackerCalibrationFileType.__module__  = __name__ 
+TrackerCalibrationFileType.__name__    = 'TrackerCalibrationFileType'
 
 # mappings 
 get_all_rbids_in_db                = _gc.db.get_all_rbids_in_db
@@ -57,6 +63,9 @@ get_dsi_j_ch_pid_map.__module__ = __name__
 
 get_rbid_pbchannel_pid_map   = _gc.db.get_rbid_pbchannel_pid_map 
 get_rbid_pbchannel_pid_map.__module__ = __name__
+
+load_calibration_db_elena    = _gc.db.load_calibration_db_elena 
+load_calibration_db_elena.__module__  = __name__ 
 
 __all__ = ['TofPaddle',\
            'ReadoutBoard',\

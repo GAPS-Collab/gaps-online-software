@@ -34,6 +34,13 @@ TrackerDAQEventPacket            = _gondola_core.events.TrackerDAQEventPacket
 TrackerDAQEventPacket.__module__ = __name__ 
 TrackerDAQEventPacket.__name__   = 'TrackerDAQEventPacket'
 
+McEvent                          = _gondola_core.events.McEvent 
+McEvent.__module__               = __name__ 
+McEvent.__name__                 = 'McEvent' 
+
+McHit                            = _gondola_core.events.McHit 
+McHit.__module__                 = __name__ 
+McHit.__name__                   = 'McHit'
 
 # functions 
 strip_id                  =  _gondola_core.events.strip_id           
