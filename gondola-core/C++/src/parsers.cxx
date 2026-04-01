@@ -1,7 +1,8 @@
 #include <cstring>
 #include <iostream>
 #include <cstdint>
- 
+#include <bit>
+#include <array>
 #include "io/parsers.h"
 
 namespace g = gondola; 
@@ -56,6 +57,39 @@ auto g::to_le_bytes(u32 number) -> Vec<u8> {
   bytes.push_back(static_cast<u8>((number >> 16) & 0xFF));
   bytes.push_back(static_cast<u8>((number >> 24) & 0xFF));
   return bytes;
+}
+
+/***********************************************/
+
+auto g::to_le_bytes(i32 number) -> Vec<u8> {
+  Vec<u8> bytes;
+  bytes.push_back(static_cast<u8>((number >> 0) & 0xFF));
+  bytes.push_back(static_cast<u8>((number >> 8) & 0xFF));
+  bytes.push_back(static_cast<u8>((number >> 16) & 0xFF));
+  bytes.push_back(static_cast<u8>((number >> 24) & 0xFF));
+  return bytes;
+}
+
+/***********************************************/
+
+auto g::to_le_bytes(u64 number) -> Vec<u8> {
+  Vec<u8> bytes;
+  bytes.push_back(static_cast<u8>((number >> 0) & 0xFF));
+  bytes.push_back(static_cast<u8>((number >> 8) & 0xFF));
+  bytes.push_back(static_cast<u8>((number >> 16) & 0xFF));
+  bytes.push_back(static_cast<u8>((number >> 24) & 0xFF));
+  bytes.push_back(static_cast<u8>((number >> 32) & 0xFF));
+  bytes.push_back(static_cast<u8>((number >> 40) & 0xFF));
+  bytes.push_back(static_cast<u8>((number >> 48) & 0xFF));
+  bytes.push_back(static_cast<u8>((number >> 56) & 0xFF));
+  return bytes;
+}
+
+/***********************************************/
+
+auto g::to_le_bytes(f32 number) -> Vec<u8> {
+  auto bytes = std::bit_cast<std::array<u8, 4>>(number);
+  return Vec<u8>(bytes.begin(), bytes.end());
 }
 
 /***********************************************/
