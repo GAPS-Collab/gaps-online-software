@@ -22,6 +22,9 @@
 #include <cstddef>
 #include <string>
 #include <cstdint>
+#include <optional>
+#include <stdexcept>
+#include <utility>
 
 typedef uint8_t   u8;
 typedef uint16_t  u16;
@@ -45,6 +48,51 @@ using Vec = std::vector<T>;
 /// Define std::map the same as HashMap in Rust
 template <typename T, typename U>
 using HashMap = std::map<T,U>;
+
+//-----------------------------------------------------
+
+template <typename T>
+struct Option : public std::optional<T> {
+    using std::optional<T>::optional; // Inherit all std::optional constructors
+
+    // --- Rust-style State Checks ---
+
+    [[nodiscard]] constexpr bool is_some() const noexcept { 
+        return this->has_value(); 
+    }
+
+    [[nodiscard]] constexpr bool is_none() const noexcept { 
+        return !this->has_value(); 
+    }
+
+    // --- Rust-style Unwrapping ---
+
+    // For lvalues (variables): returns a reference
+    constexpr T& unwrap() & {
+        if (is_none()) {
+            throw std::runtime_error("called `Option::unwrap()` on a `None` value");
+        }
+        return this->value();
+    }
+
+    // For rvalues (temporaries): moves the value out efficiently
+    constexpr T&& unwrap() && {
+        if (is_none()) {
+            throw std::runtime_error("called `Option::unwrap()` on a `None` value");
+        }
+        return std::move(this->value());
+    }
+};
+
+// Helpers for syntax
+inline constexpr std::nullopt_t None = std::nullopt;
+
+template <typename T>
+constexpr Option<std::decay_t<T>> Some(T&& value) {
+    return Option<std::decay_t<T>>(std::forward<T>(value));
+}
+
+//-----------------------------------------------------
 
 typedef HashMap<u8,HashMap<u8,HashMap<u8, std::pair<u8,u8>>>> LtbRBMap;
 
