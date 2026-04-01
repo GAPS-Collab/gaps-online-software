@@ -19,12 +19,22 @@
 
 namespace gondola {
 
+  /// byte representation of a string to be used with 
+  /// to_bytestream methods
+  auto string_to_bytes(std::string value) -> Vec<u8>; 
+
+  /// A standardized way to tag files with run id/subrun id/ timestamp 
+  auto get_runfilename(u32 run, u32 subrun, bool is_sim, Option<std::string> timestamp) -> std::string;
+
   /// These are objects which can be stored in a caraspace frame  
   enum class CRFrameObjectType : u8 {
     Unknown           = 0,
     TofPacket         = 10,
     TelemetryPacket   = 20,
+    McTree            = 30,
   };
+  
+  typedef std::map<std::string, std::tuple<u64, CRFrameObjectType>> CRFrameIndex;
 
   struct CRFrameObject {
     static constexpr u16 HEAD = 0xAAAA;
@@ -43,24 +53,44 @@ namespace gondola {
     auto to_string() -> std::string;
   };
 
-
   struct CRFrame {
     static constexpr u16 HEAD = 0xAAAA;
     static constexpr u16 TAIL = 0x5555;
       
     static auto from_bytestream(Vec<u8> stream, usize &pos) -> CRFrame;
     
-    std::map<std::string, std::tuple<u64, CRFrameObjectType>> index;
-    Vec<u8> bytestorage;
-    auto to_string() const -> std::string;
+    CRFrameIndex index;
+    Vec<u8>      bytestorage = {};
     
     static auto parse_index(Vec<u8> stream, usize &pos) -> std::map<std::string, std::tuple<u64, CRFrameObjectType>>;
-
+    
+    auto to_string()               const -> std::string;
+    auto serialize_index()         const -> Vec<u8>;
     auto put_fobject(CRFrameObject const &fobj, std::string) -> void; 
 
     /// extract a tofpacket if this frame object is of the correct type
-    auto get_tofpacket(std::string name) -> result::Result<TofPacket,IOError>;
+    auto get_tofpacket(std::string name)       -> result::Result<TofPacket,IOError>;
     auto get_telemetrypacket(std::string name) -> TelemetryPacket;
+  
+    /// to write data on disk 
+    auto to_bytestream()                 const -> Vec<u8>;
+  };
+
+  struct CRWriter {
+    CRWriter(std::string file_path, std::string filename, u32 run_id, Option<u32> subrun_id, Option<String> timestamp);  
+    std::ofstream  file           ;
+    std::string    file_path      ;
+    usize          frames_per_file;
+    usize          mbytes_per_file;
+    std::string    file_name      ;
+    u32            run_id         = 0;
+    u32            subrun_id      = 0;
+    usize          file_id        = 0; 
+    usize          n_frames       = 0; 
+    usize          file_nbytes_wr = 0; 
+    Option<String> file_timestamp = None;
+    auto add_frame(const CRFrame& frame)       -> void; 
+    auto new_file(Option<String>, bool is_sim) -> void;
   };
 
   struct CRReader {

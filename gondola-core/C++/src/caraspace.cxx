@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include<map> 
 
 #include "spdlog/spdlog.h"
 #include "spdlog/cfg/env.h"
@@ -11,11 +12,48 @@
 #include "caraspace.hpp"
 #include "io.hpp"
 #include "io/telemetry_reader.hpp"
+#include "io/parsers.h" 
 
 namespace g    = gondola;
 namespace fs   = std::filesystem;
 
 using namespace result;
+
+//--------------------------------------------------
+
+auto g::string_to_bytes(std::string value) -> Vec<u8> {
+  Vec<u8> stream;
+  u16 string_size = static_cast<u16>(value.length());
+  u8 size_bytes[2];
+  size_bytes[0] = static_cast<u8>(string_size & 0xFF);         // Lower byte
+  size_bytes[1] = static_cast<u8>((string_size >> 8) & 0xFF);  // Upper byte
+  stream.reserve(sizeof(u16) + value.length());
+  stream.push_back(size_bytes[0]);
+  stream.push_back(size_bytes[1]);
+  stream.insert(stream.end(), value.begin(), value.end());
+  return stream;
+}
+
+//--------------------------------------------------
+  
+auto g::get_runfilename(u32 run, u32 subrun, bool is_sim, Option<std::string> timestamp = None) -> std::string {
+  std::string ts  = "";
+  auto fname = std::string();
+  if (timestamp.is_some()) {
+    ts = timestamp.unwrap();
+  }
+  if (ts != "") { 
+    fname = std::format("Run{}_{}.{}.",run,subrun,ts);
+  } else { 
+    fname = std::format("Run{}_{}.", run,subrun);
+  }
+  if (is_sim) {
+    fname += "sim.gaps";
+  } else {
+    fname += ".gaps";
+  }
+  return fname;
+}
 
 //--------------------------------------------------
 
@@ -66,7 +104,9 @@ g::CRFrameObject g::CRFrameObject::from_bytestream(Vec<u8> stream, usize &pos) {
   return f_obj;
 }
 
-std::string g::CRFrameObject::to_string() {
+//--------------------------------------------------
+
+auto g::CRFrameObject::to_string() -> std::string {
   std::string repr = "<CRFrameObject";
   usize p_len = payload.size();
   // FIXME - implement the string representation for ftype
@@ -103,6 +143,8 @@ std::map<std::string, std::tuple<u64, g::CRFrameObjectType>> g::CRFrame::parse_i
   return index;
 }
 
+//--------------------------------------------------
+
 auto g::CRFrame::to_string() const -> std::string {
   std::string repr = "<CRFrame : ";
   repr += std::format("\n  size  : {}", bytestorage.size() ); 
@@ -114,12 +156,17 @@ auto g::CRFrame::to_string() const -> std::string {
   return repr;
 };
 
+//--------------------------------------------------
+
 auto g::CRFrame::put_fobject(g::CRFrameObject const &fobj, std::string name) -> void {
   u64 pos = bytestorage.size();
+  //std::cout << "Have bytestorage size of " << pos << std::endl;
   index[name] = std::tuple<u64, CRFrameObjectType>(pos, fobj.ftype);
   auto bytes = fobj.to_bytestream();
   bytestorage.insert(bytestorage.end(), bytes.begin(), bytes.end());
 }
+
+//--------------------------------------------------
 
 auto g::CRFrame::from_bytestream(Vec<u8> stream, usize &pos)
    -> g::CRFrame {
@@ -148,6 +195,45 @@ auto g::CRFrame::from_bytestream(Vec<u8> stream, usize &pos)
   frame.bytestorage = packet_bytestream;
   return frame;
 }
+
+//--------------------------------------------------
+
+auto g::CRFrame::serialize_index() const -> Vec<u8> {
+  Vec<u8> s_index = {};
+  // we do not support frames with more than 
+  // 255 objects (mostly for the reason of 
+  // keeping things not too busy?)
+  u8 idx_size  = index.size();
+  s_index.push_back(idx_size);
+  for (const auto& pair : index) {
+    auto k      = pair.first; 
+    auto s_name = g::string_to_bytes(k);
+    auto s_pos  = g::to_le_bytes((u64)std::get<0>(pair.second));
+    s_index.insert(std::end(s_index), s_name.cbegin(), s_name.cend());
+    s_index.insert(std::end(s_index), s_pos.cbegin(), s_pos.cend());
+    s_index.push_back(static_cast<u8>(std::get<1>(pair.second)));
+  }
+  return s_index; 
+}
+
+//--------------------------------------------------
+
+auto g::CRFrame::to_bytestream() const -> Vec<u8> {
+  Vec<u8> stream = {}; 
+  auto s_index = serialize_index();
+  auto head    = g::to_le_bytes(HEAD); 
+  stream.insert(std::end(stream), head.cbegin(), head.cend());
+  auto size = g::to_le_bytes((u64) (bytestorage.size() + s_index.size()));
+
+  stream.insert(std::end(stream), size.cbegin(), size.cend()); 
+  stream.insert(std::end(stream), s_index.cbegin(), s_index.cend()); 
+  stream.insert(std::end(stream), bytestorage.cbegin(), bytestorage.cend());
+  auto tail    = g::to_le_bytes(TAIL);
+  stream.insert(std::end(stream), tail.cbegin(), tail.cend());
+  return stream;
+}
+
+//--------------------------------------------------
 
 auto g::CRFrame::get_tofpacket(std::string name)
   -> Result<TofPacket,g::IOError> {
@@ -343,7 +429,9 @@ auto g::CRReader::prime_next_file_() -> void {
   }
 }
 
-g::CRFrame g::CRReader::get_next_frame() {
+//--------------------------------------------------
+
+auto g::CRReader::get_next_frame() -> g::CRFrame {
   // there are 2 "modes" - this is either from 
   // telemetry files or not. If it is from 
   // telemetry, we do the following
@@ -430,3 +518,75 @@ g::CRFrame g::CRReader::get_next_frame() {
     }
   }
 }
+
+//--------------------------------------------------
+
+g::CRWriter::CRWriter(String fpath, String filename, u32 run_id, Option<u32> subrun_id, Option<String> timestamp)  { 
+  file_path = fpath;
+  file_name = filename;
+  timestamp = timestamp;
+  auto fname = std::format("{}/{}", file_path, file_name);
+  file = std::ofstream(fname, std::ios::app | std::ios::out);
+  if (!file.is_open()) {
+    throw std::runtime_error("Unable to open file: " + fname);
+  }
+}
+
+//--------------------------------------------------
+
+auto g::CRWriter::new_file(Option<String> timestamp, bool is_sim) -> void { 
+  auto fname = std::format("{}{}", file_path, get_runfilename(run_id, file_id, is_sim, timestamp));
+  //let path     = Path::new(&filename); 
+  file = std::ofstream(fname, std::ios::app | std::ios::out);
+}
+
+//--------------------------------------------------
+
+auto g::CRWriter::add_frame(const CRFrame& frame) -> void { 
+  bool newfile = false;
+  auto buffer = frame.to_bytestream();    
+  if (file.is_open() && !buffer.empty()) {
+    file.write(reinterpret_cast<const char*>(buffer.data()),buffer.size());
+  } 
+  file_nbytes_wr += buffer.size();  
+  n_frames += 1;
+  if (frames_per_file != 0) { 
+    if (n_frames == frames_per_file) {
+      newfile = true;
+      n_frames = 0;
+    } else { 
+      if (mbytes_per_file != 0) { 
+        if (file_nbytes_wr >= mbytes_per_file * 1048576) {
+          newfile = true;
+          file_nbytes_wr = 0;
+        }
+      }
+    }
+  } 
+  if (newfile) { 
+    file.flush();
+    n_frames = 0;
+    file_id += 1;
+    // FIXME - will always write sim files 
+    new_file(file_timestamp, true);
+  } 
+
+  //  if newfile {
+  //      //let filename = self.file_prefix.clone() + "_" + &self.file_id.to_string() + ".tof.gaps";
+  //      match self.file.sync_all() {
+  //        Err(err) => {
+  //          error!("Unable to sync file to disc! {err}");
+  //        },
+  //        Ok(_) => ()
+  //      }
+  //      self.file = self.get_file(self.file_timestamp.clone());
+  //      self.file_id += 1;
+  //      //let path  = Path::new(&filename);
+  //      //println!("==> [TOFPACKETWRITER] Will start a new file {}", path.display());
+  //      //self.file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
+  //      //self.n_packets = 0;
+  //      //self.file_id += 1;
+  //    }
+  //debug!("CRFrame written!");
+}
+
