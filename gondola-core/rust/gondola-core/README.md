@@ -6,4 +6,15 @@ and control of the TOF system in the [GAPS experiment](https://gaps1.astro.ucla.
 The library allows to read raw science data as well as monitoring data for 
 several subsystems of the GAPS experiment
 
+# CHANGELOG 
+
+This project is currently still under rapid development, while we try to keep the API 
+somewhat stable, please strap in for a bit of a rough ride when upgrading. 
+However, the amount of features is increasing constantly and rapidly 
+
+v0.12.16 
+
+* OHP temperatures 
+
+
 

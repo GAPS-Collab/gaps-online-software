@@ -368,6 +368,8 @@ fn monitoring_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<TrackerGpsMoniDataSeries>()?;
   m.add_class::<GcuEvBldStatsMoniData>()?;
   m.add_class::<GcuEvBldStatsMoniDataSeries>()?;
+  m.add_class::<CoolingMoniData>()?;
+  m.add_class::<CoolingMoniDataSeries>()?;
   m.add_class::<RunStatistics>()?;
   Ok(())
 }

@@ -75,6 +75,12 @@ pub use tracker_gps::{
   TrackerGpsMoniDataSeries
 }; 
 
+pub mod cooling; 
+pub use cooling::{
+  CoolingMoniData,
+  CoolingMoniDataSeries
+};
+
 use std::collections::VecDeque;
 use std::collections::HashMap;
 
