@@ -16,9 +16,6 @@
 #include <chrono>
 #include "cxxopts.hpp"
 
-//#include "spdlog/spdlog.h"
-//#include "spdlog/cfg/env.h"
-
 #include "io.hpp"
 #include "calibration.h"
 #include "database.h"
@@ -27,12 +24,18 @@
 #include "constants.h"
 #include "EventGAPS.h"
 #include "./PacketMethods.h"
-//void GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm);
+#include "./YourMethods.h"
 
 namespace fs = std::filesystem;
 namespace gt = Gaps::Telemetry;
 
-//int main(int argc, char *argv[]){
+// This shows how to add new subroutines/methods. Must prototype the
+// method and then define it below.
+void PrintNiceMessage(void);
+
+void PrintNiceMessage(void) {
+  std::cout << "Here is a nice message in a user-defined method." << std::endl;
+}
 
 ////////////////////////////////////////////////////////////////////////////
 // Default constructor
@@ -40,21 +43,15 @@ PacketMethods::PacketMethods(void) {
   // First, we want to store information about the SiPM channels and
   // paddle relationships for analysis purpose. Read all that info             
   // into the relevant structures.
-  //GetPaddleInfo(&PadInfo, &SipmInfo);
   GetPaddleInfo();
   
   InitializeVariables();
 }
 
 ////////////////////////////////////////////////////////////////////////////
-// Default destructor
-PacketMethods::~PacketMethods(void) {
-}
-
-////////////////////////////////////////////////////////////////////////////
 void PacketMethods::ProcessTofEventSummary(TofEventSummary *Tes,
 					   unsigned long int evt_no){
-  printf("Found TofEventSummary: evt = %ld\n", evt_no);
+  //printf("Found TofEventSummary: evt = %ld\n", evt_no);
   struct EventInfo EvtInfo;
   // First, initialize all the event values properly              
   for (int i=0;i<NPAD;i++) {
@@ -71,10 +68,14 @@ void PacketMethods::ProcessTofEventSummary(TofEventSummary *Tes,
   for (int i=0;i<NRB;i++) {
     EvtInfo.Phi[i] = -999.0;
   }
+
+  // Print out the info in the packet.  
+  if (0) 
+    std::cout << *Tes << std::endl; 
+  
   // Now, parse the TofEventSummary data into EvtInfo  
   for (TofHit const &h : Tes->hits) {
     int pad = h.paddle_id;
-    //printf("HitInfo: %d %.2f %.2f\n", h.paddle_id,h.get_time_a(),h.get_time_b());
     EvtInfo.Ped[pad][0]    = h.baseline_a;
     EvtInfo.Ped[pad][1]    = h.baseline_b;
     EvtInfo.PedRMS[pad][0] = h.baseline_a_rms;
@@ -92,47 +93,20 @@ void PacketMethods::ProcessTofEventSummary(TofEventSummary *Tes,
     int sipm_a = PadInfo.SiPM_A[pad];
     int rb     = SipmInfo.RB[sipm_a];
     EvtInfo.Phi[rb]       = h.phase;
-    //printf("%d  : %d %d\n", pad, sipm_a, rb);
     
-    // Start the event analysis: initialize our variables
-    Event.InitializeVariables(evt_no);
-    
-    // Now, fill the appropriate quantities in EventGAPS                 
-    Event.FillEventValues(&EvtInfo);
-    
-    // Now, process the ch9 phases                                       
-    Event.AnalyzePhases(EvtInfo.Phi);
-    
-    // Analyze each paddle: position on paddle, hitmask, etc             
-    Event.AnalyzePaddles(10.0, 5.0); //Args: Peak and Charge cuts        
-    
-    // Now calculate beta, charge, and inner/outer tof x,y,z, etc.        
-    Event.AnalyzeEvent();
-
-    // Now fill out histograms                                         
-    Event.FillChannelHistos(0);
-    Event.FillPaddleHistos();
-    Event.FillOffsetHistos();
   } 
 }
 
 ////////////////////////////////////////////////////////////////////////////
 void PacketMethods::BeginRun(int run=5) {
   printf("Beginning Run %d.\n", run); fflush(stdout);
-  // Instantiate our class that holds analysis results and set some           
-  // initial values
-  EventGAPS Event = EventGAPS();
-  Event.SetPaddleMap(&PadInfo, &SipmInfo);
-  Event.InitializeHistograms();
-  Event.OffsetHistograms(false);
+  PrintNiceMessage();
 }
 
 ////////////////////////////////////////////////////////////////////////////
 void PacketMethods::EndRun() {
+  PrintNiceMessage();
   printf("Endning Run\n");
-  Event.WriteHistograms();
-  Event.WriteOffsetHistos();
-  //delete Event;
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -238,5 +212,10 @@ void PacketMethods::GetPaddleInfo(void) {
     }
   }
   fclose(fp); // Finished with file                                           
+}
+
+////////////////////////////////////////////////////////////////////////////
+// Default destructor
+PacketMethods::~PacketMethods(void) {
 }
 
