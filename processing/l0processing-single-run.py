@@ -117,7 +117,9 @@ if __name__ == '__main__':
     #print (run_meata) 
     
     run_packets = load_run(run_meta, args.telemetry_dir )
+    first_timestamp = go.io.get_utc_timestamp_from_unix(run_packets[0].header.gcutime)
     print (f'-> We found {len(run_packets)} telemetry packets for this run!') 
+    print (f'-> First timestamp is {first_timestamp}')
     m_events = [pack for pack in run_packets if pack.is_event_packet]
     tracker  = [pack for pack in run_packets if int(pack.header.packet_type) == 80]
     m_events = [(go.events.TelemetryEvent.from_telemetrypacket(pack), pack) for pack in m_events]
@@ -223,12 +225,13 @@ if __name__ == '__main__':
     for k in re_merged:
         frame = go.io.CRFrame()
         #print (re_merged[k][0])
-        frame.put_telemetrypacket(re_merged[k][0][1], 'TelemetryEvent') 
+        frame.put_telemetrypacket(re_merged[k][0][1], 'TelemetryEvent', record_timestamp=True) 
         for idx, trk_ev in enumerate(re_merged[k][1]):  
             frame.put_telemetrypacket(trk_ev.pack(), f'Tracker_{idx}') 
         frames.append(frame) 
 
-    writer         = go.io.CRWriter(str(args.run_dir), run_meta_data.run_id)
+    writer         = go.io.CRWriter(str(args.run_dir), run_meta_data.run_id, timestamp=first_timestamp, file_len_gcu_sec=60)
+    writer.set_mbytes_per_file(0)
     for frame in frames:
         writer.add_frame(frame)
 
