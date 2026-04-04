@@ -4,6 +4,7 @@
 use crate::prelude::*;
 
 use std::io::BufRead;
+#[cfg(feature="pybindings")]
 use std::path::PathBuf;
 
 #[cfg_attr(feature="pybindings", pyclass)] 

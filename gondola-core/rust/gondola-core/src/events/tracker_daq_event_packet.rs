@@ -270,12 +270,14 @@ impl FromRandom for TrackerDAQEventPacket {
     packet.run_id     = rng.random::<u16>();
     //packet.run_id_old = rng.random::<u8>();
     let n_events : u8 = rng.random_range(0..6);
+    //let n_events : u8 = 1;
     for _ in 0..n_events {
       let mut ev = TrackerDAQEvent::from_random();
       ev.layer   = packet.daq_header.sys_id;
       for h in &mut ev.hits {
         //h.adc = h.adc & 0b11111;
         h.oscillator = 0;
+        h.layer = ev.layer - 128;
       }
       packet.events.push(ev);
     }

@@ -4,6 +4,7 @@
 
 use crate::prelude::*;
 
+#[cfg(feature="pybindings")]
 use pyo3::basic::CompareOp;
 
 /// Hit on a tracker strip

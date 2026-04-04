@@ -698,7 +698,6 @@ fn serialization_rbevent() {
 fn pack_rbevent() {
   for _ in 0..100 {
     let mut event          = RBEvent::from_random();
-    let fix_time           = Instant::now();
     event.creation_time    = None;
     let mut test : RBEvent = event.pack().unpack().unwrap();
     test.creation_time     = None;

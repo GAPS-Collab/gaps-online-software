@@ -83,6 +83,7 @@ impl fmt::Display for TrackerHeader {
     repr    += &(format!("\n  Sync     : {}", self.sync));
     repr    += &(format!("\n  Crc      : {}", self.crc));
     repr    += &(format!("\n  PacketID : {}", self.packet_id));
+    repr    += &(format!("\n  Sys ID   : {}", self.sys_id));
     repr    += &(format!("\n  Length   : {}", self.length));
     repr    += &(format!("\n  DAQ Cnt  : {}", self.daq_count));
     repr    += &(format!("\n  Sys Time : {}", self.sys_time));
@@ -99,7 +100,7 @@ impl FromRandom for TrackerHeader {
     let mut h   = Self::new();
     h.sync      = rng.random::<u16>();
     h.crc       = rng.random::<u16>();
-    h.sys_id    = rng.random::<u8>();
+    h.sys_id    = rng.random_range(0..10) + 128;
     h.packet_id = rng.random::<u8>();
     h.length    = rng.random::<u16>();
     h.daq_count = rng.random::<u16>();

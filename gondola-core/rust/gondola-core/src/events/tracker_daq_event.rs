@@ -90,17 +90,18 @@ impl FromRandom for TrackerDAQEvent {
   fn from_random() -> Self {
     let mut ev      = Self::new();
     let mut rng     = rand::rng();
-    ev.layer        = rng.random::<u8>();
+    ev.layer        = rng.random_range(0..10) + 128;
     ev.flags1       = rng.random::<u8>();
     ev.event_id     = rng.random::<u32>(); 
     ev.event_time16 = rng.random::<u16>();
     ev.event_time32 = rng.random::<u32>();
     ev.hits         = Vec::<TrackerHit>::new();
     let n_hits : u8 = rng.random_range(0..25);
+    //let n_hits = 1u8;
     for _ in 0..n_hits {
       let mut h = TrackerHit::from_random();
       // the layer is not set here 
-      h.layer = 0;
+      h.layer = ev.layer - 128;
       ev.hits.push(h);   
     }
     ev

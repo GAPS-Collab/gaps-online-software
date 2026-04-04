@@ -1543,7 +1543,7 @@ fn compress_uncompress_config_file() {
   let bytestream  = compress_toml(&pth).unwrap();
   println!("Compressed .toml file to a bytestream of {} bytes!", bytestream.len());
   let output      = Path::new("liftof-config-decompressed.toml");
-  decompress_toml(&bytestream.as_slice(), output); 
+  let _foo        = decompress_toml(&bytestream.as_slice(), output).unwrap(); 
 }
 
 #[test]
@@ -1558,7 +1558,7 @@ fn diff_config_file_compress_uncompress() {
   let diff        = create_compressed_diff(&pth, &pth_ch).unwrap();
   println!("Diff has the size of {} bytes!", diff.len());
   let output      = Path::new("liftof-config.diff");
-  decompress_toml(&diff.as_slice(), output);
+  let _foo        = decompress_toml(&diff.as_slice(), output);
 }
 
 #[test]

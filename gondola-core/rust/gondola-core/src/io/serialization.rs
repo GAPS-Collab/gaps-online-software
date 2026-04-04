@@ -54,6 +54,8 @@ pub trait Serialization {
     let tail_pos = seek_marker(stream, Self::TAIL, head_pos + Self::SIZE-2)?;
     if tail_pos + 2 - head_pos != Self::SIZE {
       *pos = head_pos + 2; 
+      let actual = tail_pos + 2 - head_pos;
+      error!("Seeing {} bytes between HEAD and TAIL, expecting {}", actual, Self::SIZE);
       return Err(SerializationError::WrongByteSize);
     }
     *pos = head_pos + 2;

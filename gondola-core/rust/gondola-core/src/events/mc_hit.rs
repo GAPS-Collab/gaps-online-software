@@ -181,4 +181,5 @@ impl fmt::Display for McHit {
   }
 }
 
+#[cfg(feature="pybindings")]
 pythonize!(McHit);

@@ -6,17 +6,8 @@
 
 use crate::prelude::*;
 
-//// Luma's generic version - needs to be checked and benchmarked
-//pub fn parse_num<T, S>(stream: S, pos: &mut usize) -> T
-//where
-//    T: Copy + Default + Sized + FromBytes,
-//    S: AsRef<[u8]> {
-//    let bs = stream.as_ref();
-//    let mut buf = [0u8; size_of::<T>()];
-//    buf.copy_from_slice(&bs[*pos..*pos + size_of::<T>()]);
-//    *pos += size_of::<T>();
-//    T::from_le_bytes(buf)
-//}
+#[cfg(test)]
+use quickcheck::quickcheck;
 
 /// Get a u8 from a vector of bytes and advance 
 /// a position marker by 1
@@ -472,23 +463,18 @@ fn test_parse_f64() {
 
 //--------------------------------------------
 
-#[test]
-fn prop_u8_u16_back_and_forth() {
-  use quickcheck::quickcheck;
-  quickcheck! {
-    fn prop_roundtrip(vec: Vec<u8>) -> bool {
-      let converted = u8_to_u16(&vec);
-      let roundtrip = u16_to_u8(&converted);
+//#[test]
+#[cfg(test)]
+quickcheck! {
+  fn prop_roundtrip(vec: Vec<u8>) -> bool {
+    let converted = u8_to_u16(&vec);
+    let roundtrip = u16_to_u8(&converted);
 
-      // Only the portion that forms full pairs
-      let expected: Vec<u8> = vec.chunks_exact(2)
-          .flat_map(|chunk| chunk.to_vec())
-          .collect();
+    // Only the portion that forms full pairs
+    let expected: Vec<u8> = vec.chunks_exact(2)
+        .flat_map(|chunk| chunk.to_vec())
+        .collect();
 
-      roundtrip == expected
-    }
+    roundtrip == expected
   }
 }
-
-
-

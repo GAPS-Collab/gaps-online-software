@@ -66,5 +66,6 @@ impl Frameable for McEvent {
   const CRFRAMEOBJECT_TYPE : CRFrameObjectType = CRFrameObjectType::McTree;
 }
 
+#[cfg(feature="pybindings")]
 pythonize!(McEvent);
 

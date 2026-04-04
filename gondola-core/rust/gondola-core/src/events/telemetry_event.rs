@@ -60,7 +60,7 @@ impl TelemetryEvent {
     }
   }
 
-  fn pack(&self) -> TelemetryPacket {
+  pub fn pack(&self) -> TelemetryPacket {
     let mut tp = TelemetryPacket::new();
     // this is bad, but currently I am not 
     // sure how to make this better
@@ -217,7 +217,6 @@ impl Serialization for TelemetryEvent {
     let mut me       = Self::new();
     let version      = parse_u8(stream, pos);
     me.version       = version;
-    //println!("_version {}", _version);
     me.flags0        = parse_u8(stream, pos);
     // skip a bunch of Alex newly implemented things
     // FIXME
@@ -261,7 +260,11 @@ impl Serialization for TelemetryEvent {
     if version == 1 {
       let num_trk_hits = parse_u16(stream, pos);
       if (*pos + (num_trk_hits as usize)*4 ) > stream.len() {
+        let expected_s = *pos + (num_trk_hits as usize)*4 - stream.len();
+        let actual = stream.len() - *pos;
+        error!("We expect {} more bytes, but see only {}", expected_s, actual);
         error!("Not enough bytes ({}) for {} tracker hits!", stream.len(), num_trk_hits);
+        //println!("{}", &me);
         return Err(SerializationError::StreamTooShort);
       }
       for _ in 0..num_trk_hits { 

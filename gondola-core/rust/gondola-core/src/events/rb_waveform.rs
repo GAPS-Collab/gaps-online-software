@@ -220,7 +220,7 @@ impl TofPackable for RBWaveform {
 impl Serialization for RBWaveform {
   const HEAD               : u16    = 43690; //0xAAAA
   const TAIL               : u16    = 21845; //0x5555
-  const SIZE               : usize  = 13 + (4*NWORDS);
+  const SIZE               : usize  = 14 + (4*NWORDS);
 
   fn from_bytestream(stream : &Vec<u8>, pos : &mut usize)
     -> Result<Self, SerializationError> {

@@ -3483,6 +3483,7 @@ impl fmt::Display for TrackerCalibrationFile  {
 #[cfg(feature="pybindings")]
 pythonize!(TrackerCalibrationFile);
 
+#[cfg(feature="pybindings")]
 #[pymethods]
 impl TrackerCalibrationFile {
       
