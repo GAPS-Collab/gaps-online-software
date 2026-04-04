@@ -22,20 +22,25 @@ pub struct CRWriter {
   /// The maximum number of (Mega)bytes
   /// per file. After this a new file 
   /// is started
-  pub mbytes_per_file : usize,
-  pub file_name       : String,
-  pub run_id          : u32,
-  file_id             : usize,
+  pub mbytes_per_file     : usize,
+  pub file_name           : String,
+  pub run_id              : u32,
+  file_id                 : usize,
   /// internal packet counter, number of 
   /// packets which went through the writer
-  n_packets           : usize,
+  n_packets               : usize,
   /// internal counter for bytes written in 
   /// this file
-  file_nbytes_wr      : usize,
+  file_nbytes_wr          : usize,
   /// it can also take a timestamp, in case we 
   /// don't want to use the current time when the 
   /// file is written
-  pub file_timestamp  : Option<String>,
+  pub file_timestamp      : Option<String>,
+  /// if writing a new file every gcu seconds, keep 
+  /// the first gcutimestamp 
+  pub first_gcu_timestamp : Option<u64>,
+  /// Write a new file every gcu seconds (from telemetry packet header) 
+  pub file_len_gcu_sec    : Option<u32>,
 }
 
 impl CRWriter {
@@ -44,21 +49,30 @@ impl CRWriter {
   ///
   /// # Arguments
   ///
-  /// * file_path       : Path to store the file under
-  /// * run_id          : Run ID for this file (will be written in filename)
-  /// * subrun_id       : Sub-Run ID for this file (will be written in filename. 
-  ///                     If None, a generic "0" will be used
-  /// * timestamp       : The writer will add an automatic timestamp to the current file
-  ///                     based on the current time. This option allows to overwrite 
-  ///                     that behaviour
-  pub fn new(mut file_path : String, run_id : u32, subrun_id : Option<u64>, timestamp : Option<String>) -> Self {
-    //let filename = file_prefix.clone() + "_0.tof.gaps";
+  /// * file_path        : Path to store the file under
+  /// * run_id           : Run ID for this file (will be written in filename)
+  /// * subrun_id        : Sub-Run ID for this file (will be written in filename. 
+  ///                      If None, a generic "0" will be used
+  /// * timestamp        : The writer will add an automatic timestamp to the current file
+  ///                      based on the current time. This option allows to overwrite 
+  ///                      that behaviour
+  /// * file_len_gcu_sec : If not None, this will use the gcu time from added packets 
+  ///                      as the timestamp in the filename, and will write a new file 
+  ///                      every given number of seconds
+  pub fn new(mut file_path : String, run_id : u32,
+             subrun_id : Option<u64>, timestamp : Option<String>, file_len_gcu_sec : Option<u32>) -> Self {
+    if file_len_gcu_sec.is_some() {
+      if timestamp.is_none() {
+        panic!("If the writer should operate in the mode where it writes a new file every x seconds depending on the delta of gcu times in the packets, it needs the first timestamp given. This needs to be the first timestamp of the packets to be written");
+      }
+    }
     let file : File;
     let file_name : String;
     if !file_path.ends_with("/") {
       file_path += "/";
     }
     let filename : String;
+    let first_timestamp = timestamp.clone();
     if let Some(subrun) = subrun_id {
       filename = format!("{}{}", file_path, get_runfilename(run_id, subrun, None, timestamp, false));
     } else {
@@ -68,17 +82,23 @@ impl CRWriter {
     //println!("Writing to file {filename}");
     file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
     file_name = filename;
+    let mut first_gcu_timestamp = None;
+    if first_timestamp.is_some() {
+      first_gcu_timestamp = get_unix_timestamp(&first_timestamp.unwrap(), None);
+    }
     Self {
       file,
-      file_path        : file_path,
-      pkts_per_file    : 0,
-      mbytes_per_file  : 420,
-      run_id           : run_id,
-      file_nbytes_wr   : 0,    
-      file_id          : 1,
-      n_packets        : 0,
-      file_name        : file_name,
-      file_timestamp   : None,
+      file_path           : file_path,
+      pkts_per_file       : 0,
+      mbytes_per_file     : 420,
+      run_id              : run_id,
+      file_nbytes_wr      : 0,    
+      file_id             : 1,
+      n_packets           : 0,
+      file_name           : file_name,
+      file_timestamp      : None,
+      first_gcu_timestamp : first_gcu_timestamp,
+      file_len_gcu_sec    : file_len_gcu_sec
     }
   }
 
@@ -115,6 +135,13 @@ impl CRWriter {
         newfile = true;
         self.file_nbytes_wr = 0;
       }
+    } else if self.file_len_gcu_sec.is_some() {
+      if frame.timestamp.clone().unwrap() - self.first_gcu_timestamp.unwrap() as f64 > self.file_len_gcu_sec.unwrap() as f64 {
+        newfile = true; 
+        self.file_timestamp = get_utc_timestamp_from_unix(frame.timestamp.clone().unwrap()); 
+        println!("starting new file with {}", self.file_timestamp.clone().unwrap());
+        self.first_gcu_timestamp = Some(frame.timestamp.unwrap() as u64);
+      }
     }
     if newfile {
         //let filename = self.file_prefix.clone() + "_" + &self.file_id.to_string() + ".tof.gaps";
@@ -138,7 +165,7 @@ impl CRWriter {
 
 impl Default for CRWriter {
   fn default() -> Self {
-    CRWriter::new(String::from(""),0,None, None)
+    CRWriter::new(String::from(""),0,None, None, None)
   }
 }
 
@@ -156,9 +183,9 @@ impl fmt::Display for CRWriter {
 impl CRWriter {
   
   #[new]
-  #[pyo3(signature = (filename, run_id, subrun_id = None, timestamp = None))]
-  fn new_py(filename : String, run_id : u32, subrun_id : Option<u64>, timestamp : Option<String>) -> Self {
-    Self::new(filename, run_id, subrun_id, timestamp)
+  #[pyo3(signature = (filename, run_id, subrun_id = None, timestamp = None, file_len_gcu_sec = None))]
+  fn new_py(filename : String, run_id : u32, subrun_id : Option<u64>, timestamp : Option<String>, file_len_gcu_sec : Option<u32>) -> Self {
+    Self::new(filename, run_id, subrun_id, timestamp, file_len_gcu_sec)
   }
  
   fn set_mbytes_per_file(&mut self, fsize : usize) {

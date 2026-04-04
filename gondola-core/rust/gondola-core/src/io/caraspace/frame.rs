@@ -174,6 +174,10 @@ pub struct CRFrame {
   pub do_trk_calib     : bool,
   /// TRK subtract CMN 
   pub subtract_trk_cmn : bool,
+  // will not get serialized, just hold the 
+  // number for the writer in case it needs 
+  // to write files every x second interval 
+  pub timestamp : Option<f64>,
 }
 
 impl CRFrame {
@@ -190,6 +194,7 @@ impl CRFrame {
       trk_cmn          : Arc::new(HashMap::<u32, TrackerStripCmnNoise>::new()), 
       do_trk_calib     : false,
       subtract_trk_cmn : false,
+      timestamp        : None
     }
   }
 
@@ -544,8 +549,11 @@ impl CRFrame {
   ///          "TelemetryPacketType.<ValueOf(TelemetryPacketType)". This should be used in 
   ///          all cases for which there is only a single TelemetryPacket within 
   ///          the frame.
-  #[pyo3(signature = (packet, name = None))]
-  fn put_telemetrypacket(&mut self, packet : TelemetryPacket, name : Option<&str>) -> PyResult<()> {
+  #[pyo3(signature = (packet, name = None, record_timestamp = false))]
+  fn put_telemetrypacket(&mut self, packet : TelemetryPacket, name : Option<&str>, record_timestamp : bool) -> PyResult<()> {
+    if record_timestamp { 
+      self.timestamp = Some(packet.header.get_gcutime());
+    }
     if let Some(p_name) = name {
       if self.has(p_name) {
         let msg = format!("Frame already contains a TelemetryPacket named {}", p_name);
