@@ -462,6 +462,10 @@ impl TofEvent {
   #[cfg(feature="database")]
   pub fn set_paddles(&mut self, paddles : &HashMap<u8, TofPaddle>) {
     let mut nerror = 0u8;
+    if paddles.is_empty() {
+      debug!("Unable to set paddles, empty map given!");
+      return;
+    }
     if self.hits.len() == 0 {
       for rbev  in &mut self.rb_events {
         for h in &mut rbev.hits {
