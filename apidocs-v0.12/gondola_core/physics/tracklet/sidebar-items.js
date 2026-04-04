@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["G4ProcessType"],"struct":["G4ProcessTypeIter","RecoHit","Track","Tracklet"]};

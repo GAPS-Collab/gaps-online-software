@@ -1,0 +1,149 @@
+\doxysection{gondola\+::CRWriter Struct Reference}
+\hypertarget{structgondola_1_1CRWriter}{}\label{structgondola_1_1CRWriter}\index{gondola::CRWriter@{gondola::CRWriter}}
+
+
+{\ttfamily \#include $<$caraspace.\+hpp$>$}
+
+
+
+Collaboration diagram for gondola\+::CRWriter\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=223pt]{structgondola_1_1CRWriter__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structgondola_1_1CRWriter_a91b7dda052c79f22c25928e712182ba4}{CRWriter}} (std\+::string \mbox{\hyperlink{structgondola_1_1CRWriter_acdc9580d289affaeb43a18e72b088365}{file\+\_\+path}}, std\+::string \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{filename}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{structgondola_1_1CRWriter_ad7c141820921c249944c8a5d486501ea}{run\+\_\+id}}, \mbox{\hyperlink{structOption}{Option}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$ \mbox{\hyperlink{structgondola_1_1CRWriter_af4cdeb99072a9b95f8771abfa54e20c1}{subrun\+\_\+id}}, \mbox{\hyperlink{structOption}{Option}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afbeda3fd1bdc8c37d01bdf9f5c8274ff}{String}} $>$ timestamp)
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1CRWriter_a7d594611b3bf4d9a020f9d7c4d17b562}{add\+\_\+frame}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1CRFrame}{CRFrame}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{frame}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1CRWriter_a88a10b3eb9a1f2043e019a73b13a4ae2}{new\+\_\+file}} (\mbox{\hyperlink{structOption}{Option}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afbeda3fd1bdc8c37d01bdf9f5c8274ff}{String}} $>$, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{is\+\_\+sim}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ofstream \mbox{\hyperlink{structgondola_1_1CRWriter_a8b72c93af153a6a28386fb72ecb91292}{file}}
+\item 
+std\+::string \mbox{\hyperlink{structgondola_1_1CRWriter_acdc9580d289affaeb43a18e72b088365}{file\+\_\+path}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \mbox{\hyperlink{structgondola_1_1CRWriter_a46bbce4c97b476f95b27786612157bf4}{frames\+\_\+per\+\_\+file}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \mbox{\hyperlink{structgondola_1_1CRWriter_ab44d769e86a20e640a228d1a617fb1bc}{mbytes\+\_\+per\+\_\+file}}
+\item 
+std\+::string \mbox{\hyperlink{structgondola_1_1CRWriter_afeeb24b5e3493826871b24f51ec49190}{file\+\_\+name}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{structgondola_1_1CRWriter_ad7c141820921c249944c8a5d486501ea}{run\+\_\+id}} = 0
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{structgondola_1_1CRWriter_af4cdeb99072a9b95f8771abfa54e20c1}{subrun\+\_\+id}} = 0
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \mbox{\hyperlink{structgondola_1_1CRWriter_a2f68b66e5bef0f52efa58723201e4300}{file\+\_\+id}} = 0
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \mbox{\hyperlink{structgondola_1_1CRWriter_a01dd39bf78c9c70ae80635845bce771a}{n\+\_\+frames}} = 0
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \mbox{\hyperlink{structgondola_1_1CRWriter_a8ec6dc1d7b8fa4e7c4b9595ee1e39b92}{file\+\_\+nbytes\+\_\+wr}} = 0
+\item 
+\mbox{\hyperlink{structOption}{Option}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afbeda3fd1bdc8c37d01bdf9f5c8274ff}{String}} $>$ \mbox{\hyperlink{structgondola_1_1CRWriter_a78cbb24dbb99b30289c51ac61ca8a5e8}{file\+\_\+timestamp}} = \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84da6adf97f83acf6453d4a6a4b1070f3754}{None}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structgondola_1_1CRWriter_a91b7dda052c79f22c25928e712182ba4}\label{structgondola_1_1CRWriter_a91b7dda052c79f22c25928e712182ba4} 
+\index{gondola::CRWriter@{gondola::CRWriter}!CRWriter@{CRWriter}}
+\index{CRWriter@{CRWriter}!gondola::CRWriter@{gondola::CRWriter}}
+\doxysubsubsection{\texorpdfstring{CRWriter()}{CRWriter()}}
+{\footnotesize\ttfamily gondola\+::\+CRWriter\+::\+CRWriter (\begin{DoxyParamCaption}\item[{std\+::string}]{file\+\_\+path,  }\item[{std\+::string}]{filename,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}}]{run\+\_\+id,  }\item[{\mbox{\hyperlink{structOption}{Option}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$}]{subrun\+\_\+id,  }\item[{\mbox{\hyperlink{structOption}{Option}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afbeda3fd1bdc8c37d01bdf9f5c8274ff}{String}} $>$}]{timestamp }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structgondola_1_1CRWriter_a7d594611b3bf4d9a020f9d7c4d17b562}\label{structgondola_1_1CRWriter_a7d594611b3bf4d9a020f9d7c4d17b562} 
+\index{gondola::CRWriter@{gondola::CRWriter}!add\_frame@{add\_frame}}
+\index{add\_frame@{add\_frame}!gondola::CRWriter@{gondola::CRWriter}}
+\doxysubsubsection{\texorpdfstring{add\_frame()}{add\_frame()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+CRWriter\+::add\+\_\+frame (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1CRFrame}{CRFrame}} \&}]{frame }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}}
+
+\Hypertarget{structgondola_1_1CRWriter_a88a10b3eb9a1f2043e019a73b13a4ae2}\label{structgondola_1_1CRWriter_a88a10b3eb9a1f2043e019a73b13a4ae2} 
+\index{gondola::CRWriter@{gondola::CRWriter}!new\_file@{new\_file}}
+\index{new\_file@{new\_file}!gondola::CRWriter@{gondola::CRWriter}}
+\doxysubsubsection{\texorpdfstring{new\_file()}{new\_file()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+CRWriter\+::new\+\_\+file (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structOption}{Option}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afbeda3fd1bdc8c37d01bdf9f5c8274ff}{String}} $>$}]{timestamp,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}}}]{is\+\_\+sim }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structgondola_1_1CRWriter_a8b72c93af153a6a28386fb72ecb91292}\label{structgondola_1_1CRWriter_a8b72c93af153a6a28386fb72ecb91292} 
+\index{gondola::CRWriter@{gondola::CRWriter}!file@{file}}
+\index{file@{file}!gondola::CRWriter@{gondola::CRWriter}}
+\doxysubsubsection{\texorpdfstring{file}{file}}
+{\footnotesize\ttfamily std\+::ofstream gondola\+::\+CRWriter\+::file}
+
+\Hypertarget{structgondola_1_1CRWriter_a2f68b66e5bef0f52efa58723201e4300}\label{structgondola_1_1CRWriter_a2f68b66e5bef0f52efa58723201e4300} 
+\index{gondola::CRWriter@{gondola::CRWriter}!file\_id@{file\_id}}
+\index{file\_id@{file\_id}!gondola::CRWriter@{gondola::CRWriter}}
+\doxysubsubsection{\texorpdfstring{file\_id}{file\_id}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} gondola\+::\+CRWriter\+::file\+\_\+id = 0}
+
+\Hypertarget{structgondola_1_1CRWriter_afeeb24b5e3493826871b24f51ec49190}\label{structgondola_1_1CRWriter_afeeb24b5e3493826871b24f51ec49190} 
+\index{gondola::CRWriter@{gondola::CRWriter}!file\_name@{file\_name}}
+\index{file\_name@{file\_name}!gondola::CRWriter@{gondola::CRWriter}}
+\doxysubsubsection{\texorpdfstring{file\_name}{file\_name}}
+{\footnotesize\ttfamily std\+::string gondola\+::\+CRWriter\+::file\+\_\+name}
+
+\Hypertarget{structgondola_1_1CRWriter_a8ec6dc1d7b8fa4e7c4b9595ee1e39b92}\label{structgondola_1_1CRWriter_a8ec6dc1d7b8fa4e7c4b9595ee1e39b92} 
+\index{gondola::CRWriter@{gondola::CRWriter}!file\_nbytes\_wr@{file\_nbytes\_wr}}
+\index{file\_nbytes\_wr@{file\_nbytes\_wr}!gondola::CRWriter@{gondola::CRWriter}}
+\doxysubsubsection{\texorpdfstring{file\_nbytes\_wr}{file\_nbytes\_wr}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} gondola\+::\+CRWriter\+::file\+\_\+nbytes\+\_\+wr = 0}
+
+\Hypertarget{structgondola_1_1CRWriter_acdc9580d289affaeb43a18e72b088365}\label{structgondola_1_1CRWriter_acdc9580d289affaeb43a18e72b088365} 
+\index{gondola::CRWriter@{gondola::CRWriter}!file\_path@{file\_path}}
+\index{file\_path@{file\_path}!gondola::CRWriter@{gondola::CRWriter}}
+\doxysubsubsection{\texorpdfstring{file\_path}{file\_path}}
+{\footnotesize\ttfamily std\+::string gondola\+::\+CRWriter\+::file\+\_\+path}
+
+\Hypertarget{structgondola_1_1CRWriter_a78cbb24dbb99b30289c51ac61ca8a5e8}\label{structgondola_1_1CRWriter_a78cbb24dbb99b30289c51ac61ca8a5e8} 
+\index{gondola::CRWriter@{gondola::CRWriter}!file\_timestamp@{file\_timestamp}}
+\index{file\_timestamp@{file\_timestamp}!gondola::CRWriter@{gondola::CRWriter}}
+\doxysubsubsection{\texorpdfstring{file\_timestamp}{file\_timestamp}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structOption}{Option}}$<$\mbox{\hyperlink{tof__typedefs_8h_afbeda3fd1bdc8c37d01bdf9f5c8274ff}{String}}$>$ gondola\+::\+CRWriter\+::file\+\_\+timestamp = \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84da6adf97f83acf6453d4a6a4b1070f3754}{None}}}
+
+\Hypertarget{structgondola_1_1CRWriter_a46bbce4c97b476f95b27786612157bf4}\label{structgondola_1_1CRWriter_a46bbce4c97b476f95b27786612157bf4} 
+\index{gondola::CRWriter@{gondola::CRWriter}!frames\_per\_file@{frames\_per\_file}}
+\index{frames\_per\_file@{frames\_per\_file}!gondola::CRWriter@{gondola::CRWriter}}
+\doxysubsubsection{\texorpdfstring{frames\_per\_file}{frames\_per\_file}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} gondola\+::\+CRWriter\+::frames\+\_\+per\+\_\+file}
+
+\Hypertarget{structgondola_1_1CRWriter_ab44d769e86a20e640a228d1a617fb1bc}\label{structgondola_1_1CRWriter_ab44d769e86a20e640a228d1a617fb1bc} 
+\index{gondola::CRWriter@{gondola::CRWriter}!mbytes\_per\_file@{mbytes\_per\_file}}
+\index{mbytes\_per\_file@{mbytes\_per\_file}!gondola::CRWriter@{gondola::CRWriter}}
+\doxysubsubsection{\texorpdfstring{mbytes\_per\_file}{mbytes\_per\_file}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} gondola\+::\+CRWriter\+::mbytes\+\_\+per\+\_\+file}
+
+\Hypertarget{structgondola_1_1CRWriter_a01dd39bf78c9c70ae80635845bce771a}\label{structgondola_1_1CRWriter_a01dd39bf78c9c70ae80635845bce771a} 
+\index{gondola::CRWriter@{gondola::CRWriter}!n\_frames@{n\_frames}}
+\index{n\_frames@{n\_frames}!gondola::CRWriter@{gondola::CRWriter}}
+\doxysubsubsection{\texorpdfstring{n\_frames}{n\_frames}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} gondola\+::\+CRWriter\+::n\+\_\+frames = 0}
+
+\Hypertarget{structgondola_1_1CRWriter_ad7c141820921c249944c8a5d486501ea}\label{structgondola_1_1CRWriter_ad7c141820921c249944c8a5d486501ea} 
+\index{gondola::CRWriter@{gondola::CRWriter}!run\_id@{run\_id}}
+\index{run\_id@{run\_id}!gondola::CRWriter@{gondola::CRWriter}}
+\doxysubsubsection{\texorpdfstring{run\_id}{run\_id}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} gondola\+::\+CRWriter\+::run\+\_\+id = 0}
+
+\Hypertarget{structgondola_1_1CRWriter_af4cdeb99072a9b95f8771abfa54e20c1}\label{structgondola_1_1CRWriter_af4cdeb99072a9b95f8771abfa54e20c1} 
+\index{gondola::CRWriter@{gondola::CRWriter}!subrun\_id@{subrun\_id}}
+\index{subrun\_id@{subrun\_id}!gondola::CRWriter@{gondola::CRWriter}}
+\doxysubsubsection{\texorpdfstring{subrun\_id}{subrun\_id}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} gondola\+::\+CRWriter\+::subrun\+\_\+id = 0}
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/\mbox{\hyperlink{caraspace_8hpp}{caraspace.\+hpp}}\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/\mbox{\hyperlink{caraspace_8cxx}{caraspace.\+cxx}}\end{DoxyCompactItemize}

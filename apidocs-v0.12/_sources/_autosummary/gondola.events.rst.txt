@@ -18,6 +18,8 @@ gondola.events
       EventQuality
       EventStatus
       LTBThreshold
+      McEvent
+      McHit
       RBEvent
       RBEventHeader
       RBWaveform

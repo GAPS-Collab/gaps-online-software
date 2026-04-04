@@ -15,4 +15,5 @@ gondola.calibration
    .. autosummary::
    
       RBCalibrations
+      TrackerOnlineCalibration
    

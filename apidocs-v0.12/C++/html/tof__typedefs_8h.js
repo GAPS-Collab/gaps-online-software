@@ -1,5 +1,6 @@
 var tof__typedefs_8h =
 [
+    [ "Option< T >", "structOption.html", "structOption" ],
     [ "bytestream", "tof__typedefs_8h.html#ae4d34abafdf1602428db318ca44dfb84", null ],
     [ "f32", "tof__typedefs_8h.html#a5f6906312a689f27d70e9d086649d3fd", null ],
     [ "f64", "tof__typedefs_8h.html#a94dab5770726ccbef8c7d026cfbdf8e5", null ],
@@ -15,5 +16,7 @@ var tof__typedefs_8h =
     [ "u64", "tof__typedefs_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234", null ],
     [ "u8", "tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca", null ],
     [ "usize", "tof__typedefs_8h.html#a5148c9c1252e19e12def2814f71690e3", null ],
-    [ "Vec", "tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf", null ]
+    [ "Vec", "tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf", null ],
+    [ "Some", "tof__typedefs_8h.html#a725c07eddea0cafe8f2dcb76ba8aacdd", null ],
+    [ "None", "tof__typedefs_8h.html#a6ddc42c787fc55e2094925ff1a8d7d38", null ]
 ];

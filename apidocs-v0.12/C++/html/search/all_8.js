@@ -6,7 +6,7 @@ var searchData=
   ['i8_3',['i8',['../tof__typedefs_8h.html#ae3702327b5f47e83b431e22b33da7b58',1,'tof_typedefs.h']]],
   ['incompatibledata_4',['IncompatibleData',['../namespacegondola.html#ae4efa4080cf89476f85e917971613baaaba59a6fba632d1543589d766abc636df',1,'gondola']]],
   ['incompletereadout_5',['IncompleteReadout',['../namespacegondola.html#ae4efa4080cf89476f85e917971613baaae0a530b3e7e74423e454a99e3c6d0b69',1,'gondola']]],
-  ['index_6',['index',['../structgondola_1_1CRFrame.html#a053f06b5549ec50e5241d68bbd73183a',1,'gondola::CRFrame']]],
+  ['index_6',['index',['../structgondola_1_1CRFrame.html#a330428efd55c60f8d4bb2be6c6f93be7',1,'gondola::CRFrame']]],
   ['initial_5fenergy_5fper_5fnucleon_7',['initial_energy_per_nucleon',['../structSimPrimary.html#a34240211da5cdfc2cc6221d5c214dd51',1,'SimPrimary']]],
   ['interestingevent_8',['InterestingEvent',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39ceda2b585905be50d3772320efb7466bd3dc',1,'gondola']]],
   ['io_2ecxx_9',['io.cxx',['../io_8cxx.html',1,'']]],
@@ -18,5 +18,7 @@ var searchData=
   ['is_5ffrom_5ftelemetry_15',['is_from_telemetry',['../structgondola_1_1CRReader.html#ad5e490135ee09200d6551ecf505e64ac',1,'gondola::CRReader']]],
   ['is_5flocked_16',['is_locked',['../structgondola_1_1RBEventHeader.html#a6b707ca1f4a53886c91b5035dcc0ebab',1,'gondola::RBEventHeader']]],
   ['is_5flocked_5flast_5fsec_17',['is_locked_last_sec',['../structgondola_1_1RBEventHeader.html#a812ffbae6aae1269f074dc578b747bcf',1,'gondola::RBEventHeader']]],
-  ['is_5fmean_5fvalue_18',['is_mean_value',['../structgondola_1_1TrackerStripPedestal.html#aefc1a9fb445dc7add66d85db9c45bd08',1,'gondola::TrackerStripPedestal']]]
+  ['is_5fmean_5fvalue_18',['is_mean_value',['../structgondola_1_1TrackerStripPedestal.html#aefc1a9fb445dc7add66d85db9c45bd08',1,'gondola::TrackerStripPedestal']]],
+  ['is_5fnone_19',['is_none',['../structOption.html#a6794ed7cc3df4fcb6e3a82b3ac869585',1,'Option']]],
+  ['is_5fsome_20',['is_some',['../structOption.html#a7285ec35b7c178c6005b6737723ac56b',1,'Option']]]
 ];

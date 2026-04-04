@@ -30,7 +30,7 @@
 \DoxyCodeLine{00043\ \textcolor{preprocessor}{\#endif}}
 \DoxyCodeLine{00044\ }
 \DoxyCodeLine{00045\ \textcolor{keyword}{namespace\ }r\ =\ result;}
-\DoxyCodeLine{00046\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacegondola}{g}}\ =\ \mbox{\hyperlink{namespacegondola}{gondola}};}
+\DoxyCodeLine{00046\ \textcolor{comment}{//namespace\ g\ =\ gondola;}}
 \DoxyCodeLine{00047\ }
 \DoxyCodeLine{00048\ \textcolor{keyword}{class\ }\mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565ab31d9b68634b6ea4105b346f0a194f25}{RBCalibration}};}
 \DoxyCodeLine{00049\ }
@@ -134,7 +134,7 @@
 \DoxyCodeLine{00164\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structgondola_1_1TofEventSummary_a398d319dcb2901a4756ab58840c45257}{HEAD}}\ =\ 0xAAAA;}
 \DoxyCodeLine{00165\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structgondola_1_1TofEventSummary_afd326809091e8a64a0a6fd4bb1a3f8d7}{TAIL}}\ =\ 0x5555;}
 \DoxyCodeLine{00166\ \ \ }
-\DoxyCodeLine{00167\ \ \ \ \ \mbox{\hyperlink{namespacegondola_af998b820a54bca400c19e03948e82c28}{g::ProtocolVersion}}\ \ \ \ \mbox{\hyperlink{structgondola_1_1TofEventSummary_aa546c074c9bc5ce991986f04997d94de}{version}}\ ;}
+\DoxyCodeLine{00167\ \ \ \ \ \mbox{\hyperlink{namespacegondola_af998b820a54bca400c19e03948e82c28}{gondola::ProtocolVersion}}\ \ \ \ \mbox{\hyperlink{structgondola_1_1TofEventSummary_a6c3d70b924f004554f74e9bace26408f}{version}}\ ;}
 \DoxyCodeLine{00168\ \ \ \ \ \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baa}{EventStatus}}\ \mbox{\hyperlink{structgondola_1_1TofEventSummary_ac4df63562b86925145676dd3ba90a302}{status}}\ \ \ \ \ \ \ \ \ \ \ \ ;\ }
 \DoxyCodeLine{00169\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TofEventSummary_a7bc7ce1eb768ee4fad31a2d0069fbca9}{quality}}\ \ \ \ \ \ \ \ \ \ \ ;\ }
 \DoxyCodeLine{00170\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TofEventSummary_a37baf6d63dfe170c63e6b7f8f4bdb734}{trigger\_sources}}\ \ \ ;\ }
@@ -161,12 +161,12 @@
 \DoxyCodeLine{00194\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TofEventSummary_a9f1a56ab50a3e00dae4a2969e124487c}{tot\_edep\_cbe}}\ \ \ \ \ \ ;}
 \DoxyCodeLine{00195\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TofEventSummary_a1a127213deb4bb0fc81c3cc6d491d93c}{tot\_edep\_cor}}\ \ \ \ \ \ ;}
 \DoxyCodeLine{00196\ \ \ \ \ }
-\DoxyCodeLine{00197\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1TofEventSummary_a4fd68e5a2e5b06c7aacfc1ae88d4ee09}{from\_tofpacket}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structTofPacket}{TofPacket}}\ \&packet)\ \ \ \ \ \ \ \ \ \ }
-\DoxyCodeLine{00198\ \ \ \ \ \ \ -\/>\ r::Result<TofEventSummary,\ g::IOError>;}
-\DoxyCodeLine{00199\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1TofEventSummary_ae2a3103ee55b37f420a3b437515df864}{from\_bytestream}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u8>}}\ \&stream,\ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}\ \&pos)\ -\/>\ r::Result<TofEventSummary,\ g::IOError>\ ;}
+\DoxyCodeLine{00197\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1TofEventSummary_adf373012cbfdae1e80d8efbe9754d6e5}{from\_tofpacket}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structTofPacket}{TofPacket}}\ \&packet)\ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00198\ \ \ \ \ \ \ -\/>\ r::Result<TofEventSummary,\ gondola::IOError>;}
+\DoxyCodeLine{00199\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1TofEventSummary_a4ae80bb740dafe042544b2c9e59772a3}{from\_bytestream}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u8>}}\ \&stream,\ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}\ \&pos)\ -\/>\ r::Result<TofEventSummary,\ gondola::IOError>\ ;}
 \DoxyCodeLine{00200\ \ \ \ \ }
 \DoxyCodeLine{00201\ \textcolor{preprocessor}{\ \ \ \ \#ifdef\ BUILD\_CXX\_DB}}
-\DoxyCodeLine{00204\ \ \ \ \ \textcolor{keyword}{auto}\ set\_paddlemap(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacegondola_afe901f112c6aac213f44b6dd5b614035}{g::TofPaddleMap}}\&)\ -\/>\ void;}
+\DoxyCodeLine{00204\ \ \ \ \ \textcolor{keyword}{auto}\ set\_paddlemap(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacegondola_afe901f112c6aac213f44b6dd5b614035}{gondola::TofPaddleMap}}\&)\ -\/>\ void;}
 \DoxyCodeLine{00207\ \ \ \ \ \textcolor{keyword}{auto}\ normalize\_hit\_times(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacegondola_a1c2c2768738a98e4ab3c0aa6d31d88e0}{TofPaddleTimingConstantMap}}\ \&offsets)\ -\/>\ void;}
 \DoxyCodeLine{00208\ \textcolor{preprocessor}{\ \ \ \ \#endif}}
 \DoxyCodeLine{00209\ \ \ }

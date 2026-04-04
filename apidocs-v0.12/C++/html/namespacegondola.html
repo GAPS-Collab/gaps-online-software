@@ -111,6 +111,8 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1CRReader.html">CRReader</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1CRWriter.html">CRWriter</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgondola_1_1IOError.html">IOError</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1RBCalibration.html">RBCalibration</a></td></tr>
@@ -169,6 +171,8 @@ Typedefs</h2></td></tr>
 <tr class="memitem:ae720591de7c0e9e18619d265295f1ebe" id="r_ae720591de7c0e9e18619d265295f1ebe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">typedef</a> std::map&lt; <a class="el" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a>, <a class="el" href="structgondola_1_1RBCalibration.html">RBCalibration</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#ae720591de7c0e9e18619d265295f1ebe">RBCalibrationMap</a></td></tr>
 <tr class="memdesc:ae720591de7c0e9e18619d265295f1ebe"><td class="mdescLeft">&#160;</td><td class="mdescRight">shortcut for the typically used map of rb_id -&gt; calibrations  <br /></td></tr>
 <tr class="separator:ae720591de7c0e9e18619d265295f1ebe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adcb90f37f2ab2c20573b711d0210eb94" id="r_adcb90f37f2ab2c20573b711d0210eb94"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">typedef</a> std::map&lt; std::string, std::tuple&lt; <a class="el" href="tof__typedefs_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68">CRFrameObjectType</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#adcb90f37f2ab2c20573b711d0210eb94">CRFrameIndex</a></td></tr>
+<tr class="separator:adcb90f37f2ab2c20573b711d0210eb94"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe901f112c6aac213f44b6dd5b614035" id="r_afe901f112c6aac213f44b6dd5b614035"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">typedef</a> std::map&lt; <a class="el" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a>, <a class="el" href="structgondola_1_1TofPaddle.html">TofPaddle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#afe901f112c6aac213f44b6dd5b614035">TofPaddleMap</a></td></tr>
 <tr class="memdesc:afe901f112c6aac213f44b6dd5b614035"><td class="mdescLeft">&#160;</td><td class="mdescRight">A map of paddle id -&gt; <a class="el" href="structgondola_1_1TofPaddle.html">TofPaddle</a>.  <br /></td></tr>
 <tr class="separator:afe901f112c6aac213f44b6dd5b614035"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -196,6 +200,7 @@ Enumerations</h2></td></tr>
 <tr class="memitem:a466ace2a4c29903ffca2f1f86b41ba68" id="r_a466ace2a4c29903ffca2f1f86b41ba68"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68">CRFrameObjectType</a> : u8 { <a class="el" href="namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68a88183b946cc5f0e8c96b2e66e1c74a7e">Unknown</a> = 0
 , <a class="el" href="namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68a0a5f7d79c74b92d33255fc332e25b536">TofPacket</a> = 10
 , <a class="el" href="namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68aac967e66068a7e25b02b4b2e6bcc4504">TelemetryPacket</a> = 20
+, <a class="el" href="namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68a779ebf7f81f0c3e975b55f24521406b7">McTree</a> = 30
  }</td></tr>
 <tr class="memdesc:a466ace2a4c29903ffca2f1f86b41ba68"><td class="mdescLeft">&#160;</td><td class="mdescRight">These are objects which can be stored in a caraspace frame <br  />
   <a href="namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68">More...</a><br /></td></tr>
@@ -338,6 +343,11 @@ Functions</h2></td></tr>
 <tr class="memitem:ac9b080318e2d844f47a5dfe593000aef" id="r_ac9b080318e2d844f47a5dfe593000aef"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#ac9b080318e2d844f47a5dfe593000aef">load_tof_calibrations</a> (std::string <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">pathname</a>) -&gt; std::map&lt; <a class="el" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a>, <a class="el" href="structgondola_1_1RBCalibration.html">RBCalibration</a> &gt;</td></tr>
 <tr class="memdesc:ac9b080318e2d844f47a5dfe593000aef"><td class="mdescLeft">&#160;</td><td class="mdescRight">convenience function to load all the calibration files from a certain directory  <br /></td></tr>
 <tr class="separator:ac9b080318e2d844f47a5dfe593000aef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0fad83424699fde92f491a061f489158" id="r_a0fad83424699fde92f491a061f489158"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a0fad83424699fde92f491a061f489158">string_to_bytes</a> (std::string <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">value</a>) -&gt; <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">Vec</a>&lt; <a class="el" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a> &gt;</td></tr>
+<tr class="separator:a0fad83424699fde92f491a061f489158"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54ec6dae0f685d42c5d7b4c62346499e" id="r_a54ec6dae0f685d42c5d7b4c62346499e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a54ec6dae0f685d42c5d7b4c62346499e">get_runfilename</a> (<a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a> <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">run</a>, <a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a> <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">subrun</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">bool</a> <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">is_sim</a>, <a class="el" href="structOption.html">Option</a>&lt; std::string &gt; timestamp) -&gt; std::string</td></tr>
+<tr class="memdesc:a54ec6dae0f685d42c5d7b4c62346499e"><td class="mdescLeft">&#160;</td><td class="mdescRight">A standardized way to tag files with run id/subrun id/ timestamp.  <br /></td></tr>
+<tr class="separator:a54ec6dae0f685d42c5d7b4c62346499e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afcc490db45825de190a991267dacf561" id="r_afcc490db45825de190a991267dacf561"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#afcc490db45825de190a991267dacf561">get_tofpaddles</a> () -&gt; <a class="el" href="namespacegondola.html#afe901f112c6aac213f44b6dd5b614035">TofPaddleMap</a></td></tr>
 <tr class="memdesc:afcc490db45825de190a991267dacf561"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a paddle from the database.  <br /></td></tr>
 <tr class="separator:afcc490db45825de190a991267dacf561"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -391,6 +401,12 @@ Functions</h2></td></tr>
 <tr class="separator:ad6d0e546d1e3ff1ce3af42dae3177d29"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1499bf957374cccee09cd7e71c6b23f4" id="r_a1499bf957374cccee09cd7e71c6b23f4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a1499bf957374cccee09cd7e71c6b23f4">to_le_bytes</a> (<a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a> <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">number</a>) -&gt; <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">Vec</a>&lt; <a class="el" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a> &gt;</td></tr>
 <tr class="separator:a1499bf957374cccee09cd7e71c6b23f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aabfb9dd9ac4a3d53e1ecb7dce62456b3" id="r_aabfb9dd9ac4a3d53e1ecb7dce62456b3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#aabfb9dd9ac4a3d53e1ecb7dce62456b3">to_le_bytes</a> (<a class="el" href="tof__typedefs_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a> <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">number</a>) -&gt; <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">Vec</a>&lt; <a class="el" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a> &gt;</td></tr>
+<tr class="separator:aabfb9dd9ac4a3d53e1ecb7dce62456b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab539568a3a2e6c707766e3ed4110f93e" id="r_ab539568a3a2e6c707766e3ed4110f93e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#ab539568a3a2e6c707766e3ed4110f93e">to_le_bytes</a> (<a class="el" href="tof__typedefs_8h.html#a5f6906312a689f27d70e9d086649d3fd">f32</a> <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">number</a>) -&gt; <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">Vec</a>&lt; <a class="el" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a> &gt;</td></tr>
+<tr class="separator:ab539568a3a2e6c707766e3ed4110f93e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3eadf45fef1f935a2ea60fc72983914d" id="r_a3eadf45fef1f935a2ea60fc72983914d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a3eadf45fef1f935a2ea60fc72983914d">to_le_bytes</a> (<a class="el" href="tof__typedefs_8h.html#a48d6cd8e4135fb2ff7e7f2dac84089ec">i32</a> <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">number</a>) -&gt; <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">Vec</a>&lt; <a class="el" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a> &gt;</td></tr>
+<tr class="separator:a3eadf45fef1f935a2ea60fc72983914d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b45ff07f8a68edbdf3c9046172e538d" id="r_a7b45ff07f8a68edbdf3c9046172e538d"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">typename</a> <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">T</a> &gt; </td></tr>
 <tr class="memitem:a7b45ff07f8a68edbdf3c9046172e538d"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">Vec</a>&lt; <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">T</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a7b45ff07f8a68edbdf3c9046172e538d">slice</a> (<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">Vec</a>&lt; <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">T</a> &gt; &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">vec</a>, <a class="el" href="tof__typedefs_8h.html#a5148c9c1252e19e12def2814f71690e3">usize</a> <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">start</a>, <a class="el" href="tof__typedefs_8h.html#a5148c9c1252e19e12def2814f71690e3">usize</a> <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">end</a>)</td></tr>
 <tr class="separator:a7b45ff07f8a68edbdf3c9046172e538d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -433,6 +449,20 @@ Functions</h2></td></tr>
 <div class="textblock"><p>This file is part of gaps-online-software and published under the GPLv3 license</p>
 <p>Bascially a re-write of some bfsw stuff to avoid pulling in the dependency </p>
 </div><h2 class="groupheader">Typedef Documentation</h2>
+<a id="adcb90f37f2ab2c20573b711d0210eb94" name="adcb90f37f2ab2c20573b711d0210eb94"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adcb90f37f2ab2c20573b711d0210eb94">&#9670;&#160;</a></span>CRFrameIndex</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">typedef</a> std::map&lt;std::string, std::tuple&lt;<a class="el" href="tof__typedefs_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>, <a class="el" href="namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68">CRFrameObjectType</a>&gt; &gt; <a class="el" href="namespacegondola.html#adcb90f37f2ab2c20573b711d0210eb94">gondola::CRFrameIndex</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a770bde374c96a3200b922ace0d70e09b" name="a770bde374c96a3200b922ace0d70e09b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a770bde374c96a3200b922ace0d70e09b">&#9670;&#160;</a></span>DsiJChnPaddleIdMap</h2>
 
@@ -624,6 +654,7 @@ Functions</h2></td></tr>
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a466ace2a4c29903ffca2f1f86b41ba68a88183b946cc5f0e8c96b2e66e1c74a7e" name="a466ace2a4c29903ffca2f1f86b41ba68a88183b946cc5f0e8c96b2e66e1c74a7e"></a>Unknown&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a466ace2a4c29903ffca2f1f86b41ba68a0a5f7d79c74b92d33255fc332e25b536" name="a466ace2a4c29903ffca2f1f86b41ba68a0a5f7d79c74b92d33255fc332e25b536"></a>TofPacket&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a466ace2a4c29903ffca2f1f86b41ba68aac967e66068a7e25b02b4b2e6bcc4504" name="a466ace2a4c29903ffca2f1f86b41ba68aac967e66068a7e25b02b4b2e6bcc4504"></a>TelemetryPacket&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a466ace2a4c29903ffca2f1f86b41ba68a779ebf7f81f0c3e975b55f24521406b7" name="a466ace2a4c29903ffca2f1f86b41ba68a779ebf7f81f0c3e975b55f24521406b7"></a>McTree&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
 </div>
@@ -1026,6 +1057,48 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Get a paddle if the rb id and channel is known (HG) </p>
+
+</div>
+</div>
+<a id="a54ec6dae0f685d42c5d7b4c62346499e" name="a54ec6dae0f685d42c5d7b4c62346499e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a54ec6dae0f685d42c5d7b4c62346499e">&#9670;&#160;</a></span>get_runfilename()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a> gondola::get_runfilename </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a>&#160;</td>
+          <td class="paramname"><em>run</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a>&#160;</td>
+          <td class="paramname"><em>subrun</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">bool</a>&#160;</td>
+          <td class="paramname"><em>is_sim</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structOption.html">Option</a>&lt; std::string &gt;&#160;</td>
+          <td class="paramname"><em>timestamp</em> = <code><a class="el" href="namespacegondola.html#a62baa478e4adaaf6d242f135c1c9f84da6adf97f83acf6453d4a6a4b1070f3754">None</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> -&gt; std::string</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>A standardized way to tag files with run id/subrun id/ timestamp. </p>
 
 </div>
 </div>
@@ -1949,8 +2022,65 @@ template&lt;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184
 
 </div>
 </div>
+<a id="a0fad83424699fde92f491a061f489158" name="a0fad83424699fde92f491a061f489158"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0fad83424699fde92f491a061f489158">&#9670;&#160;</a></span>string_to_bytes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a> gondola::string_to_bytes </td>
+          <td>(</td>
+          <td class="paramtype">std::string&#160;</td>
+          <td class="paramname"><em>value</em></td><td>)</td>
+          <td> -&gt; <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">Vec</a>&lt;<a class="el" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a>&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>byte representation of a string to be used with to_bytestream methods </p>
+
+</div>
+</div>
+<a id="ab539568a3a2e6c707766e3ed4110f93e" name="ab539568a3a2e6c707766e3ed4110f93e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab539568a3a2e6c707766e3ed4110f93e">&#9670;&#160;</a></span>to_le_bytes() <span class="overload">[1/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a> gondola::to_le_bytes </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="tof__typedefs_8h.html#a5f6906312a689f27d70e9d086649d3fd">f32</a>&#160;</td>
+          <td class="paramname"><em>number</em></td><td>)</td>
+          <td> -&gt; <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">Vec</a>&lt;<a class="el" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a>&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Reverse-parse a f32 a la rust's built in f32::to_le_bytes </p>
+
+</div>
+</div>
+<a id="a3eadf45fef1f935a2ea60fc72983914d" name="a3eadf45fef1f935a2ea60fc72983914d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3eadf45fef1f935a2ea60fc72983914d">&#9670;&#160;</a></span>to_le_bytes() <span class="overload">[2/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a> gondola::to_le_bytes </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="tof__typedefs_8h.html#a48d6cd8e4135fb2ff7e7f2dac84089ec">i32</a>&#160;</td>
+          <td class="paramname"><em>number</em></td><td>)</td>
+          <td> -&gt; <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">Vec</a>&lt;<a class="el" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a>&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Reverse-parse a i32 a la rust's built in f32::to_le_bytes </p>
+
+</div>
+</div>
 <a id="ad6d0e546d1e3ff1ce3af42dae3177d29" name="ad6d0e546d1e3ff1ce3af42dae3177d29"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad6d0e546d1e3ff1ce3af42dae3177d29">&#9670;&#160;</a></span>to_le_bytes() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ad6d0e546d1e3ff1ce3af42dae3177d29">&#9670;&#160;</a></span>to_le_bytes() <span class="overload">[3/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1969,7 +2099,7 @@ template&lt;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184
 </div>
 </div>
 <a id="a1499bf957374cccee09cd7e71c6b23f4" name="a1499bf957374cccee09cd7e71c6b23f4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1499bf957374cccee09cd7e71c6b23f4">&#9670;&#160;</a></span>to_le_bytes() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a1499bf957374cccee09cd7e71c6b23f4">&#9670;&#160;</a></span>to_le_bytes() <span class="overload">[4/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1984,6 +2114,25 @@ template&lt;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184
       </table>
 </div><div class="memdoc">
 <p>Reverse-parse a u32 a la rust's built in u32::to_le_bytes </p>
+
+</div>
+</div>
+<a id="aabfb9dd9ac4a3d53e1ecb7dce62456b3" name="aabfb9dd9ac4a3d53e1ecb7dce62456b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aabfb9dd9ac4a3d53e1ecb7dce62456b3">&#9670;&#160;</a></span>to_le_bytes() <span class="overload">[5/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a> gondola::to_le_bytes </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="tof__typedefs_8h.html#a3f7e2bcbb0b4c338f3c4f6c937cd4234">u64</a>&#160;</td>
+          <td class="paramname"><em>number</em></td><td>)</td>
+          <td> -&gt; <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">Vec</a>&lt;<a class="el" href="tof__typedefs_8h.html#a92c50087ca0e64fa93fc59402c55f8ca">u8</a>&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Reverse-parse a u64 a la rust's built in u64::to_le_bytes </p>
 
 </div>
 </div>

@@ -12,11 +12,12 @@ var searchData=
   ['adc_5fdvdd_5fcurrent_9',['adc_dvdd_current',['../structRBMoniData.html#abe77865e852d18b85bc0c9a0aef9f7eb',1,'RBMoniData']]],
   ['adc_5fdvdd_5fpower_10',['adc_dvdd_power',['../structRBMoniData.html#a81f0ce3873ad1bdea1b121d385509843',1,'RBMoniData']]],
   ['adc_5fdvdd_5fvoltage_11',['adc_dvdd_voltage',['../structRBMoniData.html#a399b5ce026cb0d801a43bfb2a2b7784b',1,'RBMoniData']]],
-  ['any_12',['Any',['../namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21aed36a1ef76a59ee3f15180e0441188ad',1,'gondola']]],
-  ['anydatamangling_13',['AnyDataMangling',['../namespacegondola.html#ae4efa4080cf89476f85e917971613baaa914a42ba7d6f75029e02b8c5e8a80016',1,'gondola']]],
-  ['anytofhk_14',['AnyTofHK',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39ceda1d633e18b49ad6ab196ff08b21e0a052',1,'gondola']]],
-  ['anytrackerhk_15',['AnyTrackerHK',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39cedac44f8f7d9b9f501fe9278cd56521f28a',1,'gondola']]],
-  ['api_20software_20documentation_16',['gaps-online-software C++ API software documentation',['../index.html',1,'']]],
-  ['arguments_17',['Arguments',['../namespacegondola.html#autotoc_md2',1,'']]],
-  ['asic_5fevent_5fcode_18',['asic_event_code',['../structgondola_1_1TrkHit.html#ae6b6120eb7a3dc0750e139e13e82ff2d',1,'gondola::TrkHit']]]
+  ['add_5fframe_12',['add_frame',['../structgondola_1_1CRWriter.html#a7d594611b3bf4d9a020f9d7c4d17b562',1,'gondola::CRWriter']]],
+  ['any_13',['Any',['../namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21aed36a1ef76a59ee3f15180e0441188ad',1,'gondola']]],
+  ['anydatamangling_14',['AnyDataMangling',['../namespacegondola.html#ae4efa4080cf89476f85e917971613baaa914a42ba7d6f75029e02b8c5e8a80016',1,'gondola']]],
+  ['anytofhk_15',['AnyTofHK',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39ceda1d633e18b49ad6ab196ff08b21e0a052',1,'gondola']]],
+  ['anytrackerhk_16',['AnyTrackerHK',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39cedac44f8f7d9b9f501fe9278cd56521f28a',1,'gondola']]],
+  ['api_20software_20documentation_17',['gaps-online-software C++ API software documentation',['../index.html',1,'']]],
+  ['arguments_18',['Arguments',['../namespacegondola.html#autotoc_md2',1,'']]],
+  ['asic_5fevent_5fcode_19',['asic_event_code',['../structgondola_1_1TrkHit.html#ae6b6120eb7a3dc0750e139e13e82ff2d',1,'gondola::TrkHit']]]
 ];

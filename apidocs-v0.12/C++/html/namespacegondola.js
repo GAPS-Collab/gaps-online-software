@@ -4,6 +4,7 @@ var namespacegondola =
     [ "CRFrame", "structgondola_1_1CRFrame.html", "structgondola_1_1CRFrame" ],
     [ "CRFrameObject", "structgondola_1_1CRFrameObject.html", "structgondola_1_1CRFrameObject" ],
     [ "CRReader", "structgondola_1_1CRReader.html", "structgondola_1_1CRReader" ],
+    [ "CRWriter", "structgondola_1_1CRWriter.html", "structgondola_1_1CRWriter" ],
     [ "IOError", "classgondola_1_1IOError.html", "classgondola_1_1IOError" ],
     [ "RBCalibration", "structgondola_1_1RBCalibration.html", "structgondola_1_1RBCalibration" ],
     [ "RBEvent", "structgondola_1_1RBEvent.html", "structgondola_1_1RBEvent" ],
@@ -29,6 +30,7 @@ var namespacegondola =
     [ "TrkHeader", "structgondola_1_1TrkHeader.html", "structgondola_1_1TrkHeader" ],
     [ "TrkHit", "structgondola_1_1TrkHit.html", "structgondola_1_1TrkHit" ],
     [ "TrkMetaData", "structgondola_1_1TrkMetaData.html", "structgondola_1_1TrkMetaData" ],
+    [ "CRFrameIndex", "namespacegondola.html#adcb90f37f2ab2c20573b711d0210eb94", null ],
     [ "DsiJChnPaddleIdMap", "namespacegondola.html#a770bde374c96a3200b922ace0d70e09b", null ],
     [ "RBCalibrationMap", "namespacegondola.html#ae720591de7c0e9e18619d265295f1ebe", null ],
     [ "RbIdChannelPaddleIdMap", "namespacegondola.html#a2b826021db643b07ffc9b141e01d2c34", null ],
@@ -45,7 +47,8 @@ var namespacegondola =
     [ "CRFrameObjectType", "namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68", [
       [ "Unknown", "namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68a88183b946cc5f0e8c96b2e66e1c74a7e", null ],
       [ "TofPacket", "namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68a0a5f7d79c74b92d33255fc332e25b536", null ],
-      [ "TelemetryPacket", "namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68aac967e66068a7e25b02b4b2e6bcc4504", null ]
+      [ "TelemetryPacket", "namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68aac967e66068a7e25b02b4b2e6bcc4504", null ],
+      [ "McTree", "namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68a779ebf7f81f0c3e975b55f24521406b7", null ]
     ] ],
     [ "EventQuality", "namespacegondola.html#ac61bd1b8e62eab79a1089be6ecc1ca3d", [
       [ "Unknown", "namespacegondola.html#ac61bd1b8e62eab79a1089be6ecc1ca3da88183b946cc5f0e8c96b2e66e1c74a7e", null ],
@@ -147,6 +150,7 @@ var namespacegondola =
     [ "get_hid_vid_map", "namespacegondola.html#a3b25ba3aba0e585295ecefc0701cf7de", null ],
     [ "get_module_position", "namespacegondola.html#afc6e4fab8b20e77dfb9a84d9371e6588", null ],
     [ "get_rb_id_paddles", "namespacegondola.html#aa6d3f533826fda788c78aa01dea07827", null ],
+    [ "get_runfilename", "namespacegondola.html#a54ec6dae0f685d42c5d7b4c62346499e", null ],
     [ "get_tofpaddles", "namespacegondola.html#afcc490db45825de190a991267dacf561", null ],
     [ "get_tofpaddletimingconstants", "namespacegondola.html#ada24c8b1eefc326eb57c09b7663da004", null ],
     [ "get_trackerstripmasks", "namespacegondola.html#a164799954d886461ce3accc167c6c729", null ],
@@ -181,6 +185,10 @@ var namespacegondola =
     [ "spike_cleaning_all", "namespacegondola.html#a56a2781343a042a385b34244fe8e4934", null ],
     [ "spike_cleaning_drs4", "namespacegondola.html#a51016fc759994f7a750d933ea9dee8b5", null ],
     [ "spike_cleaning_simple", "namespacegondola.html#aad98e262d4567278c4414be5db426023", null ],
+    [ "string_to_bytes", "namespacegondola.html#a0fad83424699fde92f491a061f489158", null ],
+    [ "to_le_bytes", "namespacegondola.html#ab539568a3a2e6c707766e3ed4110f93e", null ],
+    [ "to_le_bytes", "namespacegondola.html#a3eadf45fef1f935a2ea60fc72983914d", null ],
     [ "to_le_bytes", "namespacegondola.html#ad6d0e546d1e3ff1ce3af42dae3177d29", null ],
-    [ "to_le_bytes", "namespacegondola.html#a1499bf957374cccee09cd7e71c6b23f4", null ]
+    [ "to_le_bytes", "namespacegondola.html#a1499bf957374cccee09cd7e71c6b23f4", null ],
+    [ "to_le_bytes", "namespacegondola.html#aabfb9dd9ac4a3d53e1ecb7dce62456b3", null ]
 ];

@@ -1,4 +1,7 @@
 var searchData=
 [
-  ['voltages_0',['voltages',['../structgondola_1_1RBCalibration.html#ad872f2d084979dedd3223e317d037bc8',1,'gondola::RBCalibration::voltages(const RBEvent &amp;event, bool spike_cleaning=false) const'],['../structgondola_1_1RBCalibration.html#aa814163cde832ec92d2ca9dec0f1d8b4',1,'gondola::RBCalibration::voltages(const RBEvent &amp;event, const u8 channel) const']]]
+  ['u32tof32_0',['u32tof32',['../parsers_8cxx.html#ad09557c31b46df2706198753fe061163',1,'parsers.cxx']]],
+  ['u8_5fto_5fu16_1',['u8_to_u16',['../events_8cxx.html#a1c10b6194055c6cc7c772ebd2fa4648c',1,'events.cxx']]],
+  ['unpack_2',['unpack',['../structTofPacket.html#a7a348ad4e49dc8667f72d12d02b97653',1,'TofPacket']]],
+  ['unwrap_3',['unwrap',['../structOption.html#abba096d2d51b3872683853a710a0d53d',1,'Option::unwrap() &amp;'],['../structOption.html#a6246d3ff2bf169a571f96a34b4fc452c',1,'Option::unwrap() &amp;&amp;']]]
 ];

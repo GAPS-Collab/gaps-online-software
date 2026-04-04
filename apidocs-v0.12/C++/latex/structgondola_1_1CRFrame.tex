@@ -9,12 +9,16 @@
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1CRFrame_a63b572f2d5e53117ff1718489d35dd5d}{to\+\_\+string}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ std\+::string
 \item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1CRFrame_aa973b862bd98cd365b9e0e234c0ae6ac}{serialize\+\_\+index}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$
+\item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1CRFrame_a610c15220200558ca0ba16234385673c}{put\+\_\+fobject}} (\mbox{\hyperlink{structgondola_1_1CRFrameObject}{CRFrame\+Object}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{fobj}}, std\+::string) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1CRFrame_ac736b9405ce559a4dfef8ba48286e185}{get\+\_\+tofpacket}} (std\+::string name) -\/$>$ result\+::\+Result$<$ \mbox{\hyperlink{structTofPacket}{Tof\+Packet}}, \mbox{\hyperlink{classgondola_1_1IOError}{IOError}} $>$
 \begin{DoxyCompactList}\small\item\em extract a tofpacket if this frame object is of the correct type \end{DoxyCompactList}\item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1CRFrame_a305ebb71b944e5b8e45686da8d3e7cce}{get\+\_\+telemetrypacket}} (std\+::string name) -\/$>$ \mbox{\hyperlink{structgondola_1_1TelemetryPacket}{Telemetry\+Packet}}
-\end{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1CRFrame_a513aeac0c4592d713385ad30753d5d14}{to\+\_\+bytestream}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$
+\begin{DoxyCompactList}\small\item\em to write data on disk \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsubsection*{Static Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
@@ -25,9 +29,9 @@
 \doxysubsubsection*{Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
-std\+::map$<$ std\+::string, std\+::tuple$<$ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}, \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68}{CRFrame\+Object\+Type}} $>$ $>$ \mbox{\hyperlink{structgondola_1_1CRFrame_a053f06b5549ec50e5241d68bbd73183a}{index}}
+\mbox{\hyperlink{namespacegondola_adcb90f37f2ab2c20573b711d0210eb94}{CRFrame\+Index}} \mbox{\hyperlink{structgondola_1_1CRFrame_a330428efd55c60f8d4bb2be6c6f93be7}{index}}
 \item 
-\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{structgondola_1_1CRFrame_a5a6c24fe721883dd2200b65c337ede69}{bytestorage}}
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{structgondola_1_1CRFrame_a5a6c24fe721883dd2200b65c337ede69}{bytestorage}} = \{\}
 \end{DoxyCompactItemize}
 \doxysubsubsection*{Static Public Attributes}
 \begin{DoxyCompactItemize}
@@ -73,6 +77,22 @@ extract a tofpacket if this frame object is of the correct type
 \doxysubsubsection{\texorpdfstring{put\_fobject()}{put\_fobject()}}
 {\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+CRFrame\+::put\+\_\+fobject (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structgondola_1_1CRFrameObject}{g\+::\+CRFrame\+Object}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&}]{fobj,  }\item[{std\+::string}]{name }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}}
 
+\Hypertarget{structgondola_1_1CRFrame_aa973b862bd98cd365b9e0e234c0ae6ac}\label{structgondola_1_1CRFrame_aa973b862bd98cd365b9e0e234c0ae6ac} 
+\index{gondola::CRFrame@{gondola::CRFrame}!serialize\_index@{serialize\_index}}
+\index{serialize\_index@{serialize\_index}!gondola::CRFrame@{gondola::CRFrame}}
+\doxysubsubsection{\texorpdfstring{serialize\_index()}{serialize\_index()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+CRFrame\+::serialize\+\_\+index (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}$>$}
+
+\Hypertarget{structgondola_1_1CRFrame_a513aeac0c4592d713385ad30753d5d14}\label{structgondola_1_1CRFrame_a513aeac0c4592d713385ad30753d5d14} 
+\index{gondola::CRFrame@{gondola::CRFrame}!to\_bytestream@{to\_bytestream}}
+\index{to\_bytestream@{to\_bytestream}!gondola::CRFrame@{gondola::CRFrame}}
+\doxysubsubsection{\texorpdfstring{to\_bytestream()}{to\_bytestream()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+CRFrame\+::to\+\_\+bytestream (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}$>$}
+
+
+
+to write data on disk 
+
 \Hypertarget{structgondola_1_1CRFrame_a63b572f2d5e53117ff1718489d35dd5d}\label{structgondola_1_1CRFrame_a63b572f2d5e53117ff1718489d35dd5d} 
 \index{gondola::CRFrame@{gondola::CRFrame}!to\_string@{to\_string}}
 \index{to\_string@{to\_string}!gondola::CRFrame@{gondola::CRFrame}}
@@ -86,7 +106,7 @@ extract a tofpacket if this frame object is of the correct type
 \index{gondola::CRFrame@{gondola::CRFrame}!bytestorage@{bytestorage}}
 \index{bytestorage@{bytestorage}!gondola::CRFrame@{gondola::CRFrame}}
 \doxysubsubsection{\texorpdfstring{bytestorage}{bytestorage}}
-{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}$>$ gondola\+::\+CRFrame\+::bytestorage}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}$>$ gondola\+::\+CRFrame\+::bytestorage = \{\}}
 
 \Hypertarget{structgondola_1_1CRFrame_a7be09944b29012fe31c9cb02bdca5c6b}\label{structgondola_1_1CRFrame_a7be09944b29012fe31c9cb02bdca5c6b} 
 \index{gondola::CRFrame@{gondola::CRFrame}!HEAD@{HEAD}}
@@ -94,11 +114,11 @@ extract a tofpacket if this frame object is of the correct type
 \doxysubsubsection{\texorpdfstring{HEAD}{HEAD}}
 {\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+CRFrame\+::\+HEAD = 0x\+AAAA\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
 
-\Hypertarget{structgondola_1_1CRFrame_a053f06b5549ec50e5241d68bbd73183a}\label{structgondola_1_1CRFrame_a053f06b5549ec50e5241d68bbd73183a} 
+\Hypertarget{structgondola_1_1CRFrame_a330428efd55c60f8d4bb2be6c6f93be7}\label{structgondola_1_1CRFrame_a330428efd55c60f8d4bb2be6c6f93be7} 
 \index{gondola::CRFrame@{gondola::CRFrame}!index@{index}}
 \index{index@{index}!gondola::CRFrame@{gondola::CRFrame}}
 \doxysubsubsection{\texorpdfstring{index}{index}}
-{\footnotesize\ttfamily std\+::map$<$std\+::string, std\+::tuple$<$\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}, \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68}{CRFrame\+Object\+Type}}$>$ $>$ gondola\+::\+CRFrame\+::index}
+{\footnotesize\ttfamily \mbox{\hyperlink{namespacegondola_adcb90f37f2ab2c20573b711d0210eb94}{CRFrame\+Index}} gondola\+::\+CRFrame\+::index}
 
 \Hypertarget{structgondola_1_1CRFrame_aeebee065bd58e2136dd030a0eb204c5a}\label{structgondola_1_1CRFrame_aeebee065bd58e2136dd030a0eb204c5a} 
 \index{gondola::CRFrame@{gondola::CRFrame}!TAIL@{TAIL}}

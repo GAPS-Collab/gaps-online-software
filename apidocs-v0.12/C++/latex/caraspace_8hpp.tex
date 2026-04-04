@@ -34,6 +34,8 @@ struct \mbox{\hyperlink{structgondola_1_1CRFrameObject}{gondola\+::\+CRFrame\+Ob
 \item 
 struct \mbox{\hyperlink{structgondola_1_1CRFrame}{gondola\+::\+CRFrame}}
 \item 
+struct \mbox{\hyperlink{structgondola_1_1CRWriter}{gondola\+::\+CRWriter}}
+\item 
 struct \mbox{\hyperlink{structgondola_1_1CRReader}{gondola\+::\+CRReader}}
 \end{DoxyCompactItemize}
 \doxysubsubsection*{Namespaces}
@@ -41,12 +43,25 @@ struct \mbox{\hyperlink{structgondola_1_1CRReader}{gondola\+::\+CRReader}}
 \item 
 namespace \mbox{\hyperlink{namespacegondola}{gondola}}
 \end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ std\+::string, std\+::tuple$<$ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}, \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68}{CRFrame\+Object\+Type}} $>$ $>$ \mbox{\hyperlink{namespacegondola_adcb90f37f2ab2c20573b711d0210eb94}{gondola\+::\+CRFrame\+Index}}
+\end{DoxyCompactItemize}
 \doxysubsubsection*{Enumerations}
 \begin{DoxyCompactItemize}
 \item 
 enum class \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68}{gondola\+::\+CRFrame\+Object\+Type}} \+: u8 \{ \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a88183b946cc5f0e8c96b2e66e1c74a7e}{gondola\+::\+Unknown}} = 0
 , \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a0a5f7d79c74b92d33255fc332e25b536}{gondola\+::\+Tof\+Packet}} = 10
 , \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68aac967e66068a7e25b02b4b2e6bcc4504}{gondola\+::\+Telemetry\+Packet}} = 20
+, \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a779ebf7f81f0c3e975b55f24521406b7}{gondola\+::\+Mc\+Tree}} = 30
  \}
 \begin{DoxyCompactList}\small\item\em These are objects which can be stored in a caraspace frame ~\newline
  \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a0fad83424699fde92f491a061f489158}{gondola\+::string\+\_\+to\+\_\+bytes}} (std\+::string \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{value}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a54ec6dae0f685d42c5d7b4c62346499e}{gondola\+::get\+\_\+runfilename}} (\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{run}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{subrun}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{is\+\_\+sim}}, \mbox{\hyperlink{structOption}{Option}}$<$ std\+::string $>$ timestamp) -\/$>$ std\+::string
+\begin{DoxyCompactList}\small\item\em A standardized way to tag files with run id/subrun id/ timestamp. \end{DoxyCompactList}\end{DoxyCompactItemize}

@@ -5,6 +5,7 @@ var hierarchy =
     [ "gondola::CRFrame", "structgondola_1_1CRFrame.html", null ],
     [ "gondola::CRFrameObject", "structgondola_1_1CRFrameObject.html", null ],
     [ "gondola::CRReader", "structgondola_1_1CRReader.html", null ],
+    [ "gondola::CRWriter", "structgondola_1_1CRWriter.html", null ],
     [ "std::formatter", null, [
       [ "std::formatter< gondola::EventStatus >", "structstd_1_1formatter_3_01gondola_1_1EventStatus_01_4.html", null ]
     ] ],
@@ -14,6 +15,10 @@ var hierarchy =
     ] ],
     [ "gondola::IOError", "classgondola_1_1IOError.html", null ],
     [ "LTBMoniData", "structLTBMoniData.html", null ],
+    [ "std::optional", null, [
+      [ "Option< String >", "structOption.html", null ],
+      [ "Option< T >", "structOption.html", null ]
+    ] ],
     [ "PAMoniData", "structPAMoniData.html", null ],
     [ "PBMoniData", "structPBMoniData.html", null ],
     [ "gondola::RBCalibration", "structgondola_1_1RBCalibration.html", null ],

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['dsijchnpaddleidmap_0',['DsiJChnPaddleIdMap',['../namespacegondola.html#a770bde374c96a3200b922ace0d70e09b',1,'gondola']]]
+  ['crframeindex_0',['CRFrameIndex',['../namespacegondola.html#adcb90f37f2ab2c20573b711d0210eb94',1,'gondola']]]
 ];

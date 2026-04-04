@@ -1,24 +1,4 @@
 var searchData=
 [
-  ['telemetryevent_0',['TelemetryEvent',['../structgondola_1_1TelemetryEvent.html',1,'gondola']]],
-  ['telemetrypacket_1',['TelemetryPacket',['../structgondola_1_1TelemetryPacket.html',1,'gondola']]],
-  ['telemetrypacketheader_2',['TelemetryPacketHeader',['../structgondola_1_1TelemetryPacketHeader.html',1,'gondola']]],
-  ['telemetrypacketreader_3',['TelemetryPacketReader',['../structgondola_1_1TelemetryPacketReader.html',1,'gondola']]],
-  ['tofevent_4',['TofEvent',['../structgondola_1_1TofEvent.html',1,'gondola']]],
-  ['tofeventsummary_5',['TofEventSummary',['../structgondola_1_1TofEventSummary.html',1,'gondola']]],
-  ['tofhit_6',['TofHit',['../structgondola_1_1TofHit.html',1,'gondola']]],
-  ['tofmetadata_7',['TofMetaData',['../structgondola_1_1TofMetaData.html',1,'gondola']]],
-  ['tofpacket_8',['TofPacket',['../structTofPacket.html',1,'']]],
-  ['tofpacketreader_9',['TofPacketReader',['../classgondola_1_1TofPacketReader.html',1,'gondola']]],
-  ['tofpaddle_10',['TofPaddle',['../structgondola_1_1TofPaddle.html',1,'gondola']]],
-  ['tofpaddletimingconstant_11',['TofPaddleTimingConstant',['../structgondola_1_1TofPaddleTimingConstant.html',1,'gondola']]],
-  ['trackerstrip_12',['TrackerStrip',['../structgondola_1_1TrackerStrip.html',1,'gondola']]],
-  ['trackerstripmask_13',['TrackerStripMask',['../structgondola_1_1TrackerStripMask.html',1,'gondola']]],
-  ['trackerstrippedestal_14',['TrackerStripPedestal',['../structgondola_1_1TrackerStripPedestal.html',1,'gondola']]],
-  ['trkcalibratedhit_15',['TrkCalibratedHit',['../structgondola_1_1TrkCalibratedHit.html',1,'gondola']]],
-  ['trkevent_16',['TrkEvent',['../structgondola_1_1TrkEvent.html',1,'gondola']]],
-  ['trkeventpacket_17',['TrkEventPacket',['../structgondola_1_1TrkEventPacket.html',1,'gondola']]],
-  ['trkheader_18',['TrkHeader',['../structgondola_1_1TrkHeader.html',1,'gondola']]],
-  ['trkhit_19',['TrkHit',['../structgondola_1_1TrkHit.html',1,'gondola']]],
-  ['trkmetadata_20',['TrkMetaData',['../structgondola_1_1TrkMetaData.html',1,'gondola']]]
+  ['simprimary_0',['SimPrimary',['../structSimPrimary.html',1,'']]]
 ];

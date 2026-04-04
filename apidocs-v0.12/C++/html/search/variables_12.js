@@ -15,7 +15,8 @@ var searchData=
   ['status_5fversion_12',['status_version',['../structgondola_1_1TofMetaData.html#aba71505bbe84162569791be3b1411f04',1,'gondola::TofMetaData']]],
   ['stop_5fcell_13',['stop_cell',['../structgondola_1_1RBEventHeader.html#a4b7e2b1f911f992c4f7dd030c9091f09',1,'gondola::RBEventHeader::stop_cell'],['../structgondola_1_1RBWaveform.html#ae864eb8d95798eeedc43316f489d0ad1',1,'gondola::RBWaveform::stop_cell']]],
   ['strip_5fid_14',['strip_id',['../structgondola_1_1TrackerStrip.html#a836e38c03eb0318d0224c967fed0e3e8',1,'gondola::TrackerStrip::strip_id'],['../structgondola_1_1TrackerStripMask.html#ac58954deb3794ff706b46fe784f34715',1,'gondola::TrackerStripMask::strip_id'],['../structgondola_1_1TrackerStripPedestal.html#a1a8de894c295e5a1090cee7d64e21f71',1,'gondola::TrackerStripPedestal::strip_id'],['../structgondola_1_1TrkCalibratedHit.html#a3ae4f15871c632ba90d4b813335cb6cc',1,'gondola::TrkCalibratedHit::strip_id']]],
-  ['sync_15',['sync',['../structgondola_1_1TelemetryPacketHeader.html#ac595cf4db9594d05eaaf208d44c01ab1',1,'gondola::TelemetryPacketHeader::sync'],['../structgondola_1_1TrkHeader.html#a88b9c3275d134b59ecd122559ad5897f',1,'gondola::TrkHeader::sync']]],
-  ['sys_5fid_16',['sys_id',['../structgondola_1_1TrkHeader.html#ae8118c7cf415bccdf5f4f844a7ebe063',1,'gondola::TrkHeader']]],
-  ['sys_5ftime_17',['sys_time',['../structgondola_1_1TrkHeader.html#a2c38f7d676a5a1cfb851425859aa8a03',1,'gondola::TrkHeader']]]
+  ['subrun_5fid_15',['subrun_id',['../structgondola_1_1CRWriter.html#af4cdeb99072a9b95f8771abfa54e20c1',1,'gondola::CRWriter']]],
+  ['sync_16',['sync',['../structgondola_1_1TelemetryPacketHeader.html#ac595cf4db9594d05eaaf208d44c01ab1',1,'gondola::TelemetryPacketHeader::sync'],['../structgondola_1_1TrkHeader.html#a88b9c3275d134b59ecd122559ad5897f',1,'gondola::TrkHeader::sync']]],
+  ['sys_5fid_17',['sys_id',['../structgondola_1_1TrkHeader.html#ae8118c7cf415bccdf5f4f844a7ebe063',1,'gondola::TrkHeader']]],
+  ['sys_5ftime_18',['sys_time',['../structgondola_1_1TrkHeader.html#a2c38f7d676a5a1cfb851425859aa8a03',1,'gondola::TrkHeader']]]
 ];

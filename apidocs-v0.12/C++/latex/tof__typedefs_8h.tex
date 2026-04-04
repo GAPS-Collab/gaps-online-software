@@ -5,6 +5,9 @@
 {\ttfamily \#include $<$cstddef$>$}\newline
 {\ttfamily \#include $<$string$>$}\newline
 {\ttfamily \#include $<$cstdint$>$}\newline
+{\ttfamily \#include $<$optional$>$}\newline
+{\ttfamily \#include $<$stdexcept$>$}\newline
+{\ttfamily \#include $<$utility$>$}\newline
 Include dependency graph for tof\+\_\+typedefs.\+h\+:
 \nopagebreak
 \begin{figure}[H]
@@ -21,6 +24,11 @@ This graph shows which files directly or indirectly include this file\+:
 \includegraphics[width=350pt]{tof__typedefs_8h__dep__incl}
 \end{center}
 \end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structOption}{Option$<$ T $>$}}
+\end{DoxyCompactItemize}
 \doxysubsubsection*{Typedefs}
 \begin{DoxyCompactItemize}
 \item 
@@ -55,6 +63,16 @@ This graph shows which files directly or indirectly include this file\+:
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::pair}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ $>$ $>$ $>$ \mbox{\hyperlink{tof__typedefs_8h_a10e7ddbc8860248f8aacfe07bed96192}{Ltb\+RBMap}}
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typename}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{T}} $>$ }\\\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{structOption}{Option}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::decay\+\_\+t}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{T}} $>$ $>$ \mbox{\hyperlink{tof__typedefs_8h_a725c07eddea0cafe8f2dcb76ba8aacdd}{Some}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{T}} \&\&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{value}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::nullopt\+\_\+t}} \mbox{\hyperlink{tof__typedefs_8h_a6ddc42c787fc55e2094925ff1a8d7d38}{None}} = \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::nullopt}}
 \end{DoxyCompactItemize}
 
 
@@ -176,4 +194,23 @@ Bonus\+: Match rust syntax a bit more closely, so it is easier to compare the C+
 
 
 Define vectors the same as in Rust. 
+
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{tof__typedefs_8h_a725c07eddea0cafe8f2dcb76ba8aacdd}\label{tof__typedefs_8h_a725c07eddea0cafe8f2dcb76ba8aacdd} 
+\index{tof\_typedefs.h@{tof\_typedefs.h}!Some@{Some}}
+\index{Some@{Some}!tof\_typedefs.h@{tof\_typedefs.h}}
+\doxysubsubsection{\texorpdfstring{Some()}{Some()}}
+{\footnotesize\ttfamily template$<$\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typename}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{T}} $>$ \\
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{structOption}{Option}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::decay\+\_\+t}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{T}} $>$ $>$ Some (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{T}} \&\&}]{value }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [constexpr]}}
+
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{tof__typedefs_8h_a6ddc42c787fc55e2094925ff1a8d7d38}\label{tof__typedefs_8h_a6ddc42c787fc55e2094925ff1a8d7d38} 
+\index{tof\_typedefs.h@{tof\_typedefs.h}!None@{None}}
+\index{None@{None}!tof\_typedefs.h@{tof\_typedefs.h}}
+\doxysubsubsection{\texorpdfstring{None}{None}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::nullopt\+\_\+t}} None = \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{std\+::nullopt}}\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}}
 

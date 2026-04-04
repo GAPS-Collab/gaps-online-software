@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/gondola-core/rust/gondola-core/src/io/telemetry_reader.rs`."><title>telemetry_reader.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-77263533.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="gondola_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.94.0 (4a4ef493e 2026-03-02)" data-channel="1.94.0" data-search-js="search-9e2438ea.js" data-stringdex-js="stringdex-b897f86f.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-7bab91a1.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-ffcac47a.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">gondola_core/io/</div>telemetry_reader.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! The TelemetryPacketReader allows to read a (file) stream of serialized
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/gondola-core/rust/gondola-core/src/io/telemetry_reader.rs`."><title>telemetry_reader.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-77263533.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="gondola_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.94.1 (e408947bf 2026-03-25)" data-channel="1.94.1" data-search-js="search-9e2438ea.js" data-stringdex-js="stringdex-b897f86f.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-7bab91a1.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-ffcac47a.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">gondola_core/io/</div>telemetry_reader.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! The TelemetryPacketReader allows to read a (file) stream of serialized
 <a href=#2 id=2 data-nosnippet>2</a>//! TelemetryPackets, which are typically the .bin files as generated 
 <a href=#3 id=3 data-nosnippet>3</a>//! by the gcu
 <a href=#4 id=4 data-nosnippet>4</a></span><span class="comment">// This file is part of gaps-online-software and published 
@@ -187,7 +187,7 @@
 <a href=#187 id=187 data-nosnippet>187</a>    <span class="self">self</span>.dedup_cache = dedup_cache;
 <a href=#188 id=188 data-nosnippet>188</a>  }
 <a href=#189 id=189 data-nosnippet>189</a>
-<a href=#190 id=190 data-nosnippet>190</a>  <span class="doccomment">/// Preview the number of frames in this reader
+<a href=#190 id=190 data-nosnippet>190</a>  <span class="doccomment">/// Loop over all packets available to this reader and count them by type
 <a href=#191 id=191 data-nosnippet>191</a>  </span><span class="kw">pub fn </span>count_packets(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; (usize, usize, HashMap&lt;TelemetryPacketType,usize&gt;) {
 <a href=#192 id=192 data-nosnippet>192</a>    <span class="kw">let _ </span>= <span class="self">self</span>.rewind();
 <a href=#193 id=193 data-nosnippet>193</a>    <span class="self">self</span>.clear_dedup_cache();
@@ -663,99 +663,95 @@
 <a href=#663 id=663 data-nosnippet>663</a>  </span><span class="kw">fn </span>get_n_duplicates(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
 <a href=#664 id=664 data-nosnippet>664</a>    <span class="self">self</span>.n_duplicates
 <a href=#665 id=665 data-nosnippet>665</a>  }
-<a href=#666 id=666 data-nosnippet>666</a>
-<a href=#667 id=667 data-nosnippet>667</a>  <span class="attr">#[pyo3(name = <span class="string">"count_packets"</span>)]
-<a href=#668 id=668 data-nosnippet>668</a>  </span><span class="kw">fn </span>count_packets_py(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; (usize,usize,HashMap&lt;TelemetryPacketType,usize&gt;) {
-<a href=#669 id=669 data-nosnippet>669</a>    <span class="self">self</span>.count_packets()
-<a href=#670 id=670 data-nosnippet>670</a>  }
-<a href=#671 id=671 data-nosnippet>671</a>
-<a href=#672 id=672 data-nosnippet>672</a>  <span class="attr">#[pyo3(name = <span class="string">"cache_all_packets"</span>)]
-<a href=#673 id=673 data-nosnippet>673</a>  </span><span class="kw">fn </span>cache_all_packets_py(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-<a href=#674 id=674 data-nosnippet>674</a>    <span class="self">self</span>.cache_all_packets();
-<a href=#675 id=675 data-nosnippet>675</a>  }
-<a href=#676 id=676 data-nosnippet>676</a>
-<a href=#677 id=677 data-nosnippet>677</a>  <span class="doccomment">/// Retrieve a copy of the internal packet cache.
-<a href=#678 id=678 data-nosnippet>678</a>  /// This will only yield a meaningful result after 
-<a href=#679 id=679 data-nosnippet>679</a>  /// a call to .cache_all_packets(). Since the entire
-<a href=#680 id=680 data-nosnippet>680</a>  /// cache is copied in the processs, this is slow 
-<a href=#681 id=681 data-nosnippet>681</a>  /// and might only be helpful for debugging. 
-<a href=#682 id=682 data-nosnippet>682</a>  </span><span class="attr">#[pyo3(name = <span class="string">"copy_packet_cache"</span>)]
-<a href=#683 id=683 data-nosnippet>683</a>  </span><span class="kw">fn </span>copy_packet_cache(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;TelemetryPacket&gt; {
-<a href=#684 id=684 data-nosnippet>684</a>    <span class="self">self</span>.packet_cache.clone()
-<a href=#685 id=685 data-nosnippet>685</a>  }
-<a href=#686 id=686 data-nosnippet>686</a>
-<a href=#687 id=687 data-nosnippet>687</a>  <span class="comment">//#[getter]
-<a href=#688 id=688 data-nosnippet>688</a>  //fn first(&amp;mut self) -&gt; Option&lt;TofPacket&gt; {
-<a href=#689 id=689 data-nosnippet>689</a>  //  self.first_packet()
-<a href=#690 id=690 data-nosnippet>690</a>  //}
-<a href=#691 id=691 data-nosnippet>691</a>
-<a href=#692 id=692 data-nosnippet>692</a>  //#[getter]
-<a href=#693 id=693 data-nosnippet>693</a>  //fn last(&amp;mut self) -&gt; Option&lt;TofPacket&gt; {
-<a href=#694 id=694 data-nosnippet>694</a>  //  self.last_packet()
-<a href=#695 id=695 data-nosnippet>695</a>  //}
-<a href=#696 id=696 data-nosnippet>696</a> 
-<a href=#697 id=697 data-nosnippet>697</a>  </span><span class="attr">#[getter]
-<a href=#698 id=698 data-nosnippet>698</a>  </span><span class="kw">fn </span>filenames(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;String&gt; {
-<a href=#699 id=699 data-nosnippet>699</a>    <span class="self">self</span>.filenames.clone()
-<a href=#700 id=700 data-nosnippet>700</a>  }
-<a href=#701 id=701 data-nosnippet>701</a>  <span class="comment">//#[pyo3(name="set_tracker_calibrations_from_fnames")]
-<a href=#702 id=702 data-nosnippet>702</a>  //#[pyo3(signature = (mask = None, pedestal = None, transfer_fn = None, cmn_noise = None))]
-<a href=#703 id=703 data-nosnippet>703</a>  //fn set_tracker_calibrations_from_fnames_py(&amp;mut self,
-<a href=#704 id=704 data-nosnippet>704</a>  //                                            mask        : Option&lt;String&gt;,
-<a href=#705 id=705 data-nosnippet>705</a>  //                                            pedestal    : Option&lt;String&gt;,
-<a href=#706 id=706 data-nosnippet>706</a>  //                                            transfer_fn : Option&lt;String&gt;,
-<a href=#707 id=707 data-nosnippet>707</a>  //                                            cmn_noise   : Option&lt;String&gt;) {
-<a href=#708 id=708 data-nosnippet>708</a>  //  self.set_tracker_calibrations_from_fnames(mask, pedestal, transfer_fn, cmn_noise);
-<a href=#709 id=709 data-nosnippet>709</a>  //}
-<a href=#710 id=710 data-nosnippet>710</a>
-<a href=#711 id=711 data-nosnippet>711</a>  </span><span class="doccomment">/// This is the filename we are currently 
-<a href=#712 id=712 data-nosnippet>712</a>  /// extracting frames from 
-<a href=#713 id=713 data-nosnippet>713</a>  </span><span class="attr">#[getter]
-<a href=#714 id=714 data-nosnippet>714</a>  #[pyo3(name=<span class="string">"current_filename"</span>)]
-<a href=#715 id=715 data-nosnippet>715</a>  </span><span class="kw">fn </span>get_current_filename_py(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
-<a href=#716 id=716 data-nosnippet>716</a>    <span class="self">self</span>.get_current_filename()
-<a href=#717 id=717 data-nosnippet>717</a>  }
-<a href=#718 id=718 data-nosnippet>718</a>
-<a href=#719 id=719 data-nosnippet>719</a>  <span class="doccomment">/// Start the reader from the beginning
-<a href=#720 id=720 data-nosnippet>720</a>  /// This is equivalent to a re-initialization
-<a href=#721 id=721 data-nosnippet>721</a>  /// of that reader.
-<a href=#722 id=722 data-nosnippet>722</a>  </span><span class="attr">#[pyo3(name=<span class="string">"rewind"</span>)]
-<a href=#723 id=723 data-nosnippet>723</a>  </span><span class="kw">fn </span>rewind_py(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; PyResult&lt;()&gt; {
-<a href=#724 id=724 data-nosnippet>724</a>    <span class="comment">// HOTFIX to avoid python segfault. However, this has to go 
-<a href=#725 id=725 data-nosnippet>725</a>    // into the rust rewind as well!
-<a href=#726 id=726 data-nosnippet>726</a>    </span><span class="self">self</span>.clear_dedup_cache();
-<a href=#727 id=727 data-nosnippet>727</a>    <span class="kw">match </span><span class="self">self</span>.rewind() {
-<a href=#728 id=728 data-nosnippet>728</a>      <span class="prelude-val">Err</span>(err) =&gt; {
-<a href=#729 id=729 data-nosnippet>729</a>        <span class="kw">return </span><span class="prelude-val">Err</span>(PyValueError::new_err(err.to_string()));
-<a href=#730 id=730 data-nosnippet>730</a>      }
-<a href=#731 id=731 data-nosnippet>731</a>      <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(())
-<a href=#732 id=732 data-nosnippet>732</a>    }
-<a href=#733 id=733 data-nosnippet>733</a>  }
-<a href=#734 id=734 data-nosnippet>734</a>
-<a href=#735 id=735 data-nosnippet>735</a>  <span class="comment">//#[pyo3(name="count_packets")]
-<a href=#736 id=736 data-nosnippet>736</a>  //fn count_packets_py(&amp;mut self) -&gt; usize {
-<a href=#737 id=737 data-nosnippet>737</a>  //  self.count_packets()
-<a href=#738 id=738 data-nosnippet>738</a>  //}
-<a href=#739 id=739 data-nosnippet>739</a>
-<a href=#740 id=740 data-nosnippet>740</a>  </span><span class="kw">fn </span>__iter__(slf: PyRef&lt;<span class="lifetime">'_</span>, <span class="self">Self</span>&gt;) -&gt; PyRef&lt;<span class="lifetime">'_</span>, <span class="self">Self</span>&gt; {
-<a href=#741 id=741 data-nosnippet>741</a>    slf 
-<a href=#742 id=742 data-nosnippet>742</a>  }
-<a href=#743 id=743 data-nosnippet>743</a>  
-<a href=#744 id=744 data-nosnippet>744</a>  <span class="kw">fn </span>__next__(<span class="kw-2">mut </span>slf: PyRefMut&lt;<span class="lifetime">'_</span>, <span class="self">Self</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;TelemetryPacket&gt; {
-<a href=#745 id=745 data-nosnippet>745</a>    slf.next()
-<a href=#746 id=746 data-nosnippet>746</a>    <span class="comment">//match slf.next() { 
-<a href=#747 id=747 data-nosnippet>747</a>    //  Some(packet) =&gt; {
-<a href=#748 id=748 data-nosnippet>748</a>    //    return Some(packet)
-<a href=#749 id=749 data-nosnippet>749</a>    //  }   
-<a href=#750 id=750 data-nosnippet>750</a>    //  None =&gt; {
-<a href=#751 id=751 data-nosnippet>751</a>    //    return None;
-<a href=#752 id=752 data-nosnippet>752</a>    //  }   
-<a href=#753 id=753 data-nosnippet>753</a>    //}   
-<a href=#754 id=754 data-nosnippet>754</a>  </span>}
-<a href=#755 id=755 data-nosnippet>755</a>}
+<a href=#666 id=666 data-nosnippet>666</a>  
+<a href=#667 id=667 data-nosnippet>667</a>  <span class="doccomment">/// Loop over all packets available to this reader and count them by type
+<a href=#668 id=668 data-nosnippet>668</a>  </span><span class="attr">#[pyo3(name = <span class="string">"count_packets"</span>)]
+<a href=#669 id=669 data-nosnippet>669</a>  </span><span class="kw">fn </span>count_packets_py(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; (usize,usize,HashMap&lt;TelemetryPacketType,usize&gt;) {
+<a href=#670 id=670 data-nosnippet>670</a>    <span class="self">self</span>.count_packets()
+<a href=#671 id=671 data-nosnippet>671</a>  }
+<a href=#672 id=672 data-nosnippet>672</a>
+<a href=#673 id=673 data-nosnippet>673</a>  <span class="attr">#[pyo3(name = <span class="string">"cache_all_packets"</span>)]
+<a href=#674 id=674 data-nosnippet>674</a>  </span><span class="kw">fn </span>cache_all_packets_py(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+<a href=#675 id=675 data-nosnippet>675</a>    <span class="self">self</span>.cache_all_packets();
+<a href=#676 id=676 data-nosnippet>676</a>  }
+<a href=#677 id=677 data-nosnippet>677</a>
+<a href=#678 id=678 data-nosnippet>678</a>  <span class="doccomment">/// Retrieve a copy of the internal packet cache.
+<a href=#679 id=679 data-nosnippet>679</a>  /// This will only yield a meaningful result after 
+<a href=#680 id=680 data-nosnippet>680</a>  /// a call to .cache_all_packets(). Since the entire
+<a href=#681 id=681 data-nosnippet>681</a>  /// cache is copied in the processs, this is slow 
+<a href=#682 id=682 data-nosnippet>682</a>  /// and might only be helpful for debugging. 
+<a href=#683 id=683 data-nosnippet>683</a>  </span><span class="attr">#[pyo3(name = <span class="string">"copy_packet_cache"</span>)]
+<a href=#684 id=684 data-nosnippet>684</a>  </span><span class="kw">fn </span>copy_packet_cache(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;TelemetryPacket&gt; {
+<a href=#685 id=685 data-nosnippet>685</a>    <span class="self">self</span>.packet_cache.clone()
+<a href=#686 id=686 data-nosnippet>686</a>  }
+<a href=#687 id=687 data-nosnippet>687</a>
+<a href=#688 id=688 data-nosnippet>688</a>  <span class="comment">//#[getter]
+<a href=#689 id=689 data-nosnippet>689</a>  //fn first(&amp;mut self) -&gt; Option&lt;TofPacket&gt; {
+<a href=#690 id=690 data-nosnippet>690</a>  //  self.first_packet()
+<a href=#691 id=691 data-nosnippet>691</a>  //}
+<a href=#692 id=692 data-nosnippet>692</a>
+<a href=#693 id=693 data-nosnippet>693</a>  //#[getter]
+<a href=#694 id=694 data-nosnippet>694</a>  //fn last(&amp;mut self) -&gt; Option&lt;TofPacket&gt; {
+<a href=#695 id=695 data-nosnippet>695</a>  //  self.last_packet()
+<a href=#696 id=696 data-nosnippet>696</a>  //}
+<a href=#697 id=697 data-nosnippet>697</a> 
+<a href=#698 id=698 data-nosnippet>698</a>  </span><span class="attr">#[getter]
+<a href=#699 id=699 data-nosnippet>699</a>  </span><span class="kw">fn </span>filenames(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;String&gt; {
+<a href=#700 id=700 data-nosnippet>700</a>    <span class="self">self</span>.filenames.clone()
+<a href=#701 id=701 data-nosnippet>701</a>  }
+<a href=#702 id=702 data-nosnippet>702</a>  <span class="comment">//#[pyo3(name="set_tracker_calibrations_from_fnames")]
+<a href=#703 id=703 data-nosnippet>703</a>  //#[pyo3(signature = (mask = None, pedestal = None, transfer_fn = None, cmn_noise = None))]
+<a href=#704 id=704 data-nosnippet>704</a>  //fn set_tracker_calibrations_from_fnames_py(&amp;mut self,
+<a href=#705 id=705 data-nosnippet>705</a>  //                                            mask        : Option&lt;String&gt;,
+<a href=#706 id=706 data-nosnippet>706</a>  //                                            pedestal    : Option&lt;String&gt;,
+<a href=#707 id=707 data-nosnippet>707</a>  //                                            transfer_fn : Option&lt;String&gt;,
+<a href=#708 id=708 data-nosnippet>708</a>  //                                            cmn_noise   : Option&lt;String&gt;) {
+<a href=#709 id=709 data-nosnippet>709</a>  //  self.set_tracker_calibrations_from_fnames(mask, pedestal, transfer_fn, cmn_noise);
+<a href=#710 id=710 data-nosnippet>710</a>  //}
+<a href=#711 id=711 data-nosnippet>711</a>
+<a href=#712 id=712 data-nosnippet>712</a>  </span><span class="doccomment">/// This is the filename we are currently 
+<a href=#713 id=713 data-nosnippet>713</a>  /// extracting frames from 
+<a href=#714 id=714 data-nosnippet>714</a>  </span><span class="attr">#[getter]
+<a href=#715 id=715 data-nosnippet>715</a>  #[pyo3(name=<span class="string">"current_filename"</span>)]
+<a href=#716 id=716 data-nosnippet>716</a>  </span><span class="kw">fn </span>get_current_filename_py(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+<a href=#717 id=717 data-nosnippet>717</a>    <span class="self">self</span>.get_current_filename()
+<a href=#718 id=718 data-nosnippet>718</a>  }
+<a href=#719 id=719 data-nosnippet>719</a>
+<a href=#720 id=720 data-nosnippet>720</a>  <span class="doccomment">/// Start the reader from the beginning
+<a href=#721 id=721 data-nosnippet>721</a>  /// This is equivalent to a re-initialization
+<a href=#722 id=722 data-nosnippet>722</a>  /// of that reader.
+<a href=#723 id=723 data-nosnippet>723</a>  </span><span class="attr">#[pyo3(name=<span class="string">"rewind"</span>)]
+<a href=#724 id=724 data-nosnippet>724</a>  </span><span class="kw">fn </span>rewind_py(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; PyResult&lt;()&gt; {
+<a href=#725 id=725 data-nosnippet>725</a>    <span class="comment">// HOTFIX to avoid python segfault. However, this has to go 
+<a href=#726 id=726 data-nosnippet>726</a>    // into the rust rewind as well!
+<a href=#727 id=727 data-nosnippet>727</a>    </span><span class="self">self</span>.clear_dedup_cache();
+<a href=#728 id=728 data-nosnippet>728</a>    <span class="kw">match </span><span class="self">self</span>.rewind() {
+<a href=#729 id=729 data-nosnippet>729</a>      <span class="prelude-val">Err</span>(err) =&gt; {
+<a href=#730 id=730 data-nosnippet>730</a>        <span class="kw">return </span><span class="prelude-val">Err</span>(PyValueError::new_err(err.to_string()));
+<a href=#731 id=731 data-nosnippet>731</a>      }
+<a href=#732 id=732 data-nosnippet>732</a>      <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(())
+<a href=#733 id=733 data-nosnippet>733</a>    }
+<a href=#734 id=734 data-nosnippet>734</a>  }
+<a href=#735 id=735 data-nosnippet>735</a>
+<a href=#736 id=736 data-nosnippet>736</a>  <span class="kw">fn </span>__iter__(slf: PyRef&lt;<span class="lifetime">'_</span>, <span class="self">Self</span>&gt;) -&gt; PyRef&lt;<span class="lifetime">'_</span>, <span class="self">Self</span>&gt; {
+<a href=#737 id=737 data-nosnippet>737</a>    slf 
+<a href=#738 id=738 data-nosnippet>738</a>  }
+<a href=#739 id=739 data-nosnippet>739</a>  
+<a href=#740 id=740 data-nosnippet>740</a>  <span class="kw">fn </span>__next__(<span class="kw-2">mut </span>slf: PyRefMut&lt;<span class="lifetime">'_</span>, <span class="self">Self</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;TelemetryPacket&gt; {
+<a href=#741 id=741 data-nosnippet>741</a>    slf.next()
+<a href=#742 id=742 data-nosnippet>742</a>    <span class="comment">//match slf.next() { 
+<a href=#743 id=743 data-nosnippet>743</a>    //  Some(packet) =&gt; {
+<a href=#744 id=744 data-nosnippet>744</a>    //    return Some(packet)
+<a href=#745 id=745 data-nosnippet>745</a>    //  }   
+<a href=#746 id=746 data-nosnippet>746</a>    //  None =&gt; {
+<a href=#747 id=747 data-nosnippet>747</a>    //    return None;
+<a href=#748 id=748 data-nosnippet>748</a>    //  }   
+<a href=#749 id=749 data-nosnippet>749</a>    //}   
+<a href=#750 id=750 data-nosnippet>750</a>  </span>}
+<a href=#751 id=751 data-nosnippet>751</a>}
+<a href=#752 id=752 data-nosnippet>752</a>
+<a href=#753 id=753 data-nosnippet>753</a><span class="attr">#[cfg(feature=<span class="string">"pybindings"</span>)]
+<a href=#754 id=754 data-nosnippet>754</a></span><span class="macro">pythonize_display!</span>(TelemetryPacketReader);
+<a href=#755 id=755 data-nosnippet>755</a>
 <a href=#756 id=756 data-nosnippet>756</a>
-<a href=#757 id=757 data-nosnippet>757</a><span class="attr">#[cfg(feature=<span class="string">"pybindings"</span>)]
-<a href=#758 id=758 data-nosnippet>758</a></span><span class="macro">pythonize_display!</span>(TelemetryPacketReader);
-<a href=#759 id=759 data-nosnippet>759</a>
-<a href=#760 id=760 data-nosnippet>760</a>
 </code></pre></div></section></main></body></html>

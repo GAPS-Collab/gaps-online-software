@@ -11,6 +11,9 @@ var parsers_8h =
     [ "parse_u64", "parsers_8h.html#a5a4af49a5fb0170a1b7b98a8d0d2e215", null ],
     [ "parse_u8", "parsers_8h.html#aba709b953fba8e891a39f876ae59724d", null ],
     [ "slice", "parsers_8h.html#a7b45ff07f8a68edbdf3c9046172e538d", null ],
+    [ "to_le_bytes", "parsers_8h.html#ab539568a3a2e6c707766e3ed4110f93e", null ],
+    [ "to_le_bytes", "parsers_8h.html#a3eadf45fef1f935a2ea60fc72983914d", null ],
     [ "to_le_bytes", "parsers_8h.html#ad6d0e546d1e3ff1ce3af42dae3177d29", null ],
-    [ "to_le_bytes", "parsers_8h.html#a1499bf957374cccee09cd7e71c6b23f4", null ]
+    [ "to_le_bytes", "parsers_8h.html#a1499bf957374cccee09cd7e71c6b23f4", null ],
+    [ "to_le_bytes", "parsers_8h.html#aabfb9dd9ac4a3d53e1ecb7dce62456b3", null ]
 ];

@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['bfsw_5fptype_5fto_5fstr_0',['bfsw_ptype_to_str',['../namespacegondola.html#a2eb98f781ad8aa43b22a51fa95f65023',1,'gondola']]],
-  ['bfsw_5fptype_5fto_5fu8_1',['bfsw_ptype_to_u8',['../namespacegondola.html#a1d6f919ba6d9021e7a8463a11055e177',1,'gondola']]]
+  ['add_5fframe_0',['add_frame',['../structgondola_1_1CRWriter.html#a7d594611b3bf4d9a020f9d7c4d17b562',1,'gondola::CRWriter']]]
 ];

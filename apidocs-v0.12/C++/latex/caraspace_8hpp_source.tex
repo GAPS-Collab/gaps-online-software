@@ -23,78 +23,104 @@
 \DoxyCodeLine{00019\ }
 \DoxyCodeLine{00020\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacegondola}{gondola}}\ \{}
 \DoxyCodeLine{00021\ }
-\DoxyCodeLine{00023\ \ \ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68}{CRFrameObjectType}}\ :\ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \{}
-\DoxyCodeLine{00024\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a88183b946cc5f0e8c96b2e66e1c74a7e}{Unknown}}\ \ \ \ \ \ \ \ \ \ \ =\ 0,}
-\DoxyCodeLine{00025\ \ \ \ \ \mbox{\hyperlink{structTofPacket}{TofPacket}}\ \ \ \ \ \ \ \ \ =\ 10,}
-\DoxyCodeLine{00026\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryPacket}{TelemetryPacket}}\ \ \ =\ 20,}
-\DoxyCodeLine{00027\ \ \ \};}
+\DoxyCodeLine{00024\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacegondola_a0fad83424699fde92f491a061f489158}{string\_to\_bytes}}(std::string\ value)\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u8>}};\ }
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00027\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacegondola_a54ec6dae0f685d42c5d7b4c62346499e}{get\_runfilename}}(\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}\ run,\ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}\ subrun,\ \textcolor{keywordtype}{bool}\ is\_sim,\ \mbox{\hyperlink{structOption}{Option<std::string>}}\ timestamp)\ -\/>\ std::string;}
 \DoxyCodeLine{00028\ }
-\DoxyCodeLine{00029\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structgondola_1_1CRFrameObject}{CRFrameObject}}\ \{}
-\DoxyCodeLine{00030\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_a93d8e4d5e30cd59ba83416b2e3ebcee4}{HEAD}}\ =\ 0xAAAA;}
-\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_a530c2c307cd4e221c15cc3e24195c8c7}{TAIL}}\ =\ 0x5555;}
-\DoxyCodeLine{00032\ \ \ \ \ }
-\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_a2edf45499451f94355d7fd686898e78e}{version}};}
-\DoxyCodeLine{00034\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68}{CRFrameObjectType}}\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_a2e3d538a8bf72ab32dbe7f9665d04628}{ftype}};}
-\DoxyCodeLine{00035\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u8>}}\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_ab79776d9e2a7370a2b4986d207001963}{payload}};}
-\DoxyCodeLine{00036\ \ }
-\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_a9db436e8a3f36f8f8862ca3d95466e44}{to\_bytestream}}()\ const\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}<\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}>;}
+\DoxyCodeLine{00030\ \ \ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68}{CRFrameObjectType}}\ :\ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a88183b946cc5f0e8c96b2e66e1c74a7e}{Unknown}}\ \ \ \ \ \ \ \ \ \ \ =\ 0,}
+\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{structTofPacket}{TofPacket}}\ \ \ \ \ \ \ \ \ =\ 10,}
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryPacket}{TelemetryPacket}}\ \ \ =\ 20,}
+\DoxyCodeLine{00034\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a779ebf7f81f0c3e975b55f24521406b7}{McTree}}\ \ \ \ \ \ \ \ \ \ \ \ =\ 30,}
+\DoxyCodeLine{00035\ \ \ \};}
+\DoxyCodeLine{00036\ \ \ }
+\DoxyCodeLine{00037\ \ \ \textcolor{keyword}{typedef}\ std::map<std::string,\ std::tuple<u64,\ CRFrameObjectType>>\ \mbox{\hyperlink{namespacegondola_adcb90f37f2ab2c20573b711d0210eb94}{CRFrameIndex}};}
 \DoxyCodeLine{00038\ }
-\DoxyCodeLine{00040\ \ \ \ \ static\ auto\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_ae9b6b4da5a35210f616f1663aebcfb9b}{from\_bytestream}}(\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}<\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}>\ stream,\ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \&pos)\ -\/>\ \mbox{\hyperlink{structgondola_1_1CRFrameObject}{CRFrameObject}};}
-\DoxyCodeLine{00041\ \ \ \ \ \ }
-\DoxyCodeLine{00043\ \ \ \ \ auto\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_a3196f8667f5985f4344e6d39e51f0982}{to\_string}}()\ -\/>\ std::\textcolor{keywordtype}{string};}
-\DoxyCodeLine{00044\ \ \ \};}
-\DoxyCodeLine{00045\ }
-\DoxyCodeLine{00046\ }
-\DoxyCodeLine{00047\ \ \ struct\ \mbox{\hyperlink{structgondola_1_1CRFrame}{CRFrame}}\ \{}
-\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_a93d8e4d5e30cd59ba83416b2e3ebcee4}{HEAD}}\ =\ 0xAAAA;}
-\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_a530c2c307cd4e221c15cc3e24195c8c7}{TAIL}}\ =\ 0x5555;}
-\DoxyCodeLine{00050\ \ \ \ \ \ \ }
-\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_ae9b6b4da5a35210f616f1663aebcfb9b}{from\_bytestream}}(\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u8>}}\ stream,\ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \&pos)\ -\/>\ \mbox{\hyperlink{structgondola_1_1CRFrame}{CRFrame}};}
-\DoxyCodeLine{00052\ \ \ \ \ }
-\DoxyCodeLine{00053\ \ \ \ \ std::map<std::string,\ std::tuple<u64,\ CRFrameObjectType>>\ \mbox{\hyperlink{structgondola_1_1CRFrame_a053f06b5549ec50e5241d68bbd73183a}{index}};}
-\DoxyCodeLine{00054\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u8>}}\ \mbox{\hyperlink{structgondola_1_1CRFrame_a5a6c24fe721883dd2200b65c337ede69}{bytestorage}};}
-\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_a3196f8667f5985f4344e6d39e51f0982}{to\_string}}()\ const\ -\/>\ std::\textcolor{keywordtype}{string};}
-\DoxyCodeLine{00056\ \ \ \ \ }
-\DoxyCodeLine{00057\ \ \ \ \ static\ auto\ parse\_index(\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}<\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}>\ stream,\ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \&pos)\ -\/>\ std::map<std::\textcolor{keywordtype}{string},\ std::tuple<\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}},\ \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68}{CRFrameObjectType}}>>;}
-\DoxyCodeLine{00058\ }
-\DoxyCodeLine{00059\ \ \ \ \ auto\ put\_fobject(\mbox{\hyperlink{structgondola_1_1CRFrameObject}{CRFrameObject}}\ const\ \&fobj,\ std::\textcolor{keywordtype}{string})\ -\/>\ \textcolor{keywordtype}{void};\ }
-\DoxyCodeLine{00060\ }
-\DoxyCodeLine{00062\ \ \ \ \ auto\ get\_tofpacket(std::\textcolor{keywordtype}{string}\ name)\ -\/>\ result::Result<\mbox{\hyperlink{structTofPacket}{TofPacket}},\mbox{\hyperlink{classgondola_1_1IOError}{IOError}}>;}
-\DoxyCodeLine{00063\ \ \ \ \ auto\ get\_telemetrypacket(std::\textcolor{keywordtype}{string}\ name)\ -\/>\ \mbox{\hyperlink{structgondola_1_1TelemetryPacket}{TelemetryPacket}};}
-\DoxyCodeLine{00064\ \ \ \};}
-\DoxyCodeLine{00065\ }
-\DoxyCodeLine{00066\ \ \ struct\ \mbox{\hyperlink{structgondola_1_1CRReader}{CRReader}}\ \{}
-\DoxyCodeLine{00067\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1CRReader}{CRReader}}();}
-\DoxyCodeLine{00068\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1CRReader}{CRReader}}(std::string\ pathname);}
-\DoxyCodeLine{00069\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1CRReader_a6f419b6f567f7f9d65d4389c91c523b2}{CRReader}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structgondola_1_1CRReader}{CRReader}}\&)\ =\ \textcolor{keyword}{delete};}
-\DoxyCodeLine{00070\ \ \ \ }
-\DoxyCodeLine{00075\ \ \ \ \ \textcolor{keyword}{auto}\ set\_path(std::\ string\ pathname)\ -\/>\ void;}
-\DoxyCodeLine{00083\ \ \ \ \ \textcolor{keyword}{auto}\ get\_next\_frame()\ \ \ \ \ \ \ -\/>\ \mbox{\hyperlink{structgondola_1_1CRFrame}{CRFrame}};}
-\DoxyCodeLine{00084\ \ \ \ \ \textcolor{keyword}{auto}\ get\_filenames()\ \ const\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}<std::\textcolor{keywordtype}{string}>;}
-\DoxyCodeLine{00088\ \ \ \ \ auto\ is\_exhausted()\ \ \ const\ -\/>\ \textcolor{keywordtype}{bool};}
-\DoxyCodeLine{00091\ \ \ \ \ auto\ n\_packets\_read()\ const\ -\/>\ \textcolor{keywordtype}{bool};}
-\DoxyCodeLine{00094\ \ \ \ \ auto\ get\_rbcalibrations(\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ n\_rb)\ -\/>\ \mbox{\hyperlink{namespacegondola_ae720591de7c0e9e18619d265295f1ebe}{RBCalibrationMap}};\ \ \ \ \ }
+\DoxyCodeLine{00039\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structgondola_1_1CRFrameObject}{CRFrameObject}}\ \{}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_a93d8e4d5e30cd59ba83416b2e3ebcee4}{HEAD}}\ =\ 0xAAAA;}
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_a530c2c307cd4e221c15cc3e24195c8c7}{TAIL}}\ =\ 0x5555;}
+\DoxyCodeLine{00042\ \ \ \ \ }
+\DoxyCodeLine{00043\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_a2edf45499451f94355d7fd686898e78e}{version}};}
+\DoxyCodeLine{00044\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68}{CRFrameObjectType}}\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_a2e3d538a8bf72ab32dbe7f9665d04628}{ftype}};}
+\DoxyCodeLine{00045\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u8>}}\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_ab79776d9e2a7370a2b4986d207001963}{payload}};}
+\DoxyCodeLine{00046\ \ }
+\DoxyCodeLine{00047\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_a9db436e8a3f36f8f8862ca3d95466e44}{to\_bytestream}}()\ const\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}<\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}>;}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00050\ \ \ \ \ static\ auto\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_ae9b6b4da5a35210f616f1663aebcfb9b}{from\_bytestream}}(\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}<\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}>\ stream,\ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \&pos)\ -\/>\ \mbox{\hyperlink{structgondola_1_1CRFrameObject}{CRFrameObject}};}
+\DoxyCodeLine{00051\ \ \ \ \ \ }
+\DoxyCodeLine{00053\ \ \ \ \ auto\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_af502652f3216d3d6810a45f2a54334db}{to\_string}}()\ -\/>\ std::\textcolor{keywordtype}{string};}
+\DoxyCodeLine{00054\ \ \ \};}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ struct\ \mbox{\hyperlink{structgondola_1_1CRFrame}{CRFrame}}\ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_a93d8e4d5e30cd59ba83416b2e3ebcee4}{HEAD}}\ =\ 0xAAAA;}
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_a530c2c307cd4e221c15cc3e24195c8c7}{TAIL}}\ =\ 0x5555;}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ }
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_ae9b6b4da5a35210f616f1663aebcfb9b}{from\_bytestream}}(\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u8>}}\ stream,\ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \&pos)\ -\/>\ \mbox{\hyperlink{structgondola_1_1CRFrame}{CRFrame}};}
+\DoxyCodeLine{00061\ \ \ \ \ }
+\DoxyCodeLine{00062\ \ \ \ \ \mbox{\hyperlink{namespacegondola_adcb90f37f2ab2c20573b711d0210eb94}{CRFrameIndex}}\ \mbox{\hyperlink{structgondola_1_1CRFrame_a330428efd55c60f8d4bb2be6c6f93be7}{index}};}
+\DoxyCodeLine{00063\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u8>}}\ \ \ \ \ \ bytestorage\ =\ \{\};}
+\DoxyCodeLine{00064\ \ \ \ \ }
+\DoxyCodeLine{00065\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{auto}\ parse\_index(\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u8>}}\ stream,\ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \&pos)\ -\/>\ std::map<std::string,\ std::tuple<u64,\ CRFrameObjectType>>;}
+\DoxyCodeLine{00066\ \ \ \ \ }
+\DoxyCodeLine{00067\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_af502652f3216d3d6810a45f2a54334db}{to\_string}}()\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ -\/>\ std::\textcolor{keywordtype}{string};}
+\DoxyCodeLine{00068\ \ \ \ \ auto\ serialize\_index()\ \ \ \ \ \ \ \ \ const\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}<\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}>;}
+\DoxyCodeLine{00069\ \ \ \ \ auto\ put\_fobject(\mbox{\hyperlink{structgondola_1_1CRFrameObject}{CRFrameObject}}\ const\ \&fobj,\ std::\textcolor{keywordtype}{string})\ -\/>\ \textcolor{keywordtype}{void};\ }
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00072\ \ \ \ \ auto\ get\_tofpacket(std::\textcolor{keywordtype}{string}\ name)\ \ \ \ \ \ \ -\/>\ result::Result<\mbox{\hyperlink{structTofPacket}{TofPacket}},\mbox{\hyperlink{classgondola_1_1IOError}{IOError}}>;}
+\DoxyCodeLine{00073\ \ \ \ \ auto\ get\_telemetrypacket(std::\textcolor{keywordtype}{string}\ name)\ -\/>\ \mbox{\hyperlink{structgondola_1_1TelemetryPacket}{TelemetryPacket}};}
+\DoxyCodeLine{00074\ \ \ }
+\DoxyCodeLine{00076\ \ \ \ \ auto\ \mbox{\hyperlink{structgondola_1_1CRFrameObject_a9db436e8a3f36f8f8862ca3d95466e44}{to\_bytestream}}()\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ const\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}<\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}>;}
+\DoxyCodeLine{00077\ \ \ \};}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ struct\ \mbox{\hyperlink{structgondola_1_1CRWriter}{CRWriter}}\ \{}
+\DoxyCodeLine{00080\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1CRWriter}{CRWriter}}(std::string\ file\_path,\ std::string\ filename,\ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}\ run\_id,\ \mbox{\hyperlink{structOption}{Option<u32>}}\ subrun\_id,\ \mbox{\hyperlink{structOption}{Option<String>}}\ timestamp);\ \ }
+\DoxyCodeLine{00081\ \ \ \ \ std::ofstream\ \ \mbox{\hyperlink{structgondola_1_1CRWriter_a8b72c93af153a6a28386fb72ecb91292}{file}}\ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00082\ \ \ \ \ std::string\ \ \ \ \mbox{\hyperlink{structgondola_1_1CRWriter_acdc9580d289affaeb43a18e72b088365}{file\_path}}\ \ \ \ \ \ ;}
+\DoxyCodeLine{00083\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1CRWriter_a46bbce4c97b476f95b27786612157bf4}{frames\_per\_file}};}
+\DoxyCodeLine{00084\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1CRWriter_ab44d769e86a20e640a228d1a617fb1bc}{mbytes\_per\_file}};}
+\DoxyCodeLine{00085\ \ \ \ \ std::string\ \ \ \ \mbox{\hyperlink{structgondola_1_1CRWriter_afeeb24b5e3493826871b24f51ec49190}{file\_name}}\ \ \ \ \ \ ;}
+\DoxyCodeLine{00086\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}\ \ \ \ \ \ \ \ \ \ \ \ run\_id\ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00087\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}\ \ \ \ \ \ \ \ \ \ \ \ subrun\_id\ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00088\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \ \ \ \ \ \ \ \ \ file\_id\ \ \ \ \ \ \ \ =\ 0;\ }
+\DoxyCodeLine{00089\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \ \ \ \ \ \ \ \ \ n\_frames\ \ \ \ \ \ \ =\ 0;\ }
+\DoxyCodeLine{00090\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \ \ \ \ \ \ \ \ \ file\_nbytes\_wr\ =\ 0;\ }
+\DoxyCodeLine{00091\ \ \ \ \ \mbox{\hyperlink{structOption}{Option<String>}}\ file\_timestamp\ =\ \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84da6adf97f83acf6453d4a6a4b1070f3754}{None}};}
+\DoxyCodeLine{00092\ \ \ \ \ \textcolor{keyword}{auto}\ add\_frame(\textcolor{keyword}{const}\ \mbox{\hyperlink{structgondola_1_1CRFrame}{CRFrame}}\&\ frame)\ \ \ \ \ \ \ -\/>\ void;\ }
+\DoxyCodeLine{00093\ \ \ \ \ \textcolor{keyword}{auto}\ new\_file(\mbox{\hyperlink{structOption}{Option<String>}},\ \textcolor{keywordtype}{bool}\ is\_sim)\ -\/>\ void;}
+\DoxyCodeLine{00094\ \ \ \};}
 \DoxyCodeLine{00095\ }
-\DoxyCodeLine{00097\ \ \ \ \ auto\ is\_from\_telemetry()\ const\ -\/>\ \textcolor{keywordtype}{bool};}
-\DoxyCodeLine{00098\ }
-\DoxyCodeLine{00102\ \ \ \ \ auto\ get\_telemetry\_packet\_index()\ const\ -\/>\ const\ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{HashMap}}<\mbox{\hyperlink{namespacegondola_a598dae982e3c16cd23a9e57c72d39ced}{TelemetryPacketType}},\ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}>\ \&;}
-\DoxyCodeLine{00103\ }
-\DoxyCodeLine{00111\ \ \ \ \ auto\ cache\_telemetry\_first()\ -\/>\ \textcolor{keywordtype}{void};}
-\DoxyCodeLine{00112\ }
-\DoxyCodeLine{00113\ \ \ private:\ \ }
-\DoxyCodeLine{00114\ \ \ \ \ \textcolor{preprocessor}{\#ifdef\ BUILD\_CXXDB}}
-\DoxyCodeLine{00115\ \ \ \ \ \mbox{\hyperlink{namespacegondola_afe901f112c6aac213f44b6dd5b614035}{TofPaddleMap}}\ paddles\_\ \ \ \ \ \ \ \ \ \ ;\ }
-\DoxyCodeLine{00116\ \textcolor{preprocessor}{\ \ \ \ \#endif\ }}
-\DoxyCodeLine{00117\ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ exhausted\_\ \ \ \ \ \ \ \ ;}
-\DoxyCodeLine{00118\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ n\_packets\_read\_\ \ \ ;}
-\DoxyCodeLine{00119\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<std::string>}}\ \ \ filenames\_\ \ \ \ \ \ \ \ ;}
-\DoxyCodeLine{00120\ \ \ \ \ std::ifstream\ \ \ \ \ \ stream\_file\_\ \ \ \ \ \ ;}
-\DoxyCodeLine{00121\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ fileindex\_\ \ \ \ \ \ \ \ ;}
-\DoxyCodeLine{00122\ \ \ \ \ \textcolor{keyword}{auto}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ prime\_next\_file\_()\ -\/>\ void;}
-\DoxyCodeLine{00127\ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \ \ \ \ \ is\_from\_telemetry\_;}
-\DoxyCodeLine{00128\ \ \ \ \ std::unique\_ptr<TelemetryPacketReader>\ telly\_reader\_;}
-\DoxyCodeLine{00129\ \ \ \};}
-\DoxyCodeLine{00130\ \}}
-\DoxyCodeLine{00131\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00096\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structgondola_1_1CRReader}{CRReader}}\ \{}
+\DoxyCodeLine{00097\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1CRReader}{CRReader}}();}
+\DoxyCodeLine{00098\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1CRReader}{CRReader}}(std::string\ pathname);}
+\DoxyCodeLine{00099\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1CRReader_a6f419b6f567f7f9d65d4389c91c523b2}{CRReader}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structgondola_1_1CRReader}{CRReader}}\&)\ =\ \textcolor{keyword}{delete};}
+\DoxyCodeLine{00100\ \ \ \ }
+\DoxyCodeLine{00105\ \ \ \ \ \textcolor{keyword}{auto}\ set\_path(std::\ string\ pathname)\ -\/>\ void;}
+\DoxyCodeLine{00113\ \ \ \ \ \textcolor{keyword}{auto}\ get\_next\_frame()\ \ \ \ \ \ \ -\/>\ \mbox{\hyperlink{structgondola_1_1CRFrame}{CRFrame}};}
+\DoxyCodeLine{00114\ \ \ \ \ \textcolor{keyword}{auto}\ get\_filenames()\ \ const\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}<std::\textcolor{keywordtype}{string}>;}
+\DoxyCodeLine{00118\ \ \ \ \ auto\ is\_exhausted()\ \ \ const\ -\/>\ \textcolor{keywordtype}{bool};}
+\DoxyCodeLine{00121\ \ \ \ \ auto\ n\_packets\_read()\ const\ -\/>\ \textcolor{keywordtype}{bool};}
+\DoxyCodeLine{00124\ \ \ \ \ auto\ get\_rbcalibrations(\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ n\_rb)\ -\/>\ \mbox{\hyperlink{namespacegondola_ae720591de7c0e9e18619d265295f1ebe}{RBCalibrationMap}};\ \ \ \ \ }
+\DoxyCodeLine{00125\ }
+\DoxyCodeLine{00127\ \ \ \ \ auto\ is\_from\_telemetry()\ const\ -\/>\ \textcolor{keywordtype}{bool};}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00132\ \ \ \ \ auto\ get\_telemetry\_packet\_index()\ const\ -\/>\ const\ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{HashMap}}<\mbox{\hyperlink{namespacegondola_a598dae982e3c16cd23a9e57c72d39ced}{TelemetryPacketType}},\ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}>\ \&;}
+\DoxyCodeLine{00133\ }
+\DoxyCodeLine{00141\ \ \ \ \ auto\ cache\_telemetry\_first()\ -\/>\ \textcolor{keywordtype}{void};}
+\DoxyCodeLine{00142\ }
+\DoxyCodeLine{00143\ \ \ private:\ \ }
+\DoxyCodeLine{00144\ \ \ \ \ \textcolor{preprocessor}{\#ifdef\ BUILD\_CXXDB}}
+\DoxyCodeLine{00145\ \ \ \ \ \mbox{\hyperlink{namespacegondola_afe901f112c6aac213f44b6dd5b614035}{TofPaddleMap}}\ paddles\_\ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00146\ \textcolor{preprocessor}{\ \ \ \ \#endif\ }}
+\DoxyCodeLine{00147\ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ exhausted\_\ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00148\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ n\_packets\_read\_\ \ \ ;}
+\DoxyCodeLine{00149\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<std::string>}}\ \ \ filenames\_\ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00150\ \ \ \ \ std::ifstream\ \ \ \ \ \ stream\_file\_\ \ \ \ \ \ ;}
+\DoxyCodeLine{00151\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ fileindex\_\ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00152\ \ \ \ \ \textcolor{keyword}{auto}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ prime\_next\_file\_()\ -\/>\ void;}
+\DoxyCodeLine{00157\ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \ \ \ \ \ is\_from\_telemetry\_;}
+\DoxyCodeLine{00158\ \ \ \ \ std::unique\_ptr<TelemetryPacketReader>\ telly\_reader\_;}
+\DoxyCodeLine{00159\ \ \ \};}
+\DoxyCodeLine{00160\ \}}
+\DoxyCodeLine{00161\ \textcolor{preprocessor}{\#endif}}
 
 \end{DoxyCode}

@@ -11,6 +11,8 @@ struct \mbox{\hyperlink{structgondola_1_1CRFrameObject}{CRFrame\+Object}}
 \item 
 struct \mbox{\hyperlink{structgondola_1_1CRReader}{CRReader}}
 \item 
+struct \mbox{\hyperlink{structgondola_1_1CRWriter}{CRWriter}}
+\item 
 class \mbox{\hyperlink{classgondola_1_1IOError}{IOError}}
 \item 
 struct \mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}}
@@ -66,6 +68,8 @@ struct \mbox{\hyperlink{structgondola_1_1TrkMetaData}{Trk\+Meta\+Data}}
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, \mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}} $>$ \mbox{\hyperlink{namespacegondola_ae720591de7c0e9e18619d265295f1ebe}{RBCalibration\+Map}}
 \begin{DoxyCompactList}\small\item\em shortcut for the typically used map of rb\+\_\+id -\/\texorpdfstring{$>$}{>} calibrations \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ std\+::string, std\+::tuple$<$ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}, \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68}{CRFrame\+Object\+Type}} $>$ $>$ \mbox{\hyperlink{namespacegondola_adcb90f37f2ab2c20573b711d0210eb94}{CRFrame\+Index}}
+\item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, \mbox{\hyperlink{structgondola_1_1TofPaddle}{Tof\+Paddle}} $>$ \mbox{\hyperlink{namespacegondola_afe901f112c6aac213f44b6dd5b614035}{Tof\+Paddle\+Map}}
 \begin{DoxyCompactList}\small\item\em A map of paddle id -\/\texorpdfstring{$>$}{>} \doxylink{structgondola_1_1TofPaddle}{Tof\+Paddle}. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{namespacegondola_afe901f112c6aac213f44b6dd5b614035}{Tof\+Paddle\+Map}} $>$ \mbox{\hyperlink{namespacegondola_a22af79ae5530ccd2bc4a9caeb455e8c6}{Tof\+Paddle\+Map\+Ptr}}
@@ -88,6 +92,7 @@ struct \mbox{\hyperlink{structgondola_1_1TrkMetaData}{Trk\+Meta\+Data}}
 enum class \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68}{CRFrame\+Object\+Type}} \+: u8 \{ \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a88183b946cc5f0e8c96b2e66e1c74a7e}{Unknown}} = 0
 , \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a0a5f7d79c74b92d33255fc332e25b536}{Tof\+Packet}} = 10
 , \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68aac967e66068a7e25b02b4b2e6bcc4504}{Telemetry\+Packet}} = 20
+, \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a779ebf7f81f0c3e975b55f24521406b7}{Mc\+Tree}} = 30
  \}
 \begin{DoxyCompactList}\small\item\em These are objects which can be stored in a caraspace frame ~\newline
  \end{DoxyCompactList}\item 
@@ -221,6 +226,10 @@ enum class \mbox{\hyperlink{namespacegondola_af998b820a54bca400c19e03948e82c28}{
 \begin{DoxyCompactList}\small\item\em Jamie\textquotesingle{}s simpler version with single-\/width spike correction. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_ac9b080318e2d844f47a5dfe593000aef}{load\+\_\+tof\+\_\+calibrations}} (std\+::string \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pathname}}) -\/$>$ std\+::map$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, \mbox{\hyperlink{structgondola_1_1RBCalibration}{RBCalibration}} $>$
 \begin{DoxyCompactList}\small\item\em convenience function to load all the calibration files from a certain directory \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a0fad83424699fde92f491a061f489158}{string\+\_\+to\+\_\+bytes}} (std\+::string \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{value}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a54ec6dae0f685d42c5d7b4c62346499e}{get\+\_\+runfilename}} (\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{run}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{subrun}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{is\+\_\+sim}}, \mbox{\hyperlink{structOption}{Option}}$<$ std\+::string $>$ timestamp) -\/$>$ std\+::string
+\begin{DoxyCompactList}\small\item\em A standardized way to tag files with run id/subrun id/ timestamp. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_afcc490db45825de190a991267dacf561}{get\+\_\+tofpaddles}} () -\/$>$ \mbox{\hyperlink{namespacegondola_afe901f112c6aac213f44b6dd5b614035}{Tof\+Paddle\+Map}}
 \begin{DoxyCompactList}\small\item\em Get a paddle from the database. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_aa6d3f533826fda788c78aa01dea07827}{get\+\_\+rb\+\_\+id\+\_\+paddles}} () -\/$>$ \mbox{\hyperlink{namespacegondola_a2b826021db643b07ffc9b141e01d2c34}{Rb\+Id\+Channel\+Paddle\+Id\+Map}}
@@ -269,6 +278,12 @@ std\+::ostream \& \mbox{\hyperlink{namespacegondola_a70a1b591bf58b6e149e2ec81514
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a1499bf957374cccee09cd7e71c6b23f4}{to\+\_\+le\+\_\+bytes}} (\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{number}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$
 \item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_aabfb9dd9ac4a3d53e1ecb7dce62456b3}{to\+\_\+le\+\_\+bytes}} (\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{number}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_ab539568a3a2e6c707766e3ed4110f93e}{to\+\_\+le\+\_\+bytes}} (\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{number}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a3eadf45fef1f935a2ea60fc72983914d}{to\+\_\+le\+\_\+bytes}} (\mbox{\hyperlink{tof__typedefs_8h_a48d6cd8e4135fb2ff7e7f2dac84089ec}{i32}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{number}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$
+\item 
 {\footnotesize template$<$\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typename}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{T}} $>$ }\\\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{T}} $>$ \mbox{\hyperlink{namespacegondola_a7b45ff07f8a68edbdf3c9046172e538d}{slice}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{T}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{vec}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{start}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{end}})
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}} \mbox{\hyperlink{namespacegondola_a4e34052f6dbf7321e933fbaa9000d94d}{parse\+\_\+bool}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}}, \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}})
@@ -305,6 +320,12 @@ This file is part of gaps-\/online-\/software and published under the GPLv3 lice
 Bascially a re-\/write of some bfsw stuff to avoid pulling in the dependency 
 
 \doxysubsection{Typedef Documentation}
+\Hypertarget{namespacegondola_adcb90f37f2ab2c20573b711d0210eb94}\label{namespacegondola_adcb90f37f2ab2c20573b711d0210eb94} 
+\index{gondola@{gondola}!CRFrameIndex@{CRFrameIndex}}
+\index{CRFrameIndex@{CRFrameIndex}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{CRFrameIndex}{CRFrameIndex}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$std\+::string, std\+::tuple$<$\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}, \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68}{CRFrame\+Object\+Type}}$>$ $>$ \mbox{\hyperlink{namespacegondola_adcb90f37f2ab2c20573b711d0210eb94}{gondola\+::\+CRFrame\+Index}}}
+
 \Hypertarget{namespacegondola_a770bde374c96a3200b922ace0d70e09b}\label{namespacegondola_a770bde374c96a3200b922ace0d70e09b} 
 \index{gondola@{gondola}!DsiJChnPaddleIdMap@{DsiJChnPaddleIdMap}}
 \index{DsiJChnPaddleIdMap@{DsiJChnPaddleIdMap}!gondola@{gondola}}
@@ -424,6 +445,10 @@ Tof\+Packet&\\
 
 \raisebox{\heightof{T}}[0pt][0pt]{\index{TelemetryPacket@{TelemetryPacket}!gondola@{gondola}}\index{gondola@{gondola}!TelemetryPacket@{TelemetryPacket}}}\Hypertarget{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68aac967e66068a7e25b02b4b2e6bcc4504}\label{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68aac967e66068a7e25b02b4b2e6bcc4504} 
 Telemetry\+Packet&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{McTree@{McTree}!gondola@{gondola}}\index{gondola@{gondola}!McTree@{McTree}}}\Hypertarget{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a779ebf7f81f0c3e975b55f24521406b7}\label{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a779ebf7f81f0c3e975b55f24521406b7} 
+Mc\+Tree&\\
 \hline
 
 \end{DoxyEnumFields}
@@ -862,6 +887,16 @@ Get the position of a module -\/ returns in cm.
 
 Get a paddle if the rb id and channel is known (HG) 
 
+\Hypertarget{namespacegondola_a54ec6dae0f685d42c5d7b4c62346499e}\label{namespacegondola_a54ec6dae0f685d42c5d7b4c62346499e} 
+\index{gondola@{gondola}!get\_runfilename@{get\_runfilename}}
+\index{get\_runfilename@{get\_runfilename}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{get\_runfilename()}{get\_runfilename()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::get\+\_\+runfilename (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}}]{run,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}}]{subrun,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}}}]{is\+\_\+sim,  }\item[{\mbox{\hyperlink{structOption}{Option}}$<$ std\+::string $>$}]{timestamp = {\ttfamily \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84da6adf97f83acf6453d4a6a4b1070f3754}{None}}} }\end{DoxyParamCaption}) -\/$>$ std\+::string}
+
+
+
+A standardized way to tag files with run id/subrun id/ timestamp. 
+
 \Hypertarget{namespacegondola_afcc490db45825de190a991267dacf561}\label{namespacegondola_afcc490db45825de190a991267dacf561} 
 \index{gondola@{gondola}!get\_tofpaddles@{get\_tofpaddles}}
 \index{get\_tofpaddles@{get\_tofpaddles}!gondola@{gondola}}
@@ -1122,16 +1157,40 @@ The original "{}\+Remove\+Spikes"{} from the DRS4 manual \Hypertarget{namespaceg
 
 An adjusted, simpler version of the spike cleaing written by Jamie. 
 
-A simple version of the spike cleaning, which does not rely on all channels being present and can work independently on each channel \Hypertarget{namespacegondola_ad6d0e546d1e3ff1ce3af42dae3177d29}\label{namespacegondola_ad6d0e546d1e3ff1ce3af42dae3177d29} 
+A simple version of the spike cleaning, which does not rely on all channels being present and can work independently on each channel \Hypertarget{namespacegondola_a0fad83424699fde92f491a061f489158}\label{namespacegondola_a0fad83424699fde92f491a061f489158} 
+\index{gondola@{gondola}!string\_to\_bytes@{string\_to\_bytes}}
+\index{string\_to\_bytes@{string\_to\_bytes}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{string\_to\_bytes()}{string\_to\_bytes()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::string\+\_\+to\+\_\+bytes (\begin{DoxyParamCaption}\item[{std\+::string}]{value }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}$>$}
+
+byte representation of a string to be used with to\+\_\+bytestream methods \Hypertarget{namespacegondola_ab539568a3a2e6c707766e3ed4110f93e}\label{namespacegondola_ab539568a3a2e6c707766e3ed4110f93e} 
 \index{gondola@{gondola}!to\_le\_bytes@{to\_le\_bytes}}
 \index{to\_le\_bytes@{to\_le\_bytes}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{to\_le\_bytes()}{to\_le\_bytes()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+\doxysubsubsection{\texorpdfstring{to\_le\_bytes()}{to\_le\_bytes()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::to\+\_\+le\+\_\+bytes (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}}]{number }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}$>$}
+
+Reverse-\/parse a f32 a la rust\textquotesingle{}s built in f32\+::to\+\_\+le\+\_\+bytes \Hypertarget{namespacegondola_a3eadf45fef1f935a2ea60fc72983914d}\label{namespacegondola_a3eadf45fef1f935a2ea60fc72983914d} 
+\index{gondola@{gondola}!to\_le\_bytes@{to\_le\_bytes}}
+\index{to\_le\_bytes@{to\_le\_bytes}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{to\_le\_bytes()}{to\_le\_bytes()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::to\+\_\+le\+\_\+bytes (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a48d6cd8e4135fb2ff7e7f2dac84089ec}{i32}}}]{number }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}$>$}
+
+Reverse-\/parse a i32 a la rust\textquotesingle{}s built in f32\+::to\+\_\+le\+\_\+bytes \Hypertarget{namespacegondola_ad6d0e546d1e3ff1ce3af42dae3177d29}\label{namespacegondola_ad6d0e546d1e3ff1ce3af42dae3177d29} 
+\index{gondola@{gondola}!to\_le\_bytes@{to\_le\_bytes}}
+\index{to\_le\_bytes@{to\_le\_bytes}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{to\_le\_bytes()}{to\_le\_bytes()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
 {\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::to\+\_\+le\+\_\+bytes (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}}]{number }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}$>$}
 
 Reverse-\/parse a u16 a la rust\textquotesingle{}s built in u16\+::to\+\_\+le\+\_\+bytes \Hypertarget{namespacegondola_a1499bf957374cccee09cd7e71c6b23f4}\label{namespacegondola_a1499bf957374cccee09cd7e71c6b23f4} 
 \index{gondola@{gondola}!to\_le\_bytes@{to\_le\_bytes}}
 \index{to\_le\_bytes@{to\_le\_bytes}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{to\_le\_bytes()}{to\_le\_bytes()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+\doxysubsubsection{\texorpdfstring{to\_le\_bytes()}{to\_le\_bytes()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
 {\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::to\+\_\+le\+\_\+bytes (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}}]{number }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}$>$}
 
-Reverse-\/parse a u32 a la rust\textquotesingle{}s built in u32\+::to\+\_\+le\+\_\+bytes 
+Reverse-\/parse a u32 a la rust\textquotesingle{}s built in u32\+::to\+\_\+le\+\_\+bytes \Hypertarget{namespacegondola_aabfb9dd9ac4a3d53e1ecb7dce62456b3}\label{namespacegondola_aabfb9dd9ac4a3d53e1ecb7dce62456b3} 
+\index{gondola@{gondola}!to\_le\_bytes@{to\_le\_bytes}}
+\index{to\_le\_bytes@{to\_le\_bytes}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{to\_le\_bytes()}{to\_le\_bytes()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::to\+\_\+le\+\_\+bytes (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}}]{number }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}$>$}
+
+Reverse-\/parse a u64 a la rust\textquotesingle{}s built in u64\+::to\+\_\+le\+\_\+bytes 

@@ -24,5 +24,5 @@ var structgondola_1_1TofEventSummary =
     [ "tot_edep_cor", "structgondola_1_1TofEventSummary.html#a1a127213deb4bb0fc81c3cc6d491d93c", null ],
     [ "tot_edep_umb", "structgondola_1_1TofEventSummary.html#aa4a812c158e913d3a95be82207953ba4", null ],
     [ "trigger_sources", "structgondola_1_1TofEventSummary.html#a37baf6d63dfe170c63e6b7f8f4bdb734", null ],
-    [ "version", "structgondola_1_1TofEventSummary.html#aa546c074c9bc5ce991986f04997d94de", null ]
+    [ "version", "structgondola_1_1TofEventSummary.html#a6c3d70b924f004554f74e9bace26408f", null ]
 ];

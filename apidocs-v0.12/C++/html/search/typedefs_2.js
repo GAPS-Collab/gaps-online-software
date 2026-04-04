@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['f32_0',['f32',['../tof__typedefs_8h.html#a5f6906312a689f27d70e9d086649d3fd',1,'tof_typedefs.h']]],
-  ['f64_1',['f64',['../tof__typedefs_8h.html#a94dab5770726ccbef8c7d026cfbdf8e5',1,'tof_typedefs.h']]]
+  ['dsijchnpaddleidmap_0',['DsiJChnPaddleIdMap',['../namespacegondola.html#a770bde374c96a3200b922ace0d70e09b',1,'gondola']]]
 ];

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["strips"]};
+window.SIDEBAR_ITEMS = {"enum":["TrackerHitSource"],"mod":["online_calibration","strips"],"struct":["TrackerHitSourceIter"]};

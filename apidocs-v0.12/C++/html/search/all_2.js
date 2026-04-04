@@ -18,7 +18,7 @@ var searchData=
   ['ch9_5ffreq_15',['ch9_freq',['../structgondola_1_1RBEventHeader.html#a3d550f576cf69562562d2e848d1c6d3c',1,'gondola::RBEventHeader']]],
   ['ch9_5fphase_16',['ch9_phase',['../structgondola_1_1RBEventHeader.html#a38924394047bc70d30d13ad872314846',1,'gondola::RBEventHeader']]],
   ['changelog_17',['CHANGELOG',['../index.html#autotoc_md5',1,'']]],
-  ['channel_18',['channel',['../structgondola_1_1TrkHit.html#a4461756861f59f9a6464621b380f809b',1,'gondola::TrkHit::channel'],['../structgondola_1_1TrackerStrip.html#a10bed513a14dfc5d61ca2c8741b6e5bb',1,'gondola::TrackerStrip::channel']]],
+  ['channel_18',['channel',['../structgondola_1_1TrackerStrip.html#a10bed513a14dfc5d61ca2c8741b6e5bb',1,'gondola::TrackerStrip::channel'],['../structgondola_1_1TrkHit.html#a4461756861f59f9a6464621b380f809b',1,'gondola::TrkHit::channel']]],
   ['channel_5fmask_19',['channel_mask',['../structgondola_1_1TofEventSummary.html#af828cd81c1608dcb33f25aa1fb6599ac',1,'gondola::TofEventSummary::channel_mask'],['../structgondola_1_1RBEventHeader.html#acf2472f9f64e05b3c4518e33222465b6',1,'gondola::RBEventHeader::channel_mask'],['../structgondola_1_1TofEvent.html#ae3ebafe20044ee6ccced77eaf60c2242',1,'gondola::TofEvent::channel_mask']]],
   ['channelidwrong_20',['ChannelIDWrong',['../namespacegondola.html#ae4efa4080cf89476f85e917971613baaae47816a3c64358b80c028dc88edcab3c',1,'gondola']]],
   ['checksum_21',['checksum',['../structgondola_1_1TelemetryPacketHeader.html#af5513ee58e80db5c1f3e7a9a272f2a85',1,'gondola::TelemetryPacketHeader']]],
@@ -40,12 +40,14 @@ var searchData=
   ['cpumonidata_37',['cpumonidata',['../structCPUMoniData.html',1,'CPUMoniData'],['../tof__packet_8h.html#aa69433dde428a8cd2a2242fb3592a565a290065ac442025f6fbe83611db302589',1,'CPUMoniData:&#160;tof_packet.h'],['../structCPUMoniData.html#ab8d928c85f13242c45c657c37e6de119',1,'CPUMoniData::CPUMoniData()']]],
   ['crc_38',['crc',['../structgondola_1_1TrkHeader.html#a5de7667bcf3f603ea03532678a4da1d1',1,'gondola::TrkHeader']]],
   ['crc32wrong_39',['Crc32Wrong',['../namespacegondola.html#ae4efa4080cf89476f85e917971613baaa1b8508e116432ac1383a292c6a0d05c1',1,'gondola']]],
-  ['create_5fid_40',['create_id',['../structgondola_1_1TrackerStrip.html#af09ff3a37a5e787b592035cf77712230',1,'gondola::TrackerStrip::create_id() const -&gt; u32'],['../structgondola_1_1TrackerStrip.html#ae38a4fa9b10d4c96f7f3028b8cb60433',1,'gondola::TrackerStrip::create_id(u32 layer, u32 row, u32 module, u32 channel) -&gt; u32']]],
+  ['create_5fid_40',['create_id',['../structgondola_1_1TrackerStrip.html#ae38a4fa9b10d4c96f7f3028b8cb60433',1,'gondola::TrackerStrip::create_id(u32 layer, u32 row, u32 module, u32 channel) -&gt; u32'],['../structgondola_1_1TrackerStrip.html#af09ff3a37a5e787b592035cf77712230',1,'gondola::TrackerStrip::create_id() const -&gt; u32']]],
   ['createcalibrationfile_41',['CreateCalibrationFile',['../commands_8h.html#ad6d9706eb4e1aa6ed956444c5cd2a3b5a65b56336792a0f107e6b14c0aa170348',1,'commands.h']]],
   ['creation_5ftime_42',['creation_time',['../structgondola_1_1TelemetryEvent.html#a702b3e3b82ee020f57cd2c692677abd4',1,'gondola::TelemetryEvent']]],
   ['crframe_43',['CRFrame',['../structgondola_1_1CRFrame.html',1,'gondola']]],
-  ['crframeobject_44',['CRFrameObject',['../structgondola_1_1CRFrameObject.html',1,'gondola']]],
-  ['crframeobjecttype_45',['CRFrameObjectType',['../namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68',1,'gondola']]],
-  ['crreader_46',['crreader',['../structgondola_1_1CRReader.html#a6f419b6f567f7f9d65d4389c91c523b2',1,'gondola::CRReader::CRReader(const CRReader &amp;)=delete'],['../structgondola_1_1CRReader.html#ab6099ef66f4d227ff4130819db00c114',1,'gondola::CRReader::CRReader(std::string pathname)'],['../structgondola_1_1CRReader.html',1,'gondola::CRReader'],['../structgondola_1_1CRReader.html#a7f8accecfe3c59fe8e2507f8a2ce4ba5',1,'gondola::CRReader::CRReader()']]],
-  ['ctr_5fetx_47',['ctr_etx',['../structgondola_1_1TofHit.html#a469f5da9286a585fe86235fa80b7bdd0',1,'gondola::TofHit']]]
+  ['crframeindex_44',['CRFrameIndex',['../namespacegondola.html#adcb90f37f2ab2c20573b711d0210eb94',1,'gondola']]],
+  ['crframeobject_45',['CRFrameObject',['../structgondola_1_1CRFrameObject.html',1,'gondola']]],
+  ['crframeobjecttype_46',['CRFrameObjectType',['../namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68',1,'gondola']]],
+  ['crreader_47',['crreader',['../structgondola_1_1CRReader.html#a7f8accecfe3c59fe8e2507f8a2ce4ba5',1,'gondola::CRReader::CRReader()'],['../structgondola_1_1CRReader.html',1,'gondola::CRReader'],['../structgondola_1_1CRReader.html#ab6099ef66f4d227ff4130819db00c114',1,'gondola::CRReader::CRReader(std::string pathname)'],['../structgondola_1_1CRReader.html#a6f419b6f567f7f9d65d4389c91c523b2',1,'gondola::CRReader::CRReader(const CRReader &amp;)=delete']]],
+  ['crwriter_48',['crwriter',['../structgondola_1_1CRWriter.html',1,'gondola::CRWriter'],['../structgondola_1_1CRWriter.html#a91b7dda052c79f22c25928e712182ba4',1,'gondola::CRWriter::CRWriter()']]],
+  ['ctr_5fetx_49',['ctr_etx',['../structgondola_1_1TofHit.html#a469f5da9286a585fe86235fa80b7bdd0',1,'gondola::TofHit']]]
 ];

@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['string_0',['String',['../tof__typedefs_8h.html#afbeda3fd1bdc8c37d01bdf9f5c8274ff',1,'tof_typedefs.h']]]
+  ['rbcalibrationmap_0',['RBCalibrationMap',['../namespacegondola.html#ae720591de7c0e9e18619d265295f1ebe',1,'gondola']]],
+  ['rbidchannelpaddleidmap_1',['RbIdChannelPaddleIdMap',['../namespacegondola.html#a2b826021db643b07ffc9b141e01d2c34',1,'gondola']]]
 ];
