@@ -87,6 +87,8 @@ impl TelemetryEvent {
   /// Add tracker hits (e.g. hits from packet type 80)
   pub fn add_tracker_hits(&mut self, hits:  &Vec<TrackerHit>) {
     self.tracker_hits.extend_from_slice(hits);
+    // for each tracker hits, the packet length extends by 4 bytes 
+    self.header.length += (4*hits.len()) as u16;
   }
 
   #[cfg(feature="database")]
@@ -332,9 +334,9 @@ impl Serialization for TelemetryEvent {
     stream.extend_from_slice(&tof_bytes);
     stream.push(0xbb);
     stream.extend_from_slice(&(self.tracker_hits.len() as u16).to_le_bytes());
+    //println!("Will add bytes for {} tracker hits!", self.tracker_hits.len());
     for h in &self.tracker_hits { 
       let mut strip_id: u16 = 0;
-
       // Shift each value to its respective position and OR them together
       strip_id |= (h.channel as u16) & 0b11111;       // Bits 0-4
       strip_id |= ((h.module as u16) & 0b111) << 5;   // Bits 5-7
@@ -478,7 +480,10 @@ impl TelemetryEvent {
   /// Add tracker hits to the merged event (e.g. with hits from packet type 80
   #[pyo3(name="add_tracker_hits")]
   pub fn add_tracker_hits_py(&mut self, hits:  Vec<TrackerHit>) {
+    // FIXME - use the above function here! 
     self.tracker_hits.extend_from_slice(&hits);
+    // for each tracker hits, the packet length extends by 4 bytes 
+    self.header.length += (4*hits.len()) as u16;
   }
   
   /// Delete tracker hits (e.g. in case they are supposed to 
