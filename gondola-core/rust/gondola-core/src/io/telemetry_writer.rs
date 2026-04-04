@@ -68,7 +68,7 @@ impl TelemetryPacketWriter {
     info!("Writing to file {filename}");
     file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
     file_name = filename;
-    Self {
+    let mut writer = Self {
       file,
       file_path        : file_path,
       pkts_per_file    : 0,
@@ -78,7 +78,9 @@ impl TelemetryPacketWriter {
       n_packets        : 0,
       file_name        : file_name,
       last_timestamp   : utc_timestamp,
-    }
+    };
+    writer.add_telemetry_packet(first_packet);
+    writer
   }
 
   /// Extract the gcutime from the packet and use it as 
