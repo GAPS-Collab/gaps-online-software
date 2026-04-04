@@ -139,7 +139,7 @@ impl CRWriter {
       if frame.timestamp.clone().unwrap() - self.first_gcu_timestamp.unwrap() as f64 > self.file_len_gcu_sec.unwrap() as f64 {
         newfile = true; 
         self.file_timestamp = get_utc_timestamp_from_unix(frame.timestamp.clone().unwrap()); 
-        println!("starting new file with {}", self.file_timestamp.clone().unwrap());
+        //println!("starting new file with {}", self.file_timestamp.clone().unwrap());
         self.first_gcu_timestamp = Some(frame.timestamp.unwrap() as u64);
       }
     }

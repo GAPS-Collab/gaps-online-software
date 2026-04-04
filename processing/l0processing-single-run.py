@@ -1,15 +1,24 @@
 #! /usr/bin/env python 
 
-# Strategy
-#
-# First - remerge tracker packet 80 with tof data 
+"""
+Re-organize telemetry binary data. This will create 
+'caraspace' files, which contain one frame/event 
+including all tracker/merged events for that specific
+event id.
 
-import os
-import shutil
+This requires a structure, where data has already been 
+organized by run. 
+
+A single instance of this script needs to be run for 
+one specific data run
+"""
+
+#import os
+#import shutil
 import tqdm
 import gondola as go
-import time
-import re
+#import time
+#import re
 import matplotlib.pyplot as plt 
 import matplotlib 
 matplotlib.use('agg')
@@ -18,8 +27,8 @@ import dashi as d
 d.visual()
 
 from pathlib import Path
-from glob import glob
-from copy import deepcopy
+#from glob import glob
+#from copy import deepcopy
 from dataclasses import dataclass
 from fancy_dataclass import TOMLDataclass
 
@@ -54,7 +63,25 @@ class RunMeta(TOMLDataclass):
     n_events       : int   = 0
     avg_rate       : float = 0
 
+@dataclass 
+class MergedSummary(TOMLDataclass): 
+    """
+    Simple logging of some quantities during 
+    the creation of the run data.
+    """ 
+    tracker_unpack_errors         : int   = 0
+    total_tracker_daq_packets     : int   = 0
+    n_multiple_evids              : int   = 0
+    associated_tracker_daq_events : int   = 0
+    total_tracker_daq_events      : int   = 0 
+    abs_smallest_delta_time       : float = np.inf
+    abs_largest_delta_time        : float = 0
+    used_gcu_cutoff_delta         : int   = 0 
+
 def load_run(fname, telemetry_dir, seconds_pre=240, seconds_post=480):
+    """
+    Load a run from a metadata file
+    """
     with open(fname, "r") as f:
         run_meta = RunMeta.load(f)
     files = go.io.grace_get_telemetry_binaries(run_meta.start_gcu_time - seconds_pre, run_meta.stop_gcu_time + seconds_post, telemetry_dir)
@@ -66,7 +93,7 @@ def load_run(fname, telemetry_dir, seconds_pre=240, seconds_post=480):
 if __name__ == '__main__':
 
     import argparse
-    import sys
+    #import sys
 
     description = """Pre-process the telemetry data for the usage with SimpleDet"""
     parser = argparse.ArgumentParser(description=description)
@@ -78,35 +105,11 @@ if __name__ == '__main__':
                         help='A directory with telemetry binaries, as received from the telemetry stream',\
                         type=Path,
                         )
-    #parser.add_argument('-n','--npackets', type=int,\
-    #                    default=-1, help='Limit readout to npackets, -1 for all packets (default)')
-    #parser.add_argument('--n-tof-files', type=int,\
-    #                    default=-1, help='Limit the readout to number of tif files, -1 for all files (default)')
-    #parser.add_argument('--tof-dir', default='', type=Path,\
-    #                    help='A directory with tof data files (.tof.gaps)',)
-    #parser.add_argument('-s','--start-time',\
-    #                    type=int, default=-1,\
-    #                    help='The run start time, e.g. as taken from the elog')
-    #parser.add_argument('-e','--end-time',
-    #                    type=int, default=-1,\
-    #                    help='The run end time, e.g. as taken from the elog')
-    #parser.add_argument('-r','--run-id', default=-1, type=int,\
-    #                    help='TOF Run id (only relevant when working with TOF files')
-    parser.add_argument('-o','--outdir',\
-                        help='Outdir for caraspace output files',
-                        type=Path,
-                        default=None)
-    parser.add_argument('--load-remainder',\
-                        help='Load a folder with files which could not be associated the last time this script was run',
-                        type=Path,
-                        default=None)
+    parser.add_argument('--gcu-seconds-time-cutoff', type=int,\
+                        default=100, help='How many seconds of the gcu clock are allowed to pass between tracker and merged event packets to still allow the merge? Typically the time gap is ~60s. If this number is too large, we risk merging event ids from different runs')
     
     #parser.add_argument('-v','--verbose', action='store_true',\
     #                    help='More verbose output')
-    #parser.add_argument('--no-gps', action='store_true', \
-    #                    help='Ignore the GPS to find matching telemetry and tof timestamps. Only use the tof file timestamps')
-    #parser.add_argument('--reprocess', action='store_true', \
-    #                    help='Recalculate tof packets with latest version of the code')
     args = parser.parse_args()
   
     run_meta = Path(args.run_dir)
@@ -114,7 +117,6 @@ if __name__ == '__main__':
     print (run_meta)
     run_meta = run_meta[0]
     run_meta_data = RunMeta.load(run_meta)
-    #print (run_meata) 
     
     run_packets = load_run(run_meta, args.telemetry_dir )
     first_timestamp = go.io.get_utc_timestamp_from_unix(run_packets[0].header.gcutime)
@@ -132,22 +134,17 @@ if __name__ == '__main__':
     #m_events_no_tr = []
     re_merged = {ev[0].tof.event_id : (ev,[]) for ev in m_events}
 
-    # deal with the tracker packets
-    tracker_unpack_errors         = 0
-    total_tracker_daq_packets     = 0 
-    n_multiple_evids              = 0
-    associated_tracker_daq_events = 0
-    total_tracker_daq_events      = 0
-    smallest_delta_time           = np.inf
+    log                           = MergedSummary() 
+    log.used_gcu_cutoff_delta     = args.gcu_seconds_time_cutoff 
     gcu_time_differences          = []
     for pack in tqdm.tqdm(tracker):
         try:
             ev = go.events.TrackerDAQEventPacket.from_telemetrypacket(pack)
         except Exception as e:
             print (f'ERROR Unpacking caused {e}') 
-            tracker_unpack_errors += 1
+            log.tracker_unpack_errors += 1
             continue
-        total_tracker_daq_packets += 1
+        log.total_tracker_daq_packets += 1
         remaining = len(ev.event_ids)
         for evid in ev.event_ids:
             candidates = []
@@ -161,8 +158,10 @@ if __name__ == '__main__':
                 # in time
                 if delta_gcutime < 100:
                     candidates.append((delta_gcutime,ev)) 
-                if delta_gcutime < smallest_delta_time:
-                    smallest_delta_time = delta_gcutime
+                if delta_gcutime < log.abs_smallest_delta_time:
+                    log.abs_smallest_delta_time = delta_gcutime
+                if delta_gcutime > log.abs_largest_delta_time:
+                    log.abs_largest_delta_time = delta_gcutime
             
             # this creates a list of candidates to which run this 
             # trackerevent might belong
@@ -171,7 +170,7 @@ if __name__ == '__main__':
                 # one closest in time - throw the rest away  
                 candidate = sorted(candidates, key=lambda x : x[0])[0]
                 if len(candidates) > 1:
-                    n_multiple_evids += 1
+                    log.n_multiple_evids += 1
                 __,ev   = candidate
                 
                 # check if the tof event id valid flag is set
@@ -180,22 +179,26 @@ if __name__ == '__main__':
                     # we put the event in the now empty TrackerPacket 
                     empty_ev.add_event( sub_event)
                     re_merged[evid][1].append(empty_ev)
-                    associated_tracker_daq_events += 1
-                #ev.remove_event(evid) 
+                    log.associated_tracker_daq_events += 1
             # all events which have undergone any processing
-            total_tracker_daq_events += 1
+            log.total_tracker_daq_events += 1
+    logfilename = args.run_dir / 'l0-caraspace.log'
+    with open(logfilename,'w') as logfile:
+        log.to_toml(logfile)
     
     #for k in m_events:
-    print(f'--> We saw {tracker_unpack_errors} unpacking errors for tracker event packets!')
-    print(f'--> We got {100*n_multiple_evids/len(tracker):.3f}% multiple evids!')
-    print(f'--> We got {n_multiple_evids} (total) multiple evids!')
+    print(f'--> We saw {log.tracker_unpack_errors} unpacking errors for tracker event packets!')
+    print(f'--> We got {100*log.n_multiple_evids/len(tracker):.3f}% multiple evids!')
+    print(f'--> We got {log.n_multiple_evids} (total) multiple evids!')
     
-    print(f'--> The smallest delta gcutime for multiple events was {smallest_delta_time}')
-    print(f'--> There were {tracker_unpack_errors} errors when unpacking merged events!')
-    print(f'--> We saw {total_tracker_daq_packets} tracker daq events')
-    print(f'--> We associated {associated_tracker_daq_events} tracker events with the merged events!')
-    print(f'--> That is ~{float(associated_tracker_daq_events)/len(tracker):.5f} events/packet')
-   
+    print(f'--> The smallest abs delta gcutime for multiple events was {log.abs_smallest_delta_time}')
+    print(f'--> The largest abs delta gcutime for multiple events was {log.abs_largest_delta_time}')
+    print(f'--> There were {log.tracker_unpack_errors} errors when unpacking merged events!')
+    print(f'--> We saw {log.total_tracker_daq_packets} tracker daq events')
+    print(f'--> We associated {log.associated_tracker_daq_events} tracker events with the merged events!')
+    print(f'--> That is ~{float(log.associated_tracker_daq_events)/len(tracker):.5f} events/packet')
+  
+    # control plots - gcu time as used in the merging 
     fig = plt.figure(figsize=cb.layout.FIGSIZE_A4_LANDSCAPE) 
     ax  = fig.gca() 
     tbins = np.linspace(-250,250,100)
@@ -203,10 +206,10 @@ if __name__ == '__main__':
     h.line(filled=True, color='w', alpha=0.7)
     ax.set_xlabel('ns',loc='right') 
     ax.set_ylabel('events', loc='top') 
-    ax.set_title('Packet GCU time difference', loc='right')
+    ax.set_title('Packet GCU time delta, tracker packets earlier', loc='right')
     ax.set_yscale('log')
-    #ax.set_xlim(right=250)
-    fig.savefig('delta_gcutimes_merging-neg.png') 
+    fname = args.run_dir / 'delta_gcutimes_merging_neg.png'
+    fig.savefig(fname) 
     
     fig = plt.figure(figsize=cb.layout.FIGSIZE_A4_LANDSCAPE) 
     ax  = fig.gca() 
@@ -215,16 +218,15 @@ if __name__ == '__main__':
     h.line(filled=True, color='w', alpha=0.7)
     ax.set_xlabel('ns',loc='right') 
     ax.set_ylabel('events', loc='top') 
-    ax.set_title('Packet GCU time difference', loc='right')
+    ax.set_title('Packet GCU time delta, tracker packets later', loc='right')
     ax.set_yscale('log')
-    #ax.set_xlim(right=250)
-    fig.savefig('delta_gcutimes_merging-pos.png') 
+    fname = args.run_dir / 'delta_gcutimes_merging_pos.png'
+    fig.savefig(fname) 
 
     # create frames, and write them out later 
     frames = [] 
     for k in re_merged:
         frame = go.io.CRFrame()
-        #print (re_merged[k][0])
         frame.put_telemetrypacket(re_merged[k][0][1], 'TelemetryEvent', record_timestamp=True) 
         for idx, trk_ev in enumerate(re_merged[k][1]):  
             frame.put_telemetrypacket(trk_ev.pack(), f'Tracker_{idx}') 
