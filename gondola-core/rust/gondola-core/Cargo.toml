@@ -1,6 +1,6 @@
 [package]
 name = "gondola-core"
-version = "0.12.16"
+version = "0.12.17"
 edition = "2024"
 
 [lib]
@@ -114,7 +114,7 @@ flate2            = "1.1"
 # for the database - in case we want to use postgres, 
 # the feature needs to be added here, however, this would
 # also require libpq to be installed.
-diesel = { version = "2.2", features = ["sqlite", "64-column-tables"], optional=true }
+diesel = { version = "2.3", features = ["sqlite", "64-column-tables"], optional=true }
 # this fixes all compiling issues for the musl target with libsqlite
 #libsqlite3-sys = { version = "0.28", features = ["bundled"] }
 libsqlite3-sys = { version = "0.35", features = ["bundled"] }

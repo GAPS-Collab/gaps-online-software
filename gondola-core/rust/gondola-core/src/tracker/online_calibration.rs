@@ -24,6 +24,13 @@ impl TrackerOnlineCalibration {
     }
   }
 
+  /// Load the online tracker calibration from the file 
+  /// as it was used in the GAPSI flight.
+  pub fn from_default() -> Self {
+    let cali_path  = env::var("GONDOLA_TRK_ONLINE_CAL").unwrap_or_else(|_| "".to_string());
+    Self::from_file(&cali_path)
+  }
+
   //pub fn from_file(fname : &str) -> Self {
   pub fn from_file<P: AsRef<Path>>(path: P) -> Self {
     let mut cali = Self::new();
@@ -84,6 +91,9 @@ impl TrackerOnlineCalibration {
   }
 
   /// Fill out the energy field in the tracker hit
+  /// 
+  /// FIXME - this panics if the calibration is not 
+  /// loaded properly
   pub fn calibrate(&self, hit : &mut TrackerHit) {
     let strip_id = hit.get_stripid();
     let scale   : f32 = 0.841/1000.0;
@@ -108,6 +118,14 @@ impl TrackerOnlineCalibration {
     Self::new()
   }
  
+  /// Fill out the energy field in the tracker hit
+  /// 
+  /// FIXME - this panics if the calibration is not 
+  /// loaded properly
+  ///
+  /// # Arguments: 
+  ///   * hit : A tracker hit. This hit will have its 
+  ///           .energy field populated
   #[pyo3(name="calibrate")]
   fn calibrate_py(&self, hit : &mut TrackerHit) {
     self.calibrate(hit);
@@ -116,6 +134,17 @@ impl TrackerOnlineCalibration {
   #[pyo3(name="is_pulsed")]
   fn is_pulsed_py(&self, hit : &TrackerHit) -> bool {
     self.is_pulsed(hit)
+  }
+  
+  /// Load the online tracker calibration from the file 
+  /// as it was used in the GAPSI flight.
+  ///
+  /// FIXME - if this fails, we won't know
+  #[staticmethod]
+  #[pyo3(name="from_default")]
+  pub fn from_default_py() -> PyResult<Self> {
+    let cali_path  = env::var("GONDOLA_TRK_ONLINE_CAL").unwrap_or_else(|_| "".to_string());
+    Ok(Self::from_file(&cali_path))
   }
 
   #[staticmethod]

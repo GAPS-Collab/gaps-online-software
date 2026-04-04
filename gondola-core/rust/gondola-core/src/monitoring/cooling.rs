@@ -261,11 +261,10 @@ impl Serialization for CoolingMoniData {
       return Err(SerializationError::StreamTooShort);
     }
     let start_byte = parse_u8(stream, pos);
-    //if (start_byte != 0x1e) {
-    //  std::string message = std::format("Start byte for cooling packet incorrect! Got {} instead of 0x1e", start_byte);
-    //  auto err = g::IOError(g::IOError::ErrorKind::WrongDelimiter, message);
-    //  return Err(err);
-    //} 
+    if start_byte != 0x1e {
+      error!("Start byte is {} and not 0x1e!", start_byte);
+      return Err(SerializationError::InvalidByte);
+    } 
     //cln.rtd.fill(0xffff);
     cln.frame_counter   = 0xffffff & parse_u32(stream, pos);
     *pos -= 1;

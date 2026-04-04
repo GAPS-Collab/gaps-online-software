@@ -4,10 +4,19 @@ export PYTHONPATH=$PYTHONPATH:@CMAKE_INSTALL_PREFIX@/python:@CMAKE_CURRENT_SOURC
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@CMAKE_INSTALL_PREFIX@/lib
 export DJANGO_SETTINGS_MODULE=gaps_db.settings
 export GapsOnlineSoftware_DIR=@CMAKE_INSTALL_PREFIX@
-# this is the database for diesel
+
+# database & tracker online calibration 
+# FIxME - in the future, these might move to the asset directory,
+# however, we need to keep local copies in the python directory,
+# so they can be published together with the python package.
+
+# deprecated internal url for the geometry/calibration database
 export DATABASE_URL=@CMAKE_CURRENT_SOURCE_DIR@/gaps-db/gaps_db/gaps_flight.db
-# the database will soon be moving, probably to an asset dir
+# current url for the geometry/calibration database
 export GONDOLA_DB_URL=@CMAKE_CURRENT_SOURCE_DIR@/gaps-db/gaps_db/gaps_flight.db
+# the online calibration as it was run on the instrument
+export GONDOLA_TRK_ONLINE_CAL=@CMAKE_CURRENT_SOURCE_DIR@/gondola-core/rust/gondola-core/python/gondola/tracker_cal
+
 
 echo -e "\n\n"
 echo -e "  ************************************************+++"
