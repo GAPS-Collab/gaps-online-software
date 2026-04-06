@@ -42,7 +42,7 @@ pub struct TelemetryPacketReader {
   /// Read only packets of type == PacketType
   pub filter          : TelemetryPacketType,
   /// Number of read packets
-  n_packs_read        : usize,
+  pub n_packs_read    : usize,
   /// Number of skipped packets
   n_packs_skipped     : usize,
   /// Skip the first n packets
@@ -67,7 +67,7 @@ pub struct TelemetryPacketReader {
 
 
 impl TelemetryPacketReader {
-  pub fn new(filename_or_directory : String, dedup : bool, start_time : Option<f64>, end_time : Option<f64>) -> Self {
+  pub fn new(filename_or_directory : String, dedup : bool, start_time : Option<f64>, end_time : Option<f64>, skip_ahead : usize, stop_after : usize) -> Self {
     #[cfg(feature="database")]
     let mut paddles  = HashMap::<u8, TofPaddle>::new();
     #[cfg(not(feature="database"))]
@@ -135,8 +135,8 @@ impl TelemetryPacketReader {
               cursor            : 0,
               filter            : TelemetryPacketType::Unknown,
               n_packs_read      : 0,
-              skip_ahead        : 0,
-              stop_after        : 0,
+              skip_ahead        : skip_ahead,
+              stop_after        : stop_after,
               n_packs_skipped   : 0,
               n_duplicates      : 0,
               dedup_cache       : dedup_cache,
@@ -483,6 +483,7 @@ impl TelemetryPacketReader {
           }
           if self.stop_after > 0 && self.n_packs_read >= self.stop_after {
             // we don't want it
+            // FIXME - do we really need this? Because we are basically done, right?
             match self.file_reader.seek(SeekFrom::Current(size as i64)) {
               Err(err) => {
                 debug!("Unable to read more data! {err}");
@@ -583,7 +584,7 @@ impl TelemetryPacketReader {
 
 impl Default for TelemetryPacketReader {
   fn default() -> Self {
-    TelemetryPacketReader::new(String::from(""), false, None, None)
+    TelemetryPacketReader::new(String::from(""), false, None, None, 0, 0)
   }
 }
 
@@ -612,8 +613,8 @@ reader!(TelemetryPacketReader, TelemetryPacket);
 impl TelemetryPacketReader {
 
   #[new]
-  #[pyo3(signature = (filenames_or_directory, dedup = false, start_time = None, end_time = None))]
-  fn new_py(filenames_or_directory : &Bound<'_,PyAny>, dedup : bool, start_time : Option<f64>, end_time : Option<f64>) -> PyResult<Self> {
+  #[pyo3(signature = (filenames_or_directory, dedup = false, start_time = None, end_time = None, skip_ahead = 0, stop_after = 0))]
+  fn new_py(filenames_or_directory : &Bound<'_,PyAny>, dedup : bool, start_time : Option<f64>, end_time : Option<f64>, skip_ahead : usize, stop_after : usize) -> PyResult<Self> {
     
     let mut string_value = String::from("foo");
     let mut fnames       = Vec::<String>::new();
@@ -643,10 +644,10 @@ impl TelemetryPacketReader {
     let mut reader : Self;
     if fnames.len() > 0 {
       string_value = fnames[0].clone();
-      reader = Self::new(string_value, dedup, start_time, end_time);
+      reader = Self::new(string_value, dedup, start_time, end_time, skip_ahead, stop_after);
       reader.filenames = fnames;
     } else {
-      reader = Self::new(string_value, dedup, start_time, end_time);
+      reader = Self::new(string_value, dedup, start_time, end_time, skip_ahead, stop_after);
     }
     Ok(reader)
     //match Self::new(&string_value) {
@@ -731,6 +732,12 @@ impl TelemetryPacketReader {
       }
       Ok(_) => Ok(())
     }
+  }
+
+  #[pyo3(name="n_packs_read")]
+  #[getter]
+  fn n_packs_read_py(&self) -> usize {
+    self.n_packs_read
   }
 
   fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {

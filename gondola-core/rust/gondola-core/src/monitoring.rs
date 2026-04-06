@@ -639,7 +639,7 @@ macro_rules! moniseries {
       /// # Arguments:
       ///   * filename    : The name of the (telemetry) file to add
       fn add_telemetryfile(&mut self, filename : String) {
-        let reader = TelemetryPacketReader::new(filename, true, None, None);
+        let reader = TelemetryPacketReader::new(filename, true, None, None, 0, 0);
         for pack in reader {
           if pack.header.packet_type == TelemetryPacketType::AnyTofHK {
             let mut pos = 0;
@@ -853,7 +853,7 @@ macro_rules! moniseries_telemetry {
       /// # Arguments:
       ///   * filename    : The name of the (telemetry) file to add
       fn add_telemetryfile(&mut self, filename : String) {
-        let reader = TelemetryPacketReader::new(filename, true, None, None);
+        let reader = TelemetryPacketReader::new(filename, true, None, None, 0, 0);
         for pack in reader {
           if pack.header.packet_type == <$class>::TEL_PACKET_TYPE {
             let mut pos = 0;
