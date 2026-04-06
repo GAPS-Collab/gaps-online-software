@@ -107,6 +107,9 @@ if __name__ == '__main__':
                         )
     parser.add_argument('--gcu-seconds-time-cutoff', type=int,\
                         default=100, help='How many seconds of the gcu clock are allowed to pass between tracker and merged event packets to still allow the merge? Typically the time gap is ~60s. If this number is too large, we risk merging event ids from different runs')
+    parser.add_argument('--control-plots', action='store_true',\
+                        default=False,
+                        help='More verbose output')
     
     #parser.add_argument('-v','--verbose', action='store_true',\
     #                    help='More verbose output')
@@ -197,31 +200,34 @@ if __name__ == '__main__':
     print(f'--> We saw {log.total_tracker_daq_packets} tracker daq events')
     print(f'--> We associated {log.associated_tracker_daq_events} tracker events with the merged events!')
     print(f'--> That is ~{float(log.associated_tracker_daq_events)/len(tracker):.5f} events/packet')
-  
-    # control plots - gcu time as used in the merging 
-    fig = plt.figure(figsize=cb.layout.FIGSIZE_A4_LANDSCAPE) 
-    ax  = fig.gca() 
-    tbins = np.linspace(-250,250,100)
-    h   = d.factory.hist1d(gcu_time_differences, tbins) 
-    h.line(filled=True, color='w', alpha=0.7)
-    ax.set_xlabel('ns',loc='right') 
-    ax.set_ylabel('events', loc='top') 
-    ax.set_title('Packet GCU time delta, tracker packets earlier', loc='right')
-    ax.set_yscale('log')
-    fname = args.run_dir / 'delta_gcutimes_merging_neg.png'
-    fig.savefig(fname) 
-    
-    fig = plt.figure(figsize=cb.layout.FIGSIZE_A4_LANDSCAPE) 
-    ax  = fig.gca() 
-    tbins = np.linspace(250,1000,100)
-    h   = d.factory.hist1d(gcu_time_differences, tbins) 
-    h.line(filled=True, color='w', alpha=0.7)
-    ax.set_xlabel('ns',loc='right') 
-    ax.set_ylabel('events', loc='top') 
-    ax.set_title('Packet GCU time delta, tracker packets later', loc='right')
-    ax.set_yscale('log')
-    fname = args.run_dir / 'delta_gcutimes_merging_pos.png'
-    fig.savefig(fname) 
+ 
+    if args.control_plots:
+        # control plots - gcu time as used in the merging 
+        fig = plt.figure(figsize=cb.layout.FIGSIZE_A4_LANDSCAPE) 
+        ax  = fig.gca() 
+        tbins = np.linspace(-250,250,100)
+        h   = d.factory.hist1d(gcu_time_differences, tbins) 
+        h.line(filled=True, color='w', alpha=0.7)
+        ax.set_xlabel('ns',loc='right') 
+        ax.set_ylabel('events', loc='top') 
+        ax.set_title('Packet GCU time delta, tracker packets earlier', loc='right')
+        ax.set_yscale('log')
+        fname = args.run_dir / 'delta_gcutimes_merging_neg.png'
+        fig.savefig(fname) 
+        
+        fig = plt.figure(figsize=cb.layout.FIGSIZE_A4_LANDSCAPE) 
+        ax  = fig.gca() 
+        tbins = np.linspace(250,1000,100)
+        h   = d.factory.hist1d(gcu_time_differences, tbins) 
+        h.line(filled=True, color='w', alpha=0.7)
+        ax.set_xlabel('ns',loc='right') 
+        ax.set_ylabel('events', loc='top') 
+        ax.set_title('Packet GCU time delta, tracker packets later', loc='right')
+        ax.set_yscale('log')
+        fname = args.run_dir / 'delta_gcutimes_merging_pos.png'
+        fig.savefig(fname) 
+
+    print ('-> Write carasapcae files')
 
     # create frames, and write them out later 
     frames = [] 
