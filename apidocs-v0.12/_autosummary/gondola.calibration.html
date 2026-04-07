@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.calibration &#8212; gondola 0.12.16 documentation</title>
+    <title>gondola.calibration &#8212; gondola 0.12.17 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2" />
 
-    <script src="../_static/documentation_options.js?v=2329844f"></script>
+    <script src="../_static/documentation_options.js?v=de59bb09"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.calibration';</script>
@@ -115,7 +115,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.12.16 documentation</p>
+    <p class="title logo__title">gondola 0.12.17 documentation</p>
   
 </a></div>
     
@@ -530,7 +530,28 @@ FIXME - mixing of naming conventions for the channels</p>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="gondola.calibration.TrackerOnlineCalibration.calibrate">
 <span class="sig-name descname"><span class="pre">calibrate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.TrackerOnlineCalibration.calibrate" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Fill out the energy field in the tracker hit</p>
+<p>FIXME - this panics if the calibration is not 
+loaded properly</p>
+<dl class="simple">
+<dt># Arguments: </dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>hit<span class="classifier">A tracker hit. This hit will have its </span></dt><dd><p>.energy field populated</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.calibration.TrackerOnlineCalibration.from_default">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_default</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.TrackerOnlineCalibration.from_default" title="Link to this definition">#</a></dt>
+<dd><p>Load the online tracker calibration from the file 
+as it was used in the GAPSI flight.</p>
+<p>FIXME - if this fails, we won't know</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.calibration.TrackerOnlineCalibration.from_file">
@@ -642,6 +663,7 @@ calibration constants.</p>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.TrackerOnlineCalibration"><code class="docutils literal notranslate"><span class="pre">TrackerOnlineCalibration</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.TrackerOnlineCalibration.calibrate"><code class="docutils literal notranslate"><span class="pre">TrackerOnlineCalibration.calibrate()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.TrackerOnlineCalibration.from_default"><code class="docutils literal notranslate"><span class="pre">TrackerOnlineCalibration.from_default()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.TrackerOnlineCalibration.from_file"><code class="docutils literal notranslate"><span class="pre">TrackerOnlineCalibration.from_file()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.TrackerOnlineCalibration.is_pulsed"><code class="docutils literal notranslate"><span class="pre">TrackerOnlineCalibration.is_pulsed()</span></code></a></li>
 </ul>
