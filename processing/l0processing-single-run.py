@@ -243,8 +243,9 @@ if __name__ == '__main__':
         print ('-> Write carasapcae files')
 
         # create frames, and write them out later 
-        frames = [] 
-        for k in re_merged:
+        frames = []
+        sorted_evids = sorted(re_merged.keys())
+        for k in sorted_evids:
             frame = go.io.CRFrame()
             frame.put_telemetrypacket(re_merged[k][0][1], 'TelemetryEvent', record_timestamp=True) 
             for idx, trk_ev in enumerate(re_merged[k][1]):  
