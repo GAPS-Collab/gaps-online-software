@@ -7,5 +7,5 @@ from .. import _gondola_core  as _gc
 
 from . import tracker 
 from . import tof
-
+from . import style
 
