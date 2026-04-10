@@ -460,29 +460,43 @@ fn get_version_patch() -> u8 {
   return VERSION_PCH.parse().unwrap();
 }
 
-// add exceptions for the custom Error types
-//#[cfg(feature="pybindings")]
-//pyo3::create_exception!(gondola_core_py, MasterTriggerError, pyo3::exceptions::PyException);
-//#[cfg(feature="pybindings")]
-//pyo3::create_exception!(gondola_core_py, RunError, pyo3::exceptions::PyException);
-//#[cfg(feature="pybindings")]
-//pyo3::create_exception!(gondola_core_py, TofError, pyo3::exceptions::PyException);
-//#[cfg(feature="pybindings")]
-//pyo3::create_exception!(gondola_core_py, StagingError, pyo3::exceptions::PyException);
-//#[cfg(feature="pybindings")]
-//pyo3::create_exception!(gondola_core_py, SensorError, pyo3::exceptions::PyException);
-//#[cfg(feature="pybindings")]
-//pyo3::create_exception!(gondola_core_py, UserError, pyo3::exceptions::PyException);
-//#[cfg(feature="pybindings")]
-//pyo3::create_exception!(gondola_core_py, CalibrationError, pyo3::exceptions::PyException);
-//#[cfg(feature="pybindings")]
-//pyo3::create_exception!(gondola_core_py, WaveformError, pyo3::exceptions::PyException);
-//#[cfg(feature="pybindings")]
-//pyo3::create_exception!(gondola_core_py, IPBusError, pyo3::exceptions::PyException);
-//#[cfg(feature="pybindings")]
-//pyo3::create_exception!(gondola_core_py, SerializationError, pyo3::exceptions::PyException);
-//#[cfg(feature="pybindings")]
-//pyo3::create_exception!(gondola_core_py, AnalysisError, pyo3::exceptions::PyException); 
+/// Check if the version is at least the 
+/// required, given string following the 
+/// format MAJOR.MINOR.PATCH 
+#[cfg(feature="pybindings")]
+#[pyfunction]
+fn version_at_least(version_string : String) -> bool {
+  let parts: Vec<u32> = version_string.split('.')
+    .map(|s| s.parse().expect("Input is not a valid version string. Please follow the MAJOR.MINOR.PATCH format!"))
+    .collect();
+  let major : u8 = parts[0] as u8;
+  let minor : u8 = parts[1] as u8;
+  let patch : u8 = parts[2] as u8;
+  if major < get_version_major() {
+    return true;
+  }
+  if major > get_version_major() {
+    println!("Required major version of {} is larger than current version {}", major, VERSION);
+    return false;
+  }
+  if major == get_version_major() {
+    if minor < get_version_minor() {
+      return true;
+    }
+    if minor > get_version_minor() {
+      println!("Required minor version of {} is larger than current version {}", minor, VERSION);
+      return false;
+    }
+    if minor == get_version_minor() {
+      if patch > get_version_patch() {
+        println!("Required patch version of {} is larger than current version {}", patch, VERSION);
+        return false 
+      }
+    }
+  } 
+  true
+}
+
 #[cfg(feature="pybindings")]
 pyo3::create_exception!(gondola_core_py, PyMasterTriggerError, pyo3::exceptions::PyException);
 #[cfg(feature="pybindings")]
@@ -540,6 +554,7 @@ fn gondola_core_py<'_py>(m : &Bound<'_py, PyModule>) -> PyResult<()> { //: Pytho
   m.add_function(wrap_pyfunction!(get_version_major, m)?)?;
   m.add_function(wrap_pyfunction!(get_version_minor, m)?)?;
   m.add_function(wrap_pyfunction!(get_version_patch, m)?)?;
+  m.add_function(wrap_pyfunction!(version_at_least, m)?)?;
   m.add_wrapped(wrap_pymodule!(events_py))?;
   m.add_wrapped(wrap_pymodule!(monitoring_py))?;
   m.add_wrapped(wrap_pymodule!(packets_py))?;

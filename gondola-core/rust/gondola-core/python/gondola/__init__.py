@@ -19,6 +19,9 @@ get_version_minor.__module__ = __name__
 get_version_patch = _gondola_core.get_version_patch
 get_version_patch.__module__ = __name__
 
+version_at_least = _gondola_core.version_at_least 
+version_at_least.__module__ = __name__
+
 # set up the python submodules
 # the python wrappers are needed to define 
 # __module__ on each rust created class, 
