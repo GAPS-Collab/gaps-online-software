@@ -9,38 +9,72 @@ from matplotlib.patches import Rectangle
 import vtk
 import numpy as np
 
+#-----------------------------------------------------------------
 
-TofPaddle                    = _gc.db.TofPaddle
-TofPaddle.__module__         = __name__
-TofPaddle.__name__           = "TofPaddle"
-TofPaddle.__doc__            = _gc.db.TofPaddle.__doc__
-ReadoutBoard                 = _gc.db.ReadoutBoard
-ReadoutBoard.__module__      = __name__ 
-ReadoutBoard.__name__        = 'ReadoutBoard' 
-TrackerStrip                 = _gc.db.TrackerStrip
-TrackerStrip.__module__      = __name__ 
-TrackerStrip.__name__        = 'TrackerStrip' 
-TrackerStripMask             = _gc.db.TrackerStripMask 
-TrackerStripMask.__module__  = __name__ 
-TrackerStripMask.__name__    = 'TrackerStripMask'
-TrackerStripPedestal         = _gc.db.TrackerStripPedestal 
-TrackerStripPedestal.__module__ = __name__ 
-TrackerStripPedestal.__name__   = 'TrackerStripPedestal' 
-TrackerStripTransferFunction = _gc.db.TrackerStripTransferFunction 
-TrackerStripTransferFunction.__module__ = __name__ 
+def get_tof_umb_paddles() -> [TofPaddle]:
+    """
+    All paddles which are in the Umbrella
+    """
+    return [k for k in TofPaddle.all() if 60 < k.paddle_id < 109]
+
+#-----------------------------------------------------------------
+
+def get_tof_cbe_paddles() -> [TofPaddle]:
+    """
+    All paddles which are in the Umbrella
+    """
+    return [k for k in TofPaddle.all() if k.paddle_id < 61]
+
+#-----------------------------------------------------------------
+
+def get_tof_cor_paddles() -> [TofPaddle]:
+    """
+    All paddles which are in the Cortina
+    """
+    return [k for k in TofPaddle.all() if  k.paddle_id > 108]
+
+#-----------------------------------------------------------------
+
+TofPaddle                                = _gc.db.TofPaddle
+TofPaddle.__module__                     = __name__
+TofPaddle.__name__                       = "TofPaddle"
+TofPaddle.__doc__                        = _gc.db.TofPaddle.__doc__
+
+ReadoutBoard                             = _gc.db.ReadoutBoard
+ReadoutBoard.__module__                  = __name__ 
+ReadoutBoard.__name__                    = 'ReadoutBoard' 
+
+TrackerStrip                             = _gc.db.TrackerStrip
+TrackerStrip.__module__                  = __name__ 
+TrackerStrip.__name__                    = 'TrackerStrip' 
+
+TrackerStripMask                         = _gc.db.TrackerStripMask 
+TrackerStripMask.__module__              = __name__ 
+TrackerStripMask.__name__                = 'TrackerStripMask'
+
+TrackerStripPedestal                     = _gc.db.TrackerStripPedestal 
+TrackerStripPedestal.__module__          = __name__ 
+TrackerStripPedestal.__name__            = 'TrackerStripPedestal' 
+
+TrackerStripTransferFunction    = _gc.db.TrackerStripTransferFunction 
+TrackerStripTransferFunction.__module__  = __name__ 
 TrackerStripTransferFunction.__name__    = 'TrackerStripPedestal' 
-TrackerStripCmnNoise         = _gc.db.TrackerStripCmnNoise
-TrackerStripCmnNoise.__module__  = __name__ 
-TrackerStripCmnNoise.__name__    = 'TrackerStripCmnNoise'
-TofPaddleTimingConstant            = _gc.db.TofPaddleTimingConstant 
-TofPaddleTimingConstant.__module__ = __name__ 
-TofPaddleTimingConstant.__name__   = 'TofPaddleTimingConstant'
-TrackerCalibrationFile             = _gc.db.TrackerCalibrationFile 
-TrackerCalibrationFile.__module__  = __name__ 
-TrackerCalibrationFile.__name__    = 'TrackerCalibrationFile'
-TrackerCalibrationFileType             = _gc.db.TrackerCalibrationFileType 
-TrackerCalibrationFileType.__module__  = __name__ 
-TrackerCalibrationFileType.__name__    = 'TrackerCalibrationFileType'
+
+TrackerStripCmnNoise                     = _gc.db.TrackerStripCmnNoise
+TrackerStripCmnNoise.__module__          = __name__ 
+TrackerStripCmnNoise.__name__            = 'TrackerStripCmnNoise'
+
+TofPaddleTimingConstant                  = _gc.db.TofPaddleTimingConstant 
+TofPaddleTimingConstant.__module__       = __name__ 
+TofPaddleTimingConstant.__name__         = 'TofPaddleTimingConstant'
+
+TrackerCalibrationFile                   = _gc.db.TrackerCalibrationFile 
+TrackerCalibrationFile.__module__        = __name__ 
+TrackerCalibrationFile.__name__          = 'TrackerCalibrationFile'
+
+TrackerCalibrationFileType               = _gc.db.TrackerCalibrationFileType 
+TrackerCalibrationFileType.__module__    = __name__ 
+TrackerCalibrationFileType.__name__      = 'TrackerCalibrationFileType'
 
 # mappings 
 get_all_rbids_in_db                = _gc.db.get_all_rbids_in_db
@@ -66,22 +100,6 @@ get_rbid_pbchannel_pid_map.__module__ = __name__
 
 load_calibration_db_elena    = _gc.db.load_calibration_db_elena 
 load_calibration_db_elena.__module__  = __name__ 
-
-__all__ = ['TofPaddle',\
-           'ReadoutBoard',\
-           'TofPaddleTimingConstant',\
-           'TrackerStrip',\
-           'TrackerStripPedestal',\
-           'TrackerStripTransferFunction',\
-           'TrackerStripCmnNoise',\
-           'TrackerStripMask',\
-           'get_all_rbids_in_db',\
-           'get_all_pbids_in_db',\
-           'get_hid_vid_map',\
-           'get_vid_hid_map',\
-           'get_dsi_j_ch_pid_map',\
-           'get_rbids_for_pbid'\
-           'get_rbid_pbchannel_pid_map']
 
 #----------------------------------------
 # extend the TofPaddles with a few methods
@@ -156,6 +174,8 @@ def _create_box(self):
 
 TofPaddle._create_box = _create_box
 
+#-----------------------------------------------------------------
+
 def _create_box_points(self):
     points = self._create_box().GetPoints()
     #points = transform_filter.GetOutput().GetPoints()
@@ -186,6 +206,8 @@ TofPaddle._create_box_points = _create_box_points
 #        self.points = box
 #
 #TofPaddle._cache_box_points = _cache_box_points 
+
+#-----------------------------------------------------------------
 
 def _draw_xy(self, fill=False, lw=0.8, edgecolor='b', facecolor='b', alpha=0.7) -> Rectangle:
     """
@@ -241,6 +263,7 @@ def _draw_xy(self, fill=False, lw=0.8, edgecolor='b', facecolor='b', alpha=0.7) 
 
 TofPaddle.draw_xy = _draw_xy
 
+#-----------------------------------------------------------------
 
 def _draw_xz(self, fill=False, lw=0.8, edgecolor='b', facecolor='b', alpha=0.7) -> Rectangle:
     """
@@ -254,6 +277,8 @@ def _draw_xz(self, fill=False, lw=0.8, edgecolor='b', facecolor='b', alpha=0.7) 
 
 TofPaddle.draw_xz = _draw_xz
 
+#-----------------------------------------------------------------
+
 def _draw_yz(self, fill=False, lw=0.8, edgecolor='b',facecolor='b', alpha=0.7) -> Rectangle:
     """
     Draw a matplotlib patch for xy projection
@@ -265,4 +290,25 @@ def _draw_yz(self, fill=False, lw=0.8, edgecolor='b',facecolor='b', alpha=0.7) -
     return yz_patch
 
 TofPaddle.draw_yz = _draw_yz
+
+#-----------------------------------------------------------------
+
+__all__ = ['TofPaddle',\
+           'ReadoutBoard',\
+           'TofPaddleTimingConstant',\
+           'TrackerStrip',\
+           'TrackerStripPedestal',\
+           'TrackerStripTransferFunction',\
+           'TrackerStripCmnNoise',\
+           'TrackerStripMask',\
+           'get_all_rbids_in_db',\
+           'get_all_pbids_in_db',\
+           'get_hid_vid_map',\
+           'get_vid_hid_map',\
+           'get_dsi_j_ch_pid_map',\
+           'get_rbids_for_pbid'\
+           'get_rbid_pbchannel_pid_map',\
+           'get_tof_umb_paddles',\
+           'get_tof_cbe_paddles',\
+           'get_tof_cor_paddles']
 
