@@ -455,7 +455,7 @@ impl TofEvent {
     self.hits.sort_by(|a,b| (a.event_t0).total_cmp(&b.event_t0));
     let t0_first_hit = self.hits[0].event_t0;
     for h in self.hits.iter_mut() {
-      h.event_t0 -= t0_first_hit
+      h.event_t0 -= t0_first_hit;
     }
   }
  
@@ -1070,6 +1070,8 @@ impl fmt::Display for TofEvent {
     repr += &(format!("\n  timestamp32      : {}", self.timestamp32)); 
     repr += &(format!("\n  timestamp16      : {}", self.timestamp16)); 
     repr += &(format!("\n   |-> timestamp48 : {}", self.get_timestamp48())); 
+    repr += &(format!("\n   |->       UNIX  : {}", (1e-8) * self.get_timestamp48() as f64)); 
+    repr += &(format!("\n   |->        UTC  : {}", get_utc_timestamp_from_unix((1e-8) * self.get_timestamp48() as f64).unwrap_or(String::from("INVALID")))); 
     //repr += &(format!("\n  mt_tiu_gps16     : {}", self.mt_tiu_gps16));
     //repr += &(format!("\n  mt_tiu_gps32     : {}", self.mt_tiu_gps32)); 
     //repr += &(format!("\n  mt_timestamp     : {}", self.mt_timestamp));
