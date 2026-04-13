@@ -166,7 +166,3 @@ pythonize_monidata!(WastieMoniData);
 #[cfg(feature="pybindings")]
 pythonize_telemetry_only!(WastieMoniData);
 
-
-
-
-
