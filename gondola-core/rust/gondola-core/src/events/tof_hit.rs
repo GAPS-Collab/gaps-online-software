@@ -213,6 +213,12 @@ impl TofHit {
     self.paddle_id
   }
 
+  #[getter]
+  #[pyo3(name="timing_offset")]
+  fn get_timing_offset(&self) -> f32 {
+    self.timing_offset
+  }
+
   /// The length of the paddle, only available after 
   /// the paddle information has been added through
   /// "set_paddle"
