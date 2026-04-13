@@ -26,6 +26,10 @@ pub struct TelemetryEvent {
   pub tracker_hits        : Vec<TrackerHit>,
   pub tracker_oscillators : Vec<u64>,
   pub tof_event           : TofEvent,
+  //#[cfg(feature = "pybindings")]
+  //pub tof_event: pyo3::Py<TofEvent>,
+  //#[cfg(not(feature = "pybindings"))]
+  //pub tof_event           : TofEvent,
   pub raw_data            : Vec<u8>,
   pub flags0              : u8,
   pub flags1              : u8,
@@ -458,12 +462,90 @@ impl TelemetryEvent {
   fn get_event_id(&self) -> u32 {
     self.event_id
   }
+  
+  /// Remove all TOF hits from the event's hit series which 
+  /// do NOT obey causality. that is where the timings
+  /// measured at ends A and B can not be correlated
+  /// by the assumed speed of light in the paddle
+  #[pyo3(name="tof_remove_non_causal_hits")]
+  fn tof_remove_non_causal_hits_py(&mut self) -> Vec<u16> {
+    // return Vec<u16> here so that python does not 
+    // interpret it as a byte
+    let mut pids = Vec::<u16>::new();
+    for pid in self.tof_event.remove_non_causal_hits() {
+      pids.push(pid as u16);
+    }
+    pids
+  }
+  
+  /// Remove TOF hits from the hitseries which can not 
+  /// be caused by the same particle, which means 
+  /// that for these two specific hits beta with 
+  /// respect to the first hit in the event is 
+  /// larger than one
+  /// That this works, first hits need to be 
+  /// "normalized" by calling normalize_hit_times
+  #[pyo3(name="tof_lightspeed_cleaning")]
+  pub fn tof_lightspeed_cleaning_py(&mut self, t_err : f32) -> (Vec<u16>, Vec<f32>) {
+    // return Vec<u16> here so that python does not 
+    // interpret it as a byte
+    let mut pids = Vec::<u16>::new();
+    let (pids_rm, twindows) = self.tof_event.lightspeed_cleaning(t_err);
+    for pid in pids_rm {
+      pids.push(pid as u16);
+    }
+    (pids, twindows)
+  }
+ 
+  /// Set per-paddle timing constant offsets 
+  /// for the TOF
+  ///
+  /// # Arguments:
+  ///   * timing_offsetes : A map of paddle id to timin
+  ///                       timing offset constant
+  #[pyo3(name="set_tof_timing_offsets")]
+  pub fn set_tof_timing_offsets_py(&mut self, timing_offsets : HashMap<u8, f32>) {
+    self.tof_event.set_timing_offsets(&timing_offsets);
+  }
+  
+  /// Normalize the hit times so that the first 
+  /// hit is at 0. This includes application 
+  /// of the phase correction
+  #[pyo3(name="tof_normalize_hit_times")]
+  pub fn tof_normalize_hit_times_py(&mut self) {
+    self.tof_event.normalize_hit_times();
+  }
 
-  // FIXME - do this with bound
+  /// Returns a COPY of the TofEvent associated 
+  /// with this event id
   #[getter]
   fn get_tof(&self) -> PyResult<TofEvent> {
     Ok(self.tof_event.clone())
   }
+  //#[getter]
+  //fn get_tof(&self, py: Python<'_>) -> Py<TofEvent> {
+  //    // This returns a reference-counted pointer to the same object
+  //    // Python can now call .timestamp = 123 on it
+  //  self.tof_event.clone_ref(py)
+  //}
+
+ // #[getter]``
+ // fn get_tof<'_py>(&self, py: Python<'_py>) -> PyResult<Bound<'_py, PyArray1<f32>>> {
+ // fn get_tof(slf: Bound<'_, Self>) -> PyResult<Bound<'_, TofEvent>> {
+      // 1. Borrow the parent (slf)
+      // 2. Map the borrow to the internal field
+      // 3. Return a Bound that points to that specific memory
+      
+  //    let py = slf.py();
+  //    let py_ref = slf.borrow_mut(); // This is a PyRef<'_, MyLibrary>
+  //    
+  //    // Use PyRef::map to project the reference to the internal field
+  //    // In PyO3 0.23+, this is often used via 'into_bound'
+  //    //let mapped = pyo3::PyRef::map(py_ref, |s| &s.tof_event);
+  //    
+  //    //Ok(mapped.into_bound(py))
+  //    Ok(py_ref)
+  //}
 
   #[getter]
   fn tracker_pointcloud(&self) -> Vec<(f32, f32, f32, f32, f32)> {
