@@ -81,6 +81,9 @@ pub use cooling::{
   CoolingMoniDataSeries
 };
 
+pub mod wastie;
+pub use wastie::*;
+
 use std::collections::VecDeque;
 use std::collections::HashMap;
 
