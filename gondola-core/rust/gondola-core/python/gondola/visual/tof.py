@@ -83,6 +83,99 @@ def plot_hg_lg_hits(h_nhits            : dashi.histogram.hist1d,
 
 #--------------------------------------------------------
 
+def tof_projection_xy_paddles(stack_panels = False,
+                              title        = 'TOF UMB/CBE TOP/CBE BOT xy projection',
+                              show_pids    = False,
+                              edgecolor    = 'k',
+                             ):
+    """
+    Plot the outline of the  xy projection of the
+    z-normal TOF panels (UMB, CBE top and bot).
+    
+    There are 2 'modes': Plot the 3 panels side-by-side 
+    or have them stacked on top of each other for a 
+    'true' 2d project for these 3 panels.
+
+    This by itself, will just outline the TOF paddles. 
+    This then can be used in combination with other data 
+    to show event displays or occupancy data.
+
+    # Keyword Args:
+      * stack_panels : Stack panels (overlay them) on top of each other
+                       to create a true 2d projection
+      * title        : Title for the whole axes arangement, appears in 
+                       the upper right
+      * show_pids    : Show paddle ids on the paddles 
+      * edgecolor    : Use this color to draw the outlines of the paddles
+                       as well as the text for the pids (if show_pids == True)
+    # Returns:
+      (matplotlib.Figure, dict[paddld id] -> matplotlib 
+    
+    """
+    if stack_panels:
+        fig = plt.figure(figsize=lo.FIGSIZE_A4_SQUARE)
+        axs = [fig.gca()]
+    else:
+        fig, axs        = plt.subplots(1, 3, figsize=(18, 5), gridspec_kw={'width_ratios': [1, 1, 1]})
+        # FIXME: in case the panels are overlayed,
+        # what about the title?
+        fig.suptitle(title, x=0.9)
+    
+    # get all paddles in panel 1,2,7 - 13 from the db
+    all_paddles     = _gc.db.TofPaddle.all() 
+    umb_paddles     = [k for k in all_paddles if k.paddle_id > 60 and k.paddle_id < 109]
+    cbe_top_paddles = [k for k in all_paddles if k.panel_id == 1] 
+    cbe_bot_paddles = [k for k in all_paddles if k.panel_id == 2]
+    
+    # set range, labels and aspect ratio for the UMB plot
+    axs[0].set_xlabel('x [cm]', loc='right')
+    axs[0].set_ylabel('y [cm]', loc='top')#, rotation=90)
+    axs[0].set_aspect('equal')
+    axs[0].set_xlim(-200, 200)
+    axs[0].set_ylim(-200, 200)
+    axs[0].spines['right'].set_visible(True)
+    axs[0].spines['top'].set_visible(True)
+    # configure the other two panels (if not stacked)
+    if not stack_panels:
+        for ax_id in 1,2:
+            axs[ax_id].set_xlabel('x [cm]', loc='right')
+            axs[ax_id].set_ylabel('y [cm]', loc='top')#, rotation=270)
+            axs[ax_id].set_xlim(-100, 100)
+            axs[ax_id].set_ylim(-100, 100)
+            axs[ax_id].set_aspect('equal')
+            axs[ax_id].spines['top'].set_visible(True)
+            axs[ax_id].spines['right'].set_visible(True)
+        axs[1].set_title('CBE TOP', loc='right')
+        axs[2].set_title('CBE BOT')
+
+    if show_pids:
+        for pdl in umb_paddles:
+            if pdl.panel_id == 7:
+                axs[0].text(pdl.global_pos_x_l0 - 4.5, 75, f'{pdl.paddle_id}',   color=edgecolor, fontsize=6)
+            if pdl.panel_id == 10 or pdl.panel_id == 8:
+                axs[0].text(pdl.global_pos_x_l0 - 4.5, 160, f'{pdl.paddle_id}',  color=edgecolor, fontsize=6)
+            if pdl.panel_id == 11 or pdl.panel_id == 13:
+                axs[0].text(pdl.global_pos_x_l0 - 4.5, -170, f'{pdl.paddle_id}', color=edgecolor, fontsize=6)
+            if pdl.panel_id == 9 or pdl.panel_id == 12:
+                axs[0].text(-80, pdl.global_pos_y_l0 - 4.5, f'{pdl.paddle_id}',  color=edgecolor, fontsize=6)
+    
+    # draw the oultine of the Umbrella paddles
+    for pdl in umb_paddles:
+        # draw the paddles as empty boxes
+        axs[0].add_patch(pdl.draw_xy(fill=False, edgecolor=edgecolor))
+
+    if not stack_paddles:
+        for pdl in cbe_top_paddles:
+            axs[1].add_patch(pdl.draw_xy(fill=False, edgecolor=edgecolor))
+            axs[1].text(pdl.global_pos_x_l0 - 4, 75, f'{pdl.paddle_id}', color=edgecolor, fontsize=9)
+        for pdl in cbe_bot_paddles:
+            axs[2].add_patch(pdl.draw_xy(fill=False, edgecolor=edgecolor))
+            axs[2].text(pdl.global_pos_x_l0 - 4, 75, f'{pdl.paddle_id}', color=edgecolor, fontsize=9)
+
+    return fig, axs 
+
+#--------------------------------------------------------
+
 def tof_projection_xy(paddle_occupancy = {}, 
                       event            = None,
                       cmap             = matplotlib.colormaps['hot'],
@@ -91,7 +184,8 @@ def tof_projection_xy(paddle_occupancy = {},
                       overlay_panels   = False,
                       indicate_empty   = 'gray',
                       umbrella_only    = False,
-                      lognorm          = False):
+                      lognorm          = False,
+                      norm             = 'lin'):
     """
     Show the projection of all paddles which
     are facing in z-direction
@@ -104,10 +198,10 @@ def tof_projection_xy(paddle_occupancy = {},
     
     # Keyword Arguments:
         paddle_occupancy : The number of events per paddle
-        event            : Plot hits from TofEvent or TofEventSummary
+        event            : Plot hits from TofEvent as circles
         cmap             : Colormap - can be lambda function
                            to return color value based on 
-                           'occupancy' numbker
+                           'occupancy' number
         show_cbar        : Show the colorbar on the figure
         overlay_panels   : Only return one axes, have the TOF CBE bottom
                            and CBE TOP panels overlaid over the umbrella
@@ -117,7 +211,18 @@ def tof_projection_xy(paddle_occupancy = {},
                            using a value from the color map. If this behavior is 
                            not desired, set this to an empty string.
         umbrella_only    : Show only the umbrella, add the colorbar next to it
+        lognorm          : Same as norm = 'log' [DEPRECATED]
+        norm             : 'lin', 'log' or 'none'. This allows to set the 
+                           normalization of the colormap. 
+                           'lin'  - linear normalization for all panels to 
+                           min/max(occupancy) 
+                           'log'  - logarithmic normalization for all panels 
+                           to min/max(occupancy) 
+                           'nono' - no normalization, plot absolute values
     """
+    if not norm in ['lin', 'log']: 
+        raise ValueError("Currently only 'lin' or 'log' arguments are supported for the 'norm' keyword!")
+
     if overlay_panels:
         fig = plt.figure(figsize=lo.FIGSIZE_A4_SQUARE)
         axs = [fig.gca()]
@@ -128,6 +233,7 @@ def tof_projection_xy(paddle_occupancy = {},
     umb_paddles     = [k for k in all_paddles if k.paddle_id > 60 and k.paddle_id < 109]
     cbe_top_paddles = [k for k in all_paddles if k.panel_id == 1] 
     cbe_bot_paddles = [k for k in all_paddles if k.panel_id == 2]
+    
     xmin, xmax      = -100,100
     ymin, ymax      = -100,100
     zmin, zmax      = -25, 120
@@ -142,9 +248,9 @@ def tof_projection_xy(paddle_occupancy = {},
         if umbrella_only:
             umb_occu = {k : paddle_occupancy[k] for k in paddle_occupancy if 60 < k < 109}
             paddle_occupancy = umb_occu
-            if lognorm:
+            if lognorm or norm == 'log':
                 umb_norm = matplotlib.colors.LogNorm(vmin=min(umb_occu.values()), vmax=max(umb_occu.values()))
-            else:
+            if norm == 'lin':
                 umb_norm = matplotlib.colors.Normalize(vmin=min(umb_occu.values()), vmax=max(umb_occu.values()))
     for pdl in umb_paddles:
         if paddle_occupancy:
@@ -162,7 +268,6 @@ def tof_projection_xy(paddle_occupancy = {},
                 axs[0].text(pdl.global_pos_x_l0 - 4.5, -170, f'{pdl.paddle_id}', color='w', fontsize=6)
             if pdl.panel_id == 9 or pdl.panel_id == 12:
                 axs[0].text(-80, pdl.global_pos_y_l0 - 4.5, f'{pdl.paddle_id}', color='w', fontsize=6)
-
 
         else:
             if event is not None:
@@ -219,6 +324,8 @@ def tof_projection_xy(paddle_occupancy = {},
     for pdl in cbe_top_paddles:   
         if paddle_occupancy:
             color = cmap(paddle_occupancy[pdl.paddle_id])
+            if norm=='lin':
+                color = cmap(umb_norm(paddle_occupancy[pdl.paddle_id]))
             if not paddle_occupancy[pdl.paddle_id] and indicate_empty:
                 color = indicate_empty
             axs[axid].add_patch(pdl.draw_xy(fill=True, edgecolor=color, facecolor=color))
@@ -252,6 +359,8 @@ def tof_projection_xy(paddle_occupancy = {},
     for pdl in cbe_bot_paddles:
         if paddle_occupancy:
             color = cmap(paddle_occupancy[pdl.paddle_id])
+            if norm=='lin':
+                color = cmap(umb_norm(paddle_occupancy[pdl.paddle_id]))
             if not paddle_occupancy[pdl.paddle_id] and indicate_empty:
                 color = indicate_empty
             axs[axid].add_patch(pdl.draw_xy(fill=True, edgecolor=color, facecolor=color))
@@ -319,7 +428,7 @@ def unroll_cbe_sides(paddle_occupancy = {},
         event            : Plot a tof event
         cmap             : Colormap - can be lambda function
                            to return color value based on 
-                           'occupancy' numbker
+                           'occupancy' number
         show_cbar        : Show the colorbar on the figure
         indicate_empty   : In case we are using this for paddle occupancy,
                            indicate empty paddles with the given color instead
