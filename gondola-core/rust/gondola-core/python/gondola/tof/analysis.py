@@ -8,6 +8,15 @@ from copy import deepcopy as copy
 
 from .. import gondola_core as _gc
 
+def format_seconds(seconds):
+    """
+    Return a string in HH:MM:SS format from a given time delta in seconds
+    """
+    total_seconds = int(seconds)
+    hours, remainder = divmod(total_seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{hours:02}:{minutes:02}:{seconds:02}"
+
 class TofAnalysis:
     """
     A container (yeah I know, don't like it either) to keep a 
@@ -58,11 +67,21 @@ class TofAnalysis:
         seen events, cut efficiencies, etc.
         """
         _repr = "\n-- -- -- -- -- -- -- -- -- "
+        if self.skip_mangled:
+            _repr += "\n  -- skipped mangled events!"
+        if self.skip_timeout:
+            _repr += "\n  -- skipped timed out events!"
+        if self.skip_mangled or self.skip_timeout:
+            _repr += "\n-- -- -- -- -- -- -- -- -- "
         _repr += "\n TOF analysis statistics"
+        _repr += f"\n  -- run ids                  : {self._analysis.run_ids}"
         if not self.cuts.void:
             _repr += f'\n  -- nevents (no    cut)      : {self.cuts.nevents}'
         else:
             _repr += f'\n  -- nevents                  : {self.n_events}'
+        _repr += f'\n  -- first event              : {_gc.io.get_utc_timestamp_from_unix(self._analysis.first_event_t*1e-8)} [{self._analysis.first_event_t*1e-8:.2f}]'
+        _repr += f'\n  -- last event               : {_gc.io.get_utc_timestamp_from_unix(self._analysis.last_event_t*1e-8)} [{self._analysis.last_event_t*1e-8:.2f}]'
+        _repr += f'\n  -- runtime                  : {format_seconds(self.run_time)}'
         _repr += f'\n  -- runtime (s)              : {self.run_time:1f} s'
         _repr += f'\n  -- rate    (Hz (nocut))     : {self.rate_nocut:.2f} Hz'
         if self.cuts.void:
@@ -85,8 +104,8 @@ class TofAnalysis:
             nevents = self.cuts.nevents 
         for k in self.event_stati:
             if nevents != 0:
-                _repr += f'\n\t -- -- {k} : {self.event_stati[k]} ({100*self.event_stati[k]/nevents:.2f} (%)'
-        
+                _repr += f'\n   -- -- {k} : {self.event_stati[k]} ({100*self.event_stati[k]/nevents:.2f} (%))'
+        _repr += "\n-- -- -- -- -- -- -- -- -- " 
         return _repr
 
     def _timing_plots(self):
@@ -166,6 +185,7 @@ class TofAnalysis:
           # created from other histograms
           'charge2d'  : d.histogram.hist2d((self.PADDLE_CHARGE_BINS, self.PADDLE_CHARGE_BINS)),
           'amp2d'     : d.histogram.hist2d((self.PADDLE_PEAK_BINS, self.PADDLE_PEAK_BINS)),
+          'pos_edep'  : d.histogram.hist2d((self.PADDLE_X0_BINS, self.PADDLE_EDEP_BINS)),
           'amp_a'     : d.histogram.hist1d(self.PADDLE_PEAK_BINS),
           'amp_b'     : d.histogram.hist1d(self.PADDLE_PEAK_BINS),
           'charge_a'  : d.histogram.hist1d(self.PADDLE_CHARGE_BINS),
@@ -178,8 +198,7 @@ class TofAnalysis:
           'bl_b_rms'  : d.histogram.hist1d(self.PADDLE_BLRMS_BINS),
           'x0'        : d.histogram.hist1d(self.PADDLE_X0_BINS),
           't0'        : d.histogram.hist1d(self.PADDLE_T0_BINS),
-          'edep'      : d.histogram.hist1d(self.PADDLE_EDEP_BINS),
-          'pos_edep'  : d.histogram.hist2d((self.PADDLE_X0_BINS, self.PADDLE_EDEP_BINS))
+          'edep'      : d.histogram.hist1d(self.PADDLE_EDEP_BINS)
         }
         all_paddle_plots = {k : copy(paddle_plots) for k in range(161)}
         paddle_caches = {k : dict() for k in range(161)}
@@ -219,9 +238,9 @@ class TofAnalysis:
         """
         Get run time from last - first event in seconds
         """
-        #print (f'LAST EV TIME  {self.last_ev_time}')
-        #print (f'FIRST EV TIME {self.first_ev_time}')
-        return 1e-5*(self._analysis.last_event_t - self._analysis.first_event_t)
+        #print (f'LAST EV TIME  {self._analysis.last_event_t}')
+        #print (f'FIRST EV TIME {self._analysis.first_event_t}')
+        return self._analysis.run_time 
 
     def reinit(self, nbins = 90):
         """
@@ -229,14 +248,16 @@ class TofAnalysis:
         reset the binning. This needs to be run in case the binning has
         been changed
         """
-        self.__init__(skip_mangled  = self.skip_mangled,
-                      skip_timeout  = self.skip_timeout,
-                      beta_analysis = self.beta_analysis,
-                      nbins         = nbins)
+        self.__init__(skip_mangled    = self.skip_mangled,
+                      skip_timeout    = self.skip_timeout,
+                      beta_analysis   = self.beta_analysis,
+                      paddle_analysis = self.paddle_analysis,
+                      nbins           = nbins)
 
     def __init__(self, skip_mangled = True,\
                  skip_timeout       = True,\
                  beta_analysis      = True,\
+                 paddle_analysis    = True,\
                  nbins              = 90,
                  cuts               = _gc.tof.TofCuts(),
                  use_offsets        = False,
@@ -264,6 +285,7 @@ class TofAnalysis:
                                      use these for a beta calculation. If pid_outer
                                      and pid_inner are given, use these paddles 
                                      instead.
+          paddle_analysis          : Create plots for the individual paddles 
           nbins                    : The number of bins for the histograms getting
                                      created
           cuts                     : Give a cut instance to reject events & hits.
@@ -280,7 +302,10 @@ class TofAnalysis:
         # process kwargs
         self.skip_mangled    = skip_mangled
         self.skip_timeout    = skip_timeout
+        # switches for the individual parts of the 
+        # analysis
         self.beta_analysis   = beta_analysis
+        self.paddle_analysis = paddle_analysis 
         self.use_offsets     = use_offsets
         self.nbins           = nbins
         self.cuts            = cuts
@@ -450,6 +475,7 @@ class TofAnalysis:
         Fill the histograms with the cached values
         """
         if self._analysis.hit_cache_len >= self.event_cache_size: 
+            print('-- --> Filling hit hitogramgs')
             # hit statistics
             self.nhit_plots['hit'     ].fill(self._analysis.c_hit) 
             self.nhit_plots['nhit_umb'].fill(self._analysis.c_hit_umb) 
@@ -465,8 +491,8 @@ class TofAnalysis:
             self.nhit_plots['miss_hit'].fill(self._analysis.c_miss_hit) 
             self.nhit_plots['nc_pdls'] .fill(self._analysis.c_nc_pid)
             self._analysis.clear_hit_stats()
-            print (f'beta analysis {self._analysis.beta_analysis}')
             if self._analysis.beta_analysis:
+                print (f'--> Filling histograms for beta analysis!')
             #    c_dist_vs_beta  = np.array([ k for k in zip(self.tmg_cache['dist'], self.tmg_cache['beta'])])
             #    c_dist_vs_tdiff = np.array([ k for k in zip(self.tmg_cache['dist'], self.tmg_cache['t_diff'])])
             #    c_beta_vs_theta = np.array([ k for k in zip(self.tmg_cache['beta'], self.tmg_cache['cos_theta'])])
@@ -487,7 +513,7 @@ class TofAnalysis:
                         try:
                             pnl = int(k[8:])
                         except Exception as e:
-                            print (f'(can not get panel edep for {k}')
+                            print (f'can not get panel edep for {k}')
                             continue
                         self.edep_plots[k].fill(self._analysis.cache.get_f32_data_panel("edep", pnl))
                         continue
@@ -545,6 +571,7 @@ class TofAnalysis:
         """
         if not self.active:
             return
+        print ('-> Finishing analysis. Filling histograms...')
         event_cache_size      = self.event_cache_size
         hit_cache_size        = self.hit_cache_size
         self.event_cache_size = 1
@@ -554,6 +581,7 @@ class TofAnalysis:
         self.event_cache_size = event_cache_size
         self.hit_cache_size   = hit_cache_size
         self.finished = True
+        print ('..done')
 
     def add_event(self, ev):
         """
