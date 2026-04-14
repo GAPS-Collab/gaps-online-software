@@ -5,6 +5,7 @@ monitoring tool of gaps-online-software
 
 import matplotlib
 import matplotlib.pyplot as plt
+import numpy as np
 
 import charmingbeauty.layout as lo
 import charmingbeauty as cb
