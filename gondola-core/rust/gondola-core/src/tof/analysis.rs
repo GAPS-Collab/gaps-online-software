@@ -791,7 +791,9 @@ pub struct TofAnalysis {
   pub cache         : TofAnalysisCache,
   #[pyo3(get)]  
   pub paddle_cache  : TofAnalysisPaddleCache,
-  pub paddles       : HashMap<u8,TofPaddle>
+  pub paddles       : HashMap<u8,TofPaddle>,
+  #[pyo3(get)]
+  pub run_ids       : Vec<u16>,
 }
 
 
@@ -859,6 +861,7 @@ impl TofAnalysis {
       cache         : TofAnalysisCache::new(),
       paddle_cache  : TofAnalysisPaddleCache::new(),
       paddles       : paddle_dict,
+      run_ids       : Vec::<u16>::new(),
     }
   }
 
@@ -871,6 +874,12 @@ impl TofAnalysis {
   }
 
   fn add_event(&mut self, ev : &mut TofEvent) {
+    if self.run_ids.is_empty() {
+      self.run_ids.push(ev.run_id);
+    }
+    if !self.run_ids.contains(&ev.run_id) {
+      self.run_ids.push(ev.run_id);
+    }
     if self.first_event_t == u64::MAX {
       self.first_event_t = ev.get_timestamp48();
     } else if self.first_event_t > ev.get_timestamp48() {
@@ -1078,6 +1087,10 @@ impl TofAnalysis {
     //self.fill_histograms()    
     //return 
   }
+
+  pub fn get_run_time(&self) -> f64 {
+    1e-8*((self.last_event_t - self.first_event_t) as f64)
+  }
 }
 
 //--------------------------------------------------
@@ -1112,6 +1125,11 @@ impl TofAnalysis {
         *self.event_stati.get_mut(&st).unwrap() += value; 
       } else {
         self.event_stati.insert(*st, *other.event_stati.get(st).unwrap());
+      }
+    }
+    for k in &other.run_ids {
+      if !self.run_ids.contains(&k) {
+        self.run_ids.push(*k);
       }
     }
   }
@@ -1159,7 +1177,13 @@ impl TofAnalysis {
     let py_array = PyArray1::from_slice(py, slice);
     return Ok(py_array);
   }
-  
+ 
+  #[getter]
+  #[pyo3(name="run_time")]
+  fn get_run_time_py(&self) -> f64 {
+    self.get_run_time()
+  }
+
   /// This is the number of hits/event for each seen event
   #[pyo3(name="c_hit_cbe")]
   #[getter]
