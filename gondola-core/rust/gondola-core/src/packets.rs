@@ -47,6 +47,24 @@ pub fn make_systime(lower : u32, upper : u16) -> u64 {
   (upper as u64) << 32 | lower as u64
 }
 
+///// This allows to pack anything in either a TOF or a Telemetry
+///// packet and will help to select what is appropriate 
+///// automatically 
+//pub trait Packable {
+//  const TOF_PACKET_TYPE     : TofPacketType = TofPacketType::Unknown;
+//  // provide an alternative TofPacketType to retrieve the 
+//  // packet from without failing
+//  const TOF_PACKET_TYPE_ALT : TofPacketType = TofPacketType::Unknown;
+//  // for data whihc is only stored in Telemetry packets, they use a 
+//  // different packet type. 
+//  const TEL_PACKET_TYPE     : TelemetryPacketType = TelemetryPacketType::Unknown;
+//  const TEL_PACKET_TYPES_EVENT : [TelemetryPacketType;4] = [
+//    TelemetryPacketType::NoGapsTriggerEvent,
+//    TelemetryPacketType::BoringEvent,
+//    TelemetryPacketType::InterestingEvent,
+//    TelemetryPacketType::NoTofDataEvent];
+//}
+
 
 /// Can be wrapped within a TofPacket. To do, we just have
 /// to define a packet type
