@@ -9,31 +9,6 @@ from matplotlib.patches import Rectangle
 import vtk
 import numpy as np
 
-#-----------------------------------------------------------------
-
-def get_tof_umb_paddles() -> [TofPaddle]:
-    """
-    All paddles which are in the Umbrella
-    """
-    return [k for k in TofPaddle.all() if 60 < k.paddle_id < 109]
-
-#-----------------------------------------------------------------
-
-def get_tof_cbe_paddles() -> [TofPaddle]:
-    """
-    All paddles which are in the Umbrella
-    """
-    return [k for k in TofPaddle.all() if k.paddle_id < 61]
-
-#-----------------------------------------------------------------
-
-def get_tof_cor_paddles() -> [TofPaddle]:
-    """
-    All paddles which are in the Cortina
-    """
-    return [k for k in TofPaddle.all() if  k.paddle_id > 108]
-
-#-----------------------------------------------------------------
 
 TofPaddle                                = _gc.db.TofPaddle
 TofPaddle.__module__                     = __name__
@@ -100,6 +75,30 @@ get_rbid_pbchannel_pid_map.__module__ = __name__
 
 load_calibration_db_elena    = _gc.db.load_calibration_db_elena 
 load_calibration_db_elena.__module__  = __name__ 
+
+#-----------------------------------------------------------------
+
+def get_tof_umb_paddles() -> [TofPaddle]:
+    """
+    All paddles which are in the Umbrella
+    """
+    return [k for k in TofPaddle.all() if 60 < k.paddle_id < 109]
+
+#-----------------------------------------------------------------
+
+def get_tof_cbe_paddles() -> [TofPaddle]:
+    """
+    All paddles which are in the Umbrella
+    """
+    return [k for k in TofPaddle.all() if k.paddle_id < 61]
+
+#-----------------------------------------------------------------
+
+def get_tof_cor_paddles() -> [TofPaddle]:
+    """
+    All paddles which are in the Cortina
+    """
+    return [k for k in TofPaddle.all() if  k.paddle_id > 108]
 
 #----------------------------------------
 # extend the TofPaddles with a few methods

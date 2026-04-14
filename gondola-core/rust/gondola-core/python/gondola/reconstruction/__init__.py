@@ -12,6 +12,8 @@ from iminuit.cost import LeastSquares as ls
 import dashi as d
 import json
 
+from .. import gondola_core as _gc
+
 #######################
 #
 ## Errors from spatial dimensions of paddles/strips
@@ -173,12 +175,9 @@ class Reconstruction:
         self.beta      = d.histogram.hist1d(self.BETA_BINS)
         self.finished  = False
         self.offsets = dict()
-        offsets = json.load(open('offsets.json'))
+        offsets      = _gc.db.TofPaddleTimingConstant.as_dict_by_name("GraceV1")
         for k in offsets:
-            k_int = int(k)
-            # currently we only have intra-panel calibrations
-            if k_int <= 12:
-                self.offsets[k_int] = offsets[k]
+            self.offsets[k] = offsets[k].timing_constant
 
     def __iadd__(self, other):
         self.chi2_c.extend(other.chi2_c)
@@ -221,7 +220,8 @@ class Reconstruction:
         ys.extend([h.y for h in ev.tof.hits])
 
         zs = [k[2] for k in ev.tracker_pointcloud]
-        zs.extend([h.z for h in ev.tof.hits])
+        zs_tof = [h.z for h in ev.tof.hits]
+        zs.extend(zs_tof)
 
         ev.tof.normalize_hit_times()
         ev.tof.set_timing_offsets(self.offsets)
@@ -229,12 +229,18 @@ class Reconstruction:
         ev.tof.lightspeed_cleaning(0.35)
         ts = [(h.event_t0,h.x,h.y,h.z) for h in ev.tof.hits]
         ts = sorted(ts, key=lambda x: x[0])
+        #print (f'RECO {ts}')
         first_t = ts[0][0]
         last_t  = ts[-1][0]
         diff_h = last_t - first_t
         xs = np.array(xs)
         ys = np.array(ys)
         zs = np.array(zs)
+        #print ('----- POINTS ------') 
+        #print (xs)
+        #print (ys)
+        #print (zs)
+
         if len(xs) < 2:
             return
         reco = line_fit(xs, ys, zs)
@@ -243,13 +249,17 @@ class Reconstruction:
         # get the cosine by just selecting
         # two points on the line
         reco_f = reco[0]
-        a = reco_f(0)
-        b = reco_f(1000)
+        a = reco_f(min(zs_tof))
+        b = reco_f(max(zs_tof))
         d = np.sqrt((a[0] - b[0])**2 + (a[1] - b[1])**2 + (a[2] - b[2])**2)
         cos_theta = (b[2] - a[2])/d
         dist = np.sqrt((ts[-1][1] - ts[0][1])**2 + (ts[-1][2] - ts[0][2])**2 + (ts[-1][3] - ts[0][3])**2)
-        beta = (dist/1000)/(diff_h*1e-9)/299792458  
-        print (f'RECO BETA {beta}, DIST {dist}, TDIFF {diff_h}')
+        simple_beta = False 
+        if simple_beta:
+            beta = (dist/1000)/(diff_h*1e-9)/299792458  
+        else:
+            beta = (d/1000)/(diff_h*1e-9)/299792458
+        #print (f'RECO BETA {beta}, DIST {dist}, TDIFF {diff_h}')
         self.beta_c.append(beta)
         self.cos2_c.append(cos_theta*cos_theta)
         return reco
