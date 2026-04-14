@@ -1,3 +1,6 @@
+# directory for tests/development 
+gondola-test/*
+
 # specific rye and jupyter notebook artefacts
 *.python-version
 # in each folder where we used rye, and created 
