@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["tracklet"]};
+window.SIDEBAR_ITEMS = {"mod":["reconstruction","tracklet"]};

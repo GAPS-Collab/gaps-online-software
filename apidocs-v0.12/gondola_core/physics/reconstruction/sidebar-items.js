@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["FitStatus"],"fn":["line3d"],"struct":["FitStatusIter","LineFit"]};
