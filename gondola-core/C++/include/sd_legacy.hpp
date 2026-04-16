@@ -1,4 +1,4 @@
-#ifdef BUILD_WITH_ROOT
+#ifdef BUILD_CXX_WITH_ROOT
 #ifndef SD_LEGACY_H_INCLUDED
 #define SD_LEGACY_H_INCLUDED
 
@@ -6,9 +6,11 @@
 #include "TVector3.h"
 
 #include "tof_typedefs.h" 
+#include "telemetry_dataclasses.hpp"
+
 
 namespace gondola {
-  auto read_sd_legacy_example() -> void; 
+  auto read_sd_legacy_example(std::string filename) -> void; 
   
   /// Read SimpleDet Root files and emit 
   /// MergedEvents
@@ -22,12 +24,13 @@ typedef i32 CFitStatusType;
 class CEventBase : public TObject {
   public: 
     CEventBase() {}
-    
-    u32 runNumber_;
-    u32 subRunNumber_;
-    u32 eventNumber_;
-    u64 eventTime_;
-    u32 eventId_;
+ 
+    u32      runNumber_;
+    u32      subRunNumber_;
+    u32      eventNumber_;
+    // upstream change in SD
+    long int eventTime_;
+    u32      eventId_;
 
     // generated primary
     f64       primaryBetaGenerated_;
@@ -87,6 +90,7 @@ class GRecoHit : public TObject {
     auto GetPos()   const -> TVector3;
     auto GetTime()  const -> f64;
     auto GetIdx()   const -> i32;
+    auto pretty_print() const -> std::string;
   private:  
     u32 volume_id_;
     f64 energydep_;
@@ -104,13 +108,18 @@ class CEventRec : public CEventBase {
   // Populate a CEventRec object from a 
   // MergedEvent
   public:
-    static auto from_telemetry(gondola::MergedEvent const &event) -> CEventRec;
-    auto to_telemetry(HashMap<u32, u32> const &hid_vid_map) -> gondola::MergedEvent;
-
+    static auto from_telemetry(gondola::TelemetryEvent const &event) -> CEventRec;
+    auto to_telemetry(HashMap<u32, u32> const &hid_vid_map) -> gondola::TelemetryEvent;
+    auto pretty_print() const -> std::string;
+    auto GetGPSTime() const -> f64;
   public:
     CEventRec() {}
     
+    std::vector<unsigned char>             trigger_sources  {};
+    std::vector<unsigned int>              trigger_vids     {};
+    
     std::string                            activeReco_;
+    std::vector<int>                       event_quality;     
     std::map<std::string,TVector3>         primaryStoppingPosition_;
     std::map<std::string,u32>              primaryStoppingVolume_;
     std::map<std::string,f64>              primaryStoppingTime_;
@@ -132,8 +141,13 @@ class CEventRec : public CEventBase {
 
     std::map<std::string, Vec<CTrackRec*>> Tracks;
     Vec<std::string>                       registeredRecos_;
-    
-    ClassDefOverride(CEventRec, 12)
+ 
+    // newer stuff (v26.03)
+    i32                                    PacketType;
+
+    u32                                    gps_time_lower_  = 0;
+    u16                                    gps_time_upper_  = 0; 
+    ClassDefOverride(CEventRec, 17)
 };
 
 namespace Crane { 
