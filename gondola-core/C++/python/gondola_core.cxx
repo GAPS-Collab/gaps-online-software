@@ -69,9 +69,9 @@ NB_MODULE(gondola_cxx, m) {
     })
     .def_prop_ro("filename", &g::TofPacketReader::get_filename);
 
-  #ifdef BUILD_WITH_ROOT
+  //#ifdef BUILD_CXX_WITH_ROOT
   m.def("read_sd_legacy_example",&g::read_sd_legacy_example); 
-  #endif 
+  //#endif 
   // caraspace
   nb::enum_<g::CRFrameObjectType>(m, "CRFrameObjectType")
      .value("Unknown",         g::CRFrameObjectType::Unknown)
