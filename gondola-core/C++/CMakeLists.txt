@@ -2,10 +2,15 @@
 cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 project(gondola_cxx VERSION 0.12 LANGUAGES C CXX)
 
-
 find_package(Python 3.11 COMPONENTS Interpreter Development.Module REQUIRED)
 
 find_package(GapsOnlineSoftware 0.12 EXACT REQUIRED)
+
+find_package(ROOT 6.36.00)
+message(STATUS "Requested build using CERN's ROOT library") 
+if(ROOT_FOUND)
+   include(${ROOT_USE_FILE})
+endif(ROOT_FOUND)
 
 set (ABS_PATH /srv/gaps/gaps-online-software) 
 # this is stupid!
@@ -18,6 +23,7 @@ set(CXX_PYBINDINGS gondola_cxx)
 nanobind_add_module(${CXX_PYBINDINGS} STABLE_ABI NOMINSIZE ${ABS_PATH}/gondola-core/C++/python/gondola_core.cxx)
 set_property(TARGET ${CXX_PYBINDINGS} PROPERTY CXX_STANDARD 20)
 #target_compile_definitions(${CXX_PYBINDINGS} PUBLIC BUILD_CXX_DB=1)
+target_compile_definitions(${CXX_PYBINDINGS} PUBLIC BUILD_CXX_WITH_ROOT=1)
 
 target_include_directories(${CXX_PYBINDINGS} 
                              SYSTEM PUBLIC

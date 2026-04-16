@@ -6,9 +6,9 @@ message(STATUS "-- will build personal analysis projects!")
 option(BUILD_ZWEERINK "build Jeff's tof analysis code" ON)
 if (BUILD_ZWEERINK)
     if (NOT BUILD_CXX_WITH_ROOT)
-    message(WARNING "-- -- unable to build Jeff's code without ROOT support. Make sure 'USE_ROOT=ON' and ROOT is found. E.g. by loading ROOT's thisroot.sh shell!")
-    message(WARNING "-- -- will disable building of Jeff's code")
-    option(BUILD_ZWEERINK "build Jeff's tof analysis code" OFF)
+     message(WARNING "-- -- unable to build Jeff's code without ROOT support. Make sure 'BUILD_CXX_WITH_ROOT=ON' and ROOT is found. E.g. by loading ROOT's thisroot.sh shell!")
+     message(WARNING "-- -- will disable building of Jeff's code")
+     option(BUILD_ZWEERINK "build Jeff's tof analysis code" OFF)
   else()
     
     #-----------------------------

@@ -2,6 +2,6 @@
 
 
 int main() {
-  gondola::read_sd_legacy_example();
+  gondola::read_sd_legacy_example("");
   return 0;
 }
