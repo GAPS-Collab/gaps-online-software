@@ -655,6 +655,8 @@ impl TofEvent {
   }
   
   pub fn get_timestamp48(&self) -> u64 {
+    // the first number here is a constant, which was not sent, it is basically 
+    // a time offset (redefinition of epoch) and gets added through the "|" operation
     0x273000000000000 | (((self.timestamp16 as u64) << 32) | self.timestamp32 as u64)
   }
   

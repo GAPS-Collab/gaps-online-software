@@ -286,10 +286,17 @@ fn packets_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<TelemetryPacket>()?;
   m.add_class::<TelemetryPacketHeader>()?;
   m.add_class::<TrackerHeader>()?;
+  // FIXME - this is monitoring data, we should 
+  // move this over to the monitoring part of the 
+  // code and they should become MoniData/Series 
   m.add_class::<PduChannel>()?;
   m.add_class::<Pac1934>()?;
   m.add_class::<PduHKPacket>()?;
   m.add_function(wrap_pyfunction!(make_systime,m)?)?;
+  m.add_class::<TrackerEventIDEchoPacket>()?;
+  m.add_class::<TrackerTempLeakPacket>()?;
+  m.add_class::<TrackerDAQTempPacket>()?;
+  m.add_class::<TrackerDAQHSKPacket>()?;
   Ok(())
 }
 
