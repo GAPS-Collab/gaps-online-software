@@ -32,9 +32,6 @@ void gondola::read_sd_legacy_example(std::string filename) {
   auto hid_vid_map    = gondola::get_hid_vid_map();
   TChain * input_tree = new TChain("TreeRec");
   input_tree->Add(filename.c_str());
-  //input_tree->Add("/srv/gaps/gaps-online-software/example-date/Run9125.gse5_241213_125815UTC_rec.root");
-  //input_tree->Add("/srv/gaps/gaps-online-software/example-data/ethernet241213_1347_rec.root");
-  //input_tree->Add(fName.c_str());
   auto input_event = new CEventRec();
   input_tree->SetBranchAddress("Rec", &input_event);
   u64 max_events = input_tree->GetEntries();
@@ -47,6 +44,27 @@ void gondola::read_sd_legacy_example(std::string filename) {
     std::cout << input_event->pretty_print() << std::endl;
     break;
   }
+}
+
+//------------------------------------------------------------------------
+
+gondola::SDRootReader::SDRootReader(std::string fname) {
+  filename            = fname;
+  tchain              = new TChain("TreeRec");
+  tchain->Add(fname.c_str());
+  event               = new CEventRec();
+  tchain->SetBranchAddress("Rec", &event);
+  nevents_total       = tchain->GetEntries();
+}
+
+gondola::SDRootReader::~SDRootReader() {
+  delete event;
+  delete tchain;
+}
+
+auto gondola::SDRootReader::get_event(u64 event_idx) -> void {
+  tchain->GetEntry(event_idx); 
+  std::cout << event->pretty_print() << std::endl;
 }
 
 //------------------------------------------------------------------------
@@ -81,6 +99,71 @@ auto GRecoHit::pretty_print() const -> std::string {
   auto idx  = index_;
   std::string repr = std::format("<GRecoHit : Vid {} Edep {:.3e} X {:.2f} Y {:.2f} Z {:.2f} Time {:.2f} Idx {}>", vid, edep, x, y, z, t, idx);
   return repr; 
+}
+
+//------------------------------------------------------------------------
+
+auto CTrackRec::pretty_print() const -> std::string {
+  // FIXME - provide pointers
+  auto vid_hid_map    = gondola::get_vid_hid_map();
+  i32 pid = -1;
+  if (vid_hid_map.contains(VertexVolumeId)) {
+    pid  = vid_hid_map.at(VertexVolumeId);
+  }
+  auto vpos = VertexPosition;
+  auto lpos = LastPosition;
+  std::string repr = "<CTrackRec (cpt layer)";
+  repr += std::format("\n   Primary        : {}", Primary);
+  repr += std::format("\n   TrackId        : {}", TrackId);
+  repr += std::format("\n   VertexVolumeId : {}/[{}]", VertexVolumeId, pid);
+  repr += std::format("\n   VertexPos X {:.2f} Y {:.2f} Z {:.2f}", vpos.X(), vpos.Y(), vpos.Z());
+  if (vid_hid_map.contains(LastVolumeId)) {
+    pid = vid_hid_map.at(LastVolumeId);
+  } else {
+    pid = -1;
+  }
+  repr += std::format("\n   LastVolumeId   ; {}/[{}]", LastVolumeId, pid);
+  repr += std::format("\n   LastPos   X {:.2f} Y {:.2f} Z {:.2f}", lpos.X(), lpos.Y(), lpos.Z());
+  repr += std::format("\n   ColumnDensity  : {}", ColumnDensity); 
+  repr += std::format("\n   bool Used      : {}", Used); 
+  repr += std::format("\n   Associated     : {}", Associated);
+  repr += std::format("\n   Chi2           : {}", Chi2);
+  repr += std::format("\n   Ndof           : {}", Ndof);
+  repr += std::format("\n   FitStatus      : {}>", FitStatus); 
+  
+  repr += "\n -- Vector size checks";
+  repr += std::format("\n -- -- EnergyDeposition       {}", EnergyDeposition      .size()) ;
+  repr += std::format("\n -- -- GlobalTime             {}", GlobalTime            .size()) ;
+  repr += std::format("\n -- -- StepLength             {}", StepLength            .size()) ;
+  repr += std::format("\n -- -- VolumeId               {}", VolumeId              .size()) ;
+  repr += std::format("\n -- -- Position               {}", Position              .size()) ;
+  repr += std::format("\n -- -- PositionResidual       {}", PositionResidual      .size()) ;
+  repr += std::format("\n -- -- MomentumDirection      {}", MomentumDirection     .size()) ;
+  repr += std::format("\n -- -- Depth                  {}", Depth                 .size()) ; 
+  repr += std::format("\n -- -- ColumnDensityUntilStep {}", ColumnDensityUntilStep.size()) ; 
+  repr += "\n -- Hits --";
+  for (usize k=0; k<EnergyDeposition.size(); k++) {
+    auto pos     = Position.at(k);
+    auto pos_res = PositionResidual.at(k);
+    auto mom     = MomentumDirection.at(k);
+    repr += std::format("\n -- EnergyDepositon  {}", EnergyDeposition.at(k));
+    repr += std::format("\n -- GlobalTime       {}", GlobalTime.at(k));        
+    repr += std::format("\n -- StepLength       {}", StepLength.at(k));
+    if (vid_hid_map.contains(VolumeId.at(k))) {
+      pid = vid_hid_map.at(VolumeId.at(k));
+    } else {
+      pid = -1;
+    }
+    repr += std::format("\n -- VolumeId         {}/[{}]", VolumeId.at(k), pid);
+    repr += std::format("\n -- Position         X {:.2f} Y {:.2f} Z {:.2f}",pos.X(), pos.Y(), pos.Z());
+    repr += std::format("\n -- PoistionResidual X {:.2f} Y {:.2f} Z {:.2f}",pos_res.X(), pos_res.Y(), pos_res.Z());
+    repr += std::format("\n -- MomentumDir      X {:.2f} Y {:.2f} Z {:.2f}",mom.X(), mom.Y(), mom.Z()); 
+    //repr += std::format("\n -- Depth            {}", Depth.at(k));
+    repr += std::format("\n -- ColDensUntStep   {}", ColumnDensityUntilStep.at(k));
+    repr += "\n -- -- -- -- -- --";
+  }
+  repr += "\n"; 
+  return repr;
 }
 
 //------------------------------------------------------------------------
@@ -197,6 +280,11 @@ auto CEventRec::pretty_print() const -> std::string {
 
       //std::map<std::string,Vec<f64>>         SdFitPar; ///< slowdown fit parameters {range, Ekin}
       //std::map<std::string,Vec<f64>>         SdFitErr; ///< slowdown fit errors
+      repr += "\n -- -- Reco Tracks -- -";
+      for (auto const &t : Tracks.at(k)) {
+        repr += "\n";
+        repr += t->pretty_print();
+      }
       repr += "\n -- -- -- -- ";
     }
   }

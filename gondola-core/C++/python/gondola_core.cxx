@@ -71,7 +71,16 @@ NB_MODULE(gondola_cxx, m) {
 
   //#ifdef BUILD_CXX_WITH_ROOT
   m.def("read_sd_legacy_example",&g::read_sd_legacy_example); 
+  nb::class_<g::SDRootReader>(m, "SDRootReader")
+    .def(nb::init<std::string>())
+    //.def("get_next_event", [](g::TofPacketReader &r) {
+    //  return r.get_next_packet().unwrap();
+    //})
+    .def_ro("filename", &g::SDRootReader::filename)
+    .def("get_event", &g::SDRootReader::get_event)
+    .def_ro("nevents_total", &g::SDRootReader::nevents_total);
   //#endif 
+  
   // caraspace
   nb::enum_<g::CRFrameObjectType>(m, "CRFrameObjectType")
      .value("Unknown",         g::CRFrameObjectType::Unknown)

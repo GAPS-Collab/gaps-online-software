@@ -2,22 +2,15 @@
 #ifndef SD_LEGACY_H_INCLUDED
 #define SD_LEGACY_H_INCLUDED
 
+#include <memory>
+
 #include "TObject.h"
 #include "TVector3.h"
+#include "TChain.h"
 
 #include "tof_typedefs.h" 
 #include "telemetry_dataclasses.hpp"
 
-
-namespace gondola {
-  auto read_sd_legacy_example(std::string filename) -> void; 
-  
-  /// Read SimpleDet Root files and emit 
-  /// MergedEvents
-  struct SDRootReader {
-  
-  };
-}
 
 typedef i32 CFitStatusType;
 
@@ -68,6 +61,8 @@ class CTrackBase : public TObject {
 class CTrackRec : public CTrackBase {
   public: 
     CTrackRec() {}
+  
+    auto pretty_print() const -> std::string;
   private:
     bool Used; ///< true if track is used in vertex fit
     bool Associated;
@@ -403,6 +398,24 @@ namespace Crane{
     }// end of namespace TrackFit
   } // end of namespace Reconstruction
 } // end of namespace Crane
+
+namespace gondola {
+  auto read_sd_legacy_example(std::string filename) -> void; 
+  
+  /// Read SimpleDet Root files and emit 
+  /// MergedEvents
+  struct SDRootReader {
+    SDRootReader(std::string);
+    ~SDRootReader();
+    auto get_event(u64 event_idx) -> void; 
+
+    std::string filename;
+    // root just hates modern memory management
+    TChain* tchain;
+    u64 nevents_total;
+    CEventRec* event;
+  };
+}
 
 #endif
 #endif

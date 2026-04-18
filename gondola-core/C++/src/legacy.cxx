@@ -1,4 +1,5 @@
-#ifdef BUILD_WITH_ROOT
+#ifdef BUILD_LEGACY_CODE
+#ifdef BUILD_CXX_WITH_ROOT
 
 #include <cstring>
 #include <math.h>
@@ -1148,4 +1149,5 @@ double Waveform::Integrate(float lo = 0, float size = -1) {
   return(sum);
 }
 
+#endif
 #endif
