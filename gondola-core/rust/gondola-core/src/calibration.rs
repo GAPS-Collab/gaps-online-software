@@ -2,4 +2,7 @@
 //! under the GPLv3 license
 
 pub mod tracker;
+pub use tracker::*;
+
 pub mod tof;
+pub use tof::*;
