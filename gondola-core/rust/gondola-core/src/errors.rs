@@ -155,17 +155,23 @@ pub enum CalibrationError {
   CalibrationFailed,
   WrongBoardId,
   IncompatibleFlightCalibrations,
+  StripIdInvalid,
+  NoStripMaskAvailable,
+  NoTransferFnAvailable,
 }
 
 impl fmt::Display for CalibrationError {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let repr : &str;
     match self {
-      Self::EmptyInputData                => { repr = "EmptyInputData"},
-      Self::CanNotConnectToMyOwnZMQSocket => { repr = "CanNotConnectToMyOwnZMQSocket"},
-      Self::CalibrationFailed             => { repr = "CalibrationFailed"},
-      Self::WrongBoardId                  => { repr = "WrongBoardId"},
+      Self::EmptyInputData                 => { repr = "EmptyInputData"},
+      Self::CanNotConnectToMyOwnZMQSocket  => { repr = "CanNotConnectToMyOwnZMQSocket"},
+      Self::CalibrationFailed              => { repr = "CalibrationFailed"},
+      Self::WrongBoardId                   => { repr = "WrongBoardId"},
       Self::IncompatibleFlightCalibrations => { repr = "IncompatibleFlightCalibrations"},
+      Self::StripIdInvalid                 => { repr = "StripIdInvalid"},
+      Self::NoTransferFnAvailable          => { repr = "NoTransferFnAvailable"},
+      Self::NoStripMaskAvailable           => { repr = "NoStripMaskAvailable"},
     }
     write!(f, "<CalibrationError : {}>", repr)
   }

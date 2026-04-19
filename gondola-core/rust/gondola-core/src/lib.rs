@@ -242,8 +242,9 @@ fn tracker_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
 #[pymodule]
 #[pyo3(name = "calibration")]
 fn calibration_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
-  use crate::calibration::tof::*;
+  use crate::calibration::*;
   m.add_class::<RBCalibrations>()?;
+  m.add_class::<TrackerOfflineCalibration>()?;
   Ok(())
 }
 
@@ -546,6 +547,8 @@ macro_rules! pythonize_error {
 pythonize_error!(SerializationError, PySerializationError);
 #[cfg(feature="pybindings")]
 pythonize_error!(AnalysisError, PyAnalysisError);
+#[cfg(feature="pybindings")]
+pythonize_error!(CalibrationError, PyCalibrationError);
 
 
 /// Python API to rust version of tof-dataclasses.
