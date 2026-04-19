@@ -19,6 +19,10 @@ ReadoutBoard                             = _gc.db.ReadoutBoard
 ReadoutBoard.__module__                  = __name__ 
 ReadoutBoard.__name__                    = 'ReadoutBoard' 
 
+TrackerCalibrationFileType               = _gc.db.TrackerCalibrationFileType 
+TrackerCalibrationFileType.__module__    = __name__ 
+TrackerCalibrationFileType.__name__      = 'TrackerCalibrationFileType'
+
 TrackerStrip                             = _gc.db.TrackerStrip
 TrackerStrip.__module__                  = __name__ 
 TrackerStrip.__name__                    = 'TrackerStrip' 
@@ -75,6 +79,9 @@ get_rbid_pbchannel_pid_map.__module__ = __name__
 
 load_calibration_db_elena    = _gc.db.load_calibration_db_elena 
 load_calibration_db_elena.__module__  = __name__ 
+
+create_trk_mask_table        = _gc.db.create_trk_mask_table 
+create_trk_mask_table.__module__ = __name__ 
 
 #-----------------------------------------------------------------
 
