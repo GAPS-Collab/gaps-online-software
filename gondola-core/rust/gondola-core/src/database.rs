@@ -49,6 +49,7 @@ pub enum TrackerCalibrationFileType {
   ChannelMask    = 202,
   PulsedChannels = 203,
   Gains          = 204,
+  Any            = 255,
 }
 
 impl ToSql<Integer, Sqlite> for TrackerCalibrationFileType {
@@ -68,6 +69,7 @@ impl FromSql<Integer, Sqlite> for TrackerCalibrationFileType {
       202 => Ok(TrackerCalibrationFileType::ChannelMask),
       203 => Ok(TrackerCalibrationFileType::PulsedChannels),
       204 => Ok(TrackerCalibrationFileType::Gains),
+      255 => Ok(TrackerCalibrationFileType::Any),
       _ => {
         error!("Unable to understand type {v}");
         return Err("Unrecognized calibration file type".into());
@@ -86,6 +88,7 @@ impl fmt::Display for TrackerCalibrationFileType {
       Self::ChannelMask    => { repr += "ChannelMask>";}
       Self::PulsedChannels => { repr += "PulsedChannels>";}
       Self::Gains          => { repr += "Gains>";}
+      Self::Any            => { repr += "Any>";}
     }
     write!(f, "{}", repr)
   }
@@ -95,9 +98,14 @@ impl fmt::Display for TrackerCalibrationFileType {
 
 //--------------------------------------------------------------
 
-/// This loads the calbration DB for SimpleDet as provided by Elan
+/// This loads the calbration DB for SimpleDet as provided by Elena 
+/// and INFN. 
+///
+/// This calibration db is basically a list of files and timestamps
+/// Exitence of these paths is not guaranteed.
 #[cfg_attr(feature="pybindings", pyfunction)]
-pub fn load_calibration_db_elena(db_path : &str) -> Option<Vec<TrackerCalibrationFile>> {
+#[cfg_attr(feature="pybindings", pyo3(signature = (db_path, cali_ftype = TrackerCalibrationFileType::Any)))]
+pub fn load_calibration_db_elena(db_path : &str, cali_ftype : TrackerCalibrationFileType) -> Option<Vec<TrackerCalibrationFile>> {
   use schema::calibration_files::dsl::*;
   info!("Will load SD calibration DB from {}", db_path);
   let mut conn = SqliteConnection::establish(db_path).ok()?;
@@ -106,8 +114,16 @@ pub fn load_calibration_db_elena(db_path : &str) -> Option<Vec<TrackerCalibratio
       error!("Unable to load tracker calibration files from db! {err}");
       return None;
     }
-    Ok(pdls) => {
-      return Some(pdls);
+    Ok(mut files) => {
+      match cali_ftype {
+        TrackerCalibrationFileType::Any => {
+          return Some(files);
+        }
+        _ => {
+          files.retain(|x| x.file_type == cali_ftype);            
+          return Some(files);
+        }
+      }
     }
   }
 }
@@ -3278,7 +3294,7 @@ impl TrackerStripCmnNoise {
     match tof_db_trackerstripcmnnoise.filter(
       schema::tof_db_trackerstripcmnnoise::name.eq(fname)).load::<Self>(&mut conn) {
       Err(err) => {
-        error!("We can't find any tracker strip transferfunction in the database! {err}");
+        error!("We can't find any tracker strip common noise information with that name in the database! {err}");
         return Ok(strips);
       }
       Ok(peds_) => {
@@ -3307,11 +3323,6 @@ impl TrackerStripCmnNoise {
       }
     }
   }
-
-  pub fn common_level(&self, adc : f32) -> f32 {
-    return (adc - self.pulse_avg)/self.gain; 
-  }
-
 }
 
 impl fmt::Display for TrackerStripCmnNoise {
@@ -3426,9 +3437,9 @@ impl TrackerStripCmnNoise {
     self.pulse_avg
   }
 
-  fn get_common_level(&self, adc : f32) -> f32 {
-    self.common_level(adc)
-  }
+  //fn get_common_level(&self, adc : f32) -> f32 {
+  //  self.common_level(adc)
+  //}
 
 }
 
@@ -3437,7 +3448,7 @@ pythonize!(TrackerStripCmnNoise);
 
 //-------------------------------------------------
 
-#[derive(Debug,Queryable, Selectable)]
+#[derive(Debug, Queryable, Selectable)]
 #[diesel(table_name = schema::calibration_files)]
 #[diesel(primary_key(id))]
 #[allow(non_snake_case)]
