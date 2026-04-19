@@ -3457,8 +3457,8 @@ pub struct TrackerCalibrationFile {
   pub id                        : i32, 
   pub file_type                 : TrackerCalibrationFileType,
   pub path                      : String, 
-  pub from_timestamp            : i32, 
-  pub to_timestamp              : i32, 
+  pub from_timestamp            : i64, 
+  pub to_timestamp              : i64, 
 }
 
 impl TrackerCalibrationFile {
@@ -3514,12 +3514,12 @@ impl TrackerCalibrationFile {
   }
 
 #[getter]
-  fn get_from_timestamp(&self) -> i32 {
+  fn get_from_timestamp(&self) -> i64 {
     self.from_timestamp
   }
 
 #[getter]
-  fn get_to_timestamp(&self) -> i32 {
+  fn get_to_timestamp(&self) -> i64 {
     self.to_timestamp
   }
 }

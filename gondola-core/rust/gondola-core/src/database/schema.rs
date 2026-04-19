@@ -95,8 +95,8 @@ diesel::table! {
     #[sql_name = "type"]
     file_type      -> Integer,
     path           -> Text,
-    from_timestamp -> Integer,
-    to_timestamp   -> Integer 
+    from_timestamp -> BigInt,
+    to_timestamp   -> BigInt 
   }
 }
 
