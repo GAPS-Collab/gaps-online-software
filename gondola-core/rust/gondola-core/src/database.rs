@@ -23,9 +23,11 @@ use diesel::sql_types::Integer;
 use diesel::serialize::ToSql;
 use diesel::backend::Backend;
 
-mod schema;
-    
+mod schema;    
 use schema::tof_db_rat::dsl::*;
+
+mod tracker_mask;
+pub use tracker_mask::create_trk_mask_table;
 
 /// Low gain/LTB connections to paddle ID 
 pub type DsiJChPidMapping = HashMap<u8, HashMap<u8, HashMap<u8, (u8, u8)>>>;
@@ -2219,61 +2221,6 @@ impl TrackerStrip {
 pythonize!(TrackerStrip);
 
 //------------------------------------------------
-
-/// The db insert companion to TrackerStripMask
-#[derive(Debug,PartialEq, Clone, Insertable)]
-#[diesel(table_name = schema::tof_db_trackerstripmask)]
-#[allow(non_snake_case)]
-#[cfg_attr(feature="pybindings", pyclass)]
-struct NewTrackerStripMask {
-  pub strip_id            : i32,    
-  pub volume_id           : i64,    
-  pub utc_timestamp_start : i64,
-  pub utc_timestamp_stop  : i64,
-  pub name                : Option<String>, 
-  pub active              : bool,   
-}
-
-impl NewTrackerStripMask {
-  pub fn from(mask : &TrackerStripMask) -> Self {
-    Self {
-      strip_id            : mask.strip_id             ,    
-      volume_id           : mask.volume_id            ,    
-      utc_timestamp_start : mask.utc_timestamp_start  ,
-      utc_timestamp_stop  : mask.utc_timestamp_stop   ,
-      name                : mask.name.clone()         , 
-      active              : mask.active               ,   
-    }
-  }
-}
-
-#[cfg_attr(feature="pybindings", pyfunction)]
-pub fn create_trk_mask_table( db_path: &str, masks: Vec<TrackerStripMask>) { 
-  use schema::tof_db_trackerstripmask::dsl::*;
-  //use schema::tof_db_trackerstripmask;
-  let mut conn = SqliteConnection::establish(db_path).ok().unwrap();
-  
-  let mut _query_result = diesel::sql_query("
-      CREATE TABLE IF NOT EXISTS tof_db_trackerstripmask (
-          data_id INTEGER PRIMARY KEY AUTOINCREMENT,
-          strip_id INTEGER NOT NULL,
-          volume_id BIGINT NOT NULL,
-          utc_timestamp_start BIGINT NOT NULL,
-          utc_timestamp_stop BIGINT NOT NULL,
-          name TEXT,
-          active BOOLEAN NOT NULL
-      )
-  ").execute(&mut conn);
-  let mut new_masks = Vec::<NewTrackerStripMask>::new();
-  for m in masks {
-    let nm = NewTrackerStripMask::from(&m);
-    new_masks.push(nm);
-  }
-  _query_result = diesel::insert_into(tof_db_trackerstripmask)
-    .values(&new_masks)
-    .execute(&mut conn);
-}
-
 
 /// Masking of unusable strips as curated by the tracker team 
 #[derive(Debug,PartialEq, Clone,Queryable, Selectable, serde::Serialize, serde::Deserialize)]
