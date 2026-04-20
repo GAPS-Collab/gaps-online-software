@@ -420,6 +420,8 @@ fn db_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<TrackerStripPedestal>()?;
   m.add_class::<TrackerStripTransferFunction>()?;
   m.add_class::<TrackerStripCmnNoise>()?;
+  m.add_class::<TrackerStripGain>()?;
+  m.add_class::<TrackerStripPulse>()?;
   m.add_class::<TofPaddleTimingConstant>()?;
   m.add_class::<TrackerCalibrationFile>()?;
   m.add_class::<TrackerCalibrationFileType>()?;
@@ -435,6 +437,8 @@ fn db_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(create_trk_mask_table, m)?)?;
   m.add_function(wrap_pyfunction!(create_trk_pedestal_table, m)?)?;
   m.add_function(wrap_pyfunction!(create_trk_transfer_fn_table, m)?)?;
+  m.add_function(wrap_pyfunction!(create_trk_pulse_table, m)?)?;
+  m.add_function(wrap_pyfunction!(create_trk_gain_table, m)?)?;
   Ok(())
 }
 

@@ -41,6 +41,18 @@ pub use tracker_transfer_fn::{
   create_trk_transfer_fn_table
 };
 
+mod tracker_gain;
+pub use tracker_gain::{
+  TrackerStripGain,
+  create_trk_gain_table
+};
+
+mod tracker_pulse;
+pub use tracker_pulse::{
+  TrackerStripPulse,
+  create_trk_pulse_table
+};
+
 /// Low gain/LTB connections to paddle ID 
 pub type DsiJChPidMapping = HashMap<u8, HashMap<u8, HashMap<u8, (u8, u8)>>>;
 /// Low gain/LTB connections to rb ID 

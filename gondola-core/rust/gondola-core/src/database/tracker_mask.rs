@@ -17,6 +17,7 @@ use std::io::{
 };
 
 
+
 /// Masking of unusable strips as curated by the tracker team 
 #[derive(Debug,PartialEq, Clone,Queryable, Selectable, serde::Serialize, serde::Deserialize)]
 #[diesel(table_name = schema::tof_db_trackerstripmask)]

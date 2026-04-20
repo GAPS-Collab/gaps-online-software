@@ -235,6 +235,33 @@ diesel::table! {
   }
 }
 
+diesel::table! { 
+  tof_db_trackerstrippulse ( data_id ) {
+    data_id             -> Integer,
+    strip_id             -> Integer,
+    volume_id            -> BigInt,
+    utc_timestamp_start  -> BigInt,
+    utc_timestamp_stop   -> BigInt,
+    name                 -> Nullable<Text>, 
+    pulse_chn            -> Integer,
+    pulse_avg            -> Float,
+    pulse_is_mean        -> Bool
+  }
+}
+
+diesel::table! { 
+  tof_db_trackerstripgain ( data_id ) {
+    data_id             -> Integer,
+    strip_id             -> Integer,
+    volume_id            -> BigInt,
+    utc_timestamp_start  -> BigInt,
+    utc_timestamp_stop   -> BigInt,
+    name                 -> Nullable<Text>, 
+    gain                 -> Float,
+    gain_is_mean         -> Bool,
+  }
+}
+
 diesel::table! {
   tof_db_localtriggerboard (board_id) {
       board_id -> SmallInt,
