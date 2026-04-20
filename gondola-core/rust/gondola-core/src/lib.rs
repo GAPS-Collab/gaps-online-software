@@ -434,6 +434,7 @@ fn db_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(load_calibration_db_elena, m)?)?;
   m.add_function(wrap_pyfunction!(create_trk_mask_table, m)?)?;
   m.add_function(wrap_pyfunction!(create_trk_pedestal_table, m)?)?;
+  m.add_function(wrap_pyfunction!(create_trk_transfer_fn_table, m)?)?;
   Ok(())
 }
 
