@@ -64,6 +64,11 @@ impl TelemetryEvent {
     }
   }
 
+  /// Create a TelemetryPacket from the 
+  /// TelemetryEvent.
+  ///
+  /// CAVEAT: Currently the checksum does 
+  /// not get re-evaluated
   pub fn pack(&self) -> TelemetryPacket {
     let mut tp = TelemetryPacket::new();
     // this is bad, but currently I am not 
@@ -71,6 +76,12 @@ impl TelemetryEvent {
     tp.header  = self.header.clone();
     tp.payload = self.to_bytestream();
     tp
+  }
+
+  pub fn calibrate_trk_hits(&mut self, cali : &TrackerOfflineCalibration) 
+    -> Result<(), CalibrationError> {
+    cali.calibrate(&mut self.tracker_hits)?;
+    Ok(())
   }
 
   /// Restore position information from database
@@ -111,102 +122,102 @@ impl TelemetryEvent {
   }
 
 
-  /// Applies a cut based on adc values
-  #[cfg(feature="database")]
-  pub fn apply_signal_cut(&mut self, cut : f32, pedestals : &HashMap<u32, TrackerStripPedestal>) {
-    let mut clean_hits = Vec::<TrackerHit>::with_capacity(self.tracker_hits.len());
-    for h in &self.tracker_hits {
-      if !pedestals.contains_key(&h.get_stripid()) {
-        warn!("We don't have pedestal information for strip id {}", h.get_stripid());
-        continue;
-      }
-      let ped = &pedestals[&h.get_stripid()];
-      if (h.adc as f32) - ped.pedestal_mean > (cut * ped.pedestal_sigma){
-        clean_hits.push(h.clone());
-      }
-    }
-    self.tracker_hits = clean_hits;
-  }
+  ///// Applies a cut based on adc values
+  //#[cfg(feature="database")]
+  //pub fn apply_signal_cut(&mut self, cut : f32, pedestals : &HashMap<u32, TrackerStripPedestal>) {
+  //  let mut clean_hits = Vec::<TrackerHit>::with_capacity(self.tracker_hits.len());
+  //  for h in &self.tracker_hits {
+  //    if !pedestals.contains_key(&h.get_stripid()) {
+  //      warn!("We don't have pedestal information for strip id {}", h.get_stripid());
+  //      continue;
+  //    }
+  //    let ped = &pedestals[&h.get_stripid()];
+  //    if (h.adc as f32) - ped.pedestal_mean > (cut * ped.pedestal_sigma){
+  //      clean_hits.push(h.clone());
+  //    }
+  //  }
+  //  self.tracker_hits = clean_hits;
+  //}
  
-  /// Calculate the absolute common noise (adc)
-  #[cfg(feature="database")]
-  pub fn cmn_noise(hit       : &TrackerHit, 
-                   pedestals : &HashMap<u32, TrackerStripPedestal>,
-                   cmn_noise : &HashMap<u32, TrackerStripCmnNoise>) -> Option<f32> {
-    let stripid = hit.get_stripid();
-    if !cmn_noise.contains_key(&stripid) {
-      warn!("We don't have pedestal information for strip id {}", stripid);
-      return None;
-    }
-    if !pedestals.contains_key(&stripid) {
-      warn!("We don't have pedestal information for strip id {}", stripid);
-      return None;
-    }
-    let mut cmn_level = 0.0f32;
-    let adc_ped_sub   = hit.adc as f32 - pedestals[&stripid].pedestal_mean; 
-    if adc_ped_sub < 400.0 {
-      cmn_level = cmn_noise[&stripid].common_level(hit.adc as f32);
-    }
-    return Some(adc_ped_sub - cmn_noise[&stripid].gain * cmn_level);
-  }
+  ///// Calculate the absolute common noise (adc)
+  //#[cfg(feature="database")]
+  //pub fn cmn_noise(hit       : &TrackerHit, 
+  //                 pedestals : &HashMap<u32, TrackerStripPedestal>,
+  //                 cmn_noise : &HashMap<u32, TrackerStripCmnNoise>) -> Option<f32> {
+  //  let stripid = hit.get_stripid();
+  //  if !cmn_noise.contains_key(&stripid) {
+  //    warn!("We don't have pedestal information for strip id {}", stripid);
+  //    return None;
+  //  }
+  //  if !pedestals.contains_key(&stripid) {
+  //    warn!("We don't have pedestal information for strip id {}", stripid);
+  //    return None;
+  //  }
+  //  let mut cmn_level = 0.0f32;
+  //  let adc_ped_sub   = hit.adc as f32 - pedestals[&stripid].pedestal_mean; 
+  //  if adc_ped_sub < 400.0 {
+  //    cmn_level = cmn_noise[&stripid].common_level(hit.adc as f32);
+  //  }
+  //  return Some(adc_ped_sub - cmn_noise[&stripid].gain * cmn_level);
+  //}
 
-  /// Calculate the energy deposition
-  #[cfg(feature="database")]
-  pub fn get_trk_energy(adc : f32, tf : &TrackerStripTransferFunction) -> f32 {
-    let mut energy = 0.0f32;
-    let mut adc_m  = adc; 
-    if adc_m <= 0.0 {
-      return energy;
-    }
-    if adc_m > 1600.0 {
-      adc_m = 1600.0;
-    }
-    #[allow(non_snake_case)]
-    let mV2keV  = 0.841f32;
-    // the max and min range are basically defined by the 
-    // polynominal [0-1600]
-    let voltage = tf.transfer_fn(adc_m);
-    println!("voltage {}", voltage);
-    energy  = voltage*mV2keV;
-    energy /= 1000.0;
-    println!("adc : {} , energy {}", adc_m, energy);
-    return energy;
-  }
+  ///// Calculate the energy deposition
+  //#[cfg(feature="database")]
+  //pub fn get_trk_energy(adc : f32, tf : &TrackerStripTransferFunction) -> f32 {
+  //  let mut energy = 0.0f32;
+  //  let mut adc_m  = adc; 
+  //  if adc_m <= 0.0 {
+  //    return energy;
+  //  }
+  //  if adc_m > 1600.0 {
+  //    adc_m = 1600.0;
+  //  }
+  //  #[allow(non_snake_case)]
+  //  let mV2keV  = 0.841f32;
+  //  // the max and min range are basically defined by the 
+  //  // polynominal [0-1600]
+  //  let voltage = tf.transfer_fn(adc_m);
+  //  println!("voltage {}", voltage);
+  //  energy  = voltage*mV2keV;
+  //  energy /= 1000.0;
+  //  println!("adc : {} , energy {}", adc_m, energy);
+  //  return energy;
+  //}
 
-  #[cfg(feature="database")]
-  pub fn calibrate_tracker(&mut self, 
-                           remove_cmn_noise : bool,
-                           pedestals        : &HashMap<u32, TrackerStripPedestal>,
-                           transfer_fn      : &HashMap<u32, TrackerStripTransferFunction>,
-                           cmn_noise        : &HashMap<u32, TrackerStripCmnNoise>) {
-    //println!("Will remove CMN noise {}", remove_cmn_noise);
-    for h in &mut self.tracker_hits {
-      let stripid = h.get_stripid();
-      //println!("Running TRK calibration for strip {}", stripid);
-      if !pedestals.contains_key(&stripid) {
-        warn!("Pedestal map does not contain strip {}. Will not calculate energy!", stripid);
-        continue;
-      }
-      if !transfer_fn.contains_key(&stripid) {
-        warn!("Transfer fn for strip {} not available. Will not calculate energy!", stripid);
-        continue;
-      }
-      let adc_no_ped = h.adc as f32 - pedestals[&stripid].pedestal_mean;
-      //println!("ADC NO PED {}", adc_no_ped);
-      if remove_cmn_noise {
-        match Self::cmn_noise(&h, pedestals, cmn_noise) { 
-          None => {
-            h.energy = Self::get_trk_energy(adc_no_ped, &transfer_fn[&stripid]); 
-          }
-          Some(cmn) => {
-            h.energy = Self::get_trk_energy(cmn, &transfer_fn[&stripid]);
-          }
-        }    
-      } else {
-        h.energy = Self::get_trk_energy(adc_no_ped, &transfer_fn[&stripid]);
-      }
-    }
-  }
+  //#[cfg(feature="database")]
+  //pub fn calibrate_tracker(&mut self, 
+  //                         remove_cmn_noise : bool,
+  //                         pedestals        : &HashMap<u32, TrackerStripPedestal>,
+  //                         transfer_fn      : &HashMap<u32, TrackerStripTransferFunction>,
+  //                         cmn_noise        : &HashMap<u32, TrackerStripCmnNoise>) {
+  //  //println!("Will remove CMN noise {}", remove_cmn_noise);
+  //  for h in &mut self.tracker_hits {
+  //    let stripid = h.get_stripid();
+  //    //println!("Running TRK calibration for strip {}", stripid);
+  //    if !pedestals.contains_key(&stripid) {
+  //      warn!("Pedestal map does not contain strip {}. Will not calculate energy!", stripid);
+  //      continue;
+  //    }
+  //    if !transfer_fn.contains_key(&stripid) {
+  //      warn!("Transfer fn for strip {} not available. Will not calculate energy!", stripid);
+  //      continue;
+  //    }
+  //    let adc_no_ped = h.adc as f32 - pedestals[&stripid].pedestal_mean;
+  //    //println!("ADC NO PED {}", adc_no_ped);
+  //    if remove_cmn_noise {
+  //      match Self::cmn_noise(&h, pedestals, cmn_noise) { 
+  //        None => {
+  //          h.energy = Self::get_trk_energy(adc_no_ped, &transfer_fn[&stripid]); 
+  //        }
+  //        Some(cmn) => {
+  //          h.energy = Self::get_trk_energy(cmn, &transfer_fn[&stripid]);
+  //        }
+  //      }    
+  //    } else {
+  //      h.energy = Self::get_trk_energy(adc_no_ped, &transfer_fn[&stripid]);
+  //    }
+  //  }
+  //}
 }
 
 
@@ -442,11 +453,11 @@ impl TelemetryEvent {
     self.flags1
   }
 
-  #[staticmethod]
-  #[pyo3(name = "get_trk_energy")]
-  fn get_trk_energy_py(adc : f32, tf : &TrackerStripTransferFunction) -> f32 {
-    Self::get_trk_energy(adc, tf)
-  }
+  //#[staticmethod]
+  //#[pyo3(name = "get_trk_energy")]
+  //fn get_trk_energy_py(adc : f32, tf : &TrackerStripTransferFunction) -> f32 {
+  //  Self::get_trk_energy(adc, tf)
+  //}
 
   #[getter]
   fn get_header(&self) -> TelemetryPacketHeader {
@@ -583,7 +594,6 @@ impl TelemetryEvent {
     match Self::from_bytestream(&packet.payload, &mut 0) {
       Ok(mut event) => {
         event.header = packet.header.clone();
-        // FIXME - replace with dehydrate
         #[cfg(feature="database")]
         event.hydrate(&packet.tof_paddles, &packet.trk_strips);
         return Ok(event);
@@ -598,6 +608,14 @@ impl TelemetryEvent {
   fn pack_py(&self) -> TelemetryPacket {
     self.pack()
   }
+
+  #[pyo3(name="calibrate_trk_hits")]
+  fn calibrate_trk_hits_py(&mut self, cali : Bound<'_, TrackerOfflineCalibration> ) -> PyResult<()> {
+    let cali_ref = cali.borrow();
+    self.calibrate_trk_hits(&*cali_ref)?;
+    Ok(())
+  }
+
 //  #[cfg(feature="database")]
 //  #[pyo3(name="mask_strips")]
 //  pub fn mask_strips_py(&mut self, masks : &HashMap<u32, TrackerStripMask>) {

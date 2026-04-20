@@ -686,11 +686,12 @@ impl CRFrame {
         event.header  = packet.header;  
         event.hydrate(&self.tof_paddles, &self.trk_strips);
         if self.do_trk_calib {
-          event.mask_strips(&self.trk_masks);
-          event.calibrate_tracker(self.subtract_trk_cmn, 
-                                  &self.trk_ped,
-                                  &self.trk_tf,
-                                  &self.trk_cmn);
+        //  event.mask_strips(&self.trk_masks);
+        //  event.calibrate_tracker(self.subtract_trk_cmn, 
+        //                          &self.trk_ped,
+        //                          &self.trk_tf,
+        //                          &self.trk_cmn);
+        error!("Tracker calibration not implemented!");
         }
         Ok(Some(event))
       }

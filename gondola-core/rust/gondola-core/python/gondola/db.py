@@ -37,11 +37,19 @@ TrackerStripPedestal.__name__            = 'TrackerStripPedestal'
 
 TrackerStripTransferFunction    = _gc.db.TrackerStripTransferFunction 
 TrackerStripTransferFunction.__module__  = __name__ 
-TrackerStripTransferFunction.__name__    = 'TrackerStripPedestal' 
+TrackerStripTransferFunction.__name__    = 'TrackerStripTransferFunction' 
 
 TrackerStripCmnNoise                     = _gc.db.TrackerStripCmnNoise
 TrackerStripCmnNoise.__module__          = __name__ 
 TrackerStripCmnNoise.__name__            = 'TrackerStripCmnNoise'
+
+TrackerStripGain                         = _gc.db.TrackerStripGain
+TrackerStripGain.__module__              = __name__ 
+TrackerStripGain.__name__                = 'TrackerStripGain'
+
+TrackerStripPulse                        = _gc.db.TrackerStripPulse
+TrackerStripPulse.__module__             = __name__ 
+TrackerStripPulse.__name__               = 'TrackerStripPulse'
 
 TofPaddleTimingConstant                  = _gc.db.TofPaddleTimingConstant 
 TofPaddleTimingConstant.__module__       = __name__ 
@@ -82,6 +90,18 @@ load_calibration_db_elena.__module__  = __name__
 
 create_trk_mask_table        = _gc.db.create_trk_mask_table 
 create_trk_mask_table.__module__ = __name__ 
+
+create_trk_pedestal_table        = _gc.db.create_trk_pedestal_table 
+create_trk_pedestal_table.__module__ = __name__ 
+
+create_trk_transfer_fn_table     = _gc.db.create_trk_transfer_fn_table 
+create_trk_transfer_fn_table.__module__ = __name__
+
+create_trk_gain_table     = _gc.db.create_trk_gain_table 
+create_trk_gain_table.__module__ = __name__
+
+create_trk_pulse_table    = _gc.db.create_trk_pulse_table 
+create_trk_pulse_table.__module__ = __name__
 
 #-----------------------------------------------------------------
 
@@ -307,6 +327,8 @@ __all__ = ['TofPaddle',\
            'TrackerStripTransferFunction',\
            'TrackerStripCmnNoise',\
            'TrackerStripMask',\
+           'TrackerStripPulse',\
+           'TrackerStripGain',\
            'get_all_rbids_in_db',\
            'get_all_pbids_in_db',\
            'get_hid_vid_map',\
@@ -316,5 +338,10 @@ __all__ = ['TofPaddle',\
            'get_rbid_pbchannel_pid_map',\
            'get_tof_umb_paddles',\
            'get_tof_cbe_paddles',\
-           'get_tof_cor_paddles']
+           'get_tof_cor_paddles',\
+           'create_trk_mask_table',\
+           'create_trk_gain_table',\
+           'create_trk_pulse_table',\
+           'create_trk_transfer_fn_table',\
+           'create_trk_pedestal_table']
 

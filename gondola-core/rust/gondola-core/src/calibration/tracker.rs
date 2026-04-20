@@ -89,6 +89,11 @@ impl TrackerOfflineCalibration {
     event_hits.retain(|x| active_strips.contains(&x.get_stripid()));
   }
 
+  pub fn calibrate_event(&self, event : &mut TelemetryEvent) -> Result<(),CalibrationError> {
+    self.calibrate(&mut event.tracker_hits)?;
+    Ok(())
+  }
+
   pub fn calibrate(&self, event_hits : &mut Vec<TrackerHit>) -> Result<(),CalibrationError> {
     let mut calibrated_hits = Vec::<TrackerHit>::with_capacity(event_hits.len());
     let mut c_hit : TrackerHit; //= TrackerHit::new();
@@ -120,7 +125,9 @@ impl TrackerOfflineCalibration {
       // apply transfer functions 
       hit_tf = self.tf_map.get(&hit.get_stripid());
       if let Some(tf) = hit_tf {
+        //println!("energy before : {}", energy);
         energy = tf.transfer_fn(energy);
+        //println!("energy after : {}", energy);
       } else {
         return Err(CalibrationError::NoTransferFnAvailable);
       }
@@ -142,6 +149,7 @@ impl TrackerOfflineCalibration {
       }
       c_hit = hit.clone();
       c_hit.energy = energy;
+      //println!("c_hit {}", c_hit);
       calibrated_hits.push(c_hit);
     }
     event_hits.clear(); 
@@ -192,20 +200,40 @@ impl TrackerOfflineCalibration {
   //}
 }
 
+impl fmt::Display for TrackerOfflineCalibration {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<TrackerOfflineCalibration:");
+    repr += &(format!("\n  N masks  : {}", self.mask_map.len()));
+    repr += &(format!("\n  N pedest : {}", self.ped_map.len()));
+    repr += &(format!("\n  N tf_fns : {}", self.tf_map.len()));
+    repr += &(format!("\n  N gains  : {}", self.gain_map.len()));
+    repr += &(format!("\n  N pulses : {}", self.pulse_map.len()));
+    repr += ">";
+    write!(f, "{}", repr)
+  }
+}
+
+
+
 #[cfg(feature="pybindings")] 
 #[pymethods]
 impl TrackerOfflineCalibration {
  
-  #[new]
-  fn new_py() -> Self {
-    Self::new()
-  }
-
   #[pyo3(name="calibrate_hits")]
   fn calibrate_hits_py(&self, mut hits : Vec<TrackerHit>) -> Vec<TrackerHit> {
     let _ = self.calibrate(&mut hits);
     hits 
   }
+  
+  //#[pyo3(name="calibrate_event")]
+  //fn calibrate_event_py(&self, mut event : TelemetryEvent) -> PyResult<()> {
+  //  //let _ = self.calibrate_event(&mut event)?;
+  //  self.calibrate_event(&mut event)?;
+  //  for h in &event.tracker_hits {
+  //    println!("Hit after calibrate {}!", h);
+  //  }
+  //  Ok(())
+  //}
   
   // all the getters/setters are here because I did not get
   // #[cfg_attr(feature="pybindings", pyo3(set,get)] 
@@ -285,6 +313,7 @@ impl TrackerOfflineCalibration {
   fn get_pulse_map_py(&self) -> HashMap<u32, TrackerStripPulse> {
     self.pulse_map.clone()
   }
+  
   #[setter]
   #[pyo3(name="pulse_map")]
   fn set_pulse_map_py(&mut self, value : HashMap<u32,TrackerStripPulse>) {
@@ -302,7 +331,6 @@ impl TrackerOfflineCalibration {
     self.gain_map = value;
   }
 
-
   #[getter]
   #[pyo3(name="adc_sig_cut")]
   fn get_adc_sig_cut_py(&self) -> HashMap<u32,f32> {
@@ -314,4 +342,7 @@ impl TrackerOfflineCalibration {
     self.adc_sig_cut = value;
   }
 }
+
+#[cfg(feature="pybindings")]
+pythonize!(TrackerOfflineCalibration);
 

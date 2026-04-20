@@ -55,7 +55,7 @@ pub struct CRReader {
   pub trk_tf           : Arc<HashMap<u32, TrackerStripTransferFunction>>,
   /// Common noise data for tracker
   pub trk_cmn          : Arc<HashMap<u32, TrackerStripCmnNoise>>, 
-  ///// did paddle loading work
+  /// did paddle loading work
   pub db_loaded        : bool,
   /// TRK calibration - convert to energy
   pub do_trk_calib     : bool,

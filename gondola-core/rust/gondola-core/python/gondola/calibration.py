@@ -7,6 +7,7 @@ import re
 import tqdm
 
 from . import _gondola_core 
+
 RBCalibrations = _gondola_core.calibration.RBCalibrations
 RBCalibrations.__module__ = __name__ 
 RBCalibrations.__name__   = 'RBCalibrations'
@@ -14,6 +15,10 @@ RBCalibrations.__name__   = 'RBCalibrations'
 TrackerOnlineCalibration = _gondola_core.tracker.TrackerOnlineCalibration 
 TrackerOnlineCalibration.__module__ = __name__ 
 TrackerOnlineCalibration.__name__   = 'TrackerOnlineCalibration'
+
+TrackerOfflineCalibration = _gondola_core.calibration.TrackerOfflineCalibration 
+TrackerOfflineCalibration.__module__ = __name__ 
+TrackerOfflineCalibration.__name__   = 'TrackerOfflineCalibration'
 
 ## convenience functions
 def load_rb_calibrations(cali_dir : Path, load_event_data = False):
