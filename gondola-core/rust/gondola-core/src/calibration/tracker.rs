@@ -10,7 +10,9 @@ pub struct TrackerOfflineCalibration {
   pub mask_map      : HashMap<u32,TrackerStripMask>, 
   pub tf_map        : HashMap<u32,TrackerStripTransferFunction>, 
   pub ped_map       : HashMap<u32,TrackerStripPedestal>,
-  pub cmn_map       : HashMap<u32,TrackerStripCmnNoise>,
+  pub gain_map      : HashMap<u32,TrackerStripGain>,
+  pub pulse_map     : HashMap<u32,TrackerStripPulse>,
+  //pub cmn_map       : HashMap<u32,TrackerStripCmnNoise>,
   pub adc_sig_cut   : HashMap<u32,f32>,
   pub remove_cmn    : bool,
   pub ped_sigma_cut : f32,
@@ -24,8 +26,9 @@ impl TrackerOfflineCalibration {
       mask_map      : HashMap::<u32, TrackerStripMask>::new(),
       tf_map        : HashMap::<u32, TrackerStripTransferFunction>::new(), 
       ped_map       : HashMap::<u32, TrackerStripPedestal>::new(),
-      cmn_map       : HashMap::<u32, TrackerStripCmnNoise>::new(),
       adc_sig_cut   : HashMap::<u32,f32>::new(),
+      gain_map      : HashMap::<u32,TrackerStripGain>::new(),
+      pulse_map     : HashMap::<u32,TrackerStripPulse>::new(),
       remove_cmn    : false,
       ped_sigma_cut : 0.0,
       remove_pulsed : false,
@@ -36,17 +39,19 @@ impl TrackerOfflineCalibration {
     let mut cmn_level     = 0.0f32;
     let mut strip_gain    = 0.0f32;
     let mut hit_is_pulser = false;
-    if let Some(cmn_strip) = self.cmn_map.get(&hit.get_stripid()) {
+    if let Some(cmn_strip) = self.gain_map.get(&hit.get_stripid()) {
       strip_gain = cmn_strip.gain;
+    } 
+    if let Some(cmn_strip) = self.pulse_map.get(&hit.get_stripid()) {
       // get the pulsed channel and the adc  for it 
       let pulse_ch = cmn_strip.pulse_chn; 
       let mut pulse_adc  : f32;// = 0.0;
       //let mut pulse_ped  : u16;// = 0;
       let mut pulse_gain : f32 = 1.0;
-      let pulse_strip_id : u32 = strip_id(hit.layer as u8, hit.row as u8,
+      let pulse_strip_id : u32 = TrackerStrip::create_stripid(hit.layer as u8, hit.row as u8,
           hit.module as u8, pulse_ch as u8); 
       hit_is_pulser = hit.get_stripid() == pulse_strip_id;
-      if let Some(cmn_pulsed_strip) = self.cmn_map.get(&pulse_strip_id) {
+      if let Some(cmn_pulsed_strip) = self.gain_map.get(&pulse_strip_id) {
         pulse_gain = cmn_pulsed_strip.gain;
       }        
       for h in event_hits {
@@ -121,8 +126,8 @@ impl TrackerOfflineCalibration {
       }
       // now we need to check if this is a pulsed channel 
       if hit_is_pulser {
-        if let Some(pulse_cmn) = self.cmn_map.get(&hit.get_stripid()) {
-          let mut p_avg = pulse_cmn.pulse_avg; 
+        if let Some(pulse) = self.pulse_map.get(&hit.get_stripid()) {
+          let mut p_avg = pulse.pulse_avg; 
           if p_avg > 0.0 && self.remove_pulsed {
             continue
           }
@@ -276,16 +281,26 @@ impl TrackerOfflineCalibration {
   }
 
   #[getter]
-  #[pyo3(name="cmn_map")]
-  fn get_cmn_map_py(&self) -> HashMap<u32, TrackerStripCmnNoise> {
-    self.cmn_map.clone()
+  #[pyo3(name="pulse_map")]
+  fn get_pulse_map_py(&self) -> HashMap<u32, TrackerStripPulse> {
+    self.pulse_map.clone()
   }
   #[setter]
-  #[pyo3(name="cmn_map")]
-  fn set_cmn_map_py(&mut self, value : HashMap<u32,TrackerStripCmnNoise>) {
-    self.cmn_map = value;
+  #[pyo3(name="pulse_map")]
+  fn set_pulse_map_py(&mut self, value : HashMap<u32,TrackerStripPulse>) {
+    self.pulse_map = value;
   }
   
+  #[getter]
+  #[pyo3(name="gain_map")]
+  fn get_gain_map_py(&self) -> HashMap<u32, TrackerStripGain> {
+    self.gain_map.clone()
+  }
+  #[setter]
+  #[pyo3(name="gain_map")]
+  fn set_gain_map_py(&mut self, value : HashMap<u32,TrackerStripGain>) {
+    self.gain_map = value;
+  }
 
 
   #[getter]
@@ -299,15 +314,4 @@ impl TrackerOfflineCalibration {
     self.adc_sig_cut = value;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
 
