@@ -80,6 +80,7 @@ impl TelemetryEvent {
 
   pub fn calibrate_trk_hits(&mut self, cali : &TrackerOfflineCalibration) 
     -> Result<(), CalibrationError> {
+    cali.mask_hits(&mut self.tracker_hits);
     cali.calibrate(&mut self.tracker_hits)?;
     Ok(())
   }
