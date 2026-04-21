@@ -8,6 +8,11 @@ gondola.db
 
    .. autosummary::
    
+      create_trk_gain_table
+      create_trk_mask_table
+      create_trk_pedestal_table
+      create_trk_pulse_table
+      create_trk_transfer_fn_table
       get_all_pbids_in_db
       get_all_rbids_in_db
       get_dsi_j_ch_pid_map
@@ -31,7 +36,9 @@ gondola.db
       TrackerCalibrationFileType
       TrackerStrip
       TrackerStripCmnNoise
+      TrackerStripGain
       TrackerStripMask
       TrackerStripPedestal
+      TrackerStripPulse
       TrackerStripTransferFunction
    

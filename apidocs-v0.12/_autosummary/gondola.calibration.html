@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.calibration &#8212; gondola 0.12.19 documentation</title>
+    <title>gondola.calibration &#8212; gondola 0.12.20 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=3aafd16a"></script>
+    <script src="../_static/documentation_options.js?v=3b2cb6f7"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.calibration';</script>
@@ -117,7 +117,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.12.19 documentation</p>
+    <p class="title logo__title">gondola 0.12.20 documentation</p>
   
 </a></div>
     
@@ -378,7 +378,10 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#gondola.calibration.RBCalibrations" title="gondola.calibration.RBCalibrations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RBCalibrations</span></code></a>()</p></td>
 <td><p>DRS4 calibration routine for the TOF readoutboards.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.calibration.TrackerOnlineCalibration" title="gondola.calibration.TrackerOnlineCalibration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerOnlineCalibration</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.calibration.TrackerOfflineCalibration" title="gondola.calibration.TrackerOfflineCalibration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerOfflineCalibration</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.calibration.TrackerOnlineCalibration" title="gondola.calibration.TrackerOnlineCalibration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerOnlineCalibration</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -568,6 +571,68 @@ as it was used in the GAPSI flight.</p>
 
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.calibration.TrackerOfflineCalibration">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.calibration.</span></span><span class="sig-name descname"><span class="pre">TrackerOfflineCalibration</span></span><a class="headerlink" href="#gondola.calibration.TrackerOfflineCalibration" title="Link to this definition">#</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.calibration.TrackerOfflineCalibration.adc_sig_cut">
+<span class="sig-name descname"><span class="pre">adc_sig_cut</span></span><a class="headerlink" href="#gondola.calibration.TrackerOfflineCalibration.adc_sig_cut" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.calibration.TrackerOfflineCalibration.calibrate_hits">
+<span class="sig-name descname"><span class="pre">calibrate_hits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.TrackerOfflineCalibration.calibrate_hits" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.calibration.TrackerOfflineCalibration.gain_map">
+<span class="sig-name descname"><span class="pre">gain_map</span></span><a class="headerlink" href="#gondola.calibration.TrackerOfflineCalibration.gain_map" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.calibration.TrackerOfflineCalibration.mask_map">
+<span class="sig-name descname"><span class="pre">mask_map</span></span><a class="headerlink" href="#gondola.calibration.TrackerOfflineCalibration.mask_map" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.calibration.TrackerOfflineCalibration.ped_map">
+<span class="sig-name descname"><span class="pre">ped_map</span></span><a class="headerlink" href="#gondola.calibration.TrackerOfflineCalibration.ped_map" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.calibration.TrackerOfflineCalibration.ped_sigma_cut">
+<span class="sig-name descname"><span class="pre">ped_sigma_cut</span></span><a class="headerlink" href="#gondola.calibration.TrackerOfflineCalibration.ped_sigma_cut" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.calibration.TrackerOfflineCalibration.plot_transfer_fn">
+<span class="sig-name descname"><span class="pre">plot_transfer_fn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strip_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.TrackerOfflineCalibration.plot_transfer_fn" title="Link to this definition">#</a></dt>
+<dd><p>Plot the transfer function for the respective strip over a 
+reasonable ADC range (0-1600)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.calibration.TrackerOfflineCalibration.pulse_map">
+<span class="sig-name descname"><span class="pre">pulse_map</span></span><a class="headerlink" href="#gondola.calibration.TrackerOfflineCalibration.pulse_map" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.calibration.TrackerOfflineCalibration.remove_cmn">
+<span class="sig-name descname"><span class="pre">remove_cmn</span></span><a class="headerlink" href="#gondola.calibration.TrackerOfflineCalibration.remove_cmn" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.calibration.TrackerOfflineCalibration.remove_pulsed">
+<span class="sig-name descname"><span class="pre">remove_pulsed</span></span><a class="headerlink" href="#gondola.calibration.TrackerOfflineCalibration.remove_pulsed" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.calibration.TrackerOfflineCalibration.tf_map">
+<span class="sig-name descname"><span class="pre">tf_map</span></span><a class="headerlink" href="#gondola.calibration.TrackerOfflineCalibration.tf_map" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="gondola.calibration.load_rb_calibrations">
 <span class="sig-prename descclassname"><span class="pre">gondola.calibration.</span></span><span class="sig-name descname"><span class="pre">load_rb_calibrations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cali_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_event_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.calibration.load_rb_calibrations" title="Link to this definition">#</a></dt>
@@ -669,6 +734,20 @@ calibration constants.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.TrackerOnlineCalibration.from_default"><code class="docutils literal notranslate"><span class="pre">TrackerOnlineCalibration.from_default()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.TrackerOnlineCalibration.from_file"><code class="docutils literal notranslate"><span class="pre">TrackerOnlineCalibration.from_file()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.TrackerOnlineCalibration.is_pulsed"><code class="docutils literal notranslate"><span class="pre">TrackerOnlineCalibration.is_pulsed()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.TrackerOfflineCalibration"><code class="docutils literal notranslate"><span class="pre">TrackerOfflineCalibration</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.TrackerOfflineCalibration.adc_sig_cut"><code class="docutils literal notranslate"><span class="pre">TrackerOfflineCalibration.adc_sig_cut</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.TrackerOfflineCalibration.calibrate_hits"><code class="docutils literal notranslate"><span class="pre">TrackerOfflineCalibration.calibrate_hits()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.TrackerOfflineCalibration.gain_map"><code class="docutils literal notranslate"><span class="pre">TrackerOfflineCalibration.gain_map</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.TrackerOfflineCalibration.mask_map"><code class="docutils literal notranslate"><span class="pre">TrackerOfflineCalibration.mask_map</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.TrackerOfflineCalibration.ped_map"><code class="docutils literal notranslate"><span class="pre">TrackerOfflineCalibration.ped_map</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.TrackerOfflineCalibration.ped_sigma_cut"><code class="docutils literal notranslate"><span class="pre">TrackerOfflineCalibration.ped_sigma_cut</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.TrackerOfflineCalibration.plot_transfer_fn"><code class="docutils literal notranslate"><span class="pre">TrackerOfflineCalibration.plot_transfer_fn()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.TrackerOfflineCalibration.pulse_map"><code class="docutils literal notranslate"><span class="pre">TrackerOfflineCalibration.pulse_map</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.TrackerOfflineCalibration.remove_cmn"><code class="docutils literal notranslate"><span class="pre">TrackerOfflineCalibration.remove_cmn</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.TrackerOfflineCalibration.remove_pulsed"><code class="docutils literal notranslate"><span class="pre">TrackerOfflineCalibration.remove_pulsed</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.TrackerOfflineCalibration.tf_map"><code class="docutils literal notranslate"><span class="pre">TrackerOfflineCalibration.tf_map</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.calibration.load_rb_calibrations"><code class="docutils literal notranslate"><span class="pre">load_rb_calibrations()</span></code></a></li>

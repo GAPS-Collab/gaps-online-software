@@ -190,48 +190,44 @@
 <a href=#190 id=190 data-nosnippet>190</a><span class="kw">pub use </span><span class="kw">crate</span>::packets::<span class="kw-2">*</span>;
 <a href=#191 id=191 data-nosnippet>191</a><span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
 <a href=#192 id=192 data-nosnippet>192</a></span><span class="kw">pub use </span><span class="kw">crate</span>::database::<span class="kw-2">*</span>;
-<a href=#193 id=193 data-nosnippet>193</a><span class="comment">//#[cfg(not(feature="database"))]
-<a href=#194 id=194 data-nosnippet>194</a>//pub use crate::TrackerStrip;
-<a href=#195 id=195 data-nosnippet>195</a>//#[cfg(not(feature="database"))]
-<a href=#196 id=196 data-nosnippet>196</a>//pub use crate::TofPaddle;
-<a href=#197 id=197 data-nosnippet>197</a>
-<a href=#198 id=198 data-nosnippet>198</a></span><span class="kw">pub use </span><span class="kw">crate</span>::calibration::tof::<span class="kw-2">*</span>;
-<a href=#199 id=199 data-nosnippet>199</a><span class="kw">pub use </span><span class="kw">crate</span>::monitoring::<span class="kw-2">*</span>;
-<a href=#200 id=200 data-nosnippet>200</a><span class="kw">pub use </span><span class="kw">crate</span>::tof::<span class="kw-2">*</span>;
-<a href=#201 id=201 data-nosnippet>201</a><span class="kw">pub use </span><span class="kw">crate</span>::tracker::<span class="kw-2">*</span>;
-<a href=#202 id=202 data-nosnippet>202</a><span class="kw">pub use </span><span class="kw">crate</span>::tof::algorithms::<span class="kw-2">*</span>;
-<a href=#203 id=203 data-nosnippet>203</a><span class="comment">//pub use crate::algorithms::*;
-<a href=#204 id=204 data-nosnippet>204</a>
-<a href=#205 id=205 data-nosnippet>205</a></span><span class="kw">pub use </span><span class="kw">crate</span>::packets::{
-<a href=#206 id=206 data-nosnippet>206</a>  TofPacket,
-<a href=#207 id=207 data-nosnippet>207</a>  TofPackable,
-<a href=#208 id=208 data-nosnippet>208</a>  TofPacketType
-<a href=#209 id=209 data-nosnippet>209</a>};
-<a href=#210 id=210 data-nosnippet>210</a>
-<a href=#211 id=211 data-nosnippet>211</a><span class="kw">pub use </span><span class="kw">crate</span>::io::parsers::{
-<a href=#212 id=212 data-nosnippet>212</a>  parse_u8,
-<a href=#213 id=213 data-nosnippet>213</a>  parse_u16,
-<a href=#214 id=214 data-nosnippet>214</a>  parse_u32,
-<a href=#215 id=215 data-nosnippet>215</a>  parse_u64,
-<a href=#216 id=216 data-nosnippet>216</a>  parse_string,
-<a href=#217 id=217 data-nosnippet>217</a>  u8_to_u16,
-<a href=#218 id=218 data-nosnippet>218</a>};
-<a href=#219 id=219 data-nosnippet>219</a>
-<a href=#220 id=220 data-nosnippet>220</a><span class="kw">pub use </span><span class="kw">crate</span>::constants::{
-<a href=#221 id=221 data-nosnippet>221</a>  NWORDS,
-<a href=#222 id=222 data-nosnippet>222</a>  NCHN
-<a href=#223 id=223 data-nosnippet>223</a>};
-<a href=#224 id=224 data-nosnippet>224</a>
-<a href=#225 id=225 data-nosnippet>225</a><span class="kw">pub use </span><span class="kw">crate</span>::errors::{
-<a href=#226 id=226 data-nosnippet>226</a>  SerializationError,
-<a href=#227 id=227 data-nosnippet>227</a>  AnalysisError,
-<a href=#228 id=228 data-nosnippet>228</a>  UserError
-<a href=#229 id=229 data-nosnippet>229</a>};
+<a href=#193 id=193 data-nosnippet>193</a>
+<a href=#194 id=194 data-nosnippet>194</a><span class="kw">pub use </span><span class="kw">crate</span>::calibration::<span class="kw-2">*</span>;
+<a href=#195 id=195 data-nosnippet>195</a><span class="kw">pub use </span><span class="kw">crate</span>::monitoring::<span class="kw-2">*</span>;
+<a href=#196 id=196 data-nosnippet>196</a><span class="kw">pub use </span><span class="kw">crate</span>::tof::<span class="kw-2">*</span>;
+<a href=#197 id=197 data-nosnippet>197</a><span class="kw">pub use </span><span class="kw">crate</span>::tracker::<span class="kw-2">*</span>;
+<a href=#198 id=198 data-nosnippet>198</a><span class="kw">pub use </span><span class="kw">crate</span>::tof::algorithms::<span class="kw-2">*</span>;
+<a href=#199 id=199 data-nosnippet>199</a><span class="comment">//pub use crate::algorithms::*;
+<a href=#200 id=200 data-nosnippet>200</a>
+<a href=#201 id=201 data-nosnippet>201</a></span><span class="kw">pub use </span><span class="kw">crate</span>::packets::{
+<a href=#202 id=202 data-nosnippet>202</a>  TofPacket,
+<a href=#203 id=203 data-nosnippet>203</a>  TofPackable,
+<a href=#204 id=204 data-nosnippet>204</a>  TofPacketType
+<a href=#205 id=205 data-nosnippet>205</a>};
+<a href=#206 id=206 data-nosnippet>206</a>
+<a href=#207 id=207 data-nosnippet>207</a><span class="kw">pub use </span><span class="kw">crate</span>::io::parsers::{
+<a href=#208 id=208 data-nosnippet>208</a>  parse_u8,
+<a href=#209 id=209 data-nosnippet>209</a>  parse_u16,
+<a href=#210 id=210 data-nosnippet>210</a>  parse_u32,
+<a href=#211 id=211 data-nosnippet>211</a>  parse_u64,
+<a href=#212 id=212 data-nosnippet>212</a>  parse_string,
+<a href=#213 id=213 data-nosnippet>213</a>  u8_to_u16,
+<a href=#214 id=214 data-nosnippet>214</a>};
+<a href=#215 id=215 data-nosnippet>215</a>
+<a href=#216 id=216 data-nosnippet>216</a><span class="kw">pub use </span><span class="kw">crate</span>::constants::{
+<a href=#217 id=217 data-nosnippet>217</a>  NWORDS,
+<a href=#218 id=218 data-nosnippet>218</a>  NCHN
+<a href=#219 id=219 data-nosnippet>219</a>};
+<a href=#220 id=220 data-nosnippet>220</a>
+<a href=#221 id=221 data-nosnippet>221</a><span class="kw">pub use </span><span class="kw">crate</span>::errors::{
+<a href=#222 id=222 data-nosnippet>222</a>  SerializationError,
+<a href=#223 id=223 data-nosnippet>223</a>  AnalysisError,
+<a href=#224 id=224 data-nosnippet>224</a>  UserError
+<a href=#225 id=225 data-nosnippet>225</a>};
+<a href=#226 id=226 data-nosnippet>226</a>
+<a href=#227 id=227 data-nosnippet>227</a><span class="comment">// macro to avoid boring enum boilerplate
+<a href=#228 id=228 data-nosnippet>228</a></span><span class="kw">pub use </span><span class="kw">crate</span>::expand_and_test_enum;
+<a href=#229 id=229 data-nosnippet>229</a><span class="kw">pub use </span><span class="kw">crate</span>::reader;
 <a href=#230 id=230 data-nosnippet>230</a>
-<a href=#231 id=231 data-nosnippet>231</a><span class="comment">// macro to avoid boring enum boilerplate
-<a href=#232 id=232 data-nosnippet>232</a></span><span class="kw">pub use </span><span class="kw">crate</span>::expand_and_test_enum;
-<a href=#233 id=233 data-nosnippet>233</a><span class="kw">pub use </span><span class="kw">crate</span>::reader;
-<a href=#234 id=234 data-nosnippet>234</a>
-<a href=#235 id=235 data-nosnippet>235</a>
-<a href=#236 id=236 data-nosnippet>236</a>
+<a href=#231 id=231 data-nosnippet>231</a>
+<a href=#232 id=232 data-nosnippet>232</a>
 </code></pre></div></section></main></body></html>

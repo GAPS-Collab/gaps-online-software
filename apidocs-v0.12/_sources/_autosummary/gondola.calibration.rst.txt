@@ -15,5 +15,6 @@ gondola.calibration
    .. autosummary::
    
       RBCalibrations
+      TrackerOfflineCalibration
       TrackerOnlineCalibration
    

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.visual.tof &#8212; gondola 0.12.19 documentation</title>
+    <title>gondola.visual.tof &#8212; gondola 0.12.20 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=3aafd16a"></script>
+    <script src="../_static/documentation_options.js?v=3b2cb6f7"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.visual.tof';</script>
@@ -117,7 +117,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.12.19 documentation</p>
+    <p class="title logo__title">gondola 0.12.20 documentation</p>
   
 </a></div>
     
@@ -369,29 +369,41 @@
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.visual.tof.plot_hg_lg_hits" title="gondola.visual.tof.plot_hg_lg_hits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_hg_lg_hits</span></code></a>(h_nhits, h_nthits, n_events)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.visual.tof.grace_tof_projection_xy" title="gondola.visual.tof.grace_tof_projection_xy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grace_tof_projection_xy</span></code></a>([paddle_occupancy, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.visual.tof.grace_unroll_cbe_sides" title="gondola.visual.tof.grace_unroll_cbe_sides"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grace_unroll_cbe_sides</span></code></a>([paddle_occupancy, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.visual.tof.grace_unroll_cor" title="gondola.visual.tof.grace_unroll_cor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grace_unroll_cor</span></code></a>([paddle_occupancy, event, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.visual.tof.plot_hg_lg_hits" title="gondola.visual.tof.plot_hg_lg_hits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_hg_lg_hits</span></code></a>(h_nhits, h_nthits, n_events)</p></td>
 <td><p>Plot the HG vs the LG (trigger) hits with extra annotations.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.visual.tof.plot_waveforms" title="gondola.visual.tof.plot_waveforms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_waveforms</span></code></a>(tof_ev[, calib, with_hits, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.visual.tof.plot_waveforms" title="gondola.visual.tof.plot_waveforms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_waveforms</span></code></a>(tof_ev[, calib, with_hits, ...])</p></td>
 <td><p>Return a list of figures with all the waveforms from a  specific tof event</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.visual.tof.tof_2dproj" title="gondola.visual.tof.tof_2dproj"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tof_2dproj</span></code></a>([event, cmap, paddle_style, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.visual.tof.tof_2dproj" title="gondola.visual.tof.tof_2dproj"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tof_2dproj</span></code></a>([event, cmap, paddle_style, ...])</p></td>
 <td><p>Plots the entire TOF system in 2d projection, that is all panels  overlaid on each other</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.visual.tof.tof_hits_time_evolution" title="gondola.visual.tof.tof_hits_time_evolution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tof_hits_time_evolution</span></code></a>(ev[, line_color, t_err])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.visual.tof.tof_hits_time_evolution" title="gondola.visual.tof.tof_hits_time_evolution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tof_hits_time_evolution</span></code></a>(ev[, line_color, t_err])</p></td>
 <td><p>A simple plot plotting normalized event times on the x axis and the energy deposition for each hit on the y axis.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.visual.tof.tof_projection_xy" title="gondola.visual.tof.tof_projection_xy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tof_projection_xy</span></code></a>([paddle_occupancy, event, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.visual.tof.tof_projection_xy" title="gondola.visual.tof.tof_projection_xy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tof_projection_xy</span></code></a>([paddle_occupancy, event, ...])</p></td>
 <td><p>Show the projection of all paddles which are facing in z-direction These are the whole Umbrella as well as  CBE TOP + Bottom.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.visual.tof.tof_projection_xy_paddles" title="gondola.visual.tof.tof_projection_xy_paddles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tof_projection_xy_paddles</span></code></a>([stack_panels, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.visual.tof.tof_projection_xy_paddles" title="gondola.visual.tof.tof_projection_xy_paddles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tof_projection_xy_paddles</span></code></a>([stack_panels, ...])</p></td>
 <td><p>Plot the outline of the  xy projection of the z-normal TOF panels (UMB, CBE top and bot).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.visual.tof.unroll_cbe_sides" title="gondola.visual.tof.unroll_cbe_sides"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unroll_cbe_sides</span></code></a>([paddle_occupancy, event, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.visual.tof.unroll_cbe_sides" title="gondola.visual.tof.unroll_cbe_sides"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unroll_cbe_sides</span></code></a>([paddle_occupancy, event, ...])</p></td>
 <td><p>Project the sides of the cube on xz and yz as well  as add the 'edge' paddles.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.visual.tof.unroll_cor" title="gondola.visual.tof.unroll_cor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unroll_cor</span></code></a>([paddle_occupancy, event, cmap, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.visual.tof.unroll_cor" title="gondola.visual.tof.unroll_cor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unroll_cor</span></code></a>([paddle_occupancy, event, cmap, ...])</p></td>
 <td><p>Project the cortina on xz and yz as well  as add the 'edge' paddles.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.visual.tof.unroll_tof" title="gondola.visual.tof.unroll_tof"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unroll_tof</span></code></a>([paddle_occupancy, cmap, ...])</p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
@@ -441,6 +453,11 @@ previously.</p>
 </ul>
 </div></blockquote>
 </dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gondola.visual.tof.grace_tof_projection_xy">
+<span class="sig-prename descclassname"><span class="pre">gondola.visual.tof.</span></span><span class="sig-name descname"><span class="pre">grace_tof_projection_xy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paddle_occupancy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coolwarm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paddle_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'edgecolor':</span> <span class="pre">'w',</span> <span class="pre">'lw':</span> <span class="pre">0.4}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_cbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlay_panels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indicate_empty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.visual.tof.grace_tof_projection_xy" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="gondola.visual.tof.tof_projection_xy_paddles">
@@ -524,6 +541,11 @@ to min/max(occupancy)
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="gondola.visual.tof.grace_unroll_cbe_sides">
+<span class="sig-prename descclassname"><span class="pre">gondola.visual.tof.</span></span><span class="sig-name descname"><span class="pre">grace_unroll_cbe_sides</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paddle_occupancy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;matplotlib.colors.LinearSegmentedColormap</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paddle_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'edgecolor':</span> <span class="pre">'w'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'lw'</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">0.4}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_cbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indicate_empty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gray'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.visual.tof.grace_unroll_cbe_sides" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="gondola.visual.tof.unroll_cbe_sides">
 <span class="sig-prename descclassname"><span class="pre">gondola.visual.tof.</span></span><span class="sig-name descname"><span class="pre">unroll_cbe_sides</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paddle_occupancy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;matplotlib.colors.LinearSegmentedColormap</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paddle_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'edgecolor':</span> <span class="pre">'w'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'lw'</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">0.4}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_cbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indicate_empty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gray'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.visual.tof.unroll_cbe_sides" title="Link to this definition">#</a></dt>
 <dd><p>Project the sides of the cube on xz and yz as well 
@@ -549,6 +571,16 @@ not desired, set this to an empty string.</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gondola.visual.tof.grace_unroll_cor">
+<span class="sig-prename descclassname"><span class="pre">gondola.visual.tof.</span></span><span class="sig-name descname"><span class="pre">grace_unroll_cor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paddle_occupancy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;matplotlib.colors.LinearSegmentedColormap</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paddle_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'edgecolor':</span> <span class="pre">'w'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'lw'</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">0.4}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_cbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indicate_empty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gray'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.visual.tof.grace_unroll_cor" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gondola.visual.tof.unroll_tof">
+<span class="sig-prename descclassname"><span class="pre">gondola.visual.tof.</span></span><span class="sig-name descname"><span class="pre">unroll_tof</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paddle_occupancy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bwr'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paddle_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'edgecolor':</span> <span class="pre">'k',</span> <span class="pre">'lw':</span> <span class="pre">0.4}</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.visual.tof.unroll_tof" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="gondola.visual.tof.unroll_cor">
@@ -671,9 +703,13 @@ in the beginning</p>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.visual.tof.plot_hg_lg_hits"><code class="docutils literal notranslate"><span class="pre">plot_hg_lg_hits()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.visual.tof.grace_tof_projection_xy"><code class="docutils literal notranslate"><span class="pre">grace_tof_projection_xy()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.visual.tof.tof_projection_xy_paddles"><code class="docutils literal notranslate"><span class="pre">tof_projection_xy_paddles()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.visual.tof.tof_projection_xy"><code class="docutils literal notranslate"><span class="pre">tof_projection_xy()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.visual.tof.grace_unroll_cbe_sides"><code class="docutils literal notranslate"><span class="pre">grace_unroll_cbe_sides()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.visual.tof.unroll_cbe_sides"><code class="docutils literal notranslate"><span class="pre">unroll_cbe_sides()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.visual.tof.grace_unroll_cor"><code class="docutils literal notranslate"><span class="pre">grace_unroll_cor()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.visual.tof.unroll_tof"><code class="docutils literal notranslate"><span class="pre">unroll_tof()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.visual.tof.unroll_cor"><code class="docutils literal notranslate"><span class="pre">unroll_cor()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.visual.tof.tof_2dproj"><code class="docutils literal notranslate"><span class="pre">tof_2dproj()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.visual.tof.tof_hits_time_evolution"><code class="docutils literal notranslate"><span class="pre">tof_hits_time_evolution()</span></code></a></li>

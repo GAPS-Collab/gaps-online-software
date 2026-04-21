@@ -8,6 +8,9 @@ gondola.visual.tof
 
    .. autosummary::
    
+      grace_tof_projection_xy
+      grace_unroll_cbe_sides
+      grace_unroll_cor
       plot_hg_lg_hits
       plot_waveforms
       tof_2dproj
@@ -16,4 +19,5 @@ gondola.visual.tof
       tof_projection_xy_paddles
       unroll_cbe_sides
       unroll_cor
+      unroll_tof
    
