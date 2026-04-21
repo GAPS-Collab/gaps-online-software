@@ -14,6 +14,9 @@ gondola.db
       get_hid_vid_maps
       get_rbid_pbchannel_pid_map
       get_rbids_for_pbid
+      get_tof_cbe_paddles
+      get_tof_cor_paddles
+      get_tof_umb_paddles
       get_vid_hid_maps
       load_calibration_db_elena
    

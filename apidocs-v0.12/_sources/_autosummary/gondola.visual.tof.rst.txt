@@ -13,6 +13,7 @@ gondola.visual.tof
       tof_2dproj
       tof_hits_time_evolution
       tof_projection_xy
+      tof_projection_xy_paddles
       unroll_cbe_sides
       unroll_cor
    

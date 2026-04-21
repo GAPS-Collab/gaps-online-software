@@ -1,0 +1,16 @@
+gondola.visual.style
+====================
+
+.. automodule:: gondola.visual.style
+
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      gander_2dplot
+      gander_line_plot
+      gander_multi_plot
+      gander_plot
+      gander_scatter_plot
+   

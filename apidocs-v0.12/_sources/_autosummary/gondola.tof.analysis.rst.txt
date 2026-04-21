@@ -4,6 +4,12 @@ gondola.tof.analysis
 .. automodule:: gondola.tof.analysis
 
    
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      format_seconds
+   
    .. rubric:: Classes
 
    .. autosummary::

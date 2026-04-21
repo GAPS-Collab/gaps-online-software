@@ -10,5 +10,6 @@ gondola.visual
    :toctree:
    :recursive:
 
+   style
    tof
    tracker

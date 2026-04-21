@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.visual.tof &#8212; gondola 0.12.18 documentation</title>
+    <title>gondola.visual.tof &#8212; gondola 0.12.19 documentation</title>
   
   
   
@@ -27,18 +27,18 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=7f76b32a3354e82990f2"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=c7dfee2c"></script>
+    <script src="../_static/documentation_options.js?v=3aafd16a"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.visual.tof';</script>
@@ -46,7 +46,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="gondola.visual.tracker" href="gondola.visual.tracker.html" />
-    <link rel="prev" title="gondola.visual" href="gondola.visual.html" />
+    <link rel="prev" title="gondola.visual.style" href="gondola.visual.style.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="python"/>
   <meta name="docsearch:version" content="" />
@@ -67,7 +67,9 @@
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
     <i class="fa-solid fa-arrow-up"></i>Back to top</button>
-
+  
+  
+  
   
   <dialog id="pst-search-dialog">
     
@@ -115,7 +117,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.12.18 documentation</p>
+    <p class="title logo__title">gondola 0.12.19 documentation</p>
   
 </a></div>
     
@@ -293,6 +295,7 @@
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="gondola.visual.html">gondola.visual</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="gondola.visual.style.html">gondola.visual.style</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">gondola.visual.tof</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gondola.visual.tracker.html">gondola.visual.tracker</a></li>
 </ul>
@@ -381,10 +384,13 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#gondola.visual.tof.tof_projection_xy" title="gondola.visual.tof.tof_projection_xy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tof_projection_xy</span></code></a>([paddle_occupancy, event, ...])</p></td>
 <td><p>Show the projection of all paddles which are facing in z-direction These are the whole Umbrella as well as  CBE TOP + Bottom.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.visual.tof.unroll_cbe_sides" title="gondola.visual.tof.unroll_cbe_sides"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unroll_cbe_sides</span></code></a>([paddle_occupancy, event, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.visual.tof.tof_projection_xy_paddles" title="gondola.visual.tof.tof_projection_xy_paddles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tof_projection_xy_paddles</span></code></a>([stack_panels, ...])</p></td>
+<td><p>Plot the outline of the  xy projection of the z-normal TOF panels (UMB, CBE top and bot).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.visual.tof.unroll_cbe_sides" title="gondola.visual.tof.unroll_cbe_sides"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unroll_cbe_sides</span></code></a>([paddle_occupancy, event, ...])</p></td>
 <td><p>Project the sides of the cube on xz and yz as well  as add the 'edge' paddles.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.visual.tof.unroll_cor" title="gondola.visual.tof.unroll_cor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unroll_cor</span></code></a>([paddle_occupancy, event, cmap, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.visual.tof.unroll_cor" title="gondola.visual.tof.unroll_cor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unroll_cor</span></code></a>([paddle_occupancy, event, cmap, ...])</p></td>
 <td><p>Project the cortina on xz and yz as well  as add the 'edge' paddles.</p></td>
 </tr>
 </tbody>
@@ -437,8 +443,44 @@ previously.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="gondola.visual.tof.tof_projection_xy_paddles">
+<span class="sig-prename descclassname"><span class="pre">gondola.visual.tof.</span></span><span class="sig-name descname"><span class="pre">tof_projection_xy_paddles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stack_panels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'TOF</span> <span class="pre">UMB/CBE</span> <span class="pre">TOP/CBE</span> <span class="pre">BOT</span> <span class="pre">xy</span> <span class="pre">projection'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_pids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edgecolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'k'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.visual.tof.tof_projection_xy_paddles" title="Link to this definition">#</a></dt>
+<dd><p>Plot the outline of the  xy projection of the
+z-normal TOF panels (UMB, CBE top and bot).</p>
+<p>There are 2 'modes': Plot the 3 panels side-by-side 
+or have them stacked on top of each other for a 
+'true' 2d project for these 3 panels.</p>
+<p>This by itself, will just outline the TOF paddles. 
+This then can be used in combination with other data 
+to show event displays or occupancy data.</p>
+<dl class="simple">
+<dt># Keyword Args:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>stack_panels<span class="classifier">Stack panels (overlay them) on top of each other</span></dt><dd><p>to create a true 2d projection</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>title<span class="classifier">Title for the whole axes arangement, appears in </span></dt><dd><p>the upper right</p>
+</dd>
+</dl>
+</li>
+<li><p>show_pids    : Show paddle ids on the paddles</p></li>
+<li><dl class="simple">
+<dt>edgecolor<span class="classifier">Use this color to draw the outlines of the paddles</span></dt><dd><p>as well as the text for the pids (if show_pids == True)</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt># Returns:</dt><dd><p>(matplotlib.Figure, dict[paddld id] -&gt; matplotlib</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="gondola.visual.tof.tof_projection_xy">
-<span class="sig-prename descclassname"><span class="pre">gondola.visual.tof.</span></span><span class="sig-name descname"><span class="pre">tof_projection_xy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paddle_occupancy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;matplotlib.colors.LinearSegmentedColormap</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paddle_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'edgecolor':</span> <span class="pre">'w'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'lw'</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">0.4}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_cbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlay_panels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indicate_empty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gray'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">umbrella_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lognorm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.visual.tof.tof_projection_xy" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">gondola.visual.tof.</span></span><span class="sig-name descname"><span class="pre">tof_projection_xy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paddle_occupancy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;matplotlib.colors.LinearSegmentedColormap</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paddle_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'edgecolor':</span> <span class="pre">'w'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'lw'</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">0.4}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_cbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlay_panels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indicate_empty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gray'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">umbrella_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lognorm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lin'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.visual.tof.tof_projection_xy" title="Link to this definition">#</a></dt>
 <dd><p>Show the projection of all paddles which
 are facing in z-direction
 These are the whole Umbrella as well as 
@@ -448,11 +490,11 @@ it can also be 'hijacked' to just highlight certain
 paddles.</p>
 <dl>
 <dt># Keyword Arguments:</dt><dd><p>paddle_occupancy : The number of events per paddle
-event            : Plot hits from TofEvent or TofEventSummary
+event            : Plot hits from TofEvent as circles
 cmap             : Colormap - can be lambda function</p>
 <blockquote>
 <div><p>to return color value based on 
-'occupancy' numbker</p>
+'occupancy' number</p>
 </div></blockquote>
 <p>show_cbar        : Show the colorbar on the figure
 overlay_panels   : Only return one axes, have the TOF CBE bottom</p>
@@ -466,7 +508,17 @@ using a value from the color map. If this behavior is
 not desired, set this to an empty string.</p>
 </dd>
 </dl>
-<p>umbrella_only    : Show only the umbrella, add the colorbar next to it</p>
+<p>umbrella_only    : Show only the umbrella, add the colorbar next to it
+lognorm          : Same as norm = 'log' [DEPRECATED]
+norm             : 'lin', 'log' or 'none'. This allows to set the</p>
+<blockquote>
+<div><p>normalization of the colormap. 
+'lin'  - linear normalization for all panels to 
+min/max(occupancy) 
+'log'  - logarithmic normalization for all panels 
+to min/max(occupancy) 
+'nono' - no normalization, plot absolute values</p>
+</div></blockquote>
 </dd>
 </dl>
 </dd></dl>
@@ -485,7 +537,7 @@ event            : Plot a tof event
 cmap             : Colormap - can be lambda function</p>
 <blockquote>
 <div><p>to return color value based on 
-'occupancy' numbker</p>
+'occupancy' number</p>
 </div></blockquote>
 <p>show_cbar        : Show the colorbar on the figure
 indicate_empty   : In case we are using this for paddle occupancy,</p>
@@ -582,12 +634,12 @@ in the beginning</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="gondola.visual.html"
+       href="gondola.visual.style.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">gondola.visual</p>
+        <p class="prev-next-title">gondola.visual.style</p>
       </div>
     </a>
     <a class="right-next"
@@ -619,6 +671,7 @@ in the beginning</p>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.visual.tof.plot_hg_lg_hits"><code class="docutils literal notranslate"><span class="pre">plot_hg_lg_hits()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.visual.tof.tof_projection_xy_paddles"><code class="docutils literal notranslate"><span class="pre">tof_projection_xy_paddles()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.visual.tof.tof_projection_xy"><code class="docutils literal notranslate"><span class="pre">tof_projection_xy()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.visual.tof.unroll_cbe_sides"><code class="docutils literal notranslate"><span class="pre">unroll_cbe_sides()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.visual.tof.unroll_cor"><code class="docutils literal notranslate"><span class="pre">unroll_cor()</span></code></a></li>
@@ -650,8 +703,8 @@ in the beginning</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -685,7 +738,7 @@ in the beginning</p>
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.1.
 </p></div>
       
     </div>
