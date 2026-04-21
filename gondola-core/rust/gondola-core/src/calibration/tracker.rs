@@ -97,6 +97,7 @@ impl TrackerOfflineCalibration {
   pub fn calibrate(&self, event_hits : &mut Vec<TrackerHit>) -> Result<(),CalibrationError> {
     let mut calibrated_hits = Vec::<TrackerHit>::with_capacity(event_hits.len());
     let mut c_hit : TrackerHit; //= TrackerHit::new();
+    let mv_2_kev = 0.841f32;// mV to keV
     for hit in event_hits.iter() {
       let hit_ped : f32; //= 0.0f32;
       let mut energy  = hit.adc as f32;
@@ -114,7 +115,9 @@ impl TrackerOfflineCalibration {
           continue;
         }
       } else {
-        return Err(CalibrationError::NoStripMaskAvailable); 
+        //error!("No entry for {} in ", hit);
+        continue;
+        //return Err(CalibrationError::NoPedestalAvailable); 
       }
       let mut hit_is_pulser = false;
       if self.remove_cmn {
@@ -148,6 +151,7 @@ impl TrackerOfflineCalibration {
         }
       }
       c_hit = hit.clone();
+      energy       = mv_2_kev/1000.0; 
       c_hit.energy = energy;
       //println!("c_hit {}", c_hit);
       calibrated_hits.push(c_hit);
