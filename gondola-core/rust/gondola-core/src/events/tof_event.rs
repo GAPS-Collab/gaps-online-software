@@ -1305,6 +1305,14 @@ impl TofEvent {
   pub fn trigger_sources(&self) -> Vec<TriggerType> {
     self.get_trigger_sources()
   } 
+  
+  /// The active triggers in this event. This can be more than one, 
+  /// if multiple trigger conditions are satisfied.
+  #[getter]
+  #[pyo3(name="trigger_sources_bytes")]
+  pub fn get_trigger_sources_bytes_py(&self) -> u16 {
+    self.trigger_sources
+  } 
 
   #[pyo3(name="move_hits")]
   pub fn move_hits_py(&mut self) {
@@ -1377,6 +1385,18 @@ impl TofEvent {
   #[pyo3(name="nhits")]
   pub fn nhits_py(&self) -> usize {
     self.get_nhits()
+  }
+
+  #[getter]
+  #[pyo3(name="dsi_j_mask")]
+  pub fn get_dsi_j_mask_py(&self) -> u32 {
+    self.dsi_j_mask
+  }
+
+  #[getter]
+  #[pyo3(name="channel_masks")]
+  pub fn get_channel_masks_py(&self) -> Vec<u16> {
+    self.channel_mask.clone()
   }
 
   #[getter]
