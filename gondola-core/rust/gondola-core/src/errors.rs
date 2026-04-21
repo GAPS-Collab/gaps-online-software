@@ -157,6 +157,7 @@ pub enum CalibrationError {
   IncompatibleFlightCalibrations,
   StripIdInvalid,
   NoStripMaskAvailable,
+  NoPedestalAvailable,
   NoTransferFnAvailable,
 }
 
@@ -172,6 +173,7 @@ impl fmt::Display for CalibrationError {
       Self::StripIdInvalid                 => { repr = "StripIdInvalid"},
       Self::NoTransferFnAvailable          => { repr = "NoTransferFnAvailable"},
       Self::NoStripMaskAvailable           => { repr = "NoStripMaskAvailable"},
+      Self::NoPedestalAvailable            => { repr = "NoPedestalAvailable"},
     }
     write!(f, "<CalibrationError : {}>", repr)
   }
