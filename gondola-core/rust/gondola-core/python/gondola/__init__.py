@@ -42,9 +42,6 @@ from . import stats
 __all__ = ['events', 'packets', 'io', 'monitoring', 'stats', 'algo', 'db',
            'calibration', 'visual','tracker', 'reconstruction', 'tof']
 
-# clean up the namespace, module still available as hidden through _gondola_core
-del gondola_core
-
 def init_database():
     """
     Returns the path to the included SQLite database file.
