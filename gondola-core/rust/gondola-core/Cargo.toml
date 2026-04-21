@@ -1,6 +1,6 @@
 [package]
 name = "gondola-core"
-version = "0.12.20"
+version = "0.12.21"
 edition = "2024"
 
 [lib]
@@ -120,4 +120,4 @@ diesel = { version = "2.3", features = ["sqlite", "64-column-tables"], optional=
 libsqlite3-sys = { version = "0.35", features = ["bundled"] }
 
 # for testing / features
-rand   = { version = "0.9", optional = true}
+rand   = { version = "0.9.3", optional = true}
