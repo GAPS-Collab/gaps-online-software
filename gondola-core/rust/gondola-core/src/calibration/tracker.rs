@@ -12,7 +12,6 @@ pub struct TrackerOfflineCalibration {
   pub ped_map       : HashMap<u32,TrackerStripPedestal>,
   pub gain_map      : HashMap<u32,TrackerStripGain>,
   pub pulse_map     : HashMap<u32,TrackerStripPulse>,
-  //pub cmn_map       : HashMap<u32,TrackerStripCmnNoise>,
   pub adc_sig_cut   : HashMap<u32,f32>,
   pub remove_cmn    : bool,
   pub ped_sigma_cut : f32,
@@ -35,44 +34,68 @@ impl TrackerOfflineCalibration {
     }
   }
 
+  /// Calculate the common noise level, according to the research of the GAPS tracker group
+  ///
+  /// General scheme is to find the pulsed channel on the strip, get the pulse value, 
+  /// subtract the pedestal and subtract it from the hit adc (taking gain into account)
   pub fn get_common_noise(&self, hit : &TrackerHit, event_hits : &Vec<TrackerHit>) -> (f32, bool) {
     let mut cmn_level     = 0.0f32;
-    let mut strip_gain    = 0.0f32;
+    // per default gains are 1 if they can not be looked up
+    let mut strip_gain    = 1.0f32;
+    let mut pulse_gain    = 1.0f32; 
     let mut hit_is_pulser = false;
+    let mut pulse_avg     = 0.0f32;
+    let mut pulse_chn     = -1i32;
+    let mut pulse_adc     = 0.0f32;
+    let mut pulse_ped     = 0.0;
+    let mut is_pulser     = false;
+    let mut pulse_is_mean = false;
     if let Some(cmn_strip) = self.gain_map.get(&hit.get_stripid()) {
       strip_gain = cmn_strip.gain;
-    } 
-    if let Some(cmn_strip) = self.pulse_map.get(&hit.get_stripid()) {
-      // get the pulsed channel and the adc  for it 
-      let pulse_ch = cmn_strip.pulse_chn; 
-      let mut pulse_adc  : f32;// = 0.0;
-      //let mut pulse_ped  : u16;// = 0;
-      let mut pulse_gain : f32 = 1.0;
-      let pulse_strip_id : u32 = TrackerStrip::create_stripid(hit.layer as u8, hit.row as u8,
-          hit.module as u8, pulse_ch as u8); 
-      hit_is_pulser = hit.get_stripid() == pulse_strip_id;
-      if let Some(cmn_pulsed_strip) = self.gain_map.get(&pulse_strip_id) {
-        pulse_gain = cmn_pulsed_strip.gain;
-      }        
-      for h in event_hits {
-        if h.get_stripid() == pulse_strip_id {
-          // we have now found the hit of the pulsed channel
-          pulse_adc = h.adc as f32; 
-          if let Some(pulse_ped) = self.ped_map.get(&h.get_stripid()) {
-            pulse_adc -= pulse_ped.pedestal_mean;
-            let adc_pulc_diff = pulse_adc as f32 - cmn_strip.pulse_avg;
-            if adc_pulc_diff < 250.0 && cmn_strip.pulse_avg > 0.0 {
-              // get the gain for the pulsed channel by selecting the cmn_noise 
-              // not for the actual strip but for the pulsed strip instead 
-              cmn_level = adc_pulc_diff / pulse_gain;
-            } else {
-              warn!("Can not get pedestal for pulsed channel!");
-            }
-          }
-        }
+    } else {
+      debug!("There is no entry for the strip gain for {}, default is 1.0", &hit.get_stripid());
+      //return (0.0, is_pulser);
+      strip_gain = 1.0;
+    }
+    if let Some(pulse_chn_) = self.pulse_map.get(&hit.get_stripid()) { 
+      pulse_chn  = pulse_chn_.pulse_chn;  
+      pulse_avg  = pulse_chn_.pulse_avg;
+      pulse_is_mean = pulse_chn_.pulse_is_mean;
+    }
+    is_pulser = pulse_chn == hit.channel as i32;
+    if pulse_chn < 0 || pulse_avg > 400.0 {
+      return (0.0, is_pulser) 
+    }
+    let pulse_id = TrackerStrip::create_stripid(hit.layer, hit.row, hit.module, pulse_chn as u8);
+    // now we need to find the hit in this event which is caused by the pulser 
+    let mut p_hit  = TrackerHit::new();
+    p_hit.layer    = hit.layer;
+    p_hit.row      = hit.row;
+    p_hit.module   = hit.module;
+    p_hit.channel  = pulse_chn as u8;
+    let mut found  = false;
+    for h in event_hits {
+      if h.get_stripid() == p_hit.get_stripid() {
+        pulse_adc = h.adc as f32;
+        found = true;
+        break; // FIXME - there might be multiple hits
       }
     }
-    return (cmn_level*strip_gain, hit_is_pulser);
+    if let Some(pulse_gain_) = self.gain_map.get(&pulse_id) {
+      pulse_gain = pulse_gain_.gain; 
+    } 
+    if found {
+      let adc_pulc_diff = pulse_adc - pulse_avg;
+      if adc_pulc_diff < 250.0 && pulse_avg > 0.0 {
+        cmn_level = adc_pulc_diff / pulse_gain;   
+      }
+    } 
+    debug!("Calculated common level of {} gain {}", cmn_level, strip_gain);
+    if cmn_level < 0.0 {
+      //error!("CMN is negative! {}", cmn_level);
+      //cmn_level = 0.0;
+    }
+    return (cmn_level * strip_gain, is_pulser);  
   }
 
   pub fn mask_hits(&self, event_hits : &mut Vec<TrackerHit>) {
@@ -94,29 +117,43 @@ impl TrackerOfflineCalibration {
     Ok(())
   }
 
+  /// The actual energy calibration of the individual tracker strips 
+  ///
+  /// This is a multistep process which includes 
+  /// 1) Pedestal subtraction
+  /// 2) Common noise reduction (if so desired) 
+  /// 3) ADC -> Energy (Transfer functions) 
+  /// 3) Deal with strips which had the pulser active 
+  ///
+  /// While this might not be the best way to do things, this 
+  /// function matches the implementation in SimpleDet very 
+  /// closely and produces the same results. 
+  ///
+  /// See also the compontents in the `database` related part 
+  /// of this code.
   pub fn calibrate(&self, event_hits : &mut Vec<TrackerHit>) -> Result<(),CalibrationError> {
     let mut calibrated_hits = Vec::<TrackerHit>::with_capacity(event_hits.len());
     let mut c_hit : TrackerHit; //= TrackerHit::new();
     let mv_2_kev = 0.841f32;// mV to keV
     for hit in event_hits.iter() {
-      let hit_ped : f32; //= 0.0f32;
+      let mut hit_ped = 0.0f32;
       let mut energy  = hit.adc as f32;
       let hit_tf  : Option<&TrackerStripTransferFunction>;
       if let Some(ped) = self.ped_map.get(&hit.get_stripid()) {
         hit_ped = ped.pedestal_mean;
         energy -= hit_ped;
-        if energy < self.ped_sigma_cut * ped.pedestal_sigma {
-          // this basically means that the energy is within the given 
-          // range of the pedestal. In this case, we set it basiccally to 0 
-          //
-          // Note - we don't raise the error, because this simply means this 
-          // is a noisy strip!
-          //return Ok(());i
-          continue;
-        }
+        //if energy < self.ped_sigma_cut * ped.pedestal_sigma {
+        //  // this basically means that the energy is within the given 
+        //  // range of the pedestal. In this case, we set it basiccally to 0 
+        //  //
+        //  // Note - we don't raise the error, because this simply means this 
+        //  // is a noisy strip!
+        //  //return Ok(());i
+        //  continue;
+        //}
       } else {
-        //error!("No entry for {} in ", hit);
-        continue;
+        error!("No entry for {} in pedestal map", hit);
+        //continue;
         //return Err(CalibrationError::NoPedestalAvailable); 
       }
       let mut hit_is_pulser = false;
@@ -132,76 +169,42 @@ impl TrackerOfflineCalibration {
         energy = tf.transfer_fn(energy);
         //println!("energy after : {}", energy);
       } else {
-        return Err(CalibrationError::NoTransferFnAvailable);
+        error!("Trying to calibrate {}, but we don't have a transfer function for that!", hit.get_stripid());
+        energy = 0.0;
+        //return Err(CalibrationError::NoTransferFnAvailable);
       }
       // now we need to check if this is a pulsed channel 
       if hit_is_pulser {
         if let Some(pulse) = self.pulse_map.get(&hit.get_stripid()) {
           let mut p_avg = pulse.pulse_avg; 
-          if p_avg > 0.0 && self.remove_pulsed {
-            continue
-          }
-          p_avg -= hit_ped;
-          if let Some(tf) = hit_tf {
-            p_avg = tf.transfer_fn(p_avg); 
-            energy -= p_avg;
+          if p_avg > 0.0 {
+            if p_avg > 400.0 && self.remove_pulsed {
+              continue;
+            }
+            p_avg -= hit_ped;
+            if let Some(tf) = hit_tf {
+              p_avg = tf.transfer_fn(p_avg); 
+              energy -= p_avg;
+            }
           }
         } else {
           warn!("Hit is from the pulser, but we don't have any information about that strip in the cmn map!"); 
         }
       }
       c_hit = hit.clone();
-      energy       = mv_2_kev/1000.0; 
+      energy       *= mv_2_kev/1000.0; 
       c_hit.energy = energy;
       //println!("c_hit {}", c_hit);
       calibrated_hits.push(c_hit);
+      if energy < -0.13 {
+        error!("Small energy!");
+        error!("{}", c_hit);
+      }
     }
     event_hits.clear(); 
     *event_hits = calibrated_hits;
     Ok(())
-    //  signal = adc - GetPED(layer, row, module, channel);
-    //  //FIX maybe this cut should be moved after CMN sub
-    //  if (signal < sig_cut_ * GetSIG(layer, row, module, channel))
-    //    continue;
-    //   }
-    ////---------------------------------------------------------
-    //// LEVEL 1 -- substract CMN
-    ////---------------------------------------------------------
-    //if (CMN_option_ ==true) {
-    //  signal = signal - GetCMN(raw, layer, row, module, channel);
-    //}
-    ////---------------------------------------------------------
-    //// LEVEL 2 -- convert to energy
-    ////---------------------------------------------------------
-    //if (level_ > 1) {
-    //  // if (!tf_is_set_)
-    //  //   SetTransferFunctions("");
-    //  signal = TrackerEnergyResponseFunction(signal, layer, row, module, channel);
-    //  //-------------------------------------------------------------
-    //  // PULSED CHANNEL
-    //  //-------------------------------------------------------------
-    //  int pulch = GetPulChs(layer, row, module, channel);
-    //  if(channel==pulch){ //this is a pulsed channel
-    //    // if(mask_pulses_ )continue; // exclude pulsed channel       
-    //    //
-    //    // energy conversion
-    //    //
-    //    double adc_pulch_ave = GetPulave(layer, row, module, pulch);
-    //    if(adc_pulch_ave>0.){
-    //      if(mask_pulses_ && adc_pulch_ave>400)continue; // exclude pulsed channel
-    //      double signal_pulch = adc_pulch_ave - GetPED(layer, row, module, pulch);
-    //      signal_pulch = TrackerEnergyResponseFunction(signal_pulch, layer, row, module, channel);
-    //      signal = signal - signal_pulch;
-    //    }
-    //  }
-    //  if(signal < mev_cut_)continue; // energy cut
-    //}
   }
-
-  //pub fn get_energy(&self, strip_id : u32, adc : u16) -> f32 {
-  //  let energy = 0.0f32;
-  //  energy
-  //}
 }
 
 impl fmt::Display for TrackerOfflineCalibration {
@@ -217,8 +220,6 @@ impl fmt::Display for TrackerOfflineCalibration {
   }
 }
 
-
-
 #[cfg(feature="pybindings")] 
 #[pymethods]
 impl TrackerOfflineCalibration {
@@ -228,17 +229,7 @@ impl TrackerOfflineCalibration {
     let _ = self.calibrate(&mut hits);
     hits 
   }
-  
-  //#[pyo3(name="calibrate_event")]
-  //fn calibrate_event_py(&self, mut event : TelemetryEvent) -> PyResult<()> {
-  //  //let _ = self.calibrate_event(&mut event)?;
-  //  self.calibrate_event(&mut event)?;
-  //  for h in &event.tracker_hits {
-  //    println!("Hit after calibrate {}!", h);
-  //  }
-  //  Ok(())
-  //}
-  
+   
   // all the getters/setters are here because I did not get
   // #[cfg_attr(feature="pybindings", pyo3(set,get)] 
   // to work. If we find out how to use that, get rid 
