@@ -202,6 +202,10 @@ auto g::TrkHit::decode_id(u32 hw_id) -> Vec<u32> {
   return {layer, row, mod, channel};
 }
 
+auto g::TrkHit::get_strip_id() const -> u32 {
+  return (u32)channel + (u32)module*100 + (u32)row*10000 + (u32)layer*100000;
+}
+
 auto g::TrkHit::to_string() const -> std::string {
   std::string repr = "<TrackerHit:";
   repr += std::format("\n  Layer      : {}", layer);

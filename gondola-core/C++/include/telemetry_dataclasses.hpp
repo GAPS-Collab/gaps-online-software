@@ -128,6 +128,7 @@ namespace gondola {
     i32 adc             {-1};
     i64 oscillator      {-1};
     f64 energy          {0};
+    auto get_strip_id() const -> u32;
     /// In BFSW, there are two versions of the tracker hit, 
     /// tracker_hit and tracker::hit. The latter has 
     /// an extra ASIC event code field. Let's unify those here
