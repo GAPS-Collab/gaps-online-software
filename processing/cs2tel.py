@@ -62,12 +62,12 @@ if __name__ == '__main__':
 
     description = """Pre-process the telemetry data for the usage with SimpleDet"""
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('--run-dir', default=Path('/data0/gaps/csbf/csbf-data/binaries/ethernet'),\
+    parser.add_argument('--run-dir', default=Path(''),\
                         help='A directory with caraspace files for a single run',\
                         type=Path,
                         )
     parser.add_argument('-o','--outdir',\
-                        help='Outdir for caraspace output files',
+                        help='Outdir for .bin output files',
                         type=Path,
                         default=None)
     args = parser.parse_args()
@@ -92,7 +92,7 @@ if __name__ == '__main__':
             #print(f'-> Event has {len(ev.tracker)} tracker hits')
             pack = ev.pack()
             ev = go.events.TelemetryEvent.from_telemetrypacket(pack)
-            writer = go.io.TelemetryPacketWriter('deleteme', pack)
+            writer = go.io.TelemetryPacketWriter(str(args.outdir), pack)
             break
         for frame in reader:
             #print (frame)
