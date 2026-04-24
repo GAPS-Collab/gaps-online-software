@@ -12,6 +12,17 @@ This project is currently still under rapid development, while we try to keep th
 somewhat stable, please strap in for a bit of a rough ride when upgrading. 
 However, the amount of features is increasing constantly and rapidly 
 
+v0.12.21 
+
+v0.12.20
+* adds fixed version for TOF occupancy plots, kudos Grace 
+  'grace_<tof_projection_xy,unroll_cbe_sides,unroll_cor>` 
+* adds TrackerOfflineCalibration (not yet ready for production use) 
+* adds to interface of `TelemetryEvent` - change tof event in-place 
+  (`TelemetryEvent.tof` only returns a copy) with
+  `TelemetryEvent.tof<_remove_non_causal_hits, _normalize_hit_times>`
+  and friends 
+
 v0.12.19
 * `version_at_least` - check version complience 
 
