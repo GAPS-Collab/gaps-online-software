@@ -16,9 +16,6 @@
 #include <chrono>
 #include "cxxopts.hpp"
 
-//#include "spdlog/spdlog.h"
-//#include "spdlog/cfg/env.h"
-
 #include "io.hpp"
 #include "calibration.h"
 #include "database.h"
@@ -37,18 +34,27 @@ namespace gt = Gaps::Telemetry;
 ////////////////////////////////////////////////////////////////////////////
 // Default constructor
 PacketMethods::PacketMethods(void) {
+  // This should rarely be changed. Just putting it at the top so that
+  // the initialization process is visible.                                  
+
   // First, we want to store information about the SiPM channels and
   // paddle relationships for analysis purpose. Read all that info             
   // into the relevant structures.
-  //GetPaddleInfo(&PadInfo, &SipmInfo);
+  InitPaddleInfo();
   GetPaddleInfo();
   
   InitializeVariables();
 }
 
 ////////////////////////////////////////////////////////////////////////////
-// Default destructor
-PacketMethods::~PacketMethods(void) {
+void PacketMethods::BeginRun(int run=5) {
+  printf("Beginning Run %d.\n", run); fflush(stdout);
+  // Instantiate our class that holds analysis results and set some           
+  // initial values
+  //EventGAPS Event = EventGAPS();
+  Event.SetPaddleMap(&PadInfo, &SipmInfo);
+  Event.InitializeHistograms();
+  Event.OffsetHistograms(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -74,7 +80,6 @@ void PacketMethods::ProcessTofEventSummary(TofEventSummary *Tes,
   // Now, parse the TofEventSummary data into EvtInfo  
   for (TofHit const &h : Tes->hits) {
     int pad = h.paddle_id;
-    //printf("HitInfo: %d %.2f %.2f\n", h.paddle_id,h.get_time_a(),h.get_time_b());
     EvtInfo.Ped[pad][0]    = h.baseline_a;
     EvtInfo.Ped[pad][1]    = h.baseline_b;
     EvtInfo.PedRMS[pad][0] = h.baseline_a_rms;
@@ -92,47 +97,38 @@ void PacketMethods::ProcessTofEventSummary(TofEventSummary *Tes,
     int sipm_a = PadInfo.SiPM_A[pad];
     int rb     = SipmInfo.RB[sipm_a];
     EvtInfo.Phi[rb]       = h.phase;
-    //printf("%d  : %d %d\n", pad, sipm_a, rb);
-    
-    // Start the event analysis: initialize our variables
-    Event.InitializeVariables(evt_no);
-    
-    // Now, fill the appropriate quantities in EventGAPS                 
-    Event.FillEventValues(&EvtInfo);
-    
-    // Now, process the ch9 phases                                       
-    Event.AnalyzePhases(EvtInfo.Phi);
-    
-    // Analyze each paddle: position on paddle, hitmask, etc             
-    Event.AnalyzePaddles(10.0, 5.0); //Args: Peak and Charge cuts        
-    
-    // Now calculate beta, charge, and inner/outer tof x,y,z, etc.        
-    Event.AnalyzeEvent();
+    //printf(" %7.4f %5.2f %5.2f %4.2f %4.2f\n",
+    //             Phi[RB[chB]], Pedestal[chA],Pedestal[chB],
+    //             PedRMS[chA],PedRMS[chB]);
+  }
 
-    // Now fill out histograms                                         
-    Event.FillChannelHistos(0);
-    Event.FillPaddleHistos();
-    Event.FillOffsetHistos();
-  } 
-}
-
-////////////////////////////////////////////////////////////////////////////
-void PacketMethods::BeginRun(int run=5) {
-  printf("Beginning Run %d.\n", run); fflush(stdout);
-  // Instantiate our class that holds analysis results and set some           
-  // initial values
-  EventGAPS Event = EventGAPS();
-  Event.SetPaddleMap(&PadInfo, &SipmInfo);
-  Event.InitializeHistograms();
-  Event.OffsetHistograms(false);
+  // Start the event analysis: initialize our variables
+  Event.InitializeVariables(evt_no);
+  
+  // Now, fill the appropriate quantities in EventGAPS                 
+  Event.FillEventValues(&EvtInfo);
+  
+  // Now, process the ch9 phases                                       
+  Event.AnalyzePhases(EvtInfo.Phi);
+  
+  // Analyze each paddle: position on paddle, hitmask, etc             
+  Event.AnalyzePaddles(10.0, 5.0); //Args: Peak and Charge cuts        
+  
+  // Now calculate beta, charge, and inner/outer tof x,y,z, etc.        
+  Event.AnalyzeEvent();
+  
+  // Now fill out histograms                                         
+  Event.FillChannelHistos(0);
+  Event.FillPaddleHistos();
+  Event.FillOffsetHistos();
+  
 }
 
 ////////////////////////////////////////////////////////////////////////////
 void PacketMethods::EndRun() {
-  printf("Endning Run\n");
+  printf("Ending Run\n");
   Event.WriteHistograms();
   Event.WriteOffsetHistos();
-  //delete Event;
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -148,7 +144,39 @@ void PacketMethods::NothingYet(void) {
 }
 
 ////////////////////////////////////////////////////////////////////////////
-//void PacketMethods::GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm) {
+void PacketMethods::InitPaddleInfo(void) {
+  printf("Init SipmInfo..."); fflush(stdout);
+  for (int i=0;i<NTOT;i++) { // First, init all values to zero.
+    SipmInfo.PB[i]         = 0;
+    SipmInfo.PB_ch[i]      = 0;
+    SipmInfo.LTB[i]        = 0;
+    SipmInfo.LTB_ch[i]     = 0;
+    SipmInfo.RB[i]         = 0;
+    SipmInfo.RB_ch[i]      = 0;
+    SipmInfo.PaddleID[ch]  = 0;
+    SipmInfo.PaddleEnd[ch] = 0;
+  }
+
+  printf("Done.\nInit PadInfo..."); fflush(stdout);
+  for (int i=0;i<NPAD;i++) { // First, init all values to zero.
+    PadInfo.VolumeID[i]       = 0;
+    for (int j=0;j<3;j++) {
+      PadInfo.Location[i][j]  = 0.0;
+      PadInfo.Dimension[i][j] = 0.0;
+    }
+    PadInfo.Orientation[i]    = 0;
+    PadInfo.CoaxLen[i]        = 0.0;
+    PadInfo.HardingLen[i]     = 0.0;
+    PadInfo.SiPM_A[i]         = 0;
+    PadInfo.SiPM_B[i]         = 0;
+    PadInfo.IsUmbrella[i]     = false;
+    PadInfo.IsCube[i]         = false;
+    PadInfo.IsCortina[i]      = false;
+  }
+  printf("Done.\n"); fflush(stdout);
+}
+
+////////////////////////////////////////////////////////////////////////////
 void PacketMethods::GetPaddleInfo(void) {
   // Eventually we will call the db to get all this info. For now, I          
   // will simple read the relevant files to get the info.                     
@@ -238,5 +266,10 @@ void PacketMethods::GetPaddleInfo(void) {
     }
   }
   fclose(fp); // Finished with file                                           
+}
+
+////////////////////////////////////////////////////////////////////////////
+// Default destructor
+PacketMethods::~PacketMethods(void) {
 }
 

@@ -27,7 +27,6 @@
 #include "constants.h"
 #include "EventGAPS.h"
 #include "./PacketMethods.h"
-void GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm);
 
 namespace fs = std::filesystem;
 namespace gt = Gaps::Telemetry;
@@ -84,27 +83,11 @@ int main(int argc, char *argv[]){
   std::string cooling_name   = "TelemetryPacketType.CoolingHK";
   std::string rbwf_name      = "TelemetryPacketType.RBWaveform";
   std::string anyTofHK       = "TelemetryPacketType.AnyTofHK";
-
-  // First, we want to store information about the SiPM channels and          
-  // paddle relationships for analysis purpose. Read all that info            
-  // into the relevant structures.                                            
-  //struct PaddleInfo PadInfo;
-  //struct SiPMInfo   SipmInfo;
-  //GetPaddleInfo(&PadInfo, &SipmInfo);
   
   // Instantiate our class that holds the data
   auto PM = PacketMethods();
   PM.BeginRun(1000);
 
-  // Instantiate our class that holds analysis results and set some       
-  // initial values                                                           
-  /*
-  auto Event = EventGAPS();
-  Event.SetPaddleMap(&PadInfo, &SipmInfo);
-  Event.InitializeHistograms();
-  Event.OffsetHistograms(false);
-  */
-  
   u64 n_frames_processed  = 0;
   u64 n_telemetry_errors  = 0;
   u64 n_tof_telemetry_err = 0;
@@ -242,64 +225,6 @@ int main(int argc, char *argv[]){
       }
       
       PM.ProcessTofEventSummary(&m_ev.tof_event, m_ev.event_id);
-      /*
-      struct EventInfo EvtInfo;
-      // First, initialize all the event values properly              
-      for (int i=0;i<NPAD;i++) {
-	for (int j=0;j<2;j++) {
-	  EvtInfo.Ped[i][j]    = -999.0;
-	  EvtInfo.PedRMS[i][j] = -999.0;
-	  EvtInfo.VPeak[i][j]  = -999.0;
-	  EvtInfo.Charge[i][j] = -999.0;
-	  EvtInfo.TDC[i][j]    = -999.0;
-	  EvtInfo.TOTLo[i][j]  = -999.0;
-	  EvtInfo.TOTHi[i][j]  = -999.0;
-	}
-      }
-      for (int i=0;i<NRB;i++) {
-	EvtInfo.Phi[i] = -999.0;
-      }
-      // Now, parse the TofEventSummary data into EvtInfo  
-      for (TofHit const &h : m_ev.tof_event.hits) {
-	int pad = h.paddle_id;
-	EvtInfo.Ped[pad][0]    = h.baseline_a;
-	EvtInfo.Ped[pad][1]    = h.baseline_b;
-	EvtInfo.PedRMS[pad][0] = h.baseline_a_rms;
-	EvtInfo.PedRMS[pad][1] = h.baseline_b_rms;
-	EvtInfo.VPeak[pad][0]  = h.get_peak_a();
-	EvtInfo.VPeak[pad][1]  = h.get_peak_b();
-	EvtInfo.Charge[pad][0] = h.get_charge_a();
-	EvtInfo.Charge[pad][1] = h.get_charge_b();
-	EvtInfo.TDC[pad][0]    = h.get_time_a();
-	EvtInfo.TDC[pad][1]    = h.get_time_b();
-	EvtInfo.TOTLo[pad][0]  = h.get_tot_low_a();
-	EvtInfo.TOTLo[pad][1]  = h.get_tot_low_b();
-	EvtInfo.TOTHi[pad][0]  = h.get_tot_high_a();
-	EvtInfo.TOTHi[pad][1]  = h.get_tot_high_b();
-	int sipm_a = PadInfo.SiPM_A[pad];
-	int rb     = SipmInfo.RB[sipm_a];
-	EvtInfo.Phi[rb]       = h.phase;
-	
-	// Start the event analysis: initialize our variables           
-	Event.InitializeVariables(m_ev.event_id);
-	
-	// Now, fill the appropriate quantities in EventGAPS            
-	Event.FillEventValues(&EvtInfo);
-
-	// Now, process the ch9 phases                                  
-	Event.AnalyzePhases(EvtInfo.Phi);
-	
-	// Analyze each paddle: position on paddle, hitmask, etc        
-	Event.AnalyzePaddles(10.0, 5.0); //Args: Peak and Charge cuts   
-	
-	// Now calculate beta, charge, and inner/outer tof x,y,z, etc.  
-	Event.AnalyzeEvent();
-	
-	// Now fill out histograms                                      
-	Event.FillChannelHistos(0);
-	Event.FillPaddleHistos();
-	Event.FillOffsetHistos();
-      }*/
       
       if (n_frames_processed % 1000 == 0) {
         auto end = std::chrono::high_resolution_clock::now();
@@ -313,8 +238,6 @@ int main(int argc, char *argv[]){
     }
   }
   PM.EndRun();
-  //Event.WriteHistograms();
-  //Event.WriteOffsetHistos();
 
   auto end = std::chrono::high_resolution_clock::now();
   auto elapsed = end - start;
@@ -330,94 +253,4 @@ int main(int argc, char *argv[]){
   return EXIT_SUCCESS;
 }
 
-void GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm) {
-  // Eventually we will call the db to get all this info. For now, I          
-  // will simple read the relevant files to get the info.                     
-  
-  FILE *fp;
-  char label[50], line[500];
-  char srcdir[200] = "/home/gaps/software/gaps_os_pro/";
-  char codedir[200] = "gaps-db/resources/master-spreadsheet/";
-  char fname[501];
-  int st;
-  float value;
-  
-  int tmp_pad, tmp_vid, vol_id[NPAD] = { 0 };
-  int tmp_o;
-  float tmp_x, tmp_y, tmp_z;
-  float tmp_dimx, tmp_dimy, tmp_dimz;
-  
-  // For each paddle, read in the location, orientation, dims and volumeID    
-  snprintf(fname, 500, "%s/%s/level0_coordinates.json", srcdir, codedir);
-  fp = fopen(fname, "r");
-  int ctr=0;
-  if ( fscanf(fp, "%s", label) != EOF ) { // Read in first "{"                
-    while (fscanf(fp,"%*[^-0-9]%d ", &tmp_pad) != EOF) { // Read paddle ID    
-      // For each paddle, we want to set the X, Y, Z locations.               
-      if (tmp_pad > 0 && tmp_pad < 161) { // Valid paddle ID                  
-	int j = tmp_pad;
-	st = fscanf(fp,"%*[^-0-9]%f %*[^-0-9]%f  %*[^-0-9]%f %*[^-0-9]%d ",
-		    &tmp_x, &tmp_y, &tmp_z, &tmp_o);
-	st = fscanf(fp,"%*[^-0-9]%f %*[^-0-9]%f  %*[^-0-9]%f %*[^-0-9]%d ",
-		    &tmp_dimx, &tmp_dimy, &tmp_dimz, &tmp_vid);
-	pad->Location[j][0]  = tmp_x;
-	pad->Location[j][1]  = tmp_y;
-	pad->Location[j][2]  = tmp_z;
-	pad->Orientation[j]  = tmp_o;
-	pad->Dimension[j][0] = tmp_dimx;
-	pad->Dimension[j][1] = tmp_dimy;
-	pad->Dimension[j][2] = tmp_dimz;
-	pad->VolumeID[j]     = tmp_vid;
-      }
-    }
-  }
-  fclose(fp); // Finished with file                                           
-  
-  float coax, harting;
-  // One last task: Get cable timings                                         
-  snprintf(fname, 500, "%s/%s/Jeff_paddle_cable.json", srcdir, codedir);
-  fp = fopen(fname, "r");
-  if ( fscanf(fp, "%s", label) != EOF ) { // Read in first "{"                
-    while (fscanf(fp,"%*[^-0-9]%d  %*[^-0-9]%f  %*[^-0-9]%f ",
-		  &tmp_pad, &coax, &harting) != EOF) {
-      if (tmp_pad > 0) {
-	pad->CoaxLen[tmp_pad]     = coax;
-	pad->HardingLen[tmp_pad]  = harting;
-	//printf("%3d %8.3f %8.3f\n", tmp_pad, coax, harting);                
-      }
-    }
-  }
-  
-  // Kludgy read to get the RB-ch to paddle map from the                      
-  // rbch-vs-paddle.json file. Achim has a way to do this via rust,           
-  // but I need the map for development purposes here.                        
-  int paddle_map[NRB][NCH] = { 0 }; // Stored value will be paddle ID;        
-  int rb_num, rb_ch, ch_num, pad_id;
-  snprintf(fname, 500, "%s/%s/rbch-vs-paddle.json", srcdir, codedir);
-  fp = fopen(fname, "r");
-  if ( fscanf(fp, "%s", label) != EOF ) { // Read in first "{"                
-    while (fscanf(fp, "%*[^-0-9]%d  %[^\n]", &rb_num, line) != EOF) {
-      if (rb_num>0 && rb_num<50) {
-	for(int i=0;i<NCH;i++) {
-	  st = fscanf(fp, "%*[^-0-9]%d  %*[^-0-9]%d ", &rb_ch, &pad_id);
-	  // Store the SiPM Channel for each Paddle end                       
-	  int paddle = pad_id % 1000;
-	  int ch_num = (rb_num-1)*NCH + (rb_ch)-1; // Map the value to NTOT   
-	  sipm->RB[ch_num] = rb_num;
-	  sipm->RB_ch[ch_num] = rb_ch;
-	  sipm->PaddleID[ch_num] = paddle;
-	  if (pad_id > 2000) { // We have a paddle ID for B                   
-	    pad->SiPM_B[paddle] = ch_num;
-	    sipm->PaddleEnd[ch_num] = 1;
-	  } else if (pad_id > 1000) { //We have a paddle ID for A             
-	    pad->SiPM_A[paddle] = ch_num;
-	    sipm->PaddleEnd[ch_num] = 0;
-	  }
-	}
-	st = fscanf(fp, "%s", line); // read in the closing "}" for RB        
-      }
-    }
-  }
-  fclose(fp); // Finished with file                                           
-}
 

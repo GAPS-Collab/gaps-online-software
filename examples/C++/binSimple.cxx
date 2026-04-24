@@ -40,12 +40,21 @@ void PrintNiceMessage(void) {
 ////////////////////////////////////////////////////////////////////////////
 // Default constructor
 PacketMethods::PacketMethods(void) {
+  // This should rarely be changed. Just putting it at the top so that
+  // the initialization process is visible.
+
   // First, we want to store information about the SiPM channels and
   // paddle relationships for analysis purpose. Read all that info             
   // into the relevant structures.
   GetPaddleInfo();
   
   InitializeVariables();
+}
+
+////////////////////////////////////////////////////////////////////////////
+void PacketMethods::BeginRun(int run=5) {
+  printf("Beginning Run %d.\n", run); fflush(stdout);
+  PrintNiceMessage();
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -98,15 +107,14 @@ void PacketMethods::ProcessTofEventSummary(TofEventSummary *Tes,
 }
 
 ////////////////////////////////////////////////////////////////////////////
-void PacketMethods::BeginRun(int run=5) {
-  printf("Beginning Run %d.\n", run); fflush(stdout);
-  PrintNiceMessage();
-}
-
-////////////////////////////////////////////////////////////////////////////
 void PacketMethods::EndRun() {
   PrintNiceMessage();
   printf("Endning Run\n");
+}
+
+void PacketMethods::NothingYet(void) {
+  
+      
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -114,11 +122,6 @@ void PacketMethods::InitializeVariables(void) {
 
   
 
-}
-
-void PacketMethods::NothingYet(void) {
-  
-      
 }
 
 ////////////////////////////////////////////////////////////////////////////

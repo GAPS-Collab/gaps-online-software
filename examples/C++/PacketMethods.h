@@ -29,6 +29,7 @@ public:
   void    EndRun(void);
   //void    SetPaddleMap(struct PaddleInfo *pad, struct SiPMInfo *sipm);
   void    NothingYet(void);
+  void    InitPaddleInfo(void);
   void    GetPaddleInfo(void);
   void    ProcessTofEventSummary(TofEventSummary *Tes, unsigned long int);
   
