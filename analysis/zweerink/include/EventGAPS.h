@@ -126,8 +126,8 @@ private:
   float   TDC[NTOT];                  // TDC value (CFD method)
   float   TDC_Cor[NTOT];              // Corrected TDC value (CFD method)
 
-  float   TotLo[NPAD][2];             // TOT values (lo threshold)
-  float   TotHi[NPAD][2];             // TOT values (hi threshold)
+  float   TotLo[NTOT];                // TOT values (lo threshold)
+  float   TotHi[NTOT];                // TOT values (hi threshold)
   
   bool    IsHit[NPAD];                // Do we have Hit info?
   int     Hits[NPAD];                 // Hit mask for paddle 
@@ -148,9 +148,9 @@ private:
   TH1D    *Charge[NTOT];               // Charge histograms
   TH1D    *Charge_cut[NTOT];           // Charge (cut) histograms
   TH1D    *tdcCFD[NTOT];               // TDC histograms
-  
-  TH1D    *totLo[NTOT][2];             // TOT (lo) histograms
-  TH1D    *totHi[NTOT][2];             // TOT (hi) histograms
+  TH1D    *totLo[NTOT];                // TOT (lo) histograms
+  TH1D    *totHi[NTOT];                // TOT (hi) histograms
+
   TH2D    *QEnd2End[NPAD];             // End 2 End charge 
   TH1I    *HitMask[NPAD];              // Hit mask of paddle
   TH1D    *tDiff[NPAD];                // tdc diff of paddle ends
