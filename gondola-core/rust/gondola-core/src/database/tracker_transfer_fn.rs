@@ -208,6 +208,9 @@ impl TrackerStripTransferFunction {
   /// The actual transfer function for this 
   /// strip. Calculate energy from adc values
   pub fn transfer_fn(&self, adc : f32) -> f32 {
+    if adc < 0.0 {
+      return 0.0;
+    }
     if adc <= 190.0 {
       return self.pol_a2_0 + self.pol_a2_1*adc + self.pol_a2_2*(adc.powi(2));
     }
@@ -217,6 +220,7 @@ impl TrackerStripTransferFunction {
     if 500.0 < adc && adc <= 900.0 {
       return self.pol_c3_0 + self.pol_c3_1*adc + self.pol_c3_2*(adc.powi(2)) + self.pol_c3_3*(adc.powi(3));
     }
+    //if 900.0 < adc && adc <= 2047.0 {
     if 900.0 < adc && adc <= 1600.0 {
       return self.pol_d3_0 + self.pol_d3_1*adc + self.pol_d3_2*(adc.powi(2)) + self.pol_d3_3*(adc.powi(3));
     }
