@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/diesel_derives-2.3.7/src/insertable.rs`."><title>insertable.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-77263533.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="diesel_derives" data-themes="" data-resource-suffix="" data-rustdoc-version="1.94.1 (e408947bf 2026-03-25)" data-channel="1.94.1" data-search-js="search-9e2438ea.js" data-stringdex-js="stringdex-b897f86f.js" data-settings-js="settings-c38705f0.js" ><script src="../../static.files/storage-e2aeef58.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-7bab91a1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-ffcac47a.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">diesel_derives/</div>insertable.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span><span class="kw">crate</span>::attrs::AttributeSpanWrapper;
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/diesel_derives-2.3.8/src/insertable.rs`."><title>insertable.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-b7b9f40b.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="diesel_derives" data-themes="" data-resource-suffix="" data-rustdoc-version="1.95.0 (59807616e 2026-04-14)" data-channel="1.95.0" data-search-js="search-63369b7b.js" data-stringdex-js="stringdex-b897f86f.js" data-settings-js="settings-170eb4bf.js" ><script src="../../static.files/storage-41dd4d93.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5013f961.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">diesel_derives/</div>insertable.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span><span class="kw">crate</span>::attrs::AttributeSpanWrapper;
 <a href=#2 id=2 data-nosnippet>2</a><span class="kw">use </span><span class="kw">crate</span>::field::Field;
 <a href=#3 id=3 data-nosnippet>3</a><span class="kw">use </span><span class="kw">crate</span>::model::Model;
 <a href=#4 id=4 data-nosnippet>4</a><span class="kw">use </span><span class="kw">crate</span>::util::{inner_of_option_ty, is_option_ty, wrap_in_dummy_mod};
@@ -112,7 +112,7 @@
 <a href=#112 id=112 data-nosnippet>112</a>                    table_name,
 <a href=#113 id=113 data-nosnippet>113</a>                    <span class="kw-2">&amp;</span>field.ty,
 <a href=#114 id=114 data-nosnippet>114</a>                    treat_none_as_default_value,
-<a href=#115 id=115 data-nosnippet>115</a>                    <span class="bool-val">false</span>,
+<a href=#115 id=115 data-nosnippet>115</a>                    <span class="prelude-val">None</span>,
 <a href=#116 id=116 data-nosnippet>116</a>                    <span class="kw-2">&amp;mut </span>field_ty_bounds_guard,
 <a href=#117 id=117 data-nosnippet>117</a>                )<span class="question-mark">?</span>);
 <a href=#118 id=118 data-nosnippet>118</a>
@@ -121,7 +121,7 @@
 <a href=#121 id=121 data-nosnippet>121</a>                    table_name,
 <a href=#122 id=122 data-nosnippet>122</a>                    <span class="kw-2">&amp;</span>field.ty,
 <a href=#123 id=123 data-nosnippet>123</a>                    treat_none_as_default_value,
-<a href=#124 id=124 data-nosnippet>124</a>                    <span class="bool-val">true</span>,
+<a href=#124 id=124 data-nosnippet>124</a>                    <span class="prelude-val">Some</span>(<span class="macro">parse_quote!</span>(<span class="lifetime">'insert</span>)),
 <a href=#125 id=125 data-nosnippet>125</a>                    <span class="kw-2">&amp;mut </span>borrowed_field_ty_bounds_guard,
 <a href=#126 id=126 data-nosnippet>126</a>                )<span class="question-mark">?</span>);
 <a href=#127 id=127 data-nosnippet>127</a>            }
@@ -144,7 +144,7 @@
 <a href=#144 id=144 data-nosnippet>144</a>                    table_name,
 <a href=#145 id=145 data-nosnippet>145</a>                    ty,
 <a href=#146 id=146 data-nosnippet>146</a>                    treat_none_as_default_value,
-<a href=#147 id=147 data-nosnippet>147</a>                    <span class="bool-val">false</span>,
+<a href=#147 id=147 data-nosnippet>147</a>                    <span class="prelude-val">None</span>,
 <a href=#148 id=148 data-nosnippet>148</a>                    <span class="kw-2">&amp;mut </span>field_ty_bounds_guard,
 <a href=#149 id=149 data-nosnippet>149</a>                )<span class="question-mark">?</span>);
 <a href=#150 id=150 data-nosnippet>150</a>
@@ -224,7 +224,7 @@
 <a href=#224 id=224 data-nosnippet>224</a>//
 <a href=#225 id=225 data-nosnippet>225</a>// That's something that is not supported by rustc currently: https://github.com/rust-lang/rust/issues/21974
 <a href=#226 id=226 data-nosnippet>226</a>// It might be fixed with the new trait solver which might land 2026
-<a href=#227 id=227 data-nosnippet>227</a></span><span class="kw">fn </span>filter_bounds(
+<a href=#227 id=227 data-nosnippet>227</a></span><span class="kw">pub fn </span>filter_bounds(
 <a href=#228 id=228 data-nosnippet>228</a>    guard: <span class="kw-2">&amp;</span>HashMap&lt;Type, HashSet&lt;Vec&lt;Lifetime&gt;&gt;&gt;,
 <a href=#229 id=229 data-nosnippet>229</a>    type_to_check: syn::Type,
 <a href=#230 id=230 data-nosnippet>230</a>    bound: TokenStream,
@@ -359,12 +359,12 @@
 <a href=#359 id=359 data-nosnippet>359</a>}
 <a href=#360 id=360 data-nosnippet>360</a>
 <a href=#361 id=361 data-nosnippet>361</a><span class="doccomment">/// Generate explicit trait bound with field span to improve error messages
-<a href=#362 id=362 data-nosnippet>362</a></span><span class="kw">fn </span>generate_field_bound(
+<a href=#362 id=362 data-nosnippet>362</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>generate_field_bound(
 <a href=#363 id=363 data-nosnippet>363</a>    field: <span class="kw-2">&amp;</span>Field,
 <a href=#364 id=364 data-nosnippet>364</a>    table_name: <span class="kw-2">&amp;</span>Path,
 <a href=#365 id=365 data-nosnippet>365</a>    ty: <span class="kw-2">&amp;</span>Type,
 <a href=#366 id=366 data-nosnippet>366</a>    treat_none_as_default_value: bool,
-<a href=#367 id=367 data-nosnippet>367</a>    borrowed: bool,
+<a href=#367 id=367 data-nosnippet>367</a>    borrowed: <span class="prelude-ty">Option</span>&lt;Lifetime&gt;,
 <a href=#368 id=368 data-nosnippet>368</a>    guard: <span class="kw-2">&amp;mut </span>HashMap&lt;Type, HashSet&lt;Vec&lt;Lifetime&gt;&gt;&gt;,
 <a href=#369 id=369 data-nosnippet>369</a>) -&gt; <span class="prelude-ty">Result</span>&lt;(syn::Type, TokenStream)&gt; {
 <a href=#370 id=370 data-nosnippet>370</a>    <span class="kw">let </span>column_name = field.column_name()<span class="question-mark">?</span>.to_ident()<span class="question-mark">?</span>;
@@ -389,8 +389,8 @@
 <a href=#389 id=389 data-nosnippet>389</a>        .entry(type_for_guard.clone())
 <a href=#390 id=390 data-nosnippet>390</a>        .or_default()
 <a href=#391 id=391 data-nosnippet>391</a>        .insert(life_times);
-<a href=#392 id=392 data-nosnippet>392</a>    <span class="kw">let </span>bound_ty = <span class="kw">if </span>borrowed {
-<a href=#393 id=393 data-nosnippet>393</a>        <span class="macro">quote_spanned!</span> {span=&gt; <span class="kw-2">&amp;</span><span class="lifetime">'insert </span>#ty_to_check}
+<a href=#392 id=392 data-nosnippet>392</a>    <span class="kw">let </span>bound_ty = <span class="kw">if let </span><span class="prelude-val">Some</span>(lt) = borrowed {
+<a href=#393 id=393 data-nosnippet>393</a>        <span class="macro">quote_spanned!</span> {span=&gt; <span class="kw-2">&amp;</span>#lt #ty_to_check}
 <a href=#394 id=394 data-nosnippet>394</a>    } <span class="kw">else </span>{
 <a href=#395 id=395 data-nosnippet>395</a>        <span class="macro">quote_spanned!</span> {span=&gt; #ty_to_check}
 <a href=#396 id=396 data-nosnippet>396</a>    };
