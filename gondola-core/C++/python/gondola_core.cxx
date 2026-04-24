@@ -78,7 +78,19 @@ NB_MODULE(gondola_cxx, m) {
     //})
     .def_ro("filename", &g::SDRootReader::filename)
     .def("get_event", &g::SDRootReader::get_event)
-    .def_ro("nevents_total", &g::SDRootReader::nevents_total);
+    .def_ro("nevents_total", &g::SDRootReader::nevents_total)
+    .def("get_event_tof_energies", &g::SDRootReader::get_event_tof_energies)
+    .def("get_event_trk_energies", &g::SDRootReader::get_event_trk_energies);
+
+  nb::class_<g::SDRootWriter>(m, "SDRootWriter")
+    .def(nb::init<std::string>())
+    //.def("get_next_event", [](g::TofPacketReader &r) {
+    //  return r.get_next_packet().unwrap();
+    //})
+    .def_ro("filename",      &g::SDRootWriter::filename)
+    .def("add_event",        &g::SDRootWriter::add_event)
+    .def("write_sdpar",      &g::SDRootWriter::write_sdpar)
+    .def_ro("nevents_total", &g::SDRootWriter::nevents_total);
   //#endif 
   
   // caraspace
@@ -106,12 +118,18 @@ NB_MODULE(gondola_cxx, m) {
   nb::class_<g::TofHit>(m, "TofHit")
     .def(nb::init<>())
     .def_ro("version"        , &g::TofHit::version)
-    .def_prop_ro("time_a"    , &g::TofHit::get_time_a)
-    .def_prop_ro("time_b"    , &g::TofHit::get_time_b)
-    .def_prop_ro("charge_a"  , &g::TofHit::get_charge_a)
-    .def_prop_ro("charge_b"  , &g::TofHit::get_charge_b)
-    .def_prop_ro("peak_a"    , &g::TofHit::get_peak_a)
-    .def_prop_ro("peak_b"    , &g::TofHit::get_peak_b)
+    //.def_prop_ro("time_a"    , &g::TofHit::get_time_a)
+    //.def_prop_ro("time_b"    , &g::TofHit::get_time_b)
+    //.def_prop_ro("charge_a"  , &g::TofHit::get_charge_a)
+    //.def_prop_ro("charge_b"  , &g::TofHit::get_charge_b)
+    //.def_prop_ro("peak_a"    , &g::TofHit::get_peak_a)
+    //.def_prop_ro("peak_b"    , &g::TofHit::get_peak_b)
+    .def_rw("time_a"         , &g::TofHit::time_a_f32)
+    .def_rw("time_b"         , &g::TofHit::time_b_f32)
+    .def_rw("charge_a"       , &g::TofHit::charge_a_f32)
+    .def_rw("charge_b"       , &g::TofHit::charge_b_f32)
+    .def_rw("peak_a"         , &g::TofHit::peak_a_f32)
+    .def_rw("peak_b"         , &g::TofHit::peak_b_f32)
     .def_prop_ro("edep"      , &g::TofHit::get_edep)
     .def_prop_ro("x0"        , &g::TofHit::get_x_pos)
     .def_prop_ro("t0_uncorr" , &g::TofHit::get_t0_relative)
@@ -124,9 +142,9 @@ NB_MODULE(gondola_cxx, m) {
     .def_prop_ro("slp_low_b" , &g::TofHit::get_tot_slp_low_b)
     .def_prop_ro("slp_high_a", &g::TofHit::get_tot_slp_high_a)
     .def_prop_ro("slp_high_b", &g::TofHit::get_tot_slp_high_b)
-    .def_ro("paddle_len"     , &g::TofHit::paddle_len)
-    .def_ro("event_t0"       , &g::TofHit::event_t0)
-    .def_ro("paddle_id"      , &g::TofHit::paddle_id)
+    .def_rw("paddle_len"     , &g::TofHit::paddle_len)
+    .def_rw("event_t0"       , &g::TofHit::event_t0)
+    .def_rw("paddle_id"      , &g::TofHit::paddle_id)
     .def("to_string"         , &g::TofHit::to_string)
     .def("__repr__", [](g::TofHit &h) {
       return "<NBWrapper" + h.to_string() + ">";
@@ -147,14 +165,18 @@ NB_MODULE(gondola_cxx, m) {
   
   nb::class_<g::TofEventSummary>(m, "TofEventSummary")
     .def(nb::init<>())
-    .def_static("from_tofpacket", &g::TofEventSummary::from_tofpacket) 
-    .def_ro("dsi_j_mask"        , &g::TofEventSummary::dsi_j_mask)
+    .def_static("from_tofpacket"   , &g::TofEventSummary::from_tofpacket) 
+    .def_rw("event_id"             , &g::TofEventSummary::event_id)
+    .def_rw("run_id"               , &g::TofEventSummary::run_id)
+    .def_rw("dsi_j_mask"           , &g::TofEventSummary::dsi_j_mask)
+    .def_rw("channel_masks"        , &g::TofEventSummary::channel_mask)
     //.def("normalize_hit_times"  , &g::TofEvent::normalize_hit_times)
     //.def_prop_ro("hits"         , &g::TofEvent::get_hits)
-    .def_ro("hits"                , &g::TofEventSummary::hits)
-    .def_prop_ro("timestamp48"    , &g::TofEventSummary::get_timestamp48)
-    .def_prop_ro("rb_link_ids"    , &g::TofEventSummary::get_rb_link_ids) 
-    .def_prop_ro("trigger_hits"   , &g::TofEventSummary::get_trigger_hits) 
+    .def_rw("hits"                , &g::TofEventSummary::hits)
+    .def_prop_ro("timestamp48"     , &g::TofEventSummary::get_timestamp48)
+    .def_prop_ro("rb_link_ids"     , &g::TofEventSummary::get_rb_link_ids) 
+    //.def_prop_ro("trigger_hits"   , &g::TofEventSummary::get_trigger_hits) 
+    .def_prop_ro("trigger_pids"   , &g::TofEventSummary::get_trigger_pids)
     .def_prop_ro("trigger_hits"   , [](g::TofEventSummary &self) {
       auto thits        = self.get_trigger_hits();
       Vec<Vec<int>> thits_py = {};
@@ -169,6 +191,7 @@ NB_MODULE(gondola_cxx, m) {
       return thits_py;
     })
     .def_prop_ro("trigger_sources", &g::TofEventSummary::get_trigger_sources)
+    .def_rw("trigger_sources_bytes", &g::TofEventSummary::trigger_sources)
     .def("to_string"              , &g::TofEventSummary::to_string);
 
   //---------------------------------------------------------
@@ -259,8 +282,17 @@ NB_MODULE(gondola_cxx, m) {
         return nb::str("{}").format(self.to_string());
     });
   
-    nb::class_<g::TrkHit>(m, "TrkHit")
+  nb::class_<g::TrkHit>(m, "TrkHit")
     .def(nb::init<>())
+    .def_rw("layer"           , &g::TrkHit::layer)
+    .def_rw("row"             , &g::TrkHit::row)
+    .def_rw("module"          , &g::TrkHit::module)
+    .def_rw("channel"         , &g::TrkHit::channel)
+    .def_rw("adc"             , &g::TrkHit::adc)
+    .def_rw("oscillator"      , &g::TrkHit::oscillator)
+    .def_rw("energy"          , &g::TrkHit::energy)
+    .def_rw("asic_event_code" , &g::TrkHit::asic_event_code)
+    
     .def("__str__", [](const g::TrkHit& self) {
         return nb::str("{}").format(self.to_string());
     })
@@ -323,7 +355,9 @@ NB_MODULE(gondola_cxx, m) {
       throw nb::value_error("Error when unpacking TelemetryEvent!");
       //return g::TelemetryEvent::from_bytestream(stream, pos).unwrap();
     })
-    .def_ro("tof"                , &g::TelemetryEvent::tof_event)
+    .def_rw("event_id"           , &g::TelemetryEvent::event_id)
+    .def_rw("tof"                , &g::TelemetryEvent::tof_event)
+    .def_rw("tracker"            , &g::TelemetryEvent::trk_hits)
     .def("__str__", [](const g::TelemetryEvent& self) {
         return nb::str("{}").format(self.to_string());
     })
