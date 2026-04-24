@@ -69,95 +69,7 @@ namespace gondola {
   };
   
   std::ostream& operator<<(std::ostream& os, const gondola::CompressionLevel& level);
-  
-  ///// The MasterTriggerEvent represesnts the information
-  ///// provided by the MTB for this one specific event.
-  ///// Most notably, it includes a board mask,
-  ///// which is the DSI/J connections which triggered, and 
-  ///// a hit mask. The hit mask gives hit channels per DSI/J,
-  ///// which correspond to hit channels on a LTB.
-  ///// 
-  ///// FIXME -compatibiltiy. Reading older data, we have 
-  ///// 2 scenarios - either 113 bytes of fixed size for 
-  ///// 20 LTBs, or 133 bytes for 25 LTBs. 
-  ///// We can modify from_bytestream to at least not 
-  ///// throw an error when reading older data, but 
-  ///// this would currently be a #todo of lower 
-  ///// priority
-  //struct MasterTriggerEvent {
-  //  /// begin struct marker
-  //  static constexpr u16 HEAD = 0xAAAA;
-  //  /// end struct marker
-  //  static constexpr u16 TAIL = 0x5555;
-  //  /// Variable size for MasterTriggerEvent
-  //  static constexpr usize SIZE = 0; // size in bytes
-  //  /// 
-  //  EventStatus event_status = EventStatus::Unknown;
-  //  /// event_id as assigned by the MasterTriggerBoard
-  //  u32 event_id             = 0; 
-  //  /// MTB timestamp
-  //  u32 timestamp            = 0; 
-  //  /// Tracker (?) timestamp
-  //  u32 tiu_timestamp        = 0; 
-  //  /// GAPS GPS clock value (slow)
-  //  u32 tiu_gps32            = 0; 
-  //  /// GAPS GPS clock value (fast)
-  //  u32 tiu_gps16            = 0; 
-  //  /// triggered paddles as seen by the MTB
-  //  u32 crc                  = 0;
-  //  u16 trigger_source       = 0;
-  //  u32 dsi_j_mask           = 0;
-  //  Vec<u16> channel_mask    = Vec<u16>();
-  //  u64 mtb_link_mask        = 0;
-  //  
-  //  MasterTriggerEvent();
-  //  
-  //  /// The combined GPS 48bit timestamp
-  //  /// into a 48bit timestamp
-  //  [[deprecated("The format of the gps timestamp changed and it is only 32 bits as of now")]]
-  //  auto get_timestamp_gps48() const -> u64;
-  //  /// Get the timestamp as sent by the GPS
-  //  auto get_timestamp_gps() const -> u32;
-  //  /// Get absolute timestamp which is calculated 
-  //  /// with the help of the 1pps pulse from the GPS
-  //  auto get_timestamp_abs48() const -> u64;
-  //  auto get_rb_link_ids()     const -> Vec<u8>;
-  //  /// Get the combination of triggered DSI/J/CH on 
-  //  /// the MTB which formed the trigger. This does 
-  //  /// not include further hits which fall into the 
-  //  /// integration window. For those, se rb_link_mask
-  //  ///
-  //  /// The returned values follow the TOF convention
-  //  /// to start with 1, so that we can use them to 
-  //  /// look up LTB ids in the db.
-  //  ///
-  //  /// # Returns
-  //  ///
-  //  ///   Vec<(hit)> where hit is (DSI, J, CH) 
-  //  auto get_trigger_hits() const 
-  //    -> Vec<std::tuple<u8, u8, u8, LTBThreshold>>;
-  //
-  //  /// Get the trigger sources from trigger source byte
-  //  auto get_trigger_sources() const -> Vec<TriggerType>; 
-  //  /**
-  //   * Factory function for MasterTriggerEvent
-  //   *
-  //   * Deserialize a MasterTriggerEvent from a vector of of bytes
-  //   *
-  //   * @param bytestream: Byte representation of a MasterTriggerEvent, or 
-  //   *                    including one at pos
-  //   * @param pos       : Expected position of MasterTriggerEvent::HEAD in 
-  //   *                    the stream
-  //   *
-  //   */
-  //  static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos)
-  //    -> MasterTriggerEvent;
-  //  /// String representation of the struct
-  //  auto to_string() const -> std::string;
-  //};
-  
-  
-  
+   
   /// Concise summary for the flight computer and 
   /// telemtry stream
   struct TofEventSummary {
@@ -205,6 +117,8 @@ namespace gondola {
     /// normalize all the hit times, taking the global ch9 
     /// phase into account
     auto normalize_hit_times(const TofPaddleTimingConstantMap &offsets) -> void;
+    /// get the trigger hits directly if we have a paddle map) 
+    auto get_trigger_pids(const gondola::DsiJChnPaddleIdMap& lgmap) const -> Vec<u8>;
     #endif
   
     // combined timestamp

@@ -1515,6 +1515,30 @@ auto g::TofEventSummary::normalize_hit_times(const g::TofPaddleTimingConstantMap
     }
   }
 }
+
+auto g::TofEventSummary::get_trigger_pids(const gondola::DsiJChnPaddleIdMap& lgmap) const -> Vec<u8> {
+  auto trigger_pids = Vec<u8>();
+  for (auto const &hit : get_trigger_hits()) {
+    u8 dsi = std::get<0>(hit);
+    u8 j   = std::get<1>(hit);
+    u8 ch  = std::get<2>(hit);
+    u8 thr = (u8)std::get<3>(hit);
+    if (!lgmap.contains(dsi)) {
+      spdlog::error("Can not find DSI {} in LG map!", dsi);
+      continue;
+    } 
+    if (!lgmap.at(dsi).contains(j)) {
+      spdlog::error("Can not find J {} for DSI {} in LG map!", j, dsi);
+      continue;
+    }
+    if (!lgmap.at(dsi).at(j).contains(ch)) {
+      spdlog::error("Can not find Ch {} for DSI {} J {} in LG map!", ch, dsi, j);
+      continue;
+    }
+    trigger_pids.push_back(lgmap.at(dsi).at(j).at(ch));
+  }
+  return trigger_pids;
+}
 #endif
 
 
