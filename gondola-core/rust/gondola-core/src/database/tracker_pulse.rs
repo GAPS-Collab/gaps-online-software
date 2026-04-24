@@ -97,8 +97,8 @@ impl TrackerStripPulse {
         continue;
       }
       let mut pulse = Self::new();
-      let parts: Vec<&str> = line.split(",").collect();
-      if parts.len() == 19 {
+      let parts: Vec<&str> = line.split_whitespace().collect();
+      if parts.len() == 6 {
         // Parse the first number as a standard decimal
         let layer   = parts[0].parse::<u8>()
           .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
@@ -125,15 +125,15 @@ impl TrackerStripPulse {
     //mean_avg   /= n_entries as f64;
     // it seems we should create an entry even for the 
     // strips which are not in the file 
-    for stripid in all_strip_ids {
-      let mut pulse = Self::new(); 
-      pulse.strip_id = *stripid as i32;
-      pulse.volume_id = *hid_vid_map.get(&(pulse.strip_id as u32)).unwrap() as i64; // critical error is good here,
-      pulse.pulse_is_mean = true;
-      pulse.pulse_avg = 0.0; // for some reason, don't set it here 
-      pulse.pulse_chn  = mean_pulse.floor() as i32;
-      pulses.push(pulse);
-    }
+    //for stripid in all_strip_ids {
+    //  let mut pulse = Self::new(); 
+    //  pulse.strip_id = *stripid as i32;
+    //  pulse.volume_id = *hid_vid_map.get(&(pulse.strip_id as u32)).unwrap() as i64; // critical error is good here,
+    //  pulse.pulse_is_mean = true;
+    //  pulse.pulse_avg = 0.0; // for some reason, don't set it here 
+    //  pulse.pulse_chn  = mean_pulse.floor() as i32;
+    //  pulses.push(pulse);
+    //}
     Ok(pulses)
   }
   
