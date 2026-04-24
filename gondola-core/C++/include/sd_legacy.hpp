@@ -7,12 +7,149 @@
 #include "TObject.h"
 #include "TVector3.h"
 #include "TChain.h"
+#include "TFile.h"
+#include "TTree.h"
+#include "TH1D.h" 
+#include "TH2D.h"
 
 #include "tof_typedefs.h" 
 #include "telemetry_dataclasses.hpp"
-
+#include "database.h"
 
 typedef i32 CFitStatusType;
+
+namespace Crane { 
+  namespace Calibration {
+    class CRawHeader : public TObject {
+      public:
+        CRawHeader() {}
+        
+        u8  type;
+        u32 timestamp;
+        u16 counter;
+        u16 length;
+        
+        u64 systime;
+        u32 eventid;
+        
+        Vec<u64>  trk_eventtime;
+        Vec<u64>  trk_eventid;
+        Vec<u16>  trk_eventid_valid;
+        Vec<u16>  trk_layer;
+        Vec<u8>   tof_packettype;
+        auto pretty_print() const -> std::string; 
+        ClassDef(CRawHeader, 4);
+    };
+    
+    class CRawTrk : public TObject {
+  
+      public:
+
+        CRawTrk() {}
+        
+        u8       flag;
+        u32      eventid;
+        Vec<u64> eventtime;
+        Vec<u8>  layer;
+        Vec<u8>  row;
+        Vec<u8>  module;
+        Vec<u8>  channel;
+        Vec<u16> adcdata;
+
+        Vec<i32> hindex; // hit index inside CEventRec
+        auto SetFlag(int bit, bool val ) -> void;
+        auto fill_from_telemetry(gondola::TelemetryEvent* event) -> void;
+        auto pretty_print() const -> std::string;
+        
+        ClassDef(CRawTrk, 4);
+    };
+  
+    class CRawTofHits : public TObject {
+      public:
+        CRawTofHits() {}
+        
+        Vec<u8>  trigger_th  ;
+        Vec<f64> timestamp48 ;
+        Vec<u8>  paddle_id   ;
+        Vec<f32> base_a      ;
+        Vec<f32> base_b      ;
+        Vec<f32> base_a_rms  ;
+        Vec<f32> base_b_rms  ;
+        Vec<f32> phase       ;
+        Vec<f32> time_a      ;
+        Vec<f32> time_b      ;
+        Vec<f32> peak_a      ;
+        Vec<f32> peak_b      ;
+        Vec<f32> charge_a    ;
+        Vec<f32> charge_b    ;
+        Vec<f32> charge_min_i;
+        Vec<f32> x_0         ;
+        Vec<f32> t_0         ;
+
+        Vec<f32> t_shift     ;
+        Vec<i32> hindex      ; // hit index inside CEventRec
+        auto pretty_print() const -> std::string;
+        ClassDef(CRawTofHits, 9);
+    };
+
+    class CRawTrigger : public TObject {
+      public:
+
+        CRawTrigger() {}
+        Vec<u8> mtb_link_ids   ; ///<       
+        Vec<u8> dsi            ;
+        Vec<u8> j              ;
+        Vec<u8> ch             ;
+        Vec<u8> th             ;
+        Vec<u8> paddle_id      ;
+        Vec<u8> trigger_sources;
+        
+        ClassDef(CRawTrigger, 3);
+    };
+
+    class CRawTofWFs : public TObject {
+      public:
+
+        CRawTofWFs() {}
+        
+        Vec<f64>                timestamp48 {}; 
+        Vec<u8>                 rb_id       {};
+        Vec<u8>                 rb_channel  {};
+        Vec<Vec<u16>>           adc         {};
+        Vec<Vec<f32>>           voltages    {};
+        Vec<Vec<f32>>           times       {};
+        Vec<i32>                paddle_id   {};
+        
+        Vec<Vec<u16>>           adc_9       {};
+        Vec<Vec<f32>>           voltages_9  {};
+        Vec<Vec<f32>>           times_9     {};
+        ClassDef(CRawTofWFs, 6);
+    };
+
+
+    class CRawTof : public TObject {
+  
+      public:
+        CRawTof() {}
+        char         flag;
+        u32          runid;                //MTB pkt
+        u32          eventid;              //summary pkt
+        u8           event_status;
+        f64          timestamp48 ;         //summary pkt
+        u32          timestamp ;          //MTB pkt ???
+        u64          timestamp_gps48 ;    //MTB pkt
+        u64          timestamp_abs48 ;    //MTB pkt
+
+        CRawTofHits  hits;      ///< hits
+        CRawTofWFs   wfs;       ///< waveforms
+        CRawTrigger  trg;    // = CRawTrigger();      ///< trigger hits
+
+        auto fill_from_telemetry(gondola::TelemetryEvent* event) -> void;
+        auto pretty_print() const -> std::string; 
+        ClassDef(CRawTof, 10);
+    }; 
+  }
+}
 
 class CEventBase : public TObject {
   public: 
@@ -86,7 +223,7 @@ class GRecoHit : public TObject {
     auto GetTime()  const -> f64;
     auto GetIdx()   const -> i32;
     auto pretty_print() const -> std::string;
-  private:  
+  public:  
     u32 volume_id_;
     f64 energydep_;
     TVector3 hit_position_;
@@ -104,9 +241,24 @@ class CEventRec : public CEventBase {
   // MergedEvent
   public:
     static auto from_telemetry(gondola::TelemetryEvent const &event) -> CEventRec;
+    
+    auto fill_from_telemetry(gondola::TelemetryEvent* event,
+                             u8  packet_type,
+                             f64 gcutime,
+                             const gondola::TofPaddleMap& pmap,
+                             const gondola::TrkStripMap& smap,
+                             const gondola::DsiJChnPaddleIdMap& lgmap,
+                             Crane::Calibration::CRawTrk* raw_trk,
+                             Crane::Calibration::CRawTof* raw_tof,
+                             const bool apply_elena_cut=true,
+                             const double mev_cut = 0.4) -> void;
     auto to_telemetry(HashMap<u32, u32> const &hid_vid_map) -> gondola::TelemetryEvent;
+    
+    auto get_tof_energies() const -> Vec<f32>;
+    auto get_trk_energies() const -> Vec<f32>;
     auto pretty_print() const -> std::string;
     auto GetGPSTime() const -> f64;
+    
   public:
     CEventRec() {}
     
@@ -145,132 +297,48 @@ class CEventRec : public CEventBase {
     ClassDefOverride(CEventRec, 17)
 };
 
-namespace Crane { 
-  namespace Calibration {
-    class CRawHeader : public TObject {
-      public:
-        CRawHeader() {}
-        
-        u8  type;
-        u32 timestamp;
-        u16 counter;
-        u16 length;
-        
-        u64 systime;
-        u32 eventid;
-        
-        Vec<u64>  trk_eventtime;
-        Vec<u64>  trk_eventid;
-        Vec<u16>  trk_eventid_valid;
-        Vec<u16>  trk_layer;
-        Vec<u8>   tof_packettype;
-        
-        ClassDef(CRawHeader, 4);
-    };
+
+class GSimulationParameter : public TObject {
+  public:
+    GSimulationParameter();
+    ~GSimulationParameter();
+    int runId_;
+    int subRunId_;
+    std::string productionHostName_;
+    std::string G4version_;
+    std::string physicsList_;
+    std::vector<std::string> CraneVersion_;
+    int randomSeed_;
+    int triggerLevel_;
+    bool UseTrigger;
+    bool UseDigitizer;
+    TH1D HPrimaryBetaGenerated;
+    TH2D HPrimaryCosZenBetaGenerated;
+    TH2D HPrimaryCosZenLogEGenerated;
+
+    // the same as above, but only for triggered events
+    TH1D HPrimaryBetaTriggered;
+    TH2D HPrimaryCosZenBetaTriggered;
+    TH2D HPrimaryCosZenLogETriggered;
+
+    bool        UniformBeta;
+    double      PrimaryBetaLow;
+    double      PrimaryBetaHigh;
+    bool        PrimaryIsotropic;
+    int         PrimaryIsotropicUpDownAll;
+    double      PrimaryLimit;
+    bool        PrimaryFile;
+    TString     PrimaryFileName;
+    bool        UniformLogE;
+    double      PrimaryLogELow;
+    double      PrimaryLogEHigh;
+    int         PrimaryPdg;
+    int         nEventsGeneratedPerFile_;
     
-    class CRawTrk : public TObject {
-  
-      public:
+    std::map<unsigned int, bool> VolumeIdAliveMap;
 
-        CRawTrk() {}
-        
-        u8       flag;
-        u32      eventid;
-        Vec<u64> eventtime;
-        Vec<u8>  layer;
-        Vec<u8>  row;
-        Vec<u8>  module;
-        Vec<u8>  channel;
-        Vec<u16> adcdata;
-
-        Vec<i32> hindex; // hit index inside CEventRec
-
-        ClassDef(CRawTrk, 4);
-    };
-  
-    class CRawTofHits : public TObject {
-      public:
-        CRawTofHits() {}
-        
-        Vec<u8>  trigger_th  ;
-        Vec<f64> timestamp48 ;
-        Vec<u8>  paddle_id   ;
-        Vec<f32> base_a      ;
-        Vec<f32> base_b      ;
-        Vec<f32> base_a_rms  ;
-        Vec<f32> base_b_rms  ;
-        Vec<f32> phase       ;
-        Vec<f32> time_a      ;
-        Vec<f32> time_b      ;
-        Vec<f32> peak_a      ;
-        Vec<f32> peak_b      ;
-        Vec<f32> charge_a    ;
-        Vec<f32> charge_b    ;
-        Vec<f32> charge_min_i;
-        Vec<f32> x_0         ;
-        Vec<f32> t_0         ;
-
-        Vec<f32> t_shift     ;
-        Vec<i32> hindex      ; // hit index inside CEventRec
-        ClassDef(CRawTofHits, 9);
-    };
-
-    class CRawTrigger : public TObject {
-      public:
-
-        CRawTrigger() {}
-        Vec<u8> mtb_link_ids   ; ///<       
-        Vec<u8> dsi            ;
-        Vec<u8> j              ;
-        Vec<u8> ch             ;
-        Vec<u8> th             ;
-        Vec<u8> paddle_id      ;
-        Vec<u8> trigger_sources;
-        
-        ClassDef(CRawTrigger, 3);
-    };
-
-    class CRawTofWFs : public TObject {
-      public:
-
-        CRawTofWFs() {}
-        
-        Vec<f64>                timestamp48 {}; 
-        Vec<u8>                 rb_id       {};
-        Vec<u8>                 rb_channel  {};
-        Vec<Vec<u16>>           adc         {};
-        Vec<Vec<f32>>           voltages    {};
-        Vec<Vec<f32>>           times       {};
-        Vec<i32>                paddle_id   {};
-        
-        Vec<Vec<u16>>           adc_9       {};
-        Vec<Vec<f32>>           voltages_9  {};
-        Vec<Vec<f32>>           times_9     {};
-        ClassDef(CRawTofWFs, 6);
-    };
-
-
-    class CRawTof : public TObject {
-  
-      public:
-        CRawTof() {}
-        char         flag;
-        u32          runid;                //MTB pkt
-        u32          eventid;              //summary pkt
-        u8           event_status;
-        f64          timestamp48 ;         //summary pkt
-        u32          timestamp ;          //MTB pkt ???
-        u64          timestamp_gps48 ;    //MTB pkt
-        u64          timestamp_abs48 ;    //MTB pkt
-
-        CRawTofHits  hits;      ///< hits
-        CRawTofWFs   wfs;       ///< waveforms
-        CRawTrigger  trg;    // = CRawTrigger();      ///< trigger hits
-        
-        ClassDef(CRawTof, 10);
-    }; 
-  }
-}
+    ClassDef(GSimulationParameter, 14)
+};
 
 //------------------------------------------------
 // Reconstruction classes
@@ -408,12 +476,42 @@ namespace gondola {
     SDRootReader(std::string);
     ~SDRootReader();
     auto get_event(u64 event_idx) -> void; 
-
+    auto get_event_tof_energies(u64 event_idx) -> Vec<f32>; 
+    auto get_event_trk_energies(u64 event_idx) -> Vec<f32>; 
+    //auto trk_energy_response(u16 adc, u8 layer, u8 row, u8 module, u8 channel) -> double;
     std::string filename;
     // root just hates modern memory management
     TChain* tchain;
     u64 nevents_total;
     CEventRec* event;
+    Crane::Calibration::CRawTrk*   rawtrk    = nullptr;
+    Crane::Calibration::CRawTof*   rawtof    = nullptr;
+    Crane::Calibration::CRawHeader* rawhd    = nullptr;
+    TChain* raw_tree                         = nullptr;
+
+  };
+  
+  struct SDRootWriter {
+    SDRootWriter(std::string fname, std::string file_mode = "RECREATE");
+    ~SDRootWriter();
+    auto add_event(TelemetryEvent* ev, u8 packet_type, f64 gcutime) -> void; 
+    auto write_sdpar(u32 run_id, std::string hostname, std::string crane_version) -> void; 
+    std::string filename = "";
+    // root just hates modern memory management
+    TChain* tchain                           = nullptr;
+    TFile* output_file                       = nullptr;
+    u64 nevents_total                        = 0;
+    CEventRec* event                         = nullptr;
+    Crane::Calibration::CRawTrk*   rawtrk    = nullptr;
+    Crane::Calibration::CRawTof*   rawtof    = nullptr;
+    Crane::Calibration::CRawHeader* rawhd    = nullptr;
+    GSimulationParameter* par                = nullptr;
+    TTree* reco_tree                         = nullptr;
+    TTree* raw_tree                          = nullptr;
+    TTree* par_tree                          = nullptr;
+    TofPaddleMap       pmap ;
+    TrkStripMap        smap;
+    DsiJChnPaddleIdMap lgmap;
   };
 }
 

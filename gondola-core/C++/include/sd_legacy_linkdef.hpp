@@ -10,6 +10,7 @@
 #pragma link C++ class Crane::Calibration::CRawTrigger+;
 #pragma link C++ class Crane::Calibration::CRawTofWFs+;
 #pragma link C++ class Crane::Calibration::CRawTof+;
+#pragma link C++ class GSimulationParameter+;
 
 // Reco stuff
 #pragma link C++ class Crane::Reconstruction::TrackFit::GDataEvent+;

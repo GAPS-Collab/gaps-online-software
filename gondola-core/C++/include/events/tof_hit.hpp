@@ -37,7 +37,6 @@ namespace gondola {
     u32 timestamp32;
     u16 timestamp16;
     
-
     // don't serialize
     f32 paddle_len    = 0;  
     f32 coax_cbl_time = 0;
@@ -45,7 +44,8 @@ namespace gondola {
  
     u8 ctr_etx;
     u16 tail = 0xF0F; 
-  
+ 
+    // FIXME - remove these getters 
     auto get_time_a()       const -> f32;
     auto get_time_b()       const -> f32;
     auto get_peak_a()       const -> f32;
@@ -110,7 +110,7 @@ namespace gondola {
     // String representation for printing
     auto to_string() const -> std::string;
     
-    private:
+    public:
       f32 time_a_f32   = 0;
       f32 time_b_f32   = 0;
       f32 peak_a_f32   = 0;
