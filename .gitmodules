@@ -19,3 +19,6 @@
 [submodule "resources/extern/blue-penguin-dark"]
 	path = resources/extern/blue-penguin-dark
 	url = https://github.com/tcarwash/blue-penguin-dark.git
+[submodule "resources/extern/tomlplusplus"]
+	path = resources/extern/tomlplusplus
+	url = https://github.com/marzer/tomlplusplus.git
