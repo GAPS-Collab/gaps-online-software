@@ -215,16 +215,26 @@ void EventGAPS::InitializeHistograms(void) {
   
   // Histograms for pedestals and pedestal RMSs
   for (int b = 0; b < NTOT; b++) {
-      sprintf(text, "pedHist[%d]", b);
-      pedHist[b] = new TH1D(text, "", 400, -10, 10);
-      pedHist[b]->GetXaxis()->SetTitle("Pedestal (mV)");
-      pedHist[b]->GetYaxis()->SetTitle("Counts");
+    sprintf(text, "pedHist[%d]", b);
+    pedHist[b] = new TH1D(text, "", 400, -10, 10);
+    pedHist[b]->GetXaxis()->SetTitle("Pedestal (mV)");
+    pedHist[b]->GetYaxis()->SetTitle("Counts");
+    
+    sprintf(text, "pedRMSHist[%d]", b);
+    pedRMSHist[b] = new TH1D(text, "", 500, -1, 4);
+    pedRMSHist[b]->GetXaxis()->SetTitle("Pedestal RMS (mV)");
+    pedRMSHist[b]->GetYaxis()->SetTitle("Counts");
+    
+    sprintf(text, "pedVtime[%d]", b);
+    pedVtime[b] = new TProfile(text, "", 7500, 0, 26);
+    pedVtime[b]->GetXaxis()->SetTitle("Flight Time (days)");
+    pedVtime[b]->GetYaxis()->SetTitle("Pedestal (mV)");
 
-      sprintf(text, "pedRMSHist[%d]", b);
-      pedRMSHist[b] = new TH1D(text, "", 500, -1, 4);
-      pedRMSHist[b]->GetXaxis()->SetTitle("Pedestal RMS (mV)");
-      pedRMSHist[b]->GetYaxis()->SetTitle("Counts");
-  }
+    sprintf(text, "pRMSVtime[%d]", b);
+    pRMSVtime[b] = new TProfile(text, "", 7500, 0, 26);
+    pRMSVtime[b]->GetXaxis()->SetTitle("Flight Time (days)");
+    pRMSVtime[b]->GetYaxis()->SetTitle("Ped RMS (mV)");
+}
 
   float lo_ch = -5.0;  // Low range of the charge plots (pC)
   float hi_ch =  60.0; // Hi range of the charge plots (pC)
@@ -444,7 +454,8 @@ void EventGAPS::WriteHistograms() {
   //create directories for the raw plots
   TDirectory *savdir = gDirectory; 
   outfile->cd();
-  TDirectory *Peddir = outfile->mkdir("Pedestals");
+  TDirectory *Peddir  = outfile->mkdir("Pedestals");
+  TDirectory *Peddir1 = outfile->mkdir("PedProfs");
   TDirectory *Peakdir = outfile->mkdir("VPeakplots");
   TDirectory *Chargedir = outfile->mkdir("Chargeplots");
   TDirectory *Hitmaskdir = outfile->mkdir("Hitmasks");
@@ -465,6 +476,11 @@ void EventGAPS::WriteHistograms() {
       pedHist[i]->Write();
       pedRMSHist[i]->Write();
     }
+  }
+  Peddir1->cd();
+  for (int i = start; i < max_sipm; i++) {
+    pedVtime[i]->Write();
+    pRMSVtime[i]->Write();
   }
 
   if (PEAK) {
@@ -602,6 +618,8 @@ void EventGAPS::FillEventValues(struct EventInfo *evt) {
   // All SiPM values in EventInfo structure are stored by Paddle
   // number. We need to find the proper SiPM number (NTOT) before
   // storing the SiPM values locally.
+
+  FlightTime = (evt->FlightTime < 1e8 ? evt->FlightTime: -999.0);
   
   int sipm[2];
   for (int i=0; i<NPAD; i++) {
@@ -817,7 +835,7 @@ void EventGAPS::AnalyzePaddles(float pk_cut = -999, float ch_cut = -999.0) {
   NPadCube     = cube;
   NPadUmbrella = upper;
   NPadCortina  = outer;
-  printf("NPad = %d %d %d\n", NPadCube, NPadUmbrella, NPadCortina); 
+  //printf("NPad = %d %d %d\n", NPadCube, NPadUmbrella, NPadCortina); 
 }
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
@@ -906,50 +924,47 @@ void EventGAPS::SetCFDFraction(float CFDS_frac){
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 void EventGAPS::FillChannelHistos(int old=0) {
+
+  // This is the default way to store the histograms in the root file
   // This section of code stores histos with channel numbers based on
-  // RBs. Histo channel = SiPM Channel = (RB-1)*NCH+rbch  
-  if (old) {
-    for (int i=0; i<NTOT; i++) {
-      pedHist[i]->Fill(Pedestal[i]);
-      pedRMSHist[i]->Fill(PedRMS[i]);
-      Peak[i]->Fill(VPeak[i]);
-      Charge[i]->Fill(QInt[i]);
-      if (QInt[i]>5.0) Charge_cut[i]->Fill(QInt[i]);
-      
-      tdcCFD[i]->Fill(TDC[i]);
-    } 
- } else {
-    // This is the default way to store the histograms in the root file
-    // This section of code stores histos with channel numbers based on
-    // paddles. For paddle N, Histo[N/N+1] = PaddleA/B SiPM
-    for (int i=0; i<NPAD; i++) {
-      if (Paddle_A[i] > 0) { 
-	int ch = 2*i;
-	pedHist[ch-1]->Fill(Pedestal[Paddle_A[i]]);
-	pedHist[ch]->Fill(Pedestal[Paddle_B[i]]);
-	pedRMSHist[ch-1]->Fill(PedRMS[Paddle_A[i]]);
-	pedRMSHist[ch]->Fill(PedRMS[Paddle_B[i]]);
-	
-	Peak[ch-1]->Fill(VPeak[Paddle_A[i]]);
-	Peak[ch]->Fill(VPeak[Paddle_B[i]]);
-	
-	// Fill TOT (lo/hi and A/B) values
-	totLo[ch-1]->Fill(TotLo[Paddle_A[i]]);
-	totLo[ch]->Fill(TotLo[Paddle_B[i]]);
-	totHi[ch-1]->Fill(TotHi[Paddle_A[i]]);
-	totHi[ch]->Fill(TotHi[Paddle_B[i]]);
-	
-	Charge[ch-1]->Fill(QInt[Paddle_A[i]]);
-	Charge[ch]->Fill(QInt[Paddle_B[i]]);
-	if (QInt[Paddle_A[i]]>5.0) Charge_cut[ch-1]->Fill(QInt[Paddle_A[i]]);
-	if (QInt[Paddle_B[i]]>5.0) Charge_cut[ch]->Fill(QInt[Paddle_B[i]]);
-	
-	tdcCFD[ch-1]->Fill(TDC[Paddle_A[i]]);
-	tdcCFD[ch]->Fill(TDC[Paddle_B[i]]);
+  // paddles. For paddle N, Histo[N/N+1] = PaddleA/B SiPM
+  for (int i=0; i<NPAD; i++) {
+    if (Paddle_A[i] > 0) { 
+      int ch = 2*i;
+      pedHist[ch-1]->Fill(Pedestal[Paddle_A[i]]);
+      pedHist[ch]->Fill(Pedestal[Paddle_B[i]]);
+      pedRMSHist[ch-1]->Fill(PedRMS[Paddle_A[i]]);
+      pedRMSHist[ch]->Fill(PedRMS[Paddle_B[i]]);
+      double tmptime = FlightTime/86400.0; // Convert to days
+      if (Pedestal[Paddle_A[i]] > -998.0 && PedRMS[Paddle_A[i]] > -998.0) {
+	pedVtime[ch-1]->Fill(tmptime, Pedestal[Paddle_A[i]]);
+	pRMSVtime[ch-1]->Fill(tmptime, PedRMS[Paddle_A[i]]);
       }
+      if (Pedestal[Paddle_B[i]] > -998.0 && PedRMS[Paddle_B[i]] > -998.0) {
+	pedVtime[ch]->Fill(tmptime, Pedestal[Paddle_B[i]]);
+	pRMSVtime[ch]->Fill(tmptime, PedRMS[Paddle_B[i]]);
+      }
+      
+      Peak[ch-1]->Fill(VPeak[Paddle_A[i]]);
+      Peak[ch]->Fill(VPeak[Paddle_B[i]]);
+      
+      // Fill TOT (lo/hi and A/B) values
+      totLo[ch-1]->Fill(TotLo[Paddle_A[i]]);
+      totLo[ch]->Fill(TotLo[Paddle_B[i]]);
+      totHi[ch-1]->Fill(TotHi[Paddle_A[i]]);
+      totHi[ch]->Fill(TotHi[Paddle_B[i]]);
+      
+      Charge[ch-1]->Fill(QInt[Paddle_A[i]]);
+      Charge[ch]->Fill(QInt[Paddle_B[i]]);
+      if (QInt[Paddle_A[i]]>5.0) Charge_cut[ch-1]->Fill(QInt[Paddle_A[i]]);
+      if (QInt[Paddle_B[i]]>5.0) Charge_cut[ch]->Fill(QInt[Paddle_B[i]]);
+      
+      tdcCFD[ch-1]->Fill(TDC[Paddle_A[i]]);
+      tdcCFD[ch]->Fill(TDC[Paddle_B[i]]);
     }
   }
 }
+
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 

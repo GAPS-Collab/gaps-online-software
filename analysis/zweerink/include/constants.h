@@ -42,7 +42,10 @@ struct EventInfo {
   float TDC[NPAD][2];
   float TOTLo[NPAD][2];
   float TOTHi[NPAD][2];
-  float Phi[NRB]; 
+  float TOTSlLo[NPAD][2];
+  float TOTSlHi[NPAD][2];
+  float Phi[NRB];
+  double FlightTime;     // in seconds since flight start
 };
 
 #endif

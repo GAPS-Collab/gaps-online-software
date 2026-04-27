@@ -49,6 +49,12 @@ PacketMethods::PacketMethods(void) {
 ////////////////////////////////////////////////////////////////////////////
 void PacketMethods::BeginRun(int run=5) {
   printf("Beginning Run %d.\n", run); fflush(stdout);
+
+  // Just for utility, set the initial time from the timestamp48 value
+  // in the first TofEventSummary Packet of the first flight .bin
+  // file--RAW251215_101836.bin
+  timeInit = 94575234425295;
+
   // Instantiate our class that holds analysis results and set some           
   // initial values
   //EventGAPS Event = EventGAPS();
@@ -60,46 +66,51 @@ void PacketMethods::BeginRun(int run=5) {
 ////////////////////////////////////////////////////////////////////////////
 void PacketMethods::ProcessTofEventSummary(TofEventSummary *Tes,
 					   unsigned long int evt_no){
-  printf("Found TofEventSummary: evt = %ld\n", evt_no);
+  //printf("Found TofEventSummary: evt = %ld\n", evt_no);
   struct EventInfo EvtInfo;
   // First, initialize all the event values properly              
   for (int i=0;i<NPAD;i++) {
     for (int j=0;j<2;j++) {
-      EvtInfo.Ped[i][j]    = -999.0;
-      EvtInfo.PedRMS[i][j] = -999.0;
-      EvtInfo.VPeak[i][j]  = -999.0;
-      EvtInfo.Charge[i][j] = -999.0;
-      EvtInfo.TDC[i][j]    = -999.0;
-      EvtInfo.TOTLo[i][j]  = -999.0;
-      EvtInfo.TOTHi[i][j]  = -999.0;
+      EvtInfo.Ped[i][j]      = -999.0;
+      EvtInfo.PedRMS[i][j]   = -999.0;
+      EvtInfo.VPeak[i][j]    = -999.0;
+      EvtInfo.Charge[i][j]   = -999.0;
+      EvtInfo.TDC[i][j]      = -999.0;
+      EvtInfo.TOTLo[i][j]    = -999.0;
+      EvtInfo.TOTHi[i][j]    = -999.0;
+      EvtInfo.TOTSlLo[i][j]  = -999.0;
+      EvtInfo.TOTSlHi[i][j]  = -999.0;
     }
   }
   for (int i=0;i<NRB;i++) {
     EvtInfo.Phi[i] = -999.0;
   }
   // Now, parse the TofEventSummary data into EvtInfo  
+  EvtInfo.FlightTime = (Tes->get_timestamp48() - timeInit)/1e8;
+
   for (TofHit const &h : Tes->hits) {
     int pad = h.paddle_id;
-    EvtInfo.Ped[pad][0]    = h.baseline_a;
-    EvtInfo.Ped[pad][1]    = h.baseline_b;
-    EvtInfo.PedRMS[pad][0] = h.baseline_a_rms;
-    EvtInfo.PedRMS[pad][1] = h.baseline_b_rms;
-    EvtInfo.VPeak[pad][0]  = h.get_peak_a();
-    EvtInfo.VPeak[pad][1]  = h.get_peak_b();
-    EvtInfo.Charge[pad][0] = h.get_charge_a();
-    EvtInfo.Charge[pad][1] = h.get_charge_b();
-    EvtInfo.TDC[pad][0]    = h.get_time_a();
-    EvtInfo.TDC[pad][1]    = h.get_time_b();
-    EvtInfo.TOTLo[pad][0]  = h.get_tot_low_a();
-    EvtInfo.TOTLo[pad][1]  = h.get_tot_low_b();
-    EvtInfo.TOTHi[pad][0]  = h.get_tot_high_a();
-    EvtInfo.TOTHi[pad][1]  = h.get_tot_high_b();
+    EvtInfo.Ped[pad][0]     = h.baseline_a;
+    EvtInfo.Ped[pad][1]     = h.baseline_b;
+    EvtInfo.PedRMS[pad][0]  = h.baseline_a_rms;
+    EvtInfo.PedRMS[pad][1]  = h.baseline_b_rms;
+    EvtInfo.VPeak[pad][0]   = h.get_peak_a();
+    EvtInfo.VPeak[pad][1]   = h.get_peak_b();
+    EvtInfo.Charge[pad][0]  = h.get_charge_a();
+    EvtInfo.Charge[pad][1]  = h.get_charge_b();
+    EvtInfo.TDC[pad][0]     = h.get_time_a();
+    EvtInfo.TDC[pad][1]     = h.get_time_b();
+    EvtInfo.TOTLo[pad][0]   = h.get_tot_low_a();
+    EvtInfo.TOTLo[pad][1]   = h.get_tot_low_b();
+    EvtInfo.TOTHi[pad][0]   = h.get_tot_high_a();
+    EvtInfo.TOTHi[pad][1]   = h.get_tot_high_b();
+    EvtInfo.TOTSlLo[pad][0] = h.get_tot_slp_low_a();
+    EvtInfo.TOTSlLo[pad][1] = h.get_tot_slp_low_b();
+    EvtInfo.TOTSlHi[pad][0] = h.get_tot_slp_high_a();
+    EvtInfo.TOTSlHi[pad][1] = h.get_tot_slp_high_b();
     int sipm_a = PadInfo.SiPM_A[pad];
     int rb     = SipmInfo.RB[sipm_a];
     EvtInfo.Phi[rb]       = h.phase;
-    //printf(" %7.4f %5.2f %5.2f %4.2f %4.2f\n",
-    //             Phi[RB[chB]], Pedestal[chA],Pedestal[chB],
-    //             PedRMS[chA],PedRMS[chB]);
   }
 
   // Start the event analysis: initialize our variables

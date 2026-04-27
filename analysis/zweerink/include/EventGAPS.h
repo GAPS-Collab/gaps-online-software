@@ -113,6 +113,7 @@ private:
   int     EarlyPaddle;               // Which paddle is first hit
   float   EarlyTime;                 // Time of earliest hit
   
+  double  FlightTime;                 // Since flight start, in seconds
   float   Pedestal[NTOT];             // Pedestal values
   float   PedRMS[NTOT];               // Pedestal RMS values
   bool    RBInData[NRB];              // RB in data stream?
@@ -144,6 +145,8 @@ private:
   
   TH1D    *pedHist[NTOT];              // Pedestal histograms
   TH1D    *pedRMSHist[NTOT];           // Pedestal RMS histograms
+  TProfile *pedVtime[NTOT];            // Pedestal profile
+  TProfile *pRMSVtime[NTOT];           // Pedestal RMS profile
   TH1D    *Peak[NTOT];                 // VPeak histograms
   TH1D    *Charge[NTOT];               // Charge histograms
   TH1D    *Charge_cut[NTOT];           // Charge (cut) histograms
