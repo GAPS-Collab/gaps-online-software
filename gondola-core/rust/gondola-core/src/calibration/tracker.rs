@@ -41,26 +41,23 @@ impl TrackerOfflineCalibration {
   pub fn get_common_noise(&self, hit : &TrackerHit, event_hits : &Vec<TrackerHit>) -> (f32, bool) {
     let mut cmn_level     = 0.0f32;
     // per default gains are 1 if they can not be looked up
-    let mut strip_gain    = 1.0f32;
-    let mut pulse_gain    = 1.0f32; 
-    let mut hit_is_pulser = false;
-    let mut pulse_avg     = 0.0f32;
-    let mut pulse_chn     = -1i32;
-    let mut pulse_adc     = 0.0f32;
-    let mut pulse_ped     = 0.0;
-    let mut is_pulser     = false;
-    let mut pulse_is_mean = false;
+    let strip_gain     : f32;
+    let mut pulse_gain = 1.0f32; 
+    let mut pulse_avg  = 0.0f32;
+    let mut pulse_chn  = -1i32;
+    let mut pulse_adc  = 0.0f32;
+    let is_pulser      : bool;
+    //let mut pulse_is_mean = false;
     if let Some(cmn_strip) = self.gain_map.get(&hit.get_stripid()) {
       strip_gain = cmn_strip.gain;
     } else {
       debug!("There is no entry for the strip gain for {}, default is 1.0", &hit.get_stripid());
-      //return (0.0, is_pulser);
       strip_gain = 1.0;
     }
     if let Some(pulse_chn_) = self.pulse_map.get(&hit.get_stripid()) { 
       pulse_chn  = pulse_chn_.pulse_chn;  
       pulse_avg  = pulse_chn_.pulse_avg;
-      pulse_is_mean = pulse_chn_.pulse_is_mean;
+      //pulse_is_mean = pulse_chn_.pulse_is_mean;
     }
     is_pulser = pulse_chn == hit.channel as i32;
     if pulse_chn < 0 || pulse_avg > 400.0 {
