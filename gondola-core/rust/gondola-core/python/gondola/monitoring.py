@@ -60,7 +60,10 @@ TrackerGpsMoniData                    = _gondola_core.monitoring.TrackerGpsMoniD
 TrackerGpsMoniData.__module__         = __name__ 
 
 CoolingMoniData                       = _gondola_core.monitoring.CoolingMoniData 
-CoolingMoniData.__module__            = _gondola_core.monitoring.CoolingMoniData 
+CoolingMoniData.__module__            = __name__
+
+WastieMoniData                        = _gondola_core.monitoring.WastieMoniData 
+WastieMoniData.__module__             = __name__
 
 # The corresponding moni series
 CPUMoniDataSeries                           = _gondola_core.monitoring.CPUMoniDataSeries        
@@ -107,4 +110,7 @@ TrackerGpsMoniDataSeries.__module__         = __name__
 
 CoolingMoniDataSeries                       = _gondola_core.monitoring.CoolingMoniDataSeries 
 CoolingMoniDataSeries.__module__            = __name__
+
+WastieMoniDataSeries                        = _gondola_core.monitoring.WastieMoniDataSeries 
+WastieMoniDataSeries.__module__             = __name__
 

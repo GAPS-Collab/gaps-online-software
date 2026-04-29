@@ -22,6 +22,9 @@ get_version_patch.__module__ = __name__
 version_at_least = _gondola_core.version_at_least 
 version_at_least.__module__ = __name__
 
+get_version     = _gondola_core.get_version 
+get_version.__module__ = __name__ 
+
 # set up the python submodules
 # the python wrappers are needed to define 
 # __module__ on each rust created class, 
@@ -38,9 +41,10 @@ from . import tracker
 from . import packets 
 from . import monitoring
 from . import stats
+from . import sim 
 
 __all__ = ['events', 'packets', 'io', 'monitoring', 'stats', 'algo', 'db',
-           'calibration', 'visual','tracker', 'reconstruction', 'tof']
+           'calibration', 'visual','tracker', 'reconstruction', 'tof', 'sim']
 
 # clean up the namespace, module still available as hidden through _gondola_core
 # this might be depending on the build process if this actually exists

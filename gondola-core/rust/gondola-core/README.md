@@ -2,9 +2,11 @@
 
 Python wrapper for gaps-online-software, a software library 
 written in Rust, which was mainly used for data acquisition 
-and control of the TOF system in the [GAPS experiment](https://gaps1.astro.ucla.edu/gaps/).
+and control of the TOF system in the [GAPS experiment](https://gaps1.astro.ucla.edu/gaps/) 
+during its first flight.
 The library allows to read raw science data as well as monitoring data for 
-several subsystems of the GAPS experiment
+several subsystems of the GAPS experiment, perform calibration as well as 
+provide some basic functionality to create basic plots.
 
 # CHANGELOG 
 
@@ -13,6 +15,8 @@ somewhat stable, please strap in for a bit of a rough ride when upgrading.
 However, the amount of features is increasing constantly and rapidly 
 
 v0.12.21 
+* FIX `get_version()` revived 
+* Read WastieHK monitoring data
 
 v0.12.20
 * adds fixed version for TOF occupancy plots, kudos Grace 
