@@ -379,6 +379,8 @@ fn monitoring_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<CoolingMoniData>()?;
   m.add_class::<CoolingMoniDataSeries>()?;
   m.add_class::<RunStatistics>()?;
+  m.add_class::<WastieMoniData>()?;
+  m.add_class::<WastieMoniDataSeries>()?;
   Ok(())
 }
 

@@ -158,7 +158,7 @@ impl fmt::Display for WastieMoniData {
   }
 }
 
-moniseries_telemetry!(WastieDataSeries, WastieMoniData);
+moniseries_telemetry!(WastieMoniDataSeries, WastieMoniData);
 
 #[cfg(feature="pybindings")]
 pythonize_monidata!(WastieMoniData);
