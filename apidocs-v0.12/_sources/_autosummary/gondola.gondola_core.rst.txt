@@ -4,9 +4,3 @@ gondola.gondola\_core
 .. automodule:: gondola.gondola_core
 
    
-   .. rubric:: Functions
-
-   .. autosummary::
-   
-      get_version
-   

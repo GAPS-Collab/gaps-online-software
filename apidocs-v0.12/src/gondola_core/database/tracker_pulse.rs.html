@@ -97,8 +97,8 @@
 <a href=#97 id=97 data-nosnippet>97</a>        <span class="kw">continue</span>;
 <a href=#98 id=98 data-nosnippet>98</a>      }
 <a href=#99 id=99 data-nosnippet>99</a>      <span class="kw">let </span><span class="kw-2">mut </span>pulse = <span class="self">Self</span>::new();
-<a href=#100 id=100 data-nosnippet>100</a>      <span class="kw">let </span>parts: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = line.split(<span class="string">","</span>).collect();
-<a href=#101 id=101 data-nosnippet>101</a>      <span class="kw">if </span>parts.len() == <span class="number">19 </span>{
+<a href=#100 id=100 data-nosnippet>100</a>      <span class="kw">let </span>parts: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = line.split_whitespace().collect();
+<a href=#101 id=101 data-nosnippet>101</a>      <span class="kw">if </span>parts.len() == <span class="number">6 </span>{
 <a href=#102 id=102 data-nosnippet>102</a>        <span class="comment">// Parse the first number as a standard decimal
 <a href=#103 id=103 data-nosnippet>103</a>        </span><span class="kw">let </span>layer   = parts[<span class="number">0</span>].parse::&lt;u8&gt;()
 <a href=#104 id=104 data-nosnippet>104</a>          .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))<span class="question-mark">?</span>;
@@ -125,16 +125,16 @@
 <a href=#125 id=125 data-nosnippet>125</a>    <span class="comment">//mean_avg   /= n_entries as f64;
 <a href=#126 id=126 data-nosnippet>126</a>    // it seems we should create an entry even for the 
 <a href=#127 id=127 data-nosnippet>127</a>    // strips which are not in the file 
-<a href=#128 id=128 data-nosnippet>128</a>    </span><span class="kw">for </span>stripid <span class="kw">in </span>all_strip_ids {
-<a href=#129 id=129 data-nosnippet>129</a>      <span class="kw">let </span><span class="kw-2">mut </span>pulse = <span class="self">Self</span>::new(); 
-<a href=#130 id=130 data-nosnippet>130</a>      pulse.strip_id = <span class="kw-2">*</span>stripid <span class="kw">as </span>i32;
-<a href=#131 id=131 data-nosnippet>131</a>      pulse.volume_id = <span class="kw-2">*</span>hid_vid_map.get(<span class="kw-2">&amp;</span>(pulse.strip_id <span class="kw">as </span>u32)).unwrap() <span class="kw">as </span>i64; <span class="comment">// critical error is good here,
-<a href=#132 id=132 data-nosnippet>132</a>      </span>pulse.pulse_is_mean = <span class="bool-val">true</span>;
-<a href=#133 id=133 data-nosnippet>133</a>      pulse.pulse_avg = <span class="number">0.0</span>; <span class="comment">// for some reason, don't set it here 
-<a href=#134 id=134 data-nosnippet>134</a>      </span>pulse.pulse_chn  = mean_pulse.floor() <span class="kw">as </span>i32;
-<a href=#135 id=135 data-nosnippet>135</a>      pulses.push(pulse);
-<a href=#136 id=136 data-nosnippet>136</a>    }
-<a href=#137 id=137 data-nosnippet>137</a>    <span class="prelude-val">Ok</span>(pulses)
+<a href=#128 id=128 data-nosnippet>128</a>    //for stripid in all_strip_ids {
+<a href=#129 id=129 data-nosnippet>129</a>    //  let mut pulse = Self::new(); 
+<a href=#130 id=130 data-nosnippet>130</a>    //  pulse.strip_id = *stripid as i32;
+<a href=#131 id=131 data-nosnippet>131</a>    //  pulse.volume_id = *hid_vid_map.get(&amp;(pulse.strip_id as u32)).unwrap() as i64; // critical error is good here,
+<a href=#132 id=132 data-nosnippet>132</a>    //  pulse.pulse_is_mean = true;
+<a href=#133 id=133 data-nosnippet>133</a>    //  pulse.pulse_avg = 0.0; // for some reason, don't set it here 
+<a href=#134 id=134 data-nosnippet>134</a>    //  pulse.pulse_chn  = mean_pulse.floor() as i32;
+<a href=#135 id=135 data-nosnippet>135</a>    //  pulses.push(pulse);
+<a href=#136 id=136 data-nosnippet>136</a>    //}
+<a href=#137 id=137 data-nosnippet>137</a>    </span><span class="prelude-val">Ok</span>(pulses)
 <a href=#138 id=138 data-nosnippet>138</a>  }
 <a href=#139 id=139 data-nosnippet>139</a>  
 <a href=#140 id=140 data-nosnippet>140</a>  <span class="kw">pub fn </span>all_names() -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;String&gt;, ConnectionError&gt; {

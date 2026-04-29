@@ -10,6 +10,7 @@ gondola.monitoring
    
       CPUMoniData
       CPUMoniDataSeries
+      CoolingMoniData
       CoolingMoniDataSeries
       DataSinkHB
       DataSinkHBSeries
@@ -37,4 +38,6 @@ gondola.monitoring
       SipTimeMoniDataSeries
       TrackerGpsMoniData
       TrackerGpsMoniDataSeries
+      WastieMoniData
+      WastieMoniDataSeries
    

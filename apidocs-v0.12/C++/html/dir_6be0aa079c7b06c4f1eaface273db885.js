@@ -5,7 +5,6 @@ var dir_6be0aa079c7b06c4f1eaface273db885 =
     [ "packets", "dir_bbe2beda53bb9b8b1f29aaf14145433f.html", "dir_bbe2beda53bb9b8b1f29aaf14145433f" ],
     [ "calibration.h", "calibration_8h.html", "calibration_8h" ],
     [ "caraspace.hpp", "caraspace_8hpp.html", "caraspace_8hpp" ],
-    [ "commands.h", "commands_8h.html", "commands_8h" ],
     [ "database.h", "database_8h.html", "database_8h" ],
     [ "errors.hpp", "errors_8hpp.html", "errors_8hpp" ],
     [ "events.h", "events_8h.html", "events_8h" ],

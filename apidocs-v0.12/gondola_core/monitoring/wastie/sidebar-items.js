@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["WastieDataSeries","WastieMoniData"]};
+window.SIDEBAR_ITEMS = {"struct":["WastieMoniData","WastieMoniDataSeries"]};

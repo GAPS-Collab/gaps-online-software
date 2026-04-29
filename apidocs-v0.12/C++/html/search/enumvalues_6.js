@@ -5,10 +5,9 @@ var searchData=
   ['gcuevtbuilderstats_2',['GcuEvtBuilderStats',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39ceda7de42fba23b28a75f40f8a83b19add28',1,'gondola']]],
   ['gcumon_3',['GcuMon',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39cedab786f26bcf3a3e7b4924849ee2fc8629',1,'gondola']]],
   ['gcumonhkaddendum_4',['GcuMonHKAddendum',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39cedaa657b2ae35a55727ac3ce70fcaf6edad',1,'gondola']]],
-  ['generalfailure_5',['GeneralFailure',['../commands_8h.html#aee4b019262fd08438aee34c463daaad3a4542287cbc392d52b6ad0f901726d176',1,'commands.h']]],
-  ['gold_6',['Gold',['../namespacegondola.html#ac61bd1b8e62eab79a1089be6ecc1ca3da9768feb3fdb1f267b06093bc572952dd',1,'gondola']]],
-  ['goodnocrccheck_7',['GoodNoCRCCheck',['../namespacegondola.html#ae4efa4080cf89476f85e917971613baaa3a4bcec2a877d364580a1a753dd0d1c8',1,'gondola']]],
-  ['goodnocrcorerrbitcheck_8',['GoodNoCRCOrErrBitCheck',['../namespacegondola.html#ae4efa4080cf89476f85e917971613baaa5c7a66b675c172f368c8331b20c68c45',1,'gondola']]],
-  ['goodnoerrbitcheck_9',['GoodNoErrBitCheck',['../namespacegondola.html#ae4efa4080cf89476f85e917971613baaa69a7cfda8af8a54154e556f4d766926c',1,'gondola']]],
-  ['gps_10',['GPS',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39ceda8c578de37278ada488d763ea86c5cf20',1,'gondola']]]
+  ['gold_5',['Gold',['../namespacegondola.html#ac61bd1b8e62eab79a1089be6ecc1ca3da9768feb3fdb1f267b06093bc572952dd',1,'gondola']]],
+  ['goodnocrccheck_6',['GoodNoCRCCheck',['../namespacegondola.html#ae4efa4080cf89476f85e917971613baaa3a4bcec2a877d364580a1a753dd0d1c8',1,'gondola']]],
+  ['goodnocrcorerrbitcheck_7',['GoodNoCRCOrErrBitCheck',['../namespacegondola.html#ae4efa4080cf89476f85e917971613baaa5c7a66b675c172f368c8331b20c68c45',1,'gondola']]],
+  ['goodnoerrbitcheck_8',['GoodNoErrBitCheck',['../namespacegondola.html#ae4efa4080cf89476f85e917971613baaa69a7cfda8af8a54154e556f4d766926c',1,'gondola']]],
+  ['gps_9',['GPS',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39ceda8c578de37278ada488d763ea86c5cf20',1,'gondola']]]
 ];

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.monitoring &#8212; gondola 0.12.20 documentation</title>
+    <title>gondola.monitoring &#8212; gondola 0.12.21 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=3b2cb6f7"></script>
+    <script src="../_static/documentation_options.js?v=c65c89b1"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.monitoring';</script>
@@ -117,7 +117,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.12.20 documentation</p>
+    <p class="title logo__title">gondola 0.12.21 documentation</p>
   
 </a></div>
     
@@ -285,6 +285,7 @@
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">gondola.monitoring</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.packets.html">gondola.packets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.reconstruction.html">gondola.reconstruction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.sim.html">gondola.sim</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.stats.html">gondola.stats</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="gondola.tof.html">gondola.tof</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="gondola.tof.analysis.html">gondola.tof.analysis</a></li>
@@ -386,85 +387,94 @@ polars dataframes.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.CPUMoniDataSeries" title="gondola.monitoring.CPUMoniDataSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CPUMoniDataSeries</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.CoolingMoniDataSeries" title="gondola.monitoring.CoolingMoniDataSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CoolingMoniDataSeries</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.CoolingMoniData" title="gondola.monitoring.CoolingMoniData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CoolingMoniData</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.DataSinkHB" title="gondola.monitoring.DataSinkHB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataSinkHB</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.CoolingMoniDataSeries" title="gondola.monitoring.CoolingMoniDataSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CoolingMoniDataSeries</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.DataSinkHBSeries" title="gondola.monitoring.DataSinkHBSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataSinkHBSeries</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.DataSinkHB" title="gondola.monitoring.DataSinkHB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataSinkHB</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.EventBuilderHB" title="gondola.monitoring.EventBuilderHB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EventBuilderHB</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.DataSinkHBSeries" title="gondola.monitoring.DataSinkHBSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataSinkHBSeries</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.EventBuilderHBSeries" title="gondola.monitoring.EventBuilderHBSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EventBuilderHBSeries</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.EventBuilderHB" title="gondola.monitoring.EventBuilderHB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EventBuilderHB</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.GcuEvBldStatsMoniData" title="gondola.monitoring.GcuEvBldStatsMoniData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GcuEvBldStatsMoniData</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.EventBuilderHBSeries" title="gondola.monitoring.EventBuilderHBSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EventBuilderHBSeries</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.GcuEvBldStatsMoniDataSeries" title="gondola.monitoring.GcuEvBldStatsMoniDataSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GcuEvBldStatsMoniDataSeries</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.GcuEvBldStatsMoniData" title="gondola.monitoring.GcuEvBldStatsMoniData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GcuEvBldStatsMoniData</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.LTBMoniData" title="gondola.monitoring.LTBMoniData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LTBMoniData</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.GcuEvBldStatsMoniDataSeries" title="gondola.monitoring.GcuEvBldStatsMoniDataSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GcuEvBldStatsMoniDataSeries</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.LTBMoniData" title="gondola.monitoring.LTBMoniData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LTBMoniData</span></code></a>()</p></td>
 <td><p>Sensors on the LTB</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.LTBMoniDataSeries" title="gondola.monitoring.LTBMoniDataSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LTBMoniDataSeries</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.LTBMoniDataSeries" title="gondola.monitoring.LTBMoniDataSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LTBMoniDataSeries</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.MasterTriggerHB" title="gondola.monitoring.MasterTriggerHB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MasterTriggerHB</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.MasterTriggerHB" title="gondola.monitoring.MasterTriggerHB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MasterTriggerHB</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.MasterTriggerHBSeries" title="gondola.monitoring.MasterTriggerHBSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MasterTriggerHBSeries</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.MasterTriggerHBSeries" title="gondola.monitoring.MasterTriggerHBSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MasterTriggerHBSeries</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.MtbMoniData" title="gondola.monitoring.MtbMoniData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MtbMoniData</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.MtbMoniData" title="gondola.monitoring.MtbMoniData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MtbMoniData</span></code></a>()</p></td>
 <td><p>Monitoring the MTB</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.MtbMoniDataSeries" title="gondola.monitoring.MtbMoniDataSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MtbMoniDataSeries</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.MtbMoniDataSeries" title="gondola.monitoring.MtbMoniDataSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MtbMoniDataSeries</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.PAMoniData" title="gondola.monitoring.PAMoniData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PAMoniData</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.PAMoniData" title="gondola.monitoring.PAMoniData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PAMoniData</span></code></a>()</p></td>
 <td><p>Preamp temperature and bias data</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.PAMoniDataSeries" title="gondola.monitoring.PAMoniDataSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PAMoniDataSeries</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.PAMoniDataSeries" title="gondola.monitoring.PAMoniDataSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PAMoniDataSeries</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.PBMoniData" title="gondola.monitoring.PBMoniData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PBMoniData</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.PBMoniData" title="gondola.monitoring.PBMoniData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PBMoniData</span></code></a>()</p></td>
 <td><p>Sensors on the power boards (PB)</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.PBMoniDataSeries" title="gondola.monitoring.PBMoniDataSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PBMoniDataSeries</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.PBMoniDataSeries" title="gondola.monitoring.PBMoniDataSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PBMoniDataSeries</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.RBMoniData" title="gondola.monitoring.RBMoniData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RBMoniData</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.RBMoniData" title="gondola.monitoring.RBMoniData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RBMoniData</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.RBMoniDataSeries" title="gondola.monitoring.RBMoniDataSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RBMoniDataSeries</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.RBMoniDataSeries" title="gondola.monitoring.RBMoniDataSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RBMoniDataSeries</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.SipPosMoniData" title="gondola.monitoring.SipPosMoniData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SipPosMoniData</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.SipPosMoniData" title="gondola.monitoring.SipPosMoniData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SipPosMoniData</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.SipPosMoniDataSeries" title="gondola.monitoring.SipPosMoniDataSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SipPosMoniDataSeries</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.SipPosMoniDataSeries" title="gondola.monitoring.SipPosMoniDataSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SipPosMoniDataSeries</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.SipPresMoniData" title="gondola.monitoring.SipPresMoniData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SipPresMoniData</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.SipPresMoniData" title="gondola.monitoring.SipPresMoniData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SipPresMoniData</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.SipPresMoniDataSeries" title="gondola.monitoring.SipPresMoniDataSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SipPresMoniDataSeries</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.SipPresMoniDataSeries" title="gondola.monitoring.SipPresMoniDataSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SipPresMoniDataSeries</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.SipTimeMoniData" title="gondola.monitoring.SipTimeMoniData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SipTimeMoniData</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.SipTimeMoniData" title="gondola.monitoring.SipTimeMoniData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SipTimeMoniData</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.SipTimeMoniDataSeries" title="gondola.monitoring.SipTimeMoniDataSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SipTimeMoniDataSeries</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.SipTimeMoniDataSeries" title="gondola.monitoring.SipTimeMoniDataSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SipTimeMoniDataSeries</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.TrackerGpsMoniData" title="gondola.monitoring.TrackerGpsMoniData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerGpsMoniData</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.TrackerGpsMoniData" title="gondola.monitoring.TrackerGpsMoniData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerGpsMoniData</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.TrackerGpsMoniDataSeries" title="gondola.monitoring.TrackerGpsMoniDataSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerGpsMoniDataSeries</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.TrackerGpsMoniDataSeries" title="gondola.monitoring.TrackerGpsMoniDataSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerGpsMoniDataSeries</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.monitoring.WastieMoniData" title="gondola.monitoring.WastieMoniData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WastieMoniData</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.monitoring.WastieMoniDataSeries" title="gondola.monitoring.WastieMoniDataSeries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WastieMoniDataSeries</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -1346,6 +1356,54 @@ or sent over network</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.monitoring.TrackerGpsMoniData.keys">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.monitoring.TrackerGpsMoniData.keys" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.monitoring.CoolingMoniData">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.monitoring.</span></span><span class="sig-name descname"><span class="pre">CoolingMoniData</span></span><a class="headerlink" href="#gondola.monitoring.CoolingMoniData" title="Link to this definition">#</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.monitoring.CoolingMoniData.board_id">
+<span class="sig-name descname"><span class="pre">board_id</span></span><a class="headerlink" href="#gondola.monitoring.CoolingMoniData.board_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.monitoring.CoolingMoniData.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">varname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.monitoring.CoolingMoniData.get" title="Link to this definition">#</a></dt>
+<dd><p>Access the (data) members by name</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.monitoring.CoolingMoniData.keys">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.monitoring.CoolingMoniData.keys" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.monitoring.WastieMoniData">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.monitoring.</span></span><span class="sig-name descname"><span class="pre">WastieMoniData</span></span><a class="headerlink" href="#gondola.monitoring.WastieMoniData" title="Link to this definition">#</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.monitoring.WastieMoniData.board_id">
+<span class="sig-name descname"><span class="pre">board_id</span></span><a class="headerlink" href="#gondola.monitoring.WastieMoniData.board_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.monitoring.WastieMoniData.from_telemetrypacket">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_telemetrypacket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">packet</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.monitoring.WastieMoniData.from_telemetrypacket" title="Link to this definition">#</a></dt>
+<dd><p>Unpack Self from a TelemetryPacket.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.monitoring.WastieMoniData.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">varname</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.monitoring.WastieMoniData.get" title="Link to this definition">#</a></dt>
+<dd><p>Access the (data) members by name</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.monitoring.WastieMoniData.keys">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.monitoring.WastieMoniData.keys" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -2678,6 +2736,77 @@ herein can be accessed.</p>
 
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="gondola.monitoring.WastieMoniDataSeries">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.monitoring.</span></span><span class="sig-name descname"><span class="pre">WastieMoniDataSeries</span></span><a class="headerlink" href="#gondola.monitoring.WastieMoniDataSeries" title="Link to this definition">#</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="gondola.monitoring.WastieMoniDataSeries.add_crfile">
+<span class="sig-name descname"><span class="pre">add_crfile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">Ellipsis</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.monitoring.WastieMoniDataSeries.add_crfile" title="Link to this definition">#</a></dt>
+<dd><p>Add an additional (Caraspace) file to the series</p>
+<dl class="simple">
+<dt># Arguments:</dt><dd><ul class="simple">
+<li><p>filename    : The name of the (caraspace) file to add</p></li>
+<li><dl class="simple">
+<dt>from_object<span class="classifier">Since this adds caraspace files, it is possible </span></dt><dd><p>to choose from where to get the information.
+Either the telemetry packet, or the tofpacket, if 
+either is present in the frame. When 
+CRFrameObjectType = Unknown, it will figure it out 
+automatically, preferring the telemetry since it has
+the gcu timestamp</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.monitoring.WastieMoniDataSeries.add_telemetryfile">
+<span class="sig-name descname"><span class="pre">add_telemetryfile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.monitoring.WastieMoniDataSeries.add_telemetryfile" title="Link to this definition">#</a></dt>
+<dd><p>Add an additional (Telemetry) file to the series</p>
+<dl class="simple">
+<dt># Arguments:</dt><dd><ul class="simple">
+<li><p>filename    : The name of the (telemetry) file to add</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.monitoring.WastieMoniDataSeries.first_ts">
+<span class="sig-name descname"><span class="pre">first_ts</span></span><a class="headerlink" href="#gondola.monitoring.WastieMoniDataSeries.first_ts" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.monitoring.WastieMoniDataSeries.get_dataframe">
+<span class="sig-name descname"><span class="pre">get_dataframe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.monitoring.WastieMoniDataSeries.get_dataframe" title="Link to this definition">#</a></dt>
+<dd><p>Reduces the MoniSeries to a single polars data frame
+The structure itself will not be changed</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.monitoring.WastieMoniDataSeries.get_var_for_board">
+<span class="sig-name descname"><span class="pre">get_var_for_board</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">varname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rb_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.monitoring.WastieMoniDataSeries.get_var_for_board" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.monitoring.WastieMoniDataSeries.max_size">
+<span class="sig-name descname"><span class="pre">max_size</span></span><a class="headerlink" href="#gondola.monitoring.WastieMoniDataSeries.max_size" title="Link to this definition">#</a></dt>
+<dd><p>The maximum size of the series. If more data 
+are added, data from the front will be removed</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.monitoring.WastieMoniDataSeries.timestamps">
+<span class="sig-name descname"><span class="pre">timestamps</span></span><a class="headerlink" href="#gondola.monitoring.WastieMoniDataSeries.timestamps" title="Link to this definition">#</a></dt>
+<dd><p>If monitoring is retrieved from telemetry, we 
+save the gcu timestamp of the packet, wich 
+herein can be accessed.</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
 
@@ -2920,6 +3049,19 @@ herein can be accessed.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.monitoring.TrackerGpsMoniData.keys"><code class="docutils literal notranslate"><span class="pre">TrackerGpsMoniData.keys()</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.monitoring.CoolingMoniData"><code class="docutils literal notranslate"><span class="pre">CoolingMoniData</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.monitoring.CoolingMoniData.board_id"><code class="docutils literal notranslate"><span class="pre">CoolingMoniData.board_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.monitoring.CoolingMoniData.get"><code class="docutils literal notranslate"><span class="pre">CoolingMoniData.get()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.monitoring.CoolingMoniData.keys"><code class="docutils literal notranslate"><span class="pre">CoolingMoniData.keys()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.monitoring.WastieMoniData"><code class="docutils literal notranslate"><span class="pre">WastieMoniData</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.monitoring.WastieMoniData.board_id"><code class="docutils literal notranslate"><span class="pre">WastieMoniData.board_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.monitoring.WastieMoniData.from_telemetrypacket"><code class="docutils literal notranslate"><span class="pre">WastieMoniData.from_telemetrypacket()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.monitoring.WastieMoniData.get"><code class="docutils literal notranslate"><span class="pre">WastieMoniData.get()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.monitoring.WastieMoniData.keys"><code class="docutils literal notranslate"><span class="pre">WastieMoniData.keys()</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.monitoring.CPUMoniDataSeries"><code class="docutils literal notranslate"><span class="pre">CPUMoniDataSeries</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.monitoring.CPUMoniDataSeries.add_crfile"><code class="docutils literal notranslate"><span class="pre">CPUMoniDataSeries.add_crfile()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.monitoring.CPUMoniDataSeries.add_telemetryfile"><code class="docutils literal notranslate"><span class="pre">CPUMoniDataSeries.add_telemetryfile()</span></code></a></li>
@@ -3075,6 +3217,16 @@ herein can be accessed.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.monitoring.CoolingMoniDataSeries.get_var_for_board"><code class="docutils literal notranslate"><span class="pre">CoolingMoniDataSeries.get_var_for_board()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.monitoring.CoolingMoniDataSeries.max_size"><code class="docutils literal notranslate"><span class="pre">CoolingMoniDataSeries.max_size</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.monitoring.CoolingMoniDataSeries.timestamps"><code class="docutils literal notranslate"><span class="pre">CoolingMoniDataSeries.timestamps</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.monitoring.WastieMoniDataSeries"><code class="docutils literal notranslate"><span class="pre">WastieMoniDataSeries</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.monitoring.WastieMoniDataSeries.add_crfile"><code class="docutils literal notranslate"><span class="pre">WastieMoniDataSeries.add_crfile()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.monitoring.WastieMoniDataSeries.add_telemetryfile"><code class="docutils literal notranslate"><span class="pre">WastieMoniDataSeries.add_telemetryfile()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.monitoring.WastieMoniDataSeries.first_ts"><code class="docutils literal notranslate"><span class="pre">WastieMoniDataSeries.first_ts</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.monitoring.WastieMoniDataSeries.get_dataframe"><code class="docutils literal notranslate"><span class="pre">WastieMoniDataSeries.get_dataframe()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.monitoring.WastieMoniDataSeries.get_var_for_board"><code class="docutils literal notranslate"><span class="pre">WastieMoniDataSeries.get_var_for_board()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.monitoring.WastieMoniDataSeries.max_size"><code class="docutils literal notranslate"><span class="pre">WastieMoniDataSeries.max_size</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.monitoring.WastieMoniDataSeries.timestamps"><code class="docutils literal notranslate"><span class="pre">WastieMoniDataSeries.timestamps</span></code></a></li>
 </ul>
 </li>
 </ul>

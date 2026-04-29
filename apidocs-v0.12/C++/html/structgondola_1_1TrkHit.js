@@ -1,5 +1,6 @@
 var structgondola_1_1TrkHit =
 [
+    [ "get_strip_id", "structgondola_1_1TrkHit.html#a36c9bc7757adec2287e38ca1a4347b33", null ],
     [ "to_string", "structgondola_1_1TrkHit.html#aff7b5576e6f62083c80dfc492f00923b", null ],
     [ "adc", "structgondola_1_1TrkHit.html#aeeba12ee28854810dcc9ecb2dcde1f1e", null ],
     [ "asic_event_code", "structgondola_1_1TrkHit.html#ae6b6120eb7a3dc0750e139e13e82ff2d", null ],

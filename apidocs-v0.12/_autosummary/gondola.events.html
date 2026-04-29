@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.events &#8212; gondola 0.12.20 documentation</title>
+    <title>gondola.events &#8212; gondola 0.12.21 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=3b2cb6f7"></script>
+    <script src="../_static/documentation_options.js?v=c65c89b1"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.events';</script>
@@ -117,7 +117,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.12.20 documentation</p>
+    <p class="title logo__title">gondola 0.12.21 documentation</p>
   
 </a></div>
     
@@ -285,6 +285,7 @@
 <li class="toctree-l1"><a class="reference internal" href="gondola.monitoring.html">gondola.monitoring</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.packets.html">gondola.packets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.reconstruction.html">gondola.reconstruction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.sim.html">gondola.sim</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.stats.html">gondola.stats</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="gondola.tof.html">gondola.tof</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="gondola.tof.analysis.html">gondola.tof.analysis</a></li>
@@ -1656,7 +1657,32 @@ be removed</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="gondola.events.McEvent">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.events.</span></span><span class="sig-name descname"><span class="pre">McEvent</span></span><a class="headerlink" href="#gondola.events.McEvent" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.McEvent.hwid_edep_map">
+<span class="sig-name descname"><span class="pre">hwid_edep_map</span></span><a class="headerlink" href="#gondola.events.McEvent.hwid_edep_map" title="Link to this definition">#</a></dt>
+<dd><p>Combine all energy depositions in a certain volume</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.McEvent.mctruth_hits">
+<span class="sig-name descname"><span class="pre">mctruth_hits</span></span><a class="headerlink" href="#gondola.events.McEvent.mctruth_hits" title="Link to this definition">#</a></dt>
+<dd><p>Get McTruth Hits in the format 
+(x,y,z,time,edep,volumeid,hardware_id)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.McEvent.primary">
+<span class="sig-name descname"><span class="pre">primary</span></span><a class="headerlink" href="#gondola.events.McEvent.primary" title="Link to this definition">#</a></dt>
+<dd><p>The properties of the injected primary</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.McEvent.volid_edep_map">
+<span class="sig-name descname"><span class="pre">volid_edep_map</span></span><a class="headerlink" href="#gondola.events.McEvent.volid_edep_map" title="Link to this definition">#</a></dt>
+<dd><p>Combine all energy depositions in a certain volume</p>
+</dd></dl>
+
+</dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gondola.events.McHit">
@@ -2285,7 +2311,13 @@ is the semantics behind it.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TrackerDAQEventPacket.to_bytestream"><code class="docutils literal notranslate"><span class="pre">TrackerDAQEventPacket.to_bytestream()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.McEvent"><code class="docutils literal notranslate"><span class="pre">McEvent</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.McEvent"><code class="docutils literal notranslate"><span class="pre">McEvent</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.McEvent.hwid_edep_map"><code class="docutils literal notranslate"><span class="pre">McEvent.hwid_edep_map</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.McEvent.mctruth_hits"><code class="docutils literal notranslate"><span class="pre">McEvent.mctruth_hits</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.McEvent.primary"><code class="docutils literal notranslate"><span class="pre">McEvent.primary</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.McEvent.volid_edep_map"><code class="docutils literal notranslate"><span class="pre">McEvent.volid_edep_map</span></code></a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.McHit"><code class="docutils literal notranslate"><span class="pre">McHit</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.strip_id"><code class="docutils literal notranslate"><span class="pre">strip_id()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.EventQuality"><code class="docutils literal notranslate"><span class="pre">EventQuality</span></code></a><ul class="nav section-nav flex-column">
