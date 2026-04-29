@@ -28,6 +28,7 @@ pub struct McHit {
   pub vertex_mom_y : f32,
   pub vertex_mom_z : f32,
   pub step_len     : f32,
+  pub step_edep    : f32,
   pub pre_mom_x    : f32,
   pub pre_mom_y    : f32,
   pub pre_mom_z    : f32,
@@ -67,6 +68,7 @@ impl McHit {
       vertex_mom_y : 0.0,
       vertex_mom_z : 0.0,
       step_len     : 0.0,
+      step_edep    : 0.0,
       pre_mom_x    : 0.0,
       pre_mom_y    : 0.0,
       pre_mom_z    : 0.0,
@@ -116,6 +118,7 @@ impl Serialization for McHit {
     hit.vertex_mom_y = parse_f32(stream, pos);
     hit.vertex_mom_z = parse_f32(stream, pos);
     hit.step_len     = parse_f32(stream, pos);
+    hit.step_edep    = parse_f32(stream, pos);
     hit.pre_mom_x    = parse_f32(stream, pos);
     hit.pre_mom_y    = parse_f32(stream, pos);
     hit.pre_mom_z    = parse_f32(stream, pos);
