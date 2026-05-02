@@ -21,11 +21,14 @@
 #include "legacy.h"
 #include <vector>
 
-#include "./include/constants.h"
-#include "./include/EventGAPS.h"
+#include "constants.h"
+#include "EventGAPS.h"
+#include "PacketMethods.h"
 
-void   GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm);
-double FitSine(std::vector<double> volts, std::vector<double> times);
+namespace fs = std::filesystem;
+
+//void   GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm);
+//double FitSine(std::vector<double> volts, std::vector<double> times);
 
 int main(int argc, char *argv[]){
   spdlog::cfg::load_env_levels();
@@ -72,6 +75,7 @@ int main(int argc, char *argv[]){
   }
 
   // -> Gaps relevant code starts here
+  // First, read in the specified calibrations
   auto calname = result["calibration"].as<std::string>();
   std::map<u8,gondola::RBCalibration> cali;
   if (calname != "") {
@@ -81,63 +85,6 @@ int main(int argc, char *argv[]){
     spdlog::info("Will use calibrations from {}", calname);
     cali = gondola::load_tof_calibrations(calname);
   }
-
-  /*
-  gondola::RBCalibration cali[NRB]; // "cali" stores values for one RB
-  // To read calibration data from individual binary files, when -c is
-  // given with the directory of the calibration files. Since the
-  // calibration files for each RB change with each calibration run,
-  // this code reads the list of calibration files in the directory,
-  // determines the RB number and copies the string into the relevant
-  // array position. For RBs with no calibration file, the length of
-  // the entry will be 0. We then read the calibrations for all RBs
-  // with files.
-  bool RB_Calibrated[NRB] = { false };
-  std::string cnames[NRB];
-  if (calname != "") {
-    char pname[500], line[500];
-    snprintf(pname,450, "ls %s/RB*.cali.tof.gaps", calname.c_str());
-    FILE *fp = popen(pname, "r");
-    while (fscanf(fp,"%s", line) != EOF) {
-      std::string c_name(line);          // Calib file found
-      int position = c_name.find("RB");  // Find "RB" in the name
-      std::string rbstr = c_name.substr(position+2, 2); // Extract RB num
-      int rbnum = atoi(rbstr.data());    // Convert to integer
-      //printf("%s %d %s\n", rbstr.c_str(), rbnum, line);
-      cnames[rbnum] = c_name;            // Copy to proper place in array
-    }
-    pclose(fp);
-    // Print out the calibration filenames as a sanity check
-    //for (int i=0; i<NRB; i++) {
-    //printf("%d: %lu %s\n", i, cnames[i].size(), cnames[i].c_str());
-    //}
-
-    for (int i=1; i<NRB; i++) {
-      if (cnames[i].size() > 4) { // RB has a calibration file
-	std::string f_str = cnames[i];
-	
-	// Read the packets from the file
-	//if ( std::filesystem::exists(f_str) ) {
-	//printf("%s file exists\n", f_str.c_str() );
-	//}
-	// Before proceeding, check that the file exists. 
-	struct stat buffer; 
-	if ( stat(f_str.c_str(), &buffer) != -1 ) {
-	  auto packet = get_tofpackets(f_str);
-	  spdlog::info("We loaded {} packets from {}", packet.size(), f_str);
-	  // Loop over the packets (should only be 1) and read into storage
-	  for (auto const &p : packet) {
-	    if (p.packet_type == PacketType::RBCalibration) {
-	      // Should have the one calibration tofpacket stored in "packet".
-	      usize pos = 0;
-	      cali[i] = gondola::RBCalibration::from_bytestream(p.payload, pos); 
-	      RB_Calibrated[i] = true;
-	    }
-	  }
-	}
-      }
-    }
-  } */
 
   // Some useful variables (some initialized to default values)
   // but overwritten from file (if it exists)
@@ -177,27 +124,30 @@ int main(int argc, char *argv[]){
     }
     fclose(fp); 
   } else
-    printf("Using default Nevis parameters.\n");
+    printf("Using default Flight parameters.\n");
   
   
   // Now, we want to store information about the SiPM channels and
   // paddle relationships for analysis purpose. Read all that info
   // into the relevant structures.
-  struct PaddleInfo PadInfo;
-  struct SiPMInfo   SipmInfo;
-  GetPaddleInfo(&PadInfo, &SipmInfo);
+  //struct PaddleInfo PadInfo;
+  //struct SiPMInfo   SipmInfo;
+  //GetPaddleInfo(&PadInfo, &SipmInfo);
       
   // Instantiate our class that holds analysis results and set some
   // initial values
-  auto Event = EventGAPS();
-  //Event.SetPaddleMap(paddle_map, vol_id, paddle_vid, paddle_location);
-  Event.SetPaddleMap(&PadInfo, &SipmInfo);
-  Event.SetThreshold(CThresh);
-  Event.SetCFDFraction(CFDS_frac);
-  Event.InitializeHistograms();
-  Event.OffsetHistograms(true);
+  //auto Event = EventGAPS();
+  //Event.SetPaddleMap(&PadInfo, &SipmInfo);
+  //Event.SetThreshold(CThresh);
+  //Event.SetCFDFraction(CFDS_frac);
+  //Event.InitializeHistograms();
+  //Event.OffsetHistograms(true);
   //return (0);
-  
+
+  // Instantiate our class that holds the data
+  auto PM = PacketMethods();
+  PM.BeginRun(1000);
+
   // the reader is something for the future, when the 
   // files get bigger so they might not fit into memory
   // at the same time
@@ -266,6 +216,7 @@ int main(int argc, char *argv[]){
       continue;
     }
     auto ev = ev_res.unwrap();
+    PM.ProcessTofEvent(&ev, cali);
     //unsigned long int evt_ctr = ev.mt_event.event_id;
     unsigned long int evt_ctr = ev.event_id;
 	if (verbose) {
@@ -311,7 +262,7 @@ int main(int argc, char *argv[]){
 	    // Before making waveforms, lets calculate the ch9
 	    // phase. For now, if we have ch9 data for this RB, we
 	    // want to analyze it.
-	    Phi[rbid] = FitSine(ch9_volts,ch9_times);
+	    //Phi[rbid] = FitSine(ch9_volts,ch9_times);
 
 	    // Now, initialize the ch9 Waveform for this RB. 
 	    wch9[rbid] = new GAPS::Waveform(ch9_volts.data(),
@@ -332,32 +283,32 @@ int main(int argc, char *argv[]){
 	}
 
 	// Now that we have the waveforms in place, analyze the event.
-	Event.InitializeVariables(evt_ctr);
-	Event.InitializeWaveforms(wave, wch9);
+	//Event.InitializeVariables(evt_ctr);
+	//Event.InitializeWaveforms(wave, wch9);
 
 	// Calculate and store pedestals/RMSs for each channel
-	Event.AnalyzePedestals(Ped_low, Ped_win);
+	//Event.AnalyzePedestals(Ped_low, Ped_win);
 
 	// Analyze the pulses in each channel
-	Event.SetThreshold(CThresh);
-	Event.SetCFDFraction(CFDS_frac);
-	Event.AnalyzePulses(Qwin_low, Qwin_size);
+	//Event.SetThreshold(CThresh);
+	//Event.SetCFDFraction(CFDS_frac);
+	//Event.AnalyzePulses(Qwin_low, Qwin_size);
 
 	// Now that we have TDC values available, process the ch9 phases
-	Event.AnalyzePhases(Phi);
+	//Event.AnalyzePhases(Phi);
 	
 	// Analyze each paddle: position on paddle, hitmask, etc
-	Event.AnalyzePaddles(10.0, CHmin); //Args: Peak and Charge cuts
+	//Event.AnalyzePaddles(10.0, CHmin); //Args: Peak and Charge cuts
 
 	// Now calculate beta, charge, and inner/outer tof x,y,z, etc.
-	Event.AnalyzeEvent();
+	//Event.AnalyzeEvent();
 	
 	// Now fill out histograms
-	Event.FillChannelHistos(0);
-	Event.FillPaddleHistos();
-	Event.FillOffsetHistos();
+	//Event.FillChannelHistos(0);
+	//Event.FillPaddleHistos();
+	//Event.FillOffsetHistos();
 	//}
-	Event.UnsetWaveforms();
+	//Event.UnsetWaveforms();
 	for (int i=0;i<NTOT;i++) 
 	  if ( wave[i] != NULL ) { delete wave[i]; wave[i] = NULL; }
 	for (int i=0;i<NRB;i++)  
@@ -419,9 +370,6 @@ int main(int argc, char *argv[]){
     }
   }
   }
-  // Write histograms after analyzing all the files
-  Event.WriteHistograms();
-  Event.WriteOffsetHistos();
   
   std::cout << "-- -- packets summary:" << std::endl;
   
@@ -438,7 +386,8 @@ int main(int argc, char *argv[]){
   return EXIT_SUCCESS;
 }
 
-void GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm) {
+/*
+  void GetPaddleInfo(struct PaddleInfo *pad, struct SiPMInfo *sipm) {
   // Eventually we will call the db to get all this info. For now, I
   // will simple read the relevant files to get the info.
 
@@ -650,3 +599,4 @@ double FitSine(std::vector<double> volts, std::vector<double> times)
 
   //return v;
 }
+*/
