@@ -142,8 +142,26 @@ private:
   int     NPadUmbrella;
   int     NPadCortina;
   
-  
-  TH1D    *pedHist[NTOT];              // Pedestal histograms
+  // Though we store the various values below by NTOT (since that is
+  // the easiest way to index through the quantities, we want to write
+  // them to histograms that are stored by NPAD.
+  TH1D    *pedHist[NPAD][2];           // Pedestal histograms
+  TH1D    *pedRMSHist[NPAD][2];        // Pedestal RMS histograms
+  TH1D    *Peak[NPAD][2];              // VPeak histograms
+  TH1D    *Charge[NPAD][2];            // Charge histograms
+  TH1D    *Charge_cut[NPAD][2];        // Charge (cut) histograms
+  TH1D    *tdcCFD[NPAD][2];            // TDC histograms
+  TH1D    *totLo[NPAD][2];             // TOT (lo) histograms
+  TH1D    *totHi[NPAD][2];             // TOT (hi) histograms
+  TProfile *pedVtime[NPAD][2];         // Pedestal profile
+  TProfile *pRMSVtime[NPAD][2];        // Pedestal RMS profile
+  TProfile *peakVtime[NPAD][2];        // peak time profile
+  TProfile *chVtime[NPAD][2];          // charge time profile
+  TProfile *tCFDVtime[NPAD][2];        // tCFD time profile
+  TProfile *totLVtime[NPAD][2];        // totLo time profile
+  TProfile *totHVtime[NPAD][2];        // totHi time profile
+
+  /*TH1D    *pedHist[NTOT];              // Pedestal histograms
   TH1D    *pedRMSHist[NTOT];           // Pedestal RMS histograms
   TProfile *pedVtime[NTOT];            // Pedestal profile
   TProfile *pRMSVtime[NTOT];           // Pedestal RMS profile
@@ -153,7 +171,8 @@ private:
   TH1D    *tdcCFD[NTOT];               // TDC histograms
   TH1D    *totLo[NTOT];                // TOT (lo) histograms
   TH1D    *totHi[NTOT];                // TOT (hi) histograms
-
+  */
+  
   TH2D    *QEnd2End[NPAD];             // End 2 End charge 
   TH1I    *HitMask[NPAD];              // Hit mask of paddle
   TH1D    *tDiff[NPAD];                // tdc diff of paddle ends

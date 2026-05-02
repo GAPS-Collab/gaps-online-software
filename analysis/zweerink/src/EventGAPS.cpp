@@ -212,29 +212,35 @@ void EventGAPS::SetPaddleMap(struct PaddleInfo *pad, struct SiPMInfo *sipm) {
 void EventGAPS::InitializeHistograms(void) {
 
   char text[400];
-  
-  // Histograms for pedestals and pedestal RMSs
-  for (int b = 0; b < NTOT; b++) {
-    sprintf(text, "pedHist[%d]", b);
-    pedHist[b] = new TH1D(text, "", 400, -10, 10);
-    pedHist[b]->GetXaxis()->SetTitle("Pedestal (mV)");
-    pedHist[b]->GetYaxis()->SetTitle("Counts");
-    
-    sprintf(text, "pedRMSHist[%d]", b);
-    pedRMSHist[b] = new TH1D(text, "", 500, -1, 4);
-    pedRMSHist[b]->GetXaxis()->SetTitle("Pedestal RMS (mV)");
-    pedRMSHist[b]->GetYaxis()->SetTitle("Counts");
-    
-    sprintf(text, "pedVtime[%d]", b);
-    pedVtime[b] = new TProfile(text, "", 7500, 0, 26);
-    pedVtime[b]->GetXaxis()->SetTitle("Flight Time (days)");
-    pedVtime[b]->GetYaxis()->SetTitle("Pedestal (mV)");
 
-    sprintf(text, "pRMSVtime[%d]", b);
-    pRMSVtime[b] = new TProfile(text, "", 7500, 0, 26);
-    pRMSVtime[b]->GetXaxis()->SetTitle("Flight Time (days)");
-    pRMSVtime[b]->GetYaxis()->SetTitle("Ped RMS (mV)");
-}
+  // Histograms for pedestals and pedestal RMSs
+  for (int b = 0; b < NPAD; b++) {
+    for (int c = 0; c < 2; c++) {
+      sprintf(text, "pedHist[%d][%d]", b, c);
+      pedHist[b][c] = new TH1D(text, "", 400, -10, 10);
+      pedHist[b][c]->GetXaxis()->SetTitle("Pedestal (mV)");
+      pedHist[b][c]->GetYaxis()->SetTitle("Counts");
+      
+      sprintf(text, "pedRMSHist[%d][%d]", b, c);
+      pedRMSHist[b][c] = new TH1D(text, "", 500, -1, 4);
+      pedRMSHist[b][c]->GetXaxis()->SetTitle("Pedestal RMS (mV)");
+      pedRMSHist[b][c]->GetYaxis()->SetTitle("Counts");
+      
+      sprintf(text, "pedVtime[%d][%d]", b, c);
+      pedVtime[b][c] = new TProfile(text, "", 7500, 0, 26);
+      pedVtime[b][c]->GetXaxis()->SetTitle("Flight Time (days)");
+      pedVtime[b][c]->GetYaxis()->SetTitle("Pedestal (mV)");
+      pedVtime[b][c]->SetMinimum(-5.0);
+      pedVtime[b][c]->SetMaximum(5.0);
+      
+      sprintf(text, "pRMSVtime[%d][%d]", b, c);
+      pRMSVtime[b][c] = new TProfile(text, "", 7500, 0, 26);
+      pRMSVtime[b][c]->GetXaxis()->SetTitle("Flight Time (days)");
+      pRMSVtime[b][c]->GetYaxis()->SetTitle("Ped RMS (mV)");
+      pRMSVtime[b][c]->SetMinimum(-5.0);
+      pRMSVtime[b][c]->SetMaximum(5.0);
+    }
+  }
 
   float lo_ch = -5.0;  // Low range of the charge plots (pC)
   float hi_ch =  60.0; // Hi range of the charge plots (pC)
@@ -243,48 +249,90 @@ void EventGAPS::InitializeHistograms(void) {
   float PeakHi   = 40.0;
   
   //Histograms containing the charge distribution
-  for (int b = 0; b < NTOT; b++) {
-    sprintf(text, "Vpeak[%d]", b);
-    //  Peak[b] = new TH1D(text, "", PeakBins, PeakLo, PeakHi);
-    Peak[b] = new TH1D(text, "", 160, -10.0, 150.0);
-    Peak[b]->GetXaxis()->SetTitle("Vpeak (mV)");
-    Peak[b]->GetYaxis()->SetTitle("Counts");
+  for (int b = 0; b < NPAD; b++) {
+    for (int c = 0; c < 2; c++) {
+      sprintf(text, "Vpeak[%d][%d]", b, c);
+      //  Peak[b] = new TH1D(text, "", PeakBins, PeakLo, PeakHi);
+      Peak[b][c] = new TH1D(text, "", 160, -10.0, 150.0);
+      Peak[b][c]->GetXaxis()->SetTitle("Vpeak (mV)");
+      Peak[b][c]->GetYaxis()->SetTitle("Counts");
+
+      sprintf(text, "peakVtime[%d][%d]", b, c);
+      peakVtime[b][c] = new TProfile(text, "", 7500, 0, 26);
+      peakVtime[b][c]->GetXaxis()->SetTitle("Flight Time (days)");
+      peakVtime[b][c]->GetYaxis()->SetTitle("Pulseheight (mV)");
+      peakVtime[b][c]->SetMinimum(0.0);
+      peakVtime[b][c]->SetMaximum(300.0);
+    }
   }
   
   //Histograms containing the charge distribution
-  for (int b = 0; b < NTOT; b++) {
-    sprintf(text, "Charge[%d]", b);
-    // Charge[b] = new TH1D(text, "", 200, lo_ch, hi_ch);
-    Charge[b] = new TH1D(text, "", 130, -10.0, 60.0);
-    Charge[b]->GetXaxis()->SetTitle("Charge(pC)");
-    Charge[b]->GetYaxis()->SetTitle("Counts");
+  for (int b = 0; b < NPAD; b++) {
+    for (int c = 0; c < 2; c++) {
+      sprintf(text, "Charge[%d][%d]", b, c);
+      // Charge[b][c] = new TH1D(text, "", 200, lo_ch, hi_ch);
+      Charge[b][c] = new TH1D(text, "", 130, -10.0, 60.0);
+      Charge[b][c]->GetXaxis()->SetTitle("Charge(pC)");
+      Charge[b][c]->GetYaxis()->SetTitle("Counts");
+      
+      sprintf(text, "Charge Cut [%d][%d]", b, c);
+      // Charge_cut[b][c] = new TH1D(text, "", 200, lo_ch, hi_ch);
+      Charge_cut[b][c] = new TH1D(text, "", 130, -10.0, 60.0);
+      Charge_cut[b][c]->GetXaxis()->SetTitle("Charge(cut,pC)");
+      Charge_cut[b][c]->GetYaxis()->SetTitle("Counts");
+
+      sprintf(text, "chVtime[%d][%d]", b, c);
+      chVtime[b][c] = new TProfile(text, "", 7500, 0, 26);
+      chVtime[b][c]->GetXaxis()->SetTitle("Flight Time (days)");
+      chVtime[b][c]->GetYaxis()->SetTitle("Charge (pC)");
+      chVtime[b][c]->SetMinimum(0.0);
+      chVtime[b][c]->SetMaximum(200.0);
+    } 
   }
 
-  for (int b = 0; b < NTOT; b++) {
-    sprintf(text, "Charge Cut [%d]", b);
-    // Charge_cut[b] = new TH1D(text, "", 200, lo_ch, hi_ch);
-    Charge_cut[b] = new TH1D(text, "", 130, -10.0, 60.0);
-    Charge_cut[b]->GetXaxis()->SetTitle("Charge(cut,pC)");
-    Charge_cut[b]->GetYaxis()->SetTitle("Counts");
-  }
+  for (int b = 0; b < NPAD; b++) {
+    for (int c = 0; c < 2; c++) {
+      sprintf(text, "tdcCFD[%d][%d]", b, c);
+      tdcCFD[b][c] = new TH1D(text, "", 400, 10.0, 200.0);
+      tdcCFD[b][c]->GetXaxis()->SetTitle("Pulse Time (ns)");
+      tdcCFD[b][c]->GetYaxis()->SetTitle("Counts");
 
-  for (int b = 0; b < NTOT; b++) {
-    sprintf(text, "tdcCFD[%d]", b);
-    tdcCFD[b] = new TH1D(text, "", 400, 10.0, 200.0);
-    tdcCFD[b]->GetXaxis()->SetTitle("Pulse Time (ns)");
-    tdcCFD[b]->GetYaxis()->SetTitle("Counts");
+      sprintf(text, "tCFDVtime[%d][%d]", b, c);
+      tCFDVtime[b][c] = new TProfile(text, "", 7500, 0, 26);
+      tCFDVtime[b][c]->GetXaxis()->SetTitle("Flight Time (days)");
+      tCFDVtime[b][c]->GetYaxis()->SetTitle("CFD value (ns)");
+      tCFDVtime[b][c]->SetMinimum(60.0);
+      tCFDVtime[b][c]->SetMaximum(160.0);
+    }
   }
   
   // TOT histos
-  for (int b = 0; b < NTOT; b++) {
-    sprintf(text, "totLo[%d]", b);
-    totLo[b] = new TH1D(text, "", 300, -5, 70);
-    totLo[b]->GetXaxis()->SetTitle("TOT - Lo Threshold");
-    totLo[b]->GetYaxis()->SetTitle("Counts");
-    sprintf(text, "totHi[%d]", b);
-    totHi[b] = new TH1D(text, "", 300, -5, 70);
-    totHi[b]->GetXaxis()->SetTitle("TOT - Hi Threshold");
-    totHi[b]->GetYaxis()->SetTitle("Counts");
+  for (int b = 0; b < NPAD; b++) {
+    for (int c = 0; c < 2; c++) {
+      sprintf(text, "totLo[%d][%d]", b, c);
+      totLo[b][c] = new TH1D(text, "", 300, -5, 70);
+      totLo[b][c]->GetXaxis()->SetTitle("TOT - Lo Threshold");
+      totLo[b][c]->GetYaxis()->SetTitle("Counts");
+      
+      sprintf(text, "totHi[%d][%d]", b, c);
+      totHi[b][c] = new TH1D(text, "", 300, -5, 70);
+      totHi[b][c]->GetXaxis()->SetTitle("TOT - Hi Threshold");
+      totHi[b][c]->GetYaxis()->SetTitle("Counts");
+
+      sprintf(text, "totLVtime[%d][%d]", b, c);
+      totLVtime[b][c] = new TProfile(text, "", 7500, 0, 26);
+      totLVtime[b][c]->GetXaxis()->SetTitle("Flight Time (days)");
+      totLVtime[b][c]->GetYaxis()->SetTitle("TOT Lo value (ns)");
+      totLVtime[b][c]->SetMinimum(0.0);
+      totLVtime[b][c]->SetMaximum(10.0);
+
+      sprintf(text, "totHVtime[%d][%d]", b, c);
+      totHVtime[b][c] = new TProfile(text, "", 7500, 0, 26);
+      totHVtime[b][c]->GetXaxis()->SetTitle("Flight Time (days)");
+      totHVtime[b][c]->GetYaxis()->SetTitle("TOT Hi value (ns)");
+      totHVtime[b][c]->SetMinimum(0.0);
+      totHVtime[b][c]->SetMaximum(10.0);
+    }
   }
 
   // TDC diffs
@@ -454,43 +502,66 @@ void EventGAPS::WriteHistograms() {
   //create directories for the raw plots
   TDirectory *savdir = gDirectory; 
   outfile->cd();
-  TDirectory *Peddir  = outfile->mkdir("Pedestals");
-  TDirectory *Peddir1 = outfile->mkdir("PedProfs");
-  TDirectory *Peakdir = outfile->mkdir("VPeakplots");
-  TDirectory *Chargedir = outfile->mkdir("Chargeplots");
+  TDirectory *Peddir     = outfile->mkdir("Pedestals");
+  TDirectory *Peddir1    = outfile->mkdir("PedProfs");
+  TDirectory *Peakdir    = outfile->mkdir("VPeakplots");
+  TDirectory *Peakdir1   = outfile->mkdir("VPeakProfs");
+  TDirectory *Chargedir  = outfile->mkdir("Chargeplots");
+  TDirectory *Chargedir1 = outfile->mkdir("ChargeProfs");
   TDirectory *Hitmaskdir = outfile->mkdir("Hitmasks");
   
-  TDirectory *TDCdir = outfile->mkdir("TDCplots");
-  TDirectory *TOTdir = outfile->mkdir("TOTplots");
+  TDirectory *TDCdir     = outfile->mkdir("TDCplots");
+  TDirectory *TDCdir1    = outfile->mkdir("TDCProfs");
+  TDirectory *TOTdir     = outfile->mkdir("TOTplots");
+  TDirectory *TOTdir1    = outfile->mkdir("TOTProfs");
 
-  int PEDS = 0;
-  int PEAK = 0;
-  int QVSP = 0;
+  int PEDS = 1;
+  int PEAK = 1;
+  int QVSP = 1;
   
   int start = 1; // No Sipm ch = 0 or paddle = 0
   max_sipm = max_paddle*2-1;
 
   if (PEDS) {
-    Peddir->cd();
-    for (int i = start; i < max_sipm; i++) {
-      pedHist[i]->Write();
-      pedRMSHist[i]->Write();
+    for (int i = start; i < max_paddle; i++) {
+      for (int j = 0; j < 2; j++) {
+	Peddir->cd(); // Write the Ped histo
+	pedHist[i][j]->Write();
+	pedRMSHist[i][j]->Write();
+	
+	Peddir1->cd(); // Write the Ped profiles
+	pedVtime[i][j]->Write();
+	pRMSVtime[i][j]->Write();
+      }
     }
-  }
-  Peddir1->cd();
-  for (int i = start; i < max_sipm; i++) {
-    pedVtime[i]->Write();
-    pRMSVtime[i]->Write();
   }
 
   if (PEAK) {
     Peakdir->cd();
-    for (int i = start; i < max_sipm; i++) Peak[i]->Write();
-    
+    for (int i = start; i < max_paddle; i++) {
+      for (int j = 0; j < 2; j++) {
+	Peak[i][j]->Write();
+      }
+    }
+    Peakdir1->cd();
+    for (int i = start; i < max_paddle; i++) {
+      for (int j = 0; j < 2; j++) {
+	peakVtime[i][j]->Write();
+      }
+    }
+  
     Chargedir->cd();
-    for (int i = start; i < max_sipm; i++) {
-      Charge[i]->Write();
-      Charge_cut[i]->Write();
+    for (int i = start; i < max_paddle; i++) {
+      for (int j = 0; j < 2; j++) {
+	Charge[i][j]->Write();
+	Charge_cut[i][j]->Write();
+      }
+    }
+    Chargedir1->cd();
+    for (int i = start; i < max_paddle; i++) {
+      for (int j = 0; j < 2; j++) {
+	chVtime[i][j]->Write();
+      }
     }
   }
   
@@ -514,16 +585,30 @@ void EventGAPS::WriteHistograms() {
   FirstTime->Write();
   BetaDist->Write();
   for (int j = 0; j < 2; j++) {Ch9Good[j]->Write(); Ch9Bad[j]->Write();}
-  for (int j = start; j < max_paddle; j++) HitTime[j]->Write();
-  for (int j = start; j < max_paddle; j++) Ch9Shift[j]->Write();
-  for (int j = start; j < max_paddle; j++) tDiff[j]->Write();
-  for (int i = start; i < max_sipm; i++) tdcCFD[i]->Write();
+  for (int i = start; i < max_paddle; i++) HitTime[i]->Write();
+  for (int i = start; i < max_paddle; i++) Ch9Shift[i]->Write();
+  for (int i = start; i < max_paddle; i++) tDiff[i]->Write();
+  for (int i = start; i < max_paddle; i++)
+    for (int j = 0; j < 2; j++) tdcCFD[i][j]->Write();
+
+  TDCdir1->cd();
+  for (int i = start; i < max_paddle; i++)
+    for (int j = 0; j < 2; j++)
+      tCFDVtime[i][j]->Write();
   
   TOTdir->cd();
-  //for (int j = start; j < max_paddle; j++) {
-  for (int i = start; i < max_sipm; i++) {
-    totLo[i]->Write();
-    totHi[i]->Write();
+  for (int i = start; i < max_paddle; i++) {
+    for (int j = 0; j < 2; j++) {
+      totLo[i][j]->Write();
+      totHi[i][j]->Write();
+    }
+  }
+  TOTdir1->cd();
+  for (int i = start; i < max_paddle; i++) {
+    for (int j = 0; j < 2; j++) {
+      totLVtime[i][j]->Write();
+      totHVtime[i][j]->Write();
+    }
   }
   
   Hitmaskdir->cd();
@@ -928,39 +1013,52 @@ void EventGAPS::FillChannelHistos(int old=0) {
   // This is the default way to store the histograms in the root file
   // This section of code stores histos with channel numbers based on
   // paddles. For paddle N, Histo[N/N+1] = PaddleA/B SiPM
+  // NEW: Histo[i][j]; i is paddle, j is end A or B
   for (int i=0; i<NPAD; i++) {
     if (Paddle_A[i] > 0) { 
-      int ch = 2*i;
-      pedHist[ch-1]->Fill(Pedestal[Paddle_A[i]]);
-      pedHist[ch]->Fill(Pedestal[Paddle_B[i]]);
-      pedRMSHist[ch-1]->Fill(PedRMS[Paddle_A[i]]);
-      pedRMSHist[ch]->Fill(PedRMS[Paddle_B[i]]);
-      double tmptime = FlightTime/86400.0; // Convert to days
-      if (Pedestal[Paddle_A[i]] > -998.0 && PedRMS[Paddle_A[i]] > -998.0) {
-	pedVtime[ch-1]->Fill(tmptime, Pedestal[Paddle_A[i]]);
-	pRMSVtime[ch-1]->Fill(tmptime, PedRMS[Paddle_A[i]]);
-      }
-      if (Pedestal[Paddle_B[i]] > -998.0 && PedRMS[Paddle_B[i]] > -998.0) {
-	pedVtime[ch]->Fill(tmptime, Pedestal[Paddle_B[i]]);
-	pRMSVtime[ch]->Fill(tmptime, PedRMS[Paddle_B[i]]);
-      }
+      //int ch = 2*i;
+      pedHist[i][0]->Fill(Pedestal[Paddle_A[i]]);
+      pedHist[i][1]->Fill(Pedestal[Paddle_B[i]]);
+      pedRMSHist[i][0]->Fill(PedRMS[Paddle_A[i]]);
+      pedRMSHist[i][1]->Fill(PedRMS[Paddle_B[i]]);
       
-      Peak[ch-1]->Fill(VPeak[Paddle_A[i]]);
-      Peak[ch]->Fill(VPeak[Paddle_B[i]]);
+      Peak[i][0]->Fill(VPeak[Paddle_A[i]]);
+      Peak[i][1]->Fill(VPeak[Paddle_B[i]]);
       
       // Fill TOT (lo/hi and A/B) values
-      totLo[ch-1]->Fill(TotLo[Paddle_A[i]]);
-      totLo[ch]->Fill(TotLo[Paddle_B[i]]);
-      totHi[ch-1]->Fill(TotHi[Paddle_A[i]]);
-      totHi[ch]->Fill(TotHi[Paddle_B[i]]);
+      totLo[i][0]->Fill(TotLo[Paddle_A[i]]);
+      totLo[i][1]->Fill(TotLo[Paddle_B[i]]);
+      totHi[i][0]->Fill(TotHi[Paddle_A[i]]);
+      totHi[i][1]->Fill(TotHi[Paddle_B[i]]);
       
-      Charge[ch-1]->Fill(QInt[Paddle_A[i]]);
-      Charge[ch]->Fill(QInt[Paddle_B[i]]);
-      if (QInt[Paddle_A[i]]>5.0) Charge_cut[ch-1]->Fill(QInt[Paddle_A[i]]);
-      if (QInt[Paddle_B[i]]>5.0) Charge_cut[ch]->Fill(QInt[Paddle_B[i]]);
+      Charge[i][0]->Fill(QInt[Paddle_A[i]]);
+      Charge[i][1]->Fill(QInt[Paddle_B[i]]);
+      if (QInt[Paddle_A[i]]>5.0) Charge_cut[i][0]->Fill(QInt[Paddle_A[i]]);
+      if (QInt[Paddle_B[i]]>5.0) Charge_cut[i][1]->Fill(QInt[Paddle_B[i]]);
       
-      tdcCFD[ch-1]->Fill(TDC[Paddle_A[i]]);
-      tdcCFD[ch]->Fill(TDC[Paddle_B[i]]);
+      tdcCFD[i][0]->Fill(TDC[Paddle_A[i]]);
+      tdcCFD[i][1]->Fill(TDC[Paddle_B[i]]);
+
+      // If ped values are good, fill time profiles
+      double tmptime = FlightTime/86400.0; // Convert to days
+      if (Pedestal[Paddle_A[i]] > -998.0 && PedRMS[Paddle_A[i]] > -998.0) {
+	pedVtime[i][0]->Fill(tmptime, Pedestal[Paddle_A[i]]);
+	pRMSVtime[i][0]->Fill(tmptime, PedRMS[Paddle_A[i]]);
+	peakVtime[i][0]->Fill(tmptime, VPeak[Paddle_A[i]]);
+	chVtime[i][0]->Fill(tmptime,   QInt[Paddle_A[i]]);
+	tCFDVtime[i][0]->Fill(tmptime, TDC[Paddle_A[i]]);
+	totLVtime[i][0]->Fill(tmptime, TotLo[Paddle_A[i]]);
+	totHVtime[i][0]->Fill(tmptime, TotHi[Paddle_A[i]]);
+      }
+      if (Pedestal[Paddle_B[i]] > -998.0 && PedRMS[Paddle_B[i]] > -998.0) {
+	pedVtime[i][1]->Fill(tmptime, Pedestal[Paddle_B[i]]);
+	pRMSVtime[i][1]->Fill(tmptime, PedRMS[Paddle_B[i]]);
+	peakVtime[i][1]->Fill(tmptime, VPeak[Paddle_B[i]]);
+	chVtime[i][1]->Fill(tmptime,   QInt[Paddle_B[i]]);
+	tCFDVtime[i][1]->Fill(tmptime, TDC[Paddle_B[i]]);
+	totLVtime[i][1]->Fill(tmptime, TotLo[Paddle_B[i]]);
+	totHVtime[i][1]->Fill(tmptime, TotHi[Paddle_B[i]]);
+      }
     }
   }
 }
