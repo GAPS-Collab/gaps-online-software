@@ -67,7 +67,7 @@ void PacketMethods::ProcessTofEventSummary(TofEventSummary *Tes,
 
   //std::cout << Tes->to_string() << std::endl;
 
-  printf("%lu %lu %lu\n", evt_no, Tes->get_timestamp48(), timeInit);
+  //printf("%lu %lu %lu\n", evt_no, Tes->get_timestamp48(), timeInit);
 
   //printf("Found TofEventSummary: evt = %ld\n", evt_no);
   struct EventInfo EvtInfo;

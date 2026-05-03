@@ -69,11 +69,32 @@ int main(int argc, char *argv[]){
         filenames.push_back(filename);
       }
     }
-  } else {
-    filenames.push_back(path.string());
+  } else { // Single file or file with filenames
+    // This is a little kludgy and could probably be done with string
+    // operators if you wanted. But, it works. 
+    char tmpline[500];
+    std::string ftype = ".bin";
+    size_t found = path.string().find(ftype);
+    bool flist = ( found == path.string().size()-4 ? false : true);
+    if (flist) { // Doesn't end with .bin -> a file with files
+      // Read files and and store in "filenames"
+      FILE *fp = fopen(path.c_str(), "r");
+      if (fp != NULL) {
+        while (fscanf(fp, "%s", tmpline) != EOF) {
+	  filenames.push_back(tmpline);
+	}
+        fclose(fp);
+      } else {
+        printf("Unable to open file %s\n", path.c_str());
+      }
+    } else { // Ends with .bin -> a single file
+      // Store file in "filenames"
+      filenames.push_back(path.string());
+    }
   }
 
   std::cout << "Will read " << filenames.size() << " files!" << std::endl; 
+  //return (0);
   std::string tp_name        = "PacketType.TofEvent";
   std::string tel_ev_nogaps  = "TelemetryPacketType.NoGapsTriggerEvent";
   std::string tel_ev_boring  = "TelemetryPacketType.BoringEvent";
@@ -230,9 +251,8 @@ int main(int argc, char *argv[]){
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = end - start;
         std::cout << "--> ------------------------------" << std::endl;
-        std::cout << "--> Processesd " << n_frames_processed << " frames in " << elapsed << std::endl;
-        std::cout << "--> Saw " << n_telemetry_errors << " errores when reading telemetry files!" << std::endl;
-        //std::cout << "--> Saw " << n_tofpacket_errors << " errores when reading tofstream files!" << std::endl;
+        std::cout << "--> Processed " << n_frames_processed << " frames in " << elapsed << std::endl;
+        std::cout << "--> Saw " << n_telemetry_errors << " errors when reading telemetry files!" << std::endl;
         auto start = std::chrono::high_resolution_clock::now();
       }
     }
@@ -243,12 +263,11 @@ int main(int argc, char *argv[]){
   auto elapsed = end - start;
   std::cout << "--> ----FINISHED--------------" << std::endl;
   std::cout << "--> Processesd " << n_frames_processed << " frames in " << elapsed << std::endl;
-  std::cout << "--> Saw " << n_telemetry_errors << " errores when reading telemetry files!" << std::endl;
-  std::cout << "--> Saw " << n_tof_telemetry_err << " errores when reading tofdata from telemetry files!" << std::endl;
+  std::cout << "--> Saw " << n_telemetry_errors << " errors when reading telemetry files!" << std::endl;
+  std::cout << "--> Saw " << n_tof_telemetry_err << " errors when reading tofdata from telemetry files!" << std::endl;
   std::cout << "--> Saw " << n_trk_hits << " valid tracker hits!" << std::endl;
   std::cout << "--> Saw " << n_trk_hits_masked << " inactive tracker hits!" << std::endl;
   std::cout << "--> Saw " << n_evt_no_trk_hits << " events without any tracker hits!" << std::endl;
-  //std::cout << "--> Saw " << n_tofpacket_errors << " errores when reading tofstream files!" << std::endl;
   spdlog::info("Finished");
   return EXIT_SUCCESS;
 }
