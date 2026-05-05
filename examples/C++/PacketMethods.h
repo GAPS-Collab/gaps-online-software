@@ -51,8 +51,11 @@ private:
   
   int     ch;                        // channel we are working with
   int     runno;                     // Run Number
-  unsigned long int  evtno;          // Event Number
-  unsigned long int  timeInit;       // Oscillator value of first Event
+  unsigned long int   evtno;         // Event Number
+  unsigned long long  timeInit;      // Oscillator value of first Event
+  unsigned long long  MAXstamp;      // Maximum oscillator value
+  double  RollOverTime;
+  int     nRollOvers;
   
   struct PaddleInfo PadInfo;
   struct SiPMInfo   SipmInfo;

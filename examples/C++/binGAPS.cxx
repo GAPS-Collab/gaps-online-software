@@ -53,8 +53,10 @@ void PacketMethods::BeginRun(int run=5) {
   // Just for utility, set the initial time from the timestamp48 value
   // in the first TofEventSummary Packet of the first flight .bin
   // file--RAW251215_101836.bin
-  timeInit = 94575234425295;
-
+  timeInit   =  94575234425295;
+  MAXstamp   = (1LL<<48)-1;
+  nRollOvers = 0;
+  RollOverTime = 2814749.76710656; // Time between RollOvers (sec)
   // Instantiate our class that holds analysis results and set some           
   // initial values
   //EventGAPS Event = EventGAPS();
@@ -85,8 +87,23 @@ void PacketMethods::ProcessTofEventSummary(TofEventSummary *Tes,
   for (int i=0;i<NRB;i++) {
     EvtInfo.Phi[i] = -999.0;
   }
-  // Now, parse the TofEventSummary data into EvtInfo  
-  EvtInfo.FlightTime = (Tes->get_timestamp48() - timeInit)/1e8;
+  // Now, parse the TofEventSummary data into EvtInfo. We want to look
+  // for when the 48-bit counter rolls over to accurately calculate
+  // the elapsed time. This code will find an arbitrary number of
+  // RollOvers, but in practice, a 48-bit number with 10ns precision
+  // will roll over only once every ~32 days (max twice per flight).
+
+  // First, get timestamp and add the number of RollOvers so far
+  unsigned long long tmpstamp = Tes->get_timestamp48() + nRollOvers*MAXstamp;
+  // Now demand a good timestamp (>0) and see if the
+  // timestamp-timeInit is too large. Using unsigned int means that
+  // "negative" values (at roll over) will get very large
+  if (tmpstamp > 0 && (tmpstamp - timeInit) > (nRollOvers+1)*MAXstamp) {
+    nRollOvers++;    
+    tmpstamp+=MAXstamp;  // Add RollOver value to timestamp
+  }
+  // Finally, convert our tmpstamp into a FlightTime (in seconds)
+  EvtInfo.FlightTime = (tmpstamp - timeInit)/1e8;
 
   for (TofHit const &h : Tes->hits) {
     int pad = h.paddle_id;
