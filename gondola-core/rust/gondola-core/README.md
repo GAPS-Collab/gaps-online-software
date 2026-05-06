@@ -14,6 +14,11 @@ This project is currently still under rapid development, while we try to keep th
 somewhat stable, please strap in for a bit of a rough ride when upgrading. 
 However, the amount of features is increasing constantly and rapidly 
 
+v0.12.23 
+* TrackerHits are now sortable and hashable (python) by using strip id and adc. All 
+  other quantities are ignored 
+
+
 v0.12.21 
 * FIX `get_version()` revived 
 * Read WastieHK monitoring data
