@@ -573,11 +573,18 @@ impl TelemetryEvent {
   
   /// Add tracker hits to the merged event (e.g. with hits from packet type 80
   #[pyo3(name="add_tracker_hits")]
-  pub fn add_tracker_hits_py(&mut self, hits:  Vec<TrackerHit>) {
-    // FIXME - use the above function here! 
+  pub fn add_tracker_hits_py(&mut self, mut hits: Vec<TrackerHit>, dedup : bool) { 
+    if dedup {
+      hits.sort();
+      hits.dedup();
+    }
+    let n_hits_before = self.tracker_hits.len();
     self.tracker_hits.extend_from_slice(&hits);
+    self.tracker_hits.sort(); 
+    self.tracker_hits.dedup();
+    let delta_hits = self.tracker_hits.len() - n_hits_before; 
     // for each tracker hits, the packet length extends by 4 bytes 
-    self.header.length += (4*hits.len()) as u16;
+    self.header.length += (4*delta_hits) as u16;
   }
   
   /// Delete tracker hits (e.g. in case they are supposed to 
