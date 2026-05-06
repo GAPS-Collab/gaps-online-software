@@ -650,14 +650,6 @@ impl TelemetryPacketReader {
       reader = Self::new(string_value, dedup, start_time, end_time, skip_ahead, stop_after);
     }
     Ok(reader)
-    //match Self::new(&string_value) {
-    //  Err(err) => {
-    //    return Err(PyValueError::new_err(err.to_string()));
-    //  }
-    //  Ok(reader) => {
-    //    return Ok(reader);
-    //  }
-    //}
   }
 
   #[getter]

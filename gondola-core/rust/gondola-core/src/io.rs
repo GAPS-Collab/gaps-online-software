@@ -81,7 +81,7 @@ pub fn list_path_contents_sorted(input: &str, pattern: Option<Regex>) -> Result<
           None => {
             // use a default pattern which matches mmost cases  
             //re = Regex::new(r"Run\d+_\d+\.(\d{6})_(\d{6})UTC(\.tof)?\.gaps$").unwrap();
-            re = Regex::new(GENERIC_ONLINE_FILE_PATTERH).unwrap();
+            re = Regex::new(GENERIC_ONLINE_FILE_PATTERN).unwrap();
           }
           Some(_re) => {
             re = _re;
@@ -184,7 +184,7 @@ pub fn get_utc_timestamp_from_unix(unix_time : f64) -> Option<String> {
 /// Retrieve the utc timestamp from any telemetry (binary) file 
 #[cfg_attr(feature="pybindings", pyfunction)]
 pub fn get_unix_timestamp_from_telemetry(fname : &str) -> Option<u64> { 
-  let tformat_re = Regex::new(GENERIC_TELEMETRY_FILE_PATTERN_CAPUTRE).unwrap();
+  let tformat_re = Regex::new(GENERIC_TELEMETRY_FILE_PATTERN_CAPTURE).unwrap();
   let res = tformat_re.captures(fname).and_then(|caps| {
     let map : HashMap<String, String> = tformat_re.capture_names()
       .filter_map(|name| name)
@@ -297,7 +297,7 @@ pub fn get_rundata_from_file(fname : &str, pattern : Option<String>) -> Option<H
       }
     }
   } else {
-    regex_pattern = Regex::new(GENERIC_ONLINE_FILE_PATTERH_CAPTURE).unwrap();
+    regex_pattern = Regex::new(GENERIC_ONLINE_FILE_PATTERN_CAPTURE).unwrap();
   }
   let res : Option<HashMap<String,String>>;
   res = regex_pattern.captures(fname).and_then(|caps| {

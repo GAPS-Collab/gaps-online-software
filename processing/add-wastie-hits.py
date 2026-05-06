@@ -96,6 +96,10 @@ if __name__ == '__main__':
                         help='A directory with telemetry binaries, as they were recovered from the disks of the flight instrument. The hits removed by wastie can solely be found on the tracker disks, e.g auxgcu',\
                         type=Path,
                         )
+    parser.add_argument('--packet-tag', default='TrkAuxGcu',\
+                        help='A dedicated tag to mark the new hits in the frame',\
+                        type=Path,
+                        )
     parser.add_argument('--gcu-seconds-time-cutoff', type=int,\
                         default=100, help='How many seconds of the gcu clock are allowed to pass between tracker and merged event packets to still allow the merge? Typically the time gap is ~60s. If this number is too large, we risk merging event ids from different runs')
     parser.add_argument('--control-plots', action='store_true',\
@@ -177,7 +181,7 @@ if __name__ == '__main__':
             evid = frame.get_telemetryevent('TelemetryEvent').event_id 
             if evid in auxevents:
                 for idx, trk_ev in enumerate(auxevents[evid]):
-                    frame.put_telemetrypacket(trk_ev.pack(), f'TrkAuxGcu_{idx}') 
+                    frame.put_telemetrypacket(trk_ev.pack(), f'{args.packet_tag}_{idx}') 
             writer.add_frame(frame)
 
 

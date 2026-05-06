@@ -95,7 +95,7 @@ if __name__ == '__main__':
     import argparse
     #import sys
 
-    description = """Pre-process the telemetry data for the usage with SimpleDet"""
+    description = __doc__
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('--run-dir', default=Path('/data0/gaps/csbf/csbf-data/binaries/ethernet'),\
                         help='A directory with telemetry binaries, as received from the telemetry stream',\

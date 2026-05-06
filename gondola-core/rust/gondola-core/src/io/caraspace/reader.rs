@@ -493,23 +493,37 @@ reader!(CRReader,CRFrame);
 impl CRReader {
 
   #[new]
-  fn new_py(filename_or_directory : &Bound<'_,PyAny>) -> PyResult<Self> {
+  fn new_py(filenames_or_directory : &Bound<'_,PyAny>) -> PyResult<Self> {
     let mut string_value = String::from("foo");
-    if let Ok(s) = filename_or_directory.extract::<String>() {
+    let mut fnames       = Vec::<String>::new();
+    if let Ok(s) = filenames_or_directory.extract::<String>() {
        string_value = s;
     } //else if let Ok(p) = filename_or_directory.extract::<&Path>() {
-    if let Ok(fspath_method) = filename_or_directory.getattr("__fspath__") {
+    if let Ok(fspath_method) = filenames_or_directory.getattr("__fspath__") {
       if let Ok(fspath_result) = fspath_method.call0() {
         if let Ok(py_string) = fspath_result.extract::<String>() {
           string_value = py_string;
         }
       }
     }
+    if let Ok(list) = filenames_or_directory.extract::<Vec<String>>() {
+      for k in list {
+        fnames.push(k);
+      } 
+    }
+    if fnames.len() > 0 {
+      string_value = fnames[0].clone();
+    }
+    
+
     match Self::new(string_value) {
       Err(err) => {
         return Err(PyValueError::new_err(err.to_string()));
       }
-      Ok(reader) => {
+      Ok(mut reader) => {
+        if fnames.len() > 0 {
+          reader.filenames = fnames;
+        }
         return Ok(reader);
       }
     }

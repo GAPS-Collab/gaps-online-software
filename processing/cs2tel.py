@@ -60,12 +60,14 @@ if __name__ == '__main__':
     import argparse
     import sys
 
-    description = """Pre-process the telemetry data for the usage with SimpleDet"""
+    description = __doc__ 
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('--run-dir', default=Path(''),\
                         help='A directory with caraspace files for a single run',\
                         type=Path,
                         )
+    parser.add_argument('--add-wastie', default=False, 
+                        action='store_true', help='add the hits from wastie to the merged events!')
     parser.add_argument('-o','--outdir',\
                         help='Outdir for .bin output files',
                         type=Path,
@@ -84,17 +86,25 @@ if __name__ == '__main__':
             #print (frame)
             ev = frame.get_telemetryevent('TelemetryEvent')
             extra_trk_hits = frame.get_tracker_hitseries()
+            #print (f'-> Found {len(extra_trk_hits)} extra hits!')
             #print(f'-> Event has {len(ev.tracker)} tracker hits')
             #print(f'-> We got {len(extra_trk_hits)} hits from the tracker events')
             #extra_trk_hits = [h for h in extra_trk_hits if not h in ev.tracker] 
             #print(f'-> These are  {len(extra_trk_hits)} extra hits')
-            event_trk_stripids = [h.strip_id for h in ev.tracker]
             len_all_extra_hits = len(extra_trk_hits)
+            event_trk_stripids = [h.strip_id for h in ev.tracker]
             extra_trk_hits     = {h.strip_id : h for h in extra_trk_hits}
             if len_all_extra_hits != len(extra_trk_hits):
                 raise ValueError("Duplicate hits in extra hits!")
             extra_trk_hits     = [extra_trk_hits[h] for h in extra_trk_hits if not h in event_trk_stripids] 
-            ev.add_tracker_hits(extra_trk_hits)
+            if args.add_wastie:
+                wastie_hits = frame.get_tracker_hitseries(name='TrkAuxGcu')
+                #print (f'-> Will add {len(wastie_hits)} wastie hits!')
+                #for h in wastie_hits:
+                #    if not h in extra_trk_hits:
+                #        extra_trk_hits.append(h)
+                extra_trk_hits.extend(wastie_hits)
+            ev.add_tracker_hits(extra_trk_hits, True)
             #print(f'-> Event has {len(ev.tracker)} tracker hits')
             pack = ev.pack()
             ev = go.events.TelemetryEvent.from_telemetrypacket(pack)
@@ -105,6 +115,8 @@ if __name__ == '__main__':
             ev = frame.get_telemetryevent('TelemetryEvent')
             n_hits_merged.append(len(ev.tracker))
             extra_trk_hits = frame.get_tracker_hitseries()
+            #print (f'-> Found {len(extra_trk_hits)} extra hits!')
+            
             #print(f'-> Event has {len(ev.tracker)} tracker hits')
             #print(f'-> We got {len(extra_trk_hits)} hits from the tracker events')
             # eliminate double hits from extra tracker hits 
@@ -117,7 +129,14 @@ if __name__ == '__main__':
             if len_all_extra_hits != len(extra_trk_hits):
                 raise ValueError("Duplicate hits in extra hits!")
             extra_trk_hits     = [extra_trk_hits[h] for h in extra_trk_hits if not h in event_trk_stripids] 
-            ev.add_tracker_hits(extra_trk_hits)
+            if args.add_wastie:
+                wastie_hits = frame.get_tracker_hitseries(name='TrkAuxGcu')
+                #print (f'-> Will add {len(wastie_hits)} wastie hits!')
+                #for h in wastie_hits:
+                #    if not h in extra_trk_hits:
+                #        extra_trk_hits.append(h)
+                extra_trk_hits.extend(wastie_hits)
+            ev.add_tracker_hits(extra_trk_hits, True)
             #print(f'-> Event has {len(ev.tracker)} tracker hits')
             n_hits_merged_plus.append(len(ev.tracker))
             #print ('--------------------')
