@@ -26,7 +26,7 @@ ClassImp(cb::CRawTrigger);
 ClassImp(cb::CRawTofWFs);
 ClassImp(cb::CRawTof);
 //ClassImp(tr::Plane);
-ClassImp(tr::GDataEvent);
+ClassImp(tf::GDataEvent);
 
 auto elena_cut(const g::TofHit& hit) -> bool {
   //---------------------------------------------------------
