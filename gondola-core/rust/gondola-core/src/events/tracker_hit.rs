@@ -7,6 +7,8 @@ use crate::prelude::*;
 #[cfg(feature="pybindings")]
 use pyo3::basic::CompareOp;
 
+use std::cmp::Ordering;
+
 /// Hit on a tracker strip
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(feature="pybindings", pyclass)]
@@ -52,7 +54,17 @@ impl TrackerHit {
       adc_pedestal    : 0,
     }
   }
- 
+
+  #[inline]
+  pub fn identity(&self) -> u64 {
+      // We shift each byte into its own position in the 64-bit integer
+      ((self.layer as u64)   << 40) |
+      ((self.row as u64)     << 32) |
+      ((self.module as u64)  << 24) |
+      ((self.channel as u64) << 16) |
+      (self.adc as u64)
+  } 
+  
   /// Calculate the strip id from layer, module, row and channel
   pub fn get_stripid(&self) -> u32 {
     crate::events::strip_id(self.layer  , 
@@ -81,15 +93,39 @@ impl PartialEq for TrackerHit {
     // are always set, merged events do 
     // not have the asic event code 
     // populated
-    self.layer              ==  other.layer           
-    && self.row             ==  other.row            
-    && self.module          ==  other.module         
-    && self.channel         ==  other.channel        
-    && self.adc             ==  other.adc            
-    && self.oscillator      ==  other.oscillator     
+    self.identity() == other.identity()
+    //self.layer              ==  other.layer           
+    //&& self.row             ==  other.row            
+    //&& self.module          ==  other.module         
+    //&& self.channel         ==  other.channel        
+    //&& self.adc             ==  other.adc            
+    // FIXME - let's excluded the oscillator for now
+    //&& self.oscillator      ==  other.oscillator     
     //&& self.asic_event_code ==  other.asic_event_code
   }
 }
+
+//----------------------------------------
+
+impl Eq for TrackerHit {
+}
+
+//----------------------------------------
+
+impl Ord for TrackerHit {
+  fn cmp(&self, other: &Self) -> Ordering {
+    other.identity().cmp(&self.identity())
+  }
+}
+
+//----------------------------------------
+
+impl PartialOrd for TrackerHit {
+  fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+    Some(self.cmp(other))
+  }
+}
+
 
 
 impl fmt::Display for TrackerHit {
@@ -112,6 +148,14 @@ impl fmt::Display for TrackerHit {
 #[cfg(feature="pybindings")]
 #[pymethods]
 impl TrackerHit {
+
+    // This allows Python's hash() function to work
+    fn __hash__(&self) -> isize {
+        let mut h = self.identity(); 
+        // Python hashes are signed integers. On 64-bit systems, 
+        // we can usually just cast. We use wrapping to be safe.
+        h as isize
+    }
 
   /// Change the ADC value, e.g. if the 
   /// pedestal should be subtracted
@@ -209,6 +253,25 @@ impl FromRandom for TrackerHit {
       adc_pedestal    : 0,
     }
   }
+}
+
+#[test]
+fn test_tracker_hit_equality() {
+  // 1. Identity: A hit must equal itself
+  let hit_a = TrackerHit::from_random();
+  let hit_b = hit_a; // Copy trait makes this a bitwise clone
+  assert_eq!(hit_a, hit_b, "Identical hits must be equal");
+
+  // 2. Inequality: Changing one field must result in hit_a != hit_c
+  let mut hit_c = hit_a;
+  // Increment the channel (or wrap if at 255) to guarantee it's different
+  hit_c.channel = hit_a.channel.wrapping_add(1); 
+  assert_ne!(hit_a, hit_c, "Hits with different channels must not be equal");
+
+  // 3. Bit-packing verification: Test the ADC (16-bit) specifically
+  let mut hit_d = hit_a;
+  hit_d.adc = hit_a.adc.wrapping_add(1);
+  assert_ne!(hit_a, hit_d, "Hits with different ADC values must not be equal");
 }
 
 
