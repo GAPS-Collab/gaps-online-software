@@ -86,8 +86,14 @@ if __name__ == '__main__':
             extra_trk_hits = frame.get_tracker_hitseries()
             #print(f'-> Event has {len(ev.tracker)} tracker hits')
             #print(f'-> We got {len(extra_trk_hits)} hits from the tracker events')
-            extra_tracker_hits = [h for h in extra_trk_hits if not h in ev.tracker] 
+            #extra_trk_hits = [h for h in extra_trk_hits if not h in ev.tracker] 
             #print(f'-> These are  {len(extra_trk_hits)} extra hits')
+            event_trk_stripids = [h.strip_id for h in ev.tracker]
+            len_all_extra_hits = len(extra_trk_hits)
+            extra_trk_hits     = {h.strip_id : h for h in extra_trk_hits}
+            if len_all_extra_hits != len(extra_trk_hits):
+                raise ValueError("Duplicate hits in extra hits!")
+            extra_trk_hits     = [extra_trk_hits[h] for h in extra_trk_hits if not h in event_trk_stripids] 
             ev.add_tracker_hits(extra_trk_hits)
             #print(f'-> Event has {len(ev.tracker)} tracker hits')
             pack = ev.pack()
@@ -101,7 +107,16 @@ if __name__ == '__main__':
             extra_trk_hits = frame.get_tracker_hitseries()
             #print(f'-> Event has {len(ev.tracker)} tracker hits')
             #print(f'-> We got {len(extra_trk_hits)} hits from the tracker events')
-            extra_tracker_hits = [h for h in extra_trk_hits if not h in ev.tracker] 
+            # eliminate double hits from extra tracker hits 
+            #extra_trk_hits     = set(extra_trk_hits) 
+            #event_trk_stripids = [h.strip_id for h in ev.tracker]
+            #extra_trk_hits     = [h for h in extra_trk_hits if not h.strip_id in event_trk_stripids] 
+            event_trk_stripids = [h.strip_id for h in ev.tracker]
+            len_all_extra_hits = len(extra_trk_hits)
+            extra_trk_hits     = {h.strip_id : h for h in extra_trk_hits}
+            if len_all_extra_hits != len(extra_trk_hits):
+                raise ValueError("Duplicate hits in extra hits!")
+            extra_trk_hits     = [extra_trk_hits[h] for h in extra_trk_hits if not h in event_trk_stripids] 
             ev.add_tracker_hits(extra_trk_hits)
             #print(f'-> Event has {len(ev.tracker)} tracker hits')
             n_hits_merged_plus.append(len(ev.tracker))
