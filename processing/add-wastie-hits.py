@@ -29,7 +29,7 @@ cb.visual.set_style_streamlit_dark()
 import charmingbeauty.layout as lo
 
 # check gondola version
-if not (go.get_version_minor() >= 12 and go.get_version_patch() >= 17):
+if not (go.get_version_minor() >= 12 and go.get_version_patch() >= 23):
     print(f'ERROR - got version {go.get_version_major()}.{go.get_version_minor()}.{go.get_version_patch()}')
     raise ImportError("gondola needs to be at least version 0.12.8!")
 
