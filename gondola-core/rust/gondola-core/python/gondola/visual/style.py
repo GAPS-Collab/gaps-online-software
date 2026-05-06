@@ -124,7 +124,7 @@ def gander_plot(h          : d.histogram.hist1d,
         model.add_data(h.bincontent, xs=h.bincenters, data_errs=h.binwidths, create_distribution=False)
         model.fit_to_data(silent=True)
         ax.plot(model.xs, Landau(model.xs, *model.best_fit_params), color=kwargs['color'], lw=2)
-        ax.text(text_xpos,0.75, f'$\mu$   = {model.best_fit_params[1]:.2f}', transform=fig.transFigure)
+        ax.text(text_xpos,0.75, fr'$\mu$   = {model.best_fit_params[1]:.2f}', transform=fig.transFigure)
         #ax.text(text_xpos,0.7, f'$\sigma$ = {model.best_fit_params[1]:.2f}', transform=fig.transFigure)
 
     ax.set_title(title, loc='right')
