@@ -9,9 +9,9 @@
 <a href=#9 id=9 data-nosnippet>9</a>//!
 <a href=#10 id=10 data-nosnippet>10</a>
 <a href=#11 id=11 data-nosnippet>11</a>/// A generic pattern for online files, matching most types 
-<a href=#12 id=12 data-nosnippet>12</a></span><span class="kw">pub static </span>GENERIC_ONLINE_FILE_PATTERH : <span class="kw-2">&amp;</span>str = <span class="string">r"Run\d+_\d+\.(\d{6})_(\d{6})UTC(\.tofsum|\.tof)?\.gaps$"</span>;
-<a href=#13 id=13 data-nosnippet>13</a><span class="kw">pub static </span>GENERIC_ONLINE_FILE_PATTERH_CAPTURE : <span class="kw-2">&amp;</span>str = <span class="string">r"Run(?P&lt;run&gt;\d+)_(?P&lt;subrun&gt;\d+)\.(?P&lt;utctime&gt;\d{6}_\d{6})UTC(\.tofsum|\.tof)?\.gaps$"</span>;
-<a href=#14 id=14 data-nosnippet>14</a><span class="kw">pub static </span>GENERIC_TELEMETRY_FILE_PATTERN_CAPUTRE : <span class="kw-2">&amp;</span>str = <span class="string">r"RAW(?P&lt;utctime&gt;\d{6}_\d{6}).bin$"</span>;
+<a href=#12 id=12 data-nosnippet>12</a></span><span class="kw">pub static </span>GENERIC_ONLINE_FILE_PATTERN : <span class="kw-2">&amp;</span>str = <span class="string">r"Run\d+_\d+\.(\d{6})_(\d{6})(UTC)?(\.tofsum|\.tof)?\.gaps$"</span>;
+<a href=#13 id=13 data-nosnippet>13</a><span class="kw">pub static </span>GENERIC_ONLINE_FILE_PATTERN_CAPTURE : <span class="kw-2">&amp;</span>str = <span class="string">r"Run(?P&lt;run&gt;\d+)_(?P&lt;subrun&gt;\d+)\.(?P&lt;utctime&gt;\d{6}_\d{6})(UTC)?(\.tofsum|\.tof)?\.gaps$"</span>;
+<a href=#14 id=14 data-nosnippet>14</a><span class="kw">pub static </span>GENERIC_TELEMETRY_FILE_PATTERN_CAPTURE : <span class="kw-2">&amp;</span>str = <span class="string">r"RAW(?P&lt;utctime&gt;\d{6}_\d{6})(UTC)?.bin$"</span>;
 <a href=#15 id=15 data-nosnippet>15</a>
 <a href=#16 id=16 data-nosnippet>16</a><span class="doccomment">/// The TimeStamp format for Human readable timestamps
 <a href=#17 id=17 data-nosnippet>17</a></span><span class="kw">pub static </span>HUMAN_TIMESTAMP_FORMAT : <span class="kw-2">&amp;</span>str = <span class="string">"%y%m%d_%H%M%S%Z"</span>; 

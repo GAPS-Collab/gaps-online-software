@@ -493,80 +493,94 @@
 <a href=#493 id=493 data-nosnippet>493</a></span><span class="kw">impl </span>CRReader {
 <a href=#494 id=494 data-nosnippet>494</a>
 <a href=#495 id=495 data-nosnippet>495</a>  <span class="attr">#[new]
-<a href=#496 id=496 data-nosnippet>496</a>  </span><span class="kw">fn </span>new_py(filename_or_directory : <span class="kw-2">&amp;</span>Bound&lt;<span class="lifetime">'_</span>,PyAny&gt;) -&gt; PyResult&lt;<span class="self">Self</span>&gt; {
+<a href=#496 id=496 data-nosnippet>496</a>  </span><span class="kw">fn </span>new_py(filenames_or_directory : <span class="kw-2">&amp;</span>Bound&lt;<span class="lifetime">'_</span>,PyAny&gt;) -&gt; PyResult&lt;<span class="self">Self</span>&gt; {
 <a href=#497 id=497 data-nosnippet>497</a>    <span class="kw">let </span><span class="kw-2">mut </span>string_value = String::from(<span class="string">"foo"</span>);
-<a href=#498 id=498 data-nosnippet>498</a>    <span class="kw">if let </span><span class="prelude-val">Ok</span>(s) = filename_or_directory.extract::&lt;String&gt;() {
-<a href=#499 id=499 data-nosnippet>499</a>       string_value = s;
-<a href=#500 id=500 data-nosnippet>500</a>    } <span class="comment">//else if let Ok(p) = filename_or_directory.extract::&lt;&amp;Path&gt;() {
-<a href=#501 id=501 data-nosnippet>501</a>    </span><span class="kw">if let </span><span class="prelude-val">Ok</span>(fspath_method) = filename_or_directory.getattr(<span class="string">"__fspath__"</span>) {
-<a href=#502 id=502 data-nosnippet>502</a>      <span class="kw">if let </span><span class="prelude-val">Ok</span>(fspath_result) = fspath_method.call0() {
-<a href=#503 id=503 data-nosnippet>503</a>        <span class="kw">if let </span><span class="prelude-val">Ok</span>(py_string) = fspath_result.extract::&lt;String&gt;() {
-<a href=#504 id=504 data-nosnippet>504</a>          string_value = py_string;
-<a href=#505 id=505 data-nosnippet>505</a>        }
-<a href=#506 id=506 data-nosnippet>506</a>      }
-<a href=#507 id=507 data-nosnippet>507</a>    }
-<a href=#508 id=508 data-nosnippet>508</a>    <span class="kw">match </span><span class="self">Self</span>::new(string_value) {
-<a href=#509 id=509 data-nosnippet>509</a>      <span class="prelude-val">Err</span>(err) =&gt; {
-<a href=#510 id=510 data-nosnippet>510</a>        <span class="kw">return </span><span class="prelude-val">Err</span>(PyValueError::new_err(err.to_string()));
-<a href=#511 id=511 data-nosnippet>511</a>      }
-<a href=#512 id=512 data-nosnippet>512</a>      <span class="prelude-val">Ok</span>(reader) =&gt; {
-<a href=#513 id=513 data-nosnippet>513</a>        <span class="kw">return </span><span class="prelude-val">Ok</span>(reader);
-<a href=#514 id=514 data-nosnippet>514</a>      }
-<a href=#515 id=515 data-nosnippet>515</a>    }
-<a href=#516 id=516 data-nosnippet>516</a>  }
-<a href=#517 id=517 data-nosnippet>517</a>
-<a href=#518 id=518 data-nosnippet>518</a>  <span class="attr">#[pyo3(name=<span class="string">"set_tracker_calibrations_from_fnames"</span>)]
-<a href=#519 id=519 data-nosnippet>519</a>  #[pyo3(signature = (mask = <span class="prelude-val">None</span>, pedestal = <span class="prelude-val">None</span>, transfer_fn = <span class="prelude-val">None</span>, cmn_noise = <span class="prelude-val">None</span>))]
-<a href=#520 id=520 data-nosnippet>520</a>  </span><span class="kw">fn </span>set_tracker_calibrations_from_fnames_py(<span class="kw-2">&amp;mut </span><span class="self">self</span>,
-<a href=#521 id=521 data-nosnippet>521</a>                                              mask        : <span class="prelude-ty">Option</span>&lt;String&gt;,
-<a href=#522 id=522 data-nosnippet>522</a>                                              pedestal    : <span class="prelude-ty">Option</span>&lt;String&gt;,
-<a href=#523 id=523 data-nosnippet>523</a>                                              transfer_fn : <span class="prelude-ty">Option</span>&lt;String&gt;,
-<a href=#524 id=524 data-nosnippet>524</a>                                              cmn_noise   : <span class="prelude-ty">Option</span>&lt;String&gt;) {
-<a href=#525 id=525 data-nosnippet>525</a>    <span class="self">self</span>.set_tracker_calibrations_from_fnames(mask, pedestal, transfer_fn, cmn_noise);
-<a href=#526 id=526 data-nosnippet>526</a>  }
-<a href=#527 id=527 data-nosnippet>527</a>
-<a href=#528 id=528 data-nosnippet>528</a>  <span class="doccomment">/// This is the filename we are currently 
-<a href=#529 id=529 data-nosnippet>529</a>  /// extracting frames from 
-<a href=#530 id=530 data-nosnippet>530</a>  </span><span class="attr">#[getter]
-<a href=#531 id=531 data-nosnippet>531</a>  #[pyo3(name=<span class="string">"current_filename"</span>)]
-<a href=#532 id=532 data-nosnippet>532</a>  </span><span class="kw">fn </span>get_current_filename_py(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-<a href=#533 id=533 data-nosnippet>533</a>    <span class="self">self</span>.get_current_filename()
-<a href=#534 id=534 data-nosnippet>534</a>  }
-<a href=#535 id=535 data-nosnippet>535</a>
-<a href=#536 id=536 data-nosnippet>536</a>  <span class="doccomment">/// Start the reader from the beginning
-<a href=#537 id=537 data-nosnippet>537</a>  /// This is equivalent to a re-initialization
-<a href=#538 id=538 data-nosnippet>538</a>  /// of that reader.
-<a href=#539 id=539 data-nosnippet>539</a>  </span><span class="attr">#[pyo3(name=<span class="string">"rewind"</span>)]
-<a href=#540 id=540 data-nosnippet>540</a>  </span><span class="kw">fn </span>rewind_py(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; PyResult&lt;()&gt; {
-<a href=#541 id=541 data-nosnippet>541</a>    <span class="kw">match </span><span class="self">self</span>.rewind() {
-<a href=#542 id=542 data-nosnippet>542</a>      <span class="prelude-val">Err</span>(err) =&gt; {
-<a href=#543 id=543 data-nosnippet>543</a>        <span class="kw">return </span><span class="prelude-val">Err</span>(PyValueError::new_err(err.to_string()));
-<a href=#544 id=544 data-nosnippet>544</a>      }
-<a href=#545 id=545 data-nosnippet>545</a>      <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(())
-<a href=#546 id=546 data-nosnippet>546</a>    }
-<a href=#547 id=547 data-nosnippet>547</a>  }
-<a href=#548 id=548 data-nosnippet>548</a>
-<a href=#549 id=549 data-nosnippet>549</a>  <span class="attr">#[pyo3(name=<span class="string">"count_frames"</span>)]
-<a href=#550 id=550 data-nosnippet>550</a>  </span><span class="kw">fn </span>count_frames_py(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; usize {
-<a href=#551 id=551 data-nosnippet>551</a>    <span class="self">self</span>.count_frames()
-<a href=#552 id=552 data-nosnippet>552</a>  }
-<a href=#553 id=553 data-nosnippet>553</a>
-<a href=#554 id=554 data-nosnippet>554</a>  <span class="kw">fn </span>__iter__(slf: PyRef&lt;<span class="lifetime">'_</span>, <span class="self">Self</span>&gt;) -&gt; PyRef&lt;<span class="lifetime">'_</span>, <span class="self">Self</span>&gt; {
-<a href=#555 id=555 data-nosnippet>555</a>    slf 
-<a href=#556 id=556 data-nosnippet>556</a>  }
-<a href=#557 id=557 data-nosnippet>557</a>  
-<a href=#558 id=558 data-nosnippet>558</a>  <span class="kw">fn </span>__next__(<span class="kw-2">mut </span>slf: PyRefMut&lt;<span class="lifetime">'_</span>, <span class="self">Self</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;CRFrame&gt; {
-<a href=#559 id=559 data-nosnippet>559</a>    <span class="kw">match </span>slf.next() { 
-<a href=#560 id=560 data-nosnippet>560</a>      <span class="prelude-val">Some</span>(frame) =&gt; {
-<a href=#561 id=561 data-nosnippet>561</a>        <span class="kw">return </span><span class="prelude-val">Some</span>(frame)
-<a href=#562 id=562 data-nosnippet>562</a>      }   
-<a href=#563 id=563 data-nosnippet>563</a>      <span class="prelude-val">None </span>=&gt; {
-<a href=#564 id=564 data-nosnippet>564</a>        <span class="kw">return </span><span class="prelude-val">None</span>;
-<a href=#565 id=565 data-nosnippet>565</a>      }   
-<a href=#566 id=566 data-nosnippet>566</a>    }   
-<a href=#567 id=567 data-nosnippet>567</a>  }
-<a href=#568 id=568 data-nosnippet>568</a>}
-<a href=#569 id=569 data-nosnippet>569</a>
-<a href=#570 id=570 data-nosnippet>570</a><span class="attr">#[cfg(feature=<span class="string">"pybindings"</span>)]
-<a href=#571 id=571 data-nosnippet>571</a></span><span class="macro">pythonize_display!</span>(CRReader);
+<a href=#498 id=498 data-nosnippet>498</a>    <span class="kw">let </span><span class="kw-2">mut </span>fnames       = Vec::&lt;String&gt;::new();
+<a href=#499 id=499 data-nosnippet>499</a>    <span class="kw">if let </span><span class="prelude-val">Ok</span>(s) = filenames_or_directory.extract::&lt;String&gt;() {
+<a href=#500 id=500 data-nosnippet>500</a>       string_value = s;
+<a href=#501 id=501 data-nosnippet>501</a>    } <span class="comment">//else if let Ok(p) = filename_or_directory.extract::&lt;&amp;Path&gt;() {
+<a href=#502 id=502 data-nosnippet>502</a>    </span><span class="kw">if let </span><span class="prelude-val">Ok</span>(fspath_method) = filenames_or_directory.getattr(<span class="string">"__fspath__"</span>) {
+<a href=#503 id=503 data-nosnippet>503</a>      <span class="kw">if let </span><span class="prelude-val">Ok</span>(fspath_result) = fspath_method.call0() {
+<a href=#504 id=504 data-nosnippet>504</a>        <span class="kw">if let </span><span class="prelude-val">Ok</span>(py_string) = fspath_result.extract::&lt;String&gt;() {
+<a href=#505 id=505 data-nosnippet>505</a>          string_value = py_string;
+<a href=#506 id=506 data-nosnippet>506</a>        }
+<a href=#507 id=507 data-nosnippet>507</a>      }
+<a href=#508 id=508 data-nosnippet>508</a>    }
+<a href=#509 id=509 data-nosnippet>509</a>    <span class="kw">if let </span><span class="prelude-val">Ok</span>(list) = filenames_or_directory.extract::&lt;Vec&lt;String&gt;&gt;() {
+<a href=#510 id=510 data-nosnippet>510</a>      <span class="kw">for </span>k <span class="kw">in </span>list {
+<a href=#511 id=511 data-nosnippet>511</a>        fnames.push(k);
+<a href=#512 id=512 data-nosnippet>512</a>      } 
+<a href=#513 id=513 data-nosnippet>513</a>    }
+<a href=#514 id=514 data-nosnippet>514</a>    <span class="kw">if </span>fnames.len() &gt; <span class="number">0 </span>{
+<a href=#515 id=515 data-nosnippet>515</a>      string_value = fnames[<span class="number">0</span>].clone();
+<a href=#516 id=516 data-nosnippet>516</a>    }
+<a href=#517 id=517 data-nosnippet>517</a>    
+<a href=#518 id=518 data-nosnippet>518</a>
+<a href=#519 id=519 data-nosnippet>519</a>    <span class="kw">match </span><span class="self">Self</span>::new(string_value) {
+<a href=#520 id=520 data-nosnippet>520</a>      <span class="prelude-val">Err</span>(err) =&gt; {
+<a href=#521 id=521 data-nosnippet>521</a>        <span class="kw">return </span><span class="prelude-val">Err</span>(PyValueError::new_err(err.to_string()));
+<a href=#522 id=522 data-nosnippet>522</a>      }
+<a href=#523 id=523 data-nosnippet>523</a>      <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>reader) =&gt; {
+<a href=#524 id=524 data-nosnippet>524</a>        <span class="kw">if </span>fnames.len() &gt; <span class="number">0 </span>{
+<a href=#525 id=525 data-nosnippet>525</a>          reader.filenames = fnames;
+<a href=#526 id=526 data-nosnippet>526</a>        }
+<a href=#527 id=527 data-nosnippet>527</a>        <span class="kw">return </span><span class="prelude-val">Ok</span>(reader);
+<a href=#528 id=528 data-nosnippet>528</a>      }
+<a href=#529 id=529 data-nosnippet>529</a>    }
+<a href=#530 id=530 data-nosnippet>530</a>  }
+<a href=#531 id=531 data-nosnippet>531</a>
+<a href=#532 id=532 data-nosnippet>532</a>  <span class="attr">#[pyo3(name=<span class="string">"set_tracker_calibrations_from_fnames"</span>)]
+<a href=#533 id=533 data-nosnippet>533</a>  #[pyo3(signature = (mask = <span class="prelude-val">None</span>, pedestal = <span class="prelude-val">None</span>, transfer_fn = <span class="prelude-val">None</span>, cmn_noise = <span class="prelude-val">None</span>))]
+<a href=#534 id=534 data-nosnippet>534</a>  </span><span class="kw">fn </span>set_tracker_calibrations_from_fnames_py(<span class="kw-2">&amp;mut </span><span class="self">self</span>,
+<a href=#535 id=535 data-nosnippet>535</a>                                              mask        : <span class="prelude-ty">Option</span>&lt;String&gt;,
+<a href=#536 id=536 data-nosnippet>536</a>                                              pedestal    : <span class="prelude-ty">Option</span>&lt;String&gt;,
+<a href=#537 id=537 data-nosnippet>537</a>                                              transfer_fn : <span class="prelude-ty">Option</span>&lt;String&gt;,
+<a href=#538 id=538 data-nosnippet>538</a>                                              cmn_noise   : <span class="prelude-ty">Option</span>&lt;String&gt;) {
+<a href=#539 id=539 data-nosnippet>539</a>    <span class="self">self</span>.set_tracker_calibrations_from_fnames(mask, pedestal, transfer_fn, cmn_noise);
+<a href=#540 id=540 data-nosnippet>540</a>  }
+<a href=#541 id=541 data-nosnippet>541</a>
+<a href=#542 id=542 data-nosnippet>542</a>  <span class="doccomment">/// This is the filename we are currently 
+<a href=#543 id=543 data-nosnippet>543</a>  /// extracting frames from 
+<a href=#544 id=544 data-nosnippet>544</a>  </span><span class="attr">#[getter]
+<a href=#545 id=545 data-nosnippet>545</a>  #[pyo3(name=<span class="string">"current_filename"</span>)]
+<a href=#546 id=546 data-nosnippet>546</a>  </span><span class="kw">fn </span>get_current_filename_py(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+<a href=#547 id=547 data-nosnippet>547</a>    <span class="self">self</span>.get_current_filename()
+<a href=#548 id=548 data-nosnippet>548</a>  }
+<a href=#549 id=549 data-nosnippet>549</a>
+<a href=#550 id=550 data-nosnippet>550</a>  <span class="doccomment">/// Start the reader from the beginning
+<a href=#551 id=551 data-nosnippet>551</a>  /// This is equivalent to a re-initialization
+<a href=#552 id=552 data-nosnippet>552</a>  /// of that reader.
+<a href=#553 id=553 data-nosnippet>553</a>  </span><span class="attr">#[pyo3(name=<span class="string">"rewind"</span>)]
+<a href=#554 id=554 data-nosnippet>554</a>  </span><span class="kw">fn </span>rewind_py(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; PyResult&lt;()&gt; {
+<a href=#555 id=555 data-nosnippet>555</a>    <span class="kw">match </span><span class="self">self</span>.rewind() {
+<a href=#556 id=556 data-nosnippet>556</a>      <span class="prelude-val">Err</span>(err) =&gt; {
+<a href=#557 id=557 data-nosnippet>557</a>        <span class="kw">return </span><span class="prelude-val">Err</span>(PyValueError::new_err(err.to_string()));
+<a href=#558 id=558 data-nosnippet>558</a>      }
+<a href=#559 id=559 data-nosnippet>559</a>      <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(())
+<a href=#560 id=560 data-nosnippet>560</a>    }
+<a href=#561 id=561 data-nosnippet>561</a>  }
+<a href=#562 id=562 data-nosnippet>562</a>
+<a href=#563 id=563 data-nosnippet>563</a>  <span class="attr">#[pyo3(name=<span class="string">"count_frames"</span>)]
+<a href=#564 id=564 data-nosnippet>564</a>  </span><span class="kw">fn </span>count_frames_py(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; usize {
+<a href=#565 id=565 data-nosnippet>565</a>    <span class="self">self</span>.count_frames()
+<a href=#566 id=566 data-nosnippet>566</a>  }
+<a href=#567 id=567 data-nosnippet>567</a>
+<a href=#568 id=568 data-nosnippet>568</a>  <span class="kw">fn </span>__iter__(slf: PyRef&lt;<span class="lifetime">'_</span>, <span class="self">Self</span>&gt;) -&gt; PyRef&lt;<span class="lifetime">'_</span>, <span class="self">Self</span>&gt; {
+<a href=#569 id=569 data-nosnippet>569</a>    slf 
+<a href=#570 id=570 data-nosnippet>570</a>  }
+<a href=#571 id=571 data-nosnippet>571</a>  
+<a href=#572 id=572 data-nosnippet>572</a>  <span class="kw">fn </span>__next__(<span class="kw-2">mut </span>slf: PyRefMut&lt;<span class="lifetime">'_</span>, <span class="self">Self</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;CRFrame&gt; {
+<a href=#573 id=573 data-nosnippet>573</a>    <span class="kw">match </span>slf.next() { 
+<a href=#574 id=574 data-nosnippet>574</a>      <span class="prelude-val">Some</span>(frame) =&gt; {
+<a href=#575 id=575 data-nosnippet>575</a>        <span class="kw">return </span><span class="prelude-val">Some</span>(frame)
+<a href=#576 id=576 data-nosnippet>576</a>      }   
+<a href=#577 id=577 data-nosnippet>577</a>      <span class="prelude-val">None </span>=&gt; {
+<a href=#578 id=578 data-nosnippet>578</a>        <span class="kw">return </span><span class="prelude-val">None</span>;
+<a href=#579 id=579 data-nosnippet>579</a>      }   
+<a href=#580 id=580 data-nosnippet>580</a>    }   
+<a href=#581 id=581 data-nosnippet>581</a>  }
+<a href=#582 id=582 data-nosnippet>582</a>}
+<a href=#583 id=583 data-nosnippet>583</a>
+<a href=#584 id=584 data-nosnippet>584</a><span class="attr">#[cfg(feature=<span class="string">"pybindings"</span>)]
+<a href=#585 id=585 data-nosnippet>585</a></span><span class="macro">pythonize_display!</span>(CRReader);
 </code></pre></div></section></main></body></html>

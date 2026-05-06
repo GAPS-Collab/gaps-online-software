@@ -81,7 +81,7 @@
 <a href=#81 id=81 data-nosnippet>81</a>          <span class="prelude-val">None </span>=&gt; {
 <a href=#82 id=82 data-nosnippet>82</a>            <span class="comment">// use a default pattern which matches mmost cases  
 <a href=#83 id=83 data-nosnippet>83</a>            //re = Regex::new(r"Run\d+_\d+\.(\d{6})_(\d{6})UTC(\.tof)?\.gaps$").unwrap();
-<a href=#84 id=84 data-nosnippet>84</a>            </span>re = Regex::new(GENERIC_ONLINE_FILE_PATTERH).unwrap();
+<a href=#84 id=84 data-nosnippet>84</a>            </span>re = Regex::new(GENERIC_ONLINE_FILE_PATTERN).unwrap();
 <a href=#85 id=85 data-nosnippet>85</a>          }
 <a href=#86 id=86 data-nosnippet>86</a>          <span class="prelude-val">Some</span>(_re) =&gt; {
 <a href=#87 id=87 data-nosnippet>87</a>            re = _re;
@@ -184,7 +184,7 @@
 <a href=#184 id=184 data-nosnippet>184</a></span><span class="doccomment">/// Retrieve the utc timestamp from any telemetry (binary) file 
 <a href=#185 id=185 data-nosnippet>185</a></span><span class="attr">#[cfg_attr(feature=<span class="string">"pybindings"</span>, pyfunction)]
 <a href=#186 id=186 data-nosnippet>186</a></span><span class="kw">pub fn </span>get_unix_timestamp_from_telemetry(fname : <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;u64&gt; { 
-<a href=#187 id=187 data-nosnippet>187</a>  <span class="kw">let </span>tformat_re = Regex::new(GENERIC_TELEMETRY_FILE_PATTERN_CAPUTRE).unwrap();
+<a href=#187 id=187 data-nosnippet>187</a>  <span class="kw">let </span>tformat_re = Regex::new(GENERIC_TELEMETRY_FILE_PATTERN_CAPTURE).unwrap();
 <a href=#188 id=188 data-nosnippet>188</a>  <span class="kw">let </span>res = tformat_re.captures(fname).and_then(|caps| {
 <a href=#189 id=189 data-nosnippet>189</a>    <span class="kw">let </span>map : HashMap&lt;String, String&gt; = tformat_re.capture_names()
 <a href=#190 id=190 data-nosnippet>190</a>      .filter_map(|name| name)
@@ -297,7 +297,7 @@
 <a href=#297 id=297 data-nosnippet>297</a>      }
 <a href=#298 id=298 data-nosnippet>298</a>    }
 <a href=#299 id=299 data-nosnippet>299</a>  } <span class="kw">else </span>{
-<a href=#300 id=300 data-nosnippet>300</a>    regex_pattern = Regex::new(GENERIC_ONLINE_FILE_PATTERH_CAPTURE).unwrap();
+<a href=#300 id=300 data-nosnippet>300</a>    regex_pattern = Regex::new(GENERIC_ONLINE_FILE_PATTERN_CAPTURE).unwrap();
 <a href=#301 id=301 data-nosnippet>301</a>  }
 <a href=#302 id=302 data-nosnippet>302</a>  <span class="kw">let </span>res : <span class="prelude-ty">Option</span>&lt;HashMap&lt;String,String&gt;&gt;;
 <a href=#303 id=303 data-nosnippet>303</a>  res = regex_pattern.captures(fname).and_then(|caps| {

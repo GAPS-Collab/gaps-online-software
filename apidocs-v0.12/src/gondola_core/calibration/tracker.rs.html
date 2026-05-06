@@ -193,11 +193,11 @@
 <a href=#193 id=193 data-nosnippet>193</a>      c_hit.energy = energy;
 <a href=#194 id=194 data-nosnippet>194</a>      <span class="comment">//println!("c_hit {}", c_hit);
 <a href=#195 id=195 data-nosnippet>195</a>      </span>calibrated_hits.push(c_hit);
-<a href=#196 id=196 data-nosnippet>196</a>      <span class="kw">if </span>energy &lt; -<span class="number">0.13 </span>{
-<a href=#197 id=197 data-nosnippet>197</a>        <span class="macro">error!</span>(<span class="string">"Small energy!"</span>);
-<a href=#198 id=198 data-nosnippet>198</a>        <span class="macro">error!</span>(<span class="string">"{}"</span>, c_hit);
-<a href=#199 id=199 data-nosnippet>199</a>      }
-<a href=#200 id=200 data-nosnippet>200</a>    }
+<a href=#196 id=196 data-nosnippet>196</a>      <span class="comment">//if energy &lt; -0.13 {
+<a href=#197 id=197 data-nosnippet>197</a>      //  error!("Small energy!");
+<a href=#198 id=198 data-nosnippet>198</a>      //  error!("{}", c_hit);
+<a href=#199 id=199 data-nosnippet>199</a>      //}
+<a href=#200 id=200 data-nosnippet>200</a>    </span>}
 <a href=#201 id=201 data-nosnippet>201</a>    event_hits.clear(); 
 <a href=#202 id=202 data-nosnippet>202</a>    <span class="kw-2">*</span>event_hits = calibrated_hits;
 <a href=#203 id=203 data-nosnippet>203</a>    <span class="prelude-val">Ok</span>(())
