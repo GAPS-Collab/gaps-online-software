@@ -93,7 +93,7 @@ def load_run(fname, telemetry_dir, seconds_pre=240, seconds_post=480, packet_off
 if __name__ == '__main__':
 
     import argparse
-    #import sys
+    import sys
 
     description = __doc__
     parser = argparse.ArgumentParser(description=description)
@@ -118,6 +118,9 @@ if __name__ == '__main__':
     run_meta = Path(args.run_dir)
     run_meta = [k for k in run_meta.glob('*.meta.toml')]
     #print (run_meta)
+    if not run_meta:
+        print(f"-> No meta information for run {args.run_dir}! Aborting!")
+        sys.exit(1)
     run_meta = run_meta[0]
     run_meta_data = RunMeta.load(run_meta)
     
