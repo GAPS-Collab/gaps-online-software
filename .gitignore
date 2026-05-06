@@ -17,7 +17,7 @@ gondola-core/rust/gondola-core/python/gondola/gaps_flight.db
 
 # gondola_cxx python bindings for C++ lib 
 gondola-core/C++/dist/*
-gondola-core/C++/gondola_cxx/*
+#gondola-core/C++/gondola_cxx/*
 gondola-core/C++/wheelhouse/*
  
 liftof/releases/*
