@@ -1,7 +1,4 @@
 var searchData=
 [
-  ['calibration_2ecxx_0',['calibration.cxx',['../calibration_8cxx.html',1,'']]],
-  ['calibration_2eh_1',['calibration.h',['../calibration_8h.html',1,'']]],
-  ['caraspace_2ecxx_2',['caraspace.cxx',['../caraspace_8cxx.html',1,'']]],
-  ['caraspace_2ehpp_3',['caraspace.hpp',['../caraspace_8hpp.html',1,'']]]
+  ['_5f_5finit_5f_5f_2epy_0',['__init__.py',['../____init_____8py.html',1,'']]]
 ];
