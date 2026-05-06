@@ -492,9 +492,10 @@ namespace gondola {
   };
   
   struct SDRootWriter {
-    SDRootWriter(std::string fname, std::string file_mode = "RECREATE");
+    SDRootWriter(std::string fname, std::string geo_file = "", std::string file_mode = "RECREATE");
     ~SDRootWriter();
-    auto add_event(TelemetryEvent* ev, u8 packet_type, f64 gcutime) -> void; 
+    auto add_event(TelemetryEvent* ev, u8 packet_type, f64 gcutime) -> void;
+    /// The SimulationParameter tree  
     auto write_sdpar(u32 run_id, std::string hostname, std::string crane_version) -> void; 
     std::string filename = "";
     // root just hates modern memory management

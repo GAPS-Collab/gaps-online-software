@@ -5,7 +5,6 @@ message(STATUS "-- will build CXX examples!")
 
 foreach(example "unpack-tofpackets" "print-database" "read-caraspace" "calculate-tof")
 
-   #set(unpack-example "unpack-tofpackets")
   add_executable(${example}
     ${CMAKE_CURRENT_SOURCE_DIR}/C++/${example}.cxx
   )
@@ -24,7 +23,8 @@ foreach(example "unpack-tofpackets" "print-database" "read-caraspace" "calculate
   )                          
   target_link_libraries(${example}
                         PRIVATE
-                        ${GONDOLA_LIBRARY_SHARED})
+                        ${GONDOLA_LIBRARY_SHARED}
+                        $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARIES}>)
   install(TARGETS ${example}
           DESTINATION ${INSTALL_EXAMPLES_DIR}
   )

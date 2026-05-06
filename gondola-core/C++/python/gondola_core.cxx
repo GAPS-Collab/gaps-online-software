@@ -83,7 +83,7 @@ NB_MODULE(gondola_cxx, m) {
     .def("get_event_trk_energies", &g::SDRootReader::get_event_trk_energies);
 
   nb::class_<g::SDRootWriter>(m, "SDRootWriter")
-    .def(nb::init<std::string>())
+    .def(nb::init<std::string, std::string>())
     //.def("get_next_event", [](g::TofPacketReader &r) {
     //  return r.get_next_packet().unwrap();
     //})

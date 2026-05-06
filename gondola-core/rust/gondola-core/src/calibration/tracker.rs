@@ -193,10 +193,10 @@ impl TrackerOfflineCalibration {
       c_hit.energy = energy;
       //println!("c_hit {}", c_hit);
       calibrated_hits.push(c_hit);
-      if energy < -0.13 {
-        error!("Small energy!");
-        error!("{}", c_hit);
-      }
+      //if energy < -0.13 {
+      //  error!("Small energy!");
+      //  error!("{}", c_hit);
+      //}
     }
     event_hits.clear(); 
     *event_hits = calibrated_hits;

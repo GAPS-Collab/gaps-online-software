@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "TChain.h"
+#include "TFileMerger.h"
 
 #include "sd_legacy.hpp"
 #include "telemetry_dataclasses.hpp"
@@ -124,7 +125,7 @@ auto gondola::SDRootReader::get_event_trk_energies(u64 event_idx) -> Vec<f32> {
 
 //------------------------------------------------------------------------
 
-gondola::SDRootWriter::SDRootWriter(std::string fname, std::string file_mode) {
+gondola::SDRootWriter::SDRootWriter(std::string fname, std::string geo_file,  std::string file_mode) {
   // databases
   pmap     = g::get_tofpaddles();
   std::cout << "-> Loaded " << pmap.size() << " TofPaddles!" << std::endl;
@@ -134,7 +135,16 @@ gondola::SDRootWriter::SDRootWriter(std::string fname, std::string file_mode) {
   std::cout << "-> Loaded " << lgmap.size() << " Dsi/J -> Pid conversions!" << std::endl;
   // setup root ouput file
   filename            = fname;
-  output_file         = new TFile(fname.c_str(), file_mode.c_str());
+  if (geo_file != "") {
+    TFileMerger merger;
+    merger.OutputFile(fname.c_str(), file_mode.c_str()); 
+    merger.AddFile(geo_file.c_str());
+    merger.Merge();
+    file_mode = "UPDATE";
+    output_file = new TFile(fname.c_str(), file_mode.c_str());
+  } else {
+    output_file = new TFile(fname.c_str(), file_mode.c_str());
+  }
   //tchain              = new TChain("TreeRec");
   event               = new CEventRec();
   rawtrk              = new Crane::Calibration::CRawTrk();
