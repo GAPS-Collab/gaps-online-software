@@ -198,18 +198,28 @@ impl CRFrame {
     }
   }
 
+  /// Extract trackerhits across the frame. 
+  ///
+  /// Sources for tracker hits can either be the regular 
+  /// TelemetryEvents, or all the different TrackerHits. 
+  ///
+  ///
   // FIXME - this needs to return references with lifetimes, not 
   // cloning the hits
-  pub fn get_tracker_hitseries(&self, source : TrackerHitSource) 
+  pub fn get_tracker_hitseries(&self, source : TrackerHitSource, name : Option<String>) 
     -> Result<Vec<TrackerHit>, SerializationError> {
     let mut hits = Vec::<TrackerHit>::new();
+    let mut tracker_hit_name = String::from("Tracker");
+    if name.is_some() {
+      tracker_hit_name = name.unwrap();
+    }
     match source {
       TrackerHitSource::TelemetryEvent |
       TrackerHitSource::Unknown => {
       }
       TrackerHitSource::TrackerPacket => {
         for k in self.index.keys() {
-          if k.contains("Tracker") {
+          if k.contains(&tracker_hit_name) {
             let pack = self.get::<TelemetryPacket>(k)?;
             let trk  = TrackerDAQEventPacket::from_telemetrypacket(&pack)?;
             for ev in trk.events {
@@ -719,8 +729,9 @@ impl CRFrame {
   }
 
   #[pyo3(name="get_tracker_hitseries")]
-  fn get_tracker_hitseries_py(&self) -> Vec<TrackerHit> {
-    self.get_tracker_hitseries(TrackerHitSource::TrackerPacket).unwrap()
+  #[pyo3(signature = (name = None))]
+  fn get_tracker_hitseries_py(&self, name : Option<String>) -> Vec<TrackerHit> {
+    self.get_tracker_hitseries(TrackerHitSource::TrackerPacket, name).unwrap()
   }
 
 }
