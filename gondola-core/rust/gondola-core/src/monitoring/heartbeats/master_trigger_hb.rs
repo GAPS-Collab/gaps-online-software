@@ -32,7 +32,9 @@ pub struct MasterTriggerHB {
   pub any_blocked_rate    : u16,
   pub trkctrl_blocked_rate: u16,
   pub trkumbctrl_blocked  : u16,
-  pub prescale_bypass     : bool 
+  pub prescale_bypass     : bool, 
+  // from gcu packet 
+  pub timestamp           : u64, 
 }
 
 impl MasterTriggerHB {
@@ -63,7 +65,8 @@ impl MasterTriggerHB {
       any_blocked_rate    : 0,
       trkctrl_blocked_rate: 0,
       trkumbctrl_blocked  : 0,
-      prescale_bypass     : false
+      prescale_bypass     : false,
+      timestamp           : 0
     }
   }
 
@@ -175,7 +178,7 @@ impl Serialization for MasterTriggerHB {
                      pos       :&mut usize)
   -> Result<Self, SerializationError>{
     Self::verify_fixed(stream, pos)?;
-    let mut hb = MasterTriggerHB::new(); 
+    let mut hb                = MasterTriggerHB::new(); 
     hb.version                = ProtocolVersion::from(parse_u8(stream, pos) as u8);
     hb.total_elapsed          = parse_u64(stream, pos);
     hb.trigger_type           = TriggerType::from(parse_u8(stream, pos) as u8);
@@ -331,19 +334,18 @@ impl MoniData for MasterTriggerHB {
   fn get_board_id(&self) -> u8 {
     0
   }
- 
+  /** 
   fn get_timestamp(&self) -> u64 {
     self.total_elapsed
   }
-  /*
+  */
+ 
   fn get_timestamp(&self) -> u64 {
     self.timestamp 
   }
-
   fn set_timestamp(&mut self, ts : u64) { 
     self.timestamp = ts;
   }
-  */
 
   /// Access the (data) members by name 
   fn get(&self, varname : &str) -> Option<f32> {
@@ -372,7 +374,7 @@ impl MoniData for MasterTriggerHB {
       "any_blocked_rate"    => Some(self.any_blocked_rate as f32), 
       "trkctrl_blocked_rate"=> Some(self.trkctrl_blocked_rate as f32),
       "trkumbctrl_blocked"  => Some(self.trkumbctrl_blocked as f32),
-      //"timestamp"           => Some(self.timestamp as f32),
+      "timestamp"           => Some(self.timestamp as f32),
       _                     => None
     }
   }
@@ -384,7 +386,7 @@ impl MoniData for MasterTriggerHB {
          "n_ev_missed", "trate", "lost_trate","clock_rate", "rb_lost_rate", "prescale_track",
          "prescale_gaps", "tiu_ignore_deadtime", "tiu_timeout_cnt", "tiu_busy_rate", "trg_lost_trg_rate", 
          "gaps_blocked_rate", "track_blocked_rate", "any_blocked_rate", "trkctrl_blocked_rate",
-         "trkumbctrl_blocked", "prescale_bypass"]
+         "trkumbctrl_blocked", "prescale_bypass","timestamp"]
   }
 }
 

@@ -364,7 +364,13 @@ macro_rules! moniseries_general {
        fn new_py() -> Self {
          Self::new() 
        }
-   
+  
+       #[pyo3(name="keys")]
+       #[staticmethod]
+       fn keys_py() -> Vec<&'static str> {
+         Self::keys()
+       }
+
        /// The maximum size of the series. If more data 
        /// are added, data from the front will be removed 
        #[getter]
@@ -423,128 +429,21 @@ macro_rules! moniseries_general {
 
 /// Implements the moniseries trait for a MoniData 
 /// type of class
+// this should basically be moniseries_tof
 #[macro_export]
 macro_rules! moniseries {
   ($name : ident, $class:ty) => {
     
     moniseries_general!($name, $class);
-    //use std::collections::VecDeque;
-    //use std::collections::HashMap;
-
-    //use crate::monitoring::MoniSeries;
-
-    //#[cfg_attr(feature="pybindings",pyclass)]
-    //#[derive(Debug, Clone, PartialEq)]
-    //pub struct $name {
-    //  data        : HashMap<u8, VecDeque<$class>>,
-    //  max_size    : usize,
-    //  timestamps  : Vec<u64>,
-    //}
-    //
-    //impl $name {
-    //  pub fn new() -> Self {
-    //    Self {
-    //      data       : HashMap::<u8, VecDeque<$class>>::new(),
-    //      max_size   : 10000,
-    //      timestamps : Vec::<u64>::new()
-    //    }
-    //  }
-    //} 
-    //
-    //impl Default for $name {
-    //  fn default() -> Self {
-    //    Self::new()
-    //  }
-    //}
-    //
-    //impl fmt::Display for $name {
-    //  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    //    write!(f, "<{} : {} boards>", stringify!($name), self.data.len())
-    //  }
-    //}
-    //
-    //impl MoniSeries<$class> for $name {
-   
-    //  fn get_first_ts(&self) -> u64 {
-    //    if self.timestamps.len() == 0 {
-    //      return 0;
-    //    } else {
-    //      self.timestamps[0]
-    //    }
-    //  }
-
-    //  fn get_data(&self) -> &HashMap<u8,VecDeque<$class>> {
-    //    return &self.data;
-    //  }
-    //
-    //  fn get_data_mut(&mut self) -> &mut HashMap<u8,VecDeque<$class>> {
-    //    return &mut self.data;
-    //  }
-    // 
-    //  fn get_max_size(&self) -> usize {
-    //    return self.max_size;
-    //  }
-    //  
-    //  fn set_max_size(&mut self, size : usize) {
-    //    self.max_size = size;
-    //  }
-  
-    //  fn add_timestamp(&mut self, ts : u64) {
-    //    self.timestamps.push(ts);
-    //  }
-
-    //  fn get_timestamps(&self) -> &Vec<u64> {
-    //    //if self.timestamps.len() == 0 {
-    //    //  let mut timestamps = Vec::<u64>::new();
-    //    //  for k in self.
-    //    //} 
-    //    return &self.timestamps;
-    //  }
-    //}
-  
-    //#[cfg(feature="pybindings")]
-    //#[pymethods]
-    //impl $name {
-    //  #[new]
-    //  fn new_py() -> Self {
-    //    Self::new() 
-    //  }
-   
-    //  /// The maximum size of the series. If more data 
-    //  /// are added, data from the front will be removed 
-    //  #[getter]
-    //  #[pyo3(name="max_size")]
-    //  fn get_max_size_py(&self) -> usize {
-    //    self.get_max_size()
-    //  }
-
-    //  #[setter]
-    //  #[pyo3(name="max_size")] 
-    //  fn set_max_size_py(&mut self, size : usize) {
-    //    self.set_max_size(size);
-    //  }
-    //  
-
-    //  #[getter]
-    //  #[pyo3(name="get_first_ts")]
-    //  fn get_first_ts_py(&self) -> u64 {
-    //    self.get_first_ts()
-    //  }
-
-    //  /// If monitoring is retrieved from telemetry, we 
-    //  /// save the gcu timestamp of the packet, wich 
-    //  /// herein can be accessed.
-    //  #[getter] 
-    //  #[pyo3(name="timestamps")] 
-    //  fn get_timestamps_py(&self) -> Vec<u64> {
-    //    warn!("This returns a full copy and is a performance bottleneck!");
-    //    return self.timestamps.clone();
-    //  }
 
     #[cfg(feature="pybindings")]
     #[pymethods]
     impl $name {
-
+      
+      //fn __len__(&self) -> usize {
+      //  self.items.len()
+      //}
+      
       /// Add an additional (Caraspace) file to the series 
       ///
       /// # Arguments:
@@ -734,44 +633,8 @@ macro_rules! moniseries {
             return Err(PyValueError::new_err(err.to_string()));
           }
         }
-      }
-      
-      //#[pyo3(name="get_var_for_board")]
-      //fn get_var_for_board_py(&self, varname : &str, rb_id : u8) -> Option<Vec<f32>> {
-      //  self.get_var_for_board(varname, &rb_id)
-      //}
-
-      ///// Reduces the MoniSeries to a single polars data frame
-      ///// The structure itself will not be changed
-      //#[pyo3(name="get_dataframe")]
-      //fn get_dataframe_py(&self) -> PyResult<PyDataFrame> {
-      //  match self.get_dataframe() {
-      //    Ok(df) => {
-      //      let pydf = PyDataFrame(df);
-      //      return Ok(pydf);
-      //    },
-      //    Err(err) => {
-      //      return Err(PyValueError::new_err(err.to_string()));
-      //    }
-      //  }
-      //}
-
-      ////fn get_pl_series_py(&self) -> PyResult<PyS
-      ////fn get_data(&self) -> &HashMap<u8,VecDeque<$class>> {
-      ////  return &self.data;
-      ////}
-    
-      ////fn get_data_mut(&mut self) -> &mut HashMap<u8,VecDeque<$class>> {
-      ////  return &mut self.data;
-      ////}
-     
-      ////fn get_max_size(&self) -> usize {
-      ////  return self.max_size;
-      ////}
+      }  
     }
-    
-    //#[cfg(feature="pybindings")]
-    //pythonize_display!($name);
   }
 }
 
