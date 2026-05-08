@@ -44,7 +44,7 @@ PAMoniData.__module__                 = __name__
 PBMoniData                            = _gondola_core.monitoring.PBMoniData 
 PBMoniData.__module__                 = __name__
 
-RBMoniData                            = _gondola_core.monitoring.PBMoniData 
+RBMoniData                            = _gondola_core.monitoring.RBMoniData 
 RBMoniData.__module__                 = __name__
 
 SipPosMoniData                        = _gondola_core.monitoring.SipPosMoniData 
@@ -93,7 +93,7 @@ PAMoniDataSeries.__module__                 = __name__
 PBMoniDataSeries                            = _gondola_core.monitoring.PBMoniDataSeries 
 PBMoniDataSeries.__module__                 = __name__
 
-RBMoniDataSeries                            = _gondola_core.monitoring.PBMoniDataSeries 
+RBMoniDataSeries                            = _gondola_core.monitoring.RBMoniDataSeries 
 RBMoniDataSeries.__module__                 = __name__
 
 SipPosMoniDataSeries                        = _gondola_core.monitoring.SipPosMoniDataSeries 
