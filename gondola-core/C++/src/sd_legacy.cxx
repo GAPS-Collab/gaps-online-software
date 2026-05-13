@@ -162,10 +162,6 @@ gondola::SDRootWriter::SDRootWriter(std::string fname, std::string geo_file,  st
     par               = new GSimulationParameter();
     par_tree->Branch("SimulationParameter", &par);
   }
-  raw_tree->Branch("Tof", &rawtof);
-  //tchain->Add(fname.c_str());
-  //tchain->SetBranchAddress("Rec", &event);
-  //nevents_total       = tchain->GetEntries();
 }
 
 gondola::SDRootWriter::~SDRootWriter() {
@@ -745,6 +741,12 @@ auto CEventRec::GetGPSTime() const -> f64 {
   u64 gps_time48 = 0x273000000000000 | (u64) gps_time_upper_ << 32 | (u64) gps_time_lower_;
   // this timestamp has 10ns precision 
   return (f64)gps_time48 * 1e-8;
+}
+
+//------------------------------------------------------------------------
+
+auto CEventRec::ListAvailableReconstructions() const -> Vec<std::string> {
+  return registeredRecos_;
 }
 
 //------------------------------------------------------------------------

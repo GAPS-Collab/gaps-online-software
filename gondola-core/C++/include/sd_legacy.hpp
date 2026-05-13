@@ -258,7 +258,7 @@ class CEventRec : public CEventBase {
     auto get_trk_energies() const -> Vec<f32>;
     auto pretty_print() const -> std::string;
     auto GetGPSTime() const -> f64;
-    
+    auto ListAvailableReconstructions() const -> Vec<std::string>;  
   public:
     CEventRec() {}
     
