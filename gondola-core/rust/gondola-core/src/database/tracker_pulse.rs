@@ -87,8 +87,8 @@ impl TrackerStripPulse {
     let reader = BufReader::new(file);
     let mut pulses = Vec::<Self>::new();
     let hid_vid_map = get_hid_vid_maps().unwrap().1;
-    let mut n_entries  = 0u64;
-    let mut mean_pulse = 0.0f64;
+    //let mut n_entries  = 0u64;
+    //let mut mean_pulse = 0.0f64;
     //let mut mean_avg   = 0.0f64;
     let mut all_strip_ids : Vec<_> = hid_vid_map.keys().collect();
     for line in reader.lines() {
@@ -114,14 +114,14 @@ impl TrackerStripPulse {
           .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
         pulse.pulse_avg = parts[5].parse::<f32>()
           .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
-        mean_pulse += pulse.pulse_chn as f64;
+        //mean_pulse += pulse.pulse_chn as f64;
         //mean_avg   += pulse.pulse_avg as f64;
         all_strip_ids.retain(|x| *x != &(pulse.strip_id as u32));
         pulses.push(pulse); 
-        n_entries += 1;
+        //n_entries += 1;
       }
     }
-    mean_pulse /= n_entries as f64;
+    //mean_pulse /= n_entries as f64;
     //mean_avg   /= n_entries as f64;
     // it seems we should create an entry even for the 
     // strips which are not in the file 

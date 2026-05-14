@@ -524,10 +524,21 @@ impl TelemetryEvent {
   /// hit is at 0. This includes application 
   /// of the phase correction
   #[pyo3(name="tof_normalize_hit_times")]
-  pub fn tof_normalize_hit_times_py(&mut self) {
+  fn tof_normalize_hit_times_py(&mut self) {
     self.tof_event.normalize_hit_times();
   }
 
+  /// Apply a set of per-paddle timing constants 
+  ///
+  /// # Arguments:
+  ///   * constants : A map of paddle id -> constant (in ns) 
+  fn tof_set_timing_constants(&mut self, constants:  HashMap<u8, f32>) {
+    for h in &mut self.tof_event.hits {
+      h.event_t0 -= constants[&h.paddle_id];
+    }
+  }
+
+  
   /// Returns a COPY of the TofEvent associated 
   /// with this event id
   #[getter]

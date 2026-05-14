@@ -151,7 +151,7 @@ impl TrackerHit {
 
     // This allows Python's hash() function to work
     fn __hash__(&self) -> isize {
-        let mut h = self.identity(); 
+        let h = self.identity(); 
         // Python hashes are signed integers. On 64-bit systems, 
         // we can usually just cast. We use wrapping to be safe.
         h as isize
