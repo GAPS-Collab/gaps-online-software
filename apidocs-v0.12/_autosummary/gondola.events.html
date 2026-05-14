@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.events &#8212; gondola 0.12.24 documentation</title>
+    <title>gondola.events &#8212; gondola 0.12.25 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=780e476d"></script>
+    <script src="../_static/documentation_options.js?v=857e782b"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.events';</script>
@@ -117,7 +117,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.12.24 documentation</p>
+    <p class="title logo__title">gondola 0.12.25 documentation</p>
   
 </a></div>
     
@@ -1495,6 +1495,18 @@ measured at ends A and B can not be correlated
 by the assumed speed of light in the paddle</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TelemetryEvent.tof_set_timing_constants">
+<span class="sig-name descname"><span class="pre">tof_set_timing_constants</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constants</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TelemetryEvent.tof_set_timing_constants" title="Link to this definition">#</a></dt>
+<dd><p>Apply a set of per-paddle timing constants</p>
+<dl class="simple">
+<dt># Arguments:</dt><dd><ul class="simple">
+<li><p>constants : A map of paddle id -&gt; constant (in ns)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TelemetryEvent.tracker">
 <span class="sig-name descname"><span class="pre">tracker</span></span><a class="headerlink" href="#gondola.events.TelemetryEvent.tracker" title="Link to this definition">#</a></dt>
@@ -2279,6 +2291,7 @@ is the semantics behind it.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.tof_lightspeed_cleaning"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.tof_lightspeed_cleaning()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.tof_normalize_hit_times"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.tof_normalize_hit_times()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.tof_remove_non_causal_hits"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.tof_remove_non_causal_hits()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.tof_set_timing_constants"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.tof_set_timing_constants()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.tracker"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.tracker</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.tracker_pointcloud"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.tracker_pointcloud</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.version"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.version</span></code></a></li>

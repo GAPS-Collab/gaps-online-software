@@ -87,9 +87,9 @@
 <a href=#87 id=87 data-nosnippet>87</a>    <span class="kw">let </span>reader = BufReader::new(file);
 <a href=#88 id=88 data-nosnippet>88</a>    <span class="kw">let </span><span class="kw-2">mut </span>pulses = Vec::&lt;<span class="self">Self</span>&gt;::new();
 <a href=#89 id=89 data-nosnippet>89</a>    <span class="kw">let </span>hid_vid_map = get_hid_vid_maps().unwrap().<span class="number">1</span>;
-<a href=#90 id=90 data-nosnippet>90</a>    <span class="kw">let </span><span class="kw-2">mut </span>n_entries  = <span class="number">0u64</span>;
-<a href=#91 id=91 data-nosnippet>91</a>    <span class="kw">let </span><span class="kw-2">mut </span>mean_pulse = <span class="number">0.0f64</span>;
-<a href=#92 id=92 data-nosnippet>92</a>    <span class="comment">//let mut mean_avg   = 0.0f64;
+<a href=#90 id=90 data-nosnippet>90</a>    <span class="comment">//let mut n_entries  = 0u64;
+<a href=#91 id=91 data-nosnippet>91</a>    //let mut mean_pulse = 0.0f64;
+<a href=#92 id=92 data-nosnippet>92</a>    //let mut mean_avg   = 0.0f64;
 <a href=#93 id=93 data-nosnippet>93</a>    </span><span class="kw">let </span><span class="kw-2">mut </span>all_strip_ids : Vec&lt;<span class="kw">_</span>&gt; = hid_vid_map.keys().collect();
 <a href=#94 id=94 data-nosnippet>94</a>    <span class="kw">for </span>line <span class="kw">in </span>reader.lines() {
 <a href=#95 id=95 data-nosnippet>95</a>      <span class="kw">let </span>line = line<span class="question-mark">?</span>;
@@ -114,15 +114,15 @@
 <a href=#114 id=114 data-nosnippet>114</a>          .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))<span class="question-mark">?</span>;
 <a href=#115 id=115 data-nosnippet>115</a>        pulse.pulse_avg = parts[<span class="number">5</span>].parse::&lt;f32&gt;()
 <a href=#116 id=116 data-nosnippet>116</a>          .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))<span class="question-mark">?</span>;
-<a href=#117 id=117 data-nosnippet>117</a>        mean_pulse += pulse.pulse_chn <span class="kw">as </span>f64;
-<a href=#118 id=118 data-nosnippet>118</a>        <span class="comment">//mean_avg   += pulse.pulse_avg as f64;
+<a href=#117 id=117 data-nosnippet>117</a>        <span class="comment">//mean_pulse += pulse.pulse_chn as f64;
+<a href=#118 id=118 data-nosnippet>118</a>        //mean_avg   += pulse.pulse_avg as f64;
 <a href=#119 id=119 data-nosnippet>119</a>        </span>all_strip_ids.retain(|x| <span class="kw-2">*</span>x != <span class="kw-2">&amp;</span>(pulse.strip_id <span class="kw">as </span>u32));
 <a href=#120 id=120 data-nosnippet>120</a>        pulses.push(pulse); 
-<a href=#121 id=121 data-nosnippet>121</a>        n_entries += <span class="number">1</span>;
-<a href=#122 id=122 data-nosnippet>122</a>      }
+<a href=#121 id=121 data-nosnippet>121</a>        <span class="comment">//n_entries += 1;
+<a href=#122 id=122 data-nosnippet>122</a>      </span>}
 <a href=#123 id=123 data-nosnippet>123</a>    }
-<a href=#124 id=124 data-nosnippet>124</a>    mean_pulse /= n_entries <span class="kw">as </span>f64;
-<a href=#125 id=125 data-nosnippet>125</a>    <span class="comment">//mean_avg   /= n_entries as f64;
+<a href=#124 id=124 data-nosnippet>124</a>    <span class="comment">//mean_pulse /= n_entries as f64;
+<a href=#125 id=125 data-nosnippet>125</a>    //mean_avg   /= n_entries as f64;
 <a href=#126 id=126 data-nosnippet>126</a>    // it seems we should create an entry even for the 
 <a href=#127 id=127 data-nosnippet>127</a>    // strips which are not in the file 
 <a href=#128 id=128 data-nosnippet>128</a>    //for stripid in all_strip_ids {

@@ -151,7 +151,7 @@
 <a href=#151 id=151 data-nosnippet>151</a>
 <a href=#152 id=152 data-nosnippet>152</a>    <span class="comment">// This allows Python's hash() function to work
 <a href=#153 id=153 data-nosnippet>153</a>    </span><span class="kw">fn </span>__hash__(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; isize {
-<a href=#154 id=154 data-nosnippet>154</a>        <span class="kw">let </span><span class="kw-2">mut </span>h = <span class="self">self</span>.identity(); 
+<a href=#154 id=154 data-nosnippet>154</a>        <span class="kw">let </span>h = <span class="self">self</span>.identity(); 
 <a href=#155 id=155 data-nosnippet>155</a>        <span class="comment">// Python hashes are signed integers. On 64-bit systems, 
 <a href=#156 id=156 data-nosnippet>156</a>        // we can usually just cast. We use wrapping to be safe.
 <a href=#157 id=157 data-nosnippet>157</a>        </span>h <span class="kw">as </span>isize
