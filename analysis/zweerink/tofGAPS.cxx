@@ -108,9 +108,7 @@ void PacketMethods::ProcessTofEvent(TofEvent *Tev,
   //unsigned long int evt_ctr = ev.mt_event.event_id;
   unsigned long int evt_ctr = Tev->event_id;
 
-  //std::cout << &Tev << std::endl;
-
-  //printf("Event %ld: RBs -", evt_ctr);
+  printf("Event %ld - RBs: \n", evt_ctr);
   //printf("%ld.", evt_ctr);
   
   for (auto const &rbid : Tev->get_rbids()) {
@@ -120,6 +118,8 @@ void PacketMethods::ProcessTofEvent(TofEvent *Tev,
     usize ch_start = (rbid-1)*NCH; // first RB is #1
     // Let's also store the channel mask to use later. 
     int ch_mask = rb_event.header.channel_mask;
+
+    
     
     if (0) {
       std::cout << rb_event << std::endl;
@@ -156,6 +156,22 @@ void PacketMethods::ProcessTofEvent(TofEvent *Tev,
 	  wave[cw] = new GAPS::Waveform(ch_volts.data(),
 					ch_times.data(), cw,0);
 	}
+      }
+    }
+    for (int i=0; i<rb_event.hits.size(); i++) {
+      if (rb_event.hits[i].paddle_id < 161) {
+	printf("RUST %3d",rb_event.hits[i].paddle_id);
+	printf(" %7.2f %7.2f %7.2f %7.2f %6.2f %6.2f",
+	       rb_event.hits[i].get_time_a(), rb_event.hits[i].get_time_b(),
+	       rb_event.hits[i].get_peak_a(), rb_event.hits[i].get_peak_b(),
+	       rb_event.hits[i].get_charge_a(),
+	       rb_event.hits[i].get_charge_b());
+	//printf(" %7.4f %5.2f %5.2f %4.2f %4.2f\n",
+	//     Phi[rbid], rb_event.hits[i].baseline_a,
+	printf(" %5.2f %5.2f %4.2f %4.2f\n",
+	       rb_event.hits[i].baseline_a,
+	       rb_event.hits[i].baseline_b, rb_event.hits[i].baseline_a_rms,
+	       rb_event.hits[i].baseline_b_rms);
       }
     }
   }

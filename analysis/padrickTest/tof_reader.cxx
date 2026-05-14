@@ -10,6 +10,7 @@
  */
 
 #include <iostream>
+#include <cstdio>
 #include "cxxopts.hpp"
 
 #include "spdlog/spdlog.h"
@@ -57,21 +58,34 @@ int main(int argc, char *argv[]){
   bool files   = result["files"].as<bool>();
   bool verbose = result["verbose"].as<bool>();
 
-  // If called with the -f option, read in the list of files to analyze
+  // If called with the -f option, read in the list of files to analyze (-f
+  // means "fname is a text file of paths", NOT the input .tof.gaps itself).
+  // Use bounded scanf: parsing a binary .tof.gaps as a list overflows %s.
   FILE *fp;
   char tmpline[500];
-  std::string fnames[1000];
-  int nfiles=0;
+  constexpr int kMaxListFiles = 1000;
+  std::string fnames[kMaxListFiles];
+  int nfiles = 0;
   if (files) {
     fp = fopen(fname.c_str(), "r");
-    if (fp != NULL) {
-      while (fscanf(fp, "%s", tmpline) != EOF) fnames[nfiles++] = tmpline;
+    if (fp != nullptr) {
+      while (nfiles < kMaxListFiles && fscanf(fp, "%499s", tmpline) == 1) {
+        fnames[nfiles++] = tmpline;
+      }
       fclose(fp);
+      if (nfiles >= kMaxListFiles) {
+        fprintf(stderr, "warning: file list truncated at %d paths\n", kMaxListFiles);
+      }
     } else {
-      printf("Unable to open file %s\n", fname.c_str());
+      perror("Unable to open file list");
+      exit(EXIT_FAILURE);
     }
   } else {
     fnames[nfiles++] = fname;
+  }
+  if (nfiles == 0) {
+    spdlog::error("No input files to process (empty -f list?)");
+    exit(EXIT_FAILURE);
   }
 
   // -> Gaps relevant code starts here
@@ -225,7 +239,7 @@ int main(int argc, char *argv[]){
 	//printf("Event %ld: RBs -", evt_ctr);
 	//printf("%ld.", evt_ctr);
 	pr_evt = false;
-	//if ( evt_ctr>6590000 && evt_ctr<415646760000 ) pr_evt = true;
+	if ( evt_ctr>6590000 && evt_ctr<415646760000 ) pr_evt = true;
 	if (pr_evt) {
 	  std::cout << "Type " << p.packet_type;
 	  printf(" %ld %ld %d %d\n", evt_ctr, evt_ctr,

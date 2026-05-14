@@ -58,6 +58,7 @@ void EventGAPS::InitializeVariables(unsigned long int evt_ctr=0) {
     QInt[i]     = -999.0;
     TDC[i]      = -999.0;
   }
+  PedRMSFix = false;
   
   // Reset everything that is stored by RB number
   for (int i=0; i<NRB; i++) {
@@ -733,6 +734,30 @@ void EventGAPS::FillEventValues(struct EventInfo *evt) {
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
+void EventGAPS::FixPedRMSValues(void) {
+  // The Pedestal RMS values improperly calculated during flight. This
+  // routine corrects the miscalculation.
+
+  // let sigma = f32::sqrt(sum2/(ped_range_bin as f32 - (average*average)));
+  //   should have been
+  // let sigma = f32::sqrt(sum2/(ped_range_bin as f32) - (average*average));
+
+  if (PedRMSFix) return; // Only apply fix once. 
+  
+  double tmp1=0, tmp2=0;
+  for (int i=0; i<NPAD*2; i++) {
+    if (Pedestal[i] > -900.0) { // Have an actual pedestal value 
+      tmp1 = Pedestal[i]*Pedestal[i];
+      tmp2 = ( PedRMS[i]*PedRMS[i] * (200.0-tmp1) ) / 200.0;
+      // Now store the values
+      PedRMS[i] = sqrt(tmp2 - tmp1);
+    }
+  }
+  PedRMSFix = true;
+}
+  
+///////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 void EventGAPS::AnalyzePedestals(float Ped_low, float Ped_win) {
 
   float rms_m = 3.0;
@@ -897,11 +922,13 @@ void EventGAPS::AnalyzePaddles(float pk_cut = -999, float ch_cut = -999.0) {
 	  IsHit[i] = true;
 	  // Next two lines are useful for printing values to compare
 	  // with online quantities stored in the TofHits() class
-	  if (0) {
-	    printf("%3d %7.2f %7.2f %7.2f %7.2f %6.2f %6.2f", i, TDC[chA],
+	  if (0 && i<161) {
+	    printf("WAVE %3d %7.2f %7.2f %7.2f %7.2f %6.2f %6.2f", i, TDC[chA],
 		   TDC[chB], VPeak[chA],VPeak[chB], QInt[chA],QInt[chB]);
-	    printf(" %7.4f %5.2f %5.2f %4.2f %4.2f\n",
-		   Phi[RB[chB]], Pedestal[chA],Pedestal[chB],
+	    //printf(" %7.4f %5.2f %5.2f %4.2f %4.2f\n",
+	    //	   Phi[RB[chB]], Pedestal[chA],Pedestal[chB],
+	    printf(" %5.2f %5.2f %4.2f %4.2f\n",
+		   Pedestal[chA],Pedestal[chB],
 		   PedRMS[chA],PedRMS[chB]);
 	  }
 	}

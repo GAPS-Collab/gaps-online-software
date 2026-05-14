@@ -9,7 +9,6 @@
  * subject to change. Please refer to the respective 
  * README.md
  *
- * binRene 04/30/26
  */
 
 #include <iostream>
@@ -23,7 +22,7 @@
 #include "caraspace.hpp"
 
 #include "constants.h"
-#include "EventGAPS.h"
+#include "EventRene.h"
 #include "./PacketMethods.h"
 #include "./YourMethods.h"
 
@@ -47,6 +46,7 @@ PacketMethods::PacketMethods(void) {
   // First, we want to store information about the SiPM channels and
   // paddle relationships for analysis purpose. Read all that info             
   // into the relevant structures.
+  InitPaddleInfo();
   GetPaddleInfo();
   
   InitializeVariables();
@@ -56,21 +56,26 @@ PacketMethods::PacketMethods(void) {
 void PacketMethods::BeginRun(int run=5) {
   printf("Beginning Run %d.\n", run); fflush(stdout);
   PrintNiceMessage();
+
   // Just for utility, set the initial time from the timestamp48 value
   // in the first TofEventSummary Packet of the first flight .bin
   // file--RAW251215_101836.bin
-  timeInit = 94575234425295;
+  timeInit   =  94575234425295;
+  MAXstamp   = (1LL<<48)-1;
+  nRollOvers = 0;
+  RollOverTime = 2814749.76710656; // Time between RollOvers (sec)
+  // Instantiate our class that holds analysis results and set some           
+  // initial values
+  //EventGAPS Event = EventGAPS();
+  Event.SetPaddleMap(&PadInfo, &SipmInfo);
+  Event.InitializeHistograms();
+  Event.OffsetHistograms(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////
 void PacketMethods::ProcessTofEventSummary(TofEventSummary *Tes,
 					   unsigned long int evt_no){
-
-  //std::cout << Tes->to_string() << std::endl;
-
-  printf("%lu %lu %lu\n", evt_no, Tes->get_timestamp48(), timeInit);
-
-  //printf("Found TofEventSummary: evt = %ld\n", evt_no);
+  //printf("TES: %ld timestamp48 = %lu\n", evt_no,Tes->get_timestamp48());
   struct EventInfo EvtInfo;
   // First, initialize all the event values properly              
   for (int i=0;i<NPAD;i++) {
@@ -94,6 +99,24 @@ void PacketMethods::ProcessTofEventSummary(TofEventSummary *Tes,
   if (0) 
     std::cout << *Tes << std::endl; 
   
+  // Now, parse the TofEventSummary data into EvtInfo. We want to look
+  // for when the 48-bit counter rolls over to accurately calculate
+  // the elapsed time. This code will find an arbitrary number of
+  // RollOvers, but in practice, a 48-bit number with 10ns precision
+  // will roll over only once every ~32 days (max twice per flight).
+
+  // First, get timestamp and add the number of RollOvers so far
+  unsigned long long tmpstamp = Tes->get_timestamp48() + nRollOvers*MAXstamp;
+  // Now demand a good timestamp (>0) and see if the
+  // timestamp-timeInit is too large. Using unsigned int means that
+  // "negative" values (at roll over) will get very large
+  if (tmpstamp > 0 && (tmpstamp - timeInit) > (nRollOvers+1)*MAXstamp) {
+    nRollOvers++;    
+    tmpstamp+=MAXstamp;  // Add RollOver value to timestamp
+  }
+  // Finally, convert our tmpstamp into a FlightTime (in seconds)
+  EvtInfo.FlightTime = (tmpstamp - timeInit)/1e8;
+
   // Now, parse the TofEventSummary data into EvtInfo  
   for (TofHit const &h : Tes->hits) {
     // Formatted output of some data in the TofHit structure
@@ -122,6 +145,27 @@ void PacketMethods::ProcessTofEventSummary(TofEventSummary *Tes,
     int rb     = SipmInfo.RB[sipm_a];  // RB number for SiPM A
     EvtInfo.Phi[rb]       = h.phase;
     
+  // Start the event analysis: initialize our variables                       
+  Event.InitializeVariables(evt_no);
+
+  // Now, fill the appropriate quantities in EventGAPS                        
+  Event.FillEventValues(&EvtInfo);
+  Event.FixPedRMSValues();
+
+  // Now, process the ch9 phases                                              
+  Event.AnalyzePhases(EvtInfo.Phi);
+
+  // Analyze each paddle: position on paddle, hitmask, etc                    
+  Event.AnalyzePaddles(10.0, 5.0); //Args: Peak and Charge cuts               
+
+  // Now calculate beta, charge, and inner/outer tof x,y,z, etc.              
+  Event.AnalyzeEvent();
+
+  // Now fill out histograms                                                  
+  Event.FillChannelHistos(0);
+  Event.FillPaddleHistos();
+  Event.FillOffsetHistos();
+
   } 
 }
 
@@ -129,6 +173,8 @@ void PacketMethods::ProcessTofEventSummary(TofEventSummary *Tes,
 void PacketMethods::EndRun() {
   PrintNiceMessage();
   printf("Endning Run\n");
+  Event.WriteHistograms();
+  Event.WriteOffsetHistos();
 }
 
 void PacketMethods::NothingYet(void) {
@@ -141,6 +187,36 @@ void PacketMethods::InitializeVariables(void) {
 
   
 
+}
+
+////////////////////////////////////////////////////////////////////////////   
+void PacketMethods::InitPaddleInfo(void) {
+  for (int i=0;i<NTOT;i++) { // First, init all values to zero.                
+    SipmInfo.PB[i]         = 0;
+    SipmInfo.PB_ch[i]      = 0;
+    SipmInfo.LTB[i]        = 0;
+    SipmInfo.LTB_ch[i]     = 0;
+    SipmInfo.RB[i]         = 0;
+    SipmInfo.RB_ch[i]      = 0;
+    SipmInfo.PaddleID[ch]  = 0;
+    SipmInfo.PaddleEnd[ch] = 0;
+  }
+
+  for (int i=0;i<NPAD;i++) { // First, init all values to zero.               
+    PadInfo.VolumeID[i]       = 0;
+    for (int j=0;j<3;j++) {
+      PadInfo.Location[i][j]  = 0.0;
+      PadInfo.Dimension[i][j] = 0.0;
+    }
+    PadInfo.Orientation[i]    = 0;
+    PadInfo.CoaxLen[i]        = 0.0;
+    PadInfo.HardingLen[i]     = 0.0;
+    PadInfo.SiPM_A[i]         = 0;
+    PadInfo.SiPM_B[i]         = 0;
+    PadInfo.IsUmbrella[i]     = false;
+    PadInfo.IsCube[i]         = false;
+    PadInfo.IsCortina[i]      = false;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////

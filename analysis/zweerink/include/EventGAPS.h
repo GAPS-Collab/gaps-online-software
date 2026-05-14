@@ -52,6 +52,7 @@ public:
   
   // Stuff related to the actual data
   void    FillEventValues(struct EventInfo *evt);
+  void    FixPedRMSValues(void);
   void    AnalyzePedestals(float Ped_begin, float Ped_win);
   void    SetThreshold(float PmtThreshold);
   void    SetCFDFraction(float CFDS_frac);
@@ -116,6 +117,7 @@ private:
   double  FlightTime;                 // Since flight start, in seconds
   float   Pedestal[NTOT];             // Pedestal values
   float   PedRMS[NTOT];               // Pedestal RMS values
+  bool    PedRMSFix;                  // PedRMS Fix applied?
   bool    RBInData[NRB];              // RB in data stream?
   float   ClockPedestal[NRB];         // Pedestal values
   float   ClockPedRMS[NRB];           // Pedestal RMS values

@@ -29,7 +29,13 @@
 namespace fs = std::filesystem;
 namespace gt = Gaps::Telemetry;
 
-//int main(int argc, char *argv[]){
+// This shows how to add new subroutines/methods. Must prototype the
+// method and then define it below.
+void PrintNiceMessage(void);
+
+void PrintNiceMessage(void) {
+  std::cout << "Here is a nice message in a user-defined method." << std::endl;
+}
 
 ////////////////////////////////////////////////////////////////////////////
 // Default constructor
@@ -49,6 +55,7 @@ PacketMethods::PacketMethods(void) {
 ////////////////////////////////////////////////////////////////////////////
 void PacketMethods::BeginRun(int run=5) {
   printf("Beginning Run %d.\n", run); fflush(stdout);
+  //PrintNiceMessage();
 
   // Just for utility, set the initial time from the timestamp48 value
   // in the first TofEventSummary Packet of the first flight .bin
@@ -135,6 +142,7 @@ void PacketMethods::ProcessTofEventSummary(TofEventSummary *Tes,
   
   // Now, fill the appropriate quantities in EventGAPS                 
   Event.FillEventValues(&EvtInfo);
+  Event.FixPedRMSValues();
   
   // Now, process the ch9 phases                                       
   Event.AnalyzePhases(EvtInfo.Phi);
@@ -173,7 +181,6 @@ void PacketMethods::NothingYet(void) {
 
 ////////////////////////////////////////////////////////////////////////////
 void PacketMethods::InitPaddleInfo(void) {
-  printf("Init SipmInfo..."); fflush(stdout);
   for (int i=0;i<NTOT;i++) { // First, init all values to zero.
     SipmInfo.PB[i]         = 0;
     SipmInfo.PB_ch[i]      = 0;
@@ -185,7 +192,6 @@ void PacketMethods::InitPaddleInfo(void) {
     SipmInfo.PaddleEnd[ch] = 0;
   }
 
-  printf("Done.\nInit PadInfo..."); fflush(stdout);
   for (int i=0;i<NPAD;i++) { // First, init all values to zero.
     PadInfo.VolumeID[i]       = 0;
     for (int j=0;j<3;j++) {
@@ -201,7 +207,6 @@ void PacketMethods::InitPaddleInfo(void) {
     PadInfo.IsCube[i]         = false;
     PadInfo.IsCortina[i]      = false;
   }
-  printf("Done.\n"); fflush(stdout);
 }
 
 ////////////////////////////////////////////////////////////////////////////
