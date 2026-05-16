@@ -61,7 +61,7 @@ if (BUILD_CXX_WITH_ROOT)
           DESTINATION ${INSTALL_EXAMPLES_DIR}
   )
 
-  foreach(analysis "binSimple" "binGAPS" "binRene")
+  foreach(analysis "binSimple" "binGAPS")
 
   #set(analysis "binSimple")
   add_executable(${analysis}
@@ -94,35 +94,37 @@ if (BUILD_CXX_WITH_ROOT)
   )
 endforeach()
 
-  #set(analysis1 "binGAPS")
-  #add_executable(${analysis1}
-  #  ${CMAKE_CURRENT_SOURCE_DIR}/C++/reader.cxx
-  #  ${CMAKE_CURRENT_SOURCE_DIR}/C++/${analysis1}.cxx
-  #  ${CMAKE_CURRENT_SOURCE_DIR}/C++/../../analysis/zweerink/src/EventGAPS.cpp
-  #)
-  #set_property(TARGET ${analysis1} PROPERTY CXX_STANDARD 20)
-  #target_include_directories(${analysis1} 
-  #                          SYSTEM PUBLIC
-  #                          ${CMAKE_CURRENT_SOURCE_DIR}/../analysis/zweerink/include
-  #                          ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
-  #                          ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
-  #                          ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/result/
-  #                          $<$<BOOL:${BUILD_CXX_DB}>:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/sqlite_orm/include/sqlite_orm>
-  #                          $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_INCLUDE_DIRS}>
+  foreach(analysis "binRene")
+
+  add_executable(${analysis}
+    ${CMAKE_CURRENT_SOURCE_DIR}/C++/reader.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/C++/${analysis}.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/C++/../../analysis/zweerink/src/EventRene.cpp
+  )
+  set_property(TARGET ${analysis} PROPERTY CXX_STANDARD 20)
+  target_include_directories(${analysis} 
+                            SYSTEM PUBLIC
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../analysis/zweerink/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/result/
+                            $<$<BOOL:${BUILD_CXX_DB}>:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/sqlite_orm/include/sqlite_orm>
+                            $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_INCLUDE_DIRS}>
   
-  #)
-  #target_include_directories(${analysis1}
-  #                           PUBLIC
-  #                             ${CMAKE_CURRENT_SOURCE_DIR}/../gondola-core/C++/include
-  #)                          
-  #target_link_libraries(${analysis1}
-  #                      PRIVATE
-  #                      ${GONDOLA_LIBRARY_SHARED}
-  #                      $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARY_SHARED}>
-  #)
-  #install(TARGETS ${analysis1}
-  #        DESTINATION ${INSTALL_EXAMPLES_DIR}
-  #)
+  )
+  target_include_directories(${analysis}
+                             PUBLIC
+                               ${CMAKE_CURRENT_SOURCE_DIR}/../gondola-core/C++/include
+  )                          
+  target_link_libraries(${analysis}
+                        PRIVATE
+                        ${GONDOLA_LIBRARY_SHARED}
+                        $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARY_SHARED}>
+  )
+  install(TARGETS ${analysis}
+          DESTINATION ${INSTALL_EXAMPLES_DIR}
+  )
+endforeach()
   
 endif()
 

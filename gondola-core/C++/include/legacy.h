@@ -101,6 +101,7 @@ public:
   int     GetPedBegin(void){return wf_ped_begin;}
   double  GetPedestal(void){return wf_pedestal;}
   double  GetPedsigma(void){return wf_pedsigma;}
+  double  GetPedsigmaNew(void);
   void    CalcPedestalRange(void);
   void    CalcPedestalDynamic(void);
   void    SubtractPedestal(void);
@@ -157,6 +158,7 @@ private:
   double  wf_pedestal;               // Pedestal value
   double  run_pedestal;              // Average pedestal for run
   double  wf_pedsigma;               // Deviation of pedestal distribution
+  double  wf_pedsigmaNew;            // Mirrored from wf_pedsigma (old2 dataclass legacy had σ only)
   double  wf_pedshift;               // Amount pedestal shifts (in DC) just
                                      // because we connect inputs to FADCs
 
