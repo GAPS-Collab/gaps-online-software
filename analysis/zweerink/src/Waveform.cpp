@@ -373,6 +373,16 @@ void Waveplot::PlotWaveform(int npoints, float x_lo, float x_hi,
     if ( peaks_allocated && num_peaks > 0 ) {
       y[0] = -1e6;
       y[1] =  1e6;
+      x[0] = 350.0;
+      x[1] = 350.0;
+      pedrange1 = new TGraph(2,x,y);
+      pedrange1->SetLineColor(4);
+      pedrange1->Draw("L");
+      x[0] = 450.0;
+      x[1] = 450.0;
+      pedrange2 = new TGraph(2,x,y);
+      pedrange2->SetLineColor(4);
+      pedrange2->Draw("L");
       for(int i=0; i<num_peaks; i++) {
         //printf("ch %d--Peak %d: Peak = %d, TDC = %.2f, w = %.2f, h = %.2f\n", 
         //       ch, i, peaks[i], tdcs[i], width[i], height[i]);

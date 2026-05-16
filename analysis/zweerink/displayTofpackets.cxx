@@ -65,6 +65,7 @@ int main(int argc, char *argv[]){
   ("h,help", "Print help")
   ("c,calibration", "Calibration file (in txt format)", cxxopts::value<std::string>()->default_value("/home/gaps/nevis-data/tofdata/calibration/latest/"))
   ("file", "A file with TofPackets in it", cxxopts::value<std::string>())
+  ("f,files", "List of Files", cxxopts::value<bool>()->default_value("false"))
   ("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
   ;
   options.parse_positional({"file"});
@@ -79,7 +80,25 @@ int main(int argc, char *argv[]){
     exit(EXIT_FAILURE);
   }
   auto fname   = result["file"].as<std::string>();
+  bool files   = result["files"].as<bool>();
   bool verbose = result["verbose"].as<bool>();
+
+  // If called with the -f option, read in the list of files to analyze
+  FILE *fp;
+  char tmpline[500];
+  std::string fnames[1000];
+  int nfiles=0;
+  if (files) {
+    fp = fopen(fname.c_str(), "r");
+    if (fp != NULL) {
+      while (fscanf(fp, "%s", tmpline) != EOF) fnames[nfiles++] = tmpline;
+      fclose(fp);
+    } else {
+      printf("Unable to open file %s\n", fname.c_str());
+    }
+  } else {
+    fnames[nfiles++] = fname;
+  }
 
   // -> Gaps relevant code starts here
  
@@ -112,27 +131,30 @@ int main(int argc, char *argv[]){
   // One last task before reading the data file processing events
   // -- read in some analysis parameters.
   // Doing this in a kludgy way since we will not use later.
-  FILE *fp = fopen("paramNEVIS.txt", "r");
-  while (fscanf(fp, "%s %f", label, &value) != EOF) {
-    if (strcmp(label,"ped_lo") ==0 )     Ped_low = value; 
-    if (strcmp(label,"ped_win") ==0 )    Ped_win = value;
-    if (strcmp(label,"pulse_lo") ==0 )   Qwin_low = value;
-    if (strcmp(label,"pulse_win") ==0 )  Qwin_size = value;
-    if (strcmp(label,"charge_min") ==0 ) CHmin = value;
-    if (strcmp(label,"thresh") ==0 )     CThresh = value;
-    if (strcmp(label,"cfd_frac") ==0 )   CFDS_frac = value;
-    status = fscanf(fp,"%[^\n]",line); // Scan the rest of the line
-  }
-  fclose(fp); 
+  FILE *fparam = fopen("paramFLIGHT.txt", "r");
+  if (fparam != NULL) { // Actually opened file
+    while (fscanf(fparam, "%s %f", label, &value) != EOF) {
+      if (strcmp(label,"ped_lo") ==0 )     Ped_low = value; 
+      if (strcmp(label,"ped_win") ==0 )    Ped_win = value;
+      if (strcmp(label,"pulse_lo") ==0 )   Qwin_low = value;
+      if (strcmp(label,"pulse_win") ==0 )  Qwin_size = value;
+      if (strcmp(label,"charge_min") ==0 ) CHmin = value;
+      if (strcmp(label,"thresh") ==0 )     CThresh = value;
+      if (strcmp(label,"cfd_frac") ==0 )   CFDS_frac = value;
+      status = fscanf(fparam,"%[^\n]",line); // Scan the rest of the line
+    }
+    fclose(fparam);
+  } else printf("Using default Nevis parameters.\n");
 
   // the reader is something for the future, when the 
   // files get bigger so they might not fit into memory
   // at the same time
   //auto reader = Gaps::TofPacketReader(fname); 
   // for now, we have to load the whole file in memory
-  auto packets = get_tofpackets(fname);
-  spdlog::info("We loaded {} packets from {}", packets.size(), fname);
-
+  for (int k=0; k<nfiles; k++) { 
+    auto packets = get_tofpackets(fnames[k]);
+    spdlog::info("We loaded {} packets from {}", packets.size(), fnames[k]);
+    
   u32 n_rbcalib = 0;
   u32 n_rbmoni  = 0;
   u32 n_mte     = 0;
@@ -147,7 +169,7 @@ int main(int argc, char *argv[]){
   x_sc_hi =  500.0;    // in ns
   y_sc_lo =  -20.0;    // in mV
   y_sc_hi =   40.0;    // in mV
-
+  
   float factor = 1.0;
   x_scr_lo =   50.0;    // in ns                                          
   x_scr_hi =  250.0;    // in ns                                          
@@ -374,6 +396,7 @@ int main(int argc, char *argv[]){
   std::cout << "-- -- MtbMoniData       : " << n_mtbmoni << "\t (packets) " <<  std::endl;
   std::cout << "-- -- undecoded         : " << n_unknown << "\t (packets) " <<  std::endl;
   
+  }
   spdlog::info("Finished");
   return EXIT_SUCCESS;
 }
