@@ -111,7 +111,8 @@ void PacketMethods::ProcessTofEventSummary(TofEventSummary *Tes,
   }
   // Finally, convert our tmpstamp into a FlightTime (in seconds)
   EvtInfo.FlightTime = (tmpstamp - timeInit)/1e8;
-
+  printf("TES0: %llu  %lf\n", tmpstamp, EvtInfo.FlightTime);
+  
   for (TofHit const &h : Tes->hits) {
     int pad = h.paddle_id;
     EvtInfo.Ped[pad][0]     = h.baseline_a;

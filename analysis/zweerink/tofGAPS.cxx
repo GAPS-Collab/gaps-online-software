@@ -55,8 +55,8 @@ void PacketMethods::BeginRun(int run=5) {
 
   // Some useful variables (some initialized to default values)
   // but overwritten from file (if it exists)
-  float Ped_low   = 10;
-  float Ped_win   = 90;
+  float Ped_low   = 350;
+  float Ped_win   = 100;
   float CThresh   = 5.0;
   float CFDS_frac = 0.10;
   float Qwin_low  = 100;
@@ -79,8 +79,8 @@ void PacketMethods::ProcessTofEvent(TofEvent *Tev,
 
   // Some useful variables (some initialized to default values)
   // but overwritten from file (if it exists)
-  float Ped_low   = 10;
-  float Ped_win   = 90;
+  float Ped_low   = 350;
+  float Ped_win   = 100;
   float CThresh   = 5.0;
   float CFDS_frac = 0.10;
   float Qwin_low  = 100;
@@ -108,7 +108,7 @@ void PacketMethods::ProcessTofEvent(TofEvent *Tev,
   //unsigned long int evt_ctr = ev.mt_event.event_id;
   unsigned long int evt_ctr = Tev->event_id;
 
-  printf("Event %ld - RBs: \n", evt_ctr);
+  //printf("Event %ld - RBs: \n", evt_ctr);
   //printf("%ld.", evt_ctr);
   
   for (auto const &rbid : Tev->get_rbids()) {
@@ -160,18 +160,18 @@ void PacketMethods::ProcessTofEvent(TofEvent *Tev,
     }
     for (int i=0; i<rb_event.hits.size(); i++) {
       if (rb_event.hits[i].paddle_id < 161) {
-	printf("RUST %3d",rb_event.hits[i].paddle_id);
-	printf(" %7.2f %7.2f %7.2f %7.2f %6.2f %6.2f",
-	       rb_event.hits[i].get_time_a(), rb_event.hits[i].get_time_b(),
-	       rb_event.hits[i].get_peak_a(), rb_event.hits[i].get_peak_b(),
-	       rb_event.hits[i].get_charge_a(),
-	       rb_event.hits[i].get_charge_b());
+	//printf("RUST %3d",rb_event.hits[i].paddle_id);
+	//printf(" %7.2f %7.2f %7.2f %7.2f %6.2f %6.2f",
+	//     rb_event.hits[i].get_time_a(), rb_event.hits[i].get_time_b(),
+	//     rb_event.hits[i].get_peak_a(), rb_event.hits[i].get_peak_b(),
+	//     rb_event.hits[i].get_charge_a(),
+	//     rb_event.hits[i].get_charge_b());
 	//printf(" %7.4f %5.2f %5.2f %4.2f %4.2f\n",
 	//     Phi[rbid], rb_event.hits[i].baseline_a,
-	printf(" %5.2f %5.2f %4.2f %4.2f\n",
-	       rb_event.hits[i].baseline_a,
-	       rb_event.hits[i].baseline_b, rb_event.hits[i].baseline_a_rms,
-	       rb_event.hits[i].baseline_b_rms);
+	//printf(" %6.3f %6.3f %5.3f %5.3f\n",
+	//     rb_event.hits[i].baseline_a,
+	//     rb_event.hits[i].baseline_b, rb_event.hits[i].baseline_a_rms,
+	//     rb_event.hits[i].baseline_b_rms);
       }
     }
   }

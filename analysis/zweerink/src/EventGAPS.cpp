@@ -922,12 +922,12 @@ void EventGAPS::AnalyzePaddles(float pk_cut = -999, float ch_cut = -999.0) {
 	  IsHit[i] = true;
 	  // Next two lines are useful for printing values to compare
 	  // with online quantities stored in the TofHits() class
-	  if (1 && i<161) {
-	    printf("WAVE %3d %7.2f %7.2f %7.2f %7.2f %6.2f %6.2f", i, TDC[chA],
-		   TDC[chB], VPeak[chA],VPeak[chB], QInt[chA],QInt[chB]);
+	  if (0 && i<161) {
+	    //printf("WAVE %3d %7.2f %7.2f %7.2f %7.2f %6.2f %6.2f",i,TDC[chA],
+	    //	   TDC[chB], VPeak[chA],VPeak[chB], QInt[chA],QInt[chB]);
 	    //printf(" %7.4f %5.2f %5.2f %4.2f %4.2f\n",
 	    //	   Phi[RB[chB]], Pedestal[chA],Pedestal[chB],
-	    printf(" %5.2f %5.2f %4.2f %4.2f\n",
+	    printf("WAVE %3d %6.3f %6.3f %5.3f %5.3f\n", i,
 		   Pedestal[chA],Pedestal[chB],
 		   PedRMS[chA],PedRMS[chB]);
 	  }

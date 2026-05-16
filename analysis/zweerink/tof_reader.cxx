@@ -370,6 +370,7 @@ int main(int argc, char *argv[]){
     }
   }
   }
+  PM.EndRun();
   
   std::cout << "-- -- packets summary:" << std::endl;
   

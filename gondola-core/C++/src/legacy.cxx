@@ -326,6 +326,7 @@ void Waveform::InitializeVariables(int no_acq) {
 
   wf_pedestal     = 0;
   wf_pedsigma     = 0;
+  wf_pedsigmaNew  = 0;
 
   run_pedestal    = 0.0;  // Set to zero until we know a better value.
 
@@ -361,6 +362,8 @@ void Waveform::SetThreshold(float PmtThreshold){
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 
+double Waveform::GetPedsigmaNew(void) { return wf_pedsigmaNew; }
+
 //==================PEDESTAL RELATED STUFF=================
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
@@ -381,6 +384,8 @@ void Waveform::SetPedRange(float range) {
     spdlog::warn(txt);
   } else {
     wf_ped_range = bin_range;
+    // This is to match the value used in the online code.
+    wf_ped_range = 200;
   }
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -391,6 +396,9 @@ void Waveform::SetPedRange(float range) {
 void Waveform::SetPedBegin(float begin)
 {
   int begin_bin = Time2Bin(begin);
+
+  // This is to match the value used in the online code.
+  begin_bin = 700;
   if (begin_bin < 0)
   {
     spdlog::trace("Unable to set a negative pedestal beginning.");
@@ -414,9 +422,11 @@ void Waveform::SetPedBegin(float begin)
 ////////////////////////////////////////////////////////////////////////////
 void Waveform::CalcPedestalRange(void)
 {
+  /* Pedestal math aligned with old2/gaps_os_pro/tof/dataclasses/C++/src/legacy.cxx */
   double sum=0;
   double sum2=0;
   double average;
+  double thresholdguy = 10.0;
 
   /* Here we find the sum and sum^2 for each point of the waveform between
      the start point and the end point (determined from wf_ped_begin and
@@ -424,20 +434,18 @@ void Waveform::CalcPedestalRange(void)
   int ctr=0;
   for(int i=wf_ped_begin ; i<(wf_ped_begin+wf_ped_range) ; i++ )
   {
+    //if (WaveData[i] > thresholdguy) {
       sum  += (double) WaveData[i];
       sum2 += (double) SQR(WaveData[i]);
       ctr++;
+    //}
   }
 
-  //average = sum / (double) wf_ped_range;
   average = sum / (double) ctr;
-  //if (ctr!=wf_ped_range) printf("%d:  %d   %d\n", ch, ctr, wf_ped_range);
 
-  // Now set the pedestal and pedsigma values (in mV)
   wf_pedestal = average;
-  //wf_pedsigma = sqrt( sum2/(double)wf_ped_range - SQR(average) );
   wf_pedsigma = sqrt( sum2/(double)ctr - SQR(average) );
-
+  wf_pedsigmaNew = sqrt( sum2/((double)ctr - SQR(average)) );
 }
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
@@ -446,6 +454,7 @@ void Waveform::CalcPedestalRange(void)
 ////////////////////////////////////////////////////////////////////////////
 void Waveform::CalcPedestalDynamic(void)
 {
+  /* Aligned with old2/gaps_os_pro/tof/dataclasses/C++/src/legacy.cxx */
   // algorithm to find pedestal window and remove darks - JLR 180821
   double sum = 0;
   double sum2 = 0;
@@ -496,9 +505,11 @@ void Waveform::CalcPedestalDynamic(void)
       }
       if (j > i-offset)
       {
+        
         sum  += (double) WaveData[i];
         sum2 += (double) SQR(WaveData[i]);
         ctr++;
+        
       }
     }
     if (ctr > 0)
@@ -515,6 +526,8 @@ void Waveform::CalcPedestalDynamic(void)
   average = sum / (double) ctr;
   wf_pedestal = average;
   wf_pedsigma = sqrt(sum2 / (double) ctr - SQR(average));
+  wf_pedsigmaNew = sqrt(sum2 / ((double) ctr - SQR(average)));
+
 }
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
