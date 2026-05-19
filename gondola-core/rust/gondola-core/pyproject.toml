@@ -29,6 +29,7 @@ dependencies = [
     "pyzmq>=27",
     "twine>=6.2.0",
     "HErmes-py>=0.2.0",
+    "fancy-dataclass>=0.10.2",
 ]
 
 [build-system]

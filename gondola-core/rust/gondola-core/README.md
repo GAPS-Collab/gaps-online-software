@@ -14,6 +14,9 @@ This project is currently still under rapid development, while we try to keep th
 somewhat stable, please strap in for a bit of a rough ride when upgrading. 
 However, the amount of features is increasing constantly and rapidly 
 
+## v0.12.26 
+* run.py - run meta information, handling of data processing
+
 ## v0.12.25
 
 * apply timing constants for tof directly to telemetry events

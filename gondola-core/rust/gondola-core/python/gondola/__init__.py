@@ -42,9 +42,15 @@ from . import packets
 from . import monitoring
 from . import stats
 from . import sim 
+from . import run 
 
-__all__ = ['events', 'packets', 'io', 'monitoring', 'stats', 'algo', 'db',
-           'calibration', 'visual','tracker', 'reconstruction', 'tof', 'sim']
+__all__ = ['events', 'packets',\
+           'io', 'monitoring',\
+           'stats', 'algo',\
+           'db', 'calibration',\
+           'visual','tracker',\
+           'reconstruction', 'tof',\
+           'sim', 'run']
 
 # clean up the namespace, module still available as hidden through _gondola_core
 # this might be depending on the build process if this actually exists
