@@ -12,16 +12,17 @@ dependencies = [
     "tqdm>=4.66.5",
     "django>=5.1.1",
     "vtk>=9.3.1",
-    "dashi>=0.0.0",
     "pydashi>=2.0.1",
     "ipython>=9.2.0",
     "iminuit>=2.31.1",
     "loguru>=0.7.3",
-    "gondola>=0.11.6",
+    "gondola>=0.12.15",
+    "fancy-dataclass>=0.10.2",
+    "uproot>=5.7.3",
 ]
 #"gondola @ file:///srv/gaps/gaps-online-software/gondola-core/rust/gondola-core/target/wheels/gondola-0.11.0-cp311-abi3-manylinux_2_34_x86_64.whl",
 readme = "README.md"
-requires-python = ">= 3.8"
+requires-python = ">= 3.11"
 
 [tool.rye.scripts]
 merge = {cmd = "./merge_tcfc.py"}

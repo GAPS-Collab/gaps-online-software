@@ -29,9 +29,9 @@ cb.visual.set_style_default()
 cb.visual.set_style_streamlit_dark()
 
 # check gondola version
-if not (go.get_version_minor() >= 12 and go.get_version_patch() >= 20):
+if not (go.get_version_minor() >= 12 and go.get_version_patch() >= 25):
     print(f'ERROR - got version {go.get_version_major()}.{go.get_version_minor()}.{go.get_version_patch()}')
-    raise ImportError(f"gondola needs to be at least version 0.12.20!")
+    raise ImportError(f"gondola needs to be at least version 0.12.25!")
 
 #TRK_MASK = "/srv/gaps/crane/v26.01/calib-unpack/cal_run_10047//tracker_channel_enables_100.txt"
 #TRK_PED  = "/srv/gaps/crane/v26.01/calib-unpack/cal_run_10047/List-251216-NZS-0.txt-pedestals-cn2-mod2.txt"
@@ -40,13 +40,15 @@ if not (go.get_version_minor() >= 12 and go.get_version_patch() >= 20):
 #TRK_GAIN = "/srv/gaps/crane/v26.01/calib-unpack/cal_run_10047//List-251216-NZS-0.txt-gains-cn2-mod2.txt"
 
 #v26.01 processing
-TRK_TRF   = "/srv/gaps/crane/v26.03/build/install/gaps-v26.3/resources/calibration//trk-2025/TF_Fit_Coefficients_Calibration_1217_fit.txt" 
-TRK_MASK  = "/srv/gaps/crane/v26.03/build/install/gaps-v26.3/resources/calibration//trk-2025/tracker_channel_enables_100.txt"
-TRK_PED   = "/srv/gaps/crane/v26.03/build/install/gaps-v26.3/resources/calibration//trk-2025/ped_1217.txt"
-TRK_PLS   = "/srv/gaps/crane/v26.03/build/install/gaps-v26.3/resources/calibration//trk-2025/251217-calibration.root-888888-pulse-mask-cut.txt"
-TRK_GAIN  = "/srv/gaps/crane/v26.03/build/install/gaps-v26.3/resources/calibration//trk-2025/List-251216-NZS-0.txt-gains-cn2-mod2.txt"
+CRANE_INSTALL = "/srv/gaps/crane/v26.03/build/install/gaps-v26.3/resources/calibration/"
+CRANE_INSTALL = "/home/stoessl/crane/v26.03/build/install/gaps-v26.3/resources/calibration/"
+TRK_TRF   = f"{CRANE_INSTALL}trk-2025/TF_Fit_Coefficients_Calibration_1217_fit.txt" 
+TRK_MASK  = f"{CRANE_INSTALL}trk-2025/tracker_channel_enables_100.txt"
+TRK_PED   = f"{CRANE_INSTALL}trk-2025/ped_1217.txt"
+TRK_PLS   = f"{CRANE_INSTALL}trk-2025/251217-calibration.root-888888-pulse-mask-cut.txt"
+TRK_GAIN  = f"{CRANE_INSTALL}trk-2025/List-251216-NZS-0.txt-gains-cn2-mod2.txt"
   
-GEO      = "/srv/gaps/crane/v26.01/resources/geometry/geometry.v25.09.root"
+GEO      = "/home/stoessl/crane/v26.03/resources/geometry/geometry.v25.09.root"
 
 try:
     import gondola_cxx as gxx 
@@ -130,8 +132,7 @@ if __name__ == '__main__':
     import argparse
     #import sys
 
-    description = """Calibrate L0 data and write SimpleDet compatible ROOT files"""
-    parser = argparse.ArgumentParser(description=description)
+    parser      = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--telemetry-dir', default=Path('/data0/gaps/csbf/csbf-data/binaries/ethernet'),\
                         help='A directory with telemetry binaries, as received from the telemetry stream',\
                         type=Path,
@@ -144,6 +145,10 @@ if __name__ == '__main__':
     parser.add_argument('--control-plots', action='store_true',\
                         default=False,
                         help='More verbose output')
+    parser.add_argument('-o','--outdir',\
+                        help='Outdir for .root output files',
+                        type=Path,
+                        default=None)
     
     #parser.add_argument('-v','--verbose', action='store_true',\
     #                    help='More verbose output')
@@ -170,8 +175,14 @@ if __name__ == '__main__':
     tracker_cali.remove_cmn = args.remove_cmn
     tracker_cali.remove_pulsed = True
     print (tracker_cali)
-   
-    files   = [str(k) for k in sorted(args.telemetry_dir.glob('*.bin'))]
+    # paddle offsets as calculated by Grace
+    tof_timing_offsets = go.db.TofPaddleTimingConstant.as_dict_by_name('GraceV1')
+    tof_timing_offsets = {k : tof_timing_offsets[k].timing_constant for k in tof_timing_offsets}
+    print (f'--> Loaded TOF timing constants for  {len(tof_timing_offsets)} paddles from db!')
+    if args.telemetry_dir.is_dir():
+        files   = [k for k in sorted(args.telemetry_dir.glob('*.bin'))]
+    if args.telemetry_dir.is_file():
+        files   = [args.telemetry_dir]
     print (f'--> Found {len(files)} telemetry files!')
     nth_event = 0
     done      = False 
@@ -181,10 +192,12 @@ if __name__ == '__main__':
     for f in tqdm.tqdm(files, total=len(files)):
         if done:
             break
-        root_writer = gxx.gondola_cxx.SDRootWriter(f.replace('.bin','.root'), GEO) 
-        root_writer.write_sdpar(0, "valkyrie", "v23.03")
+        outfile = args.outdir / f.name
+        outfile = str(outfile)
+        root_writer = gxx.gondola_cxx.SDRootWriter(outfile.replace('.bin','.root'), GEO) 
+        root_writer.write_sdpar(0, "uhcra", "v23.03")
         #reader  = go.io.TelemetryPacketReader(args.telemetry_dir) 
-        reader   = go.io.TelemetryPacketReader(f)
+        reader   = go.io.TelemetryPacketReader(str(f))
         n_packs, _n_err, _data = reader.count_packets()
         for pack in tqdm.tqdm(reader, total=n_packs):
             if pack.is_event_packet:
@@ -196,6 +209,7 @@ if __name__ == '__main__':
                 n_trk_hits_before = len(ev.tracker) 
                 ev.calibrate_trk_hits(tracker_cali)
                 #print(f'-> We masked {n_trk_hits_before - len(ev.tracker)} tracker hits!')
+                ev.tof_set_timing_constants(tof_timing_offsets)
                 ev.tof_normalize_hit_times()
                 #tracker_cali.calibrate_event(ev) 
                 #print (ev)

@@ -41,20 +41,20 @@ if not (go.get_version_minor() >= 12 and go.get_version_patch() >= 23):
     print(f'ERROR - got version {go.get_version_major()}.{go.get_version_minor()}.{go.get_version_patch()}')
     raise ImportError("gondola needs to be at least version 0.12.8!")
 
-strip_mask = go.db.TrackerStripMask.parse_from_file('/srv/gaps/crane/v26.03/calibration/resources/trk-2025/tracker_channel_enables_100.txt')
-strip_mask = {k.strip_id : k for k in strip_mask}
-
-active_strips = 0
-all_strips = go.db.TrackerStrip.all_as_dict()
-for strip in all_strips:
-    if not strip in strip_mask:
-        active_strips += 1 
-        continue
-    if strip_mask[strip].active:
-        active_strips += 1 
-active_strip_fraction = active_strips/len(all_strips)
-
-print(f'-> {100*active_strip_fraction:.2f} % of strips active (as indicated by map)')
+#strip_mask = go.db.TrackerStripMask.parse_from_file('/srv/gaps/crane/v26.03/calibration/resources/trk-2025/tracker_channel_enables_100.txt')
+#strip_mask = {k.strip_id : k for k in strip_mask}
+#
+#active_strips = 0
+#all_strips = go.db.TrackerStrip.all_as_dict()
+#for strip in all_strips:
+#    if not strip in strip_mask:
+#        active_strips += 1 
+#        continue
+#    if strip_mask[strip].active:
+#        active_strips += 1 
+#active_strip_fraction = active_strips/len(all_strips)
+#
+#print(f'-> {100*active_strip_fraction:.2f} % of strips active (as indicated by map)')
 if __name__ == '__main__':
 
     import argparse
@@ -140,11 +140,11 @@ if __name__ == '__main__':
             #print(f'-> Event has {len(ev.tracker)} tracker hits')
             n_hits_merged_plus.append(len(ev.tracker))
             #print ('--------------------')
-            n_unmasked = 0
-            for h in ev.tracker:
-                if strip_mask[h.strip_id].active: 
-                    n_unmasked += 1 
-            n_hits_merged_plus_masked.append(n_unmasked)
+            #n_unmasked = 0
+            #for h in ev.tracker:
+            #    if strip_mask[h.strip_id].active: 
+            #        n_unmasked += 1 
+            #n_hits_merged_plus_masked.append(n_unmasked)
             tp = ev.pack() 
             # debug 
             #ev = go.events.TelemetryEvent.from_telemetrypacket(tp)
@@ -158,22 +158,22 @@ if __name__ == '__main__':
         #print (f) 
    
 
-    fig = plt.figure(figsize=cb.layout.FIGSIZE_A4_LANDSCAPE) 
-    ax  = fig.gca() 
-    #tbins = np.linspace(-250,250,100)
-    bins = np.arange(-0.5, 250.5, 1)
-    h    = d.factory.hist1d(n_hits_merged, bins) 
-    h.line(filled=True, color='w', alpha=0.7, label='merged, telemetry') 
-    h2   = d.factory.hist1d(n_hits_merged_plus, bins) 
-    h2.line(filled=True, color='r', alpha=0.7, label='remerged with pk80')
-    h3   = d.factory.hist1d(n_hits_merged_plus_masked, bins) 
-    h3.line(filled=False, color='c', alpha=0.7, label=f'remerged, masked (active fraction {100*active_strip_fraction:.1f} \%)')
-    ax.set_xlabel('hits/event',loc='right') 
-    ax.set_ylabel('events', loc='top') 
-    ax.legend(loc='upper right')
-    #ax.set_title('', loc='right')
-    #ax.set_yscale('log')
-    #ax.set_xlim(right=250)
-    ax.set_ylim(bottom=0)
-    fig.savefig('extra-hits.png') 
+    #fig = plt.figure(figsize=cb.layout.FIGSIZE_A4_LANDSCAPE) 
+    #ax  = fig.gca() 
+    ##tbins = np.linspace(-250,250,100)
+    #bins = np.arange(-0.5, 250.5, 1)
+    #h    = d.factory.hist1d(n_hits_merged, bins) 
+    #h.line(filled=True, color='w', alpha=0.7, label='merged, telemetry') 
+    #h2   = d.factory.hist1d(n_hits_merged_plus, bins) 
+    #h2.line(filled=True, color='r', alpha=0.7, label='remerged with pk80')
+    #h3   = d.factory.hist1d(n_hits_merged_plus_masked, bins) 
+    #h3.line(filled=False, color='c', alpha=0.7, label=f'remerged, masked (active fraction {100*active_strip_fraction:.1f} \%)')
+    #ax.set_xlabel('hits/event',loc='right') 
+    #ax.set_ylabel('events', loc='top') 
+    #ax.legend(loc='upper right')
+    ##ax.set_title('', loc='right')
+    ##ax.set_yscale('log')
+    ##ax.set_xlim(right=250)
+    #ax.set_ylim(bottom=0)
+    #fig.savefig('extra-hits.png') 
 
