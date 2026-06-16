@@ -48,15 +48,12 @@ if (BUILD_CXX_BINDINGS)
               C++/src/version.cxx
               C++/src/telemetry_dataclasses.cxx
               C++/src/caraspace.cxx
+              C++/src/tracklet.cxx
               $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:C++/src/sd_legacy.cxx>
               $<$<BOOL:${BUILD_CXX_DB}>:C++/src/database.cxx>
               $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${GONDOLA_DICTIONARY}.cxx>
   )
   set_property(TARGET ${GONDOLA_LIBRARY_SHARED} PROPERTY CXX_STANDARD 20)
-  if(BUILD_CXX_DB)
-    target_compile_definitions(${GONDOLA_LIBRARY_SHARED} PUBLIC BUILD_CXX_DB)
-  endif(BUILD_CXX_DB)
-  #target_compile_definitions(${GONDOLA_LIBRARY_SHARED} PUBLIC SPDLOG_COMPILED_LIB SPDLOG_SHARED_LIB)
   target_compile_options(${GONDOLA_LIBRARY_SHARED} PRIVATE -Wall -Wextra -Wpedantic)# -Werror)
   if(BUILD_CXX_DB)
     target_compile_definitions(${GONDOLA_LIBRARY_SHARED} PUBLIC BUILD_CXX_DB)
@@ -87,6 +84,9 @@ if (BUILD_CXX_BINDINGS)
       INCLUDES DESTINATION ${INSTALL_INCLUDE_DIR}
   )
   
+
+  # -- general installation 
+  
   if (BUILD_CXX_WITH_ROOT)
     # install the additional ROOT libraries
     install(FILES 
@@ -95,67 +95,6 @@ if (BUILD_CXX_BINDINGS)
         DESTINATION lib
     )
   endif (BUILD_CXX_WITH_ROOT)
-
-  ## -----------------------------------------------------
-  ## also build a static library 
-
-
-  #message(STATUS "-- Building gondola-core C++ library.")
-  #set(GONDOLA_LIBRARY_STATIC GondolaCore CACHE INTERNAL "gondola-core C++ static library" FORCE)
-  #add_library(${GONDOLA_LIBRARY_STATIC} STATIC
-  #            C++/src/tof_packet.cxx
-  #            C++/src/calibration.cxx
-  #            C++/src/serialization.cxx
-  #            C++/src/parsers.cxx
-  #            C++/src/events.cxx
-  #            C++/src/io.cxx
-  #            C++/src/telemetry_reader.cxx
-  #            C++/src/monitoring.cxx
-  #            C++/src/legacy.cxx
-  #            C++/src/version.cxx
-  #            C++/src/telemetry_dataclasses.cxx
-  #            C++/src/caraspace.cxx
-  #            $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:C++/src/sd_legacy.cxx>
-  #            $<$<BOOL:${BUILD_CXX_DB}>:C++/src/database.cxx>
-  #            $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${GONDOLA_DICTIONARY}.cxx>
-  #)
-  #set_property(TARGET ${GONDOLA_LIBRARY_SHARED} PROPERTY CXX_STANDARD 20)
-  #if(BUILD_CXX_DB)
-  #  target_compile_definitions(${GONDOLA_LIBRARY_SHARED} PUBLIC BUILD_CXX_DB)
-  #endif(BUILD_CXX_DB)
-  ##target_compile_definitions(${GONDOLA_LIBRARY_SHARED} PUBLIC SPDLOG_COMPILED_LIB SPDLOG_SHARED_LIB)
-  #target_compile_options(${GONDOLA_LIBRARY_SHARED} PRIVATE -Wall -Wextra -Wpedantic)# -Werror)
-  #if(BUILD_CXX_DB)
-  #  target_compile_definitions(${GONDOLA_LIBRARY_SHARED} PUBLIC BUILD_CXX_DB)
-  #endif(BUILD_CXX_DB)
-  #
-  #target_include_directories(${GONDOLA_LIBRARY_SHARED} 
-  #                             SYSTEM PUBLIC
-  #                               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include>
-  #                               $<$<BOOL:${BUILD_CXX_DB}>:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/sqlite_orm/include/sqlite_orm>
-  #)
-  #target_include_directories(${GONDOLA_LIBRARY_SHARED}
-  #                             PUBLIC
-  #                               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/C++/include>
-  #                               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/result>
-  #                               $<INSTALL_INTERFACE:include> 
-  #                               $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_INCLUDE_DIRS}>
-  #)
-  #target_link_libraries(${GONDOLA_LIBRARY_SHARED}
-  #                        PUBLIC
-  #                          $<$<BOOL:${BUILD_CXX_DB}>:${SQLite3_LIBRARIES}>
-  #                          $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARIES}>
-  #)
-  ## install the library in the lib directory
-  #install(TARGETS ${GONDOLA_LIBRARY_SHARED}
-  #    EXPORT GAPSTargets         
-  #    LIBRARY DESTINATION ${INSTALL_LIBRARY_DIR}
-  #    PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}
-  #    INCLUDES DESTINATION ${INSTALL_INCLUDE_DIR}
-  #)
-
-
-  # -----------------------------------------------------
 
   include(CMakePackageConfigHelpers)
   write_basic_package_version_file(
@@ -184,32 +123,62 @@ if (BUILD_CXX_BINDINGS)
     FILES_MATCHING PATTERN "*.hxx" PATTERN "*.hpp" PATTERN "*.h"
   )
 endif(BUILD_CXX_BINDINGS)
-
-##============================================
-
-if(BUILD_CXX_PYBINDINGS)
-  set(CXX_PYBINDINGS gondola_cxx)
-  message(STATUS "-- Building gondola-core C++ pybindings with nanobind.")
-  nanobind_add_module(${CXX_PYBINDINGS} STABLE_ABI NOMINSIZE C++/python/gondola_core.cxx)
-  target_include_directories(${CXX_PYBINDINGS} 
+  
+# -- static library for pybindings 
+if (BUILD_CXX_STATIC_LIB)
+  message(STATUS "-- Building gondola-core C++ STATIC library (for the use with nanobind).")
+  set(GONDOLA_LIBRARY_STATIC GondolaCoreStatic CACHE INTERNAL "gondola-core C++ static library" FORCE)
+  add_library(${GONDOLA_LIBRARY_STATIC} STATIC 
+              C++/src/tof_packet.cxx
+              C++/src/calibration.cxx
+              C++/src/serialization.cxx
+              C++/src/parsers.cxx
+              C++/src/events.cxx
+              C++/src/io.cxx
+              C++/src/telemetry_reader.cxx
+              C++/src/monitoring.cxx
+              C++/src/legacy.cxx
+              C++/src/version.cxx
+              C++/src/telemetry_dataclasses.cxx
+              C++/src/caraspace.cxx
+              C++/src/tracklet.cxx
+              $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:C++/src/sd_legacy.cxx>
+              $<$<BOOL:${BUILD_CXX_DB}>:C++/src/database.cxx>
+              $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${GONDOLA_DICTIONARY}.cxx>
+  )
+  set_target_properties(${GONDOLA_LIBRARY_STATIC} PROPERTIES 
+    POSITION_INDEPENDENT_CODE ON
+  )
+  set_target_properties(${GONDOLA_LIBRARY_STATIC} PROPERTIES 
+    EXCLUDE_FROM_ALL FALSE
+  )
+  
+  set_property(TARGET ${GONDOLA_LIBRARY_STATIC} PROPERTY CXX_STANDARD 20)
+  if(BUILD_CXX_DB)
+      target_compile_definitions(${GONDOLA_LIBRARY_STATIC} PUBLIC BUILD_CXX_DB)
+  endif(BUILD_CXX_DB)
+  target_compile_options(${GONDOLA_LIBRARY_STATIC} PRIVATE -Wall -Wextra -Wpedantic)# -Werror)
+  
+  target_include_directories(${GONDOLA_LIBRARY_STATIC} 
                                SYSTEM PUBLIC
                                  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include>
                                  $<$<BOOL:${BUILD_CXX_DB}>:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/sqlite_orm/include/sqlite_orm>
   )
-  target_include_directories(${CXX_PYBINDINGS}
+  target_include_directories(${GONDOLA_LIBRARY_STATIC}
                                PUBLIC
                                  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/C++/include>
                                  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/result>
                                  $<INSTALL_INTERFACE:include> 
                                  $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_INCLUDE_DIRS}>
   )
-  target_link_libraries(${CXX_PYBINDINGS}
+  target_link_libraries(${GONDOLA_LIBRARY_STATIC}
                           PUBLIC
-                            $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARY_SHARED}>
-                            $<$<BOOL:${BUILD_CXX_DB}>:${SQLite3_LIBRARIES}>
-                            ${GONDOLA_LIBRARY_SHARED}
-                            ${ROOT_LIBRARIES}
+                            "$<$<BOOL:${BUILD_CXX_DB}>:${SQLite3_LIBRARIES}>"
+                            "$<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARIES}>"
   )
-endif(BUILD_CXX_PYBINDINGS) 
-
+  install(TARGETS ${GONDOLA_LIBRARY_STATIC}
+    EXPORT GAPSTargets         
+    ARCHIVE DESTINATION lib     # Where the single static .a goes
+  )
+endif(BUILD_CXX_STATIC_LIB)
 
