@@ -78,6 +78,14 @@ class TofPaddleTimingConstant(models.Model):
                                     default=0,
                                     null=False,
                                     help_text="Actual constant in ns")
+    paddle_constant      = models.FloatField(
+                                    default=0,
+                                    null=False,
+                                    help_text="Actual constant in ns (paddle part)")
+    panel_constant       = models.FloatField(
+                                    default=0,
+                                    null=False,
+                                    help_text="Actual constant in ns (panel part)")
     @staticmethod
     def get_from_file(filename, utc_start = 0, utc_stop = 0, name = None, version = None, no_fail_on_vid_check = False):
         """
@@ -100,8 +108,10 @@ class TofPaddleTimingConstant(models.Model):
                 #print (all_paddles[tc.paddle_id])
                 if not no_fail_on_vid_check:
                     raise ValueError
-            tc.volume_id       = vid 
-            tc.timing_constant = k['total_offset']
+            tc.volume_id           = vid 
+            tc.timing_constant     = k['total_offset']
+            tc.paddle_constant     = k['paddle_offset']
+            tc.panel_constant      = k['panel_offset']
             tc.utc_timestamp_start = utc_start 
             tc.utc_timestamp_stop  = utc_stop 
             tc.name                = name 
