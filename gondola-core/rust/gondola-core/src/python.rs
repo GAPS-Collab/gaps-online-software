@@ -118,13 +118,20 @@ macro_rules! pythonize_monidata {
       fn new_py() -> Self {
         Self::new()
       }
+
+      // this is a bit of a kludge, but in general
+      // we need something to allow to set the timestamp
+      // in case we read TofPackets from MoniData
+      #[setter]
+      fn set_timestamp(&mut self, timestamp : u64) {
+        self.timestamp = timestamp;
+      }
     
       #[getter]
       #[pyo3(name="board_id")]
       fn board_id_py(&self) -> u8 {
         self.get_board_id()
       }
-
 
       #[staticmethod]
       #[pyo3(name="keys")]
