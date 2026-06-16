@@ -265,7 +265,7 @@ impl FromRandom for MtbMoniData {
 #[cfg(feature="pybindings")]
 #[pymethods]
 impl MtbMoniData {
-  
+ 
   #[getter]
   fn get_vccint(&self) -> f32 {
     Self::adc_vcc_conversion(self.vccint)
@@ -332,7 +332,6 @@ impl MtbMoniData {
   pub fn get_tiu_ignore_busy_py(&self) -> bool {
     self.get_tiu_ignore_busy()
   }
-
 
   #[getter]
   #[pyo3(name="fpga_temp")]

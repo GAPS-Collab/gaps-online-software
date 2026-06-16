@@ -102,7 +102,10 @@ pub trait MoniData {
   /// board. This might not be its own board, but 
   /// maybe the RB the data was gathered from
   /// This is an unique identifier for the 
-  /// monitoring data
+  /// monitoring data across the same type. 
+  ///
+  /// MoniData which only belongs to a single board will 
+  /// have board id 0
   fn get_board_id(&self) -> u8;
   
   /// Access the (data) members by name 
@@ -117,11 +120,23 @@ pub trait MoniData {
 
   fn set_timestamp(&mut self, _ts : u64) {
   }
-  ///// access the internal timestamps as obtained from 
-  ///// MoniDat 
-  //fn get_timestamps_mut(&mut self) -> &Vec<u64> {
-  //}   
 }
+
+// FIXME - this whole system gets too much. We need to reorganize this 
+// -> push it to 0.13. For now, just make the timestamp settable, which 
+// will basically achieve the same thing
+///// A specialized MoniData series, originating in housekeeping 
+///// from the TOF system. During flight, the housekeeping 
+///// data has been wrapped in telemetry packets as an "outer layer" 
+//pub trait TofMoniData 
+//  where Self : MoniData {
+//  
+//  // Read TofMoniData from TelemetryPackets, since technically, 
+//  // they are not TelemetryPackable
+//  fn from_telemetrypacket(packet : TelemetryPacket) -> PyResult<Self> {
+//  } 
+//}
+
 
 /// A MoniSeries is a collection of (primarily) monitoring
 /// data, which comes from multiple senders.
@@ -271,7 +286,7 @@ pub trait MoniSeries<T>
       self.get_data_mut().get_mut(&board_id).unwrap().pop_front();
     }
   }
-  
+ 
   fn get_last_moni(&self, board_id : u8) -> Option<T> {
     let size = self.get_data().get(&board_id)?.len();
     Some(self.get_data().get(&board_id).unwrap()[size - 1])
@@ -385,7 +400,6 @@ macro_rules! moniseries_general {
          self.set_max_size(size);
        }
        
-
        #[getter]
        #[pyo3(name="first_ts")]
        pub fn get_first_ts_py(&self) -> u64 {
@@ -400,6 +414,23 @@ macro_rules! moniseries_general {
        fn get_timestamps_py(&self) -> Vec<u64> {
          warn!("This returns a full copy and is a performance bottleneck!");
          return self.timestamps.clone();
+       }
+
+       /// Manually add a timestamp. There is a caveat to the 
+       /// timestamps. In general, f32 is not large enough to 
+       /// hold a 48bit timestamp, as the gcutime. 
+       ///
+       /// This needs some overhaul, this will be done in v0.13. 
+       /// For now, we can keep track manually
+       #[pyo3(name="add_timestamp")]
+       fn add_timestamp_py(&mut self, ts : u64) {
+         self.timestamps.push(ts);
+       }
+
+       /// Add a new daughter item to the series
+       #[pyo3(name="add")]
+       fn add_py(&mut self, moni : $class) {
+         self.add(moni);
        }
 
        #[pyo3(name="get_var_for_board")]
