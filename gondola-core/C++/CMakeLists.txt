@@ -35,7 +35,6 @@ add_subdirectory(${GONDOLA_PATH}/resources/extern/nanobind
 set(CXX_PYBINDINGS gondola_cxx)
 nanobind_add_module(${CXX_PYBINDINGS} STABLE_ABI NOMINSIZE ${GONDOLA_PATH}/gondola-core/C++/python/gondola_core.cxx)
 set_property(TARGET ${CXX_PYBINDINGS} PROPERTY CXX_STANDARD 20)
-#target_compile_definitions(${CXX_PYBINDINGS} PUBLIC BUILD_CXX_DB=1)
 target_compile_definitions(${CXX_PYBINDINGS} PUBLIC BUILD_CXX_WITH_ROOT=1)
 
 target_include_directories(${CXX_PYBINDINGS} 
@@ -54,7 +53,7 @@ target_link_libraries(${CXX_PYBINDINGS}
                         PUBLIC
                           $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARY_SHARED}>
                           $<$<BOOL:${BUILD_CXX_DB}>:${SQLite3_LIBRARIES}>
-                          GapsOnlineSoftware::GondolaCore
+                          GapsOnlineSoftware::GondolaCoreStatic
                           ${ROOT_LIBRARIES}
 )
 install(TARGETS ${CXX_PYBINDINGS} LIBRARY DESTINATION gondola_cxx)

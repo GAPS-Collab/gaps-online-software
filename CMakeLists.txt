@@ -46,7 +46,7 @@ endif()
 
 message(STATUS "Installing into ${CMAKE_INSTALL_PREFIX}")
 option(BUILD_CXX_BINDINGS "build C++ implementation of gondola-core" OFF)
-option(BUILD_CXX_PYBINDINGS "build C++ pybindings with pybind11 (deprecated)" OFF)
+option(BUILD_CXX_STATIC_LIB "build C++ implementation of gondola-core (static library - this is ONLY used for the gondola_cxx pybindings! and usually should be OFF)" OFF)
 option(BUILD_CXX_DB "Build C++ bindings with SQLITE3 to access GAPS DB. Requires SQlite3 installed" OFF) 
 option(BUILD_CXX_EXAMPLES "build C++ examples to illustrate usage of the GondolaCore C++ library" OFF)
 option(BUILD_CXX_PERSONAL_ANALYSIS_CODE "builds personal analysis code in the analysis/ directory. This includes e.g. Jeff's TOF code. This might require the (CERN) ROOT library, so BUILD_CXX_WITH_ROOT needs to be switched on" OFF)
@@ -89,13 +89,6 @@ if(BUILD_CXX_DB)
   endif()
 endif()
 
-# -- pybindings with pybind11
-
-#if (BUILD_CXXPYBINDINGS)
-if (BUILD_CXX_PYBINDINGS) 
-  find_package(Python 3.8 COMPONENTS Interpreter Development.Module REQUIRED)
-  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/resources/extern/nanobind)
-endif() 
 
 set(INSTALL_LIBRARY_DIR  "${CMAKE_INSTALL_PREFIX}/lib" CACHE PATH      "installation directory for libraries" FORCE)
 set(INSTALL_INCLUDE_DIR  "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH  "installation directory for header files" FORCE)
