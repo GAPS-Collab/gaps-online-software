@@ -6,6 +6,7 @@ to a ROOT formt whcih is used with SimpleDet, the
 analysis code widely used in GAPS.
 """
 
+import sys
 import tqdm
 import gondola as go
 import time
@@ -41,15 +42,20 @@ if not (go.get_version_minor() >= 12 and go.get_version_patch() >= 25):
 
 #v26.01 processing
 CRANE_INSTALL = "/srv/gaps/crane/v26.03/build/install/gaps-v26.3/resources/calibration/"
-CRANE_INSTALL = "/home/stoessl/crane/v26.03/build/install/gaps-v26.3/resources/calibration/"
+#CRANE_INSTALL = "/home/stoessl/crane/v26.03/build/install/gaps-v26.3/resources/calibration/"
 TRK_TRF   = f"{CRANE_INSTALL}trk-2025/TF_Fit_Coefficients_Calibration_1217_fit.txt" 
 TRK_MASK  = f"{CRANE_INSTALL}trk-2025/tracker_channel_enables_100.txt"
 TRK_PED   = f"{CRANE_INSTALL}trk-2025/ped_1217.txt"
 TRK_PLS   = f"{CRANE_INSTALL}trk-2025/251217-calibration.root-888888-pulse-mask-cut.txt"
-TRK_GAIN  = f"{CRANE_INSTALL}trk-2025/List-251216-NZS-0.txt-gains-cn2-mod2.txt"
-  
-GEO      = "/home/stoessl/crane/v26.03/resources/geometry/geometry.v25.09.root"
+TRK_GAIN  = f"{CRANE_INSTALL}trk-2025/List-251216-NZS-0.txt-gains-cn2-mod2.txt"  
+GEO       = f"{CRANE_INSTALL}/resources/geometry/geometry.v25.09.root"
 
+GEO       = f"/srv/gaps/crane/v26.03/resources/geometry/geometry.v25.09.root"
+
+for k in TRK_TRF, TRK_MASK, TRK_PED, TRK_PLS, TRK_GAIN, GEO:
+    if not Path(k).exists():
+        print (f'{k} does not exist! Aborting!')
+        sys.exit(1) 
 try:
     import gondola_cxx as gxx 
 except ImportError:
@@ -177,7 +183,11 @@ if __name__ == '__main__':
     print (tracker_cali)
     # paddle offsets as calculated by Grace
     tof_timing_offsets = go.db.TofPaddleTimingConstant.as_dict_by_name('GraceV1')
-    tof_timing_offsets = {k : tof_timing_offsets[k].timing_constant for k in tof_timing_offsets}
+    # these are the broken ones
+    #tof_timing_offsets = {k : tof_timing_offsets[k].timing_constant for k in tof_timing_offsets}
+    # fix the timing constants by subtracting the panel constant 
+    tof_timing_offsets = {k : tof_timing_offsets[k].paddle_constant - tof_timing_offsets[k].panel_constant for k in tof_timing_offsets}
+
     print (f'--> Loaded TOF timing constants for  {len(tof_timing_offsets)} paddles from db!')
     if args.telemetry_dir.is_dir():
         files   = [k for k in sorted(args.telemetry_dir.glob('*.bin'))]
