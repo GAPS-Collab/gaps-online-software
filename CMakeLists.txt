@@ -166,13 +166,22 @@ endif()
 # Write setup-env.sh shell script
 ####################################
 
-## Define the paths
+# Define the paths
 set(SETUP_SCRIPT_SOURCE ${CMAKE_SOURCE_DIR}/setup-env.sh.in)
 set(SETUP_SCRIPT_DEST ${CMAKE_BINARY_DIR}/setup-env.sh)
 
+# The shell will append to the $PYTHONPATH shell variable. Before 
+# we do so, clean the PYTHONPATH of unnecessary duplicates
+set(PYTHONPATH_ $ENV{PYTHONPATH})
+string(REPLACE ":" ";" PYTHONPATH_LIST "${PYTHONPATH_}")
+if(PYTHONPATH_LIST)
+    list(REMOVE_DUPLICATES PYTHONPATH_LIST)
+endif()
+string(REPLACE ";" ":" CLEAN_PYTHONPATH "${PYTHONPATH_LIST}")
+set(ENV{PYTHONPATH} "${CLEAN_PYTHONPATH}")
+
 # Configure the setup script during configuration
 configure_file(${SETUP_SCRIPT_SOURCE} ${SETUP_SCRIPT_DEST} @ONLY)
-#
 ## Install the generated setup script during installation
 install(FILES ${SETUP_SCRIPT_DEST} DESTINATION ${CMAKE_INSTALL_PREFIX})
 
