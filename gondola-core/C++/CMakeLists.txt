@@ -1,4 +1,9 @@
-# this is only to be used with scikit
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+# CMakeLists.txt for nanobind pybindings 
+# -- intended to be used with scikit 
+# -- see build.sh script in this directory
+# -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
 cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 project(gondola_cxx VERSION 0.12 LANGUAGES C CXX)
 
@@ -12,30 +17,38 @@ if(ROOT_FOUND)
    include(${ROOT_USE_FILE})
 endif(ROOT_FOUND)
 
-set (ABS_PATH /srv/gaps/gaps-online-software) 
-# this is stupid!
-add_subdirectory(${ABS_PATH}/resources/extern/nanobind
-    #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../resources/extern/nanobind
+# there is a gotcha when building with scikit - it sets up 
+# a temporary CMAKE_CURRENT_SOURCE_DIR, and does not copy 
+# the whole repository there, so we can't locate the externals 
+# and headers the usual way
+set (GONDOLA_PATH $ENV{GapsOnlineSoftware_SRC}) 
+
+if (NOT EXISTS "${GONDOLA_PATH}") 
+  message(FATAL_ERROR "Need to load gaps-online-software setup-env.sh shell for build!")
+else() 
+  message(STATUS "Found gaps-online-software src directory at ${GONDOLA_PATH}")
+endif()
+
+add_subdirectory(${GONDOLA_PATH}/resources/extern/nanobind
                  ${CMAKE_BINARY_DIR}/nanobind_build)
 
-
 set(CXX_PYBINDINGS gondola_cxx)
-nanobind_add_module(${CXX_PYBINDINGS} STABLE_ABI NOMINSIZE ${ABS_PATH}/gondola-core/C++/python/gondola_core.cxx)
+nanobind_add_module(${CXX_PYBINDINGS} STABLE_ABI NOMINSIZE ${GONDOLA_PATH}/gondola-core/C++/python/gondola_core.cxx)
 set_property(TARGET ${CXX_PYBINDINGS} PROPERTY CXX_STANDARD 20)
 #target_compile_definitions(${CXX_PYBINDINGS} PUBLIC BUILD_CXX_DB=1)
 target_compile_definitions(${CXX_PYBINDINGS} PUBLIC BUILD_CXX_WITH_ROOT=1)
 
 target_include_directories(${CXX_PYBINDINGS} 
                              SYSTEM PUBLIC
-                             $<BUILD_INTERFACE:${ABS_PATH}//resources/extern/spdlog/include>
-                             $<$<BOOL:${BUILD_CXX_DB}>:${ABS_PATH}/resources/extern/sqlite_orm/include/sqlite_orm>
+                             $<BUILD_INTERFACE:${GONDOLA_PATH}//resources/extern/spdlog/include>
+                             $<$<BOOL:${BUILD_CXX_DB}>:${GONDOLA_PATH}/resources/extern/sqlite_orm/include/sqlite_orm>
 )
 target_include_directories(${CXX_PYBINDINGS}
                              PUBLIC
-                             $<BUILD_INTERFACE:${ABS_PATH}/gondola-core/C++/include>
-                             $<BUILD_INTERFACE:${ABS_PATH}//resources/extern/result>
-                               $<INSTALL_INTERFACE:include> 
-                               $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_INCLUDE_DIRS}>
+                             $<BUILD_INTERFACE:${GONDOLA_PATH}/gondola-core/C++/include>
+                             $<BUILD_INTERFACE:${GONDOLA_PATH}/resources/extern/result>
+                             $<INSTALL_INTERFACE:include> 
+                             $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_INCLUDE_DIRS}>
 )
 target_link_libraries(${CXX_PYBINDINGS}
                         PUBLIC
