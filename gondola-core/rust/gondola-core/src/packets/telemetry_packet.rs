@@ -30,7 +30,8 @@ impl TelemetryPacket {
   
   /// For a packet of any merged event type, retrieve the run id from 
   /// the TOF part 
-  #[pyo3(name="get_runid")]
+  #[getter]
+  #[pyo3(name="run_id")]
   fn get_runid_py(&self) -> PyResult<u16> {
     let runid_opt = self.get_runid();
     match runid_opt {
