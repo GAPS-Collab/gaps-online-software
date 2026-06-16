@@ -74,6 +74,9 @@ impl RBWaveform {
   }
   
   pub fn charge_a_below_500(&self) -> f32 {
+    if self.nanoseconds_b.len() == 0 || self.voltages_b.len() == 0 {
+      return 0.0;
+    }
 
     let mut total_area = 0.0f32;
     for i in 0..(self.nanoseconds_a.len() - 1) {
@@ -93,6 +96,9 @@ impl RBWaveform {
   }
   
   pub fn charge_b_below_500(&self) -> f32 {
+    if self.nanoseconds_b.len() == 0 || self.voltages_b.len() == 0 {
+      return 0.0;
+    }
 
     let mut total_area = 0.0f32;
     for i in 0..(self.nanoseconds_b.len() - 1) {
@@ -122,6 +128,9 @@ impl RBWaveform {
   //}
   
   pub fn charge_a_trap(&self) -> f32 {
+    if self.nanoseconds_b.len() == 0 || self.voltages_b.len() == 0 {
+      return 0.0;
+    }
     let mut total_area = 0.0f32;
     for i in 0..(self.nanoseconds_a.len() - 1) {
         let h = self.nanoseconds_a[i + 1] - self.nanoseconds_a[i]; // The width of the trapezoid.
@@ -132,6 +141,9 @@ impl RBWaveform {
   }
   
   pub fn charge_b_trap(&self) -> f32 {
+    if self.nanoseconds_b.len() == 0 || self.voltages_b.len() == 0 {
+      return 0.0;
+    }
     let mut total_area = 0.0f32;
     for i in 0..(self.nanoseconds_b.len() - 1) {
         let h = self.nanoseconds_b[i + 1] - self.nanoseconds_b[i]; // The width of the trapezoid.
