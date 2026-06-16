@@ -5,6 +5,8 @@
 
 use crate::prelude::*;
 
+use std::collections::HashSet;
+
 /// The basic event type as sent over telemetry, often 
 /// also dubbed as "merged event".
 ///
@@ -62,6 +64,17 @@ impl TelemetryEvent {
       oscillator_idx      : Vec::<u8>::new(),
       expected_tr_hits    : 0,
     }
+  }
+
+  /// This can be useful for single track analysis 
+  pub fn has_only_one_hit_per_tlayer(&self) -> bool { 
+    let mut layers = HashSet::<u8>::new();
+    for h in &self.tracker_hits {
+      if !layers.insert(h.layer) {
+        return false; // we found a duplicate! 
+      }
+    } 
+    return true;
   }
 
   /// Create a TelemetryPacket from the 
@@ -426,8 +439,14 @@ impl TelemetryEvent {
 
   #[getter]
   #[pyo3(name="exptected_tracker_hits")]
-  fn excpected_trk_hits_py(&self) -> u8 {
+  fn expected_trk_hits_py(&self) -> u8 {
     self.expected_tr_hits
+  }
+
+  #[getter]
+  #[pyo3(name="has_only_one_hit_per_tlayer")] 
+  fn has_only_one_hit_per_tlayer_py(&self) -> bool {
+    self.has_only_one_hit_per_tlayer()
   }
 
   #[getter]
@@ -475,6 +494,19 @@ impl TelemetryEvent {
     self.event_id
   }
   
+  /// If available parse the run id from 
+  /// the TOF part of the event 
+  ///
+  /// Returns None if the run id is not 
+  /// set or 0
+  #[getter]
+  fn get_run_id(&self) -> Option<u16> {
+    if self.tof_event.run_id == 0 {
+      return None;
+    }
+    Some(self.tof_event.run_id) 
+  }
+  
   /// Remove all TOF hits from the event's hit series which 
   /// do NOT obey causality. that is where the timings
   /// measured at ends A and B can not be correlated
@@ -489,6 +521,18 @@ impl TelemetryEvent {
     }
     pids
   }
+  
+  /// Remove the hits from the event which are not passing 
+  /// Elena's cuts. This has a large overlap with "non-causal"
+  /// hit, but is stricter 
+  ///
+  /// # Arguments:
+  ///   * no_return : If true, don't return anything, which 
+  ///                 will make the execution time shorter
+  ///
+  pub fn tof_remove_elena_hits(&mut self, no_return : bool) -> Option<Vec<TofHit>> {
+    return self.tof_event.remove_elena_hits(no_return);
+  } 
   
   /// Remove TOF hits from the hitseries which can not 
   /// be caused by the same particle, which means 
