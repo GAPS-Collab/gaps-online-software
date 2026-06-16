@@ -1,6 +1,6 @@
 [package]
 name = "gondola-core"
-version = "0.12.25"
+version = "0.12.26"
 edition = "2024"
 
 [lib]

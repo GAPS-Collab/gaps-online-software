@@ -140,6 +140,8 @@ diesel::table! {
       name                -> Nullable<Text>,
       version             -> Nullable<Integer>,
       timing_constant     -> Float, 
+      paddle_constant     -> Float,
+      panel_constant      -> Float
   }
 }
 

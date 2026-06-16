@@ -2266,6 +2266,8 @@ pub struct TofPaddleTimingConstant {
   pub name                : Option<String>, 
   pub version             : Option<i32>,   
   pub timing_constant     : f32,  
+  pub paddle_constant     : f32, 
+  pub panel_constant      : f32,
 }
 
 impl TofPaddleTimingConstant {
@@ -2280,6 +2282,8 @@ impl TofPaddleTimingConstant {
       name                : None, 
       version             : None,
       timing_constant     : 0.0,
+      paddle_constant     : 0.0,
+      panel_constant      : 0.0,
     }
   }
 
@@ -2338,7 +2342,8 @@ impl TofPaddleTimingConstant {
     return Ok(paddles);
   }
 
-  /// Get all tracker strip mask from the database
+  /// Get all timing calibration constants we have from the database
+  /// - not recommended, this will be mixing different versions 
   ///
   /// # Returns:
   ///   * HashMap<u32 [strip id], TrackeStripMask> 
@@ -2375,6 +2380,8 @@ impl fmt::Display for TofPaddleTimingConstant {
     if self.version.is_some() {
       repr += &(format!("\n   version        : {}", self.version.unwrap())); 
     }
+    repr += &(format!("\n   paddle const.    : {}", self.paddle_constant));   
+    repr += &(format!("\n   panel  const.    : {}", self.panel_constant));   
     repr += &(format!("\n   timing const.    : {}", self.timing_constant));   
     write!(f, "{}", repr)
   }
@@ -2459,6 +2466,23 @@ impl TofPaddleTimingConstant {
   fn get_timing_constant       (&self) -> f32 { 
     self.timing_constant
   }
+  
+  #[getter]
+  fn get_paddle_constant       (&self) -> f32 { 
+    self.paddle_constant
+  }
+  
+  #[getter]
+  fn get_panel_constant       (&self) -> f32 { 
+    self.panel_constant
+  }
+
+  /// Completely reset the timing constant and 
+  /// NOT use the one from the db, but an own 
+  fn set_timing_constan(&mut self, tc : f32) {
+    self.timing_constant = tc;
+  }
+
 }
 
 #[cfg(feature="pybindings")]
