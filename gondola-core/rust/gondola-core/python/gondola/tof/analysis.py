@@ -1,7 +1,15 @@
+"""
+Provides one-shot containers for various plots, allowing 
+to apply cuts.
 
+FIXME - the .fill_histograms method is currently a massive 
+performance bottleneck. To mitigate that, we are working 
+on the kanidashi project, so stay tuned.
+"""
 import numpy as np
 import dashi as d
 import json
+import tqdm
 d.visual()
 
 from copy import deepcopy as copy
@@ -28,38 +36,66 @@ class TofAnalysis:
     The gist here it is independent of the data source, as 
     long as some kind of TofEvent can be plugged in.
     """
+    NBINS              = 70 
+    PADDLE_PEAK_BINS   = np.linspace(0    , 200 ,     NBINS)
+    PADDLE_CHARGE_BINS = np.linspace(-2   , 60  ,     NBINS)
+    PADDLE_TIMING_BINS = np.linspace(0    , 250 ,     NBINS)
+    PADDLE_BL_BINS     = np.linspace(-2.5 , 2.5 ,     NBINS)
+    PADDLE_BLRMS_BINS  = np.linspace(0    , 2   ,     NBINS)
+    PADDLE_X0_BINS     = np.linspace(-0.1 , 1.1 ,     NBINS)
+    PADDLE_T0_BINS     = np.linspace(0    , 500 ,     NBINS)
+    PADDLE_EDEP_BINS   = np.linspace(0    , 30  ,     NBINS)
+    BETA_BINS          = np.linspace(0    , 2   ,     NBINS)
+    EDEP_BINS          = np.linspace(0    , 50  ,     NBINS)
+    TIMING_BINS        = np.linspace(-100 , 300 ,     NBINS)
+    PDELAY_BINS        = np.linspace(-60  , 60  ,     NBINS)
+    TDIFF_BINS         = np.linspace(-1   , 10  ,     NBINS)
+    DIST_BINS          = np.linspace(0    , 4   ,     NBINS)
+    COS_T_BINS         = np.linspace(0    , 1   ,     NBINS)
+    COS_T2_BINS        = np.linspace(0    , 1   , int(NBINS/3))
+    X_BINS_OUTER       = np.linspace(-2000, 2000,     NBINS)
+    Y_BINS_OUTER       = np.linspace(-2000, 2000,     NBINS)
+    Z_BINS_OUTER       = np.linspace(-250 , 2500,     NBINS)
+    X_BINS_INNER       = np.linspace(-1000, 1000,     NBINS)
+    Y_BINS_INNER       = np.linspace(-1000, 1000,     NBINS)
+    Z_BINS_INNER       = np.linspace(-250 , 1500,     NBINS)
 
-    def define_bins(self, nbins = 70):
-        """
-        Set the bins for the different histograms for the 
-        variables. Only the number of bins can be set
-        """
-        self.PADDLE_PEAK_BINS   = np.linspace(0,200,     nbins)
-        self.PADDLE_CHARGE_BINS = np.linspace(-2,60 ,     nbins)
-        self.PADDLE_TIMING_BINS = np.linspace(0,250,     nbins)
-        self.PADDLE_BL_BINS     = np.linspace(-2.5,2.5 ,     nbins)
-        self.PADDLE_BLRMS_BINS  = np.linspace(0,2  ,     nbins)
-        self.PADDLE_X0_BINS     = np.linspace(-0.1, 1.1, nbins)
-        self.PADDLE_T0_BINS     = np.linspace(0,500,     nbins)
-        self.PADDLE_EDEP_BINS   = np.linspace(0,30 ,     nbins)
-        self.NHIT_BINS          = np.arange(-0.5,25.5,1)   
-        self.PID_BINS           = np.arange(0.5,160.5,1)
-        self.BETA_BINS          = np.linspace(0,2  ,     nbins)
-        self.EDEP_BINS          = np.linspace(0,50,      nbins)
-        self.TIMING_BINS        = np.linspace(-100, 300, nbins)
-        self.PDELAY_BINS        = np.linspace(-60,60,    nbins)
-        self.TDIFF_BINS         = np.linspace(-1, 10, nbins)
-        self.DIST_BINS          = np.linspace(0,4, nbins)
-        self.COS_T_BINS         = np.linspace(0,1,nbins)
-        self.COS_T2_BINS        = np.linspace(0,1,int(nbins/3))
-        self.X_BINS_OUTER       = np.linspace(-2000,2000,nbins)
-        self.Y_BINS_OUTER       = np.linspace(-2000,2000,nbins)
-        self.Z_BINS_OUTER       = np.linspace(-250, 2500,nbins)
-        self.X_BINS_INNER       = np.linspace(-1000,1000,nbins)
-        self.Y_BINS_INNER       = np.linspace(-1000,1000,nbins)
-        self.Z_BINS_INNER       = np.linspace(-250, 1500,nbins)
-        self.PID_BINS_INNER     = np.arange(0.5, 60.5, 1)
-        self.PID_BINS_OUTER     = np.arange(61.5, 161.5,1)
+    PID_BINS_INNER     = np.arange(0.5 , 60.5 , 1)
+    PID_BINS_OUTER     = np.arange(61.5, 161.5, 1)
+    NHIT_BINS          = np.arange(-0.5, 25.5 , 1)   
+    PID_BINS           = np.arange(0.5 , 160.5, 1)
+
+    #def define_bins(self, nbins = 70):
+    #    """
+    #    Set the bins for the different histograms for the 
+    #    variables. Only the number of bins can be set
+    #    """
+    #    self.PADDLE_PEAK_BINS   = np.linspace(0,200,     nbins)
+    #    self.PADDLE_CHARGE_BINS = np.linspace(-2,60 ,     nbins)
+    #    self.PADDLE_TIMING_BINS = np.linspace(0,250,     nbins)
+    #    self.PADDLE_BL_BINS     = np.linspace(-2.5,2.5 ,     nbins)
+    #    self.PADDLE_BLRMS_BINS  = np.linspace(0,2  ,     nbins)
+    #    self.PADDLE_X0_BINS     = np.linspace(-0.1, 1.1, nbins)
+    #    self.PADDLE_T0_BINS     = np.linspace(0,500,     nbins)
+    #    self.PADDLE_EDEP_BINS   = np.linspace(0,30 ,     nbins)
+    #    self.NHIT_BINS          = np.arange(-0.5,25.5,1)   
+    #    self.PID_BINS           = np.arange(0.5,160.5,1)
+    #    self.BETA_BINS          = np.linspace(0,2  ,     nbins)
+    #    self.EDEP_BINS          = np.linspace(0,50,      nbins)
+    #    self.TIMING_BINS        = np.linspace(-100, 300, nbins)
+    #    self.PDELAY_BINS        = np.linspace(-60,60,    nbins)
+    #    self.TDIFF_BINS         = np.linspace(-1, 10, nbins)
+    #    self.DIST_BINS          = np.linspace(0,4, nbins)
+    #    self.COS_T_BINS         = np.linspace(0,1,nbins)
+    #    self.COS_T2_BINS        = np.linspace(0,1,int(nbins/3))
+    #    self.X_BINS_OUTER       = np.linspace(-2000,2000,nbins)
+    #    self.Y_BINS_OUTER       = np.linspace(-2000,2000,nbins)
+    #    self.Z_BINS_OUTER       = np.linspace(-250, 2500,nbins)
+    #    self.X_BINS_INNER       = np.linspace(-1000,1000,nbins)
+    #    self.Y_BINS_INNER       = np.linspace(-1000,1000,nbins)
+    #    self.Z_BINS_INNER       = np.linspace(-250, 1500,nbins)
+    #    self.PID_BINS_INNER     = np.arange(0.5, 60.5, 1)
+    #    self.PID_BINS_OUTER     = np.arange(61.5, 161.5,1)
 
     def pretty_print_statistics(self):
         """
@@ -159,19 +195,19 @@ class TofAnalysis:
 
     def _nhit_plots(self):
         nhit_plots = {
-          'hit'        : d.histogram.hist1d(self.NHIT_BINS),
-          'nhit_cbe'   : d.histogram.hist1d(self.NHIT_BINS),
-          'nhit_umb'   : d.histogram.hist1d(self.NHIT_BINS),
-          'nhit_cor'   : d.histogram.hist1d(self.NHIT_BINS),
-          'i_vs_o_nhit': d.histogram.hist2d((self.NHIT_BINS, self.NHIT_BINS)),
+          'hit'            : d.histogram.hist1d(self.NHIT_BINS),
+          'nhit_cbe'       : d.histogram.hist1d(self.NHIT_BINS),
+          'nhit_umb'       : d.histogram.hist1d(self.NHIT_BINS),
+          'nhit_cor'       : d.histogram.hist1d(self.NHIT_BINS),
+          'i_vs_o_nhit'    : d.histogram.hist2d((self.NHIT_BINS, self.NHIT_BINS)),
           'umb_vs_cor_nhit': d.histogram.hist2d((self.NHIT_BINS, self.NHIT_BINS)),
           'cbe_vs_umb_nhit': d.histogram.hist2d((self.NHIT_BINS, self.NHIT_BINS)),
           'cbe_vs_cor_nhit': d.histogram.hist2d((self.NHIT_BINS, self.NHIT_BINS)),
-          'thit'       : d.histogram.hist1d(self.NHIT_BINS),
-          'rblink'     : d.histogram.hist1d(self.NHIT_BINS),
-          'miss_hit'   : d.histogram.hist1d(self.PID_BINS),
+          'thit'           : d.histogram.hist1d(self.NHIT_BINS),
+          'rblink'         : d.histogram.hist1d(self.NHIT_BINS),
+          'miss_hit'       : d.histogram.hist1d(self.PID_BINS),
           # these are non causal hits
-          'nc_pdls'    : d.histogram.hist1d(self.PID_BINS),
+          'nc_pdls'        : d.histogram.hist1d(self.PID_BINS),
         }
         return nhit_plots
 
@@ -299,6 +335,9 @@ class TofAnalysis:
         """
         self._analysis       = _gc.tof.TofAnalysis() 
 
+        # FIXME 
+        self.plot_paddles    = False
+
         # process kwargs
         self.skip_mangled    = skip_mangled
         self.skip_timeout    = skip_timeout
@@ -321,7 +360,7 @@ class TofAnalysis:
                 if k_int <= 12:
                     self.offsets[k_int] = offsets[k]
         
-        self.define_bins(nbins = self.nbins)
+        #self.define_bins(nbins = self.nbins)
         #self.first_ev_time = np.inf
         #self.last_ev_time  = 0
         self.finished      = False
@@ -475,67 +514,81 @@ class TofAnalysis:
         Fill the histograms with the cached values
         """
         if self._analysis.hit_cache_len >= self.event_cache_size: 
-            print('-- --> Filling hit hitogramgs')
-            # hit statistics
-            self.nhit_plots['hit'     ].fill(self._analysis.c_hit) 
-            self.nhit_plots['nhit_umb'].fill(self._analysis.c_hit_umb) 
-            self.nhit_plots['nhit_cor'].fill(self._analysis.c_hit_cor) 
-            self.nhit_plots['nhit_cbe'].fill(self._analysis.c_hit_cbe) 
-            outer_n_hit = [self._analysis.c_hit_umb[k] + self._analysis.c_hit_cor[k] for k in range(len(self._analysis.c_hit_cor))]
-            self.nhit_plots['i_vs_o_nhit'].fill((self._analysis.c_hit_cbe, outer_n_hit))
-            self.nhit_plots['umb_vs_cor_nhit'].fill((self._analysis.c_hit_umb, self._analysis.c_hit_cor))
-            self.nhit_plots['cbe_vs_umb_nhit'].fill((self._analysis.c_hit_cbe, self._analysis.c_hit_umb))
-            self.nhit_plots['cbe_vs_cor_nhit'].fill((self._analysis.c_hit_cbe, self._analysis.c_hit_cbe))
-            self.nhit_plots['thit'    ].fill(self._analysis.c_thit) 
-            self.nhit_plots['rblink'  ].fill(self._analysis.c_rblink) 
-            self.nhit_plots['miss_hit'].fill(self._analysis.c_miss_hit) 
-            self.nhit_plots['nc_pdls'] .fill(self._analysis.c_nc_pid)
-            self._analysis.clear_hit_stats()
-            if self._analysis.beta_analysis:
-                print (f'--> Filling histograms for beta analysis!')
-            #    c_dist_vs_beta  = np.array([ k for k in zip(self.tmg_cache['dist'], self.tmg_cache['beta'])])
-            #    c_dist_vs_tdiff = np.array([ k for k in zip(self.tmg_cache['dist'], self.tmg_cache['t_diff'])])
-            #    c_beta_vs_theta = np.array([ k for k in zip(self.tmg_cache['beta'], self.tmg_cache['cos_theta'])])
-            #    self.tmg_plots['dist_vs_beta'].fill(c_dist_vs_beta)
-            #    self.tmg_plots['dist_vs_tdiff'].fill(c_dist_vs_tdiff)
-            #    self.tmg_plots['beta_vs_theta'].fill(c_beta_vs_theta)
-                for k in self.tmg_plots:
-                    #print (k)
-                    if k in ['dist_vs_beta', 'dist_vs_tdiff', 'beta_vs_theta']:
-                        continue
-                    if k in ['pid_inner','pid_outer']:
-                        self.tmg_plots[k].fill(self._analysis.cache.get_u8_data(k))
-                        print (self._analysis.cache.get_u8_data('pid_inner'))
-                    else:
-                        self.tmg_plots[k].fill(self._analysis.cache.get_f32_data(k))
-                for k in self.edep_plots:
-                    if not k in ['umb_vs_cor_edep', 'cbe_vs_cor_edep', 'cbe_vs_umb_edep', 'edep', 'edep_cor', 'edep_cbe', 'edep_cor']:
-                        try:
-                            pnl = int(k[8:])
-                        except Exception as e:
-                            print (f'can not get panel edep for {k}')
+            with tqdm.tqdm(total=12, desc='Filling hit histograms...', colour='blue') as pbar:
+                self.nhit_plots['hit'     ].fill(self._analysis.c_hit) 
+                pbar.update(1)
+                self.nhit_plots['nhit_umb'].fill(self._analysis.c_hit_umb) 
+                pbar.update(1)
+                self.nhit_plots['nhit_cor'].fill(self._analysis.c_hit_cor) 
+                pbar.update(1)
+                self.nhit_plots['nhit_cbe'].fill(self._analysis.c_hit_cbe) 
+                pbar.update(1) 
+                #outer_n_hit = [self._analysis.c_hit_umb[k] + self._analysis.c_hit_cor[k] for k in range(len(self._analysis.c_hit_cor))]
+                self.nhit_plots['i_vs_o_nhit'].fill((self._analysis.c_hit_cbe, self._analysis.c_hit_out))
+                pbar.update(1)
+                # FIXME - technically, it is y vs x, right? :) 
+                self.nhit_plots['umb_vs_cor_nhit'].fill((self._analysis.c_hit_umb, self._analysis.c_hit_cor))
+                pbar.update(1)
+                self.nhit_plots['cbe_vs_umb_nhit'].fill((self._analysis.c_hit_cbe, self._analysis.c_hit_umb))
+                pbar.update(1)
+                self.nhit_plots['cbe_vs_cor_nhit'].fill((self._analysis.c_hit_cbe, self._analysis.c_hit_cor))
+                pbar.update(1)
+                self.nhit_plots['thit'    ].fill(self._analysis.c_thit) 
+                pbar.update(1)
+                self.nhit_plots['rblink'  ].fill(self._analysis.c_rblink) 
+                pbar.update(1)
+                self.nhit_plots['miss_hit'].fill(self._analysis.c_miss_hit) 
+                pbar.update(1)
+                self.nhit_plots['nc_pdls'] .fill(self._analysis.c_nc_pid)
+                pbar.update(1)
+                self._analysis.clear_hit_stats()
+                
+                if self._analysis.beta_analysis:
+                    print (f'--> Filling histograms for beta analysis!')
+                #    c_dist_vs_beta  = np.array([ k for k in zip(self.tmg_cache['dist'], self.tmg_cache['beta'])])
+                #    c_dist_vs_tdiff = np.array([ k for k in zip(self.tmg_cache['dist'], self.tmg_cache['t_diff'])])
+                #    c_beta_vs_theta = np.array([ k for k in zip(self.tmg_cache['beta'], self.tmg_cache['cos_theta'])])
+                #    self.tmg_plots['dist_vs_beta'].fill(c_dist_vs_beta)
+                #    self.tmg_plots['dist_vs_tdiff'].fill(c_dist_vs_tdiff)
+                #    self.tmg_plots['beta_vs_theta'].fill(c_beta_vs_theta)
+                    for k in self.tmg_plots:
+                        #print (k)
+                        if k in ['dist_vs_beta', 'dist_vs_tdiff', 'beta_vs_theta']:
                             continue
-                        self.edep_plots[k].fill(self._analysis.cache.get_f32_data_panel("edep", pnl))
-                        continue
-                    if k == 'umb_vs_cor_edep':
-                        self.edep_plots[k].fill(\
-                                (self._analysis.cache.get_f32_data("edep_umb"),
-                                self._analysis.cache.get_f32_data("edep_cor")))
-                        continue
-                    if k == 'cbe_vs_cor_edep':
-                        self.edep_plots[k].fill(\
-                                (self._analysis.cache.get_f32_data("edep_cbe"),
-                                self._analysis.cache.get_f32_data("edep_cor")))
-                        continue
-                    if k == 'cbe_vs_umb_edep':
-                        self.edep_plots[k].fill(\
-                                (self._analysis.cache.get_f32_data("edep_cbe"),
-                                self._analysis.cache.get_f32_data("edep_umb")))
-                        continue
-                    self.edep_plots[k].fill(self._analysis.cache.get_f32_data(k))
-                self._analysis.cache.clear()
-
-            for paddle_id in range(1,161):
+                        if k in ['pid_inner','pid_outer']:
+                            self.tmg_plots[k].fill(self._analysis.cache.get_u8_data(k))
+                            print (self._analysis.cache.get_u8_data('pid_inner'))
+                        else:
+                            self.tmg_plots[k].fill(self._analysis.cache.get_f32_data(k))
+                    for k in self.edep_plots:
+                        if not k in ['umb_vs_cor_edep', 'cbe_vs_cor_edep', 'cbe_vs_umb_edep', 'edep', 'edep_cor', 'edep_cbe', 'edep_cor']:
+                            try:
+                                pnl = int(k[8:])
+                            except Exception as e:
+                                print (f'can not get panel edep for {k}')
+                                continue
+                            self.edep_plots[k].fill(self._analysis.cache.get_f32_data_panel("edep", pnl))
+                            continue
+                        if k == 'umb_vs_cor_edep':
+                            self.edep_plots[k].fill(\
+                                    (self._analysis.cache.get_f32_data("edep_umb"),
+                                    self._analysis.cache.get_f32_data("edep_cor")))
+                            continue
+                        if k == 'cbe_vs_cor_edep':
+                            self.edep_plots[k].fill(\
+                                    (self._analysis.cache.get_f32_data("edep_cbe"),
+                                    self._analysis.cache.get_f32_data("edep_cor")))
+                            continue
+                        if k == 'cbe_vs_umb_edep':
+                            self.edep_plots[k].fill(\
+                                    (self._analysis.cache.get_f32_data("edep_cbe"),
+                                    self._analysis.cache.get_f32_data("edep_umb")))
+                            continue
+                        self.edep_plots[k].fill(self._analysis.cache.get_f32_data(k))
+                    self._analysis.cache.clear()
+            if not self.plot_paddles:
+                return
+            for paddle_id in tqdm.trange(1,161, desc='Filling paddle histograms', colour='blue'):
                 for k in self.paddle_plots[paddle_id]:
                     #print (f'getting {paddle_id} {k}')
                     if k == 'charge2d':#,'amp2d','pos_edep']:
