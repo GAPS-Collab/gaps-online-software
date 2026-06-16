@@ -7,6 +7,8 @@
 use crate::prelude::*;
 use crate::tof::cuts::TofCuts;
 
+use std::cmp::Ordering;
+
 #[cfg_attr(feature="pybindings", pyclass)]
 #[derive(Debug, Clone)]
 pub struct TofAnalysisCache {
@@ -783,6 +785,7 @@ pub struct TofAnalysis {
   pub c_hit_umb     : Vec<u8>,
   pub c_hit_cor     : Vec<u8>,
   pub c_hit_cbe     : Vec<u8>,
+  pub c_hit_out     : Vec<u8>,
   pub c_thit        : Vec<u8>,
   pub c_rblink      : Vec<u8>,
   pub c_miss_hit    : Vec<u8>,   
@@ -804,6 +807,7 @@ impl TofAnalysis {
     self.c_hit_cbe  .clear();
     self.c_hit_umb  .clear();
     self.c_hit_cor  .clear();
+    self.c_hit_out  .clear();
     self.c_thit     .clear();
     self.c_rblink   .clear();
     self.c_miss_hit .clear();   
@@ -856,6 +860,7 @@ impl TofAnalysis {
       c_hit_umb     : Vec::<u8>::new(),
       c_hit_cor     : Vec::<u8>::new(),
       c_hit_cbe     : Vec::<u8>::new(),
+      c_hit_out     : Vec::<u8>::new(),
       c_thit        : Vec::<u8>::new(),
       c_rblink      : Vec::<u8>::new(),
       cache         : TofAnalysisCache::new(),
@@ -1036,6 +1041,7 @@ impl TofAnalysis {
     self.c_hit_umb.push(ev.n_hits_umb);
     self.c_hit_cor.push(ev.n_hits_cor);
     self.c_hit_cbe.push(ev.n_hits_cbe);
+    self.c_hit_out.push(ev.n_hits_cor + ev.n_hits_cbe);
     self.c_hit.push(nhit_ev);
     self.c_thit.push(nhit_t_ev);
     self.c_rblink.push(n_rblink_ev);
@@ -1047,8 +1053,11 @@ impl TofAnalysis {
     }
     //println!("Len outer h {}", outer_h.len());
     //println!("Len innner h {}", inner_h.len());
-    outer_h.sort_unstable_by(|x,y| x.event_t0.total_cmp(&y.event_t0));
-    inner_h.sort_unstable_by(|x,y| x.event_t0.total_cmp(&y.event_t0));
+    //FIXME!! 
+    //outer_h.sort_unstable_by(|x,y| x.event_t0.total_cmp(&y.event_t0));
+    //inner_h.sort_unstable_by(|x,y| x.event_t0.total_cmp(&y.event_t0));
+    inner_h .sort_by(|a,b| (a.event_t0).partial_cmp(&b.event_t0).unwrap_or(Ordering::Greater));
+    outer_h .sort_by(|a,b| (a.event_t0).partial_cmp(&b.event_t0).unwrap_or(Ordering::Greater));
     let mut beta = 0.0f32;
     if inner_h.len() > 0 && outer_h.len() > 0 {
       //println!("Doing advanced analysis!");
@@ -1139,6 +1148,7 @@ impl TofAnalysis {
     self.c_hit_umb .extend_from_slice(&other.c_hit_umb);
     self.c_hit_cor .extend_from_slice(&other.c_hit_cor);
     self.c_hit_cbe .extend_from_slice(&other.c_hit_cbe);
+    self.c_hit_out .extend_from_slice(&other.c_hit_out);
     self.c_thit    .extend_from_slice(&other.c_thit);
     self.c_rblink  .extend_from_slice(&other.c_rblink);
     self.c_miss_hit.extend_from_slice(&other.c_miss_hit);   
@@ -1189,6 +1199,16 @@ impl TofAnalysis {
   #[getter]
   fn c_hit_cbe_py<'py>(&'py self, py: Python<'py>) -> PyResult<Bound<'py, PyArray1<u8>>> {
     let slice = &self.c_hit_cbe[..];
+    // this is supposed to be readonly
+    // FIXME - check this!
+    let py_array = PyArray1::from_slice(py, slice);
+    return Ok(py_array);
+  }
+  
+  #[pyo3(name="c_hit_out")]
+  #[getter]
+  fn c_hit_out_py<'py>(&'py self, py: Python<'py>) -> PyResult<Bound<'py, PyArray1<u8>>> {
+    let slice = &self.c_hit_out[..];
     // this is supposed to be readonly
     // FIXME - check this!
     let py_array = PyArray1::from_slice(py, slice);
