@@ -118,7 +118,7 @@ def line_fit(xs, ys, zs, errs_x=None, errs_y=None, errs_z=None, search_anchor = 
     # start values
     if len(xs) < 2:
         print("Not enough points!")
-        return
+        return None
     x,y,z = xs[0],ys[0],zs[0]
     dx    = xs[1] - xs[0]
     dy    = ys[1] - ys[0]
@@ -160,7 +160,7 @@ def line_fit(xs, ys, zs, errs_x=None, errs_y=None, errs_z=None, search_anchor = 
 
 class Reconstruction:
 
-    def __init__(self, nbins = 100, active = False):
+    def __init__(self, nbins = 100, active = False, chi2_cut = None):
         self.active    = active
         self.CHIBINS   = np.linspace(0,500, nbins)
         self.COS2_BINS = np.linspace(0,1.1, nbins)
@@ -178,6 +178,7 @@ class Reconstruction:
         offsets      = _gc.db.TofPaddleTimingConstant.as_dict_by_name("GraceV1")
         for k in offsets:
             self.offsets[k] = offsets[k].timing_constant
+        self.chi2_cut = chi2_cut 
 
     def __iadd__(self, other):
         self.chi2_c.extend(other.chi2_c)
@@ -212,57 +213,73 @@ class Reconstruction:
         self.event_cache_size = ev_cache_size
 
 
-    def reco(self, ev):
+    def reco(self, ev, tracker_only=False):
+        
+        """
+        Perform the linefit to the pointcloud of 
+        the event.
+
+        # Arguments:
+            * tracker_only : Only use the tracker hits 
+                             for fitting 
+        """
         xs = [k[0] for k in ev.tracker_pointcloud]
-        xs.extend([h.x for h in ev.tof.hits])
-
         ys = [k[1] for k in ev.tracker_pointcloud]
-        ys.extend([h.y for h in ev.tof.hits])
-
         zs = [k[2] for k in ev.tracker_pointcloud]
-        zs_tof = [h.z for h in ev.tof.hits]
-        zs.extend(zs_tof)
-
-        ev.tof.normalize_hit_times()
-        ev.tof.set_timing_offsets(self.offsets)
-        ev.tof.remove_non_causal_hits()
-        ev.tof.lightspeed_cleaning(0.35)
-        ts = [(h.event_t0,h.x,h.y,h.z) for h in ev.tof.hits]
-        ts = sorted(ts, key=lambda x: x[0])
-        #print (f'RECO {ts}')
-        first_t = ts[0][0]
-        last_t  = ts[-1][0]
-        diff_h = last_t - first_t
+        #xs,ys,zs = [],[],[] 
+        tof = ev.tof 
+        #FIXME - maybe we should indicate on the 
+        #        actual event what had already been 
+        #        applied 
+        #tof.normalize_hit_times()
+        #tof.set_timing_offsets(self.offsets)
+        #tof.remove_non_causal_hits()
+        #tof.lightspeed_cleaning(0.35)
+        tof_hits = tof.hits 
+       
+        zs_tof =  [h.z for h in tof_hits]
+        if not tracker_only:
+            xs.extend([h.x for h in tof_hits])
+            ys.extend([h.y for h in tof_hits])
+            zs.extend(zs_tof)
         xs = np.array(xs)
         ys = np.array(ys)
         zs = np.array(zs)
-        #print ('----- POINTS ------') 
-        #print (xs)
-        #print (ys)
-        #print (zs)
-
-        if len(xs) < 2:
-            return
-        reco = line_fit(xs, ys, zs)
-        self.chi2_c.append(reco[1])
         
+        # first inner hit 
+        inner = [h for h in tof_hits if h.paddle_id < 61]  
+        outer = [h for h in tof_hits if h.paddle_id > 60] 
+        # right now this fit is truly only 
+        # spacial
+        reco_f_chi2 = line_fit(xs,ys,zs)  
+        if reco_f_chi2 is None:
+            return None 
+        reco_f, chi2 = reco_f_chi2
+        if len(inner) == 0 or len(outer) == 0 or len(xs) < 2:
+            return reco_f,chi2
+        if self.chi2_cut is not None:
+            if chi2 > self.chi2_cut:
+                # return the reco, but don't append 
+                # to the internal histogram
+                return reco_f, chi2 
+
+
+        first_t  = inner[0].event_t0  
+        last_t   = outer[0].event_t0 
+        delta_t  = first_t - last_t 
+        # evaluate distance  
+        a = reco_f(inner[0].z)
+        b = reco_f(outer[0].z)
+        d = np.sqrt((a[0] - b[0])**2 + (a[1] - b[1])**2 + (a[2] - b[2])**2)
         # get the cosine by just selecting
         # two points on the line
-        reco_f = reco[0]
-        a = reco_f(min(zs_tof))
-        b = reco_f(max(zs_tof))
-        d = np.sqrt((a[0] - b[0])**2 + (a[1] - b[1])**2 + (a[2] - b[2])**2)
         cos_theta = (b[2] - a[2])/d
-        dist = np.sqrt((ts[-1][1] - ts[0][1])**2 + (ts[-1][2] - ts[0][2])**2 + (ts[-1][3] - ts[0][3])**2)
-        simple_beta = False 
-        if simple_beta:
-            beta = (dist/1000)/(diff_h*1e-9)/299792458  
-        else:
-            beta = (d/1000)/(diff_h*1e-9)/299792458
-        #print (f'RECO BETA {beta}, DIST {dist}, TDIFF {diff_h}')
+        beta = (d/1000)/(delta_t*1e-9)/299792458
+        #print (f'RECO BETA {beta}, DIST {d}, TDIFF {diff_h}')
+        self.chi2_c.append(chi2)
         self.beta_c.append(beta)
         self.cos2_c.append(cos_theta*cos_theta)
-        return reco
+        return reco_f,chi2
 
 #
 #
