@@ -5,11 +5,12 @@ var searchData=
   ['set_5ffilename_2',['set_filename',['../classgondola_1_1TofPacketReader.html#af2c738f90297ff3043a6457da1bda2ec',1,'gondola::TofPacketReader']]],
   ['set_5fpaddle_5flen_3',['set_paddle_len',['../structgondola_1_1TofHit.html#aed83c72add3ace3a7948285b73fa61e9',1,'gondola::TofHit']]],
   ['set_5fpath_4',['set_path',['../structgondola_1_1CRReader.html#ad4ffc9e5ae011c674d4deb8464cacf72',1,'gondola::CRReader::set_path()'],['../structgondola_1_1TelemetryPacketReader.html#aecb4a47ffb724ec5913e15928b4e0aaa',1,'gondola::TelemetryPacketReader::set_path()']]],
-  ['simprimary_5',['SimPrimary',['../structSimPrimary.html#a3fb6b8a490c2fffc878db9ee63621d56',1,'SimPrimary']]],
-  ['slice_6',['slice',['../namespacegondola.html#a7b45ff07f8a68edbdf3c9046172e538d',1,'gondola']]],
-  ['some_7',['Some',['../tof__typedefs_8h.html#a725c07eddea0cafe8f2dcb76ba8aacdd',1,'tof_typedefs.h']]],
-  ['spike_5fcleaning_5fall_8',['spike_cleaning_all',['../namespacegondola.html#a56a2781343a042a385b34244fe8e4934',1,'gondola']]],
-  ['spike_5fcleaning_5fdrs4_9',['spike_cleaning_drs4',['../namespacegondola.html#a51016fc759994f7a750d933ea9dee8b5',1,'gondola']]],
-  ['spike_5fcleaning_5fsimple_10',['spike_cleaning_simple',['../namespacegondola.html#aad98e262d4567278c4414be5db426023',1,'gondola']]],
-  ['string_5fto_5fbytes_11',['string_to_bytes',['../namespacegondola.html#a0fad83424699fde92f491a061f489158',1,'gondola']]]
+  ['set_5fstop_5',['set_stop',['../structgondola_1_1Tracklet.html#a096a586bcdbeba9b1a6c15322a0ff1d6',1,'gondola::Tracklet']]],
+  ['simprimary_6',['SimPrimary',['../structSimPrimary.html#a3fb6b8a490c2fffc878db9ee63621d56',1,'SimPrimary']]],
+  ['slice_7',['slice',['../namespacegondola.html#a7b45ff07f8a68edbdf3c9046172e538d',1,'gondola']]],
+  ['some_8',['Some',['../tof__typedefs_8h.html#a725c07eddea0cafe8f2dcb76ba8aacdd',1,'tof_typedefs.h']]],
+  ['spike_5fcleaning_5fall_9',['spike_cleaning_all',['../namespacegondola.html#a56a2781343a042a385b34244fe8e4934',1,'gondola']]],
+  ['spike_5fcleaning_5fdrs4_10',['spike_cleaning_drs4',['../namespacegondola.html#a51016fc759994f7a750d933ea9dee8b5',1,'gondola']]],
+  ['spike_5fcleaning_5fsimple_11',['spike_cleaning_simple',['../namespacegondola.html#aad98e262d4567278c4414be5db426023',1,'gondola']]],
+  ['string_5fto_5fbytes_12',['string_to_bytes',['../namespacegondola.html#a0fad83424699fde92f491a061f489158',1,'gondola']]]
 ];

@@ -23,6 +23,8 @@ struct \mbox{\hyperlink{structgondola_1_1RBEventHeader}{RBEvent\+Header}}
 \item 
 struct \mbox{\hyperlink{structgondola_1_1RBWaveform}{RBWaveform}}
 \begin{DoxyCompactList}\small\item\em A representation of a pair of waveforms from a single paddle. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{structgondola_1_1RecoHit}{Reco\+Hit}}
+\item 
 struct \mbox{\hyperlink{structgondola_1_1TelemetryEvent}{Telemetry\+Event}}
 \begin{DoxyCompactList}\small\item\em The actual merged event sent over telemetry. \end{DoxyCompactList}\item 
 struct \mbox{\hyperlink{structgondola_1_1TelemetryPacket}{Telemetry\+Packet}}
@@ -51,6 +53,8 @@ struct \mbox{\hyperlink{structgondola_1_1TrackerStripMask}{Tracker\+Strip\+Mask}
 \item 
 struct \mbox{\hyperlink{structgondola_1_1TrackerStripPedestal}{Tracker\+Strip\+Pedestal}}
 \item 
+struct \mbox{\hyperlink{structgondola_1_1Tracklet}{Tracklet}}
+\begin{DoxyCompactList}\small\item\em A straight line as it could be part of a track. \end{DoxyCompactList}\item 
 struct \mbox{\hyperlink{structgondola_1_1TrkCalibratedHit}{Trk\+Calibrated\+Hit}}
 \item 
 struct \mbox{\hyperlink{structgondola_1_1TrkEvent}{Trk\+Event}}
@@ -309,6 +313,10 @@ std\+::string \mbox{\hyperlink{namespacegondola_a8b1462d66effc709585dbe29237850c
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a1d6f919ba6d9021e7a8463a11055e177}{bfsw\+\_\+ptype\+\_\+to\+\_\+u8}} (\mbox{\hyperlink{namespacegondola_a598dae982e3c16cd23a9e57c72d39ced}{Telemetry\+Packet\+Type}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pt}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}
 \begin{DoxyCompactList}\small\item\em FIXME -\/ this is obviously incomplete. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a2eb98f781ad8aa43b22a51fa95f65023}{bfsw\+\_\+ptype\+\_\+to\+\_\+str}} (\mbox{\hyperlink{namespacegondola_a598dae982e3c16cd23a9e57c72d39ced}{Telemetry\+Packet\+Type}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pt}}) -\/$>$ std\+::string
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacegondola_a046acf2a43bdae770216c94c665b135b}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1RecoHit}{gondola\+::\+Reco\+Hit}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{et}})
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacegondola_a76923511b147ba22b4bd784c42a31ebb}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1Tracklet}{gondola\+::\+Tracklet}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{et}})
 \item 
 std\+::string \mbox{\hyperlink{namespacegondola_a1171cd3cced2c82a0f7bf971a972de24}{pversion\+\_\+to\+\_\+string}} (\mbox{\hyperlink{namespacegondola_af998b820a54bca400c19e03948e82c28}{Protocol\+Version}} version)
 \end{DoxyCompactItemize}
@@ -965,67 +973,79 @@ convenience function to load all the calibration files from a certain directory
 \Hypertarget{namespacegondola_accbe4d2d1e3b9822ec059c62f1fd9744}\label{namespacegondola_accbe4d2d1e3b9822ec059c62f1fd9744} 
 \index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [1/11]}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [1/13]}}
 {\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baa}{Event\+Status}} \&}]{status }\end{DoxyParamCaption})}
 
 \Hypertarget{namespacegondola_a9086a1522bf1269d1824786811a08141}\label{namespacegondola_a9086a1522bf1269d1824786811a08141} 
 \index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [2/11]}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [2/13]}}
 {\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84d}{gondola\+::\+Compression\+Level}} \&}]{level }\end{DoxyParamCaption})}
 
 \Hypertarget{namespacegondola_a9de221b8ccf9c0782f0790897ff063c5}\label{namespacegondola_a9de221b8ccf9c0782f0790897ff063c5} 
 \index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [3/11]}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [3/13]}}
 {\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_ac61bd1b8e62eab79a1089be6ecc1ca3d}{gondola\+::\+Event\+Quality}} \&}]{qual }\end{DoxyParamCaption})}
 
 \Hypertarget{namespacegondola_a95d0c48f85317911ad997722c25219b6}\label{namespacegondola_a95d0c48f85317911ad997722c25219b6} 
 \index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [4/11]}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [4/13]}}
 {\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580}{gondola\+::\+LTBThreshold}} \&}]{thresh }\end{DoxyParamCaption})}
 
 \Hypertarget{namespacegondola_aba7a0abca261a73c5b085036ea3d85c9}\label{namespacegondola_aba7a0abca261a73c5b085036ea3d85c9} 
 \index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [5/11]}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [5/13]}}
 {\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1RBEvent}{gondola\+::\+RBEvent}} \&}]{re }\end{DoxyParamCaption})}
 
 \Hypertarget{namespacegondola_a801130bb64dc4827fdc3f24f8c8894eb}\label{namespacegondola_a801130bb64dc4827fdc3f24f8c8894eb} 
 \index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [6/11]}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [6/13]}}
 {\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1RBEventHeader}{gondola\+::\+RBEvent\+Header}} \&}]{rh }\end{DoxyParamCaption})}
 
 \Hypertarget{namespacegondola_ac9cb0b91c67a4b60151e456492a27d37}\label{namespacegondola_ac9cb0b91c67a4b60151e456492a27d37} 
 \index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [7/11]}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [7/13]}}
 {\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1RBWaveform}{gondola\+::\+RBWaveform}} \&}]{rh }\end{DoxyParamCaption})}
+
+\Hypertarget{namespacegondola_a046acf2a43bdae770216c94c665b135b}\label{namespacegondola_a046acf2a43bdae770216c94c665b135b} 
+\index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [8/13]}}
+{\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1RecoHit}{gondola\+::\+Reco\+Hit}} \&}]{et }\end{DoxyParamCaption})}
 
 \Hypertarget{namespacegondola_a6878be1debdc1d7832f0e68faa4be862}\label{namespacegondola_a6878be1debdc1d7832f0e68faa4be862} 
 \index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [8/11]}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [9/13]}}
 {\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1TofEvent}{gondola\+::\+Tof\+Event}} \&}]{et }\end{DoxyParamCaption})}
 
 \Hypertarget{namespacegondola_ad142b09b980b0577047b677bd0750252}\label{namespacegondola_ad142b09b980b0577047b677bd0750252} 
 \index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [9/11]}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [10/13]}}
 {\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1TofEventSummary}{gondola\+::\+Tof\+Event\+Summary}} \&}]{tes }\end{DoxyParamCaption})}
+
+\Hypertarget{namespacegondola_a76923511b147ba22b4bd784c42a31ebb}\label{namespacegondola_a76923511b147ba22b4bd784c42a31ebb} 
+\index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [11/13]}}
+{\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1Tracklet}{gondola\+::\+Tracklet}} \&}]{et }\end{DoxyParamCaption})}
 
 \Hypertarget{namespacegondola_a70a1b591bf58b6e149e2ec815142e4ac}\label{namespacegondola_a70a1b591bf58b6e149e2ec815142e4ac} 
 \index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [10/11]}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [12/13]}}
 {\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21}{gondola\+::\+Trigger\+Type}} \&}]{t\+\_\+type }\end{DoxyParamCaption})}
 
 \Hypertarget{namespacegondola_ac9b115d5a1e5b9755b3345e438f9f2e2}\label{namespacegondola_ac9b115d5a1e5b9755b3345e438f9f2e2} 
 \index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [11/11]}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [13/13]}}
 {\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1TofHit}{Tof\+Hit}} \&}]{pad }\end{DoxyParamCaption})}
 
 \Hypertarget{namespacegondola_a4e34052f6dbf7321e933fbaa9000d94d}\label{namespacegondola_a4e34052f6dbf7321e933fbaa9000d94d} 

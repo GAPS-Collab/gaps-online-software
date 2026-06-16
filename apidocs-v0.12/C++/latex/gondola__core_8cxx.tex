@@ -1,5 +1,6 @@
 \doxysection{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/python/gondola\+\_\+core.cxx File Reference}
 \hypertarget{gondola__core_8cxx}{}\label{gondola__core_8cxx}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/python/gondola\_core.cxx@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/python/gondola\_core.cxx}}
+{\ttfamily \#include $<$memory$>$}\newline
 {\ttfamily \#include $<$nanobind/nanobind.\+h$>$}\newline
 {\ttfamily \#include $<$nanobind/stl/string.\+h$>$}\newline
 {\ttfamily \#include $<$nanobind/stl/vector.\+h$>$}\newline
@@ -11,6 +12,7 @@
 {\ttfamily \#include "{}telemetry\+\_\+dataclasses.\+hpp"{}}\newline
 {\ttfamily \#include "{}io/telemetry\+\_\+reader.\+hpp"{}}\newline
 {\ttfamily \#include "{}calibration.\+h"{}}\newline
+{\ttfamily \#include "{}tracklet.\+hpp"{}}\newline
 Include dependency graph for gondola\+\_\+core.\+cxx\+:
 \nopagebreak
 \begin{figure}[H]
@@ -22,11 +24,19 @@ Include dependency graph for gondola\+\_\+core.\+cxx\+:
 \doxysubsubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{nb\+::tuple}} \mbox{\hyperlink{gondola__core_8cxx_af32ab01bf4db4bc54caff883a426e5da}{get\+\_\+coordinates}} (\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} x, \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} y, \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} z)
+\item 
 \mbox{\hyperlink{gondola__core_8cxx_accc81d6dd00b80e2e71706cae5f6ad6f}{NB\+\_\+\+MODULE}} (gondola\+\_\+cxx, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{m}})
 \end{DoxyCompactItemize}
 
 
 \doxysubsection{Function Documentation}
+\Hypertarget{gondola__core_8cxx_af32ab01bf4db4bc54caff883a426e5da}\label{gondola__core_8cxx_af32ab01bf4db4bc54caff883a426e5da} 
+\index{gondola\_core.cxx@{gondola\_core.cxx}!get\_coordinates@{get\_coordinates}}
+\index{get\_coordinates@{get\_coordinates}!gondola\_core.cxx@{gondola\_core.cxx}}
+\doxysubsubsection{\texorpdfstring{get\_coordinates()}{get\_coordinates()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{nb\+::tuple}} get\+\_\+coordinates (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}}]{x,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}}]{y,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}}]{z }\end{DoxyParamCaption})}
+
 \Hypertarget{gondola__core_8cxx_accc81d6dd00b80e2e71706cae5f6ad6f}\label{gondola__core_8cxx_accc81d6dd00b80e2e71706cae5f6ad6f} 
 \index{gondola\_core.cxx@{gondola\_core.cxx}!NB\_MODULE@{NB\_MODULE}}
 \index{NB\_MODULE@{NB\_MODULE}!gondola\_core.cxx@{gondola\_core.cxx}}

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>gaps-online-software: gondola_cxx - C++ compatibility layer for gondola</title>
+<title>gaps-online-software: &lt;tt&gt;gondola_cxx&lt;/tt&gt; - C++ compatibility layer for gondola</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -92,10 +92,26 @@ $(document).ready(function(){initNavTree('md__2home_2runner_2work_2gaps-online-s
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">gondola_cxx - C++ compatibility layer for gondola</div></div>
+  <div class="headertitle"><div class="title">&lt;tt&gt;gondola_cxx&lt;/tt&gt; - C++ compatibility layer for gondola</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md3"></a> The CMakeLists.txt file in this directory is seperate from the entire gaps-online-software build system. </p>
+<div class="textblock"><p><a class="anchor" id="autotoc_md3"></a> C++ bridge for <code>gaps-online-software</code> core library, <code>gondola</code></p>
+<p>While the core <code>gondola</code> library is written in rust (pybindings are available on pypi, see <code>gondola</code>), a secondary implementation exists in C++. It's main purpose is to interface with existing C++ code, notably, "SimpleDet", which is a pre-existing analysis framework used widely within the GAPS collaboration. The <code><a class="el" href="namespacegondola__cxx.html">gondola_cxx</a></code> package includes the pybindings for the C++ implementation for the gondola C++ library as well as a compatibility layer, to interface with SimpleDet.</p>
+<p>The project is still in an early alpha stage and can not be used for producion.</p>
+<p>Example: Read SimpleDet files:</p>
+<div class="fragment"><div class="line">import gondola_cxx as gxx </div>
+<div class="line">import tqdm</div>
+<div class="line"> </div>
+<div class="line"># the address will be cleaned up more nicely in future releases</div>
+<div class="line">reader = gxx.gondola_cxx.SDRootReader(&#39;/path/to/your/favorite/sd-file.root&#39;) </div>
+<div class="line"> </div>
+<div class="line"># right now, looping over the events is a bit clumsy</div>
+<div class="line">for k in tqdm.tqdm(range(reader.nevents_total)):</div>
+<div class="line">    # not a lot is currently supported, but this returns </div>
+<div class="line">    # many of the primary properties</div>
+<div class="line">    primary = reader.get_primary(k) </div>
+<div class="line">    print (primary) # primary is a gxx.gondola_cxx.Tracklet </div>
+</div><!-- fragment --><p>The CMakeLists.txt file in this directory is seperate from the entire gaps-online-software build system. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

@@ -10,7 +10,7 @@ var searchData=
   ['file_5ftimestamp_7',['file_timestamp',['../structgondola_1_1CRWriter.html#a78cbb24dbb99b30289c51ac61ca8a5e8',1,'gondola::CRWriter']]],
   ['flags0_8',['flags0',['../structgondola_1_1TelemetryEvent.html#a3280f397f70eae02f09c508951f74963',1,'gondola::TelemetryEvent']]],
   ['flags1_9',['flags1',['../structgondola_1_1TrkEvent.html#a29d3c5bbb0127be3dd90e9c8de90ca13',1,'gondola::TrkEvent::flags1'],['../structgondola_1_1TelemetryEvent.html#a675ada8e83e8810bc68089b07123d3db',1,'gondola::TelemetryEvent::flags1']]],
-  ['for_20gondola_10',['gondola_cxx - C++ compatibility layer for gondola',['../md__2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2README.html',1,'']]],
+  ['for_20gondola_10',['&lt;tt&gt;gondola_cxx&lt;/tt&gt; - C++ compatibility layer for gondola',['../md__2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2README.html',1,'']]],
   ['forced_11',['Forced',['../namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21adc2eb84d1f952ad0e6b58014aabd616a',1,'gondola']]],
   ['format_12',['format',['../structstd_1_1formatter_3_01gondola_1_1EventStatus_01_4.html#a305ff04496350dffade082a7a4ade716',1,'std::formatter&lt; gondola::EventStatus &gt;']]],
   ['formatter_3c_20gondola_3a_3aeventstatus_20_3e_13',['formatter&lt; gondola::EventStatus &gt;',['../structstd_1_1formatter_3_01gondola_1_1EventStatus_01_4.html',1,'std']]],

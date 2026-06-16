@@ -17,5 +17,6 @@ var dir_6be0aa079c7b06c4f1eaface273db885 =
     [ "simclasses.h", "simclasses_8h.html", "simclasses_8h" ],
     [ "telemetry_dataclasses.hpp", "telemetry__dataclasses_8hpp.html", "telemetry__dataclasses_8hpp" ],
     [ "tof_typedefs.h", "tof__typedefs_8h.html", "tof__typedefs_8h" ],
+    [ "tracklet.hpp", "tracklet_8hpp.html", "tracklet_8hpp" ],
     [ "version.h", "version_8h.html", "version_8h" ]
 ];

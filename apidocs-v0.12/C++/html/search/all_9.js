@@ -16,9 +16,10 @@ var searchData=
   ['is_5fevent_5fpacket_13',['is_event_packet',['../structgondola_1_1TelemetryPacket.html#a039f12a19b160a410fc24ec61e36218e',1,'gondola::TelemetryPacket']]],
   ['is_5fexhausted_14',['is_exhausted',['../structgondola_1_1TelemetryPacketReader.html#a16cf37c876f8496252347f8c21939b2f',1,'gondola::TelemetryPacketReader::is_exhausted()'],['../classgondola_1_1TofPacketReader.html#ad9b4666aea5bbdca1d392323bd5fbcd3',1,'gondola::TofPacketReader::is_exhausted()'],['../structgondola_1_1CRReader.html#ad5439dcba3fe2eb69daf07815d7630be',1,'gondola::CRReader::is_exhausted() const -&gt; bool']]],
   ['is_5ffrom_5ftelemetry_15',['is_from_telemetry',['../structgondola_1_1CRReader.html#ad5e490135ee09200d6551ecf505e64ac',1,'gondola::CRReader']]],
-  ['is_5flocked_16',['is_locked',['../structgondola_1_1RBEventHeader.html#a6b707ca1f4a53886c91b5035dcc0ebab',1,'gondola::RBEventHeader']]],
-  ['is_5flocked_5flast_5fsec_17',['is_locked_last_sec',['../structgondola_1_1RBEventHeader.html#a812ffbae6aae1269f074dc578b747bcf',1,'gondola::RBEventHeader']]],
-  ['is_5fmean_5fvalue_18',['is_mean_value',['../structgondola_1_1TrackerStripPedestal.html#aefc1a9fb445dc7add66d85db9c45bd08',1,'gondola::TrackerStripPedestal']]],
-  ['is_5fnone_19',['is_none',['../structOption.html#a6794ed7cc3df4fcb6e3a82b3ac869585',1,'Option']]],
-  ['is_5fsome_20',['is_some',['../structOption.html#a7285ec35b7c178c6005b6737723ac56b',1,'Option']]]
+  ['is_5finfinite_16',['is_infinite',['../structgondola_1_1Tracklet.html#a33e05f27ca357ad68734ad69480f82c0',1,'gondola::Tracklet']]],
+  ['is_5flocked_17',['is_locked',['../structgondola_1_1RBEventHeader.html#a6b707ca1f4a53886c91b5035dcc0ebab',1,'gondola::RBEventHeader']]],
+  ['is_5flocked_5flast_5fsec_18',['is_locked_last_sec',['../structgondola_1_1RBEventHeader.html#a812ffbae6aae1269f074dc578b747bcf',1,'gondola::RBEventHeader']]],
+  ['is_5fmean_5fvalue_19',['is_mean_value',['../structgondola_1_1TrackerStripPedestal.html#aefc1a9fb445dc7add66d85db9c45bd08',1,'gondola::TrackerStripPedestal']]],
+  ['is_5fnone_20',['is_none',['../structOption.html#a6794ed7cc3df4fcb6e3a82b3ac869585',1,'Option']]],
+  ['is_5fsome_21',['is_some',['../structOption.html#a7285ec35b7c178c6005b6737723ac56b',1,'Option']]]
 ];

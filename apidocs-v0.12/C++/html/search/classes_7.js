@@ -4,5 +4,6 @@ var searchData=
   ['rbevent_1',['RBEvent',['../structgondola_1_1RBEvent.html',1,'gondola']]],
   ['rbeventheader_2',['RBEventHeader',['../structgondola_1_1RBEventHeader.html',1,'gondola']]],
   ['rbmonidata_3',['RBMoniData',['../structRBMoniData.html',1,'']]],
-  ['rbwaveform_4',['RBWaveform',['../structgondola_1_1RBWaveform.html',1,'gondola']]]
+  ['rbwaveform_4',['RBWaveform',['../structgondola_1_1RBWaveform.html',1,'gondola']]],
+  ['recohit_5',['RecoHit',['../structgondola_1_1RecoHit.html',1,'gondola']]]
 ];

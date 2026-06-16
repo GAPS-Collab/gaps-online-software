@@ -4,7 +4,7 @@ var searchData=
   ['labjacksettings_1',['LabjackSettings',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39cedaef3076d7d19ab28aed4fa3b5c4566765',1,'gondola']]],
   ['last_5fcmd_2',['last_cmd',['../structgondola_1_1Cooling.html#a8d43406cb20576f0c6f627cbb363c867',1,'gondola::Cooling']]],
   ['layer_3',['layer',['../structgondola_1_1TrackerStrip.html#acc87b57574773cf8ddf59c276c9f5532',1,'gondola::TrackerStrip::layer'],['../structgondola_1_1TrkHit.html#a63b3d1cca6e54885361fb05ee9c544ce',1,'gondola::TrkHit::layer'],['../structgondola_1_1TrkEvent.html#a8e8c8cb0e8cb6a0d6ff48020f8a4d891',1,'gondola::TrkEvent::layer']]],
-  ['layer_20for_20gondola_4',['gondola_cxx - C++ compatibility layer for gondola',['../md__2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2README.html',1,'']]],
+  ['layer_20for_20gondola_4',['&lt;tt&gt;gondola_cxx&lt;/tt&gt; - C++ compatibility layer for gondola',['../md__2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2README.html',1,'']]],
   ['leading_5fzeros_5',['leading_zeros',['../parsers_8cxx.html#a69c298a8ebd38c31015bf5ee5a6d88a2',1,'parsers.cxx']]],
   ['legacy_2ecxx_6',['legacy.cxx',['../legacy_8cxx.html',1,'']]],
   ['legacy_2eh_7',['legacy.h',['../legacy_8h.html',1,'']]],

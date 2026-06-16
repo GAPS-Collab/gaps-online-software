@@ -1,0 +1,7 @@
+<map id="gondola::Tracklet" name="gondola::Tracklet">
+<area shape="rect" id="Node000001" title="A straight line as it could be part of a track." alt="" coords="16,168,149,193"/>
+<area shape="rect" id="Node000002" href="$structOption.html" title=" " alt="" coords="25,80,141,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="85,119,85,167,80,167,80,119"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,5,160,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="85,45,85,80,80,80,80,45"/>
+</map>

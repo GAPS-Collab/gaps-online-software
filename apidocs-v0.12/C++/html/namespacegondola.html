@@ -124,6 +124,8 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1RBWaveform.html">RBWaveform</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A representation of a pair of waveforms from a single paddle.  <a href="structgondola_1_1RBWaveform.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1RecoHit.html">RecoHit</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1TelemetryEvent.html">TelemetryEvent</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The actual merged event sent over telemetry.  <a href="structgondola_1_1TelemetryEvent.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -152,6 +154,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1TrackerStripMask.html">TrackerStripMask</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1TrackerStripPedestal.html">TrackerStripPedestal</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1Tracklet.html">Tracklet</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A straight line as it could be part of a track.  <a href="structgondola_1_1Tracklet.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1TrkCalibratedHit.html">TrkCalibratedHit</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -442,6 +447,10 @@ Functions</h2></td></tr>
 <tr class="separator:a1d6f919ba6d9021e7a8463a11055e177"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2eb98f781ad8aa43b22a51fa95f65023" id="r_a2eb98f781ad8aa43b22a51fa95f65023"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a2eb98f781ad8aa43b22a51fa95f65023">bfsw_ptype_to_str</a> (<a class="el" href="namespacegondola.html#a598dae982e3c16cd23a9e57c72d39ced">TelemetryPacketType</a> <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">pt</a>) -&gt; std::string</td></tr>
 <tr class="separator:a2eb98f781ad8aa43b22a51fa95f65023"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a046acf2a43bdae770216c94c665b135b" id="r_a046acf2a43bdae770216c94c665b135b"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a046acf2a43bdae770216c94c665b135b">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1RecoHit.html">gondola::RecoHit</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">et</a>)</td></tr>
+<tr class="separator:a046acf2a43bdae770216c94c665b135b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76923511b147ba22b4bd784c42a31ebb" id="r_a76923511b147ba22b4bd784c42a31ebb"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a76923511b147ba22b4bd784c42a31ebb">operator&lt;&lt;</a> (std::ostream &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1Tracklet.html">gondola::Tracklet</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">et</a>)</td></tr>
+<tr class="separator:a76923511b147ba22b4bd784c42a31ebb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1171cd3cced2c82a0f7bf971a972de24" id="r_a1171cd3cced2c82a0f7bf971a972de24"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a1171cd3cced2c82a0f7bf971a972de24">pversion_to_string</a> (<a class="el" href="namespacegondola.html#af998b820a54bca400c19e03948e82c28">ProtocolVersion</a> version)</td></tr>
 <tr class="separator:a1171cd3cced2c82a0f7bf971a972de24"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -1267,7 +1276,7 @@ Arguments</h1>
 </div>
 </div>
 <a id="accbe4d2d1e3b9822ec059c62f1fd9744" name="accbe4d2d1e3b9822ec059c62f1fd9744"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#accbe4d2d1e3b9822ec059c62f1fd9744">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[1/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#accbe4d2d1e3b9822ec059c62f1fd9744">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[1/13]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1295,7 +1304,7 @@ Arguments</h1>
 </div>
 </div>
 <a id="a9086a1522bf1269d1824786811a08141" name="a9086a1522bf1269d1824786811a08141"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9086a1522bf1269d1824786811a08141">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[2/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a9086a1522bf1269d1824786811a08141">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[2/13]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1323,7 +1332,7 @@ Arguments</h1>
 </div>
 </div>
 <a id="a9de221b8ccf9c0782f0790897ff063c5" name="a9de221b8ccf9c0782f0790897ff063c5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9de221b8ccf9c0782f0790897ff063c5">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[3/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a9de221b8ccf9c0782f0790897ff063c5">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[3/13]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1351,7 +1360,7 @@ Arguments</h1>
 </div>
 </div>
 <a id="a95d0c48f85317911ad997722c25219b6" name="a95d0c48f85317911ad997722c25219b6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a95d0c48f85317911ad997722c25219b6">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[4/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a95d0c48f85317911ad997722c25219b6">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[4/13]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1379,7 +1388,7 @@ Arguments</h1>
 </div>
 </div>
 <a id="aba7a0abca261a73c5b085036ea3d85c9" name="aba7a0abca261a73c5b085036ea3d85c9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aba7a0abca261a73c5b085036ea3d85c9">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[5/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aba7a0abca261a73c5b085036ea3d85c9">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[5/13]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1407,7 +1416,7 @@ Arguments</h1>
 </div>
 </div>
 <a id="a801130bb64dc4827fdc3f24f8c8894eb" name="a801130bb64dc4827fdc3f24f8c8894eb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a801130bb64dc4827fdc3f24f8c8894eb">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[6/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a801130bb64dc4827fdc3f24f8c8894eb">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[6/13]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1435,7 +1444,7 @@ Arguments</h1>
 </div>
 </div>
 <a id="ac9cb0b91c67a4b60151e456492a27d37" name="ac9cb0b91c67a4b60151e456492a27d37"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac9cb0b91c67a4b60151e456492a27d37">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[7/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9cb0b91c67a4b60151e456492a27d37">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[7/13]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1462,8 +1471,36 @@ Arguments</h1>
 
 </div>
 </div>
+<a id="a046acf2a43bdae770216c94c665b135b" name="a046acf2a43bdae770216c94c665b135b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a046acf2a43bdae770216c94c665b135b">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[8/13]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream &amp; gondola::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1RecoHit.html">gondola::RecoHit</a> &amp;&#160;</td>
+          <td class="paramname"><em>et</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a6878be1debdc1d7832f0e68faa4be862" name="a6878be1debdc1d7832f0e68faa4be862"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6878be1debdc1d7832f0e68faa4be862">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[8/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a6878be1debdc1d7832f0e68faa4be862">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[9/13]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1491,7 +1528,7 @@ Arguments</h1>
 </div>
 </div>
 <a id="ad142b09b980b0577047b677bd0750252" name="ad142b09b980b0577047b677bd0750252"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad142b09b980b0577047b677bd0750252">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[9/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ad142b09b980b0577047b677bd0750252">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[10/13]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1518,8 +1555,36 @@ Arguments</h1>
 
 </div>
 </div>
+<a id="a76923511b147ba22b4bd784c42a31ebb" name="a76923511b147ba22b4bd784c42a31ebb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a76923511b147ba22b4bd784c42a31ebb">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[11/13]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream &amp; gondola::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1Tracklet.html">gondola::Tracklet</a> &amp;&#160;</td>
+          <td class="paramname"><em>et</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a70a1b591bf58b6e149e2ec815142e4ac" name="a70a1b591bf58b6e149e2ec815142e4ac"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a70a1b591bf58b6e149e2ec815142e4ac">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[10/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a70a1b591bf58b6e149e2ec815142e4ac">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[12/13]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1547,7 +1612,7 @@ Arguments</h1>
 </div>
 </div>
 <a id="ac9b115d5a1e5b9755b3345e438f9f2e2" name="ac9b115d5a1e5b9755b3345e438f9f2e2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac9b115d5a1e5b9755b3345e438f9f2e2">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[11/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9b115d5a1e5b9755b3345e438f9f2e2">&#9670;&#160;</a></span>operator&lt;&lt;() <span class="overload">[13/13]</span></h2>
 
 <div class="memitem">
 <div class="memproto">

@@ -17,6 +17,7 @@ var hierarchy =
     [ "LTBMoniData", "structLTBMoniData.html", null ],
     [ "std::optional", null, [
       [ "Option< String >", "structOption.html", null ],
+      [ "Option< f32 >", "structOption.html", null ],
       [ "Option< T >", "structOption.html", null ]
     ] ],
     [ "PAMoniData", "structPAMoniData.html", null ],
@@ -26,6 +27,7 @@ var hierarchy =
     [ "gondola::RBEventHeader", "structgondola_1_1RBEventHeader.html", null ],
     [ "RBMoniData", "structRBMoniData.html", null ],
     [ "gondola::RBWaveform", "structgondola_1_1RBWaveform.html", null ],
+    [ "gondola::RecoHit", "structgondola_1_1RecoHit.html", null ],
     [ "SimPrimary", "structSimPrimary.html", null ],
     [ "gondola::TelemetryEvent", "structgondola_1_1TelemetryEvent.html", null ],
     [ "gondola::TelemetryPacket", "structgondola_1_1TelemetryPacket.html", null ],
@@ -42,6 +44,7 @@ var hierarchy =
     [ "gondola::TrackerStrip", "structgondola_1_1TrackerStrip.html", null ],
     [ "gondola::TrackerStripMask", "structgondola_1_1TrackerStripMask.html", null ],
     [ "gondola::TrackerStripPedestal", "structgondola_1_1TrackerStripPedestal.html", null ],
+    [ "gondola::Tracklet", "structgondola_1_1Tracklet.html", null ],
     [ "gondola::TrkCalibratedHit", "structgondola_1_1TrkCalibratedHit.html", null ],
     [ "gondola::TrkEvent", "structgondola_1_1TrkEvent.html", null ],
     [ "gondola::TrkEventPacket", "structgondola_1_1TrkEventPacket.html", null ],

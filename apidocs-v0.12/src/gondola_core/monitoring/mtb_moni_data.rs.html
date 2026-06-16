@@ -265,7 +265,7 @@
 <a href=#265 id=265 data-nosnippet>265</a><span class="attr">#[cfg(feature=<span class="string">"pybindings"</span>)]
 <a href=#266 id=266 data-nosnippet>266</a>#[pymethods]
 <a href=#267 id=267 data-nosnippet>267</a></span><span class="kw">impl </span>MtbMoniData {
-<a href=#268 id=268 data-nosnippet>268</a>  
+<a href=#268 id=268 data-nosnippet>268</a> 
 <a href=#269 id=269 data-nosnippet>269</a>  <span class="attr">#[getter]
 <a href=#270 id=270 data-nosnippet>270</a>  </span><span class="kw">fn </span>get_vccint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
 <a href=#271 id=271 data-nosnippet>271</a>    <span class="self">Self</span>::adc_vcc_conversion(<span class="self">self</span>.vccint)
@@ -333,40 +333,39 @@
 <a href=#333 id=333 data-nosnippet>333</a>    <span class="self">self</span>.get_tiu_ignore_busy()
 <a href=#334 id=334 data-nosnippet>334</a>  }
 <a href=#335 id=335 data-nosnippet>335</a>
-<a href=#336 id=336 data-nosnippet>336</a>
-<a href=#337 id=337 data-nosnippet>337</a>  <span class="attr">#[getter]
-<a href=#338 id=338 data-nosnippet>338</a>  #[pyo3(name=<span class="string">"fpga_temp"</span>)]
-<a href=#339 id=339 data-nosnippet>339</a>  </span><span class="kw">pub fn </span>get_fpga_temp_py(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
-<a href=#340 id=340 data-nosnippet>340</a>    <span class="self">self</span>.get_fpga_temp()
-<a href=#341 id=341 data-nosnippet>341</a>  }
-<a href=#342 id=342 data-nosnippet>342</a>  
-<a href=#343 id=343 data-nosnippet>343</a>  <span class="attr">#[getter]
-<a href=#344 id=344 data-nosnippet>344</a>  </span><span class="kw">pub fn </span>get_timestamp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
-<a href=#345 id=345 data-nosnippet>345</a>    <span class="self">self</span>.timestamp
-<a href=#346 id=346 data-nosnippet>346</a>  }
-<a href=#347 id=347 data-nosnippet>347</a>}
-<a href=#348 id=348 data-nosnippet>348</a>
-<a href=#349 id=349 data-nosnippet>349</a><span class="comment">//----------------------------------------
-<a href=#350 id=350 data-nosnippet>350</a>
-<a href=#351 id=351 data-nosnippet>351</a>// make it available as a monidata series
-<a href=#352 id=352 data-nosnippet>352</a></span><span class="macro">moniseries!</span>(MtbMoniDataSeries, MtbMoniData);
-<a href=#353 id=353 data-nosnippet>353</a>
-<a href=#354 id=354 data-nosnippet>354</a><span class="attr">#[cfg(feature=<span class="string">"pybindings"</span>)]
-<a href=#355 id=355 data-nosnippet>355</a></span><span class="macro">pythonize_packable_no_new!</span>(MtbMoniData);
-<a href=#356 id=356 data-nosnippet>356</a>
-<a href=#357 id=357 data-nosnippet>357</a><span class="attr">#[cfg(feature=<span class="string">"pybindings"</span>)]
-<a href=#358 id=358 data-nosnippet>358</a></span><span class="macro">pythonize_monidata!</span>(MtbMoniData);
-<a href=#359 id=359 data-nosnippet>359</a>
-<a href=#360 id=360 data-nosnippet>360</a><span class="comment">//----------------------------------------
-<a href=#361 id=361 data-nosnippet>361</a>
-<a href=#362 id=362 data-nosnippet>362</a></span><span class="attr">#[test]
-<a href=#363 id=363 data-nosnippet>363</a>#[cfg(feature = <span class="string">"random"</span>)]
-<a href=#364 id=364 data-nosnippet>364</a></span><span class="kw">fn </span>pack_mtbmonidata() {
-<a href=#365 id=365 data-nosnippet>365</a>  <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">100 </span>{
-<a href=#366 id=366 data-nosnippet>366</a>    <span class="kw">let </span>data = MtbMoniData::from_random();
-<a href=#367 id=367 data-nosnippet>367</a>    <span class="kw">let </span>test : MtbMoniData = data.pack().unpack().unwrap();
-<a href=#368 id=368 data-nosnippet>368</a>    <span class="macro">assert_eq!</span>(data, test);
-<a href=#369 id=369 data-nosnippet>369</a>  }
-<a href=#370 id=370 data-nosnippet>370</a>}
-<a href=#371 id=371 data-nosnippet>371</a>
+<a href=#336 id=336 data-nosnippet>336</a>  <span class="attr">#[getter]
+<a href=#337 id=337 data-nosnippet>337</a>  #[pyo3(name=<span class="string">"fpga_temp"</span>)]
+<a href=#338 id=338 data-nosnippet>338</a>  </span><span class="kw">pub fn </span>get_fpga_temp_py(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f32 {
+<a href=#339 id=339 data-nosnippet>339</a>    <span class="self">self</span>.get_fpga_temp()
+<a href=#340 id=340 data-nosnippet>340</a>  }
+<a href=#341 id=341 data-nosnippet>341</a>  
+<a href=#342 id=342 data-nosnippet>342</a>  <span class="attr">#[getter]
+<a href=#343 id=343 data-nosnippet>343</a>  </span><span class="kw">pub fn </span>get_timestamp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+<a href=#344 id=344 data-nosnippet>344</a>    <span class="self">self</span>.timestamp
+<a href=#345 id=345 data-nosnippet>345</a>  }
+<a href=#346 id=346 data-nosnippet>346</a>}
+<a href=#347 id=347 data-nosnippet>347</a>
+<a href=#348 id=348 data-nosnippet>348</a><span class="comment">//----------------------------------------
+<a href=#349 id=349 data-nosnippet>349</a>
+<a href=#350 id=350 data-nosnippet>350</a>// make it available as a monidata series
+<a href=#351 id=351 data-nosnippet>351</a></span><span class="macro">moniseries!</span>(MtbMoniDataSeries, MtbMoniData);
+<a href=#352 id=352 data-nosnippet>352</a>
+<a href=#353 id=353 data-nosnippet>353</a><span class="attr">#[cfg(feature=<span class="string">"pybindings"</span>)]
+<a href=#354 id=354 data-nosnippet>354</a></span><span class="macro">pythonize_packable_no_new!</span>(MtbMoniData);
+<a href=#355 id=355 data-nosnippet>355</a>
+<a href=#356 id=356 data-nosnippet>356</a><span class="attr">#[cfg(feature=<span class="string">"pybindings"</span>)]
+<a href=#357 id=357 data-nosnippet>357</a></span><span class="macro">pythonize_monidata!</span>(MtbMoniData);
+<a href=#358 id=358 data-nosnippet>358</a>
+<a href=#359 id=359 data-nosnippet>359</a><span class="comment">//----------------------------------------
+<a href=#360 id=360 data-nosnippet>360</a>
+<a href=#361 id=361 data-nosnippet>361</a></span><span class="attr">#[test]
+<a href=#362 id=362 data-nosnippet>362</a>#[cfg(feature = <span class="string">"random"</span>)]
+<a href=#363 id=363 data-nosnippet>363</a></span><span class="kw">fn </span>pack_mtbmonidata() {
+<a href=#364 id=364 data-nosnippet>364</a>  <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">100 </span>{
+<a href=#365 id=365 data-nosnippet>365</a>    <span class="kw">let </span>data = MtbMoniData::from_random();
+<a href=#366 id=366 data-nosnippet>366</a>    <span class="kw">let </span>test : MtbMoniData = data.pack().unpack().unwrap();
+<a href=#367 id=367 data-nosnippet>367</a>    <span class="macro">assert_eq!</span>(data, test);
+<a href=#368 id=368 data-nosnippet>368</a>  }
+<a href=#369 id=369 data-nosnippet>369</a>}
+<a href=#370 id=370 data-nosnippet>370</a>
 </code></pre></div></section></main></body></html>

@@ -1,0 +1,161 @@
+\doxysection{gondola\+::Tracklet Struct Reference}
+\hypertarget{structgondola_1_1Tracklet}{}\label{structgondola_1_1Tracklet}\index{gondola::Tracklet@{gondola::Tracklet}}
+
+
+A straight line as it could be part of a track.  
+
+
+
+
+{\ttfamily \#include $<$tracklet.\+hpp$>$}
+
+
+
+Collaboration diagram for gondola\+::Tracklet\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=196pt]{structgondola_1_1Tracklet__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structgondola_1_1Tracklet_ab7529c2017ef53fd73822e4cc13ec41f}{Tracklet}} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structgondola_1_1RecoHit}{Reco\+Hit}} $>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{vertex}})
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1Tracklet_a371d4f1cef6345eedef955b5fc20a173}{get\+\_\+vertex}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structgondola_1_1RecoHit}{Reco\+Hit}} $>$
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1Tracklet_ad52b57299c0d7fa5dba9ab30ce509a37}{get\+\_\+stop}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{structOption}{Option}}$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structgondola_1_1RecoHit}{Reco\+Hit}} $>$ $>$
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1Tracklet_a096a586bcdbeba9b1a6c15322a0ff1d6}{set\+\_\+stop}} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structgondola_1_1RecoHit}{Reco\+Hit}} $>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{stop}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1Tracklet_a57b6172edd87d3c0a3708955806f42f0}{to\+\_\+string}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ std\+::string
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}} \mbox{\hyperlink{structgondola_1_1Tracklet_a33e05f27ca357ad68734ad69480f82c0}{is\+\_\+infinite}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1Tracklet_a7d8f02f6f073b4851f74dfe63021bbef}{vertex\+\_\+mom\+\_\+x}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1Tracklet_a88e4ebc8cc767331844e0ba1bbe303c9}{vertex\+\_\+mom\+\_\+y}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1Tracklet_a9a37c61bd025b0e17cc35620451aadae}{vertex\+\_\+mom\+\_\+z}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1Tracklet_a1f8865660ce5c7d2edb6ab6c5ce630b0}{beta}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1Tracklet_a75e8d8cf6795563c647c5a3596e8a357}{beta\+\_\+err}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ std\+::tuple$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} $>$ $>$ \mbox{\hyperlink{structgondola_1_1Tracklet_aafdbb80e74f859b0c447c66fa380df43}{edeps}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a94dab5770726ccbef8c7d026cfbdf8e5}{f64}} $>$ \mbox{\hyperlink{structgondola_1_1Tracklet_adfda17d3c9869c8edd8b61aa015a97d6}{coldens}}
+\begin{DoxyCompactList}\small\item\em Column density (if applicable) \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structOption}{Option}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} $>$ \mbox{\hyperlink{structgondola_1_1Tracklet_a80b9f43ca42d6e51a4903719efdb72c9}{gof}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A straight line as it could be part of a track. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structgondola_1_1Tracklet_ab7529c2017ef53fd73822e4cc13ec41f}\label{structgondola_1_1Tracklet_ab7529c2017ef53fd73822e4cc13ec41f} 
+\index{gondola::Tracklet@{gondola::Tracklet}!Tracklet@{Tracklet}}
+\index{Tracklet@{Tracklet}!gondola::Tracklet@{gondola::Tracklet}}
+\doxysubsubsection{\texorpdfstring{Tracklet()}{Tracklet()}}
+{\footnotesize\ttfamily gondola\+::\+Tracklet\+::\+Tracklet (\begin{DoxyParamCaption}\item[{std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structgondola_1_1RecoHit}{Reco\+Hit}} $>$}]{vertex }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structgondola_1_1Tracklet_ad52b57299c0d7fa5dba9ab30ce509a37}\label{structgondola_1_1Tracklet_ad52b57299c0d7fa5dba9ab30ce509a37} 
+\index{gondola::Tracklet@{gondola::Tracklet}!get\_stop@{get\_stop}}
+\index{get\_stop@{get\_stop}!gondola::Tracklet@{gondola::Tracklet}}
+\doxysubsubsection{\texorpdfstring{get\_stop()}{get\_stop()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tracklet\+::get\+\_\+stop (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{structOption}{Option}}$<$std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{structgondola_1_1RecoHit}{Reco\+Hit}}$>$$>$}
+
+\Hypertarget{structgondola_1_1Tracklet_a371d4f1cef6345eedef955b5fc20a173}\label{structgondola_1_1Tracklet_a371d4f1cef6345eedef955b5fc20a173} 
+\index{gondola::Tracklet@{gondola::Tracklet}!get\_vertex@{get\_vertex}}
+\index{get\_vertex@{get\_vertex}!gondola::Tracklet@{gondola::Tracklet}}
+\doxysubsubsection{\texorpdfstring{get\_vertex()}{get\_vertex()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tracklet\+::get\+\_\+vertex (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{structgondola_1_1RecoHit}{Reco\+Hit}}$>$}
+
+\Hypertarget{structgondola_1_1Tracklet_a096a586bcdbeba9b1a6c15322a0ff1d6}\label{structgondola_1_1Tracklet_a096a586bcdbeba9b1a6c15322a0ff1d6} 
+\index{gondola::Tracklet@{gondola::Tracklet}!set\_stop@{set\_stop}}
+\index{set\_stop@{set\_stop}!gondola::Tracklet@{gondola::Tracklet}}
+\doxysubsubsection{\texorpdfstring{set\_stop()}{set\_stop()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tracklet\+::set\+\_\+stop (\begin{DoxyParamCaption}\item[{std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structgondola_1_1RecoHit}{Reco\+Hit}} $>$}]{stop }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}}
+
+\Hypertarget{structgondola_1_1Tracklet_a57b6172edd87d3c0a3708955806f42f0}\label{structgondola_1_1Tracklet_a57b6172edd87d3c0a3708955806f42f0} 
+\index{gondola::Tracklet@{gondola::Tracklet}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!gondola::Tracklet@{gondola::Tracklet}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tracklet\+::to\+\_\+string (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ std\+::string}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structgondola_1_1Tracklet_a1f8865660ce5c7d2edb6ab6c5ce630b0}\label{structgondola_1_1Tracklet_a1f8865660ce5c7d2edb6ab6c5ce630b0} 
+\index{gondola::Tracklet@{gondola::Tracklet}!beta@{beta}}
+\index{beta@{beta}!gondola::Tracklet@{gondola::Tracklet}}
+\doxysubsubsection{\texorpdfstring{beta}{beta}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tracklet\+::beta}
+
+\Hypertarget{structgondola_1_1Tracklet_a75e8d8cf6795563c647c5a3596e8a357}\label{structgondola_1_1Tracklet_a75e8d8cf6795563c647c5a3596e8a357} 
+\index{gondola::Tracklet@{gondola::Tracklet}!beta\_err@{beta\_err}}
+\index{beta\_err@{beta\_err}!gondola::Tracklet@{gondola::Tracklet}}
+\doxysubsubsection{\texorpdfstring{beta\_err}{beta\_err}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tracklet\+::beta\+\_\+err}
+
+\Hypertarget{structgondola_1_1Tracklet_adfda17d3c9869c8edd8b61aa015a97d6}\label{structgondola_1_1Tracklet_adfda17d3c9869c8edd8b61aa015a97d6} 
+\index{gondola::Tracklet@{gondola::Tracklet}!coldens@{coldens}}
+\index{coldens@{coldens}!gondola::Tracklet@{gondola::Tracklet}}
+\doxysubsubsection{\texorpdfstring{coldens}{coldens}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a94dab5770726ccbef8c7d026cfbdf8e5}{f64}}$>$ gondola\+::\+Tracklet\+::coldens}
+
+
+
+Column density (if applicable) 
+
+\Hypertarget{structgondola_1_1Tracklet_aafdbb80e74f859b0c447c66fa380df43}\label{structgondola_1_1Tracklet_aafdbb80e74f859b0c447c66fa380df43} 
+\index{gondola::Tracklet@{gondola::Tracklet}!edeps@{edeps}}
+\index{edeps@{edeps}!gondola::Tracklet@{gondola::Tracklet}}
+\doxysubsubsection{\texorpdfstring{edeps}{edeps}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$std\+::tuple$<$\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}},\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}$>$ $>$ gondola\+::\+Tracklet\+::edeps}
+
+The energy depositions per each crossed volume \Hypertarget{structgondola_1_1Tracklet_a80b9f43ca42d6e51a4903719efdb72c9}\label{structgondola_1_1Tracklet_a80b9f43ca42d6e51a4903719efdb72c9} 
+\index{gondola::Tracklet@{gondola::Tracklet}!gof@{gof}}
+\index{gof@{gof}!gondola::Tracklet@{gondola::Tracklet}}
+\doxysubsubsection{\texorpdfstring{gof}{gof}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structOption}{Option}}$<$\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}$>$ gondola\+::\+Tracklet\+::gof}
+
+Goodness of fit, most likely some chi\texorpdfstring{$^\wedge$}{\string^}2 or similar \Hypertarget{structgondola_1_1Tracklet_a33e05f27ca357ad68734ad69480f82c0}\label{structgondola_1_1Tracklet_a33e05f27ca357ad68734ad69480f82c0} 
+\index{gondola::Tracklet@{gondola::Tracklet}!is\_infinite@{is\_infinite}}
+\index{is\_infinite@{is\_infinite}!gondola::Tracklet@{gondola::Tracklet}}
+\doxysubsubsection{\texorpdfstring{is\_infinite}{is\_infinite}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}} gondola\+::\+Tracklet\+::is\+\_\+infinite}
+
+\Hypertarget{structgondola_1_1Tracklet_a7d8f02f6f073b4851f74dfe63021bbef}\label{structgondola_1_1Tracklet_a7d8f02f6f073b4851f74dfe63021bbef} 
+\index{gondola::Tracklet@{gondola::Tracklet}!vertex\_mom\_x@{vertex\_mom\_x}}
+\index{vertex\_mom\_x@{vertex\_mom\_x}!gondola::Tracklet@{gondola::Tracklet}}
+\doxysubsubsection{\texorpdfstring{vertex\_mom\_x}{vertex\_mom\_x}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tracklet\+::vertex\+\_\+mom\+\_\+x}
+
+\Hypertarget{structgondola_1_1Tracklet_a88e4ebc8cc767331844e0ba1bbe303c9}\label{structgondola_1_1Tracklet_a88e4ebc8cc767331844e0ba1bbe303c9} 
+\index{gondola::Tracklet@{gondola::Tracklet}!vertex\_mom\_y@{vertex\_mom\_y}}
+\index{vertex\_mom\_y@{vertex\_mom\_y}!gondola::Tracklet@{gondola::Tracklet}}
+\doxysubsubsection{\texorpdfstring{vertex\_mom\_y}{vertex\_mom\_y}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tracklet\+::vertex\+\_\+mom\+\_\+y}
+
+\Hypertarget{structgondola_1_1Tracklet_a9a37c61bd025b0e17cc35620451aadae}\label{structgondola_1_1Tracklet_a9a37c61bd025b0e17cc35620451aadae} 
+\index{gondola::Tracklet@{gondola::Tracklet}!vertex\_mom\_z@{vertex\_mom\_z}}
+\index{vertex\_mom\_z@{vertex\_mom\_z}!gondola::Tracklet@{gondola::Tracklet}}
+\doxysubsubsection{\texorpdfstring{vertex\_mom\_z}{vertex\_mom\_z}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tracklet\+::vertex\+\_\+mom\+\_\+z}
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/\mbox{\hyperlink{tracklet_8hpp}{tracklet.\+hpp}}\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/\mbox{\hyperlink{tracklet_8cxx}{tracklet.\+cxx}}\end{DoxyCompactItemize}

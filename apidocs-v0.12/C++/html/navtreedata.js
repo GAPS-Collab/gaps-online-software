@@ -26,7 +26,7 @@ var NAVTREE =
 [
   [ "gaps-online-software", "index.html", [
     [ "gaps-online-software C++ API software documentation", "index.html", null ],
-    [ "gondola_cxx - C++ compatibility layer for gondola", "md__2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2README.html", null ],
+    [ "<tt>gondola_cxx</tt> - C++ compatibility layer for gondola", "md__2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2README.html", null ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ],
       [ "Namespace Members", "namespacemembers.html", [
@@ -65,12 +65,12 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "____init_____8py.html",
-"io_8cxx.html#a8d5c0194dba1a90894ab97be23eae59d",
-"structMtbMoniData.html#a35909b221be2cc784e92937873a5b9c9",
-"structgondola_1_1RBCalibration.html#a6a1ecc8b17d1c8bb310b581649648851",
-"structgondola_1_1TofEvent.html#a8c11f7473434ec4d75847455454ce7cb",
-"structgondola_1_1TofPaddle.html#ace5613d0d4f0c06380e2af38af47acae",
-"tof__event_8hpp_source.html"
+"io_8cxx.html",
+"structMtbMoniData.html#a29bb45ae96b1920aca3fc2c212e3c3af",
+"structgondola_1_1RBCalibration.html#a5455256956208f6f606872eb5ad94834",
+"structgondola_1_1TofEvent.html#a53d802f90336536a0b2fe1fa84d3722b",
+"structgondola_1_1TofPaddle.html#a808146a08129c82f7ea0d13fa78ecffd",
+"structstd_1_1formatter_3_01gondola_1_1EventStatus_01_4.html#a305ff04496350dffade082a7a4ade716"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
