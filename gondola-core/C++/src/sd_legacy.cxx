@@ -1,6 +1,7 @@
 #ifdef BUILD_CXX_WITH_ROOT
 
 #include <iostream>
+#include <algorithm> 
 
 #include "TChain.h"
 #include "TFileMerger.h"
@@ -77,7 +78,7 @@ void gondola::read_sd_legacy_example(std::string filename) {
 
 //------------------------------------------------------------------------
 
-gondola::SDRootReader::SDRootReader(std::string fname) {
+g::SDRootReader::SDRootReader(std::string fname) {
   filename            = fname;
   tchain              = new TChain("TreeRec");
   tchain->Add(fname.c_str());
@@ -91,14 +92,15 @@ gondola::SDRootReader::SDRootReader(std::string fname) {
   raw_tree->Add(fname.c_str());
   raw_tree->SetBranchAddress("Trk", &rawtrk); 
   raw_tree->SetBranchAddress("Tof", &rawtof);
+  paddle_vid_hid_map  = gondola::get_vid_hid_map(); 
 }
 
-gondola::SDRootReader::~SDRootReader() {
+g::SDRootReader::~SDRootReader() {
   delete event;
   delete tchain;
 }
 
-auto gondola::SDRootReader::get_event(u64 event_idx) -> void {
+auto g::SDRootReader::get_event(u64 event_idx) -> void {
   tchain->GetEntry(event_idx); 
   std::cout << event->pretty_print() << std::endl;
   if (raw_tree != nullptr) {
@@ -111,21 +113,64 @@ auto gondola::SDRootReader::get_event(u64 event_idx) -> void {
   }
 }
 
-auto gondola::SDRootReader::get_event_tof_energies(u64 event_idx) -> Vec<f32> {
+auto g::SDRootReader::get_event_tof_energies(u64 event_idx) -> Vec<f32> {
   tchain->GetEntry(event_idx); 
   return event->get_tof_energies();
   //std::cout << event->pretty_print() << std::endl;
 }
 
-auto gondola::SDRootReader::get_event_trk_energies(u64 event_idx) -> Vec<f32> {
+auto g::SDRootReader::get_event_trk_energies(u64 event_idx) -> Vec<f32> {
   tchain->GetEntry(event_idx); 
   return event->get_trk_energies();
   //std::cout << event->pretty_print() << std::endl;
 }
 
+
+auto g::SDRootReader::get_simple_beta(u64 event_idx) -> f32 {
+  tchain->GetEntry(event_idx);
+  auto primary   = event->GetPrimaryTrack();
+  if (primary == nullptr) {
+    return 0;
+  }
+  auto pos           = primary->Position[0];
+  auto dir           = primary->MomentumDirection[0];
+  double first_outer = 1e10;
+  double first_inner = 1e10;
+  TVector3 first_outer_pos;
+  TVector3 first_inner_pos;
+  for (uint k=0; k<primary->EnergyDeposition.size();k++) { 
+    auto vid = primary->VolumeId[k];    
+    if (vid > 200000000) {
+      continue;
+    }
+    auto hid = paddle_vid_hid_map.at(vid); 
+    if (hid < 60) {
+      if (primary->GlobalTime[k] < first_inner) {
+        first_inner     = primary->GlobalTime[k];
+        first_inner_pos = primary->Position[k];
+      }
+    } else {
+      if (primary->GlobalTime[k] < first_outer) {
+        first_outer     = primary->GlobalTime[k];
+        first_outer_pos = primary->Position[k];
+      }
+    }  
+  }
+  auto beta = (first_inner_pos-first_outer_pos).Mag()/(first_inner-first_outer)*1e6/299792458;
+  return (f32)beta;
+}
+
+//------------------------------------------------------------------------
+    
+auto g::SDRootReader::get_primary(u64 event_idx)            -> Option<g::Tracklet> {
+  tchain->GetEntry(event_idx);
+  auto primary   = event->get_primary();
+  return primary;
+}
+
 //------------------------------------------------------------------------
 
-gondola::SDRootWriter::SDRootWriter(std::string fname, std::string geo_file,  std::string file_mode) {
+g::SDRootWriter::SDRootWriter(std::string fname, std::string geo_file,  std::string file_mode) {
   // databases
   pmap     = g::get_tofpaddles();
   std::cout << "-> Loaded " << pmap.size() << " TofPaddles!" << std::endl;
@@ -481,11 +526,6 @@ auto Crane::Calibration::CRawTofHits::pretty_print() const -> std::string {
 
 //------------------------------------------------------------------------
 
-auto CEventRec::from_telemetry(g::TelemetryEvent const &event) -> CEventRec {
-  auto sd_event = CEventRec();
-  return sd_event;
-}
-    
 auto CEventRec::get_tof_energies() const -> Vec<f32> {
   auto energies = Vec<f32>();
   for (auto const &h : hitseries_) {
@@ -495,6 +535,8 @@ auto CEventRec::get_tof_energies() const -> Vec<f32> {
   }
   return energies;
 };
+
+//------------------------------------------------------------------------
 
 auto CEventRec::get_trk_energies() const -> Vec<f32> {
   auto energies = Vec<f32>();
@@ -508,6 +550,78 @@ auto CEventRec::get_trk_energies() const -> Vec<f32> {
 
 //------------------------------------------------------------------------
 
+auto CEventRec::has_primary() const -> bool {
+  if (registeredRecos_.size() == 0){
+    return false;
+  }  
+  if (Tracks.find(activeReco_) ==  Tracks.end()) {
+    return false;
+  }
+  for (CTrackRec* track : Tracks.at(activeReco_)) {
+    if (track->Primary) {
+      return true;
+    }
+  }
+  return false;
+}
+
+//------------------------------------------------------------------------
+
+auto CEventRec::get_primary() const -> Option<g::Tracklet> {
+  
+  if (!has_primary()) {
+    return None;
+  }
+  auto vertex          = std::make_shared<g::RecoHit>();
+  auto cev_prim        = GetPrimaryTrack(); 
+
+  if (cev_prim != nullptr) {
+    vertex->x         = cev_prim->VertexPosition.X();
+    vertex->y         = cev_prim->VertexPosition.Y();
+    vertex->z         = cev_prim->VertexPosition.Z();
+  }
+  
+  g::Tracklet primary(vertex);
+  if (cev_prim != nullptr) { 
+    auto cev_prim_edep = cev_prim->EnergyDeposition; 
+    auto cev_prim_vid  = cev_prim->VolumeId; 
+    for (usize k=0;k<cev_prim_edep.size();k++) {
+      primary.edeps.push_back(std::make_tuple(cev_prim_vid[k], cev_prim_edep[k]));
+    }
+    for (auto const &k : cev_prim->ColumnDensityUntilStep) {
+      primary.coldens.push_back(k);
+    }
+  }
+  if (!primaryMomentumDirection_.contains(activeReco_)) {
+    std::cerr << std::format("Unable to access reconstruction results for reco with name '{}'", activeReco_) << std::endl;
+    return Some(primary);
+  }
+  
+  auto stop            = std::make_shared<g::RecoHit>();
+  auto psp             = primaryStoppingPosition_.at(activeReco_); 
+  auto dir             = primaryMomentumDirection_.at(activeReco_);
+  auto edeps           = primaryEnergyDepositions_.at(activeReco_);
+  stop->x              = psp.X();
+  stop->y              = psp.Y();
+  stop->z              = psp.Z();
+  stop->time           = primaryStoppingTime_.at(activeReco_);
+  stop->volume         = primaryStoppingVolume_.at(activeReco_);
+  
+  // -- assign to priamry
+  //primary.vertex     = vertex;
+  //primary.stop       = stop;
+  
+  primary.vertex_mom_x = dir.X();
+  primary.vertex_mom_y = dir.Y();
+  primary.vertex_mom_z = dir.Z(); 
+  primary.gof          = Some(Chi2.at(activeReco_));
+  primary.beta         = primaryBeta_.at(activeReco_);
+  primary.beta_err     = primaryBetaError_.at(activeReco_);
+  return Some(primary);
+}
+    
+//------------------------------------------------------------------------
+
 auto CEventRec::fill_from_telemetry(g::TelemetryEvent* event,
                                     u8  packet_type,
                                     f64 gcutime,
@@ -518,7 +632,6 @@ auto CEventRec::fill_from_telemetry(g::TelemetryEvent* event,
                                     cb::CRawTof* raw_tof,
                                     const bool apply_elena_cut,  
                                     const double mev_cut) -> void {
-
   primaryBetaGenerated_ = NAN;
   //primaryMomentumDirectionGenerated_;
   primaryKineticEnergyGenerated_ = NAN;
@@ -731,8 +844,6 @@ auto CEventRec::fill_from_telemetry(g::TelemetryEvent* event,
   //  recevent.SetEventTime  (double(event.get_timestamp48())*1e-5); 
   //  recevent.SetGPSTime(event.timestamp32, event.timestamp16);
   //}
-
-
 }
 
 //------------------------------------------------------------------------
@@ -747,6 +858,20 @@ auto CEventRec::GetGPSTime() const -> f64 {
 
 auto CEventRec::ListAvailableReconstructions() const -> Vec<std::string> {
   return registeredRecos_;
+}
+
+//------------------------------------------------------------------------
+
+auto CEventRec::GetPrimaryTrack() const -> CTrackRec* {
+  if (!has_primary()) {
+    return nullptr;
+  }
+  for (CTrackRec* track : Tracks.at(activeReco_)) {
+    if (track->Primary) {
+      return track;
+    }
+  }
+  return nullptr;
 }
 
 //------------------------------------------------------------------------

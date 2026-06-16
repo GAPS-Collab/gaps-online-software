@@ -1,6 +1,5 @@
 #ifdef BUILD_CXX_WITH_ROOT
-#ifndef SD_LEGACY_H_INCLUDED
-#define SD_LEGACY_H_INCLUDED
+#pragma once 
 
 #include <memory>
 
@@ -15,6 +14,7 @@
 #include "tof_typedefs.h" 
 #include "telemetry_dataclasses.hpp"
 #include "database.h"
+#include "tracklet.hpp"
 
 typedef i32 CFitStatusType;
 
@@ -173,14 +173,14 @@ class CEventBase : public TObject {
 class CTrackBase : public TObject {
   public:
     CTrackBase() {}
-  protected:
-    bool     Primary;
-    u32      TrackId;
-    u32      VertexVolumeId;
-    TVector3 VertexPosition;
-    u32      LastVolumeId;
-    TVector3 LastPosition;
-    f64      ColumnDensity; // column density [g/cm2]
+  //protected:
+    bool          Primary;
+    u32           TrackId;
+    u32           VertexVolumeId;
+    TVector3      VertexPosition;
+    u32           LastVolumeId;
+    TVector3      LastPosition;
+    f64           ColumnDensity; // column density [g/cm2]
 
     Vec<f64>      EnergyDeposition;
     Vec<f64>      GlobalTime;
@@ -240,7 +240,6 @@ class CEventRec : public CEventBase {
   // Populate a CEventRec object from a 
   // MergedEvent
   public:
-    static auto from_telemetry(gondola::TelemetryEvent const &event) -> CEventRec;
     
     auto fill_from_telemetry(gondola::TelemetryEvent* event,
                              u8  packet_type,
@@ -254,11 +253,15 @@ class CEventRec : public CEventBase {
                              const double mev_cut = 0.4) -> void;
     auto to_telemetry(HashMap<u32, u32> const &hid_vid_map) -> gondola::TelemetryEvent;
     
-    auto get_tof_energies() const -> Vec<f32>;
-    auto get_trk_energies() const -> Vec<f32>;
-    auto pretty_print() const -> std::string;
-    auto GetGPSTime() const -> f64;
+    auto get_tof_energies()             const -> Vec<f32>;
+    auto get_trk_energies()             const -> Vec<f32>;
+    auto pretty_print()                 const -> std::string;
+    auto get_primary()                  const -> Option<gondola::Tracklet>;
+    auto has_primary()                  const -> bool;
+    auto GetGPSTime()                   const -> f64;
     auto ListAvailableReconstructions() const -> Vec<std::string>;  
+    auto GetPrimaryTrack()              const -> CTrackRec*;
+
   public:
     CEventRec() {}
     
@@ -478,6 +481,8 @@ namespace gondola {
     auto get_event(u64 event_idx) -> void; 
     auto get_event_tof_energies(u64 event_idx) -> Vec<f32>; 
     auto get_event_trk_energies(u64 event_idx) -> Vec<f32>; 
+    auto get_primary(u64 event_idx)            -> Option<Tracklet>;
+    auto get_simple_beta(u64 event_id)         -> f32;
     //auto trk_energy_response(u16 adc, u8 layer, u8 row, u8 module, u8 channel) -> double;
     std::string filename;
     // root just hates modern memory management
@@ -488,7 +493,7 @@ namespace gondola {
     Crane::Calibration::CRawTof*   rawtof    = nullptr;
     Crane::Calibration::CRawHeader* rawhd    = nullptr;
     TChain* raw_tree                         = nullptr;
-
+    HashMap<u32,u32> paddle_vid_hid_map; 
   };
   
   struct SDRootWriter {
@@ -516,5 +521,4 @@ namespace gondola {
   };
 }
 
-#endif
 #endif

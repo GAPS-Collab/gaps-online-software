@@ -1,3 +1,8 @@
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
+
+#include <memory> 
+
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
@@ -10,11 +15,19 @@
 #include "telemetry_dataclasses.hpp"
 #include "io/telemetry_reader.hpp"
 #include "calibration.h"
+#include "tracklet.hpp"
 
 namespace nb  = nanobind;
 namespace g   = gondola;
+  
+// helper to allow returning a tuple from seperately 
+// stored members for x,y,z coordinates
+nb::tuple get_coordinates(f32 x, f32 y, f32 z) {
+  return nb::make_tuple(x, y, z);
+}
 
 NB_MODULE(gondola_cxx, m) {
+
 
   nb::enum_<g::ProtocolVersion>(m, "ProtocolVersion") 
     .value("Unknown"           , g::ProtocolVersion::Unknown)
@@ -77,16 +90,24 @@ NB_MODULE(gondola_cxx, m) {
     //  return r.get_next_packet().unwrap();
     //})
     .def_ro("filename", &g::SDRootReader::filename)
-    .def("get_event", &g::SDRootReader::get_event)
+    .def("get_event",      &g::SDRootReader::get_event)
     .def_ro("nevents_total", &g::SDRootReader::nevents_total)
+    //.def("get_primary", &g::SDRootReader::get_primary)
+    .def("get_primary", [](g::SDRootReader &r, u64 idx) -> nb::object {
+      auto prim = r.get_primary(idx);
+      if (prim.is_none()) {
+        return nb::none();
+      } else {
+        g::Tracklet prim_value = prim.unwrap();
+        return nb::cast(prim_value);
+      }
+    })
     .def("get_event_tof_energies", &g::SDRootReader::get_event_tof_energies)
+    .def("get_simple_beta"       , &g::SDRootReader::get_simple_beta) 
     .def("get_event_trk_energies", &g::SDRootReader::get_event_trk_energies);
 
   nb::class_<g::SDRootWriter>(m, "SDRootWriter")
     .def(nb::init<std::string, std::string>())
-    //.def("get_next_event", [](g::TofPacketReader &r) {
-    //  return r.get_next_packet().unwrap();
-    //})
     .def_ro("filename",      &g::SDRootWriter::filename)
     .def("add_event",        &g::SDRootWriter::add_event)
     .def("write_sdpar",      &g::SDRootWriter::write_sdpar)
@@ -377,6 +398,71 @@ NB_MODULE(gondola_cxx, m) {
   m.def("spike_cleaning_all", &g::spike_cleaning_all, 
         nb::arg("voltages"), nb::arg("calibrated") = true,
         "Jamie's simpler version with single-width spike correction");
+  
+  // physics part 
+  nb::class_<g::RecoHit>(m, "RecoHit")
+    .def(nb::init<>())
+    .def_ro("x"                  , &g::RecoHit::x) 
+    .def_ro("x_err"              , &g::RecoHit::x_err) 
+    .def_ro("y"                  , &g::RecoHit::y) 
+    .def_ro("y_err"              , &g::RecoHit::y_err) 
+    .def_ro("z"                  , &g::RecoHit::z) 
+    .def_ro("z_err"              , &g::RecoHit::z_err) 
+    .def_ro("time"               , &g::RecoHit::time) 
+    .def_ro("energy"             , &g::RecoHit::energy) 
+    .def_ro("volume"             , &g::RecoHit::volume) 
+    .def("__str__", [](const g::RecoHit& self) {
+        return nb::str("{}").format(self.to_string());
+    })
+    .def("__repr__", [](const g::RecoHit& self) {
+        return nb::str("{}").format(self.to_string());
+    });
+  
+  // --------------------------------------------------
+    
+  nb::class_<g::Tracklet>(m, "Tracklet")
+    .def(nb::init<std::shared_ptr<g::RecoHit>>())
+    .def_ro("is_infinite"        , &g::Tracklet::is_infinite) 
+    .def_ro("beta"               , &g::Tracklet::beta) 
+    .def_ro("beta_err"           , &g::Tracklet::beta_err) 
+    .def_prop_ro("edeps"         , [] (const g::Tracklet &t) {
+      auto ed = Vec<f32>();
+      for (auto const &k: t.edeps) {
+        ed.push_back(std::get<1>(k));
+      }     
+      return ed;     
+    })
+    .def_prop_ro("vids"         , [] (const g::Tracklet &t) {
+      auto v = Vec<f32>();
+      for (auto const &k: t.edeps) {
+        v.push_back(std::get<0>(k));
+      }     
+      return v;     
+    })
+    .def_ro("coldens"            , &g::Tracklet::coldens)
+    .def_prop_ro("vertex"        , &g::Tracklet::get_vertex) 
+    .def_prop_ro("stop"          , &g::Tracklet::get_stop) 
+    .def_prop_ro("vertex_mom", [](const g::Tracklet &t) {
+       return get_coordinates(t.vertex_mom_x, t.vertex_mom_y, t.vertex_mom_z);
+    })
+    .def_prop_ro("gof", [](const g::Tracklet &t) -> nb::object {
+      if (t.gof.is_none()) {
+        return nb::none();
+      } else {
+        //return (f32)t.gof.unwrap();
+        auto gof_ = t.gof;
+        f32 gof_value = gof_.unwrap();
+        return nb::cast(gof_value);
+      }
+    })
+  
+    .def("__str__", [](const g::Tracklet& self) {
+        return nb::str("{}").format(self.to_string());
+    })
+    .def("__repr__", [](const g::Tracklet& self) {
+        return nb::str("{}").format(self.to_string());
+    });
+
 }
 
 
