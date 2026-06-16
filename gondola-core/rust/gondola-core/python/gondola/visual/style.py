@@ -17,11 +17,21 @@ d.visual()
 #--------------------------------------------
 
 def gander_scatter_plot(xs, ys,
-                        xlabel    : str,
-                        ylabel    : str,
-                        title     : str,
-                        figsize   = lo.FIGSIZE_A4_LANDSCAPE,
+                        xlabel     : str,
+                        ylabel     : str,
+                        title      : str,
+                        figsize    = lo.FIGSIZE_A4_LANDSCAPE,
+                        ylabel_rot = 0,
                         **kwargs) -> matplotlib.figure.Figure:
+    """
+    A stylized, generic plot.
+
+    # Arguments:
+        All kwargs will get passed through to the matplotlib scatter plot
+
+    # Returns:
+        A figure instance 
+    """
     if not kwargs:
         kwargs = {'color'  : 'w',\
                   'alpha'  : 0.4,\
@@ -34,7 +44,7 @@ def gander_scatter_plot(xs, ys,
     #ax.set_ylim(bottom=0)
     
     ax.set_xlabel(xlabel, loc='right')
-    ax.set_ylabel(ylabel, loc='top')#, rotation=0)
+    ax.set_ylabel(ylabel, loc='top', rotation=ylabel_rot)
     ax.set_title(title, loc='right')
     #if log:
     #    ax.set_yscale('symlog')
@@ -209,7 +219,8 @@ def gander_2dplot(h      : d.histogram.hist2d,
                   ylabel : str,
                   title  : str,
                   xlim   = None,
-                  invert_yaxis = False,
+                  show_nentries = False,
+                  invert_yaxis  = False,
                   **kwargs) -> matplotlib.figure.Figure:
     """
     A plot with a default style for the 
@@ -265,6 +276,9 @@ def gander_2dplot(h      : d.histogram.hist2d,
     cb.visual.adjust_minor_ticks(ax, which='both')
     ax.spines['top'].set_visible(True)
     ax.spines['right'].set_visible(True)
+    text_xpos = 0.7
+    if show_nentries:
+        ax.text(text_xpos,0.8, f'N = {h.stats.nentries:.2e}', transform=fig.transFigure, color='w')
     if invert_yaxis:
         ax.invert_yaxis()
     return fig
