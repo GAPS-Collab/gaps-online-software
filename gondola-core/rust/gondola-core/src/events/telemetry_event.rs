@@ -493,7 +493,7 @@ impl TelemetryEvent {
   fn get_event_id(&self) -> u32 {
     self.event_id
   }
-  
+ 
   /// If available parse the run id from 
   /// the TOF part of the event 
   ///
@@ -552,7 +552,21 @@ impl TelemetryEvent {
     }
     (pids, twindows)
   }
- 
+
+  /// One shot function for a simple calculation of the tof time of flight 
+  /// as calucated by first inner - first outer time. 
+  /// Depending on the event topology, this might or might not be very useful.
+  ///
+  /// That this yields something reasonable, the systematic timing offsets 
+  /// have to be set before, see `set_tof_timing_offsets` 
+  ///
+  /// Returns: 
+  ///   time-of-flight, beta, phase differenc, distance, harting cable time difference 
+  #[getter]
+  fn get_tof_time_of_flight(&mut self) -> Option<(f32,f32,f32,f32,f32)> {
+    self.tof_event.get_tof()
+  }
+
   /// Set per-paddle timing constant offsets 
   /// for the TOF
   ///
