@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.db &#8212; gondola 0.12.25 documentation</title>
+    <title>gondola.db &#8212; gondola 0.12.26 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
 
-    <script src="../_static/documentation_options.js?v=857e782b"></script>
+    <script src="../_static/documentation_options.js?v=599f3fa0"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.db';</script>
@@ -117,7 +117,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.12.25 documentation</p>
+    <p class="title logo__title">gondola 0.12.26 documentation</p>
   
 </a></div>
     
@@ -285,6 +285,7 @@
 <li class="toctree-l1"><a class="reference internal" href="gondola.monitoring.html">gondola.monitoring</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.packets.html">gondola.packets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.reconstruction.html">gondola.reconstruction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.run.html">gondola.run</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.sim.html">gondola.sim</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.stats.html">gondola.stats</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="gondola.tof.html">gondola.tof</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -823,9 +824,26 @@ name</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddleTimingConstant.paddle_constant">
+<span class="sig-name descname"><span class="pre">paddle_constant</span></span><a class="headerlink" href="#gondola.db.TofPaddleTimingConstant.paddle_constant" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.db.TofPaddleTimingConstant.paddle_id">
 <span class="sig-name descname"><span class="pre">paddle_id</span></span><a class="headerlink" href="#gondola.db.TofPaddleTimingConstant.paddle_id" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.db.TofPaddleTimingConstant.panel_constant">
+<span class="sig-name descname"><span class="pre">panel_constant</span></span><a class="headerlink" href="#gondola.db.TofPaddleTimingConstant.panel_constant" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gondola.db.TofPaddleTimingConstant.set_timing_constan">
+<span class="sig-name descname"><span class="pre">set_timing_constan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.db.TofPaddleTimingConstant.set_timing_constan" title="Link to this definition">#</a></dt>
+<dd><p>Completely reset the timing constant and 
+NOT use the one from the db, but an own</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.db.TofPaddleTimingConstant.timing_constant">
@@ -1531,7 +1549,10 @@ triggered.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddleTimingConstant.all_names"><code class="docutils literal notranslate"><span class="pre">TofPaddleTimingConstant.all_names()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddleTimingConstant.as_dict_by_name"><code class="docutils literal notranslate"><span class="pre">TofPaddleTimingConstant.as_dict_by_name()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddleTimingConstant.name"><code class="docutils literal notranslate"><span class="pre">TofPaddleTimingConstant.name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddleTimingConstant.paddle_constant"><code class="docutils literal notranslate"><span class="pre">TofPaddleTimingConstant.paddle_constant</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddleTimingConstant.paddle_id"><code class="docutils literal notranslate"><span class="pre">TofPaddleTimingConstant.paddle_id</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddleTimingConstant.panel_constant"><code class="docutils literal notranslate"><span class="pre">TofPaddleTimingConstant.panel_constant</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddleTimingConstant.set_timing_constan"><code class="docutils literal notranslate"><span class="pre">TofPaddleTimingConstant.set_timing_constan()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddleTimingConstant.timing_constant"><code class="docutils literal notranslate"><span class="pre">TofPaddleTimingConstant.timing_constant</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddleTimingConstant.utc_timestamp_start"><code class="docutils literal notranslate"><span class="pre">TofPaddleTimingConstant.utc_timestamp_start</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.db.TofPaddleTimingConstant.utc_timestamp_stop"><code class="docutils literal notranslate"><span class="pre">TofPaddleTimingConstant.utc_timestamp_stop</span></code></a></li>

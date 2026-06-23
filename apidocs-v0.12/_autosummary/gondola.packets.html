@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.packets &#8212; gondola 0.12.25 documentation</title>
+    <title>gondola.packets &#8212; gondola 0.12.26 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
 
-    <script src="../_static/documentation_options.js?v=857e782b"></script>
+    <script src="../_static/documentation_options.js?v=599f3fa0"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.packets';</script>
@@ -117,7 +117,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.12.25 documentation</p>
+    <p class="title logo__title">gondola 0.12.26 documentation</p>
   
 </a></div>
     
@@ -285,6 +285,7 @@
 <li class="toctree-l1"><a class="reference internal" href="gondola.monitoring.html">gondola.monitoring</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">gondola.packets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.reconstruction.html">gondola.reconstruction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.run.html">gondola.run</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.sim.html">gondola.sim</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.stats.html">gondola.stats</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="gondola.tof.html">gondola.tof</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -399,9 +400,20 @@ see the respective <cite>from_bytestream</cite> methods</p>
 <dd><p>A wrapper for packets from the telemetry stream</p>
 <p>This is very compact and mostly used as an 
 intermediary</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.packets.TelemetryPacket.event_id">
+<span class="sig-name descname"><span class="pre">event_id</span></span><a class="headerlink" href="#gondola.packets.TelemetryPacket.event_id" title="Link to this definition">#</a></dt>
+<dd><p>For a packet of any merged event type, retrieve the event id from</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.packets.TelemetryPacket.from_bytestream">
 <span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_bytestream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.packets.TelemetryPacket.from_bytestream" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.packets.TelemetryPacket.gcutime">
+<span class="sig-name descname"><span class="pre">gcutime</span></span><a class="headerlink" href="#gondola.packets.TelemetryPacket.gcutime" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -421,13 +433,6 @@ also get the GPS time (as long as it is assigned)</p>
 <span class="sig-name descname"><span class="pre">get_gpstime_tracker</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.packets.TelemetryPacket.get_gpstime_tracker" title="Link to this definition">#</a></dt>
 <dd><p>For a packet of type 80 (tracker standalooe) retrieve the GPS time from 
 the tracker header</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="gondola.packets.TelemetryPacket.get_runid">
-<span class="sig-name descname"><span class="pre">get_runid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.packets.TelemetryPacket.get_runid" title="Link to this definition">#</a></dt>
-<dd><p>For a packet of any merged event type, retrieve the run id from 
-the TOF part</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -459,6 +464,13 @@ send by the TOF system</p>
 <span class="sig-name descname"><span class="pre">payload</span></span><a class="headerlink" href="#gondola.packets.TelemetryPacket.payload" title="Link to this definition">#</a></dt>
 <dd><p>Get a zero copy view of the payload 
 Might be mostly useful for debugging purposes</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.packets.TelemetryPacket.run_id">
+<span class="sig-name descname"><span class="pre">run_id</span></span><a class="headerlink" href="#gondola.packets.TelemetryPacket.run_id" title="Link to this definition">#</a></dt>
+<dd><p>For a packet of any merged event type, retrieve the run id from 
+the TOF part</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1116,16 +1128,18 @@ throughout the TOF system.</p>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.packets.TelemetryPacket"><code class="docutils literal notranslate"><span class="pre">TelemetryPacket</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.packets.TelemetryPacket.event_id"><code class="docutils literal notranslate"><span class="pre">TelemetryPacket.event_id</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.packets.TelemetryPacket.from_bytestream"><code class="docutils literal notranslate"><span class="pre">TelemetryPacket.from_bytestream()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.packets.TelemetryPacket.gcutime"><code class="docutils literal notranslate"><span class="pre">TelemetryPacket.gcutime</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.packets.TelemetryPacket.get_gcutime_unpacked"><code class="docutils literal notranslate"><span class="pre">TelemetryPacket.get_gcutime_unpacked()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.packets.TelemetryPacket.get_gpstime_tof"><code class="docutils literal notranslate"><span class="pre">TelemetryPacket.get_gpstime_tof()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.packets.TelemetryPacket.get_gpstime_tracker"><code class="docutils literal notranslate"><span class="pre">TelemetryPacket.get_gpstime_tracker()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.packets.TelemetryPacket.get_runid"><code class="docutils literal notranslate"><span class="pre">TelemetryPacket.get_runid()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.packets.TelemetryPacket.header"><code class="docutils literal notranslate"><span class="pre">TelemetryPacket.header</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.packets.TelemetryPacket.is_event_packet"><code class="docutils literal notranslate"><span class="pre">TelemetryPacket.is_event_packet</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.packets.TelemetryPacket.is_tof_toml_packet"><code class="docutils literal notranslate"><span class="pre">TelemetryPacket.is_tof_toml_packet</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.packets.TelemetryPacket.packet_type"><code class="docutils literal notranslate"><span class="pre">TelemetryPacket.packet_type</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.packets.TelemetryPacket.payload"><code class="docutils literal notranslate"><span class="pre">TelemetryPacket.payload</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.packets.TelemetryPacket.run_id"><code class="docutils literal notranslate"><span class="pre">TelemetryPacket.run_id</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.packets.TelemetryPacket.to_bytestream"><code class="docutils literal notranslate"><span class="pre">TelemetryPacket.to_bytestream()</span></code></a></li>
 </ul>
 </li>

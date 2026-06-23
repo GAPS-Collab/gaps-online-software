@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.reconstruction &#8212; gondola 0.12.25 documentation</title>
+    <title>gondola.reconstruction &#8212; gondola 0.12.26 documentation</title>
   
   
   
@@ -38,14 +38,14 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
 
-    <script src="../_static/documentation_options.js?v=857e782b"></script>
+    <script src="../_static/documentation_options.js?v=599f3fa0"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.reconstruction';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="gondola.sim" href="gondola.sim.html" />
+    <link rel="next" title="gondola.run" href="gondola.run.html" />
     <link rel="prev" title="gondola.packets" href="gondola.packets.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="python"/>
@@ -117,7 +117,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.12.25 documentation</p>
+    <p class="title logo__title">gondola 0.12.26 documentation</p>
   
 </a></div>
     
@@ -285,6 +285,7 @@
 <li class="toctree-l1"><a class="reference internal" href="gondola.monitoring.html">gondola.monitoring</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.packets.html">gondola.packets</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">gondola.reconstruction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.run.html">gondola.run</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.sim.html">gondola.sim</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.stats.html">gondola.stats</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="gondola.tof.html">gondola.tof</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -388,7 +389,7 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#gondola.reconstruction.LeastSquares" title="gondola.reconstruction.LeastSquares"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LeastSquares</span></code></a>(model, x, y, z, x_err, y_err)</p></td>
 <td><p>Generic least-squares cost function with error.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.reconstruction.Reconstruction" title="gondola.reconstruction.Reconstruction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Reconstruction</span></code></a>([nbins, active])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.reconstruction.Reconstruction" title="gondola.reconstruction.Reconstruction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Reconstruction</span></code></a>([nbins, active, chi2_cut])</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -461,10 +462,10 @@ have been used. Return the line with the best chi2.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gondola.reconstruction.Reconstruction">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.reconstruction.</span></span><span class="sig-name descname"><span class="pre">Reconstruction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.reconstruction.Reconstruction" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gondola.reconstruction.</span></span><span class="sig-name descname"><span class="pre">Reconstruction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chi2_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.reconstruction.Reconstruction" title="Link to this definition">#</a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="gondola.reconstruction.Reconstruction.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.reconstruction.Reconstruction.__init__" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chi2_cut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.reconstruction.Reconstruction.__init__" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -479,8 +480,20 @@ have been used. Return the line with the best chi2.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.reconstruction.Reconstruction.reco">
-<span class="sig-name descname"><span class="pre">reco</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ev</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.reconstruction.Reconstruction.reco" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">reco</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ev</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracker_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.reconstruction.Reconstruction.reco" title="Link to this definition">#</a></dt>
+<dd><p>Perform the linefit to the pointcloud of 
+the event.</p>
+<dl class="simple">
+<dt># Arguments:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>tracker_only<span class="classifier">Only use the tracker hits </span></dt><dd><p>for fitting</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -506,11 +519,11 @@ have been used. Return the line with the best chi2.</p>
       </div>
     </a>
     <a class="right-next"
-       href="gondola.sim.html"
+       href="gondola.run.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">gondola.sim</p>
+        <p class="prev-next-title">gondola.run</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

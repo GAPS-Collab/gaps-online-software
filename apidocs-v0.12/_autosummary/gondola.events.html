@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.events &#8212; gondola 0.12.25 documentation</title>
+    <title>gondola.events &#8212; gondola 0.12.26 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
 
-    <script src="../_static/documentation_options.js?v=857e782b"></script>
+    <script src="../_static/documentation_options.js?v=599f3fa0"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.events';</script>
@@ -117,7 +117,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.12.25 documentation</p>
+    <p class="title logo__title">gondola 0.12.26 documentation</p>
   
 </a></div>
     
@@ -285,6 +285,7 @@
 <li class="toctree-l1"><a class="reference internal" href="gondola.monitoring.html">gondola.monitoring</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.packets.html">gondola.packets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.reconstruction.html">gondola.reconstruction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gondola.run.html">gondola.run</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.sim.html">gondola.sim</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gondola.stats.html">gondola.stats</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="gondola.tof.html">gondola.tof</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -611,6 +612,11 @@ the paddle information has been added through
 <dd><p>Get the delay relative to other readoutboards based 
 on the channel9 sine wave</p>
 </dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofHit.phase_ns">
+<span class="sig-name descname"><span class="pre">phase_ns</span></span><a class="headerlink" href="#gondola.events.TofHit.phase_ns" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TofHit.pos">
@@ -1255,7 +1261,14 @@ on the RBs was busy</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.TofEvent.normalize_hit_times">
 <span class="sig-name descname"><span class="pre">normalize_hit_times</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.normalize_hit_times" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Revisit all hit times and apply all event-wide 
+corrections (local, e.g. cable corrections) 
+and global (phase difference, timing offsets) 
+applied and then after, sort them by time.</p>
+<p>The order of functions calls needs to be 
+1) ev.set_timing_offsets 
+2) ev.normalize_hit_times</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.TofEvent.pack">
@@ -1267,7 +1280,18 @@ or sent over network</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TofEvent.pointcloud">
 <span class="sig-name descname"><span class="pre">pointcloud</span></span><a class="headerlink" href="#gondola.events.TofEvent.pointcloud" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Get the pointcloud of this event, sorted by time. 
+For this to work, the event times have to be 
+normalized first, this means that the first hit 
+in the event is at 0 and the hits have been 
+sorted in time</p>
+<dl class="simple">
+<dt># Returns</dt><dd><p>(f32, f32, f32, f32, f32) : (x,y,z,t,edep)
+Will return None if information about the tof paddles 
+as obtained from the gondola_db is not available!</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TofEvent.rb_events">
@@ -1305,7 +1329,18 @@ by the assumed speed of light in the paddle</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.TofEvent.set_timing_offsets">
 <span class="sig-name descname"><span class="pre">set_timing_offsets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timing_offsets</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TofEvent.set_timing_offsets" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Set timing offsets on the hit times of the events' hits,
+which absorb any systematic besides the phase &amp; cable length.</p>
+<p>This will NOT yet subtract these numbers. To 
+do so, the hit times have to be &quot;normalized&quot; by 
+calling ev.normalize_hit_times</p>
+<dl class="simple">
+<dt># Arguments:</dt><dd><ul class="simple">
+<li><p>offsets : a hashmap paddle id -&gt; timing offset</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TofEvent.status">
@@ -1335,6 +1370,11 @@ by the assumed speed of light in the paddle</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TofEvent.timestamp48">
 <span class="sig-name descname"><span class="pre">timestamp48</span></span><a class="headerlink" href="#gondola.events.TofEvent.timestamp48" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TofEvent.tof">
+<span class="sig-name descname"><span class="pre">tof</span></span><a class="headerlink" href="#gondola.events.TofEvent.tof" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1433,6 +1473,11 @@ be replaced by packet type 80 tracker hits)</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TelemetryEvent.has_only_one_hit_per_tlayer">
+<span class="sig-name descname"><span class="pre">has_only_one_hit_per_tlayer</span></span><a class="headerlink" href="#gondola.events.TelemetryEvent.has_only_one_hit_per_tlayer" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="gondola.events.TelemetryEvent.header">
 <span class="sig-name descname"><span class="pre">header</span></span><a class="headerlink" href="#gondola.events.TelemetryEvent.header" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -1441,6 +1486,15 @@ be replaced by packet type 80 tracker hits)</p>
 <dt class="sig sig-object py" id="gondola.events.TelemetryEvent.pack">
 <span class="sig-name descname"><span class="pre">pack</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TelemetryEvent.pack" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TelemetryEvent.run_id">
+<span class="sig-name descname"><span class="pre">run_id</span></span><a class="headerlink" href="#gondola.events.TelemetryEvent.run_id" title="Link to this definition">#</a></dt>
+<dd><p>If available parse the run id from 
+the TOF part of the event</p>
+<p>Returns None if the run id is not 
+set or 0</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.TelemetryEvent.set_tof_timing_offsets">
@@ -1487,6 +1541,24 @@ of the phase correction</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="gondola.events.TelemetryEvent.tof_remove_elena_hits">
+<span class="sig-name descname"><span class="pre">tof_remove_elena_hits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">no_return</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TelemetryEvent.tof_remove_elena_hits" title="Link to this definition">#</a></dt>
+<dd><p>Remove the hits from the event which are not passing 
+Elena's cuts. This has a large overlap with &quot;non-causal&quot;
+hit, but is stricter</p>
+<dl class="simple">
+<dt># Arguments:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>no_return<span class="classifier">If true, don't return anything, which </span></dt><dd><p>will make the execution time shorter</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="gondola.events.TelemetryEvent.tof_remove_non_causal_hits">
 <span class="sig-name descname"><span class="pre">tof_remove_non_causal_hits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#gondola.events.TelemetryEvent.tof_remove_non_causal_hits" title="Link to this definition">#</a></dt>
 <dd><p>Remove all TOF hits from the event's hit series which 
@@ -1503,6 +1575,20 @@ by the assumed speed of light in the paddle</p>
 <dt># Arguments:</dt><dd><ul class="simple">
 <li><p>constants : A map of paddle id -&gt; constant (in ns)</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="gondola.events.TelemetryEvent.tof_time_of_flight">
+<span class="sig-name descname"><span class="pre">tof_time_of_flight</span></span><a class="headerlink" href="#gondola.events.TelemetryEvent.tof_time_of_flight" title="Link to this definition">#</a></dt>
+<dd><p>One shot function for a simple calculation of the tof time of flight 
+as calucated by first inner - first outer time. 
+Depending on the event topology, this might or might not be very useful.</p>
+<p>That this yields something reasonable, the systematic timing offsets 
+have to be set before, see <cite>set_tof_timing_offsets</cite></p>
+<dl class="simple">
+<dt>Returns: </dt><dd><p>time-of-flight, beta, phase differenc, distance, harting cable time difference</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2136,6 +2222,7 @@ is the semantics behind it.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.peak_b"><code class="docutils literal notranslate"><span class="pre">TofHit.peak_b</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.phase"><code class="docutils literal notranslate"><span class="pre">TofHit.phase</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.phase_delay"><code class="docutils literal notranslate"><span class="pre">TofHit.phase_delay</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.phase_ns"><code class="docutils literal notranslate"><span class="pre">TofHit.phase_ns</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.pos"><code class="docutils literal notranslate"><span class="pre">TofHit.pos</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.set_paddle"><code class="docutils literal notranslate"><span class="pre">TofHit.set_paddle()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofHit.t0"><code class="docutils literal notranslate"><span class="pre">TofHit.t0</span></code></a></li>
@@ -2267,6 +2354,7 @@ is the semantics behind it.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.timestamp16"><code class="docutils literal notranslate"><span class="pre">TofEvent.timestamp16</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.timestamp32"><code class="docutils literal notranslate"><span class="pre">TofEvent.timestamp32</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.timestamp48"><code class="docutils literal notranslate"><span class="pre">TofEvent.timestamp48</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.tof"><code class="docutils literal notranslate"><span class="pre">TofEvent.tof</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.trigger_hits"><code class="docutils literal notranslate"><span class="pre">TofEvent.trigger_hits</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.trigger_sources"><code class="docutils literal notranslate"><span class="pre">TofEvent.trigger_sources</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TofEvent.trigger_sources_bytes"><code class="docutils literal notranslate"><span class="pre">TofEvent.trigger_sources_bytes</span></code></a></li>
@@ -2284,14 +2372,18 @@ is the semantics behind it.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.flags1"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.flags1</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.from_telemetrypacket"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.from_telemetrypacket()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.has_at_least_expected_trk_hits"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.has_at_least_expected_trk_hits</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.has_only_one_hit_per_tlayer"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.has_only_one_hit_per_tlayer</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.header"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.header</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.pack"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.pack()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.run_id"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.run_id</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.set_tof_timing_offsets"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.set_tof_timing_offsets()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.tof"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.tof</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.tof_lightspeed_cleaning"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.tof_lightspeed_cleaning()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.tof_normalize_hit_times"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.tof_normalize_hit_times()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.tof_remove_elena_hits"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.tof_remove_elena_hits()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.tof_remove_non_causal_hits"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.tof_remove_non_causal_hits()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.tof_set_timing_constants"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.tof_set_timing_constants()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.tof_time_of_flight"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.tof_time_of_flight</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.tracker"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.tracker</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.tracker_pointcloud"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.tracker_pointcloud</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gondola.events.TelemetryEvent.version"><code class="docutils literal notranslate"><span class="pre">TelemetryEvent.version</span></code></a></li>

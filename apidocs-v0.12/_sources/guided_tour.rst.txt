@@ -74,8 +74,8 @@ lorem ipsum
   `TelemetryPacketReader`, all working in a similar fashion.  
 
 
-Database access 
----------------
+Geometry & Calibration data are stored in a built-in database! (How to access them) 
+-----------------------------------------------------------------------------------
 
 `gondola` utilizes an internal sqlite database, which is automatically installed with the library. In fact, upon importing the 
 `gondola library, it should greet you with somehting like 
@@ -154,8 +154,83 @@ With the help of this database, you can actually do the following:
 The database contains much more, there are for example it also contains `TrackerStripPedestal`, `TrackerStripTransferFunction` 
 and `TrackerStripMask` which are relevant for tracker calibrations. 
 
+
+TOF timings, time-of-flight and beta calculations
+-------------------------------------------------
+
+Before this gets discussed in terms of software, conceptionally beta and the time-of-flight itself
+need to be discussed. First, in order to obtain them, some kind of reconstruction is necessary, 
+even if that is just a line between two points. However, this already assumes something about 
+the event topology. For complex events, with many hits and maybe several competing (coincident) 
+tracks, obtaining a simple and meaningful time-of-flight is outside the scope of this 
+software documentation.
+
+To illustrate what the software is capable though, we assume a single track sample, where the 
+primary only leaves deposited energy in detectors it crosses (e.g. no emission of delta electrons 
+which could then cause secondary hits). While this is a somewhat ideal case, it is pretty much 
+realized with muon data, as obtained in test campaigns on the ground. In this case, a good 
+proxy for the time-of-flight can be obtained fairly simply with the `gondola` software package. 
+
+.. note::  The time-of-flight here is defined by the subtraction of the first hit on the outer TOF from the first hit on the inner TOF
+
+Exapmle:
+
+```
+# before an accurate TOF can be calculated, some setup is needed 
+t_offsets   = dict() # these are externally calculated timing constants 
+                     # which absorb unknown systematics and have been 
+                     # calculated by paddle 
+
+# different iterations of these constants can be loaded
+offsets     = go.db.TofPaddleTimingConstant.as_dict_by_name("GraceV2")
+# the individual values in this dictionary contain more inforrmation, 
+# we can just strip them down to be easilier to handle.
+for k in offsets:
+    t_offsets[k] = offsets[k].timing_constant
+
+# let's assume you have some binary data (.bin format) 
+fname  = '/path/to/binary/RAW000000_000000.bin' 
+reader = go.io.TelemetryPacketReader(fname)
+for pack in reader:
+    if pack.is_event_packet:
+        # as mentioned in the above excerpt, we focus on "clean tracks" for now 
+        if pack.header.packet_type != go.packets.TelemetryPacketType.NoGapsTriggerEvent:
+            continue
+
+        ev = go.events.TelemetryEvent.from_telemetrypacket(pack)
+        # this is an entirely seperate topic, however, for here we can only accept hits 
+        # which have sane hits in both paddle ends
+        bad = ev.tof_remove_non_causal_hits() # we can store bad hits to be analyzed later 
+
+        # apply the systematic offsets 
+        ev.set_tof_timing_offsets(t_offsets)
+        # this step is critical. Since the correct calculation of the hit times 
+        # depends on the channel 9 phase difference between the hits, this has 
+        # to be happening on the event leve. As a side effect, the first hit time 
+        # in the event gets set to zero. This call is also included in the tof_time_of_flight
+        # function, however, if beta is calculated manually, it has to be applied!
+        ev.tof_normalize_hit_times() 
+        # then there is a one-shot function for the tof, which also returns 
+        # the calculated beta value as well as other variables which went into 
+        # the calculation for some diagnostics
+        tof, beta, phase, distance, harting_cable_time_difference = ev.tof_time_of_flight 
+
+        # alternatively, beta can be calculated manually 
+        hits = ev.tof.hits 
+        outer = [h for h in hits if h.paddle_id > 60]
+        inner = [h for h in hits if h.paddle_id < 61]
+        if len (outer) > 0 and len(inner) > 0:
+            outer  = sorted(outer, key = lambda h: h.event_t0) 
+            inner  = sorted(inner, key = lambda h: h.event_t0) 
+            t_diff = inner[first].event_t0 - outer[first].event_t0
+            dist   = inner[first].distance(outer[first])/1000.0
+            beta   = 0
+            if t_diff != 0:
+                beta = dist/(t_diff*1e-9)/299792458.0;
+``` 
+
 Calibrations
------------
+------------
 
 TOF
 ^^^ 
