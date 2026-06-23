@@ -7,8 +7,31 @@ directory per run, including some metadata for this run.
 
 Another script can then parse binary data based on this run 
 meta informtion
-
 """
+
+## Some overview information about the different disk drives 
+# 2 disks on the gcu
+#(py3) gaps@gse7:~$ ls /gaps_binaries/gcu/disk_a/ | wc -l
+#881
+#(py3) gaps@gse7:~$ ls /gaps_binaries/gcu/disk_b/ | wc -l
+#10692
+# telemetry (starlink)
+#(py3) gaps@gse7:~$ ls /gaps_binaries/live/raw/starlink | wc -l
+#54997
+# 2 drives on the aux gcu
+#(py3) gaps@gse7:~$ ls /sqlRAID/flight_drives/aux_gcu_1_gaps_data/ | wc -l
+#42511
+#(py3) gaps@gse7:~$ ls /sqlRAID/flight_drives/aux_gcu_2_backup_data/ | wc -l
+#42515
+# --- UH
+# on uhcra we have 
+#❯ ls /data1/nextcloud/cra_data/data/binaries_berkeley/starlink | wc -l
+#60257 [not consistent with B]
+#❯ ls /data1/nextcloud/cra_data/data/binaries_berkeley/auxgcu/disk_a | wc -l
+#30188 [not consistent with B]
+# FIXME !! Here is another one, which should be the actual gcu disks! 
+# ls /data1/nextcloud/cra_data/data/binaries_berkeley/gcu_2_gcupool | wc -l
+#53425
 
 import os
 import shutil
@@ -23,7 +46,6 @@ from pathlib import Path
 from glob import glob
 from copy import deepcopy
 from dataclasses import dataclass
-from fancy_dataclass import TOMLDataclass
 
 # try to suppress RUST logging
 import logging
@@ -36,87 +58,250 @@ matplotlib.use('agg')
 
 import charmingbeauty as cb 
 cb.visual.set_style_default()
-
 # join the dark side 
-plt.rcParams['text.color']        = '#FAFAFA'
-plt.rcParams['axes.labelcolor']   = '#FAFAFA'
-plt.rcParams['xtick.color']       = '#FAFAFA'
-plt.rcParams['ytick.color']       = '#FAFAFA'
-plt.rcParams['text.color']        = '#FAFAFA'
-plt.rcParams['axes.labelcolor']   = '#FAFAFA'
-plt.rcParams['xtick.color']       = '#FAFAFA'
-plt.rcParams['ytick.color']       = '#FAFAFA'
-plt.rcParams['grid.color']        = '#FAFAFA'
-plt.rcParams['axes.edgecolor']    = '#FAFAFA'
-plt.rcParams['savefig.facecolor'] = '#0E1117'
-plt.rcParams['axes.facecolor']    = '#0E1117'
+cb.visual.set_style_streamlit_dark() 
 
 # check gondola version
-if not (go.get_version_minor() >= 12 and go.get_version_patch() >= 8):
-    print(f'ERROR - got version {go.get_version_major()}.{go.get_version_minor()}.{go.get_version_patch()}')
-    raise ImportError("gondola needs to be at least version 0.12.8!")
+GON_VERSION_REQUIRED = '0.12.8' 
+if not go.version_at_least(GON_VERSION_REQUIRED):
+    print(f'ERROR - got version {go.get_version()} but need version {GON_VERSION_REQUIRED}')
+    raise ImportError("gondola needs to be at least version {GON_VERSION_REQUIRED}!")
 
-@dataclass 
-class RunMeta(TOMLDataclass): 
-    """
-    Write out some statistics for this run and 
-    write it ultimately to a .toml file on disk
-    """
-    start_gps_time : float = np.inf 
-    stop_gps_time  : float = 0
-    start_gcu_time : float = np.inf
-    stop_gcu_time  : float = 0
-    run_id         : int   = 0
-    start_event_id : int   = np.inf
-    stop_event_id  : int   = 0
-    missing_evids  : int   = 0
-    runtime_h      : float = 0
-    n_events       : int   = 0
-    avg_rate       : float = 0
+if go.version_at_least('0.12.26'): 
+    RunMeta  = go.run.RunMeta 
+
+else:
+    # if we have a gondola version smaller than 0.12.26, we have to create our RunMeta data here 
+    from fancy_dataclass import TOMLDataclass
+
+    @dataclass 
+    class RunMeta(TOMLDataclass): 
+        """
+        Write out some statistics for this run and 
+        write it ultimately to a .toml file on disk
+        """
+        start_gps_time : float = np.inf 
+        stop_gps_time  : float = 0
+        start_gcu_time : float = np.inf
+        stop_gcu_time  : float = 0
+        run_id         : int   = 0
+        start_event_id : int   = np.inf
+        stop_event_id  : int   = 0
+        missing_evids  : int   = 0
+        runtime_h      : float = 0
+        n_events       : int   = 0
+        avg_rate       : float = 0
+
 
 if __name__ == '__main__':
 
     import argparse
     import sys
 
-    description = """Create directory structure as well as writing files with meta information for each run"""
-    parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('--telemetry-dir', default=Path('/data0/gaps/csbf/csbf-data/binaries/ethernet'),\
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('-t','--telemetry-dir', default=Path('/data1/nextcloud/cra_data/data/binaries_berkeley/starlink'),\
                         help='A directory with telemetry binaries, as received from the telemetry stream',\
                         type=Path,
                         )
-    #parser.add_argument('-n','--npackets', type=int,\
-    #                    default=-1, help='Limit readout to npackets, -1 for all packets (default)')
-    #parser.add_argument('--n-tof-files', type=int,\
-    #                    default=-1, help='Limit the readout to number of tif files, -1 for all files (default)')
-    #parser.add_argument('--tof-dir', default='', type=Path,\
-    #                    help='A directory with tof data files (.tof.gaps)',)
-    #parser.add_argument('-s','--start-time',\
-    #                    type=int, default=-1,\
-    #                    help='The run start time, e.g. as taken from the elog')
-    #parser.add_argument('-e','--end-time',
-    #                    type=int, default=-1,\
-    #                    help='The run end time, e.g. as taken from the elog')
-    #parser.add_argument('-r','--run-id', default=-1, type=int,\
-    #                    help='TOF Run id (only relevant when working with TOF files')
     parser.add_argument('-o','--outdir',\
                         help='Outdir for caraspace output files',
                         type=Path,
                         default=None)
-    #parser.add_argument('-v','--verbose', action='store_true',\
-    #                    help='More verbose output')
+    parser.add_argument('--only-run',\
+                        help='Just process a single run',
+                        type=int,
+                        default=-1)
+    parser.add_argument('--reuse-existing', action='store_true',\
+                        help='Use a directory with an already existing directory structure and expand on that')
+    parser.add_argument('--bootstrap-only', action='store_true',\
+                        help='Only create the directory structure and quit after')
+    parser.add_argument('-v','--verbose', action='store_true',\
+                        help='More verbose output')
+    #parser.add_argument('--packet-tag',\
+    #                    help='When packing the TelemetryPackets in CRFrames, tag them with this prefix',
+    #                    type=str,
+    #                    default='SL')
+    
     #parser.add_argument('--no-gps', action='store_true', \
     #                    help='Ignore the GPS to find matching telemetry and tof timestamps. Only use the tof file timestamps')
     #parser.add_argument('--reprocess', action='store_true', \
     #                    help='Recalculate tof packets with latest version of the code')
     args = parser.parse_args()
- 
-    # get the files first 
-    data = Path(args.telemetry_dir) 
-    data = sorted(data.glob("*.bin"))
-    print (f'-> We found {len(data)} .bin files!') 
-   
+
+    if not args.reuse_existing: 
+        # the binary files here need to live in a flat directory (no subdirectories) 
+        data = Path(args.telemetry_dir) 
+        data = [str(k) for k in sorted(data.glob("*.bin"))]
+        print (f'-> We found {len(data)} .bin files in {args.telemetry_dir}!') 
+        # store the run informaton in a dict runid -> metadata 
+        # we seem to have 545 runs, add some for good measure 
+        # the first run is 10000
+        runs        = {10000 + k : RunMeta() for k in range(600)}
+        for k in runs:
+            runs[k].run_id = k
+        # tof configuration packets - keep that for the future for now, 
+        # since the configuratoin itself does not know which run id it is 
+        # it is easy to confuse them. Rather get the config files from the 
+        # tof disk drives 
+        #tof_configs = dict()
+        
+        # go with the one-file, one reader even though it is 
+        # a bit slower, but then we can get our progressbar :) 
+        for fname in tqdm.tqdm(data, desc='Looping over .bin files'):
+            reader = go.io.TelemetryPacketReader(fname) 
+            for pack in reader:
+                if pack.is_event_packet:
+                    try:
+                        ev     = go.events.TelemetryEvent.from_telemetrypacket(pack) 
+                    except Exception as e:
+                        print (e)
+                        continue # deliberately fail silently. Deal with broken packets 
+                                 # at some other time. For now, these will simply be 
+                                 # missing
+                    tof        = ev.tof
+                    run_id     = tof.run_id 
+                    gpstime    = tof.timestamp48*1e-8
+                    event_id   = ev.event_id
+                    gcutime    = pack.header.gcutime 
+                    if run_id == 0:
+                        continue # just the packet is broken, this can be passed on 
+                                 # silently 
+                    if run_id < 10000:
+                        print("-> [WARN} There is a run id < 10000. This might be ground data?")
+                        continue 
+                    meta      = runs[run_id] 
+                    if gcutime < meta.start_gcu_time:
+                        meta.start_gcu_time = gcutime 
+                    if gcutime > meta.stop_gcu_time:
+                        meta.stop_gcu_time  = gcutime
+                    if gpstime < meta.start_gps_time:
+                        meta.start_gps_time = gpstime 
+                    if gpstime > meta.stop_gps_time:
+                        meta.stop_gps_time  = gpstime 
+                    if event_id < meta.start_event_id:
+                        meta.start_event_id = event_id 
+                    if event_id > meta.stop_event_id:
+                        meta.stop_event_id  = event_id
+                    meta.n_events += 1 
+                    # will be filled in later
+                    #meta.missing_evids  
+                    #meta.runtime_h      
+                    #meta.n_events       
+                    #meta.avg_rate       
+        # clean out non-populated runs 
+        clean_runs = dict() 
+        for r in runs:
+            # if it doesn't have a stop event id, it is 
+            # probably borked
+            if runs[r].stop_event_id != 0:
+                clean_runs[r] = runs[r]
+                print (runs[r])
+        print (f'-> Retrieved meta information for {len(clean_runs)} runs!')
+        
+        # create directories 
+        for r in clean_runs:    
+            run_dir = args.outdir / f'{r}' 
+            run_dir.mkdir(parents=True, exist_ok=True) 
+            metadata_file = Path(f'{run_dir}/run{r}.meta.toml') 
+            with open(metadata_file,'w') as meta_f:
+                meta = clean_runs[r]
+                meta.runtime_h      = (meta.stop_gps_time - meta.start_gps_time)/3600 
+                meta.missing_evids  = (meta.stop_event_id  - meta.start_event_id) - meta.n_events
+                meta.avg_rate       = meta.n_events / (3600*meta.runtime_h)
+                meta.to_toml(meta_f)
+        if args.bootstrap_only:
+            print('-> Selceted to bootstrap only, concluding!') 
+            sys.exit(0) 
+
+    else: # if not args.reuse_existing 
+        # we have to load the run meta data in outdir 
+        clean_runs = dict() 
+        run_dirs   = args.outdir.glob('*') 
+        for rd in run_dirs: 
+            meta = RunMeta.load(rd / f'run{rd.name}.meta.toml') 
+            clean_runs[meta.run_id] = meta 
+
+    print (f'-> {len(clean_runs)} runs available for processing!') 
     
+    # -- the actual processing. Load the telemetry files and convert them 
+    #     to caraspace files 1-1 
+    # gcu time guard. Allow for a few seconds +- before and after start/stop times 
+    seconds_pre, seconds_post = 120,120 
+    for run_id in sorted(clean_runs):
+        if args.only_run != -1:
+            if not args.only_run in clean_runs:
+                print (f'-> [ERROR] run to be requested is not available (run id {args.only_run})')
+            if args.only_run != run_id:
+                continue 
+        print (f'-> Working on run {run_id}') 
+        meta = clean_runs[run_id] 
+        # set up a writer for the output    
+        cr_timestamp = go.io.get_utc_timestamp_from_unix(float(meta.start_gcu_time) - seconds_pre)  
+        writer       = go.io.CRWriter(str(args.outdir / Path(str(run_id))), run_id, timestamp=cr_timestamp, subrun_id = 0, file_len_gcu_sec = 60)
+        # load all binary files! 
+        bin_files = go.io.grace_get_telemetry_binaries(float(meta.start_gcu_time) - seconds_pre, float(meta.stop_gcu_time) + seconds_post, args.telemetry_dir)
+        # has been processed - use to avoid duplicate 
+        seen = [] 
+        nfile = 0
+        for bfname in tqdm.tqdm(bin_files, desc='Reading telemetry'):
+            ## load each file individually + gcu safeguard 
+            ## this means, first we have to find out first
+            ## and last gcutime 
+            #first_gcutime = np.inf 
+            #last_gcutime  = -np.inf 
+            treader = go.io.TelemetryPacketReader(str(bfname)) 
+            tevents = []
+            for pack in treader: 
+                # bootstrapping - only select merged events for now!
+                if (not pack.is_event_packet) or pack.packet_type == go.packets.TelemetryPacketType.NoTofDataEvent:
+                    continue 
+                # get event id, run _id 
+                try:
+                    if not pack.get_runid() == run_id:
+                        continue 
+                except Exception as e:
+                    print (e) 
+                    print (pack) 
+                    raise
+                # FIXME - in the future, the unpack step won't be necessary
+                ev = go.events.TelemetryEvent.from_telemetrypacket(pack) 
+                tevents.append((pack,ev)) 
+            # FIXME - we can gain MASSIVELY here if we can extract the event id 
+            #         from the packet as well 
+            tevents = sorted(tevents, key=lambda x : x[1].event_id) 
+            if args.verbose:
+                print (f'-> Extracted {len(tevents)} telemetry events from {bfname}!')
+            # if something useful has been extracted, write it to L0files 
+            if tevents:
+                first_time = tevents[0][0].header.gcutime 
+            for pack,__ in tevents:
+                frame = go.io.CRFrame() 
+                frame.put_telemetrypacket(pack, name='TelemetryEvent') 
+                writer.add_frame(frame)
+                
+                if pack.header.gcutime - first_time > 50:
+                    nfile += 1
+                    # start a new file 
+                    cr_timestamp = go.io.get_utc_timestamp_from_unix(pack.header.gcutime)  
+                    writer       = go.io.CRWriter(str(args.outdir / Path(str(run_id))), run_id, subrun_id = nfile,  timestamp=cr_timestamp)
+                    first_time = pack.header.gcutime 
+    sys.exit(0) 
+
+            #for pack in treader:
+            #    p_gcutime = pack.header.gcutime 
+            #    if p_gcutime > last_gcutime:
+            #        last_gcutime = p_gcutime 
+            #    if p_gcutime < first_gcutime: 
+            #        first_gcutime = p_gcutime 
+            ## reload files with the safeguard 
+            #bfs_for_l0 = go.io.grace_get_telemetry_binaries(first_gcutime - seconds_pre, last_gcutime + seconds_post, args.telemetry_dir)
+            #treader = go.io.TelemetryPacketReader(bfs_for_l0) 
+            #packs   = [pack for pack in treader if pack.is_event_packet] 
+                         
+
+            #print (f'-> Loaded {bfs_for_l0} for {bfname}') 
+    raise   
+
     # one file is approximately 1min, many runs are ~1h
     # we always want to grab some overlap
     data_chunks = [data[i:i + 100] for i in range(0, len(data), 100)]
@@ -126,7 +311,7 @@ if __name__ == '__main__':
     for pack in first:
         if pack.is_event_packet:
             break 
-    first_gcu_time = pack.header.gcutime 
+    first_gcu_time = pack.header.gcutime  
     first_event    = go.events.TelemetryEvent.from_telemetrypacket(pack)
     first_run_id   = first_event.tof.run_id 
 

@@ -32,6 +32,7 @@ endif()
 add_subdirectory(${GONDOLA_PATH}/resources/extern/nanobind
                  ${CMAKE_BINARY_DIR}/nanobind_build)
 
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CXX_PYBINDINGS gondola_cxx)
 nanobind_add_module(${CXX_PYBINDINGS} STABLE_ABI NOMINSIZE ${GONDOLA_PATH}/gondola-core/C++/python/gondola_core.cxx)
 set_property(TARGET ${CXX_PYBINDINGS} PROPERTY CXX_STANDARD 20)
