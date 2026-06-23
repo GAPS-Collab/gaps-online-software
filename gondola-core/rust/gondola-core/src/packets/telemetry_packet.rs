@@ -24,10 +24,39 @@ impl TelemetryPacket {
 
   #[staticmethod]
   #[pyo3(name="get_gcutime_unpacked")]
+  // FIXME - this should just be "gcutime" 
   fn get_gcutime_unpacked_py(stream : Vec<u8>) -> PyResult<f64> {
     Ok(Self::get_gcutime_unpacked(&stream)?)
   }
+
+  #[getter] 
+  #[pyo3(name="gcutime")]
+  fn get_gcutime_py(&self) -> f64 {
+    TelemetryPacketHeader::convert_telemetry_header_ts(self.header.timestamp)
+  }
   
+  /// For a packet of any merged event type, retrieve the event id from 
+  #[getter]
+  #[pyo3(name="event_id")]
+  fn get_eventid_py(&self) -> PyResult<u16> {
+    let evid_opt = self.get_eventid();
+    match evid_opt {
+      Some(evid_res) => {
+        match evid_res { 
+          Ok(evid) => {
+            return Ok(evid);
+          }
+          Err(err) => {
+            return Err(PyValueError::new_err(err.to_string()));
+          }
+        }
+      }
+      None => {
+        return Err(PyValueError::new_err("This packet does not seem to contain a (useful) eventid!")); 
+      }
+    }
+  }
+
   /// For a packet of any merged event type, retrieve the run id from 
   /// the TOF part 
   #[getter]
@@ -202,6 +231,21 @@ impl TelemetryPacket {
     let runid = parse_u16(&self.payload, &mut pos);
     return Some(Ok(runid));
   }
+  
+  /// For a packet of any merged event type, retrieve the event id from 
+  /// the TelemetryEvent  
+  pub fn get_eventid(&self) -> Option<Result<u16, SerializationError>> {
+    if !self.is_event_packet() {
+      return None;
+    }
+    // the event id is 10bytes into the actual telemetryevent payload
+    if self.payload.len() < 13 + 10 + 4{
+      return Some(Err(SerializationError::StreamTooShort));
+    }
+    let mut pos   = 10usize;
+    let evid = parse_u16(&self.payload, &mut pos);
+    return Some(Ok(evid));
+  }
 
   /// For a packet of type 80 (tracker standalooe) retrieve the GPS time from 
   /// the tracker header 
@@ -259,7 +303,7 @@ impl TelemetryPacket {
     // and then the timestamp is 32 bit. So we need to jump 3 bytes 
     // and then read 4 
     if stream.len() < 7 {
-      error!("Can get gcutime from a bytestream shorter than 7 bytes!");
+      error!("Can not get gcutime from a bytestream shorter than 7 bytes!");
       return Err(SerializationError::StreamTooShort);
     }
     let mut pos = 3usize;

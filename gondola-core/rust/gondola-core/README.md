@@ -15,7 +15,12 @@ somewhat stable, please strap in for a bit of a rough ride when upgrading.
 However, the amount of features is increasing constantly and rapidly 
 
 ## v0.12.26 
-* run.py - run meta information, handling of data processing
+* gondola.run                             - run meta information, handling of data processing
+* `TelemetryEvent.get_tof_time_of_flight` - simplification of getting TOF time-of-flight information 
+                                            from the perspective of the (WIP, this might change slightly 
+                                            again) 
+* `CRWriter.current_filename`             - access the name of the current file 
+* updated documentation, see the guided tour for mor information about TOF time-of-flight 
 
 ## v0.12.25
 
