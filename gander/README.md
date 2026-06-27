@@ -10,3 +10,9 @@ apply some selection criteria.
 * typical distributios (TOF, hits, paddle charge, etc)
 
 * event display 
+
+
+## How to set it up? 
+
+A password needs to be put in file in a hidden folder called `.streamlit/secrets.toml` like this:
+`password = "whateverpasswordyouchoosebutnotthisonesinceitispublic!"`

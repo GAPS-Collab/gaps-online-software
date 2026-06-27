@@ -22,6 +22,7 @@ pub struct TrackerHit {
   /// In BFSW, there are two versions of the tracker hit, 
   /// tracker_hit and tracker::hit. The latter has 
   /// an extra ASIC event code field. Let's unify those here
+  /// good hits should have asic event code 0 or 2
   pub asic_event_code : u8,
 
   // not getting serialized

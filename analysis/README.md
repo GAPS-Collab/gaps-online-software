@@ -17,8 +17,5 @@ We have the following:
  
 ### How to run the python scripts?
 
-We are typically using rye to run everything within it's own virtual environment. A pyproject.toml is 
-provided, so all you need to do is to run `rye sync`. 
-Then scripts can be run through rye.
-For the jupyter notebooks, we provide an alias `rye run jupy-lab` which opens a jupyter lab at port 9876.
-
+`pypoject.toml` files are provided for the use with [uv](https://docs.astral.sh/uv/) which is 
+higly recommend and just a fantastic tool that solve all of your python woes. 
