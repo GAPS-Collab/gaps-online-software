@@ -123,6 +123,104 @@ impl TofEvent {
     }
   }
 
+  /// Remove hits from the event as proposed by Elena. 
+  /// This is pretty similar to the non-causal hits, 
+  /// however, a bit stricter
+  pub fn elena_cuts(hit : &TofHit) -> bool {
+    let peak_cut   = 10.0f32;
+    let charge_cut = 5.0f32;
+    let time_sat   = 490.032;
+    
+    let hit_a = hit.time_a.to_f32() > 0.1
+             && hit.time_a.to_f32() < time_sat
+             && hit.peak_a.to_f32() > peak_cut
+             && hit.charge_a.to_f32() > charge_cut;
+    let hit_b = hit.time_b.to_f32() > 0.1
+             && hit.time_b.to_f32() < time_sat
+             && hit.peak_b.to_f32() > peak_cut
+             && hit.charge_b.to_f32() > charge_cut;
+    
+    return hit_a && hit_b;
+  }
+
+  /// Remove the hits from the event which are not passing 
+  /// Elena's cuts 
+  ///
+  /// # Arguments:
+  ///   * no_return : If true, don't return anything, which 
+  ///                 will make the execution time shorter
+  ///
+  pub fn remove_elena_hits(&mut self, no_return : bool) -> Option<Vec<TofHit>> {
+    if !no_return {
+      let mut removed = Vec::<TofHit>::new();
+      for h in &self.hits {
+        if Self::elena_cuts(h) {
+          removed.push(h.clone());
+        }
+      }
+      self.hits.retain(|h| Self::elena_cuts(h));
+      return Some(removed);
+    } else {
+      self.hits.retain(|h| Self::elena_cuts(h));
+      return None; 
+    }
+  }
+
+
+  /// The actual time-of-flight as calculated by the 
+  /// first inner hit time - first outer hit time. 
+  ///
+  /// This is a crude version and does not include 
+  /// any reconstruction, just the bare information 
+  /// as available to the TOF. 
+  ///
+  /// Be careful with using this number for anything else 
+  /// than a crude guess
+  ///
+  /// # Returns:
+  ///   * (tof,beta) for events with at least one inner and outer hit, 
+  ///     None for the others
+  pub fn get_tof(&mut self) -> Option<(f32,f32,f32,f32,f32)> {
+    // in case the hits are already normalized, this should do 
+    // nothing 
+    self.normalize_hit_times();
+    let mut outer_h = Vec::<TofHit>::new();
+    let mut inner_h = Vec::<TofHit>::new();
+    for h in &self.hits {
+      if h.paddle_id < 61 {
+        inner_h.push(*h);
+      } else {
+        outer_h.push(*h);
+      }
+    }
+    if inner_h.len() == 0 || outer_h.len() == 0 {
+      return None;
+    }
+    inner_h .sort_by(|a,b| (a.get_t0_with_local_corrections()).partial_cmp(&&b.get_t0_with_local_corrections()).unwrap_or(Ordering::Greater));
+    outer_h .sort_by(|a,b| (a.get_t0_with_local_corrections()).partial_cmp(&&b.get_t0_with_local_corrections()).unwrap_or(Ordering::Greater));
+    //let tof  = (inner_h[0].t0_fr() - outer_h[0].t0_fr()).abs();
+    let dist     = inner_h[0].distance(&outer_h[0])/1000.0; 
+    // fix wrong phase difference calculation 
+    let t0       = inner_h[0].get_t0_with_local_corrections() - inner_h[0].get_phase_ns() - inner_h[0].timing_offset;
+    let t1       = outer_h[0].get_t0_with_local_corrections() - outer_h[0].get_phase_ns() - outer_h[0].timing_offset;
+    let mut pd   = inner_h[0].get_phase_ns() - outer_h[0].get_phase_ns();
+    if pd > 25.0 {
+      pd -= 50.0;
+    }
+    if pd < -25.0 {
+      pd += 50.0; 
+    }
+    let tof = t0 - t1 + pd;  
+    //let mut tof  = inner_h[0].t0_fr() - outer_h[0].t0_fr();
+    //if tof > 50.0 {
+    //  tof -= 50.0; 
+    //}
+    let beta = dist.abs()/(tof*1e-9)/299792458.0;
+    //let pd   = inner_h[0].get_phase_ns() - outer_h[0].get_phase_ns();
+    let hart_diff = inner_h[0].hart_cable_time - outer_h[0].hart_cable_time;
+    Some((tof, beta, pd, dist, hart_diff))
+  }
+
   /// Calculate the timestamp from the MTB inlcuding GPS and all
   ///
   /// This will be the most precise timestamp in GAPS, based on 
@@ -172,7 +270,12 @@ impl TofEvent {
     }
     self.rb_events.clear();
   }
-  
+
+  /// At the moment, this instance of TofEvent gets 
+  /// created, a timer begins to tick. 
+  ///
+  /// The age of the event is the elapsed time since
+  /// this instance (self) was created in seconds.
   pub fn age(&self) -> u64 {
     self.creation_time.elapsed().as_secs()
   }
@@ -323,7 +426,12 @@ impl TofEvent {
     (rb_event_len, miss_len)
   }
 
-  /// Set timing offsets to the event's hits
+  /// Set timing offsets on the hit times of the events' hits,
+  /// which absorb any systematic besides the phase & cable length.
+  ///
+  /// This will NOT yet subtract these numbers. To 
+  /// do so, the hit times have to be "normalized" by 
+  /// calling ev.normalize_hit_times 
   ///
   /// # Arguments:
   ///   * offsets : a hashmap paddle id -> timing offset
@@ -426,7 +534,15 @@ impl TofEvent {
     self.hits = clean_hits;
     removed_pids
   }
-  
+
+  /// Revisit all hit times and apply all event-wide 
+  /// corrections (local, e.g. cable corrections) 
+  /// and global (phase difference, timing offsets) 
+  /// applied and then after, sort them by time.
+  ///
+  /// The order of functions calls needs to be 
+  /// 1) ev.set_timing_offsets 
+  /// 2) ev.normalize_hit_times
   #[cfg(feature="database")]
   pub fn normalize_hit_times(&mut self) {
     if self.hits.len() == 0 {
@@ -438,8 +554,12 @@ impl TofEvent {
     }
 
     let phase0 = self.hits[0].phase.to_f32();
+    // add the corrections here 
+    // 1) phase
+    // 2) second timing offsets 
     for h in &mut self.hits {
       let t0 = h.get_t0_uncorrected() + h.get_cable_delay();
+      // deal with the phase difference
       let mut phase_diff = h.phase.to_f32() - phase0;
       while phase_diff < - PI/2.0 {
         phase_diff += 2.0*PI;
@@ -448,7 +568,7 @@ impl TofEvent {
         phase_diff -= 2.0*PI;
       }
       let t_shift = 50.0*phase_diff/(2.0*PI);
-      h.event_t0 = t0 + t_shift;
+      h.event_t0 = t0 + t_shift - h.timing_offset;
     }
     // start the first hit at 0
     //self.hits.sort_by(|a,b| (a.event_t0).partial_cmp(&b.event_t0).unwrap_or(Ordering::Greater));
@@ -458,7 +578,15 @@ impl TofEvent {
       h.event_t0 -= t0_first_hit;
     }
   }
- 
+
+  /// Certain quantitities can only be calculated if we know more 
+  /// about the paddle the hit was seen in. 
+  /// This meta information is not stored within the hit to save 
+  /// space for telemetry/storage reasons.
+  ///
+  /// The meta-information (e.g. paddle length) can be added by 
+  /// filling in the blanks from the specific paddles as obtained 
+  /// from the database shipped with gondola.
   #[cfg(feature="database")]
   pub fn set_paddles(&mut self, paddles : &HashMap<u8, TofPaddle>) {
     let mut nerror = 0u8;
@@ -501,7 +629,11 @@ impl TofEvent {
     }
   }
 
-  /// Get the pointcloud of this event, sorted by time
+  /// Get the pointcloud of this event, sorted by time. 
+  /// For this to work, the event times have to be 
+  /// normalized first, this means that the first hit 
+  /// in the event is at 0 and the hits have been 
+  /// sorted in time
   /// 
   /// # Returns
   ///   (f32, f32, f32, f32, f32) : (x,y,z,t,edep)
@@ -512,7 +644,7 @@ impl TofEvent {
       return None;
     }
     for h in &self.hits {
-      let result = (h.x, h.y, h.z, h.get_t0(), h.get_edep());
+      let result = (h.x, h.y, h.z, h.event_t0, h.get_edep());
       pc.push(result);
     }
     Some(pc)
@@ -717,6 +849,7 @@ impl TofEvent {
     tot_edep
   }
 
+  /// The number of hits in the umbrella (UMB)
   pub fn get_nhits_umb(&self) -> usize {
     let mut nhit = 0;
     for h in &self.hits {
@@ -727,6 +860,7 @@ impl TofEvent {
     nhit
   }
   
+  /// The number of hits in the cube (CBE)
   pub fn get_nhits_cbe(&self) -> usize {
     let mut nhit = 0;
     for h in &self.hits {
@@ -1171,7 +1305,13 @@ impl FromRandom for TofEvent {
 #[cfg(feature="pybindings")]
 #[pymethods]
 impl TofEvent {
-   
+
+  #[getter]
+  #[pyo3(name="tof")] 
+  fn get_tof_py(&mut self) -> Option<(f32,f32,f32,f32,f32)> {
+    self.get_tof()
+  }
+
   #[pyo3(name="strip_rbevents")]
   fn strip_rbevents_py(&mut self) {
     self.strip_rbevents()
@@ -1189,16 +1329,33 @@ impl TofEvent {
     self.clone()
   }
 
+  /// Set timing offsets on the hit times of the events' hits,
+  /// which absorb any systematic besides the phase & cable length.
+  ///
+  /// This will NOT yet subtract these numbers. To 
+  /// do so, the hit times have to be "normalized" by 
+  /// calling ev.normalize_hit_times 
+  ///
+  /// # Arguments:
+  ///   * offsets : a hashmap paddle id -> timing offset
   #[pyo3(name="set_timing_offsets")]
   pub fn set_timing_offsets_py(&mut self, timing_offsets : HashMap<u8, f32>) {
     self.set_timing_offsets(&timing_offsets);
   }
   
+  /// Revisit all hit times and apply all event-wide 
+  /// corrections (local, e.g. cable corrections) 
+  /// and global (phase difference, timing offsets) 
+  /// applied and then after, sort them by time.
+  ///
+  /// The order of functions calls needs to be 
+  /// 1) ev.set_timing_offsets 
+  /// 2) ev.normalize_hit_times
   #[pyo3(name="normalize_hit_times")]
   pub fn normalize_hit_times_py(&mut self) {
     self.normalize_hit_times();
   }
-
+  
   /// Remove hits from the hitseries which can not 
   /// be caused by the same particle, which means 
   /// that for these two specific hits beta with 
@@ -1239,8 +1396,19 @@ impl TofEvent {
     pids
   }
   
+  /// Get the pointcloud of this event, sorted by time. 
+  /// For this to work, the event times have to be 
+  /// normalized first, this means that the first hit 
+  /// in the event is at 0 and the hits have been 
+  /// sorted in time
+  /// 
+  /// # Returns
+  ///   (f32, f32, f32, f32, f32) : (x,y,z,t,edep)
+  ///   Will return None if information about the tof paddles 
+  ///   as obtained from the gondola_db is not available! 
   #[getter]
-  fn pointcloud(&self) -> Option<Vec<(f32,f32,f32,f32,f32)>> {
+  #[pyo3(name="pointcloud")]
+  fn get_pointcloud_py(&self) -> Option<Vec<(f32,f32,f32,f32,f32)>> {
     self.get_pointcloud()
   }
 

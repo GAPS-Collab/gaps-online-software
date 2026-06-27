@@ -23,6 +23,7 @@ pub struct CRWriter {
   /// per file. After this a new file 
   /// is started
   pub mbytes_per_file     : usize,
+  /// the name of the current file we are writing to
   pub file_name           : String,
   pub run_id              : u32,
   file_id                 : usize,
@@ -98,7 +99,7 @@ impl CRWriter {
       file_name           : file_name,
       file_timestamp      : None,
       first_gcu_timestamp : first_gcu_timestamp,
-      file_len_gcu_sec    : file_len_gcu_sec
+      file_len_gcu_sec    : file_len_gcu_sec,
     }
   }
 
@@ -187,7 +188,13 @@ impl CRWriter {
   fn new_py(filename : String, run_id : u32, subrun_id : Option<u64>, timestamp : Option<String>, file_len_gcu_sec : Option<u32>) -> Self {
     Self::new(filename, run_id, subrun_id, timestamp, file_len_gcu_sec)
   }
- 
+
+  #[getter] 
+  #[pyo3(name="current_filename")] 
+  fn get_current_filename_py(&self) -> String { 
+    self.file_name.clone()
+  }
+
   fn set_mbytes_per_file(&mut self, fsize : usize) {
     self.mbytes_per_file = fsize;
   }

@@ -297,6 +297,12 @@ impl TofHit {
     self.phase.to_f32()
   }
 
+  #[getter] 
+  #[pyo3(name="phase_ns")] 
+  fn phase_ns_py(&self) -> f32 {
+    self.get_phase_ns()
+  }
+
   #[getter]
   #[pyo3(name="cable_delay")]
   /// Get the cable correction time
@@ -319,7 +325,7 @@ impl TofHit {
   #[getter]
   #[pyo3(name="t0")]
   fn get_t0_py(&self) -> f32 {
-    self.get_t0()
+    self.get_global_t0()
   }
   
   /// Event t0 is the calculated interaction time based on 
@@ -336,7 +342,8 @@ impl TofHit {
   #[getter]
   #[pyo3(name="event_t0")]
   fn get_event_t0_py(&self) -> f32 {
-    self.get_t0()
+    //self.get_t0()
+    self.get_global_t0()
   }
 
   /// Calculate the interaction time based on the peak timings measured 
@@ -503,9 +510,7 @@ pythonize!(TofHit);
 
 // methods which have wrapped pybindings
 impl TofHit {
-  
-  
-  
+   
   /// Calculate the position across the paddle from
   /// the two times at the paddle ends
   ///
@@ -547,9 +552,9 @@ impl TofHit {
   /// be set before (in mm).
   /// This assumes that the cable on both sides of the paddle are 
   /// the same length
-  pub fn get_t0(&self) -> f32 {
+  pub fn get_global_t0(&self) -> f32 {
     //self.get_t0_uncorrected() + self.get_phase_delay() + self.get_cable_delay()
-    self.event_t0 + self.timing_offset
+    self.event_t0 //- self.timing_offset
   }
 
   /// Calculate the interaction time based on the peak timings measured 
@@ -648,16 +653,16 @@ impl TofHit {
   }
 
 
-  /// Get the (official) paddle id
-  ///
-  /// Convert the paddle end id following 
-  /// the convention
-  ///
-  /// A-side : paddle id + 1000
-  /// B-side : paddle id + 2000
-  ///
-  /// FIXME - maybe return Result?
-  //#[deprecated(since="0.10", note="We are not using a paddle end id anymore")]
+  ///// Get the (official) paddle id
+  /////
+  ///// Convert the paddle end id following 
+  ///// the convention
+  /////
+  ///// A-side : paddle id + 1000
+  ///// B-side : paddle id + 2000
+  /////
+  ///// FIXME - maybe return Result?
+  ////#[deprecated(since="0.10", note="We are not using a paddle end id anymore")]
   pub fn get_pid(paddle_end_id : u16) -> u8 {
     if paddle_end_id < 1000 {
       return 0;
@@ -671,7 +676,18 @@ impl TofHit {
     return 0;
   }
 
-
+  /// The relative phase converted to ns using 
+  /// a frequency of 20MHz (50ns period)
+  pub fn get_phase_ns(&self) -> f32 {
+    let mut phase_ns = 50.0*self.phase.to_f32()/(2.0*PI);
+    // make sure the phase is always positive 
+    // FIXME - there is a slight, possible, unconfirmed issue with the sine fit. 
+    //       - it sometimes might latch on to the "wrong" side, and thus this has 
+    //       - to be corrected. If it is not the sine fit, it is something else 
+    //       - unknown. Just adding a full phase make things easier downstream.
+    phase_ns += 50.0;
+    phase_ns
+  }
 
   pub fn get_phase_rollovers(&self) -> i16 {
     let mut phase = self.phase.to_f32();
@@ -705,6 +721,15 @@ impl TofHit {
     self.x          = pos.0;
     self.y          = pos.1;
     self.z          = pos.2;
+  }
+}
+
+//-------------------------
+
+// dedicated rust-only implementations 
+impl TofHit {
+  pub fn get_t0_with_local_corrections(&self) -> f32 {
+    self.get_t0_uncorrected() + self.get_cable_delay() + self.get_phase_ns() 
   }
 }
 
@@ -744,7 +769,10 @@ impl fmt::Display for TofHit {
     energy_dep    {:.2}   
     edep_att      {:.2}
     pos_across    {:.2}   
-    t0            {:.2}  
+    t0 (uncorr)   {:.2}  
+    t0 (local c)  {:.2}  
+    t0 (global c) {:.2}
+    ev t0 [DEPR]  {:.2}
     x, y, z       {:.2} {:.2} {:.2}
   ** V1 variables
     phase (ch9)   {:.4}
@@ -775,7 +803,11 @@ impl fmt::Display for TofHit {
             self.get_edep(),
             self.get_edep_att(),
             self.get_pos(),
-            self.get_t0(),
+            //self.get_t0(),
+            self.get_t0_uncorrected(),
+            self.get_t0_with_local_corrections(),
+            self.get_global_t0(),
+            self.event_t0,
             self.x,
             self.y,
             self.z,
