@@ -1,6 +1,6 @@
 [project]
 name = "gondola_cxx"
-version = "0.12.1"
+version = "0.12.2"
 dependencies = [
     "build>=1.4.0",
 ] # Add any runtime dependencies here

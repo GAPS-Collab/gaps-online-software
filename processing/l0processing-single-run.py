@@ -41,27 +41,35 @@ cb.visual.set_style_default()
 cb.visual.set_style_streamlit_dark()
 
 # check gondola version
-if not (go.get_version_minor() >= 12 and go.get_version_patch() >= 17):
-    print(f'ERROR - got version {go.get_version_major()}.{go.get_version_minor()}.{go.get_version_patch()}')
-    raise ImportError("gondola needs to be at least version 0.12.8!")
+GON_VERSION_REQUIRED = '0.12.17' 
+if not go.version_at_least(GON_VERSION_REQUIRED):
+    print(f'ERROR - got version {go.get_version()} but need version {GON_VERSION_REQUIRED}')
+    raise ImportError("gondola needs to be at least version {GON_VERSION_REQUIRED}!")
 
-@dataclass 
-class RunMeta(TOMLDataclass): 
-    """
-    Write out some statistics for this run and 
-    write it ultimately to a .toml file on disk
-    """
-    start_gps_time : float = 0 
-    stop_gps_time  : float = 0
-    start_gcu_time : float = 0
-    stop_gcu_time  : float = 0
-    run_id         : int   = 0
-    start_event_id : int   = 0
-    stop_event_id  : int   = 0
-    missing_evids  : int   = 0
-    runtime_h      : float = 0
-    n_events       : int   = 0
-    avg_rate       : float = 0
+if go.version_at_least('0.12.26'): 
+    RunMeta = go.run.RunMeta 
+else:
+    # if we have a gondola version smaller than 0.12.26, we have to create our RunMeta data here 
+    from fancy_dataclass import TOMLDataclass
+
+    @dataclass 
+    class RunMeta(TOMLDataclass): 
+        """
+        Write out some statistics for this run and 
+        write it ultimately to a .toml file on disk
+        """
+        start_gps_time : float = np.inf 
+        stop_gps_time  : float = 0
+        start_gcu_time : float = np.inf
+        stop_gcu_time  : float = 0
+        run_id         : int   = 0
+        start_event_id : int   = np.inf
+        stop_event_id  : int   = 0
+        missing_evids  : int   = 0
+        runtime_h      : float = 0
+        n_events       : int   = 0
+        avg_rate       : float = 0
+
 
 @dataclass 
 class MergedSummary(TOMLDataclass): 
