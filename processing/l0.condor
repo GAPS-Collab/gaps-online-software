@@ -4,7 +4,8 @@
 #   -- Assembly of flight data and advanced processing for GAPS I
 #   
 
-L0_DIR=/data/stoessl/flight/GAPSI/dataset/L0/starlink 
+#L0_DIR=/data/stoessl/flight/GAPSI/dataset/L0/starlink 
+L0_DIR=/data/stoessl/flight/GAPSI/dataset/L0/gcu_2_gcupool
 EXE=/home/stoessl/gaps-online-software-v0.12/processing/l0.sh
 
 runid = $Fdb(dirname)
@@ -13,9 +14,9 @@ executable     = $(EXE)
 arguments      = $(runid)
 
 # merge output and error log
-output         = /data/stoessl/logs/l0/l0.5-$(runid)-$(Process).log
-error          = /data/stoessl/logs/l0/l0.5-$(runid)-$(Process).log
-log            = /data/stoessl/logs/l0/all-jobs.log
+output         = /data/stoessl/logs/l0/gcupool/l0-$(runid)-$(Process).log
+error          = /data/stoessl/logs/l0/gcupool/l0-$(runid)-$(Process).log
+log            = /data/stoessl/logs/l0/gcupool/all-jobs.log
 make_log_dir   = True
 
 

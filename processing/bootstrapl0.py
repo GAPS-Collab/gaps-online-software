@@ -117,6 +117,8 @@ if __name__ == '__main__':
                         help='Only create the directory structure and quit after')
     parser.add_argument('-v','--verbose', action='store_true',\
                         help='More verbose output')
+    parser.add_argument('--quiet', action='store_true',\
+                        help='Suppress unnecessary output (e.g. progressbar) for use on cluster!')
     #parser.add_argument('--packet-tag',\
     #                    help='When packing the TelemetryPackets in CRFrames, tag them with this prefix',
     #                    type=str,
@@ -147,7 +149,7 @@ if __name__ == '__main__':
         
         # go with the one-file, one reader even though it is 
         # a bit slower, but then we can get our progressbar :) 
-        for fname in tqdm.tqdm(data, desc='Looping over .bin files'):
+        for fname in tqdm.tqdm(data, desc='Looping over .bin files', disable=args.quiet):
             reader = go.io.TelemetryPacketReader(fname) 
             for pack in reader:
                 if pack.is_event_packet:
@@ -183,11 +185,6 @@ if __name__ == '__main__':
                     if event_id > meta.stop_event_id:
                         meta.stop_event_id  = event_id
                     meta.n_events += 1 
-                    # will be filled in later
-                    #meta.missing_evids  
-                    #meta.runtime_h      
-                    #meta.n_events       
-                    #meta.avg_rate       
         # clean out non-populated runs 
         clean_runs = dict() 
         for r in runs:
@@ -222,7 +219,9 @@ if __name__ == '__main__':
             clean_runs[meta.run_id] = meta 
 
     print (f'-> {len(clean_runs)} runs available for processing!') 
-    
+    if not clean_runs:
+        print (f'[ERROR] - no runs found!') 
+        sys.exit(1) 
     # -- the actual processing. Load the telemetry files and convert them 
     #     to caraspace files 1-1 
     # gcu time guard. Allow for a few seconds +- before and after start/stop times 
@@ -243,7 +242,7 @@ if __name__ == '__main__':
         # has been processed - use to avoid duplicate 
         seen = [] 
         nfile = 0
-        for bfname in tqdm.tqdm(bin_files, desc='Reading telemetry'):
+        for bfname in tqdm.tqdm(bin_files, desc='Reading telemetry',disable=args.quiet):
             ## load each file individually + gcu safeguard 
             ## this means, first we have to find out first
             ## and last gcutime 
@@ -285,6 +284,7 @@ if __name__ == '__main__':
                     cr_timestamp = go.io.get_utc_timestamp_from_unix(pack.header.gcutime)  
                     writer       = go.io.CRWriter(str(args.outdir / Path(str(run_id))), run_id, subrun_id = nfile,  timestamp=cr_timestamp)
                     first_time = pack.header.gcutime 
+    print(f'-> Finished!')
     sys.exit(0) 
 
             #for pack in treader:
