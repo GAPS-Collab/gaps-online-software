@@ -96,7 +96,7 @@ def rust_to_cxx_bridge(event):
     cxx_tof_event.dsi_j_mask    = tof_event.dsi_j_mask
     cxx_tof_event.channel_masks = tof_event.channel_masks 
     cxx_tof_event.trigger_sources_bytes = tof_event.trigger_sources_bytes
-
+    cxx_tof_event.status        = tof_event.status
     #print (cxx_tof_event.dsi_j_mask, tof_event.dsi_j_mask)
     #print (f"--> Will bridge {len(tof_event.hits)} TOF hits")
     cxx_hits = []
