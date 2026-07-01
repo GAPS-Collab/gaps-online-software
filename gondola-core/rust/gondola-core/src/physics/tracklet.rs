@@ -44,7 +44,10 @@ expand_and_test_enum!(G4ProcessType, test_g4processtype_repr);
 
 //------------------------------------------------------------
 
-#[derive(Debug, Copy, Clone)]
+
+/// A "RecoHit" is truly just an assembly of coordinates, time 
+/// and energy, allowing to carry an error on the position along. 
+#[derive(Debug, Copy, Clone, PartialEq)]
 #[cfg_attr(feature="pybindings", pyclass)] 
 pub struct RecoHit {
   pub x      : f32,
@@ -74,22 +77,68 @@ impl RecoHit {
   }
 }
 
+impl Serialization for RecoHit {
+  //FIXME - this has fixed size!!
+  fn from_bytestream(stream : &Vec<u8>,
+                     pos    : &mut usize) 
+    -> Result<Self, SerializationError> {
+    let mut hit = Self::new();
+    let head    = parse_u16(stream, pos);
+    if head != Self::HEAD {
+      error!("Decoding of HEAD failed! Got {} instead!", head);
+      return Err(SerializationError::HeadInvalid);
+    }
+    hit.x      = parse_f32(stream, pos);
+    hit.x_err  = parse_f32(stream, pos);
+    hit.y      = parse_f32(stream, pos);
+    hit.y_err  = parse_f32(stream, pos);
+    hit.z      = parse_f32(stream, pos);
+    hit.z_err  = parse_f32(stream, pos);
+    hit.time   = parse_f32(stream, pos);
+    hit.energy = parse_f32(stream, pos);
+    hit.volume = parse_u32(stream, pos);
+    let tail   = parse_u16(stream, pos);
+    if tail != Self::TAIL {
+      //error!("Decoding of TAIL failed for version {}! Got {} instead!", version, tail);
+      error!("Decoding of TAIL failed! Got {} instead!", tail);
+      return Err(SerializationError::TailInvalid);
+    }
+    Ok(hit) 
+  }
+}
+
+impl fmt::Display for RecoHit {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<RecoHit");
+    repr += &(format!("\n  x {:.2} y {:.2} z {:.2}", self.x, self.y, self.z));
+    repr += &(format!("\n  energy {:.2}", self.energy));
+    repr += &(format!("\n  time   {:.2}>", self.time));
+    write!(f,"{}", repr)
+  } 
+}
+
+// --------------------------------------------
+
+/// This is semantics. However, in a vertex the 
+/// energy will return the energy of the particle 
+/// at that actual position, not the energy depositions
+type Vertex = RecoHit;
+
+// --------------------------------------------
+
 /// A representation of a physics track, as a single, 
 /// unbent, stright line
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 #[cfg_attr(feature="pybindings", pyclass)] 
 pub struct Tracklet {
-  pub start         : RecoHit,
-  pub stop          : RecoHit,
+  pub start         : Vertex,
+  pub stop          : Vertex,
   pub is_infinite   : bool,
   pub vertex_mom_x  : f32,
   pub vertex_mom_y  : f32,
   pub vertex_mom_z  : f32,
-  pub vertex_x      : f32,
-  pub vertex_y      : f32,
-  pub vertex_z      : f32,
-  // initial kinetic energy in MeV
-  pub vertex_energy : f32,
+  /// particle identifier
+  pub pdg           : i32,
 }
 
 impl Tracklet {
@@ -101,19 +150,44 @@ impl Tracklet {
       vertex_mom_x  : 0.0,
       vertex_mom_y  : 0.0,
       vertex_mom_z  : 0.0,
-      vertex_x      : 0.0,
-      vertex_y      : 0.0,
-      vertex_z      : 0.0,
-      vertex_energy : 0.0,
+      pdg           : 0,
     }
   }
 
   pub fn get_vertex_pos(&self) -> (f32,f32,f32) {
-    (self.vertex_x, self.vertex_y, self.vertex_z)
+    (self.start.x, self.start.y, self.start.z)
   }
   
   pub fn get_vertex_mom(&self) -> (f32,f32,f32) {
     (self.vertex_mom_x, self.vertex_mom_y, self.vertex_mom_z)
+  }
+}
+
+impl Serialization for Tracklet {
+  //FIXME - this has fixed size!!
+  fn from_bytestream(stream : &Vec<u8>,
+                     pos    : &mut usize) 
+    -> Result<Self, SerializationError> {
+    let mut tracklet = Self::new();
+    let head    = parse_u16(stream, pos);
+    if head != Self::HEAD {
+      error!("Decoding of HEAD failed! Got {} instead!", head);
+      return Err(SerializationError::HeadInvalid);
+    }
+    tracklet.start         = RecoHit::from_bytestream(stream, pos)?;
+    tracklet.stop          = RecoHit::from_bytestream(stream, pos)?;
+    tracklet.is_infinite   = parse_bool(stream, pos);
+    tracklet.vertex_mom_x  = parse_f32(stream, pos);
+    tracklet.vertex_mom_y  = parse_f32(stream, pos);
+    tracklet.vertex_mom_z  = parse_f32(stream, pos);
+    tracklet.pdg           = parse_i32(stream, pos);
+    let tail   = parse_u16(stream, pos);
+    if tail != Self::TAIL {
+      //error!("Decoding of TAIL failed for version {}! Got {} instead!", version, tail);
+      error!("Decoding of TAIL failed! Got {} instead!", tail);
+      return Err(SerializationError::TailInvalid);
+    }
+    Ok(tracklet) 
   }
 }
 
@@ -130,7 +204,7 @@ impl Tracklet {
   #[getter] 
   #[pyo3(name="vertex_energy")]
   fn get_vertex_energy_py(&self) -> f32 {
-    self.vertex_energy
+    self.start.energy
   }
 
   #[getter]
@@ -138,17 +212,20 @@ impl Tracklet {
   fn get_vertex_pos_py(&self) -> (f32,f32,f32) {
     self.get_vertex_pos()
   }
-
 }
 
 impl fmt::Display for Tracklet {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut repr = String::from("<Tracklet");
-    repr += &(format!("\n  vertex {:.2} {:.2} {:.2}", self.vertex_x, self.vertex_y, self.vertex_z));
-
+    repr += &(format!("\n  vertex {:.2} {:.2} {:.2}", self.start.x, self.start.y, self.start.z));
+    repr += &(format!("\n  pdg    {}>", self.pdg));
     write!(f,"{}", repr)
   } 
 }
+
+#[cfg(feature="pybindings")]
+pythonize!(Tracklet);
+
 
 pub struct Track {
   pub tracklets : Vec<Tracklet>

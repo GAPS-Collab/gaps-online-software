@@ -1,0 +1,53 @@
+[gun] 
+# the source can be set to a fixed position
+fixed_pos     = true 
+fixed_pos_x   = 0.0
+fixed_pos_y   = 0.0 
+fixed_pos_z   = 2100.0
+# if used with the isotropic setting, the 
+# source can be also set on a surface which 
+# has a certain Tof paddle in the center
+center_around_pid  = 0
+sample_isotropic_1 = false
+
+
+# incjected particle 
+particle_type = "anti_deuteron"
+#particle_type = "mu-"
+# energy of the primary
+fixed_energy  = true
+energy        = 350
+# can be drawn from a distribution
+uniform_energy = false 
+min_e_per_n    = 0.0 
+max_e_per_n    = 0.0
+
+[active_detectors]
+tof_active_from_db = false
+# if this is different from 0, we 
+# will only place this specific 
+# paddle id
+only_place_pid = 1
+tof_panel_1    = [ 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12] 
+tof_panel_2    = [13,14,15,16,17,18,19,20,21,22,23,24]
+tof_panel_3    = [25,26,27,28,29,30,31,32]
+tof_panel_4    = [33,34,35,36,37,38,39,40]
+tof_panel_5    = [41,42,43,44,45,46,47,48] 
+tof_panel_6    = [49,50,51,52,53,54,55,56]
+edge_paddles   = [57,58,59,60]
+tof_panel_7    = [61,62,63,64,65,66,67,68,69,70,71,72]
+tof_panel_8    = [73,74,75,76,77,78]
+
+all_sili       = true 
+
+[passive_materials]
+
+outer_frame    = true 
+inner_frame    = true 
+# the aluminum frame for the tracker modules
+trk_mod_frame  = true
+# the other passive parts for the tracker modules
+trk_mod_psv    = true 
+# sadly, especially the bottom foam makes it really slow 
+trk_foam_bot   = false 
+trk_foam_layer = true 

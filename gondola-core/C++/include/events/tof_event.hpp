@@ -28,7 +28,7 @@ namespace gondola {
     static constexpr u16 TAIL = 0x5555;
  
     ProtocolVersion       version ;
-    EventStatus status            ;
+    EventStatus           status  ;
     EventQuality          quality ;
     u16         trigger_sources   ;
     /// the number of triggered paddles coming

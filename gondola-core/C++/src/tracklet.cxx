@@ -5,7 +5,7 @@
 #include <ostream>
 
 #include "tracklet.hpp" 
-
+#include "io/parsers.h"
 namespace g = gondola;
 
 //-------------------------------------------
@@ -22,9 +22,46 @@ auto g::RecoHit::to_string() const -> std::string {
 
 //-------------------------------------------
 
+auto g::RecoHit::to_bytestream() const -> Vec<u8> { 
+  Vec<u8> stream;
+  stream.push_back(0xAA);
+  stream.push_back(0xAA);
+  auto bytes = g::to_le_bytes(x);
+  stream.insert(stream.end(),bytes.begin(), bytes.end());
+  bytes      = g::to_le_bytes(x_err );
+  stream.insert(stream.end(),bytes.begin(), bytes.end());
+  bytes      = g::to_le_bytes(y     );
+  stream.insert(stream.end(),bytes.begin(), bytes.end());
+  bytes      = g::to_le_bytes(y_err );
+  stream.insert(stream.end(),bytes.begin(), bytes.end());
+  bytes      = g::to_le_bytes(z     );
+  stream.insert(stream.end(),bytes.begin(), bytes.end());
+  bytes      = g::to_le_bytes(z_err );
+  stream.insert(stream.end(),bytes.begin(), bytes.end());
+  bytes      = g::to_le_bytes(time  );
+  stream.insert(stream.end(),bytes.begin(), bytes.end());
+  bytes      = g::to_le_bytes(energy);
+  stream.insert(stream.end(),bytes.begin(), bytes.end());
+  bytes      = g::to_le_bytes(volume);
+  stream.insert(stream.end(),bytes.begin(), bytes.end());
+  stream.push_back(0x55);
+  stream.push_back(0x55);
+  return stream;
+}
+
+//-------------------------------------------
+
+g::Tracklet::Tracklet() {
+    vertex_ = std::make_shared<g::RecoHit>(); 
+    stop_   = std::make_shared<g::RecoHit>();
+    is_infinite = true;
+}
+
+//-------------------------------------------
+
 g::Tracklet::Tracklet(std::shared_ptr<RecoHit> vertex) : 
   vertex_(vertex) {
-    auto stop   = std::make_shared<g::RecoHit>();
+    stop_   = std::make_shared<g::RecoHit>();
     is_infinite = true;
 }
 
@@ -76,6 +113,30 @@ auto g::Tracklet::to_string() const -> std::string {
   return repr;
 }
 
+//-------------------------------------------
+
+auto g::Tracklet::to_bytestream() const -> Vec<u8> { 
+  Vec<u8> stream;
+  stream.push_back(0xAA);
+  stream.push_back(0xAA);
+  auto bytes = vertex_->to_bytestream(); 
+  stream.insert(stream.end(),bytes.begin(), bytes.end());
+  bytes = stop_->to_bytestream(); 
+  stream.insert(stream.end(),bytes.begin(), bytes.end());
+  stream.push_back((u8)is_infinite); 
+  bytes      =   g::to_le_bytes(vertex_mom_x)           ; 
+  stream.insert(stream.end(),bytes.begin(), bytes.end());
+  bytes      =   g::to_le_bytes(vertex_mom_y)           ; 
+  stream.insert(stream.end(),bytes.begin(), bytes.end());
+  bytes      =   g::to_le_bytes(vertex_mom_z)           ; 
+  stream.insert(stream.end(),bytes.begin(), bytes.end());
+  bytes      =   g::to_le_bytes(pdg)           ; 
+  stream.insert(stream.end(),bytes.begin(), bytes.end());
+  stream.push_back(0x55);
+  stream.push_back(0x55);
+  return stream;
+}
+ 
 //-------------------------------------------
 
 namespace gondola {

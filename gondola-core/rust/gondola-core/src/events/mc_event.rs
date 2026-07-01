@@ -8,7 +8,6 @@ use crate::prelude::*;
 pub struct McEvent {
   pub run_id   : u32,
   pub event_id : u32,
-  pub hits     : Vec<McHit>,
   pub mctree   : McTree, 
   pub primary  : Tracklet
 }
@@ -19,14 +18,32 @@ impl McEvent {
     Self {
       run_id   : 0,
       event_id : 0,
-      hits     : Vec::<McHit>::new(),
       mctree   : McTree::new(),
       primary  : Tracklet::new()
     }
   }
 
-  fn create_mc_tree(&mut self) {
-    self.mctree.assemble(&mut self.hits);
+
+  /// Calculate the difference between the first and the last 
+  /// hit time in the event
+  pub fn get_event_duration(&self) -> f32 {
+    let mut first_hit = f32::MAX;
+    let mut last_hit  = 0.0f32; 
+    if self.mctree.trackmap.len() == 0 {
+      return 0.0;
+    }
+    for k in self.mctree.trackmap.keys() {
+      //println!("glob time {}", h.glob_time);
+      for h in &self.mctree.trackmap[k].hits { 
+        if h.glob_time > last_hit {
+          last_hit = h.glob_time; 
+        }
+        if h.glob_time < first_hit {
+          first_hit = h.glob_time;
+        }
+      }
+    }
+    return last_hit - first_hit;
   }
 }
 
@@ -42,9 +59,11 @@ impl Serialization for McEvent {
     }
     event.run_id   = parse_u32(stream, pos);
     event.event_id = parse_u32(stream, pos);
+    event.primary  = Tracklet::from_bytestream(stream, pos)?;
     let nhits      = parse_u16(stream, pos);
+    let mut hits   = Vec::<McHit>::new();
     for _ in 0..nhits {
-      event.hits.push(McHit::from_bytestream(stream, pos)?);
+      hits.push(McHit::from_bytestream(stream, pos)?);
     }
     let tail = parse_u16(stream, pos);
     if tail != Self::TAIL {
@@ -53,22 +72,8 @@ impl Serialization for McEvent {
       return Err(SerializationError::TailInvalid);
     }
     // assemble and sort the mc tree 
-    //event.mctree.assemble(event.hits);
-    event.create_mc_tree();
-    // fill primary properties from the tree
-    if event.mctree.trackmap.contains_key(&0) {
-      if event.mctree.trackmap[&0].len() > 0 {
-        //self.primary.is_infinite   
-
-        event.primary.vertex_mom_x  = event.mctree.trackmap[&0][0].vertex_mom_x;
-        event.primary.vertex_mom_y  = event.mctree.trackmap[&0][0].vertex_mom_y;
-        event.primary.vertex_mom_z  = event.mctree.trackmap[&0][0].vertex_mom_z;
-        event.primary.vertex_x      = event.mctree.trackmap[&0][0].vertex_pos_x;
-        event.primary.vertex_y      = event.mctree.trackmap[&0][0].vertex_pos_y;
-        event.primary.vertex_z      = event.mctree.trackmap[&0][0].vertex_pos_z;
-        event.primary.vertex_energy = event.mctree.trackmap[&0][0].vertex_kin_E;
-      }
-    }
+    // this consumes the hits! 
+    event.mctree.assemble(&mut hits);
     Ok(event) 
   }
 }
@@ -80,10 +85,10 @@ impl fmt::Display for McEvent {
     repr += &(format!("\n event id : {}",self.event_id));
     repr += "\n === PRIMARY ===";
     repr += &(format!("\n  {}", self.primary));
-    repr += "\n === HITS ===";
-    for h in &self.hits {
-      repr += &(format!("\n {}", h));
-    }
+    //repr += "\n === HITS ===";
+    //for h in &self.hits {
+    //  repr += &(format!("\n {}", h));
+    //}
     repr += "\n === MCTREE ===";
     repr += &(format!("\n {}", self.mctree));
     repr += ">";
@@ -106,13 +111,19 @@ impl McEvent {
     self.primary.clone() 
   }
 
+  #[getter] 
+  #[pyo3(name="event_duration")]
+  fn get_event_duration_py(&self) -> f32 {
+    return self.get_event_duration();
+  }
+
   /// Get McTruth Hits in the format 
   /// (x,y,z,time,edep,volumeid,hardware_id)
   #[getter]
   fn get_mctruth_hits(&self) -> Vec<(f32, f32, f32, f32, f32, u32, u32)> {
     let mut hits = Vec::<(f32,f32,f32,f32,f32,u32,u32)>::new();
     for track_id in self.mctree.trackmap.keys() {
-      for h in &self.mctree.trackmap[track_id] {
+      for h in &self.mctree.trackmap[track_id].hits {
         let hp = (h.pos_x, h.pos_y, h.pos_z, h.glob_time,h.kin_E,h.hw_id, h.volume_id);
         hits.push(hp);
       }
@@ -125,7 +136,7 @@ impl McEvent {
   fn get_volid_edep_map(&self) -> HashMap<u32, f32> {
     let mut edep_map = HashMap::<u32,f32>::new();
     for track_id in self.mctree.trackmap.keys() {
-      for h in &self.mctree.trackmap[track_id] {
+      for h in &self.mctree.trackmap[track_id].hits {
         if edep_map.contains_key(&h.volume_id) {
           *edep_map.get_mut(&h.volume_id).unwrap() += h.step_edep; 
         } else {
@@ -141,7 +152,7 @@ impl McEvent {
   fn get_hwid_edep_map(&self) -> HashMap<u32, f32> {
     let mut edep_map = HashMap::<u32,f32>::new();
     for track_id in self.mctree.trackmap.keys() {
-      for h in &self.mctree.trackmap[track_id] {
+      for h in &self.mctree.trackmap[track_id].hits {
         if edep_map.contains_key(&h.hw_id) {
           *edep_map.get_mut(&h.hw_id).unwrap() += h.step_edep; 
         } else {
@@ -151,6 +162,13 @@ impl McEvent {
     }
     return edep_map;
   }
+  
+  #[getter]
+  #[pyo3(name="mctree")]
+  fn get_mctree_py(&self) -> McTree { 
+    self.mctree.clone()
+  }
+
 }
 
 #[cfg(feature="pybindings")]

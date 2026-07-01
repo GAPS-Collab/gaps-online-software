@@ -6,8 +6,8 @@ use crate::prelude::*;
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature="pybindings", pyclass)] 
 pub struct McTree {
-  pub tracks    : Vec<McTrack>,
-  pub trackmap  : HashMap<u32, Vec<McHit>>,
+  //pub tracks    : Vec<McTrack>,
+  pub trackmap  : HashMap<u32, McTrack>,
   pub max_gen   : usize,
 
   //pub track_map : HashMap<usize, McTrack>,
@@ -41,9 +41,9 @@ pub struct McTree {
 impl McTree {
   pub fn new() -> Self {
     Self {
-      tracks   : Vec::<McTrack>::new(),
+      //tracks   : Vec::<McTrack>::new(),
       max_gen  : 0,
-      trackmap : HashMap::<u32, Vec<McHit>>::new(),
+      trackmap : HashMap::<u32, McTrack>::new(),
     }
   }
 
@@ -60,14 +60,17 @@ impl McTree {
   // create all the tracks and create the actual 
   // tree
   pub fn assemble(&mut self, hits : &mut Vec<McHit>) {
-    let mut trackmap = HashMap::<u32, Vec<McHit>>::new();
+    let mut trackmap = HashMap::<u32, McTrack>::new();
     let mut nhits = hits.len();
     while nhits > 0 {
       let h = hits.pop().unwrap();
       if trackmap.contains_key(&h.track_id) {
-        trackmap.get_mut(&h.track_id).unwrap().push(h);
+        trackmap.get_mut(&h.track_id).unwrap().hits.push(h);
       } else {
-        trackmap.insert(h.track_id, vec![h]);
+        let mut new_track   = McTrack::new();
+        new_track.track.pdg = h.pdg;
+        new_track.hits      = vec![h];
+        trackmap.insert(h.track_id, new_track);
       }
       nhits -= 1;
     }
@@ -76,7 +79,7 @@ impl McTree {
       tm_keys.push(*k);
     }
     for k in &tm_keys {
-      trackmap.get_mut(&k).unwrap().sort_by(|i,j| i.glob_time.total_cmp(&j.glob_time));  
+      trackmap.get_mut(&k).unwrap().hits.sort_by(|i,j| i.glob_time.total_cmp(&j.glob_time));  
     }
     self.trackmap = trackmap;
   }
@@ -85,8 +88,10 @@ impl McTree {
 impl fmt::Display for McTree {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut repr = String::from("<McTree");
-    for k in self.trackmap.keys() {
-      repr += &(format!("\n  Track Id: {} -> NHits : {}",k, self.trackmap[k].len()));
+    let mut sorted_keys : Vec<u32> = self.trackmap.keys().copied().collect();
+    sorted_keys.sort();
+    for k in sorted_keys {
+      repr += &(format!("\n  Track Id: {} [pdg {}] -> NHits : {}",k,self.trackmap[&k].track.pdg, self.trackmap[&k].hits.len()));
     }
     repr += ">";
     write!(f, "{}", repr) 
@@ -96,6 +101,17 @@ impl fmt::Display for McTree {
 #[cfg(feature="pybindings")] 
 #[pymethods] 
 impl McTree {
+
+  #[getter]
+  fn get_trackids(&self) -> Vec<u32> {
+    let mut sorted_keys : Vec<u32> = self.trackmap.keys().copied().collect();
+    sorted_keys.sort();
+    sorted_keys
+  }
+
+  fn get_track(&self, track_id : u32) -> Option<McTrack> {
+    self.trackmap.get(&track_id).clone().cloned()
+  }
 }
 
 

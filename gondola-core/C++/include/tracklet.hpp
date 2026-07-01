@@ -21,6 +21,9 @@ namespace gondola {
     u32 volume;
 
     auto to_string() const -> std::string;
+    /// Serializaton to bytes - needed to be 
+    /// written to a file
+    auto to_bytestream() const -> Vec<u8>;
 
   };
   
@@ -31,12 +34,16 @@ namespace gondola {
     bool is_infinite                ; 
     f32  vertex_mom_x               ; 
     f32  vertex_mom_y               ; 
-    f32  vertex_mom_z               ; 
+    f32  vertex_mom_z               ;
+    /// particle type identifier (see PDG codes) 
+    i32  pdg                        ;
+    // these are for SD interoperatibility and won't get 
+    // serialized
     f32  beta                       ;
     f32  beta_err                   ;
    
     Tracklet(std::shared_ptr<RecoHit> vertex);
-
+    Tracklet();
     /// The energy depositions per each 
     /// crossed volume
     Vec<std::tuple<u32,f32>> edeps  ;
@@ -49,11 +56,13 @@ namespace gondola {
     auto get_stop()   const -> Option<std::shared_ptr<RecoHit>>;
     auto set_stop(std::shared_ptr<RecoHit> stop) -> void;
     auto to_string()  const -> std::string;
+    /// Serializaton to bytes - needed to be 
+    /// written to a file
+    auto to_bytestream() const -> Vec<u8>;
     
     private:
       std::shared_ptr<RecoHit> vertex_ ; 
       std::shared_ptr<RecoHit> stop_   ; 
-
   };
   
   std::ostream& operator<<(std::ostream& os, const gondola::Tracklet& et);
