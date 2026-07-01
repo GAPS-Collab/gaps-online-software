@@ -323,9 +323,10 @@ auto g::get_vid_hid_map() -> HashMap<u32, u32> {
   for (const auto& p : paddles) {
     map.insert(std::make_pair(p.second.volume_id, p.first));  
   }
-  for (const auto& s : strips) {
-    map.insert(std::make_pair(s.second.volume_id, s.first));   
-  }
+  //FIXME - this needs maybe 2 seperate functions
+  //for (const auto& s : strips) {
+  //  map.insert(std::make_pair(s.second.volume_id, s.first));   
+  //}
   return map;
 }
 
