@@ -2370,15 +2370,15 @@ impl Default for TofPaddleTimingConstant {
 
 impl fmt::Display for TofPaddleTimingConstant {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let mut repr = format!("<TofPaddleTimingConstant [{}]:", self.paddle_id);
-    repr += &(format!("\n   vid           : {}", self.volume_id));
-    repr += "\n   UTC Timestamps (Begin/End):";
+    let mut repr = format!("<TofPaddleTimingConstant [paddle {}]:", self.paddle_id);
+    repr += &(format!("\n   volume id        : {}", self.volume_id));
+    repr += "\n   UTC Timestamps (Begin/End) :";
     repr += &(format!("\n   {}/{}", self.utc_timestamp_start, self.utc_timestamp_stop));    
     if self.name.is_some() {
-      repr += &(format!("\n   name        : {}", self.name.clone().unwrap())); 
+      repr += &(format!("\n   name             : {}", self.name.clone().unwrap())); 
     }
     if self.version.is_some() {
-      repr += &(format!("\n   version        : {}", self.version.unwrap())); 
+      repr += &(format!("\n   version          : {}", self.version.unwrap())); 
     }
     repr += &(format!("\n   paddle const.    : {}", self.paddle_constant));   
     repr += &(format!("\n   panel  const.    : {}", self.panel_constant));   
