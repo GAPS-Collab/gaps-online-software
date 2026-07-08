@@ -604,7 +604,7 @@ impl TofEvent {
               continue;
             }
             Some(pdl) => {
-              h.set_paddle(pdl);
+              let _ = h.set_paddle(pdl);
             }
           }
         }
@@ -618,7 +618,7 @@ impl TofEvent {
             continue;
           }
           Some(pdl) => {
-            h.set_paddle(pdl);
+            let _ = h.set_paddle(pdl);
           }
         }
       }
@@ -1653,6 +1653,21 @@ impl TofEvent {
     ev.set_paddles(&pack.tof_paddles);
     Ok(ev)
   }
+
+  /// Certain quantitities can only be calculated if we know more 
+  /// about the paddle the hit was seen in. 
+  /// This meta information is not stored within the hit to save 
+  /// space for telemetry/storage reasons.
+  ///
+  /// The meta-information (e.g. paddle length) can be added by 
+  /// filling in the blanks from the specific paddles as obtained 
+  /// from the database shipped with gondola.
+  #[cfg(feature="database")]
+  #[pyo3(name="set_paddles")]
+  fn set_paddles_py(&mut self, paddles : HashMap<u8, TofPaddle>) {
+    self.set_paddles(&paddles); 
+  }
+
 }
 
 #[cfg(feature="pybindings")]

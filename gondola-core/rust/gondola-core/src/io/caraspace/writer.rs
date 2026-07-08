@@ -72,6 +72,13 @@ impl CRWriter {
     if !file_path.ends_with("/") {
       file_path += "/";
     }
+    // check if this path exists 
+    let tmppath = Path::new(&file_path);
+    if !tmppath.exists() {
+      fs::create_dir_all(tmppath)
+      .expect(&format!("Failed to create directory at: {}", file_path));
+    }
+
     let filename : String;
     let first_timestamp = timestamp.clone();
     if let Some(subrun) = subrun_id {
@@ -81,7 +88,8 @@ impl CRWriter {
     }
     let path     = Path::new(&filename); 
     //println!("Writing to file {filename}");
-    file = OpenOptions::new().create(true).append(true).open(path).expect("Unable to open file {filename}");
+    //FIXME - do we really want to have this append here?
+    file = OpenOptions::new().create(true).append(true).open(path).expect(&format!("Unable to open file {}", filename));
     file_name = filename;
     let mut first_gcu_timestamp = None;
     if first_timestamp.is_some() {

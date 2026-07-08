@@ -163,7 +163,7 @@ impl TrackerOfflineCalibration {
       hit_tf = self.tf_map.get(&hit.get_stripid());
       if let Some(tf) = hit_tf {
         //println!("energy before : {}", energy);
-        energy = tf.transfer_fn(energy);
+        energy = tf.evaluate(energy);
         //println!("energy after : {}", energy);
       } else {
         error!("Trying to calibrate {}, but we don't have a transfer function for that!", hit.get_stripid());
@@ -180,7 +180,7 @@ impl TrackerOfflineCalibration {
             }
             p_avg -= hit_ped;
             if let Some(tf) = hit_tf {
-              p_avg = tf.transfer_fn(p_avg); 
+              p_avg = tf.evaluate(p_avg); 
               energy -= p_avg;
             }
           }

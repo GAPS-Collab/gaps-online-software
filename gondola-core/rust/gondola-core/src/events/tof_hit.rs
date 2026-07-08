@@ -231,10 +231,9 @@ impl TofHit {
   /// Set the length and cable length for the paddle
   /// FIXME - take gaps_online.db.Paddle as argument
   #[pyo3(name="set_paddle")]
-  fn set_paddle_py(&mut self, plen : f32, coax_cbl_time : f32, hart_cbl_time : f32 ) {
-    self.paddle_len      = plen;
-    self.coax_cable_time = coax_cbl_time;
-    self.hart_cable_time = hart_cbl_time;
+  //fn set_paddle_py(&mut self, plen : f32, coax_cbl_time : f32, hart_cbl_time : f32 ) {
+  fn set_paddle_py(&mut self, paddle : &TofPaddle) -> PyResult<()> {
+    Ok(self.set_paddle(paddle)?)
   }
   
   /// The time in ns the signal spends in the coax 
@@ -708,7 +707,10 @@ impl TofHit {
 
 #[cfg(feature="database")]
 impl TofHit {
-  pub fn set_paddle(&mut self, paddle : &TofPaddle) {
+  pub fn set_paddle(&mut self, paddle : &TofPaddle) -> Result<(), UserError> {
+    if self.paddle_id != paddle.paddle_id as u8 {
+      return Err(UserError::WrongPaddleId);
+    }
     self.coax_cable_time = paddle.coax_cable_time;
     self.hart_cable_time = paddle.harting_cable_time;
     self.paddle_len = paddle.length * 10.0; // stupid units!
@@ -721,6 +723,7 @@ impl TofHit {
     self.x          = pos.0;
     self.y          = pos.1;
     self.z          = pos.2;
+    Ok(())
   }
 }
 

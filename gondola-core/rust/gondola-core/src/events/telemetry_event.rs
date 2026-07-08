@@ -627,6 +627,20 @@ impl TelemetryEvent {
   //    //Ok(mapped.into_bound(py))
   //    Ok(py_ref)
   //}
+  
+  /// Certain quantitities can only be calculated if we know more 
+  /// about the paddle the hit was seen in. 
+  /// This meta information is not stored within the hit to save 
+  /// space for telemetry/storage reasons.
+  ///
+  /// The meta-information (e.g. paddle length) can be added by 
+  /// filling in the blanks from the specific paddles as obtained 
+  /// from the database shipped with gondola.
+  #[cfg(feature="database")]
+  #[pyo3(name="tof_set_paddles")]
+  fn tof_set_paddles_py(&mut self, paddles : HashMap<u8, TofPaddle>) {
+    self.tof_event.set_paddles(&paddles); 
+  }
 
   #[getter]
   fn tracker_pointcloud(&self) -> Vec<(f32, f32, f32, f32, f32)> {

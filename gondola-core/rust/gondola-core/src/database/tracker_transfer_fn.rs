@@ -207,7 +207,7 @@ impl TrackerStripTransferFunction {
 
   /// The actual transfer function for this 
   /// strip. Calculate energy from adc values
-  pub fn transfer_fn(&self, adc : f32) -> f32 {
+  pub fn evaluate(&self, adc : f32) -> f32 {
     if adc < 0.0 {
       return 0.0;
     }
@@ -225,6 +225,81 @@ impl TrackerStripTransferFunction {
       return self.pol_d3_0 + self.pol_d3_1*adc + self.pol_d3_2*(adc.powi(2)) + self.pol_d3_3*(adc.powi(3));
     }
     0.0
+  }
+ 
+  /// First derivative of the transfer function
+  pub fn derivative(&self, adc : f32) -> f32 {
+    if adc < 0.0 {
+      return 0.0;
+    }
+    if adc <= 190.0 {
+      return self.pol_a2_1 + 2.0*self.pol_a2_2*adc;
+    }
+    if 190.0 < adc && adc <= 500.0 {
+      return self.pol_b3_1 + 2.0*self.pol_b3_2*adc + 3.0*self.pol_b3_3*(adc.powi(2));
+    }
+    if 500.0 < adc && adc <= 900.0 {
+      return self.pol_c3_1 + 2.0*self.pol_c3_2 + 3.0*self.pol_c3_3*(adc.powi(2));
+    }
+    //if 900.0 < adc && adc <= 2047.0 {
+    if 900.0 < adc && adc <= 1600.0 {
+      return self.pol_d3_1 + 2.0*self.pol_d3_2 + 3.0*self.pol_d3_3*(adc.powi(2));
+    }
+    0.0
+  }
+
+  /// Create the inverse of the transfer function, which then 
+  /// can be used in the simulation
+  /// FIXME - switch to f64, however, only store f32 in the db
+  pub fn invert(&self, y : f64, epsilon_opt : Option<f64>) -> Result<f64, AnalysisError> {
+    let x_min = 0.0f32;
+    let x_max = 1600.0f32;
+    let y_min = self.evaluate(x_min);
+    let y_max = self.evaluate(x_max);
+    if y < y_min as f64 || y > y_max as f64 {
+      error!("y value of {} is out of bounds for 0 <= x <= 1600", y);
+      return Err(AnalysisError::OutOfBounds);
+    }
+    let max_iterations = 50;
+    let epsilon : f64;
+    if epsilon_opt.is_some() {
+      epsilon = epsilon_opt.unwrap();
+    } else {
+      epsilon = 1e-12; // random default
+    }
+
+    let mut low  = x_min;
+    let mut high = x_max;
+    let mut x = 0.5 * (low + high);
+
+    for _ in 0..max_iterations {
+      let f_x = self.evaluate(x) as f64 - y;
+      let df_x = self.derivative(x) as f64;
+      // If we are close enough, or if the derivative is effectively zero
+      if f_x.abs() < epsilon {
+        return Ok(x as f64);
+      }
+      // Update bisection bounds
+      if f_x > 0.0 {
+        high = x;
+      } else {
+        low = x;
+      }
+      // Attempt a Newton-Raphson step
+      if df_x.abs() > 1e-9 {
+        let next_x = x as f64 - f_x / df_x;
+        // Safety check: if Newton step jumps outside our bounded bracket,
+        // fallback to a safe Bisection step.
+        if next_x > low as f64 && next_x < high as f64 {
+          x = next_x as f32;
+          continue;
+        }
+      }
+      // Fallback to Bisection if Newton fails or is too slow
+      x = 0.5 * (low + high);
+    }
+    error!("We couldn't find a solution which is epsilon {} away! Try to reduce epsilon!", epsilon);
+    Err(AnalysisError::DidNotConverge)
   }
 }
 
@@ -330,9 +405,28 @@ impl TrackerStripTransferFunction {
     if adc > 1600.0 {
       warn!("ADC value larger than 1600! {}. Transfer fn not defined beyond 1600.", adc);
     }
-    return self.transfer_fn(adc);
+    return self.evaluate(adc);
   }
-  
+ 
+  #[pyo3(name="derivative")]
+  fn derivative_py(&self, adc : f32) -> f32 {
+    if adc > 1600.0 {
+      warn!("ADC value larger than 1600! {}. Transfer fn not defined beyond 1600.", adc);
+    }
+    return self.derivative(adc);
+  }
+
+  /// The inverse transfer function as to be used 
+  /// in the simulation. 
+  /// If this returns errors for values within 
+  /// range, try to reduce the convergence 
+  /// crtierion epsilon 
+  #[pyo3(signature = (mv , epsilon = None))] 
+  #[pyo3(name="invert")]
+  fn invert_py(&self, mv : f64, epsilon : Option<f64>) -> PyResult<f64> {
+    Ok(self.invert(mv, epsilon)?)
+  }
+
   #[staticmethod]
   #[pyo3(name="parse_from_file")]
   fn parse_from_file_py(fname : &str) -> Option<Vec<Self>> {

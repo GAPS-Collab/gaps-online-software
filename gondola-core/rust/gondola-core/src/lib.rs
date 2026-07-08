@@ -558,7 +558,8 @@ pythonize_error!(SerializationError, PySerializationError);
 pythonize_error!(AnalysisError, PyAnalysisError);
 #[cfg(feature="pybindings")]
 pythonize_error!(CalibrationError, PyCalibrationError);
-
+#[cfg(feature="pybindings")]
+pythonize_error!(UserError, PyUserError);
 
 /// Python API to rust version of tof-dataclasses.
 ///

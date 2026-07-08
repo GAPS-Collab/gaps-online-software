@@ -189,6 +189,7 @@ impl Error for CalibrationError {
 pub enum UserError {
   IneligibleChannelLabel,
   NoChannel9Data,
+  WrongPaddleId
 }
 
 impl fmt::Display for UserError {
@@ -197,10 +198,13 @@ impl fmt::Display for UserError {
     match self {
       UserError::IneligibleChannelLabel => {
         disp = "IneligibleChannelLabel";
-      },
+      }
       UserError::NoChannel9Data => {
         disp = "NoChannel9Data";
-      },
+      }
+      UserError::WrongPaddleId => {
+        disp = "WrongPaddleId";
+      }
     }
     write!(f, "<UserError : {}>", disp)
   }
@@ -217,18 +221,21 @@ pub enum AnalysisError {
   MissingChannel,
   NoChannel9,
   InputBroken,
-  DataMangling
+  DataMangling,
+  OutOfBounds,
+  DidNotConverge
 }
 
 impl fmt::Display for AnalysisError {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let disp : &str;
     match self {
-      AnalysisError::MissingChannel => {disp = "MissingChannel"},
-      AnalysisError::NoChannel9     => {disp = "NoChannel9"},
-      AnalysisError::InputBroken    => {disp = "InputBroken"},
-      AnalysisError::DataMangling   => {disp = "DataMangling"}
-    
+      Self::MissingChannel => {disp = "MissingChannel"},
+      Self::NoChannel9     => {disp = "NoChannel9"},
+      Self::InputBroken    => {disp = "InputBroken"},
+      Self::DataMangling   => {disp = "DataMangling"},
+      Self::DidNotConverge => {disp = "DidNotConverge"},
+      Self::OutOfBounds    => {disp = "OutOfBounds"}
     }
     write!(f, "<AnalysisError : {}>", disp)
   }

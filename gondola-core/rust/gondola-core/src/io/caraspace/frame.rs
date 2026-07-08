@@ -539,12 +539,15 @@ impl CRFrame {
   fn get_first_gcutime_py(&self) -> Option<f64> {
     self.get_first_gcutime()
   }
- 
+
+  /// The number of individual frame objects in the frame
   #[getter] 
   fn get_n_objects(&self) -> usize {
     self.index.len()
   }
 
+  /// For multiple telemetry packets in the frame, get the first and 
+  /// last gcu time, as well as the delta between them
   #[pyo3(name="get_telemetrypacket_gcutime_range")]
   fn get_telemetrypacket_gcutime_range_py(&self) -> Option<(f64,f64,f64)> {
     self.get_telemetrypacket_gcutime_range()
@@ -716,7 +719,10 @@ impl CRFrame {
   fn has_py(&self, name : &str) -> bool {
     self.has(name)
   }
-  
+ 
+
+  /// The index of the frame. This is a dictionary of name, 
+  /// to byte position in the file as well as its type
   #[getter]
   fn index(&self) -> HashMap<String, (u64, CRFrameObjectType)> {
     self.index.clone()
@@ -728,6 +734,9 @@ impl CRFrame {
     self.do_trk_calib
   }
 
+  /// For multiple telemetry packets in the frame, this allows to 
+  /// select a specific hitseries from a number of packets with 
+  /// the same name tag
   #[pyo3(name="get_tracker_hitseries")]
   #[pyo3(signature = (name = None))]
   fn get_tracker_hitseries_py(&self, name : Option<String>) -> Vec<TrackerHit> {

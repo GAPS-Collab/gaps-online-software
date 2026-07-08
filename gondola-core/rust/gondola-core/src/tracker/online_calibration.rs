@@ -101,7 +101,7 @@ impl TrackerOnlineCalibration {
     if adc > 1500.0 {
       adc = 1500.0;
     } 
-    hit.energy = scale*self.tf_map[&strip_id].transfer_fn(adc);
+    hit.energy = scale*self.tf_map[&strip_id].evaluate(adc);
   }
 
   pub fn is_pulsed(&self, hit : &TrackerHit) -> bool {
