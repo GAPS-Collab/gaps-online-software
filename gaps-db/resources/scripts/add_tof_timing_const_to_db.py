@@ -57,5 +57,25 @@ if __name__ == '__main__':
         print (f'-> Will save timing constants to DB')
         for tc in tcs:
             tc.save()
-
-
+        # Summer 26 -  a slight adjustement - fix the sign error 
+        # as well as adjust the bottom panel 
+        offsets = { 13 : 0.000, 14 : 0.129, 15: -0.196, 16 : -0.122,\
+                    17 : 0.001, 18 : -0.84} # panel 2a
+        offsets.update({20: 0.000, 21: -0.494, 22: -0.005, 23 : -0.281}) # panel 2b
+        tcs     = m.TofPaddleTimingConstant.get_from_file(args.timing_const_file,\
+                                                      utc_start = args.utc_start,
+                                                      utc_stop  = args.utc_stop,
+                                                      name      = args.name,
+                                                      version   = args.version,
+                                                      no_fail_on_vid_check = True)
+        for tc in tcs:
+            tc.name = "GraceV1.5" 
+            if tc.paddle_id in offsets.keys():
+                tc.paddle_constant = offsets[tc.paddle_id] 
+                tc.panel_constant  = -0.898
+            try:
+                tc.timing_constant = tc.paddle_constant - tc.panel_constant 
+            except:
+                print (tc) 
+                print (tc.paddle_constant)
+            tc.save()

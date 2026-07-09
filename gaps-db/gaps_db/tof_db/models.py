@@ -63,7 +63,6 @@ class TofPaddleTimingConstant(models.Model):
     volume_id            = models.PositiveBigIntegerField(
                                     default=0,
                                     null=False,
-                                    unique=True,
                                     help_text="The VolumeId as used in the GAPS simulation code")
     utc_timestamp_start  = models.PositiveBigIntegerField(null=False, default=0,
                                                           help_text="UNIX Timestamp for first point in time where this constant is relevant")
