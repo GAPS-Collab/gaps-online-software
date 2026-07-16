@@ -146,3 +146,14 @@ analysis/umbrella-checkout/content/images/*
 
 #test fragments
 gondola-core/rust/gondola-core/liftof-config-test.toml
+
+# pad_notebooks generated data/output (padrick)
+analysis/notebooks/pad_notebooks/*.h5
+analysis/notebooks/pad_notebooks/*.pdf
+analysis/notebooks/pad_notebooks/compressed_chunks/
+analysis/notebooks/pad_notebooks/saved_dfs/
+analysis/notebooks/pad_notebooks/saved_dfs_absolute_ts/
+analysis/notebooks/pad_notebooks/run_lists/
+analysis/notebooks/pad_notebooks/low_level_analysis/
+analysis/notebooks/pad_notebooks/tof_flight_runs_new.tsv
+analysis/notebooks/pad_notebooks/tof_flight_runs_new.txt
