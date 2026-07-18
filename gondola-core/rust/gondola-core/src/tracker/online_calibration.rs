@@ -7,6 +7,9 @@ use std::io::BufRead;
 #[cfg(feature="pybindings")]
 use std::path::PathBuf;
 
+/// The tracker online (in-flight) calibration. This converts 
+/// adc to energy,  according to a transfer function. 
+/// There is only a single transfer function for all the strips
 #[cfg_attr(feature="pybindings", pyclass)] 
 pub struct TrackerOnlineCalibration {
   pub tf_map     : HashMap<u32,TrackerStripTransferFunction>, 

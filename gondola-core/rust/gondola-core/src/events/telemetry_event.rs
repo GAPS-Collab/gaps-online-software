@@ -91,10 +91,10 @@ impl TelemetryEvent {
     tp
   }
 
-  pub fn calibrate_trk_hits(&mut self, cali : &TrackerOfflineCalibration) 
+  pub fn calibrate_trk_hits(&mut self, cali : &TrackerOfflineCalibration, remove_pulsed : bool) 
     -> Result<(), CalibrationError> {
     cali.mask_hits(&mut self.tracker_hits);
-    cali.calibrate(&mut self.tracker_hits)?;
+    cali.calibrate(&mut self.tracker_hits, remove_pulsed)?;
     Ok(())
   }
 
@@ -334,10 +334,10 @@ impl Serialization for TelemetryEvent {
       }
       me.oscillator_idx = oscillator_idx;
     } else if version == 0 {
-      error!("Unsupported {version}!");
+      error!("Version {version} found, which is currently not supported!");
       return Err(SerializationError::UnsupportedVersion);
     } else {
-      error!("Unsuported version {version}!");
+      error!("Unsuported and unknown version : {version}!");
       return Err(SerializationError::UnsupportedVersion);
     } 
     me.expected_tr_hits = me.tracker_hits.len() as u8;
@@ -701,28 +701,11 @@ impl TelemetryEvent {
   }
 
   #[pyo3(name="calibrate_trk_hits")]
-  fn calibrate_trk_hits_py(&mut self, cali : Bound<'_, TrackerOfflineCalibration> ) -> PyResult<()> {
+  fn calibrate_trk_hits_py(&mut self, cali : Bound<'_, TrackerOfflineCalibration> , remove_pulsed : bool) -> PyResult<()> {
     let cali_ref = cali.borrow();
-    self.calibrate_trk_hits(&*cali_ref)?;
+    self.calibrate_trk_hits(&*cali_ref, remove_pulsed)?;
     Ok(())
   }
-
-//  #[cfg(feature="database")]
-//  #[pyo3(name="mask_strips")]
-//  pub fn mask_strips_py(&mut self, masks : &HashMap<u32, TrackerStripMask>) {
-//  }
-//
-//  #[cfg(feature="database")]
-//  #[pyo3(name="remove_cmn_noise")]
-//  pub fn remove_cmn_noise_py(&mut self, cmn_noise : &HashMap<u32, TrackerStripCmnNoise>) {
-//  }
-//
-//  #[cfg(feature="database")]
-//  #[pyo3(name="calibrate_tracker")]
-//  pub fn calibrate_tracker_py(&mut self, 
-//                              pedestals   : &HashMap<u32, TrackerStripPedestal>,
-//                              transfer_fn : &HashMap<u32, TrackerStripTransferFunction>) {
-//  }
 }
 
 #[cfg(feature="random")]

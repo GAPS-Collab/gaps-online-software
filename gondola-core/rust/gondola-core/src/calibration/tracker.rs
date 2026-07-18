@@ -15,7 +15,6 @@ pub struct TrackerOfflineCalibration {
   pub adc_sig_cut   : HashMap<u32,f32>,
   pub remove_cmn    : bool,
   pub ped_sigma_cut : f32,
-  pub remove_pulsed : bool,
 }
 
 impl TrackerOfflineCalibration {
@@ -30,7 +29,6 @@ impl TrackerOfflineCalibration {
       pulse_map     : HashMap::<u32,TrackerStripPulse>::new(),
       remove_cmn    : false,
       ped_sigma_cut : 0.0,
-      remove_pulsed : false,
     }
   }
 
@@ -109,8 +107,8 @@ impl TrackerOfflineCalibration {
     event_hits.retain(|x| active_strips.contains(&x.get_stripid()));
   }
 
-  pub fn calibrate_event(&self, event : &mut TelemetryEvent) -> Result<(),CalibrationError> {
-    self.calibrate(&mut event.tracker_hits)?;
+  pub fn calibrate_event(&self, event : &mut TelemetryEvent, remove_pulsed : bool) -> Result<(),CalibrationError> {
+    self.calibrate(&mut event.tracker_hits, remove_pulsed)?;
     Ok(())
   }
 
@@ -128,7 +126,10 @@ impl TrackerOfflineCalibration {
   ///
   /// See also the compontents in the `database` related part 
   /// of this code.
-  pub fn calibrate(&self, event_hits : &mut Vec<TrackerHit>) -> Result<(),CalibrationError> {
+  ///
+  /// # Arguments:
+  ///   * remove_pulsed: If true, remove pulser hits with adc > 400
+  pub fn calibrate(&self, event_hits : &mut Vec<TrackerHit>, remove_pulsed : bool) -> Result<(),CalibrationError> {
     let mut calibrated_hits = Vec::<TrackerHit>::with_capacity(event_hits.len());
     let mut c_hit : TrackerHit; //= TrackerHit::new();
     let mv_2_kev = 0.841f32;// mV to keV
@@ -175,7 +176,7 @@ impl TrackerOfflineCalibration {
         if let Some(pulse) = self.pulse_map.get(&hit.get_stripid()) {
           let mut p_avg = pulse.pulse_avg; 
           if p_avg > 0.0 {
-            if p_avg > 400.0 && self.remove_pulsed {
+            if p_avg > 400.0 && remove_pulsed {
               continue;
             }
             p_avg -= hit_ped;
@@ -222,8 +223,8 @@ impl fmt::Display for TrackerOfflineCalibration {
 impl TrackerOfflineCalibration {
  
   #[pyo3(name="calibrate_hits")]
-  fn calibrate_hits_py(&self, mut hits : Vec<TrackerHit>) -> Vec<TrackerHit> {
-    let _ = self.calibrate(&mut hits);
+  fn calibrate_hits_py(&self, mut hits : Vec<TrackerHit>, remove_pulsed : bool) -> Vec<TrackerHit> {
+    let _ = self.calibrate(&mut hits, remove_pulsed);
     hits 
   }
    
@@ -242,13 +243,7 @@ impl TrackerOfflineCalibration {
   fn get_ped_sigma_cut_py(&self) -> f32 {
     self.ped_sigma_cut
   }
-
-  #[getter]
-  #[pyo3(name="remove_pulsed")] 
-  fn get_remove_pulsed_py(&self) -> bool {
-    self.remove_pulsed 
-  }
-  
+ 
   #[setter]
   #[pyo3(name="remove_cmn")] 
   fn set_remove_cmn_py(&mut self, value : bool) {
@@ -261,17 +256,12 @@ impl TrackerOfflineCalibration {
     self.ped_sigma_cut = value;
   }
 
-  #[setter]
-  #[pyo3(name="remove_pulsed")] 
-  fn set_remove_pulsed_py(&mut self, value : bool) {
-    self.remove_pulsed = value; 
-  }
-
   #[getter]
   #[pyo3(name="mask_map")]
   fn get_mask_map_py(&self) -> HashMap<u32,TrackerStripMask> {
     self.mask_map.clone()
   }
+  
   #[setter]
   #[pyo3(name="mask_map")]
   fn set_mask_map_py(&mut self, value : HashMap<u32,TrackerStripMask>) {
