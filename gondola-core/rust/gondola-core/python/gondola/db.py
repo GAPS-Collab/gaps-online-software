@@ -63,6 +63,10 @@ TrackerCalibrationFileType               = _gc.db.TrackerCalibrationFileType
 TrackerCalibrationFileType.__module__    = __name__ 
 TrackerCalibrationFileType.__name__      = 'TrackerCalibrationFileType'
 
+TrackerCaliTimeWindow                    = _gc.db.TrackerCaliTimeWindow
+TrackerCaliTimeWindow.__module__         = __name__ 
+TrackerCaliTimeWindow.__name__           = 'TrackerCaliTimeWindow'
+
 # mappings 
 get_all_rbids_in_db                = _gc.db.get_all_rbids_in_db
 get_all_rbids_in_db.__module__     = __name__
@@ -102,6 +106,12 @@ create_trk_gain_table.__module__ = __name__
 
 create_trk_pulse_table    = _gc.db.create_trk_pulse_table 
 create_trk_pulse_table.__module__ = __name__
+
+is_in_tracker_cali_window = _gc.db.is_in_tracker_cali_window 
+is_in_tracker_cali_window.__module__ = __name__ 
+
+create_trk_cali_tw_table  = _gc.db.create_trk_cali_tw_table 
+create_trk_cali_tw_table.__module__ = __name__ 
 
 #-----------------------------------------------------------------
 

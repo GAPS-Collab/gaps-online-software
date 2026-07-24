@@ -176,7 +176,6 @@ proxy for the time-of-flight can be obtained fairly simply with the `gondola` so
 Exapmle:
 
 .. code-block:: python 
-
     # before an accurate TOF can be calculated, some setup is needed 
     t_offsets   = dict() # these are externally calculated timing constants 
                          # which absorb unknown systematics and have been 

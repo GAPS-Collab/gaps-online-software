@@ -177,6 +177,15 @@ diesel::table! {
   }
 }
 
+diesel::table! {
+  tof_db_trackercalitime (data_id) {
+    data_id             -> Integer,
+    utc_timestamp_start -> BigInt,
+    utc_timestamp_stop  -> BigInt,
+    meta                -> Nullable<Text>,
+  }
+}
+
 diesel::table! { 
   tof_db_trackerstrippedestal ( data_id ) {
     data_id             -> Integer,

@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 """
-Adds mask data files for Tracker to database
+(Re)create tables in the global GAPS database from txt file for Si(Li) strip mask data.
 """
 import django
 django.setup()
@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
     import argparse
 
-    parser = argparse.ArgumentParser(description="(Re)create tables in the global GAPS database from txt file for Si(Li) strip mask data.")
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--utc-start', type=int, default=0,\
                         help='First UTC Timestamp of timespan for which these values shall be applied to')
     parser.add_argument('--utc-stop', type=int, default=0,\
