@@ -244,10 +244,10 @@ int main(int argc, char *argv[]){
       } else {
         n_trk_hits += m_ev.trk_hits.size();
       }
-      
+
       PM.ProcessTofEventSummary(&m_ev.tof_event, m_ev.event_id);
       
-      if (n_frames_processed % 1000 == 0) {
+      if (n_frames_processed % 1000000 == 0) {
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = end - start;
         std::cout << "--> ------------------------------" << std::endl;

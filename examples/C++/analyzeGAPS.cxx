@@ -273,7 +273,7 @@ int main(int argc, char *argv[]){
 	EvtInfo.Phi[rb]       = h.phase;
 	
 	// Start the event analysis: initialize our variables           
-	Event.InitializeVariables(m_ev.event_id);
+	Event.InitializeVariables(m_ev.tof_event.run_id, m_ev.event_id);
 	
 	// Now, fill the appropriate quantities in EventGAPS            
 	Event.FillEventValues(&EvtInfo);

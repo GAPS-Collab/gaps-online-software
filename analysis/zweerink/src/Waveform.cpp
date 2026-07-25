@@ -339,6 +339,19 @@ void Waveplot::PlotWaveform(int npoints, float x_lo, float x_hi,
   trace->SetAxisRange(x_sc_lo, x_sc_hi, "X");
   trace->SetAxisRange(y_sc_lo, y_sc_hi, "Y");
   trace->SetLineColor(1);
+  // If we should cut this channel, change the color
+  if ( (wf_pedsigma>2.0 && (wf_pedestal>1.0||wf_pedestal<-1.0)) ||
+       wf_pedsigma>3.0 ) {
+    trace->SetLineColor(2);
+    if ( peaks_allocated && num_peaks > 0 ) {
+      if (height[0] > 600.0 && charge[0]>100.0) // Keep really large pulses
+	trace->SetLineColor(1);
+    }
+    if (y_hi > 399.0 && y_lo < -399.0) // Ignore ch9 traces. 
+      trace->SetLineColor(1);
+  }
+
+  
   trace->SetStats(kFALSE);
   //trace->SetLabelSize(0.08,"txy");
   trace->SetTitleSize(0.15,"txy");
@@ -397,13 +410,13 @@ void Waveplot::PlotWaveform(int npoints, float x_lo, float x_hi,
         // Now show the peak widths...
         x[0] = WaveTime[peaks[i]] - width[i]/2.0;
         x[1] = WaveTime[peaks[i]] + width[i]/2.0;
-        w[0] = (wf_pedestal - height[i])/2.0;
-        w[1] = (wf_pedestal - height[i])/2.0;
+        w[0] = (height[i] - wf_pedestal)/2.0;
+        w[1] = (height[i] - wf_pedestal)/2.0;
         //gwidth[i] = new TGraph(2, x, w);
         //gwidth[i]->SetLineColor(4);
         //gwidth[i]->Draw("L");
         // ..and the peak height...
-        h[0] = wf_pedestal - height[i];
+        h[0] = height[i] - wf_pedestal;
         h[1] = wf_pedestal;        
         //gheight[i] = new TGraph(2, p, h);
         //gheight[i]->SetLineColor(4);
@@ -840,11 +853,11 @@ void Waveplot::MeasurePeaksRms(int start, int size) {
     peaks[i]  = GetMinBin(begin_pk[i], end_pk[i]-begin_pk[i] );
     // Extract the pulse height from the peak location.  
     height[i] = wf_pedestal - WaveData[peaks[i]];
-    width[i] = CalculateWidth(i, -0.5*height[i]);
+    width[i] = CalculateWidth(i, 0.5*height[i]);
     // Now for the charge contained in the pulse.  The 'PEAK_OFFSET' and
     // 'PEAK_LENGTH' are arbitrary at this point.
     charge[i] = Integrate( peaks[i]+(int)PEAK_OFFSET, PEAK_LENGTH);
-    charge[i] *= -1.0;
+    //charge[i] *= -1.0;
   }
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -892,11 +905,11 @@ void Waveplot::MeasurePeaksThresh(float start, float size, int th_type) {
     // Extract the pulse height from the peak location.
     //height[i] = wf_pedestal - WaveData[peaks[i]];
     height[i] = WaveData[peaks[i]];
-    width[i] = CalculateWidth(i, -0.5*height[i]);
+    width[i] = CalculateWidth(i, 0.5*height[i]);
     // Now for the charge contained in the pulse.  The 'PEAK_OFFSET' and
     // 'PEAK_LENGTH' are arbitrary at this point.
     charge[i] = Integrate( WaveTime[peaks[i]]+(int)PEAK_OFFSET, PEAK_LENGTH);
-    charge[i] *= -1.0;
+    //charge[i] *= -1.0;
   }
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -1067,8 +1080,8 @@ double Waveplot::CalculateWidth(int pk, float level) {
 
   // Find rising 'level' crossing time
   for (int i = peak; i>start; i--) {
-    if ( (WaveData[i]-wf_pedestal > level) && 
-         (WaveData[i+1]-wf_pedestal < level) ) {
+    if ( (WaveData[i]-wf_pedestal < level) && 
+         (WaveData[i+1]-wf_pedestal > level) ) {
       Tb = FindInterpolatedTime(level-wf_pedestal, i, 1);
       i = start;
     }
@@ -1076,8 +1089,8 @@ double Waveplot::CalculateWidth(int pk, float level) {
 
   // Find falling 'level' crossing time
   for (int i = peak; i<end; i++) {
-    if ( (WaveData[i]-wf_pedestal < level) && 
-         (WaveData[i+1]-wf_pedestal > level) ) {
+    if ( (WaveData[i]-wf_pedestal > level) && 
+         (WaveData[i+1]-wf_pedestal < level) ) {
       Ta = FindInterpolatedTime(level-wf_pedestal, i, 1);
       i = end;
     }

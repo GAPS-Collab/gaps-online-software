@@ -146,7 +146,7 @@ void PacketMethods::ProcessTofEventSummary(TofEventSummary *Tes,
     EvtInfo.Phi[rb]       = h.phase;
     
   // Start the event analysis: initialize our variables                       
-  Event.InitializeVariables(evt_no);
+  Event.InitializeVariables(Tes->run_id, evt_no);
 
   // Now, fill the appropriate quantities in EventGAPS                        
   Event.FillEventValues(&EvtInfo);

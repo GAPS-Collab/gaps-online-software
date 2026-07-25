@@ -43,7 +43,7 @@ public:
   
   // MEMBER FUNCTIONS
   
-  void    InitializeVariables(unsigned long int evt_ctr);
+  void    InitializeVariables(int run_no, unsigned long int evt_ctr);
   void    InitializeWaveforms(GAPS::Waveform *wave[], GAPS::Waveform *wch9[]);
   void    UnsetWaveforms(void);
   void    SetPaddleMap(int paddle_map[NRB][NCH], int pad2volid[NPAD],

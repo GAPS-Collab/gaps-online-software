@@ -50,7 +50,7 @@ int restrict_range = 0;
 float x_sc_lo, x_sc_hi, y_sc_lo, y_sc_hi;     // For full ranges
 float x_scr_lo, x_scr_hi;
 float y_scr_lo, y_scr_hi; // For restricted ranges
-int Events[MAX_EVENTS];
+int EvtChk[2][MAX_EVENTS];
 TH2F    *h_dum2;
 TROOT root("GUI","test",initfuncs);
 TApplication theApp("FADC", 0, 0, 0, 0);    
@@ -144,7 +144,7 @@ int main(int argc, char *argv[]){
       status = fscanf(fparam,"%[^\n]",line); // Scan the rest of the line
     }
     fclose(fparam);
-  } else printf("Using default Nevis parameters.\n");
+  } else printf("Using default Flight parameters.\n");
 
   // the reader is something for the future, when the 
   // files get bigger so they might not fit into memory
@@ -167,8 +167,8 @@ int main(int argc, char *argv[]){
   // used if the program is called with 'gui_flag' set to 1).
   x_sc_lo =    0.0;    // in ns
   x_sc_hi =  500.0;    // in ns
-  y_sc_lo =  -20.0;    // in mV
-  y_sc_hi =   40.0;    // in mV
+  y_sc_lo =  -50.0;    // in mV
+  y_sc_hi =  200.0;    // in mV
   
   float factor = 1.0;
   x_scr_lo =   50.0;    // in ns                                          
@@ -223,17 +223,17 @@ int main(int argc, char *argv[]){
       }
       //unsigned long int evt_ctr = ev.mt_event.event_id;
       unsigned long int evt_ctr = ev.event_id;
-      printf("%ld.", evt_ctr); fflush(stdout);
       
       // Now, let's plot the data to see what it looks like
-      int PLOT_EVENT = event_flag(evt_ctr);
+      int PLOT_EVENT = event_flag(evt_ctr, ev.run_id);
       if (PLOT_EVENT) {
+	printf("%ld(%d).", evt_ctr, ev.run_id); fflush(stdout);
 	
 	for (auto const &rbid : ev.get_rbids()) {
 	  RBEvent rb_event = ev.get_rbevent(rbid);
 	  if (verbose) {
 	    std::cout << rb_event << std::endl;
-          }
+	  }
 	  int ch_mask = rb_event.header.channel_mask;
 	  // Now that we know the RBID, we can set the starting ch_no
 	  // Eventually we will use a function to map RB_ch to GAPS_ch
@@ -275,7 +275,7 @@ int main(int argc, char *argv[]){
 		wave[cw]->SetPedBegin(Ped_low);
 		wave[cw]->SetPedRange(Ped_win);
 		wave[cw]->CalcPedestalRange(); 
-		wave[cw]->SubtractPedestal(); 
+		//wave[cw]->SubtractPedestal(); 
 		if (wave[cw]->GetPedsigma() < 60.6) {
 		  wave[cw]->FindPeaks(Qwin_low, Qwin_size);
 		  wave[cw]->FindTdc(0, CFD_SIMPLE);
@@ -414,29 +414,33 @@ int gui_wait() {
 
     
 void read_events() {
-  int i;
-  for (i = 0; i < MAX_EVENTS; i++)
-    Events[i] = -1; // Initialize the values                                   
+  for (int i = 0; i < MAX_EVENTS; i++)
+    for (int j=0; j<2; j++) 
+      EvtChk[j][i] = -1; // Initialize the values
+  
 
   // Now let's read the events to be displayed                                 
-  FILE *fp = fopen("event_list.txt","r");
+  //FILE *fp = fopen("event_list.txt","r");  // Just an EvtNo
+  FILE *fp = fopen("event_new.txt","r"); // EvtNo and RunNo
   if (fp == NULL)
     return;
 
   ALL_EVENTS = 0;
-  i=0;
-  // Read events
-  while ( (fscanf(fp,"%d",&Events[i++]) != EOF) && (i<MAX_EVENTS) );
-
+  int i=0;
+  // Read events and runno
+  while ( (fscanf(fp, "%d", &EvtChk[0][i]) != EOF) && (i<MAX_EVENTS) ) {
+    int stat = fscanf(fp, "%d", &EvtChk[1][i++]);
+  }
+  
   fclose (fp);
   return ;
 }
 
-int event_flag( int evno ) {
+int event_flag( int evno , int run) {
   if (ALL_EVENTS==1) return 1;
 
   for (int i=0;i<MAX_EVENTS;i++)
-    if (evno == Events[i]) return 1;
+    if (evno == EvtChk[0][i] && run == EvtChk[1][i]) return 1;
   return 0;
 }
 

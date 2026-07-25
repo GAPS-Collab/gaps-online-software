@@ -228,7 +228,7 @@ int main(int argc, char *argv[]){
 	//if ( evt_ctr>6590000 && evt_ctr<415646760000 ) pr_evt = true;
 	if (pr_evt) {
 	  std::cout << "Type " << p.packet_type;
-	  printf(" %ld %ld %d %d\n", evt_ctr, evt_ctr,
+	  printf(" %ld %ld %u %d\n", evt_ctr, evt_ctr,
 		 ev.header.timestamp32, ev.header.n_paddles);
 	}
 	

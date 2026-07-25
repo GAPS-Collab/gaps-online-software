@@ -26,7 +26,7 @@ using namespace std;
 EventGAPS::EventGAPS(void) {
 
   // Initialize any values necessary for a new event
-  InitializeVariables(0);
+  InitializeVariables(0, 0);
 
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -45,8 +45,9 @@ EventGAPS::~EventGAPS(void) {
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-void EventGAPS::InitializeVariables(unsigned long int evt_ctr=0) {
+void EventGAPS::InitializeVariables(int run_no, unsigned long int evt_ctr=0) {
   
+  runno    = run_no;
   evtno    = evt_ctr;
   sc_speed = 154.0;   // Scintillator speed of light, in mm/ns
   
@@ -218,17 +219,18 @@ void EventGAPS::InitializeHistograms(void) {
   for (int b = 0; b < NPAD; b++) {
     for (int c = 0; c < 2; c++) {
       sprintf(text, "pedHist[%d][%d]", b, c);
-      pedHist[b][c] = new TH1D(text, "", 400, -10, 10);
+      pedHist[b][c] = new TH1D(text, "", 400, -5, 5);
       pedHist[b][c]->GetXaxis()->SetTitle("Pedestal (mV)");
       pedHist[b][c]->GetYaxis()->SetTitle("Counts");
       
       sprintf(text, "pedRMSHist[%d][%d]", b, c);
-      pedRMSHist[b][c] = new TH1D(text, "", 500, -1, 4);
+      pedRMSHist[b][c] = new TH1D(text, "", 500, -0.1, 4);
       pedRMSHist[b][c]->GetXaxis()->SetTitle("Pedestal RMS (mV)");
       pedRMSHist[b][c]->GetYaxis()->SetTitle("Counts");
       
       sprintf(text, "pedVtime[%d][%d]", b, c);
       pedVtime[b][c] = new TProfile(text, "", 7500, 0, 26);
+      //pedVtime[b][c] = new TProfile(text, "", 3600, 0, 0.0417);
       pedVtime[b][c]->GetXaxis()->SetTitle("Flight Time (days)");
       pedVtime[b][c]->GetYaxis()->SetTitle("Pedestal (mV)");
       pedVtime[b][c]->SetMinimum(-5.0);
@@ -236,9 +238,10 @@ void EventGAPS::InitializeHistograms(void) {
       
       sprintf(text, "pRMSVtime[%d][%d]", b, c);
       pRMSVtime[b][c] = new TProfile(text, "", 7500, 0, 26);
+      //pRMSVtime[b][c] = new TProfile(text, "", 3600, 0, 0.0417);
       pRMSVtime[b][c]->GetXaxis()->SetTitle("Flight Time (days)");
       pRMSVtime[b][c]->GetYaxis()->SetTitle("Ped RMS (mV)");
-      pRMSVtime[b][c]->SetMinimum(-5.0);
+      pRMSVtime[b][c]->SetMinimum(-0.1);
       pRMSVtime[b][c]->SetMaximum(5.0);
     }
   }
@@ -751,6 +754,8 @@ void EventGAPS::FixPedRMSValues(void) {
       tmp2 = ( PedRMS[i]*PedRMS[i] * (200.0-tmp1) ) / 200.0;
       // Now store the values
       PedRMS[i] = sqrt(tmp2 - tmp1);
+      //if (PedRMS[i]>0.999) printf("%d %lu %d %.3f %.3f\n", runno, evtno,
+      //			  i, Pedestal[i], PedRMS[i]);
     }
   }
   PedRMSFix = true;
@@ -1042,50 +1047,76 @@ void EventGAPS::FillChannelHistos(int old=0) {
   // paddles. For paddle N, Histo[N/N+1] = PaddleA/B SiPM
   // NEW: Histo[i][j]; i is paddle, j is end A or B
   for (int i=0; i<NPAD; i++) {
-    if (Paddle_A[i] > 0) { 
-      //int ch = 2*i;
-      pedHist[i][0]->Fill(Pedestal[Paddle_A[i]]);
-      pedHist[i][1]->Fill(Pedestal[Paddle_B[i]]);
-      pedRMSHist[i][0]->Fill(PedRMS[Paddle_A[i]]);
-      pedRMSHist[i][1]->Fill(PedRMS[Paddle_B[i]]);
+    if (Paddle_A[i] > 0 && Paddle_B[i] > 0 &&     // Have a good paddle
+	Pedestal[Paddle_A[i]] > -998.0 &&         // Good PedA 
+	Pedestal[Paddle_B[i]] > -998.0 ) {        // Good PedB
+
+      int ia = Paddle_A[i];
+      int ib = Paddle_B[i];
+      bool GoodHita = true;
+      bool GoodHitb = true;
+
+      if ( PedRMS[ia]>3.0 ) GoodHita = false; 
+      if ( PedRMS[ib]>3.0 ) GoodHitb = false; 
+
+      if ( PedRMS[ia]>2.0 && (Pedestal[ia]>1.0||Pedestal[ia]<-1.0)) {
+	if ( VPeak[ia] < 600.0 && QInt[ia] < 100.0 ) 
+	  GoodHita = false;
+      }
+      if ( PedRMS[ib]>2.0 && (Pedestal[ib]>1.0||Pedestal[ib]<-1.0)) {
+	if ( VPeak[ib] < 600.0 && QInt[ib] < 100.0 ) 
+	  GoodHitb = false;
+      }
+
+      if ( TDC[ia] < 0.1 ) GoodHita = false;
+      if ( TDC[ib] < 0.1 ) GoodHitb = false;
+
+      // Don't apply the cuts. 
+      //GoodHita = true;
+      //GoodHitb = true;
       
-      Peak[i][0]->Fill(VPeak[Paddle_A[i]]);
-      Peak[i][1]->Fill(VPeak[Paddle_B[i]]);
+      // Fill Values for Paddle_A side
+      if (GoodHita) { 
+	pedHist[i][0]->Fill(Pedestal[Paddle_A[i]]);
+	pedRMSHist[i][0]->Fill(PedRMS[Paddle_A[i]]);
+	Peak[i][0]->Fill(VPeak[Paddle_A[i]]);
+	// Fill TOT (lo/hi) values
+	totLo[i][0]->Fill(TotLo[Paddle_A[i]]);
+	totHi[i][0]->Fill(TotHi[Paddle_A[i]]);
+	Charge[i][0]->Fill(QInt[Paddle_A[i]]);
+	if (QInt[Paddle_A[i]]>5.0) Charge_cut[i][0]->Fill(QInt[Paddle_A[i]]);
+	tdcCFD[i][0]->Fill(TDC[Paddle_A[i]]);
+      }
       
-      // Fill TOT (lo/hi and A/B) values
-      totLo[i][0]->Fill(TotLo[Paddle_A[i]]);
-      totLo[i][1]->Fill(TotLo[Paddle_B[i]]);
-      totHi[i][0]->Fill(TotHi[Paddle_A[i]]);
-      totHi[i][1]->Fill(TotHi[Paddle_B[i]]);
-      
-      Charge[i][0]->Fill(QInt[Paddle_A[i]]);
-      Charge[i][1]->Fill(QInt[Paddle_B[i]]);
-      if (QInt[Paddle_A[i]]>5.0) Charge_cut[i][0]->Fill(QInt[Paddle_A[i]]);
-      if (QInt[Paddle_B[i]]>5.0) Charge_cut[i][1]->Fill(QInt[Paddle_B[i]]);
-      
-      tdcCFD[i][0]->Fill(TDC[Paddle_A[i]]);
-      tdcCFD[i][1]->Fill(TDC[Paddle_B[i]]);
+      // Fill Values for Paddle_B side
+      if (GoodHitb) { 
+	pedHist[i][1]->Fill(Pedestal[Paddle_B[i]]);
+	pedRMSHist[i][1]->Fill(PedRMS[Paddle_B[i]]);
+	Peak[i][1]->Fill(VPeak[Paddle_B[i]]);
+	totLo[i][1]->Fill(TotLo[Paddle_B[i]]);
+	totHi[i][1]->Fill(TotHi[Paddle_B[i]]);
+	Charge[i][1]->Fill(QInt[Paddle_B[i]]);
+	if (QInt[Paddle_B[i]]>5.0) Charge_cut[i][1]->Fill(QInt[Paddle_B[i]]);
+	tdcCFD[i][1]->Fill(TDC[Paddle_B[i]]);
+      }
 
       // If ped values are good, fill time profiles
       double tmptime = FlightTime/86400.0; // Convert to days
-      if (Pedestal[Paddle_A[i]] > -998.0 && PedRMS[Paddle_A[i]] > -998.0) {
-	pedVtime[i][0]->Fill(tmptime, Pedestal[Paddle_A[i]]);
-	pRMSVtime[i][0]->Fill(tmptime, PedRMS[Paddle_A[i]]);
-	peakVtime[i][0]->Fill(tmptime, VPeak[Paddle_A[i]]);
-	chVtime[i][0]->Fill(tmptime,   QInt[Paddle_A[i]]);
-	tCFDVtime[i][0]->Fill(tmptime, TDC[Paddle_A[i]]);
-	totLVtime[i][0]->Fill(tmptime, TotLo[Paddle_A[i]]);
-	totHVtime[i][0]->Fill(tmptime, TotHi[Paddle_A[i]]);
-      }
-      if (Pedestal[Paddle_B[i]] > -998.0 && PedRMS[Paddle_B[i]] > -998.0) {
-	pedVtime[i][1]->Fill(tmptime, Pedestal[Paddle_B[i]]);
-	pRMSVtime[i][1]->Fill(tmptime, PedRMS[Paddle_B[i]]);
-	peakVtime[i][1]->Fill(tmptime, VPeak[Paddle_B[i]]);
-	chVtime[i][1]->Fill(tmptime,   QInt[Paddle_B[i]]);
-	tCFDVtime[i][1]->Fill(tmptime, TDC[Paddle_B[i]]);
-	totLVtime[i][1]->Fill(tmptime, TotLo[Paddle_B[i]]);
-	totHVtime[i][1]->Fill(tmptime, TotHi[Paddle_B[i]]);
-      }
+      pedVtime[i][0]->Fill(tmptime, Pedestal[Paddle_A[i]]);
+      pRMSVtime[i][0]->Fill(tmptime, PedRMS[Paddle_A[i]]);
+      peakVtime[i][0]->Fill(tmptime, VPeak[Paddle_A[i]]);
+      chVtime[i][0]->Fill(tmptime,   QInt[Paddle_A[i]]);
+      tCFDVtime[i][0]->Fill(tmptime, TDC[Paddle_A[i]]);
+      totLVtime[i][0]->Fill(tmptime, TotLo[Paddle_A[i]]);
+      totHVtime[i][0]->Fill(tmptime, TotHi[Paddle_A[i]]);
+
+      pedVtime[i][1]->Fill(tmptime, Pedestal[Paddle_B[i]]);
+      pRMSVtime[i][1]->Fill(tmptime, PedRMS[Paddle_B[i]]);
+      peakVtime[i][1]->Fill(tmptime, VPeak[Paddle_B[i]]);
+      chVtime[i][1]->Fill(tmptime,   QInt[Paddle_B[i]]);
+      tCFDVtime[i][1]->Fill(tmptime, TDC[Paddle_B[i]]);
+      totLVtime[i][1]->Fill(tmptime, TotLo[Paddle_B[i]]);
+      totHVtime[i][1]->Fill(tmptime, TotHi[Paddle_B[i]]);
     }
   }
 }

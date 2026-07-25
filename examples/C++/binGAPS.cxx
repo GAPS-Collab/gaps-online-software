@@ -60,13 +60,22 @@ void PacketMethods::BeginRun(int run=5) {
   // Just for utility, set the initial time from the timestamp48 value
   // in the first TofEventSummary Packet of the first flight .bin
   // file--RAW251215_101836.bin
-  timeInit   =  94575234425295;
+  timeInit   =   94575234425295; // RAW251215_101836.bin
+  //timeInit   =  104187338953921; // RAW251216_130037.bin
+  //timeInit   =  179427734285704; // RAW251225_060041.bin
+  //timeInit   =  181587190069886; // RAW251225_120036.bin
+  //timeInit   =  183746584827217; // RAW251225_180030.bin
+  //timeInit   =  185187728542041; // RAW251225_220041.bin
+  //timeInit   =  265824759925343; // RAW260104_060012.bin
+  //timeInit   =  268706984448990; // RAW260104_140034.bin
+  //timeInit   =  270866513756342; // RAW260104_200029.bin
+  //timeInit   =  273023982926626; // RAW260105_020004.bin
+  //timeInit   =   26110817076763; // RAW260109_020022.bin
   MAXstamp   = (1LL<<48)-1;
   nRollOvers = 0;
   RollOverTime = 2814749.76710656; // Time between RollOvers (sec)
-  // Instantiate our class that holds analysis results and set some           
-  // initial values
-  //EventGAPS Event = EventGAPS();
+
+  // Set some initial values for the class that holds analysis results
   Event.SetPaddleMap(&PadInfo, &SipmInfo);
   Event.InitializeHistograms();
   Event.OffsetHistograms(false);
@@ -75,7 +84,9 @@ void PacketMethods::BeginRun(int run=5) {
 ////////////////////////////////////////////////////////////////////////////
 void PacketMethods::ProcessTofEventSummary(TofEventSummary *Tes,
 					   unsigned long int evt_no){
-  //printf("Found TofEventSummary: evt = %ld\n", evt_no);
+  //std::cout << Tes->to_string() << std::endl;
+  
+  //printf("TES: %d %ld %lu\n", Tes->run_id, evt_no, Tes->get_timestamp48());
   struct EventInfo EvtInfo;
   // First, initialize all the event values properly              
   for (int i=0;i<NPAD;i++) {
@@ -111,7 +122,7 @@ void PacketMethods::ProcessTofEventSummary(TofEventSummary *Tes,
   }
   // Finally, convert our tmpstamp into a FlightTime (in seconds)
   EvtInfo.FlightTime = (tmpstamp - timeInit)/1e8;
-  printf("TES0: %llu  %lf\n", tmpstamp, EvtInfo.FlightTime);
+  //printf("TES0: %llu  %lf\n", tmpstamp, EvtInfo.FlightTime);
   
   for (TofHit const &h : Tes->hits) {
     int pad = h.paddle_id;
@@ -136,10 +147,19 @@ void PacketMethods::ProcessTofEventSummary(TofEventSummary *Tes,
     int sipm_a = PadInfo.SiPM_A[pad];
     int rb     = SipmInfo.RB[sipm_a];
     EvtInfo.Phi[rb]       = h.phase;
+    if (0) {
+    printf("Hit: %3d %5.2f %4.2f %5.2f %4.2f ",pad,
+	   h.baseline_a, h.baseline_a_rms,
+	   h.baseline_b, h.baseline_b_rms);
+    printf("%6.2f %6.2f %6.2f %6.2f %6.2f %6.2f\n",
+	   h.get_peak_a(), h.get_peak_b(),
+	   h.get_charge_a(), h.get_charge_b(),
+	   h.get_time_a(), h.get_time_b());
+    }
   }
-
+  
   // Start the event analysis: initialize our variables
-  Event.InitializeVariables(evt_no);
+  Event.InitializeVariables(Tes->run_id, evt_no);
   
   // Now, fill the appropriate quantities in EventGAPS                 
   Event.FillEventValues(&EvtInfo);

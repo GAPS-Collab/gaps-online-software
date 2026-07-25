@@ -161,7 +161,7 @@ void PacketMethods::ProcessTofEvent(TofEvent *Tev,
   }
   
   // Now that we have the waveforms in place, analyze the event.
-  Event.InitializeVariables(evt_ctr);
+  Event.InitializeVariables(Tev->run_id, evt_ctr);
   Event.InitializeWaveforms(wave, wch9);
   
   // Calculate and store pedestals/RMSs for each channel

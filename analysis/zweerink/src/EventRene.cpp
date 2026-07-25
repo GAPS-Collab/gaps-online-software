@@ -26,7 +26,7 @@ using namespace std;
 EventGAPS::EventGAPS(void) {
 
   // Initialize any values necessary for a new event
-  InitializeVariables(0);
+  InitializeVariables(0, 0);
 
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -45,8 +45,9 @@ EventGAPS::~EventGAPS(void) {
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-void EventGAPS::InitializeVariables(unsigned long int evt_ctr=0) {
+void EventGAPS::InitializeVariables(int run_no, unsigned long int evt_ctr=0) {
   
+  runno    = run_no;
   evtno    = evt_ctr;
   sc_speed = 154.0;   // Scintillator speed of light, in mm/ns
   
