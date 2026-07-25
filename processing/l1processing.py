@@ -1,48 +1,36 @@
 #! /usr/bin/env python 
 
 """
-Convert raw (.bin) files from the GAPS experiment
+Convert L0 (caraspace) or (.bin) files from the GAPS experiment
 to a ROOT formt whcih is used with SimpleDet, the 
-analysis code widely used in GAPS.
+analysis code used in GAPS.
 """
 
 import sys
 import tqdm
 import gondola as go
 import time
-import matplotlib.pyplot as plt 
-import matplotlib 
-matplotlib.use('agg')
 import numpy as np
-import dashi as d 
-d.visual()
 
 from pathlib import Path
 from dataclasses import dataclass
-from fancy_dataclass import TOMLDataclass
 
 # try to suppress RUST logging
 import logging
 logging.getLogger('go').addHandler(logging.NullHandler())
 
-import charmingbeauty as cb 
-cb.visual.set_style_default()
-cb.visual.set_style_streamlit_dark()
-
 # check gondola version
-if not (go.get_version_minor() >= 12 and go.get_version_patch() >= 25):
-    print(f'ERROR - got version {go.get_version_major()}.{go.get_version_minor()}.{go.get_version_patch()}')
-    raise ImportError(f"gondola needs to be at least version 0.12.25!")
+GON_VERSION_REQUIRED = '0.12.31' 
+if not go.version_at_least(GON_VERSION_REQUIRED):
+    print(f'ERROR - got version {go.get_version()} but need version {GON_VERSION_REQUIRED}')
+    raise ImportError("gondola needs to be at least version {GON_VERSION_REQUIRED}!")
 
-#TRK_MASK = "/srv/gaps/crane/v26.01/calib-unpack/cal_run_10047//tracker_channel_enables_100.txt"
-#TRK_PED  = "/srv/gaps/crane/v26.01/calib-unpack/cal_run_10047/List-251216-NZS-0.txt-pedestals-cn2-mod2.txt"
-#TRK_TRF  = "/srv/gaps/crane/v26.01/calib-unpack/cal_run_10047//TF_1216.txt"
-#TRK_PLS  = "/srv/gaps/crane/v26.01/calib-unpack/cal_run_10047//pulch_10047.txt" 
-#TRK_GAIN = "/srv/gaps/crane/v26.01/calib-unpack/cal_run_10047//List-251216-NZS-0.txt-gains-cn2-mod2.txt"
 
-#v26.01 processing
-CRANE_INSTALL = "/srv/gaps/crane/v26.03/build/install/gaps-v26.3/resources/calibration/"
-#CRANE_INSTALL = "/home/stoessl/crane/v26.03/build/install/gaps-v26.3/resources/calibration/"
+#v26.08 processing
+#CRANE_INSTALL = "/srv/gaps/crane/v26.03/build/install/gaps-v26.3/resources/calibration/"
+CRANE_VERSION = "v26.8" # it is stupid that sometimes we have the proceeding 0 here
+CRANE_BASEDIR = f"/home/stoessl/crane/v26.08/"
+CRANE_INSTALL = f"{CRANE_BASEDIR}build/install/gaps-{CRANE_VERSION}/resources/calibration/"
 TRK_TRF   = f"{CRANE_INSTALL}trk-2025/TF_Fit_Coefficients_Calibration_1217_fit.txt" 
 TRK_MASK  = f"{CRANE_INSTALL}trk-2025/tracker_channel_enables_100.txt"
 TRK_PED   = f"{CRANE_INSTALL}trk-2025/ped_1217.txt"
@@ -50,7 +38,8 @@ TRK_PLS   = f"{CRANE_INSTALL}trk-2025/251217-calibration.root-888888-pulse-mask-
 TRK_GAIN  = f"{CRANE_INSTALL}trk-2025/List-251216-NZS-0.txt-gains-cn2-mod2.txt"  
 GEO       = f"{CRANE_INSTALL}/resources/geometry/geometry.v25.09.root"
 
-GEO       = f"/srv/gaps/crane/v26.03/resources/geometry/geometry.v25.09.root"
+GEO       = f"{CRANE_BASEDIR}/resources/geometry/geometry.v25.09.root"
+CALI_DB   = F"{CRANE_BASEDIR}/calibration/resources/CalibrationDB.db"
 
 for k in TRK_TRF, TRK_MASK, TRK_PED, TRK_PLS, TRK_GAIN, GEO:
     if not Path(k).exists():
@@ -72,7 +61,7 @@ TRK_MEV_CUT=0
 # in C++ because the member of CTrackRec* is not supported in 
 # either python (uproot) or any of the more popular rust root 
 # libraries (as of 2026)
-def rust_to_cxx_bridge(event): 
+def rust_to_cxx_bridge(event, tof_paddles): 
     """
     This will bridge between rust and C++ 
     implementations of the gondola-core library 
@@ -101,6 +90,7 @@ def rust_to_cxx_bridge(event):
     #print (f"--> Will bridge {len(tof_event.hits)} TOF hits")
     cxx_hits = []
     for h in tof_event.hits:
+        #pdl = tof_paddles[h.paddle_id] 
         h_cxx = gxx.gondola_cxx.TofHit() 
         h_cxx.paddle_id  = h.paddle_id
         h_cxx.time_a     = h.time_a 
@@ -148,9 +138,10 @@ if __name__ == '__main__':
     parser.add_argument('--remove-cmn', action='store_true',\
                         default=False,
                         help='Remove the common noise as identifier by the tracker team')
-    parser.add_argument('--control-plots', action='store_true',\
-                        default=False,
-                        help='More verbose output')
+    parser.add_argument('--ground', action='store_true',\
+                        help='Advises the script that it is intended to deal with ground data. This will e.g. change the way how it deals with the tracker calibratoin files')
+    parser.add_argument('--quiet', action='store_true',\
+                        help='Suppress unnecessary output (e.g. progressbar) for use on cluster!')
     parser.add_argument('-o','--outdir',\
                         help='Outdir for .root output files',
                         type=Path,
@@ -159,12 +150,65 @@ if __name__ == '__main__':
     #parser.add_argument('-v','--verbose', action='store_true',\
     #                    help='More verbose output')
     args = parser.parse_args()
+    if args.ground:
+        cali_db = go.db.load_calibration_db_elena(CALI_DB)
+        if args.telemetry_dir.is_dir():
+            meta_files   = [k for k in sorted(args.telemetry_dir.glob('*.toml'))]
+            meta_files   = meta_files[0]
+            run_meta     = go.run.RunMeta.load(meta_files)
+            start_ts     = run_meta.start_gcu_time 
+            stop_ts      = run_meta.stop_gcu_time 
+            eligible_cali_files = []
+            cali_files   = {'mask': [], 'ped' : [], 'tfn': [], 'pls':[], 'gain':[]}
+            cft          = go.db.TrackerCalibrationFileType
+            for cf in cali_db:
+                if cf.from_timestamp > start_ts: 
+                    continue 
+                if cf.to_timestamp < stop_ts:
+                    continue
+                match cf.file_type:
+                    case cft.ChannelMask:
+                        cali_files['mask'].append(cf)
+                    case cft.Pedestal:
+                        cali_files['ped'].append(cf) 
+                    case cft.TransferFn:
+                        cali_files['tfn'].append(cf)
+                    case cft.PulsedChannels:
+                        cali_files['pls'].append(cf)
+                    case cft.Gains:
+                        cali_files['gain'].append(cf)
+                    case _:
+                        print ('-> Unknonw Trk calibration file type! {cf}')
+            for k in cali_files.keys():
+                if len(cali_files[k]) == 0:
+                    raise ValueError(f"Missing Tracker calibratoin files for {name}!")
+                if len(cali_files[k]) != 1:
+                    # iteratively clean the list to select the most suitable file 
+                    clean_cali_files = []
+                    for cf in cali_files[k]:
+                        if cf.from_timestamp == 0:
+                            continue
+                        clean_cali_files.append(cf)
+                    if len(clean_cali_files) != 1: 
+                        clean_cali_files = [j for j in clean_cali_files if not j.to_timestamp > 1834031538]
+                    cali_files[k] = clean_cali_files
+            for k in cali_files.keys():
+                if len(cali_files[k]) != 1: # we just fixed it above
+                    print (cali_files[k])
+                    raise ValueError(f'Ambiguous cali files {k}')
+                cali_files[k] = cali_files[k][0]
 
-    trk_mask = go.db.TrackerStripMask.parse_from_file            (TRK_MASK)
-    trk_ped  = go.db.TrackerStripPedestal.parse_from_file        (TRK_PED)
-    trk_trf  = go.db.TrackerStripTransferFunction.parse_from_file(TRK_TRF)
-    trk_pls  = go.db.TrackerStripPulse.parse_from_file           (TRK_PLS)
-    trk_gain = go.db.TrackerStripGain.parse_from_file            (TRK_GAIN)
+            trk_mask = go.db.TrackerStripMask.parse_from_file(cali_files['mask'].path) 
+            trk_ped  = go.db.TrackerStripPedestal.parse_from_file(cali_files['ped'].path) 
+            trk_trf  = go.db.TrackerStripTransferFunction.parse_from_file(cali_files['tfn'].path) 
+            trk_pls  = go.db.TrackerStripPulse.parse_from_file(cali_files['pls'].path) 
+            trk_gain = go.db.TrackerStripGain.parse_from_file(cali_files['gain'].path) 
+    else:
+        trk_mask = go.db.TrackerStripMask.parse_from_file            (TRK_MASK)
+        trk_ped  = go.db.TrackerStripPedestal.parse_from_file        (TRK_PED)
+        trk_trf  = go.db.TrackerStripTransferFunction.parse_from_file(TRK_TRF)
+        trk_pls  = go.db.TrackerStripPulse.parse_from_file           (TRK_PLS)
+        trk_gain = go.db.TrackerStripGain.parse_from_file            (TRK_GAIN)
 
     trk_mask = {k.strip_id : k for k in trk_mask} 
     trk_ped  = {k.strip_id : k for k in trk_ped} 
@@ -179,21 +223,36 @@ if __name__ == '__main__':
     tracker_cali.pulse_map = trk_pls 
     tracker_cali.gain_map  = trk_gain
     tracker_cali.remove_cmn = args.remove_cmn
-    tracker_cali.remove_pulsed = True
+    print ('--- --- --- --- ---')
     print (tracker_cali)
+    #if args.ground:
+    #    sys.exit(0)
+    
     # paddle offsets as calculated by Grace
-    tof_timing_offsets = go.db.TofPaddleTimingConstant.as_dict_by_name('GraceV1')
+    tof_timing_offsets = go.db.TofPaddleTimingConstant.as_dict_by_name('GraceV1.5')
+    tof_paddles        = go.db.TofPaddle.all_as_dict()
     # these are the broken ones
     #tof_timing_offsets = {k : tof_timing_offsets[k].timing_constant for k in tof_timing_offsets}
-    # fix the timing constants by subtracting the panel constant 
+    # fix the timing constants by subtracting the panel constant
+    # update - this is no longer necessary for GraceV1.5, however, it 
+    # does not hurt. However, for that version, the timing field could 
+    # also be used directly 
     tof_timing_offsets = {k : tof_timing_offsets[k].paddle_constant - tof_timing_offsets[k].panel_constant for k in tof_timing_offsets}
 
     print (f'--> Loaded TOF timing constants for  {len(tof_timing_offsets)} paddles from db!')
+    is_caraspace = False
+    print (f'--> Reading {args.telemetry_dir}!')
     if args.telemetry_dir.is_dir():
         files   = [k for k in sorted(args.telemetry_dir.glob('*.bin'))]
+        if not files:
+            files = [k for k in sorted(args.telemetry_dir.glob('*.gaps'))]
+            is_caraspace = True
     if args.telemetry_dir.is_file():
         files   = [args.telemetry_dir]
+        if args.telemetry_dir.endswith('.gaps'):
+            is_caraspace = True
     print (f'--> Found {len(files)} telemetry files!')
+
     nth_event = 0
     done      = False 
     # do some benchmarking 
@@ -202,30 +261,93 @@ if __name__ == '__main__':
     for f in tqdm.tqdm(files, total=len(files)):
         if done:
             break
-        outfile = args.outdir / f.name
+        fname = str(f.name) 
+        if fname.endswith('.bin'):
+            outfile_fname = fname.replace('.bin', '.root')
+        if fname.endswith('.gaps'):
+            outfile_fname = fname.split('.')[1] 
+            outfile_fname = 'RAW' + outfile_fname + '.root' 
+
+        outfile = args.outdir / outfile_fname
         outfile = str(outfile)
-        root_writer = gxx.gondola_cxx.SDRootWriter(outfile.replace('.bin','.root'), GEO) 
-        root_writer.write_sdpar(0, "uhcra", "v23.03")
+        print (f'-> Writing to {outfile}')
+        root_writer = gxx.gondola_cxx.SDRootWriter(outfile, GEO) 
+        root_writer.write_sdpar(0, "uhcra", CRANE_VERSION)
         #reader  = go.io.TelemetryPacketReader(args.telemetry_dir) 
-        reader   = go.io.TelemetryPacketReader(str(f))
-        n_packs, _n_err, _data = reader.count_packets()
-        for pack in tqdm.tqdm(reader, total=n_packs):
-            if pack.is_event_packet:
+        is_event = lambda x : x.is_event_packet
+        if is_caraspace:
+            reader  = go.io.CRReader(str(f)) 
+            # we can treat the packets/frames more 
+            # or less interchangeably. 
+            # one of them represent an event, that is 
+            # important
+            n_packs = reader.count_frames() 
+            is_event = lambda x : True # all frames 
+                                       # should be events
+        else:
+            reader   = go.io.TelemetryPacketReader(str(f))
+            n_packs, _n_err, _data = reader.count_packets()
+        for pack in tqdm.tqdm(reader, total=n_packs, disable=args.quiet):
+            if is_event(pack):
                 if nth_event >= args.n_events and args.n_events > 0:
                     done = True
                     break
-                ev = go.events.TelemetryEvent.from_telemetrypacket(pack) 
+                if is_caraspace:
+                    frame = pack
+                
+                    pack  = frame.get_telemetrypacket('TelemetryEvent') 
+                    pack_gcutime = pack.header.gcutime 
+                    pack_ptype   = pack.header.packet_type 
+
+                    #ev = frame.get_telemetryevent('TelemetryEvent')
+                    ev = go.events.TelemetryEvent.from_telemetrypacket(pack)
+                    extra_trk_hits = frame.get_tracker_hitseries('TrkAuxGcu')
+                    len_all_extra_hits = len(extra_trk_hits)
+                    event_trk_stripids = [h.strip_id for h in ev.tracker]
+                    # the dictionary here will ensure that per strip we only 
+                    # have a single hit. This should be guaranteed by design, 
+                    # except if we have a problem with mixing runs or anything 
+                    # else
+                    # -- 
+                    # the dictionary should have less hits than then list! 
+                    extra_trk_hits     = {h.strip_id : h for h in extra_trk_hits}
+                    if len_all_extra_hits != len(extra_trk_hits):
+                        # we modify the error here, since we are lossing hits
+                        # this is definitely not good, and needs to be investigated
+                        # but currently we only warn and need to investigate later
+                        print(f"[ERROR] Duplicate hits in extra hits! Before filtering per strip id, we have {len_all_extra_hits}, but after we have {len(extra_trk_hits)}")
+                    extra_trk_hits     = [extra_trk_hits[h] for h in extra_trk_hits if not h in event_trk_stripids] 
+                    ev.add_tracker_hits(extra_trk_hits, True)
+
+                else:
+                    # all tracker hits should be in the binary file already!
+                    ev = go.events.TelemetryEvent.from_telemetrypacket(pack) 
+                    pack_gcutime = pack.header.gcutime 
+                    pack_ptype   = pack.header.packet_type 
                 # calibration steps 
-                n_trk_hits_before = len(ev.tracker) 
-                ev.calibrate_trk_hits(tracker_cali)
+                n_trk_hits_before = len(ev.tracker)
+                # sadly, in the curretn implemetnation, we have to do the 
+                # calibration twice, once to calibrate all hits, the second
+                # time to remove the pulsed hits 
+                ev.calibrate_trk_hits(tracker_cali, False)
+
                 #print(f'-> We masked {n_trk_hits_before - len(ev.tracker)} tracker hits!')
+                # for reading from caraspace files, the paddles do not get set 
+                # automatically (yet) in all cases
+                ev.tof_set_paddles(tof_paddles)
                 ev.tof_set_timing_constants(tof_timing_offsets)
                 ev.tof_normalize_hit_times()
                 #tracker_cali.calibrate_event(ev) 
                 #print (ev)
-                cxx_ev = rust_to_cxx_bridge(ev)
+                cxx_ev_for_raw = rust_to_cxx_bridge(ev, tof_paddles)
+                # now we remove the pulsed hits for the rec part
+                ev.calibrate_trk_hits(tracker_cali, True)
+                cxx_ev_for_rec = rust_to_cxx_bridge(ev, tof_paddles)
+            
+
                 #print (cxx_ev.tof.dsi_j_mask, "cxx dsi j mask")
-                root_writer.add_event(cxx_ev, pack.header.packet_type, pack.header.gcutime)
+                #print (cxx_ev)
+                root_writer.add_event(cxx_ev_for_rec, cxx_ev_for_raw, pack_ptype, pack_gcutime)
                 #nth_event += 1
                 #if nth_event % 500 == 0:
                 #    timedelta = time.time() - start_time
