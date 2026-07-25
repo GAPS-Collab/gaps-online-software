@@ -297,7 +297,15 @@ class CEventRec : public CEventBase {
 
     u32                                    gps_time_lower_  = 0;
     u16                                    gps_time_upper_  = 0; 
-    ClassDefOverride(CEventRec, 17)
+    
+    // newer stuff (v26.08)
+    f32                                    altitude_        = 0;
+    f32                                    longitude_       = 0;
+    f32                                    latitude_        = 0;
+    f32                                    geo_cutoff_      = 0;
+
+
+    ClassDefOverride(CEventRec, 18)
 };
 
 
@@ -499,7 +507,10 @@ namespace gondola {
   struct SDRootWriter {
     SDRootWriter(std::string fname, std::string geo_file = "", std::string file_mode = "RECREATE");
     ~SDRootWriter();
-    auto add_event(TelemetryEvent* ev, u8 packet_type, f64 gcutime) -> void;
+
+    /// Write events to the root tree. Writing to TreeRec and TreeRaw is 
+    /// supported
+    auto add_event(TelemetryEvent* ev, TelemetryEvent* ev_for_raw, u8 packet_type, f64 gcutime) -> void;
     /// The SimulationParameter tree  
     auto write_sdpar(u32 run_id, std::string hostname, std::string crane_version) -> void; 
     std::string filename = "";

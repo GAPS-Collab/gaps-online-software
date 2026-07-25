@@ -245,7 +245,7 @@ auto gondola::SDRootWriter::write_sdpar(u32 run_id, std::string hostname, std::s
 }
 
 
-auto gondola::SDRootWriter::add_event(TelemetryEvent* ev, u8 packet_type, f64 gcutime) -> void {
+auto gondola::SDRootWriter::add_event(TelemetryEvent* ev, TelemetryEvent* ev_for_raw, u8 packet_type, f64 gcutime) -> void {
    if (ev == nullptr) {
      std::cout << "Received nullptr for TelemetryEvent!" << std::endl;
      return;
@@ -257,7 +257,14 @@ auto gondola::SDRootWriter::add_event(TelemetryEvent* ev, u8 packet_type, f64 gc
    *rawhd  = std::move(Crane::Calibration::CRawHeader());
    // first need to fill the raw tree, since it is referenced
    // later on 
-   rawtrk->fill_from_telemetry(ev);
+   if (ev_for_raw != nullptr) {
+     // the reason why this is relevant at all are the pulses
+     // from the pulser, whcih midght be excluded from the 
+     // other event (ev)
+     rawtrk->fill_from_telemetry(ev_for_raw);
+   } else {
+     rawtrk->fill_from_telemetry(ev);
+   }
    rawtof->fill_from_telemetry(ev);
    event ->fill_from_telemetry(ev, packet_type, gcutime, pmap, smap, lgmap, rawtrk, rawtof, true, 0.4);
    //std::cout << rawtrk->pretty_print() << std::endl;
@@ -704,6 +711,8 @@ auto CEventRec::fill_from_telemetry(g::TelemetryEvent* event,
     //reco_hit.SetTime    ( hit.get_t0() - first_time);//scaled to first hit
     reco_hit.hit_time_      = hit.event_t0  ;
     reco_hit.energydep_     = hit.get_edep();
+    //std::cout << hit << std::endl;
+    //std::cout << reco_hit.pretty_print() << std::endl;
     hitseries_.push_back(reco_hit); 
   }
   // do the same thing with the hit index again, 
