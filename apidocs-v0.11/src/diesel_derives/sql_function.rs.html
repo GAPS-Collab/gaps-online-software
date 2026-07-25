@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/diesel_derives-2.3.9/src/sql_function.rs`."><title>sql_function.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-b7b9f40b.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="diesel_derives" data-themes="" data-resource-suffix="" data-rustdoc-version="1.95.0 (59807616e 2026-04-14)" data-channel="1.95.0" data-search-js="search-63369b7b.js" data-stringdex-js="stringdex-b897f86f.js" data-settings-js="settings-170eb4bf.js" ><script src="../../static.files/storage-41dd4d93.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5013f961.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">diesel_derives/</div>sql_function.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-4"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>proc_macro2::Span;
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/diesel_derives-2.3.9/src/sql_function.rs`."><title>sql_function.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="diesel_derives" data-themes="" data-resource-suffix="" data-rustdoc-version="1.97.1 (8bab26f4f 2026-07-14)" data-channel="1.97.1" data-search-js="search-fd9372ac.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../static.files/storage-41dd4d93.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-fcd733ba.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">diesel_derives/</div>sql_function.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-4"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>proc_macro2::Span;
 <a href=#2 id=2 data-nosnippet>2</a><span class="kw">use </span>proc_macro2::TokenStream;
 <a href=#3 id=3 data-nosnippet>3</a><span class="kw">use </span>quote::format_ident;
 <a href=#4 id=4 data-nosnippet>4</a><span class="kw">use </span>quote::quote;
@@ -65,7 +65,7 @@
 <a href=#65 id=65 data-nosnippet>65</a>        </span><span class="kw">mod </span>return_type_helpers {
 <a href=#66 id=66 data-nosnippet>66</a>            #(
 <a href=#67 id=67 data-nosnippet>67</a>                <span class="attr">#[doc(inline)]
-<a href=#68 id=68 data-nosnippet>68</a>                </span><span class="kw">pub use </span>super:: #return_type_helper_module_paths ::<span class="kw-2">*</span>;
+<a href=#68 id=68 data-nosnippet>68</a>                </span><span class="kw">pub use super</span>:: #return_type_helper_module_paths ::<span class="kw-2">*</span>;
 <a href=#69 id=69 data-nosnippet>69</a>            )*
 <a href=#70 id=70 data-nosnippet>70</a>        }
 <a href=#71 id=71 data-nosnippet>71</a>    }
@@ -140,7 +140,7 @@
 <a href=#140 id=140 data-nosnippet>140</a>            </span><span class="kw">mod </span>#return_types_module_name {
 <a href=#141 id=141 data-nosnippet>141</a>                #(
 <a href=#142 id=142 data-nosnippet>142</a>                    <span class="attr">#[doc(inline)]
-<a href=#143 id=143 data-nosnippet>143</a>                    </span><span class="kw">pub use </span>super:: #helper_type_modules ::<span class="kw-2">*</span>;
+<a href=#143 id=143 data-nosnippet>143</a>                    </span><span class="kw">pub use super</span>:: #helper_type_modules ::<span class="kw-2">*</span>;
 <a href=#144 id=144 data-nosnippet>144</a>                )*
 <a href=#145 id=145 data-nosnippet>145</a>            }
 <a href=#146 id=146 data-nosnippet>146</a>        };
@@ -471,7 +471,7 @@
 <a href=#471 id=471 data-nosnippet>471</a>        <span class="kw">use </span>diesel::query_builder::{QueryFragment, AstPass};
 <a href=#472 id=472 data-nosnippet>472</a>        <span class="kw">use </span>diesel::sql_types::<span class="kw-2">*</span>;
 <a href=#473 id=473 data-nosnippet>473</a>        <span class="kw">use </span>diesel::internal::sql_functions::<span class="kw-2">*</span>;
-<a href=#474 id=474 data-nosnippet>474</a>        <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#474 id=474 data-nosnippet>474</a>        <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#475 id=475 data-nosnippet>475</a>
 <a href=#476 id=476 data-nosnippet>476</a>        <span class="attr">#[derive(Debug, Clone, Copy, diesel::query_builder::QueryId)]
 <a href=#477 id=477 data-nosnippet>477</a>        </span>#numeric_derive
@@ -651,7 +651,7 @@
 <a href=#651 id=651 data-nosnippet>651</a>                    <span class="attr">#[doc = #doc]
 <a href=#652 id=652 data-nosnippet>652</a>                    </span><span class="kw">pub type </span>#fn_name&lt;
 <a href=#653 id=653 data-nosnippet>653</a>                        #(#arg_names_iter,)*
-<a href=#654 id=654 data-nosnippet>654</a>                    &gt; = super::#fn_name&lt;
+<a href=#654 id=654 data-nosnippet>654</a>                    &gt; = <span class="kw">super</span>::#fn_name&lt;
 <a href=#655 id=655 data-nosnippet>655</a>                        #( &lt;#auto_derived_types <span class="kw">as </span>diesel::expression::Expression&gt;::SqlType, )*
 <a href=#656 id=656 data-nosnippet>656</a>                        #(#arg_names_iter,)*
 <a href=#657 id=657 data-nosnippet>657</a>                    &gt;;
@@ -985,7 +985,7 @@
 <a href=#985 id=985 data-nosnippet>985</a>
 <a href=#986 id=986 data-nosnippet>986</a><span class="kw">impl </span>Parse <span class="kw">for </span>ExternSqlBlock {
 <a href=#987 id=987 data-nosnippet>987</a>    <span class="kw">fn </span>parse(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
-<a href=#988 id=988 data-nosnippet>988</a>        <span class="kw">let </span><span class="kw-2">mut </span>error = None::&lt;syn::Error&gt;;
+<a href=#988 id=988 data-nosnippet>988</a>        <span class="kw">let </span><span class="kw-2">mut </span>error = <span class="prelude-val">None</span>::&lt;syn::Error&gt;;
 <a href=#989 id=989 data-nosnippet>989</a>
 <a href=#990 id=990 data-nosnippet>990</a>        <span class="kw">let </span><span class="kw-2">mut </span>combine_error = |e: syn::Error| {
 <a href=#991 id=991 data-nosnippet>991</a>            error = <span class="prelude-val">Some</span>(
@@ -1080,7 +1080,7 @@
 <a href=#1080 id=1080 data-nosnippet>1080</a>
 <a href=#1081 id=1081 data-nosnippet>1081</a><span class="kw">impl </span>Parse <span class="kw">for </span>SqlFunctionDecl {
 <a href=#1082 id=1082 data-nosnippet>1082</a>    <span class="kw">fn </span>parse(input: ParseStream) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
-<a href=#1083 id=1083 data-nosnippet>1083</a>        <span class="kw">let </span><span class="kw-2">mut </span>error = None::&lt;syn::Error&gt;;
+<a href=#1083 id=1083 data-nosnippet>1083</a>        <span class="kw">let </span><span class="kw-2">mut </span>error = <span class="prelude-val">None</span>::&lt;syn::Error&gt;;
 <a href=#1084 id=1084 data-nosnippet>1084</a>        <span class="kw">let </span><span class="kw-2">mut </span>combine_error = |e: syn::Error| {
 <a href=#1085 id=1085 data-nosnippet>1085</a>            error = <span class="prelude-val">Some</span>(
 <a href=#1086 id=1086 data-nosnippet>1086</a>                error
@@ -1124,7 +1124,7 @@
 <a href=#1124 id=1124 data-nosnippet>1124</a>                combine_error(e);
 <a href=#1125 id=1125 data-nosnippet>1125</a>                Punctuated::new()
 <a href=#1126 id=1126 data-nosnippet>1126</a>            });
-<a href=#1127 id=1127 data-nosnippet>1127</a>        <span class="kw">let </span>rarrow = Option::&lt;<span class="macro">Token!</span>[-&gt;]&gt;::parse(input).unwrap_or_else(|e| {
+<a href=#1127 id=1127 data-nosnippet>1127</a>        <span class="kw">let </span>rarrow = <span class="prelude-ty">Option</span>::&lt;<span class="macro">Token!</span>[-&gt;]&gt;::parse(input).unwrap_or_else(|e| {
 <a href=#1128 id=1128 data-nosnippet>1128</a>            combine_error(e);
 <a href=#1129 id=1129 data-nosnippet>1129</a>            <span class="prelude-val">None
 <a href=#1130 id=1130 data-nosnippet>1130</a>        </span>});
@@ -1138,7 +1138,7 @@
 <a href=#1138 id=1138 data-nosnippet>1138</a>        } <span class="kw">else </span>{
 <a href=#1139 id=1139 data-nosnippet>1139</a>            <span class="macro">parse_quote!</span>(diesel::expression::expression_types::NotSelectable)
 <a href=#1140 id=1140 data-nosnippet>1140</a>        };
-<a href=#1141 id=1141 data-nosnippet>1141</a>        <span class="kw">let </span>_semi = Option::&lt;<span class="macro">Token!</span>[;]&gt;::parse(input).unwrap_or_else(|e| {
+<a href=#1141 id=1141 data-nosnippet>1141</a>        <span class="kw">let </span>_semi = <span class="prelude-ty">Option</span>::&lt;<span class="macro">Token!</span>[;]&gt;::parse(input).unwrap_or_else(|e| {
 <a href=#1142 id=1142 data-nosnippet>1142</a>            combine_error(e);
 <a href=#1143 id=1143 data-nosnippet>1143</a>            <span class="prelude-val">None
 <a href=#1144 id=1144 data-nosnippet>1144</a>        </span>});

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"macro":["btreemap","btreeset","convert_args","hashmap","hashset"]};
+window.SIDEBAR_ITEMS = {"macro":[["btreemap",1],["btreeset",1],["convert_args",1],["hashmap",1],["hashset",1]]};

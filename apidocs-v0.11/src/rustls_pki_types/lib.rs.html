@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-pki-types-1.14.1/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-b7b9f40b.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rustls_pki_types" data-themes="" data-resource-suffix="" data-rustdoc-version="1.95.0 (59807616e 2026-04-14)" data-channel="1.95.0" data-search-js="search-63369b7b.js" data-stringdex-js="stringdex-b897f86f.js" data-settings-js="settings-170eb4bf.js" ><script src="../../static.files/storage-41dd4d93.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5013f961.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">rustls_pki_types/</div>lib.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-4"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! This crate provides types for representing X.509 certificates, keys and other types as
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-pki-types-1.15.1/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rustls_pki_types" data-themes="" data-resource-suffix="" data-rustdoc-version="1.97.1 (8bab26f4f 2026-07-14)" data-channel="1.97.1" data-search-js="search-fd9372ac.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../static.files/storage-41dd4d93.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-fcd733ba.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">rustls_pki_types/</div>lib.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-4"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! This crate provides types for representing X.509 certificates, keys and other types as
 <a href=#2 id=2 data-nosnippet>2</a>//! commonly used in the rustls ecosystem. It is intended to be used by crates that need to work
 <a href=#3 id=3 data-nosnippet>3</a>//! with such X.509 types, such as [rustls](https://crates.io/crates/rustls),
 <a href=#4 id=4 data-nosnippet>4</a>//! [rustls-webpki](https://crates.io/crates/rustls-webpki), and others.
@@ -1097,61 +1097,77 @@
 <a href=#1097 id=1097 data-nosnippet>1097</a>    },
 <a href=#1098 id=1098 data-nosnippet>1098</a>}
 <a href=#1099 id=1099 data-nosnippet>1099</a>
-<a href=#1100 id=1100 data-nosnippet>1100</a><span class="comment">// Format an iterator of u8 into a hex string
-<a href=#1101 id=1101 data-nosnippet>1101</a></span><span class="kw">fn </span>hex&lt;<span class="lifetime">'a</span>&gt;(f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;, payload: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">'a </span>u8&gt;) -&gt; fmt::Result {
-<a href=#1102 id=1102 data-nosnippet>1102</a>    <span class="kw">for </span>(i, b) <span class="kw">in </span>payload.into_iter().enumerate() {
-<a href=#1103 id=1103 data-nosnippet>1103</a>        <span class="kw">if </span>i == <span class="number">0 </span>{
-<a href=#1104 id=1104 data-nosnippet>1104</a>            <span class="macro">write!</span>(f, <span class="string">"0x"</span>)<span class="question-mark">?</span>;
-<a href=#1105 id=1105 data-nosnippet>1105</a>        }
-<a href=#1106 id=1106 data-nosnippet>1106</a>        <span class="macro">write!</span>(f, <span class="string">"{b:02x}"</span>)<span class="question-mark">?</span>;
+<a href=#1100 id=1100 data-nosnippet>1100</a><span class="kw">impl </span>FipsStatus {
+<a href=#1101 id=1101 data-nosnippet>1101</a>    <span class="doccomment">/// Construct a [`FipsStatus::Certified`].
+<a href=#1102 id=1102 data-nosnippet>1102</a>    ///
+<a href=#1103 id=1103 data-nosnippet>1103</a>    /// The argument should be a name, number or URL referencing the FIPS certificate.
+<a href=#1104 id=1104 data-nosnippet>1104</a>    /// This is for human presentation purposes, it is not for automated use.
+<a href=#1105 id=1105 data-nosnippet>1105</a>    </span><span class="kw">pub const fn </span>certified(certificate: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str) -&gt; <span class="self">Self </span>{
+<a href=#1106 id=1106 data-nosnippet>1106</a>        <span class="self">Self</span>::Certified { certificate }
 <a href=#1107 id=1107 data-nosnippet>1107</a>    }
-<a href=#1108 id=1108 data-nosnippet>1108</a>    <span class="prelude-val">Ok</span>(())
-<a href=#1109 id=1109 data-nosnippet>1109</a>}
-<a href=#1110 id=1110 data-nosnippet>1110</a>
-<a href=#1111 id=1111 data-nosnippet>1111</a><span class="attr">#[cfg(all(test, feature = <span class="string">"std"</span>))]
-<a href=#1112 id=1112 data-nosnippet>1112</a></span><span class="kw">mod </span>tests {
-<a href=#1113 id=1113 data-nosnippet>1113</a>    <span class="kw">use </span>super::<span class="kw-2">*</span>;
-<a href=#1114 id=1114 data-nosnippet>1114</a>
-<a href=#1115 id=1115 data-nosnippet>1115</a>    <span class="attr">#[test]
-<a href=#1116 id=1116 data-nosnippet>1116</a>    </span><span class="kw">fn </span>der_debug() {
-<a href=#1117 id=1117 data-nosnippet>1117</a>        <span class="kw">let </span>der = Der::from_slice(<span class="kw-2">&amp;</span>[<span class="number">0x01</span>, <span class="number">0x02</span>, <span class="number">0x03</span>]);
-<a href=#1118 id=1118 data-nosnippet>1118</a>        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{der:?}"</span>), <span class="string">"0x010203"</span>);
-<a href=#1119 id=1119 data-nosnippet>1119</a>    }
+<a href=#1108 id=1108 data-nosnippet>1108</a>}
+<a href=#1109 id=1109 data-nosnippet>1109</a>
+<a href=#1110 id=1110 data-nosnippet>1110</a><span class="comment">// Format an iterator of u8 into a hex string
+<a href=#1111 id=1111 data-nosnippet>1111</a></span><span class="kw">fn </span>hex&lt;<span class="lifetime">'a</span>&gt;(f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;, payload: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">'a </span>u8&gt;) -&gt; fmt::Result {
+<a href=#1112 id=1112 data-nosnippet>1112</a>    <span class="kw">for </span>(i, b) <span class="kw">in </span>payload.into_iter().enumerate() {
+<a href=#1113 id=1113 data-nosnippet>1113</a>        <span class="kw">if </span>i == <span class="number">0 </span>{
+<a href=#1114 id=1114 data-nosnippet>1114</a>            <span class="macro">write!</span>(f, <span class="string">"0x"</span>)<span class="question-mark">?</span>;
+<a href=#1115 id=1115 data-nosnippet>1115</a>        }
+<a href=#1116 id=1116 data-nosnippet>1116</a>        <span class="macro">write!</span>(f, <span class="string">"{b:02x}"</span>)<span class="question-mark">?</span>;
+<a href=#1117 id=1117 data-nosnippet>1117</a>    }
+<a href=#1118 id=1118 data-nosnippet>1118</a>    <span class="prelude-val">Ok</span>(())
+<a href=#1119 id=1119 data-nosnippet>1119</a>}
 <a href=#1120 id=1120 data-nosnippet>1120</a>
-<a href=#1121 id=1121 data-nosnippet>1121</a>    <span class="attr">#[test]
-<a href=#1122 id=1122 data-nosnippet>1122</a>    </span><span class="kw">fn </span>alg_id_debug() {
-<a href=#1123 id=1123 data-nosnippet>1123</a>        <span class="kw">let </span>alg_id = AlgorithmIdentifier::from_slice(<span class="kw-2">&amp;</span>[<span class="number">0x01</span>, <span class="number">0x02</span>, <span class="number">0x03</span>]);
-<a href=#1124 id=1124 data-nosnippet>1124</a>        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{alg_id:?}"</span>), <span class="string">"0x010203"</span>);
-<a href=#1125 id=1125 data-nosnippet>1125</a>    }
-<a href=#1126 id=1126 data-nosnippet>1126</a>
-<a href=#1127 id=1127 data-nosnippet>1127</a>    <span class="attr">#[test]
-<a href=#1128 id=1128 data-nosnippet>1128</a>    </span><span class="kw">fn </span>bytes_inner_equality() {
-<a href=#1129 id=1129 data-nosnippet>1129</a>        <span class="kw">let </span>owned_a = BytesInner::Owned(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]);
-<a href=#1130 id=1130 data-nosnippet>1130</a>        <span class="kw">let </span>owned_b = BytesInner::Owned(<span class="macro">vec!</span>[<span class="number">4</span>, <span class="number">5</span>]);
-<a href=#1131 id=1131 data-nosnippet>1131</a>        <span class="kw">let </span>borrowed_a = BytesInner::Borrowed(<span class="kw-2">&amp;</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]);
-<a href=#1132 id=1132 data-nosnippet>1132</a>        <span class="kw">let </span>borrowed_b = BytesInner::Borrowed(<span class="kw-2">&amp;</span>[<span class="number">99</span>]);
-<a href=#1133 id=1133 data-nosnippet>1133</a>
-<a href=#1134 id=1134 data-nosnippet>1134</a>        <span class="comment">// Self-equality.
-<a href=#1135 id=1135 data-nosnippet>1135</a>        </span><span class="macro">assert_eq!</span>(owned_a, owned_a);
-<a href=#1136 id=1136 data-nosnippet>1136</a>        <span class="macro">assert_eq!</span>(owned_b, owned_b);
-<a href=#1137 id=1137 data-nosnippet>1137</a>        <span class="macro">assert_eq!</span>(borrowed_a, borrowed_a);
-<a href=#1138 id=1138 data-nosnippet>1138</a>        <span class="macro">assert_eq!</span>(borrowed_b, borrowed_b);
-<a href=#1139 id=1139 data-nosnippet>1139</a>
-<a href=#1140 id=1140 data-nosnippet>1140</a>        <span class="comment">// Borrowed vs Owned equality
-<a href=#1141 id=1141 data-nosnippet>1141</a>        </span><span class="macro">assert_eq!</span>(owned_a, borrowed_a);
-<a href=#1142 id=1142 data-nosnippet>1142</a>        <span class="macro">assert_eq!</span>(borrowed_a, owned_a);
-<a href=#1143 id=1143 data-nosnippet>1143</a>
-<a href=#1144 id=1144 data-nosnippet>1144</a>        <span class="comment">// Owned inequality
-<a href=#1145 id=1145 data-nosnippet>1145</a>        </span><span class="macro">assert_ne!</span>(owned_a, owned_b);
-<a href=#1146 id=1146 data-nosnippet>1146</a>        <span class="macro">assert_ne!</span>(owned_b, owned_a);
-<a href=#1147 id=1147 data-nosnippet>1147</a>
-<a href=#1148 id=1148 data-nosnippet>1148</a>        <span class="comment">// Borrowed inequality
-<a href=#1149 id=1149 data-nosnippet>1149</a>        </span><span class="macro">assert_ne!</span>(borrowed_a, borrowed_b);
-<a href=#1150 id=1150 data-nosnippet>1150</a>        <span class="macro">assert_ne!</span>(borrowed_b, borrowed_a);
-<a href=#1151 id=1151 data-nosnippet>1151</a>
-<a href=#1152 id=1152 data-nosnippet>1152</a>        <span class="comment">// Borrowed vs Owned inequality
-<a href=#1153 id=1153 data-nosnippet>1153</a>        </span><span class="macro">assert_ne!</span>(owned_a, borrowed_b);
-<a href=#1154 id=1154 data-nosnippet>1154</a>        <span class="macro">assert_ne!</span>(borrowed_b, owned_a);
-<a href=#1155 id=1155 data-nosnippet>1155</a>    }
-<a href=#1156 id=1156 data-nosnippet>1156</a>}
+<a href=#1121 id=1121 data-nosnippet>1121</a><span class="attr">#[cfg(all(test, feature = <span class="string">"std"</span>))]
+<a href=#1122 id=1122 data-nosnippet>1122</a></span><span class="kw">mod </span>tests {
+<a href=#1123 id=1123 data-nosnippet>1123</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+<a href=#1124 id=1124 data-nosnippet>1124</a>
+<a href=#1125 id=1125 data-nosnippet>1125</a>    <span class="attr">#[test]
+<a href=#1126 id=1126 data-nosnippet>1126</a>    </span><span class="kw">fn </span>der_debug() {
+<a href=#1127 id=1127 data-nosnippet>1127</a>        <span class="kw">let </span>der = Der::from_slice(<span class="kw-2">&amp;</span>[<span class="number">0x01</span>, <span class="number">0x02</span>, <span class="number">0x03</span>]);
+<a href=#1128 id=1128 data-nosnippet>1128</a>        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{der:?}"</span>), <span class="string">"0x010203"</span>);
+<a href=#1129 id=1129 data-nosnippet>1129</a>    }
+<a href=#1130 id=1130 data-nosnippet>1130</a>
+<a href=#1131 id=1131 data-nosnippet>1131</a>    <span class="attr">#[test]
+<a href=#1132 id=1132 data-nosnippet>1132</a>    </span><span class="kw">fn </span>alg_id_debug() {
+<a href=#1133 id=1133 data-nosnippet>1133</a>        <span class="kw">let </span>alg_id = AlgorithmIdentifier::from_slice(<span class="kw-2">&amp;</span>[<span class="number">0x01</span>, <span class="number">0x02</span>, <span class="number">0x03</span>]);
+<a href=#1134 id=1134 data-nosnippet>1134</a>        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{alg_id:?}"</span>), <span class="string">"0x010203"</span>);
+<a href=#1135 id=1135 data-nosnippet>1135</a>    }
+<a href=#1136 id=1136 data-nosnippet>1136</a>
+<a href=#1137 id=1137 data-nosnippet>1137</a>    <span class="attr">#[test]
+<a href=#1138 id=1138 data-nosnippet>1138</a>    </span><span class="kw">fn </span>fips_status_debug() {
+<a href=#1139 id=1139 data-nosnippet>1139</a>        <span class="kw">let </span>fips = FipsStatus::certified(<span class="string">"hello"</span>);
+<a href=#1140 id=1140 data-nosnippet>1140</a>        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{fips:?}"</span>), <span class="string">"Certified { certificate: \"hello\" }"</span>);
+<a href=#1141 id=1141 data-nosnippet>1141</a>    }
+<a href=#1142 id=1142 data-nosnippet>1142</a>
+<a href=#1143 id=1143 data-nosnippet>1143</a>    <span class="attr">#[test]
+<a href=#1144 id=1144 data-nosnippet>1144</a>    </span><span class="kw">fn </span>bytes_inner_equality() {
+<a href=#1145 id=1145 data-nosnippet>1145</a>        <span class="kw">let </span>owned_a = BytesInner::Owned(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]);
+<a href=#1146 id=1146 data-nosnippet>1146</a>        <span class="kw">let </span>owned_b = BytesInner::Owned(<span class="macro">vec!</span>[<span class="number">4</span>, <span class="number">5</span>]);
+<a href=#1147 id=1147 data-nosnippet>1147</a>        <span class="kw">let </span>borrowed_a = BytesInner::Borrowed(<span class="kw-2">&amp;</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]);
+<a href=#1148 id=1148 data-nosnippet>1148</a>        <span class="kw">let </span>borrowed_b = BytesInner::Borrowed(<span class="kw-2">&amp;</span>[<span class="number">99</span>]);
+<a href=#1149 id=1149 data-nosnippet>1149</a>
+<a href=#1150 id=1150 data-nosnippet>1150</a>        <span class="comment">// Self-equality.
+<a href=#1151 id=1151 data-nosnippet>1151</a>        </span><span class="macro">assert_eq!</span>(owned_a, owned_a);
+<a href=#1152 id=1152 data-nosnippet>1152</a>        <span class="macro">assert_eq!</span>(owned_b, owned_b);
+<a href=#1153 id=1153 data-nosnippet>1153</a>        <span class="macro">assert_eq!</span>(borrowed_a, borrowed_a);
+<a href=#1154 id=1154 data-nosnippet>1154</a>        <span class="macro">assert_eq!</span>(borrowed_b, borrowed_b);
+<a href=#1155 id=1155 data-nosnippet>1155</a>
+<a href=#1156 id=1156 data-nosnippet>1156</a>        <span class="comment">// Borrowed vs Owned equality
+<a href=#1157 id=1157 data-nosnippet>1157</a>        </span><span class="macro">assert_eq!</span>(owned_a, borrowed_a);
+<a href=#1158 id=1158 data-nosnippet>1158</a>        <span class="macro">assert_eq!</span>(borrowed_a, owned_a);
+<a href=#1159 id=1159 data-nosnippet>1159</a>
+<a href=#1160 id=1160 data-nosnippet>1160</a>        <span class="comment">// Owned inequality
+<a href=#1161 id=1161 data-nosnippet>1161</a>        </span><span class="macro">assert_ne!</span>(owned_a, owned_b);
+<a href=#1162 id=1162 data-nosnippet>1162</a>        <span class="macro">assert_ne!</span>(owned_b, owned_a);
+<a href=#1163 id=1163 data-nosnippet>1163</a>
+<a href=#1164 id=1164 data-nosnippet>1164</a>        <span class="comment">// Borrowed inequality
+<a href=#1165 id=1165 data-nosnippet>1165</a>        </span><span class="macro">assert_ne!</span>(borrowed_a, borrowed_b);
+<a href=#1166 id=1166 data-nosnippet>1166</a>        <span class="macro">assert_ne!</span>(borrowed_b, borrowed_a);
+<a href=#1167 id=1167 data-nosnippet>1167</a>
+<a href=#1168 id=1168 data-nosnippet>1168</a>        <span class="comment">// Borrowed vs Owned inequality
+<a href=#1169 id=1169 data-nosnippet>1169</a>        </span><span class="macro">assert_ne!</span>(owned_a, borrowed_b);
+<a href=#1170 id=1170 data-nosnippet>1170</a>        <span class="macro">assert_ne!</span>(borrowed_b, owned_a);
+<a href=#1171 id=1171 data-nosnippet>1171</a>    }
+<a href=#1172 id=1172 data-nosnippet>1172</a>}
 </code></pre></div></section></main></body></html>

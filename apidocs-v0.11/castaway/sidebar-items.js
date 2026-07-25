@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"macro":["cast","match_type"],"trait":["LifetimeFree"]};
+window.SIDEBAR_ITEMS = {"macro":[["cast",1],["match_type",1]],"trait":["LifetimeFree"]};
