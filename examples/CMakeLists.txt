@@ -5,6 +5,7 @@ message(STATUS "-- will build CXX examples!")
 
 foreach(example "unpack-tofpackets" "print-database" "read-caraspace" "calculate-tof")
 
+   #set(unpack-example "unpack-tofpackets")
   add_executable(${example}
     ${CMAKE_CURRENT_SOURCE_DIR}/C++/${example}.cxx
   )
@@ -23,12 +24,109 @@ foreach(example "unpack-tofpackets" "print-database" "read-caraspace" "calculate
   )                          
   target_link_libraries(${example}
                         PRIVATE
-                        ${GONDOLA_LIBRARY_SHARED}
-                        $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARIES}>)
+                        ${GONDOLA_LIBRARY_SHARED})
   install(TARGETS ${example}
           DESTINATION ${INSTALL_EXAMPLES_DIR}
   )
 endforeach()
+
+# UCLA analysis needs ROOT
+if (BUILD_CXX_WITH_ROOT)
+  set(example "analyzeGAPS")
+  add_executable(${example}
+    ${CMAKE_CURRENT_SOURCE_DIR}/C++/${example}.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/C++/../../analysis/zweerink/src/EventGAPS.cpp
+  )
+  set_property(TARGET ${example} PROPERTY CXX_STANDARD 20)
+  target_include_directories(${example} 
+                            SYSTEM PUBLIC
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../analysis/zweerink/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/result/
+                            $<$<BOOL:${BUILD_CXX_DB}>:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/sqlite_orm/include/sqlite_orm>
+                            $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_INCLUDE_DIRS}>
+  
+  )
+  target_include_directories(${example}
+                             PUBLIC
+                               ${CMAKE_CURRENT_SOURCE_DIR}/../gondola-core/C++/include
+  )                          
+  target_link_libraries(${example}
+                        PRIVATE
+                        ${GONDOLA_LIBRARY_SHARED}
+                        $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARY_SHARED}>
+  )
+  install(TARGETS ${example}
+          DESTINATION ${INSTALL_EXAMPLES_DIR}
+  )
+
+  foreach(analysis "binSimple" "binGAPS")
+
+  #set(analysis "binSimple")
+  add_executable(${analysis}
+    ${CMAKE_CURRENT_SOURCE_DIR}/C++/reader.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/C++/${analysis}.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/C++/../../analysis/zweerink/src/EventGAPS.cpp
+  )
+  set_property(TARGET ${analysis} PROPERTY CXX_STANDARD 20)
+  target_include_directories(${analysis} 
+                            SYSTEM PUBLIC
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../analysis/zweerink/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/result/
+                            $<$<BOOL:${BUILD_CXX_DB}>:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/sqlite_orm/include/sqlite_orm>
+                            $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_INCLUDE_DIRS}>
+  
+  )
+  target_include_directories(${analysis}
+                             PUBLIC
+                               ${CMAKE_CURRENT_SOURCE_DIR}/../gondola-core/C++/include
+  )                          
+  target_link_libraries(${analysis}
+                        PRIVATE
+                        ${GONDOLA_LIBRARY_SHARED}
+                        $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARY_SHARED}>
+  )
+  install(TARGETS ${analysis}
+          DESTINATION ${INSTALL_EXAMPLES_DIR}
+  )
+endforeach()
+
+  foreach(analysis "binRene")
+
+  add_executable(${analysis}
+    ${CMAKE_CURRENT_SOURCE_DIR}/C++/reader.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/C++/${analysis}.cxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/C++/../../analysis/zweerink/src/EventRene.cpp
+  )
+  set_property(TARGET ${analysis} PROPERTY CXX_STANDARD 20)
+  target_include_directories(${analysis} 
+                            SYSTEM PUBLIC
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../analysis/zweerink/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/cxxopts/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/result/
+                            $<$<BOOL:${BUILD_CXX_DB}>:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/sqlite_orm/include/sqlite_orm>
+                            $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_INCLUDE_DIRS}>
+  
+  )
+  target_include_directories(${analysis}
+                             PUBLIC
+                               ${CMAKE_CURRENT_SOURCE_DIR}/../gondola-core/C++/include
+  )                          
+  target_link_libraries(${analysis}
+                        PRIVATE
+                        ${GONDOLA_LIBRARY_SHARED}
+                        $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_LIBRARY_SHARED}>
+  )
+  install(TARGETS ${analysis}
+          DESTINATION ${INSTALL_EXAMPLES_DIR}
+  )
+endforeach()
+  
+endif()
 
 # sd-legacy reader needs ROOT
 if (BUILD_CXX_WITH_ROOT)
@@ -61,6 +159,7 @@ if (BUILD_CXX_WITH_ROOT)
 
     
 endif()
+
 #
 #if (BUILD_CXXDB)
 #  # no longer just a paddle example, but also has tracker strips now

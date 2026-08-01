@@ -1,4 +1,4 @@
-#ifdef BUILD_LEGACY_CODE
+//#ifdef BUILD_LEGACY_CODE
 #ifdef BUILD_CXX_WITH_ROOT
 
 #include <cstring>
@@ -195,7 +195,7 @@ void RemoveSpikes(double wf[NCHN][1024], unsigned int tCell, int spikes[])
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 // Default constructor
-Waveform::Waveform(double *data, double *time, int chnl, int flag ) {
+GAPS::Waveform::Waveform(double *data, double *time, int chnl, int flag ) {
 
   ch = chnl;
   runno = 4;
@@ -223,7 +223,7 @@ Waveform::Waveform(double *data, double *time, int chnl, int flag ) {
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-Waveform::Waveform (int size)
+GAPS::Waveform::Waveform (int size)
 // This constructor is used to create a Waveform from scratch. The
 // whole trace is flat at 0 mV, with 0 varinace and 0 pedestal.
 {
@@ -242,7 +242,7 @@ Waveform::Waveform (int size)
 
 /***************************************************************************/
 
-void Waveform::SetTime(std::vector<double> times)
+void GAPS::Waveform::SetTime(std::vector<double> times)
 {
     for (uint j=0; j<wf_size; j++)
     { WaveTime[j] = times[j];}
@@ -250,7 +250,7 @@ void Waveform::SetTime(std::vector<double> times)
 
 /***************************************************************************/
 
-void Waveform::SetWave(std::vector<double> wave)
+void GAPS::Waveform::SetWave(std::vector<double> wave)
 {
     for (uint j=0; j<wf_size; j++)
     { WaveData[j] = wave[j];}
@@ -261,7 +261,7 @@ void Waveform::SetWave(std::vector<double> wave)
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 // Default destructor
-Waveform::~Waveform(void) {
+GAPS::Waveform::~Waveform(void) {
   //Delete trace;
   if (WaveData) 
     delete[] WaveData;
@@ -291,7 +291,7 @@ Waveform::~Waveform(void) {
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-void Waveform::InitializePointers() {
+void GAPS::Waveform::InitializePointers() {
 
   WaveData     = NULL;
   WaveTime     = NULL;
@@ -307,7 +307,7 @@ void Waveform::InitializePointers() {
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-void Waveform::InitializeVariables(int no_acq) {
+void GAPS::Waveform::InitializeVariables(int no_acq) {
   
   // stuff related to the peaks
   max_num_peaks   = 15;  // Some relatively small value to start so that we
@@ -357,7 +357,7 @@ void Waveform::InitializeVariables(int no_acq) {
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 // PmtThreshold should be set to the value used by vmedaq.
-void Waveform::SetThreshold(float PmtThreshold){
+void GAPS::Waveform::SetThreshold(float PmtThreshold){
   Threshold = PmtThreshold; 
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -366,7 +366,7 @@ void Waveform::SetThreshold(float PmtThreshold){
 //==================PEDESTAL RELATED STUFF=================
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-void Waveform::SetPedRange(float range) {
+void GAPS::Waveform::SetPedRange(float range) {
   // This is a little convoluted, but we must convert the range (in
   // ns) into bins
   int bin_range = Time2Bin(WaveTime[wf_ped_begin]+range) - wf_ped_begin;
@@ -390,7 +390,7 @@ void Waveform::SetPedRange(float range) {
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-void Waveform::SetPedBegin(float begin)
+void GAPS::Waveform::SetPedBegin(float begin)
 {
   int begin_bin = Time2Bin(begin);
   if (begin_bin < 0)
@@ -414,7 +414,7 @@ void Waveform::SetPedBegin(float begin)
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-void Waveform::CalcPedestalRange(void)
+void GAPS::Waveform::CalcPedestalRange(void)
 {
   double sum=0;
   double sum2=0;
@@ -446,7 +446,7 @@ void Waveform::CalcPedestalRange(void)
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-void Waveform::CalcPedestalDynamic(void)
+void GAPS::Waveform::CalcPedestalDynamic(void)
 {
   // algorithm to find pedestal window and remove darks - JLR 180821
   double sum = 0;
@@ -523,7 +523,7 @@ void Waveform::CalcPedestalDynamic(void)
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-void Waveform::SubtractPedestal(void)
+void GAPS::Waveform::SubtractPedestal(void)
 {
   // Subtract the calculated pedestal value from the whole trace
   for(int i = 0; i < wf_size; i++)
@@ -536,7 +536,7 @@ void Waveform::SubtractPedestal(void)
 //==================PEAK RELATED STUFF=====================
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-void Waveform::AllocatePeaks(void)
+void GAPS::Waveform::AllocatePeaks(void)
 {
   // Now allocate pointers to the peak pos., tdc, width, height and charge 
   peaks   = new int[num_peaks];
@@ -549,7 +549,7 @@ void Waveform::AllocatePeaks(void)
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-void Waveform::SetMaxPeaks(int max_num)
+void GAPS::Waveform::SetMaxPeaks(int max_num)
 {
   char text[500];
   if (max_num > MAX_NUM_PEAKS)
@@ -569,7 +569,7 @@ void Waveform::SetMaxPeaks(int max_num)
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-void Waveform::CleanUpPeaks(void)
+void GAPS::Waveform::CleanUpPeaks(void)
 {
   if (peaks_found)
   {
@@ -593,7 +593,7 @@ void Waveform::CleanUpPeaks(void)
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-int Waveform::GetNumPeaks(void)
+int GAPS::Waveform::GetNumPeaks(void)
 {
   if (peaks_found) {
     return num_peaks;
@@ -606,7 +606,7 @@ int Waveform::GetNumPeaks(void)
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-void Waveform::FindPeaks(float start, float size) {
+void GAPS::Waveform::FindPeaks(float start, float size) {
   pulse_start = start;
   CleanUpPeaks();
   // Turn time values into bin numbers
@@ -1150,4 +1150,4 @@ double Waveform::Integrate(float lo = 0, float size = -1) {
 }
 
 #endif
-#endif
+//#endif

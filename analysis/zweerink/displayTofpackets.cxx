@@ -25,6 +25,8 @@
 #include <TSystem.h>
 #include <TApplication.h>
 
+namespace g = gondola;
+
 #define MAX_EVENTS  1000
 // A whole bunch of ROOT stuff for plotting. 
 /* Global Variables */
@@ -50,7 +52,7 @@ int restrict_range = 0;
 float x_sc_lo, x_sc_hi, y_sc_lo, y_sc_hi;     // For full ranges
 float x_scr_lo, x_scr_hi;
 float y_scr_lo, y_scr_hi; // For restricted ranges
-int Events[MAX_EVENTS];
+int EvtChk[2][MAX_EVENTS];
 TH2F    *h_dum2;
 TROOT root("GUI","test",initfuncs);
 TApplication theApp("FADC", 0, 0, 0, 0);    
@@ -65,6 +67,7 @@ int main(int argc, char *argv[]){
   ("h,help", "Print help")
   ("c,calibration", "Calibration file (in txt format)", cxxopts::value<std::string>()->default_value("/home/gaps/nevis-data/tofdata/calibration/latest/"))
   ("file", "A file with TofPackets in it", cxxopts::value<std::string>())
+  ("f,files", "List of Files", cxxopts::value<bool>()->default_value("false"))
   ("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
   ;
   options.parse_positional({"file"});
@@ -79,70 +82,41 @@ int main(int argc, char *argv[]){
     exit(EXIT_FAILURE);
   }
   auto fname   = result["file"].as<std::string>();
+  bool files   = result["files"].as<bool>();
   bool verbose = result["verbose"].as<bool>();
+
+  // If called with the -f option, read in the list of files to analyze
+  FILE *fp;
+  char tmpline[500];
+  std::string fnames[1000];
+  int nfiles=0;
+  if (files) {
+    fp = fopen(fname.c_str(), "r");
+    if (fp != NULL) {
+      while (fscanf(fp, "%s", tmpline) != EOF) fnames[nfiles++] = tmpline;
+      fclose(fp);
+    } else {
+      printf("Unable to open file %s\n", fname.c_str());
+    }
+  } else {
+    fnames[nfiles++] = fname;
+  }
+
   // -> Gaps relevant code starts here
  
   read_events();  // List of event numbers to plot
 
+  // Read in the specified calibration files
   auto calname = result["calibration"].as<std::string>();
-  gondola::RBCalibration cali[NRB]; // "cali" stores values for one RB
-
-  // To read calibration data from individual binary files, when -c is
-  // given with the directory of the calibration files. Since the
-  // calibration files for each RB change with each calibration run,
-  // this code reads the list of calibration files in the directory,
-  // determines the RB number and copies the string into the relevant
-  // array position. For RBs with no calibration file, the length of
-  // the entry will be 0. We then use read the calibrations for all
-  // RBs with files.
-  bool RB_Calibrated[NRB] = { false };
-  std::string cnames[NRB];
+  std::map<u8,gondola::RBCalibration> cali;
   if (calname != "") {
-    char pname[500], line[500];
-    snprintf(pname,450, "ls %s/RB*.cali.tof.gaps", calname.c_str());
-    FILE *fp = popen(pname, "r");
-    while (fscanf(fp,"%s", line) != EOF) {
-      std::string c_name(line);          // Calib file found
-      int position = c_name.find("RB");  // Find "RB" in the name
-      std::string rbstr = c_name.substr(position+2, 2); // Extract RB num
-      int rbnum = atoi(rbstr.data());    // Convert to integer
-      //printf("%s %d %s\n", rbstr.c_str(), rbnum, line);
-      cnames[rbnum] = c_name;            // Copy to proper place in array
-    }
-    pclose(fp);
-    // Print out the calibration filenames as a sanity check
-    //for (int i=0; i<NRB; i++) {
-    //printf("%d: %lu %s\n", i, cnames[i].size(), cnames[i].c_str());
-    //}
-    
-    for (int i=1; i<NRB; i++) {
-      if (cnames[i].size() > 4) { // RB has a calibration file
-	std::string f_str = cnames[i];
-	//spdlog::info("Extracting RB data from file {}", f_str);
-	
-	// Read the packets from the file
-	//if ( std::filesystem::exists(f_str) ) {
-	//printf("%s file exists\n", f_str.c_str() );
-	//}
-	// Before proceeding, check that the file exists. 
-	struct stat buffer; 
-	if ( stat(f_str.c_str(), &buffer) != -1 ) {
-	  auto packet = get_tofpackets(f_str);
-	  spdlog::info("We loaded {} packets from {}", packet.size(), f_str);
-	  // Loop over the packets (should only be 1) and read into storage
-	  for (auto const &p : packet) {
-	    //int ctr=0;
-	    if (p.packet_type == PacketType::RBCalibration) {
-	      // Should have the one calibration tofpacket stored in "packet".
-	      usize pos = 0;
-	      cali[i] = gondola::RBCalibration::from_bytestream(p.payload, pos); 
-	    }
-	  }
-	}
-      } //else {printf("File does not exist: %s\n", f_str.c_str());}
-    }
+    // obviously here we have to get all the calibration files,           
+    // but for the sake of the example let's use only one                
+    // Ultimatly, they will be stored in the stream.                 
+    spdlog::info("Will use calibrations from {}", calname);
+    cali = gondola::load_tof_calibrations(calname);
   }
-
+  
   // Some useful variables (some initialized to default values)
   // but overwritten from file (if it exists)
   float Ped_low   = 350;
@@ -159,26 +133,20 @@ int main(int argc, char *argv[]){
   // One last task before reading the data file processing events
   // -- read in some analysis parameters.
   // Doing this in a kludgy way since we will not use later.
-  FILE *fp = fopen("paramNEVIS.txt", "r");
-  while (fscanf(fp, "%s %f", label, &value) != EOF) {
-    if (strcmp(label,"ped_lo") ==0 )     Ped_low = value; 
-    if (strcmp(label,"ped_win") ==0 )    Ped_win = value;
-    if (strcmp(label,"pulse_lo") ==0 )   Qwin_low = value;
-    if (strcmp(label,"pulse_win") ==0 )  Qwin_size = value;
-    if (strcmp(label,"charge_min") ==0 ) CHmin = value;
-    if (strcmp(label,"thresh") ==0 )     CThresh = value;
-    if (strcmp(label,"cfd_frac") ==0 )   CFDS_frac = value;
-    status = fscanf(fp,"%[^\n]",line); // Scan the rest of the line
-  }
-  fclose(fp); 
-
-  // the reader is something for the future, when the 
-  // files get bigger so they might not fit into memory
-  // at the same time
-  //auto reader = Gaps::TofPacketReader(fname); 
-  // for now, we have to load the whole file in memory
-  auto packets = get_tofpackets(fname);
-  spdlog::info("We loaded {} packets from {}", packets.size(), fname);
+  FILE *fparam = fopen("paramFLIGHT.txt", "r");
+  if (fparam != NULL) { // Actually opened file
+    while (fscanf(fparam, "%s %f", label, &value) != EOF) {
+      if (strcmp(label,"ped_lo") ==0 )     Ped_low = value; 
+      if (strcmp(label,"ped_win") ==0 )    Ped_win = value;
+      if (strcmp(label,"pulse_lo") ==0 )   Qwin_low = value;
+      if (strcmp(label,"pulse_win") ==0 )  Qwin_size = value;
+      if (strcmp(label,"charge_min") ==0 ) CHmin = value;
+      if (strcmp(label,"thresh") ==0 )     CThresh = value;
+      if (strcmp(label,"cfd_frac") ==0 )   CFDS_frac = value;
+      status = fscanf(fparam,"%[^\n]",line); // Scan the rest of the line
+    }
+    fclose(fparam);
+  } else printf("Using default Flight parameters.\n");
 
   u32 n_rbcalib = 0;
   u32 n_rbmoni  = 0;
@@ -187,171 +155,131 @@ int main(int argc, char *argv[]){
   u32 n_mtbmoni = 0;
   u32 n_unknown = 0;
   u32 n_tofevents = 0;
-
-  // Set the scale for the plots of the traces (this histogram is only  
-  // used if the program is called with 'gui_flag' set to 1).
-  x_sc_lo =    0.0;    // in ns
-  x_sc_hi =  500.0;    // in ns
-  y_sc_lo =  -20.0;    // in mV
-  y_sc_hi =   40.0;    // in mV
-  //y_sc_lo = -500.0;    // in mV
-  //y_sc_hi = 1500.0;    // in mV
-  //x_sc_lo =  -9999;    // in ns
-  //x_sc_hi =  -9999;    // in ns
-
-  float factor = 1.0;
-  x_scr_lo =   50.0;    // in ns                                          
-  x_scr_hi =  250.0;    // in ns                                          
-  y_scr_lo = -270.0/factor;    // in mV                                   
-  y_scr_hi =   35.0;    // in mV                                          
-
-  int eventctr=0;
   
-  for (auto const &p : packets) {
-    // print it
-    //std::cout << p << std::endl;
-    // there will be a more generic way to unpack TofPackets in the future
-    // for now we have to use the packet_type field
-    switch (p.packet_type) {
-      case PacketType::RBCalibration : {
-	// if you have the packet payload, the second argument 
-	// (position in stream) will always be 0
-	//
-	// pos keeps track of the current position in bytestream, 
-	// thus passed by reference so we need an rvalue
-	//
-	// the usize is a typedef from tof_typedefs.h and used
-	// to make the rust and C++ code look more similar, so that 
-	// is easier to compare them.
+  // the reader is something for the future, when the 
+  // files get bigger so they might not fit into memory
+  // at the same time
+  //auto reader = Gaps::TofPacketReader(fname); 
+  // for now, we have to load the whole file in memory
+  for (int k=0; k<nfiles; k++) { 
+    // Setup a "TofPacketReader", 
+    auto reader = g::TofPacketReader(fnames[k]); 
+    //auto packets = get_tofpackets(fnames[k]);
+    //spdlog::info("We loaded {} packets from {}", packets.size(), fnames[k]);
+    
+    // Set the scale for the plots of the traces (this histogram is only  
+    // used if the program is called with 'gui_flag' set to 1).
+    x_sc_lo =    0.0;    // in ns
+    x_sc_hi =  500.0;    // in ns
+    y_sc_lo =  -50.0;    // in mV
+    y_sc_hi =  200.0;    // in mV
+    
+    float factor = 1.0;
+    x_scr_lo =   50.0;    // in ns                                          
+    x_scr_hi =  250.0;    // in ns                                          
+    y_scr_lo = -270.0/factor;    // in mV                                   
+    y_scr_hi =   35.0;    // in mV                                          
+    
+    int eventctr=0;
+    
+    while (!reader.is_exhausted()) {
+      auto pdata = reader.get_next_packet();
+      if (pdata.is_err()) {
+	spdlog::error("I/O issue when reading next packet!");
+	continue;
+      }
+      auto p = pdata.unwrap();
+      //for (auto const &p : packets) {
+      // print it
+      //std::cout << p << std::endl;
+      // there will be a more generic way to unpack TofPackets in the future
+      // for now we have to use the packet_type field
+      switch (p.packet_type) {
+	
+	// this only works for the data I combined
+	// recently, NOT for the "stream" kind of data
+	// THe format will change as well soon.
+      case PacketType::TofEvent : 
+      case PacketType::TofEventSummary : {
+	
 	usize pos = 0;
-	auto cali = gondola::RBCalibration::from_bytestream(p.payload, pos);
-	if (verbose) {
-	  std::cout << cali << std::endl;
-	}
-	n_rbcalib++;
-      break;
-    }
-      // this only works for the data I combined
-      // recently, NOT for the "stream" kind of data
-      // THe format will change as well soon.
-      case PacketType::TofEvent : {
-
-	usize pos = 0;
-	//std::vector<GAPS::Waveform> wave;
-	//wave.reserve(NTOT); // Number of SiPMs
-	//wch9.reserve(NRB);  // Number of RBs
 	usize ch_start;
 	int nrbs=0;
 	// Delete any waveforms 
 	for (int i=0;i<NTOT;i++) wave[i] = NULL;
 	for (int i=0;i<NRB;i++)  wch9[i] = NULL;
-	//for(int c=0;c<NTOT;c++) 
-	// if ( wave[c] != NULL ) { delete wave[c]; wave[c] = NULL; }
-	//for(int c=0;c<NRB;c++) 
-	//  if ( wch9[c] != NULL ) { delete wch9[c]; wch9[c] = NULL; }
 	
+	auto ev_res = g::TofEvent::from_bytestream(p.payload, pos);
+	g::TofEvent ev;
+	if (ev_res.is_ok()) {
+	  ev = ev_res.unwrap();
+	}
+	//unsigned long int evt_ctr = ev.mt_event.event_id;
+	unsigned long int evt_ctr = ev.event_id;
 	
-    auto ev_res = TofEvent::from_bytestream(p.payload, pos);
-	TofEvent ev;
-    if (ev_res.is_ok()) {
-      ev = ev_res.unwrap();
-    }
-    unsigned long int evt_ctr = ev.mt_event.event_id;
-	printf("%ld.", evt_ctr); fflush(stdout);
 	// Now, let's plot the data to see what it looks like
-	int PLOT_EVENT = event_flag(evt_ctr);
-	//ch_start = 0;
+	int PLOT_EVENT = event_flag(evt_ctr, ev.run_id);
 	if (PLOT_EVENT) {
-
-	for (auto const &rbid : ev.get_rbids()) {
-	  RBEvent rb_event = ev.get_rbevent(rbid);
-	  if (verbose) {
-	    std::cout << rb_event << std::endl;
-          }
-	  //printf(" %d (%d)\n", rbid, rb_event.header.channel_mask);
-	  int ch_mask = rb_event.header.channel_mask;
-	  // Now that we know the RBID, we can set the starting ch_no
-	  // Eventually we will use a function to map RB_ch to GAPS_ch
-	  ch_start = (rbid-1)*NCH; // first RB is #1
-	  //printf("Event %ld: RB %d: start %ld\n", evt_ctr, rbid, ch_start);
-
-	  Vec<Vec<f32>> volts;
-	  Vec<Vec<f32>> times;
-	  //if ((calname != "") && rbid < 44 ){
-	  //if ((calname != "") && cali.rb_id == rbid ){
-	  if (calname != "") { // For combined data all boards calibrated
-	  /*if (calname != "" &&  // For combined data all boards calibrated
-	      ( rbid==3  || rbid==14 || rbid==15 || rbid==32 || // Umb-cen
-		rbid==16 || rbid==25 || rbid==44 || rbid==46 || // cube-top
-		rbid==1  || rbid==11 || rbid==41 || rbid==42 ) ) {// cube-bot
-	  */
-	  /*if (calname != "" &&  // For combined data all boards calibrated
-              ( rbid==17  || rbid==19 || rbid==13 || rbid==20 || 
-                rbid==26) ) {// RBs with strange 
-          */
-	 // if (calname != "" &&  // For combined data all boards calibrated
-         //     ( rbid==13 || rbid==20 || 
-         //       rbid==26) ) {// RBs with strange 
-
-
-
-
-	    nrbs++;
-	    // Vec<f32> is a typedef for std::vector<float32>
-	    //printf(" %d (%d)", rbid, rb_event.header.channel_mask);
-	    volts = cali[rbid].voltages(rb_event, true); // second argument is for spike cleaning
-	    // (C++ implementation causes a segfault sometimes when "true"
-	    times = cali[rbid].nanoseconds(rb_event);
-	    // volts and times are now ch 0-8 with the waveforms
-	    // for this event.
-
-	    // First, store the waveform for channel 9
-	    Vec<f64> ch9_volts(volts[8].begin(), volts[8].end());
-	    Vec<f64> ch9_times(times[8].begin(), times[8].end());
-	    wch9[rbid] = new Waveplot(ch9_volts.data(),ch9_times.data(),rbid,0);
-	    wch9[rbid]->SetPedBegin(10);
-	    wch9[rbid]->SetPedRange(100);
-	    wch9[rbid]->CalcPedestalRange(); 
-	    float ch9RMS = wch9[rbid]->GetPedsigma();
-	    //printf(" %d(%.1f)", rbid, ch9RMS);
+	  printf("%ld(%d).", evt_ctr, ev.run_id); fflush(stdout);
+	  
+	  for (auto const &rbid : ev.get_rbids()) {
+	    g::RBEvent rb_event = ev.get_rbevent(rbid);
+	    if (verbose) {
+	      std::cout << rb_event << std::endl;
+	    }
+	    int ch_mask = rb_event.header.channel_mask;
+	    // Now that we know the RBID, we can set the starting ch_no
+	    // Eventually we will use a function to map RB_ch to GAPS_ch
+	    ch_start = (rbid-1)*NCH; // first RB is #1
 	    
-	    // Now, deal with all the SiPM data
-	    for(int c=0;c<NCH;c++) {
-	      //bool e = (ch_mask & (1 << c) > 0 ? true : false);
-	      unsigned int inEvent = ch_mask & (1 << c);
-	      if (inEvent > 0 ) {
-		Vec<f64> ch_volts(volts[c].begin(), volts[c].end());
-		Vec<f64> ch_times(times[c].begin(), times[c].end());
-		
-		usize cw = c+ch_start; 
-		wave[cw] = new Waveplot(ch_volts.data(),ch_times.data(), cw,0);
-		wave[cw]->SetThreshold(CThresh);
-		wave[cw]->SetCFDSFraction(CFDS_frac);
-		
-		// Calculate the pedestal
-		wave[cw]->SetPedBegin(Ped_low);
-		wave[cw]->SetPedRange(Ped_win);
-		wave[cw]->CalcPedestalRange(); 
-		wave[cw]->SubtractPedestal(); 
-		if (wave[cw]->GetPedsigma() < 60.6) {
-		  wave[cw]->FindPeaks(Qwin_low, Qwin_size);
-		  wave[cw]->FindTdc(0, CFD_SIMPLE);
-		  //wave[cw]->FindTdc(0, CONSTANT);
-		  //printf("%ld: %ld - %7.3f\n",evt_ctr,cw,wave[cw]->GetTdcs(0));
-		}
-		//if (c==0) printf("%ld(%.2f) ", cw, wave[cw]->GetPedestal());
-	      } // Only for channels in ch_mask for this RB
+	    Vec<Vec<f32>> volts;
+	    Vec<Vec<f32>> times;
+	    if (calname != "") { // For combined data all boards calibrated
+	      nrbs++;
+	      // Vec<f32> is a typedef for std::vector<float32>
+	      volts = cali[rbid].voltages(rb_event, true); // second argument is for spike cleaning
+	      // (C++ implementation causes a segfault sometimes when "true"
+	      times = cali[rbid].nanoseconds(rb_event);
+	      // volts and times are now ch 0-8 with the waveforms
+	      // for this event.
+	      
+	      // First, store the waveform for channel 9
+	      Vec<f64> ch9_volts(volts[8].begin(), volts[8].end());
+	      Vec<f64> ch9_times(times[8].begin(), times[8].end());
+	      wch9[rbid] = new Waveplot(ch9_volts.data(),ch9_times.data(),rbid,0);
+	      wch9[rbid]->SetPedBegin(10);
+	      wch9[rbid]->SetPedRange(100);
+	      wch9[rbid]->CalcPedestalRange(); 
+	      float ch9RMS = wch9[rbid]->GetPedsigma();
+	      
+	      // Now, deal with all the SiPM data
+	      for(int c=0;c<NCH;c++) {
+		unsigned int inEvent = ch_mask & (1 << c);
+		if (inEvent > 0 ) {
+		  Vec<f64> ch_volts(volts[c].begin(), volts[c].end());
+		  Vec<f64> ch_times(times[c].begin(), times[c].end());
+		  
+		  usize cw = c+ch_start; 
+		  wave[cw] = new Waveplot(ch_volts.data(),ch_times.data(), cw,0);
+		  wave[cw]->SetThreshold(CThresh);
+		  wave[cw]->SetCFDSFraction(CFDS_frac);
+		  
+		  // Calculate the pedestal
+		  wave[cw]->SetPedBegin(Ped_low);
+		  wave[cw]->SetPedRange(Ped_win);
+		  wave[cw]->CalcPedestalRange(); 
+		  //wave[cw]->SubtractPedestal(); 
+		  if (wave[cw]->GetPedsigma() < 60.6) {
+		    wave[cw]->FindPeaks(Qwin_low, Qwin_size);
+		    wave[cw]->FindTdc(0, CFD_SIMPLE);
+		  }
+		} // Only for channels in ch_mask for this RB
+	      }
 	    }
 	  }
-	}
-	
-	n_chan = NTOT;
-	// Now, let's plot the data to see what it looks like
-	//int PLOT_EVENT = event_flag(evt_ctr);
-	//ch_start = 0;
-	//if (PLOT_EVENT) {
-	  //printf(".%ld", evt_ctr); fflush(stdout);
-	  //plotrb(n_chan, ch_start);
+	  
+	  n_chan = NTOT;
+	  
 	  plotall(n_chan, nrbs);
 	  
 	  if (plot_flag != FINISH) {
@@ -407,46 +335,20 @@ int main(int argc, char *argv[]){
 	    }		  
 	  } // Move on to the next RB
 	} 
-	for (int i=0;i<NTOT;i++) //{delete wave[i]; wave[i] = NULL;}
+	for (int i=0;i<NTOT;i++) 
 	  if ( wave[i] != NULL ) { delete wave[i]; wave[i] = NULL; }
-	for (int i=0;i<NRB;i++)  //{delete wch9[i]; wch9[i] = NULL;}
+	for (int i=0;i<NRB;i++)  
 	  if ( wch9[i] != NULL ) { delete wch9[i]; wch9[i] = NULL; }
 	n_tofevents++;
-        break;
-      }
-      case PacketType::RBMoni : {
-        usize pos = 0;
-        auto moni = RBMoniData::from_bytestream(p.payload, pos);
-        if (verbose) {
-          std::cout << moni << std::endl;
-        }
-        n_rbmoni++;
-        break;
-      }
-      case PacketType::MasterTrigger : {
-        usize pos = 0;
-        auto mte = MasterTriggerEvent::from_bytestream(p.payload, pos);
-        if (verbose) {
-          std::cout << mte << std::endl;
-        }
-        n_mte++;
-        break;
-      }
-      case PacketType::MTBMoni : {
-        usize pos = 0;
-        auto mtbmoni = MtbMoniData::from_bytestream(p.payload, pos);
-        if (verbose) {
-          std::cout << mtbmoni << std::endl;
-        }
-        n_mtbmoni++;
-        break;
+	break;
       }
       default : {
-        if (verbose) {
-          std::cout << "-- nothing to do for " << p.packet_type << " --" << std::endl;
-        }
-        n_unknown++;
-        break;
+	if (verbose) {
+	  std::cout << "-- nothing to do for " << p.packet_type << " --" << std::endl;
+	}
+	n_unknown++;
+	break;
+      }
       }
     }
   }
@@ -460,7 +362,7 @@ int main(int argc, char *argv[]){
   std::cout << "-- -- TofCmpMoniData    : " << n_tcmoni  << "\t (packets) " <<  std::endl;
   std::cout << "-- -- MtbMoniData       : " << n_mtbmoni << "\t (packets) " <<  std::endl;
   std::cout << "-- -- undecoded         : " << n_unknown << "\t (packets) " <<  std::endl;
-
+  
   spdlog::info("Finished");
   return EXIT_SUCCESS;
 }
@@ -478,29 +380,33 @@ int gui_wait() {
 
     
 void read_events() {
-  int i;
-  for (i = 0; i < MAX_EVENTS; i++)
-    Events[i] = -1; // Initialize the values                                   
+  for (int i = 0; i < MAX_EVENTS; i++)
+    for (int j=0; j<2; j++) 
+      EvtChk[j][i] = -1; // Initialize the values
+  
 
   // Now let's read the events to be displayed                                 
-  FILE *fp = fopen("event_list.txt","r");
+  //FILE *fp = fopen("event_list.txt","r");  // Just an EvtNo
+  FILE *fp = fopen("event_new.txt","r"); // EvtNo and RunNo
   if (fp == NULL)
     return;
 
   ALL_EVENTS = 0;
-  i=0;
-  // Read events
-  while ( (fscanf(fp,"%d",&Events[i++]) != EOF) && (i<MAX_EVENTS) );
-
+  int i=0;
+  // Read events and runno
+  while ( (fscanf(fp, "%d", &EvtChk[0][i]) != EOF) && (i<MAX_EVENTS) ) {
+    int stat = fscanf(fp, "%d", &EvtChk[1][i++]);
+  }
+  
   fclose (fp);
   return ;
 }
 
-int event_flag( int evno ) {
+int event_flag( int evno , int run) {
   if (ALL_EVENTS==1) return 1;
 
   for (int i=0;i<MAX_EVENTS;i++)
-    if (evno == Events[i]) return 1;
+    if (evno == EvtChk[0][i] && run == EvtChk[1][i]) return 1;
   return 0;
 }
 

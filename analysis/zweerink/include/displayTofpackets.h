@@ -9,7 +9,7 @@ int gui_wait();
 void plotrb(int n_ch, int ch_start);
 void plotall(int n_ch, int nrbs);
 void read_events(void);
-int  event_flag(int evno);
+int  event_flag(int evno, int runy);
 extern void InitGui();
 
 /* Constants */

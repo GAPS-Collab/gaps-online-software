@@ -1,3 +1,5 @@
+#ifndef EVENTGAPS
+#define EVENTGAPS
 /* ROOT Stuff for plotting traces */
 #include <TDirectory.h>
 #include <TGraph.h>
@@ -11,9 +13,6 @@
 
 #include <legacy.h>
 #include "./constants.h"
-
-#ifndef EVENTGAPS
-#define EVENTGAPS
 
 #define ERRVAL		(999999999)
 
@@ -31,6 +30,8 @@ enum THRTYPE { CONSTANT, CFD_ELEC, CFD_SIMPLE, PCONSTANT, PCFD };
 
 //double Pulse(double *x, double *par);
 
+//namespace Gaps = GAPS;
+
 class EventGAPS {
 
 public:
@@ -41,7 +42,7 @@ public:
   
   // MEMBER FUNCTIONS
   
-  void    InitializeVariables(unsigned long int evt_ctr);
+  void    InitializeVariables(int run_no, unsigned long int evt_ctr);
   void    InitializeWaveforms(GAPS::Waveform *wave[], GAPS::Waveform *wch9[]);
   void    UnsetWaveforms(void);
   void    SetPaddleMap(int paddle_map[NRB][NCH], int pad2volid[NPAD],
@@ -49,6 +50,8 @@ public:
   void    SetPaddleMap(struct PaddleInfo *pad, struct SiPMInfo *sipm);
   
   // Stuff related to the actual data
+  void    FillEventValues(struct EventInfo *evt);
+  void    FixPedRMSValues(void);
   void    AnalyzePedestals(float Ped_begin, float Ped_win);
   void    SetThreshold(float PmtThreshold);
   void    SetCFDFraction(float CFDS_frac);
@@ -110,8 +113,10 @@ private:
   int     EarlyPaddle;               // Which paddle is first hit
   float   EarlyTime;                 // Time of earliest hit
   
+  double  FlightTime;                 // Since flight start, in seconds
   float   Pedestal[NTOT];             // Pedestal values
   float   PedRMS[NTOT];               // Pedestal RMS values
+  bool    PedRMSFix;                  // PedRMS Fix applied?
   bool    RBInData[NRB];              // RB in data stream?
   float   ClockPedestal[NRB];         // Pedestal values
   float   ClockPedRMS[NRB];           // Pedestal RMS values
@@ -122,6 +127,9 @@ private:
   float   QInt[NTOT];                 // Pulse charge value
   float   TDC[NTOT];                  // TDC value (CFD method)
   float   TDC_Cor[NTOT];              // Corrected TDC value (CFD method)
+
+  float   TotLo[NTOT];                // TOT values (lo threshold)
+  float   TotHi[NTOT];                // TOT values (hi threshold)
   
   bool    IsHit[NPAD];                // Do we have Hit info?
   int     Hits[NPAD];                 // Hit mask for paddle 
@@ -135,13 +143,36 @@ private:
   int     NPadUmbrella;
   int     NPadCortina;
   
-  
-  TH1D    *pedHist[NTOT];              // Pedestal histograms
+  // Though we store the various values below by NTOT (since that is
+  // the easiest way to index through the quantities, we want to write
+  // them to histograms that are stored by NPAD.
+  TH1D    *pedHist[NPAD][2];           // Pedestal histograms
+  TH1D    *pedRMSHist[NPAD][2];        // Pedestal RMS histograms
+  TH1D    *Peak[NPAD][2];              // VPeak histograms
+  TH1D    *Charge[NPAD][2];            // Charge histograms
+  TH1D    *Charge_cut[NPAD][2];        // Charge (cut) histograms
+  TH1D    *tdcCFD[NPAD][2];            // TDC histograms
+  TH1D    *totLo[NPAD][2];             // TOT (lo) histograms
+  TH1D    *totHi[NPAD][2];             // TOT (hi) histograms
+  TProfile *pedVtime[NPAD][2];         // Pedestal profile
+  TProfile *pRMSVtime[NPAD][2];        // Pedestal RMS profile
+  TProfile *peakVtime[NPAD][2];        // peak time profile
+  TProfile *chVtime[NPAD][2];          // charge time profile
+  TProfile *tCFDVtime[NPAD][2];        // tCFD time profile
+  TProfile *totLVtime[NPAD][2];        // totLo time profile
+  TProfile *totHVtime[NPAD][2];        // totHi time profile
+
+  /*TH1D    *pedHist[NTOT];              // Pedestal histograms
   TH1D    *pedRMSHist[NTOT];           // Pedestal RMS histograms
+  TProfile *pedVtime[NTOT];            // Pedestal profile
+  TProfile *pRMSVtime[NTOT];           // Pedestal RMS profile
   TH1D    *Peak[NTOT];                 // VPeak histograms
   TH1D    *Charge[NTOT];               // Charge histograms
   TH1D    *Charge_cut[NTOT];           // Charge (cut) histograms
   TH1D    *tdcCFD[NTOT];               // TDC histograms
+  TH1D    *totLo[NTOT];                // TOT (lo) histograms
+  TH1D    *totHi[NTOT];                // TOT (hi) histograms
+  */
   
   TH2D    *QEnd2End[NPAD];             // End 2 End charge 
   TH1I    *HitMask[NPAD];              // Hit mask of paddle
@@ -160,11 +191,7 @@ private:
   TProfile *QvPositionB[NPAD];         // Q vs position - End B
   TH1I    *FirstPaddle;
   TH1F    *FirstTime;
-  TH1F    *FirstTimeBad;
-  TH1F    *BetaDist1;
-  TH1F    *BetaDist2;
-  TH1F    *BetaDist3;
-  TH1F    *BetaDist4;
+  TH1F    *BetaDist;
   TH1I    *NPaddlesCube;
   TH1I    *NPaddlesUmbrella;
   TH1I    *NPaddlesCortina;
@@ -177,8 +204,6 @@ private:
   TH1F    *H_OffCorW[NCORT][NCUBS]; // 8 Cube, 10 Cortina paddles
   
   // MEMBER FUNCTIONS
-  void    Message(const char *s);           // Print out messages as needed
-  // Stuff related to the peaks
 };
 
 #endif
