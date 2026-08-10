@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/gondola-core/rust/gondola-core/src/events/telemetry_event.rs`."><title>telemetry_event.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="gondola_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.96.0 (ac68faa20 2026-05-25)" data-channel="1.96.0" data-search-js="search-b5634cc7.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-5013f961.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">gondola_core/events/</div>telemetry_event.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! The TelemetryEvent or former "MergedEvent" is that what gets 
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/work/gaps-online-software/gaps-online-software/gondola-core/rust/gondola-core/src/events/telemetry_event.rs`."><title>telemetry_event.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="gondola_core" data-themes="" data-resource-suffix="" data-rustdoc-version="1.97.1 (8bab26f4f 2026-07-14)" data-channel="1.97.1" data-search-js="search-fd9372ac.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-fcd733ba.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">gondola_core/events/</div>telemetry_event.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! The TelemetryEvent or former "MergedEvent" is that what gets 
 <a href=#2 id=2 data-nosnippet>2</a>//! sent over telemetry during flight
 <a href=#3 id=3 data-nosnippet>3</a></span><span class="comment">// The following file is part of gaps-online-software and published 
 <a href=#4 id=4 data-nosnippet>4</a>// under the GPLv3 license
@@ -91,10 +91,10 @@
 <a href=#91 id=91 data-nosnippet>91</a>    tp
 <a href=#92 id=92 data-nosnippet>92</a>  }
 <a href=#93 id=93 data-nosnippet>93</a>
-<a href=#94 id=94 data-nosnippet>94</a>  <span class="kw">pub fn </span>calibrate_trk_hits(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cali : <span class="kw-2">&amp;</span>TrackerOfflineCalibration) 
+<a href=#94 id=94 data-nosnippet>94</a>  <span class="kw">pub fn </span>calibrate_trk_hits(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cali : <span class="kw-2">&amp;</span>TrackerOfflineCalibration, remove_pulsed : bool) 
 <a href=#95 id=95 data-nosnippet>95</a>    -&gt; <span class="prelude-ty">Result</span>&lt;(), CalibrationError&gt; {
 <a href=#96 id=96 data-nosnippet>96</a>    cali.mask_hits(<span class="kw-2">&amp;mut </span><span class="self">self</span>.tracker_hits);
-<a href=#97 id=97 data-nosnippet>97</a>    cali.calibrate(<span class="kw-2">&amp;mut </span><span class="self">self</span>.tracker_hits)<span class="question-mark">?</span>;
+<a href=#97 id=97 data-nosnippet>97</a>    cali.calibrate(<span class="kw-2">&amp;mut </span><span class="self">self</span>.tracker_hits, remove_pulsed)<span class="question-mark">?</span>;
 <a href=#98 id=98 data-nosnippet>98</a>    <span class="prelude-val">Ok</span>(())
 <a href=#99 id=99 data-nosnippet>99</a>  }
 <a href=#100 id=100 data-nosnippet>100</a>
@@ -334,10 +334,10 @@
 <a href=#334 id=334 data-nosnippet>334</a>      }
 <a href=#335 id=335 data-nosnippet>335</a>      me.oscillator_idx = oscillator_idx;
 <a href=#336 id=336 data-nosnippet>336</a>    } <span class="kw">else if </span>version == <span class="number">0 </span>{
-<a href=#337 id=337 data-nosnippet>337</a>      <span class="macro">error!</span>(<span class="string">"Unsupported {version}!"</span>);
+<a href=#337 id=337 data-nosnippet>337</a>      <span class="macro">error!</span>(<span class="string">"Version {version} found, which is currently not supported!"</span>);
 <a href=#338 id=338 data-nosnippet>338</a>      <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::UnsupportedVersion);
 <a href=#339 id=339 data-nosnippet>339</a>    } <span class="kw">else </span>{
-<a href=#340 id=340 data-nosnippet>340</a>      <span class="macro">error!</span>(<span class="string">"Unsuported version {version}!"</span>);
+<a href=#340 id=340 data-nosnippet>340</a>      <span class="macro">error!</span>(<span class="string">"Unsuported and unknown version : {version}!"</span>);
 <a href=#341 id=341 data-nosnippet>341</a>      <span class="kw">return </span><span class="prelude-val">Err</span>(SerializationError::UnsupportedVersion);
 <a href=#342 id=342 data-nosnippet>342</a>    } 
 <a href=#343 id=343 data-nosnippet>343</a>    me.expected_tr_hits = me.tracker_hits.len() <span class="kw">as </span>u8;
@@ -627,176 +627,173 @@
 <a href=#627 id=627 data-nosnippet>627</a>  //    //Ok(mapped.into_bound(py))
 <a href=#628 id=628 data-nosnippet>628</a>  //    Ok(py_ref)
 <a href=#629 id=629 data-nosnippet>629</a>  //}
-<a href=#630 id=630 data-nosnippet>630</a>
-<a href=#631 id=631 data-nosnippet>631</a>  </span><span class="attr">#[getter]
-<a href=#632 id=632 data-nosnippet>632</a>  </span><span class="kw">fn </span>tracker_pointcloud(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;(f32, f32, f32, f32, f32)&gt; {
-<a href=#633 id=633 data-nosnippet>633</a>    <span class="kw">let </span><span class="kw-2">mut </span>pts = Vec::&lt;(f32,f32,f32,f32,f32)&gt;::new();
-<a href=#634 id=634 data-nosnippet>634</a>    <span class="kw">for </span>h <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.tracker_hits {
-<a href=#635 id=635 data-nosnippet>635</a>      <span class="comment">// uses adc
-<a href=#636 id=636 data-nosnippet>636</a>      // FIXME - factor 10!
-<a href=#637 id=637 data-nosnippet>637</a>      </span><span class="kw">let </span>pt = (<span class="number">10.0</span><span class="kw-2">*</span>h.x, <span class="number">10.0</span><span class="kw-2">*</span>h.y, <span class="number">10.0</span><span class="kw-2">*</span>h.z, f32::NAN, h.adc <span class="kw">as </span>f32);
-<a href=#638 id=638 data-nosnippet>638</a>      pts.push(pt);
-<a href=#639 id=639 data-nosnippet>639</a>    }
-<a href=#640 id=640 data-nosnippet>640</a>    pts
-<a href=#641 id=641 data-nosnippet>641</a>  }
-<a href=#642 id=642 data-nosnippet>642</a>  
-<a href=#643 id=643 data-nosnippet>643</a>  <span class="doccomment">/// Add tracker hits to the merged event (e.g. with hits from packet type 80
-<a href=#644 id=644 data-nosnippet>644</a>  </span><span class="attr">#[pyo3(name=<span class="string">"add_tracker_hits"</span>)]
-<a href=#645 id=645 data-nosnippet>645</a>  </span><span class="kw">pub fn </span>add_tracker_hits_py(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>hits: Vec&lt;TrackerHit&gt;, dedup : bool) { 
-<a href=#646 id=646 data-nosnippet>646</a>    <span class="kw">if </span>dedup {
-<a href=#647 id=647 data-nosnippet>647</a>      hits.sort();
-<a href=#648 id=648 data-nosnippet>648</a>      hits.dedup();
-<a href=#649 id=649 data-nosnippet>649</a>    }
-<a href=#650 id=650 data-nosnippet>650</a>    <span class="kw">let </span>n_hits_before = <span class="self">self</span>.tracker_hits.len();
-<a href=#651 id=651 data-nosnippet>651</a>    <span class="self">self</span>.tracker_hits.extend_from_slice(<span class="kw-2">&amp;</span>hits);
-<a href=#652 id=652 data-nosnippet>652</a>    <span class="self">self</span>.tracker_hits.sort(); 
-<a href=#653 id=653 data-nosnippet>653</a>    <span class="self">self</span>.tracker_hits.dedup();
-<a href=#654 id=654 data-nosnippet>654</a>    <span class="kw">let </span>delta_hits = <span class="self">self</span>.tracker_hits.len() - n_hits_before; 
-<a href=#655 id=655 data-nosnippet>655</a>    <span class="comment">// for each tracker hits, the packet length extends by 4 bytes 
-<a href=#656 id=656 data-nosnippet>656</a>    </span><span class="self">self</span>.header.length += (<span class="number">4</span><span class="kw-2">*</span>delta_hits) <span class="kw">as </span>u16;
-<a href=#657 id=657 data-nosnippet>657</a>  }
-<a href=#658 id=658 data-nosnippet>658</a>  
-<a href=#659 id=659 data-nosnippet>659</a>  <span class="doccomment">/// Delete tracker hits (e.g. in case they are supposed to 
-<a href=#660 id=660 data-nosnippet>660</a>  /// be replaced by packet type 80 tracker hits)
-<a href=#661 id=661 data-nosnippet>661</a>  </span><span class="attr">#[pyo3(name=<span class="string">"delete_all_tracker_hits"</span>)]
-<a href=#662 id=662 data-nosnippet>662</a>  </span><span class="kw">pub fn </span>delete_all_tracker_hits_py(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-<a href=#663 id=663 data-nosnippet>663</a>    <span class="self">self</span>.tracker_hits.clear();
-<a href=#664 id=664 data-nosnippet>664</a>  }
-<a href=#665 id=665 data-nosnippet>665</a>
-<a href=#666 id=666 data-nosnippet>666</a>  <span class="doccomment">/// Populate a merged event from a TelemetryPacket.
-<a href=#667 id=667 data-nosnippet>667</a>  ///
-<a href=#668 id=668 data-nosnippet>668</a>  /// Telemetry packet type should be 90 (MergedEvent)
-<a href=#669 id=669 data-nosnippet>669</a>  </span><span class="attr">#[staticmethod]
-<a href=#670 id=670 data-nosnippet>670</a>  </span><span class="kw">fn </span>from_telemetrypacket(packet : TelemetryPacket) -&gt; PyResult&lt;<span class="self">Self</span>&gt; {
-<a href=#671 id=671 data-nosnippet>671</a>    <span class="kw">match </span><span class="self">Self</span>::from_bytestream(<span class="kw-2">&amp;</span>packet.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
-<a href=#672 id=672 data-nosnippet>672</a>      <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>event) =&gt; {
-<a href=#673 id=673 data-nosnippet>673</a>        event.header = packet.header.clone();
-<a href=#674 id=674 data-nosnippet>674</a>        <span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
-<a href=#675 id=675 data-nosnippet>675</a>        </span>event.hydrate(<span class="kw-2">&amp;</span>packet.tof_paddles, <span class="kw-2">&amp;</span>packet.trk_strips);
-<a href=#676 id=676 data-nosnippet>676</a>        <span class="kw">return </span><span class="prelude-val">Ok</span>(event);
-<a href=#677 id=677 data-nosnippet>677</a>      }
-<a href=#678 id=678 data-nosnippet>678</a>      <span class="prelude-val">Err</span>(err) =&gt; {
-<a href=#679 id=679 data-nosnippet>679</a>        <span class="kw">return </span><span class="prelude-val">Err</span>(PyValueError::new_err(err.to_string()));
-<a href=#680 id=680 data-nosnippet>680</a>      }  
-<a href=#681 id=681 data-nosnippet>681</a>    }
-<a href=#682 id=682 data-nosnippet>682</a>  }
-<a href=#683 id=683 data-nosnippet>683</a>
-<a href=#684 id=684 data-nosnippet>684</a>  <span class="attr">#[pyo3(name=<span class="string">"pack"</span>)]
-<a href=#685 id=685 data-nosnippet>685</a>  </span><span class="kw">fn </span>pack_py(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TelemetryPacket {
-<a href=#686 id=686 data-nosnippet>686</a>    <span class="self">self</span>.pack()
-<a href=#687 id=687 data-nosnippet>687</a>  }
-<a href=#688 id=688 data-nosnippet>688</a>
-<a href=#689 id=689 data-nosnippet>689</a>  <span class="attr">#[pyo3(name=<span class="string">"calibrate_trk_hits"</span>)]
-<a href=#690 id=690 data-nosnippet>690</a>  </span><span class="kw">fn </span>calibrate_trk_hits_py(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cali : Bound&lt;<span class="lifetime">'_</span>, TrackerOfflineCalibration&gt; ) -&gt; PyResult&lt;()&gt; {
-<a href=#691 id=691 data-nosnippet>691</a>    <span class="kw">let </span>cali_ref = cali.borrow();
-<a href=#692 id=692 data-nosnippet>692</a>    <span class="self">self</span>.calibrate_trk_hits(<span class="kw-2">&amp;*</span>cali_ref)<span class="question-mark">?</span>;
-<a href=#693 id=693 data-nosnippet>693</a>    <span class="prelude-val">Ok</span>(())
-<a href=#694 id=694 data-nosnippet>694</a>  }
-<a href=#695 id=695 data-nosnippet>695</a>
-<a href=#696 id=696 data-nosnippet>696</a><span class="comment">//  #[cfg(feature="database")]
-<a href=#697 id=697 data-nosnippet>697</a>//  #[pyo3(name="mask_strips")]
-<a href=#698 id=698 data-nosnippet>698</a>//  pub fn mask_strips_py(&amp;mut self, masks : &amp;HashMap&lt;u32, TrackerStripMask&gt;) {
-<a href=#699 id=699 data-nosnippet>699</a>//  }
-<a href=#700 id=700 data-nosnippet>700</a>//
-<a href=#701 id=701 data-nosnippet>701</a>//  #[cfg(feature="database")]
-<a href=#702 id=702 data-nosnippet>702</a>//  #[pyo3(name="remove_cmn_noise")]
-<a href=#703 id=703 data-nosnippet>703</a>//  pub fn remove_cmn_noise_py(&amp;mut self, cmn_noise : &amp;HashMap&lt;u32, TrackerStripCmnNoise&gt;) {
-<a href=#704 id=704 data-nosnippet>704</a>//  }
-<a href=#705 id=705 data-nosnippet>705</a>//
-<a href=#706 id=706 data-nosnippet>706</a>//  #[cfg(feature="database")]
-<a href=#707 id=707 data-nosnippet>707</a>//  #[pyo3(name="calibrate_tracker")]
-<a href=#708 id=708 data-nosnippet>708</a>//  pub fn calibrate_tracker_py(&amp;mut self, 
-<a href=#709 id=709 data-nosnippet>709</a>//                              pedestals   : &amp;HashMap&lt;u32, TrackerStripPedestal&gt;,
-<a href=#710 id=710 data-nosnippet>710</a>//                              transfer_fn : &amp;HashMap&lt;u32, TrackerStripTransferFunction&gt;) {
-<a href=#711 id=711 data-nosnippet>711</a>//  }
-<a href=#712 id=712 data-nosnippet>712</a></span>}
+<a href=#630 id=630 data-nosnippet>630</a>  
+<a href=#631 id=631 data-nosnippet>631</a>  </span><span class="doccomment">/// Certain quantitities can only be calculated if we know more 
+<a href=#632 id=632 data-nosnippet>632</a>  /// about the paddle the hit was seen in. 
+<a href=#633 id=633 data-nosnippet>633</a>  /// This meta information is not stored within the hit to save 
+<a href=#634 id=634 data-nosnippet>634</a>  /// space for telemetry/storage reasons.
+<a href=#635 id=635 data-nosnippet>635</a>  ///
+<a href=#636 id=636 data-nosnippet>636</a>  /// The meta-information (e.g. paddle length) can be added by 
+<a href=#637 id=637 data-nosnippet>637</a>  /// filling in the blanks from the specific paddles as obtained 
+<a href=#638 id=638 data-nosnippet>638</a>  /// from the database shipped with gondola.
+<a href=#639 id=639 data-nosnippet>639</a>  </span><span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
+<a href=#640 id=640 data-nosnippet>640</a>  #[pyo3(name=<span class="string">"tof_set_paddles"</span>)]
+<a href=#641 id=641 data-nosnippet>641</a>  </span><span class="kw">fn </span>tof_set_paddles_py(<span class="kw-2">&amp;mut </span><span class="self">self</span>, paddles : HashMap&lt;u8, TofPaddle&gt;) {
+<a href=#642 id=642 data-nosnippet>642</a>    <span class="self">self</span>.tof_event.set_paddles(<span class="kw-2">&amp;</span>paddles); 
+<a href=#643 id=643 data-nosnippet>643</a>  }
+<a href=#644 id=644 data-nosnippet>644</a>
+<a href=#645 id=645 data-nosnippet>645</a>  <span class="attr">#[getter]
+<a href=#646 id=646 data-nosnippet>646</a>  </span><span class="kw">fn </span>tracker_pointcloud(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;(f32, f32, f32, f32, f32)&gt; {
+<a href=#647 id=647 data-nosnippet>647</a>    <span class="kw">let </span><span class="kw-2">mut </span>pts = Vec::&lt;(f32,f32,f32,f32,f32)&gt;::new();
+<a href=#648 id=648 data-nosnippet>648</a>    <span class="kw">for </span>h <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.tracker_hits {
+<a href=#649 id=649 data-nosnippet>649</a>      <span class="comment">// uses adc
+<a href=#650 id=650 data-nosnippet>650</a>      // FIXME - factor 10!
+<a href=#651 id=651 data-nosnippet>651</a>      </span><span class="kw">let </span>pt = (<span class="number">10.0</span><span class="kw-2">*</span>h.x, <span class="number">10.0</span><span class="kw-2">*</span>h.y, <span class="number">10.0</span><span class="kw-2">*</span>h.z, f32::NAN, h.adc <span class="kw">as </span>f32);
+<a href=#652 id=652 data-nosnippet>652</a>      pts.push(pt);
+<a href=#653 id=653 data-nosnippet>653</a>    }
+<a href=#654 id=654 data-nosnippet>654</a>    pts
+<a href=#655 id=655 data-nosnippet>655</a>  }
+<a href=#656 id=656 data-nosnippet>656</a>  
+<a href=#657 id=657 data-nosnippet>657</a>  <span class="doccomment">/// Add tracker hits to the merged event (e.g. with hits from packet type 80
+<a href=#658 id=658 data-nosnippet>658</a>  </span><span class="attr">#[pyo3(name=<span class="string">"add_tracker_hits"</span>)]
+<a href=#659 id=659 data-nosnippet>659</a>  </span><span class="kw">pub fn </span>add_tracker_hits_py(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>hits: Vec&lt;TrackerHit&gt;, dedup : bool) { 
+<a href=#660 id=660 data-nosnippet>660</a>    <span class="kw">if </span>dedup {
+<a href=#661 id=661 data-nosnippet>661</a>      hits.sort();
+<a href=#662 id=662 data-nosnippet>662</a>      hits.dedup();
+<a href=#663 id=663 data-nosnippet>663</a>    }
+<a href=#664 id=664 data-nosnippet>664</a>    <span class="kw">let </span>n_hits_before = <span class="self">self</span>.tracker_hits.len();
+<a href=#665 id=665 data-nosnippet>665</a>    <span class="self">self</span>.tracker_hits.extend_from_slice(<span class="kw-2">&amp;</span>hits);
+<a href=#666 id=666 data-nosnippet>666</a>    <span class="self">self</span>.tracker_hits.sort(); 
+<a href=#667 id=667 data-nosnippet>667</a>    <span class="self">self</span>.tracker_hits.dedup();
+<a href=#668 id=668 data-nosnippet>668</a>    <span class="kw">let </span>delta_hits = <span class="self">self</span>.tracker_hits.len() - n_hits_before; 
+<a href=#669 id=669 data-nosnippet>669</a>    <span class="comment">// for each tracker hits, the packet length extends by 4 bytes 
+<a href=#670 id=670 data-nosnippet>670</a>    </span><span class="self">self</span>.header.length += (<span class="number">4</span><span class="kw-2">*</span>delta_hits) <span class="kw">as </span>u16;
+<a href=#671 id=671 data-nosnippet>671</a>  }
+<a href=#672 id=672 data-nosnippet>672</a>  
+<a href=#673 id=673 data-nosnippet>673</a>  <span class="doccomment">/// Delete tracker hits (e.g. in case they are supposed to 
+<a href=#674 id=674 data-nosnippet>674</a>  /// be replaced by packet type 80 tracker hits)
+<a href=#675 id=675 data-nosnippet>675</a>  </span><span class="attr">#[pyo3(name=<span class="string">"delete_all_tracker_hits"</span>)]
+<a href=#676 id=676 data-nosnippet>676</a>  </span><span class="kw">pub fn </span>delete_all_tracker_hits_py(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+<a href=#677 id=677 data-nosnippet>677</a>    <span class="self">self</span>.tracker_hits.clear();
+<a href=#678 id=678 data-nosnippet>678</a>  }
+<a href=#679 id=679 data-nosnippet>679</a>
+<a href=#680 id=680 data-nosnippet>680</a>  <span class="doccomment">/// Populate a merged event from a TelemetryPacket.
+<a href=#681 id=681 data-nosnippet>681</a>  ///
+<a href=#682 id=682 data-nosnippet>682</a>  /// Telemetry packet type should be 90 (MergedEvent)
+<a href=#683 id=683 data-nosnippet>683</a>  </span><span class="attr">#[staticmethod]
+<a href=#684 id=684 data-nosnippet>684</a>  </span><span class="kw">fn </span>from_telemetrypacket(packet : TelemetryPacket) -&gt; PyResult&lt;<span class="self">Self</span>&gt; {
+<a href=#685 id=685 data-nosnippet>685</a>    <span class="kw">match </span><span class="self">Self</span>::from_bytestream(<span class="kw-2">&amp;</span>packet.payload, <span class="kw-2">&amp;mut </span><span class="number">0</span>) {
+<a href=#686 id=686 data-nosnippet>686</a>      <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>event) =&gt; {
+<a href=#687 id=687 data-nosnippet>687</a>        event.header = packet.header.clone();
+<a href=#688 id=688 data-nosnippet>688</a>        <span class="attr">#[cfg(feature=<span class="string">"database"</span>)]
+<a href=#689 id=689 data-nosnippet>689</a>        </span>event.hydrate(<span class="kw-2">&amp;</span>packet.tof_paddles, <span class="kw-2">&amp;</span>packet.trk_strips);
+<a href=#690 id=690 data-nosnippet>690</a>        <span class="kw">return </span><span class="prelude-val">Ok</span>(event);
+<a href=#691 id=691 data-nosnippet>691</a>      }
+<a href=#692 id=692 data-nosnippet>692</a>      <span class="prelude-val">Err</span>(err) =&gt; {
+<a href=#693 id=693 data-nosnippet>693</a>        <span class="kw">return </span><span class="prelude-val">Err</span>(PyValueError::new_err(err.to_string()));
+<a href=#694 id=694 data-nosnippet>694</a>      }  
+<a href=#695 id=695 data-nosnippet>695</a>    }
+<a href=#696 id=696 data-nosnippet>696</a>  }
+<a href=#697 id=697 data-nosnippet>697</a>
+<a href=#698 id=698 data-nosnippet>698</a>  <span class="attr">#[pyo3(name=<span class="string">"pack"</span>)]
+<a href=#699 id=699 data-nosnippet>699</a>  </span><span class="kw">fn </span>pack_py(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TelemetryPacket {
+<a href=#700 id=700 data-nosnippet>700</a>    <span class="self">self</span>.pack()
+<a href=#701 id=701 data-nosnippet>701</a>  }
+<a href=#702 id=702 data-nosnippet>702</a>
+<a href=#703 id=703 data-nosnippet>703</a>  <span class="attr">#[pyo3(name=<span class="string">"calibrate_trk_hits"</span>)]
+<a href=#704 id=704 data-nosnippet>704</a>  </span><span class="kw">fn </span>calibrate_trk_hits_py(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cali : Bound&lt;<span class="lifetime">'_</span>, TrackerOfflineCalibration&gt; , remove_pulsed : bool) -&gt; PyResult&lt;()&gt; {
+<a href=#705 id=705 data-nosnippet>705</a>    <span class="kw">let </span>cali_ref = cali.borrow();
+<a href=#706 id=706 data-nosnippet>706</a>    <span class="self">self</span>.calibrate_trk_hits(<span class="kw-2">&amp;*</span>cali_ref, remove_pulsed)<span class="question-mark">?</span>;
+<a href=#707 id=707 data-nosnippet>707</a>    <span class="prelude-val">Ok</span>(())
+<a href=#708 id=708 data-nosnippet>708</a>  }
+<a href=#709 id=709 data-nosnippet>709</a>}
+<a href=#710 id=710 data-nosnippet>710</a>
+<a href=#711 id=711 data-nosnippet>711</a><span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
+<a href=#712 id=712 data-nosnippet>712</a></span><span class="kw">impl </span>FromRandom <span class="kw">for </span>TelemetryEvent {
 <a href=#713 id=713 data-nosnippet>713</a>
-<a href=#714 id=714 data-nosnippet>714</a><span class="attr">#[cfg(feature=<span class="string">"random"</span>)]
-<a href=#715 id=715 data-nosnippet>715</a></span><span class="kw">impl </span>FromRandom <span class="kw">for </span>TelemetryEvent {
-<a href=#716 id=716 data-nosnippet>716</a>
-<a href=#717 id=717 data-nosnippet>717</a>  <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
-<a href=#718 id=718 data-nosnippet>718</a>    <span class="kw">let </span><span class="kw-2">mut </span>rng    = rand::rng();
-<a href=#719 id=719 data-nosnippet>719</a>    <span class="kw">let </span><span class="kw-2">mut </span>ev     = <span class="self">Self</span>::new();
-<a href=#720 id=720 data-nosnippet>720</a>    ev.header      = TelemetryPacketHeader::from_random();
-<a href=#721 id=721 data-nosnippet>721</a>    ev.tof_event   = TofEvent::from_random();
-<a href=#722 id=722 data-nosnippet>722</a>    <span class="comment">//let n_trk_hits = rng.random::&lt;u8&gt;();
-<a href=#723 id=723 data-nosnippet>723</a>    </span><span class="kw">let </span>n_trk_hits = <span class="number">1u8</span>;
-<a href=#724 id=724 data-nosnippet>724</a>    <span class="kw">for _ in </span><span class="number">0</span>..n_trk_hits {
-<a href=#725 id=725 data-nosnippet>725</a>      <span class="kw">let </span><span class="kw-2">mut </span>h = TrackerHit::from_random();
-<a href=#726 id=726 data-nosnippet>726</a>      h.oscillator = <span class="number">0</span>;
-<a href=#727 id=727 data-nosnippet>727</a>      h.asic_event_code = <span class="number">0</span>;
-<a href=#728 id=728 data-nosnippet>728</a>      ev.tracker_hits.push(h);
-<a href=#729 id=729 data-nosnippet>729</a>    }
-<a href=#730 id=730 data-nosnippet>730</a>    <span class="comment">//ev.creation_time      = rng.random::&lt;u64&gt;();
-<a href=#731 id=731 data-nosnippet>731</a>    </span>ev.creation_time      = <span class="number">0</span>;
-<a href=#732 id=732 data-nosnippet>732</a>    ev.event_id           = rng.random::&lt;u32&gt;();
-<a href=#733 id=733 data-nosnippet>733</a>    ev.flags0             = <span class="number">3</span>;
-<a href=#734 id=734 data-nosnippet>734</a>    ev.flags1             = <span class="number">1</span>;
-<a href=#735 id=735 data-nosnippet>735</a>    ev.version            = <span class="number">1</span>;
-<a href=#736 id=736 data-nosnippet>736</a>    <span class="comment">// tracker oscillators are one by layer - set 
-<a href=#737 id=737 data-nosnippet>737</a>    // layers active by random choice 
-<a href=#738 id=738 data-nosnippet>738</a>    </span><span class="kw">for </span>idx <span class="kw">in </span><span class="number">0</span>..<span class="number">10usize </span>{
-<a href=#739 id=739 data-nosnippet>739</a>      <span class="kw">let </span>active = rng.random::&lt;bool&gt;();
-<a href=#740 id=740 data-nosnippet>740</a>      <span class="kw">if </span>idx &lt; <span class="number">8 </span>&amp;&amp; active {
-<a href=#741 id=741 data-nosnippet>741</a>        ev.osc_flags = ev.osc_flags | (<span class="number">0b1 </span>&lt;&lt; idx);
-<a href=#742 id=742 data-nosnippet>742</a>        <span class="kw">let </span>osc  = rng.random::&lt;u64&gt;() &amp; <span class="number">0x0000FFFFFFFFFFFF</span>;
-<a href=#743 id=743 data-nosnippet>743</a>        ev.tracker_oscillators[idx] = osc;
-<a href=#744 id=744 data-nosnippet>744</a>        ev.oscillator_idx.push(idx <span class="kw">as </span>u8);
-<a href=#745 id=745 data-nosnippet>745</a>        <span class="comment">//ev.tracker_oscillators[idx] = u32::MAX as u64 + 1;
-<a href=#746 id=746 data-nosnippet>746</a>      </span>}
-<a href=#747 id=747 data-nosnippet>747</a>    }
-<a href=#748 id=748 data-nosnippet>748</a>    <span class="kw">return </span>ev;
-<a href=#749 id=749 data-nosnippet>749</a>  }
-<a href=#750 id=750 data-nosnippet>750</a>}
-<a href=#751 id=751 data-nosnippet>751</a>
-<a href=#752 id=752 data-nosnippet>752</a><span class="attr">#[test]
-<a href=#753 id=753 data-nosnippet>753</a>#[cfg(feature=<span class="string">"random"</span>)]
-<a href=#754 id=754 data-nosnippet>754</a></span><span class="kw">fn </span>serialize_deserialize_telemetryevent() {
-<a href=#755 id=755 data-nosnippet>755</a>  <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">10 </span>{
-<a href=#756 id=756 data-nosnippet>756</a>    <span class="kw">let </span><span class="kw-2">mut </span>ev        = TelemetryEvent::from_random();  
-<a href=#757 id=757 data-nosnippet>757</a>    <span class="kw">let </span>bytes         = ev.to_bytestream();
-<a href=#758 id=758 data-nosnippet>758</a>    <span class="kw">let </span><span class="kw-2">mut </span>test      = TelemetryEvent::from_bytestream(<span class="kw-2">&amp;</span>bytes, <span class="kw-2">&amp;mut </span><span class="number">0</span>).unwrap();
-<a href=#759 id=759 data-nosnippet>759</a>    <span class="kw">let </span>creation_time = Instant::now();
-<a href=#760 id=760 data-nosnippet>760</a>    ev.tof_event.creation_time   = creation_time;
-<a href=#761 id=761 data-nosnippet>761</a>    test.tof_event.creation_time = creation_time;
-<a href=#762 id=762 data-nosnippet>762</a>    ev.tof_event.rb_events.clear();
-<a href=#763 id=763 data-nosnippet>763</a>    test.tof_event.rb_events.clear();
-<a href=#764 id=764 data-nosnippet>764</a>    <span class="kw">for </span>h <span class="kw">in </span><span class="kw-2">&amp;mut </span>ev.tof_event.hits {
-<a href=#765 id=765 data-nosnippet>765</a>      h.coax_cable_time = <span class="number">0.0</span>;
-<a href=#766 id=766 data-nosnippet>766</a>      h.hart_cable_time = <span class="number">0.0</span>;
-<a href=#767 id=767 data-nosnippet>767</a>      h.event_t0 = <span class="number">0.0</span>;
-<a href=#768 id=768 data-nosnippet>768</a>      h.paddle_len = <span class="number">0.0</span>;
-<a href=#769 id=769 data-nosnippet>769</a>      h.x = <span class="number">0.0</span>; 
-<a href=#770 id=770 data-nosnippet>770</a>      h.y = <span class="number">0.0</span>; 
-<a href=#771 id=771 data-nosnippet>771</a>      h.z = <span class="number">0.0</span>; 
-<a href=#772 id=772 data-nosnippet>772</a>    }
-<a href=#773 id=773 data-nosnippet>773</a>    <span class="kw">for </span>h <span class="kw">in </span><span class="kw-2">&amp;mut </span>test.tof_event.hits {
-<a href=#774 id=774 data-nosnippet>774</a>      h.coax_cable_time = <span class="number">0.0</span>;
-<a href=#775 id=775 data-nosnippet>775</a>      h.hart_cable_time = <span class="number">0.0</span>;
-<a href=#776 id=776 data-nosnippet>776</a>      h.event_t0 = <span class="number">0.0</span>;
-<a href=#777 id=777 data-nosnippet>777</a>      h.paddle_len = <span class="number">0.0</span>;
-<a href=#778 id=778 data-nosnippet>778</a>      h.x = <span class="number">0.0</span>; 
-<a href=#779 id=779 data-nosnippet>779</a>      h.y = <span class="number">0.0</span>; 
-<a href=#780 id=780 data-nosnippet>780</a>      h.z = <span class="number">0.0</span>; 
-<a href=#781 id=781 data-nosnippet>781</a>    }
-<a href=#782 id=782 data-nosnippet>782</a>    <span class="comment">// the header will not be the same, since it is not  
-<a href=#783 id=783 data-nosnippet>783</a>    // deserialized with from_bytestream, but just attached 
-<a href=#784 id=784 data-nosnippet>784</a>    </span><span class="macro">assert_eq!</span>(ev.creation_time      , test.creation_time); 
-<a href=#785 id=785 data-nosnippet>785</a>    <span class="macro">assert_eq!</span>(ev.event_id           , test.event_id); 
-<a href=#786 id=786 data-nosnippet>786</a>    <span class="macro">assert_eq!</span>(ev.osc_flags          , test.osc_flags); 
-<a href=#787 id=787 data-nosnippet>787</a>    <span class="macro">assert_eq!</span>(ev.tracker_oscillators, test.tracker_oscillators); 
-<a href=#788 id=788 data-nosnippet>788</a>    <span class="macro">assert_eq!</span>(ev.raw_data           , test.raw_data); 
-<a href=#789 id=789 data-nosnippet>789</a>    <span class="macro">assert_eq!</span>(ev.flags0             , test.flags0); 
-<a href=#790 id=790 data-nosnippet>790</a>    <span class="macro">assert_eq!</span>(ev.flags1             , test.flags1); 
-<a href=#791 id=791 data-nosnippet>791</a>    <span class="macro">assert_eq!</span>(ev.version            , test.version); 
-<a href=#792 id=792 data-nosnippet>792</a>    <span class="macro">assert_eq!</span>(ev.oscillator_idx     , test.oscillator_idx); 
-<a href=#793 id=793 data-nosnippet>793</a>    <span class="macro">assert_eq!</span>(ev.tracker_hits       , test.tracker_hits); 
-<a href=#794 id=794 data-nosnippet>794</a>    <span class="macro">assert_eq!</span>(ev.tof_event          , test.tof_event); 
-<a href=#795 id=795 data-nosnippet>795</a>    <span class="comment">//assert_eq!(ev, test);
-<a href=#796 id=796 data-nosnippet>796</a>  </span>}
-<a href=#797 id=797 data-nosnippet>797</a>}
+<a href=#714 id=714 data-nosnippet>714</a>  <span class="kw">fn </span>from_random() -&gt; <span class="self">Self </span>{
+<a href=#715 id=715 data-nosnippet>715</a>    <span class="kw">let </span><span class="kw-2">mut </span>rng    = rand::rng();
+<a href=#716 id=716 data-nosnippet>716</a>    <span class="kw">let </span><span class="kw-2">mut </span>ev     = <span class="self">Self</span>::new();
+<a href=#717 id=717 data-nosnippet>717</a>    ev.header      = TelemetryPacketHeader::from_random();
+<a href=#718 id=718 data-nosnippet>718</a>    ev.tof_event   = TofEvent::from_random();
+<a href=#719 id=719 data-nosnippet>719</a>    <span class="comment">//let n_trk_hits = rng.random::&lt;u8&gt;();
+<a href=#720 id=720 data-nosnippet>720</a>    </span><span class="kw">let </span>n_trk_hits = <span class="number">1u8</span>;
+<a href=#721 id=721 data-nosnippet>721</a>    <span class="kw">for _ in </span><span class="number">0</span>..n_trk_hits {
+<a href=#722 id=722 data-nosnippet>722</a>      <span class="kw">let </span><span class="kw-2">mut </span>h = TrackerHit::from_random();
+<a href=#723 id=723 data-nosnippet>723</a>      h.oscillator = <span class="number">0</span>;
+<a href=#724 id=724 data-nosnippet>724</a>      h.asic_event_code = <span class="number">0</span>;
+<a href=#725 id=725 data-nosnippet>725</a>      ev.tracker_hits.push(h);
+<a href=#726 id=726 data-nosnippet>726</a>    }
+<a href=#727 id=727 data-nosnippet>727</a>    <span class="comment">//ev.creation_time      = rng.random::&lt;u64&gt;();
+<a href=#728 id=728 data-nosnippet>728</a>    </span>ev.creation_time      = <span class="number">0</span>;
+<a href=#729 id=729 data-nosnippet>729</a>    ev.event_id           = rng.random::&lt;u32&gt;();
+<a href=#730 id=730 data-nosnippet>730</a>    ev.flags0             = <span class="number">3</span>;
+<a href=#731 id=731 data-nosnippet>731</a>    ev.flags1             = <span class="number">1</span>;
+<a href=#732 id=732 data-nosnippet>732</a>    ev.version            = <span class="number">1</span>;
+<a href=#733 id=733 data-nosnippet>733</a>    <span class="comment">// tracker oscillators are one by layer - set 
+<a href=#734 id=734 data-nosnippet>734</a>    // layers active by random choice 
+<a href=#735 id=735 data-nosnippet>735</a>    </span><span class="kw">for </span>idx <span class="kw">in </span><span class="number">0</span>..<span class="number">10usize </span>{
+<a href=#736 id=736 data-nosnippet>736</a>      <span class="kw">let </span>active = rng.random::&lt;bool&gt;();
+<a href=#737 id=737 data-nosnippet>737</a>      <span class="kw">if </span>idx &lt; <span class="number">8 </span>&amp;&amp; active {
+<a href=#738 id=738 data-nosnippet>738</a>        ev.osc_flags = ev.osc_flags | (<span class="number">0b1 </span>&lt;&lt; idx);
+<a href=#739 id=739 data-nosnippet>739</a>        <span class="kw">let </span>osc  = rng.random::&lt;u64&gt;() &amp; <span class="number">0x0000FFFFFFFFFFFF</span>;
+<a href=#740 id=740 data-nosnippet>740</a>        ev.tracker_oscillators[idx] = osc;
+<a href=#741 id=741 data-nosnippet>741</a>        ev.oscillator_idx.push(idx <span class="kw">as </span>u8);
+<a href=#742 id=742 data-nosnippet>742</a>        <span class="comment">//ev.tracker_oscillators[idx] = u32::MAX as u64 + 1;
+<a href=#743 id=743 data-nosnippet>743</a>      </span>}
+<a href=#744 id=744 data-nosnippet>744</a>    }
+<a href=#745 id=745 data-nosnippet>745</a>    <span class="kw">return </span>ev;
+<a href=#746 id=746 data-nosnippet>746</a>  }
+<a href=#747 id=747 data-nosnippet>747</a>}
+<a href=#748 id=748 data-nosnippet>748</a>
+<a href=#749 id=749 data-nosnippet>749</a><span class="attr">#[test]
+<a href=#750 id=750 data-nosnippet>750</a>#[cfg(feature=<span class="string">"random"</span>)]
+<a href=#751 id=751 data-nosnippet>751</a></span><span class="kw">fn </span>serialize_deserialize_telemetryevent() {
+<a href=#752 id=752 data-nosnippet>752</a>  <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">10 </span>{
+<a href=#753 id=753 data-nosnippet>753</a>    <span class="kw">let </span><span class="kw-2">mut </span>ev        = TelemetryEvent::from_random();  
+<a href=#754 id=754 data-nosnippet>754</a>    <span class="kw">let </span>bytes         = ev.to_bytestream();
+<a href=#755 id=755 data-nosnippet>755</a>    <span class="kw">let </span><span class="kw-2">mut </span>test      = TelemetryEvent::from_bytestream(<span class="kw-2">&amp;</span>bytes, <span class="kw-2">&amp;mut </span><span class="number">0</span>).unwrap();
+<a href=#756 id=756 data-nosnippet>756</a>    <span class="kw">let </span>creation_time = Instant::now();
+<a href=#757 id=757 data-nosnippet>757</a>    ev.tof_event.creation_time   = creation_time;
+<a href=#758 id=758 data-nosnippet>758</a>    test.tof_event.creation_time = creation_time;
+<a href=#759 id=759 data-nosnippet>759</a>    ev.tof_event.rb_events.clear();
+<a href=#760 id=760 data-nosnippet>760</a>    test.tof_event.rb_events.clear();
+<a href=#761 id=761 data-nosnippet>761</a>    <span class="kw">for </span>h <span class="kw">in </span><span class="kw-2">&amp;mut </span>ev.tof_event.hits {
+<a href=#762 id=762 data-nosnippet>762</a>      h.coax_cable_time = <span class="number">0.0</span>;
+<a href=#763 id=763 data-nosnippet>763</a>      h.hart_cable_time = <span class="number">0.0</span>;
+<a href=#764 id=764 data-nosnippet>764</a>      h.event_t0 = <span class="number">0.0</span>;
+<a href=#765 id=765 data-nosnippet>765</a>      h.paddle_len = <span class="number">0.0</span>;
+<a href=#766 id=766 data-nosnippet>766</a>      h.x = <span class="number">0.0</span>; 
+<a href=#767 id=767 data-nosnippet>767</a>      h.y = <span class="number">0.0</span>; 
+<a href=#768 id=768 data-nosnippet>768</a>      h.z = <span class="number">0.0</span>; 
+<a href=#769 id=769 data-nosnippet>769</a>    }
+<a href=#770 id=770 data-nosnippet>770</a>    <span class="kw">for </span>h <span class="kw">in </span><span class="kw-2">&amp;mut </span>test.tof_event.hits {
+<a href=#771 id=771 data-nosnippet>771</a>      h.coax_cable_time = <span class="number">0.0</span>;
+<a href=#772 id=772 data-nosnippet>772</a>      h.hart_cable_time = <span class="number">0.0</span>;
+<a href=#773 id=773 data-nosnippet>773</a>      h.event_t0 = <span class="number">0.0</span>;
+<a href=#774 id=774 data-nosnippet>774</a>      h.paddle_len = <span class="number">0.0</span>;
+<a href=#775 id=775 data-nosnippet>775</a>      h.x = <span class="number">0.0</span>; 
+<a href=#776 id=776 data-nosnippet>776</a>      h.y = <span class="number">0.0</span>; 
+<a href=#777 id=777 data-nosnippet>777</a>      h.z = <span class="number">0.0</span>; 
+<a href=#778 id=778 data-nosnippet>778</a>    }
+<a href=#779 id=779 data-nosnippet>779</a>    <span class="comment">// the header will not be the same, since it is not  
+<a href=#780 id=780 data-nosnippet>780</a>    // deserialized with from_bytestream, but just attached 
+<a href=#781 id=781 data-nosnippet>781</a>    </span><span class="macro">assert_eq!</span>(ev.creation_time      , test.creation_time); 
+<a href=#782 id=782 data-nosnippet>782</a>    <span class="macro">assert_eq!</span>(ev.event_id           , test.event_id); 
+<a href=#783 id=783 data-nosnippet>783</a>    <span class="macro">assert_eq!</span>(ev.osc_flags          , test.osc_flags); 
+<a href=#784 id=784 data-nosnippet>784</a>    <span class="macro">assert_eq!</span>(ev.tracker_oscillators, test.tracker_oscillators); 
+<a href=#785 id=785 data-nosnippet>785</a>    <span class="macro">assert_eq!</span>(ev.raw_data           , test.raw_data); 
+<a href=#786 id=786 data-nosnippet>786</a>    <span class="macro">assert_eq!</span>(ev.flags0             , test.flags0); 
+<a href=#787 id=787 data-nosnippet>787</a>    <span class="macro">assert_eq!</span>(ev.flags1             , test.flags1); 
+<a href=#788 id=788 data-nosnippet>788</a>    <span class="macro">assert_eq!</span>(ev.version            , test.version); 
+<a href=#789 id=789 data-nosnippet>789</a>    <span class="macro">assert_eq!</span>(ev.oscillator_idx     , test.oscillator_idx); 
+<a href=#790 id=790 data-nosnippet>790</a>    <span class="macro">assert_eq!</span>(ev.tracker_hits       , test.tracker_hits); 
+<a href=#791 id=791 data-nosnippet>791</a>    <span class="macro">assert_eq!</span>(ev.tof_event          , test.tof_event); 
+<a href=#792 id=792 data-nosnippet>792</a>    <span class="comment">//assert_eq!(ev, test);
+<a href=#793 id=793 data-nosnippet>793</a>  </span>}
+<a href=#794 id=794 data-nosnippet>794</a>}
+<a href=#795 id=795 data-nosnippet>795</a>
+<a href=#796 id=796 data-nosnippet>796</a><span class="attr">#[cfg(feature=<span class="string">"pybindings"</span>)]
+<a href=#797 id=797 data-nosnippet>797</a></span><span class="macro">pythonize!</span>(TelemetryEvent);
 <a href=#798 id=798 data-nosnippet>798</a>
-<a href=#799 id=799 data-nosnippet>799</a><span class="attr">#[cfg(feature=<span class="string">"pybindings"</span>)]
-<a href=#800 id=800 data-nosnippet>800</a></span><span class="macro">pythonize!</span>(TelemetryEvent);
-<a href=#801 id=801 data-nosnippet>801</a>
 </code></pre></div></section></main></body></html>

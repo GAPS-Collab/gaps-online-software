@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"macro":["impl_downcast"],"trait":["Downcast","DowncastSend","DowncastSync"]};
+window.SIDEBAR_ITEMS = {"macro":[["impl_downcast",1]],"trait":["Downcast","DowncastSend","DowncastSync"]};

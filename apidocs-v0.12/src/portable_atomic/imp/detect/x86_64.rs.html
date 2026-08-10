@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/portable-atomic-1.13.1/src/imp/atomic128/../detect/x86_64.rs`."><title>x86_64.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="portable_atomic" data-themes="" data-resource-suffix="" data-rustdoc-version="1.96.0 (ac68faa20 2026-05-25)" data-channel="1.96.0" data-search-js="search-b5634cc7.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../../static.files/src-script-813739b1.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-5013f961.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">portable_atomic/imp/detect/</div>x86_64.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="comment">// SPDX-License-Identifier: Apache-2.0 OR MIT
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/portable-atomic-1.15.0/src/imp/atomic128/../detect/x86_64.rs`."><title>x86_64.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="portable_atomic" data-themes="" data-resource-suffix="" data-rustdoc-version="1.97.1 (8bab26f4f 2026-07-14)" data-channel="1.97.1" data-search-js="search-fd9372ac.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../../static.files/src-script-813739b1.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-fcd733ba.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">portable_atomic/imp/detect/</div>x86_64.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="comment">// SPDX-License-Identifier: Apache-2.0 OR MIT
 <a href=#2 id=2 data-nosnippet>2</a>
 <a href=#3 id=3 data-nosnippet>3</a>/*
 <a href=#4 id=4 data-nosnippet>4</a>Run-time CPU feature detection on x86_64 by using CPUID.
@@ -51,60 +51,62 @@
 <a href=#51 id=51 data-nosnippet>51</a>}
 <a href=#52 id=52 data-nosnippet>52</a>
 <a href=#53 id=53 data-nosnippet>53</a><span class="attr">#[cold]
-<a href=#54 id=54 data-nosnippet>54</a></span><span class="kw">fn </span>_detect(info: <span class="kw-2">&amp;mut </span>CpuInfo) {
-<a href=#55 id=55 data-nosnippet>55</a>    <span class="kw">let </span>CpuidResult { ecx: proc_info_ecx, .. } = __cpuid(<span class="number">1</span>);
-<a href=#56 id=56 data-nosnippet>56</a>
-<a href=#57 id=57 data-nosnippet>57</a>    <span class="comment">// https://github.com/rust-lang/rust/blob/1.92.0/library/std_detect/src/detect/os/x86.rs#L104
-<a href=#58 id=58 data-nosnippet>58</a>    </span><span class="kw">if </span>test(proc_info_ecx, <span class="number">13</span>) {
-<a href=#59 id=59 data-nosnippet>59</a>        info.set(CpuInfoFlag::cmpxchg16b);
-<a href=#60 id=60 data-nosnippet>60</a>    }
-<a href=#61 id=61 data-nosnippet>61</a>
-<a href=#62 id=62 data-nosnippet>62</a>    <span class="comment">// We only use VMOVDQA when SSE is enabled. See _atomic_load_vmovdqa() in atomic128/x86_64.rs for more.
-<a href=#63 id=63 data-nosnippet>63</a>    </span><span class="attr">#[cfg(target_feature = <span class="string">"sse"</span>)]
-<a href=#64 id=64 data-nosnippet>64</a>    </span>{
-<a href=#65 id=65 data-nosnippet>65</a>        <span class="kw">use </span>core::arch::x86_64::_xgetbv;
-<a href=#66 id=66 data-nosnippet>66</a>
-<a href=#67 id=67 data-nosnippet>67</a>        <span class="comment">// https://github.com/rust-lang/rust/blob/1.92.0/library/std_detect/src/detect/os/x86.rs#L166-L236
-<a href=#68 id=68 data-nosnippet>68</a>        </span><span class="kw">let </span>cpu_xsave = test(proc_info_ecx, <span class="number">26</span>);
-<a href=#69 id=69 data-nosnippet>69</a>        <span class="kw">if </span>cpu_xsave {
-<a href=#70 id=70 data-nosnippet>70</a>            <span class="kw">let </span>cpu_osxsave = test(proc_info_ecx, <span class="number">27</span>);
-<a href=#71 id=71 data-nosnippet>71</a>            <span class="kw">if </span>cpu_osxsave {
-<a href=#72 id=72 data-nosnippet>72</a>                <span class="comment">// SAFETY: Calling `_xgetbv` is safe because the CPU has `xsave` support
-<a href=#73 id=73 data-nosnippet>73</a>                // and OS has set `osxsave`.
-<a href=#74 id=74 data-nosnippet>74</a>                </span><span class="kw">let </span>xcr0 = <span class="kw">unsafe </span>{ _xgetbv(<span class="number">0</span>) };
-<a href=#75 id=75 data-nosnippet>75</a>                <span class="kw">let </span>os_avx_support = xcr0 &amp; <span class="number">6 </span>== <span class="number">6</span>;
-<a href=#76 id=76 data-nosnippet>76</a>                <span class="kw">if </span>os_avx_support &amp;&amp; test(proc_info_ecx, <span class="number">28</span>) {
-<a href=#77 id=77 data-nosnippet>77</a>                    info.set(CpuInfoFlag::avx);
-<a href=#78 id=78 data-nosnippet>78</a>                }
-<a href=#79 id=79 data-nosnippet>79</a>            }
-<a href=#80 id=80 data-nosnippet>80</a>        }
-<a href=#81 id=81 data-nosnippet>81</a>    }
-<a href=#82 id=82 data-nosnippet>82</a>}
-<a href=#83 id=83 data-nosnippet>83</a>
-<a href=#84 id=84 data-nosnippet>84</a><span class="attr">#[allow(
-<a href=#85 id=85 data-nosnippet>85</a>    clippy::alloc_instead_of_core,
-<a href=#86 id=86 data-nosnippet>86</a>    clippy::std_instead_of_alloc,
-<a href=#87 id=87 data-nosnippet>87</a>    clippy::std_instead_of_core,
-<a href=#88 id=88 data-nosnippet>88</a>    clippy::undocumented_unsafe_blocks,
-<a href=#89 id=89 data-nosnippet>89</a>    clippy::wildcard_imports
-<a href=#90 id=90 data-nosnippet>90</a>)]
-<a href=#91 id=91 data-nosnippet>91</a>#[cfg(test)]
-<a href=#92 id=92 data-nosnippet>92</a></span><span class="kw">mod </span>tests {
-<a href=#93 id=93 data-nosnippet>93</a>    <span class="kw">use </span>super::<span class="kw-2">*</span>;
-<a href=#94 id=94 data-nosnippet>94</a>
-<a href=#95 id=95 data-nosnippet>95</a>    <span class="attr">#[test]
-<a href=#96 id=96 data-nosnippet>96</a>    #[cfg_attr(portable_atomic_test_detect_false, ignore = <span class="string">"detection disabled"</span>)]
-<a href=#97 id=97 data-nosnippet>97</a>    </span><span class="kw">fn </span>test_cpuid() {
-<a href=#98 id=98 data-nosnippet>98</a>        <span class="comment">// The recent Rosetta 2 unofficially implements AVX support.
-<a href=#99 id=99 data-nosnippet>99</a>        // (The OS reports it as unsupported, likely due to poor performance.)
-<a href=#100 id=100 data-nosnippet>100</a>        </span><span class="attr">#[cfg(target_vendor = <span class="string">"apple"</span>)]
-<a href=#101 id=101 data-nosnippet>101</a>        </span><span class="macro">assert_eq!</span>(
-<a href=#102 id=102 data-nosnippet>102</a>            <span class="macro">std::is_x86_feature_detected!</span>(<span class="string">"avx"</span>),
-<a href=#103 id=103 data-nosnippet>103</a>            detect().avx() || <span class="macro">cfg!</span>(target_feature = <span class="string">"avx"</span>)
-<a href=#104 id=104 data-nosnippet>104</a>        );
-<a href=#105 id=105 data-nosnippet>105</a>        <span class="attr">#[cfg(not(target_vendor = <span class="string">"apple"</span>))]
-<a href=#106 id=106 data-nosnippet>106</a>        </span><span class="macro">assert_eq!</span>(<span class="macro">std::is_x86_feature_detected!</span>(<span class="string">"avx"</span>), detect().avx());
-<a href=#107 id=107 data-nosnippet>107</a>        <span class="macro">assert_eq!</span>(<span class="macro">std::is_x86_feature_detected!</span>(<span class="string">"cmpxchg16b"</span>), detect().cmpxchg16b());
-<a href=#108 id=108 data-nosnippet>108</a>    }
-<a href=#109 id=109 data-nosnippet>109</a>}
+<a href=#54 id=54 data-nosnippet>54</a>#[must_use]
+<a href=#55 id=55 data-nosnippet>55</a></span><span class="kw">fn </span>_detect(<span class="kw-2">mut </span>info: CpuInfo) -&gt; CpuInfo {
+<a href=#56 id=56 data-nosnippet>56</a>    <span class="kw">let </span>CpuidResult { ecx: proc_info_ecx, .. } = __cpuid(<span class="number">1</span>);
+<a href=#57 id=57 data-nosnippet>57</a>
+<a href=#58 id=58 data-nosnippet>58</a>    <span class="comment">// https://github.com/rust-lang/rust/blob/1.92.0/library/std_detect/src/detect/os/x86.rs#L104
+<a href=#59 id=59 data-nosnippet>59</a>    </span><span class="kw">if </span>test(proc_info_ecx, <span class="number">13</span>) {
+<a href=#60 id=60 data-nosnippet>60</a>        info.set(CpuInfoFlag::cmpxchg16b);
+<a href=#61 id=61 data-nosnippet>61</a>    }
+<a href=#62 id=62 data-nosnippet>62</a>
+<a href=#63 id=63 data-nosnippet>63</a>    <span class="comment">// We only use VMOVDQA when SSE is enabled. See _atomic_load_vmovdqa() in atomic128/x86_64.rs for more.
+<a href=#64 id=64 data-nosnippet>64</a>    </span><span class="attr">#[cfg(target_feature = <span class="string">"sse"</span>)]
+<a href=#65 id=65 data-nosnippet>65</a>    </span>{
+<a href=#66 id=66 data-nosnippet>66</a>        <span class="kw">use </span>core::arch::x86_64::_xgetbv;
+<a href=#67 id=67 data-nosnippet>67</a>
+<a href=#68 id=68 data-nosnippet>68</a>        <span class="comment">// https://github.com/rust-lang/rust/blob/1.92.0/library/std_detect/src/detect/os/x86.rs#L166-L236
+<a href=#69 id=69 data-nosnippet>69</a>        </span><span class="kw">let </span>cpu_xsave = test(proc_info_ecx, <span class="number">26</span>);
+<a href=#70 id=70 data-nosnippet>70</a>        <span class="kw">if </span>cpu_xsave {
+<a href=#71 id=71 data-nosnippet>71</a>            <span class="kw">let </span>cpu_osxsave = test(proc_info_ecx, <span class="number">27</span>);
+<a href=#72 id=72 data-nosnippet>72</a>            <span class="kw">if </span>cpu_osxsave {
+<a href=#73 id=73 data-nosnippet>73</a>                <span class="comment">// SAFETY: Calling `_xgetbv` is safe because the CPU has `xsave` support
+<a href=#74 id=74 data-nosnippet>74</a>                // and OS has set `osxsave`.
+<a href=#75 id=75 data-nosnippet>75</a>                </span><span class="kw">let </span>xcr0 = <span class="kw">unsafe </span>{ _xgetbv(<span class="number">0</span>) };
+<a href=#76 id=76 data-nosnippet>76</a>                <span class="kw">let </span>os_avx_support = xcr0 &amp; <span class="number">6 </span>== <span class="number">6</span>;
+<a href=#77 id=77 data-nosnippet>77</a>                <span class="kw">if </span>os_avx_support &amp;&amp; test(proc_info_ecx, <span class="number">28</span>) {
+<a href=#78 id=78 data-nosnippet>78</a>                    info.set(CpuInfoFlag::avx);
+<a href=#79 id=79 data-nosnippet>79</a>                }
+<a href=#80 id=80 data-nosnippet>80</a>            }
+<a href=#81 id=81 data-nosnippet>81</a>        }
+<a href=#82 id=82 data-nosnippet>82</a>    }
+<a href=#83 id=83 data-nosnippet>83</a>    info
+<a href=#84 id=84 data-nosnippet>84</a>}
+<a href=#85 id=85 data-nosnippet>85</a>
+<a href=#86 id=86 data-nosnippet>86</a><span class="attr">#[allow(
+<a href=#87 id=87 data-nosnippet>87</a>    clippy::alloc_instead_of_core,
+<a href=#88 id=88 data-nosnippet>88</a>    clippy::std_instead_of_alloc,
+<a href=#89 id=89 data-nosnippet>89</a>    clippy::std_instead_of_core,
+<a href=#90 id=90 data-nosnippet>90</a>    clippy::undocumented_unsafe_blocks,
+<a href=#91 id=91 data-nosnippet>91</a>    clippy::wildcard_imports
+<a href=#92 id=92 data-nosnippet>92</a>)]
+<a href=#93 id=93 data-nosnippet>93</a>#[cfg(test)]
+<a href=#94 id=94 data-nosnippet>94</a></span><span class="kw">mod </span>tests {
+<a href=#95 id=95 data-nosnippet>95</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+<a href=#96 id=96 data-nosnippet>96</a>
+<a href=#97 id=97 data-nosnippet>97</a>    <span class="attr">#[test]
+<a href=#98 id=98 data-nosnippet>98</a>    #[cfg_attr(portable_atomic_test_detect_false, ignore = <span class="string">"detection disabled"</span>)]
+<a href=#99 id=99 data-nosnippet>99</a>    </span><span class="kw">fn </span>test_cpuid() {
+<a href=#100 id=100 data-nosnippet>100</a>        <span class="comment">// The recent Rosetta 2 unofficially implements AVX support.
+<a href=#101 id=101 data-nosnippet>101</a>        // (The OS reports it as unsupported, likely due to poor performance.)
+<a href=#102 id=102 data-nosnippet>102</a>        </span><span class="attr">#[cfg(target_vendor = <span class="string">"apple"</span>)]
+<a href=#103 id=103 data-nosnippet>103</a>        </span><span class="macro">assert_eq!</span>(
+<a href=#104 id=104 data-nosnippet>104</a>            <span class="macro">std::is_x86_feature_detected!</span>(<span class="string">"avx"</span>),
+<a href=#105 id=105 data-nosnippet>105</a>            detect().avx() || <span class="macro">cfg!</span>(target_feature = <span class="string">"avx"</span>)
+<a href=#106 id=106 data-nosnippet>106</a>        );
+<a href=#107 id=107 data-nosnippet>107</a>        <span class="attr">#[cfg(not(target_vendor = <span class="string">"apple"</span>))]
+<a href=#108 id=108 data-nosnippet>108</a>        </span><span class="macro">assert_eq!</span>(<span class="macro">std::is_x86_feature_detected!</span>(<span class="string">"avx"</span>), detect().avx());
+<a href=#109 id=109 data-nosnippet>109</a>        <span class="macro">assert_eq!</span>(<span class="macro">std::is_x86_feature_detected!</span>(<span class="string">"cmpxchg16b"</span>), detect().cmpxchg16b());
+<a href=#110 id=110 data-nosnippet>110</a>    }
+<a href=#111 id=111 data-nosnippet>111</a>}
 </code></pre></div></section></main></body></html>

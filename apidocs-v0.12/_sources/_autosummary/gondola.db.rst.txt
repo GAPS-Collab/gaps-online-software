@@ -8,6 +8,7 @@ gondola.db
 
    .. autosummary::
    
+      create_trk_cali_tw_table
       create_trk_gain_table
       create_trk_mask_table
       create_trk_pedestal_table
@@ -23,6 +24,7 @@ gondola.db
       get_tof_cor_paddles
       get_tof_umb_paddles
       get_vid_hid_maps
+      is_in_tracker_cali_window
       load_calibration_db_elena
    
    .. rubric:: Classes
@@ -32,6 +34,7 @@ gondola.db
       ReadoutBoard
       TofPaddle
       TofPaddleTimingConstant
+      TrackerCaliTimeWindow
       TrackerCalibrationFile
       TrackerCalibrationFileType
       TrackerStrip

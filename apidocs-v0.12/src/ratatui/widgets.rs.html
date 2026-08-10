@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ratatui-0.29.0/src/widgets.rs`."><title>widgets.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.96.0 (ac68faa20 2026-05-25)" data-channel="1.96.0" data-search-js="search-b5634cc7.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../static.files/storage-41dd4d93.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5013f961.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">ratatui/</div>widgets.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="attr">#![warn(missing_docs)]
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ratatui-0.29.0/src/widgets.rs`."><title>widgets.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="ratatui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.97.1 (8bab26f4f 2026-07-14)" data-channel="1.97.1" data-search-js="search-fd9372ac.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../static.files/storage-41dd4d93.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-fcd733ba.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/ratatui/ratatui/main/assets/favicon.ico"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">ratatui/</div>widgets.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="attr">#![warn(missing_docs)]
 <a href=#2 id=2 data-nosnippet>2</a></span><span class="doccomment">//! `widgets` is a collection of types that implement [`Widget`] or [`StatefulWidget`] or both.
 <a href=#3 id=3 data-nosnippet>3</a>//!
 <a href=#4 id=4 data-nosnippet>4</a>//! Widgets are created for each frame as they are consumed after rendered.
@@ -39,7 +39,7 @@
 <a href=#39 id=39 data-nosnippet>39</a><span class="kw">mod </span>table;
 <a href=#40 id=40 data-nosnippet>40</a><span class="kw">mod </span>tabs;
 <a href=#41 id=41 data-nosnippet>41</a>
-<a href=#42 id=42 data-nosnippet>42</a><span class="kw">pub use </span>self::{
+<a href=#42 id=42 data-nosnippet>42</a><span class="kw">pub use </span><span class="self">self</span>::{
 <a href=#43 id=43 data-nosnippet>43</a>    barchart::{Bar, BarChart, BarGroup},
 <a href=#44 id=44 data-nosnippet>44</a>    block::{Block, BorderType, Padding},
 <a href=#45 id=45 data-nosnippet>45</a>    borders::<span class="kw-2">*</span>,
@@ -54,7 +54,7 @@
 <a href=#54 id=54 data-nosnippet>54</a>    table::{Cell, HighlightSpacing, Row, Table, TableState},
 <a href=#55 id=55 data-nosnippet>55</a>    tabs::Tabs,
 <a href=#56 id=56 data-nosnippet>56</a>};
-<a href=#57 id=57 data-nosnippet>57</a><span class="kw">use </span>crate::{buffer::Buffer, layout::Rect, style::Style};
+<a href=#57 id=57 data-nosnippet>57</a><span class="kw">use crate</span>::{buffer::Buffer, layout::Rect, style::Style};
 <a href=#58 id=58 data-nosnippet>58</a>
 <a href=#59 id=59 data-nosnippet>59</a><span class="doccomment">/// A `Widget` is a type that can be drawn on a [`Buffer`] in a given [`Rect`].
 <a href=#60 id=60 data-nosnippet>60</a>///
@@ -507,7 +507,7 @@
 <a href=#507 id=507 data-nosnippet>507</a></span><span class="kw">mod </span>tests {
 <a href=#508 id=508 data-nosnippet>508</a>    <span class="kw">use </span>rstest::{fixture, rstest};
 <a href=#509 id=509 data-nosnippet>509</a>
-<a href=#510 id=510 data-nosnippet>510</a>    <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#510 id=510 data-nosnippet>510</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#511 id=511 data-nosnippet>511</a>    <span class="kw">use </span><span class="kw">crate</span>::text::Line;
 <a href=#512 id=512 data-nosnippet>512</a>
 <a href=#513 id=513 data-nosnippet>513</a>    <span class="attr">#[fixture]
@@ -516,7 +516,7 @@
 <a href=#516 id=516 data-nosnippet>516</a>    }
 <a href=#517 id=517 data-nosnippet>517</a>
 <a href=#518 id=518 data-nosnippet>518</a>    <span class="kw">mod </span>widget {
-<a href=#519 id=519 data-nosnippet>519</a>        <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#519 id=519 data-nosnippet>519</a>        <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#520 id=520 data-nosnippet>520</a>
 <a href=#521 id=521 data-nosnippet>521</a>        <span class="kw">struct </span>Greeting;
 <a href=#522 id=522 data-nosnippet>522</a>
@@ -535,7 +535,7 @@
 <a href=#535 id=535 data-nosnippet>535</a>    }
 <a href=#536 id=536 data-nosnippet>536</a>
 <a href=#537 id=537 data-nosnippet>537</a>    <span class="kw">mod </span>widget_ref {
-<a href=#538 id=538 data-nosnippet>538</a>        <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#538 id=538 data-nosnippet>538</a>        <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#539 id=539 data-nosnippet>539</a>
 <a href=#540 id=540 data-nosnippet>540</a>        <span class="kw">struct </span>Greeting;
 <a href=#541 id=541 data-nosnippet>541</a>        <span class="kw">struct </span>Farewell;
@@ -591,7 +591,7 @@
 <a href=#591 id=591 data-nosnippet>591</a>    }
 <a href=#592 id=592 data-nosnippet>592</a>
 <a href=#593 id=593 data-nosnippet>593</a>    <span class="kw">mod </span>stateful_widget {
-<a href=#594 id=594 data-nosnippet>594</a>        <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#594 id=594 data-nosnippet>594</a>        <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#595 id=595 data-nosnippet>595</a>
 <a href=#596 id=596 data-nosnippet>596</a>        <span class="kw">struct </span>PersonalGreeting;
 <a href=#597 id=597 data-nosnippet>597</a>
@@ -611,7 +611,7 @@
 <a href=#611 id=611 data-nosnippet>611</a>    }
 <a href=#612 id=612 data-nosnippet>612</a>
 <a href=#613 id=613 data-nosnippet>613</a>    <span class="kw">mod </span>stateful_widget_ref {
-<a href=#614 id=614 data-nosnippet>614</a>        <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#614 id=614 data-nosnippet>614</a>        <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#615 id=615 data-nosnippet>615</a>
 <a href=#616 id=616 data-nosnippet>616</a>        <span class="kw">struct </span>PersonalGreeting;
 <a href=#617 id=617 data-nosnippet>617</a>
@@ -650,7 +650,7 @@
 <a href=#650 id=650 data-nosnippet>650</a>    }
 <a href=#651 id=651 data-nosnippet>651</a>
 <a href=#652 id=652 data-nosnippet>652</a>    <span class="kw">mod </span>option_widget_ref {
-<a href=#653 id=653 data-nosnippet>653</a>        <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#653 id=653 data-nosnippet>653</a>        <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#654 id=654 data-nosnippet>654</a>
 <a href=#655 id=655 data-nosnippet>655</a>        <span class="kw">struct </span>Greeting;
 <a href=#656 id=656 data-nosnippet>656</a>
@@ -676,7 +676,7 @@
 <a href=#676 id=676 data-nosnippet>676</a>    }
 <a href=#677 id=677 data-nosnippet>677</a>
 <a href=#678 id=678 data-nosnippet>678</a>    <span class="kw">mod </span>str {
-<a href=#679 id=679 data-nosnippet>679</a>        <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#679 id=679 data-nosnippet>679</a>        <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#680 id=680 data-nosnippet>680</a>
 <a href=#681 id=681 data-nosnippet>681</a>        <span class="attr">#[rstest]
 <a href=#682 id=682 data-nosnippet>682</a>        </span><span class="kw">fn </span>render(<span class="kw-2">mut </span>buf: Buffer) {
@@ -711,7 +711,7 @@
 <a href=#711 id=711 data-nosnippet>711</a>    }
 <a href=#712 id=712 data-nosnippet>712</a>
 <a href=#713 id=713 data-nosnippet>713</a>    <span class="kw">mod </span>string {
-<a href=#714 id=714 data-nosnippet>714</a>        <span class="kw">use </span>super::<span class="kw-2">*</span>;
+<a href=#714 id=714 data-nosnippet>714</a>        <span class="kw">use super</span>::<span class="kw-2">*</span>;
 <a href=#715 id=715 data-nosnippet>715</a>        <span class="attr">#[rstest]
 <a href=#716 id=716 data-nosnippet>716</a>        </span><span class="kw">fn </span>render(<span class="kw-2">mut </span>buf: Buffer) {
 <a href=#717 id=717 data-nosnippet>717</a>            String::from(<span class="string">"hello world"</span>).render(buf.area, <span class="kw-2">&amp;mut </span>buf);

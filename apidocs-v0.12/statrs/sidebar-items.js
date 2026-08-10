@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"macro":["assert_almost_eq"],"mod":["consts","distribution","euclid","function","generate","prec","statistics","stats_tests"]};
+window.SIDEBAR_ITEMS = {"macro":[["assert_almost_eq",1]],"mod":["consts","distribution","euclid","function","generate","prec","statistics","stats_tests"]};

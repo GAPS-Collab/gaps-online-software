@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/csv-1.4.0/src/serializer.rs`."><title>serializer.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="csv" data-themes="" data-resource-suffix="" data-rustdoc-version="1.96.0 (ac68faa20 2026-05-25)" data-channel="1.96.0" data-search-js="search-b5634cc7.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../static.files/storage-41dd4d93.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5013f961.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">csv/</div>serializer.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-4"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>std::{fmt, io, mem};
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/csv-1.4.0/src/serializer.rs`."><title>serializer.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="csv" data-themes="" data-resource-suffix="" data-rustdoc-version="1.97.1 (8bab26f4f 2026-07-14)" data-channel="1.97.1" data-search-js="search-fd9372ac.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../static.files/storage-41dd4d93.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-fcd733ba.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">csv/</div>serializer.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-4"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>std::{fmt, io, mem};
 <a href=#2 id=2 data-nosnippet>2</a>
 <a href=#3 id=3 data-nosnippet>3</a><span class="kw">use </span>serde_core::ser::{
 <a href=#4 id=4 data-nosnippet>4</a>    Error <span class="kw">as </span>SerdeError, Serialize, SerializeMap, SerializeSeq,
@@ -6,7 +6,7 @@
 <a href=#6 id=6 data-nosnippet>6</a>    SerializeTupleStruct, SerializeTupleVariant, Serializer,
 <a href=#7 id=7 data-nosnippet>7</a>};
 <a href=#8 id=8 data-nosnippet>8</a>
-<a href=#9 id=9 data-nosnippet>9</a><span class="kw">use </span>crate::{
+<a href=#9 id=9 data-nosnippet>9</a><span class="kw">use crate</span>::{
 <a href=#10 id=10 data-nosnippet>10</a>    error::{Error, ErrorKind},
 <a href=#11 id=11 data-nosnippet>11</a>    writer::Writer,
 <a href=#12 id=12 data-nosnippet>12</a>};
@@ -127,7 +127,7 @@
 <a href=#127 id=127 data-nosnippet>127</a>    }
 <a href=#128 id=128 data-nosnippet>128</a>
 <a href=#129 id=129 data-nosnippet>129</a>    <span class="kw">fn </span>serialize_unit(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Ok, <span class="self">Self</span>::Error&gt; {
-<a href=#130 id=130 data-nosnippet>130</a>        None::&lt;()&gt;.serialize(<span class="self">self</span>)
+<a href=#130 id=130 data-nosnippet>130</a>        <span class="prelude-val">None</span>::&lt;()&gt;.serialize(<span class="self">self</span>)
 <a href=#131 id=131 data-nosnippet>131</a>    }
 <a href=#132 id=132 data-nosnippet>132</a>
 <a href=#133 id=133 data-nosnippet>133</a>    <span class="kw">fn </span>serialize_unit_struct(
@@ -811,17 +811,17 @@
 <a href=#811 id=811 data-nosnippet>811</a></span><span class="kw">mod </span>tests {
 <a href=#812 id=812 data-nosnippet>812</a>    <span class="kw">use </span>{bstr::ByteSlice, serde::Serialize};
 <a href=#813 id=813 data-nosnippet>813</a>
-<a href=#814 id=814 data-nosnippet>814</a>    <span class="kw">use </span>crate::{
+<a href=#814 id=814 data-nosnippet>814</a>    <span class="kw">use crate</span>::{
 <a href=#815 id=815 data-nosnippet>815</a>        error::{Error, ErrorKind},
 <a href=#816 id=816 data-nosnippet>816</a>        writer::Writer,
 <a href=#817 id=817 data-nosnippet>817</a>    };
 <a href=#818 id=818 data-nosnippet>818</a>
-<a href=#819 id=819 data-nosnippet>819</a>    <span class="kw">use </span>super::{SeHeader, SeRecord};
+<a href=#819 id=819 data-nosnippet>819</a>    <span class="kw">use super</span>::{SeHeader, SeRecord};
 <a href=#820 id=820 data-nosnippet>820</a>
 <a href=#821 id=821 data-nosnippet>821</a>    <span class="kw">fn </span>serialize&lt;S: Serialize&gt;(s: S) -&gt; String {
 <a href=#822 id=822 data-nosnippet>822</a>        <span class="kw">let </span><span class="kw-2">mut </span>wtr = Writer::from_writer(<span class="macro">vec!</span>[]);
 <a href=#823 id=823 data-nosnippet>823</a>        s.serialize(<span class="kw-2">&amp;mut </span>SeRecord { wtr: <span class="kw-2">&amp;mut </span>wtr }).unwrap();
-<a href=#824 id=824 data-nosnippet>824</a>        wtr.write_record(None::&lt;<span class="kw-2">&amp;</span>[u8]&gt;).unwrap();
+<a href=#824 id=824 data-nosnippet>824</a>        wtr.write_record(<span class="prelude-val">None</span>::&lt;<span class="kw-2">&amp;</span>[u8]&gt;).unwrap();
 <a href=#825 id=825 data-nosnippet>825</a>        String::from_utf8(wtr.into_inner().unwrap()).unwrap()
 <a href=#826 id=826 data-nosnippet>826</a>    }
 <a href=#827 id=827 data-nosnippet>827</a>
@@ -930,9 +930,9 @@
 <a href=#930 id=930 data-nosnippet>930</a>
 <a href=#931 id=931 data-nosnippet>931</a>    <span class="attr">#[test]
 <a href=#932 id=932 data-nosnippet>932</a>    </span><span class="kw">fn </span>option() {
-<a href=#933 id=933 data-nosnippet>933</a>        <span class="kw">let </span>got = serialize(None::&lt;()&gt;);
+<a href=#933 id=933 data-nosnippet>933</a>        <span class="kw">let </span>got = serialize(<span class="prelude-val">None</span>::&lt;()&gt;);
 <a href=#934 id=934 data-nosnippet>934</a>        <span class="macro">assert_eq!</span>(got, <span class="string">"\"\"\n"</span>);
-<a href=#935 id=935 data-nosnippet>935</a>        <span class="kw">let </span>(wrote, got) = serialize_header(None::&lt;()&gt;);
+<a href=#935 id=935 data-nosnippet>935</a>        <span class="kw">let </span>(wrote, got) = serialize_header(<span class="prelude-val">None</span>::&lt;()&gt;);
 <a href=#936 id=936 data-nosnippet>936</a>        <span class="macro">assert!</span>(!wrote);
 <a href=#937 id=937 data-nosnippet>937</a>        <span class="macro">assert_eq!</span>(got, <span class="string">""</span>);
 <a href=#938 id=938 data-nosnippet>938</a>

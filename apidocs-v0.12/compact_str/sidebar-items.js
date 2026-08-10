@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["ToCompactStringError"],"macro":["format_compact"],"struct":["CompactString","Drain","ReserveError","Utf16Error"],"trait":["CompactStringExt","ToCompactString"]};
+window.SIDEBAR_ITEMS = {"enum":["ToCompactStringError"],"macro":[["format_compact",1]],"struct":["CompactString","Drain","ReserveError","Utf16Error"],"trait":["CompactStringExt","ToCompactString"]};

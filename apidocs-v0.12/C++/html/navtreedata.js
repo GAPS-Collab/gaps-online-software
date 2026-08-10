@@ -43,7 +43,7 @@ var NAVTREE =
       [ "Class Hierarchy", "hierarchy.html", "hierarchy" ],
       [ "Class Members", "functions.html", [
         [ "All", "functions.html", "functions_dup" ],
-        [ "Functions", "functions_func.html", null ],
+        [ "Functions", "functions_func.html", "functions_func" ],
         [ "Variables", "functions_vars.html", "functions_vars" ],
         [ "Enumerations", "functions_enum.html", null ]
       ] ]
@@ -65,12 +65,12 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "____init_____8py.html",
-"io_8cxx.html",
-"structMtbMoniData.html#a29bb45ae96b1920aca3fc2c212e3c3af",
-"structgondola_1_1RBCalibration.html#a5455256956208f6f606872eb5ad94834",
-"structgondola_1_1TofEvent.html#a53d802f90336536a0b2fe1fa84d3722b",
-"structgondola_1_1TofPaddle.html#a808146a08129c82f7ea0d13fa78ecffd",
-"structstd_1_1formatter_3_01gondola_1_1EventStatus_01_4.html#a305ff04496350dffade082a7a4ade716"
+"functions_x.html",
+"structCPUMoniData.html#a312741597779dccac1f8a5313aaa4a82",
+"structgondola_1_1Cooling.html#aca70e7adff91e85069fe82cb210b5194",
+"structgondola_1_1TelemetryPacketReader.html#aecb4a47ffb724ec5913e15928b4e0aaa",
+"structgondola_1_1TofPaddle.html#a22d12a349572b516c75545f27ceb6178",
+"structgondola_1_1TrkHit.html#a44f9b3824db8806bdc3ae81ff338bd98"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

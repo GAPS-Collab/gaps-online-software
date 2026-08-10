@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/portable-atomic-1.13.1/src/cfgs.rs`."><title>cfgs.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="portable_atomic" data-themes="" data-resource-suffix="" data-rustdoc-version="1.96.0 (ac68faa20 2026-05-25)" data-channel="1.96.0" data-search-js="search-b5634cc7.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../static.files/storage-41dd4d93.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-5013f961.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">portable_atomic/</div>cfgs.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="comment">// SPDX-License-Identifier: Apache-2.0 OR MIT
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/portable-atomic-1.15.0/src/cfgs.rs`."><title>cfgs.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="portable_atomic" data-themes="" data-resource-suffix="" data-rustdoc-version="1.97.1 (8bab26f4f 2026-07-14)" data-channel="1.97.1" data-search-js="search-fd9372ac.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../static.files/storage-41dd4d93.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-fcd733ba.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">portable_atomic/</div>cfgs.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="comment">// SPDX-License-Identifier: Apache-2.0 OR MIT
 <a href=#2 id=2 data-nosnippet>2</a>
 <a href=#3 id=3 data-nosnippet>3</a></span><span class="attr">#![allow(missing_docs)]
 <a href=#4 id=4 data-nosnippet>4</a>
@@ -569,26 +569,64 @@
 <a href=#569 id=569 data-nosnippet>569</a>    }
 <a href=#570 id=570 data-nosnippet>570</a>}
 <a href=#571 id=571 data-nosnippet>571</a>
-<a href=#572 id=572 data-nosnippet>572</a><span class="comment">// Check that all cfg_ macros work.
-<a href=#573 id=573 data-nosnippet>573</a></span><span class="kw">mod </span>check {
-<a href=#574 id=574 data-nosnippet>574</a>    <span class="macro">crate::cfg_has_atomic_8!</span> { <span class="kw">type </span>_Atomic8 = (); }
-<a href=#575 id=575 data-nosnippet>575</a>    <span class="macro">crate::cfg_no_atomic_8!</span> { <span class="kw">type </span>_Atomic8 = (); }
-<a href=#576 id=576 data-nosnippet>576</a>    <span class="macro">crate::cfg_has_atomic_16!</span> { <span class="kw">type </span>_Atomic16 = (); }
-<a href=#577 id=577 data-nosnippet>577</a>    <span class="macro">crate::cfg_no_atomic_16!</span> { <span class="kw">type </span>_Atomic16 = (); }
-<a href=#578 id=578 data-nosnippet>578</a>    <span class="macro">crate::cfg_has_atomic_32!</span> { <span class="kw">type </span>_Atomic32 = (); }
-<a href=#579 id=579 data-nosnippet>579</a>    <span class="macro">crate::cfg_no_atomic_32!</span> { <span class="kw">type </span>_Atomic32 = (); }
-<a href=#580 id=580 data-nosnippet>580</a>    <span class="macro">crate::cfg_has_atomic_64!</span> { <span class="kw">type </span>_Atomic64 = (); }
-<a href=#581 id=581 data-nosnippet>581</a>    <span class="macro">crate::cfg_no_atomic_64!</span> { <span class="kw">type </span>_Atomic64 = (); }
-<a href=#582 id=582 data-nosnippet>582</a>    <span class="macro">crate::cfg_has_atomic_128!</span> { <span class="kw">type </span>_Atomic128 = (); }
-<a href=#583 id=583 data-nosnippet>583</a>    <span class="macro">crate::cfg_no_atomic_128!</span> { <span class="kw">type </span>_Atomic128 = (); }
-<a href=#584 id=584 data-nosnippet>584</a>    <span class="macro">crate::cfg_has_atomic_ptr!</span> { <span class="kw">type </span>_AtomicPtr = (); }
-<a href=#585 id=585 data-nosnippet>585</a>    <span class="macro">crate::cfg_no_atomic_ptr!</span> { <span class="kw">type </span>_AtomicPtr = (); }
-<a href=#586 id=586 data-nosnippet>586</a>    <span class="macro">crate::cfg_has_atomic_cas!</span> { <span class="kw">type </span>__AtomicPtr = (); }
-<a href=#587 id=587 data-nosnippet>587</a>    <span class="macro">crate::cfg_no_atomic_cas!</span> { <span class="kw">type </span>__AtomicPtr = (); }
-<a href=#588 id=588 data-nosnippet>588</a>    <span class="attr">#[allow(unused_imports)]
-<a href=#589 id=589 data-nosnippet>589</a>    </span><span class="kw">use </span>self::{
-<a href=#590 id=590 data-nosnippet>590</a>        __AtomicPtr <span class="kw">as _</span>, _Atomic8 <span class="kw">as _</span>, _Atomic16 <span class="kw">as _</span>, _Atomic32 <span class="kw">as _</span>, _Atomic64 <span class="kw">as _</span>,
-<a href=#591 id=591 data-nosnippet>591</a>        _Atomic128 <span class="kw">as _</span>, _AtomicPtr <span class="kw">as _</span>,
-<a href=#592 id=592 data-nosnippet>592</a>    };
-<a href=#593 id=593 data-nosnippet>593</a>}
+<a href=#572 id=572 data-nosnippet>572</a><span class="macro">macro_rules!</span> cfg_core_atomic {
+<a href=#573 id=573 data-nosnippet>573</a>    ($(<span class="macro-nonterminal">$tt</span>:tt)<span class="kw-2">*</span>) =&gt; {
+<a href=#574 id=574 data-nosnippet>574</a>        <span class="attr">#[cfg(not(any(
+<a href=#575 id=575 data-nosnippet>575</a>            target_arch = <span class="string">"avr"</span>,
+<a href=#576 id=576 data-nosnippet>576</a>            target_arch = <span class="string">"msp430"</span>,
+<a href=#577 id=577 data-nosnippet>577</a>            all(
+<a href=#578 id=578 data-nosnippet>578</a>                portable_atomic_no_atomic_load_store,
+<a href=#579 id=579 data-nosnippet>579</a>                not(all(target_arch = <span class="string">"bpf"</span>, not(feature = <span class="string">"critical-section"</span>))),
+<a href=#580 id=580 data-nosnippet>580</a>            ),
+<a href=#581 id=581 data-nosnippet>581</a>        )))]
+<a href=#582 id=582 data-nosnippet>582</a>        #[cfg_attr(
+<a href=#583 id=583 data-nosnippet>583</a>            portable_atomic_no_cfg_target_has_atomic,
+<a href=#584 id=584 data-nosnippet>584</a>            cfg(not(all(
+<a href=#585 id=585 data-nosnippet>585</a>                any(
+<a href=#586 id=586 data-nosnippet>586</a>                    target_arch = <span class="string">"riscv32"</span>,
+<a href=#587 id=587 data-nosnippet>587</a>                    target_arch = <span class="string">"riscv64"</span>,
+<a href=#588 id=588 data-nosnippet>588</a>                    feature = <span class="string">"critical-section"</span>,
+<a href=#589 id=589 data-nosnippet>589</a>                    portable_atomic_unsafe_assume_single_core,
+<a href=#590 id=590 data-nosnippet>590</a>                ),
+<a href=#591 id=591 data-nosnippet>591</a>                portable_atomic_no_atomic_cas,
+<a href=#592 id=592 data-nosnippet>592</a>            )))
+<a href=#593 id=593 data-nosnippet>593</a>        )]
+<a href=#594 id=594 data-nosnippet>594</a>        #[cfg_attr(
+<a href=#595 id=595 data-nosnippet>595</a>            not(portable_atomic_no_cfg_target_has_atomic),
+<a href=#596 id=596 data-nosnippet>596</a>            cfg(not(all(
+<a href=#597 id=597 data-nosnippet>597</a>                any(
+<a href=#598 id=598 data-nosnippet>598</a>                    target_arch = <span class="string">"riscv32"</span>,
+<a href=#599 id=599 data-nosnippet>599</a>                    target_arch = <span class="string">"riscv64"</span>,
+<a href=#600 id=600 data-nosnippet>600</a>                    feature = <span class="string">"critical-section"</span>,
+<a href=#601 id=601 data-nosnippet>601</a>                    portable_atomic_unsafe_assume_single_core,
+<a href=#602 id=602 data-nosnippet>602</a>                ),
+<a href=#603 id=603 data-nosnippet>603</a>                not(target_has_atomic = <span class="string">"ptr"</span>),
+<a href=#604 id=604 data-nosnippet>604</a>            )))
+<a href=#605 id=605 data-nosnippet>605</a>        )]
+<a href=#606 id=606 data-nosnippet>606</a>        </span><span class="macro">items!</span>($(<span class="macro-nonterminal">$tt</span>)<span class="kw-2">*</span>);
+<a href=#607 id=607 data-nosnippet>607</a>    };
+<a href=#608 id=608 data-nosnippet>608</a>}
+<a href=#609 id=609 data-nosnippet>609</a>
+<a href=#610 id=610 data-nosnippet>610</a><span class="comment">// Check that all cfg_ macros work.
+<a href=#611 id=611 data-nosnippet>611</a></span><span class="kw">mod </span>check {
+<a href=#612 id=612 data-nosnippet>612</a>    <span class="macro">crate::cfg_has_atomic_8!</span> { <span class="kw">type </span>_Atomic8 = (); }
+<a href=#613 id=613 data-nosnippet>613</a>    <span class="macro">crate::cfg_no_atomic_8!</span> { <span class="kw">type </span>_Atomic8 = (); }
+<a href=#614 id=614 data-nosnippet>614</a>    <span class="macro">crate::cfg_has_atomic_16!</span> { <span class="kw">type </span>_Atomic16 = (); }
+<a href=#615 id=615 data-nosnippet>615</a>    <span class="macro">crate::cfg_no_atomic_16!</span> { <span class="kw">type </span>_Atomic16 = (); }
+<a href=#616 id=616 data-nosnippet>616</a>    <span class="macro">crate::cfg_has_atomic_32!</span> { <span class="kw">type </span>_Atomic32 = (); }
+<a href=#617 id=617 data-nosnippet>617</a>    <span class="macro">crate::cfg_no_atomic_32!</span> { <span class="kw">type </span>_Atomic32 = (); }
+<a href=#618 id=618 data-nosnippet>618</a>    <span class="macro">crate::cfg_has_atomic_64!</span> { <span class="kw">type </span>_Atomic64 = (); }
+<a href=#619 id=619 data-nosnippet>619</a>    <span class="macro">crate::cfg_no_atomic_64!</span> { <span class="kw">type </span>_Atomic64 = (); }
+<a href=#620 id=620 data-nosnippet>620</a>    <span class="macro">crate::cfg_has_atomic_128!</span> { <span class="kw">type </span>_Atomic128 = (); }
+<a href=#621 id=621 data-nosnippet>621</a>    <span class="macro">crate::cfg_no_atomic_128!</span> { <span class="kw">type </span>_Atomic128 = (); }
+<a href=#622 id=622 data-nosnippet>622</a>    <span class="macro">crate::cfg_has_atomic_ptr!</span> { <span class="kw">type </span>_AtomicPtr = (); }
+<a href=#623 id=623 data-nosnippet>623</a>    <span class="macro">crate::cfg_no_atomic_ptr!</span> { <span class="kw">type </span>_AtomicPtr = (); }
+<a href=#624 id=624 data-nosnippet>624</a>    <span class="macro">crate::cfg_has_atomic_cas!</span> { <span class="kw">type </span>__AtomicPtr = (); }
+<a href=#625 id=625 data-nosnippet>625</a>    <span class="macro">crate::cfg_no_atomic_cas!</span> { <span class="kw">type </span>__AtomicPtr = (); }
+<a href=#626 id=626 data-nosnippet>626</a>    <span class="attr">#[allow(unused_imports)]
+<a href=#627 id=627 data-nosnippet>627</a>    </span><span class="kw">use </span><span class="self">self</span>::{
+<a href=#628 id=628 data-nosnippet>628</a>        __AtomicPtr <span class="kw">as _</span>, _Atomic8 <span class="kw">as _</span>, _Atomic16 <span class="kw">as _</span>, _Atomic32 <span class="kw">as _</span>, _Atomic64 <span class="kw">as _</span>,
+<a href=#629 id=629 data-nosnippet>629</a>        _Atomic128 <span class="kw">as _</span>, _AtomicPtr <span class="kw">as _</span>,
+<a href=#630 id=630 data-nosnippet>630</a>    };
+<a href=#631 id=631 data-nosnippet>631</a>}
 </code></pre></div></section></main></body></html>
