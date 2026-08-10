@@ -31,6 +31,7 @@ impl fmt::Display for McTrack {
   } 
 }
 
+#[cfg(feature="pybindings")]
 pythonize!(McTrack);
 
 #[cfg(feature="pybindings")]
