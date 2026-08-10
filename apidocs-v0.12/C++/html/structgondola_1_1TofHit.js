@@ -35,6 +35,7 @@ var structgondola_1_1TofHit =
     [ "peak_a_f32", "structgondola_1_1TofHit.html#a220c1b36e9b6e630b24c059aaf83c351", null ],
     [ "peak_b_f32", "structgondola_1_1TofHit.html#aca20e173802304d09c8788f749b0329c", null ],
     [ "phase", "structgondola_1_1TofHit.html#a442c8ee678471c1df13f599a1efb7319", null ],
+    [ "quality", "structgondola_1_1TofHit.html#a28e5440bdb4d538f834c702fda40b36b", null ],
     [ "tail", "structgondola_1_1TofHit.html#aa9d901afff1a2e399b01f0f19e755a1b", null ],
     [ "time_a_f32", "structgondola_1_1TofHit.html#a489fd8fc723ad2f5a3682a17022fbc3e", null ],
     [ "time_b_f32", "structgondola_1_1TofHit.html#aa0378829471c39bd3597651da4d37fb7", null ],

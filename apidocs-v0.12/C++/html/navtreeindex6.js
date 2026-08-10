@@ -1,5 +1,7 @@
 var NAVTREEINDEX6 =
 {
+"structgondola_1_1TrkHit.html#a4461756861f59f9a6464621b380f809b":[4,0,0,30,4],
+"structgondola_1_1TrkHit.html#a44f9b3824db8806bdc3ae81ff338bd98":[2,0,0,30,8],
 "structgondola_1_1TrkHit.html#a44f9b3824db8806bdc3ae81ff338bd98":[4,0,0,30,8],
 "structgondola_1_1TrkHit.html#a63b3d1cca6e54885361fb05ee9c544ce":[2,0,0,30,7],
 "structgondola_1_1TrkHit.html#a63b3d1cca6e54885361fb05ee9c544ce":[4,0,0,30,7],
