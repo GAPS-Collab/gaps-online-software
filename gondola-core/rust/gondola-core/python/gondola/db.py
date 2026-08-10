@@ -67,6 +67,10 @@ TrackerCaliTimeWindow                    = _gc.db.TrackerCaliTimeWindow
 TrackerCaliTimeWindow.__module__         = __name__ 
 TrackerCaliTimeWindow.__name__           = 'TrackerCaliTimeWindow'
 
+TofPaddleTemp                            = _gc.db.TofPaddleTemp
+TofPaddleTemp.__module__                 = __name__ 
+TofPaddleTemp.__name__                   = 'TofPaddleTemp'
+
 # mappings 
 get_all_rbids_in_db                = _gc.db.get_all_rbids_in_db
 get_all_rbids_in_db.__module__     = __name__
@@ -112,6 +116,9 @@ is_in_tracker_cali_window.__module__ = __name__
 
 create_trk_cali_tw_table  = _gc.db.create_trk_cali_tw_table 
 create_trk_cali_tw_table.__module__ = __name__ 
+
+create_tof_paddle_temp_table = _gc.db.create_tof_paddle_temp_table 
+create_tof_paddle_temp_table.__module__ = __name__
 
 #-----------------------------------------------------------------
 

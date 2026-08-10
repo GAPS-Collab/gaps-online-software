@@ -60,6 +60,12 @@ pub use tracker_cali_times::{
   create_trk_cali_tw_table,
 };
 
+mod tof_paddle_temps;
+pub use tof_paddle_temps::{
+  TofPaddleTemp,
+  create_tof_paddle_temp_table
+};
+
 /// Low gain/LTB connections to paddle ID 
 pub type DsiJChPidMapping = HashMap<u8, HashMap<u8, HashMap<u8, (u8, u8)>>>;
 /// Low gain/LTB connections to rb ID 

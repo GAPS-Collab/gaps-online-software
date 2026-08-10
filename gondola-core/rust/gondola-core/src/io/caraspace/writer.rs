@@ -3,11 +3,29 @@
 
 use crate::prelude::*;
 
-/// Write CRFrames to disk.
+/// Write CRFrames ("caraspace frames") to disk. 
+/// 
+/// A frame can hold any TOF/TelemetryPacket.
+/// Data are written to disk in sequential matter,
+/// where frames can be added one at a time and 
+/// buffered for efficient writing
 ///
-/// Operates sequentially, frames can 
-/// be added one at a time, then will
-/// be synced to disk.
+/// -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+///
+/// How to create a new CRWriter (python)
+///
+/// # Arguments
+///
+/// * file_path        (str) : Path to store the file under
+/// * run_id           (u32) : Run ID for this file (will be written in filename)
+/// * subrun_id        (u32) : Sub-Run ID for this file (will be written in filename. 
+///                            If None, a generic "0" will be used
+/// * timestamp        (str) : The writer will add an automatic timestamp to the current file
+///                            based on the current time. This option allows to overwrite 
+///                            that behaviour
+/// * file_len_gcu_sec (u32) : If not None, this will use the gcu time from added packets 
+///                            as the timestamp in the filename, and will write a new file 
+///                            every given number of seconds
 #[cfg_attr(feature="pybindings", pyclass)]
 pub struct CRWriter {
 

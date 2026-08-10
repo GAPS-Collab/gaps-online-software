@@ -428,6 +428,7 @@ fn db_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<TrackerCalibrationFile>()?;
   m.add_class::<TrackerCalibrationFileType>()?;
   m.add_class::<TrackerCaliTimeWindow>()?;
+  m.add_class::<TofPaddleTemp>()?;
   m.add_function(wrap_pyfunction!(load_calibration_db_elena, m)?)?;
   m.add_function(wrap_pyfunction!(get_all_rbids_in_db, m)?)?;
   m.add_function(wrap_pyfunction!(get_all_pbids_in_db, m)?)?;
@@ -444,6 +445,7 @@ fn db_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(create_trk_gain_table, m)?)?;
   m.add_function(wrap_pyfunction!(is_in_tracker_cali_window, m)?)?;
   m.add_function(wrap_pyfunction!(create_trk_cali_tw_table, m)?)?;
+  m.add_function(wrap_pyfunction!(create_tof_paddle_temp_table, m)?)?;
   Ok(())
 }
 

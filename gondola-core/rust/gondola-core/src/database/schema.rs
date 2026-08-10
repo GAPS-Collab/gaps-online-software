@@ -1,6 +1,7 @@
 //! The following file is part of gaps-online-software and published 
 //! under the GPLv3 license
 
+
 diesel::table! {
   auth_group (id) {
       id -> Integer,
@@ -182,6 +183,17 @@ diesel::table! {
     data_id             -> Integer,
     utc_timestamp_start -> BigInt,
     utc_timestamp_stop  -> BigInt,
+    meta                -> Nullable<Text>,
+  }
+}
+
+diesel::table! {
+  tof_db_tofpaddletemp (data_id) {
+    data_id             -> Integer,
+    paddle_id           -> SmallInt, 
+    utc_timestamp       -> BigInt,
+    temp_a              -> Float,
+    temp_b              -> Float,
     meta                -> Nullable<Text>,
   }
 }
