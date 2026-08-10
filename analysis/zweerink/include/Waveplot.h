@@ -206,6 +206,7 @@ private:
   TGraphAsymmErrors  *sat_trace;
   TGraph *pedestal;
   TGraph *pedsigma;
+  TGraph *pedrange1, *pedrange2;
   TGraph *thresh;
   TGraph *gpeaks[MAX_NUM_PEAKS];
   TGraph *gwidth[MAX_NUM_PEAKS];

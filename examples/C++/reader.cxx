@@ -1,0 +1,276 @@
+/*
+ * Binary to illustrate how to read GAPS L0 file with the
+ * caraspace library.
+ * To use this example, the code has to be build with
+ * BUILD_CARASPACE=ON
+ * 
+ * March 2025, gaps-online-sw V0.10
+ * The API will not be stable until V1.0 and is thus 
+ * subject to change. Please refer to the respective 
+ * README.md
+ *
+ */
+
+#include <iostream>
+#include <filesystem>
+#include <chrono>
+#include "cxxopts.hpp"
+
+#include "spdlog/spdlog.h"
+#include "spdlog/cfg/env.h"
+
+#include "io.hpp"
+#include "calibration.h"
+#include "database.h"
+#include "caraspace.hpp"
+
+#include "constants.h"
+#include "EventGAPS.h"
+#include "./PacketMethods.h"
+
+namespace fs = std::filesystem;
+//namespace gt = Gaps::Telemetry;
+namespace g = gondola;
+
+int main(int argc, char *argv[]){
+  spdlog::cfg::load_env_levels();
+    
+  cxxopts::Options options("analyzeGAPS", "Read GAPS L0 (caraspace) or GAPS .bin files. These files contain ALL information, including the TOF disk (waveform) stream and ALL telemetry packets");
+  options.add_options()
+  ("h,help", "Print help")
+  ("file", "A Caraspace file", cxxopts::value<std::string>())
+  ("directory", "A directory containing .gaps (caraspace) files, e.g. L0 Gaps files", cxxopts::value<std::string>())
+  ("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
+  ;
+  options.parse_positional({"file"});
+  auto result = options.parse(argc, argv);
+  if (result.count("help")) {
+    std::cout << options.help() << std::endl;
+    exit(EXIT_SUCCESS);
+  }
+  if (!result.count("file")) {
+    spdlog::error("No input file given!");
+    std::cout << options.help() << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  auto pathname   = result["file"].as<std::string>();
+  bool verbose = result["verbose"].as<bool>();
+  
+  fs::path path(pathname);
+  if (!fs::exists(path)) {
+    spdlog::error("Path {} does not exist!", pathname);
+    exit(EXIT_FAILURE);
+  }
+  
+  Vec<std::string> filenames;
+  if (fs::is_directory(path)) {
+    for (const auto& entry : fs::directory_iterator(path)) {
+      if (entry.is_regular_file()) {
+        std::string filename = entry.path().string();
+        filenames.push_back(filename);
+      }
+    }
+  } else { // Single file or file with filenames
+    // This is a little kludgy and could probably be done with string
+    // operators if you wanted. But, it works. 
+    char tmpline[500];
+    std::string ftype = ".bin";
+    size_t found = path.string().find(ftype);
+    bool flist = ( found == path.string().size()-4 ? false : true);
+    if (flist) { // Doesn't end with .bin -> a file with files
+      // Read files and and store in "filenames"
+      FILE *fp = fopen(path.c_str(), "r");
+      if (fp != NULL) {
+        while (fscanf(fp, "%s", tmpline) != EOF) {
+	  filenames.push_back(tmpline);
+	}
+        fclose(fp);
+      } else {
+        printf("Unable to open file %s\n", path.c_str());
+      }
+    } else { // Ends with .bin -> a single file
+      // Store file in "filenames"
+      filenames.push_back(path.string());
+    }
+  }
+
+  std::cout << "Will read " << filenames.size() << " files!" << std::endl; 
+  //return (0);
+  std::string tp_name        = "PacketType.TofEvent";
+  std::string tel_ev_nogaps  = "TelemetryPacketType.NoGapsTriggerEvent";
+  std::string tel_ev_boring  = "TelemetryPacketType.BoringEvent";
+  std::string tel_ev_intrst  = "TelemetryPacketType.InterestingEvent";
+  std::string tel_ev_notof   = "TelemetryPacketType.NoTofDataEvent";
+
+  std::string cooling_name   = "TelemetryPacketType.CoolingHK";
+  std::string rbwf_name      = "TelemetryPacketType.RBWaveform";
+  std::string anyTofHK       = "TelemetryPacketType.AnyTofHK";
+  
+  // Instantiate our class that holds the data
+  auto PM = PacketMethods();
+  PM.BeginRun(1000);
+
+  u64 n_frames_processed  = 0;
+  u64 n_telemetry_errors  = 0;
+  u64 n_tof_telemetry_err = 0;
+        
+  // counters for merged event packets                                    
+  u64 n_boring            = 0;
+  u64 n_nogaps            = 0;
+  u64 n_interest          = 0;
+  u64 n_notof             = 0;
+
+  u64 n_cooling           = 0;
+
+  auto start = std::chrono::high_resolution_clock::now();
+
+  // as an example, count tracker hits
+  u64 n_trk_hits        = 0;
+  u64 n_trk_hits_masked = 0;
+  u64 n_evt_no_trk_hits = 0;
+  auto event_ids        = Vec<u32>();
+  for (auto const &f : filenames) {
+    auto start = std::chrono::high_resolution_clock::now();
+    auto reader = gondola::CRReader(f);
+    u64 n_frames_processed_file = 0;
+    while (!reader.is_exhausted()) {
+      auto frame = gondola::CRFrame();
+      try {
+        frame = reader.get_next_frame();
+      } catch (const std::exception& e) {
+        std::string emeesage = std::format("--> Exception '{}' caught!", e.what());
+        std::string message = std::format("--> File {} with {} frames processed! In total, we proceseed {} frames", f, n_frames_processed_file, n_frames_processed);
+        std::cout << emeesage << std::endl;
+        std::cout << message << std::endl;
+        break;
+      }
+      ++n_frames_processed;
+      ++n_frames_processed_file;
+
+      g::TelemetryPacket pack;
+      // check for RBWaveform                                       
+      if (frame.index.contains(rbwf_name)) {
+        auto pack = frame.get_telemetrypacket(rbwf_name);
+        usize pos = 0;
+        auto tp_res   = TofPacket::from_bytestream(pack.payload, pos);
+        if (!tp_res.is_ok()) {
+          spdlog::error("Can't get tofpacket for rbwaveform from telemetrypacket!");
+          continue;
+        }
+        auto tp   = tp_res.unwrap();
+        pos       = 0;
+	auto rbwf = g::RBWaveform::from_bytestream(tp.payload, pos);
+        std::cout << rbwf.to_string() << std::endl;
+      }
+
+      if (frame.index.contains(anyTofHK)) {
+        auto pack = frame.get_telemetrypacket(anyTofHK);
+        //usize pos = 0;
+        //auto tp_res   = TofPacket::from_bytestream(pack.payload, pos);
+        //if (!tp_res.is_ok()) {
+         //spdlog::error("Can't get tofpacket f/ ToFHK from telemetrypacket!");
+	//continue;
+        //}
+	//auto tp   = tp_res.unwrap();
+	// pos       = 0;
+	//auto rbwf = RBWaveform::from_bytestream(tp.payload, pos);
+        std::cout << "Found TOF HK packet" << std::endl;
+      }
+
+      if (frame.index.contains(tel_ev_nogaps)) {
+        ++n_nogaps;
+        pack = frame.get_telemetrypacket(tel_ev_nogaps);
+        //printf("Found NoGaps\n");
+      } else if (frame.index.contains(tel_ev_boring)) {
+        ++n_boring;
+        pack = frame.get_telemetrypacket(tel_ev_boring);
+        //printf("Found Boring\n");
+      } else if (frame.index.contains(tel_ev_intrst)) {
+        ++n_interest;
+        pack = frame.get_telemetrypacket(tel_ev_intrst);
+        //printf("Found Interesting\n");
+     } else if (frame.index.contains(tel_ev_notof)) {
+        ++n_notof;
+        pack = frame.get_telemetrypacket(tel_ev_notof);
+        //printf("Found NoTOF\n");
+      } else {
+        continue;
+      }
+
+      if (frame.index.contains(cooling_name)) {
+        pack = frame.get_telemetrypacket(cooling_name);
+        ++n_cooling;
+        printf("Found Cooling\n");
+        std::cout << pack.to_string() << std::endl;
+      //  usize pos = 0;
+      //  auto cooling = gt::Cooling::from_bytestream(pack.payload, pos);
+      //  if (cooling.is_ok()) {
+      //    std::cout << cooling.unwrap().to_string() << std::endl;
+      //  } else {
+      //    std::cout << cooling.unwrap_err().reason << std::endl;
+      //  }
+      //  //std::exit(1);
+      }
+
+      if (verbose) {
+        std::cout << "---- TELEMETRY -----" << std::endl;
+        std::cout << frame.to_string() << std::endl;
+        std::cout << pack.to_string() << std::endl;
+      }
+      usize pos = 0;
+      auto result = g::TelemetryEvent::from_bytestream(pack.payload, pos);
+      // in case of errors, we just move on
+      if (result.is_err()) {
+        std::string message = result.unwrap_err().reason;
+        spdlog::error(message);
+        ++n_telemetry_errors;
+        continue;
+      }
+      auto m_ev = result.unwrap();
+      for (g::TrkHit const &h : m_ev.trk_hits) {
+        auto strip_id = g::TrackerStrip::create_id(h.layer, h.row, h.module, h.channel);
+        //if (trk_mask[strip_id]) {
+        //  // only count active strips
+        //  ++n_trk_hits;
+        //  // just as an example - subtract a pedestal
+        //  auto adc_no_pedestal = h.adc - trk_ped[strip_id].pedestal_mean;
+        //  //adc_no_pedestal;
+        //} else {
+        //  ++n_trk_hits_masked;
+	//}
+          //std::cout << h.to_string() << std::endl;
+      }
+      if (m_ev.trk_hits.size() == 0) {
+        ++n_evt_no_trk_hits;
+      } else {
+        n_trk_hits += m_ev.trk_hits.size();
+      }
+
+      PM.ProcessTofEventSummary(&m_ev.tof_event, m_ev.event_id);
+      
+      if (n_frames_processed % 1000000 == 0) {
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsed = end - start;
+        std::cout << "--> ------------------------------" << std::endl;
+        std::cout << "--> Processed " << n_frames_processed << " frames in " << elapsed << std::endl;
+        std::cout << "--> Saw " << n_telemetry_errors << " errors when reading telemetry files!" << std::endl;
+        auto start = std::chrono::high_resolution_clock::now();
+      }
+    }
+  }
+  PM.EndRun();
+
+  auto end = std::chrono::high_resolution_clock::now();
+  auto elapsed = end - start;
+  std::cout << "--> ----FINISHED--------------" << std::endl;
+  std::cout << "--> Processesd " << n_frames_processed << " frames in " << elapsed << std::endl;
+  std::cout << "--> Saw " << n_telemetry_errors << " errors when reading telemetry files!" << std::endl;
+  std::cout << "--> Saw " << n_tof_telemetry_err << " errors when reading tofdata from telemetry files!" << std::endl;
+  std::cout << "--> Saw " << n_trk_hits << " valid tracker hits!" << std::endl;
+  std::cout << "--> Saw " << n_trk_hits_masked << " inactive tracker hits!" << std::endl;
+  std::cout << "--> Saw " << n_evt_no_trk_hits << " events without any tracker hits!" << std::endl;
+  spdlog::info("Finished");
+  return EXIT_SUCCESS;
+}
+
+

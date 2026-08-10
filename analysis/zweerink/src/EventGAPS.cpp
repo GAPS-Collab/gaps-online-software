@@ -18,6 +18,7 @@
 
 
 using namespace std;
+//using namespace GAPS;
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
@@ -25,7 +26,7 @@ using namespace std;
 EventGAPS::EventGAPS(void) {
 
   // Initialize any values necessary for a new event
-  InitializeVariables(0);
+  InitializeVariables(0, 0);
 
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -44,8 +45,9 @@ EventGAPS::~EventGAPS(void) {
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-void EventGAPS::InitializeVariables(unsigned long int evt_ctr=0) {
+void EventGAPS::InitializeVariables(int run_no, unsigned long int evt_ctr=0) {
   
+  runno    = run_no;
   evtno    = evt_ctr;
   sc_speed = 154.0;   // Scintillator speed of light, in mm/ns
   
@@ -57,6 +59,7 @@ void EventGAPS::InitializeVariables(unsigned long int evt_ctr=0) {
     QInt[i]     = -999.0;
     TDC[i]      = -999.0;
   }
+  PedRMSFix = false;
   
   // Reset everything that is stored by RB number
   for (int i=0; i<NRB; i++) {
@@ -66,33 +69,34 @@ void EventGAPS::InitializeVariables(unsigned long int evt_ctr=0) {
     Phi[i]           = -999.0;
   }
 
-  /*
-  float umb[12] = {0.215, 0.187, 0.172, 0.154, 0.102, 0.000, 1.021, 0.279,
-		   1.064, 0.431, 1.235, 0.390};
-  float cube_top[12] = {0.070, 0.537,-0.008, 0.471, 0.046, 0.504,-0.143, 0.050,
-		  -0.166, 0.003,-0.089, 0.000};
-  float cube_bot[12] = {0.792, 0.000, 0.631, 0.751, 0.772, 0.615, 0.626, 0.942,
-		   0.664, 0.000, 0.716, 0.000};
-  */
-  float umb[12] = {0.164, 0.133, 0.146, 0.138, 0.098, 0.000, 1.006, 0.354,
-		   1.052, 0.421, 1.180, 0.247};
-  float c_top[12] = { 0.060, 0.480,-0.017, 0.461, 0.035, 0.491,-0.153, 0.038,
-		      -0.176, 0.008,-0.038, 0.000};
-  float c_bot[12] = { 0.793, 0.000, 0.609, 0.750, 0.751, 0.613, 0.622, 0.937,
-		      0.646, 0.923, 0.699, 0.872};
-  float c_sid[32] = { 0.380,-0.054, 0.453, 0.386, 0.433, 0.401, 0.649, 0.524,
-		      0.033, 0.468, 0.332, 0.517, 0.080, 0.598, 0.123, 0.540,
-		      -0.124, 0.245, 0.566, 0.411, 0.423, 0.301, 0.445, 0.081,
-		      0.515, 0.581, 0.438, 0.693, 0.380, 0.697, 0.662, 0.817};
+  float t_off[NPAD] = {
+        0.269,  0.685,  0.223,  0.605,  0.293,  0.622, -0.160, -0.020,
+        0.071, -0.117, -0.148, -0.153,  1.073,  1.184,  0.891,  0.935,
+        1.078,  0.123,  0.000,  1.200,  0.799,  1.189,  0.964,  0.000,
+        0.705,  0.205,  0.808,  0.771,  0.793,  0.798,  0.981,  0.952,
+        0.205,  0.559,  0.506,  0.616,  0.000,  0.661,  0.272,  0.523,
+        0.000,  0.011,  0.732,  0.000,  0.000,  0.385,  0.723,  0.000,
+        0.447,  0.801,  0.505,  0.924,  0.652,  0.883,  0.988,  1.042,
+        0.411,  0.541, -0.318,  0.446, -0.217, -0.223, -0.144, -0.169,
+       -0.060, -0.000, -0.951, -0.291, -1.041, -0.395, -1.193, -0.302,
+        0.424,  0.000,  0.757,  0.529,  0.947,  0.492, -0.571, -0.442,
+       -0.619, -0.500, -0.933, -0.802, -0.636, -0.708,  0.000,  0.000,
+        0.000,  0.000,  0.623,  1.638, -0.154,  0.000,  0.000,  0.000,
+        0.000,  1.680,  1.227,  1.489,  1.014,  1.263,  1.614,  1.075,
+        1.050,  0.832,  0.806,  0.000, -0.475, -0.306, -0.432, -0.520,
+       -0.180, -0.808, -0.808, -3.932, -0.808, -0.808, -0.988, -1.133,
+       -1.100, -1.077, -1.241, -3.921, -0.506, -0.506, -0.506, -0.506,
+       -1.152, -0.943, -0.969, -1.323, -1.048, -3.513, -3.878, -4.161,
+       -3.997, -0.732, -0.848, -0.133, -0.693, -0.031, -0.708, -2.737,
+       -0.505, -3.544, -0.505, -0.505,  0.000,  0.000,  0.000,  0.000,
+        0.000,  0.000,  0.000,  0.000,  0.000,  0.000,  0.000,  0.000 };
+
   
   for (int i=0;i<NPAD;i++) {
-    if (i>0&&i<13) Offset[i] = c_top[i-1];
-    else if (i>12&&i<25) Offset[i] = c_bot[i-13];
-    else if (i>24&&i<57) Offset[i] = c_sid[i-25];
-    else if (i>60&&i<73) Offset[i] = -1.0*umb[i-61];
+    if (i>0&&i<161) Offset[i] = t_off[i-1];
     else Offset[i] = 0.0;
-    // If we want to calculate the offsets, set them all to zero.
-    Offset[i] = 0.0;
+    // If we want to calculate the offsets, set them all to zero.             
+    //Offset[i] = 0.0;                                                        
   }
   
   // Reset everything that is stored by Paddle number (1-160)
@@ -136,11 +140,9 @@ void EventGAPS::InitializeWaveforms(GAPS::Waveform *wave[],
 void EventGAPS::UnsetWaveforms(void) {
   // Store pointers to the waveforms locally
   for (int i=0; i<NTOT; i++) {
-    //delete wData[i];
     wData[i]  = NULL;
   }
   for (int i=0; i<NRB;  i++) {
-    //delete wData[i];
     wClock[i] = NULL;
   }
   
@@ -152,77 +154,19 @@ void EventGAPS::UnsetWaveforms(void) {
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 // Set up our SiPM channel to Paddle map to Location in detector
-void EventGAPS::SetPaddleMap(int paddle_map[NRB][NCH], int pad2volid[NPAD],
-			     int padvid[NPAD], float padLocation[NPAD][4]) {
-  // This was an older, more kludgey way of doing this where a bunch
-  // of arrays were passed into the subroutine. The next method is
-  // much cleaner where arguments are two structures with all the
-  // mapping already done.
-  
-  // This subroutine stores the SiPM channel for each paddle end (A,B)
-  for (int i=0; i<NRB; i++) {
-    for (int j=0; j<NCH; j++) {
-      // Store the paddle for each RB/CH
-      //ChnlMap[i][j] = paddle_map[i][j];
-      
-      // Store the SiPM Channel for each Paddle end
-      int paddle = paddle_map[i][j] % 1000;
-      int ch_num = (i-1)*NCH+j; // Map the value to NTOT
-      if (paddle_map[i][j] > 2000) { // We have a paddle ID for B
-	Paddle_B[paddle] = ch_num; 
-	//printf("B -> %d %d %d %d %d\n", i,j,ch_num, paddle,paddle_map[i][j]);
-      } else if (paddle_map[i][j] > 1000) { //We have a paddle ID for A
-	Paddle_A[paddle] = ch_num;
-      }
-    }
-  }
-  
-  /*
-  for (int i=0; i<NPAD; i++) {
-    printf("PadID %3d  -> RB_A %3d %2d %2d; RB_B %3d %2d %2d\n", i,
-	   Paddle_A[i], (int)Paddle_A[i]/NCH, Paddle_A[i]%NCH, 
-	   Paddle_B[i], (int)Paddle_B[i]/NCH, Paddle_B[i]%NCH); 
-  }
-  */
-  
-  // For each paddle, we want to set the X, Y, Z locations. So, index
-  // through the pad2volid[] array, find matching volid in
-  // padLocation[][] array, and set x,y,z from appropriate values
-  for (int i=0; i<NPAD; i++) { 
-    int tmp_id = pad2volid[i];
-    if (tmp_id > 0) { // Valid Volume ID
-      for (int j=0; j<NPAD; j++) {
-	if (tmp_id == padvid[j]) { // Found a match
-	  PadVID[i] = tmp_id;
-	  PadX[i]   = padLocation[j][0];
-	  PadY[i]   = padLocation[j][1];
-	  PadZ[i]   = padLocation[j][2];
-	  PadO[i]   = (int)(padLocation[j][3]);
-	  //printf("  Pad %d: %d  %.2f %.2f %.2f %.d\n", i, PadVID[i],
-	  //	 PadX[i], PadY[i], PadZ[i], PadO[i]);
-	}
-      }
-    }
-  }
-}
-////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////
-
-
-////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////
-// Set up our SiPM channel to Paddle map to Location in detector
 void EventGAPS::SetPaddleMap(struct PaddleInfo *pad, struct SiPMInfo *sipm) {
   // This subroutine stores the SiPM channel for each paddle end (A,B)
+
   for (int i=1; i<NRB; i++) { // There is no RB0
     for (int j=0; j<NCH; j++) {
       int ch=(i-1)*NCH + j;  // Determine NTOT position
-      RB[ch]     = sipm->RB[ch];
-      RB_ch[ch]  = sipm->RB_ch[ch];
-      Paddle[ch] = sipm->PaddleID[ch];
-      PadEnd[ch] = sipm->PaddleEnd[ch];
-      // If we have a valid RB, set the maximum sipm ch
-      if (RB[ch] > 0 && RB[ch] < NRB) max_sipm = ch;
+      // If we have a valid RB, set the appropriate values
+      if (sipm->RB[ch] > 0 && sipm->RB[ch] < NRB) {
+	RB[ch]     = sipm->RB[ch];
+	RB_ch[ch]  = sipm->RB_ch[ch];
+	Paddle[ch] = sipm->PaddleID[ch];
+	PadEnd[ch] = sipm->PaddleEnd[ch];
+      }
     }
   }
   if (0)
@@ -270,18 +214,36 @@ void EventGAPS::SetPaddleMap(struct PaddleInfo *pad, struct SiPMInfo *sipm) {
 void EventGAPS::InitializeHistograms(void) {
 
   char text[400];
-  
-  // Histograms for pedestals and pedestal RMSs
-  for (int b = 0; b < NTOT; b++) {
-      sprintf(text, "pedHist[%d]", b);
-      pedHist[b] = new TH1D(text, "", 400, -10, 10);
-      pedHist[b]->GetXaxis()->SetTitle("Pedestal (mV)");
-      pedHist[b]->GetYaxis()->SetTitle("Counts");
 
-      sprintf(text, "pedRMSHist[%d]", b);
-      pedRMSHist[b] = new TH1D(text, "", 500, -1, 4);
-      pedRMSHist[b]->GetXaxis()->SetTitle("Pedestal RMS (mV)");
-      pedRMSHist[b]->GetYaxis()->SetTitle("Counts");
+  // Histograms for pedestals and pedestal RMSs
+  for (int b = 0; b < NPAD; b++) {
+    for (int c = 0; c < 2; c++) {
+      sprintf(text, "pedHist[%d][%d]", b, c);
+      pedHist[b][c] = new TH1D(text, "", 400, -5, 5);
+      pedHist[b][c]->GetXaxis()->SetTitle("Pedestal (mV)");
+      pedHist[b][c]->GetYaxis()->SetTitle("Counts");
+      
+      sprintf(text, "pedRMSHist[%d][%d]", b, c);
+      pedRMSHist[b][c] = new TH1D(text, "", 500, -0.1, 4);
+      pedRMSHist[b][c]->GetXaxis()->SetTitle("Pedestal RMS (mV)");
+      pedRMSHist[b][c]->GetYaxis()->SetTitle("Counts");
+      
+      sprintf(text, "pedVtime[%d][%d]", b, c);
+      pedVtime[b][c] = new TProfile(text, "", 7500, 0, 26);
+      //pedVtime[b][c] = new TProfile(text, "", 3600, 0, 0.0417);
+      pedVtime[b][c]->GetXaxis()->SetTitle("Flight Time (days)");
+      pedVtime[b][c]->GetYaxis()->SetTitle("Pedestal (mV)");
+      pedVtime[b][c]->SetMinimum(-5.0);
+      pedVtime[b][c]->SetMaximum(5.0);
+      
+      sprintf(text, "pRMSVtime[%d][%d]", b, c);
+      pRMSVtime[b][c] = new TProfile(text, "", 7500, 0, 26);
+      //pRMSVtime[b][c] = new TProfile(text, "", 3600, 0, 0.0417);
+      pRMSVtime[b][c]->GetXaxis()->SetTitle("Flight Time (days)");
+      pRMSVtime[b][c]->GetYaxis()->SetTitle("Ped RMS (mV)");
+      pRMSVtime[b][c]->SetMinimum(-0.1);
+      pRMSVtime[b][c]->SetMaximum(5.0);
+    }
   }
 
   float lo_ch = -5.0;  // Low range of the charge plots (pC)
@@ -291,43 +253,93 @@ void EventGAPS::InitializeHistograms(void) {
   float PeakHi   = 40.0;
   
   //Histograms containing the charge distribution
-  for (int b = 0; b < NTOT; b++) {
-    //rao  change this histogram name and parameters
-    sprintf(text, "Vpeak[%d]", b);
-    //  Peak[b] = new TH1D(text, "", PeakBins, PeakLo, PeakHi);
-    Peak[b] = new TH1D(text, "", 160, -10.0, 150.0);
-    Peak[b]->GetXaxis()->SetTitle("Vpeak (mV)");
-    Peak[b]->GetYaxis()->SetTitle("Counts");
+  for (int b = 0; b < NPAD; b++) {
+    for (int c = 0; c < 2; c++) {
+      sprintf(text, "Vpeak[%d][%d]", b, c);
+      //  Peak[b] = new TH1D(text, "", PeakBins, PeakLo, PeakHi);
+      Peak[b][c] = new TH1D(text, "", 160, -10.0, 150.0);
+      Peak[b][c]->GetXaxis()->SetTitle("Vpeak (mV)");
+      Peak[b][c]->GetYaxis()->SetTitle("Counts");
+
+      sprintf(text, "peakVtime[%d][%d]", b, c);
+      peakVtime[b][c] = new TProfile(text, "", 7500, 0, 26);
+      peakVtime[b][c]->GetXaxis()->SetTitle("Flight Time (days)");
+      peakVtime[b][c]->GetYaxis()->SetTitle("Pulseheight (mV)");
+      peakVtime[b][c]->SetMinimum(0.0);
+      peakVtime[b][c]->SetMaximum(300.0);
+    }
   }
   
   //Histograms containing the charge distribution
-  for (int b = 0; b < NTOT; b++) {
-    //rao  change the parameters of this histogram
-    sprintf(text, "Charge[%d]", b);
-    // Charge[b] = new TH1D(text, "", 200, lo_ch, hi_ch);
-    Charge[b] = new TH1D(text, "", 130, -10.0, 60.0);
-    // Charge[b]->GetXaxis()->SetTitle("Charge(pC) (voltage*time/imp)");
-    Charge[b]->GetXaxis()->SetTitle("Charge(pC)");
-    Charge[b]->GetYaxis()->SetTitle("Counts");
+  for (int b = 0; b < NPAD; b++) {
+    for (int c = 0; c < 2; c++) {
+      sprintf(text, "Charge[%d][%d]", b, c);
+      // Charge[b][c] = new TH1D(text, "", 200, lo_ch, hi_ch);
+      Charge[b][c] = new TH1D(text, "", 130, -10.0, 60.0);
+      Charge[b][c]->GetXaxis()->SetTitle("Charge(pC)");
+      Charge[b][c]->GetYaxis()->SetTitle("Counts");
+      
+      sprintf(text, "Charge Cut [%d][%d]", b, c);
+      // Charge_cut[b][c] = new TH1D(text, "", 200, lo_ch, hi_ch);
+      Charge_cut[b][c] = new TH1D(text, "", 130, -10.0, 60.0);
+      Charge_cut[b][c]->GetXaxis()->SetTitle("Charge(cut,pC)");
+      Charge_cut[b][c]->GetYaxis()->SetTitle("Counts");
+
+      sprintf(text, "chVtime[%d][%d]", b, c);
+      chVtime[b][c] = new TProfile(text, "", 7500, 0, 26);
+      chVtime[b][c]->GetXaxis()->SetTitle("Flight Time (days)");
+      chVtime[b][c]->GetYaxis()->SetTitle("Charge (pC)");
+      chVtime[b][c]->SetMinimum(0.0);
+      chVtime[b][c]->SetMaximum(200.0);
+    } 
   }
 
-  for (int b = 0; b < NTOT; b++) {
-    // rao  change the parameters of this histogram
-    sprintf(text, "Charge Cut [%d]", b);
-    // Charge_cut[b] = new TH1D(text, "", 200, lo_ch, hi_ch);
-    Charge_cut[b] = new TH1D(text, "", 130, -10.0, 60.0);
-    Charge_cut[b]->GetXaxis()->SetTitle("Charge(cut,pC)");
-    Charge_cut[b]->GetYaxis()->SetTitle("Counts");
-  }
+  for (int b = 0; b < NPAD; b++) {
+    for (int c = 0; c < 2; c++) {
+      sprintf(text, "tdcCFD[%d][%d]", b, c);
+      tdcCFD[b][c] = new TH1D(text, "", 400, 10.0, 200.0);
+      tdcCFD[b][c]->GetXaxis()->SetTitle("Pulse Time (ns)");
+      tdcCFD[b][c]->GetYaxis()->SetTitle("Counts");
 
-  for (int b = 0; b < NTOT; b++) {
-    sprintf(text, "tdcCFD[%d]", b);
-    tdcCFD[b] = new TH1D(text, "", 400, 10.0, 200.0);
-    tdcCFD[b]->GetXaxis()->SetTitle("Pulse Time (ns)");
-    tdcCFD[b]->GetYaxis()->SetTitle("Counts");
+      sprintf(text, "tCFDVtime[%d][%d]", b, c);
+      tCFDVtime[b][c] = new TProfile(text, "", 7500, 0, 26);
+      tCFDVtime[b][c]->GetXaxis()->SetTitle("Flight Time (days)");
+      tCFDVtime[b][c]->GetYaxis()->SetTitle("CFD value (ns)");
+      tCFDVtime[b][c]->SetMinimum(60.0);
+      tCFDVtime[b][c]->SetMaximum(160.0);
+    }
   }
   
-  //rao  TDC diffs
+  // TOT histos
+  for (int b = 0; b < NPAD; b++) {
+    for (int c = 0; c < 2; c++) {
+      sprintf(text, "totLo[%d][%d]", b, c);
+      totLo[b][c] = new TH1D(text, "", 300, -5, 70);
+      totLo[b][c]->GetXaxis()->SetTitle("TOT - Lo Threshold");
+      totLo[b][c]->GetYaxis()->SetTitle("Counts");
+      
+      sprintf(text, "totHi[%d][%d]", b, c);
+      totHi[b][c] = new TH1D(text, "", 300, -5, 70);
+      totHi[b][c]->GetXaxis()->SetTitle("TOT - Hi Threshold");
+      totHi[b][c]->GetYaxis()->SetTitle("Counts");
+
+      sprintf(text, "totLVtime[%d][%d]", b, c);
+      totLVtime[b][c] = new TProfile(text, "", 7500, 0, 26);
+      totLVtime[b][c]->GetXaxis()->SetTitle("Flight Time (days)");
+      totLVtime[b][c]->GetYaxis()->SetTitle("TOT Lo value (ns)");
+      totLVtime[b][c]->SetMinimum(0.0);
+      totLVtime[b][c]->SetMaximum(10.0);
+
+      sprintf(text, "totHVtime[%d][%d]", b, c);
+      totHVtime[b][c] = new TProfile(text, "", 7500, 0, 26);
+      totHVtime[b][c]->GetXaxis()->SetTitle("Flight Time (days)");
+      totHVtime[b][c]->GetYaxis()->SetTitle("TOT Hi value (ns)");
+      totHVtime[b][c]->SetMinimum(0.0);
+      totHVtime[b][c]->SetMaximum(10.0);
+    }
+  }
+
+  // TDC diffs
   for (int b = 0; b < NPAD; b++) {
     sprintf(text, "tDiff[%d]", b);
     tDiff[b] = new TH1D(text, "", 400, -100, 100);
@@ -335,7 +347,7 @@ void EventGAPS::InitializeHistograms(void) {
     tDiff[b]->GetYaxis()->SetTitle("Counts");
   }
 
-  //Ch9 time shift
+  // Ch9 time shift
   for (int b = 0; b < NPAD; b++) {
     sprintf(text, "Ch9Shift[%d]", b);
     Ch9Shift[b] = new TH1D(text, "", 400, -15, 15);
@@ -370,24 +382,11 @@ void EventGAPS::InitializeHistograms(void) {
   FirstTime = new TH1F("First Hit Time", "", 300, 10.5, 160.5);
   FirstTime->GetXaxis()->SetTitle("First Hit Time");
   FirstTime->GetYaxis()->SetTitle("Counts");
-  // Earliest Paddle hit time
-  FirstTimeBad = new TH1F("First Hit Time (Bad", "", 300, 10.5, 160.5);
-  FirstTimeBad->GetXaxis()->SetTitle("First Hit Time");
-  FirstTimeBad->GetYaxis()->SetTitle("Counts");
 
   // Distribution of Beta
-  BetaDist1 = new TH1F("Beta6 Distribution", "", 560, -0.05, 5.55);
-  BetaDist1->GetXaxis()->SetTitle("Beta Value");
-  BetaDist1->GetYaxis()->SetTitle("Counts");
-  BetaDist2 = new TH1F("Beta7 Distribution", "", 560, -0.05, 5.55);
-  BetaDist2->GetXaxis()->SetTitle("Beta Value");
-  BetaDist2->GetYaxis()->SetTitle("Counts");
-  BetaDist3 = new TH1F("Beta18 Distribution", "", 560, -0.05, 5.55);
-  BetaDist3->GetXaxis()->SetTitle("Beta Value");
-  BetaDist3->GetYaxis()->SetTitle("Counts");
-  BetaDist4 = new TH1F("Beta19 Distribution", "", 560, -0.05, 5.55);
-  BetaDist4->GetXaxis()->SetTitle("Beta Value");
-  BetaDist4->GetYaxis()->SetTitle("Counts");
+  BetaDist = new TH1F("Beta Distribution", "", 560, -0.05, 5.55);
+  BetaDist->GetXaxis()->SetTitle("Beta Value");
+  BetaDist->GetYaxis()->SetTitle("Counts");
 
   // Histograms comparing the charge measured at both ends of the paddle.
   for (int b = 0; b < NPAD; b++) {
@@ -398,7 +397,7 @@ void EventGAPS::InitializeHistograms(void) {
     QEnd2End[b]->GetYaxis()->SetTitle("End B");
   }
 
-  //rao  hit mask histograms
+  // Hit mask histograms
   for (int b = 0; b < NPAD; b++) {
     sprintf(text, "HitMask[%d]", b);
     HitMask[b] = new TH1I(text, "", 10, -2.5, 7.5);
@@ -502,55 +501,71 @@ void EventGAPS::InitializeHistograms(void) {
 ////////////////////////////////////////////////////////////////////////////
 void EventGAPS::WriteHistograms() {
   
-  //TFile *outfile=TFile::Open("/home/gaps/zweerink/outfile.root","RECREATE"); 
   TFile *outfile = TFile::Open("./outfile.root","RECREATE"); 
   
-  // For reasons I don't understand, the code to make subdirectories
-  // is not compiling properly and gives an error (below) when run
-  
-  //./analyzeNevis: symbol lookup error: ./analyzeNevis: undefined
-  //symbol: _ZN10TDirectory30GetSharedLocalCurrentDirectoryEv
-  
-  // For now, I am simply writing all the plots to the main directory.
-  
   //create directories for the raw plots
-  //TDirectory *savdir = gDirectory; 
-  //outfile->cd();
-  //TDirectory *Peddir = outfile->mkdir("Pedestals");
-  //TDirectory *Peakdir = outfile->mkdir("VPeakplots");
-  //TDirectory *Chargedir = outfile->mkdir("Chargeplots");
-  //TDirectory *Hitmaskdir = outfile->mkdir("Hitmasks");
+  TDirectory *savdir = gDirectory; 
+  outfile->cd();
+  TDirectory *Peddir     = outfile->mkdir("Pedestals");
+  TDirectory *Peddir1    = outfile->mkdir("PedProfs");
+  TDirectory *Peakdir    = outfile->mkdir("VPeakplots");
+  TDirectory *Peakdir1   = outfile->mkdir("VPeakProfs");
+  TDirectory *Chargedir  = outfile->mkdir("Chargeplots");
+  TDirectory *Chargedir1 = outfile->mkdir("ChargeProfs");
+  TDirectory *Hitmaskdir = outfile->mkdir("Hitmasks");
   
-  //TDirectory *TDCdir = outfile->mkdir("TDCplots");
+  TDirectory *TDCdir     = outfile->mkdir("TDCplots");
+  TDirectory *TDCdir1    = outfile->mkdir("TDCProfs");
+  TDirectory *TOTdir     = outfile->mkdir("TOTplots");
+  TDirectory *TOTdir1    = outfile->mkdir("TOTProfs");
 
-  // Plots made using simple CFD timing
-  //TDirectory *CFDTimingdir = savdir->mkdir("CFDTimingplots");
-  //TDirectory *CFDTimeVsQdir = savdir->mkdir("CFDTimeVsQplots");
-  //TDirectory *CFDTVsTdir = savdir->mkdir("CFDTvsTplots");
-
-  int PEDS = 0;
-  int PEAK = 0;
-  int QVSP = 0;
+  int PEDS = 1;
+  int PEAK = 1;
+  int QVSP = 1;
   
   int start = 1; // No Sipm ch = 0 or paddle = 0
   max_sipm = max_paddle*2-1;
-  //write all the Trace plots to the root file
+
   if (PEDS) {
-    //Peddir->cd();
-    for (int i = start; i < max_sipm; i++) {
-      pedHist[i]->Write();
-      pedRMSHist[i]->Write();
+    for (int i = start; i < max_paddle; i++) {
+      for (int j = 0; j < 2; j++) {
+	Peddir->cd(); // Write the Ped histo
+	pedHist[i][j]->Write();
+	pedRMSHist[i][j]->Write();
+	
+	Peddir1->cd(); // Write the Ped profiles
+	pedVtime[i][j]->Write();
+	pRMSVtime[i][j]->Write();
+      }
     }
   }
 
   if (PEAK) {
-    //Peakdir->cd();
-    for (int i = start; i < max_sipm; i++) Peak[i]->Write();
-    
-    //Chargedir->cd();
-    for (int i = start; i < max_sipm; i++) {
-      Charge[i]->Write();
-      Charge_cut[i]->Write();
+    Peakdir->cd();
+    for (int i = start; i < max_paddle; i++) {
+      for (int j = 0; j < 2; j++) {
+	Peak[i][j]->Write();
+      }
+    }
+    Peakdir1->cd();
+    for (int i = start; i < max_paddle; i++) {
+      for (int j = 0; j < 2; j++) {
+	peakVtime[i][j]->Write();
+      }
+    }
+  
+    Chargedir->cd();
+    for (int i = start; i < max_paddle; i++) {
+      for (int j = 0; j < 2; j++) {
+	Charge[i][j]->Write();
+	Charge_cut[i][j]->Write();
+      }
+    }
+    Chargedir1->cd();
+    for (int i = start; i < max_paddle; i++) {
+      for (int j = 0; j < 2; j++) {
+	chVtime[i][j]->Write();
+      }
     }
   }
   
@@ -569,21 +584,38 @@ void EventGAPS::WriteHistograms() {
     }
   }
   
-  //TDCdir->cd();
+  TDCdir->cd();
   FirstPaddle->Write();
   FirstTime->Write();
-  FirstTimeBad->Write();
-  BetaDist1->Write();
-  BetaDist2->Write();
-  BetaDist3->Write();
-  BetaDist4->Write();
+  BetaDist->Write();
   for (int j = 0; j < 2; j++) {Ch9Good[j]->Write(); Ch9Bad[j]->Write();}
-  for (int j = start; j < max_paddle; j++) HitTime[j]->Write();
-  for (int j = start; j < max_paddle; j++) Ch9Shift[j]->Write();
-  for (int j = start; j < max_paddle; j++) tDiff[j]->Write();
-  for (int i = start; i < max_sipm; i++) tdcCFD[i]->Write();
+  for (int i = start; i < max_paddle; i++) HitTime[i]->Write();
+  for (int i = start; i < max_paddle; i++) Ch9Shift[i]->Write();
+  for (int i = start; i < max_paddle; i++) tDiff[i]->Write();
+  for (int i = start; i < max_paddle; i++)
+    for (int j = 0; j < 2; j++) tdcCFD[i][j]->Write();
+
+  TDCdir1->cd();
+  for (int i = start; i < max_paddle; i++)
+    for (int j = 0; j < 2; j++)
+      tCFDVtime[i][j]->Write();
   
-  //Hitmaskdir->cd();
+  TOTdir->cd();
+  for (int i = start; i < max_paddle; i++) {
+    for (int j = 0; j < 2; j++) {
+      totLo[i][j]->Write();
+      totHi[i][j]->Write();
+    }
+  }
+  TOTdir1->cd();
+  for (int i = start; i < max_paddle; i++) {
+    for (int j = 0; j < 2; j++) {
+      totLVtime[i][j]->Write();
+      totHVtime[i][j]->Write();
+    }
+  }
+  
+  Hitmaskdir->cd();
   NPaddlesCube->Write();
   NPaddlesUmbrella->Write();
   NPaddlesCortina->Write();
@@ -608,7 +640,6 @@ void EventGAPS::OffsetHistograms(bool flag=false) {
       sprintf(text, "H_OffCube[%d][%d]", b, c);
       H_OffCube[b][c] = new TH1F(text, "", 160, -5, 11);
       sprintf(text, "Hit Time (ns): Cube %d - UmbCen %d", b, c+61);
-      //H_OffCube[b][c]->GetXaxis()->SetTitle("Hit Time (ns)");
       H_OffCube[b][c]->GetXaxis()->SetTitle(text);
       H_OffCube[b][c]->GetYaxis()->SetTitle("Counts");
     }
@@ -672,6 +703,66 @@ void EventGAPS::OffsetHistograms(bool flag=false) {
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
+void EventGAPS::FillEventValues(struct EventInfo *evt) {
+  // All SiPM values in EventInfo structure are stored by Paddle
+  // number. We need to find the proper SiPM number (NTOT) before
+  // storing the SiPM values locally.
+
+  FlightTime = (evt->FlightTime < 1e8 ? evt->FlightTime: -999.0);
+  
+  int sipm[2];
+  for (int i=0; i<NPAD; i++) {
+    if (evt->Ped[i][0] > -900 && evt->Ped[i][1] > -900) { // Good Paddle
+      sipm[0] = Paddle_A[i];
+      sipm[1] = Paddle_B[i];
+      for (int j=0; j<2; j++) {
+	Pedestal[sipm[j]] = evt->Ped[i][j];
+	PedRMS[sipm[j]]   = evt->PedRMS[i][j];
+	VPeak[sipm[j]]    = evt->VPeak[i][j];
+	QInt[sipm[j]]     = evt->Charge[i][j];
+	TDC[sipm[j]]      = evt->TDC[i][j];
+	TotLo[sipm[j]]    = evt->TOTLo[i][j];
+	TotHi[sipm[j]]    = evt->TOTHi[i][j];
+      }
+      /*printf("%3d %7.2f %7.2f %7.2f %7.2f %6.2f %6.2f (%d %d)\n", i,
+	     TDC[sipm[0]],TDC[sipm[1]],
+	     VPeak[sipm[0]],VPeak[sipm[1]],
+	     QInt[sipm[0]],QInt[sipm[1]],
+	     Paddle_A[i], Paddle_B[i]);*/
+    }
+  }
+  // Phi is already indexed by RB number and will be set by the
+  // AnalyzePhases() call
+}
+
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+void EventGAPS::FixPedRMSValues(void) {
+  // The Pedestal RMS values improperly calculated during flight. This
+  // routine corrects the miscalculation.
+
+  // let sigma = f32::sqrt(sum2/(ped_range_bin as f32 - (average*average)));
+  //   should have been
+  // let sigma = f32::sqrt(sum2/(ped_range_bin as f32) - (average*average));
+
+  if (PedRMSFix) return; // Only apply fix once. 
+  
+  double tmp1=0, tmp2=0;
+  for (int i=0; i<NPAD*2; i++) {
+    if (Pedestal[i] > -900.0) { // Have an actual pedestal value 
+      tmp1 = Pedestal[i]*Pedestal[i];
+      tmp2 = ( PedRMS[i]*PedRMS[i] * (200.0-tmp1) ) / 200.0;
+      // Now store the values
+      PedRMS[i] = sqrt(tmp2 - tmp1);
+      //if (PedRMS[i]>0.999) printf("%d %lu %d %.3f %.3f\n", runno, evtno,
+      //			  i, Pedestal[i], PedRMS[i]);
+    }
+  }
+  PedRMSFix = true;
+}
+  
+///////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 void EventGAPS::AnalyzePedestals(float Ped_low, float Ped_win) {
 
   float rms_m = 3.0;
@@ -686,10 +777,7 @@ void EventGAPS::AnalyzePedestals(float Ped_low, float Ped_win) {
       Pedestal[i] = wData[i]->GetPedestal(); 
       PedRMS[i]   = wData[i]->GetPedsigma();
 
-
-      //if ( PedRMS[i] > 15 ) printf("Channel %d: %8.1f\n", i, PedRMS[i]);
       // Check for data mangling
-      
       if ( PedRMS[i] > rms_m ) {
 	if ( i%NCH==7 )
 	  if (PedRMS[i-1]>rms_m && PedRMS[i-2]>rms_m && PedRMS[i-3]>rms_m &&
@@ -699,20 +787,6 @@ void EventGAPS::AnalyzePedestals(float Ped_low, float Ped_win) {
       }
     }
   }
-  // This does the same thing for the clock data if so desired
-  /*for (int i=0; i<NRB; i++) {
-    if (wClock[i] != NULL) { 
-      wClock[i]->SetPedBegin(Ped_begin);
-      wClock[i]->SetPedRange(Ped_win);
-      wClock[i]->CalcPedestalRange();    // Calculate pedestals
-      wClock[i]->PedestalSubtract();     // Subtract pedestals
-      // Now store the values
-      ClockPedestal[i] = wClock[i]->GetPedestal(); 
-      ClockPedRMS[i] = wClock[i]->GetPedsigma();
-
-      if ( ClockRMS[i] > 190 ) printf("RB %d: %8.1f\n", i, ClockPedRMS[i]);
-    }
-  }*/
 }
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
@@ -723,7 +797,6 @@ void EventGAPS::AnalyzePulses(float Pulse_low, float Pulse_win) {
 
   for (int i=0; i<NTOT; i++) {
     if (wData[i] != NULL) { 
-      //if (wData[i] != NULL && PedRMS[i] < 3.0 ) { 
       // Verify that quantities are set correctly
       wData[i]->SetThreshold(Threshold);
       wData[i]->SetCFDSFraction(CFDFraction);
@@ -741,16 +814,17 @@ void EventGAPS::AnalyzePulses(float Pulse_low, float Pulse_win) {
 	size  = 100;
       }
       QInt[i]  = wData[i]->Integrate(begin, size);
-      //if (size <100) printf("Evt %ld, %d: %.1f %.1f\n",evtno,i,begin,size);
-      //QInt[i]  = wData[i]->Integrate(Pulse_low, Pulse_win);
+
       // If we have a pulse above threshold, find the TDC value
       wData[i]->FindPeaks(Pulse_low, Pulse_win);
-      //if ( (wData[i]->GetNumPeaks() > 0) && (Qint[i] > 5.0) ) {
       if ( (wData[i]->GetNumPeaks() > 0) ) {
 	wData[i]->FindTdc(0, GAPS::CFD_SIMPLE);     // Simple CFD
 	//wData[i]->FindTdc(0, GAPS::CONSTANT);     // Simple CFD
 	TDC[i] = wData[i]->GetTdcs(0);
-	//printf("%ld: %d - %7.3f\n", evtno, i, TDC[i]);
+
+	// Just for test purpose, fill the TOT values with dummies
+	TotLo[i] = 20.0;
+	TotHi[i] = 10.0;
       }
     }
   }
@@ -780,7 +854,6 @@ void EventGAPS::AnalyzePhases(float phi[NRB]) {
   for (int i=0; i<NRB-1; i++) {
     // For each RB, subtract phi from reference value...
     if (RBInData[i]) {
-      //float phi_shift = ref_phi - Phi[i];
       float phi_shift = Phi[i] - ref_phi;
       // Ensure the shift is in proper range: -Pi/3 < shift < Pi/3
       while (phi_shift < -PI/2.0) phi_shift += 2.0*PI;
@@ -790,14 +863,11 @@ void EventGAPS::AnalyzePhases(float phi[NRB]) {
     } else TShift[i] = -999.0;
   }
 
-  if (0) { 
+  if (0) { // Print some diagnostics is useful
     printf("%ld - Phase Analysis: %d %6.3f\n", evtno, ref_rb, ref_phi);
     for (int i=0; i<NRB; i++) {
       if (Phi[i]>-998.0) printf("%2d : %6.3f %6.3f\n", i, TShift[i], Phi[i]);
-      //printf(" %.3f (%.3f)", TShift[i], Phi[i]);
-      //if (i%4 == 3) printf("\n");
     }
-    //printf("%d %6.3f\n", ref_rb, ref_phi);
   }
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -827,7 +897,8 @@ void EventGAPS::AnalyzePaddles(float pk_cut = -999, float ch_cut = -999.0) {
     bhit = (VPeak[chB] > Vpeak_cut) ? 2 : 0 ;   
     Hits[i] = ahit + bhit;
     IsHit[i] = false; // Flag that we don't have Hit info
-    
+    //printf("%3d: %d ", i, IsHit[i]);
+
     if (Hits[i] == 3) { // We have hits on both ends of paddle
       float tdc_diff = TDC[chA] - TDC[chB];
       float delta_pos = tdc_diff*sc_speed/2.0;
@@ -849,26 +920,29 @@ void EventGAPS::AnalyzePaddles(float pk_cut = -999, float ch_cut = -999.0) {
       TDC_Cor[chB] = TDC[chB] + TCorrEvent[i] + TCorrFixed[i];
       // Calculate hit time for the paddle
       HitT[i] = (TDC_Cor[chA]+TDC_Cor[chB])/2.0 - Dimension[i][0]/(2.0*sc_speed);
-      //if (i<61 || i>72) // For all paddles except UMB
       
+      // Check that the paddle has a good hit (TDCs in range, good peds)
       if ( TDC[chA]>5 && TDC[chA]<220 && TDC[chB]>5 && TDC[chB]<220 ) {
 	if (PedRMS[chA]<2.0 && PedRMS[chB]<2.0) {
 	  IsHit[i] = true;
 	  // Next two lines are useful for printing values to compare
 	  // with online quantities stored in the TofHits() class
-	  if (0) {
-	  printf("%3d %7.2f %7.2f %7.2f %7.2f %6.2f %6.2f", i, TDC[chA],
-		 TDC[chB], VPeak[chA],VPeak[chB], QInt[chA],QInt[chB]);
-	  printf(" %7.4f %5.2f %5.2f %4.2f %4.2f\n",
-		 Phi[RB[chB]], Pedestal[chA],Pedestal[chB],
-		 PedRMS[chA],PedRMS[chB]);
+	  if (0 && i<161) {
+	    //printf("WAVE %3d %7.2f %7.2f %7.2f %7.2f %6.2f %6.2f",i,TDC[chA],
+	    //	   TDC[chB], VPeak[chA],VPeak[chB], QInt[chA],QInt[chB]);
+	    //printf(" %7.4f %5.2f %5.2f %4.2f %4.2f\n",
+	    //	   Phi[RB[chB]], Pedestal[chA],Pedestal[chB],
+	    printf("WAVE %3d %6.3f %6.3f %5.3f %5.3f\n", i,
+		   Pedestal[chA],Pedestal[chB],
+		   PedRMS[chA],PedRMS[chB]);
 	  }
 	}
 	HitT[i] -= Offset[i];
       }
     }
     
-    if (IsHit[i]>0) {
+    //printf("%d\n", IsHit[i]);
+    if ( IsHit[i] ) {
       if (i<61) cube++;         // Paddle in Cube
       else if (i<109) upper++;  // Paddle in Umbrella
       else if (i<161) outer++;  // Paddle in Cortina
@@ -878,6 +952,7 @@ void EventGAPS::AnalyzePaddles(float pk_cut = -999, float ch_cut = -999.0) {
   NPadCube     = cube;
   NPadUmbrella = upper;
   NPadCortina  = outer;
+  //printf("NPad = %d %d %d\n", NPadCube, NPadUmbrella, NPadCortina); 
 }
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
@@ -895,8 +970,6 @@ void EventGAPS::AnalyzeEvent(void) {
   // Find the earliest hit time (and paddle) and demand that it is
   // either in the umbrella or cortina
   for (int i=61; i<NPAD; i++) {
-  //for (int i=61; i<73; i++) { // UMB-Center
-  //for (int i=61; i<109; i++) { // UMB
     if (IsHit[i] ) {
       if (0) {
 	printf(" %3d %7.3f %7.3f %7.2f -%7.2f (%7.2f) %8.2f %6.2f\n", i,
@@ -912,7 +985,6 @@ void EventGAPS::AnalyzeEvent(void) {
   }
   EarlyTime = early;
   EarlyPaddle = e_pad;
-  //printf("Earliest: %ld  %d (%.2f)\n", evtno, EarlyPaddle, early);
   
   // Now, subtract the earliest time from all other times
   if (e_pad > 0) { // Only if we found a umb/cor paddle hit
@@ -921,35 +993,17 @@ void EventGAPS::AnalyzeEvent(void) {
   }
   int ctr=0;
   // Now that we have the hit times and positions, calculate beta
-  //for (int i=0; i<61; i++) { // Only calculate beta for cube hits
   for (int i=0; i<13; i++) { // Only calculate beta for cube-top hits
-  //for (int i=13; i<25; i++) { // Only calculate beta for cube-bot hits
-  //for (int i=6; i<8; i++) { // Only calculate beta for middle cube-top hits
-    //if (IsHit[i] && (i==6 || i==7 || i==8 || i==9) ) {
     if ( IsHit[i] ) {
+      //printf("HitT: %f\t%f\t%f\n",HitX[i],HitY[i],HitZ[i]);fflush(stdout);
       float dist_sq = SQR(HitX[i]-HitX[e_pad]) + SQR(HitY[i]-HitY[e_pad]) +
 	SQR(HitZ[i]-HitZ[e_pad]);
       float t_diff = HitT[i] - HitT[EarlyPaddle];
-      if ( 0 && (i==5) && t_diff < 2.29 ) {
-	printf("Too Early: %ld -- %d - %5.2f (%6.2f %6.2f)\n",evtno,i,t_diff,
-	       HitT[i], HitT[EarlyPaddle]);
-      }
       float speed = sqrt(dist_sq) / (t_diff); // mm/ns
       ctr++;
-      //if (ctr>1) printf("%ld: Previous beta = %.3f\n", evtno, beta);
       beta = speed/(CSPEED);
-      if (0 && e_pad>60 && e_pad<73) {
-	//if (0 && (EarlyPaddle>65 && EarlyPaddle<68) ) {
-	printf("Positions: (%d %d) (%.2f %.2f)  (%.2f %.2f)  (%.2f %.2f)\n",
-	       i, EarlyPaddle, HitX[i], HitX[EarlyPaddle], HitY[i],
-	       HitY[EarlyPaddle], HitZ[i], HitZ[EarlyPaddle]);
-	printf("Speeds: (%.2f %.2f): %.2f   %.2f  %.2f\n", HitT[i],
-	       HitT[EarlyPaddle], t_diff,  speed, beta); 
-	printf(" %3d %7.3f %7.3f %7.2f -%7.2f (%7.2f) (%7.2f %7.2f) %3d\n",
-	       i,TCorrEvent[i],TCorrFixed[i],TDC[Paddle_A[i]],TDC[Paddle_B[i]],
-	       TDC[Paddle_A[i]]+TDC[Paddle_B[i]], HitT[i],
-	       HitT[EarlyPaddle], EarlyPaddle);
-      }
+      //printf("Beta = %.2f  %.2f   %.2f\n",dist_sq,t_diff,beta); fflush(stdout);
+      //BetaDist->Fill(1.0);
     }
   }
 }
@@ -987,44 +1041,86 @@ void EventGAPS::SetCFDFraction(float CFDS_frac){
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 void EventGAPS::FillChannelHistos(int old=0) {
+
+  // This is the default way to store the histograms in the root file
   // This section of code stores histos with channel numbers based on
-  // RBs. Histo channel = SiPM Channel = (RB-1)*NCH+rbch  
-  if (old) {
-    for (int i=0; i<NTOT; i++) {
-      pedHist[i]->Fill(Pedestal[i]);
-      pedRMSHist[i]->Fill(PedRMS[i]);
-      Peak[i]->Fill(VPeak[i]);
-      Charge[i]->Fill(QInt[i]);
-      if (QInt[i]>5.0) Charge_cut[i]->Fill(QInt[i]);
-      
-      tdcCFD[i]->Fill(TDC[i]);
-    }
-  } else {
-    // This is the default way to store the histograms in the root file
-    // This section of code stores histos with channel numbers based on
-    // paddles. For paddle N, Histo[N/N+1] = PaddleA/B SiPM
-    for (int i=0; i<NPAD; i++) {
-      if (Paddle_A[i] > 0) { 
-	int ch = 2*i;
-	pedHist[ch-1]->Fill(Pedestal[Paddle_A[i]]);
-	pedHist[ch]->Fill(Pedestal[Paddle_B[i]]);
-	pedRMSHist[ch-1]->Fill(PedRMS[Paddle_A[i]]);
-	pedRMSHist[ch]->Fill(PedRMS[Paddle_B[i]]);
-	
-	Peak[ch-1]->Fill(VPeak[Paddle_A[i]]);
-	Peak[ch]->Fill(VPeak[Paddle_B[i]]);
-	
-	Charge[ch-1]->Fill(QInt[Paddle_A[i]]);
-	Charge[ch]->Fill(QInt[Paddle_B[i]]);
-	if (QInt[Paddle_A[i]]>5.0) Charge_cut[ch-1]->Fill(QInt[Paddle_A[i]]);
-	if (QInt[Paddle_B[i]]>5.0) Charge_cut[ch]->Fill(QInt[Paddle_B[i]]);
-	
-	tdcCFD[ch-1]->Fill(TDC[Paddle_A[i]]);
-	tdcCFD[ch]->Fill(TDC[Paddle_B[i]]);
+  // paddles. For paddle N, Histo[N/N+1] = PaddleA/B SiPM
+  // NEW: Histo[i][j]; i is paddle, j is end A or B
+  for (int i=0; i<NPAD; i++) {
+    if (Paddle_A[i] > 0 && Paddle_B[i] > 0 &&     // Have a good paddle
+	Pedestal[Paddle_A[i]] > -998.0 &&         // Good PedA 
+	Pedestal[Paddle_B[i]] > -998.0 ) {        // Good PedB
+
+      int ia = Paddle_A[i];
+      int ib = Paddle_B[i];
+      bool GoodHita = true;
+      bool GoodHitb = true;
+
+      if ( PedRMS[ia]>3.0 ) GoodHita = false; 
+      if ( PedRMS[ib]>3.0 ) GoodHitb = false; 
+
+      if ( PedRMS[ia]>2.0 && (Pedestal[ia]>1.0||Pedestal[ia]<-1.0)) {
+	if ( VPeak[ia] < 600.0 && QInt[ia] < 100.0 ) 
+	  GoodHita = false;
       }
+      if ( PedRMS[ib]>2.0 && (Pedestal[ib]>1.0||Pedestal[ib]<-1.0)) {
+	if ( VPeak[ib] < 600.0 && QInt[ib] < 100.0 ) 
+	  GoodHitb = false;
+      }
+
+      if ( TDC[ia] < 0.1 ) GoodHita = false;
+      if ( TDC[ib] < 0.1 ) GoodHitb = false;
+
+      // Don't apply the cuts. 
+      //GoodHita = true;
+      //GoodHitb = true;
+      
+      // Fill Values for Paddle_A side
+      if (GoodHita) { 
+	pedHist[i][0]->Fill(Pedestal[Paddle_A[i]]);
+	pedRMSHist[i][0]->Fill(PedRMS[Paddle_A[i]]);
+	Peak[i][0]->Fill(VPeak[Paddle_A[i]]);
+	// Fill TOT (lo/hi) values
+	totLo[i][0]->Fill(TotLo[Paddle_A[i]]);
+	totHi[i][0]->Fill(TotHi[Paddle_A[i]]);
+	Charge[i][0]->Fill(QInt[Paddle_A[i]]);
+	if (QInt[Paddle_A[i]]>5.0) Charge_cut[i][0]->Fill(QInt[Paddle_A[i]]);
+	tdcCFD[i][0]->Fill(TDC[Paddle_A[i]]);
+      }
+      
+      // Fill Values for Paddle_B side
+      if (GoodHitb) { 
+	pedHist[i][1]->Fill(Pedestal[Paddle_B[i]]);
+	pedRMSHist[i][1]->Fill(PedRMS[Paddle_B[i]]);
+	Peak[i][1]->Fill(VPeak[Paddle_B[i]]);
+	totLo[i][1]->Fill(TotLo[Paddle_B[i]]);
+	totHi[i][1]->Fill(TotHi[Paddle_B[i]]);
+	Charge[i][1]->Fill(QInt[Paddle_B[i]]);
+	if (QInt[Paddle_B[i]]>5.0) Charge_cut[i][1]->Fill(QInt[Paddle_B[i]]);
+	tdcCFD[i][1]->Fill(TDC[Paddle_B[i]]);
+      }
+
+      // If ped values are good, fill time profiles
+      double tmptime = FlightTime/86400.0; // Convert to days
+      pedVtime[i][0]->Fill(tmptime, Pedestal[Paddle_A[i]]);
+      pRMSVtime[i][0]->Fill(tmptime, PedRMS[Paddle_A[i]]);
+      peakVtime[i][0]->Fill(tmptime, VPeak[Paddle_A[i]]);
+      chVtime[i][0]->Fill(tmptime,   QInt[Paddle_A[i]]);
+      tCFDVtime[i][0]->Fill(tmptime, TDC[Paddle_A[i]]);
+      totLVtime[i][0]->Fill(tmptime, TotLo[Paddle_A[i]]);
+      totHVtime[i][0]->Fill(tmptime, TotHi[Paddle_A[i]]);
+
+      pedVtime[i][1]->Fill(tmptime, Pedestal[Paddle_B[i]]);
+      pRMSVtime[i][1]->Fill(tmptime, PedRMS[Paddle_B[i]]);
+      peakVtime[i][1]->Fill(tmptime, VPeak[Paddle_B[i]]);
+      chVtime[i][1]->Fill(tmptime,   QInt[Paddle_B[i]]);
+      tCFDVtime[i][1]->Fill(tmptime, TDC[Paddle_B[i]]);
+      totLVtime[i][1]->Fill(tmptime, TotLo[Paddle_B[i]]);
+      totHVtime[i][1]->Fill(tmptime, TotHi[Paddle_B[i]]);
     }
   }
 }
+
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 
@@ -1043,42 +1139,12 @@ void EventGAPS::FillPaddleHistos(void) {
 	Ch9Shift[i]->Fill(TShift[RB[Paddle_A[i]]]); // Paddle ends in same RB
       }
       if (IsHit[i]) { // Both ends of paddle hit
-
-	//if (EarlyPaddle>60 && EarlyPaddle<109) { // Demand a UMB paddle hit
-	// Only record HitTimes[] and beta for events which hit two
-	// center umbrella paddles and two center Cube top paddles
-	// (and within 10cm of center).
-
 	if ( (EarlyPaddle>60&&EarlyPaddle<73) && (i>0&&i<13) ) { 
-	//if ( (EarlyPaddle>60&&EarlyPaddle<73) && (i>12&&i<25) ) { 
 	  if ( ABS(delta[i])< 15.4 && ABS(delta[EarlyPaddle])<15.4 &&
 	       NHitPaddles < 4 ) {
 	    int ind = (EarlyPaddle-61)*12;
 	    HitTime[i+ind]->Fill(HitT[i]);
 	    FirstPaddle->Fill(EarlyPaddle);
-	    
-	    if (beta>0 && (i==6||i==7)) {
-	      //printf("Found Event %ld - %d: %.3f %.2f %.2f %.2f\n", evtno,i,
-	      //     EarlyTime, beta, TShift[RB[Paddle_A[EarlyPaddle]]],
-	      //     TShift[RB[Paddle_A[i]]]); 
-	      if (beta > 1.0) {
-		Ch9Bad[i-6]->Fill(TShift[RB[Paddle_A[EarlyPaddle]]],
-				  TShift[RB[Paddle_A[i]]]);
-		FirstTimeBad->Fill(EarlyTime);
-	      } else { 
-		Ch9Good[i-6]->Fill(TShift[RB[Paddle_A[EarlyPaddle]]],
-				TShift[RB[Paddle_A[i]]]);
-		FirstTime->Fill(EarlyTime);
-	      }
-	    }
-	    if (beta>0 && i==6) BetaDist1->Fill(beta); 
-	    if (beta>0 && i==7) BetaDist2->Fill(beta); 
-	    if (beta>0 && i==8) BetaDist3->Fill(beta); 
-	    if (beta>0 && i==9) BetaDist4->Fill(beta); 
-	    if ( 1 && (i==5||i==6||i==18||i==19) && beta > 1.1 ) {
-	      printf("Fast: %ld %d - %5.2f %6.2f %6.2f\n",evtno,i,beta,
-	       HitT[i], HitT[EarlyPaddle]);
-	    }
 	  }
 	}
 	HitPosition[i]->Fill(delta[i]);
@@ -1095,23 +1161,20 @@ void EventGAPS::FillPaddleHistos(void) {
       }
     }
   }
-  //if (beta > 0) BetaDist1->Fill(beta); // Only when beta was calculated
-  NPaddlesCube->Fill(NPadCube);
-  NPaddlesUmbrella->Fill(NPadUmbrella);
-  NPaddlesCortina->Fill(NPadCortina);
+  // Histo for the number of paddles hit in parts of the detector
+  //NPaddlesCube->Fill(NPadCube);
+  //NPaddlesUmbrella->Fill(NPadUmbrella);
+  //NPaddlesCortina->Fill(NPadCortina);
 }
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 void EventGAPS::FillOffsetHistos(void) {
   
-  for (int i=1; i<NCUBT; i++) {
+  for (int i=1; i<NCUBT; i++) { // Loop through CUB paddles
     if (Paddle_A[i] > 0) { // Paddle-channel map exists
       if ( IsHit[i] && (EarlyPaddle>60&&EarlyPaddle<73) ) { // Good hits
-	//if ( IsHit[i] && (EarlyPaddle>60&&EarlyPaddle<109) ) { // Good hits
-	// We have an UMB-Cen and CUB hit -> fill H_OffCube[][]
-	
-	// Here we use a much wide range on the paddle, which we can
+	// Here we use a much wider range on the paddle, which we can
 	// do because we are calculating the residual compared to the
 	// maximum time.
 	if ( ABS(delta[i]) < 0.70*Dimension[i][0] &&
@@ -1157,12 +1220,10 @@ void EventGAPS::FillOffsetHistos(void) {
       if ( IsHit[cort_paddle] ) {
 	// Loop through relevant CubeSide paddles
 	int panel = i / (int)NCORT;
-	//printf("Hit: %d %d %d: ",i, cort_paddle, panel);
 	int cube_start = 25+panel*NCUBS;
 	for (int j=0; j<NCUBS; j++) { // Any Hit paddles?
 	  int cube_paddle = cube_start+j;
 	  if ( IsHit[cube_paddle] ) {
-	    //printf("%d %d\n",j,cube_paddle);
 	    // Good paddle combo, calculate HitT and Tdist
 	    if ( ABS(delta[cube_paddle]) < 0.70*Dimension[cube_paddle][0] &&
 		 ABS(delta[cort_paddle]) < 0.70*Dimension[cort_paddle][0]) {
@@ -1186,7 +1247,6 @@ void EventGAPS::FillOffsetHistos(void) {
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 void EventGAPS::WriteOffsetHistos(void) {
-  //TFile *outfile=TFile::Open("/home/gaps/zweerink/offset.root","RECREATE"); 
   TFile *outfile = TFile::Open("./offset.root","RECREATE"); 
   
   for (int i = 1; i < NCUBT; i++) {
@@ -1229,10 +1289,3 @@ void EventGAPS::WriteOffsetHistos(void) {
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
-
-//==================END OF PEAK STUFF======================
-
-void EventGAPS::Message(const char *s) {
-  //cerr << s << endl;
-}
-

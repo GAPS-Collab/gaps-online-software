@@ -34,4 +34,18 @@ struct SiPMInfo {
   int PaddleEnd[NTOT];           // 0->A, 1->B
 };
 
+struct EventInfo {
+  float Ped[NPAD][2];
+  float PedRMS[NPAD][2];
+  float VPeak[NPAD][2];
+  float Charge[NPAD][2];
+  float TDC[NPAD][2];
+  float TOTLo[NPAD][2];
+  float TOTHi[NPAD][2];
+  float TOTSlLo[NPAD][2];
+  float TOTSlHi[NPAD][2];
+  float Phi[NRB];
+  double FlightTime;     // in seconds since flight start
+};
+
 #endif
