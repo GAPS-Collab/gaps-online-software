@@ -1340,8 +1340,11 @@ auto g::TofHit::from_bytestream(const Vec<u8> &bytestream, u64 &pos)
    auto err = g::IOError(g::IOError::ErrorKind::UnsupportedProtocolVersion, message);
    return Err(err);
  }
- u8  version        = g::parse_u8(bytestream, ver_pos);
- hit.version        = (g::ProtocolVersion) version;
+ u8 quality_version_u8     = g::parse_u8(bytestream, ver_pos);
+ hit.quality               = static_cast<EventQuality>(quality_version_u8 & 0x3f);
+ hit.version               = (g::ProtocolVersion)(quality_version_u8 & 0xc0);
+ //u8  version        = g::parse_u8(bytestream, ver_pos);
+ //hit.version        = (g::ProtocolVersion) version;
  hit.paddle_id      = bytestream[pos]; pos+=1;
  hit.time_a_f32     = g::parse_f16(bytestream, pos); 
  hit.time_b_f32     = g::parse_f16(bytestream, pos); 
@@ -1369,7 +1372,7 @@ auto g::TofHit::from_bytestream(const Vec<u8> &bytestream, u64 &pos)
  //------------------------------
  u16 tail = g::parse_u16(bytestream, pos);
  if (tail != TAIL) {
-   spdlog::error("VERSION {}", version); 
+   spdlog::error("VERSION {}", quality_version_u8 & 0xc0); 
    spdlog::error("TofHit TAIL signature {} is incorrect!", tail);
  }
  return Ok(hit); 

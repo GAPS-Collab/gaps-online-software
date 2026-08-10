@@ -25,6 +25,7 @@ namespace gondola {
   
     // new variables for V1
     ProtocolVersion version;
+    EventQuality quality = EventQuality::Unknown;;
     f32 baseline_a;
     f32 baseline_a_rms;
     f32 baseline_b;
