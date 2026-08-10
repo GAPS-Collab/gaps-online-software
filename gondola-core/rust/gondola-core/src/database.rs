@@ -395,7 +395,7 @@ pub fn get_dsi_j_ch_pid_map_py() -> Option<DsiJChPidMapping> {
 ///
 /// Get the map first and then query it 
 /// 
-/// ```
+/// ```python
 /// m = gondola.db.get_hid_vid_maps() 
 /// print (m[0][160]) # volume id for paddle 160
 /// ```  
@@ -425,7 +425,7 @@ pub fn get_hid_vid_maps() -> Option<(HashMap<u32, u64>, HashMap<u32, u64>)> {
 /// ("hardware") detector ids
 ///
 /// Get the map first and then query it 
-/// ```
+/// ```python
 /// m = gondola.db.get_vid_hid_maps() 
 /// print (m[0][100000000]) # tof paddle 1
 /// ```  
