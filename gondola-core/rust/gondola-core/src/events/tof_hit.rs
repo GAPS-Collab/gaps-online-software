@@ -75,7 +75,8 @@ pub struct TofHit {
   pub charge_a       : f16,
   pub charge_b       : f16,
   pub version        : ProtocolVersion,
-  // for now, but we want to use half instead
+  // use event quality for hit quality
+  pub quality        : EventQuality, 
   pub baseline_a     : f16,
   pub baseline_a_rms : f16,
   pub baseline_b     : f16,
@@ -136,6 +137,7 @@ impl TofHit {
       valid           : true,
       // v1 variables 
       version         : ProtocolVersion::V1,
+      quality         : EventQuality::Unknown, 
       baseline_a      : f16::from_f32(0.0),
       baseline_a_rms  : f16::from_f32(0.0),
       baseline_b      : f16::from_f32(0.0),
@@ -855,7 +857,9 @@ impl Serialization for TofHit {
     bytestream.extend_from_slice(&self.baseline_a   .to_le_bytes());
     bytestream.extend_from_slice(&self.baseline_a_rms.to_le_bytes());
     bytestream.extend_from_slice(&self.phase       .to_le_bytes());
-    bytestream.push(self.version.to_u8());
+    let quality_version = self.quality as u8 | self.version.to_u8();
+    bytestream.push(quality_version);
+    //bytestream.push(self.version.to_u8());
     bytestream.extend_from_slice(&self.baseline_b  .to_le_bytes());
     bytestream.extend_from_slice(&self.baseline_b_rms.to_le_bytes());
     bytestream.extend_from_slice(&self.tot_low_b   .to_le_bytes());
@@ -908,8 +912,11 @@ impl Serialization for TofHit {
     phase_vec.push(parse_u8(stream, pos));
     phase_vec.push(parse_u8(stream, pos));
     pp.phase          = parse_f16(&phase_vec, &mut 0);
-    let version       = ProtocolVersion::from(parse_u8(stream, pos));
+    let quality_version_u8  = parse_u8(stream, pos);
+    let quality             = EventQuality::from(quality_version_u8 & 0x3f);
+    let version             = ProtocolVersion::from(quality_version_u8 & 0xc0); 
     pp.version        = version;
+    pp.quality        = quality;
     match pp.version {
       ProtocolVersion::V1 => {
       }
@@ -952,7 +959,8 @@ impl FromRandom for TofHit {
     pp.peak_b          = f16::from_f32(rng.random::<f32>());
     pp.charge_a        = f16::from_f32(rng.random::<f32>());
     pp.charge_b        = f16::from_f32(rng.random::<f32>());
-    pp.version         = ProtocolVersion::from(rng.random::<u8>());
+    pp.version         = ProtocolVersion::from_random();
+    pp.quality         = EventQuality::from_random();
     pp.baseline_a      = f16::from_f32(rng.random::<f32>());
     pp.baseline_a_rms  = f16::from_f32(rng.random::<f32>());
     pp.baseline_b      = f16::from_f32(rng.random::<f32>());
