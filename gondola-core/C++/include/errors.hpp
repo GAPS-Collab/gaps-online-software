@@ -1,0 +1,35 @@
+#ifndef GO_ERRORS_H_INCLUDED
+#define GO_ERRORS_H_INCLUDED
+
+
+namespace gondola {
+  class IOError {
+    public:
+   
+      enum class ErrorKind {
+        StreamTooShort,
+        StreamTooLong,
+        TooManyTrkEvents,
+        WrongDelimiter,
+        PacketNotFound,
+        WrongPacketType,
+        WrongHeaderBytes,
+        WrongTailBytes,
+        EventHeaderCorrupt,
+        UnsupportedProtocolVersion
+      };
+     
+      IOError(ErrorKind kind, std::string reason = ""):
+        kind(kind), reason(reason) {}
+      
+      ErrorKind kind;
+      std::string reason;
+  };
+
+  //class FatalException : public std::exception {
+  //  virtual const char* what() const throw() { 
+  //    return "Abort program due to a FatalException thrown in gaps-online-software!!";
+  //  }
+  //};
+}  
+#endif

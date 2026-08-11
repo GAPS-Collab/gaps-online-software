@@ -1,0 +1,600 @@
+//! Dataclasses provides structures to facilitate the work with data drom 
+//! the GAPS experiment. Most noticeably, there are
+//!
+//! * events       - TOF/Tracker data, TOF events on disk, MergedEvents send over telemetry
+//!
+//! * packets      - containers to serialize/deserialize the described structures so that 
+//!                  these can be stored on disk or send over the network
+//!
+//! * calibration  - TOF/Tracker related calibration routines and containers to hold results
+//! 
+//! * io           - read/write packets to/from disk or receive them over the network
+//! 
+//! * random       - random numbers for software tests
+//! 
+//! * tof          - Very specific TOF related code which does not fall under a different 
+//!                  category
+//! 
+//! * tracker      - Very specific TRK related code which does not fall under any other 
+//!                  category
+//!
+//! # features:
+//!
+//! * random              - allow random number generated data classes for 
+//!                         testing
+//!
+//! * database            - access a data base for advanced paddle
+//!                         mapping, readoutboard and ltb information etc.
+//!                         This will introduce a dependency on sqlite and 
+//!                         diesel
+//! * tof-control         - allows to control LTB & Powerboard from the RBs 
+//!                         over i2c. Since the i2c protocoll is not supported 
+//!                         on Mac, code with this feature enable won't build 
+//!                         on Apple systems. 
+//! * advanced-algorithms - allows to use a different algorithm for pulse extraction 
+//! * pybindings          - build the python library "gondola". Most of the entitities 
+//!                         within "gondola-core" have pybindings, e.g. events, hits.
+//! * tof-liftof          - build the code which is required to build liftof, the flight
+//!                         code utiilizing this library 
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
+
+#[macro_use] extern crate log; 
+
+pub mod prelude;
+#[cfg(feature="random")]
+pub mod random;
+pub mod constants;
+pub mod events;
+pub mod packets;
+pub mod version;
+pub mod io;
+pub mod calibration;
+pub mod errors;
+pub mod tof;
+pub mod tracker;
+pub mod monitoring;
+pub mod stats;
+pub mod physics;
+#[cfg(feature="pybindings")]
+pub mod python;
+#[cfg(feature="database")]
+pub mod database;
+
+// python convention
+pub const VERSION: &str = env!("CARGO_PKG_VERSION"); 
+pub const VERSION_MAJ: &str = env!("CARGO_PKG_VERSION_MAJOR");
+pub const VERSION_MIN: &str = env!("CARGO_PKG_VERSION_MINOR");
+pub const VERSION_PCH: &str = env!("CARGO_PKG_VERSION_PATCH");
+
+#[cfg(feature="pybindings")]
+use crate::errors::*;
+
+/// A simple helper macro adding an as_str function 
+/// as well as the Display method to any enum.
+///
+/// Avoids writing boilerplate
+#[macro_export]
+macro_rules! expand_and_test_enum {
+  ($name:ident, $test_name:ident) => {
+    impl fmt::Display for $name {
+      fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "<{}: {}>",stringify!($name), self.as_ref())
+      }
+    }
+
+    impl From<u8> for $name {
+      fn from(value: u8) -> Self {
+        match Self::from_repr(value)  {
+          None => {
+            return Self::Unknown;
+          }
+          Some(variant) => {
+            return variant;
+          }
+        }
+      }
+    }
+
+    #[cfg(feature="random")]
+    impl FromRandom for $name {
+      fn from_random() -> Self {
+        let mut choices = Vec::<Self>::new();
+        for k in Self::iter() {
+          choices.push(k);
+        }
+        let mut rng  = rand::rng();
+        let idx = rng.random_range(0..choices.len());
+        choices[idx]
+      }
+    }
+
+    #[test]
+    fn $test_name() {
+      for _ in 0..100 {
+        let data = $name::from_random();
+        assert_eq!($name::from(data as u8), data);
+      }
+    }
+
+    #[cfg(feature="pybindings")]
+    #[pymethods]
+    impl $name {
+    
+      #[staticmethod]  
+      #[pyo3(name = "from_u8")]
+      fn from_py(byte : u8) -> Self {
+        Self::from(byte) 
+      }
+    }
+  };
+}
+
+//---------------------------------------
+// helpers to init the logging system
+//
+
+use colored::{
+    Colorize,
+    ColoredString
+};
+use chrono::Utc;
+use log::Level;
+use std::io::Write;
+
+/// Make sure that the loglevel is in color, even though not using pretty_env logger
+pub fn color_log(level : &Level) -> ColoredString {
+  match level {
+    Level::Error    => String::from(" ERROR!").red(),
+    Level::Warn     => String::from(" WARN  ").yellow(),
+    Level::Info     => String::from(" Info  ").green(),
+    Level::Debug    => String::from(" debug ").blue(),
+    Level::Trace    => String::from(" trace ").cyan(),
+  }
+}
+
+/// Set up the environmental (env) logger
+/// with our format
+///
+/// Ensure that the lines and module paths
+/// are printed in the logging output
+pub fn init_env_logger() {
+  env_logger::builder()
+    .format(|buf, record| {
+    writeln!( buf, "[{ts} - {level}][{module_path}:{line}] {args}",
+      ts    = Utc::now().format("%Y/%m/%d-%H:%M:%SUTC"), 
+      level = color_log(&record.level()),
+      module_path = record.module_path().unwrap_or("<unknown>"),
+      line  = record.line().unwrap_or(0),
+      args  = record.args()
+      )
+    }).init();
+}
+
+//-------------------------------------------------
+// Build the python library
+
+#[cfg(feature="pybindings")]
+pub use pyo3::prelude::*; 
+#[cfg(feature="pybindings")]
+pub use pyo3::wrap_pymodule; 
+#[cfg(feature="pybindings")]
+pub use pyo3::wrap_pyfunction; 
+
+#[cfg(feature="pybindings")]
+#[pymodule]
+#[pyo3(name = "tof")]
+fn tof_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
+  use crate::tof::*;
+  m.add_class::<RBPaddleID>()?;
+  m.add_class::<TofDetectorStatus>()?;
+  m.add_class::<TofCommandCode>()?;
+  m.add_class::<TofCommand>()?;
+  m.add_class::<TofOperationMode>()?;
+  m.add_class::<BuildStrategy>()?;
+  m.add_class::<PreampBiasConfig>()?;
+  m.add_class::<RBChannelMaskConfig>()?;
+  m.add_class::<TriggerConfig>()?;
+  m.add_class::<TofRunConfig>()?;
+  m.add_class::<TofCuts>()?;
+  m.add_class::<TofAnalysis>()?;
+  m.add_class::<TofAnalysisCache>()?;
+  m.add_class::<TofAnalysisPaddleCache>()?;
+  m.add_class::<AnalysisEngineSettings>()?;
+  #[cfg(feature="tof-liftof")]
+  m.add_class::<PyMasterTrigger>()?;
+  m.add_function(wrap_pyfunction!(waveform_analysis, m)?)?;
+  m.add_function(wrap_pyfunction!(to_board_id_string, m)?)?;
+  // the commands
+  m.add_function(wrap_pyfunction!(start_run, m)?)?;
+  m.add_function(wrap_pyfunction!(stop_run, m)?)?;
+  m.add_function(wrap_pyfunction!(restart_liftofrb, m)?)?;
+  m.add_function(wrap_pyfunction!(enable_verification_run, m)?)?;
+  m.add_function(wrap_pyfunction!(shutdown_all_rbs, m)?)?;
+  m.add_function(wrap_pyfunction!(shutdown_rat, m)?)?;
+  m.add_function(wrap_pyfunction!(shutdown_ratpair, m)?)?;
+  m.add_function(wrap_pyfunction!(shutdown_rb, m)?)?;
+  m.add_function(wrap_pyfunction!(shutdown_tofcpu, m)?)?;
+  m.add_function(wrap_pyfunction!(run_action_alfa, m)?)?;
+  m.add_function(wrap_pyfunction!(run_action_bravo, m)?)?;
+  m.add_function(wrap_pyfunction!(run_action_charlie, m)?)?;
+  m.add_function(wrap_pyfunction!(run_action_whiskey, m)?)?;
+  m.add_function(wrap_pyfunction!(run_action_tango, m)?)?;
+  m.add_function(wrap_pyfunction!(run_action_foxtrott, m)?)?;
+  m.add_function(wrap_pyfunction!(request_liftof_settings, m)?)?;
+  m.add_function(wrap_pyfunction!(restore_default_config, m)?)?;
+  m.add_function(wrap_pyfunction!(apply_settings_diff, m)?)?;
+  Ok(())
+}
+
+#[cfg(feature="pybindings")]
+#[pymodule]
+#[pyo3(name = "tracker")]
+fn tracker_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
+  use crate::tracker::*;
+  //m.add_function(wrap_pyfunction!(mt_event_get_timestamp_abs48,m)?)?;
+  m.add_function(wrap_pyfunction!(strip_lines, m)?)?;
+  m.add_class::<TrackerOnlineCalibration>()?;
+  Ok(())
+}
+
+#[cfg(feature="pybindings")]
+#[pymodule]
+#[pyo3(name = "calibration")]
+fn calibration_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
+  use crate::calibration::*;
+  m.add_class::<RBCalibrations>()?;
+  m.add_class::<TrackerOfflineCalibration>()?;
+  Ok(())
+}
+
+#[cfg(feature="pybindings")]
+#[pymodule]
+#[pyo3(name = "events")]
+fn events_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
+  use crate::events::*;
+  m.add_class::<McHit>()?;
+  m.add_class::<McEvent>()?;
+  m.add_class::<McTrack>()?;
+  m.add_class::<McTree>()?;
+  m.add_class::<TofHit>()?;
+  m.add_class::<TrackerHit>()?;
+  m.add_class::<RBEventHeader>()?;
+  m.add_class::<RBEvent>()?;
+  m.add_class::<RBWaveform>()?;
+  m.add_class::<EventStatus>()?;
+  m.add_class::<DataType>()?;
+  m.add_class::<TofEvent>()?;
+  m.add_class::<TrackerDAQEvent>()?;
+  m.add_class::<TrackerDAQEventPacket>()?;
+  m.add_class::<TelemetryEvent>()?;
+  m.add_function(wrap_pyfunction!(strip_id, m)?)?;
+  m.add_class::<EventQuality>()?;
+  m.add_class::<TriggerType>()?;
+  m.add_class::<LTBThreshold>()?;
+  m.add_function(wrap_pyfunction!(mt_event_get_timestamp_abs48,m)?)?;
+  Ok(())
+}
+
+#[cfg(feature="pybindings")]
+#[pymodule]
+#[pyo3(name = "packets")]
+fn packets_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
+  use crate::packets::*;
+  m.add_class::<TofPacketType>()?;
+  m.add_class::<TofPacket>()?;
+  m.add_class::<TelemetryPacketType>()?;
+  m.add_class::<TelemetryPacket>()?;
+  m.add_class::<TelemetryPacketHeader>()?;
+  m.add_class::<TrackerHeader>()?;
+  // FIXME - this is monitoring data, we should 
+  // move this over to the monitoring part of the 
+  // code and they should become MoniData/Series 
+  m.add_class::<PduChannel>()?;
+  m.add_class::<Pac1934>()?;
+  m.add_class::<PduHKPacket>()?;
+  m.add_function(wrap_pyfunction!(make_systime,m)?)?;
+  m.add_class::<TrackerEventIDEchoPacket>()?;
+  m.add_class::<TrackerTempLeakPacket>()?;
+  m.add_class::<TrackerDAQTempPacket>()?;
+  m.add_class::<TrackerDAQHSKPacket>()?;
+  Ok(())
+}
+
+#[cfg(feature="pybindings")]
+#[pymodule]
+#[pyo3(name = "io")]
+fn io_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
+  use crate::io::*;
+  use crate::io::caraspace::*;
+  #[cfg(feature="root")]
+  use crate::io::root_reader::read_example;
+  use crate::io::caraspace::frame::get_all_telemetry_event_names;
+  #[cfg(feature="root")]
+  m.add_function(wrap_pyfunction!(read_example, m)?)?;
+  m.add_function(wrap_pyfunction!(get_all_telemetry_event_names, m)?)?;
+  m.add_function(wrap_pyfunction!(get_runfilename, m)?)?;
+  m.add_function(wrap_pyfunction!(get_califilename, m)?)?;
+  m.add_function(wrap_pyfunction!(list_path_contents_sorted_py, m)?)?;
+  m.add_function(wrap_pyfunction!(get_utc_timestamp, m)?)?;
+  m.add_function(wrap_pyfunction!(get_utc_date, m)?)?;
+  m.add_function(wrap_pyfunction!(get_rundata_from_file, m)?)?;
+  m.add_function(wrap_pyfunction!(get_datetime, m)?)?;
+  m.add_function(wrap_pyfunction!(get_utc_timestamp_from_unix, m)?)?;
+  m.add_function(wrap_pyfunction!(get_unix_timestamp, m)?)?;
+  m.add_function(wrap_pyfunction!(get_unix_timestamp_from_telemetry, m)?)?;
+  // these are the config file manipulators
+  m.add_function(wrap_pyfunction!(apply_diff_to_file_py, m)?)?;
+  m.add_function(wrap_pyfunction!(compress_toml_py, m)?)?;
+  m.add_function(wrap_pyfunction!(decompress_toml_py, m)?)?;
+  m.add_function(wrap_pyfunction!(create_compressed_diff_py, m)?)?;
+
+  m.add_class::<CRFrameObject>()?;
+  m.add_class::<CRFrameObjectType>()?;
+  m.add_class::<CRFrame>()?;
+  m.add_class::<DataSourceKind>()?;
+  m.add_class::<CRReader>()?;
+  m.add_class::<CRWriter>()?;
+  m.add_class::<TofPacketReader>()?;
+  m.add_class::<TofPacketWriter>()?;
+  m.add_class::<TelemetryPacketReader>()?;
+  m.add_class::<TelemetryPacketWriter>()?;
+  //m.add_class::<PyDataSource>()?;
+  Ok(())
+}
+
+#[cfg(feature="pybindings")]
+#[pymodule]
+#[pyo3(name = "monitoring")]
+fn monitoring_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
+  use crate::monitoring::*;
+  m.add_class::<EventBuilderHB>()?;
+  m.add_class::<EventBuilderHBSeries>()?;
+  m.add_class::<DataSinkHB>()?;
+  m.add_class::<DataSinkHBSeries>()?;
+  m.add_class::<MasterTriggerHB>()?;
+  m.add_class::<MasterTriggerHBSeries>()?;
+  m.add_class::<PAMoniData>()?;
+  m.add_class::<PAMoniDataSeries>()?;
+  m.add_class::<PBMoniData>()?;
+  m.add_class::<PBMoniDataSeries>()?;
+  m.add_class::<MtbMoniData>()?;
+  m.add_class::<MtbMoniDataSeries>()?;
+  m.add_class::<LTBMoniData>()?;
+  m.add_class::<LTBMoniDataSeries>()?;
+  m.add_class::<RBMoniData>()?;
+  m.add_class::<RBMoniDataSeries>()?;
+  m.add_class::<CPUMoniData>()?;
+  m.add_class::<CPUMoniDataSeries>()?;
+  m.add_class::<SipPresMoniData>()?;
+  m.add_class::<SipPresMoniDataSeries>()?;
+  m.add_class::<SipPosMoniData>()?;
+  m.add_class::<SipPosMoniDataSeries>()?;
+  m.add_class::<SipTimeMoniData>()?;
+  m.add_class::<SipTimeMoniDataSeries>()?;
+  m.add_class::<TrackerGpsMoniData>()?;
+  m.add_class::<TrackerGpsMoniDataSeries>()?;
+  m.add_class::<GcuEvBldStatsMoniData>()?;
+  m.add_class::<GcuEvBldStatsMoniDataSeries>()?;
+  m.add_class::<CoolingMoniData>()?;
+  m.add_class::<CoolingMoniDataSeries>()?;
+  m.add_class::<RunStatistics>()?;
+  m.add_class::<WastieMoniData>()?;
+  m.add_class::<WastieMoniDataSeries>()?;
+  Ok(())
+}
+
+#[cfg(feature="pybindings")]
+#[pymodule]
+#[pyo3(name = "stats")]
+fn stats_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
+  //use crate::io::*;
+  use crate::stats::gamma_pdf_py;
+  use crate::stats::mean_py;
+  m.add_function(wrap_pyfunction!(gamma_pdf_py, m)?)?;
+  m.add_function(wrap_pyfunction!(mean_py, m)?)?;
+  Ok(())
+}
+
+#[cfg(feature="pybindings")]
+#[pymodule]
+#[pyo3(name = "algo")]
+fn algo_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
+  //use crate::io::*;
+  use crate::tof::algorithms::*;
+  m.add_function(wrap_pyfunction!(get_max_value_idx_py, m)?)?;
+  m.add_function(wrap_pyfunction!(interpolate_time_py, m)?)?;
+  m.add_function(wrap_pyfunction!(fit_sine_simple_py, m)?)?;
+  Ok(())
+}
+
+#[cfg(feature="database")]
+#[cfg(feature="pybindings")]
+#[pymodule]
+#[pyo3(name = "db")]
+fn db_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
+  use crate::database::*;
+  m.add_class::<ReadoutBoard>()?;
+  m.add_class::<RAT>()?;
+  m.add_class::<TofPaddle>()?;
+  m.add_class::<TrackerStrip>()?;
+  m.add_class::<TrackerStripMask>()?;
+  m.add_class::<TrackerStripPedestal>()?;
+  m.add_class::<TrackerStripTransferFunction>()?;
+  m.add_class::<TrackerStripCmnNoise>()?;
+  m.add_class::<TrackerStripGain>()?;
+  m.add_class::<TrackerStripPulse>()?;
+  m.add_class::<TofPaddleTimingConstant>()?;
+  m.add_class::<TrackerCalibrationFile>()?;
+  m.add_class::<TrackerCalibrationFileType>()?;
+  m.add_class::<TrackerCaliTimeWindow>()?;
+  m.add_class::<TofPaddleTemp>()?;
+  m.add_function(wrap_pyfunction!(load_calibration_db_elena, m)?)?;
+  m.add_function(wrap_pyfunction!(get_all_rbids_in_db, m)?)?;
+  m.add_function(wrap_pyfunction!(get_all_pbids_in_db, m)?)?;
+  m.add_function(wrap_pyfunction!(get_hid_vid_maps, m)?)?;
+  m.add_function(wrap_pyfunction!(get_vid_hid_maps, m)?)?;
+  m.add_function(wrap_pyfunction!(get_rbids_for_pbid, m)?)?;
+  m.add_function(wrap_pyfunction!(get_dsi_j_ch_pid_map_py, m)?)?;
+  m.add_function(wrap_pyfunction!(get_rbid_pbchannel_pid_map_py, m)?)?;
+  m.add_function(wrap_pyfunction!(load_calibration_db_elena, m)?)?;
+  m.add_function(wrap_pyfunction!(create_trk_mask_table, m)?)?;
+  m.add_function(wrap_pyfunction!(create_trk_pedestal_table, m)?)?;
+  m.add_function(wrap_pyfunction!(create_trk_transfer_fn_table, m)?)?;
+  m.add_function(wrap_pyfunction!(create_trk_pulse_table, m)?)?;
+  m.add_function(wrap_pyfunction!(create_trk_gain_table, m)?)?;
+  m.add_function(wrap_pyfunction!(is_in_tracker_cali_window, m)?)?;
+  m.add_function(wrap_pyfunction!(create_trk_cali_tw_table, m)?)?;
+  m.add_function(wrap_pyfunction!(create_tof_paddle_temp_table, m)?)?;
+  Ok(())
+}
+
+#[cfg(feature="pybindings")]
+#[pyfunction]
+fn get_version() -> &'static str {
+  return VERSION;
+}
+
+/// Major version of the package 
+/// from the version string
+/// (Major.Minor.Patch)
+#[cfg(feature="pybindings")]
+#[pyfunction]
+fn get_version_major() -> u8 {
+  return VERSION_MAJ.parse().unwrap();
+}
+
+/// Minor version of the package 
+/// from the version string
+/// (Major.Minor.Patch)
+#[cfg(feature="pybindings")]
+#[pyfunction]
+fn get_version_minor() -> u8 {
+  return VERSION_MIN.parse().unwrap();
+}
+
+/// Patch level of the package 
+/// from the version string
+/// (Major.Minor.Patch)
+#[cfg(feature="pybindings")]
+#[pyfunction]
+fn get_version_patch() -> u8 {
+  return VERSION_PCH.parse().unwrap();
+}
+
+/// Check if the version is at least the 
+/// required, given string following the 
+/// format MAJOR.MINOR.PATCH 
+#[cfg(feature="pybindings")]
+#[pyfunction]
+fn version_at_least(version_string : String) -> bool {
+  let parts: Vec<u32> = version_string.split('.')
+    .map(|s| s.parse().expect("Input is not a valid version string. Please follow the MAJOR.MINOR.PATCH format!"))
+    .collect();
+  let major : u8 = parts[0] as u8;
+  let minor : u8 = parts[1] as u8;
+  let patch : u8 = parts[2] as u8;
+  if major < get_version_major() {
+    return true;
+  }
+  if major > get_version_major() {
+    println!("Required major version of {} is larger than current version {}", major, VERSION);
+    return false;
+  }
+  if major == get_version_major() {
+    if minor < get_version_minor() {
+      return true;
+    }
+    if minor > get_version_minor() {
+      println!("Required minor version of {} is larger than current version {}", minor, VERSION);
+      return false;
+    }
+    if minor == get_version_minor() {
+      if patch > get_version_patch() {
+        println!("Required patch version of {} is larger than current version {}", patch, VERSION);
+        return false 
+      }
+    }
+  } 
+  true
+}
+
+#[cfg(feature="pybindings")]
+pyo3::create_exception!(gondola_core_py, PyMasterTriggerError, pyo3::exceptions::PyException);
+#[cfg(feature="pybindings")]
+pyo3::create_exception!(gondola_core_py, PyRunError, pyo3::exceptions::PyException);
+#[cfg(feature="pybindings")]
+pyo3::create_exception!(gondola_core_py, PyTofError, pyo3::exceptions::PyException);
+#[cfg(feature="pybindings")]
+pyo3::create_exception!(gondola_core_py, PyStagingError, pyo3::exceptions::PyException);
+#[cfg(feature="pybindings")]
+pyo3::create_exception!(gondola_core_py, PySensorError, pyo3::exceptions::PyException);
+#[cfg(feature="pybindings")]
+pyo3::create_exception!(gondola_core_py, PyUserError, pyo3::exceptions::PyException);
+#[cfg(feature="pybindings")]
+pyo3::create_exception!(gondola_core_py, PyCalibrationError, pyo3::exceptions::PyException);
+#[cfg(feature="pybindings")]
+pyo3::create_exception!(gondola_core_py, PyWaveformError, pyo3::exceptions::PyException);
+#[cfg(feature="pybindings")]
+pyo3::create_exception!(gondola_core_py, PyIPBusError, pyo3::exceptions::PyException);
+#[cfg(feature="pybindings")]
+pyo3::create_exception!(gondola_core_py, PySerializationError, pyo3::exceptions::PyException);
+#[cfg(feature="pybindings")]
+pyo3::create_exception!(gondola_core_py, PyAnalysisError, pyo3::exceptions::PyException); 
+
+#[macro_export]
+macro_rules! pythonize_error {
+  ($name:ident, $pyname:ident) => {
+
+    impl From<$name> for PyErr {
+      fn from(err: $name) -> PyErr {
+        // You can use a standard Python exception if you prefer, 
+        // e.g., pyo3::exceptions::PyValueError::new_err(...)
+        // But mapping to your custom PyAnalysisError is usually better. 
+        $pyname::new_err(format!("<GondolaCoreException: {}>", err))
+      }
+    }
+  }
+}
+
+#[cfg(feature="pybindings")]
+pythonize_error!(SerializationError, PySerializationError);
+#[cfg(feature="pybindings")]
+pythonize_error!(AnalysisError, PyAnalysisError);
+#[cfg(feature="pybindings")]
+pythonize_error!(CalibrationError, PyCalibrationError);
+#[cfg(feature="pybindings")]
+pythonize_error!(UserError, PyUserError);
+
+/// Python API to rust version of tof-dataclasses.
+///
+/// Currently, this contains only the analysis 
+/// functions
+#[cfg(feature="pybindings")]
+#[pymodule]
+#[pyo3(name = "gondola_core")]
+fn gondola_core_py<'_py>(m : &Bound<'_py, PyModule>) -> PyResult<()> { //: Python<'_>, m: &PyModule) -> PyResult<()> {
+  pyo3_log::init();
+  m.add_function(wrap_pyfunction!(get_version, m)?)?;
+  m.add_function(wrap_pyfunction!(get_version_major, m)?)?;
+  m.add_function(wrap_pyfunction!(get_version_minor, m)?)?;
+  m.add_function(wrap_pyfunction!(get_version_patch, m)?)?;
+  m.add_function(wrap_pyfunction!(version_at_least, m)?)?;
+  m.add_wrapped(wrap_pymodule!(events_py))?;
+  m.add_wrapped(wrap_pymodule!(monitoring_py))?;
+  m.add_wrapped(wrap_pymodule!(packets_py))?;
+  m.add_wrapped(wrap_pymodule!(tof_py))?;
+  m.add_wrapped(wrap_pymodule!(tracker_py))?;
+  m.add_wrapped(wrap_pymodule!(io_py))?;
+  m.add_wrapped(wrap_pymodule!(db_py))?;
+  m.add_wrapped(wrap_pymodule!(stats_py))?;
+  m.add_wrapped(wrap_pymodule!(algo_py))?;
+  m.add_wrapped(wrap_pymodule!(calibration_py))?;
+  //m.add("SerializationError",  pyo3::types::PyAnyMethods::<PySerializationError>::get_type(m))?;
+  //m.add("AnalysisError",  pyo3::types::PyAnyMethods::<PyAnalysisError>::get_type(m))?;
+  Ok(())
+}
+
+
+
+

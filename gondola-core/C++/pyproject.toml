@@ -1,0 +1,26 @@
+[project]
+name = "gondola_cxx"
+version = "0.12.2"
+dependencies = [
+    "build>=1.4.0",
+] # Add any runtime dependencies here
+description = "C++ compatibility layer for gondola"
+#dynamic = ["readme", "authors"]
+license = {file = "LICENSE"}
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: C++",
+    "Operating System :: OS Independent",
+]
+
+[build-system]
+requires = ["scikit-build-core>=0.8", "nanobind>=1.8"]
+build-backend = "scikit_build_core.build"
+
+[tool.scikit-build]
+cmake.build-type = "Release" # Ensures an optimized release build
+cmake.targets = ["gondola_cxx"]
+
+[tool.cibuildwheel]
+skip = ["* univerzalis*"] # Skip building universal wheels, which are not needed for C++ extensions

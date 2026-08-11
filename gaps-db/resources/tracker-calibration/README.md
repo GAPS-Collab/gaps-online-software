@@ -12,3 +12,9 @@ The following files seem to be needed for a calibrated tracker strip:
 * I am making a wild guess here and assume val1 is the mean and val2 is the 
   sigma for the pedestal distribution
 
+### Tracker calibration times during flight
+
+`cali_times` - each line of this file is a start/stop time when the tracker calibration was active
+
+
+

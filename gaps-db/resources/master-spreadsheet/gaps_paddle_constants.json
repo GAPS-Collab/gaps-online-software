@@ -1,0 +1,1282 @@
+[
+    {
+        "panel_id": "1",
+        "paddle_id": "1",
+        "volume_id": "110000000",
+        "panel_offset": "0.000",
+        "paddle_offset": "0.000",
+        "total_offset": "0.000"
+    },
+    {
+        "panel_id": "1",
+        "paddle_id": "2",
+        "volume_id": "110000100",
+        "panel_offset": "0.000",
+        "paddle_offset": "0.391",
+        "total_offset": "0.391"
+    },
+    {
+        "panel_id": "1",
+        "paddle_id": "3",
+        "volume_id": "110000200",
+        "panel_offset": "0.000",
+        "paddle_offset": "-0.069",
+        "total_offset": "-0.069"
+    },
+    {
+        "panel_id": "1",
+        "paddle_id": "4",
+        "volume_id": "110000300",
+        "panel_offset": "0.000",
+        "paddle_offset": "0.279",
+        "total_offset": "0.279"
+    },
+    {
+        "panel_id": "1",
+        "paddle_id": "5",
+        "volume_id": "110000400",
+        "panel_offset": "0.000",
+        "paddle_offset": "-0.002",
+        "total_offset": "-0.002"
+    },
+    {
+        "panel_id": "1",
+        "paddle_id": "6",
+        "volume_id": "110000500",
+        "panel_offset": "0.000",
+        "paddle_offset": "0.299",
+        "total_offset": "0.299"
+    },
+    {
+        "panel_id": "1",
+        "paddle_id": "7",
+        "volume_id": "110000600",
+        "panel_offset": "0.000",
+        "paddle_offset": "-0.430",
+        "total_offset": "-0.430"
+    },
+    {
+        "panel_id": "1",
+        "paddle_id": "8",
+        "volume_id": "110000700",
+        "panel_offset": "0.000",
+        "paddle_offset": "-0.311",
+        "total_offset": "-0.311"
+    },
+    {
+        "panel_id": "1",
+        "paddle_id": "9",
+        "volume_id": "110000800",
+        "panel_offset": "0.000",
+        "paddle_offset": "-0.201",
+        "total_offset": "-0.201"
+    },
+    {
+        "panel_id": "1",
+        "paddle_id": "10",
+        "volume_id": "110000900",
+        "panel_offset": "0.000",
+        "paddle_offset": "-0.441",
+        "total_offset": "-0.441"
+    },
+    {
+        "panel_id": "1",
+        "paddle_id": "11",
+        "volume_id": "110001000",
+        "panel_offset": "0.000",
+        "paddle_offset": "-0.434",
+        "total_offset": "-0.434"
+    },
+    {
+        "panel_id": "1",
+        "paddle_id": "12",
+        "volume_id": "110001100",
+        "panel_offset": "0.000",
+        "paddle_offset": "-0.465",
+        "total_offset": "-0.465"
+    },
+    {
+        "panel_id": "2a",
+        "paddle_id": "13",
+        "volume_id": "111001100",
+        "panel_offset": "-0.725",
+        "paddle_offset": "0.000",
+        "total_offset": "-0.725"
+    },
+    {
+        "panel_id": "2a",
+        "paddle_id": "14",
+        "volume_id": "111001000",
+        "panel_offset": "-0.725",
+        "paddle_offset": "0.000",
+        "total_offset": "-0.725"
+    },
+    {
+        "panel_id": "2a",
+        "paddle_id": "15",
+        "volume_id": "111000900",
+        "panel_offset": "-0.725",
+        "paddle_offset": "0.276",
+        "total_offset": "-0.449"
+    },
+    {
+        "panel_id": "2a",
+        "paddle_id": "16",
+        "volume_id": "111000800",
+        "panel_offset": "-0.725",
+        "paddle_offset": "-0.213",
+        "total_offset": "-0.938"
+    },
+    {
+        "panel_id": "2a",
+        "paddle_id": "17",
+        "volume_id": "111000700",
+        "panel_offset": "-0.725",
+        "paddle_offset": "0.281",
+        "total_offset": "-0.444"
+    },
+    {
+        "panel_id": "2b",
+        "paddle_id": "18",
+        "volume_id": "111000600",
+        "panel_offset": "0.025",
+        "paddle_offset": "0.000",
+        "total_offset": "0.025"
+    },
+    {
+        "panel_id": "2b",
+        "paddle_id": "19",
+        "volume_id": "111000500",
+        "panel_offset": "0.025",
+        "paddle_offset": "0.000",
+        "total_offset": "0.025"
+    },
+    {
+        "panel_id": "2b",
+        "paddle_id": "20",
+        "volume_id": "111000400",
+        "panel_offset": "0.025",
+        "paddle_offset": "0.848",
+        "total_offset": "0.873"
+    },
+    {
+        "panel_id": "2b",
+        "paddle_id": "21",
+        "volume_id": "111000300",
+        "panel_offset": "0.025",
+        "paddle_offset": "0.725",
+        "total_offset": "0.75"
+    },
+    {
+        "panel_id": "2b",
+        "paddle_id": "22",
+        "volume_id": "111000200",
+        "panel_offset": "0.025",
+        "paddle_offset": "0.651",
+        "total_offset": "0.676"
+    },
+    {
+        "panel_id": "2b",
+        "paddle_id": "23",
+        "volume_id": "111000100",
+        "panel_offset": "0.025",
+        "paddle_offset": "0.976",
+        "total_offset": "1.001"
+    },
+    {
+        "panel_id": "2b",
+        "paddle_id": "24",
+        "volume_id": "111000000",
+        "panel_offset": "0.025",
+        "paddle_offset": "0.847",
+        "total_offset": "0.872"
+    },
+    {
+        "panel_id": "3",
+        "paddle_id": "25",
+        "volume_id": "112000700",
+        "panel_offset": "-0.075",
+        "paddle_offset": "0.000",
+        "total_offset": "-0.075"
+    },
+    {
+        "panel_id": "3",
+        "paddle_id": "26",
+        "volume_id": "112000600",
+        "panel_offset": "-0.075",
+        "paddle_offset": "-0.397",
+        "total_offset": "-0.472"
+    },
+    {
+        "panel_id": "3",
+        "paddle_id": "27",
+        "volume_id": "112000500",
+        "panel_offset": "-0.075",
+        "paddle_offset": "0.291",
+        "total_offset": "0.216"
+    },
+    {
+        "panel_id": "3",
+        "paddle_id": "28",
+        "volume_id": "112000400",
+        "panel_offset": "-0.075",
+        "paddle_offset": "0.305",
+        "total_offset": "0.23"
+    },
+    {
+        "panel_id": "3",
+        "paddle_id": "29",
+        "volume_id": "112000300",
+        "panel_offset": "-0.075",
+        "paddle_offset": "0.463",
+        "total_offset": "0.388"
+    },
+    {
+        "panel_id": "3",
+        "paddle_id": "30",
+        "volume_id": "112000200",
+        "panel_offset": "-0.075",
+        "paddle_offset": "0.463",
+        "total_offset": "0.388"
+    },
+    {
+        "panel_id": "3",
+        "paddle_id": "31",
+        "volume_id": "112000100",
+        "panel_offset": "-0.075",
+        "paddle_offset": "0.799",
+        "total_offset": "0.724"
+    },
+    {
+        "panel_id": "3",
+        "paddle_id": "32",
+        "volume_id": "112000000",
+        "panel_offset": "-0.075",
+        "paddle_offset": "0.781",
+        "total_offset": "0.706"
+    },
+    {
+        "panel_id": "4",
+        "paddle_id": "33",
+        "volume_id": "114000700",
+        "panel_offset": "0.325",
+        "paddle_offset": "0.000",
+        "total_offset": "0.325"
+    },
+    {
+        "panel_id": "4",
+        "paddle_id": "34",
+        "volume_id": "114000600",
+        "panel_offset": "0.325",
+        "paddle_offset": "0.384",
+        "total_offset": "0.709"
+    },
+    {
+        "panel_id": "4",
+        "paddle_id": "35",
+        "volume_id": "114000500",
+        "panel_offset": "0.325",
+        "paddle_offset": "0.391",
+        "total_offset": "0.716"
+    },
+    {
+        "panel_id": "4",
+        "paddle_id": "36",
+        "volume_id": "114000400",
+        "panel_offset": "0.325",
+        "paddle_offset": "0.523",
+        "total_offset": "0.848"
+    },
+    {
+        "panel_id": "4",
+        "paddle_id": "37",
+        "volume_id": "114000300",
+        "panel_offset": "0.325",
+        "paddle_offset": "0.187",
+        "total_offset": "0.512"
+    },
+    {
+        "panel_id": "4",
+        "paddle_id": "38",
+        "volume_id": "114000200",
+        "panel_offset": "0.325",
+        "paddle_offset": "0.876",
+        "total_offset": "1.201"
+    },
+    {
+        "panel_id": "4",
+        "paddle_id": "39",
+        "volume_id": "114000100",
+        "panel_offset": "0.325",
+        "paddle_offset": "0.544",
+        "total_offset": "0.869"
+    },
+    {
+        "panel_id": "4",
+        "paddle_id": "40",
+        "volume_id": "114000000",
+        "panel_offset": "0.325",
+        "paddle_offset": "0.833",
+        "total_offset": "1.158"
+    },
+    {
+        "panel_id": "5a",
+        "paddle_id": "41",
+        "volume_id": "113000700",
+        "panel_offset": "0.025",
+        "paddle_offset": "0.000",
+        "total_offset": "0.025"
+    },
+    {
+        "panel_id": "5a",
+        "paddle_id": "42",
+        "volume_id": "113000600",
+        "panel_offset": "0.025",
+        "paddle_offset": "0.113",
+        "total_offset": "0.138"
+    },
+    {
+        "panel_id": "5a",
+        "paddle_id": "43",
+        "volume_id": "113000500",
+        "panel_offset": "0.025",
+        "paddle_offset": "0.828",
+        "total_offset": "0.853"
+    },
+    {
+        "panel_id": "5a",
+        "paddle_id": "44",
+        "volume_id": "113000400",
+        "panel_offset": "0.025",
+        "paddle_offset": "0.000",
+        "total_offset": "0.025"
+    },
+    {
+        "panel_id": "5a",
+        "paddle_id": "45",
+        "volume_id": "113000300",
+        "panel_offset": "0.025",
+        "paddle_offset": "0.000",
+        "total_offset": "0.025"
+    },
+    {
+        "panel_id": "5b",
+        "paddle_id": "46",
+        "volume_id": "113000200",
+        "panel_offset": "0.025",
+        "paddle_offset": "0.000",
+        "total_offset": "0.025"
+    },
+    {
+        "panel_id": "5b",
+        "paddle_id": "47",
+        "volume_id": "113000100",
+        "panel_offset": "0.025",
+        "paddle_offset": "0.460",
+        "total_offset": "0.485"
+    },
+    {
+        "panel_id": "5b",
+        "paddle_id": "48",
+        "volume_id": "113000000",
+        "panel_offset": "0.025",
+        "paddle_offset": "0.737",
+        "total_offset": "0.762"
+    },
+    {
+        "panel_id": "6",
+        "paddle_id": "49",
+        "volume_id": "115000000",
+        "panel_offset": "0.075",
+        "paddle_offset": "0.000",
+        "total_offset": "0.075"
+    },
+    {
+        "panel_id": "6",
+        "paddle_id": "50",
+        "volume_id": "115000100",
+        "panel_offset": "0.075",
+        "paddle_offset": "0.366",
+        "total_offset": "0.441"
+    },
+    {
+        "panel_id": "6",
+        "paddle_id": "51",
+        "volume_id": "115000200",
+        "panel_offset": "0.075",
+        "paddle_offset": "0.172",
+        "total_offset": "0.247"
+    },
+    {
+        "panel_id": "6",
+        "paddle_id": "52",
+        "volume_id": "115000300",
+        "panel_offset": "0.075",
+        "paddle_offset": "0.610",
+        "total_offset": "0.685"
+    },
+    {
+        "panel_id": "6",
+        "paddle_id": "53",
+        "volume_id": "115000400",
+        "panel_offset": "0.075",
+        "paddle_offset": "0.479",
+        "total_offset": "0.554"
+    },
+    {
+        "panel_id": "6",
+        "paddle_id": "54",
+        "volume_id": "115000500",
+        "panel_offset": "0.075",
+        "paddle_offset": "0.755",
+        "total_offset": "0.83"
+    },
+    {
+        "panel_id": "6",
+        "paddle_id": "55",
+        "volume_id": "115000600",
+        "panel_offset": "0.075",
+        "paddle_offset": "0.956",
+        "total_offset": "1.031"
+    },
+    {
+        "panel_id": "6",
+        "paddle_id": "56",
+        "volume_id": "115000700",
+        "panel_offset": "0.075",
+        "paddle_offset": "1.034",
+        "total_offset": "1.109"
+    },
+    {
+        "panel_id": "57",
+        "paddle_id": "57",
+        "volume_id": "116000000",
+        "panel_offset": "-0.125",
+        "paddle_offset": "0.000",
+        "total_offset": "-0.125"
+    },
+    {
+        "panel_id": "58",
+        "paddle_id": "58",
+        "volume_id": "116200000",
+        "panel_offset": "-0.275",
+        "paddle_offset": "0.000",
+        "total_offset": "-0.275"
+    },
+    {
+        "panel_id": "59",
+        "paddle_id": "59",
+        "volume_id": "116300000",
+        "panel_offset": "0.575",
+        "paddle_offset": "0.000",
+        "total_offset": "0.575"
+    },
+    {
+        "panel_id": "60",
+        "paddle_id": "60",
+        "volume_id": "116100000",
+        "panel_offset": "-0.225",
+        "paddle_offset": "0.000",
+        "total_offset": "-0.225"
+    },
+    {
+        "panel_id": "7",
+        "paddle_id": "61",
+        "volume_id": "100000000",
+        "panel_offset": "0.475",
+        "paddle_offset": "0.000",
+        "total_offset": "0.475"
+    },
+    {
+        "panel_id": "7",
+        "paddle_id": "62",
+        "volume_id": "100000100",
+        "panel_offset": "0.475",
+        "paddle_offset": "0.024",
+        "total_offset": "0.499"
+    },
+    {
+        "panel_id": "7",
+        "paddle_id": "63",
+        "volume_id": "100000200",
+        "panel_offset": "0.475",
+        "paddle_offset": "0.091",
+        "total_offset": "0.566"
+    },
+    {
+        "panel_id": "7",
+        "paddle_id": "64",
+        "volume_id": "100000300",
+        "panel_offset": "0.475",
+        "paddle_offset": "0.092",
+        "total_offset": "0.567"
+    },
+    {
+        "panel_id": "7",
+        "paddle_id": "65",
+        "volume_id": "100000400",
+        "panel_offset": "0.475",
+        "paddle_offset": "0.165",
+        "total_offset": "0.64"
+    },
+    {
+        "panel_id": "7",
+        "paddle_id": "66",
+        "volume_id": "100000500",
+        "panel_offset": "0.475",
+        "paddle_offset": "0.247",
+        "total_offset": "0.722"
+    },
+    {
+        "panel_id": "7",
+        "paddle_id": "67",
+        "volume_id": "100000600",
+        "panel_offset": "0.475",
+        "paddle_offset": "-0.722",
+        "total_offset": "-0.247"
+    },
+    {
+        "panel_id": "7",
+        "paddle_id": "68",
+        "volume_id": "100000700",
+        "panel_offset": "0.475",
+        "paddle_offset": "-0.048",
+        "total_offset": "0.427"
+    },
+    {
+        "panel_id": "7",
+        "paddle_id": "69",
+        "volume_id": "100000800",
+        "panel_offset": "0.475",
+        "paddle_offset": "-0.816",
+        "total_offset": "-0.341"
+    },
+    {
+        "panel_id": "7",
+        "paddle_id": "70",
+        "volume_id": "100000900",
+        "panel_offset": "0.475",
+        "paddle_offset": "-0.158",
+        "total_offset": "0.317"
+    },
+    {
+        "panel_id": "7",
+        "paddle_id": "71",
+        "volume_id": "100001000",
+        "panel_offset": "0.475",
+        "paddle_offset": "-0.979",
+        "total_offset": "-0.504"
+    },
+    {
+        "panel_id": "7",
+        "paddle_id": "72",
+        "volume_id": "100001100",
+        "panel_offset": "0.475",
+        "paddle_offset": "-0.099",
+        "total_offset": "0.376"
+    },
+    {
+        "panel_id": "8",
+        "paddle_id": "73",
+        "volume_id": "100300500",
+        "panel_offset": "0.425",
+        "paddle_offset": "0.000",
+        "total_offset": "0.425"
+    },
+    {
+        "panel_id": "8",
+        "paddle_id": "74",
+        "volume_id": "100300400",
+        "panel_offset": "0.425",
+        "paddle_offset": "0.023",
+        "total_offset": "0.448"
+    },
+    {
+        "panel_id": "8",
+        "paddle_id": "75",
+        "volume_id": "100300300",
+        "panel_offset": "0.425",
+        "paddle_offset": "-0.335",
+        "total_offset": "0.09"
+    },
+    {
+        "panel_id": "8",
+        "paddle_id": "76",
+        "volume_id": "100300200",
+        "panel_offset": "0.425",
+        "paddle_offset": "-0.031",
+        "total_offset": "0.394"
+    },
+    {
+        "panel_id": "8",
+        "paddle_id": "77",
+        "volume_id": "100300100",
+        "panel_offset": "0.425",
+        "paddle_offset": "-0.465",
+        "total_offset": "-0.04"
+    },
+    {
+        "panel_id": "8",
+        "paddle_id": "78",
+        "volume_id": "100300000",
+        "panel_offset": "0.425",
+        "paddle_offset": "-0.039",
+        "total_offset": "0.386"
+    },
+    {
+        "panel_id": "9",
+        "paddle_id": "79",
+        "volume_id": "100200500",
+        "panel_offset": "-0.725",
+        "paddle_offset": "0.000",
+        "total_offset": "-0.725"
+    },
+    {
+        "panel_id": "9",
+        "paddle_id": "80",
+        "volume_id": "100200400",
+        "panel_offset": "-0.725",
+        "paddle_offset": "-0.161",
+        "total_offset": "-0.886"
+    },
+    {
+        "panel_id": "9",
+        "paddle_id": "81",
+        "volume_id": "100200300",
+        "panel_offset": "-0.725",
+        "paddle_offset": "-0.051",
+        "total_offset": "-0.776"
+    },
+    {
+        "panel_id": "9",
+        "paddle_id": "82",
+        "volume_id": "100200200",
+        "panel_offset": "-0.725",
+        "paddle_offset": "-0.160",
+        "total_offset": "-0.885"
+    },
+    {
+        "panel_id": "9",
+        "paddle_id": "83",
+        "volume_id": "100200100",
+        "panel_offset": "-0.725",
+        "paddle_offset": "0.212",
+        "total_offset": "-0.513"
+    },
+    {
+        "panel_id": "9",
+        "paddle_id": "84",
+        "volume_id": "100200000",
+        "panel_offset": "-0.725",
+        "paddle_offset": "0.089",
+        "total_offset": "-0.636"
+    },
+    {
+        "panel_id": "10",
+        "paddle_id": "85",
+        "volume_id": "100400000",
+        "panel_offset": "-0.675",
+        "paddle_offset": "0.000",
+        "total_offset": "-0.675"
+    },
+    {
+        "panel_id": "10",
+        "paddle_id": "86",
+        "volume_id": "100400100",
+        "panel_offset": "-0.675",
+        "paddle_offset": "0.095",
+        "total_offset": "-0.58"
+    },
+    {
+        "panel_id": "10",
+        "paddle_id": "87",
+        "volume_id": "100400200",
+        "panel_offset": "-0.675",
+        "paddle_offset": "-0.922",
+        "total_offset": "-1.597"
+    },
+    {
+        "panel_id": "10",
+        "paddle_id": "88",
+        "volume_id": "100400300",
+        "panel_offset": "-0.675",
+        "paddle_offset": "-0.362",
+        "total_offset": "-1.037"
+    },
+    {
+        "panel_id": "10",
+        "paddle_id": "89",
+        "volume_id": "100400400",
+        "panel_offset": "-0.675",
+        "paddle_offset": "-0.976",
+        "total_offset": "-1.651"
+    },
+    {
+        "panel_id": "10",
+        "paddle_id": "90",
+        "volume_id": "100400500",
+        "panel_offset": "-0.675",
+        "paddle_offset": "-0.233",
+        "total_offset": "-0.908"
+    },
+    {
+        "panel_id": "11",
+        "paddle_id": "91",
+        "volume_id": "100600500",
+        "panel_offset": "0.675",
+        "paddle_offset": "0.000",
+        "total_offset": "0.675"
+    },
+    {
+        "panel_id": "11",
+        "paddle_id": "92",
+        "volume_id": "100600400",
+        "panel_offset": "0.675",
+        "paddle_offset": "-0.773",
+        "total_offset": "-0.098"
+    },
+    {
+        "panel_id": "11",
+        "paddle_id": "93",
+        "volume_id": "100600300",
+        "panel_offset": "0.675",
+        "paddle_offset": "0.788",
+        "total_offset": "1.463"
+    },
+    {
+        "panel_id": "11",
+        "paddle_id": "94",
+        "volume_id": "100600200",
+        "panel_offset": "0.675",
+        "paddle_offset": "1.622",
+        "total_offset": "2.297"
+    },
+    {
+        "panel_id": "11",
+        "paddle_id": "95",
+        "volume_id": "100600100",
+        "panel_offset": "0.675",
+        "paddle_offset": "1.041",
+        "total_offset": "1.716"
+    },
+    {
+        "panel_id": "11",
+        "paddle_id": "96",
+        "volume_id": "100600000",
+        "panel_offset": "0.675",
+        "paddle_offset": "1.297",
+        "total_offset": "1.972"
+    },
+    {
+        "panel_id": "12",
+        "paddle_id": "97",
+        "volume_id": "100100500",
+        "panel_offset": "1.475",
+        "paddle_offset": "0.000",
+        "total_offset": "1.475"
+    },
+    {
+        "panel_id": "12",
+        "paddle_id": "98",
+        "volume_id": "100100400",
+        "panel_offset": "1.475",
+        "paddle_offset": "0.000",
+        "total_offset": "1.475"
+    },
+    {
+        "panel_id": "12",
+        "paddle_id": "99",
+        "volume_id": "100100300",
+        "panel_offset": "1.475",
+        "paddle_offset": "0.350",
+        "total_offset": "1.825"
+    },
+    {
+        "panel_id": "12",
+        "paddle_id": "100",
+        "volume_id": "100100200",
+        "panel_offset": "1.475",
+        "paddle_offset": "0.119",
+        "total_offset": "1.594"
+    },
+    {
+        "panel_id": "12",
+        "paddle_id": "101",
+        "volume_id": "100100100",
+        "panel_offset": "1.475",
+        "paddle_offset": "0.532",
+        "total_offset": "2.007"
+    },
+    {
+        "panel_id": "12",
+        "paddle_id": "102",
+        "volume_id": "100100000",
+        "panel_offset": "1.475",
+        "paddle_offset": "0.252",
+        "total_offset": "1.727"
+    },
+    {
+        "panel_id": "13",
+        "paddle_id": "103",
+        "volume_id": "100500500",
+        "panel_offset": "1.525",
+        "paddle_offset": "0.000",
+        "total_offset": "1.525"
+    },
+    {
+        "panel_id": "13",
+        "paddle_id": "104",
+        "volume_id": "100500400",
+        "panel_offset": "1.525",
+        "paddle_offset": "0.528",
+        "total_offset": "2.053"
+    },
+    {
+        "panel_id": "13",
+        "paddle_id": "105",
+        "volume_id": "100500300",
+        "panel_offset": "1.525",
+        "paddle_offset": "0.495",
+        "total_offset": "2.02"
+    },
+    {
+        "panel_id": "13",
+        "paddle_id": "106",
+        "volume_id": "100500200",
+        "panel_offset": "1.525",
+        "paddle_offset": "0.696",
+        "total_offset": "2.221"
+    },
+    {
+        "panel_id": "13",
+        "paddle_id": "107",
+        "volume_id": "100500100",
+        "panel_offset": "1.525",
+        "paddle_offset": "0.724",
+        "total_offset": "2.249"
+    },
+    {
+        "panel_id": "13",
+        "paddle_id": "108",
+        "volume_id": "100500000",
+        "panel_offset": "1.525",
+        "paddle_offset": "0.716",
+        "total_offset": "2.241"
+    },
+    {
+        "panel_id": "14",
+        "paddle_id": "109",
+        "volume_id": "102000900",
+        "panel_offset": "-0.025",
+        "paddle_offset": "0.000",
+        "total_offset": "-0.025"
+    },
+    {
+        "panel_id": "14",
+        "paddle_id": "110",
+        "volume_id": "102000800",
+        "panel_offset": "-0.025",
+        "paddle_offset": "-0.043",
+        "total_offset": "-0.068"
+    },
+    {
+        "panel_id": "14",
+        "paddle_id": "111",
+        "volume_id": "102000700",
+        "panel_offset": "-0.025",
+        "paddle_offset": "0.097",
+        "total_offset": "0.072"
+    },
+    {
+        "panel_id": "14",
+        "paddle_id": "112",
+        "volume_id": "102000600",
+        "panel_offset": "-0.025",
+        "paddle_offset": "0.241",
+        "total_offset": "0.216"
+    },
+    {
+        "panel_id": "14",
+        "paddle_id": "113",
+        "volume_id": "102000500",
+        "panel_offset": "-0.025",
+        "paddle_offset": "-0.254",
+        "total_offset": "-0.279"
+    },
+    {
+        "panel_id": "14",
+        "paddle_id": "114",
+        "volume_id": "102000400",
+        "panel_offset": "-0.025",
+        "paddle_offset": "-0.184",
+        "total_offset": "-0.209"
+    },
+    {
+        "panel_id": "14",
+        "paddle_id": "115",
+        "volume_id": "102000300",
+        "panel_offset": "-0.025",
+        "paddle_offset": "-0.135",
+        "total_offset": "-0.16"
+    },
+    {
+        "panel_id": "14",
+        "paddle_id": "116",
+        "volume_id": "102000200",
+        "panel_offset": "-0.025",
+        "paddle_offset": "-0.102",
+        "total_offset": "-0.127"
+    },
+    {
+        "panel_id": "14",
+        "paddle_id": "117",
+        "volume_id": "102000100",
+        "panel_offset": "-0.025",
+        "paddle_offset": "0.406",
+        "total_offset": "0.381"
+    },
+    {
+        "panel_id": "14",
+        "paddle_id": "118",
+        "volume_id": "102000000",
+        "panel_offset": "-0.025",
+        "paddle_offset": "-0.044",
+        "total_offset": "-0.069"
+    },
+    {
+        "panel_id": "15",
+        "paddle_id": "119",
+        "volume_id": "104000000",
+        "panel_offset": "-0.175",
+        "paddle_offset": "0.000",
+        "total_offset": "-0.175"
+    },
+    {
+        "panel_id": "15",
+        "paddle_id": "120",
+        "volume_id": "104000100",
+        "panel_offset": "-0.175",
+        "paddle_offset": "0.224",
+        "total_offset": "0.049"
+    },
+    {
+        "panel_id": "15",
+        "paddle_id": "121",
+        "volume_id": "104000200",
+        "panel_offset": "-0.175",
+        "paddle_offset": "0.258",
+        "total_offset": "0.083"
+    },
+    {
+        "panel_id": "15",
+        "paddle_id": "122",
+        "volume_id": "104000300",
+        "panel_offset": "-0.175",
+        "paddle_offset": "0.428",
+        "total_offset": "0.253"
+    },
+    {
+        "panel_id": "15",
+        "paddle_id": "123",
+        "volume_id": "104000400",
+        "panel_offset": "-0.175",
+        "paddle_offset": "0.649",
+        "total_offset": "0.474"
+    },
+    {
+        "panel_id": "15",
+        "paddle_id": "124",
+        "volume_id": "104000500",
+        "panel_offset": "-0.175",
+        "paddle_offset": "0.853",
+        "total_offset": "0.678"
+    },
+    {
+        "panel_id": "15",
+        "paddle_id": "125",
+        "volume_id": "104000600",
+        "panel_offset": "-0.175",
+        "paddle_offset": "1.981",
+        "total_offset": "1.806"
+    },
+    {
+        "panel_id": "15",
+        "paddle_id": "126",
+        "volume_id": "104000700",
+        "panel_offset": "-0.175",
+        "paddle_offset": "1.032",
+        "total_offset": "0.857"
+    },
+    {
+        "panel_id": "15",
+        "paddle_id": "127",
+        "volume_id": "104000800",
+        "panel_offset": "-0.175",
+        "paddle_offset": "0.457",
+        "total_offset": "0.282"
+    },
+    {
+        "panel_id": "15",
+        "paddle_id": "128",
+        "volume_id": "104000900",
+        "panel_offset": "-0.175",
+        "paddle_offset": "0.134",
+        "total_offset": "-0.041"
+    },
+    {
+        "panel_id": "16",
+        "paddle_id": "129",
+        "volume_id": "103000900",
+        "panel_offset": "-0.275",
+        "paddle_offset": "0.000",
+        "total_offset": "-0.275"
+    },
+    {
+        "panel_id": "16",
+        "paddle_id": "130",
+        "volume_id": "103000800",
+        "panel_offset": "-0.275",
+        "paddle_offset": "-0.114",
+        "total_offset": "-0.389"
+    },
+    {
+        "panel_id": "16",
+        "paddle_id": "131",
+        "volume_id": "103000700",
+        "panel_offset": "-0.275",
+        "paddle_offset": "-0.017",
+        "total_offset": "-0.292"
+    },
+    {
+        "panel_id": "16",
+        "paddle_id": "132",
+        "volume_id": "103000600",
+        "panel_offset": "-0.275",
+        "paddle_offset": "0.534",
+        "total_offset": "0.259"
+    },
+    {
+        "panel_id": "16",
+        "paddle_id": "133",
+        "volume_id": "103000500",
+        "panel_offset": "-0.275",
+        "paddle_offset": "0.339",
+        "total_offset": "0.064"
+    },
+    {
+        "panel_id": "16",
+        "paddle_id": "134",
+        "volume_id": "103000400",
+        "panel_offset": "-0.275",
+        "paddle_offset": "0.242",
+        "total_offset": "-0.033"
+    },
+    {
+        "panel_id": "16",
+        "paddle_id": "135",
+        "volume_id": "103000300",
+        "panel_offset": "-0.275",
+        "paddle_offset": "0.429",
+        "total_offset": "0.154"
+    },
+    {
+        "panel_id": "16",
+        "paddle_id": "136",
+        "volume_id": "103000200",
+        "panel_offset": "-0.275",
+        "paddle_offset": "0.180",
+        "total_offset": "-0.095"
+    },
+    {
+        "panel_id": "16",
+        "paddle_id": "137",
+        "volume_id": "103000100",
+        "panel_offset": "-0.275",
+        "paddle_offset": "-0.570",
+        "total_offset": "-0.845"
+    },
+    {
+        "panel_id": "16",
+        "paddle_id": "138",
+        "volume_id": "103000000",
+        "panel_offset": "-0.275",
+        "paddle_offset": "0.311",
+        "total_offset": "0.036"
+    },
+    {
+        "panel_id": "17",
+        "paddle_id": "139",
+        "volume_id": "105000900",
+        "panel_offset": "0.275",
+        "paddle_offset": "0.000",
+        "total_offset": "0.275"
+    },
+    {
+        "panel_id": "17",
+        "paddle_id": "140",
+        "volume_id": "105000800",
+        "panel_offset": "0.275",
+        "paddle_offset": "-0.555",
+        "total_offset": "-0.28"
+    },
+    {
+        "panel_id": "17",
+        "paddle_id": "141",
+        "volume_id": "105000700",
+        "panel_offset": "0.275",
+        "paddle_offset": "0.063",
+        "total_offset": "0.338"
+    },
+    {
+        "panel_id": "17",
+        "paddle_id": "142",
+        "volume_id": "105000600",
+        "panel_offset": "0.275",
+        "paddle_offset": "-0.419",
+        "total_offset": "-0.144"
+    },
+    {
+        "panel_id": "17",
+        "paddle_id": "143",
+        "volume_id": "105000500",
+        "panel_offset": "0.275",
+        "paddle_offset": "0.345",
+        "total_offset": "0.62"
+    },
+    {
+        "panel_id": "17",
+        "paddle_id": "144",
+        "volume_id": "105000400",
+        "panel_offset": "0.275",
+        "paddle_offset": "-0.154",
+        "total_offset": "0.121"
+    },
+    {
+        "panel_id": "17",
+        "paddle_id": "145",
+        "volume_id": "105000300",
+        "panel_offset": "0.275",
+        "paddle_offset": "0.492",
+        "total_offset": "0.767"
+    },
+    {
+        "panel_id": "17",
+        "paddle_id": "146",
+        "volume_id": "105000200",
+        "panel_offset": "0.275",
+        "paddle_offset": "-0.129",
+        "total_offset": "0.146"
+    },
+    {
+        "panel_id": "17",
+        "paddle_id": "147",
+        "volume_id": "105000100",
+        "panel_offset": "0.275",
+        "paddle_offset": "0.681",
+        "total_offset": "0.956"
+    },
+    {
+        "panel_id": "17",
+        "paddle_id": "148",
+        "volume_id": "105000000",
+        "panel_offset": "0.275",
+        "paddle_offset": "-0.102",
+        "total_offset": "0.173"
+    },
+    {
+        "panel_id": "18",
+        "paddle_id": "149",
+        "volume_id": "106000200",
+        "panel_offset": "-0.375",
+        "paddle_offset": "0.000",
+        "total_offset": "-0.375"
+    },
+    {
+        "panel_id": "18",
+        "paddle_id": "150",
+        "volume_id": "106000100",
+        "panel_offset": "-0.375",
+        "paddle_offset": "-0.042",
+        "total_offset": "-0.417"
+    },
+    {
+        "panel_id": "18",
+        "paddle_id": "151",
+        "volume_id": "106000000",
+        "panel_offset": "-0.375",
+        "paddle_offset": "-0.125",
+        "total_offset": "-0.5"
+    },
+    {
+        "panel_id": "19",
+        "paddle_id": "152",
+        "volume_id": "106200000",
+        "panel_offset": "-0.625",
+        "paddle_offset": "0.000",
+        "total_offset": "-0.625"
+    },
+    {
+        "panel_id": "19",
+        "paddle_id": "153",
+        "volume_id": "106200100",
+        "panel_offset": "-0.625",
+        "paddle_offset": "-0.018",
+        "total_offset": "-0.643"
+    },
+    {
+        "panel_id": "19",
+        "paddle_id": "154",
+        "volume_id": "106200200",
+        "panel_offset": "-0.625",
+        "paddle_offset": "0.023",
+        "total_offset": "-0.602"
+    },
+    {
+        "panel_id": "20",
+        "paddle_id": "155",
+        "volume_id": "106300000",
+        "panel_offset": "0.075",
+        "paddle_offset": "0.000",
+        "total_offset": "0.075"
+    },
+    {
+        "panel_id": "20",
+        "paddle_id": "156",
+        "volume_id": "106300100",
+        "panel_offset": "0.075",
+        "paddle_offset": "0.610",
+        "total_offset": "0.685"
+    },
+    {
+        "panel_id": "20",
+        "paddle_id": "157",
+        "volume_id": "106300200",
+        "panel_offset": "0.075",
+        "paddle_offset": "-0.184",
+        "total_offset": "-0.109"
+    },
+    {
+        "panel_id": "21",
+        "paddle_id": "158",
+        "volume_id": "106100200",
+        "panel_offset": "-0.325",
+        "paddle_offset": "0.000",
+        "total_offset": "-0.325"
+    },
+    {
+        "panel_id": "21",
+        "paddle_id": "159",
+        "volume_id": "106100100",
+        "panel_offset": "-0.325",
+        "paddle_offset": "-0.438",
+        "total_offset": "-0.763"
+    },
+    {
+        "panel_id": "21",
+        "paddle_id": "160",
+        "volume_id": "106100000",
+        "panel_offset": "-0.325",
+        "paddle_offset": "0.015",
+        "total_offset": "-0.31"
+    }
+]

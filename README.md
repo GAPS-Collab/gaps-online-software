@@ -1,50 +1,38 @@
-# gaps-online-software
+# gaps-online-software 
 
 ![build-docs-badge](https://github.com/GAPS-Collab/gaps-online-software/workflows/BuildBot/badge.svg)
 
-This is branch LELEWAA-0.10. [Lelewaa is a whale shark](https://dlnr.hawaii.gov/dar/sharks-and-rays/).
-![Manta ray](resources/assets/lelewaa.png)
+This is Version AULEPE-0.12 <a href="https://en.wikipedia.org/wiki/Sailfish">Aulepe are sailfish!</a><img src="resources/assets/aulepe_luma.png" align="right" width="15%">
+<br clear="right"/>
 
->[!TIP] 
->Whale sharks are the largest fish on our planet, and despite their size they are not aggressive towards humans. Whale sharks can be spotted in the Hawaiian waters, however, sightings are rare so if you see one enjoy your encounter and please be respectful. 
+>[!NOTE] 
+>The fastest non-airborne species is actually not the Cheetah! Marine life can be even faster. While the sailfish seems to be a little less fast then the [fastest non-airborne animal on the planet (Black Marlin with speeds up to 80MpH)](https://en.wikipedia.org/wiki/Fastest_animals). Thus the Black Marlin is faster than a Cheetah.
+>Sailfish have been observed to swim up to 68 MpH, and while that's a little less fast than their world-record cousin, their displays when they leap out of the water at these speed are quite astonishing. 
+>Marlin can be found around the Hawaiian islands and are actually quite tasty!
 
->[!NOTE]
->Apparently the Hawai'ian name Lelewa'a stems from the tale that the whale sharks like to approach and lean on canoe outriggers. 
+## CHANGELOG/Migration guide  
+[Since v0.12 we are keeping a global CHANELOG.MD](CHANGELOG.md)
 
-In contrast to what we claimed in the last pre-release branch, HAHALUA-0.9, this branch is NOT the flight version. Creating another pre-release version had been become necessary, because a breaking change in the way we communicate with the MTB has 
-been introduce, see also [MTB fw v3.0.0](https://gitlab.com/ucla-gaps-tof/firmware/-/tree/v3.0.0) . This affects the size of the MasterTriggerEvent. The purpose of this branch is to align the MasterTriggerEvent closer to the actual representation 
-on the MTB, which will boost performance and reduce data size, while increasing clarity and readibility of the code.
-**All previous data will be readable with this code, however, data taken with this version (or a later version of the code will not be able to be read by earlier versions of this code (or there is no guarantee that it works))** 
-
+* Antarctic RBWaveform data from telemetry might not be able to be read be read with this version, use v0.11 instead 
 ## API docs 
 
-The API docs for Rust as well as for the C++ API are hosted on github-pages. Documentation
-for the python API will follow soon.
+The documentation supports different release versions of the code and is hosted on github-pages.
 
-[API-docs](https://gaps-collab.github.io/gaps-online-software/)
+[software documentation](https://gaps-collab.github.io/gaps-online-software/)
 
-## prerequisites
+## Installation
 
-* rust toolchain - to compile `liftof` flight software suite as well as
-  `tof-dataclasses` which are the backbone of `liftof`
-* `cmake` is used as a build system
-* `pybind11` is used to build the pybindings for the C++ API. It also 
-   requires a minimum of `gcc-13` and python `3.10`
-*  a number of C++ libraries are pulled from github during installation.
-* The C++ API uses the C++20 standard and thus wants gcc-13 or later.
+### Installation of the python library 
 
-### software repository
+The python code is called `gondola` and hosted on [pypi](https://pypi.org/project/gondola/) and can 
+be installed with `uv/pip`.
 
-The code is organized in a (private) github repository at 
+## From source
+
+### Software repository
+
+The code is organized in a public github repository at 
 * [github](https://github.com/GAPS-Collab/gaps-online-software)
-
-## installation
-
-### Clone the repository wit submodules
-
-We are using git submodules to pull in some of the dependencies.
-To automatically check them out when clone te repository, use
-`git clone --recurse-submodules`
 
 ### Branches and how to get updates
 
@@ -52,16 +40,26 @@ The branches/releases are named after fish in Hawaii. A fish
 identification card can be found [here](https://www.honolulu.gov/rep/site/dpr/dpr_docs/hbep_fish_id_card.pdf).
 You can switch branches with `git checkout <branch>`. To get updates, use `git pull`
 
-Usually, each branch has a specific purpose, everything with version numbers < 1.0.0 or 
-named `develop` or `<name>_dev` will be unstable.
+Usually, each branch has a specific purpose, everything with version numbers < 1.0.0 will be unstable, meaning there is no guarantee for code to work even after a pull.
 The branches following the naming scheme "FISHNAME-X.X" are dedicated to specific tasks, 
-e.g. the NTS campaign. Please see the dedicated README for this branch.
+e.g. the NTS campaign, during flight I (0.11) or after flight I (>=0.12). Please see the dedicated README for the specific branch.
 
-We are following a git-flow model, which is e.g. described [here](https://www.gitkraken.com/learn/git/git-flow). This means that `main` should point to the latest release, however, it has to be considered that until
-we are at version < 1.0.0, there are no "official" releases. Instead, the main branch will point to the 
-most stable and useful version at the time.
+### Clone the repository wit submodules
 
-### Build system
+We are using git submodules to pull in some of the dependencies.
+To automatically check them out when clone te repository, use
+`git clone --recurse-submodules`
+
+### Prerequisites for compilation from source
+
+* rust toolchain - to compile `liftof` flight software suite as well as the 
+  core library `gondola-core` with the pybindings. Rust edtion 2024 is 
+  required
+* `cmake` is used as a build system for the C++ part.
+* The C++ API uses the C++20 standard and thus wants gcc-13 or later.
+* Doxygen to build the C++ documentation locally.
+
+### Building the C++ implementation of the `gondola-core` library
 
 The installation uses `cmake`. Create a build directory and execute
 `cmake <gaps-online-software source directory> --install-prefix <install_dir>`
@@ -83,39 +81,14 @@ Do so with
 It will greet you with a banner.
 
 After that, you can either write your own C++ code, linking to the gaps-online-software
-C++ API, or use the include pybindings (if `pybind11` was available at compile time)
+C++ API, or use the included pybindings
 
-To use the pybindings, simply fire up an (i)python shell and type:
-`import gaps_tof as gt`
-
-Then the bindings should be ready. Example code on how to use them can be found in 
+Example code on how to use them can be found in 
 `<install_dir>/examples/`
 
 [More detailed installation instructions can be found in INSTALL.MD](INSTALL.md)
 
-## software components
-
-The software includes (<src> is the original source directory of `gaps-online-software`:
-
-- dataclasses for the time-of-flight system (`<src>/tof/dataclasses`) available for rust 
-  and C++/PYTHON
-- software for the tof flight computer as well as the readoutboards in 
-  `<src>/tof/liftof` written in rust. This has several components:
-  - `liftof-rb` - code to be run on the readoutboards. This has to be cross-compiled for 
-    the ARM32 architechture. This can be done with the [`cross`](https://github.com/cross-rs/cross) project.  
-    Helper scripts for that are provided, it does need a docker installation.
-  - `liftof-cc` - code to be run on the tof computer. This is Command&Control code, which collects the data 
-    from the MTB and the readoutboards, analyses and packages them and answers to commands from the flight 
-    computer
-  - `liftof-lib` - common functionality for all `liftof` code, factored out
-  - `liftof-tui` - an interactive tui ("terminal user interface") which allows a live view of waveforms and 
-                   other tof related quantities in the terminal.
-- A database system : `<src>/gaps_db` written in Python/django it uses a `sqlite` backend and is basically the 
-                      translation of Sydney's paddle spreadsheet. The db can be used by `liftof` as well 
-                      as python analysis code.
-- A live eventviewer : `<src>/event-viewer` This currently only shows the tracker in a 2d projection.
-
-## A note about testing
+## Running the tests (rust only)
 
 `cargo` provides unit and integration tests. Without going into further detail here,
 please note that some care is needed that all tests are run when using `cargo test`. 
@@ -127,12 +100,12 @@ In general, there is
 The command `cargo test --features=random -- list` will list all tests. Further usefule
 is the addition of the `--no-capture` flag, e.g. `cargo test --features=random -- --no-captuer` in case the output of the tests shall be printed as well.
 
-## getting help
+## Getting help
 
 Please see the README.md in the individual subfolders. 
 
-## maintainer
+## Maintainer
 
 * A. Stoessl <stoessl@hawaii.edu>
 
-* G. Tytus <gtytus@hawaii.it>
+* G. Tytus <gtytus@hawaii.edu>

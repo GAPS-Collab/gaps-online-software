@@ -6,9 +6,17 @@ merged events into a single file.
 """
 
 import time
+import sys
 from pathlib import Path
 
-import gaps_online as go
+import gondola as go
+# skip everything which is not monitoring/housekeeping
+SKIP_PACKETS = [go.packets.TelemetryPacketType.InterestingEvent,
+                go.packets.TelemetryPacketType.BoringEvent,
+                go.packets.TelemetryPacketType.NoGapsTriggerEvent,
+                go.packets.TelemetryPacketType.NoTofDataEvent,
+                go.packets.TelemetryPacketType.Tracker,
+                go.packets.TelemetryPacketType.RBWaveform]
 
 if __name__ == '__main__':
     import argparse
@@ -30,6 +38,8 @@ if __name__ == '__main__':
                         help='Outdir for caraspace output files',
                         type=Path,
                         default=None)
+    parser.add_argument('--to-bin-files', action='store_true',\
+                        help='Do not write caraspace files, but write "regular" .bin files instead with TelemetryPackets')
     parser.add_argument('-v','--verbose', action='store_true',\
                         help='More verbose output')
     args = parser.parse_args()
@@ -37,17 +47,27 @@ if __name__ == '__main__':
     # create a fake run id for the writer
     runid  = 1
     reader = go.io.TelemetryPacketReader(args.telemetry_dir)
+    if args.to_bin_files:
+        # we need the first packet for the timestamp 
+        for pack in reader:
+            if pack.packet_type in SKIP_PACKETS:
+                continue
+            break
+        writer = go.io.TelemetryPacketWriter(str(args.outdir), pack) 
+        print ("-> Start writing packets!") 
+        for pack in reader:
+            if pack.packet_type in SKIP_PACKETS:
+                continue
+            writer.add_telemetry_packet(pack)
+        print ("-> Finished") 
+        sys.exit(0)
     file_timestamp = str(int(time.time())) 
     writer = go.io.CRWriter(str(args.outdir), runid, timestamp = file_timestamp)
     frames_written = 0
     start_time = time.time()
     for pack in reader:
         frame = go.io.CRFrame()
-        if pack.packet_type in [go.io.TelemetryPacketType.InterestingEvent,
-                                go.io.TelemetryPacketType.BoringEvent,
-                                go.io.TelemetryPacketType.NoGapsTriggerEvent,
-                                go.io.TelemetryPacketType.NoTofDataEvent,
-                                go.io.TelemetryPacketType.Tracker]:
+        if pack.packet_type in SKIP_PACKETS: 
             continue
         frame.put_telemetrypacket(pack, str(pack.packet_type))
         if frames_written % 1e6 == 0 and frames_written != 0: # or n_toffy_errors % 1000 == 0 or n_telly_errors % 1000 == 0:

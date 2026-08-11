@@ -1,0 +1,72 @@
+# PAKII series 
+
+* compatibility wit RBWaveform increased
+
+# LELEWAA series
+
+##v0.10.7
+* new feature : telemetry packet list
+* new feature : distributions of TofHit
+                variables in paddle tab
+
+##v0.10.6
+* updated to use the new RWWaveform API
+* retires RBWaveform Tab. This is replaced
+  by the Paddle tab. We just need to make sure
+  that the Paddle tab can receive RBWaveforms 
+  as well
+* performance improvement of the paddle waveform
+  display
+* FEAATURE -  a new global rates tab that summarizes
+  all the trigger rates for all the RBs to easily 
+  allow to identify those which do not participate
+  in the trigger
+* FIX - fixes the LTBMoniData and PAMoniData (temperaturs)
+  displays
+
+##v0.10.5
+* upgrade to ratatui v0.29
+
+##v0.10.4
+* fixes baseline and 2d charge plot for Paddle display
+
+##v0.10.3
+* new command line flag --allow-commands. If this is not 
+  set, then commands will not be able to get send and the 
+  zmq pub socket for the commands will not be bound
+* heartbeats ! <3 implements Heartbeat display to monitor
+  liftof-cc
+
+##v0.10.2
+* massive overhaul - show waveforms per each paddle
+* interface change - use arrow keys to navigate
+
+##v0.10.1
+* support to read directly from the GAPS telemetry 
+  stream and parse relevant data to the other tabs.
+  This adds the --from-telemetry commandline 
+  argument
+
+##v0.10.0
+* get MasterTrigger information from TofEventSummary
+  or MasterTriggerEvent, automatic switching
+* Displays for PAMoniData and LTBMoniData, LTB selector
+* Triggered Panel display
+* nicer B/W color theme with orange highlight
+* switch to new TofPacket API
+
+# HAHALUA series
+
+##v0.9.2
+* dedictaed tabs for RBWaveforms, TofSummary and TofHit
+
+##v0.9.1
+* including new flight packets
+
+##v0.9.0
+* adapts to upstream changes
+
+# NIUHI series
+
+##v0.8.0
+* Complete revamp of the interface

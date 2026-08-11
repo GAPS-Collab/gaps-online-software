@@ -1,6 +1,3 @@
-[submodule "tof/extern/tof-control"]
-	path = tof/extern/tof-control
-	url = https://github.com/GAPS-Collab/tof-control.git
 [submodule "resources/extern/cxxopts"]
 	path = resources/extern/cxxopts
 	url = https://github.com/jarro2783/cxxopts.git
@@ -16,6 +13,12 @@
 [submodule "resources/extern/result"]
 	path = resources/extern/result
 	url = https://github.com/tylerreisinger/result
+[submodule "resources/extern/nanobind"]
+	path = resources/extern/nanobind
+	url = https://github.com/wjakob/nanobind
 [submodule "resources/extern/blue-penguin-dark"]
 	path = resources/extern/blue-penguin-dark
 	url = https://github.com/tcarwash/blue-penguin-dark.git
+[submodule "resources/extern/tomlplusplus"]
+	path = resources/extern/tomlplusplus
+	url = https://github.com/marzer/tomlplusplus.git

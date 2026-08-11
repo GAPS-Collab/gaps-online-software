@@ -1,0 +1,1752 @@
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
+
+#include<numeric>
+#include<sstream>
+#include<format>
+#include<limits>
+#include<bitset>
+#include<cmath>
+#include <sstream>
+#include <numbers>
+
+#include "events.h"
+#include "io/parsers.h"
+#include "serialization.h"
+#include "version.h"
+
+#include "spdlog/spdlog.h"
+#include "spdlog/cfg/env.h"
+
+namespace g = gondola;
+using namespace result;
+
+/// masks to decode LTB hit masks
+const u16 LTB_CH0 = 0x3   ;
+const u16 LTB_CH1 = 0xc   ;
+const u16 LTB_CH2 = 0x30  ; 
+const u16 LTB_CH3 = 0xc0  ;
+const u16 LTB_CH4 = 0x300 ;
+const u16 LTB_CH5 = 0xc00 ;
+const u16 LTB_CH6 = 0x3000;
+const u16 LTB_CH7 = 0xc000;
+const u16 LTB_CHANNELS[8] = {
+    LTB_CH0,
+    LTB_CH1,
+    LTB_CH2,
+    LTB_CH3,
+    LTB_CH4,
+    LTB_CH5,
+    LTB_CH6,
+    LTB_CH7
+};
+
+const Vec<Vec<u8>> PHYSICAL_CHANNELS = {
+  {1,2},
+  {3,4},
+  {5,6},
+  {7,8},
+  {9,10},
+  {11,12},
+  {13,14},
+  {15,16}
+};
+
+/// Helper to get adc data from Vec<u8>
+auto u8_to_u16(const Vec<u8> &vec_u8) -> Vec<u16> {
+  Vec<u16> vec_u16;
+  vec_u16.reserve(vec_u8.size() / sizeof(u16));
+  for (size_t i = 0; i < vec_u8.size(); i += sizeof(u16)) {
+    u16 value;
+    std::memcpy(&value, &vec_u8[i], sizeof(u16));
+    vec_u16.push_back(value);
+  }
+  return vec_u16;
+}
+
+/*************************************/
+
+g::RBEventHeader::RBEventHeader() {
+  rb_id              = 0; 
+  event_id           = 0; 
+  channel_mask       = 0; 
+  status_byte        = 0;
+  stop_cell          = 0; 
+  ch9_amp            = 0;
+  ch9_freq           = 0;
+  ch9_phase          = 0;
+  fpga_temp          = 0;
+  timestamp16        = 0; 
+  timestamp32        = 0; 
+}
+
+/*************************************/
+
+auto g::RBEventHeader::to_string() const -> std::string {
+  auto sfit = get_sine_fit();
+  std::string repr = "<RBEventHeader";
+  repr += "\n  rb id          " + std::to_string(rb_id)                 ;
+  repr += "\n  event id       " + std::to_string(event_id)              ;
+  repr += "\n  is locked      " + std::to_string(is_locked())           ;
+  repr += "\n  is locked (1s) " + std::to_string(is_locked_last_sec())  ;
+  repr += "\n  lost trigger   " + std::to_string(drs_lost_trigger())    ;
+  repr += "\n  event fragment " + std::to_string(is_event_fragment())   ;
+  repr += "\n  channel mask   " + std::to_string(channel_mask)          ;
+  repr += "\n  |-> channels   ";
+  for (auto ch : get_channels()) {
+    repr += " " + std::to_string(ch) + " ";
+  }
+  repr += "\n  stop cell      " + std::to_string(stop_cell)             ;
+  repr += "\n  ** online ch9 fit amp, freq, phase";
+  repr += "\n    AMP " + std::to_string(sfit[0]);
+  repr += "  FREQ " + std::to_string(sfit[1]);
+  repr += "  PHASE " + std::to_string(sfit[2]); 
+  repr += "\n  timestamp32    " + std::to_string(timestamp32)           ;
+  repr += "\n  timestamp16    " + std::to_string(timestamp16)           ;
+  repr += "\n  |->timestamp48 " + std::to_string(get_timestamp48())     ;
+  repr += "\n  FPGA temp [C]  " + std::to_string(get_fpga_temp())       ;
+  repr += ">";
+  return repr;
+}
+
+/*************************************/
+
+auto g::RBEventHeader::get_channels() const -> Vec<u8> {
+  Vec<u8>  channels = Vec<u8>();
+  for (u8 k=0;k<9;k++) {
+    if ((channel_mask & (1 << k)) > 0) {
+      channels.push_back(k);
+    }
+  }
+  return channels; 
+}
+
+/*************************************/
+
+auto g::RBEventHeader::get_nchan() const -> u8 {
+  return get_channels().size(); 
+}
+
+/*************************************/
+
+auto g::RBEventHeader::from_bytestream(const Vec<u8> &stream, u64 &pos)\
+  -> Result<RBEventHeader, g::IOError> {
+  //g::set_loglevel(g::LOGLEVEL::info);
+  if (stream.size() < RBEventHeader::SIZE) {
+    auto message = std::format("RBEventHeader can not be parsed from a string with size {}, when {} bytes are expected!", stream.size(), RBEventHeader::SIZE);
+    auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
+    return Err(err);
+  }
+  RBEventHeader header;
+  u16 head                  = g::parse_u16(stream, pos);
+  if (head != RBEventHeader::HEAD) {
+    spdlog::error("[RBEventHeader::from_bytestream] Header signature {} invalid!", head);
+  }
+  header.rb_id               = g::parse_u8(stream , pos);  
+  header.event_id            = g::parse_u32(stream, pos);  
+  header.channel_mask        = g::parse_u16(stream, pos);   
+  header.status_byte         = g::parse_u8(stream , pos); 
+  header.stop_cell           = g::parse_u16(stream, pos);  
+  header.ch9_amp             = g::parse_u16(stream, pos);  
+  header.ch9_freq            = g::parse_u16(stream, pos);  
+  header.ch9_phase           = g::parse_u32(stream, pos);  
+  header.fpga_temp           = g::parse_u16(stream, pos);  
+  header.timestamp32         = g::parse_u32(stream, pos);
+  header.timestamp16         = g::parse_u16(stream, pos);
+  u16 tail                   = g::parse_u16(stream, pos);
+  if (tail != RBEventHeader::TAIL) {
+    spdlog::error("Tail signature incorrect! Got tail {}", tail);
+  }
+  return Ok(header); 
+}
+
+/*************************************/
+
+auto g::RBEventHeader::has_ch9() const -> bool {
+  return (channel_mask & 512) > 0;
+}
+
+/*************************************/
+  
+auto g::RBEventHeader::get_fpga_temp() const -> f32 {
+  f32 zynq_temp = (((fpga_temp & 4095) * 503.975) / 4096.0) - 273.15;
+  //f32 temp = (fpga_temp * 503.975/4096) - 273.15;
+  return zynq_temp;
+}
+
+/*************************************/
+
+auto g::RBEventHeader::is_event_fragment() const -> bool {
+  return (status_byte & 1) > 0;
+}
+
+/*************************************/
+
+auto g::RBEventHeader::drs_lost_trigger() const -> bool {
+  return ((status_byte >> 1) & 1) > 0;
+}
+
+/*************************************/
+
+auto g::RBEventHeader::lost_lock() const -> bool {
+  return ((status_byte >> 2) & 1) > 0;
+}
+
+/*************************************/
+
+auto g::RBEventHeader::lost_lock_last_sec() const -> bool {
+  return ((status_byte >> 3) & 1) > 0;
+}
+
+/*************************************/
+
+auto g::RBEventHeader::is_locked() const -> bool {
+  return !(lost_lock());
+}
+
+/*************************************/
+
+auto g::RBEventHeader::is_locked_last_sec() const -> bool {
+  return !(lost_lock_last_sec());
+}
+
+/*************************************/
+
+auto g::RBEventHeader::get_timestamp48() const -> u64 {
+  return ((u64)timestamp16 << 32) | (u64)timestamp32;
+}
+
+/*************************************/
+
+auto g::RBEventHeader::get_active_data_channels() const -> Vec<u8> {
+  Vec<u8> active_channels;
+  for (auto const &ch : {1,2,3,4,5,6,7,8} ) {
+    if ((channel_mask & (u8)pow(2, ch - 1)) == (u8)pow(2,ch - 1)) active_channels.push_back(ch);
+  } 
+  //if ((channel_mask & 1)   == 1)   active_channels.push_back(1);
+  return active_channels;
+}
+
+/*************************************/
+
+auto g::RBEventHeader::get_n_datachan() const -> u8 {
+  Vec<u8> active_channels = get_active_data_channels();
+  return (u8)active_channels.size();
+}
+
+/*************************************/
+
+auto g::RBEventHeader::get_sine_fit() const -> std::array<f32, 3> {
+  f32 u16_MAX = 65535;
+  f32 amp    = (20.0 * ch9_amp   /u16_MAX) - 10.0;
+  f32 freq   = (20.0 * ch9_freq  /u16_MAX) - 10.0;
+  f32 phase  = (20.0 * ch9_phase /u16_MAX) - 10.0;
+  std::array<f32, 3> result = {amp,freq,phase};
+  return result;
+}
+
+/*************************************/
+
+g::RBEvent::RBEvent() {  
+  data_type = 0;
+  status    = EventStatus::Unknown;
+  header = RBEventHeader();
+  adc    = Vec<Vec<u16>>(); 
+  for (usize k=0; k<NCHN; k++) {
+    adc.push_back(Vec<u16>());
+  }
+  hits  = Vec<g::TofHit>();
+}
+
+/**********************************************************/
+
+auto g::RBEvent::to_string() const -> std::string {
+  std::string repr = "<RBEvent\n";
+  std::stringstream ss;
+  ss << status;
+  repr += "  status    : " + ss.str() + "\n";
+  repr += header.to_string();
+  repr += "\n";
+  repr += " -- -- adc -- --";
+  for (auto ch : header.get_channels()) {
+    repr += "\n " + std::to_string(ch)  + ": ..";
+    repr += std::to_string(adc[ch][0]);
+    repr += " "; 
+    repr += std::to_string(adc[ch][1]);
+    repr += " .. .."; 
+  }
+  if ( hits.size() > 0 ) {
+    repr += "\n\n ** ** hits ** **\n";
+    for (auto const &h : hits) {
+      repr += h.to_string();
+      repr += "\n";
+    } 
+  } else {
+    repr += "\n -- no hits!";
+  }
+  repr += ">";
+  return repr;
+}
+
+/**********************************************************/
+
+bool g::RBEvent::channel_check(u8 channel) const {
+  if (channel == 0) {
+    spdlog::error("Remember, channels start at 1. 0 does not exist!");
+    return false;
+  }
+  if (channel > 9) {
+    spdlog::error("Thera are no channels > 9!");
+    return false;
+  }
+  return true;
+}
+
+/**********************************************************/
+  
+const Vec<u16>& g::RBEvent::get_channel_adc(u8 channel) const {
+  if (!(channel_check(channel))) {
+    return _empty_channel;
+  }
+  return adc[channel -1]; 
+}
+
+/*************************************/
+  
+const Vec<u16>& g::RBEvent::get_channel_by_label(u8 channel) const {
+  return adc[channel - 1];
+}
+
+const Vec<u16>& g::RBEvent::get_channel_by_id(u8 channel) const {
+  return adc[channel];
+}
+
+/**********************************************************/
+
+auto g::RBEvent::calc_baseline(const Vec<f32> &volts, usize min_bin, usize max_bin) 
+  -> f32 {
+  f32 bl     = 0;
+  for (usize idx = 0; idx<volts.size(); idx++) {
+    //f32 bl     = std::accumulate(ch_bl[ch].begin() + min_bin, ch_bl[ch].begin() + max_bin,0);
+    if (idx <= min_bin) {
+      continue;
+    } else if ((idx > min_bin) && (idx <=max_bin)) {
+      bl += volts[idx];
+    } else {
+      break;
+    }
+  }
+  bl        /= (f32)(max_bin - min_bin);
+    //baselines.push_back(bl);
+  return bl;
+}
+
+/**********************************************************/
+
+auto g::RBEvent::from_bytestream(const Vec<u8> &stream, u64 &pos) 
+  -> RBEvent {
+  RBEvent event = RBEvent();
+  spdlog::debug("Start decoding at pos {}", pos);
+  u16 head = g::parse_u16(stream, pos);
+  if (head != RBEvent::HEAD)  {
+    spdlog::error("[RBEvent::from_bytestream] Header signature invalid!");  
+    event.status = EventStatus::IncompleteReadout;
+    return event;
+  }
+  event.data_type = g::parse_u8(stream, pos);
+  //event.status    = g::parse_u8(stream, pos);
+  // FIXME - this can fail. Write a custom casting method that doesn't
+  event.status    = static_cast<EventStatus>(stream[pos]); pos+=1; 
+  // hits are below when readking out hit vector
+  // FIXME
+  u8 nhits        = g::parse_u8(stream, pos);
+  //spdlog::info("{}", event.data_type);
+  //spdlog::info("{}", event.status);
+  auto header     = RBEventHeader::from_bytestream(stream, pos);
+  if (header.is_err()) {
+    // FIXME
+    return event;
+  }
+  event.header    = header.unwrap();
+  spdlog::debug("Decoded RBEventHeader!");
+  if (event.header.is_event_fragment() || event.header.drs_lost_trigger()) {
+    return event;
+  }
+  for (auto ch : event.header.get_channels()) {
+    if (stream.size() < pos + 2*NWORDS) {
+      event.status = EventStatus::IncompleteReadout;
+      return event;
+    }
+    Vec<u8>::const_iterator start = stream.begin() + pos;
+    Vec<u8>::const_iterator end   = stream.begin() + pos + 2*NWORDS;    // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
+    Vec<u8> data(start, end);
+    event.adc[ch] = u8_to_u16(data);
+    pos += 2*NWORDS;
+  }
+  // Decode the hits
+  for (u8 k=0;k<nhits;k++) {
+    auto maybe_hit = g::TofHit::from_bytestream(stream, pos);
+    if (maybe_hit.is_ok()) {
+      auto hit = maybe_hit.unwrap();
+      event.hits.push_back(hit);
+    }
+  }
+  u16 tail = g::parse_u16(stream, pos);
+  if (tail != RBEvent::TAIL) {
+    spdlog::error("After parsing the event, we found an invalid tail signature {}", tail);
+  }
+  return event;
+}
+
+/**********************************************************/
+
+namespace gondola {
+  std::ostream& operator<<(std::ostream& os, const g::EventQuality& qual) {
+     os << "<EventQuality: " ;
+     switch (qual) {
+       case g::EventQuality::Unknown : { 
+         os << "Unknown>";
+         break;
+       }
+       case g::EventQuality::Silver : { 
+         os << "Silver>";
+         break;
+       }
+       case g::EventQuality::Gold : { 
+         os << "Gold>";
+         break;
+       }
+       case g::EventQuality::Diamond : { 
+         os << "Diamond>";
+         break;
+       }
+       case g::EventQuality::FourLeafClover : { 
+         os << "FourLeafClover>";
+         break;
+       }
+     }
+     return os;
+  }
+    
+  /**********************************************************/
+  
+  std::ostream& operator<<(std::ostream& os, const g::CompressionLevel& level) {
+     os << "<CompressionLevel: " ;
+     switch (level) {
+       case g::CompressionLevel::Unknown : { 
+         os << "Unknown>";
+         break;
+       }
+       case g::CompressionLevel::None : { 
+         os << "None>";
+         break;
+       }
+     }
+     return os;
+  }
+  
+  /**********************************************************/
+  
+  std::ostream& operator<<(std::ostream& os, const g::EventStatus& qual) {
+     os << "<EventStatus: " ;
+     switch (qual) {
+       case g::EventStatus::Unknown : { 
+         os << "Unknown>";
+         break;
+       }
+       case g::EventStatus::Crc32Wrong : { 
+         os << "Crc32Wrong>";
+         break;
+       }
+       case g::EventStatus::TailWrong : { 
+         os << "TailWrong>";
+         break;
+       }
+       case g::EventStatus::IncompleteReadout : { 
+         os << "IncompleteReadout>";
+         break;
+       }
+       case g::EventStatus::Perfect : { 
+         os << "Perfect>";
+         break;
+       }
+       case g::EventStatus::ChannelIDWrong : { 
+         os << "ChannelIDWrong>";
+         break;
+       }
+       case g::EventStatus::CellSyncErrors : {
+         os << "CellSyncErrors>";
+         break;
+       }
+       case g::EventStatus::ChnSyncErrors  : {
+         os << "ChnSyncErrors>";
+         break;
+       }
+       case g::EventStatus::CellAndChnSyncErrors : {
+         os << "CellAndChnSyncErrors>";
+         break;
+       }
+       case g::EventStatus::AnyDataMangling : {
+         os << "AnyDataMangling>";
+         break;
+       }
+       case g::EventStatus::IncompatibleData : {
+         os << "IncompleteData>";
+         break;
+       }
+       case g::EventStatus::EventTimeOut   : {
+         os << "EventTimeOut>";
+         break;
+       }
+       case g::EventStatus::GoodNoCRCOrErrBitCheck : {
+         os << "GoodNoCRCOrErrBitCheck>";
+         break;
+       }
+       case g::EventStatus::GoodNoCRCCheck : {
+         os << "GoodNoCRCCheck>";
+         break;
+       }
+       case g::EventStatus::GoodNoErrBitCheck : {
+         os << "GoodNoErrBitCheck>";
+         break;
+       }
+     }
+     return os;
+  }
+  
+  /**********************************************************/
+  
+  std::ostream& operator<<(std::ostream& os, const g::TriggerType& t_type) {
+     os << "<TriggerType: " ;
+     switch (t_type) {
+       case g::TriggerType::Unknown : { 
+         os << "Unknown>";
+         break;
+       }
+       case g::TriggerType::Gaps : { 
+         os << "Gaps>";
+         break;
+       }
+       case g::TriggerType::Any : { 
+         os << "Any>";
+         break;
+       }
+       case g::TriggerType::Track : { 
+         os << "Track>";
+         break;
+       }
+       case g::TriggerType::TrackCentral : { 
+         os << "TrackCentral>";
+         break;
+       }
+       case g::TriggerType::Poisson : { 
+         os << "Poisson>";
+         break;
+       }
+       case g::TriggerType::Forced : { 
+         os << "Forced>";
+         break;
+       }
+     }
+     return os;
+  }
+  
+  /**********************************************************/
+  
+  std::ostream& operator<<(std::ostream& os, const g::LTBThreshold& thresh) {
+     os << "<LTBThresholde: " ;
+     switch (thresh) {
+       case g::LTBThreshold::Unknown : { 
+         os << "Unknown>";
+         break;
+       }
+       case g::LTBThreshold::NoHit : { 
+         os << "NoHit>";
+         break;
+       }
+       case g::LTBThreshold::Hit : { 
+         os << "Hit>";
+         break;
+       }
+       case g::LTBThreshold::Beta : { 
+         os << "Beta>";
+         break;
+       }
+       case g::LTBThreshold::Veto : { 
+         os << "Veto>";
+         break;
+       }
+     }
+     return os;
+  }
+}
+
+/**********************************************************/
+
+auto g::TofEvent::get_n_rbevents(u32 mask) -> u32 {
+  return (mask & 0xFF);
+}
+
+/**********************************************************/
+
+#ifdef BUILD_CXX_DB
+auto g::TofEvent::normalize_hit_times(const g::TofPaddleTimingConstantMap &offsets) -> void {
+  if (rb_events.size() == 0) {
+    return;
+  }
+  auto PI = std::numbers::pi_v<f32>;
+  bool first_phase = false;
+  f32 phase0 = 0;
+  for (auto &rbev : rb_events) {
+    for (auto &h : rbev.hits) {
+      if (!first_phase) {
+        phase0 = h.phase;
+        first_phase = true;
+      }
+      auto t0 = h.get_t0_relative() + h.get_cable_delay();
+      auto phase_diff = h.phase - phase0;
+      while (phase_diff < - PI/2.0) {
+        phase_diff += 2.0*PI;
+      }
+      while (phase_diff > PI/2.0) {
+        phase_diff -= 2.0*PI;
+      }
+      auto t_shift = 50.0*phase_diff/(2.0*PI);
+      h.event_t0 = t0 + t_shift;
+      if (!offsets.empty()) {
+        h.event_t0 -= offsets.at(h.paddle_id);
+      }
+    }
+  }
+}
+#endif
+
+/**********************************************************/
+
+auto g::TofEvent::get_timestamp48() const -> u64 {
+  return ((u64)timestamp16 << 32) | (u64)timestamp32;
+}
+
+/*************************************/
+
+auto g::TofEvent::get_trigger_sources() const -> Vec<g::TriggerType> {
+  auto t_types = Vec<g::TriggerType>();
+  u16 gaps_trigger = (trigger_sources >> 5 & 0x1) == 1;
+  if (gaps_trigger) {
+    t_types.push_back(g::TriggerType::Gaps);
+  }
+  u16 any_trigger    = (trigger_sources >> 6 & 0x1) == 1;
+  if (any_trigger) {
+    t_types.push_back(g::TriggerType::Any);
+  }
+  u16 forced_trigger = (trigger_sources >> 7 & 0x1) == 1;
+  if (forced_trigger) {
+    t_types.push_back(g::TriggerType::Forced);
+  }
+  u16 track_trigger  = (trigger_sources >> 8 & 0x1) == 1;
+  if (track_trigger) {
+    t_types.push_back(g::TriggerType::Track);
+  }
+  u16 central_track_trigger
+                     = (trigger_sources >> 9 & 0x1) == 1;
+  if (central_track_trigger) {
+    t_types.push_back(g::TriggerType::TrackCentral);
+  }
+  return t_types;
+} 
+
+/**********************************************************/
+    
+auto g::TofEvent::get_trigger_hits() const
+  -> Vec<std::tuple<u8, u8, u8, g::LTBThreshold>> {
+  auto hits = Vec<std::tuple<u8,u8,u8, g::LTBThreshold>>(); 
+  auto dsi_j_mask_bits = std::bitset<32>(dsi_j_mask);
+  u32 n_masks_needed   = dsi_j_mask_bits.count();
+  if (channel_mask.size() < n_masks_needed) {
+    spdlog::error("We need {} hit masks, but only have {}! This is bad!", n_masks_needed,  channel_mask.size());
+    return hits;
+  }
+  u8 n_mask = 0;
+  for (u8 k=0;k<32;k++) {
+    if ((u32)((dsi_j_mask >> k) & 0x1) == 1) {
+      u8 dsi = 0;
+      u8 j   = 0;
+      if (k < 5) {
+        dsi = 1;
+        j   = k  + 1;
+      } else if (k < 10) {
+        dsi = 2;
+        j   = k  - 5 + 1;
+      } else if (k < 15) {
+        dsi = 3;
+        j   = k - 10 + 1;
+      } else if (k < 20) {
+        dsi = 4;
+        j   = k - 15 + 1;
+      } else if (k < 25) {
+        dsi = 5;
+        j   = k - 20 + 1;
+      } 
+      u32 channels = channel_mask[n_mask]; 
+      for (u8 i=0;i<8; i++) {
+        u32 ch  = LTB_CHANNELS[i];
+        u32 chn = 2*i + 1; 
+        int thresh_bits = (int)((channels & ch) >> (i*2));
+        if (thresh_bits > 0 && thresh_bits < 255 ) { // hit over threshold
+          hits.push_back(std::make_tuple(dsi, j, chn, (LTBThreshold)(thresh_bits)));
+        }
+      }
+      n_mask += 1;
+    }
+  }
+  return hits;
+}
+
+/**********************************************************/
+
+auto g::TofEvent::get_rb_link_ids() const -> Vec<u8> {
+  auto links = Vec<u8>();
+  for (u8 k=0;k<64;k++) {
+    if (((u64)(mtb_link_mask >> k) & (u64)0x1) == 1) {
+      links.push_back(k);
+    }
+  }
+  return links;
+}
+
+/**********************************************************/
+
+g::TofEvent::TofEvent() {
+  status       = g::EventStatus::IncompleteReadout;
+  //mt_event     = g::MasterTriggerEvent();
+  rb_events    = Vec<g::RBEvent>();
+}
+
+/**********************************************************/
+
+#ifdef BUILD_CXX_DB
+auto g::TofEvent::set_paddlemap(const g::TofPaddleMap& paddlemap) -> void {
+  for (auto &ev : rb_events) {
+    for (auto &h : ev.hits) {
+      h.set_paddle(paddlemap.at(h.paddle_id));
+    }
+  }
+};
+#endif
+
+/**********************************************************/
+
+auto g::TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
+  -> Result<TofEvent, g::IOError> {
+  spdlog::cfg::load_env_levels();
+  TofEvent event = TofEvent();
+  spdlog::debug("Start decoding at pos ",pos);
+  u16 head = g::parse_u16(stream, pos);
+  if (head != TofEvent::HEAD)  {
+    spdlog::error("No header signature found!");  
+    auto message = std::format("TofEvent has incorrect header!");
+    auto err = g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, message);
+    return Err(err);
+  }
+  u8 status_version_u8     = g::parse_u8(stream, pos);
+  event.status             = static_cast<EventStatus>(status_version_u8 & 0x3f);
+  event.version            = (g::ProtocolVersion)(status_version_u8 & 0xc0);
+  event.trigger_sources    = g::parse_u16(stream, pos);
+  event.n_trigger_paddles  = g::parse_u8(stream, pos);
+  event.event_id           = g::parse_u32(stream, pos);
+  if (event.version == g::ProtocolVersion::V1
+    || event.version == g::ProtocolVersion::V3) {
+    event.n_hits_umb       = g::parse_u8(stream, pos); 
+    event.n_hits_cbe       = g::parse_u8(stream, pos); 
+    event.n_hits_cor       = g::parse_u8(stream, pos); 
+    event.tot_edep_umb     = g::parse_f32(stream, pos); 
+    event.tot_edep_cbe     = g::parse_f32(stream, pos); 
+    event.tot_edep_cor     = g::parse_f32(stream, pos); 
+  }
+  event.quality            = static_cast<g::EventQuality>(g::parse_u8(stream, pos));
+  event.timestamp32        = g::parse_u32(stream, pos);
+  event.timestamp16        = g::parse_u16(stream, pos);
+  event.run_id             = g::parse_u16(stream, pos);
+  event.drs_dead_lost_hits = g::parse_u16(stream, pos);
+  event.dsi_j_mask         = g::parse_u32(stream, pos);
+  u8 n_channel_masks       = g::parse_u8(stream, pos);
+  while (n_channel_masks > 0) {
+    event.channel_mask.push_back(g::parse_u16(stream, pos));
+    n_channel_masks -= 1;
+  }
+  event.mtb_link_mask      = g::parse_u64(stream, pos);
+  u16 nhits                = g::parse_u16(stream, pos);
+  if (nhits > 160) {
+    spdlog::error("There are way too many hits in this event (more than 160)!");  
+    auto message = std::format("TofEvent has too many hits (more than paddles)!");
+    auto err = g::IOError(g::IOError::ErrorKind::StreamTooLong, message);
+    return Err(err);
+  } 
+  while (nhits > 0) {\
+    auto hit_res = TofHit::from_bytestream(stream, pos);
+    if (hit_res.is_ok()) {
+      event.hits.push_back(hit_res.unwrap());
+      nhits -= 1;
+    } else {
+      return Err(hit_res.unwrap_err());
+    }
+  }
+  if (event.version == g::ProtocolVersion::V2 
+    || event.version == g::ProtocolVersion::V3) {
+    u8 n_rb_events = g::parse_u8(stream, pos);
+    while (n_rb_events > 0) {
+      event.rb_events.push_back(RBEvent::from_bytestream(stream, pos));
+      n_rb_events -= 1;
+    }
+  }
+  u16 tail = g::parse_u16(stream, pos);
+  if (tail != TofEvent::TAIL) {
+    auto message = std::format("Decoding of TAIL failed! Got {} instead!", tail);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongTailBytes, message);
+    return Err(err);
+  }
+  return Ok(event);
+}
+  
+/**********************************************************/
+
+auto g::TofEvent::from_tofpacket(const TofPacket &packet) -> TofEvent {
+  TofEvent event;
+  if (packet.packet_type != PacketType::TofEvent) {
+    spdlog::error("Wrong packet type! {}", packet_type_to_string(packet.packet_type));
+    return event;
+  } 
+  u64 _pos = 0;
+  // FIXME
+  event = TofEvent::from_bytestream(packet.payload, _pos).unwrap();
+  return event;
+}
+
+/**********************************************************/
+  
+const g::RBEvent& g::TofEvent::get_rbevent(u8 board_id) const {
+  for (const auto &ev : rb_events) {
+    if (ev.header.rb_id == board_id) {
+      return ev;
+    }
+  }
+  spdlog::error("No RBEvent for board ", board_id);
+  return _empty_event;
+}
+
+/**********************************************************/
+  
+Vec<u8> g::TofEvent::get_rbids() const {
+  Vec<u8> rb_ids = Vec<u8>();
+  for (const auto &ev : rb_events) {
+    rb_ids.push_back(ev.header.rb_id);
+  }
+  return rb_ids;
+}
+
+/**********************************************************/
+    
+bool g::TofEvent::passed_consistency_check() {
+  spdlog::error("This is not implmented yet!");
+  return false;
+}
+
+/**********************************************************/
+
+  
+//u64 g::MasterTriggerEvent::get_timestamp_gps48() const {
+//  return (((u64)tiu_gps16 << 32) | (u64) tiu_gps32); 
+//}
+//
+///*************************************/
+//
+//auto g::MasterTriggerEvent::get_timestamp_gps() const -> u32 {
+//  return tiu_gps32;
+//}
+//
+///*************************************/
+//
+//u64 g::MasterTriggerEvent::get_timestamp_abs48() const {
+//  u64 gps       = (u64)get_timestamp_gps();
+//  u64 ts        = (u64)timestamp;
+//  if (ts < (u64)tiu_timestamp) {
+//    // it has wrapped
+//    ts +=  4294967295 + 1; // u32::MAX + 1
+//  }
+//  u64 gps_mult = 100000000 * gps; 
+//  u64 ts_abs = gps_mult + ts - (u64)tiu_timestamp;
+//  return ts_abs;
+//}
+//
+///*************************************/
+//
+//Vec<g::TriggerType> g::MasterTriggerEvent::get_trigger_sources() const {
+//  auto t_types = Vec<g::TriggerType>();
+//  u16 gaps_trigger = (trigger_source >> 5 & 0x1) == 1;
+//  if (gaps_trigger) {
+//    t_types.push_back(g::TriggerType::Gaps);
+//  }
+//  u16 any_trigger    = (trigger_source >> 6 & 0x1) == 1;
+//  if (any_trigger) {
+//    t_types.push_back(g::TriggerType::Any);
+//  }
+//  u16 forced_trigger = (trigger_source >> 7 & 0x1) == 1;
+//  if (forced_trigger) {
+//    t_types.push_back(g::TriggerType::Forced);
+//  }
+//  u16 track_trigger  = (trigger_source >> 8 & 0x1) == 1;
+//  if (track_trigger) {
+//    t_types.push_back(g::TriggerType::Track);
+//  }
+//  u16 central_track_trigger
+//                     = (trigger_source >> 9 & 0x1) == 1;
+//  if (central_track_trigger) {
+//    t_types.push_back(g::TriggerType::TrackCentral);
+//  }
+//  return t_types;
+//} 
+//
+///**********************************************************/
+//
+//g::MasterTriggerEvent::MasterTriggerEvent() {
+//  event_id       = 0; 
+//  timestamp      = 0; 
+//  tiu_timestamp  = 0; 
+//  tiu_gps32      = 0; 
+//  tiu_gps16      = 0; 
+//  crc            = 0;
+//  trigger_source = 0;
+//  dsi_j_mask     = 0;
+//  channel_mask   = Vec<u16>();
+//  mtb_link_mask  = 0;
+//}  
+//
+///**********************************************************/
+//  
+//auto g::MasterTriggerEvent::get_rb_link_ids() const -> Vec<u8> {
+//  auto links = Vec<u8>();
+//  for (u8 k=0;k<64;k++) {
+//    if (((u64)(mtb_link_mask >> k) & (u64)0x1) == 1) {
+//      links.push_back(k);
+//    }
+//  }
+//  return links;
+//}
+//
+///**********************************************************/
+//    
+//Vec<std::tuple<u8, u8, u8, g::LTBThreshold>> g::MasterTriggerEvent::get_trigger_hits() const {
+//
+//  auto hits = Vec<std::tuple<u8,u8,u8,g::LTBThreshold>>(); 
+//  //let n_masks_needed = self.dsi_j_mask.count_ones() / 2 + self.dsi_j_mask.count_ones() % 2;
+//  auto dsi_j_mask_bits = std::bitset<32>(dsi_j_mask);
+//  u32 n_masks_needed   = dsi_j_mask_bits.count();
+//  if (channel_mask.size() < n_masks_needed) {
+//    spdlog::error("We need {} hit masks, but only have {}! This is bad!", n_masks_needed, channel_mask.size());
+//    return hits;
+//  }
+//  u8 n_mask = 0;
+//  for (u8 k=0;k<32;k++) {
+//    if ((u32)((dsi_j_mask >> k) & 0x1) == 1) {
+//      u8 dsi = 0;
+//      u8 j   = 0;
+//      if (k < 5) {
+//        dsi = 1;
+//        j   = k  + 1;
+//      } else if (k < 10) {
+//        dsi = 2;
+//        j   = k  - 5 + 1;
+//      } else if (k < 15) {
+//        dsi = 3;
+//        j   = k - 10 + 1;
+//      } else if (k < 20) {
+//        dsi = 4;
+//        j   = k - 15 + 1;
+//      } else if (k < 25) {
+//        dsi = 5;
+//        j   = k - 20 + 1;
+//      } 
+//      u32 channels = channel_mask[n_mask]; 
+//      for (u8 i=0;i<8; i++) {
+//        u32 ch  = LTB_CHANNELS[i];
+//        u32 chn = 2*i + 1; 
+//        //for (i,ch) in LTB_CHANNELS.iter().enumerate() {
+//        //let chn = ch + 1;
+//        //println!("i,ch {}, {}", i, ch);
+//        u32 thresh_bits = (u8)((channels & ch) >> (i*2));
+//        //println!("thresh_bits {}", thresh_bits);
+//        if (thresh_bits > 0) { // hit over threshold
+//          hits.push_back(std::make_tuple(dsi, j, chn, (LTBThreshold)(thresh_bits)));
+//        }
+//      }
+//      n_mask += 1;
+//    }
+//  }
+//  return hits;
+//}
+//
+//
+///*************************************/
+//
+//g::MasterTriggerEvent g::MasterTriggerEvent::from_bytestream(const Vec<u8> &bytestream,
+//                                                          u64 &pos) {
+//
+//  g::MasterTriggerEvent event;
+//  
+//  // HACK - we make this compatible with the old data, 
+//  // but old data won't be useful
+//  //usize n_ltbs = 20;
+//  //// now we have to figure out if we have 20 or 25 
+//  //// LTBS
+//  //usize packet_size = MasterTriggerEvent::get_packet_size(bytestream,
+//  //                                                        pos);
+//  //if (packet_size == MasterTriggerEvent::SIZE_LTB20) {
+//  //  n_ltbs = 20;
+//  //  event = MasterTriggerEvent(n_ltbs);
+//  //} else if (packet_size == MasterTriggerEvent::SIZE_LTB25) {
+//  //  n_ltbs = 25;
+//  //  event = MasterTriggerEvent(n_ltbs);
+//  //} else {
+//  //  log_error("Size matches neither 20 nor 25 LTBs!");
+//  //  return event;
+//  //}
+//  
+//  u16 header = g::parse_u16(bytestream, pos);
+//  if (header != g::MasterTriggerEvent::HEAD) {
+//    spdlog::error("Wrong header signature!");
+//    return event;
+//  }
+//  event.event_status   = (EventStatus)g::parse_u8 (bytestream, pos);
+//  event.event_id       = g::parse_u32(bytestream, pos);
+//  event.timestamp      = g::parse_u32(bytestream, pos);
+//  event.tiu_timestamp  = g::parse_u32(bytestream, pos);
+//  event.tiu_gps32      = g::parse_u32(bytestream, pos);
+//  event.tiu_gps16      = g::parse_u16(bytestream, pos);
+//  event.crc            = g::parse_u32(bytestream, pos);
+//  event.trigger_source = g::parse_u16(bytestream, pos);
+//  event.dsi_j_mask     = g::parse_u32(bytestream, pos);
+//  u8 n_channel_masks   = g::parse_u8 (bytestream, pos);
+//  for (u8 k=0;k<n_channel_masks;k++) {
+//  //for _ in 0..n_channel_masks {
+//    event.channel_mask.push_back(g::parse_u16(bytestream, pos));
+//  }
+//  event.mtb_link_mask  = g::parse_u64(bytestream, pos);
+//
+//  // just search the next footer and don't fill the deprecated fields
+//  //bool has_ended = false;
+//  //u64 tail_pos = search_for_2byte_marker(bytestream,0x55,has_ended,pos);   
+//  u16 tail = g::parse_u16(bytestream, pos);
+//  if (tail != g::MasterTriggerEvent::TAIL) {
+//    spdlog::error("Invalid tail signature!");
+//  }
+//  //event.n_paddles          = g::parse_u8 (bytestream, pos);
+//
+//  //event.set_board_mask(g::parse_u3h2(bytestream, pos));
+//  //// FIXME
+//  //for (usize k=0;k<n_ltbs;k++) {
+//  //  u32 hitmask = g::parse_u32(bytestream, pos);
+//  //  event.set_hit_mask(k, hitmask);
+//  //}
+//  //event.crc = g::parse_u32(bytestream, pos);
+//  //u8 tail_a = g::parse_u8 (bytestream, pos);
+//  //u8 tail_b = g::parse_u8 (bytestream, pos);
+//  //if (tail_a == 85 && tail_b == 85) {
+//  //  log_debug("Correct tail found!");
+//  //}
+//  //else if (tail_a == 85 && tail_b == 5) {
+//  //  log_warn("Tail for version 0.6.0/0.6.1 found");
+//  //} else {
+//  //  log_error("Tail is messed up. See comment for version 0.6.0/0.6.1 in CHANGELOG! We got " << tail_a << " " << tail_b << " but were expecting 85 5");
+//  //}
+//  return event;
+//}
+//
+//auto g::MasterTriggerEvent::to_string() const -> std::string {
+//  std::string repr = "<MasterTriggerEvent";
+//  repr += std::format("\n  event_status  : {}",(u8)event_status ); 
+//  repr += std::format("\n  event_id      : {}",event_id     ); 
+//  repr += std::format("\n  timestamp     : {}",timestamp    ); 
+//  repr += std::format("\n  tiu_timestamp : {}",tiu_timestamp); 
+//  repr += std::format("\n  tiu_gps32     : {}",tiu_gps32    ); 
+//  repr += std::format("\n  tiu_gps16     : {}",tiu_gps16    ); 
+//  repr += std::format("\n  crc           : {}",crc          );
+//  repr += "\n** Trigger Sources **";
+//  for (const auto &ts : get_trigger_sources()) {
+//    repr += std::format("\n -- {}", (u8)ts);
+//  }
+//  repr += "\n** Trigger Hits **";
+//  for (const auto &h : get_trigger_hits()) {
+//    repr += std::format("\n -- {} {} {} {}", std::get<0>(h), std::get<1>(h), std::get<2>(h), (u8)std::get<3>(h));
+//  }
+//  repr += "\n** MTB Link IDs **";
+//  for (const u8 &lid : get_rb_link_ids()) {
+//    repr += std::format("\n -- {}", lid);
+//  }
+//  repr += ">";
+//  return repr;
+//}
+
+/*************************************/
+
+auto g::TofEvent::get_hits() const -> Vec<g::TofHit> {
+  Vec<g::TofHit> hits;
+  for (auto &rb : rb_events) {
+    for (auto &h : rb.hits) {
+      hits.push_back(h);
+    }
+  }
+  return hits;
+}
+
+/*************************************/
+
+auto g::TofEvent::to_string() const -> std::string {
+  std::string repr = std::format("<TofEvent (version {})", pversion_to_string(version));
+  repr += std::format("\n  EventID          : {}", event_id);
+  repr += std::format("\n  RunID            : {}", run_id);
+  repr += std::format("\n  EventStatus      : {}", (u8)status);
+  //repr += std::format("\n  TriggerSources   : {:?}", get_trigger_sources()));
+  repr += std::format("\n  NTrigPaddles     : {}", n_trigger_paddles);
+  repr += std::format("\n  DRS dead hits    : {}", drs_dead_lost_hits);
+  repr += std::format("\n  timestamp32      : {}", timestamp32); 
+  repr += std::format("\n  timestamp16      : {}", timestamp16); 
+  //repr += std::format("\n   |-> timestamp48 : {}", get_timestamp48()); 
+  if (version == g::ProtocolVersion::V1) {
+    repr += "\n ---- V1 variables ----";
+    repr += std::format("\n n_hits_umb   : {}", n_hits_umb  );   
+    repr += std::format("\n n_hits_cbe   : {}", n_hits_cbe  );   
+    repr += std::format("\n n_hits_cor   : {}", n_hits_cor  );   
+    repr += std::format("\n tot_edep_umb : {}", tot_edep_umb); 
+    repr += std::format("\n tot_edep_cbe : {}", tot_edep_cbe); 
+    repr += std::format("\n tot_edep_cor : {}", tot_edep_cor); 
+  }
+  //repr += &(format!("\n  ** ** TRIGGER HITS (DSI/J/CH) [{} LTBS] ** **", self.dsi_j_mask.count_ones()));
+  //for k in self.get_trigger_hits() {
+  //  repr += &(format!("\n  => {}/{}/({},{}) ({}) ", k.0, k.1, k.2.0, k.2.1, k.3));
+  //}  
+  //repr += "\n  ** ** MTB LINK IDs ** **";
+  //let mut mtblink_str = String::from("\n  => ");
+  //for k in self.get_rb_link_ids() {
+  //  mtblink_str += &(format!("{} ", k))
+  //}  
+  //repr += &mtblink_str;
+  //repr += &(format!("\n  == Trigger hits {}, expected RBEvents {}",
+  //        self.get_trigger_hits().len(),
+  //        self.get_rb_link_ids().len()));
+  //repr += &String::from("\n  ** ** ** HITS ** ** **");
+  //for h in &self.hits {
+  //  repr += &(format!("\n  {}", h));
+  //}  
+  //if self.rb_events.len() > 0 {
+  //  repr += &format!("\n -- has {} RBEvents with waveforms!", self.rb_events.len());
+  //  repr += "\n -- -- boards: ";
+  //  for b in &self.rb_events {
+  //    repr += &format!("{} ", b.header.rb_id);
+  //  }
+  //}  
+  repr += "\n  n RBEvents    : " + std::to_string(rb_events.size() )     ;    
+  repr += "\n  n TofHits     : " + std::to_string(hits.size() )     ;    
+  repr += ">"; 
+  //std::string repr = "<TofEvent\n";
+  ////repr += "  " + header.to_string()   + "\n";
+  ////repr += "  " + mt_event.to_string() + "\n";
+  //repr += ".. .. ..\n";
+  //repr += "  n RBEvents    : " + std::to_string(rb_events.size() )     ;
+  return repr;
+}
+
+/*************************************/
+
+void g::TofHit::set_paddle_len(f32 paddle_len) {
+  paddle_len = paddle_len;
+}
+
+/*************************************/
+
+#ifdef BUILD_CXXDB
+auto g::TofHit::set_paddle(const g::TofPaddle& paddle) -> void {
+  paddle_len    = paddle.length;
+  coax_cbl_time = paddle.coax_cable_time; 
+  hart_cbl_time = paddle.harting_cable_time;
+}
+
+auto g::TofHit::get_phase_delay() const -> f32 {
+  f32 freq = 20e6;
+  f32 phase_fixed = phase;
+  auto PI = std::numbers::pi_v<f32>;
+  while (phase_fixed < -PI/2.0) {
+    phase_fixed += PI/2.0;
+  }
+  while (phase_fixed > PI/2.0) {
+    phase_fixed -= PI/2.0;
+  }
+  auto phase_delay = (phase_fixed/(2.0*PI*freq))*1.0e9;
+  return phase_delay;
+}
+
+/*************************************/
+
+auto g::TofHit::get_cable_delay() const -> f32 {
+  return hart_cbl_time - coax_cbl_time;
+}
+
+/*************************************/
+
+auto g::TofHit::get_t0()          const -> f32 {
+  return get_t0_relative() + get_cable_delay() + get_phase_delay();
+}
+#endif
+
+/*************************************/
+
+f32 g::TofHit::get_time_a() const {
+  return time_a_f32;
+}
+
+/*************************************/
+
+f32 g::TofHit::get_time_b() const {
+  return time_b_f32;
+}
+
+/*************************************/
+
+f32 g::TofHit::get_peak_a() const {
+  return peak_a_f32;
+}
+
+/*************************************/
+
+f32 g::TofHit::get_peak_b() const {
+  return peak_b_f32;
+}
+
+/*************************************/
+
+f32 g::TofHit::get_charge_a() const {
+  return charge_a_f32;
+}
+
+/*************************************/
+
+f32 g::TofHit::get_charge_b() const {
+  return charge_b_f32;
+}
+
+/*************************************/
+
+// time-over-threshold variables 
+auto g::TofHit::get_tot_low_a() const -> f32 {
+  return tot_low_a; 
+}
+
+/*************************************/
+
+auto g::TofHit::get_tot_low_b() const -> f32 {
+  return tot_low_b; 
+}
+
+/*************************************/
+
+auto g::TofHit::get_tot_high_a() const -> f32 {
+  return tot_high_a;
+}
+
+/*************************************/
+
+auto g::TofHit::get_tot_high_b() const -> f32 {
+  return tot_high_b; 
+}
+
+/*************************************/
+
+auto g::TofHit::get_tot_slp_low_a() const -> f32 {
+  return tot_slp_low_a;
+}
+
+/*************************************/
+
+auto g::TofHit::get_tot_slp_low_b() const -> f32 {
+  return tot_slp_low_b;
+}
+
+/*************************************/
+
+auto g::TofHit::get_tot_slp_high_a() const -> f32 {
+  return tot_slp_high_a;
+}
+
+/*************************************/
+
+auto g::TofHit::get_tot_slp_high_b() const -> f32 {
+  return tot_slp_high_b;
+}
+
+/*************************************/
+
+f32 g::TofHit::get_x_pos() const {
+  return (time_a_f32 - get_t0_relative())*C_LIGHT_PADDLE*10.0; // 10 for cm->mm 
+}
+
+/*************************************/
+
+auto g::TofHit::obeys_causality() const -> bool {
+  return 10.0*paddle_len/(10.0*C_LIGHT_PADDLE) - std::abs(time_a_f32 - time_b_f32) > 0.0
+  && get_t0_relative() > 0.0;
+}
+
+/*************************************/
+
+f32 g::TofHit::get_t0_relative() const {
+  // FIXME - we should just consistently make the paddle len in mm!
+  return 0.5*(time_a_f32 + time_b_f32 - (10.0*paddle_len/(10.0*C_LIGHT_PADDLE)));
+}
+
+/// combine the slow timestamp with 
+/// the fast to get the full
+auto g::TofHit::get_timestamp48() const -> f64 {
+  f64 ts48 = timestamp16 << 16 | timestamp32;
+  return ts48;
+}
+
+#ifdef BUILD_CXXDB
+/// simple calculation based on Philip's 
+/// attenuation function as used in pgaps
+auto g::TofHit::get_edep() const -> f32 {
+  f32 x0    = get_x_pos();
+  //f32 att_a = (std::exp(3.9-0.00126*( x0+(10.0*paddle_len/2.)))+22.15)/ (std::exp(3.9)+22.15);
+  //f32 att_b = (std::exp(3.9-0.00126*(-x0+(10.0*paddle_len/2.)))+22.15)/ (std::exp(3.9)+22.15);
+  f32 att_a = (std::exp(3.9-0.00126*( x0            ))+22.15)/ (std::exp(3.9)+22.15);
+  f32 att_b = (std::exp(3.9-0.00126*(10.0*paddle_len - x0))+22.15)/ (std::exp(3.9)+22.15);
+  //std::cout << "Att A, Att B, x0 " << att_a << " " << att_b << " " << x0 << std::endl;
+  f32 edep  = 0.0159 * (get_peak_a()/att_a + get_peak_b()/att_b) / 2.; // vertical muon peak @ 0.97 MeV
+  return edep; 
+}
+#endif
+
+auto g::TofHit::from_bytestream(const Vec<u8> &bytestream, u64 &pos) 
+ -> r::Result<g::TofHit,g::IOError> {
+ auto hit = g::TofHit();
+ u16 maybe_header = g::parse_u16(bytestream, pos);
+ if (maybe_header != TofHit::HEAD) {
+   auto message = std::format("Decoding of HEAD failed! Got {} instead!", maybe_header);
+   auto err = g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, message);
+   return Err(err);
+ }
+ // UPDATE - get version byte first!
+ u64 ver_pos            = pos + 21; // version byte is at position 23
+ if (bytestream.size() <= ver_pos) {
+   auto message = std::format("Currently, reading older data without the hit time-over-threshold variables is not supported!");
+   auto err = g::IOError(g::IOError::ErrorKind::UnsupportedProtocolVersion, message);
+   return Err(err);
+ }
+ u8 quality_version_u8     = g::parse_u8(bytestream, ver_pos);
+ hit.quality               = static_cast<EventQuality>(quality_version_u8 & 0x3f);
+ hit.version               = (g::ProtocolVersion)(quality_version_u8 & 0xc0);
+ //u8  version        = g::parse_u8(bytestream, ver_pos);
+ //hit.version        = (g::ProtocolVersion) version;
+ hit.paddle_id      = bytestream[pos]; pos+=1;
+ hit.time_a_f32     = g::parse_f16(bytestream, pos); 
+ hit.time_b_f32     = g::parse_f16(bytestream, pos); 
+ hit.peak_a_f32     = g::parse_f16(bytestream, pos); 
+ hit.peak_b_f32     = g::parse_f16(bytestream, pos); 
+ hit.charge_a_f32   = g::parse_f16(bytestream, pos); 
+ hit.charge_b_f32   = g::parse_f16(bytestream, pos); 
+ // this is one of the new saturation variables 
+ hit.tot_low_a      = g::parse_f16(bytestream, pos);
+ //hit.charge_min_i   = g::parse_u16(bytestream, pos); 
+ hit.baseline_a     = g::parse_f16(bytestream, pos);
+ hit.baseline_a_rms = g::parse_f16(bytestream, pos);
+ hit.phase          = g::parse_f16(bytestream, pos);
+ pos += 1; // skip version - it has already been read
+ hit.baseline_b     = g::parse_f16(bytestream, pos);
+ hit.baseline_b_rms = g::parse_f16(bytestream, pos);
+ // new saturation variables 
+ hit.tot_low_b      = g::parse_f16(bytestream, pos);
+ hit.tot_high_a     = g::parse_f16(bytestream, pos);
+ hit.tot_high_b     = g::parse_f16(bytestream, pos);
+ hit.tot_slp_low_a  = g::parse_f16(bytestream, pos);
+ hit.tot_slp_low_b  = g::parse_f16(bytestream, pos);
+ hit.tot_slp_high_a = g::parse_f16(bytestream, pos);
+ hit.tot_slp_high_b = g::parse_f16(bytestream, pos);
+ //------------------------------
+ u16 tail = g::parse_u16(bytestream, pos);
+ if (tail != TAIL) {
+   spdlog::error("VERSION {}", quality_version_u8 & 0xc0); 
+   spdlog::error("TofHit TAIL signature {} is incorrect!", tail);
+ }
+ return Ok(hit); 
+}
+
+auto g::TofHit::to_string() const -> std::string {
+  std::string vstr = g::pversion_to_string(version);
+  std::string repr = std::format("<TofHit ({})", vstr);
+  //repr += std::format("\n -- format test {:.2f}", get_time_a() );
+  repr += "\n  paddle ID         : "     + std::to_string(paddle_id         );
+  repr += "\n  paddle len        : "     + std::to_string(paddle_len         );
+  if (version == g::ProtocolVersion::Unknown) {
+    repr += "\n  timestamp32       : "     + std::to_string(timestamp32       );
+    repr += "\n  timestamp16       : "     + std::to_string(timestamp16       );
+    repr += "\n   |-> timestamp48  : "     + std::to_string(get_timestamp48() ); 
+  }
+  repr += "\n  _________";
+  repr += "\n  ##  Peak:";
+  repr += std::format("\n  >> time       A | B  : {:.2f} {:.2f}", get_time_a(), get_time_b());
+  //repr += "\n  >>  time   A | B  : "     + std::to_string(get_time_a()      )
+  //     +  " " + std::to_string(get_time_b());
+  repr += std::format("\n  >> height     A | B  : {:.2f} {:.2f}",get_peak_a(), get_peak_b());
+  repr += std::format("\n  >> charge     A | B  : {:.2f} {:.2f}",get_charge_a(), get_charge_b());
+  repr += std::format("\n  >> baseline   A | B  : {:.2f} {:.2f}",baseline_a, baseline_b);
+  repr += std::format("\n  >> base. rms  A | B  : {:.2f} {:.2f}",baseline_a_rms, baseline_b_rms);
+  // saturation variabes 
+  repr += "\n  ** time over threshold information";
+  repr += std::format("\n  >> Lo TOT     A | B  : {:.2f} {:.2f}",get_tot_low_a(), get_tot_low_b());  
+  repr += std::format("\n  >> Hi TOT     A | B  : {:.2f} {:.2f}",get_tot_high_a(), get_tot_high_b());  
+  repr += std::format("\n  >> Lo Slope   A | B  : {:.2f} {:.2f}",get_tot_slp_low_a(), get_tot_slp_low_b()); 
+  repr += std::format("\n  >> Hi Slope   A | B  : {:.2f} {:.2f}",get_tot_slp_high_a(), get_tot_slp_high_b());  
+  // -------------------
+  
+  #ifdef BUILD_CXXDB
+  repr += "\n  >> t0            : "     + std::to_string(get_t0()       );
+  #endif
+  repr += ">";
+  return repr;
+}
+
+g::RBWaveform g::RBWaveform::from_bytestream(const Vec<u8> &stream,
+                                       u64 &pos) {
+  RBWaveform wf = RBWaveform();
+  u16 head = g::parse_u16(stream, pos);
+  if (head != RBWaveform::HEAD)  {
+    //log_error("[RBEvent::from_bytestream] Header signature invalid!");  
+    return wf;
+  }
+  wf.event_id     = g::parse_u32(stream, pos);
+  wf.rb_id        = g::parse_u8(stream, pos);
+  wf.rb_channel_a = g::parse_u8(stream, pos); 
+  wf.rb_channel_b = g::parse_u8(stream, pos);
+  wf.stop_cell    = g::parse_u16(stream, pos);
+  Vec<u8>::const_iterator start = stream.begin() + pos;
+  Vec<u8>::const_iterator end   = stream.begin() + pos + 2*NWORDS;    // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
+  Vec<u8> data_a(start, end);
+  wf.adc_a = u8_to_u16(data_a);
+  pos += 2*NWORDS;
+  start = stream.begin() + pos;
+  end   = stream.begin() + pos + 2*NWORDS;
+  Vec<u8> data_b(start, end);
+  wf.adc_b = u8_to_u16(data_b);
+  u16 tail   = g::parse_u16(stream, pos);
+  if (tail != RBWaveform::TAIL) {
+    spdlog::error("After parsing, we found an invalid tail signature {}", tail);
+  }
+  return wf;
+} 
+
+auto g::RBWaveform::to_string() const -> std::string {
+  std::string repr = "<RBWaveform";
+  //repr += std::format("\n  format test {:.2f}", get_time_a() );
+  repr += std::format("\n  Event ID  : {}", event_id);
+  repr += std::format("\n  RB        : {}", rb_id);
+  repr += std::format("\n  Channel A : {}", rb_channel_a);
+  repr += std::format("\n  Channel B : {}", rb_channel_b);
+  repr += std::format("\n  Stop cell : {}", stop_cell);
+  if (adc_a.size() >= 273) {
+    repr += std::format("\n  adc[{}]    : .. {} {} {} ..", adc_a.size(), adc_a[270], adc_a[271], adc_a[272]);
+  } else {
+    repr += std::format("\n  adc [{}/corrupt?]", adc_a.size());
+  }
+  if (adc_b.size() >= 273) {
+    repr += std::format("\n  adc[{}]    : .. {} {} {} ..", adc_b.size(), adc_b[270], adc_b[271], adc_b[272]);
+  } else {
+    repr += std::format("\n  adc [{}/corrupt?]", adc_b.size());
+  }
+  repr += ">";
+  return repr;
+}
+
+auto g::TofEventSummary::get_trigger_sources() const -> Vec<g::TriggerType> {
+  auto t_types = Vec<g::TriggerType>();
+  u16 gaps_trigger = (trigger_sources >> 5 & 0x1) == 1;
+  if (gaps_trigger) {
+    t_types.push_back(g::TriggerType::Gaps);
+  }
+  u16 any_trigger    = (trigger_sources >> 6 & 0x1) == 1;
+  if (any_trigger) {
+    t_types.push_back(g::TriggerType::Any);
+  }
+  u16 forced_trigger = (trigger_sources >> 7 & 0x1) == 1;
+  if (forced_trigger) {
+    t_types.push_back(g::TriggerType::Forced);
+  }
+  u16 track_trigger  = (trigger_sources >> 8 & 0x1) == 1;
+  if (track_trigger) {
+    t_types.push_back(g::TriggerType::Track);
+  }
+  u16 central_track_trigger
+                     = (trigger_sources >> 9 & 0x1) == 1;
+  if (central_track_trigger) {
+    t_types.push_back(g::TriggerType::TrackCentral);
+  }
+  return t_types;
+} 
+
+#ifdef BUILD_CXX_DB
+auto g::TofEventSummary::normalize_hit_times(const g::TofPaddleTimingConstantMap &offsets) -> void {
+  if (hits.size() == 0) {
+    return;
+  }
+  auto PI = std::numbers::pi_v<f32>;
+  bool first_phase = false;
+  f32 phase0 = 0;
+  for (auto &h : hits) {
+    if (!first_phase) {
+      phase0 = h.phase;
+      first_phase = true;
+    }
+    auto t0 = h.get_t0_relative() + h.get_cable_delay();
+    auto phase_diff = h.phase - phase0;
+    while (phase_diff < - PI/2.0) {
+      phase_diff += 2.0*PI;
+    }
+    while (phase_diff > PI/2.0) {
+      phase_diff -= 2.0*PI;
+    }
+    auto t_shift = 50.0*phase_diff/(2.0*PI);
+    h.event_t0 = t0 + t_shift;
+    if (!offsets.empty()) {
+      h.event_t0 -= offsets.at(h.paddle_id);
+    }
+  }
+}
+
+auto g::TofEventSummary::get_trigger_pids(const gondola::DsiJChnPaddleIdMap& lgmap) const -> Vec<u8> {
+  auto trigger_pids = Vec<u8>();
+  for (auto const &hit : get_trigger_hits()) {
+    u8 dsi = std::get<0>(hit);
+    u8 j   = std::get<1>(hit);
+    u8 ch  = std::get<2>(hit);
+    u8 thr = (u8)std::get<3>(hit);
+    if (!lgmap.contains(dsi)) {
+      spdlog::error("Can not find DSI {} in LG map!", dsi);
+      continue;
+    } 
+    if (!lgmap.at(dsi).contains(j)) {
+      spdlog::error("Can not find J {} for DSI {} in LG map!", j, dsi);
+      continue;
+    }
+    if (!lgmap.at(dsi).at(j).contains(ch)) {
+      spdlog::error("Can not find Ch {} for DSI {} J {} in LG map!", ch, dsi, j);
+      continue;
+    }
+    trigger_pids.push_back(lgmap.at(dsi).at(j).at(ch));
+  }
+  return trigger_pids;
+}
+#endif
+
+
+auto g::TofEventSummary::get_trigger_hits() const -> Vec<std::tuple<u8,u8,u8, g::LTBThreshold>> {
+  auto hits = Vec<std::tuple<u8,u8,u8, g::LTBThreshold>>(); 
+  auto dsi_j_mask_bits = std::bitset<32>(dsi_j_mask);
+  u32 n_masks_needed   = dsi_j_mask_bits.count();
+  if (channel_mask.size() < n_masks_needed) {
+    spdlog::error("We need {} hit masks, but only have {}! This is bad!", n_masks_needed,  channel_mask.size());
+    return hits;
+  }
+  u8 n_mask = 0;
+  for (u8 k=0;k<32;k++) {
+    if ((u32)((dsi_j_mask >> k) & 0x1) == 1) {
+      u8 dsi = 0;
+      u8 j   = 0;
+      if (k < 5) {
+        dsi = 1;
+        j   = k  + 1;
+      } else if (k < 10) {
+        dsi = 2;
+        j   = k  - 5 + 1;
+      } else if (k < 15) {
+        dsi = 3;
+        j   = k - 10 + 1;
+      } else if (k < 20) {
+        dsi = 4;
+        j   = k - 15 + 1;
+      } else if (k < 25) {
+        dsi = 5;
+        j   = k - 20 + 1;
+      } 
+      u32 channels = channel_mask[n_mask]; 
+      for (u8 i=0;i<8; i++) {
+        u32 ch  = LTB_CHANNELS[i];
+        u32 chn = 2*i + 1; 
+        int thresh_bits = (int)((channels & ch) >> (i*2));
+        if (thresh_bits > 0 && thresh_bits < 255 ) { // hit over threshold
+          hits.push_back(std::make_tuple(dsi, j, chn, (LTBThreshold)(thresh_bits)));
+        }
+      }
+      n_mask += 1;
+    }
+  }
+  return hits;
+}
+
+auto g::TofEventSummary::get_rb_link_ids() const -> Vec<u8> {
+  auto links = Vec<u8>();
+  for (u8 k=0;k<64;k++) {
+    if (((u64)(mtb_link_mask >> k) & (u64)0x1) == 1) {
+      links.push_back(k);
+    }
+  }
+  return links;
+}
+
+
+auto g::TofEventSummary::from_bytestream(const Vec<u8> &stream, u64 &pos) 
+  -> Result<g::TofEventSummary, g::IOError> {
+  u16 head = g::parse_u16(stream, pos);
+  if (head != TofEventSummary::HEAD) {
+    auto message = std::format("Decoding of HEAD failed! Got {} instead!", head);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, message);
+    return Err(err);
+  }
+  TofEventSummary tes;
+  u8 status_version_u8  = g::parse_u8(stream, pos);
+  tes.status            = static_cast<EventStatus>(status_version_u8 & 0x3f);
+  tes.version           = (g::ProtocolVersion)(status_version_u8 & 0xc0);
+  tes.trigger_sources   = g::parse_u16(stream, pos);
+  tes.n_trigger_paddles = g::parse_u8(stream, pos);
+  tes.event_id          = g::parse_u32(stream, pos);
+  if (tes.version == g::ProtocolVersion::V1) {
+    tes.n_hits_umb      = g::parse_u8(stream, pos);
+    tes.n_hits_cbe      = g::parse_u8(stream, pos);
+    tes.n_hits_cor      = g::parse_u8(stream, pos);
+    tes.tot_edep_umb    = g::parse_f32(stream, pos);
+    tes.tot_edep_cbe    = g::parse_f32(stream, pos);
+    tes.tot_edep_cor    = g::parse_f32(stream, pos);
+  } 
+  tes.quality           = g::parse_u8(stream, pos);
+  tes.timestamp32       = g::parse_u32(stream, pos);
+  tes.timestamp16       = g::parse_u16(stream, pos);
+  tes.run_id            = g::parse_u16(stream, pos);
+  //tes.primary_beta      = g::parse_u16(stream, pos); 
+  //tes.primary_charge    = g::parse_u16(stream, pos); 
+  tes.drs_dead_lost_hits = g::parse_u16(stream, pos);
+  tes.dsi_j_mask        = g::parse_u32(stream, pos);
+  u8 n_channel_masks    = g::parse_u8(stream, pos);
+  for (u8 k=0;k<n_channel_masks;k++) {
+    tes.channel_mask.push_back(g::parse_u16(stream, pos));
+  }
+  tes.mtb_link_mask     = g::parse_u64(stream, pos);
+  u16 nhits             = g::parse_u16(stream, pos);
+  for (u16 k=0; k<nhits; k++) {
+    auto maybe_h = g::TofHit::from_bytestream(stream, pos);
+    if (maybe_h.is_ok()) {
+      auto h = maybe_h.unwrap();
+      tes.hits.push_back(h);
+    }
+  }
+  u16 tail = g::parse_u16(stream, pos);
+  if (tail != g::TofEventSummary::TAIL) {
+    auto message = std::format("Decoding of TAIL failed! Got {} instead!", tail);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongTailBytes, message);
+    return Err(err);
+  }
+  return Ok(tes);
+}
+
+auto g::TofEventSummary::from_tofpacket(const TofPacket &packet) 
+  -> Result<TofEventSummary, g::IOError> {
+  TofEventSummary event;
+  if (packet.packet_type != PacketType::TofEventSummary) {
+    auto message = std::format("Wrong packet type! {}", packet_type_to_string(packet.packet_type));
+    spdlog::error(message);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongPacketType, message);
+    return Err(err);
+  } 
+  u64 _pos = 0;
+  return TofEventSummary::from_bytestream(packet.payload, _pos);
+}
+
+u64 g::TofEventSummary::get_timestamp48() const {
+  return ((u64)timestamp16 << 32) | (u64)timestamp32;
+}
+
+#ifdef BUILD_CXXDB
+auto g::TofEventSummary::set_paddlemap(const g::TofPaddleMap& paddlemap) -> void {
+  for (auto &h : hits) {
+    h.set_paddle(paddlemap.at(h.paddle_id));
+  }
+};
+#endif
+
+auto g::TofEventSummary::to_string() const -> std::string {
+  std::ostringstream oss;
+  oss << status;  // Use the << operator to stream the enum
+  std::string repr = "<TofEventSummary";
+  //repr += std::format("\n  format test {:.2f}", get_time_a() );
+  repr += std::format("\n  Run ID             : {}", run_id);
+  repr += std::format("\n  Event ID           : {}", event_id);
+  repr += std::format("\n  Status             : {}", oss.str());
+  repr += std::format("\n  Trigger Sources    : {}", trigger_sources);
+  repr += std::format("\n  N trig paddles     : {}", n_trigger_paddles);
+  repr += std::format("\n  timestamp32        : {}", timestamp32)      ;
+  repr += std::format("\n  timestamp16        : {}", timestamp16)      ;
+  repr += std::format("\n  |->timestamp48     : {}", get_timestamp48());
+  repr += std::format("\n  NHits       (reco) : {}", hits.size());
+  repr += "\n** Trigger Sources **";
+  for (const auto &ts : get_trigger_sources()) {
+    repr += std::format("\n -- {}", (u8)ts);
+  }
+  repr += "\n** Trigger Hits **";
+  for (const auto &h : get_trigger_hits()) {
+    repr += std::format("\n -- {} {} {} {}", std::get<0>(h), std::get<1>(h), std::get<2>(h), (u8)std::get<3>(h));
+  }
+  repr += "\n** MTB Link IDs **";
+  for (const u8 &lid : get_rb_link_ids()) {
+    repr += std::format("\n -- {}", lid);
+  }
+  repr += ">";
+  repr += "\n  **** **** ****";
+  for (auto const &h : hits) {
+    repr += std::format("\n  {}",h.to_string()); 
+  }
+  repr += ">";
+  return repr;
+}
+
+namespace gondola {
+  
+  std::ostream& operator<<(std::ostream& os, const g::TofHit& th) {
+    os << th.to_string();
+    return os;
+  }
+  
+  //std::ostream& operator<<(std::ostream& os, const g::MasterTriggerEvent& mt) {
+  //  os << mt.to_string();
+  //  return os;
+  //}
+  
+  std::ostream& operator<<(std::ostream& os, const g::TofEvent& te) {
+    os << te.to_string();
+    return os;
+  }
+  
+  std::ostream& operator<<(std::ostream& os, const g::RBEvent& re) {
+    os << re.to_string();
+    return os;
+  }
+  
+  std::ostream& operator<<(std::ostream& os, const g::RBEventHeader& rh) {
+    os << rh.to_string();
+    return os;
+  }
+  
+  std::ostream& operator<<(std::ostream& os, const g::RBWaveform& wf) {
+    os << wf.to_string();
+    return os;
+  }
+  
+  std::ostream& operator<<(std::ostream& os, const g::TofEventSummary& tes) {
+    os << tes.to_string();
+    return os;
+  }
+}

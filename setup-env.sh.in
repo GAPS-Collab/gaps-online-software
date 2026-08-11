@@ -1,23 +1,41 @@
 #! /bin/sh
 export PATH=$PATH:@CMAKE_INSTALL_PREFIX@/bin
+# this removes duplicates from $PATH
+export PATH=$(echo "$PATH" | awk -v RS=: '!a[$0]++ {printf "%s%s", (NR==1?"":":"), $0}')
 export PYTHONPATH=$PYTHONPATH:@CMAKE_INSTALL_PREFIX@/python:@CMAKE_CURRENT_SOURCE_DIR@/gaps-db/gaps_db
+# this removes duplicates from $PYTHONPATH
+export PYTHONPATH=$(echo "$PYTHONPATH" | awk -v RS=: '!a[$0]++ {printf "%s%s", (NR==1?"":":"), $0}')
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:@CMAKE_INSTALL_PREFIX@/lib
+# this removes duplicates from $LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$(echo "$LD_LIBRARY_PATH" | awk -v RS=: '!a[$0]++ {printf "%s%s", (NR==1?"":":"), $0}')
+
 export DJANGO_SETTINGS_MODULE=gaps_db.settings
 export GapsOnlineSoftware_DIR=@CMAKE_INSTALL_PREFIX@
-# this is the database for diesel
-export DATABASE_URL=@CMAKE_CURRENT_SOURCE_DIR@/gaps-db/gaps_db/gaps_flight.db
+export GapsOnlineSoftware_SRC=@CMAKE_CURRENT_SOURCE_DIR@ 
+
+# database & tracker online calibration 
+# FIxME - in the future, these might move to the asset directory,
+# however, we need to keep local copies in the python directory,
+# so they can be published together with the python package.
+
+# current url for the geometry/calibration database
+export GONDOLA_DB_URL=@CMAKE_CURRENT_SOURCE_DIR@/gaps-db/gaps_db/gaps_flight.db
+# the online calibration as it was run on the instrument
+export GONDOLA_TRK_ONLINE_CAL=@CMAKE_CURRENT_SOURCE_DIR@/gondola-core/rust/gondola-core/python/gondola/tracker_cal
 
 echo -e "\n\n"
-echo -e "  ************************************************+++"
-echo -e "  * WELCOME TO GAPS-ONLINE-SOFTWARE V0.10 'LELEWAA' *"
-echo -e "  ***************************************************"
+echo -e "  *******************************************************************"
+echo -e "  * WELCOME TO GAPS-ONLINE-SOFTWARE V0.12 'AULEPE'                  *"
+echo -e "  *******************************************************************"
 echo -e "   -- We have set the following variables:"
-echo -e "   -- PYTHONPATH=$PYTHONPATH"
-echo -e "   -- PATH=${PATH//:/\\n  -- }"
-echo -e "   -- LD_LIBRARY_PATH=${LD_LIBRARY_PATH//:/\\n  -- }"
+echo -e "   -- PYTHONPATH=${PYTHONPATH//:/\\n    >> }"
+echo -e "   -- PATH=${PATH//:/\\n    >> }"
+echo -e "   -- LD_LIBRARY_PATH=${LD_LIBRARY_PATH//:/\\n    >> }"
+echo -e "   -- GapsOnlineSoftware_SRC=${GapsOnlineSoftware_SRC}"
 echo -e "   -- GapsOnlineSoftware_DIR=${GapsOnlineSoftware_DIR}" 
 echo -e "      (for cmake's find_package(GapsOnlineSoftware) calls)"
-echo -e "  ***************************************************"
+echo -e "   -- GONDOLA_DB_URL=${GONDOLA_DB_URL}"
+echo -e "  *******************************************************************"
 echo -e "   => software repository:"
 echo -e "      - https://github.com/GAPS-Collab/gaps-online-software"
 echo -e "   => Where to get help?:"

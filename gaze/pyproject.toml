@@ -1,0 +1,15 @@
+[project]
+name = "gaze"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "gondola>=0.12.7",
+    "numpy>=2.4.2",
+    "pyvista[jupyter]>=0.46.5",
+    "stpyvista>=0.1.4",
+    "streamlit-js-eval>=1.0.0",
+    "charmingbeauty>=0.1.7",
+    "streamlit>=1.54.0",
+]

@@ -1,0 +1,176 @@
+#include <filesystem>
+#include <algorithm>
+#include <regex>
+#include "spdlog/spdlog.h"
+#include "spdlog/cfg/env.h"
+
+#include "serialization.h"
+#include "io/parsers.h"
+#include "io.hpp"
+
+using namespace result;
+
+namespace g = gondola;
+
+namespace fs = std::filesystem;
+
+/***************************************************/
+
+auto g::list_path_contents_sorted(const std::string& input, bool use_telemetry_re) -> Vec<std::string> {
+  fs::path path(input);
+  Vec<std::string> result;
+  Vec<std::string> dirty_fnames;
+  std::regex re(R"(Run\d+_\d+\.(\d{6})_(\d{6})UTC\.gaps$)");
+  if (use_telemetry_re) {
+    spdlog::info("Using regular expression to match telemetry files!");
+    re = std::regex(R"(RAW(\d{6})_(\d{6}).bin$)");
+  }
+  std::vector<std::tuple<uint32_t, uint32_t, std::string>> entries;
+
+  if (!fs::exists(path)) {
+    std::cerr << "Error: Path does not exist." << std::endl;
+    return result;
+  }
+
+  if (fs::is_regular_file(path)) {
+    dirty_fnames.push_back(path.string());
+    //return result;
+  }  else if (fs::is_directory(path)) {
+    for (const auto& entry : fs::directory_iterator(path)) {
+      if (entry.is_regular_file()) {
+        std::string filename = entry.path().string();
+        dirty_fnames.push_back(filename);
+      }
+    } 
+  } else {
+    std::cerr << "Error: Path is neither a file nor a directory." << std::endl;
+  }
+
+  for (auto const &fname : dirty_fnames) {
+    std::smatch match;
+    if (std::regex_search(fname, match, re) && match.size() > 2) {
+      try {
+        u32 date = std::stoul(match[1].str());
+        u32 time = std::stoul(match[2].str());
+        entries.emplace_back(date, time, fname);
+      } catch (const std::exception&) {
+        continue;
+      }
+    }
+  }
+
+  std::sort(entries.begin(), entries.end(), [](const auto& a, const auto& b) {
+    return std::tie(std::get<0>(a), std::get<1>(a)) < std::tie(std::get<0>(b), std::get<1>(b));
+  });
+
+  for (const auto& entry : entries) {
+    result.push_back(std::get<2>(entry));
+  }
+  return result;
+}
+
+/***************************************************/
+
+Vec<u32> get_event_ids_from_raw_stream(const Vec<u8> &bytestream, u64 &pos) {
+  Vec<u32> event_ids;
+  u32 event_id = 0;
+  // first, we need to find the first header in the 
+  // stream starting from the given position
+  bool has_ended = false;
+  while (!has_ended) { 
+    pos = search_for_2byte_marker(bytestream, 0xAA, has_ended, pos);  
+    pos += 22;
+    event_id = g::parse_u32(bytestream, pos);
+    event_ids.push_back(event_id);
+    pos += 18530 - 22 - 4;
+  }
+  return event_ids; 
+}
+
+/***************************************************/
+
+g::TofPacketReader::TofPacketReader() {
+  // here it is exhausted because we did not 
+  // set a file yet
+  exhausted_  = true;
+  n_packets_read_ = 0;
+}
+
+/***************************************************/
+
+void g::TofPacketReader::set_filename(String filename) {
+  if (fs::exists(filename)) {
+    filename_  = filename;
+    exhausted_ = false;
+    stream_file_ = std::ifstream(filename, std::ios::binary);   
+    stream_file_.seekg (0, stream_file_.end);
+    auto file_size = stream_file_.tellg();
+    stream_file_.seekg (0, stream_file_.beg);
+    auto fs_string = std::format("{:4.2f}", (f64)file_size/1e6);
+    spdlog::info("Will read packets from {} [{} MB]", filename, fs_string);
+  } else {
+    auto msg = std::format("File {} does not exist!", filename);
+    spdlog::critical(msg); 
+    throw std::runtime_error(msg);
+  }
+}
+
+/***************************************************/
+
+g::TofPacketReader::TofPacketReader(String filename) : g::TofPacketReader() {
+  set_filename(filename);
+}
+
+/***************************************************/
+
+auto g::TofPacketReader::is_exhausted() const -> bool{
+  return exhausted_;
+}
+
+/***************************************************/
+
+auto g::TofPacketReader::n_packets_read() const -> usize {
+  return n_packets_read_;
+}
+
+/***************************************************/
+
+auto g::TofPacketReader::get_next_packet() -> Result<TofPacket, g::IOError> {
+  while (true) {
+    if (stream_file_.eof()) {
+      exhausted_ = true;
+      throw std::runtime_error("No more packets in file!");
+    } 
+    u8 byte = stream_file_.get();
+    if (byte == 0xAA) {
+      byte = stream_file_.get();
+      if (stream_file_.eof()) {
+        exhausted_ = true;
+        throw std::runtime_error("No more packets in file!");
+      } 
+      if (byte == 0xAA) {
+        u8 packet_type = stream_file_.get();
+        bytestream buffer = bytestream(4);
+        stream_file_.read(reinterpret_cast<char*>(buffer.data()), 4);
+        usize pos = 0;
+        u32 p_size       = g::parse_u32(buffer, pos);
+        TofPacket packet;
+        packet.packet_type  = static_cast<PacketType>(packet_type);
+        packet.payload_size = p_size;
+        buffer = bytestream(p_size);
+        stream_file_.read(reinterpret_cast<char*>(buffer.data()), p_size);
+        buffer.resize(stream_file_.gcount());
+        packet.payload = std::move(buffer);
+        n_packets_read_++;
+        return Ok(packet);
+      }
+    } 
+  }
+}
+
+/***************************************************/
+
+String g::TofPacketReader::get_filename() const {
+  return filename_;
+}
+

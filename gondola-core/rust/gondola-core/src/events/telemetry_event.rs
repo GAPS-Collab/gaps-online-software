@@ -1,0 +1,798 @@
+//! The TelemetryEvent or former "MergedEvent" is that what gets 
+//! sent over telemetry during flight
+// The following file is part of gaps-online-software and published 
+// under the GPLv3 license
+
+use crate::prelude::*;
+
+use std::collections::HashSet;
+
+/// The basic event type as sent over telemetry, often 
+/// also dubbed as "merged event".
+///
+/// This event type contains tof as well as tracker 
+/// hits, and comes in several flavors, depending 
+/// on the suspected signalness of the online system
+/// determined by a specific algorith.
+/// For that, please see the TelemetryPacketHeader, 
+/// which identifiers these different flavors. 
+///
+/// For most purposes, this event is the to-go data 
+/// to start any analysis.
+#[cfg_attr(feature="pybindings", pyclass)]
+#[derive(Debug, Clone, PartialEq)]
+pub struct TelemetryEvent {
+  pub header              : TelemetryPacketHeader,
+  pub creation_time       : u64,
+  pub event_id            : u32,
+  pub tracker_hits        : Vec<TrackerHit>,
+  pub tracker_oscillators : Vec<u64>,
+  pub tof_event           : TofEvent,
+  //#[cfg(feature = "pybindings")]
+  //pub tof_event: pyo3::Py<TofEvent>,
+  //#[cfg(not(feature = "pybindings"))]
+  //pub tof_event           : TofEvent,
+  pub raw_data            : Vec<u8>,
+  pub flags0              : u8,
+  pub flags1              : u8,
+  pub version             : u8,
+  pub osc_flags           : u8,
+  pub oscillator_idx      : Vec<u8>,
+  // this is for re-merging and does not get serialized to disk 
+  pub expected_tr_hits    : u8,
+}
+
+impl TelemetryEvent {
+
+  pub fn new() -> Self {
+    let mut tracker_oscillators = Vec::<u64>::new();
+    for _ in 0..10 {
+      tracker_oscillators.push(0);
+    }
+    Self {
+      header              : TelemetryPacketHeader::new(),
+      creation_time       : 0,
+      event_id            : 0,
+      tracker_hits        : Vec::<TrackerHit>::new(),
+      tracker_oscillators : tracker_oscillators,
+      tof_event           : TofEvent::new(),
+      raw_data            : Vec::<u8>::new(),
+      flags0              : 0,
+      flags1              : 1,
+      version             : 0, 
+      osc_flags           : 0,
+      oscillator_idx      : Vec::<u8>::new(),
+      expected_tr_hits    : 0,
+    }
+  }
+
+  /// This can be useful for single track analysis 
+  pub fn has_only_one_hit_per_tlayer(&self) -> bool { 
+    let mut layers = HashSet::<u8>::new();
+    for h in &self.tracker_hits {
+      if !layers.insert(h.layer) {
+        return false; // we found a duplicate! 
+      }
+    } 
+    return true;
+  }
+
+  /// Create a TelemetryPacket from the 
+  /// TelemetryEvent.
+  ///
+  /// CAVEAT: Currently the checksum does 
+  /// not get re-evaluated
+  pub fn pack(&self) -> TelemetryPacket {
+    let mut tp = TelemetryPacket::new();
+    // this is bad, but currently I am not 
+    // sure how to make this better
+    tp.header  = self.header.clone();
+    tp.payload = self.to_bytestream();
+    tp
+  }
+
+  pub fn calibrate_trk_hits(&mut self, cali : &TrackerOfflineCalibration, remove_pulsed : bool) 
+    -> Result<(), CalibrationError> {
+    cali.mask_hits(&mut self.tracker_hits);
+    cali.calibrate(&mut self.tracker_hits, remove_pulsed)?;
+    Ok(())
+  }
+
+  /// Restore position information from database
+  #[cfg(feature="database")]
+  pub fn hydrate(&mut self, tof_paddles : &HashMap<u8,TofPaddle>, trk_strips : &HashMap<u32, TrackerStrip>) {
+    self.tof_event.set_paddles(tof_paddles);
+    for h in &mut self.tracker_hits {  
+      h.set_coordinates(trk_strips);
+    }
+  }
+  
+  /// Delete tracker hits (e.g. in case they are supposed to 
+  /// be replaced by packet type 80 tracker hits)
+  pub fn delete_all_tracker_hits(&mut self) {
+    self.tracker_hits.clear();
+  }
+
+  /// Add tracker hits (e.g. hits from packet type 80)
+  pub fn add_tracker_hits(&mut self, hits:  &Vec<TrackerHit>) {
+    self.tracker_hits.extend_from_slice(hits);
+    // for each tracker hits, the packet length extends by 4 bytes 
+    self.header.length += (4*hits.len()) as u16;
+  }
+
+  #[cfg(feature="database")]
+  pub fn mask_strips(&mut self, masks : &HashMap<u32, TrackerStripMask>) {
+    let mut clean_hits = Vec::<TrackerHit>::with_capacity(self.tracker_hits.len());
+    for h in &self.tracker_hits {
+      if !masks.contains_key(&h.get_stripid()) {
+        warn!("We don't have a mask information for strip id {}", h.get_stripid());
+        continue;
+      }
+      if masks[&h.get_stripid()].active {
+        clean_hits.push(h.clone());
+      }
+    }
+    self.tracker_hits = clean_hits;
+  }
+
+
+  ///// Applies a cut based on adc values
+  //#[cfg(feature="database")]
+  //pub fn apply_signal_cut(&mut self, cut : f32, pedestals : &HashMap<u32, TrackerStripPedestal>) {
+  //  let mut clean_hits = Vec::<TrackerHit>::with_capacity(self.tracker_hits.len());
+  //  for h in &self.tracker_hits {
+  //    if !pedestals.contains_key(&h.get_stripid()) {
+  //      warn!("We don't have pedestal information for strip id {}", h.get_stripid());
+  //      continue;
+  //    }
+  //    let ped = &pedestals[&h.get_stripid()];
+  //    if (h.adc as f32) - ped.pedestal_mean > (cut * ped.pedestal_sigma){
+  //      clean_hits.push(h.clone());
+  //    }
+  //  }
+  //  self.tracker_hits = clean_hits;
+  //}
+ 
+  ///// Calculate the absolute common noise (adc)
+  //#[cfg(feature="database")]
+  //pub fn cmn_noise(hit       : &TrackerHit, 
+  //                 pedestals : &HashMap<u32, TrackerStripPedestal>,
+  //                 cmn_noise : &HashMap<u32, TrackerStripCmnNoise>) -> Option<f32> {
+  //  let stripid = hit.get_stripid();
+  //  if !cmn_noise.contains_key(&stripid) {
+  //    warn!("We don't have pedestal information for strip id {}", stripid);
+  //    return None;
+  //  }
+  //  if !pedestals.contains_key(&stripid) {
+  //    warn!("We don't have pedestal information for strip id {}", stripid);
+  //    return None;
+  //  }
+  //  let mut cmn_level = 0.0f32;
+  //  let adc_ped_sub   = hit.adc as f32 - pedestals[&stripid].pedestal_mean; 
+  //  if adc_ped_sub < 400.0 {
+  //    cmn_level = cmn_noise[&stripid].common_level(hit.adc as f32);
+  //  }
+  //  return Some(adc_ped_sub - cmn_noise[&stripid].gain * cmn_level);
+  //}
+
+  ///// Calculate the energy deposition
+  //#[cfg(feature="database")]
+  //pub fn get_trk_energy(adc : f32, tf : &TrackerStripTransferFunction) -> f32 {
+  //  let mut energy = 0.0f32;
+  //  let mut adc_m  = adc; 
+  //  if adc_m <= 0.0 {
+  //    return energy;
+  //  }
+  //  if adc_m > 1600.0 {
+  //    adc_m = 1600.0;
+  //  }
+  //  #[allow(non_snake_case)]
+  //  let mV2keV  = 0.841f32;
+  //  // the max and min range are basically defined by the 
+  //  // polynominal [0-1600]
+  //  let voltage = tf.transfer_fn(adc_m);
+  //  println!("voltage {}", voltage);
+  //  energy  = voltage*mV2keV;
+  //  energy /= 1000.0;
+  //  println!("adc : {} , energy {}", adc_m, energy);
+  //  return energy;
+  //}
+
+  //#[cfg(feature="database")]
+  //pub fn calibrate_tracker(&mut self, 
+  //                         remove_cmn_noise : bool,
+  //                         pedestals        : &HashMap<u32, TrackerStripPedestal>,
+  //                         transfer_fn      : &HashMap<u32, TrackerStripTransferFunction>,
+  //                         cmn_noise        : &HashMap<u32, TrackerStripCmnNoise>) {
+  //  //println!("Will remove CMN noise {}", remove_cmn_noise);
+  //  for h in &mut self.tracker_hits {
+  //    let stripid = h.get_stripid();
+  //    //println!("Running TRK calibration for strip {}", stripid);
+  //    if !pedestals.contains_key(&stripid) {
+  //      warn!("Pedestal map does not contain strip {}. Will not calculate energy!", stripid);
+  //      continue;
+  //    }
+  //    if !transfer_fn.contains_key(&stripid) {
+  //      warn!("Transfer fn for strip {} not available. Will not calculate energy!", stripid);
+  //      continue;
+  //    }
+  //    let adc_no_ped = h.adc as f32 - pedestals[&stripid].pedestal_mean;
+  //    //println!("ADC NO PED {}", adc_no_ped);
+  //    if remove_cmn_noise {
+  //      match Self::cmn_noise(&h, pedestals, cmn_noise) { 
+  //        None => {
+  //          h.energy = Self::get_trk_energy(adc_no_ped, &transfer_fn[&stripid]); 
+  //        }
+  //        Some(cmn) => {
+  //          h.energy = Self::get_trk_energy(cmn, &transfer_fn[&stripid]);
+  //        }
+  //      }    
+  //    } else {
+  //      h.energy = Self::get_trk_energy(adc_no_ped, &transfer_fn[&stripid]);
+  //    }
+  //  }
+  //}
+}
+
+
+impl TelemetryPackable for TelemetryEvent {
+  // trivial for TelemetryEvent, since the default 
+  // already contains the packet types
+}
+
+impl Serialization for TelemetryEvent {
+  
+  fn from_bytestream(stream : &Vec<u8>,
+                     pos    : &mut usize)
+    -> Result<Self, SerializationError> {
+    let mut me       = Self::new();
+    let version      = parse_u8(stream, pos);
+    me.version       = version;
+    me.flags0        = parse_u8(stream, pos);
+    // skip a bunch of Alex newly implemented things
+    // FIXME
+    if version == 0 {
+      me.flags1      = parse_u8(stream, pos);
+    } else {
+      *pos += 8;
+    }
+
+    me.event_id       = parse_u32(stream, pos);
+    //println!("EVENT ID {}", me.event_id);
+    let _tof_delim    = parse_u8(stream, pos);
+    //println!("TOF delim : {}", _tof_delim);
+    if stream.len() <= *pos + 2 {
+      error!("Not able to parse merged event!");
+      return Err(SerializationError::StreamTooShort);
+    }
+    let num_tof_bytes = parse_u16(stream, pos) as usize;
+    //println!("Num TOF bytes : {}", num_tof_bytes);
+    if stream.len() < *pos+num_tof_bytes {
+      error!("Not enough bytes for TOF packet with {} bytes! Only {} bytes remaining in input", num_tof_bytes, stream.len() - *pos);
+      return Err(SerializationError::StreamTooShort); 
+    }
+    let pos_before = *pos;
+    if num_tof_bytes != 0 {
+      let tof_pack   = TofPacket::from_bytestream(stream, pos)?;
+      let ts         = tof_pack.unpack::<TofEvent>()?;
+    // sanity check - is tofpacket as long as num_tof_bytes lets us believe?
+      me.tof_event = ts;
+    }
+    if pos_before + num_tof_bytes != *pos {
+      error!("Byte misalignment. Expected {num_tof_bytes}, got {pos} - {pos_before}"); 
+      return Err(SerializationError::WrongByteSize);
+    }
+    let trk_delim    = parse_u8(stream, pos);
+
+    //println!("TRK delim {}", trk_delim);
+    if trk_delim != 0xbb {
+      return Err(SerializationError::HeadInvalid);
+    }
+    if version == 1 {
+      let num_trk_hits = parse_u16(stream, pos);
+      if (*pos + (num_trk_hits as usize)*4 ) > stream.len() {
+        let expected_s = *pos + (num_trk_hits as usize)*4 - stream.len();
+        let actual = stream.len() - *pos;
+        error!("We expect {} more bytes, but see only {}", expected_s, actual);
+        error!("Not enough bytes ({}) for {} tracker hits!", stream.len(), num_trk_hits);
+        //println!("{}", &me);
+        return Err(SerializationError::StreamTooShort);
+      }
+      for _ in 0..num_trk_hits { 
+        let mut hit  = TrackerHit::new();
+        let strip_id = parse_u16(stream, pos);
+        let adc      = parse_u16(stream, pos);
+        hit.channel  = (strip_id & 0b11111) as u8;
+        hit.module   = ((strip_id >> 5) & 0b111) as u8;
+        hit.row      = ((strip_id >> 8) & 0b111) as u8;
+        hit.layer    = ((strip_id >> 11) & 0b1111) as u8;
+        hit.adc      = adc;
+        me.tracker_hits.push(hit);
+      }
+      // oscillators
+      let oscillators_delimiter = parse_u8(stream, pos);
+      if oscillators_delimiter != 0xcc {
+        return Err(SerializationError::HeadInvalid);
+      }
+      me.osc_flags = parse_u8(stream, pos);
+      let mut oscillator_idx = Vec::<u8>::new();
+      for j in 0..8 {
+        if (me.osc_flags >> j & 0b1) > 0 {
+          oscillator_idx.push(j)
+        }
+      }
+      if (*pos + oscillator_idx.len()*6) > stream.len() {
+        error!("Not enough bytes to parse tracker oscillators!");
+        return Err(SerializationError::StreamTooShort);
+      }
+      for idx in oscillator_idx.iter() {
+        let lower = parse_u32(stream, pos);
+        let upper = parse_u16(stream, pos);
+        let osc : u64 = (upper as u64) << 32 | (lower as u64);
+        //println!("FROM: IDX {}, LOWER {}, UPPER {}, OSC {}", idx, lower, upper, osc);
+        me.tracker_oscillators[*idx as usize] = osc;
+      }
+      me.oscillator_idx = oscillator_idx;
+    } else if version == 0 {
+      error!("Version {version} found, which is currently not supported!");
+      return Err(SerializationError::UnsupportedVersion);
+    } else {
+      error!("Unsuported and unknown version : {version}!");
+      return Err(SerializationError::UnsupportedVersion);
+    } 
+    me.expected_tr_hits = me.tracker_hits.len() as u8;
+    Ok(me)
+  }
+  
+  fn to_bytestream(&self) -> Vec<u8> {
+    let mut stream = Vec::<u8>::new();
+    stream.push(self.version);
+    stream.push(self.flags0);
+    if self.version == 0 {
+      stream.push(self.flags1);
+    } else {
+      stream.extend_from_slice(&[0u8;8]);
+    }
+    stream.extend_from_slice(&self.event_id.to_le_bytes());
+    stream.push(0xaa); // tof delimiter
+    let tof           = self.tof_event.pack();
+    let tof_bytes     = tof.to_bytestream();
+    let num_tof_bytes = tof_bytes.len() as u16;
+    debug!("Will write {} bytes for tef event to stream!", num_tof_bytes);
+    stream.extend_from_slice(&num_tof_bytes.to_le_bytes());
+    stream.extend_from_slice(&tof_bytes);
+    stream.push(0xbb);
+    stream.extend_from_slice(&(self.tracker_hits.len() as u16).to_le_bytes());
+    //println!("Will add bytes for {} tracker hits!", self.tracker_hits.len());
+    for h in &self.tracker_hits { 
+      let mut strip_id: u16 = 0;
+      // Shift each value to its respective position and OR them together
+      strip_id |= (h.channel as u16) & 0b11111;       // Bits 0-4
+      strip_id |= ((h.module as u16) & 0b111) << 5;   // Bits 5-7
+      strip_id |= ((h.row as u16) & 0b111) << 8;      // Bits 8-10
+      strip_id |= ((h.layer as u16) & 0b1111) << 11; 
+      stream.extend_from_slice(&strip_id.to_le_bytes());
+      stream.extend_from_slice(&h.adc.to_le_bytes());
+    }
+    stream.push(0xcc); // oscillators delimiter
+    stream.push(self.osc_flags);
+    for idx in &self.oscillator_idx { 
+    //for osc in &self.tracker_oscillators {
+      //deconstruct the timestamps    
+      let osc   = self.tracker_oscillators[*idx as usize];
+      let upper = ((osc >> 32) & (u16::MAX as u64)) as u16;
+      let lower = (osc & (u32::MAX as u64)) as u32; 
+      //println!("TO: OSC {}, upper {}, lower {}", osc, upper, lower);
+      stream.extend_from_slice(&lower.to_le_bytes());
+      stream.extend_from_slice(&upper.to_le_bytes());
+    }
+    return stream;
+  }
+}
+
+impl fmt::Display for TelemetryEvent {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr     = String::from("<TelemetryEvent:");
+    let mut te = self.tof_event.clone();
+    te.calc_gcu_variables();
+    let tof_str  = format!("\n  {}", self.tof_event);
+    let mut good_hits = 0;
+    
+    if self.version == 0 {
+      repr += "\n VERSION 0 NOT SUPPORTED!!";
+    } else if self.version == 1 {
+      for _ in &self.tracker_hits {
+        good_hits += 1;
+      }
+    }
+    repr += &(format!("  {}", self.header));
+    repr += "\n  ** ** ** MERGED  ** ** **";
+    repr += &(format!("\n  version      {}", self.version));
+    repr += &(format!("\n  event ID     {}", self.event_id));  
+    repr += "\n  ** ** ** TOF GCU VARIABLES  ** ** **";
+    repr += &(format!("\n  n_hits_umb   {}", te.n_hits_umb));
+    repr += &(format!("\n  n_hits_cbe   {}", te.n_hits_cbe));
+    repr += &(format!("\n  n_hits_cor   {}", te.n_hits_cor));
+    repr += &(format!("\n  tot_edep_umb {}", te.tot_edep_umb));  
+    repr += &(format!("\n  tot_edep_cbe {}", te.tot_edep_cbe));  
+    repr += &(format!("\n  tot_edep_cor {}", te.tot_edep_cor));  
+    if self.version == 0 {
+      repr += "\n VERSION 0 NOT SUPPORTED!!"; 
+    }
+    repr += "\n  ** ** ** TRACKER ** ** **";
+    if self.version == 0 {
+      repr += "\n VERSION 0 NOT SUPPORTED!!"; 
+    } else if self.version == 1 {
+      repr += &(format!("\n  Trk oscillators {:?}", self.tracker_oscillators)); 
+    }
+    repr += &(format!("\n  N Good Trk Hits {}", good_hits));
+    repr += &tof_str;
+    write!(f,"{}", repr)
+  }
+}
+
+//----------------------------------------
+
+#[cfg(feature="pybindings")]
+#[pymethods]
+impl TelemetryEvent {
+
+  #[getter]
+  #[pyo3(name="exptected_tracker_hits")]
+  fn expected_trk_hits_py(&self) -> u8 {
+    self.expected_tr_hits
+  }
+
+  #[getter]
+  #[pyo3(name="has_only_one_hit_per_tlayer")] 
+  fn has_only_one_hit_per_tlayer_py(&self) -> bool {
+    self.has_only_one_hit_per_tlayer()
+  }
+
+  #[getter]
+  #[pyo3(name="has_at_least_expected_trk_hits")]
+  fn has_at_least_expected_trk_hits(&self) -> bool {
+    return self.tracker_hits.len() as u8 >= self.expected_tr_hits
+  }
+
+  #[getter]
+  #[pyo3(name="version")]
+  fn version_py(&self) -> u8 {
+    self.version
+  }
+ 
+  #[getter] 
+  #[pyo3(name="flags0")]
+  fn flags0_py(&self) -> u8 {
+    self.flags0
+  }
+  
+  #[getter] 
+  #[pyo3(name="flags1")]
+  fn flags1_py(&self) -> u8 {
+    self.flags1
+  }
+
+  //#[staticmethod]
+  //#[pyo3(name = "get_trk_energy")]
+  //fn get_trk_energy_py(adc : f32, tf : &TrackerStripTransferFunction) -> f32 {
+  //  Self::get_trk_energy(adc, tf)
+  //}
+
+  #[getter]
+  fn get_header(&self) -> TelemetryPacketHeader {
+    self.header
+  }
+
+  #[getter]
+  fn tracker(&self) -> PyResult<Vec<TrackerHit>> {
+    Ok(self.tracker_hits.clone())
+  }
+
+  #[getter]
+  fn get_event_id(&self) -> u32 {
+    self.event_id
+  }
+ 
+  /// If available parse the run id from 
+  /// the TOF part of the event 
+  ///
+  /// Returns None if the run id is not 
+  /// set or 0
+  #[getter]
+  fn get_run_id(&self) -> Option<u16> {
+    if self.tof_event.run_id == 0 {
+      return None;
+    }
+    Some(self.tof_event.run_id) 
+  }
+  
+  /// Remove all TOF hits from the event's hit series which 
+  /// do NOT obey causality. that is where the timings
+  /// measured at ends A and B can not be correlated
+  /// by the assumed speed of light in the paddle
+  #[pyo3(name="tof_remove_non_causal_hits")]
+  fn tof_remove_non_causal_hits_py(&mut self) -> Vec<u16> {
+    // return Vec<u16> here so that python does not 
+    // interpret it as a byte
+    let mut pids = Vec::<u16>::new();
+    for pid in self.tof_event.remove_non_causal_hits() {
+      pids.push(pid as u16);
+    }
+    pids
+  }
+  
+  /// Remove the hits from the event which are not passing 
+  /// Elena's cuts. This has a large overlap with "non-causal"
+  /// hit, but is stricter 
+  ///
+  /// # Arguments:
+  ///   * no_return : If true, don't return anything, which 
+  ///                 will make the execution time shorter
+  ///
+  pub fn tof_remove_elena_hits(&mut self, no_return : bool) -> Option<Vec<TofHit>> {
+    return self.tof_event.remove_elena_hits(no_return);
+  } 
+  
+  /// Remove TOF hits from the hitseries which can not 
+  /// be caused by the same particle, which means 
+  /// that for these two specific hits beta with 
+  /// respect to the first hit in the event is 
+  /// larger than one
+  /// That this works, first hits need to be 
+  /// "normalized" by calling normalize_hit_times
+  #[pyo3(name="tof_lightspeed_cleaning")]
+  pub fn tof_lightspeed_cleaning_py(&mut self, t_err : f32) -> (Vec<u16>, Vec<f32>) {
+    // return Vec<u16> here so that python does not 
+    // interpret it as a byte
+    let mut pids = Vec::<u16>::new();
+    let (pids_rm, twindows) = self.tof_event.lightspeed_cleaning(t_err);
+    for pid in pids_rm {
+      pids.push(pid as u16);
+    }
+    (pids, twindows)
+  }
+
+  /// One shot function for a simple calculation of the tof time of flight 
+  /// as calucated by first inner - first outer time. 
+  /// Depending on the event topology, this might or might not be very useful.
+  ///
+  /// That this yields something reasonable, the systematic timing offsets 
+  /// have to be set before, see `set_tof_timing_offsets` 
+  ///
+  /// Returns: 
+  ///   time-of-flight, beta, phase differenc, distance, harting cable time difference 
+  #[getter]
+  fn get_tof_time_of_flight(&mut self) -> Option<(f32,f32,f32,f32,f32)> {
+    self.tof_event.get_tof()
+  }
+
+  /// Set per-paddle timing constant offsets 
+  /// for the TOF
+  ///
+  /// # Arguments:
+  ///   * timing_offsetes : A map of paddle id to timin
+  ///                       timing offset constant
+  #[pyo3(name="set_tof_timing_offsets")]
+  pub fn set_tof_timing_offsets_py(&mut self, timing_offsets : HashMap<u8, f32>) {
+    self.tof_event.set_timing_offsets(&timing_offsets);
+  }
+  
+  /// Normalize the hit times so that the first 
+  /// hit is at 0. This includes application 
+  /// of the phase correction
+  #[pyo3(name="tof_normalize_hit_times")]
+  fn tof_normalize_hit_times_py(&mut self) {
+    self.tof_event.normalize_hit_times();
+  }
+
+  /// Apply a set of per-paddle timing constants 
+  ///
+  /// # Arguments:
+  ///   * constants : A map of paddle id -> constant (in ns) 
+  fn tof_set_timing_constants(&mut self, constants:  HashMap<u8, f32>) {
+    for h in &mut self.tof_event.hits {
+      h.event_t0 -= constants[&h.paddle_id];
+    }
+  }
+
+  
+  /// Returns a COPY of the TofEvent associated 
+  /// with this event id
+  #[getter]
+  fn get_tof(&self) -> PyResult<TofEvent> {
+    Ok(self.tof_event.clone())
+  }
+  //#[getter]
+  //fn get_tof(&self, py: Python<'_>) -> Py<TofEvent> {
+  //    // This returns a reference-counted pointer to the same object
+  //    // Python can now call .timestamp = 123 on it
+  //  self.tof_event.clone_ref(py)
+  //}
+
+ // #[getter]``
+ // fn get_tof<'_py>(&self, py: Python<'_py>) -> PyResult<Bound<'_py, PyArray1<f32>>> {
+ // fn get_tof(slf: Bound<'_, Self>) -> PyResult<Bound<'_, TofEvent>> {
+      // 1. Borrow the parent (slf)
+      // 2. Map the borrow to the internal field
+      // 3. Return a Bound that points to that specific memory
+      
+  //    let py = slf.py();
+  //    let py_ref = slf.borrow_mut(); // This is a PyRef<'_, MyLibrary>
+  //    
+  //    // Use PyRef::map to project the reference to the internal field
+  //    // In PyO3 0.23+, this is often used via 'into_bound'
+  //    //let mapped = pyo3::PyRef::map(py_ref, |s| &s.tof_event);
+  //    
+  //    //Ok(mapped.into_bound(py))
+  //    Ok(py_ref)
+  //}
+  
+  /// Certain quantitities can only be calculated if we know more 
+  /// about the paddle the hit was seen in. 
+  /// This meta information is not stored within the hit to save 
+  /// space for telemetry/storage reasons.
+  ///
+  /// The meta-information (e.g. paddle length) can be added by 
+  /// filling in the blanks from the specific paddles as obtained 
+  /// from the database shipped with gondola.
+  #[cfg(feature="database")]
+  #[pyo3(name="tof_set_paddles")]
+  fn tof_set_paddles_py(&mut self, paddles : HashMap<u8, TofPaddle>) {
+    self.tof_event.set_paddles(&paddles); 
+  }
+
+  #[getter]
+  fn tracker_pointcloud(&self) -> Vec<(f32, f32, f32, f32, f32)> {
+    let mut pts = Vec::<(f32,f32,f32,f32,f32)>::new();
+    for h in &self.tracker_hits {
+      // uses adc
+      // FIXME - factor 10!
+      let pt = (10.0*h.x, 10.0*h.y, 10.0*h.z, f32::NAN, h.adc as f32);
+      pts.push(pt);
+    }
+    pts
+  }
+  
+  /// Add tracker hits to the merged event (e.g. with hits from packet type 80
+  #[pyo3(name="add_tracker_hits")]
+  pub fn add_tracker_hits_py(&mut self, mut hits: Vec<TrackerHit>, dedup : bool) { 
+    if dedup {
+      hits.sort();
+      hits.dedup();
+    }
+    let n_hits_before = self.tracker_hits.len();
+    self.tracker_hits.extend_from_slice(&hits);
+    self.tracker_hits.sort(); 
+    self.tracker_hits.dedup();
+    let delta_hits = self.tracker_hits.len() - n_hits_before; 
+    // for each tracker hits, the packet length extends by 4 bytes 
+    self.header.length += (4*delta_hits) as u16;
+  }
+  
+  /// Delete tracker hits (e.g. in case they are supposed to 
+  /// be replaced by packet type 80 tracker hits)
+  #[pyo3(name="delete_all_tracker_hits")]
+  pub fn delete_all_tracker_hits_py(&mut self) {
+    self.tracker_hits.clear();
+  }
+
+  /// Populate a merged event from a TelemetryPacket.
+  ///
+  /// Telemetry packet type should be 90 (MergedEvent)
+  #[staticmethod]
+  fn from_telemetrypacket(packet : TelemetryPacket) -> PyResult<Self> {
+    match Self::from_bytestream(&packet.payload, &mut 0) {
+      Ok(mut event) => {
+        event.header = packet.header.clone();
+        #[cfg(feature="database")]
+        event.hydrate(&packet.tof_paddles, &packet.trk_strips);
+        return Ok(event);
+      }
+      Err(err) => {
+        return Err(PyValueError::new_err(err.to_string()));
+      }  
+    }
+  }
+
+  #[pyo3(name="pack")]
+  fn pack_py(&self) -> TelemetryPacket {
+    self.pack()
+  }
+
+  #[pyo3(name="calibrate_trk_hits")]
+  fn calibrate_trk_hits_py(&mut self, cali : Bound<'_, TrackerOfflineCalibration> , remove_pulsed : bool) -> PyResult<()> {
+    let cali_ref = cali.borrow();
+    self.calibrate_trk_hits(&*cali_ref, remove_pulsed)?;
+    Ok(())
+  }
+}
+
+#[cfg(feature="random")]
+impl FromRandom for TelemetryEvent {
+
+  fn from_random() -> Self {
+    let mut rng    = rand::rng();
+    let mut ev     = Self::new();
+    ev.header      = TelemetryPacketHeader::from_random();
+    ev.tof_event   = TofEvent::from_random();
+    //let n_trk_hits = rng.random::<u8>();
+    let n_trk_hits = 1u8;
+    for _ in 0..n_trk_hits {
+      let mut h = TrackerHit::from_random();
+      h.oscillator = 0;
+      h.asic_event_code = 0;
+      ev.tracker_hits.push(h);
+    }
+    //ev.creation_time      = rng.random::<u64>();
+    ev.creation_time      = 0;
+    ev.event_id           = rng.random::<u32>();
+    ev.flags0             = 3;
+    ev.flags1             = 1;
+    ev.version            = 1;
+    // tracker oscillators are one by layer - set 
+    // layers active by random choice 
+    for idx in 0..10usize {
+      let active = rng.random::<bool>();
+      if idx < 8 && active {
+        ev.osc_flags = ev.osc_flags | (0b1 << idx);
+        let osc  = rng.random::<u64>() & 0x0000FFFFFFFFFFFF;
+        ev.tracker_oscillators[idx] = osc;
+        ev.oscillator_idx.push(idx as u8);
+        //ev.tracker_oscillators[idx] = u32::MAX as u64 + 1;
+      }
+    }
+    return ev;
+  }
+}
+
+#[test]
+#[cfg(feature="random")]
+fn serialize_deserialize_telemetryevent() {
+  for _ in 0..10 {
+    let mut ev        = TelemetryEvent::from_random();  
+    let bytes         = ev.to_bytestream();
+    let mut test      = TelemetryEvent::from_bytestream(&bytes, &mut 0).unwrap();
+    let creation_time = Instant::now();
+    ev.tof_event.creation_time   = creation_time;
+    test.tof_event.creation_time = creation_time;
+    ev.tof_event.rb_events.clear();
+    test.tof_event.rb_events.clear();
+    for h in &mut ev.tof_event.hits {
+      h.coax_cable_time = 0.0;
+      h.hart_cable_time = 0.0;
+      h.event_t0 = 0.0;
+      h.paddle_len = 0.0;
+      h.x = 0.0; 
+      h.y = 0.0; 
+      h.z = 0.0; 
+    }
+    for h in &mut test.tof_event.hits {
+      h.coax_cable_time = 0.0;
+      h.hart_cable_time = 0.0;
+      h.event_t0 = 0.0;
+      h.paddle_len = 0.0;
+      h.x = 0.0; 
+      h.y = 0.0; 
+      h.z = 0.0; 
+    }
+    // the header will not be the same, since it is not  
+    // deserialized with from_bytestream, but just attached 
+    assert_eq!(ev.creation_time      , test.creation_time); 
+    assert_eq!(ev.event_id           , test.event_id); 
+    assert_eq!(ev.osc_flags          , test.osc_flags); 
+    assert_eq!(ev.tracker_oscillators, test.tracker_oscillators); 
+    assert_eq!(ev.raw_data           , test.raw_data); 
+    assert_eq!(ev.flags0             , test.flags0); 
+    assert_eq!(ev.flags1             , test.flags1); 
+    assert_eq!(ev.version            , test.version); 
+    assert_eq!(ev.oscillator_idx     , test.oscillator_idx); 
+    assert_eq!(ev.tracker_hits       , test.tracker_hits); 
+    assert_eq!(ev.tof_event          , test.tof_event); 
+    //assert_eq!(ev, test);
+  }
+}
+
+#[cfg(feature="pybindings")]
+pythonize!(TelemetryEvent);
+

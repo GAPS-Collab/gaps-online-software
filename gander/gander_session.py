@@ -32,6 +32,33 @@ class GanderHist:
 
 #################################################
 
+def gander_scatter_plot(xs, ys,
+                     xlabel    : str,
+                     ylabel    : str,
+                     title     : str,
+                     figsize   = lo.FIGSIZE_A4_LANDSCAPE,
+                     **kwargs) -> matplotlib.figure.Figure:
+    if not kwargs:
+        kwargs = {'color'  : 'w',\
+                  'alpha'  : 0.4,\
+                  'marker' : '+'}
+    #kwargs.update({'label' : label})
+    fig = plt.figure(figsize=figsize)
+    ax = fig.gca()
+    #ax.legend(loc='upper right', frameon=False)
+    ax.scatter(xs,ys, **kwargs)
+    #ax.set_ylim(bottom=0)
+    
+    ax.set_xlabel(xlabel, loc='right')
+    ax.set_ylabel(ylabel, loc='top')#, rotation=0)
+    ax.set_title(title, loc='right')
+    #if log:
+    #    ax.set_yscale('symlog')
+    cb.visual.adjust_minor_ticks(ax, which='x')
+    return fig
+
+#################################################
+
 def gander_line_plot(xs, ys,
                      xlabel    : str,
                      ylabel    : str,

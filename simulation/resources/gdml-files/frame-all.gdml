@@ -1,0 +1,255 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+  <define>
+    <constant name="HALFPI" value="pi/2"/>
+    <constant name="PI" value="1*pi"/>
+    <constant name="TWOPI" value="2*pi"/>
+    <rotation name="identity" x="0" y="0" z="0"/>
+    <position name="center" x="0" y="0" z="0" unit="mm"/>
+  </define>
+  <materials/>
+  <solids/>
+  <structure>
+    <assembly name="GAPS-FRM-MEC-611 Resting block, TKR diag support"/>
+    <assembly name="GAPS-FRM-MEC-616 EBY diagonal support for TKR_-1 [NBoom-SOL corner]">
+      <physvol name="PV_GAPS-FRM-MEC-611 Resting block, TKR diag support">
+        <volumeref ref="GAPS-FRM-MEC-611 Resting block, TKR diag support"/>
+        <position name="P-GAPS-FRM-MEC-611 Resting block, TKR diag support1" unit="mm" x="6.661338147750939e-13" y="832.6628000000002" z="-139.99378505988025"/>
+        <rotation name="R-GAPS-FRM-MEC-611 Resting block, TKR diag support1" unit="deg" x="2.54444374517081e-14" y="-90.0" z="6.361109362927035e-14"/>
+      </physvol>
+    </assembly>
+    <assembly name="GAPS-FRM-MEC-611 Resting block, TKR diag support001"/>
+    <assembly name="GAPS-FRM-MEC-616 EBY diagonal support for TKR_-2 [NBoom-RAD corner]">
+      <physvol name="PV_GAPS-FRM-MEC-611 Resting block, TKR diag support001">
+        <volumeref ref="GAPS-FRM-MEC-611 Resting block, TKR diag support001"/>
+        <position name="P-GAPS-FRM-MEC-611 Resting block, TKR diag support0013" unit="mm" x="6.661338147750939e-13" y="832.6628000000002" z="-139.99378505988025"/>
+        <rotation name="R-GAPS-FRM-MEC-611 Resting block, TKR diag support0012" unit="deg" x="2.54444374517081e-14" y="-90.0" z="6.361109362927039e-14"/>
+      </physvol>
+    </assembly>
+    <assembly name="GAPS-FRM-MEC-611 Resting block, TKR diag support002"/>
+    <assembly name="GAPS-FRM-MEC-616 EBY diagonal support for TKR_-3 [Boom-SOL corner]">
+      <physvol name="PV_GAPS-FRM-MEC-611 Resting block, TKR diag support002">
+        <volumeref ref="GAPS-FRM-MEC-611 Resting block, TKR diag support002"/>
+        <position name="P-GAPS-FRM-MEC-611 Resting block, TKR diag support0025" unit="mm" x="6.661338147750939e-13" y="832.6628000000003" z="-139.99378505988025"/>
+        <rotation name="R-GAPS-FRM-MEC-611 Resting block, TKR diag support0024" unit="deg" x="2.54444374517081e-14" y="-90.0" z="6.361109362927039e-14"/>
+      </physvol>
+    </assembly>
+    <assembly name="GAPS-FRM-MEC-611 Resting block, TKR diag support003"/>
+    <assembly name="GAPS-FRM-MEC-616 EBY diagonal support for TKR_-4 [Boom-RAD corner]">
+      <physvol name="PV_GAPS-FRM-MEC-611 Resting block, TKR diag support003">
+        <volumeref ref="GAPS-FRM-MEC-611 Resting block, TKR diag support003"/>
+        <position name="P-GAPS-FRM-MEC-611 Resting block, TKR diag support0037" unit="mm" x="6.661338147750939e-13" y="832.6628000000002" z="-139.99378505988025"/>
+        <rotation name="R-GAPS-FRM-MEC-611 Resting block, TKR diag support0036" unit="deg" x="2.54444374517081e-14" y="-90.0" z="6.361109362927035e-14"/>
+      </physvol>
+    </assembly>
+    <assembly name="GAPS-FRM-MEC-000 Frame Assy, E-bay, GAPS">
+      <physvol name="PV_GAPS-FRM-MEC-616 EBY diagonal support for TKR_-1 [NBoom-SOL corner]">
+        <volumeref ref="GAPS-FRM-MEC-616 EBY diagonal support for TKR_-1 [NBoom-SOL corner]"/>
+        <position name="P-GAPS-FRM-MEC-616 EBY diagonal support for TKR_-1 [NBoom-SOL corner]2" unit="mm" x="666.7500000000005" y="-990.219000000001" z="1095.2988000000003"/>
+        <rotationref ref="identity"/>
+      </physvol>
+      <physvol name="PV_GAPS-FRM-MEC-616 EBY diagonal support for TKR_-2 [NBoom-RAD corner]">
+        <volumeref ref="GAPS-FRM-MEC-616 EBY diagonal support for TKR_-2 [NBoom-RAD corner]"/>
+        <position name="P-GAPS-FRM-MEC-616 EBY diagonal support for TKR_-2 [NBoom-RAD corner]4" unit="mm" x="666.7499999999998" y="-990.2189999999994" z="-1095.2987999999998"/>
+        <rotation name="R-GAPS-FRM-MEC-616 EBY diagonal support for TKR_-2 [NBoom-RAD corner]3" unit="deg" x="180.0" z="-180.0"/>
+      </physvol>
+      <physvol name="PV_GAPS-FRM-MEC-616 EBY diagonal support for TKR_-3 [Boom-SOL corner]">
+        <volumeref ref="GAPS-FRM-MEC-616 EBY diagonal support for TKR_-3 [Boom-SOL corner]"/>
+        <position name="P-GAPS-FRM-MEC-616 EBY diagonal support for TKR_-3 [Boom-SOL corner]6" unit="mm" x="-666.7500000000001" y="-990.2189999999994" z="-1095.2988"/>
+        <rotation name="R-GAPS-FRM-MEC-616 EBY diagonal support for TKR_-3 [Boom-SOL corner]5" unit="deg" x="180.0" z="-180.0"/>
+      </physvol>
+      <physvol name="PV_GAPS-FRM-MEC-616 EBY diagonal support for TKR_-4 [Boom-RAD corner]">
+        <volumeref ref="GAPS-FRM-MEC-616 EBY diagonal support for TKR_-4 [Boom-RAD corner]"/>
+        <position name="P-GAPS-FRM-MEC-616 EBY diagonal support for TKR_-4 [Boom-RAD corner]8" unit="mm" x="-666.750000000002" y="-990.2189999999991" z="1095.2988000000005"/>
+        <rotationref ref="identity"/>
+      </physvol>
+    </assembly>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy001"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy002"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy003"/>
+    <assembly name="GAPS-TKR-MEC-151 cabel relief, NBoom side"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy004"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy005"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy006"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy007"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy008"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy009"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy010"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy011"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy012"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy013"/>
+    <assembly name="GAPS-FRM-MEC-500 Frame Assy, Upper, GAPS">
+      <physvol name="av_1_impr_1_TOF-PAN-132 10PP cable relief bracket assy_pv_0">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy9" unit="mm" x="-568.3249999999995" y="-177.93335000000965" z="1120.6988000000001"/>
+        <rotation name="R-TOF-PAN-132 10PP cable relief bracket assy7" unit="deg" y="-90.0"/>
+      </physvol>
+      <physvol name="av_1_impr_1_TOF-PAN-132 10PP cable relief bracket assy001_pv_1">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy001"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy00110" unit="mm" x="-1101.6487999999997" y="-177.93335000000957" z="568.3249999999999"/>
+        <rotationref ref="identity"/>
+      </physvol>
+      <physvol name="av_1_impr_1_TOF-PAN-132 10PP cable relief bracket assy002_pv_2">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy002"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy00211" unit="mm" x="-568.3250000000012" y="1467.05955" z="1120.6987999999565"/>
+        <rotation name="R-TOF-PAN-132 10PP cable relief bracket assy0028" unit="deg" x="-126.86285649158013" y="90.0" z="53.137143508419825"/>
+      </physvol>
+      <physvol name="av_1_impr_1_TOF-PAN-132 10PP cable relief bracket assy003_pv_3">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy003"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy00312" unit="mm" x="-1101.6488000000002" y="1467.0595499999995" z="568.3250000000013"/>
+        <rotation name="R-TOF-PAN-132 10PP cable relief bracket assy0039" unit="deg" x="179.99999999999991"/>
+      </physvol>
+      <physvol name="av_1_impr_1_GAPS-TKR-MEC-151 cabel relief, NBoom side_pv_4">
+        <volumeref ref="GAPS-TKR-MEC-151 cabel relief, NBoom side"/>
+        <position name="P-GAPS-TKR-MEC-151 cabel relief, NBoom side13" unit="mm" x="1015.9238000000008" y="-160.3375" z="1.1102230246251565e-13"/>
+        <rotationref ref="identity"/>
+      </physvol>
+      <physvol name="av_1_impr_1_TOF-PAN-132 10PP cable relief bracket assy004_pv_5">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy004"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy00414" unit="mm" x="568.3249999999995" y="-177.93335000000965" z="1120.6988000000001"/>
+        <rotation name="R-TOF-PAN-132 10PP cable relief bracket assy00410" unit="deg" y="-90.0"/>
+      </physvol>
+      <physvol name="av_1_impr_1_TOF-PAN-132 10PP cable relief bracket assy005_pv_6">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy005"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy00515" unit="mm" x="568.3249999999995" y="-177.93335000000965" z="-1120.6988000000001"/>
+        <rotation name="R-TOF-PAN-132 10PP cable relief bracket assy00511" unit="deg" y="-90.0"/>
+      </physvol>
+      <physvol name="av_1_impr_1_TOF-PAN-132 10PP cable relief bracket assy006_pv_7">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy006"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy00616" unit="mm" x="-568.3249999999995" y="-177.93335000000965" z="-1120.6988000000001"/>
+        <rotation name="R-TOF-PAN-132 10PP cable relief bracket assy00612" unit="deg" y="-90.0"/>
+      </physvol>
+      <physvol name="av_1_impr_1_TOF-PAN-132 10PP cable relief bracket assy007_pv_8">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy007"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy00717" unit="mm" x="-1101.6487999999997" y="-177.93335000000957" z="-568.3249999999999"/>
+        <rotationref ref="identity"/>
+      </physvol>
+      <physvol name="av_1_impr_1_TOF-PAN-132 10PP cable relief bracket assy008_pv_9">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy008"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy00818" unit="mm" x="568.3250000000011" y="1467.0595500000009" z="1120.6987999999985"/>
+        <rotation name="R-TOF-PAN-132 10PP cable relief bracket assy00813" unit="deg" x="52.775736925923006" y="90.0" z="-127.22426307407702"/>
+      </physvol>
+      <physvol name="av_1_impr_1_TOF-PAN-132 10PP cable relief bracket assy009_pv_10">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy009"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy00919" unit="mm" x="1101.6488000000002" y="1467.0595499999995" z="568.3250000000013"/>
+        <rotation name="R-TOF-PAN-132 10PP cable relief bracket assy00914" unit="deg" x="-7.847540028923776e-14" z="-180.0"/>
+      </physvol>
+      <physvol name="av_1_impr_1_TOF-PAN-132 10PP cable relief bracket assy010_pv_11">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy010"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy01020" unit="mm" x="-1101.6488000000002" y="1467.0595499999995" z="-568.3250000000013"/>
+        <rotation name="R-TOF-PAN-132 10PP cable relief bracket assy01015" unit="deg" x="-179.99999999999991"/>
+      </physvol>
+      <physvol name="av_1_impr_1_TOF-PAN-132 10PP cable relief bracket assy011_pv_12">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy011"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy01121" unit="mm" x="-568.3250000000011" y="1467.0595500000009" z="-1120.6987999999985"/>
+        <rotation name="R-TOF-PAN-132 10PP cable relief bracket assy01116" unit="deg" x="-52.775736925923006" y="90.0" z="127.22426307407702"/>
+      </physvol>
+      <physvol name="av_1_impr_1_TOF-PAN-132 10PP cable relief bracket assy012_pv_13">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy012"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy01222" unit="mm" x="568.3250000000011" y="1467.0595500000009" z="-1120.6987999999985"/>
+        <rotation name="R-TOF-PAN-132 10PP cable relief bracket assy01217" unit="deg" x="127.22426307407702" y="90.0" z="-52.775736925923"/>
+      </physvol>
+      <physvol name="av_1_impr_1_TOF-PAN-132 10PP cable relief bracket assy013_pv_14">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy013"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy01323" unit="mm" x="1101.6488000000002" y="1467.0595499999995" z="-568.3250000000013"/>
+        <rotation name="R-TOF-PAN-132 10PP cable relief bracket assy01318" unit="deg" x="7.847540028923776e-14" z="-180.0"/>
+      </physvol>
+    </assembly>
+    <assembly name="GAPS-TKR-MEC-620 Base Assy, Tracker Frame"/>
+    <assembly name="GAPS-TKR-MEC-650 Top Assy, Tracker Frame"/>
+    <assembly name="GAPS-TKR-MEC-640 Upper Assy, Tracker Frame">
+      <physvol name="av_19_impr_2_GAPS-TKR-MEC-650 Top Assy, Tracker Frame_pv_0">
+        <volumeref ref="GAPS-TKR-MEC-650 Top Assy, Tracker Frame"/>
+        <positionref ref="center"/>
+        <rotationref ref="identity"/>
+      </physvol>
+    </assembly>
+    <assembly name="GAPS-TKR-MEC-106 Spacer Block Assy, Tracker_-1 [Default]"/>
+    <assembly name="GAPS-TKR-MEC-106 Spacer Block Assy, Tracker_-1 [Default]001"/>
+    <assembly name="GAPS-TKR-MEC-106 Spacer Block Assy, Tracker_-1 [Default]002"/>
+    <assembly name="GAPS-TKR-MEC-106 Spacer Block Assy, Tracker_-1 [Default]003"/>
+    <assembly name="GAPS-FRM-MEC-603 Screwplate 46 Assy, Frame"/>
+    <assembly name="GAPS-FRM-MEC-603 Screwplate 46 Assy, Frame001"/>
+    <assembly name="GAPS-FRM-MEC-603 Screwplate 46 Assy, Frame002"/>
+    <assembly name="GAPS-FRM-MEC-603 Screwplate 46 Assy, Frame003"/>
+    <assembly name="GAPS-TKR-MEC-150 cabel relief, SOL side"/>
+    <assembly name="GAPS-TKR-MEC-600 Frame Assy, Tracker">
+      <physvol name="av_17_impr_1_GAPS-TKR-MEC-620 Base Assy, Tracker Frame_pv_0">
+        <volumeref ref="GAPS-TKR-MEC-620 Base Assy, Tracker Frame"/>
+        <positionref ref="center"/>
+        <rotationref ref="identity"/>
+      </physvol>
+      <physvol name="av_17_impr_1_GAPS-TKR-MEC-640 Upper Assy, Tracker Frame_pv_1">
+        <volumeref ref="GAPS-TKR-MEC-640 Upper Assy, Tracker Frame"/>
+        <position name="P-GAPS-TKR-MEC-640 Upper Assy, Tracker Frame24" unit="mm" x="1.877128313898517e-15" y="1085.2531000000008" z="1.3010426069826053e-14"/>
+        <rotationref ref="identity"/>
+      </physvol>
+      <physvol name="av_17_impr_1_GAPS-TKR-MEC-106 Spacer Block Assy, Tracker_-1 [Default]_pv_2">
+        <volumeref ref="GAPS-TKR-MEC-106 Spacer Block Assy, Tracker_-1 [Default]"/>
+        <position name="P-GAPS-TKR-MEC-106 Spacer Block Assy, Tracker_-1 [Default]25" unit="mm" x="-666.75" y="-88.9" z="-1120.6480000000001"/>
+        <rotationref ref="identity"/>
+      </physvol>
+      <physvol name="av_17_impr_1_GAPS-TKR-MEC-106 Spacer Block Assy, Tracker_-1 [Default]001_pv_3">
+        <volumeref ref="GAPS-TKR-MEC-106 Spacer Block Assy, Tracker_-1 [Default]001"/>
+        <position name="P-GAPS-TKR-MEC-106 Spacer Block Assy, Tracker_-1 [Default]00126" unit="mm" x="-666.75" y="-88.9" z="1120.6479999999997"/>
+        <rotationref ref="identity"/>
+      </physvol>
+      <physvol name="av_17_impr_1_GAPS-TKR-MEC-106 Spacer Block Assy, Tracker_-1 [Default]002_pv_4">
+        <volumeref ref="GAPS-TKR-MEC-106 Spacer Block Assy, Tracker_-1 [Default]002"/>
+        <position name="P-GAPS-TKR-MEC-106 Spacer Block Assy, Tracker_-1 [Default]00227" unit="mm" x="666.75" y="-88.9" z="-1120.6480000000001"/>
+        <rotation name="R-GAPS-TKR-MEC-106 Spacer Block Assy, Tracker_-1 [Default]00219" unit="deg" x="180.0" z="-180.0"/>
+      </physvol>
+      <physvol name="av_17_impr_1_GAPS-TKR-MEC-106 Spacer Block Assy, Tracker_-1 [Default]003_pv_5">
+        <volumeref ref="GAPS-TKR-MEC-106 Spacer Block Assy, Tracker_-1 [Default]003"/>
+        <position name="P-GAPS-TKR-MEC-106 Spacer Block Assy, Tracker_-1 [Default]00328" unit="mm" x="666.75" y="-88.9" z="1120.6479999999997"/>
+        <rotation name="R-GAPS-TKR-MEC-106 Spacer Block Assy, Tracker_-1 [Default]00320" unit="deg" x="180.0" z="-180.0"/>
+      </physvol>
+      <physvol name="av_17_impr_1_GAPS-FRM-MEC-603 Screwplate 46 Assy, Frame_pv_6">
+        <volumeref ref="GAPS-FRM-MEC-603 Screwplate 46 Assy, Frame"/>
+        <position name="P-GAPS-FRM-MEC-603 Screwplate 46 Assy, Frame29" unit="mm" x="-666.7499999999999" y="-114.29999999999995" z="-1092.073"/>
+        <rotation name="R-GAPS-FRM-MEC-603 Screwplate 46 Assy, Frame21" unit="deg" x="180.0" z="-180.0"/>
+      </physvol>
+      <physvol name="av_17_impr_1_GAPS-FRM-MEC-603 Screwplate 46 Assy, Frame001_pv_7">
+        <volumeref ref="GAPS-FRM-MEC-603 Screwplate 46 Assy, Frame001"/>
+        <position name="P-GAPS-FRM-MEC-603 Screwplate 46 Assy, Frame00130" unit="mm" x="-666.7499999999999" y="-114.29999999999998" z="1092.0729999999996"/>
+        <rotationref ref="identity"/>
+      </physvol>
+      <physvol name="av_17_impr_1_GAPS-FRM-MEC-603 Screwplate 46 Assy, Frame002_pv_8">
+        <volumeref ref="GAPS-FRM-MEC-603 Screwplate 46 Assy, Frame002"/>
+        <position name="P-GAPS-FRM-MEC-603 Screwplate 46 Assy, Frame00231" unit="mm" x="666.7499999999999" y="-114.29999999999998" z="-1092.073"/>
+        <rotation name="R-GAPS-FRM-MEC-603 Screwplate 46 Assy, Frame00222" unit="deg" x="180.0" z="-180.0"/>
+      </physvol>
+      <physvol name="av_17_impr_1_GAPS-FRM-MEC-603 Screwplate 46 Assy, Frame003_pv_9">
+        <volumeref ref="GAPS-FRM-MEC-603 Screwplate 46 Assy, Frame003"/>
+        <position name="P-GAPS-FRM-MEC-603 Screwplate 46 Assy, Frame00332" unit="mm" x="666.7499999999999" y="-114.29999999999998" z="1092.0729999999996"/>
+        <rotationref ref="identity"/>
+      </physvol>
+      <physvol name="av_17_impr_1_GAPS-TKR-MEC-150 cabel relief, SOL side_pv_10">
+        <volumeref ref="GAPS-TKR-MEC-150 cabel relief, SOL side"/>
+        <position name="P-GAPS-TKR-MEC-150 cabel relief, SOL side33" unit="mm" y="-9.52499999999841" z="1088.8980000000013"/>
+        <rotationref ref="identity"/>
+      </physvol>
+    </assembly>
+    <assembly name="Achim - Tracker Frame">
+      <physvol name="PV_GAPS-FRM-MEC-000 Frame Assy, E-bay, GAPS">
+        <volumeref ref="GAPS-FRM-MEC-000 Frame Assy, E-bay, GAPS"/>
+        <positionref ref="center"/>
+        <rotationref ref="identity"/>
+      </physvol>
+      <physvol name="PV_GAPS-FRM-MEC-500 Frame Assy, Upper, GAPS">
+        <volumeref ref="GAPS-FRM-MEC-500 Frame Assy, Upper, GAPS"/>
+        <positionref ref="center"/>
+        <rotationref ref="identity"/>
+      </physvol>
+      <physvol name="PV_GAPS-TKR-MEC-600 Frame Assy, Tracker">
+        <volumeref ref="GAPS-TKR-MEC-600 Frame Assy, Tracker"/>
+        <position name="P-GAPS-TKR-MEC-600 Frame Assy, Tracker34" unit="mm" x="-3.713392440762853e-14" y="-38.4809999999995" z="0.05080000000023954"/>
+        <rotationref ref="identity"/>
+      </physvol>
+    </assembly>
+  </structure>
+  <setup name="Default" version="1.0">
+    <world ref="Achim - Tracker Frame"/>
+  </setup>
+</gdml>

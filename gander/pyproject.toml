@@ -19,23 +19,26 @@ dependencies = [
     "polars>=1.31.0",
     "cmocean>=4.0.3",
     "tomli-w>=1.2.0",
+    "pyvista>=0.46.3",
+    "stpyvista>=0.1.4",
+    "gondola>=0.12",
 ]
 readme = "README.md"
-requires-python = ">= 3.8"
+requires-python = ">= 3.11"
 
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+#[build-system]
+#requires = ["hatchling"]
+#build-backend = "hatchling.build"
+#
+#[tool.rye]
+#managed = true
+#dev-dependencies = []
+#
+[projects.scripts]
+gander = "streamlit run gander.py --server.headless true --server.port 8080"
 
-[tool.rye]
-managed = true
-dev-dependencies = []
-
-[tool.rye.scripts]
-gander = "streamlit run gander.py --server.headless true --server.port 8502"
-
-[tool.hatch.metadata]
-allow-direct-references = true
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/gander"]
+#[tool.hatch.metadata]
+#allow-direct-references = true
+#
+#[tool.hatch.build.targets.wheel]
+#packages = ["src/gander"]

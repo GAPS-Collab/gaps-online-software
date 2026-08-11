@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+  <define>
+    <rotation name="identity" x="0" y="0" z="0"/>
+  </define>
+  <materials/>
+  <solids/>
+  <structure>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy001"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy002"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy003"/>
+    <assembly name="GAPS-TKR-MEC-151 cabel relief, NBoom side"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy004"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy005"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy006"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy007"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy008"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy009"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy010"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy011"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy012"/>
+    <assembly name="TOF-PAN-132 10PP cable relief bracket assy013"/>
+    <assembly name="GAPS-FRM-MEC-500 Frame Assy, Upper, GAPS">
+      <physvol name="PV_TOF-PAN-132 10PP cable relief bracket assy">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy1" unit="mm" x="-568.3249999999" y="-177.93335" z="1120.6988"/>
+        <rotation name="R-TOF-PAN-132 10PP cable relief bracket assy1" unit="deg" y="-90.0"/>
+      </physvol>
+      <physvol name="PV_TOF-PAN-132 10PP cable relief bracket assy001">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy001"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy0012" unit="mm" x="-1101.6488" y="-177.93335" z="568.325"/>
+        <rotationref ref="identity"/>
+      </physvol>
+      <physvol name="PV_TOF-PAN-132 10PP cable relief bracket assy002">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy002"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy0023" unit="mm" x="-568.325" y="1467.05955" z="1120.6988"/>
+        <rotation name="R-TOF-PAN-132 10PP cable relief bracket assy0022" unit="deg" x="-126.86285649158428" y="90.0" z="53.13714350841571"/>
+      </physvol>
+      <physvol name="PV_TOF-PAN-132 10PP cable relief bracket assy003">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy003"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy0034" unit="mm" x="-1101.6488" y="1467.05955" z="568.325"/>
+        <rotation name="R-TOF-PAN-132 10PP cable relief bracket assy0033" unit="deg" x="179.99999999999991"/>
+      </physvol>
+      <physvol name="PV_GAPS-TKR-MEC-151 cabel relief, NBoom side">
+        <volumeref ref="GAPS-TKR-MEC-151 cabel relief, NBoom side"/>
+        <position name="P-GAPS-TKR-MEC-151 cabel relief, NBoom side5" unit="mm" x="1015.9238" y="-160.3375" z="1.110223024625e-13"/>
+        <rotationref ref="identity"/>
+      </physvol>
+      <physvol name="PV_TOF-PAN-132 10PP cable relief bracket assy004">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy004"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy0046" unit="mm" x="568.32499999999" y="-177.93335" z="1120.6988"/>
+        <rotation name="R-TOF-PAN-132 10PP cable relief bracket assy0044" unit="deg" y="-90.0"/>
+      </physvol>
+      <physvol name="PV_TOF-PAN-132 10PP cable relief bracket assy005">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy005"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy0057" unit="mm" x="568.32499999999" y="-177.93335" z="-1120.6988"/>
+        <rotation name="R-TOF-PAN-132 10PP cable relief bracket assy0055" unit="deg" y="-90.0"/>
+      </physvol>
+      <physvol name="PV_TOF-PAN-132 10PP cable relief bracket assy006">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy006"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy0068" unit="mm" x="-568.3249999999" y="-177.93335" z="-1120.6988"/>
+        <rotation name="R-TOF-PAN-132 10PP cable relief bracket assy0066" unit="deg" y="-90.0"/>
+      </physvol>
+      <physvol name="PV_TOF-PAN-132 10PP cable relief bracket assy007">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy007"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy0079" unit="mm" x="-1101.6488" y="-177.93335" z="-568.325"/>
+        <rotationref ref="identity"/>
+      </physvol>
+      <physvol name="PV_TOF-PAN-132 10PP cable relief bracket assy008">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy008"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy00810" unit="mm" x="568.325" y="1467.05955" z="1120.6988"/>
+        <rotation name="R-TOF-PAN-132 10PP cable relief bracket assy0087" unit="deg" x="52.77573692591539" y="90.0" z="-127.22426307408462"/>
+      </physvol>
+      <physvol name="PV_TOF-PAN-132 10PP cable relief bracket assy009">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy009"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy00911" unit="mm" x="1101.6488" y="1467.05955" z="568.325"/>
+        <rotation name="R-TOF-PAN-132 10PP cable relief bracket assy0098" unit="deg" x="-7.847540028925442e-14" z="-180.0"/>
+      </physvol>
+      <physvol name="PV_TOF-PAN-132 10PP cable relief bracket assy010">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy010"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy01012" unit="mm" x="-1101.6488" y="1467.05955" z="-568.325"/>
+        <rotation name="R-TOF-PAN-132 10PP cable relief bracket assy0109" unit="deg" x="-179.99999999999991"/>
+      </physvol>
+      <physvol name="PV_TOF-PAN-132 10PP cable relief bracket assy011">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy011"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy01113" unit="mm" x="-568.325" y="1467.05955" z="-1120.6988"/>
+        <rotation name="R-TOF-PAN-132 10PP cable relief bracket assy01110" unit="deg" x="-52.77573692591539" y="90.0" z="127.22426307408459"/>
+      </physvol>
+      <physvol name="PV_TOF-PAN-132 10PP cable relief bracket assy012">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy012"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy01214" unit="mm" x="568.325" y="1467.05955" z="-1120.6988"/>
+        <rotation name="R-TOF-PAN-132 10PP cable relief bracket assy01211" unit="deg" x="127.22426307408462" y="90.0" z="-52.77573692591538"/>
+      </physvol>
+      <physvol name="PV_TOF-PAN-132 10PP cable relief bracket assy013">
+        <volumeref ref="TOF-PAN-132 10PP cable relief bracket assy013"/>
+        <position name="P-TOF-PAN-132 10PP cable relief bracket assy01315" unit="mm" x="1101.6488" y="1467.05955" z="-568.325"/>
+        <rotation name="R-TOF-PAN-132 10PP cable relief bracket assy01312" unit="deg" x="7.847540028925442e-14" z="-180.0"/>
+      </physvol>
+    </assembly>
+  </structure>
+  <setup name="Default" version="1.0">
+    <world ref="GAPS-FRM-MEC-500 Frame Assy, Upper, GAPS"/>
+  </setup>
+</gdml>

@@ -1,0 +1,53 @@
+[project]
+name            = 'gondola'
+dynamic         = ['version']
+description     = "GAPS Online and Offline Analysis software"
+authors         = [{ name = "J.A.Stoessl, G.Tytus", email = "stoessl@hawaii.edu" }]
+readme          = "README.md"
+license         = { text = "GPLV3" }
+requires-python = ">=3.11"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Physics"
+]
+
+dependencies = [
+    "tqdm>=4.0",
+    "numpy>=2.3",
+    "matplotlib>=3.10",
+    "charmingbeauty>=0.1",
+    "pydashi>=2",
+    "cmocean>=4",
+    "loguru>=0.7",
+    "vtk>=9",
+    "iminuit>=2",
+    "polars>=1.33",
+    "pyzmq>=27",
+    "twine>=6.2.0",
+    "HErmes-py>=0.2.0",
+    "fancy-dataclass>=0.10.2",
+]
+
+[build-system]
+requires      = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project.urls]
+Homepage   = "https://github.com/GAPS-Collab/gaps-online-software"
+Repository = "https://github.com/GAPS-Collab/gaps-online-software" 
+Documentation = "https://gaps-collab.github.io/gaps-online-software/" 
+
+[tool.maturin]
+# "extension-module" tells pyo3 we want to build an extension module (skips linking against libpython.so)
+#features     = ["pyo3/extension-module"]
+#all-features  = true
+features      = ["random","database","advanced-algorithms","pybindings","tof-liftof"]
+module-name   = "gondola.gondola_core"
+#python-source = "."
+python-source = "python"
+
+

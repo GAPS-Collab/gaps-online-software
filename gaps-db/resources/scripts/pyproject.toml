@@ -1,0 +1,33 @@
+[project]
+name = "scripts"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "Achim Stoessl", email = "achim.stoessl@gmail.com" }
+]
+dependencies = [
+    "django>=5.1.1",
+    "polars>=1.6.0",
+    "numpy>=2.1.1",
+    "fastexcel>=0.11.6",
+    "matplotlib>=3.9.2",
+    "ipython>=9.0.2",
+    "tqdm>=4.67.1",
+    "gondola>=0.12"
+]
+readme = "README.md"
+requires-python = ">= 3.13"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = []
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/scripts"]
