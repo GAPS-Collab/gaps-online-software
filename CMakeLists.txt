@@ -45,9 +45,9 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 endif()
 
 message(STATUS "Installing into ${CMAKE_INSTALL_PREFIX}")
-option(BUILD_CXX_BINDINGS "build C++ implementation of gondola-core" OFF)
+option(BUILD_CXX_BINDINGS "build C++ implementation of gondola-core" ON)
 option(BUILD_CXX_STATIC_LIB "build C++ implementation of gondola-core (static library - this is ONLY used for the gondola_cxx pybindings! and usually should be OFF)" OFF)
-option(BUILD_CXX_DB "Build C++ bindings with SQLITE3 to access GAPS DB. Requires SQlite3 installed" OFF) 
+option(BUILD_CXX_DB "Build C++ bindings with SQLITE3 to access GAPS DB. Requires SQlite3 installed" ON) 
 option(BUILD_CXX_EXAMPLES "build C++ examples to illustrate usage of the GondolaCore C++ library" OFF)
 option(BUILD_CXX_PERSONAL_ANALYSIS_CODE "builds personal analysis code in the analysis/ directory. This includes e.g. Jeff's TOF code. This might require the (CERN) ROOT library, so BUILD_CXX_WITH_ROOT needs to be switched on" OFF)
 # ROOT can be optionally used for the C++ bindings. This will allow to build the 
