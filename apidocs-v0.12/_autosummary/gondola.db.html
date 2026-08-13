@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>gondola.db &#8212; gondola 0.12.32 documentation</title>
+    <title>gondola.db &#8212; gondola 0.12.33 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=85ff5aa0"></script>
+    <script src="../_static/documentation_options.js?v=788f65e6"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_autosummary/gondola.db';</script>
@@ -117,7 +117,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.12.32 documentation</p>
+    <p class="title logo__title">gondola 0.12.33 documentation</p>
   
 </a></div>
     
@@ -370,58 +370,61 @@ detector status data</p>
 <p class="rubric">Functions</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_trk_cali_tw_table</span></code>(db_path, ...)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_tof_paddle_temp_table</span></code>(db_path, ...)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.create_trk_gain_table" title="gondola.db.create_trk_gain_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_trk_gain_table</span></code></a>(db_path, gains)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_trk_cali_tw_table</span></code>(db_path, ...)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.create_trk_mask_table" title="gondola.db.create_trk_mask_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_trk_mask_table</span></code></a>(db_path, masks)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.create_trk_gain_table" title="gondola.db.create_trk_gain_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_trk_gain_table</span></code></a>(db_path, gains)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.create_trk_pedestal_table" title="gondola.db.create_trk_pedestal_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_trk_pedestal_table</span></code></a>(db_path, pedestals)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.create_trk_mask_table" title="gondola.db.create_trk_mask_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_trk_mask_table</span></code></a>(db_path, masks)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.create_trk_pulse_table" title="gondola.db.create_trk_pulse_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_trk_pulse_table</span></code></a>(db_path, pulses)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.create_trk_pedestal_table" title="gondola.db.create_trk_pedestal_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_trk_pedestal_table</span></code></a>(db_path, pedestals)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.create_trk_transfer_fn_table" title="gondola.db.create_trk_transfer_fn_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_trk_transfer_fn_table</span></code></a>(db_path, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.create_trk_pulse_table" title="gondola.db.create_trk_pulse_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_trk_pulse_table</span></code></a>(db_path, pulses)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.get_all_pbids_in_db" title="gondola.db.get_all_pbids_in_db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_all_pbids_in_db</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.create_trk_transfer_fn_table" title="gondola.db.create_trk_transfer_fn_table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_trk_transfer_fn_table</span></code></a>(db_path, ...)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.get_all_rbids_in_db" title="gondola.db.get_all_rbids_in_db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_all_rbids_in_db</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.get_all_pbids_in_db" title="gondola.db.get_all_pbids_in_db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_all_pbids_in_db</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.get_all_rbids_in_db" title="gondola.db.get_all_rbids_in_db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_all_rbids_in_db</span></code></a>()</p></td>
 <td><p>Get all rb ids from paddles which are stored in the  database</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.get_dsi_j_ch_pid_map" title="gondola.db.get_dsi_j_ch_pid_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_dsi_j_ch_pid_map</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.get_dsi_j_ch_pid_map" title="gondola.db.get_dsi_j_ch_pid_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_dsi_j_ch_pid_map</span></code></a>()</p></td>
 <td><p>Create a mapping of DSI/J(LTB) -&gt; PaddleID</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_hid_vid_maps</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_hid_vid_maps</span></code>()</p></td>
 <td><p>Map the detector ids (&quot;hardware&quot; ids) to volume ids as used in the  simulation</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rbid_pbchannel_pid_map</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rbid_pbchannel_pid_map</span></code>()</p></td>
 <td><p>Create a mapping of RB/PB Channel -&gt; PaddleID</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rbids_for_pbid</span></code>(pbid)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_rbids_for_pbid</span></code>(pbid)</p></td>
 <td><p>Get a mapping of which pb controls paddles connected to which RB</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.get_tof_cbe_paddles" title="gondola.db.get_tof_cbe_paddles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_tof_cbe_paddles</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.get_tof_cbe_paddles" title="gondola.db.get_tof_cbe_paddles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_tof_cbe_paddles</span></code></a>()</p></td>
 <td><p>All paddles which are in the Umbrella</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.get_tof_cor_paddles" title="gondola.db.get_tof_cor_paddles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_tof_cor_paddles</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.get_tof_cor_paddles" title="gondola.db.get_tof_cor_paddles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_tof_cor_paddles</span></code></a>()</p></td>
 <td><p>All paddles which are in the Cortina</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.get_tof_umb_paddles" title="gondola.db.get_tof_umb_paddles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_tof_umb_paddles</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.get_tof_umb_paddles" title="gondola.db.get_tof_umb_paddles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_tof_umb_paddles</span></code></a>()</p></td>
 <td><p>All paddles which are in the Umbrella</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_vid_hid_maps</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_vid_hid_maps</span></code>()</p></td>
 <td><p>Map the volume id as it is used in the simulation to the actual  (&quot;hardware&quot;) detector ids</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_in_tracker_cali_window</span></code>(ts, cali_windows)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_in_tracker_cali_window</span></code>(ts, cali_windows)</p></td>
 <td><p>Check if the given (unix) time is within a calibration  time window for the tracker</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_calibration_db_elena</span></code>(db_path[, cali_ftype])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_calibration_db_elena</span></code>(db_path[, cali_ftype])</p></td>
 <td><p>This loads the calbration DB for SimpleDet as provided by Elena  and INFN.</p></td>
 </tr>
 </tbody>
@@ -436,37 +439,40 @@ detector status data</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.TofPaddle" title="gondola.db.TofPaddle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofPaddle</span></code></a>()</p></td>
 <td><p>A single TOF paddle with 2 ends comnected</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.TofPaddleTimingConstant" title="gondola.db.TofPaddleTimingConstant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofPaddleTimingConstant</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofPaddleTemp</span></code>()</p></td>
+<td><p>Recorded Temperature of each paddle end.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.TofPaddleTimingConstant" title="gondola.db.TofPaddleTimingConstant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TofPaddleTimingConstant</span></code></a>()</p></td>
 <td><p>Masking of unusable strips as curated by the tracker team</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerCaliTimeWindow</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerCaliTimeWindow</span></code>()</p></td>
 <td><p>Tracker calibrations were conducted on several ocasions during  the flight.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerCalibrationFile</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerCalibrationFile</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerCalibrationFileType</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerCalibrationFileType</span></code>()</p></td>
 <td><p>Describe the contents of a byte sequence (&quot;packet&quot;) typicially  crafted for telemetry.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.TrackerStrip" title="gondola.db.TrackerStrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerStrip</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.TrackerStrip" title="gondola.db.TrackerStrip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerStrip</span></code></a>()</p></td>
 <td><p>A single Tracker strip</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.TrackerStripCmnNoise" title="gondola.db.TrackerStripCmnNoise"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerStripCmnNoise</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.TrackerStripCmnNoise" title="gondola.db.TrackerStripCmnNoise"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerStripCmnNoise</span></code></a>()</p></td>
 <td><p>Common noise subtraction - pulse channels on the wafers and get the average adc.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.TrackerStripGain" title="gondola.db.TrackerStripGain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerStripGain</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.TrackerStripGain" title="gondola.db.TrackerStripGain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerStripGain</span></code></a>()</p></td>
 <td><p>Common noise subtraction - pulse channels on the wafers and get the average adc.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.TrackerStripMask" title="gondola.db.TrackerStripMask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerStripMask</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.TrackerStripMask" title="gondola.db.TrackerStripMask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerStripMask</span></code></a>()</p></td>
 <td><p>Masking of unusable strips as curated by the tracker team</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.TrackerStripPedestal" title="gondola.db.TrackerStripPedestal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerStripPedestal</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.TrackerStripPedestal" title="gondola.db.TrackerStripPedestal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerStripPedestal</span></code></a>()</p></td>
 <td><p>Measurement of tracker pedestal values for each strip</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.TrackerStripPulse" title="gondola.db.TrackerStripPulse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerStripPulse</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.TrackerStripPulse" title="gondola.db.TrackerStripPulse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerStripPulse</span></code></a>()</p></td>
 <td><p>Common noise subtraction - pulse channels on the wafers and get the average adc.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#gondola.db.TrackerStripTransferFunction" title="gondola.db.TrackerStripTransferFunction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerStripTransferFunction</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#gondola.db.TrackerStripTransferFunction" title="gondola.db.TrackerStripTransferFunction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TrackerStripTransferFunction</span></code></a>()</p></td>
 <td><p>Tracker transfer functions connect the tracker adc to a measurement of energy</p></td>
 </tr>
 </tbody>

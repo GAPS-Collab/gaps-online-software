@@ -1,7 +1,7 @@
 var searchData=
 [
   ['active_0',['active',['../structgondola_1_1TrackerStripMask.html#acc288609b461cb708f940e0985bbab91',1,'gondola::TrackerStripMask']]],
-  ['adc_1',['adc',['../structgondola_1_1RBEvent.html#abf95a887ae0756207426180718583624',1,'gondola::RBEvent::adc'],['../structgondola_1_1TrkHit.html#aeeba12ee28854810dcc9ecb2dcde1f1e',1,'gondola::TrkHit::adc'],['../structgondola_1_1TrkCalibratedHit.html#af2da95799454a387f18105568d223935',1,'gondola::TrkCalibratedHit::adc']]],
+  ['adc_1',['adc',['../structgondola_1_1RBEvent.html#abf95a887ae0756207426180718583624',1,'gondola::RBEvent::adc'],['../structgondola_1_1TrkCalibratedHit.html#af2da95799454a387f18105568d223935',1,'gondola::TrkCalibratedHit::adc'],['../structgondola_1_1TrkHit.html#aeeba12ee28854810dcc9ecb2dcde1f1e',1,'gondola::TrkHit::adc']]],
   ['adc_5fa_2',['adc_a',['../structgondola_1_1RBWaveform.html#a593a5a66ed29068cabae6374504aef4c',1,'gondola::RBWaveform']]],
   ['adc_5favdd_5fcurrent_3',['adc_avdd_current',['../structRBMoniData.html#aaa3ab0ffa3f670681b2771df183875f2',1,'RBMoniData']]],
   ['adc_5favdd_5fpower_4',['adc_avdd_power',['../structRBMoniData.html#a95b37a3957b630fb227f6f83f39bc848',1,'RBMoniData']]],

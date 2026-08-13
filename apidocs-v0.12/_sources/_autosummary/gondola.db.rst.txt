@@ -8,6 +8,7 @@ gondola.db
 
    .. autosummary::
    
+      create_tof_paddle_temp_table
       create_trk_cali_tw_table
       create_trk_gain_table
       create_trk_mask_table
@@ -33,6 +34,7 @@ gondola.db
    
       ReadoutBoard
       TofPaddle
+      TofPaddleTemp
       TofPaddleTimingConstant
       TrackerCaliTimeWindow
       TrackerCalibrationFile

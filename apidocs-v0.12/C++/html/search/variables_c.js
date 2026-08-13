@@ -8,5 +8,5 @@ var searchData=
   ['mb_5ftemp_5',['mb_temp',['../structCPUMoniData.html#aabb18ce0d1033963eb34cddfc70f8851',1,'CPUMoniData']]],
   ['mbytes_5fper_5ffile_6',['mbytes_per_file',['../structgondola_1_1CRWriter.html#ab44d769e86a20e640a228d1a617fb1bc',1,'gondola::CRWriter']]],
   ['mtb_5flink_5fid_7',['mtb_link_id',['../structgondola_1_1TofPaddle.html#a0db53fd960807fa52fb8b7df9aa00369',1,'gondola::TofPaddle']]],
-  ['mtb_5flink_5fmask_8',['mtb_link_mask',['../structgondola_1_1TofEventSummary.html#aa9e34dff102d7922f57c7bfb02de1010',1,'gondola::TofEventSummary::mtb_link_mask'],['../structgondola_1_1TofEvent.html#ae9026f0e498aa7b24847862c1f5a6851',1,'gondola::TofEvent::mtb_link_mask']]]
+  ['mtb_5flink_5fmask_8',['mtb_link_mask',['../structgondola_1_1TofEvent.html#ae9026f0e498aa7b24847862c1f5a6851',1,'gondola::TofEvent::mtb_link_mask'],['../structgondola_1_1TofEventSummary.html#aa9e34dff102d7922f57c7bfb02de1010',1,'gondola::TofEventSummary::mtb_link_mask']]]
 ];

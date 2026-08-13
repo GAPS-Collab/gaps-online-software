@@ -7,7 +7,7 @@ var searchData=
   ['file_5fpath_4',['file_path',['../structgondola_1_1CRWriter.html#acdc9580d289affaeb43a18e72b088365',1,'gondola::CRWriter']]],
   ['file_5ftimestamp_5',['file_timestamp',['../structgondola_1_1CRWriter.html#a78cbb24dbb99b30289c51ac61ca8a5e8',1,'gondola::CRWriter']]],
   ['flags0_6',['flags0',['../structgondola_1_1TelemetryEvent.html#a3280f397f70eae02f09c508951f74963',1,'gondola::TelemetryEvent']]],
-  ['flags1_7',['flags1',['../structgondola_1_1TrkEvent.html#a29d3c5bbb0127be3dd90e9c8de90ca13',1,'gondola::TrkEvent::flags1'],['../structgondola_1_1TelemetryEvent.html#a675ada8e83e8810bc68089b07123d3db',1,'gondola::TelemetryEvent::flags1']]],
+  ['flags1_7',['flags1',['../structgondola_1_1TelemetryEvent.html#a675ada8e83e8810bc68089b07123d3db',1,'gondola::TelemetryEvent::flags1'],['../structgondola_1_1TrkEvent.html#a29d3c5bbb0127be3dd90e9c8de90ca13',1,'gondola::TrkEvent::flags1']]],
   ['fpga_5fboard_5fi_5fin_8',['fpga_board_i_in',['../structgondola_1_1Cooling.html#a6b5842f1211dd0816572cb458d43f7ae',1,'gondola::Cooling']]],
   ['fpga_5fboard_5fp_9',['fpga_board_p',['../structgondola_1_1Cooling.html#a2d0ddf12cdbe5456fd602565b17e3e81',1,'gondola::Cooling']]],
   ['fpga_5fboard_5ft_10',['fpga_board_t',['../structgondola_1_1Cooling.html#a637fa3bfd654af0028991a3495dda164',1,'gondola::Cooling']]],

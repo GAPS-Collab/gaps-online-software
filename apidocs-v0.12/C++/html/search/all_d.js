@@ -13,7 +13,7 @@ var searchData=
   ['monitoring_2ecxx_10',['monitoring.cxx',['../monitoring_8cxx.html',1,'']]],
   ['monitoring_2eh_11',['monitoring.h',['../monitoring_8h.html',1,'']]],
   ['mtb_5flink_5fid_12',['mtb_link_id',['../structgondola_1_1TofPaddle.html#a0db53fd960807fa52fb8b7df9aa00369',1,'gondola::TofPaddle']]],
-  ['mtb_5flink_5fmask_13',['mtb_link_mask',['../structgondola_1_1TofEvent.html#ae9026f0e498aa7b24847862c1f5a6851',1,'gondola::TofEvent::mtb_link_mask'],['../structgondola_1_1TofEventSummary.html#aa9e34dff102d7922f57c7bfb02de1010',1,'gondola::TofEventSummary::mtb_link_mask']]],
+  ['mtb_5flink_5fmask_13',['mtb_link_mask',['../structgondola_1_1TofEventSummary.html#aa9e34dff102d7922f57c7bfb02de1010',1,'gondola::TofEventSummary::mtb_link_mask'],['../structgondola_1_1TofEvent.html#ae9026f0e498aa7b24847862c1f5a6851',1,'gondola::TofEvent::mtb_link_mask']]],
   ['mtbmoni_14',['MTBMoni',['../tof__packet_8h.html#aa69433dde428a8cd2a2242fb3592a565ad7a28d6ab27c3c5981ed8ec8b27c2fd5',1,'tof_packet.h']]],
   ['mtbmonidata_15',['mtbmonidata',['../structMtbMoniData.html#a29bb45ae96b1920aca3fc2c212e3c3af',1,'MtbMoniData::MtbMoniData()'],['../structMtbMoniData.html',1,'MtbMoniData']]]
 ];

@@ -12,13 +12,15 @@ Tof event classes.
 {\ttfamily \#include "{}tof\+\_\+typedefs.\+h"{}}\newline
 {\ttfamily \#include "{}packets/monitoring.\+h"{}}\newline
 {\ttfamily \#include "{}packets/tof\+\_\+packet.\+h"{}}\newline
+{\ttfamily \#include "{}events/event\+\_\+status.\+hpp"{}}\newline
 {\ttfamily \#include "{}events/rb\+\_\+event\+\_\+header.\+hpp"{}}\newline
 {\ttfamily \#include "{}events/tof\+\_\+hit.\+hpp"{}}\newline
 {\ttfamily \#include "{}events/rb\+\_\+event.\+hpp"{}}\newline
-{\ttfamily \#include "{}events/event\+\_\+status.\+hpp"{}}\newline
 {\ttfamily \#include "{}events/event\+\_\+quality.\+hpp"{}}\newline
 {\ttfamily \#include "{}events/rb\+\_\+waveform.\+hpp"{}}\newline
 {\ttfamily \#include "{}events/tof\+\_\+event.\+hpp"{}}\newline
+{\ttfamily \#include "{}events/tof\+\_\+event\+\_\+summary.\+hpp"{}}\newline
+{\ttfamily \#include "{}events/telemetry\+\_\+event.\+hpp"{}}\newline
 {\ttfamily \#include "{}calibration.\+h"{}}\newline
 {\ttfamily \#include "{}version.\+h"{}}\newline
 {\ttfamily \#include "{}errors.\+hpp"{}}\newline
@@ -38,11 +40,6 @@ This graph shows which files directly or indirectly include this file\+:
 \includegraphics[width=350pt]{events_8h__dep__incl}
 \end{center}
 \end{figure}
-\doxysubsubsection*{Classes}
-\begin{DoxyCompactItemize}
-\item 
-struct \mbox{\hyperlink{structgondola_1_1TofEventSummary}{gondola\+::\+Tof\+Event\+Summary}}
-\end{DoxyCompactItemize}
 \doxysubsubsection*{Namespaces}
 \begin{DoxyCompactItemize}
 \item 
@@ -70,8 +67,6 @@ enum class \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84d}{
 \begin{DoxyCompactItemize}
 \item 
 std\+::ostream \& \mbox{\hyperlink{namespacegondola_a9086a1522bf1269d1824786811a08141}{gondola\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84d}{gondola\+::\+Compression\+Level}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{level}})
-\item 
-std\+::ostream \& \mbox{\hyperlink{namespacegondola_ad142b09b980b0577047b677bd0750252}{gondola\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1TofEventSummary}{gondola\+::\+Tof\+Event\+Summary}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{tes}})
 \end{DoxyCompactItemize}
 
 

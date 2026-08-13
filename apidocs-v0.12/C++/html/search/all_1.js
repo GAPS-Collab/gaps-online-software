@@ -3,7 +3,7 @@ var searchData=
   ['a_0',['A',['../namespacegondola.html#a044b95c22747f96dac042c1b3bcacf77a7fc56270e7a70fa81a5935b72eacbe29',1,'gondola']]],
   ['ack_1',['Ack',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39cedab25d8b2099e52bb9300aca6661601b8b',1,'gondola']]],
   ['active_2',['active',['../structgondola_1_1TrackerStripMask.html#acc288609b461cb708f940e0985bbab91',1,'gondola::TrackerStripMask']]],
-  ['adc_3',['adc',['../structgondola_1_1RBEvent.html#abf95a887ae0756207426180718583624',1,'gondola::RBEvent::adc'],['../structgondola_1_1TrkHit.html#aeeba12ee28854810dcc9ecb2dcde1f1e',1,'gondola::TrkHit::adc'],['../structgondola_1_1TrkCalibratedHit.html#af2da95799454a387f18105568d223935',1,'gondola::TrkCalibratedHit::adc']]],
+  ['adc_3',['adc',['../structgondola_1_1RBEvent.html#abf95a887ae0756207426180718583624',1,'gondola::RBEvent::adc'],['../structgondola_1_1TrkCalibratedHit.html#af2da95799454a387f18105568d223935',1,'gondola::TrkCalibratedHit::adc'],['../structgondola_1_1TrkHit.html#aeeba12ee28854810dcc9ecb2dcde1f1e',1,'gondola::TrkHit::adc']]],
   ['adc_5fa_4',['adc_a',['../structgondola_1_1RBWaveform.html#a593a5a66ed29068cabae6374504aef4c',1,'gondola::RBWaveform']]],
   ['adc_5favdd_5fcurrent_5',['adc_avdd_current',['../structRBMoniData.html#aaa3ab0ffa3f670681b2771df183875f2',1,'RBMoniData']]],
   ['adc_5favdd_5fpower_6',['adc_avdd_power',['../structRBMoniData.html#a95b37a3957b630fb227f6f83f39bc848',1,'RBMoniData']]],

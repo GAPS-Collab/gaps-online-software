@@ -2,5 +2,56 @@
 \hypertarget{telemetry__event_8hpp_source}{}\label{telemetry__event_8hpp_source}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/events/telemetry\_event.hpp@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/events/telemetry\_event.hpp}}
 \mbox{\hyperlink{telemetry__event_8hpp}{Go to the documentation of this file.}}
 \begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#pragma\ once\ }}
+\DoxyCodeLine{00005\ }
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ "{}result/result.h"{}}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tof__typedefs_8h}{tof\_typedefs.h}}"{}}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{errors_8hpp}{errors.hpp}}"{}}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{version_8h}{version.h}}"{}}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{event__status_8hpp}{events/event\_status.hpp}}"{}}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{event__quality_8hpp}{events/event\_quality.hpp}}"{}}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{trigger_8hpp}{events/trigger.hpp}}"{}}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tracker__hit_8hpp}{events/tracker\_hit.hpp}}"{}}}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tracker__event_8hpp}{events/tracker\_event.hpp}}"{}}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tof__event__summary_8hpp}{events/tof\_event\_summary.hpp}}"{}}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tracker__meta_8hpp}{events/tracker\_meta.hpp}}"{}}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tof__meta_8hpp}{events/tof\_meta.hpp}}"{}}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tof__packet_8h}{packets/tof\_packet.h}}"{}}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{telemetry__packet_8hpp}{packets/telemetry\_packet.hpp}}"{}}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{database_8h}{database.h}}"{}}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacegondola}{gondola}}\ \{}
+\DoxyCodeLine{00024\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structgondola_1_1TelemetryEvent}{TelemetryEvent}}\ \{}
+\DoxyCodeLine{00025\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryPacketHeader}{TelemetryPacketHeader}}\ \mbox{\hyperlink{structgondola_1_1TelemetryEvent_aeea7ea2452b34c0a4e715f198f801ffe}{header}}\ \ \ =\ \mbox{\hyperlink{structgondola_1_1TelemetryPacketHeader}{TelemetryPacketHeader}}();}
+\DoxyCodeLine{00026\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryEvent_aac36a9f8a68d798a7d7baa889660f1c3}{version}}\ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00027\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a3280f397f70eae02f09c508951f74963}{flags0}}\ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00028\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a675ada8e83e8810bc68089b07123d3db}{flags1}}\ \ \ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00029\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u8>}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a0fe3025c15921b47dff7a701fd1413ae}{row\_flags}}\ \ \ \ \ \ =\ \{\};}
+\DoxyCodeLine{00030\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a702b3e3b82ee020f57cd2c692677abd4}{creation\_time}}\ \ =\ 0;}
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryEvent_ade7af5914399f3bf63c46d20d2a1f59e}{event\_id}}\ \ \ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a1c605f615168d231eb789987e770d934}{n\_tof\_hits}}\ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}}\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a3f24ad42c6a1ebc1835b9ef96fcc8e08}{n\_trk\_hits}}\ \ \ \ \ =\ 0;}
+\DoxyCodeLine{00034\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<TrkEvent>}}\ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryEvent_af466059d0e78dff3afa38564fff33442}{tracker\_events}}\ =\ \{\};\ \ }
+\DoxyCodeLine{00035\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<TrkHit>}}\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a8280aedcddbd7577c48ff7a8f0336fdb}{trk\_hits}}\ \ \ \ \ \ \ =\ \{\};}
+\DoxyCodeLine{00036\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TofEventSummary}{TofEventSummary}}\ \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a89623b54267194807666ac4c9de112c5}{tof\_event}}\ \ \ \ \ \ =\ \mbox{\hyperlink{structgondola_1_1TofEventSummary}{TofEventSummary}}();}
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u8>}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a8f4ba4a6fa3ec18da67415249a4286cc}{raw\_data}}\ \ \ \ \ \ \ =\ \{\};}
+\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TofMetaData}{TofMetaData}}\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a4d7c200e43e7a3e190cb975f103d90d7}{tof\_meta}};}
+\DoxyCodeLine{00039\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrkMetaData}{TrkMetaData}}\ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a2cf14fdcdc6c8e973b85913a7fd916ad}{tracker\_meta}};}
+\DoxyCodeLine{00040\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u64>}}\ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a4fa5ed8dacb20a2f3f008d26d224a564}{tracker\_oscillators}}\ =\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec<u64>}}(10,0)\ ;}
+\DoxyCodeLine{00041\ \ \ }
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1TelemetryEvent_ab63cf8fd14c7af05f4190aac42fc34d8}{to\_string}}()\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ -\/>\ std::\textcolor{keywordtype}{string};}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}}\ \mbox{\hyperlink{structgondola_1_1TelemetryEvent_a172a34f10a104c79cd12dfce20edb850}{from\_bytestream}}(\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}<\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}>\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{stream}},\ \mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}})}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{r}}::\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Result}}<\mbox{\hyperlink{structgondola_1_1TelemetryEvent}{TelemetryEvent}},\ \mbox{\hyperlink{classgondola_1_1IOError}{IOError}}>;}
+\DoxyCodeLine{00046\ \ \ \ \ }
+\DoxyCodeLine{00047\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}}\ \mbox{\hyperlink{structgondola_1_1TelemetryEvent_aec5eae35e2b2a9ff020237664971ddac}{from\_telemetrypacket}}(\mbox{\hyperlink{structgondola_1_1TelemetryPacket}{TelemetryPacket}}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{packet}})\ }
+\DoxyCodeLine{00048\ \ \ \ \ \ \ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{r}}::\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Result}}<\mbox{\hyperlink{structgondola_1_1TelemetryEvent}{TelemetryEvent}},\ \mbox{\hyperlink{classgondola_1_1IOError}{IOError}}>;}
+\DoxyCodeLine{00049\ \ \ \};\ \ }
+\DoxyCodeLine{00050\ \}}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ }
 
 \end{DoxyCode}

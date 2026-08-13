@@ -2,5 +2,31 @@
 \hypertarget{tracker__hit_8hpp_source}{}\label{tracker__hit_8hpp_source}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/events/tracker\_hit.hpp@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/events/tracker\_hit.hpp}}
 \mbox{\hyperlink{tracker__hit_8hpp}{Go to the documentation of this file.}}
 \begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once\ }}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tof__typedefs_8h}{tof\_typedefs.h}}"{}}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacegondola}{gondola}}\ \{}
+\DoxyCodeLine{00006\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structgondola_1_1TrkHit}{TrkHit}}\ \{}
+\DoxyCodeLine{00007\ \ \ \ \ \textcolor{comment}{//\ using\ i32\ here\ makes\ no\ sense\ in\ my\ eyes,\ but\ I\ defer\ to\ }}
+\DoxyCodeLine{00008\ \ \ \ \ \textcolor{comment}{//\ bfsw\ (\ I\ assume\ it\ is\ because\ of\ sqlite\ which\ does\ not\ know}}
+\DoxyCodeLine{00009\ \ \ \ \ \textcolor{comment}{//\ unsigned)\ }}
+\DoxyCodeLine{00010\ \ \ \ \ \textcolor{comment}{//\ FIXME\ -\/\ change\ this}}
+\DoxyCodeLine{00011\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a48d6cd8e4135fb2ff7e7f2dac84089ec}{i32}}\ \mbox{\hyperlink{structgondola_1_1TrkHit_a63b3d1cca6e54885361fb05ee9c544ce}{layer}}\ \ \ \ \ \ \ \ \ \ \ \{-\/1\};}
+\DoxyCodeLine{00012\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a48d6cd8e4135fb2ff7e7f2dac84089ec}{i32}}\ \mbox{\hyperlink{structgondola_1_1TrkHit_a6c5acdaeec0e5a1cef6ec1b8867b797a}{row}}\ \ \ \ \ \ \ \ \ \ \ \ \ \{-\/1\};}
+\DoxyCodeLine{00013\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a48d6cd8e4135fb2ff7e7f2dac84089ec}{i32}}\ \textcolor{keyword}{module}\ \ \ \ \ \ \ \ \ \ \{-\/1\};}
+\DoxyCodeLine{00014\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a48d6cd8e4135fb2ff7e7f2dac84089ec}{i32}}\ \mbox{\hyperlink{structgondola_1_1TrkHit_a4461756861f59f9a6464621b380f809b}{channel}}\ \ \ \ \ \ \ \ \ \{-\/1\};}
+\DoxyCodeLine{00015\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a48d6cd8e4135fb2ff7e7f2dac84089ec}{i32}}\ \mbox{\hyperlink{structgondola_1_1TrkHit_aeeba12ee28854810dcc9ecb2dcde1f1e}{adc}}\ \ \ \ \ \ \ \ \ \ \ \ \ \{-\/1\};}
+\DoxyCodeLine{00016\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a85cb35fbe5bf2961d7ad5f26814a91a2}{i64}}\ \mbox{\hyperlink{structgondola_1_1TrkHit_a44f9b3824db8806bdc3ae81ff338bd98}{oscillator}}\ \ \ \ \ \ \{-\/1\};}
+\DoxyCodeLine{00017\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a94dab5770726ccbef8c7d026cfbdf8e5}{f64}}\ \mbox{\hyperlink{structgondola_1_1TrkHit_a3e12c3a84256fe40da0d67ace4e5956a}{energy}}\ \ \ \ \ \ \ \ \ \ \{0\};}
+\DoxyCodeLine{00018\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1TrkHit_a36c9bc7757adec2287e38ca1a4347b33}{get\_strip\_id}}()\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}};}
+\DoxyCodeLine{00022\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \mbox{\hyperlink{structgondola_1_1TrkHit_ae6b6120eb7a3dc0750e139e13e82ff2d}{asic\_event\_code}}\ \{0\};}
+\DoxyCodeLine{00023\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1TrkHit_aff7b5576e6f62083c80dfc492f00923b}{to\_string}}()\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}}\ -\/>\ std::\textcolor{keywordtype}{string};}
+\DoxyCodeLine{00024\ \ \ \ \ }
+\DoxyCodeLine{00026\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}}\ \mbox{\hyperlink{structgondola_1_1TrkHit_ad161438cd176eecc3462e866875abac2}{decode\_id}}(\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{hw\_id}})\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}<\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}>;}
+\DoxyCodeLine{00027\ \ \ }
+\DoxyCodeLine{00028\ \ \ \};}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \}}
 
 \end{DoxyCode}

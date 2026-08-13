@@ -92,11 +92,198 @@ $(document).ready(function(){initNavTree('telemetry__event_8hpp.html',''); initR
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
+<a href="#namespaces">Namespaces</a>  </div>
   <div class="headertitle"><div class="title">telemetry_event.hpp File Reference</div></div>
 </div><!--header-->
 <div class="contents">
-
+<div class="textblock"><code>#include &quot;result/result.h&quot;</code><br />
+<code>#include &quot;<a class="el" href="tof__typedefs_8h_source.html">tof_typedefs.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="errors_8hpp_source.html">errors.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="version_8h_source.html">version.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="event__status_8hpp_source.html">events/event_status.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="event__quality_8hpp_source.html">events/event_quality.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="trigger_8hpp_source.html">events/trigger.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="tracker__hit_8hpp_source.html">events/tracker_hit.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="tracker__event_8hpp_source.html">events/tracker_event.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="tof__event__summary_8hpp_source.html">events/tof_event_summary.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="tracker__meta_8hpp_source.html">events/tracker_meta.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="tof__meta_8hpp_source.html">events/tof_meta.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="tof__packet_8h_source.html">packets/tof_packet.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="telemetry__packet_8hpp_source.html">packets/telemetry_packet.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="database_8h_source.html">database.h</a>&quot;</code><br />
+</div><div class="textblock"><div class="dynheader">
+Include dependency graph for telemetry_event.hpp:</div>
+<div class="dyncontent">
+<div class="center"><img src="telemetry__event_8hpp__incl.png" border="0" usemap="#a_2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2include_2events_2telemetry__event_8hpp" alt=""/></div>
+<map name="a_2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2include_2events_2telemetry__event_8hpp" id="a_2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2include_2events_2telemetry__event_8hpp">
+<area shape="rect" title=" " alt="" coords="917,5,1106,89"/>
+<area shape="rect" title=" " alt="" coords="862,299,974,324"/>
+<area shape="poly" title=" " alt="" coords="999,90,929,287,924,285,994,89"/>
+<area shape="rect" href="tof__typedefs_8h.html" title=" " alt="" coords="953,372,1069,397"/>
+<area shape="poly" title=" " alt="" coords="1014,90,1014,358,1009,358,1009,90"/>
+<area shape="rect" href="errors_8hpp.html" title=" " alt="" coords="1143,299,1231,324"/>
+<area shape="poly" title=" " alt="" coords="1100,87,1209,147,1254,179,1282,209,1288,231,1282,252,1260,277,1234,295,1231,290,1257,273,1277,249,1283,231,1277,212,1251,183,1206,152,1097,92"/>
+<area shape="rect" href="version_8h.html" title=" " alt="" coords="705,299,787,324"/>
+<area shape="poly" title=" " alt="" coords="972,91,769,291,766,287,968,88"/>
+<area shape="rect" href="event__status_8hpp.html" title=" " alt="" coords="169,218,352,243"/>
+<area shape="poly" title=" " alt="" coords="917,58,780,70,623,88,476,111,417,125,372,140,346,154,321,173,281,210,278,206,318,168,343,150,370,135,415,120,475,106,622,82,780,65,916,53"/>
+<area shape="rect" href="event__quality_8hpp.html" title=" " alt="" coords="360,299,545,324"/>
+<area shape="poly" title=" " alt="" coords="917,61,819,73,713,91,617,113,580,126,553,140,518,172,492,211,473,252,462,286,457,285,468,250,487,209,514,168,550,135,578,121,616,108,712,85,818,68,916,56"/>
+<area shape="rect" href="trigger_8hpp.html" title=" " alt="" coords="5,218,145,243"/>
+<area shape="poly" title=" " alt="" coords="917,57,797,67,649,83,487,107,327,140,210,177,114,215,112,210,208,172,325,135,486,102,649,78,797,61,916,52"/>
+<area shape="rect" href="tracker__hit_8hpp.html" title=" " alt="" coords="1735,218,1901,243"/>
+<area shape="poly" title=" " alt="" coords="1106,55,1294,82,1402,105,1508,135,1534,147,1559,160,1656,191,1746,213,1745,218,1655,196,1557,165,1532,152,1506,140,1401,110,1293,87,1106,60"/>
+<area shape="rect" href="tracker__event_8hpp.html" title=" " alt="" coords="1751,137,1938,163"/>
+<area shape="poly" title=" " alt="" coords="1106,57,1738,133,1737,138,1106,63"/>
+<area shape="rect" href="tof__event__summary_8hpp.html" title=" " alt="" coords="590,137,817,163"/>
+<area shape="poly" title=" " alt="" coords="917,82,752,136,751,130,916,77"/>
+<area shape="rect" href="database_8h.html" title=" " alt="" coords="585,299,680,324"/>
+<area shape="poly" title=" " alt="" coords="917,59,823,71,724,87,636,110,603,124,580,139,558,165,547,190,548,218,559,249,576,272,598,289,595,294,572,276,554,252,543,219,542,189,553,162,576,135,601,119,635,105,723,82,822,65,916,54"/>
+<area shape="rect" href="tof__packet_8h.html" title=" " alt="" coords="1343,218,1499,243"/>
+<area shape="poly" title=" " alt="" coords="1108,80,1243,135,1323,173,1389,209,1387,214,1320,178,1241,140,1106,85"/>
+<area shape="rect" href="tracker__meta_8hpp.html" title=" " alt="" coords="1311,137,1495,163"/>
+<area shape="poly" title=" " alt="" coords="1107,70,1346,131,1345,137,1106,75"/>
+<area shape="rect" href="tof__meta_8hpp.html" title=" " alt="" coords="1570,137,1727,163"/>
+<area shape="poly" title=" " alt="" coords="1106,61,1563,133,1562,138,1106,66"/>
+<area shape="rect" href="telemetry__packet_8hpp.html" title=" " alt="" coords="1049,218,1267,243"/>
+<area shape="poly" title=" " alt="" coords="1047,88,1142,205,1138,209,1043,91"/>
+<area shape="rect" title=" " alt="" coords="1376,445,1439,471"/>
+<area shape="poly" title=" " alt="" coords="1070,394,1363,446,1362,451,1069,399"/>
+<area shape="rect" title=" " alt="" coords="697,445,747,471"/>
+<area shape="poly" title=" " alt="" coords="959,400,761,448,760,443,958,395"/>
+<area shape="rect" title=" " alt="" coords="1065,445,1136,471"/>
+<area shape="poly" title=" " alt="" coords="1027,395,1077,434,1074,439,1024,399"/>
+<area shape="rect" title=" " alt="" coords="1161,445,1219,471"/>
+<area shape="poly" title=" " alt="" coords="1041,395,1149,438,1147,443,1039,400"/>
+<area shape="rect" title=" " alt="" coords="1258,445,1325,471"/>
+<area shape="poly" title=" " alt="" coords="1057,395,1245,442,1244,447,1056,400"/>
+<area shape="rect" title=" " alt="" coords="771,445,846,471"/>
+<area shape="poly" title=" " alt="" coords="980,400,855,443,853,438,978,395"/>
+<area shape="rect" title=" " alt="" coords="871,445,957,471"/>
+<area shape="poly" title=" " alt="" coords="997,400,943,439,940,435,994,395"/>
+<area shape="rect" title=" " alt="" coords="981,445,1041,471"/>
+<area shape="poly" title=" " alt="" coords="1014,398,1014,432,1009,432,1009,398"/>
+<area shape="poly" title=" " alt="" coords="788,321,956,366,955,371,787,326"/>
+<area shape="poly" title=" " alt="" coords="270,242,300,283,322,305,348,322,382,331,440,340,603,356,940,377,939,382,603,361,439,345,381,336,346,326,319,309,296,286,265,245"/>
+<area shape="rect" title=" " alt="" coords="139,372,206,397"/>
+<area shape="poly" title=" " alt="" coords="249,245,224,269,200,300,187,330,180,359,174,357,182,328,196,297,220,265,245,241"/>
+<area shape="rect" title=" " alt="" coords="210,299,285,324"/>
+<area shape="poly" title=" " alt="" coords="261,244,254,286,249,285,256,243"/>
+<area shape="poly" title=" " alt="" coords="408,327,220,374,219,369,407,321"/>
+<area shape="poly" title=" " alt="" coords="85,242,160,359,156,362,80,245"/>
+<area shape="poly" title=" " alt="" coords="1760,246,1722,253,1083,373,1082,368,1722,248,1759,241"/>
+<area shape="poly" title=" " alt="" coords="1843,164,1829,206,1824,204,1838,162"/>
+<area shape="poly" title=" " alt="" coords="737,160,782,180,829,209,871,247,904,286,899,289,867,251,826,213,780,185,735,165"/>
+<area shape="poly" title=" " alt="" coords="716,161,757,209,783,243,801,270,820,296,852,322,899,348,948,366,947,371,897,353,848,326,817,299,796,273,778,246,753,212,712,165"/>
+<area shape="poly" title=" " alt="" coords="712,162,734,210,743,249,747,284,742,285,737,250,729,212,708,164"/>
+<area shape="poly" title=" " alt="" coords="639,165,339,218,338,213,639,160"/>
+<area shape="poly" title=" " alt="" coords="665,165,613,185,558,213,511,251,473,290,469,286,507,247,555,208,610,180,663,160"/>
+<area shape="poly" title=" " alt="" coords="590,162,388,182,157,213,135,218,134,212,156,208,387,177,589,157"/>
+<area shape="rect" href="tof__hit_8hpp.html" title=" " alt="" coords="580,218,720,243"/>
+<area shape="poly" title=" " alt="" coords="698,164,668,208,664,205,693,161"/>
+<area shape="poly" title=" " alt="" coords="642,165,601,183,584,196,570,212,564,230,570,250,584,271,603,288,600,292,580,274,565,252,558,230,565,209,580,192,598,178,639,160"/>
+<area shape="poly" title=" " alt="" coords="817,159,1280,208,1329,214,1329,219,1279,213,817,165"/>
+<area shape="poly" title=" " alt="" coords="690,241,867,292,865,297,688,246"/>
+<area shape="poly" title=" " alt="" coords="666,241,723,288,720,292,662,246"/>
+<area shape="poly" title=" " alt="" coords="622,246,495,296,493,291,620,241"/>
+<area shape="poly" title=" " alt="" coords="650,244,641,286,636,285,645,243"/>
+<area shape="poly" title=" " alt="" coords="681,319,693,321,940,367,939,373,692,327,680,324"/>
+<area shape="poly" title=" " alt="" coords="650,322,675,343,698,371,712,401,720,431,715,432,707,403,693,373,671,347,647,326"/>
+<area shape="rect" title=" " alt="" coords="479,372,557,397"/>
+<area shape="poly" title=" " alt="" coords="616,326,550,367,547,362,613,322"/>
+<area shape="rect" title=" " alt="" coords="581,372,684,397"/>
+<area shape="poly" title=" " alt="" coords="635,324,635,358,630,358,630,324"/>
+<area shape="poly" title=" " alt="" coords="1348,246,988,302,987,297,1347,241"/>
+<area shape="poly" title=" " alt="" coords="1401,246,1320,290,1244,326,1162,353,1084,372,1082,367,1160,348,1242,322,1317,285,1399,241"/>
+<area shape="poly" title=" " alt="" coords="1423,244,1411,431,1406,431,1417,243"/>
+<area shape="poly" title=" " alt="" coords="1416,245,1307,435,1303,432,1412,242"/>
+<area shape="poly" title=" " alt="" coords="1388,246,1235,297,1233,292,1386,241"/>
+<area shape="rect" href="tracker__calibrated__hit_8hpp.html" title=" " alt="" coords="1523,211,1710,251"/>
+<area shape="poly" title=" " alt="" coords="1435,160,1553,203,1552,208,1433,165"/>
+<area shape="poly" title=" " alt="" coords="1124,246,967,297,965,292,1122,241"/>
+<area shape="poly" title=" " alt="" coords="1149,245,1034,364,1030,360,1145,242"/>
+<area shape="poly" title=" " alt="" coords="1165,243,1181,285,1176,287,1160,244"/>
+<area shape="poly" title=" " alt="" coords="1071,246,694,301,694,296,1070,241"/>
+</map>
+</div>
+</div><div class="textblock"><div class="dynheader">
+This graph shows which files directly or indirectly include this file:</div>
+<div class="dyncontent">
+<div class="center"><img src="telemetry__event_8hpp__dep__incl.png" border="0" usemap="#a_2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2include_2events_2telemetry__event_8hppdep" alt=""/></div>
+<map name="a_2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2include_2events_2telemetry__event_8hppdep" id="a_2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2include_2events_2telemetry__event_8hppdep">
+<area shape="rect" title=" " alt="" coords="732,5,921,89"/>
+<area shape="rect" href="events_8h.html" title="Tof event classes." alt="" coords="657,137,858,207"/>
+<area shape="poly" title=" " alt="" coords="799,103,778,139,774,136,794,100"/>
+<area shape="rect" href="telemetry__dataclasses_8hpp.html" title=" " alt="" coords="1410,255,1619,339"/>
+<area shape="poly" title=" " alt="" coords="935,85,1410,255,1408,260,933,90"/>
+<area shape="rect" href="calibration_8h.html" title="ReadoutBoard calibration C++ implementation for RBCalibration class." alt="" coords="644,262,871,331"/>
+<area shape="poly" title=" " alt="" coords="751,220,752,262,746,262,746,220"/>
+<area shape="rect" href="gondola_8hpp.html" title=" " alt="" coords="385,262,610,331"/>
+<area shape="poly" title=" " alt="" coords="675,215,570,264,567,259,673,210"/>
+<area shape="rect" href="io_8hpp.html" title=" " alt="" coords="913,262,1098,331"/>
+<area shape="poly" title=" " alt="" coords="838,210,938,259,936,264,836,215"/>
+<area shape="rect" href="events_8cxx.html" title=" " alt="" coords="1122,262,1310,331"/>
+<area shape="poly" title=" " alt="" coords="872,193,987,219,1110,252,1132,259,1130,264,1108,257,986,224,870,198"/>
+<area shape="poly" title=" " alt="" coords="763,248,763,207,768,207,769,248"/>
+<area shape="rect" href="caraspace_8hpp.html" title=" " alt="" coords="1403,526,1642,595"/>
+<area shape="poly" title=" " alt="" coords="875,334,929,357,981,384,1011,407,1032,429,1052,449,1082,468,1162,500,1246,523,1329,539,1403,549,1402,554,1328,544,1245,528,1161,505,1080,473,1048,453,1028,432,1008,411,978,389,926,362,872,339"/>
+<area shape="rect" href="gondola__core_8cxx.html" title=" " alt="" coords="1029,651,1224,735"/>
+<area shape="poly" title=" " alt="" coords="742,345,735,375,731,407,734,439,745,469,771,506,802,540,837,569,875,594,955,635,1030,663,1028,668,953,640,873,599,834,573,798,543,767,510,740,472,729,441,726,407,730,374,737,344"/>
+<area shape="rect" href="calibration_8cxx.html" title=" " alt="" coords="755,394,968,463"/>
+<area shape="poly" title=" " alt="" coords="795,341,836,392,832,396,791,344"/>
+<area shape="poly" title=" " alt="" coords="1408,602,1225,662,1223,657,1406,597"/>
+<area shape="rect" href="caraspace_8cxx.html" title=" " alt="" coords="1368,658,1579,727"/>
+<area shape="poly" title=" " alt="" coords="1507,609,1488,659,1483,657,1502,607"/>
+<area shape="rect" href="telemetry__reader_8cxx.html" title=" " alt="" coords="1603,658,1859,727"/>
+<area shape="poly" title=" " alt="" coords="1590,601,1678,656,1675,660,1587,605"/>
+<area shape="rect" href="rb__event__header_8hpp.html" title=" " alt="" coords="244,387,433,471"/>
+<area shape="poly" title=" " alt="" coords="447,342,390,389,387,384,444,338"/>
+<area shape="rect" href="tof__event_8hpp.html" title=" " alt="" coords="31,387,220,471"/>
+<area shape="poly" title=" " alt="" coords="381,338,233,389,221,393,219,388,231,384,380,333"/>
+<area shape="rect" href="tracklet_8hpp.html" title=" " alt="" coords="458,394,681,463"/>
+<area shape="poly" title=" " alt="" coords="525,342,553,393,548,395,520,345"/>
+<area shape="poly" title=" " alt="" coords="332,373,333,343,339,310,351,280,370,253,390,238,418,226,490,205,574,190,656,179,656,185,575,195,491,210,419,231,392,243,374,257,356,282,344,312,339,343,337,373"/>
+<area shape="rect" href="rb__event_8hpp.html" title=" " alt="" coords="60,519,249,603"/>
+<area shape="poly" title=" " alt="" coords="271,481,215,520,211,516,267,477"/>
+<area shape="poly" title=" " alt="" coords="51,512,32,494,16,472,6,449,3,429,6,408,16,385,34,355,53,331,72,313,94,298,144,276,207,252,264,232,324,215,445,191,559,178,656,172,657,177,560,183,446,197,325,220,266,237,209,257,146,281,97,303,76,317,57,335,39,358,21,388,11,410,8,429,11,448,21,469,36,490,55,509"/>
+<area shape="poly" title=" " alt="" coords="169,375,241,310,284,278,331,252,413,220,499,198,582,184,656,176,657,181,583,189,500,204,415,226,333,257,287,283,244,314,173,379"/>
+<area shape="poly" title=" " alt="" coords="608,472,643,517,659,542,668,564,680,582,700,601,739,623,780,641,867,668,953,682,1029,689,1029,694,952,688,866,673,778,646,736,628,697,605,675,586,664,566,654,545,639,520,604,476"/>
+<area shape="rect" href="tracklet_8cxx.html" title=" " alt="" coords="435,526,629,595"/>
+<area shape="poly" title=" " alt="" coords="558,478,544,527,539,525,553,476"/>
+<area shape="poly" title=" " alt="" coords="1022,344,1116,650,1111,651,1017,345"/>
+<area shape="poly" title=" " alt="" coords="1102,334,1110,336,1162,347,1205,350,1246,358,1268,368,1291,385,1317,410,1334,435,1344,461,1351,486,1365,540,1376,570,1394,601,1440,656,1436,660,1390,604,1371,572,1360,542,1346,488,1339,463,1329,438,1313,414,1287,389,1265,373,1244,363,1204,355,1161,352,1108,341,1101,339"/>
+<area shape="poly" title=" " alt="" coords="959,343,900,396,897,392,956,339"/>
+<area shape="rect" href="telemetry__reader_8hpp.html" title=" " alt="" coords="1402,387,1627,471"/>
+<area shape="poly" title=" " alt="" coords="1099,333,1110,336,1186,354,1246,362,1307,369,1384,384,1402,389,1401,394,1383,389,1306,374,1246,367,1185,359,1109,341,1098,338"/>
+<area shape="rect" href="io_8cxx.html" title=" " alt="" coords="1093,394,1277,463"/>
+<area shape="poly" title=" " alt="" coords="1065,337,1140,392,1137,396,1061,342"/>
+<area shape="poly" title=" " alt="" coords="1521,484,1523,525,1518,526,1515,485"/>
+<area shape="poly" title=" " alt="" coords="1448,481,1393,521,1340,564,1284,605,1205,653,1202,648,1281,600,1336,560,1390,517,1445,476"/>
+<area shape="poly" title=" " alt="" coords="1621,477,1641,495,1657,517,1667,540,1671,561,1668,582,1657,604,1643,619,1621,633,1564,660,1562,656,1618,628,1639,614,1652,601,1663,580,1666,561,1662,542,1652,520,1637,499,1617,481"/>
+<area shape="poly" title=" " alt="" coords="1634,476,1660,495,1682,517,1703,551,1717,589,1731,657,1726,658,1712,590,1698,553,1678,520,1656,499,1631,480"/>
+<area shape="poly" title=" " alt="" coords="1609,345,1628,364,1642,385,1652,408,1655,429,1652,449,1642,472,1619,503,1590,528,1586,524,1615,500,1638,469,1647,447,1650,429,1647,410,1638,388,1623,367,1605,349"/>
+<area shape="poly" title=" " alt="" coords="1442,349,1392,389,1323,457,1258,529,1159,652,1155,648,1254,526,1319,453,1389,385,1438,345"/>
+<area shape="poly" title=" " alt="" coords="1517,352,1517,386,1512,386,1512,352"/>
+<area shape="rect" href="telemetry__dataclasses_8cxx.html" title=" " alt="" coords="1702,394,1994,463"/>
+<area shape="poly" title=" " alt="" coords="1633,341,1763,391,1761,396,1631,346"/>
+</map>
+</div>
+</div>
 <p><a href="telemetry__event_8hpp_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1TelemetryEvent.html">gondola::TelemetryEvent</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The actual merged event sent over telemetry.  <a href="structgondola_1_1TelemetryEvent.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="namespaces" name="namespaces"></a>
+Namespaces</h2></td></tr>
+<tr class="memitem:namespacegondola" id="r_namespacegondola"><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html">gondola</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
