@@ -13,10 +13,10 @@
 #include "events/tracker_hit.hpp"
 #include "events/tracker_event.hpp"
 #include "events/tof_event_summary.hpp"
+#include "events/tracker_meta.hpp"
+#include "events/tof_meta.hpp"
 #include "packets/tof_packet.h"
 #include "packets/telemetry_packet.hpp"
-#include "tracker_meta.hpp"
-#include "tof_meta.hpp"
 #include "database.h"
 
 namespace gondola {

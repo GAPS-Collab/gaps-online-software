@@ -50,6 +50,7 @@ if (BUILD_CXX_BINDINGS)
               C++/src/tracker_hit.cxx
               C++/src/caraspace.cxx
               C++/src/tracklet.cxx
+              C++/src/cooling.cxx
               $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:C++/src/sd_legacy.cxx>
               $<$<BOOL:${BUILD_CXX_DB}>:C++/src/database.cxx>
               $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${GONDOLA_DICTIONARY}.cxx>
