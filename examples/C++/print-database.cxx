@@ -12,6 +12,7 @@
  */
 
 #include <iostream>
+#include <cstdint>
 #include "cxxopts.hpp"
 
 #include "spdlog/spdlog.h"

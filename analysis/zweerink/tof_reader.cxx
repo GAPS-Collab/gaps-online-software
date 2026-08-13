@@ -10,6 +10,8 @@
  */
 
 #include <iostream>
+#include <cstdint>
+#include <filesystem>
 #include "cxxopts.hpp"
 
 #include "spdlog/spdlog.h"
