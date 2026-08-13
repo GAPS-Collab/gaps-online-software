@@ -4,10 +4,9 @@
 
 #include "result/result.h"
 
-#include "gondola.hpp"
-#include "errors.hpp"
 #include "database.h"
 #include "version.h" 
+#include "events/event_quality.hpp"
 
 namespace r = result;
 

@@ -3,12 +3,10 @@
 #pragma once 
 
 #include "result/result.h"
-
-#include "gondola.hpp"
+#include "tof_typedefs.h"
 #include "errors.hpp"
 #include "database.h"
 #include "version.h"
-#include "events.h"
 #include "events/rb_event_header.hpp"
 #include "events/tof_hit.hpp"
 #include "events/event_status.hpp" 

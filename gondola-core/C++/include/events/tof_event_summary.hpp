@@ -3,13 +3,14 @@
 
 #pragma once 
 #include "result/result.h"
-#include "gondola.hpp"
+#include "tof_typedefs.h"
 #include "version.h"
-#include "events/event_status.hpp"
 #include "events/event_quality.hpp"
 #include "events/trigger.hpp"
+#include "events/tof_hit.hpp"
 #include "packets/tof_packet.h"
 #include "database.h"
+#include "events/event_status.hpp"
 
 namespace gondola {
   /// Concise summary for the flight computer and 

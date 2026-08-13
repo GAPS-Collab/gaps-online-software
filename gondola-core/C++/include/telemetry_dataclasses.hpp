@@ -8,94 +8,15 @@
 #include <memory>
 #include "tof_typedefs.h"
 #include "result/result.h"
-#include "events.h"
 #include "errors.hpp"
+#include "events/telemetry_event.hpp"
+#include "packets/telemetry_packet.hpp"
+#include "events/tracker_event.hpp"
+
 
 namespace r = result;
 
 namespace gondola {
-
-  enum class TelemetryPacketType : u8 {
-    Unknown            = 0,
-    SipGpsPosition     = 20,
-    SipGpsTime         = 21,
-    SipPressure        = 22,
-    CardHKP            = 30,
-    CoolingHK          = 40,
-    PDUHK              = 50,
-    Tracker            = 80,
-    TrackerDAQCntr     = 81,
-    GPS                = 82,
-    TrkTempLeak        = 83,
-    RPiHKP             = 89,
-    BoringEvent        = 90,
-    RBWaveform         = 91,
-    AnyTofHK           = 92,
-    GcuEvtBldSettings  = 93,
-    GcuEvtBuilderStats = 94,
-    TmP96              = 96,
-    LabJackHK          = 100,
-    LabjackSettings    = 101,
-    HeatHVLVSettings   = 102,
-    MagHK              = 108,
-    GcuMon             = 110,
-    PacketStats        = 111,
-    TeleMainSettings   = 112,
-    DecimationSettings = 113,
-    SurvivalPacket     = 114,
-    GcuMonHKAddendum   = 120,
-    InterestingEvent   = 190,
-    NoGapsTriggerEvent = 191,
-    NoTofDataEvent     = 192,
-    Ack                = 200,     
-    RatePacket         = 219,
-    AnyTrackerHK       = 255,
-    // unknown/unused stuff
-    TmP33              = 33,
-    TmP34              = 34,
-    TmP37              = 37,
-    TmP38              = 38,
-    TmP55              = 55,
-    TmP64              = 64,
-    //TmP92            = 92,
-    TmP214             = 214,
-  };
-
-  auto bfsw_ptype_to_u8(TelemetryPacketType pt) -> u8;
-  auto bfsw_ptype_to_str(TelemetryPacketType pt) -> std::string;
-
-  struct TelemetryPacketHeader {
-    static constexpr u16 SIZE = 13; 
-    static constexpr u16 HEAD = 0x90eb;
-
-    u16                  sync     {0};
-    TelemetryPacketType  ptype    {TelemetryPacketType::Unknown};
-    u32                  timestamp{0};
-    u16                  counter  {0};
-    u16                  length   {0};
-    u16                  checksum {0};
-  
-    auto get_gcutime()   const -> f64;
-    auto to_string()     const -> std::string;
-    auto to_bytestream() const -> Vec<u8>;
-    static auto from_bytestream(Vec<u8> const &stream, usize &pos)
-      -> r::Result<TelemetryPacketHeader, IOError>;
-  };
-
-  struct TelemetryPacket {
-    auto to_string() const -> std::string;
-    auto is_event_packet() const -> bool;
-    
-    static auto from_bytestream(Vec<u8> const &stream, usize &pos) -> TelemetryPacket;
-     
-    TelemetryPacketHeader header;
-    Vec<u8> payload;
-    #ifdef BUILD_CXX_DB
-    /// The map of all paddles. This is needed later on to look up properties 
-    /// of the TOF paddles when we are unpacking events 
-    TofPaddleMapPtr paddles;
-    #endif 
-  };
   
   struct TrkHeader {
      static constexpr u16 SIZE = 17; 
@@ -115,40 +36,7 @@ namespace gondola {
      static auto from_bytestream(Vec<u8> const &stream, usize &pos)
        -> r::Result<TrkHeader, IOError>;
   };
-
-  struct TrkHit {
-    // using i32 here makes no sense in my eyes, but I defer to 
-    // bfsw ( I assume it is because of sqlite which does not know
-    // unsigned) 
-    // FIXME - change this
-    i32 layer           {-1};
-    i32 row             {-1};
-    i32 module          {-1};
-    i32 channel         {-1};
-    i32 adc             {-1};
-    i64 oscillator      {-1};
-    f64 energy          {0};
-    auto get_strip_id() const -> u32;
-    /// In BFSW, there are two versions of the tracker hit, 
-    /// tracker_hit and tracker::hit. The latter has 
-    /// an extra ASIC event code field. Let's unify those here
-    u8  asic_event_code {0};
-    auto to_string() const -> std::string;
-    
-    /// Decode layer, row, module, channel from the strip id 
-    static auto decode_id(u32 hw_id) -> Vec<u32>;
   
-  };
-  
-  struct TrkEvent {
-    u8          layer;
-    u8          flags1;
-    u32         event_id; 
-    u64         event_time;
-    Vec<TrkHit> hits;
-
-    auto to_string() const -> std::string;
-  };
   
   struct TrkEventPacket {
     TelemetryPacketHeader  header;
@@ -162,35 +50,8 @@ namespace gondola {
       -> r::Result<TrkEventPacket, IOError>;
   };
    
-  struct TofMetaData {
-    u32  event_id {0xffffffff};
-    u8   status_version {0xff};
-    bool stats_valid {false};
-    u16  trigger_sources {0};
-    u8   n_hits_umb {0xff};
-    u8   n_hits_cbe {0xff};
-    u8   n_hits_cor {0xff};
-    f32  tot_edep_umb {0};
-    f32  tot_edep_cbe {0};
-    f32  tot_edep_cor {0};
-    
-    static auto from_bytestream(Vec<u8> const &stream, usize &pos) -> TofMetaData;
-    auto to_string() const -> std::string;
-  };
    
-  struct TrkCalibratedHit {
-    u16 strip_id;
-    u16 adc;
-    //calibrated_hit(uint16_t strip_id, uint16_t adc) : strip_id(strip_id), adc(adc) {}
-   };
    
-  struct TrkMetaData {
-    u64 num_hits {0};
-    u64 row_flags {0};
-    f64 total_energy {0};
-    Vec<TrkCalibratedHit> calibrated_hits;
-    //std::array<uint64_t,8> oscillators = {0,0,0,0,0,0,0,0};
-   };
    
    struct Cooling {
      /// size with packet header
@@ -224,34 +85,6 @@ namespace gondola {
      static auto from_bytestream(Vec<u8> const &stream, usize &pos)
       -> r::Result<Cooling, IOError>;   
   };
-
-  /// The actual merged event sent over telemetry 
-  struct TelemetryEvent {
-    TelemetryPacketHeader header   = TelemetryPacketHeader();
-    u8              version        = 0;
-    u8              flags0         = 0;
-    u8              flags1         = 0;
-    Vec<u8>         row_flags      = {};
-    u64             creation_time  = 0;
-    u32             event_id       = 0;
-    u8              n_tof_hits     = 0;
-    u16             n_trk_hits     = 0;
-    Vec<TrkEvent>   tracker_events = {};  
-    Vec<TrkHit>     trk_hits       = {};
-    TofEventSummary tof_event      = TofEventSummary();
-    Vec<u8>         raw_data       = {};
-    TofMetaData     tof_meta;
-    TrkMetaData     tracker_meta;
-    Vec<u64>        tracker_oscillators = Vec<u64>(10,0) ;
-  
-    auto to_string() const -> std::string;
-
-    static auto from_bytestream(Vec<u8> const &stream, usize &pos)
-      -> r::Result<TelemetryEvent, IOError>;
-    
-    static auto from_telemetrypacket(TelemetryPacket const &packet) 
-      -> r::Result<TelemetryEvent, IOError>;
-  };  
 }
 
 #endif

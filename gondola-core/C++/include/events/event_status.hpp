@@ -3,7 +3,8 @@
 #pragma once 
 
 #include <format>
-#include "gondola.hpp"
+#include <sstream>
+#include "tof_typedefs.h"
 
 namespace gondola { 
   

@@ -2,6 +2,9 @@
 #include "spdlog/cfg/env.h"
 
 #include "telemetry_dataclasses.hpp"
+#include "events/tracker_event.hpp"
+#include "events/tracker_hit.hpp"
+#include "packets/telemetry_packet.hpp"
 #include "io/parsers.h"
 
 namespace g   = gondola;
@@ -204,18 +207,6 @@ auto g::TrkHit::decode_id(u32 hw_id) -> Vec<u32> {
 
 auto g::TrkHit::get_strip_id() const -> u32 {
   return (u32)channel + (u32)module*100 + (u32)row*10000 + (u32)layer*100000;
-}
-
-auto g::TrkHit::to_string() const -> std::string {
-  std::string repr = "<TrackerHit:";
-  repr += std::format("\n  Layer      : {}", layer);
-  repr += std::format("\n  Row        : {}", row);
-  repr += std::format("\n  Module     : {}", module);
-  repr += std::format("\n  Channel    : {}", channel);
-  repr += std::format("\n  ADC        : {}", adc);
-  repr += std::format("\n  Oscillator : {}", oscillator);
-  repr += std::format("\n  Energy     : {}", energy);
-  return repr;
 }
 
 //----------------------------------------

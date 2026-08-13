@@ -28,14 +28,15 @@
 #include "tof_typedefs.h"
 #include "packets/monitoring.h"
 #include "packets/tof_packet.h"
+#include "events/event_status.hpp"
 #include "events/rb_event_header.hpp"
 #include "events/tof_hit.hpp"
 #include "events/rb_event.hpp"
-#include "events/event_status.hpp"
 #include "events/event_quality.hpp"
 #include "events/rb_waveform.hpp"
 #include "events/tof_event.hpp"
 #include "events/tof_event_summary.hpp"
+#include "events/telemetry_event.hpp"
 #include "calibration.h"
 #include "version.h"
 #include "errors.hpp"
@@ -44,7 +45,6 @@
 #endif
 
 namespace r = result;
-//namespace g = gondola;
 
 class RBCalibration;
 
@@ -59,8 +59,6 @@ namespace gondola {
   
   /// Speed of light in the paddle in cm/ns
   static const f32 C_LIGHT_PADDLE = 15.4; 
-  
-
   
   /*********************************************************/
 
