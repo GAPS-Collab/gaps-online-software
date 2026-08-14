@@ -264,8 +264,7 @@ pub fn get_dsi_j_ch_rb_map(paddles : &Vec<TofPaddle>) -> DsiJChRbMapping {
 /// Get a mapping of which pb controls paddles connected to which RB
 #[cfg_attr(feature="pybindings", pyfunction)]
 pub fn get_rbids_for_pbid(pbid : u8) -> Option<(u8, u8)> {
-  let mut conn = connect_to_db().ok()?;
-  let rats = RAT::all(&mut conn)?;
+  let rats = RAT::all()?;
   for rat in rats {
     if rat.pb_id as u8 == pbid {
       return Some((rat.rb1_id as u8, rat.rb2_id as u8));
@@ -277,51 +276,54 @@ pub fn get_rbids_for_pbid(pbid : u8) -> Option<(u8, u8)> {
 pub fn get_rbid_pbchannel_pid_map(paddles : &Vec<TofPaddle>) -> Option<(RbChPidMapping, RbChPidMapping)> {
   let mut map_a    = RbChPidMapping::new();
   let mut map_b    = RbChPidMapping::new();
-  let mut map_a_rb = RbChPidMapping::new();
-  let mut map_b_rb = RbChPidMapping::new();
-
-  //let all_rbs       = get_all_rbids_in_db()?; 
-  //let pbch_to_pid_a = HashMap::<u8,u8>::new(); 
-  //let pbch_to_pid_b = HashMap::<u8,u8>::new(); 
-  //let all_pbs       = get_all_pbids_in_db()?;
-  // first we fill the maps with the pb id instead of the rb id, then we 
-  // translate that later
+ 
+  let rats = RAT::all().unwrap();
+  let mut rb1rb2map = HashMap::<u8,u8>::new();
+  let mut rb2rb1map = HashMap::<u8,u8>::new();
+  for r in rats {
+    // these vectors are sorted now
+    // the index is the smae for each rat
+    rb1rb2map.insert(r.rb1_id as u8, r.rb2_id as u8);
+    rb2rb1map.insert(r.rb2_id as u8, r.rb1_id as u8);
+  }
+  // for the map, what we want is that for 
+  // BOTH rbs in the rat, we have the SAME 
+  // PB channels/pids 
+  // For the PB, we don't care to which 
+  // RB the data channels are connected to
+  // The rb here is a stand-in for the 
+  // "any rb in that RAT"
   for pdl in paddles {
-    if pdl.pb_id == 19 {
-      println!("{}", pdl);
+    let rb_id   = pdl.rb_id as u8;
+    let pb_ch_a = pdl.pb_chA as u8;
+    let pb_ch_b = pdl.pb_chB as u8;
+    let pid     = pdl.paddle_id as u8;
+    // chheck if it is rb1 or 2 
+    let other_rb : u8;
+    if rb1rb2map.contains_key(&rb_id) { 
+      other_rb = *rb1rb2map.get(&rb_id).unwrap(); 
+    } else { 
+      other_rb = *rb2rb1map.get(&rb_id).unwrap();   
     }
-    if map_a.contains_key(&(pdl.pb_id as u8)) {
-      map_a.get_mut(&(pdl.pb_id as u8)).unwrap().insert(pdl.pb_chA as u8, pdl.paddle_id as u8);
-    } else {
-      let mut ch_map = HashMap::<u8,u8>::new();
-      ch_map.insert(pdl.pb_chA as u8, pdl.paddle_id as u8);
-      map_a.insert(pdl.pb_id as u8, ch_map);
-    }
-    if map_b.contains_key(&(pdl.pb_id as u8)) {
-      map_b.get_mut(&(pdl.pb_id as u8)).unwrap().insert(pdl.pb_chA as u8, pdl.paddle_id as u8);
-    } else {
-      let mut ch_map = HashMap::<u8,u8>::new();
-      ch_map.insert(pdl.pb_chB as u8, pdl.paddle_id as u8);
-      map_b.insert(pdl.pb_id as u8, ch_map);
-    }
-  }
-  for k in map_a.keys() {
-    match get_rbids_for_pbid(*k) {
-      Some(rbid) => {
-        map_a_rb.insert(rbid.0, map_a[k].clone()); 
-        map_a_rb.insert(rbid.1, map_a[k].clone()); 
+   
+    for rid in [rb_id,other_rb] {
+      if map_a.contains_key(&rid) {
+        map_a.get_mut(&rid).unwrap().insert(pb_ch_a, pid);
+      } else {
+        let mut ch_map = HashMap::<u8,u8>::new();
+        ch_map.insert(pb_ch_a, pid);
+        map_a.insert(rid , ch_map);
       }
-      None => {
-        println!("Can not get rb ids for pb id {}!", k);
+      if map_b.contains_key(&rid) {
+        map_b.get_mut(&rid).unwrap().insert(pb_ch_b, pid);
+      } else{
+        let mut ch_map = HashMap::<u8,u8>::new();
+        ch_map.insert(pb_ch_b, pid);
+        map_b.insert(rid , ch_map);
       }
     }
   }
-  for k in map_b.keys() {
-    let rbid = get_rbids_for_pbid(*k).unwrap();
-    map_b_rb.insert(rbid.0, map_b[k].clone()); 
-    map_b_rb.insert(rbid.1, map_b[k].clone()); 
-  }
-  return Some((map_a_rb, map_b_rb))
+  Some((map_a, map_b))
 }
 
 //---------------------------------------------------------------------
@@ -1556,10 +1558,10 @@ impl RAT {
   }
   
   /// Get the RAT where rb2id matched the argument
-  pub fn where_rb2id(conn: &mut SqliteConnection, rb2id : u8) -> Option<Vec<RAT>> {
+  pub fn where_rb2id(rb2id : u8) -> Option<Vec<RAT>> {
 
     let mut result = Vec::<RAT>::new();
-    match RAT::all(conn) {
+    match RAT::all() {
       Some(rats) => {
         for rat in rats {
           if rat.rb2_id == rb2id as i16 {
@@ -1574,9 +1576,9 @@ impl RAT {
   }
   
   /// Get the RAT where rb1id (the rb id of rb"1" in the RAT) matched the argument
-  pub fn where_rb1id(conn: &mut SqliteConnection, rb2id : u8) -> Option<Vec<RAT>> {
+  pub fn where_rb1id(rb2id : u8) -> Option<Vec<RAT>> {
     let mut result = Vec::<RAT>::new();
-    match RAT::all(conn) {
+    match RAT::all() {
       Some(rats) => {
         for rat in rats {
           if rat.rb1_id == rb2id as i16 {
@@ -1590,8 +1592,10 @@ impl RAT {
     Some(result)
   }
 
-  pub fn all(conn: &mut SqliteConnection) -> Option<Vec<RAT>> {
-    match tof_db_rat.load::<RAT>(conn) {
+  pub fn all() -> Option<Vec<RAT>> {
+    use schema::tof_db_rat::dsl::*;
+    let mut conn = connect_to_db().ok()?;
+    match tof_db_rat.load::<RAT>(&mut conn) {
       Err(err) => {
         error!("Unable to load RATs from db! {err}");
         return None;
