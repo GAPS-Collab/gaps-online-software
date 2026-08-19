@@ -433,9 +433,33 @@ macro_rules! moniseries_general {
          self.add(moni);
        }
 
+       #[getter]
+       #[pyo3(name="boards")]
+       fn get_boards(&self) -> Vec<u16> {
+         // use u16 here, so it apperas as numbers
+         // in python (u8 will be bytes)
+         let mut boards = Vec::<u16>::new();
+         for k in self.data.keys() {
+           boards.push(*k as u16);
+         }
+         boards
+       }
+
        #[pyo3(name="get_var_for_board")]
        fn get_var_for_board_py(&self, varname : &str, rb_id : u8) -> Option<Vec<f32>> {
          self.get_var_for_board(varname, &rb_id)
+       }
+
+       #[pyo3(name="get_monidata_for_board")]
+       fn get_monidata_for_board(&self, board_id : u8, idx : usize) -> Option<$class> {
+         if !self.data.contains_key(&board_id) {
+           return None;
+         }
+         if self.data.get(&board_id).unwrap().len() < idx + 1 {
+           return None;
+         } else { 
+           return Some(self.data.get(&board_id).unwrap()[idx].clone());
+         }
        }
 
        /// Reduces the MoniSeries to a single polars data frame

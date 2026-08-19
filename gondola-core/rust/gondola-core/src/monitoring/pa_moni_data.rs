@@ -9,15 +9,14 @@ use tof_control::helper::pa_type::{
   PAReadBias
 };
 
-
 /// Preamp temperature and bias data
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[cfg_attr(feature="pybindings", pyclass)] 
 pub struct PAMoniData {
-  pub board_id           : u8,
-  pub temps              : [f32;16],
-  pub biases             : [f32;16],
-  pub timestamp          : u64,
+  pub board_id   : u8,
+  pub temps      : [f32;16],
+  pub biases     : [f32;16],
+  pub timestamp  : u64,
 }
 
 impl PAMoniData {
@@ -40,6 +39,33 @@ impl PAMoniData {
   pub fn add_biases(&mut self, pb : &PAReadBias) {
     self.biases = pb.read_biases;
   }
+
+  /// Get the paddle temps and resolve the powerboard
+  /// channel to the paddle id 
+  pub fn get_pid_temps(&mut self, pid_map_a : &RbChPidMapping, pid_map_b : &RbChPidMapping ) -> HashMap<u8, (f32, f32)> {
+    let mut pid_temps = HashMap::<u8, (f32,f32)>::new();
+    // the pid_map_a/b are maps rbid -> channel -> pid 
+    // each will contain the board_id 
+    let channels_a = pid_map_a.get(&(self.board_id as u8)).expect("There is no RB {self.board_id} in te provided mapping!");
+    let channels_b = pid_map_b.get(&(self.board_id as u8)).expect("There is no board id {self.board_id} in the provided mapping!");
+    for k in 0..16u8 {
+      if channels_a.contains_key(&(k+1) ) {
+        let pid = channels_a.get(&(k+1)).unwrap();
+        if !pid_temps.contains_key(&pid) {
+          pid_temps.insert(*pid, (-273.0, -273.0));
+        }
+        pid_temps.get_mut(&pid).unwrap().0 = self.temps[k as usize];
+      }
+      if channels_b.contains_key(&(k+1)) {
+        let pid = channels_b.get(&(k+1)).unwrap();
+        if !pid_temps.contains_key(&pid) {
+          pid_temps.insert(*pid, (-273.0, -273.0));
+        }
+        pid_temps.get_mut(&pid).unwrap().1 = self.temps[k as usize];
+      }
+    }
+    pid_temps
+  }
 }
 
 #[cfg(feature="pybindings")]
@@ -56,6 +82,16 @@ impl PAMoniData {
   #[getter]
   fn get_biases(&self) -> [f32;16] {
     self.biases
+  }
+  
+  /// Get the paddle temps and resolve the powerboard
+  /// channel to the paddle id
+  ///
+  /// ISSUES: This needs to be refactored somehow so that
+  ///         it takes references instead of copies...
+  #[pyo3(name="get_pid_temps")]
+  fn get_pid_temps_py(&mut self, pid_map_a : RbChPidMapping, pid_map_b : RbChPidMapping) -> HashMap<u8, (f32, f32)> {
+    self.get_pid_temps(&pid_map_a, &pid_map_b) 
   }
 }
 
