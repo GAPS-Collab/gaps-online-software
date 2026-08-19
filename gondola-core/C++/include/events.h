@@ -30,6 +30,8 @@
 #include "packets/tof_packet.h"
 #include "events/event_status.hpp"
 #include "events/rb_event_header.hpp"
+#include "events/hit_quality.hpp"
+#include "events/post_flight_correction_functions.hpp"
 #include "events/tof_hit.hpp"
 #include "events/rb_event.hpp"
 #include "events/event_quality.hpp"

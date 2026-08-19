@@ -420,16 +420,229 @@ namespace gondola {
          os << "Diamond>";
          break;
        }
-       case g::EventQuality::FourLeafClover : { 
+       case g::EventQuality::FourLeafClover : {
          os << "FourLeafClover>";
          break;
        }
      }
      return os;
   }
-    
+
   /**********************************************************/
-  
+
+  std::ostream& operator<<(std::ostream& os, const g::HitQuality& quality) {
+     os << "<HitQuality: " ;
+     switch (quality) {
+       case g::HitQuality::Unknown : {
+         os << "Unknown>";
+         break;
+       }
+       case g::HitQuality::Mangled : {
+         os << "Mangled>";
+         break;
+       }
+       case g::HitQuality::MissingHit : {
+         os << "MissingHit>";
+         break;
+       }
+       case g::HitQuality::LowPedPlusPedRMS : {
+         os << "LowPedPlusPedRMS>";
+         break;
+       }
+       case g::HitQuality::LowRMSgrThree : {
+         os << "LowRMSgrThree>";
+         break;
+       }
+       case g::HitQuality::LowElenaCuts : {
+         os << "LowElenaCuts>";
+         break;
+       }
+       case g::HitQuality::Low : {
+         os << "Low>";
+         break;
+       }
+       case g::HitQuality::MidPedRMS : {
+         os << "MidPedRMS>";
+         break;
+       }
+       case g::HitQuality::MidPos : {
+         os << "MidPos>";
+         break;
+       }
+       case g::HitQuality::MidPedRMSandPos : {
+         os << "MidPedRMSandPos>";
+         break;
+       }
+       case g::HitQuality::MidPosSat : {
+         os << "MidPosSat>";
+         break;
+       }
+       case g::HitQuality::Mid : {
+         os << "Mid>";
+         break;
+       }
+       case g::HitQuality::HighSat : {
+         os << "HighSat>";
+         break;
+       }
+       case g::HitQuality::High : {
+         os << "High>";
+         break;
+       }
+       case g::HitQuality::ReprocessHigh : {
+         os << "ReprocessHigh>";
+         break;
+       }
+       case g::HitQuality::ReprocessHighSat : {
+         os << "ReprocessHighSat>";
+         break;
+       }
+     }
+     return os;
+  }
+
+  /**********************************************************/
+
+  namespace {
+    // Domains derived from the "side rms vs peak" study (40h dataset):
+    //  * rms <  RMS_GOOD_MAX                       -> unconditionally good (High)
+    //  * rms >= RMS_LOW_MIN                         -> unconditionally bad  (Low), any peak
+    //  * RMS_GOOD_MAX <= rms < RMS_LOW_MIN          -> "correctable" triangle: a large
+    //    peak (good S/N) can still compensate for the elevated baseline noise. The
+    //    triangle's hypotenuse runs from (RMS_GOOD_MAX, peak=0) to (RMS_LOW_MIN, PEAK_REF),
+    //    so hits on/right of it (low peak relative to rms) are Mid, the rest stay High.
+    constexpr f32 RMS_GOOD_MAX = 1.8f;
+    constexpr f32 RMS_LOW_MIN  = 3.0f;
+    constexpr f32 PEAK_REF     = 600.0f;
+    constexpr f32 PED_REF_JEFF     = 1.0f;
+    constexpr f32 PEDRMS_REF_JEFF     = 2.0f;
+
+
+    constexpr f32 RMS_REPROCESS_MIN = 1.7f;
+
+    // Placeholder
+    constexpr f32 POS_CUT_LENGTH_MM = 100.0f;
+
+    //classifies side behavior
+    auto classify_side(f32 rms, f32 peak, f32 ped, f32 tot725) -> g::HitQuality {
+
+      // +++++  large pulse IFs +++++
+      if ((tot725 != 0) && (rms > RMS_REPROCESS_MIN))
+      {
+        return g::HitQuality::ReprocessHighSat;
+      }
+      else if (tot725 != 0) {
+        return g::HitQuality::HighSat;
+      }
+
+      if ((peak > PEAK_REF) && (rms > RMS_REPROCESS_MIN))
+      {
+        return g::HitQuality::ReprocessHigh;
+      }
+      else if (peak > PEAK_REF) {
+        return g::HitQuality::High;
+      }
+      // +++++  END large pulse IFs +++++
+
+      f32 boundary = RMS_GOOD_MAX + (RMS_LOW_MIN - RMS_GOOD_MAX) * (peak / PEAK_REF);
+      //mid and low side classificaiton
+      if (rms >= RMS_LOW_MIN) { // box2 cuts
+        return g::HitQuality::LowRMSgrThree;
+      }
+      else if ((rms >= PEDRMS_REF_JEFF) && (std::abs(ped) >= PED_REF_JEFF)) { // jeff's cuts
+        return g::HitQuality::LowPedPlusPedRMS;
+      }
+      if (rms >= boundary) { //coincidence (box1) cuts
+        return g::HitQuality::MidPedRMS;
+      }
+      //anything else will be a good pulse...
+
+      return g::HitQuality::High;
+    }
+
+    // true if the hit's reconstructed position sits away from both paddle
+    // ends by at least POS_CUT_LENGTH_MM. Everything in this function is
+    // kept in mm - paddle_len is stored in cm, so it's converted once here.
+    auto position_ok(const g::TofHit& hit) -> bool {
+      f32 paddle_len_mm = 10.0f * hit.paddle_len;
+      f32 half_len_mm   = paddle_len_mm / 2.0f;
+      f32 x_pos_mm      = hit.get_x_pos(); // already mm
+      return (x_pos_mm > -half_len_mm + POS_CUT_LENGTH_MM) && (x_pos_mm < half_len_mm - POS_CUT_LENGTH_MM);
+    }
+  }
+
+  auto postFlightCorrectionFunctions::corrected_rms_noWF(f32 mu, f32 sigB, u32 num) -> f32 {
+    f32 n   = static_cast<f32>(num);
+    f32 val = ((n - mu*mu) / n) * (sigB*sigB) - mu*mu;
+    if (!std::isfinite(val) || val < 0.0f) {
+      return std::numeric_limits<f32>::quiet_NaN();
+    }
+    return std::sqrt(val);
+  }
+
+  /**********************************************************/
+
+  auto classify_hit(const g::TofHit& hit) -> g::HitQuality {
+    //hit obeys causality
+    if (!hit.obeys_causality()) {
+      return g::HitQuality::Low;
+    }
+    // #### ped RMS and Ped classificaiton... ####
+    // (uncorrected) rms if the correction is undefined (NaN)
+    f32 baseline_a_correction = postFlightCorrectionFunctions::corrected_rms_noWF(hit.baseline_a, hit.baseline_a_rms);
+    f32 baseline_b_correction = postFlightCorrectionFunctions::corrected_rms_noWF(hit.baseline_b, hit.baseline_b_rms);
+    // this will be fixed by grace, keep the correction now...
+    if (!std::isfinite(baseline_a_correction)) {
+      baseline_a_correction = hit.baseline_a_rms;
+    }
+    if (!std::isfinite(baseline_b_correction)) {
+      baseline_b_correction = hit.baseline_b_rms;
+    }
+    auto quality_a = classify_side(baseline_a_correction, hit.get_peak_a(), hit.baseline_a, hit.tot_high_a);
+    auto quality_b = classify_side(baseline_b_correction, hit.get_peak_b(), hit.baseline_b, hit.tot_high_b);
+
+    // a side already in the High family (High/HighSat/ReprocessHigh/ReprocessHighSat)
+    // reflects a large/saturated pulse on that side, and shouldn't be dragged
+    // down to Low/Mid.
+    auto is_high_family = [](g::HitQuality q) {
+      return q == g::HitQuality::High || q == g::HitQuality::HighSat
+          || q == g::HitQuality::ReprocessHigh || q == g::HitQuality::ReprocessHighSat;
+    };
+
+    bool a_saturated = is_high_family(quality_a);
+    bool b_saturated = is_high_family(quality_b);
+    g::HitQuality quality;
+    if (a_saturated != b_saturated) {
+      quality = a_saturated ? quality_a : quality_b;
+    } else {
+      // both saturated, or neither the worse side wins
+      quality = std::min(quality_a, quality_b);
+    }
+
+    // #### paddle position classification... ####
+    // position cuts only ever demote a Mid/High verdict further into Mid
+    // an already-Low hit stays Low regardless of where it reconstructs
+    if (!position_ok(hit)) {
+      switch (quality) {
+        case g::HitQuality::MidPedRMS:
+          quality = g::HitQuality::MidPedRMSandPos;
+          break;
+        case g::HitQuality::HighSat:
+          quality = g::HitQuality::MidPosSat;
+          break;
+        case g::HitQuality::High:
+          quality = g::HitQuality::MidPos;
+          break;
+        default:
+          break;
+      }
+    }
+
+    return quality;
+  }
+
+  /**********************************************************/
+
   std::ostream& operator<<(std::ostream& os, const g::CompressionLevel& level) {
      os << "<CompressionLevel: " ;
      switch (level) {
@@ -1341,7 +1554,7 @@ auto g::TofHit::from_bytestream(const Vec<u8> &bytestream, u64 &pos)
    return Err(err);
  }
  u8 quality_version_u8     = g::parse_u8(bytestream, ver_pos);
- hit.quality               = static_cast<EventQuality>(quality_version_u8 & 0x3f);
+ hit.quality               = static_cast<HitQuality>(quality_version_u8 & 0x3f);
  hit.version               = (g::ProtocolVersion)(quality_version_u8 & 0xc0);
  //u8  version        = g::parse_u8(bytestream, ver_pos);
  //hit.version        = (g::ProtocolVersion) version;
