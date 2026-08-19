@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>A guided tour to get you started &#8212; gondola 0.12.33 documentation</title>
+    <title>A guided tour to get you started &#8212; gondola 0.12.34 documentation</title>
   
   
   
@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="_static/documentation_options.js?v=788f65e6"></script>
+    <script src="_static/documentation_options.js?v=e74cd3f7"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'guided_tour';</script>
@@ -117,7 +117,7 @@
   
   
   
-    <p class="title logo__title">gondola 0.12.33 documentation</p>
+    <p class="title logo__title">gondola 0.12.34 documentation</p>
   
 </a></div>
     
@@ -368,8 +368,8 @@ the <cite>SimpleDet library &lt;https://uhhepvcs.phys.hawaii.edu/philipvd/Simple
 <h3>L0 data - binary merger of telemetry and TOF disk data<a class="headerlink" href="#l0-data-binary-merger-of-telemetry-and-tof-disk-data" title="Link to this heading">#</a></h3>
 <p>For reading the L0 data, you can do the following</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gondola</span>
-<span class="c1"># Set up a reader - For L0 data, we will need &quot;CRReader&quot;</span>
-<span class="n">reader</span> <span class="o">=</span> <span class="n">CRReader</span><span class="p">(</span><span class="s2">&quot;/path/to/L0/data&quot;</span><span class="p">)</span> <span class="c1"># &lt;- can be a single file</span>
+<span class="c1"># Set up a reader - For L0 data, we will need "CRReader"</span>
+<span class="n">reader</span> <span class="o">=</span> <span class="n">CRReader</span><span class="p">(</span><span class="s2">"/path/to/L0/data"</span><span class="p">)</span> <span class="c1"># &lt;- can be a single file</span>
                                       <span class="c1"># or a directory, it will</span>
                                       <span class="c1"># figure it out automatically</span>
 
@@ -381,15 +381,15 @@ the <cite>SimpleDet library &lt;https://uhhepvcs.phys.hawaii.edu/philipvd/Simple
 <span class="c1"># The reader acts as an iterator and can be looped over.</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">tqdm</span> <span class="c1"># &lt;- Just for the progressbar, can be omitted</span>
 <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">tqdm</span><span class="p">(</span><span class="n">reader</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="n">nframes</span><span class="p">):</span>
-    <span class="c1"># the frame has an &quot;index&quot; showing the contents of the</span>
+    <span class="c1"># the frame has an "index" showing the contents of the</span>
     <span class="c1"># frame. It is a dictionary string -&gt; packet</span>
     <span class="nb">print</span> <span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
     <span class="c1"># This allows to check if a frame contains a certain key</span>
-    <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="s1">&#39;TelemetryPacketType.NoGapsTriggerEvent&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="s1">'TelemetryPacketType.NoGapsTriggerEvent'</span><span class="p">):</span>
         <span class="n">ev</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">get_telemetryevent</span><span class="p">()</span> <span class="c1"># no argument needed if this</span>
                                           <span class="ow">is</span> <span class="n">unambiguous</span>
         <span class="c1"># if multiple events are in the frame, specify packet name</span>
-        <span class="n">ev</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">get_telemetryevent</span><span class="p">(</span><span class="s1">&#39;TelemetryPacketType.NoGapsTriggerEvent&#39;</span><span class="p">)</span>
+        <span class="n">ev</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">get_telemetryevent</span><span class="p">(</span><span class="s1">'TelemetryPacketType.NoGapsTriggerEvent'</span><span class="p">)</span>
         <span class="n">ev</span><span class="o">.</span><span class="n">tof</span> <span class="c1"># &lt;- packet TOF data for Telemetry</span>
         <span class="n">ev</span><span class="o">.</span><span class="n">tracker</span> <span class="c1"># &lt;- tracker hits</span>
 
@@ -503,7 +503,7 @@ proxy for the time-of-flight can be obtained fairly simply with the <cite>gondol
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gondola</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gon</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="c1"># creates a dictionary of rb_id -&gt; RBCalibrations</span>
-<span class="n">calib</span> <span class="o">=</span> <span class="n">gon</span><span class="o">.</span><span class="n">calibration</span><span class="o">.</span><span class="n">load_rb_calibrations</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/path/to/your/calibration-directory-with-all-calibration-files&#39;</span><span class="p">))</span>
+<span class="n">calib</span> <span class="o">=</span> <span class="n">gon</span><span class="o">.</span><span class="n">calibration</span><span class="o">.</span><span class="n">load_rb_calibrations</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s1">'/path/to/your/calibration-directory-with-all-calibration-files'</span><span class="p">))</span>
 </pre></div>
 </div>
 </section>
@@ -526,7 +526,7 @@ so the bytestream of this packet needs specials treatement.</p>
 
 <span class="n">start_of_run_time</span> <span class="o">=</span> <span class="mi">3600</span> <span class="c1"># e.g. for a run that started and hour in the past</span>
 
-<span class="n">files</span>  <span class="o">=</span> <span class="n">gon</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">grace_get_telemetry_binaries</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_of_run_time</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span> <span class="s1">&#39;/prestaging/live/&#39;</span><span class="p">)</span>
+<span class="n">files</span>  <span class="o">=</span> <span class="n">gon</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">grace_get_telemetry_binaries</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_of_run_time</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span> <span class="s1">'/prestaging/live/'</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
     <span class="n">reader</span> <span class="o">=</span> <span class="n">gon</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">TelemetryPacketReader</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">pack</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
@@ -538,7 +538,7 @@ so the bytestream of this packet needs specials treatement.</p>
                 <span class="k">break</span>
 <span class="c1"># this is the file decompression, and the config</span>
 <span class="c1"># will be saved in test.toml</span>
-<span class="n">gon</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">decompress_toml</span><span class="p">(</span><span class="n">lpt</span><span class="o">.</span><span class="n">payload</span><span class="p">,</span> <span class="s1">&#39;test.toml&#39;</span><span class="p">)</span>
+<span class="n">gon</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">decompress_toml</span><span class="p">(</span><span class="n">lpt</span><span class="o">.</span><span class="n">payload</span><span class="p">,</span> <span class="s1">'test.toml'</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>

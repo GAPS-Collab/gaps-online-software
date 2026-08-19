@@ -12,6 +12,7 @@ var dir_81644d6308dab417156220ca507a652d =
     [ "sd_legacy.cxx", "sd__legacy_8cxx.html", null ],
     [ "serialization.cxx", "serialization_8cxx.html", "serialization_8cxx" ],
     [ "telemetry_dataclasses.cxx", "telemetry__dataclasses_8cxx.html", null ],
+    [ "telemetry_packet.cxx", "telemetry__packet_8cxx.html", null ],
     [ "telemetry_reader.cxx", "telemetry__reader_8cxx.html", null ],
     [ "tof_packet.cxx", "tof__packet_8cxx.html", "tof__packet_8cxx" ],
     [ "tracker_hit.cxx", "tracker__hit_8cxx.html", null ],
