@@ -1,3 +1,6 @@
+[general] 
+parts_root_dir = "/home/achim/gaps/gaps-detector-parts"
+
 [gun] 
 # the source can be set to a fixed position
 fixed_pos     = true 
@@ -27,7 +30,7 @@ tof_active_from_db = false
 # if this is different from 0, we 
 # will only place this specific 
 # paddle id
-only_place_pid = 1
+only_place_pid = 0
 tof_panel_1    = [ 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12] 
 tof_panel_2    = [13,14,15,16,17,18,19,20,21,22,23,24]
 tof_panel_3    = [25,26,27,28,29,30,31,32]
@@ -37,7 +40,19 @@ tof_panel_6    = [49,50,51,52,53,54,55,56]
 edge_paddles   = [57,58,59,60]
 tof_panel_7    = [61,62,63,64,65,66,67,68,69,70,71,72]
 tof_panel_8    = [73,74,75,76,77,78]
-
+tof_panel_9    = [79,80,81,82,83,84]
+tof_panel_10   = [85,86,87,88,89,90]
+tof_panel_11   = [91,92,93,94,95,96]
+tof_panel_12   = [97,98,99,100,101,102]
+tof_panel_13   = [103,104,105,106,107,108]
+tof_panel_14   = [109,110,111,112,113,114,115,116,117,118]
+tof_panel_15   = [119,120,121,122,123,124,125,126,127,128]
+tof_panel_16   = [129,130,131,132,133,134,135,136,137,138]
+tof_panel_17   = [139,140,141,142,143,144,145,146,147,148]
+tof_panel_18   = [149,150,151]
+tof_panel_19   = [152,153,154]
+tof_panel_20   = [155,156,157]
+tof_panel_21   = [158,159,160]
 all_sili       = true 
 
 [passive_materials]

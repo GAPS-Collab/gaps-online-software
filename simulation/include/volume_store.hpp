@@ -11,6 +11,7 @@
 
 #include "tof_typedefs.h"
 #include "materials.hpp"
+#include "sim_config.hpp"
 
 namespace gondola {
   typedef G4LogicalVolume* G4LogicalVolumePtr;
@@ -18,7 +19,7 @@ namespace gondola {
   typedef G4VSolid* G4VSolidPtr;
   typedef G4TessellatedSolid* G4TessellatedSolidPtr;
 
-  auto InitLVolumes() -> void;
+  auto InitLVolumes(const SimConfig& cfg) -> void;
 
   auto GetLogicalVolumeByName(const G4String& name)              -> G4LogicalVolumePtr; 
   auto GetTessSolidFromGdml(const G4String& name, bool validate) -> G4TessellatedSolidPtr;

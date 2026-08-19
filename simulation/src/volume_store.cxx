@@ -171,7 +171,7 @@ auto go::GetTessSolidFromGdml(const G4String& f_name, bool validate) -> go::G4Te
 //} 
 
 
-auto go::InitLVolumes() -> void {
+auto go::InitLVolumes(const SimConfig& cfg) -> void {
 
   // rgb colors
   f32 r     = 3.0/255.0;
@@ -289,25 +289,41 @@ auto go::InitLVolumes() -> void {
                                                    scinti_name );
   scinti_pid80_98_lvol->SetVisAttributes(paddle_vis);
 
+  // gaps detector part dir 
+  auto parts_root = cfg.parts_root_dir;
+
   // tracker volumes
-  auto t_mod_frame      = go::GetTessSolidFromGdml("/srv/gaps/gaps-detector-parts/gdml/tracker/module/shrink/frame.shrink0.999.fix.gdml", false);
+  auto t_mod_frame      = go::GetTessSolidFromGdml(parts_root + "/gdml/tracker/module/shrink/frame.shrink0.999.fix.gdml", false);
   auto t_mod_frame_lvol = new G4LogicalVolume (t_mod_frame,
                                                go::GetMaterial("Al"),
                                                "PassiveTrackerModuleFrame");
   t_mod_frame_lvol->SetVisAttributes(frame_vis);
   // top_window
-  auto t_mod_top = go::GetTessSolidFromGdml("/srv/gaps/gaps-detector-parts/gdml/tracker/module/top_window.fix.gdml", false);
+  auto t_mod_top = go::GetTessSolidFromGdml(parts_root + "/gdml/tracker/module/top_window.fix.gdml", false);
   //auto t_mod_top      = go::GetTessSolidFromGdml("/srv/gaps/gaps-detector-parts/gdml/tracker/module/top_window.fix.gdml", false);
   auto t_mod_top_lvol = new G4LogicalVolume (t_mod_top,
                                              go::GetMaterial("Al"),
                                              "PassiveTrackerTopWindow");
   t_mod_top_lvol->SetVisAttributes(frame_vis);
-  auto t_mod_bot      = go::GetTessSolidFromGdml("/srv/gaps/gaps-detector-parts/gdml/tracker/module/bot_window.gdml", false);
+  auto t_mod_bot      = go::GetTessSolidFromGdml(parts_root + "/gdml/tracker/module/bot_window.gdml", false);
   auto t_mod_bot_lvol = new G4LogicalVolume (t_mod_bot,
                                              go::GetMaterial("Al"),
                                              "PassiveTrackerBotWindow");
   t_mod_bot_lvol->SetVisAttributes(frame_vis);
+  
+  // frame, inner and outer
+  auto frame_outer = go::GetTessSolidFromGdml(parts_root + "/frame-outer.gdml", false);
+  auto frame_outer_lvol = new G4LogicalVolume (frame_outer,
+                                               G4Material::GetMaterial("Al"),
+                                               "PassiveOuterFrame");
+  frame_outer_lvol->SetVisAttributes(frame_vis);
 
+  //auto frame_inner = go::GetTessSolidFromGdml(parts_root + "/frame-outer.gdml", false);
+  //auto frame_inner_lvol = new G4LogicalVolume(frame_inner,
+  //                                            G4Material::GetMaterial("Al"),
+  //                                            "PassiveInnerFrame");
+  //frame_inner_lvol->SetVisAttributes(frame_vis);
+  
   // foam
   //auto tfoam = go::GetTessSolidFromGdml("/srv/gaps/gaps-detector-parts/tracker-foam-piece.fix.gdml", false);
   //auto tfoam_lvol = new G4LogicalVolume (tfoam,

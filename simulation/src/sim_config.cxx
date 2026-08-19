@@ -13,6 +13,7 @@ auto SimConfig::from_file(std::string fname) -> SimConfig {
   std::cout << "======================================" << std::endl;
   //exit(1);
   // get key-value pairs
+  sim.parts_root_dir               = config["general"]["parts_root_dir"].value_or("");
   sim.gun_fixed_pos                = config["gun"]["fixed_pos"].value_or(false);
   sim.gun_fixed_pos_x              = config["gun"]["fixed_pos_x"].value_or(0.0);
   sim.gun_fixed_pos_y              = config["gun"]["fixed_pos_y"].value_or(0.0);
@@ -75,6 +76,45 @@ auto SimConfig::from_file(std::string fname) -> SimConfig {
       active_pids.push_back(el.value_or(0)); 
     } 
     for (auto&& el : *config["active_detectors"]["tof_panel_8"].as_array()) {
+      active_pids.push_back(el.value_or(0)); 
+    } 
+    for (auto&& el : *config["active_detectors"]["tof_panel_9"].as_array()) {
+      active_pids.push_back(el.value_or(0)); 
+    } 
+    for (auto&& el : *config["active_detectors"]["tof_panel_10"].as_array()) {
+      active_pids.push_back(el.value_or(0)); 
+    } 
+    for (auto&& el : *config["active_detectors"]["tof_panel_11"].as_array()) {
+      active_pids.push_back(el.value_or(0)); 
+    } 
+    for (auto&& el : *config["active_detectors"]["tof_panel_12"].as_array()) {
+      active_pids.push_back(el.value_or(0)); 
+    } 
+    for (auto&& el : *config["active_detectors"]["tof_panel_13"].as_array()) {
+      active_pids.push_back(el.value_or(0)); 
+    } 
+    for (auto&& el : *config["active_detectors"]["tof_panel_14"].as_array()) {
+      active_pids.push_back(el.value_or(0)); 
+    } 
+    for (auto&& el : *config["active_detectors"]["tof_panel_15"].as_array()) {
+      active_pids.push_back(el.value_or(0)); 
+    } 
+    for (auto&& el : *config["active_detectors"]["tof_panel_16"].as_array()) {
+      active_pids.push_back(el.value_or(0)); 
+    } 
+    for (auto&& el : *config["active_detectors"]["tof_panel_17"].as_array()) {
+      active_pids.push_back(el.value_or(0)); 
+    } 
+    for (auto&& el : *config["active_detectors"]["tof_panel_18"].as_array()) {
+      active_pids.push_back(el.value_or(0)); 
+    } 
+    for (auto&& el : *config["active_detectors"]["tof_panel_19"].as_array()) {
+      active_pids.push_back(el.value_or(0)); 
+    } 
+    for (auto&& el : *config["active_detectors"]["tof_panel_20"].as_array()) {
+      active_pids.push_back(el.value_or(0)); 
+    } 
+    for (auto&& el : *config["active_detectors"]["tof_panel_21"].as_array()) {
       active_pids.push_back(el.value_or(0)); 
     } 
     sim.active_paddles = active_pids;

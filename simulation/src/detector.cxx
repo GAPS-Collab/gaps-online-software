@@ -19,6 +19,9 @@ namespace go = gondola;
 
 go::GapsDetector::GapsDetector(const SimConfig& cfg) {
   sim_config = cfg;
+  // make all logical volumes globally available through 
+  // Geant4 managers, together with the needed materials
+  go::InitLVolumes(cfg);
 }
 
 auto go::GapsDetector::SaveGeometry(std::string fname) -> void {
@@ -40,9 +43,6 @@ auto go::GapsDetector::Construct() -> G4VPhysicalVolume* {
   // Geant4 manages all the boxes and logical volumes, don't delete
   u64 psv_vid         = 300000000; // smallest passive Volume id
   f32 world_extent    = 4400;
-  // make all logical volumes globally available through 
-  // Geant4 managers, together with the needed materials
-  go::InitLVolumes();
   auto air      = G4Material::GetMaterial("Air"); 
   auto worldbox = new G4Box("WorldVolId0", world_extent, world_extent, world_extent);
   auto worldvol = new G4LogicalVolume(worldbox,air, "WorldVolId0"); 
@@ -72,9 +72,9 @@ auto go::GapsDetector::Construct() -> G4VPhysicalVolume* {
 
   // tracker foam
   auto general_foam_trafo = G4ThreeVector(0,46.5, -3.1);
-  auto tfoam_odd  = go::GetAssemblyFromGdml("/srv/gaps/gaps-detector-parts/gdml/tracker/foam/layer_odd.assembly.gdml", false);
+  auto tfoam_odd  = go::GetAssemblyFromGdml(sim_config.parts_root_dir + "/gdml/tracker/foam/layer_odd.assembly.gdml", false);
   if (sim_config.pm_trk_foam_bot) {
-    auto tfoam_bot  = go::GetAssemblyFromGdml("/srv/gaps/gaps-detector-parts/trk-foam-bot.gdml", false);
+    auto tfoam_bot  = go::GetAssemblyFromGdml(sim_config.parts_root_dir + "/trk-foam-bot.gdml", false);
     for (auto const &k : tfoam_bot) {
       auto trala = k->GetTranslation();
       // slight adjustment, reason unknonwn
@@ -379,7 +379,30 @@ auto go::GapsDetector::Construct() -> G4VPhysicalVolume* {
     auto strip_vol = GetLogicalVolumeByName(strip_name);
     active_vols.push_back(strip_vol);
   }
-  
+
+  // the framing 
+  //auto outer_frame = go::GetLogicalVolumeByName("PassiveOuterFrame");
+  auto outer_frame = go::GetAssemblyFromGdml(sim_config.parts_root_dir + "/frame-outer.gdml", false);
+  G4Transform3D of_transform;
+  G4ThreeVector of_pos = G4ThreeVector(0,
+                                       0,
+                                       0);
+  of_transform = G4Translate3D(of_pos)
+     * G4RotateZ3D(90*deg)
+     * G4RotateX3D(90*deg);
+  //of_transform     = of_transform*G4RotateX3D(90*deg);
+  for (auto const &k : outer_frame) {
+    new G4PVPlacement(of_transform,
+                      k->GetLogicalVolume(),
+                      //outer_frame,
+                      "PassiveOuterFrame",
+                      worldvol,
+                      false,
+                      psv_vid,
+                      check_overlap);
+    ++psv_vid;
+  }
+
   // place active TOF paddles 
   auto paddles = gondola::get_tofpaddles(); 
   usize npaddles = 0;
