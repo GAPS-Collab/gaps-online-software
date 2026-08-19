@@ -581,6 +581,20 @@ impl TofHit {
     return edep; 
   }
 
+  // whatever newest and latest stuff we could not have anticipated 
+  // 3 years ago
+  pub fn get_edep_birk(&self) -> f32 { 
+    let x0    = self.get_pos();
+    let att_a = ((3.9-0.00126*( x0+self.paddle_len/2.))+22.15).exp() / ((3.9)+22.15).exp();
+    let att_b = ((3.9-0.00126*(-x0+self.paddle_len/2.))+22.15).exp() / ((3.9)+22.15).exp();
+    //let edep  = 0.0159 * (self.get_peak_a()/att_a + self.get_peak_b()/att_b) / 2.; // vertical muon peak @ 0.97 MeV
+    //return edep; 
+  
+    let V  = (self.get_peak_a()/att_a + self.get_peak_b()/att_b) / 2.0; 
+    let edep = -1000.0*V/(21.0*V - 35260.0);
+    return edep;
+  }
+
   /// Arrival time of the photons at side A
   pub fn get_time_a(&self) -> f32 {
     self.time_a.to_f32()
