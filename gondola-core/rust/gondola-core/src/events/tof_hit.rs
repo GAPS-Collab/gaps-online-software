@@ -371,6 +371,13 @@ impl TofHit {
   fn get_edep_att_py(&self) -> f32 {
     self.get_edep_att()
   }
+  
+  /// The "new" thing following Birk's law
+  #[getter]
+  #[pyo3(name="edep_att_birk")]
+  fn get_edep_att_py(&self) -> f32 {
+    self.get_edep_birk()
+  }
 
   /// Arrival time of the photons at side A
   #[getter]
