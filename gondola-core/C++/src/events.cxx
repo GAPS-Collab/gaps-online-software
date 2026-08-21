@@ -477,6 +477,14 @@ namespace gondola {
          os << "MidPosSat>";
          break;
        }
+       case g::HitQuality::MidPosSatReprocess : {
+         os << "MidPosSatReprocess>";
+         break;
+       }
+       case g::HitQuality::MidPosReprocess : {
+         os << "MidPosReprocess>";
+         break;
+       }
        case g::HitQuality::Mid : {
          os << "Mid>";
          break;
@@ -560,14 +568,14 @@ namespace gondola {
       return g::HitQuality::High;
     }
 
-    // true if the hit's reconstructed position sits away from both paddle
-    // ends by at least POS_CUT_LENGTH_MM. Everything in this function is
-    // kept in mm - paddle_len is stored in cm, so it's converted once here.
+
+    // NB: get_x_pos() is measured from end A (x=0) to end B (x=paddle_len_mm),
+    // not centered on the paddle - see get_edep()/sd_legacy.cxx for the same
+    // convention.
     auto position_ok(const g::TofHit& hit) -> bool {
       f32 paddle_len_mm = 10.0f * hit.paddle_len;
-      f32 half_len_mm   = paddle_len_mm / 2.0f;
       f32 x_pos_mm      = hit.get_x_pos(); // already mm
-      return (x_pos_mm > -half_len_mm + POS_CUT_LENGTH_MM) && (x_pos_mm < half_len_mm - POS_CUT_LENGTH_MM);
+      return (x_pos_mm > POS_CUT_LENGTH_MM) && (x_pos_mm < paddle_len_mm - POS_CUT_LENGTH_MM);
     }
   }
 
@@ -583,23 +591,33 @@ namespace gondola {
   /**********************************************************/
 
   auto classify_hit(const g::TofHit& hit) -> g::HitQuality {
+
+    //fatal analysis cuts...
     //hit obeys causality
     if (!hit.obeys_causality()) {
       return g::HitQuality::Low;
     }
+    // #### Elena's cuts - cases where the analysis itself failed ####
+    if (hit.baseline_a == 0 || hit.get_time_a() == 0
+     || hit.baseline_b == 0 || hit.get_time_b() == 0
+     || hit.get_time_a() > 350 || hit.get_time_b() > 350) {
+      return g::HitQuality::LowElenaCuts;
+    }
+
+
     // #### ped RMS and Ped classificaiton... ####
     // (uncorrected) rms if the correction is undefined (NaN)
-    f32 baseline_a_correction = postFlightCorrectionFunctions::corrected_rms_noWF(hit.baseline_a, hit.baseline_a_rms);
-    f32 baseline_b_correction = postFlightCorrectionFunctions::corrected_rms_noWF(hit.baseline_b, hit.baseline_b_rms);
+    f32 baseline_a_rms_correction = postFlightCorrectionFunctions::corrected_rms_noWF(hit.baseline_a, hit.baseline_a_rms);
+    f32 baseline_b_rms_correction = postFlightCorrectionFunctions::corrected_rms_noWF(hit.baseline_b, hit.baseline_b_rms);
     // this will be fixed by grace, keep the correction now...
-    if (!std::isfinite(baseline_a_correction)) {
-      baseline_a_correction = hit.baseline_a_rms;
+    if (!std::isfinite(baseline_a_rms_correction)) {
+      baseline_a_rms_correction = hit.baseline_a_rms;
     }
-    if (!std::isfinite(baseline_b_correction)) {
-      baseline_b_correction = hit.baseline_b_rms;
+    if (!std::isfinite(baseline_b_rms_correction)) {
+      baseline_b_rms_correction = hit.baseline_b_rms;
     }
-    auto quality_a = classify_side(baseline_a_correction, hit.get_peak_a(), hit.baseline_a, hit.tot_high_a);
-    auto quality_b = classify_side(baseline_b_correction, hit.get_peak_b(), hit.baseline_b, hit.tot_high_b);
+    auto quality_a = classify_side(baseline_a_rms_correction, hit.get_peak_a(), hit.baseline_a, hit.tot_high_a);
+    auto quality_b = classify_side(baseline_b_rms_correction, hit.get_peak_b(), hit.baseline_b, hit.tot_high_b);
 
     // a side already in the High family (High/HighSat/ReprocessHigh/ReprocessHighSat)
     // reflects a large/saturated pulse on that side, and shouldn't be dragged
@@ -611,6 +629,7 @@ namespace gondola {
 
     bool a_saturated = is_high_family(quality_a);
     bool b_saturated = is_high_family(quality_b);
+
     g::HitQuality quality;
     if (a_saturated != b_saturated) {
       quality = a_saturated ? quality_a : quality_b;
@@ -633,6 +652,13 @@ namespace gondola {
         case g::HitQuality::High:
           quality = g::HitQuality::MidPos;
           break;
+        case g::HitQuality::ReprocessHighSat:
+          quality = g::HitQuality::MidPosSatReprocess;
+          break;
+        case g::HitQuality::ReprocessHigh:
+          quality = g::HitQuality::MidPosReprocess;
+          break;
+
         default:
           break;
       }
@@ -1371,7 +1397,9 @@ auto g::TofEvent::to_string() const -> std::string {
 /*************************************/
 
 void g::TofHit::set_paddle_len(f32 paddle_len) {
-  paddle_len = paddle_len;
+  // was this, but does this cause a collision without this?
+  //paddle_len = paddle_len;
+  this->paddle_len = paddle_len;
 }
 
 /*************************************/

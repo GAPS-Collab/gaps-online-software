@@ -36,6 +36,8 @@ namespace gondola {
     MidPos            = 12, // hit position too close to a paddle end
     MidPedRMSandPos   = 13, // MidPedRMS and MidPos both apply
     MidPosSat         = 14, // position issue on an otherwise-saturated pulse; ped cuts don't apply to saturated pulses
+    MidPosSatReprocess= 15,
+    MidPosReprocess   = 16,
     Mid               = 20, // general Mid status
 
     HighSat           = 21, // High, but the pulse is saturated (> 600 mV)
