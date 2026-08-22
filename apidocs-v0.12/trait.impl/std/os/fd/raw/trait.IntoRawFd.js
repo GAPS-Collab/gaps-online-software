@@ -1,5 +1,5 @@
 (function() {
-    const implementors = Object.fromEntries([["nix",[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.97.1/std/os/fd/raw/trait.IntoRawFd.html\" title=\"trait std::os::fd::raw::IntoRawFd\">IntoRawFd</a> for <a class=\"struct\" href=\"nix/pty/struct.PtyMaster.html\" title=\"struct nix::pty::PtyMaster\">PtyMaster</a>",0]]],["rustix",[]]]);
+    const implementors = Object.fromEntries([["nix",[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.98.0/std/os/fd/raw/trait.IntoRawFd.html\" title=\"trait std::os::fd::raw::IntoRawFd\">IntoRawFd</a> for <a class=\"struct\" href=\"nix/pty/struct.PtyMaster.html\" title=\"struct nix::pty::PtyMaster\">PtyMaster</a>",0]]],["rustix",[]]]);
     if (window.register_implementors) {
         window.register_implementors(implementors);
     } else {
