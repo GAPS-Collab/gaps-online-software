@@ -126,7 +126,13 @@ macro_rules! pythonize_monidata {
       fn set_timestamp(&mut self, timestamp : u64) {
         self.timestamp = timestamp;
       }
-    
+   
+      #[getter]
+      #[pyo3(name="timestamp")]
+      fn get_timestamp_py(&self) -> u64 {
+        self.timestamp
+      }
+
       #[getter]
       #[pyo3(name="board_id")]
       fn board_id_py(&self) -> u8 {

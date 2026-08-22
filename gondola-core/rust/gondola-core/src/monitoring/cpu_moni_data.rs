@@ -234,11 +234,6 @@ impl CPUMoniData {
   fn get_mb_temp(&self) -> f32 {
     self.mb_temp
   }  
- 
-  #[getter]
-  fn get_timestamp_py(&self) -> u64 {
-    self.timestamp
-  }
 }
 
 //----------------------------------------

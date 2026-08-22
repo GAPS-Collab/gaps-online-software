@@ -15,13 +15,21 @@ pub fn create_tof_paddle_temp_table( db_path: &str, paddle_temps: Vec<TofPaddleT
   let mut _query_result = diesel::sql_query("
       CREATE TABLE IF NOT EXISTS tof_db_tofpaddletemp (
           data_id INTEGER PRIMARY KEY AUTOINCREMENT,
-          paddlie_id          SMALLINT NOT NULL, 
-          utc_timestamp       BIGINT NOT NULLt,
-          temp_a              FLOAT NOT NULL,
-          temp_b              FLOAT NOT NULL,
+          paddle_id SMALLINT NOT NULL, 
+          utc_timestamp BIGINT NOT NULL,
+          temp_a FLOAT NOT NULL,
+          temp_b FLOAT NOT NULL,
           meta TEXT
       )
   ").execute(&mut conn);
+  match _query_result {
+    Ok(_) => {
+      println!("Created table successfully!");
+    }
+    Err(err) => {
+      println!("Error occured when creating tof_db_tofpaddletemp table! {err}");
+    }
+  }
   _query_result = diesel::insert_into(tof_db_tofpaddletemp)
     .values(&paddle_temps)
     .execute(&mut conn);
@@ -32,6 +40,37 @@ pub fn create_tof_paddle_temp_table( db_path: &str, paddle_temps: Vec<TofPaddleT
     Err(err) => {
       println!("Error occured when entering data in the db! {err}");
     }
+  }
+}
+
+#[derive(Debug, PartialEq, Clone)]
+#[allow(non_snake_case)]
+#[cfg_attr(feature="pybindings", pyclass)]
+pub struct TofPaddleTempDataSeries {
+  pub temp_a         : Vec<f32>,
+  pub temp_b         : Vec<f32>,
+  pub utc_timestamps : Vec<u64>,
+  pub paddle_id      : u8
+}
+
+impl TofPaddleTempDataSeries {
+  pub fn new() -> Self {
+    Self {
+      temp_a         : Vec::<f32>::new(),
+      temp_b         : Vec::<f32>::new(),
+      utc_timestamps : Vec::<u64>::new(),
+      paddle_id      : 0
+    }
+  }
+}
+
+impl fmt::Display for TofPaddleTempDataSeries {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let mut repr = String::from("<TofPaddleTempDataSeries:");
+    repr += &(format!("\n  Paddle ID : {}", self.paddle_id));
+    repr += &(format!("\n  Values    : {}", self.temp_a.len()));
+    repr += ">";
+    write!(f, "{}", repr)
   }
 }
 
@@ -66,11 +105,11 @@ impl TofPaddleTemp {
     }
   }
  
-  /// Retrieve all paddle calibration times as they are 
+  /// Retrieve all paddle temperatures
   /// stroed in the database
   ///
   /// # Returns:
-  ///   * Vec<Self>  : All paddletimes as they are 
+  ///   * Vec<Self>  : All paddle temperatures as they are 
   ///                  stored in the db
   pub fn all() -> Option<Vec<Self>> {
     use schema::tof_db_tofpaddletemp::dsl::*;
@@ -80,17 +119,42 @@ impl TofPaddleTemp {
         error!("Unable to load TOF paddle temperature data from db! {err}");
         return None;
       }
-      Ok(cali_times) => {
-        return Some(cali_times);
+      Ok(tpts) => {
+        return Some(tpts);
       }
     }
   }
-
-  pub fn from_telemetry_packet(pack : &TelemetryPacket) -> Self { 
-    let mut tpt = Self::new();
-    tpt.utc_timestamp = pack.header.get_gcutime() as i64;
-    return tpt;
+  
+  /// Retrieve all paddle temperatures for a specific paddle id
+  ///
+  /// # Returns:
+  ///   * Vec<Self>  : All paddle tempereaturs as they are 
+  ///                  stored in the db for this paddle id
+  pub fn all_for_paddle(pid : u8) -> Option<TofPaddleTempDataSeries> {
+    use schema::tof_db_tofpaddletemp::dsl::*;
+    let mut conn = connect_to_db().ok()?;
+    let results = tof_db_tofpaddletemp
+      .filter(paddle_id.eq(pid as i16))
+      .load::<Self>(&mut conn);
+    let mut ds = TofPaddleTempDataSeries::new();
+    match results {
+      Err(err) => {
+        error!("Unable to load TOF paddle temperature data from db! {err}");
+        return None;
+      }
+      Ok(tpts) => {
+        //return Some(tpts);
+        return Some(ds);
+      }
+    }
+    
   }
+
+  //pub fn from_telemetry_packet(pack : &TelemetryPacket) -> Self { 
+  //  let mut tpt = Self::new();
+  //  tpt.utc_timestamp = pack.header.get_gcutime() as i64;
+  //  return tpt;
+  //}
 
 
   //pub fn from_pa_monidata(&PAMoniData) -> Self {
@@ -122,6 +186,11 @@ impl fmt::Display for TofPaddleTemp {
 
 #[cfg(feature="pybindings")]
 #[pymethods]
+impl TofPaddleTempDataSeries {
+}
+
+#[cfg(feature="pybindings")]
+#[pymethods]
 impl TofPaddleTemp {
   
   #[staticmethod]
@@ -130,16 +199,61 @@ impl TofPaddleTemp {
     Self::all()
   } 
   
+  /// Retrieve all paddle temperatures for a specific paddle id
+  ///
+  /// # Returns:
+  ///   * Vec<Self>  : All paddle tempereaturs as they are 
+  ///                  stored in the db for this paddle id
+  #[staticmethod]
+  #[pyo3(name="all_for_paddle")]
+  fn all_for_paddle_py(pid : u8) -> Option<TofPaddleTempDataSeries> {
+    Self::all_for_paddle(pid)
+  } 
 
   #[getter]
   fn get_utc_timestamp(&self) -> i64 {
     self.utc_timestamp
+  }
+  
+  #[setter]
+  fn set_utc_timestamp(&mut self, ts : i64) {
+    self.utc_timestamp = ts;
   }
    
   #[getter]
   fn get_meta    (&self) -> Option<String> {
     self.meta.clone()
   }  
+  
+  #[getter]
+  fn get_paddle_id(&self) -> i16 { 
+    self.paddle_id 
+  }
+  
+  #[getter]
+  fn get_temp_a(&self)    -> f32 { 
+    self.temp_a 
+  }
+  
+  #[getter]
+  fn get_temp_b(&self)    -> f32 {
+    self.temp_b
+  }
+  
+  #[setter]
+  fn set_paddle_id(&mut self, pid : i16) { 
+    self.paddle_id = pid;
+  }
+  
+  #[setter]
+  fn set_temp_a(&mut self, t : f32) { 
+    self.temp_a = t;
+  }
+  
+  #[setter]
+  fn set_temp_b(&mut self, t : f32) {
+    self.temp_b = t;
+  }
 }
 
 #[cfg(feature="pybindings")]

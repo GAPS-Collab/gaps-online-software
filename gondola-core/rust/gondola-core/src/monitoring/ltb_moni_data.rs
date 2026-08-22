@@ -179,15 +179,10 @@ impl LTBMoniData {
   fn get_thresh1       (&self)  -> f32  {
     self.thresh[1]
   }
+
   #[getter]
   fn get_thresh2       (&self)  -> f32  {
     self.thresh[2]
-  }
-
-  #[getter]
-  #[pyo3(name = "timestamp")]
-  fn get_timestamp_py(&self)  -> u64 {
-    self.timestamp 
   }
 }
 

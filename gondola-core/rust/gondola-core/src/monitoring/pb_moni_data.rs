@@ -72,17 +72,6 @@ impl PBMoniData {
 impl PBMoniData {
 
   #[getter]
-  fn get_board_id(&self) -> u8 {
-    self.board_id
-  }
-
-  #[getter]
-  #[pyo3(name="timestamp")]
-  fn get_timestamp_py(&self) -> u64 {
-    self.timestamp
-  }
-
-  #[getter]
   fn get_p3v6_preamp_vcp(&self) -> [f32; 3] {
     self.p3v6_preamp_vcp
   }

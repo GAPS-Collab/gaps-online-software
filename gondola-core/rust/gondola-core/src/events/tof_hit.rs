@@ -375,7 +375,7 @@ impl TofHit {
   /// The "new" thing following Birk's law
   #[getter]
   #[pyo3(name="edep_att_birk")]
-  fn get_edep_att_py(&self) -> f32 {
+  fn get_edep_att_birk_py(&self) -> f32 {
     self.get_edep_birk()
   }
 
@@ -597,8 +597,8 @@ impl TofHit {
     //let edep  = 0.0159 * (self.get_peak_a()/att_a + self.get_peak_b()/att_b) / 2.; // vertical muon peak @ 0.97 MeV
     //return edep; 
   
-    let V  = (self.get_peak_a()/att_a + self.get_peak_b()/att_b) / 2.0; 
-    let edep = -1000.0*V/(21.0*V - 35260.0);
+    let v = (self.get_peak_a()/att_a + self.get_peak_b()/att_b) / 2.0; 
+    let edep = -1000.0*v/(21.0*v - 35260.0);
     return edep;
   }
 
