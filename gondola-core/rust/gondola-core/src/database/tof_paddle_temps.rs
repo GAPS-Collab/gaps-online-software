@@ -62,6 +62,42 @@ impl TofPaddleTempDataSeries {
       paddle_id      : 0
     }
   }
+
+  pub fn add(&mut self, pdl_t : &TofPaddleTemp) {
+    if pdl_t.paddle_id == self.paddle_id as i16 {
+      self.temp_a.push(pdl_t.temp_a);
+      self.temp_b.push(pdl_t.temp_b);
+      self.utc_timestamps.push(pdl_t.utc_timestamp as u64);
+    }
+  }
+
+  pub fn get_for_ts(&self, utc_timestamp : u64) -> (f32, f32) {
+    let mut result = (-273.0, -273.0); 
+    let idx_opt = self.utc_timestamps.partition_point(|&t| t < utc_timestamp)
+        .checked_sub(1);
+    if let Some(idx) = idx_opt {
+      if self.temp_a.len() > idx as usize && self.temp_b.len() > idx {
+        result.0 = self.temp_a[idx]; 
+        result.1 = self.temp_b[idx];
+      }
+    }
+    result
+  }
+
+  pub fn sort(&mut self) {
+    let mut indices: Vec<usize> = (0..self.utc_timestamps.len()).collect();
+    indices.sort_unstable_by_key(|&i| self.utc_timestamps[i]);
+    let timestamps_sorted: Vec<u64> =
+      indices.iter().map(|&i| self.utc_timestamps[i]).collect();
+    let values_a_sorted: Vec<f32> =
+      indices.iter().map(|&i| self.temp_a[i]).collect();
+    let values_b_sorted: Vec<f32> =
+      indices.iter().map(|&i| self.temp_b[i]).collect();
+    self.utc_timestamps = timestamps_sorted;
+    self.temp_a = values_a_sorted;
+    self.temp_b = values_b_sorted;
+    //self.utc_timestamps.sort_unstable();
+  }
 }
 
 impl fmt::Display for TofPaddleTempDataSeries {
@@ -130,24 +166,36 @@ impl TofPaddleTemp {
   /// # Returns:
   ///   * Vec<Self>  : All paddle tempereaturs as they are 
   ///                  stored in the db for this paddle id
-  pub fn all_for_paddle(pid : u8) -> Option<TofPaddleTempDataSeries> {
+  pub fn all_data() -> Option<HashMap<u8,TofPaddleTempDataSeries>> {
     use schema::tof_db_tofpaddletemp::dsl::*;
     let mut conn = connect_to_db().ok()?;
     let results = tof_db_tofpaddletemp
-      .filter(paddle_id.eq(pid as i16))
+      //.filter(paddle_id.eq(pid as i16))
       .load::<Self>(&mut conn);
-    let mut ds = TofPaddleTempDataSeries::new();
+    let mut all_ds = HashMap::<u8, TofPaddleTempDataSeries>::new();
+    for k in 1..161u8 {
+      let mut new_series = TofPaddleTempDataSeries::new();
+      new_series.paddle_id = k;
+      all_ds.insert(k, new_series); 
+    }
+    
     match results {
       Err(err) => {
         error!("Unable to load TOF paddle temperature data from db! {err}");
         return None;
       }
       Ok(tpts) => {
-        //return Some(tpts);
-        return Some(ds);
+        for tp in tpts {
+          all_ds.get_mut(&(tp.paddle_id as u8)).unwrap().add(&tp);
+          //ds.add(&tp);
+        }
       }
     }
-    
+    for k in 1..161 {
+      all_ds.get_mut(&k).unwrap().sort(); 
+    }
+    //return Some(tpts);
+    return Some(all_ds);
   }
 
   //pub fn from_telemetry_packet(pack : &TelemetryPacket) -> Self { 
@@ -187,7 +235,24 @@ impl fmt::Display for TofPaddleTemp {
 #[cfg(feature="pybindings")]
 #[pymethods]
 impl TofPaddleTempDataSeries {
+  #[pyo3(name="get_for_ts")]
+  pub fn get_for_ts_py(&self, timestamp : u64) -> (f32, f32) {
+    self.get_for_ts(timestamp)
+  }
+  
+  #[getter]
+  fn get_first_ts(&self) -> Option<&u64> {
+    self.utc_timestamps.first() 
+  }
+  
+  #[getter]
+  fn get_last_ts(&self) -> Option<&u64> {
+    self.utc_timestamps.last() 
+  }
 }
+
+#[cfg(feature="pybindings")]
+pythonize!(TofPaddleTempDataSeries);
 
 #[cfg(feature="pybindings")]
 #[pymethods]
@@ -205,9 +270,9 @@ impl TofPaddleTemp {
   ///   * Vec<Self>  : All paddle tempereaturs as they are 
   ///                  stored in the db for this paddle id
   #[staticmethod]
-  #[pyo3(name="all_for_paddle")]
-  fn all_for_paddle_py(pid : u8) -> Option<TofPaddleTempDataSeries> {
-    Self::all_for_paddle(pid)
+  #[pyo3(name="all_data")]
+  fn all_data_py() -> Option<HashMap<u8,TofPaddleTempDataSeries>> {
+    Self::all_data()
   } 
 
   #[getter]
