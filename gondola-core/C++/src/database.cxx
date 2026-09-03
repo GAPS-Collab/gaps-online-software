@@ -303,30 +303,39 @@ auto g::get_module_position(u8 layer, u8 row, u8 mod, const g::TrkStripMap& stri
   return result;
 }
 
-auto g::get_hid_vid_map() -> HashMap<u32, u32> {
+auto g::get_hid_vid_map_tracker() -> HashMap<u32, u32> {
   auto map = HashMap<u32, u32>();
-  auto paddles = g::get_tofpaddles();
   auto strips  = g::get_trackerstrips();
-  for (const auto& p : paddles) {
-    map.insert(std::make_pair(p.first, p.second.volume_id));  
-  }
   for (const auto& s : strips) {
     map.insert(std::make_pair(s.first, s.second.volume_id));  
   }
   return map;
 }
 
-auto g::get_vid_hid_map() -> HashMap<u32, u32> {
+auto g::get_vid_hid_map_tracker() -> HashMap<u32, u32> {
+  auto map = HashMap<u32, u32>();
+  auto strips  = g::get_trackerstrips();
+  for (const auto& s : strips) {
+    map.insert(std::make_pair(s.second.volume_id, s.first));   
+  }
+  return map;
+}
+
+auto g::get_hid_vid_map_tof() -> HashMap<u32, u32> {
   auto map = HashMap<u32, u32>();
   auto paddles = g::get_tofpaddles();
-  auto strips  = g::get_trackerstrips();
+  for (const auto& p : paddles) {
+    map.insert(std::make_pair(p.first, p.second.volume_id));  
+  }
+  return map;
+}
+
+auto g::get_vid_hid_map_tof() -> HashMap<u32, u32> {
+  auto map = HashMap<u32, u32>();
+  auto paddles = g::get_tofpaddles();
   for (const auto& p : paddles) {
     map.insert(std::make_pair(p.second.volume_id, p.first));  
   }
-  //FIXME - this needs maybe 2 seperate functions
-  //for (const auto& s : strips) {
-  //  map.insert(std::make_pair(s.second.volume_id, s.first));   
-  //}
   return map;
 }
 

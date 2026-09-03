@@ -143,13 +143,16 @@ namespace gondola {
   
   auto get_trackerstrippedestals() -> TrkStripPedMap;
 
-  /// The mapping of volume id to hardware id, which is either the strip
-  /// identifier or the paddle id 
-  auto get_hid_vid_map() -> HashMap<u32, u32>;
+  /// The mapping of volume id to hardware id, in this case, strip id
+  auto get_hid_vid_map_tracker() -> HashMap<u32, u32>;
 
-  /// The mapping of hardwer id (either paddle id or strip id to the 
-  /// volume id
-  auto get_vid_hid_map() -> HashMap<u32, u32>; 
+  /// The mapping of hardwer id, in 
+  /// this case, strip id to volume id
+  auto get_vid_hid_map_tracker() -> HashMap<u32, u32>; 
+  
+  auto get_hid_vid_map_tof() -> HashMap<u32, u32>;
+
+  auto get_vid_hid_map_tof() -> HashMap<u32, u32>; 
   
   /// Arbitrary timing constant which is calibrated out 
   /// by requiring that overrlapping paddles should see 

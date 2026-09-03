@@ -59,7 +59,7 @@ auto elena_cut(const g::TofHit& hit) -> bool {
 }
 
 void gondola::read_sd_legacy_example(std::string filename) {
-  auto hid_vid_map    = gondola::get_hid_vid_map();
+  //auto hid_vid_map    = gondola::get_hid_vid_map();
   TChain * input_tree = new TChain("TreeRec");
   input_tree->Add(filename.c_str());
   auto input_event = new CEventRec();
@@ -92,7 +92,7 @@ g::SDRootReader::SDRootReader(std::string fname) {
   raw_tree->Add(fname.c_str());
   raw_tree->SetBranchAddress("Trk", &rawtrk); 
   raw_tree->SetBranchAddress("Tof", &rawtof);
-  paddle_vid_hid_map  = gondola::get_vid_hid_map(); 
+  paddle_vid_hid_map  = gondola::get_vid_hid_map_tof(); 
 }
 
 g::SDRootReader::~SDRootReader() {
@@ -306,10 +306,16 @@ auto GRecoHit::pretty_print() const -> std::string {
 
 auto CTrackRec::pretty_print() const -> std::string {
   // FIXME - provide pointers
-  auto vid_hid_map    = gondola::get_vid_hid_map();
+  auto vid_hid_map_tof    = gondola::get_vid_hid_map_tof();
   i32 pid = -1;
-  if (vid_hid_map.contains(VertexVolumeId)) {
-    pid  = vid_hid_map.at(VertexVolumeId);
+  if (vid_hid_map_tof.contains(VertexVolumeId)) {
+    pid  = vid_hid_map_tof.at(VertexVolumeId);
+  }
+  auto vid_hid_map_tracker    = gondola::get_vid_hid_map_tracker();
+  if (pid == -1) {
+    if (vid_hid_map_tracker.contains(VertexVolumeId)) {
+      pid  = vid_hid_map_tracker.at(VertexVolumeId);
+    }
   }
   auto vpos = VertexPosition;
   auto lpos = LastPosition;
@@ -318,10 +324,10 @@ auto CTrackRec::pretty_print() const -> std::string {
   repr += std::format("\n   TrackId        : {}", TrackId);
   repr += std::format("\n   VertexVolumeId : {}/[{}]", VertexVolumeId, pid);
   repr += std::format("\n   VertexPos X {:.2f} Y {:.2f} Z {:.2f}", vpos.X(), vpos.Y(), vpos.Z());
-  if (vid_hid_map.contains(LastVolumeId)) {
-    pid = vid_hid_map.at(LastVolumeId);
+  if (vid_hid_map_tof.contains(LastVolumeId)) {
+    pid = vid_hid_map_tof.at(LastVolumeId);
   } else {
-    pid = -1;
+    pid = vid_hid_map_tracker.at(LastVolumeId);
   }
   repr += std::format("\n   LastVolumeId   ; {}/[{}]", LastVolumeId, pid);
   repr += std::format("\n   LastPos   X {:.2f} Y {:.2f} Z {:.2f}", lpos.X(), lpos.Y(), lpos.Z());
@@ -350,10 +356,10 @@ auto CTrackRec::pretty_print() const -> std::string {
     repr += std::format("\n -- EnergyDepositon  {}", EnergyDeposition.at(k));
     repr += std::format("\n -- GlobalTime       {}", GlobalTime.at(k));        
     repr += std::format("\n -- StepLength       {}", StepLength.at(k));
-    if (vid_hid_map.contains(VolumeId.at(k))) {
-      pid = vid_hid_map.at(VolumeId.at(k));
+    if (vid_hid_map_tof.contains(VolumeId.at(k))) {
+      pid = vid_hid_map_tof.at(VolumeId.at(k));
     } else {
-      pid = -1;
+      pid = vid_hid_map_tracker.at(VolumeId.at(k));
     }
     repr += std::format("\n -- VolumeId         {}/[{}]", VolumeId.at(k), pid);
     repr += std::format("\n -- Position         X {:.2f} Y {:.2f} Z {:.2f}",pos.X(), pos.Y(), pos.Z());
