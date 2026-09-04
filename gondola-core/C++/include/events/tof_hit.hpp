@@ -5,8 +5,8 @@
 #include "result/result.h"
 
 #include "database.h"
-#include "version.h" 
-#include "events/event_quality.hpp"
+#include "version.h"
+#include "events/hit_quality.hpp"
 
 namespace r = result;
 
@@ -24,7 +24,7 @@ namespace gondola {
   
     // new variables for V1
     ProtocolVersion version;
-    EventQuality quality = EventQuality::Unknown;;
+    HitQuality quality = HitQuality::Unknown;
     f32 baseline_a;
     f32 baseline_a_rms;
     f32 baseline_b;
