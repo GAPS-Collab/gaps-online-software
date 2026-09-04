@@ -1,6 +1,5 @@
 var database_8h =
 [
-    [ "gondola::TofPaddle", "structgondola_1_1TofPaddle.html", "structgondola_1_1TofPaddle" ],
     [ "gondola::TrackerStrip", "structgondola_1_1TrackerStrip.html", "structgondola_1_1TrackerStrip" ],
     [ "gondola::TrackerStripMask", "structgondola_1_1TrackerStripMask.html", "structgondola_1_1TrackerStripMask" ],
     [ "gondola::TrackerStripPedestal", "structgondola_1_1TrackerStripPedestal.html", "structgondola_1_1TrackerStripPedestal" ],
@@ -19,7 +18,8 @@ var database_8h =
       [ "B", "database_8h.html#a044b95c22747f96dac042c1b3bcacf77a9d5ed678fe57bcca610140957afab571", null ]
     ] ],
     [ "get_dsi_j_paddles", "database_8h.html#a6789ee24087165a3cefdf592965fb6cd", null ],
-    [ "get_hid_vid_map", "database_8h.html#a3b25ba3aba0e585295ecefc0701cf7de", null ],
+    [ "get_hid_vid_map_tof", "database_8h.html#a1cdc9562d1ae47fbb076d27123608270", null ],
+    [ "get_hid_vid_map_tracker", "database_8h.html#a51e0333172307de3ac0e30e85bc059dd", null ],
     [ "get_module_position", "database_8h.html#afc6e4fab8b20e77dfb9a84d9371e6588", null ],
     [ "get_rb_id_paddles", "database_8h.html#aa6d3f533826fda788c78aa01dea07827", null ],
     [ "get_tofpaddles", "database_8h.html#afcc490db45825de190a991267dacf561", null ],
@@ -27,7 +27,8 @@ var database_8h =
     [ "get_trackerstripmasks", "database_8h.html#a164799954d886461ce3accc167c6c729", null ],
     [ "get_trackerstrippedestals", "database_8h.html#a87a647fb4e49b12299adceb8fa26c03e", null ],
     [ "get_trackerstrips", "database_8h.html#af743678888adf4609f0f9312abd50304", null ],
-    [ "get_vid_hid_map", "database_8h.html#ab1c635d648526ddffc8f60a7b9a0a8a6", null ],
+    [ "get_vid_hid_map_tof", "database_8h.html#a6d708d52ab675e8ef87a64fc7de1dfb8", null ],
+    [ "get_vid_hid_map_tracker", "database_8h.html#acb394640fc149ebaad55841d1e8b6125", null ],
     [ "operator<<", "database_8h.html#a1dd512fa879a9673a224aef27e311eda", null ],
     [ "operator<<", "database_8h.html#a6dbcb8f366e7ef77456c95563c0fd076", null ],
     [ "operator<<", "database_8h.html#a6ebd732c72552fed0e2e9340379c54da", null ],

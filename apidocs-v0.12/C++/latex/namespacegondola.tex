@@ -248,9 +248,13 @@ enum class \mbox{\hyperlink{namespacegondola_af998b820a54bca400c19e03948e82c28}{
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a87a647fb4e49b12299adceb8fa26c03e}{get\+\_\+trackerstrippedestals}} () -\/$>$ \mbox{\hyperlink{namespacegondola_ade9651d29d2bd4c235bc490a57affaf2}{Trk\+Strip\+Ped\+Map}}
 \item 
-\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a3b25ba3aba0e585295ecefc0701cf7de}{get\+\_\+hid\+\_\+vid\+\_\+map}} () -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a51e0333172307de3ac0e30e85bc059dd}{get\+\_\+hid\+\_\+vid\+\_\+map\+\_\+tracker}} () -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$
+\begin{DoxyCompactList}\small\item\em The mapping of volume id to hardware id, in this case, strip id. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_acb394640fc149ebaad55841d1e8b6125}{get\+\_\+vid\+\_\+hid\+\_\+map\+\_\+tracker}} () -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$
 \item 
-\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_ab1c635d648526ddffc8f60a7b9a0a8a6}{get\+\_\+vid\+\_\+hid\+\_\+map}} () -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a1cdc9562d1ae47fbb076d27123608270}{get\+\_\+hid\+\_\+vid\+\_\+map\+\_\+tof}} () -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a6d708d52ab675e8ef87a64fc7de1dfb8}{get\+\_\+vid\+\_\+hid\+\_\+map\+\_\+tof}} () -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_ada24c8b1eefc326eb57c09b7663da004}{get\+\_\+tofpaddletimingconstants}} (std\+::string mask\+\_\+name="{}"{}) -\/$>$ \mbox{\hyperlink{namespacegondola_a1c2c2768738a98e4ab3c0aa6d31d88e0}{Tof\+Paddle\+Timing\+Constant\+Map}}
 \item 
@@ -868,14 +872,23 @@ FIXME -\/ this is obviously incomplete.
 
 Get a paddle if the dsi,j connection of a paddle is known (LTB, LG) 
 
-\Hypertarget{namespacegondola_a3b25ba3aba0e585295ecefc0701cf7de}\label{namespacegondola_a3b25ba3aba0e585295ecefc0701cf7de} 
-\index{gondola@{gondola}!get\_hid\_vid\_map@{get\_hid\_vid\_map}}
-\index{get\_hid\_vid\_map@{get\_hid\_vid\_map}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{get\_hid\_vid\_map()}{get\_hid\_vid\_map()}}
-{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::get\+\_\+hid\+\_\+vid\+\_\+map (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) -\/$>$  \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$}
+\Hypertarget{namespacegondola_a1cdc9562d1ae47fbb076d27123608270}\label{namespacegondola_a1cdc9562d1ae47fbb076d27123608270} 
+\index{gondola@{gondola}!get\_hid\_vid\_map\_tof@{get\_hid\_vid\_map\_tof}}
+\index{get\_hid\_vid\_map\_tof@{get\_hid\_vid\_map\_tof}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{get\_hid\_vid\_map\_tof()}{get\_hid\_vid\_map\_tof()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::get\+\_\+hid\+\_\+vid\+\_\+map\+\_\+tof (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) -\/$>$  \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$}
 
-The mapping of volume id to hardware id, which is either the strip identifier or the paddle id ~\newline
- \Hypertarget{namespacegondola_afc6e4fab8b20e77dfb9a84d9371e6588}\label{namespacegondola_afc6e4fab8b20e77dfb9a84d9371e6588} 
+\Hypertarget{namespacegondola_a51e0333172307de3ac0e30e85bc059dd}\label{namespacegondola_a51e0333172307de3ac0e30e85bc059dd} 
+\index{gondola@{gondola}!get\_hid\_vid\_map\_tracker@{get\_hid\_vid\_map\_tracker}}
+\index{get\_hid\_vid\_map\_tracker@{get\_hid\_vid\_map\_tracker}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{get\_hid\_vid\_map\_tracker()}{get\_hid\_vid\_map\_tracker()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::get\+\_\+hid\+\_\+vid\+\_\+map\+\_\+tracker (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) -\/$>$  \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$}
+
+
+
+The mapping of volume id to hardware id, in this case, strip id. 
+
+\Hypertarget{namespacegondola_afc6e4fab8b20e77dfb9a84d9371e6588}\label{namespacegondola_afc6e4fab8b20e77dfb9a84d9371e6588} 
 \index{gondola@{gondola}!get\_module\_position@{get\_module\_position}}
 \index{get\_module\_position@{get\_module\_position}!gondola@{gondola}}
 \doxysubsubsection{\texorpdfstring{get\_module\_position()}{get\_module\_position()}}
@@ -943,13 +956,19 @@ Get a paddle from the database.
 
 Retrieve all tracker strips from the database. 
 
-\Hypertarget{namespacegondola_ab1c635d648526ddffc8f60a7b9a0a8a6}\label{namespacegondola_ab1c635d648526ddffc8f60a7b9a0a8a6} 
-\index{gondola@{gondola}!get\_vid\_hid\_map@{get\_vid\_hid\_map}}
-\index{get\_vid\_hid\_map@{get\_vid\_hid\_map}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{get\_vid\_hid\_map()}{get\_vid\_hid\_map()}}
-{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::get\+\_\+vid\+\_\+hid\+\_\+map (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) -\/$>$  \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$}
+\Hypertarget{namespacegondola_a6d708d52ab675e8ef87a64fc7de1dfb8}\label{namespacegondola_a6d708d52ab675e8ef87a64fc7de1dfb8} 
+\index{gondola@{gondola}!get\_vid\_hid\_map\_tof@{get\_vid\_hid\_map\_tof}}
+\index{get\_vid\_hid\_map\_tof@{get\_vid\_hid\_map\_tof}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{get\_vid\_hid\_map\_tof()}{get\_vid\_hid\_map\_tof()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::get\+\_\+vid\+\_\+hid\+\_\+map\+\_\+tof (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) -\/$>$  \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$}
 
-The mapping of hardwer id (either paddle id or strip id to the volume id \Hypertarget{namespacegondola_ae1a0adbbbcd177ece4e936813e8ab262}\label{namespacegondola_ae1a0adbbbcd177ece4e936813e8ab262} 
+\Hypertarget{namespacegondola_acb394640fc149ebaad55841d1e8b6125}\label{namespacegondola_acb394640fc149ebaad55841d1e8b6125} 
+\index{gondola@{gondola}!get\_vid\_hid\_map\_tracker@{get\_vid\_hid\_map\_tracker}}
+\index{get\_vid\_hid\_map\_tracker@{get\_vid\_hid\_map\_tracker}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{get\_vid\_hid\_map\_tracker()}{get\_vid\_hid\_map\_tracker()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::get\+\_\+vid\+\_\+hid\+\_\+map\+\_\+tracker (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) -\/$>$  \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$}
+
+The mapping of hardwer id, in this case, strip id to volume id \Hypertarget{namespacegondola_ae1a0adbbbcd177ece4e936813e8ab262}\label{namespacegondola_ae1a0adbbbcd177ece4e936813e8ab262} 
 \index{gondola@{gondola}!list\_path\_contents\_sorted@{list\_path\_contents\_sorted}}
 \index{list\_path\_contents\_sorted@{list\_path\_contents\_sorted}!gondola@{gondola}}
 \doxysubsubsection{\texorpdfstring{list\_path\_contents\_sorted()}{list\_path\_contents\_sorted()}}

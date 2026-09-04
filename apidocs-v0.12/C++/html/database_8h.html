@@ -105,35 +105,40 @@ $(document).ready(function(){initNavTree('database_8h.html',''); initResizable()
 <code>#include &quot;<a class="el" href="tof__typedefs_8h_source.html">tof_typedefs.h</a>&quot;</code><br />
 <code>#include &quot;sqlite_orm.h&quot;</code><br />
 <code>#include &lt;map&gt;</code><br />
+<code>#include &quot;<a class="el" href="tof__paddle_8hpp_source.html">database/tof_paddle.hpp</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for database.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="database_8h__incl.png" border="0" usemap="#a_2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2include_2database_8h" alt=""/></div>
 <map name="a_2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2include_2database_8h" id="a_2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2include_2database_8h">
-<area shape="rect" title=" " alt="" coords="135,5,353,75"/>
-<area shape="rect" title=" " alt="" coords="81,123,159,148"/>
-<area shape="poly" title=" " alt="" coords="201,77,148,116,145,112,198,73"/>
-<area shape="rect" href="tof__typedefs_8h.html" title=" " alt="" coords="234,123,350,148"/>
-<area shape="poly" title=" " alt="" coords="264,74,282,109,277,112,259,76"/>
-<area shape="rect" title=" " alt="" coords="5,196,56,221"/>
-<area shape="poly" title=" " alt="" coords="230,76,206,114,172,150,128,173,70,196,68,191,126,169,169,146,201,111,225,73"/>
-<area shape="rect" title=" " alt="" coords="374,123,477,148"/>
-<area shape="poly" title=" " alt="" coords="311,72,392,114,389,118,308,77"/>
-<area shape="rect" title=" " alt="" coords="81,196,143,221"/>
-<area shape="poly" title=" " alt="" coords="264,151,155,193,153,188,262,146"/>
-<area shape="poly" title=" " alt="" coords="248,151,70,198,69,193,247,145"/>
-<area shape="rect" title=" " alt="" coords="167,196,238,221"/>
-<area shape="poly" title=" " alt="" coords="279,150,230,189,226,185,276,146"/>
-<area shape="rect" title=" " alt="" coords="263,196,321,221"/>
-<area shape="poly" title=" " alt="" coords="295,148,295,182,289,182,289,148"/>
-<area shape="rect" title=" " alt="" coords="345,196,412,221"/>
-<area shape="poly" title=" " alt="" coords="308,146,356,185,352,189,304,150"/>
-<area shape="rect" title=" " alt="" coords="436,196,511,221"/>
-<area shape="poly" title=" " alt="" coords="322,146,432,188,430,193,320,151"/>
-<area shape="rect" title=" " alt="" coords="535,196,622,221"/>
-<area shape="poly" title=" " alt="" coords="339,145,523,191,521,196,337,151"/>
-<area shape="rect" title=" " alt="" coords="646,196,706,221"/>
-<area shape="poly" title=" " alt="" coords="351,143,633,193,632,198,350,149"/>
+<area shape="rect" title=" " alt="" coords="62,5,279,75"/>
+<area shape="rect" title=" " alt="" coords="5,123,83,148"/>
+<area shape="poly" title=" " alt="" coords="127,77,73,116,69,112,123,73"/>
+<area shape="rect" href="tof__typedefs_8h.html" title=" " alt="" coords="238,196,354,221"/>
+<area shape="poly" title=" " alt="" coords="175,74,182,111,198,146,223,170,252,188,249,192,220,175,194,150,176,113,169,75"/>
+<area shape="rect" title=" " alt="" coords="9,269,60,295"/>
+<area shape="poly" title=" " alt="" coords="154,76,51,258,46,255,149,74"/>
+<area shape="rect" title=" " alt="" coords="378,196,481,221"/>
+<area shape="poly" title=" " alt="" coords="280,55,347,79,378,97,406,121,423,151,430,182,425,183,418,153,402,124,375,102,345,84,278,60"/>
+<area shape="rect" href="tof__paddle_8hpp.html" title=" " alt="" coords="209,123,391,148"/>
+<area shape="poly" title=" " alt="" coords="219,73,274,112,271,116,216,77"/>
+<area shape="rect" title=" " alt="" coords="85,269,147,295"/>
+<area shape="poly" title=" " alt="" coords="268,224,159,267,157,262,266,219"/>
+<area shape="poly" title=" " alt="" coords="252,224,74,272,73,266,251,219"/>
+<area shape="rect" title=" " alt="" coords="171,269,242,295"/>
+<area shape="poly" title=" " alt="" coords="283,223,234,263,230,258,280,219"/>
+<area shape="rect" title=" " alt="" coords="267,269,325,295"/>
+<area shape="poly" title=" " alt="" coords="299,222,299,256,293,256,293,222"/>
+<area shape="rect" title=" " alt="" coords="349,269,416,295"/>
+<area shape="poly" title=" " alt="" coords="312,219,360,258,356,263,308,223"/>
+<area shape="rect" title=" " alt="" coords="440,269,515,295"/>
+<area shape="poly" title=" " alt="" coords="326,219,436,262,434,267,324,224"/>
+<area shape="rect" title=" " alt="" coords="539,269,626,295"/>
+<area shape="poly" title=" " alt="" coords="343,219,527,264,525,269,341,224"/>
+<area shape="rect" title=" " alt="" coords="650,269,710,295"/>
+<area shape="poly" title=" " alt="" coords="355,217,637,267,636,272,354,222"/>
+<area shape="poly" title=" " alt="" coords="302,148,300,183,295,182,297,148"/>
+<area shape="poly" title=" " alt="" coords="322,146,397,187,395,191,320,150"/>
 </map>
 </div>
 </div><div class="textblock"><div class="dynheader">
@@ -227,8 +232,6 @@ This graph shows which files directly or indirectly include this file:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1TofPaddle.html">gondola::TofPaddle</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1TrackerStrip.html">gondola::TrackerStrip</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structgondola_1_1TrackerStripMask.html">gondola::TrackerStripMask</a></td></tr>
@@ -296,10 +299,15 @@ Functions</h2></td></tr>
 <tr class="separator:a164799954d886461ce3accc167c6c729"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a87a647fb4e49b12299adceb8fa26c03e" id="r_a87a647fb4e49b12299adceb8fa26c03e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a87a647fb4e49b12299adceb8fa26c03e">gondola::get_trackerstrippedestals</a> () -&gt; <a class="el" href="namespacegondola.html#ade9651d29d2bd4c235bc490a57affaf2">TrkStripPedMap</a></td></tr>
 <tr class="separator:a87a647fb4e49b12299adceb8fa26c03e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b25ba3aba0e585295ecefc0701cf7de" id="r_a3b25ba3aba0e585295ecefc0701cf7de"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a3b25ba3aba0e585295ecefc0701cf7de">gondola::get_hid_vid_map</a> () -&gt; <a class="el" href="tof__typedefs_8h.html#af5449d3b4076aa8188b912b9b069fc5a">HashMap</a>&lt; <a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a>, <a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a> &gt;</td></tr>
-<tr class="separator:a3b25ba3aba0e585295ecefc0701cf7de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab1c635d648526ddffc8f60a7b9a0a8a6" id="r_ab1c635d648526ddffc8f60a7b9a0a8a6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#ab1c635d648526ddffc8f60a7b9a0a8a6">gondola::get_vid_hid_map</a> () -&gt; <a class="el" href="tof__typedefs_8h.html#af5449d3b4076aa8188b912b9b069fc5a">HashMap</a>&lt; <a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a>, <a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a> &gt;</td></tr>
-<tr class="separator:ab1c635d648526ddffc8f60a7b9a0a8a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a51e0333172307de3ac0e30e85bc059dd" id="r_a51e0333172307de3ac0e30e85bc059dd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a51e0333172307de3ac0e30e85bc059dd">gondola::get_hid_vid_map_tracker</a> () -&gt; <a class="el" href="tof__typedefs_8h.html#af5449d3b4076aa8188b912b9b069fc5a">HashMap</a>&lt; <a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a>, <a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a> &gt;</td></tr>
+<tr class="memdesc:a51e0333172307de3ac0e30e85bc059dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">The mapping of volume id to hardware id, in this case, strip id.  <br /></td></tr>
+<tr class="separator:a51e0333172307de3ac0e30e85bc059dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb394640fc149ebaad55841d1e8b6125" id="r_acb394640fc149ebaad55841d1e8b6125"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#acb394640fc149ebaad55841d1e8b6125">gondola::get_vid_hid_map_tracker</a> () -&gt; <a class="el" href="tof__typedefs_8h.html#af5449d3b4076aa8188b912b9b069fc5a">HashMap</a>&lt; <a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a>, <a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a> &gt;</td></tr>
+<tr class="separator:acb394640fc149ebaad55841d1e8b6125"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1cdc9562d1ae47fbb076d27123608270" id="r_a1cdc9562d1ae47fbb076d27123608270"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a1cdc9562d1ae47fbb076d27123608270">gondola::get_hid_vid_map_tof</a> () -&gt; <a class="el" href="tof__typedefs_8h.html#af5449d3b4076aa8188b912b9b069fc5a">HashMap</a>&lt; <a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a>, <a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a> &gt;</td></tr>
+<tr class="separator:a1cdc9562d1ae47fbb076d27123608270"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d708d52ab675e8ef87a64fc7de1dfb8" id="r_a6d708d52ab675e8ef87a64fc7de1dfb8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#a6d708d52ab675e8ef87a64fc7de1dfb8">gondola::get_vid_hid_map_tof</a> () -&gt; <a class="el" href="tof__typedefs_8h.html#af5449d3b4076aa8188b912b9b069fc5a">HashMap</a>&lt; <a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a>, <a class="el" href="tof__typedefs_8h.html#afaa62991928fb9fb18ff0db62a040aba">u32</a> &gt;</td></tr>
+<tr class="separator:a6d708d52ab675e8ef87a64fc7de1dfb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ada24c8b1eefc326eb57c09b7663da004" id="r_ada24c8b1eefc326eb57c09b7663da004"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">auto</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegondola.html#ada24c8b1eefc326eb57c09b7663da004">gondola::get_tofpaddletimingconstants</a> (std::string mask_name=&quot;&quot;) -&gt; <a class="el" href="namespacegondola.html#a1c2c2768738a98e4ab3c0aa6d31d88e0">TofPaddleTimingConstantMap</a></td></tr>
 <tr class="separator:ada24c8b1eefc326eb57c09b7663da004"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1dd512fa879a9673a224aef27e311eda" id="r_a1dd512fa879a9673a224aef27e311eda"><td class="memItemLeft" align="right" valign="top"><a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">std::ostream</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="database_8h.html#a1dd512fa879a9673a224aef27e311eda">operator&lt;&lt;</a> (<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">std::ostream</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">os</a>, <a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">const</a> <a class="el" href="structgondola_1_1TofPaddle.html">gondola::TofPaddle</a> &amp;<a class="el" href="tof__typedefs_8h.html#a1b01c504448c96cd2191a5184dd31acf">paddle</a>)</td></tr>

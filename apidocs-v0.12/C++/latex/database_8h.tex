@@ -4,6 +4,7 @@
 {\ttfamily \#include "{}tof\+\_\+typedefs.\+h"{}}\newline
 {\ttfamily \#include "{}sqlite\+\_\+orm.\+h"{}}\newline
 {\ttfamily \#include $<$map$>$}\newline
+{\ttfamily \#include "{}database/tof\+\_\+paddle.\+hpp"{}}\newline
 Include dependency graph for database.\+h\+:
 \nopagebreak
 \begin{figure}[H]
@@ -22,8 +23,6 @@ This graph shows which files directly or indirectly include this file\+:
 \end{figure}
 \doxysubsubsection*{Classes}
 \begin{DoxyCompactItemize}
-\item 
-struct \mbox{\hyperlink{structgondola_1_1TofPaddle}{gondola\+::\+Tof\+Paddle}}
 \item 
 struct \mbox{\hyperlink{structgondola_1_1TrackerStrip}{gondola\+::\+Tracker\+Strip}}
 \item 
@@ -82,9 +81,13 @@ enum class \mbox{\hyperlink{namespacegondola_a044b95c22747f96dac042c1b3bcacf77}{
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a87a647fb4e49b12299adceb8fa26c03e}{gondola\+::get\+\_\+trackerstrippedestals}} () -\/$>$ \mbox{\hyperlink{namespacegondola_ade9651d29d2bd4c235bc490a57affaf2}{Trk\+Strip\+Ped\+Map}}
 \item 
-\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a3b25ba3aba0e585295ecefc0701cf7de}{gondola\+::get\+\_\+hid\+\_\+vid\+\_\+map}} () -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a51e0333172307de3ac0e30e85bc059dd}{gondola\+::get\+\_\+hid\+\_\+vid\+\_\+map\+\_\+tracker}} () -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$
+\begin{DoxyCompactList}\small\item\em The mapping of volume id to hardware id, in this case, strip id. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_acb394640fc149ebaad55841d1e8b6125}{gondola\+::get\+\_\+vid\+\_\+hid\+\_\+map\+\_\+tracker}} () -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$
 \item 
-\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_ab1c635d648526ddffc8f60a7b9a0a8a6}{gondola\+::get\+\_\+vid\+\_\+hid\+\_\+map}} () -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a1cdc9562d1ae47fbb076d27123608270}{gondola\+::get\+\_\+hid\+\_\+vid\+\_\+map\+\_\+tof}} () -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a6d708d52ab675e8ef87a64fc7de1dfb8}{gondola\+::get\+\_\+vid\+\_\+hid\+\_\+map\+\_\+tof}} () -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_ada24c8b1eefc326eb57c09b7663da004}{gondola\+::get\+\_\+tofpaddletimingconstants}} (std\+::string mask\+\_\+name="{}"{}) -\/$>$ \mbox{\hyperlink{namespacegondola_a1c2c2768738a98e4ab3c0aa6d31d88e0}{Tof\+Paddle\+Timing\+Constant\+Map}}
 \item 

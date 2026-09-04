@@ -1,0 +1,53 @@
+\doxysection{tof\+\_\+paddle.\+hpp}
+\hypertarget{tof__paddle_8hpp_source}{}\label{tof__paddle_8hpp_source}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/database/tof\_paddle.hpp@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/database/tof\_paddle.hpp}}
+\mbox{\hyperlink{tof__paddle_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tof__typedefs_8h}{tof\_typedefs.h}}"{}}}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}sqlite\_orm.h"{}}}
+\DoxyCodeLine{00005\ }
+\DoxyCodeLine{00006\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacegondola}{gondola}}\ \{}
+\DoxyCodeLine{00007\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structgondola_1_1TofPaddle}{TofPaddle}}\ \{}
+\DoxyCodeLine{00008\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \mbox{\hyperlink{structgondola_1_1TofPaddle_a808146a08129c82f7ea0d13fa78ecffd}{paddle\_id}}\ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00009\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}\ \mbox{\hyperlink{structgondola_1_1TofPaddle_adf644a0463b22b53c5bee09acfc78800}{volume\_id}}\ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00010\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \mbox{\hyperlink{structgondola_1_1TofPaddle_ae4beb3a5307c8795627b5e051e1f1ba5}{panel\_id}}\ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00011\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \mbox{\hyperlink{structgondola_1_1TofPaddle_a0db53fd960807fa52fb8b7df9aa00369}{mtb\_link\_id}}\ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00012\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \mbox{\hyperlink{structgondola_1_1TofPaddle_a7b3bb5c61dd18e62086dca5aa350846c}{rb\_id}}\ \ \ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00013\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \mbox{\hyperlink{structgondola_1_1TofPaddle_a9b73ce657b6db1151bf84e4aeff3f470}{rb\_chA}}\ \ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00014\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \mbox{\hyperlink{structgondola_1_1TofPaddle_ac5984679625c4ccd8feb3512b16b8eed}{rb\_chB}}\ \ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00017\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \mbox{\hyperlink{structgondola_1_1TofPaddle_a796dc0486bf1de0b580d322c4a679bc6}{ltb\_id}}\ \ \ \ \ \ \ \ \ \ \ \ ;\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00018\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \mbox{\hyperlink{structgondola_1_1TofPaddle_a5466308953be34cae657e27e91d01b05}{ltb\_chA}}\ \ \ \ \ \ \ \ \ \ \ ;\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \mbox{\hyperlink{structgondola_1_1TofPaddle_a46a87cbbcba6ca5d043b4a5380fa567c}{ltb\_chB}}\ \ \ \ \ \ \ \ \ \ \ ;\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00020\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \mbox{\hyperlink{structgondola_1_1TofPaddle_a3e506270436404e8b04bfa0ada98fa28}{pb\_id}}\ \ \ \ \ \ \ \ \ \ \ \ \ ;\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00021\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \mbox{\hyperlink{structgondola_1_1TofPaddle_af39fb59c88aefeab2a9563a627cc47af}{pb\_chA}}\ \ \ \ \ \ \ \ \ \ \ \ ;\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00022\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \mbox{\hyperlink{structgondola_1_1TofPaddle_a0f8bf1dc0d810e36681b6a8e9b9d1bc7}{pb\_chB}}\ \ \ \ \ \ \ \ \ \ \ \ ;\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00023\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \mbox{\hyperlink{structgondola_1_1TofPaddle_a77768b14f42da4df4886080b20f66a1c}{cable\_len}}\ \ \ \ \ \ \ \ \ ;\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00024\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \mbox{\hyperlink{structgondola_1_1TofPaddle_a8caa26597d27b43873390681c4e06350}{dsi}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ;\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00025\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \mbox{\hyperlink{structgondola_1_1TofPaddle_ace5613d0d4f0c06380e2af38af47acae}{j\_rb}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ ;\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00026\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \ \mbox{\hyperlink{structgondola_1_1TofPaddle_a4ce048ded0f38c68833b08c21addb764}{j\_ltb}}\ \ \ \ \ \ \ \ \ \ \ \ \ ;\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00027\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \mbox{\hyperlink{structgondola_1_1TofPaddle_ae45104deb63b9bf0becf5f47d29dd803}{height}}\ \ \ \ \ \ \ \ \ \ \ \ ;\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00028\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \mbox{\hyperlink{structgondola_1_1TofPaddle_abf9e6e5acf88b219ac032a27b2e76bbd}{width}}\ \ \ \ \ \ \ \ \ \ \ \ \ ;\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00029\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \mbox{\hyperlink{structgondola_1_1TofPaddle_af84465d3a74473a1a5373869120c222d}{length}}\ \ \ \ \ \ \ \ \ \ \ \ ;\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00030\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \mbox{\hyperlink{structgondola_1_1TofPaddle_a253d22fc36d24cc82e0e9de6b4bcc19d}{normal\_x}}\ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \mbox{\hyperlink{structgondola_1_1TofPaddle_a177f3c1e6696785788bdaf669858f539}{normal\_y}}\ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \mbox{\hyperlink{structgondola_1_1TofPaddle_ab6cc93747d3ebe74d688d657df5477eb}{normal\_z}}\ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \mbox{\hyperlink{structgondola_1_1TofPaddle_a22d12a349572b516c75545f27ceb6178}{global\_pos\_x\_l0}}\ \ \ ;\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00034\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \mbox{\hyperlink{structgondola_1_1TofPaddle_aeefbe885cce4b466511c22b0d5304540}{global\_pos\_y\_l0}}\ \ \ ;\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00035\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \mbox{\hyperlink{structgondola_1_1TofPaddle_a60f36d345c18aa46dad277f3bf4d3a4c}{global\_pos\_z\_l0}}\ \ \ ;\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00036\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \mbox{\hyperlink{structgondola_1_1TofPaddle_abf7e76a66bd9144cffc0d06c70b1c228}{global\_pos\_x\_l0\_A}}\ ;\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \mbox{\hyperlink{structgondola_1_1TofPaddle_ad4d96e0c74611c889ac97118a794d403}{global\_pos\_y\_l0\_A}}\ ;\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \mbox{\hyperlink{structgondola_1_1TofPaddle_ae12ad468c2b4b2a7b8ca3e2b54f1b7d8}{global\_pos\_z\_l0\_A}}\ ;\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00039\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \mbox{\hyperlink{structgondola_1_1TofPaddle_ac5a2a3b30cbca69ae3aa689aea0de91c}{global\_pos\_x\_l0\_B}}\ ;\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00040\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \mbox{\hyperlink{structgondola_1_1TofPaddle_a9a810fc9ca1ea035ab23de73864cf3d9}{global\_pos\_y\_l0\_B}}\ ;\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00041\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \mbox{\hyperlink{structgondola_1_1TofPaddle_abf00eed6f1e1a3078862dfaa8757d21d}{global\_pos\_z\_l0\_B}}\ ;\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00042\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \mbox{\hyperlink{structgondola_1_1TofPaddle_a83d1c7e41fcfcfb60c6337de09e463f8}{coax\_cable\_time}}\ \ \ ;}
+\DoxyCodeLine{00043\ \ \ \ \ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \mbox{\hyperlink{structgondola_1_1TofPaddle_ae7d022ad0870502affb25833ec2e35b1}{harting\_cable\_time}};}
+\DoxyCodeLine{00044\ \ \ }
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1TofPaddle_ad41a41fa672224ed7f73998dd4d56d2b}{to\_string}}()\ const\ -\/>\ std::\textcolor{keywordtype}{string};}
+\DoxyCodeLine{00046\ \ \ }
+\DoxyCodeLine{00048\ \ \ \ \ auto\ \mbox{\hyperlink{structgondola_1_1TofPaddle_a96e25986cc97252516842e15d9e07248}{get\_principal}}()\ const\ -\/>\ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}<\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}>;}
+\DoxyCodeLine{00049\ \ \ \};}
+\DoxyCodeLine{00050\ \}}
+
+\end{DoxyCode}

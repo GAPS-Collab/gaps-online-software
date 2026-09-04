@@ -13,13 +13,14 @@ var searchData=
   ['tof_5fmeta_2ehpp_10',['tof_meta.hpp',['../tof__meta_8hpp.html',1,'']]],
   ['tof_5fpacket_2ecxx_11',['tof_packet.cxx',['../tof__packet_8cxx.html',1,'']]],
   ['tof_5fpacket_2eh_12',['tof_packet.h',['../tof__packet_8h.html',1,'']]],
-  ['tof_5ftypedefs_2eh_13',['tof_typedefs.h',['../tof__typedefs_8h.html',1,'']]],
-  ['tracker_5fcalibrated_5fhit_2ehpp_14',['tracker_calibrated_hit.hpp',['../tracker__calibrated__hit_8hpp.html',1,'']]],
-  ['tracker_5fevent_2ehpp_15',['tracker_event.hpp',['../tracker__event_8hpp.html',1,'']]],
-  ['tracker_5fhit_2ecxx_16',['tracker_hit.cxx',['../tracker__hit_8cxx.html',1,'']]],
-  ['tracker_5fhit_2ehpp_17',['tracker_hit.hpp',['../tracker__hit_8hpp.html',1,'']]],
-  ['tracker_5fmeta_2ehpp_18',['tracker_meta.hpp',['../tracker__meta_8hpp.html',1,'']]],
-  ['tracklet_2ecxx_19',['tracklet.cxx',['../tracklet_8cxx.html',1,'']]],
-  ['tracklet_2ehpp_20',['tracklet.hpp',['../tracklet_8hpp.html',1,'']]],
-  ['trigger_2ehpp_21',['trigger.hpp',['../trigger_8hpp.html',1,'']]]
+  ['tof_5fpaddle_2ehpp_13',['tof_paddle.hpp',['../tof__paddle_8hpp.html',1,'']]],
+  ['tof_5ftypedefs_2eh_14',['tof_typedefs.h',['../tof__typedefs_8h.html',1,'']]],
+  ['tracker_5fcalibrated_5fhit_2ehpp_15',['tracker_calibrated_hit.hpp',['../tracker__calibrated__hit_8hpp.html',1,'']]],
+  ['tracker_5fevent_2ehpp_16',['tracker_event.hpp',['../tracker__event_8hpp.html',1,'']]],
+  ['tracker_5fhit_2ecxx_17',['tracker_hit.cxx',['../tracker__hit_8cxx.html',1,'']]],
+  ['tracker_5fhit_2ehpp_18',['tracker_hit.hpp',['../tracker__hit_8hpp.html',1,'']]],
+  ['tracker_5fmeta_2ehpp_19',['tracker_meta.hpp',['../tracker__meta_8hpp.html',1,'']]],
+  ['tracklet_2ecxx_20',['tracklet.cxx',['../tracklet_8cxx.html',1,'']]],
+  ['tracklet_2ehpp_21',['tracklet.hpp',['../tracklet_8hpp.html',1,'']]],
+  ['trigger_2ehpp_22',['trigger.hpp',['../trigger_8hpp.html',1,'']]]
 ];
