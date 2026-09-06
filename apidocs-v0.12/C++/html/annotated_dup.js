@@ -35,7 +35,8 @@ var annotated_dup =
       [ "TrkMetaData", "structgondola_1_1TrkMetaData.html", "structgondola_1_1TrkMetaData" ]
     ] ],
     [ "std", null, [
-      [ "formatter< gondola::EventStatus >", "structstd_1_1formatter_3_01gondola_1_1EventStatus_01_4.html", "structstd_1_1formatter_3_01gondola_1_1EventStatus_01_4" ]
+      [ "formatter< gondola::EventStatus >", "structstd_1_1formatter_3_01gondola_1_1EventStatus_01_4.html", "structstd_1_1formatter_3_01gondola_1_1EventStatus_01_4" ],
+      [ "formatter< gondola::HitQuality >", "structstd_1_1formatter_3_01gondola_1_1HitQuality_01_4.html", "structstd_1_1formatter_3_01gondola_1_1HitQuality_01_4" ]
     ] ],
     [ "CPUMoniData", "structCPUMoniData.html", "structCPUMoniData" ],
     [ "FromTofPacket", "structFromTofPacket.html", null ],

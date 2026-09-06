@@ -1,0 +1,76 @@
+\doxysection{hit\+\_\+quality.\+hpp}
+\hypertarget{hit__quality_8hpp_source}{}\label{hit__quality_8hpp_source}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/events/hit\_quality.hpp@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/events/hit\_quality.hpp}}
+\mbox{\hyperlink{hit__quality_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00003\ \textcolor{comment}{//\ only\ ever\ include\ this\ header\ once\ per\ compilation\ unit,}}
+\DoxyCodeLine{00004\ \textcolor{comment}{//\ even\ if\ multiple\ files\ \#include\ it}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{comment}{//\ std::format\ /\ std::formatter\ -\/\ needed\ for\ the\ formatter}}
+\DoxyCodeLine{00008\ \textcolor{comment}{//\ specialization\ at\ the\ bottom\ of\ this\ file}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ <format>}}
+\DoxyCodeLine{00010\ \textcolor{comment}{//\ std::ostringstream\ -\/\ used\ by\ the\ formatter\ to\ capture\ the}}
+\DoxyCodeLine{00011\ \textcolor{comment}{//\ output\ of\ operator<<\ into\ a\ string}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#include\ <sstream>}}
+\DoxyCodeLine{00013\ }
+\DoxyCodeLine{00014\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacegondola}{gondola}}\ \{}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \ \ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4}{HitQuality}}\ :\ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \{}
+\DoxyCodeLine{00018\ \ \ \ \ \textcolor{comment}{//\ hit\ has\ not\ been\ classified\ (yet)}}
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a88183b946cc5f0e8c96b2e66e1c74a7e}{Unknown}}\ \ \ \ \ \ \ \ \ \ \ =\ \ 0,}
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{comment}{//\$\$\$\$\$\ Reserved\ for\ future\ use,\ nothing\ sets\ these\ yet.}}
+\DoxyCodeLine{00021\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4aebe9e17696fcfe4afbf16b9437973d39}{Mangled}}\ \ \ \ \ \ \ \ \ \ \ =\ \ 1,}
+\DoxyCodeLine{00022\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a7bb2a370b7a728baf6af3248cfac2aa2}{MissingHit}}\ \ \ \ \ \ \ \ =\ \ 2,}
+\DoxyCodeLine{00023\ \ \ \ \ \textcolor{comment}{//\$\$\$\$\$}}
+\DoxyCodeLine{00024\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4aedb35b2396d8b258949678d3635028a6}{LowPedPlusPedRMS}}\ \ =\ \ 3,\ \textcolor{comment}{//\ abs(ped)\ >\ 1\ and\ pedRMS\ >\ 2\ (jeff's\ cut)}}
+\DoxyCodeLine{00025\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4ab5462c819948caaa1e9df0f9cd31ce1e}{LowRMSgrThree}}\ \ \ \ \ =\ \ 4,\ \textcolor{comment}{//\ rms\ >\ 3\ (box2\ cut)}}
+\DoxyCodeLine{00026\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a9624eef2c7e36aab92562eb59b92e8b3}{LowElenaCuts}}\ \ \ \ \ \ =\ \ 5,\ \textcolor{comment}{//\ cuts\ where\ really\ the\ analysis\ failed.}}
+\DoxyCodeLine{00027\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a28d0edd045e05cf5af64e35ae0c4c6ef}{Low}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 10,\ \textcolor{comment}{//\ general\ Low\ status}}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a33c762ce5a43eeb87be1d8b11cdfab34}{MidPedRMS}}\ \ \ \ \ \ \ \ \ =\ 11,\ \textcolor{comment}{//\ middle\ triangular\ region\ in\ peak\ vs\ rms\ for\ coincidence\ pulses\ (box1\ cut)}}
+\DoxyCodeLine{00030\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4ab14092ae36820f0a4e99e55562aaa0ca}{MidPos}}\ \ \ \ \ \ \ \ \ \ \ \ =\ 12,\ \textcolor{comment}{//\ hit\ position\ too\ close\ to\ a\ paddle\ end}}
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4ae9c70b3c79f80e90e1a27d7bc95c0bba}{MidPedRMSandPos}}\ \ \ =\ 13,\ \textcolor{comment}{//\ MidPedRMS\ and\ MidPos\ both\ apply}}
+\DoxyCodeLine{00032\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a36fe9f52f427848fdbe85dda0a58203d}{MidPosSat}}\ \ \ \ \ \ \ \ \ =\ 14,\ \textcolor{comment}{//\ position\ issue\ on\ an\ otherwise-\/saturated\ pulse;\ ped\ cuts\ don't\ apply\ to\ saturated\ pulses}}
+\DoxyCodeLine{00033\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a526325a04406742b49fdcd3c6020b7e9}{MidPosSatReprocess}}=\ 15,}
+\DoxyCodeLine{00034\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a9e9df9c4e16e9562f6cda87981d9314d}{MidPosReprocess}}\ \ \ =\ 16,}
+\DoxyCodeLine{00035\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a55c6b09cbca39ef0cdb728eb112a5049}{Mid}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 20,\ \textcolor{comment}{//\ general\ Mid\ status}}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a14babdfc81d733e2ce3324252e873aea}{HighSat}}\ \ \ \ \ \ \ \ \ \ \ =\ 21,\ \textcolor{comment}{//\ High,\ but\ the\ pulse\ is\ saturated\ (>\ 600\ mV)}}
+\DoxyCodeLine{00038\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a655d20c1ca69519ca647684edbb2db35}{High}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ =\ 30,\ \textcolor{comment}{//\ general\ High\ status}}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{comment}{//\ between\ mid\ and\ high,\ really\ just\ techincally\ high\ hits}}
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{comment}{//\ but\ could\ use\ some\ sort\ of\ recalibration...}}
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{comment}{//\ like\ a\ noisy\ saturated\ pulse\ for\ example}}
+\DoxyCodeLine{00042\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a6b6b617d15444be727ca8a526ddfc9e5}{ReprocessHighSat}}\ \ =\ 31,}
+\DoxyCodeLine{00043\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a67ea1fe35548269eb4f4641423b5af7a}{ReprocessHigh}}\ \ \ \ \ =\ 40,}
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{comment}{//\ same\ as\ ReprocessHigh,\ but\ the\ pulse\ is\ also\ saturated\ (tot725\ filled)}}
+\DoxyCodeLine{00045\ \ \ \};}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \textcolor{comment}{//\ Implemented\ in\ src/events.cxx}}
+\DoxyCodeLine{00049\ \ \ std::ostream\&\ \mbox{\hyperlink{namespacegondola_a9086a1522bf1269d1824786811a08141}{operator<<}}(std::ostream\&\ os,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4}{gondola::HitQuality}}\&\ quality);}
+\DoxyCodeLine{00050\ \}}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \textcolor{keyword}{template}\ <>}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \textcolor{keyword}{struct\ }std::formatter<\mbox{\hyperlink{namespacegondola}{gondola}}::HitQuality>\ :\ std::formatter<std::string>\ \{}
+\DoxyCodeLine{00056\ \ \ \textcolor{keyword}{constexpr}\ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structstd_1_1formatter_3_01gondola_1_1HitQuality_01_4_a46e989de3eaf1beee6732804aa1b5ba9}{parse}}(std::format\_parse\_context\&\ ctx)\ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ ctx.begin();}
+\DoxyCodeLine{00058\ \ \ \}}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00060\ \ \ \textcolor{comment}{//\ format()\ does\ the\ actual\ conversion\ of\ a\ HitQuality\ value}}
+\DoxyCodeLine{00061\ \ \ \textcolor{comment}{//\ into\ characters\ written\ to\ the\ output\ (ctx.out())}}
+\DoxyCodeLine{00062\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structstd_1_1formatter_3_01gondola_1_1HitQuality_01_4_a3974c95dd8798e3bf8634438f418d8a1}{format}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4}{gondola::HitQuality}}\&\ quality,\ \textcolor{keyword}{auto}\&\ ctx)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \textcolor{comment}{//\ an\ in-\/memory\ output\ stream\ to\ write\ into}}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ std::ostringstream\ oss;}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \textcolor{comment}{//\ reuse\ operator<<\ (see\ above)\ so\ the\ printed\ text\ is\ the}}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \textcolor{comment}{//\ same\ for\ std::cout\ and\ std::format}}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ oss\ <<\ quality;}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \textcolor{comment}{//\ copy\ the\ accumulated\ string\ into\ the\ formatter's\ output}}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ std::format\_to(ctx.out(),\ \textcolor{stringliteral}{"{}\{\}"{}},\ oss.str());}
+\DoxyCodeLine{00070\ \ \ \}}
+\DoxyCodeLine{00071\ \};}
+
+\end{DoxyCode}

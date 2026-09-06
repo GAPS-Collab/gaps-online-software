@@ -9,6 +9,8 @@ var dir_81644d6308dab417156220ca507a652d =
     [ "legacy.cxx", "legacy_8cxx.html", null ],
     [ "monitoring.cxx", "monitoring_8cxx.html", "monitoring_8cxx" ],
     [ "parsers.cxx", "parsers_8cxx.html", "parsers_8cxx" ],
+    [ "rb_event.cxx", "rb__event_8cxx.html", null ],
+    [ "rb_event_header.cxx", "rb__event__header_8cxx.html", null ],
     [ "sd_legacy.cxx", "sd__legacy_8cxx.html", null ],
     [ "serialization.cxx", "serialization_8cxx.html", "serialization_8cxx" ],
     [ "telemetry_dataclasses.cxx", "telemetry__dataclasses_8cxx.html", null ],

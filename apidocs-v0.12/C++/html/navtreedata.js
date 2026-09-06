@@ -32,6 +32,7 @@ var NAVTREE =
       [ "Namespace Members", "namespacemembers.html", [
         [ "All", "namespacemembers.html", null ],
         [ "Functions", "namespacemembers_func.html", null ],
+        [ "Variables", "namespacemembers_vars.html", null ],
         [ "Typedefs", "namespacemembers_type.html", null ],
         [ "Enumerations", "namespacemembers_enum.html", null ]
       ] ]
@@ -65,12 +66,13 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "____init_____8py.html",
-"functions_vars_v.html",
-"serialization_8h.html",
-"structgondola_1_1Cooling.html#aaaaa061ba89f3378008fd754e9d4feea",
-"structgondola_1_1TelemetryPacketReader.html#ab06f74e00c5c2813a0013404782384cc",
-"structgondola_1_1TofMetaData.html#ad8f6029fa983e521aee1acee0be433f2",
-"structgondola_1_1TrkHeader.html#afb77b967e4f50a50e349242821623fe9"
+"functions_vars_o.html",
+"namespacegondola.html#ae4efa4080cf89476f85e917971613baaae0a530b3e7e74423e454a99e3c6d0b69",
+"structgondola_1_1CRReader.html#ad5439dcba3fe2eb69daf07815d7630be",
+"structgondola_1_1TelemetryEvent.html#a4d7c200e43e7a3e190cb975f103d90d7",
+"structgondola_1_1TofHit.html#a948319242243d19f27c8fc6f251a94a6",
+"structgondola_1_1Tracklet.html#a80b9f43ca42d6e51a4903719efdb72c9",
+"trigger_8hpp.html#a70a1b591bf58b6e149e2ec815142e4ac"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

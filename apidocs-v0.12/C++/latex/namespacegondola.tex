@@ -139,6 +139,31 @@ enum class \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baa}{
 , \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baaa56cdd7e9e3cef1974f4075c03a80332d}{Perfect}} = 42
  \}
 \item 
+enum class \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4}{Hit\+Quality}} \+: u8 \{ \newline
+\mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a88183b946cc5f0e8c96b2e66e1c74a7e}{Unknown}} = 0
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4aebe9e17696fcfe4afbf16b9437973d39}{Mangled}} = 1
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a7bb2a370b7a728baf6af3248cfac2aa2}{Missing\+Hit}} = 2
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4aedb35b2396d8b258949678d3635028a6}{Low\+Ped\+Plus\+Ped\+RMS}} = 3
+, \newline
+\mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4ab5462c819948caaa1e9df0f9cd31ce1e}{Low\+RMSgr\+Three}} = 4
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a9624eef2c7e36aab92562eb59b92e8b3}{Low\+Elena\+Cuts}} = 5
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a28d0edd045e05cf5af64e35ae0c4c6ef}{Low}} = 10
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a33c762ce5a43eeb87be1d8b11cdfab34}{Mid\+Ped\+RMS}} = 11
+, \newline
+\mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4ab14092ae36820f0a4e99e55562aaa0ca}{Mid\+Pos}} = 12
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4ae9c70b3c79f80e90e1a27d7bc95c0bba}{Mid\+Ped\+RMSand\+Pos}} = 13
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a36fe9f52f427848fdbe85dda0a58203d}{Mid\+Pos\+Sat}} = 14
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a526325a04406742b49fdcd3c6020b7e9}{Mid\+Pos\+Sat\+Reprocess}} = 15
+, \newline
+\mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a9e9df9c4e16e9562f6cda87981d9314d}{Mid\+Pos\+Reprocess}} = 16
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a55c6b09cbca39ef0cdb728eb112a5049}{Mid}} = 20
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a14babdfc81d733e2ce3324252e873aea}{High\+Sat}} = 21
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a655d20c1ca69519ca647684edbb2db35}{High}} = 30
+, \newline
+\mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a6b6b617d15444be727ca8a526ddfc9e5}{Reprocess\+High\+Sat}} = 31
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a67ea1fe35548269eb4f4641423b5af7a}{Reprocess\+High}} = 40
+ \}
+\item 
 enum class \mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580}{LTBThreshold}} \+: u8 \{ \newline
 \mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580af8246e1e45d89414e8bf56ffe1680a54}{No\+Hit}} = 0
 , \mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580aebfe5e1791db03c4cd6ab95801e0977d}{Hit}} = 1
@@ -264,6 +289,10 @@ std\+::ostream \& \mbox{\hyperlink{namespacegondola_a9de221b8ccf9c0782f0790897ff
 \item 
 std\+::ostream \& \mbox{\hyperlink{namespacegondola_accbe4d2d1e3b9822ec059c62f1fd9744}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baa}{Event\+Status}} \&status)
 \item 
+std\+::ostream \& \mbox{\hyperlink{namespacegondola_ada381e9964f4564151c78428f5cec383}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4}{gondola\+::\+Hit\+Quality}} \&quality)
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a27dfd6071c53c5176b6bb8a6dd74a1a3}{corrected\+\_\+rms\+\_\+no\+WF}} (\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{mu}}, \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{sigB}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{num}}=200) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}
+\item 
 std\+::ostream \& \mbox{\hyperlink{namespacegondola_aba7a0abca261a73c5b085036ea3d85c9}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1RBEvent}{gondola\+::\+RBEvent}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{re}})
 \item 
 std\+::ostream \& \mbox{\hyperlink{namespacegondola_a801130bb64dc4827fdc3f24f8c8894eb}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1RBEventHeader}{gondola\+::\+RBEvent\+Header}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{rh}})
@@ -273,6 +302,12 @@ std\+::ostream \& \mbox{\hyperlink{namespacegondola_ac9cb0b91c67a4b60151e456492a
 std\+::ostream \& \mbox{\hyperlink{namespacegondola_a6878be1debdc1d7832f0e68faa4be862}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1TofEvent}{gondola\+::\+Tof\+Event}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{et}})
 \item 
 std\+::ostream \& \mbox{\hyperlink{namespacegondola_ad142b09b980b0577047b677bd0750252}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1TofEventSummary}{gondola\+::\+Tof\+Event\+Summary}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{tes}})
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_af0b5e7179d54ca27e9e392c0b7be5c33}{classify\+\_\+side}} (\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{rms}}, \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{peak}}, \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{ped}}, \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{tot725}}) -\/$>$ \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4}{Hit\+Quality}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a0e1fb097c830801cbb92ff76615785d1}{classify\+\_\+hit}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1TofHit}{Tof\+Hit}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{hit}}) -\/$>$ \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4}{Hit\+Quality}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_ab6c9da90df7391f7ee0bdfae47d66d85}{position\+\_\+ok}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1TofHit}{Tof\+Hit}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{hit}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}}
 \item 
 std\+::ostream \& \mbox{\hyperlink{namespacegondola_ac9b115d5a1e5b9755b3345e438f9f2e2}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1TofHit}{Tof\+Hit}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pad}})
 \item 
@@ -323,6 +358,23 @@ std\+::ostream \& \mbox{\hyperlink{namespacegondola_a046acf2a43bdae770216c94c665
 std\+::ostream \& \mbox{\hyperlink{namespacegondola_a76923511b147ba22b4bd784c42a31ebb}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1Tracklet}{gondola\+::\+Tracklet}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{et}})
 \item 
 std\+::string \mbox{\hyperlink{namespacegondola_a1171cd3cced2c82a0f7bf971a972de24}{pversion\+\_\+to\+\_\+string}} (\mbox{\hyperlink{namespacegondola_af998b820a54bca400c19e03948e82c28}{Protocol\+Version}} version)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{namespacegondola_a780cd89aae40feb241224637c97225f8}{RMS\+\_\+\+GOOD\+\_\+\+MAX}} = 1.\+8\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{f}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{namespacegondola_a15d6a1f66496a9ed7ca3f46429c5cb87}{RMS\+\_\+\+LOW\+\_\+\+MIN}} = 3.\+0f
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{namespacegondola_abce50f923eee00db39eaee63726b689f}{PEAK\+\_\+\+REF}} = 600.\+0f
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{namespacegondola_a4441f55595c16936a314c2d39124f7bd}{PED\+\_\+\+REF\+\_\+\+JEFF}} = 1.\+0f
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{namespacegondola_a992f8513fb019b01e30b16f501e50758}{PEDRMS\+\_\+\+REF\+\_\+\+JEFF}} = 2.\+0f
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{namespacegondola_a5bb85b68010852553de7149077d6a7b7}{RMS\+\_\+\+REPROCESS\+\_\+\+MIN}} = 1.\+7\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{f}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{namespacegondola_a91aa95d2f3f56cde273df408ae66b2a0}{POS\+\_\+\+CUT\+\_\+\+LENGTH\+\_\+\+MM}} = 100.\+0f
 \end{DoxyCompactItemize}
 
 
@@ -557,6 +609,86 @@ Good\+No\+Err\+Bit\+Check&The event is good, but we did not perform error checks
 
 \raisebox{\heightof{T}}[0pt][0pt]{\index{Perfect@{Perfect}!gondola@{gondola}}\index{gondola@{gondola}!Perfect@{Perfect}}}\Hypertarget{namespacegondola_ae4efa4080cf89476f85e917971613baaa56cdd7e9e3cef1974f4075c03a80332d}\label{namespacegondola_ae4efa4080cf89476f85e917971613baaa56cdd7e9e3cef1974f4075c03a80332d} 
 Perfect&\\
+\hline
+
+\end{DoxyEnumFields}
+\Hypertarget{namespacegondola_a6f6c2584bb01630af689a2c451eefae4}\label{namespacegondola_a6f6c2584bb01630af689a2c451eefae4} 
+\index{gondola@{gondola}!HitQuality@{HitQuality}}
+\index{HitQuality@{HitQuality}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{HitQuality}{HitQuality}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{enum}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{class}} \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4}{gondola\+::\+Hit\+Quality}} \+: \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\hspace{0.3cm}{\ttfamily [strong]}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Unknown@{Unknown}!gondola@{gondola}}\index{gondola@{gondola}!Unknown@{Unknown}}}\Hypertarget{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a88183b946cc5f0e8c96b2e66e1c74a7e}\label{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a88183b946cc5f0e8c96b2e66e1c74a7e} 
+Unknown&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Mangled@{Mangled}!gondola@{gondola}}\index{gondola@{gondola}!Mangled@{Mangled}}}\Hypertarget{namespacegondola_a6f6c2584bb01630af689a2c451eefae4aebe9e17696fcfe4afbf16b9437973d39}\label{namespacegondola_a6f6c2584bb01630af689a2c451eefae4aebe9e17696fcfe4afbf16b9437973d39} 
+Mangled&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{MissingHit@{MissingHit}!gondola@{gondola}}\index{gondola@{gondola}!MissingHit@{MissingHit}}}\Hypertarget{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a7bb2a370b7a728baf6af3248cfac2aa2}\label{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a7bb2a370b7a728baf6af3248cfac2aa2} 
+Missing\+Hit&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{LowPedPlusPedRMS@{LowPedPlusPedRMS}!gondola@{gondola}}\index{gondola@{gondola}!LowPedPlusPedRMS@{LowPedPlusPedRMS}}}\Hypertarget{namespacegondola_a6f6c2584bb01630af689a2c451eefae4aedb35b2396d8b258949678d3635028a6}\label{namespacegondola_a6f6c2584bb01630af689a2c451eefae4aedb35b2396d8b258949678d3635028a6} 
+Low\+Ped\+Plus\+Ped\+RMS&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{LowRMSgrThree@{LowRMSgrThree}!gondola@{gondola}}\index{gondola@{gondola}!LowRMSgrThree@{LowRMSgrThree}}}\Hypertarget{namespacegondola_a6f6c2584bb01630af689a2c451eefae4ab5462c819948caaa1e9df0f9cd31ce1e}\label{namespacegondola_a6f6c2584bb01630af689a2c451eefae4ab5462c819948caaa1e9df0f9cd31ce1e} 
+Low\+RMSgr\+Three&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{LowElenaCuts@{LowElenaCuts}!gondola@{gondola}}\index{gondola@{gondola}!LowElenaCuts@{LowElenaCuts}}}\Hypertarget{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a9624eef2c7e36aab92562eb59b92e8b3}\label{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a9624eef2c7e36aab92562eb59b92e8b3} 
+Low\+Elena\+Cuts&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Low@{Low}!gondola@{gondola}}\index{gondola@{gondola}!Low@{Low}}}\Hypertarget{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a28d0edd045e05cf5af64e35ae0c4c6ef}\label{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a28d0edd045e05cf5af64e35ae0c4c6ef} 
+Low&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{MidPedRMS@{MidPedRMS}!gondola@{gondola}}\index{gondola@{gondola}!MidPedRMS@{MidPedRMS}}}\Hypertarget{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a33c762ce5a43eeb87be1d8b11cdfab34}\label{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a33c762ce5a43eeb87be1d8b11cdfab34} 
+Mid\+Ped\+RMS&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{MidPos@{MidPos}!gondola@{gondola}}\index{gondola@{gondola}!MidPos@{MidPos}}}\Hypertarget{namespacegondola_a6f6c2584bb01630af689a2c451eefae4ab14092ae36820f0a4e99e55562aaa0ca}\label{namespacegondola_a6f6c2584bb01630af689a2c451eefae4ab14092ae36820f0a4e99e55562aaa0ca} 
+Mid\+Pos&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{MidPedRMSandPos@{MidPedRMSandPos}!gondola@{gondola}}\index{gondola@{gondola}!MidPedRMSandPos@{MidPedRMSandPos}}}\Hypertarget{namespacegondola_a6f6c2584bb01630af689a2c451eefae4ae9c70b3c79f80e90e1a27d7bc95c0bba}\label{namespacegondola_a6f6c2584bb01630af689a2c451eefae4ae9c70b3c79f80e90e1a27d7bc95c0bba} 
+Mid\+Ped\+RMSand\+Pos&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{MidPosSat@{MidPosSat}!gondola@{gondola}}\index{gondola@{gondola}!MidPosSat@{MidPosSat}}}\Hypertarget{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a36fe9f52f427848fdbe85dda0a58203d}\label{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a36fe9f52f427848fdbe85dda0a58203d} 
+Mid\+Pos\+Sat&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{MidPosSatReprocess@{MidPosSatReprocess}!gondola@{gondola}}\index{gondola@{gondola}!MidPosSatReprocess@{MidPosSatReprocess}}}\Hypertarget{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a526325a04406742b49fdcd3c6020b7e9}\label{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a526325a04406742b49fdcd3c6020b7e9} 
+Mid\+Pos\+Sat\+Reprocess&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{MidPosReprocess@{MidPosReprocess}!gondola@{gondola}}\index{gondola@{gondola}!MidPosReprocess@{MidPosReprocess}}}\Hypertarget{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a9e9df9c4e16e9562f6cda87981d9314d}\label{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a9e9df9c4e16e9562f6cda87981d9314d} 
+Mid\+Pos\+Reprocess&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{Mid@{Mid}!gondola@{gondola}}\index{gondola@{gondola}!Mid@{Mid}}}\Hypertarget{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a55c6b09cbca39ef0cdb728eb112a5049}\label{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a55c6b09cbca39ef0cdb728eb112a5049} 
+Mid&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{HighSat@{HighSat}!gondola@{gondola}}\index{gondola@{gondola}!HighSat@{HighSat}}}\Hypertarget{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a14babdfc81d733e2ce3324252e873aea}\label{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a14babdfc81d733e2ce3324252e873aea} 
+High\+Sat&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{High@{High}!gondola@{gondola}}\index{gondola@{gondola}!High@{High}}}\Hypertarget{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a655d20c1ca69519ca647684edbb2db35}\label{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a655d20c1ca69519ca647684edbb2db35} 
+High&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ReprocessHighSat@{ReprocessHighSat}!gondola@{gondola}}\index{gondola@{gondola}!ReprocessHighSat@{ReprocessHighSat}}}\Hypertarget{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a6b6b617d15444be727ca8a526ddfc9e5}\label{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a6b6b617d15444be727ca8a526ddfc9e5} 
+Reprocess\+High\+Sat&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{ReprocessHigh@{ReprocessHigh}!gondola@{gondola}}\index{gondola@{gondola}!ReprocessHigh@{ReprocessHigh}}}\Hypertarget{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a67ea1fe35548269eb4f4641423b5af7a}\label{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a67ea1fe35548269eb4f4641423b5af7a} 
+Reprocess\+High&\\
 \hline
 
 \end{DoxyEnumFields}
@@ -862,7 +994,41 @@ Forced&\\
 
 FIXME -\/ this is obviously incomplete. 
 
-\Hypertarget{namespacegondola_a6789ee24087165a3cefdf592965fb6cd}\label{namespacegondola_a6789ee24087165a3cefdf592965fb6cd} 
+\Hypertarget{namespacegondola_a0e1fb097c830801cbb92ff76615785d1}\label{namespacegondola_a0e1fb097c830801cbb92ff76615785d1} 
+\index{gondola@{gondola}!classify\_hit@{classify\_hit}}
+\index{classify\_hit@{classify\_hit}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{classify\_hit()}{classify\_hit()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::classify\+\_\+hit (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1TofHit}{Tof\+Hit}} \&}]{hit }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4}{Hit\+Quality}}}
+
+\Hypertarget{namespacegondola_af0b5e7179d54ca27e9e392c0b7be5c33}\label{namespacegondola_af0b5e7179d54ca27e9e392c0b7be5c33} 
+\index{gondola@{gondola}!classify\_side@{classify\_side}}
+\index{classify\_side@{classify\_side}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{classify\_side()}{classify\_side()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::classify\+\_\+side (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}}]{rms,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}}]{peak,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}}]{ped,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}}]{tot725 }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4}{Hit\+Quality}}}
+
+\Hypertarget{namespacegondola_a27dfd6071c53c5176b6bb8a6dd74a1a3}\label{namespacegondola_a27dfd6071c53c5176b6bb8a6dd74a1a3} 
+\index{gondola@{gondola}!corrected\_rms\_noWF@{corrected\_rms\_noWF}}
+\index{corrected\_rms\_noWF@{corrected\_rms\_noWF}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{corrected\_rms\_noWF()}{corrected\_rms\_noWF()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::corrected\+\_\+rms\+\_\+no\+WF (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}}]{mu,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}}]{sigB,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}}}]{num = {\ttfamily 200} }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}}
+
+Corrections applied post-\/flight to quantities that were computed online without access to the full raw waveform (e.\+g. a fast baseline rms estimate). Each function here undoes a specific, known bias of its no-\/waveform online counterpart. Correct a no-\/waveform baseline rms estimate for the bias introduced by a nonzero mean mu over a window of num samples.
+
+Implemented in \doxylink{events_8cxx}{src/events.\+cxx}
+
+
+\begin{DoxyParams}{Parameters}
+{\em mu} & \+: online-\/estimated mean of the baseline window \\
+\hline
+{\em sigB} & \+: online-\/estimated (biased) rms of the baseline window \\
+\hline
+{\em num} & \+: number of samples the online estimate was taken over\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the corrected rms, or NaN if the correction is undefined (negative radicand or non-\/finite intermediate value)
+\end{DoxyReturn}
+FIXME -\/ this needs to go away as soon as we have the general thing fixed \Hypertarget{namespacegondola_a6789ee24087165a3cefdf592965fb6cd}\label{namespacegondola_a6789ee24087165a3cefdf592965fb6cd} 
 \index{gondola@{gondola}!get\_dsi\_j\_paddles@{get\_dsi\_j\_paddles}}
 \index{get\_dsi\_j\_paddles@{get\_dsi\_j\_paddles}!gondola@{gondola}}
 \doxysubsubsection{\texorpdfstring{get\_dsi\_j\_paddles()}{get\_dsi\_j\_paddles()}}
@@ -992,79 +1158,85 @@ convenience function to load all the calibration files from a certain directory
 \Hypertarget{namespacegondola_accbe4d2d1e3b9822ec059c62f1fd9744}\label{namespacegondola_accbe4d2d1e3b9822ec059c62f1fd9744} 
 \index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [1/13]}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [1/14]}}
 {\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_ae4efa4080cf89476f85e917971613baa}{Event\+Status}} \&}]{status }\end{DoxyParamCaption})}
 
 \Hypertarget{namespacegondola_a9086a1522bf1269d1824786811a08141}\label{namespacegondola_a9086a1522bf1269d1824786811a08141} 
 \index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [2/13]}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [2/14]}}
 {\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84d}{gondola\+::\+Compression\+Level}} \&}]{level }\end{DoxyParamCaption})}
 
 \Hypertarget{namespacegondola_a9de221b8ccf9c0782f0790897ff063c5}\label{namespacegondola_a9de221b8ccf9c0782f0790897ff063c5} 
 \index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [3/13]}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [3/14]}}
 {\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_ac61bd1b8e62eab79a1089be6ecc1ca3d}{gondola\+::\+Event\+Quality}} \&}]{qual }\end{DoxyParamCaption})}
+
+\Hypertarget{namespacegondola_ada381e9964f4564151c78428f5cec383}\label{namespacegondola_ada381e9964f4564151c78428f5cec383} 
+\index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [4/14]}}
+{\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4}{gondola\+::\+Hit\+Quality}} \&}]{quality }\end{DoxyParamCaption})}
 
 \Hypertarget{namespacegondola_a95d0c48f85317911ad997722c25219b6}\label{namespacegondola_a95d0c48f85317911ad997722c25219b6} 
 \index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [4/13]}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [5/14]}}
 {\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_a3e679dd5cf65b9be26ead6c7555f2580}{gondola\+::\+LTBThreshold}} \&}]{thresh }\end{DoxyParamCaption})}
 
 \Hypertarget{namespacegondola_aba7a0abca261a73c5b085036ea3d85c9}\label{namespacegondola_aba7a0abca261a73c5b085036ea3d85c9} 
 \index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [5/13]}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [6/14]}}
 {\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1RBEvent}{gondola\+::\+RBEvent}} \&}]{re }\end{DoxyParamCaption})}
 
 \Hypertarget{namespacegondola_a801130bb64dc4827fdc3f24f8c8894eb}\label{namespacegondola_a801130bb64dc4827fdc3f24f8c8894eb} 
 \index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [6/13]}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [7/14]}}
 {\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1RBEventHeader}{gondola\+::\+RBEvent\+Header}} \&}]{rh }\end{DoxyParamCaption})}
 
 \Hypertarget{namespacegondola_ac9cb0b91c67a4b60151e456492a27d37}\label{namespacegondola_ac9cb0b91c67a4b60151e456492a27d37} 
 \index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [7/13]}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [8/14]}}
 {\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1RBWaveform}{gondola\+::\+RBWaveform}} \&}]{rh }\end{DoxyParamCaption})}
 
 \Hypertarget{namespacegondola_a046acf2a43bdae770216c94c665b135b}\label{namespacegondola_a046acf2a43bdae770216c94c665b135b} 
 \index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [8/13]}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [9/14]}}
 {\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1RecoHit}{gondola\+::\+Reco\+Hit}} \&}]{et }\end{DoxyParamCaption})}
 
 \Hypertarget{namespacegondola_a6878be1debdc1d7832f0e68faa4be862}\label{namespacegondola_a6878be1debdc1d7832f0e68faa4be862} 
 \index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [9/13]}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [10/14]}}
 {\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1TofEvent}{gondola\+::\+Tof\+Event}} \&}]{et }\end{DoxyParamCaption})}
 
 \Hypertarget{namespacegondola_ad142b09b980b0577047b677bd0750252}\label{namespacegondola_ad142b09b980b0577047b677bd0750252} 
 \index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [10/13]}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [11/14]}}
 {\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1TofEventSummary}{gondola\+::\+Tof\+Event\+Summary}} \&}]{tes }\end{DoxyParamCaption})}
 
 \Hypertarget{namespacegondola_a76923511b147ba22b4bd784c42a31ebb}\label{namespacegondola_a76923511b147ba22b4bd784c42a31ebb} 
 \index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [11/13]}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [12/14]}}
 {\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1Tracklet}{gondola\+::\+Tracklet}} \&}]{et }\end{DoxyParamCaption})}
 
 \Hypertarget{namespacegondola_a70a1b591bf58b6e149e2ec815142e4ac}\label{namespacegondola_a70a1b591bf58b6e149e2ec815142e4ac} 
 \index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [12/13]}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [13/14]}}
 {\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_aac91e1b082fd02305f77ee3d0338ff21}{gondola\+::\+Trigger\+Type}} \&}]{t\+\_\+type }\end{DoxyParamCaption})}
 
 \Hypertarget{namespacegondola_ac9b115d5a1e5b9755b3345e438f9f2e2}\label{namespacegondola_ac9b115d5a1e5b9755b3345e438f9f2e2} 
 \index{gondola@{gondola}!operator$<$$<$@{operator$<$$<$}}
 \index{operator$<$$<$@{operator$<$$<$}!gondola@{gondola}}
-\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [13/13]}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$()}{operator<<()}\hspace{0.1cm}{\footnotesize\ttfamily [14/14]}}
 {\footnotesize\ttfamily std\+::ostream \& gondola\+::operator$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1TofHit}{Tof\+Hit}} \&}]{pad }\end{DoxyParamCaption})}
 
 \Hypertarget{namespacegondola_a4e34052f6dbf7321e933fbaa9000d94d}\label{namespacegondola_a4e34052f6dbf7321e933fbaa9000d94d} 
@@ -1157,6 +1329,12 @@ get an unsigned long64 from a vector of bytes, advancing pos by 8
 
 get an unsigned char from a vector of bytes, advancing pos by 1 
 
+\Hypertarget{namespacegondola_ab6c9da90df7391f7ee0bdfae47d66d85}\label{namespacegondola_ab6c9da90df7391f7ee0bdfae47d66d85} 
+\index{gondola@{gondola}!position\_ok@{position\_ok}}
+\index{position\_ok@{position\_ok}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{position\_ok()}{position\_ok()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::position\+\_\+ok (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1TofHit}{Tof\+Hit}} \&}]{hit }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}}}
+
 \Hypertarget{namespacegondola_a1171cd3cced2c82a0f7bf971a972de24}\label{namespacegondola_a1171cd3cced2c82a0f7bf971a972de24} 
 \index{gondola@{gondola}!pversion\_to\_string@{pversion\_to\_string}}
 \index{pversion\_to\_string@{pversion\_to\_string}!gondola@{gondola}}
@@ -1233,3 +1411,47 @@ Reverse-\/parse a u32 a la rust\textquotesingle{}s built in u32\+::to\+\_\+le\+\
 {\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::to\+\_\+le\+\_\+bytes (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}}]{number }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}$>$}
 
 Reverse-\/parse a u64 a la rust\textquotesingle{}s built in u64\+::to\+\_\+le\+\_\+bytes 
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{namespacegondola_abce50f923eee00db39eaee63726b689f}\label{namespacegondola_abce50f923eee00db39eaee63726b689f} 
+\index{gondola@{gondola}!PEAK\_REF@{PEAK\_REF}}
+\index{PEAK\_REF@{PEAK\_REF}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{PEAK\_REF}{PEAK\_REF}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+PEAK\+\_\+\+REF = 600.\+0f\hspace{0.3cm}{\ttfamily [constexpr]}}
+
+\Hypertarget{namespacegondola_a4441f55595c16936a314c2d39124f7bd}\label{namespacegondola_a4441f55595c16936a314c2d39124f7bd} 
+\index{gondola@{gondola}!PED\_REF\_JEFF@{PED\_REF\_JEFF}}
+\index{PED\_REF\_JEFF@{PED\_REF\_JEFF}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{PED\_REF\_JEFF}{PED\_REF\_JEFF}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+PED\+\_\+\+REF\+\_\+\+JEFF = 1.\+0f\hspace{0.3cm}{\ttfamily [constexpr]}}
+
+\Hypertarget{namespacegondola_a992f8513fb019b01e30b16f501e50758}\label{namespacegondola_a992f8513fb019b01e30b16f501e50758} 
+\index{gondola@{gondola}!PEDRMS\_REF\_JEFF@{PEDRMS\_REF\_JEFF}}
+\index{PEDRMS\_REF\_JEFF@{PEDRMS\_REF\_JEFF}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{PEDRMS\_REF\_JEFF}{PEDRMS\_REF\_JEFF}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+PEDRMS\+\_\+\+REF\+\_\+\+JEFF = 2.\+0f\hspace{0.3cm}{\ttfamily [constexpr]}}
+
+\Hypertarget{namespacegondola_a91aa95d2f3f56cde273df408ae66b2a0}\label{namespacegondola_a91aa95d2f3f56cde273df408ae66b2a0} 
+\index{gondola@{gondola}!POS\_CUT\_LENGTH\_MM@{POS\_CUT\_LENGTH\_MM}}
+\index{POS\_CUT\_LENGTH\_MM@{POS\_CUT\_LENGTH\_MM}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{POS\_CUT\_LENGTH\_MM}{POS\_CUT\_LENGTH\_MM}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+POS\+\_\+\+CUT\+\_\+\+LENGTH\+\_\+\+MM = 100.\+0f\hspace{0.3cm}{\ttfamily [constexpr]}}
+
+\Hypertarget{namespacegondola_a780cd89aae40feb241224637c97225f8}\label{namespacegondola_a780cd89aae40feb241224637c97225f8} 
+\index{gondola@{gondola}!RMS\_GOOD\_MAX@{RMS\_GOOD\_MAX}}
+\index{RMS\_GOOD\_MAX@{RMS\_GOOD\_MAX}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{RMS\_GOOD\_MAX}{RMS\_GOOD\_MAX}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+RMS\+\_\+\+GOOD\+\_\+\+MAX = 1.\+8\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{f}}\hspace{0.3cm}{\ttfamily [constexpr]}}
+
+\Hypertarget{namespacegondola_a15d6a1f66496a9ed7ca3f46429c5cb87}\label{namespacegondola_a15d6a1f66496a9ed7ca3f46429c5cb87} 
+\index{gondola@{gondola}!RMS\_LOW\_MIN@{RMS\_LOW\_MIN}}
+\index{RMS\_LOW\_MIN@{RMS\_LOW\_MIN}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{RMS\_LOW\_MIN}{RMS\_LOW\_MIN}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+RMS\+\_\+\+LOW\+\_\+\+MIN = 3.\+0f\hspace{0.3cm}{\ttfamily [constexpr]}}
+
+\Hypertarget{namespacegondola_a5bb85b68010852553de7149077d6a7b7}\label{namespacegondola_a5bb85b68010852553de7149077d6a7b7} 
+\index{gondola@{gondola}!RMS\_REPROCESS\_MIN@{RMS\_REPROCESS\_MIN}}
+\index{RMS\_REPROCESS\_MIN@{RMS\_REPROCESS\_MIN}!gondola@{gondola}}
+\doxysubsubsection{\texorpdfstring{RMS\_REPROCESS\_MIN}{RMS\_REPROCESS\_MIN}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+RMS\+\_\+\+REPROCESS\+\_\+\+MIN = 1.\+7\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{f}}\hspace{0.3cm}{\ttfamily [constexpr]}}
+

@@ -7,7 +7,8 @@ var hierarchy =
     [ "gondola::CRReader", "structgondola_1_1CRReader.html", null ],
     [ "gondola::CRWriter", "structgondola_1_1CRWriter.html", null ],
     [ "std::formatter", null, [
-      [ "std::formatter< gondola::EventStatus >", "structstd_1_1formatter_3_01gondola_1_1EventStatus_01_4.html", null ]
+      [ "std::formatter< gondola::EventStatus >", "structstd_1_1formatter_3_01gondola_1_1EventStatus_01_4.html", null ],
+      [ "std::formatter< gondola::HitQuality >", "structstd_1_1formatter_3_01gondola_1_1HitQuality_01_4.html", null ]
     ] ],
     [ "FromTofPacket< Derived >", "structFromTofPacket.html", null ],
     [ "FromTofPacket< MtbMoniData >", "structFromTofPacket.html", [

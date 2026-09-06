@@ -1,0 +1,63 @@
+\doxysection{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/events/hit\+\_\+quality.hpp File Reference}
+\hypertarget{hit__quality_8hpp}{}\label{hit__quality_8hpp}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/events/hit\_quality.hpp@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/events/hit\_quality.hpp}}
+{\ttfamily \#include $<$format$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+Include dependency graph for hit\+\_\+quality.\+hpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=222pt]{hit__quality_8hpp__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hit__quality_8hpp__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structstd_1_1formatter_3_01gondola_1_1HitQuality_01_4}{std\+::formatter$<$ gondola\+::\+Hit\+Quality $>$}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacegondola}{gondola}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum class \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4}{gondola\+::\+Hit\+Quality}} \+: u8 \{ \newline
+\mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a88183b946cc5f0e8c96b2e66e1c74a7e}{gondola\+::\+Unknown}} = 0
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4aebe9e17696fcfe4afbf16b9437973d39}{gondola\+::\+Mangled}} = 1
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a7bb2a370b7a728baf6af3248cfac2aa2}{gondola\+::\+Missing\+Hit}} = 2
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4aedb35b2396d8b258949678d3635028a6}{gondola\+::\+Low\+Ped\+Plus\+Ped\+RMS}} = 3
+, \newline
+\mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4ab5462c819948caaa1e9df0f9cd31ce1e}{gondola\+::\+Low\+RMSgr\+Three}} = 4
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a9624eef2c7e36aab92562eb59b92e8b3}{gondola\+::\+Low\+Elena\+Cuts}} = 5
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a28d0edd045e05cf5af64e35ae0c4c6ef}{gondola\+::\+Low}} = 10
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a33c762ce5a43eeb87be1d8b11cdfab34}{gondola\+::\+Mid\+Ped\+RMS}} = 11
+, \newline
+\mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4ab14092ae36820f0a4e99e55562aaa0ca}{gondola\+::\+Mid\+Pos}} = 12
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4ae9c70b3c79f80e90e1a27d7bc95c0bba}{gondola\+::\+Mid\+Ped\+RMSand\+Pos}} = 13
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a36fe9f52f427848fdbe85dda0a58203d}{gondola\+::\+Mid\+Pos\+Sat}} = 14
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a526325a04406742b49fdcd3c6020b7e9}{gondola\+::\+Mid\+Pos\+Sat\+Reprocess}} = 15
+, \newline
+\mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a9e9df9c4e16e9562f6cda87981d9314d}{gondola\+::\+Mid\+Pos\+Reprocess}} = 16
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a55c6b09cbca39ef0cdb728eb112a5049}{gondola\+::\+Mid}} = 20
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a14babdfc81d733e2ce3324252e873aea}{gondola\+::\+High\+Sat}} = 21
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a655d20c1ca69519ca647684edbb2db35}{gondola\+::\+High}} = 30
+, \newline
+\mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a6b6b617d15444be727ca8a526ddfc9e5}{gondola\+::\+Reprocess\+High\+Sat}} = 31
+, \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4a67ea1fe35548269eb4f4641423b5af7a}{gondola\+::\+Reprocess\+High}} = 40
+ \}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacegondola_ada381e9964f4564151c78428f5cec383}{gondola\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_a6f6c2584bb01630af689a2c451eefae4}{gondola\+::\+Hit\+Quality}} \&quality)
+\end{DoxyCompactItemize}

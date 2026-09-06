@@ -3,6 +3,7 @@ var events_8cxx =
     [ "operator<<", "events_8cxx.html#accbe4d2d1e3b9822ec059c62f1fd9744", null ],
     [ "operator<<", "events_8cxx.html#a9086a1522bf1269d1824786811a08141", null ],
     [ "operator<<", "events_8cxx.html#a9de221b8ccf9c0782f0790897ff063c5", null ],
+    [ "operator<<", "events_8cxx.html#ada381e9964f4564151c78428f5cec383", null ],
     [ "operator<<", "events_8cxx.html#a95d0c48f85317911ad997722c25219b6", null ],
     [ "operator<<", "events_8cxx.html#aba7a0abca261a73c5b085036ea3d85c9", null ],
     [ "operator<<", "events_8cxx.html#a801130bb64dc4827fdc3f24f8c8894eb", null ],
@@ -11,7 +12,6 @@ var events_8cxx =
     [ "operator<<", "events_8cxx.html#ad142b09b980b0577047b677bd0750252", null ],
     [ "operator<<", "events_8cxx.html#a70a1b591bf58b6e149e2ec815142e4ac", null ],
     [ "operator<<", "events_8cxx.html#ac9b115d5a1e5b9755b3345e438f9f2e2", null ],
-    [ "u8_to_u16", "events_8cxx.html#a1c10b6194055c6cc7c772ebd2fa4648c", null ],
     [ "LTB_CH0", "events_8cxx.html#a0cf7e1f9e13dbe1db99b385adfee4f2e", null ],
     [ "LTB_CH1", "events_8cxx.html#a1b99a0fc8ba941f78112521f915e4512", null ],
     [ "LTB_CH2", "events_8cxx.html#a6310f7e8478886d2de265fe59229f81a", null ],
@@ -21,5 +21,12 @@ var events_8cxx =
     [ "LTB_CH6", "events_8cxx.html#a06fa3d542f01496f50b46b1bdc10bd83", null ],
     [ "LTB_CH7", "events_8cxx.html#a3e53025bb5e0673d65b6e85c82d244a0", null ],
     [ "LTB_CHANNELS", "events_8cxx.html#a3d60db15337aed0c3fcb524a20f8abd4", null ],
-    [ "PHYSICAL_CHANNELS", "events_8cxx.html#a48d93d6f519ee267a8dcd6131f857306", null ]
+    [ "PEAK_REF", "events_8cxx.html#abce50f923eee00db39eaee63726b689f", null ],
+    [ "PED_REF_JEFF", "events_8cxx.html#a4441f55595c16936a314c2d39124f7bd", null ],
+    [ "PEDRMS_REF_JEFF", "events_8cxx.html#a992f8513fb019b01e30b16f501e50758", null ],
+    [ "PHYSICAL_CHANNELS", "events_8cxx.html#a48d93d6f519ee267a8dcd6131f857306", null ],
+    [ "POS_CUT_LENGTH_MM", "events_8cxx.html#a91aa95d2f3f56cde273df408ae66b2a0", null ],
+    [ "RMS_GOOD_MAX", "events_8cxx.html#a780cd89aae40feb241224637c97225f8", null ],
+    [ "RMS_LOW_MIN", "events_8cxx.html#a15d6a1f66496a9ed7ca3f46429c5cb87", null ],
+    [ "RMS_REPROCESS_MIN", "events_8cxx.html#a5bb85b68010852553de7149077d6a7b7", null ]
 ];

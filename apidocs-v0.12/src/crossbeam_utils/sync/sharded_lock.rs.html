@@ -1,9 +1,9 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/crossbeam-utils-0.8.22/src/sync/sharded_lock.rs`."><title>sharded_lock.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-1ed95124.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="crossbeam_utils" data-themes="" data-resource-suffix="" data-rustdoc-version="1.98.1 (48a229cea 2026-09-01)" data-channel="1.98.1" data-search-js="search-9944d736.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-417ebf0a.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">crossbeam_utils/sync/</div>sharded_lock.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>std::boxed::Box;
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/crossbeam-utils-0.8.23/src/sync/sharded_lock.rs`."><title>sharded_lock.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-1ed95124.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="crossbeam_utils" data-themes="" data-resource-suffix="" data-rustdoc-version="1.98.1 (48a229cea 2026-09-01)" data-channel="1.98.1" data-search-js="search-9944d736.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-417ebf0a.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">crossbeam_utils/sync/</div>sharded_lock.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>std::boxed::Box;
 <a href=#2 id=2 data-nosnippet>2</a><span class="kw">use </span>std::cell::UnsafeCell;
 <a href=#3 id=3 data-nosnippet>3</a><span class="kw">use </span>std::collections::HashMap;
 <a href=#4 id=4 data-nosnippet>4</a><span class="kw">use </span>std::fmt;
 <a href=#5 id=5 data-nosnippet>5</a><span class="kw">use </span>std::marker::PhantomData;
-<a href=#6 id=6 data-nosnippet>6</a><span class="kw">use </span>std::mem;
+<a href=#6 id=6 data-nosnippet>6</a><span class="kw">use </span>std::mem::{<span class="self">self</span>, MaybeUninit};
 <a href=#7 id=7 data-nosnippet>7</a><span class="kw">use </span>std::ops::{Deref, DerefMut};
 <a href=#8 id=8 data-nosnippet>8</a><span class="kw">use </span>std::panic::{RefUnwindSafe, UnwindSafe};
 <a href=#9 id=9 data-nosnippet>9</a><span class="kw">use </span>std::sync::{LockResult, PoisonError, TryLockError, TryLockResult};
@@ -26,7 +26,7 @@
 <a href=#26 id=26 data-nosnippet>26</a>    ///
 <a href=#27 id=27 data-nosnippet>27</a>    /// Write operations will lock each shard and store the guard here. These guards get dropped at
 <a href=#28 id=28 data-nosnippet>28</a>    /// the same time the big guard is dropped.
-<a href=#29 id=29 data-nosnippet>29</a>    </span>write_guard: UnsafeCell&lt;<span class="prelude-ty">Option</span>&lt;RwLockWriteGuard&lt;<span class="lifetime">'static</span>, ()&gt;&gt;&gt;,
+<a href=#29 id=29 data-nosnippet>29</a>    </span>write_guard: UnsafeCell&lt;MaybeUninit&lt;RwLockWriteGuard&lt;<span class="lifetime">'static</span>, ()&gt;&gt;&gt;,
 <a href=#30 id=30 data-nosnippet>30</a>}
 <a href=#31 id=31 data-nosnippet>31</a>
 <a href=#32 id=32 data-nosnippet>32</a><span class="doccomment">/// A sharded reader-writer lock.
@@ -105,7 +105,7 @@
 <a href=#105 id=105 data-nosnippet>105</a>                .map(|<span class="kw">_</span>| {
 <a href=#106 id=106 data-nosnippet>106</a>                    CachePadded::new(Shard {
 <a href=#107 id=107 data-nosnippet>107</a>                        lock: RwLock::new(()),
-<a href=#108 id=108 data-nosnippet>108</a>                        write_guard: UnsafeCell::new(<span class="prelude-val">None</span>),
+<a href=#108 id=108 data-nosnippet>108</a>                        write_guard: UnsafeCell::new(MaybeUninit::uninit()),
 <a href=#109 id=109 data-nosnippet>109</a>                    })
 <a href=#110 id=110 data-nosnippet>110</a>                })
 <a href=#111 id=111 data-nosnippet>111</a>                .collect::&lt;Box&lt;[<span class="kw">_</span>]&gt;&gt;(),
@@ -349,18 +349,18 @@
 <a href=#349 id=349 data-nosnippet>349</a>            </span><span class="kw">unsafe </span>{
 <a href=#350 id=350 data-nosnippet>350</a>                <span class="kw">let </span>guard: RwLockWriteGuard&lt;<span class="lifetime">'static</span>, ()&gt; = mem::transmute(guard);
 <a href=#351 id=351 data-nosnippet>351</a>                <span class="kw">let </span>dest: <span class="kw-2">*mut </span><span class="kw">_ </span>= shard.write_guard.get();
-<a href=#352 id=352 data-nosnippet>352</a>                <span class="kw-2">*</span>dest = <span class="prelude-val">Some</span>(guard);
+<a href=#352 id=352 data-nosnippet>352</a>                <span class="kw-2">*</span>dest = MaybeUninit::new(guard);
 <a href=#353 id=353 data-nosnippet>353</a>            }
 <a href=#354 id=354 data-nosnippet>354</a>        }
 <a href=#355 id=355 data-nosnippet>355</a>
 <a href=#356 id=356 data-nosnippet>356</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>(i) = blocked {
 <a href=#357 id=357 data-nosnippet>357</a>            <span class="comment">// Unlock the shards in reverse order of locking.
 <a href=#358 id=358 data-nosnippet>358</a>            </span><span class="kw">for </span>shard <span class="kw">in </span><span class="self">self</span>.shards[<span class="number">0</span>..i].iter().rev() {
-<a href=#359 id=359 data-nosnippet>359</a>                <span class="kw">unsafe </span>{
-<a href=#360 id=360 data-nosnippet>360</a>                    <span class="kw">let </span>dest: <span class="kw-2">*mut </span><span class="kw">_ </span>= shard.write_guard.get();
-<a href=#361 id=361 data-nosnippet>361</a>                    <span class="kw">let </span>guard = (<span class="kw-2">*</span>dest).take();
-<a href=#362 id=362 data-nosnippet>362</a>                    drop(guard);
-<a href=#363 id=363 data-nosnippet>363</a>                }
+<a href=#359 id=359 data-nosnippet>359</a>                <span class="kw">let </span>dest: <span class="kw-2">*mut </span>MaybeUninit&lt;RwLockWriteGuard&lt;<span class="lifetime">'static</span>, ()&gt;&gt; = shard.write_guard.get();
+<a href=#360 id=360 data-nosnippet>360</a>                <span class="comment">// SAFETY: we've acquired lock and filled write_guard of self.shards[0..i].
+<a href=#361 id=361 data-nosnippet>361</a>                // Note that drop_in_place cannot be used because it releases the lock during the drop.
+<a href=#362 id=362 data-nosnippet>362</a>                </span><span class="kw">let </span>guard = <span class="kw">unsafe </span>{ dest.cast::&lt;RwLockWriteGuard&lt;<span class="lifetime">'static</span>, ()&gt;&gt;().read() };
+<a href=#363 id=363 data-nosnippet>363</a>                drop(guard);
 <a href=#364 id=364 data-nosnippet>364</a>            }
 <a href=#365 id=365 data-nosnippet>365</a>            <span class="prelude-val">Err</span>(TryLockError::WouldBlock)
 <a href=#366 id=366 data-nosnippet>366</a>        } <span class="kw">else if </span>poisoned {
@@ -425,7 +425,7 @@
 <a href=#425 id=425 data-nosnippet>425</a>                <span class="kw">let </span>guard: RwLockWriteGuard&lt;<span class="lifetime">'_</span>, ()&gt; = guard;
 <a href=#426 id=426 data-nosnippet>426</a>                <span class="kw">let </span>guard: RwLockWriteGuard&lt;<span class="lifetime">'static</span>, ()&gt; = mem::transmute(guard);
 <a href=#427 id=427 data-nosnippet>427</a>                <span class="kw">let </span>dest: <span class="kw-2">*mut </span><span class="kw">_ </span>= shard.write_guard.get();
-<a href=#428 id=428 data-nosnippet>428</a>                <span class="kw-2">*</span>dest = <span class="prelude-val">Some</span>(guard);
+<a href=#428 id=428 data-nosnippet>428</a>                <span class="kw-2">*</span>dest = MaybeUninit::new(guard);
 <a href=#429 id=429 data-nosnippet>429</a>            }
 <a href=#430 id=430 data-nosnippet>430</a>        }
 <a href=#431 id=431 data-nosnippet>431</a>
@@ -526,11 +526,11 @@
 <a href=#526 id=526 data-nosnippet>526</a>    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
 <a href=#527 id=527 data-nosnippet>527</a>        <span class="comment">// Unlock the shards in reverse order of locking.
 <a href=#528 id=528 data-nosnippet>528</a>        </span><span class="kw">for </span>shard <span class="kw">in </span><span class="self">self</span>.lock.shards.iter().rev() {
-<a href=#529 id=529 data-nosnippet>529</a>            <span class="kw">unsafe </span>{
-<a href=#530 id=530 data-nosnippet>530</a>                <span class="kw">let </span>dest: <span class="kw-2">*mut </span><span class="kw">_ </span>= shard.write_guard.get();
-<a href=#531 id=531 data-nosnippet>531</a>                <span class="kw">let </span>guard = (<span class="kw-2">*</span>dest).take();
-<a href=#532 id=532 data-nosnippet>532</a>                drop(guard);
-<a href=#533 id=533 data-nosnippet>533</a>            }
+<a href=#529 id=529 data-nosnippet>529</a>            <span class="kw">let </span>dest: <span class="kw-2">*mut </span>MaybeUninit&lt;RwLockWriteGuard&lt;<span class="lifetime">'static</span>, ()&gt;&gt; = shard.write_guard.get();
+<a href=#530 id=530 data-nosnippet>530</a>            <span class="comment">// SAFETY: ShardedLockWriteGuard is constructed only when all locks have been acquired.
+<a href=#531 id=531 data-nosnippet>531</a>            // Note that drop_in_place cannot be used because it releases the lock during the drop.
+<a href=#532 id=532 data-nosnippet>532</a>            </span><span class="kw">let </span>guard = <span class="kw">unsafe </span>{ dest.cast::&lt;RwLockWriteGuard&lt;<span class="lifetime">'static</span>, ()&gt;&gt;().read() };
+<a href=#533 id=533 data-nosnippet>533</a>            drop(guard);
 <a href=#534 id=534 data-nosnippet>534</a>        }
 <a href=#535 id=535 data-nosnippet>535</a>    }
 <a href=#536 id=536 data-nosnippet>536</a>}

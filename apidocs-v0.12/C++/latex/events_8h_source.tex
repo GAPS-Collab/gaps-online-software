@@ -17,46 +17,48 @@
 \DoxyCodeLine{00030\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tof__packet_8h}{packets/tof\_packet.h}}"{}}}
 \DoxyCodeLine{00031\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{event__status_8hpp}{events/event\_status.hpp}}"{}}}
 \DoxyCodeLine{00032\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{rb__event__header_8hpp}{events/rb\_event\_header.hpp}}"{}}}
-\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tof__hit_8hpp}{events/tof\_hit.hpp}}"{}}}
-\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{rb__event_8hpp}{events/rb\_event.hpp}}"{}}}
-\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{event__quality_8hpp}{events/event\_quality.hpp}}"{}}}
-\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{rb__waveform_8hpp}{events/rb\_waveform.hpp}}"{}}}
-\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tof__event_8hpp}{events/tof\_event.hpp}}"{}}}
-\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tof__event__summary_8hpp}{events/tof\_event\_summary.hpp}}"{}}}
-\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{telemetry__event_8hpp}{events/telemetry\_event.hpp}}"{}}}
-\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{calibration_8h}{calibration.h}}"{}}}
-\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{version_8h}{version.h}}"{}}}
-\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{errors_8hpp}{errors.hpp}}"{}}}
-\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#ifdef\ BUILD\_CXX\_DB}}
-\DoxyCodeLine{00044\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{database_8h}{database.h}}"{}}}
-\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#endif}}
-\DoxyCodeLine{00046\ }
-\DoxyCodeLine{00047\ \textcolor{keyword}{namespace\ }r\ =\ result;}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{hit__quality_8hpp}{events/hit\_quality.hpp}}"{}}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{post__flight__correction__functions_8hpp}{events/post\_flight\_correction\_functions.hpp}}"{}}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tof__hit_8hpp}{events/tof\_hit.hpp}}"{}}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{rb__event_8hpp}{events/rb\_event.hpp}}"{}}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{event__quality_8hpp}{events/event\_quality.hpp}}"{}}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{rb__waveform_8hpp}{events/rb\_waveform.hpp}}"{}}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tof__event_8hpp}{events/tof\_event.hpp}}"{}}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{tof__event__summary_8hpp}{events/tof\_event\_summary.hpp}}"{}}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{telemetry__event_8hpp}{events/telemetry\_event.hpp}}"{}}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{calibration_8h}{calibration.h}}"{}}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{version_8h}{version.h}}"{}}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{errors_8hpp}{errors.hpp}}"{}}}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#ifdef\ BUILD\_CXX\_DB}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{database_8h}{database.h}}"{}}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\#endif}}
 \DoxyCodeLine{00048\ }
-\DoxyCodeLine{00049\ \textcolor{keyword}{class\ }\mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565ab31d9b68634b6ea4105b346f0a194f25}{RBCalibration}};}
+\DoxyCodeLine{00049\ \textcolor{keyword}{namespace\ }r\ =\ result;}
 \DoxyCodeLine{00050\ }
-\DoxyCodeLine{00051\ \textcolor{preprocessor}{\#define\ NCHN\ 9}}
-\DoxyCodeLine{00052\ \textcolor{preprocessor}{\#define\ NWORDS\ 1024}}
-\DoxyCodeLine{00053\ \textcolor{preprocessor}{\#define\ N\_LTBS\ 25}}
-\DoxyCodeLine{00054\ \textcolor{preprocessor}{\#define\ N\_CHN\_PER\_LTB\ 16}}
-\DoxyCodeLine{00055\ }
-\DoxyCodeLine{00056\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacegondola}{gondola}}\ \{}
-\DoxyCodeLine{00057\ \ \ }
-\DoxyCodeLine{00058\ \textcolor{comment}{\ \ /*********************************************************/}}
+\DoxyCodeLine{00051\ \textcolor{keyword}{class\ }\mbox{\hyperlink{tof__packet_8h_aa69433dde428a8cd2a2242fb3592a565ab31d9b68634b6ea4105b346f0a194f25}{RBCalibration}};}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\#define\ NCHN\ 9}}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\#define\ NWORDS\ 1024}}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\#define\ N\_LTBS\ 25}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\#define\ N\_CHN\_PER\_LTB\ 16}}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacegondola}{gondola}}\ \{}
 \DoxyCodeLine{00059\ \ \ }
-\DoxyCodeLine{00061\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ C\_LIGHT\_PADDLE\ =\ 15.4;\ }
-\DoxyCodeLine{00062\ \ \ }
-\DoxyCodeLine{00063\ \textcolor{comment}{\ \ /*********************************************************/}}
-\DoxyCodeLine{00064\ }
-\DoxyCodeLine{00065\ \ \ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84d}{CompressionLevel}}\ :\ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \{}
-\DoxyCodeLine{00066\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a88183b946cc5f0e8c96b2e66e1c74a7e}{Unknown}}\ \ \ \ \ \ \ \ =\ \ 0,}
-\DoxyCodeLine{00067\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84da6adf97f83acf6453d4a6a4b1070f3754}{None}}\ \ \ \ \ \ \ \ \ \ \ =\ 10,}
-\DoxyCodeLine{00068\ \ \ \};}
-\DoxyCodeLine{00069\ \ \ }
-\DoxyCodeLine{00070\ \ \ std::ostream\&\ \mbox{\hyperlink{namespacegondola_a9086a1522bf1269d1824786811a08141}{operator<<}}(std::ostream\&\ os,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84d}{gondola::CompressionLevel}}\&\ level);\ \ }
-\DoxyCodeLine{00071\ \}\ }
-\DoxyCodeLine{00072\ }
-\DoxyCodeLine{00073\ }
-\DoxyCodeLine{00074\ \textcolor{preprocessor}{\#endif\ }}
+\DoxyCodeLine{00060\ \textcolor{comment}{\ \ /*********************************************************/}}
+\DoxyCodeLine{00061\ \ \ }
+\DoxyCodeLine{00063\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{tof__typedefs_8h_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ C\_LIGHT\_PADDLE\ =\ 15.4;\ }
+\DoxyCodeLine{00064\ \ \ }
+\DoxyCodeLine{00065\ \textcolor{comment}{\ \ /*********************************************************/}}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \ \ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84d}{CompressionLevel}}\ :\ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}\ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68a88183b946cc5f0e8c96b2e66e1c74a7e}{Unknown}}\ \ \ \ \ \ \ \ =\ \ 0,}
+\DoxyCodeLine{00069\ \ \ \ \ \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84da6adf97f83acf6453d4a6a4b1070f3754}{None}}\ \ \ \ \ \ \ \ \ \ \ =\ 10,}
+\DoxyCodeLine{00070\ \ \ \};}
+\DoxyCodeLine{00071\ \ \ }
+\DoxyCodeLine{00072\ \ \ std::ostream\&\ \mbox{\hyperlink{namespacegondola_a9086a1522bf1269d1824786811a08141}{operator<<}}(std::ostream\&\ os,\ \textcolor{keyword}{const}\ \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84d}{gondola::CompressionLevel}}\&\ level);\ \ }
+\DoxyCodeLine{00073\ \}\ }
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \textcolor{preprocessor}{\#endif\ }}
 
 \end{DoxyCode}
