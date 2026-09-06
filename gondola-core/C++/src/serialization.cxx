@@ -61,4 +61,15 @@ Vec<u32> get_2byte_markers_indices(const Vec<u8> &bytestream, uint8_t marker)
 
 /***********************************************/
 
+/// Helper to get adc data from Vec<u8>
+auto u8_to_u16(const Vec<u8> &vec_u8) -> Vec<u16> {
+  Vec<u16> vec_u16;
+  vec_u16.reserve(vec_u8.size() / sizeof(u16));
+  for (size_t i = 0; i < vec_u8.size(); i += sizeof(u16)) {
+    u16 value;
+    std::memcpy(&value, &vec_u8[i], sizeof(u16));
+    vec_u16.push_back(value);
+  }
+  return vec_u16;
+}
 

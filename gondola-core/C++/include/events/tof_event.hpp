@@ -8,6 +8,7 @@
 #include "events/event_status.hpp"
 #include "events/event_quality.hpp"
 #include "events/trigger.hpp"
+#include "events/rb_event.hpp"
 #include "packets/tof_packet.h"
 #include "database.h"
 

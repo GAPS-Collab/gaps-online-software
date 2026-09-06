@@ -52,4 +52,9 @@ auto search_for_2byte_marker(const Vec<u8> &bytestream,
 auto get_2byte_markers_indices(const Vec<u8> &bytestream, u8 marker)
   -> Vec<u32>;
 
+  
+/***********************************************/
+
+auto u8_to_u16(const Vec<u8> &vec_u8) -> Vec<u16>;
+
 #endif

@@ -40,6 +40,8 @@ if (BUILD_CXX_BINDINGS)
               C++/src/calibration.cxx
               C++/src/serialization.cxx
               C++/src/parsers.cxx
+              C++/src/rb_event.cxx
+              C++/src/rb_event_header.cxx
               C++/src/events.cxx
               C++/src/io.cxx
               C++/src/telemetry_reader.cxx

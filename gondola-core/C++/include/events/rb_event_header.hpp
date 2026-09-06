@@ -4,7 +4,6 @@
 
 #include "result/result.h"
 
-#include "gondola.hpp"
 #include "errors.hpp"
 
 namespace r = result;

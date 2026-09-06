@@ -11,14 +11,8 @@
 // output of operator<< into a string
 #include <sstream>
 
-// basic typedefs (u8, f32, Vec, ...) via tof_typedefs.h
-#include "gondola.hpp"
-
-// everything in gaps-online-software C++ lives in the
-// gondola namespace
 namespace gondola {
 
-  struct TofHit;
 
   enum class HitQuality : u8 {
     // hit has not been classified (yet)
@@ -50,8 +44,6 @@ namespace gondola {
     // same as ReprocessHigh, but the pulse is also saturated (tot725 filled)
   };
 
-  // Implemented in src/events.cxx
-  auto classify_hit(const TofHit& hit) -> HitQuality;
 
   // Implemented in src/events.cxx
   std::ostream& operator<<(std::ostream& os, const gondola::HitQuality& quality);

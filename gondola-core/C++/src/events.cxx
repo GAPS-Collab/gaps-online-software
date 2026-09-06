@@ -52,623 +52,174 @@ const Vec<Vec<u8>> PHYSICAL_CHANNELS = {
   {15,16}
 };
 
-/// Helper to get adc data from Vec<u8>
-auto u8_to_u16(const Vec<u8> &vec_u8) -> Vec<u16> {
-  Vec<u16> vec_u16;
-  vec_u16.reserve(vec_u8.size() / sizeof(u16));
-  for (size_t i = 0; i < vec_u8.size(); i += sizeof(u16)) {
-    u16 value;
-    std::memcpy(&value, &vec_u8[i], sizeof(u16));
-    vec_u16.push_back(value);
-  }
-  return vec_u16;
-}
-
-/*************************************/
-
-g::RBEventHeader::RBEventHeader() {
-  rb_id              = 0; 
-  event_id           = 0; 
-  channel_mask       = 0; 
-  status_byte        = 0;
-  stop_cell          = 0; 
-  ch9_amp            = 0;
-  ch9_freq           = 0;
-  ch9_phase          = 0;
-  fpga_temp          = 0;
-  timestamp16        = 0; 
-  timestamp32        = 0; 
-}
-
-/*************************************/
-
-auto g::RBEventHeader::to_string() const -> std::string {
-  auto sfit = get_sine_fit();
-  std::string repr = "<RBEventHeader";
-  repr += "\n  rb id          " + std::to_string(rb_id)                 ;
-  repr += "\n  event id       " + std::to_string(event_id)              ;
-  repr += "\n  is locked      " + std::to_string(is_locked())           ;
-  repr += "\n  is locked (1s) " + std::to_string(is_locked_last_sec())  ;
-  repr += "\n  lost trigger   " + std::to_string(drs_lost_trigger())    ;
-  repr += "\n  event fragment " + std::to_string(is_event_fragment())   ;
-  repr += "\n  channel mask   " + std::to_string(channel_mask)          ;
-  repr += "\n  |-> channels   ";
-  for (auto ch : get_channels()) {
-    repr += " " + std::to_string(ch) + " ";
-  }
-  repr += "\n  stop cell      " + std::to_string(stop_cell)             ;
-  repr += "\n  ** online ch9 fit amp, freq, phase";
-  repr += "\n    AMP " + std::to_string(sfit[0]);
-  repr += "  FREQ " + std::to_string(sfit[1]);
-  repr += "  PHASE " + std::to_string(sfit[2]); 
-  repr += "\n  timestamp32    " + std::to_string(timestamp32)           ;
-  repr += "\n  timestamp16    " + std::to_string(timestamp16)           ;
-  repr += "\n  |->timestamp48 " + std::to_string(get_timestamp48())     ;
-  repr += "\n  FPGA temp [C]  " + std::to_string(get_fpga_temp())       ;
-  repr += ">";
-  return repr;
-}
-
-/*************************************/
-
-auto g::RBEventHeader::get_channels() const -> Vec<u8> {
-  Vec<u8>  channels = Vec<u8>();
-  for (u8 k=0;k<9;k++) {
-    if ((channel_mask & (1 << k)) > 0) {
-      channels.push_back(k);
-    }
-  }
-  return channels; 
-}
-
-/*************************************/
-
-auto g::RBEventHeader::get_nchan() const -> u8 {
-  return get_channels().size(); 
-}
-
-/*************************************/
-
-auto g::RBEventHeader::from_bytestream(const Vec<u8> &stream, u64 &pos)\
-  -> Result<RBEventHeader, g::IOError> {
-  //g::set_loglevel(g::LOGLEVEL::info);
-  if (stream.size() < RBEventHeader::SIZE) {
-    auto message = std::format("RBEventHeader can not be parsed from a string with size {}, when {} bytes are expected!", stream.size(), RBEventHeader::SIZE);
-    auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
-    return Err(err);
-  }
-  RBEventHeader header;
-  u16 head                  = g::parse_u16(stream, pos);
-  if (head != RBEventHeader::HEAD) {
-    spdlog::error("[RBEventHeader::from_bytestream] Header signature {} invalid!", head);
-  }
-  header.rb_id               = g::parse_u8(stream , pos);  
-  header.event_id            = g::parse_u32(stream, pos);  
-  header.channel_mask        = g::parse_u16(stream, pos);   
-  header.status_byte         = g::parse_u8(stream , pos); 
-  header.stop_cell           = g::parse_u16(stream, pos);  
-  header.ch9_amp             = g::parse_u16(stream, pos);  
-  header.ch9_freq            = g::parse_u16(stream, pos);  
-  header.ch9_phase           = g::parse_u32(stream, pos);  
-  header.fpga_temp           = g::parse_u16(stream, pos);  
-  header.timestamp32         = g::parse_u32(stream, pos);
-  header.timestamp16         = g::parse_u16(stream, pos);
-  u16 tail                   = g::parse_u16(stream, pos);
-  if (tail != RBEventHeader::TAIL) {
-    spdlog::error("Tail signature incorrect! Got tail {}", tail);
-  }
-  return Ok(header); 
-}
-
-/*************************************/
-
-auto g::RBEventHeader::has_ch9() const -> bool {
-  return (channel_mask & 512) > 0;
-}
-
-/*************************************/
-  
-auto g::RBEventHeader::get_fpga_temp() const -> f32 {
-  f32 zynq_temp = (((fpga_temp & 4095) * 503.975) / 4096.0) - 273.15;
-  //f32 temp = (fpga_temp * 503.975/4096) - 273.15;
-  return zynq_temp;
-}
-
-/*************************************/
-
-auto g::RBEventHeader::is_event_fragment() const -> bool {
-  return (status_byte & 1) > 0;
-}
-
-/*************************************/
-
-auto g::RBEventHeader::drs_lost_trigger() const -> bool {
-  return ((status_byte >> 1) & 1) > 0;
-}
-
-/*************************************/
-
-auto g::RBEventHeader::lost_lock() const -> bool {
-  return ((status_byte >> 2) & 1) > 0;
-}
-
-/*************************************/
-
-auto g::RBEventHeader::lost_lock_last_sec() const -> bool {
-  return ((status_byte >> 3) & 1) > 0;
-}
-
-/*************************************/
-
-auto g::RBEventHeader::is_locked() const -> bool {
-  return !(lost_lock());
-}
-
-/*************************************/
-
-auto g::RBEventHeader::is_locked_last_sec() const -> bool {
-  return !(lost_lock_last_sec());
-}
-
-/*************************************/
-
-auto g::RBEventHeader::get_timestamp48() const -> u64 {
-  return ((u64)timestamp16 << 32) | (u64)timestamp32;
-}
-
-/*************************************/
-
-auto g::RBEventHeader::get_active_data_channels() const -> Vec<u8> {
-  Vec<u8> active_channels;
-  for (auto const &ch : {1,2,3,4,5,6,7,8} ) {
-    if ((channel_mask & (u8)pow(2, ch - 1)) == (u8)pow(2,ch - 1)) active_channels.push_back(ch);
-  } 
-  //if ((channel_mask & 1)   == 1)   active_channels.push_back(1);
-  return active_channels;
-}
-
-/*************************************/
-
-auto g::RBEventHeader::get_n_datachan() const -> u8 {
-  Vec<u8> active_channels = get_active_data_channels();
-  return (u8)active_channels.size();
-}
-
-/*************************************/
-
-auto g::RBEventHeader::get_sine_fit() const -> std::array<f32, 3> {
-  f32 u16_MAX = 65535;
-  f32 amp    = (20.0 * ch9_amp   /u16_MAX) - 10.0;
-  f32 freq   = (20.0 * ch9_freq  /u16_MAX) - 10.0;
-  f32 phase  = (20.0 * ch9_phase /u16_MAX) - 10.0;
-  std::array<f32, 3> result = {amp,freq,phase};
-  return result;
-}
-
-/*************************************/
-
-g::RBEvent::RBEvent() {  
-  data_type = 0;
-  status    = EventStatus::Unknown;
-  header = RBEventHeader();
-  adc    = Vec<Vec<u16>>(); 
-  for (usize k=0; k<NCHN; k++) {
-    adc.push_back(Vec<u16>());
-  }
-  hits  = Vec<g::TofHit>();
-}
-
-/**********************************************************/
-
-auto g::RBEvent::to_string() const -> std::string {
-  std::string repr = "<RBEvent\n";
-  std::stringstream ss;
-  ss << status;
-  repr += "  status    : " + ss.str() + "\n";
-  repr += header.to_string();
-  repr += "\n";
-  repr += " -- -- adc -- --";
-  for (auto ch : header.get_channels()) {
-    repr += "\n " + std::to_string(ch)  + ": ..";
-    repr += std::to_string(adc[ch][0]);
-    repr += " "; 
-    repr += std::to_string(adc[ch][1]);
-    repr += " .. .."; 
-  }
-  if ( hits.size() > 0 ) {
-    repr += "\n\n ** ** hits ** **\n";
-    for (auto const &h : hits) {
-      repr += h.to_string();
-      repr += "\n";
-    } 
-  } else {
-    repr += "\n -- no hits!";
-  }
-  repr += ">";
-  return repr;
-}
-
-/**********************************************************/
-
-bool g::RBEvent::channel_check(u8 channel) const {
-  if (channel == 0) {
-    spdlog::error("Remember, channels start at 1. 0 does not exist!");
-    return false;
-  }
-  if (channel > 9) {
-    spdlog::error("Thera are no channels > 9!");
-    return false;
-  }
-  return true;
-}
-
-/**********************************************************/
-  
-const Vec<u16>& g::RBEvent::get_channel_adc(u8 channel) const {
-  if (!(channel_check(channel))) {
-    return _empty_channel;
-  }
-  return adc[channel -1]; 
-}
-
-/*************************************/
-  
-const Vec<u16>& g::RBEvent::get_channel_by_label(u8 channel) const {
-  return adc[channel - 1];
-}
-
-const Vec<u16>& g::RBEvent::get_channel_by_id(u8 channel) const {
-  return adc[channel];
-}
-
-/**********************************************************/
-
-auto g::RBEvent::calc_baseline(const Vec<f32> &volts, usize min_bin, usize max_bin) 
-  -> f32 {
-  f32 bl     = 0;
-  for (usize idx = 0; idx<volts.size(); idx++) {
-    //f32 bl     = std::accumulate(ch_bl[ch].begin() + min_bin, ch_bl[ch].begin() + max_bin,0);
-    if (idx <= min_bin) {
-      continue;
-    } else if ((idx > min_bin) && (idx <=max_bin)) {
-      bl += volts[idx];
-    } else {
-      break;
-    }
-  }
-  bl        /= (f32)(max_bin - min_bin);
-    //baselines.push_back(bl);
-  return bl;
-}
-
-/**********************************************************/
-
-auto g::RBEvent::from_bytestream(const Vec<u8> &stream, u64 &pos) 
-  -> RBEvent {
-  RBEvent event = RBEvent();
-  spdlog::debug("Start decoding at pos {}", pos);
-  u16 head = g::parse_u16(stream, pos);
-  if (head != RBEvent::HEAD)  {
-    spdlog::error("[RBEvent::from_bytestream] Header signature invalid!");  
-    event.status = EventStatus::IncompleteReadout;
-    return event;
-  }
-  event.data_type = g::parse_u8(stream, pos);
-  //event.status    = g::parse_u8(stream, pos);
-  // FIXME - this can fail. Write a custom casting method that doesn't
-  event.status    = static_cast<EventStatus>(stream[pos]); pos+=1; 
-  // hits are below when readking out hit vector
-  // FIXME
-  u8 nhits        = g::parse_u8(stream, pos);
-  //spdlog::info("{}", event.data_type);
-  //spdlog::info("{}", event.status);
-  auto header     = RBEventHeader::from_bytestream(stream, pos);
-  if (header.is_err()) {
-    // FIXME
-    return event;
-  }
-  event.header    = header.unwrap();
-  spdlog::debug("Decoded RBEventHeader!");
-  if (event.header.is_event_fragment() || event.header.drs_lost_trigger()) {
-    return event;
-  }
-  for (auto ch : event.header.get_channels()) {
-    if (stream.size() < pos + 2*NWORDS) {
-      event.status = EventStatus::IncompleteReadout;
-      return event;
-    }
-    Vec<u8>::const_iterator start = stream.begin() + pos;
-    Vec<u8>::const_iterator end   = stream.begin() + pos + 2*NWORDS;    // 2*NWORDS because stream is Vec::<u8> and it is 16 bit words.
-    Vec<u8> data(start, end);
-    event.adc[ch] = u8_to_u16(data);
-    pos += 2*NWORDS;
-  }
-  // Decode the hits
-  for (u8 k=0;k<nhits;k++) {
-    auto maybe_hit = g::TofHit::from_bytestream(stream, pos);
-    if (maybe_hit.is_ok()) {
-      auto hit = maybe_hit.unwrap();
-      event.hits.push_back(hit);
-    }
-  }
-  u16 tail = g::parse_u16(stream, pos);
-  if (tail != RBEvent::TAIL) {
-    spdlog::error("After parsing the event, we found an invalid tail signature {}", tail);
-  }
-  return event;
-}
 
 /**********************************************************/
 
 namespace gondola {
   std::ostream& operator<<(std::ostream& os, const g::EventQuality& qual) {
-     os << "<EventQuality: " ;
-     switch (qual) {
-       case g::EventQuality::Unknown : { 
-         os << "Unknown>";
-         break;
-       }
-       case g::EventQuality::Silver : { 
-         os << "Silver>";
-         break;
-       }
-       case g::EventQuality::Gold : { 
-         os << "Gold>";
-         break;
-       }
-       case g::EventQuality::Diamond : { 
-         os << "Diamond>";
-         break;
-       }
-       case g::EventQuality::FourLeafClover : {
-         os << "FourLeafClover>";
-         break;
-       }
-     }
-     return os;
+    os << "<EventQuality: " ;
+    switch (qual) {
+      case g::EventQuality::Unknown : { 
+        os << "Unknown>";
+        break;
+      }
+      case g::EventQuality::Silver : { 
+        os << "Silver>";
+        break;
+      }
+      case g::EventQuality::Gold : { 
+        os << "Gold>";
+        break;
+      }
+      case g::EventQuality::Diamond : { 
+        os << "Diamond>";
+        break;
+      }
+      case g::EventQuality::FourLeafClover : {
+        os << "FourLeafClover>";
+        break;
+      }
+    }
+    return os;
   }
 
   /**********************************************************/
 
   std::ostream& operator<<(std::ostream& os, const g::HitQuality& quality) {
-     os << "<HitQuality: " ;
-     switch (quality) {
-       case g::HitQuality::Unknown : {
-         os << "Unknown>";
-         break;
-       }
-       case g::HitQuality::Mangled : {
-         os << "Mangled>";
-         break;
-       }
-       case g::HitQuality::MissingHit : {
-         os << "MissingHit>";
-         break;
-       }
-       case g::HitQuality::LowPedPlusPedRMS : {
-         os << "LowPedPlusPedRMS>";
-         break;
-       }
-       case g::HitQuality::LowRMSgrThree : {
-         os << "LowRMSgrThree>";
-         break;
-       }
-       case g::HitQuality::LowElenaCuts : {
-         os << "LowElenaCuts>";
-         break;
-       }
-       case g::HitQuality::Low : {
-         os << "Low>";
-         break;
-       }
-       case g::HitQuality::MidPedRMS : {
-         os << "MidPedRMS>";
-         break;
-       }
-       case g::HitQuality::MidPos : {
-         os << "MidPos>";
-         break;
-       }
-       case g::HitQuality::MidPedRMSandPos : {
-         os << "MidPedRMSandPos>";
-         break;
-       }
-       case g::HitQuality::MidPosSat : {
-         os << "MidPosSat>";
-         break;
-       }
-       case g::HitQuality::MidPosSatReprocess : {
-         os << "MidPosSatReprocess>";
-         break;
-       }
-       case g::HitQuality::MidPosReprocess : {
-         os << "MidPosReprocess>";
-         break;
-       }
-       case g::HitQuality::Mid : {
-         os << "Mid>";
-         break;
-       }
-       case g::HitQuality::HighSat : {
-         os << "HighSat>";
-         break;
-       }
-       case g::HitQuality::High : {
-         os << "High>";
-         break;
-       }
-       case g::HitQuality::ReprocessHigh : {
-         os << "ReprocessHigh>";
-         break;
-       }
-       case g::HitQuality::ReprocessHighSat : {
-         os << "ReprocessHighSat>";
-         break;
-       }
-     }
-     return os;
+    os << "<HitQuality: " ;
+    switch (quality) {
+      case g::HitQuality::Unknown : {
+        os << "Unknown>";
+        break;
+      }
+      case g::HitQuality::Mangled : {
+        os << "Mangled>";
+        break;
+      }
+      case g::HitQuality::MissingHit : {
+        os << "MissingHit>";
+        break;
+      }
+      case g::HitQuality::LowPedPlusPedRMS : {
+        os << "LowPedPlusPedRMS>";
+        break;
+      }
+      case g::HitQuality::LowRMSgrThree : {
+        os << "LowRMSgrThree>";
+        break;
+      }
+      case g::HitQuality::LowElenaCuts : {
+        os << "LowElenaCuts>";
+        break;
+      }
+      case g::HitQuality::Low : {
+        os << "Low>";
+        break;
+      }
+      case g::HitQuality::MidPedRMS : {
+        os << "MidPedRMS>";
+        break;
+      }
+      case g::HitQuality::MidPos : {
+        os << "MidPos>";
+        break;
+      }
+      case g::HitQuality::MidPedRMSandPos : {
+        os << "MidPedRMSandPos>";
+        break;
+      }
+      case g::HitQuality::MidPosSat : {
+        os << "MidPosSat>";
+        break;
+      }
+      case g::HitQuality::MidPosSatReprocess : {
+        os << "MidPosSatReprocess>";
+        break;
+      }
+      case g::HitQuality::MidPosReprocess : {
+        os << "MidPosReprocess>";
+        break;
+      }
+      case g::HitQuality::Mid : {
+        os << "Mid>";
+        break;
+      }
+      case g::HitQuality::HighSat : {
+        os << "HighSat>";
+        break;
+      }
+      case g::HitQuality::High : {
+        os << "High>";
+        break;
+      }
+      case g::HitQuality::ReprocessHigh : {
+        os << "ReprocessHigh>";
+        break;
+      }
+      case g::HitQuality::ReprocessHighSat : {
+        os << "ReprocessHighSat>";
+        break;
+      }
+    }
+    return os;
   }
 
   /**********************************************************/
 
-  namespace {
-    // Domains derived from the "side rms vs peak" study (40h dataset):
-    //  * rms <  RMS_GOOD_MAX                       -> unconditionally good (High)
-    //  * rms >= RMS_LOW_MIN                         -> unconditionally bad  (Low), any peak
-    //  * RMS_GOOD_MAX <= rms < RMS_LOW_MIN          -> "correctable" triangle: a large
-    //    peak (good S/N) can still compensate for the elevated baseline noise. The
-    //    triangle's hypotenuse runs from (RMS_GOOD_MAX, peak=0) to (RMS_LOW_MIN, PEAK_REF),
-    //    so hits on/right of it (low peak relative to rms) are Mid, the rest stay High.
-    constexpr f32 RMS_GOOD_MAX = 1.8f;
-    constexpr f32 RMS_LOW_MIN  = 3.0f;
-    constexpr f32 PEAK_REF     = 600.0f;
-    constexpr f32 PED_REF_JEFF     = 1.0f;
-    constexpr f32 PEDRMS_REF_JEFF     = 2.0f;
+  // Domains derived from the "side rms vs peak" study (40h dataset):
+  //  * rms <  RMS_GOOD_MAX                       -> unconditionally good (High)
+  //  * rms >= RMS_LOW_MIN                         -> unconditionally bad  (Low), any peak
+  //  * RMS_GOOD_MAX <= rms < RMS_LOW_MIN          -> "correctable" triangle: a large
+  //    peak (good S/N) can still compensate for the elevated baseline noise. The
+  //    triangle's hypotenuse runs from (RMS_GOOD_MAX, peak=0) to (RMS_LOW_MIN, PEAK_REF),
+  //    so hits on/right of it (low peak relative to rms) are Mid, the rest stay High.
+  constexpr f32 RMS_GOOD_MAX = 1.8f;
+  constexpr f32 RMS_LOW_MIN  = 3.0f;
+  constexpr f32 PEAK_REF     = 600.0f;
+  constexpr f32 PED_REF_JEFF     = 1.0f;
+  constexpr f32 PEDRMS_REF_JEFF     = 2.0f;
 
 
-    constexpr f32 RMS_REPROCESS_MIN = 1.7f;
+  constexpr f32 RMS_REPROCESS_MIN = 1.7f;
 
-    // Placeholder
-    constexpr f32 POS_CUT_LENGTH_MM = 100.0f;
+  // Placeholder
+  constexpr f32 POS_CUT_LENGTH_MM = 100.0f;
 
-    //classifies side behavior
-    auto classify_side(f32 rms, f32 peak, f32 ped, f32 tot725) -> g::HitQuality {
-
-      // +++++  large pulse IFs +++++
-      if ((tot725 != 0) && (rms > RMS_REPROCESS_MIN))
-      {
-        return g::HitQuality::ReprocessHighSat;
-      }
-      else if (tot725 != 0) {
-        return g::HitQuality::HighSat;
-      }
-
-      if ((peak > PEAK_REF) && (rms > RMS_REPROCESS_MIN))
-      {
-        return g::HitQuality::ReprocessHigh;
-      }
-      else if (peak > PEAK_REF) {
-        return g::HitQuality::High;
-      }
-      // +++++  END large pulse IFs +++++
-
-      f32 boundary = RMS_GOOD_MAX + (RMS_LOW_MIN - RMS_GOOD_MAX) * (peak / PEAK_REF);
-      //mid and low side classificaiton
-      if (rms >= RMS_LOW_MIN) { // box2 cuts
-        return g::HitQuality::LowRMSgrThree;
-      }
-      else if ((rms >= PEDRMS_REF_JEFF) && (std::abs(ped) >= PED_REF_JEFF)) { // jeff's cuts
-        return g::HitQuality::LowPedPlusPedRMS;
-      }
-      if (rms >= boundary) { //coincidence (box1) cuts
-        return g::HitQuality::MidPedRMS;
-      }
-      //anything else will be a good pulse...
-
-      return g::HitQuality::High;
-    }
-
-
-    // NB: get_x_pos() is measured from end A (x=0) to end B (x=paddle_len_mm),
-    // not centered on the paddle - see get_edep()/sd_legacy.cxx for the same
-    // convention.
-    auto position_ok(const g::TofHit& hit) -> bool {
-      f32 paddle_len_mm = 10.0f * hit.paddle_len;
-      f32 x_pos_mm      = hit.get_x_pos(); // already mm
-      return (x_pos_mm > POS_CUT_LENGTH_MM) && (x_pos_mm < paddle_len_mm - POS_CUT_LENGTH_MM);
-    }
+  std::ostream& operator<<(std::ostream& os, const g::TofHit& th) {
+    os << th.to_string();
+    return os;
   }
-
-  auto postFlightCorrectionFunctions::corrected_rms_noWF(f32 mu, f32 sigB, u32 num) -> f32 {
-    f32 n   = static_cast<f32>(num);
-    f32 val = ((n - mu*mu) / n) * (sigB*sigB) - mu*mu;
-    if (!std::isfinite(val) || val < 0.0f) {
-      return std::numeric_limits<f32>::quiet_NaN();
-    }
-    return std::sqrt(val);
+  
+  //std::ostream& operator<<(std::ostream& os, const g::MasterTriggerEvent& mt) {
+  //  os << mt.to_string();
+  //  return os;
+  //}
+  
+  std::ostream& operator<<(std::ostream& os, const g::TofEvent& te) {
+    os << te.to_string();
+    return os;
   }
-
-  /**********************************************************/
-
-  auto classify_hit(const g::TofHit& hit) -> g::HitQuality {
-
-    //fatal analysis cuts...
-    //hit obeys causality
-    if (!hit.obeys_causality()) {
-      return g::HitQuality::Low;
-    }
-    // #### Elena's cuts - cases where the analysis itself failed ####
-    if (hit.baseline_a == 0 || hit.get_time_a() == 0
-     || hit.baseline_b == 0 || hit.get_time_b() == 0
-     || hit.get_time_a() > 350 || hit.get_time_b() > 350) {
-      return g::HitQuality::LowElenaCuts;
-    }
-
-
-    // #### ped RMS and Ped classificaiton... ####
-    // (uncorrected) rms if the correction is undefined (NaN)
-    f32 baseline_a_rms_correction = postFlightCorrectionFunctions::corrected_rms_noWF(hit.baseline_a, hit.baseline_a_rms);
-    f32 baseline_b_rms_correction = postFlightCorrectionFunctions::corrected_rms_noWF(hit.baseline_b, hit.baseline_b_rms);
-    // this will be fixed by grace, keep the correction now...
-    if (!std::isfinite(baseline_a_rms_correction)) {
-      baseline_a_rms_correction = hit.baseline_a_rms;
-    }
-    if (!std::isfinite(baseline_b_rms_correction)) {
-      baseline_b_rms_correction = hit.baseline_b_rms;
-    }
-    auto quality_a = classify_side(baseline_a_rms_correction, hit.get_peak_a(), hit.baseline_a, hit.tot_high_a);
-    auto quality_b = classify_side(baseline_b_rms_correction, hit.get_peak_b(), hit.baseline_b, hit.tot_high_b);
-
-    // a side already in the High family (High/HighSat/ReprocessHigh/ReprocessHighSat)
-    // reflects a large/saturated pulse on that side, and shouldn't be dragged
-    // down to Low/Mid.
-    auto is_high_family = [](g::HitQuality q) {
-      return q == g::HitQuality::High || q == g::HitQuality::HighSat
-          || q == g::HitQuality::ReprocessHigh || q == g::HitQuality::ReprocessHighSat;
-    };
-
-    bool a_saturated = is_high_family(quality_a);
-    bool b_saturated = is_high_family(quality_b);
-
-    g::HitQuality quality;
-    if (a_saturated != b_saturated) {
-      quality = a_saturated ? quality_a : quality_b;
-    } else {
-      // both saturated, or neither the worse side wins
-      quality = std::min(quality_a, quality_b);
-    }
-
-    // #### paddle position classification... ####
-    // position cuts only ever demote a Mid/High verdict further into Mid
-    // an already-Low hit stays Low regardless of where it reconstructs
-    if (!position_ok(hit)) {
-      switch (quality) {
-        case g::HitQuality::MidPedRMS:
-          quality = g::HitQuality::MidPedRMSandPos;
-          break;
-        case g::HitQuality::HighSat:
-          quality = g::HitQuality::MidPosSat;
-          break;
-        case g::HitQuality::High:
-          quality = g::HitQuality::MidPos;
-          break;
-        case g::HitQuality::ReprocessHighSat:
-          quality = g::HitQuality::MidPosSatReprocess;
-          break;
-        case g::HitQuality::ReprocessHigh:
-          quality = g::HitQuality::MidPosReprocess;
-          break;
-
-        default:
-          break;
-      }
-    }
-
-    return quality;
+  
+  std::ostream& operator<<(std::ostream& os, const g::RBEvent& re) {
+    os << re.to_string();
+    return os;
   }
-
-  /**********************************************************/
-
+  
+  std::ostream& operator<<(std::ostream& os, const g::RBEventHeader& rh) {
+    os << rh.to_string();
+    return os;
+  }
+  
+  std::ostream& operator<<(std::ostream& os, const g::RBWaveform& wf) {
+    os << wf.to_string();
+    return os;
+  }
+  
+  std::ostream& operator<<(std::ostream& os, const g::TofEventSummary& tes) {
+    os << tes.to_string();
+    return os;
+  }
+  
   std::ostream& operator<<(std::ostream& os, const g::CompressionLevel& level) {
      os << "<CompressionLevel: " ;
      switch (level) {
@@ -793,31 +344,164 @@ namespace gondola {
   /**********************************************************/
   
   std::ostream& operator<<(std::ostream& os, const g::LTBThreshold& thresh) {
-     os << "<LTBThresholde: " ;
-     switch (thresh) {
-       case g::LTBThreshold::Unknown : { 
-         os << "Unknown>";
-         break;
-       }
-       case g::LTBThreshold::NoHit : { 
-         os << "NoHit>";
-         break;
-       }
-       case g::LTBThreshold::Hit : { 
-         os << "Hit>";
-         break;
-       }
-       case g::LTBThreshold::Beta : { 
-         os << "Beta>";
-         break;
-       }
-       case g::LTBThreshold::Veto : { 
-         os << "Veto>";
-         break;
-       }
-     }
-     return os;
+    os << "<LTBThresholde: " ;
+    switch (thresh) {
+      case g::LTBThreshold::Unknown : { 
+        os << "Unknown>";
+        break;
+      }
+      case g::LTBThreshold::NoHit : { 
+        os << "NoHit>";
+        break;
+      }
+      case g::LTBThreshold::Hit : { 
+        os << "Hit>";
+        break;
+      }
+      case g::LTBThreshold::Beta : { 
+        os << "Beta>";
+        break;
+      }
+      case g::LTBThreshold::Veto : { 
+        os << "Veto>";
+        break;
+      }
+    }
+    return os;
   }
+}
+
+//classifies side behavior
+auto g::classify_side(f32 rms, f32 peak, f32 ped, f32 tot725) -> g::HitQuality {
+
+  // +++++  large pulse IFs +++++
+  if ((tot725 != 0) && (rms > RMS_REPROCESS_MIN)) {
+  
+   return g::HitQuality::ReprocessHighSat;
+  
+  } else if (tot725 != 0) {
+   return g::HitQuality::HighSat;
+  }
+  
+  if ((peak > PEAK_REF) && (rms > RMS_REPROCESS_MIN)) {
+   return g::HitQuality::ReprocessHigh;  
+  } else if (peak > PEAK_REF) {
+   return g::HitQuality::High;
+  }
+  // +++++  END large pulse IFs +++++
+  
+  f32 boundary = RMS_GOOD_MAX + (RMS_LOW_MIN - RMS_GOOD_MAX) * (peak / PEAK_REF);
+  //mid and low side classificaiton
+  if (rms >= RMS_LOW_MIN) { // box2 cuts
+   return g::HitQuality::LowRMSgrThree;
+  } else if ((rms >= PEDRMS_REF_JEFF) && (std::abs(ped) >= PED_REF_JEFF)) { // jeff's cuts
+   return g::HitQuality::LowPedPlusPedRMS;
+  }  
+  if (rms >= boundary) { //coincidence (box1) cuts
+   return g::HitQuality::MidPedRMS;
+  }
+  //anything else will be a good pulse...
+  return g::HitQuality::High;
+}
+
+
+// NB: get_x_pos() is measured from end A (x=0) to end B (x=paddle_len_mm),
+// not centered on the paddle - see get_edep()/sd_legacy.cxx for the same
+// convention.
+auto g::position_ok(const g::TofHit& hit) -> bool {
+  f32 paddle_len_mm = 10.0f * hit.paddle_len;
+  f32 x_pos_mm      = hit.get_x_pos(); // already mm
+  return (x_pos_mm > POS_CUT_LENGTH_MM) && (x_pos_mm < paddle_len_mm - POS_CUT_LENGTH_MM);
+}
+
+
+/**********************************************************/
+
+/// FIXME - this needs to go away as soon as we have the general
+/// thing fixed
+auto g::corrected_rms_noWF(f32 mu, f32 sigB, u32 num) -> f32 {
+  f32 n   = static_cast<f32>(num);
+  f32 val = ((n - mu*mu) / n) * (sigB*sigB) - mu*mu;
+  if (!std::isfinite(val) || val < 0.0f) {
+    return std::numeric_limits<f32>::quiet_NaN();
+  }
+  return std::sqrt(val);
+}
+
+auto g::classify_hit(const g::TofHit& hit) -> g::HitQuality {
+
+  //fatal analysis cuts...
+  //hit obeys causality
+  if (!hit.obeys_causality()) {
+    return g::HitQuality::Low;
+  }
+  // #### Elena's cuts - cases where the analysis itself failed ####
+  if (hit.baseline_a == 0 || hit.get_time_a() == 0
+   || hit.baseline_b == 0 || hit.get_time_b() == 0
+   || hit.get_time_a() > 350 || hit.get_time_b() > 350) {
+    return g::HitQuality::LowElenaCuts;
+  }
+
+
+  // #### ped RMS and Ped classificaiton... ####
+  // (uncorrected) rms if the correction is undefined (NaN)
+  f32 baseline_a_rms_correction = g::corrected_rms_noWF(hit.baseline_a, hit.baseline_a_rms);
+  f32 baseline_b_rms_correction = g::corrected_rms_noWF(hit.baseline_b, hit.baseline_b_rms);
+  // this will be fixed by grace, keep the correction now...
+  if (!std::isfinite(baseline_a_rms_correction)) {
+    baseline_a_rms_correction = hit.baseline_a_rms;
+  }
+  if (!std::isfinite(baseline_b_rms_correction)) {
+    baseline_b_rms_correction = hit.baseline_b_rms;
+  }
+  auto quality_a = classify_side(baseline_a_rms_correction, hit.get_peak_a(), hit.baseline_a, hit.tot_high_a);
+  auto quality_b = classify_side(baseline_b_rms_correction, hit.get_peak_b(), hit.baseline_b, hit.tot_high_b);
+
+  // a side already in the High family (High/HighSat/ReprocessHigh/ReprocessHighSat)
+  // reflects a large/saturated pulse on that side, and shouldn't be dragged
+  // down to Low/Mid.
+  auto is_high_family = [](g::HitQuality q) {
+    return q == g::HitQuality::High || q == g::HitQuality::HighSat
+        || q == g::HitQuality::ReprocessHigh || q == g::HitQuality::ReprocessHighSat;
+  };
+
+  bool a_saturated = is_high_family(quality_a);
+  bool b_saturated = is_high_family(quality_b);
+
+  g::HitQuality quality;
+  if (a_saturated != b_saturated) {
+    quality = a_saturated ? quality_a : quality_b;
+  } else {
+    // both saturated, or neither the worse side wins
+    quality = std::min(quality_a, quality_b);
+  }
+
+  // #### paddle position classification... ####
+  // position cuts only ever demote a Mid/High verdict further into Mid
+  // an already-Low hit stays Low regardless of where it reconstructs
+  if (!position_ok(hit)) {
+    switch (quality) {
+      case g::HitQuality::MidPedRMS:
+        quality = g::HitQuality::MidPedRMSandPos;
+        break;
+      case g::HitQuality::HighSat:
+        quality = g::HitQuality::MidPosSat;
+        break;
+      case g::HitQuality::High:
+        quality = g::HitQuality::MidPos;
+        break;
+      case g::HitQuality::ReprocessHighSat:
+        quality = g::HitQuality::MidPosSatReprocess;
+        break;
+      case g::HitQuality::ReprocessHigh:
+        quality = g::HitQuality::MidPosReprocess;
+        break;
+
+      default:
+        break;
+    }
+  }
+  return quality;
 }
 
 /**********************************************************/
@@ -1766,7 +1450,8 @@ auto g::TofEventSummary::get_trigger_pids(const gondola::DsiJChnPaddleIdMap& lgm
     u8 dsi = std::get<0>(hit);
     u8 j   = std::get<1>(hit);
     u8 ch  = std::get<2>(hit);
-    u8 thr = (u8)std::get<3>(hit);
+    // don't care about the threshold here
+    //u8 thr = (u8)std::get<3>(hit);
     if (!lgmap.contains(dsi)) {
       spdlog::error("Can not find DSI {} in LG map!", dsi);
       continue;
@@ -1954,40 +1639,4 @@ auto g::TofEventSummary::to_string() const -> std::string {
   return repr;
 }
 
-namespace gondola {
-  
-  std::ostream& operator<<(std::ostream& os, const g::TofHit& th) {
-    os << th.to_string();
-    return os;
-  }
-  
-  //std::ostream& operator<<(std::ostream& os, const g::MasterTriggerEvent& mt) {
-  //  os << mt.to_string();
-  //  return os;
-  //}
-  
-  std::ostream& operator<<(std::ostream& os, const g::TofEvent& te) {
-    os << te.to_string();
-    return os;
-  }
-  
-  std::ostream& operator<<(std::ostream& os, const g::RBEvent& re) {
-    os << re.to_string();
-    return os;
-  }
-  
-  std::ostream& operator<<(std::ostream& os, const g::RBEventHeader& rh) {
-    os << rh.to_string();
-    return os;
-  }
-  
-  std::ostream& operator<<(std::ostream& os, const g::RBWaveform& wf) {
-    os << wf.to_string();
-    return os;
-  }
-  
-  std::ostream& operator<<(std::ostream& os, const g::TofEventSummary& tes) {
-    os << tes.to_string();
-    return os;
-  }
-}
+

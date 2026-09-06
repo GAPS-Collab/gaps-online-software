@@ -131,5 +131,12 @@ namespace gondola {
       f32 tot_slp_high_b = 0;
   };
   
+  auto classify_side(f32 rms, f32 peak, f32 ped, f32 tot725) -> HitQuality;
+  
+  // Implemented in src/events.cxx
+  auto classify_hit(const TofHit& hit) -> HitQuality;
+ 
+ auto position_ok(const TofHit& hit) -> bool;
+
   std::ostream& operator<<(std::ostream& os, const TofHit& pad);
 }
