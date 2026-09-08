@@ -269,6 +269,7 @@ fn events_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<TrackerDAQEventPacket>()?;
   m.add_class::<TelemetryEvent>()?;
   m.add_function(wrap_pyfunction!(strip_id, m)?)?;
+  m.add_class::<HitQuality>()?;
   m.add_class::<EventQuality>()?;
   m.add_class::<TriggerType>()?;
   m.add_class::<LTBThreshold>()?;

@@ -150,6 +150,43 @@ pub enum EventQuality {
 expand_and_test_enum!(EventQuality, test_eventquality_repr);
 
 //--------------------------------------------
+  
+#[derive(Debug, Copy, Clone, PartialEq,FromRepr, AsRefStr, EnumIter)]
+#[repr(u8)]
+#[cfg_attr(feature = "pybindings", pyclass(eq, eq_int))]
+pub enum HitQuality {
+  // hit has not been classified (yet)
+  Unknown           =  0,
+  //$$$$$ Reserved for future use, nothing sets these yet.
+  Mangled           =  1,
+  MissingHit        =  2,
+  //$$$$$
+  LowPedPlusPedRMS  =  3, // abs(ped) > 1 and pedRMS > 2 (jeff's cut)
+  LowRMSgrThree     =  4, // rms > 3 (box2 cut)
+  LowElenaCuts      =  5, // cuts where really the analysis failed.
+  Low               = 10, // general Low status
+
+  MidPedRMS         = 11, // middle triangular region in peak vs rms for coincidence pulses (box1 cut)
+  MidPos            = 12, // hit position too close to a paddle end
+  MidPedRMSandPos   = 13, // MidPedRMS and MidPos both apply
+  MidPosSat         = 14, // position issue on an otherwise-saturated pulse; ped cuts don't apply to saturated pulses
+  MidPosSatReprocess= 15,
+  MidPosReprocess   = 16,
+  Mid               = 20, // general Mid status
+
+  HighSat           = 21, // High, but the pulse is saturated (> 600 mV)
+  High              = 30, // general High status
+  // between mid and high, really just techincally high hits
+  // but could use some sort of recalibration...
+  // like a noisy saturated pulse for example
+  ReprocessHighSat  = 31,
+  ReprocessHigh     = 40,
+  // same as ReprocessHigh, but the pulse is also saturated (tot725 filled)
+}
+
+expand_and_test_enum!(HitQuality, test_hitquality_repr);
+
+//--------------------------------------------
 
 /// The type of trigger which has fired at time of 
 /// recoring a specific event. 
