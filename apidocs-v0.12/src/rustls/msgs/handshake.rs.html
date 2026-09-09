@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.43/src/msgs/handshake.rs`."><title>handshake.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-1ed95124.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.98.1 (48a229cea 2026-09-01)" data-channel="1.98.1" data-search-js="search-9944d736.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-417ebf0a.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">rustls/msgs/</div>handshake.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-4"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>alloc::boxed::Box;
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rustls-0.23.44/src/msgs/handshake.rs`."><title>handshake.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-1ed95124.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rustls" data-themes="" data-resource-suffix="" data-rustdoc-version="1.98.1 (48a229cea 2026-09-01)" data-channel="1.98.1" data-search-js="search-9944d736.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-417ebf0a.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">rustls/msgs/</div>handshake.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-4"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>alloc::boxed::Box;
 <a href=#2 id=2 data-nosnippet>2</a><span class="kw">use </span>alloc::collections::BTreeSet;
 <a href=#3 id=3 data-nosnippet>3</a><span class="attr">#[cfg(feature = <span class="string">"logging"</span>)]
 <a href=#4 id=4 data-nosnippet>4</a></span><span class="kw">use </span>alloc::string::String;
@@ -2481,786 +2481,787 @@
 <a href=#2481 id=2481 data-nosnippet>2481</a></span><span class="doccomment">/// Only supports OCSP
 <a href=#2482 id=2482 data-nosnippet>2482</a></span><span class="attr">#[derive(Clone, Debug)]
 <a href=#2483 id=2483 data-nosnippet>2483</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CertificateStatus&lt;<span class="lifetime">'a</span>&gt; {
-<a href=#2484 id=2484 data-nosnippet>2484</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) ocsp_response: PayloadU24&lt;<span class="lifetime">'a</span>&gt;,
-<a href=#2485 id=2485 data-nosnippet>2485</a>}
-<a href=#2486 id=2486 data-nosnippet>2486</a>
-<a href=#2487 id=2487 data-nosnippet>2487</a><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Codec&lt;<span class="lifetime">'a</span>&gt; <span class="kw">for </span>CertificateStatus&lt;<span class="lifetime">'a</span>&gt; {
-<a href=#2488 id=2488 data-nosnippet>2488</a>    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
-<a href=#2489 id=2489 data-nosnippet>2489</a>        CertificateStatusType::OCSP.encode(bytes);
-<a href=#2490 id=2490 data-nosnippet>2490</a>        <span class="self">self</span>.ocsp_response.encode(bytes);
-<a href=#2491 id=2491 data-nosnippet>2491</a>    }
-<a href=#2492 id=2492 data-nosnippet>2492</a>
-<a href=#2493 id=2493 data-nosnippet>2493</a>    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
-<a href=#2494 id=2494 data-nosnippet>2494</a>        <span class="kw">let </span>typ = CertificateStatusType::read(r)<span class="question-mark">?</span>;
-<a href=#2495 id=2495 data-nosnippet>2495</a>
-<a href=#2496 id=2496 data-nosnippet>2496</a>        <span class="kw">match </span>typ {
-<a href=#2497 id=2497 data-nosnippet>2497</a>            CertificateStatusType::OCSP =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
-<a href=#2498 id=2498 data-nosnippet>2498</a>                ocsp_response: PayloadU24::read(r)<span class="question-mark">?</span>,
-<a href=#2499 id=2499 data-nosnippet>2499</a>            }),
-<a href=#2500 id=2500 data-nosnippet>2500</a>            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(InvalidMessage::InvalidCertificateStatusType),
-<a href=#2501 id=2501 data-nosnippet>2501</a>        }
-<a href=#2502 id=2502 data-nosnippet>2502</a>    }
-<a href=#2503 id=2503 data-nosnippet>2503</a>}
-<a href=#2504 id=2504 data-nosnippet>2504</a>
-<a href=#2505 id=2505 data-nosnippet>2505</a><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CertificateStatus&lt;<span class="lifetime">'a</span>&gt; {
-<a href=#2506 id=2506 data-nosnippet>2506</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(ocsp: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]) -&gt; <span class="self">Self </span>{
-<a href=#2507 id=2507 data-nosnippet>2507</a>        CertificateStatus {
-<a href=#2508 id=2508 data-nosnippet>2508</a>            ocsp_response: PayloadU24(Payload::Borrowed(ocsp)),
-<a href=#2509 id=2509 data-nosnippet>2509</a>        }
-<a href=#2510 id=2510 data-nosnippet>2510</a>    }
-<a href=#2511 id=2511 data-nosnippet>2511</a>
-<a href=#2512 id=2512 data-nosnippet>2512</a>    <span class="attr">#[cfg(feature = <span class="string">"tls12"</span>)]
-<a href=#2513 id=2513 data-nosnippet>2513</a>    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_inner(<span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
-<a href=#2514 id=2514 data-nosnippet>2514</a>        <span class="self">self</span>.ocsp_response.<span class="number">0</span>.into_vec()
-<a href=#2515 id=2515 data-nosnippet>2515</a>    }
-<a href=#2516 id=2516 data-nosnippet>2516</a>
-<a href=#2517 id=2517 data-nosnippet>2517</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_owned(<span class="self">self</span>) -&gt; CertificateStatus&lt;<span class="lifetime">'static</span>&gt; {
-<a href=#2518 id=2518 data-nosnippet>2518</a>        CertificateStatus {
-<a href=#2519 id=2519 data-nosnippet>2519</a>            ocsp_response: <span class="self">self</span>.ocsp_response.into_owned(),
-<a href=#2520 id=2520 data-nosnippet>2520</a>        }
-<a href=#2521 id=2521 data-nosnippet>2521</a>    }
-<a href=#2522 id=2522 data-nosnippet>2522</a>}
-<a href=#2523 id=2523 data-nosnippet>2523</a>
-<a href=#2524 id=2524 data-nosnippet>2524</a><span class="comment">// -- RFC8879 compressed certificates
-<a href=#2525 id=2525 data-nosnippet>2525</a>
-<a href=#2526 id=2526 data-nosnippet>2526</a></span><span class="attr">#[derive(Debug)]
-<a href=#2527 id=2527 data-nosnippet>2527</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CompressedCertificatePayload&lt;<span class="lifetime">'a</span>&gt; {
-<a href=#2528 id=2528 data-nosnippet>2528</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) alg: CertificateCompressionAlgorithm,
-<a href=#2529 id=2529 data-nosnippet>2529</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) uncompressed_len: u32,
-<a href=#2530 id=2530 data-nosnippet>2530</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) compressed: PayloadU24&lt;<span class="lifetime">'a</span>&gt;,
-<a href=#2531 id=2531 data-nosnippet>2531</a>}
-<a href=#2532 id=2532 data-nosnippet>2532</a>
-<a href=#2533 id=2533 data-nosnippet>2533</a><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Codec&lt;<span class="lifetime">'a</span>&gt; <span class="kw">for </span>CompressedCertificatePayload&lt;<span class="lifetime">'a</span>&gt; {
-<a href=#2534 id=2534 data-nosnippet>2534</a>    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
-<a href=#2535 id=2535 data-nosnippet>2535</a>        <span class="self">self</span>.alg.encode(bytes);
-<a href=#2536 id=2536 data-nosnippet>2536</a>        codec::u24(<span class="self">self</span>.uncompressed_len).encode(bytes);
-<a href=#2537 id=2537 data-nosnippet>2537</a>        <span class="self">self</span>.compressed.encode(bytes);
-<a href=#2538 id=2538 data-nosnippet>2538</a>    }
-<a href=#2539 id=2539 data-nosnippet>2539</a>
-<a href=#2540 id=2540 data-nosnippet>2540</a>    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
-<a href=#2541 id=2541 data-nosnippet>2541</a>        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
-<a href=#2542 id=2542 data-nosnippet>2542</a>            alg: CertificateCompressionAlgorithm::read(r)<span class="question-mark">?</span>,
-<a href=#2543 id=2543 data-nosnippet>2543</a>            uncompressed_len: codec::u24::read(r)<span class="question-mark">?</span>.<span class="number">0</span>,
-<a href=#2544 id=2544 data-nosnippet>2544</a>            compressed: PayloadU24::read(r)<span class="question-mark">?</span>,
-<a href=#2545 id=2545 data-nosnippet>2545</a>        })
-<a href=#2546 id=2546 data-nosnippet>2546</a>    }
-<a href=#2547 id=2547 data-nosnippet>2547</a>}
-<a href=#2548 id=2548 data-nosnippet>2548</a>
-<a href=#2549 id=2549 data-nosnippet>2549</a><span class="kw">impl </span>CompressedCertificatePayload&lt;<span class="lifetime">'_</span>&gt; {
-<a href=#2550 id=2550 data-nosnippet>2550</a>    <span class="kw">fn </span>into_owned(<span class="self">self</span>) -&gt; CompressedCertificatePayload&lt;<span class="lifetime">'static</span>&gt; {
-<a href=#2551 id=2551 data-nosnippet>2551</a>        CompressedCertificatePayload {
-<a href=#2552 id=2552 data-nosnippet>2552</a>            compressed: <span class="self">self</span>.compressed.into_owned(),
-<a href=#2553 id=2553 data-nosnippet>2553</a>            ..<span class="self">self
-<a href=#2554 id=2554 data-nosnippet>2554</a>        </span>}
-<a href=#2555 id=2555 data-nosnippet>2555</a>    }
-<a href=#2556 id=2556 data-nosnippet>2556</a>
-<a href=#2557 id=2557 data-nosnippet>2557</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_borrowed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CompressedCertificatePayload&lt;<span class="lifetime">'_</span>&gt; {
-<a href=#2558 id=2558 data-nosnippet>2558</a>        CompressedCertificatePayload {
-<a href=#2559 id=2559 data-nosnippet>2559</a>            alg: <span class="self">self</span>.alg,
-<a href=#2560 id=2560 data-nosnippet>2560</a>            uncompressed_len: <span class="self">self</span>.uncompressed_len,
-<a href=#2561 id=2561 data-nosnippet>2561</a>            compressed: PayloadU24(Payload::Borrowed(<span class="self">self</span>.compressed.<span class="number">0</span>.bytes())),
-<a href=#2562 id=2562 data-nosnippet>2562</a>        }
-<a href=#2563 id=2563 data-nosnippet>2563</a>    }
-<a href=#2564 id=2564 data-nosnippet>2564</a>}
-<a href=#2565 id=2565 data-nosnippet>2565</a>
-<a href=#2566 id=2566 data-nosnippet>2566</a><span class="attr">#[derive(Debug)]
-<a href=#2567 id=2567 data-nosnippet>2567</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>HandshakePayload&lt;<span class="lifetime">'a</span>&gt; {
-<a href=#2568 id=2568 data-nosnippet>2568</a>    HelloRequest,
-<a href=#2569 id=2569 data-nosnippet>2569</a>    ClientHello(ClientHelloPayload),
-<a href=#2570 id=2570 data-nosnippet>2570</a>    ServerHello(ServerHelloPayload),
-<a href=#2571 id=2571 data-nosnippet>2571</a>    HelloRetryRequest(HelloRetryRequest),
-<a href=#2572 id=2572 data-nosnippet>2572</a>    Certificate(CertificateChain&lt;<span class="lifetime">'a</span>&gt;),
-<a href=#2573 id=2573 data-nosnippet>2573</a>    CertificateTls13(CertificatePayloadTls13&lt;<span class="lifetime">'a</span>&gt;),
-<a href=#2574 id=2574 data-nosnippet>2574</a>    CompressedCertificate(CompressedCertificatePayload&lt;<span class="lifetime">'a</span>&gt;),
-<a href=#2575 id=2575 data-nosnippet>2575</a>    ServerKeyExchange(ServerKeyExchangePayload),
-<a href=#2576 id=2576 data-nosnippet>2576</a>    CertificateRequest(CertificateRequestPayload),
-<a href=#2577 id=2577 data-nosnippet>2577</a>    CertificateRequestTls13(CertificateRequestPayloadTls13),
-<a href=#2578 id=2578 data-nosnippet>2578</a>    CertificateVerify(DigitallySignedStruct),
-<a href=#2579 id=2579 data-nosnippet>2579</a>    ServerHelloDone,
-<a href=#2580 id=2580 data-nosnippet>2580</a>    EndOfEarlyData,
-<a href=#2581 id=2581 data-nosnippet>2581</a>    ClientKeyExchange(Payload&lt;<span class="lifetime">'a</span>&gt;),
-<a href=#2582 id=2582 data-nosnippet>2582</a>    NewSessionTicket(NewSessionTicketPayload),
-<a href=#2583 id=2583 data-nosnippet>2583</a>    NewSessionTicketTls13(NewSessionTicketPayloadTls13),
-<a href=#2584 id=2584 data-nosnippet>2584</a>    EncryptedExtensions(Box&lt;ServerExtensions&lt;<span class="lifetime">'a</span>&gt;&gt;),
-<a href=#2585 id=2585 data-nosnippet>2585</a>    KeyUpdate(KeyUpdateRequest),
-<a href=#2586 id=2586 data-nosnippet>2586</a>    Finished(Payload&lt;<span class="lifetime">'a</span>&gt;),
-<a href=#2587 id=2587 data-nosnippet>2587</a>    CertificateStatus(CertificateStatus&lt;<span class="lifetime">'a</span>&gt;),
-<a href=#2588 id=2588 data-nosnippet>2588</a>    MessageHash(Payload&lt;<span class="lifetime">'a</span>&gt;),
-<a href=#2589 id=2589 data-nosnippet>2589</a>    Unknown((HandshakeType, Payload&lt;<span class="lifetime">'a</span>&gt;)),
-<a href=#2590 id=2590 data-nosnippet>2590</a>}
-<a href=#2591 id=2591 data-nosnippet>2591</a>
-<a href=#2592 id=2592 data-nosnippet>2592</a><span class="kw">impl </span>HandshakePayload&lt;<span class="lifetime">'_</span>&gt; {
-<a href=#2593 id=2593 data-nosnippet>2593</a>    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
-<a href=#2594 id=2594 data-nosnippet>2594</a>        <span class="kw">use </span><span class="self">self</span>::HandshakePayload::<span class="kw-2">*</span>;
-<a href=#2595 id=2595 data-nosnippet>2595</a>        <span class="kw">match </span><span class="self">self </span>{
-<a href=#2596 id=2596 data-nosnippet>2596</a>            HelloRequest | ServerHelloDone | EndOfEarlyData =&gt; {}
-<a href=#2597 id=2597 data-nosnippet>2597</a>            ClientHello(x) =&gt; x.encode(bytes),
-<a href=#2598 id=2598 data-nosnippet>2598</a>            ServerHello(x) =&gt; x.encode(bytes),
-<a href=#2599 id=2599 data-nosnippet>2599</a>            HelloRetryRequest(x) =&gt; x.encode(bytes),
-<a href=#2600 id=2600 data-nosnippet>2600</a>            Certificate(x) =&gt; x.encode(bytes),
-<a href=#2601 id=2601 data-nosnippet>2601</a>            CertificateTls13(x) =&gt; x.encode(bytes),
-<a href=#2602 id=2602 data-nosnippet>2602</a>            CompressedCertificate(x) =&gt; x.encode(bytes),
-<a href=#2603 id=2603 data-nosnippet>2603</a>            ServerKeyExchange(x) =&gt; x.encode(bytes),
-<a href=#2604 id=2604 data-nosnippet>2604</a>            ClientKeyExchange(x) =&gt; x.encode(bytes),
-<a href=#2605 id=2605 data-nosnippet>2605</a>            CertificateRequest(x) =&gt; x.encode(bytes),
-<a href=#2606 id=2606 data-nosnippet>2606</a>            CertificateRequestTls13(x) =&gt; x.encode(bytes),
-<a href=#2607 id=2607 data-nosnippet>2607</a>            CertificateVerify(x) =&gt; x.encode(bytes),
-<a href=#2608 id=2608 data-nosnippet>2608</a>            NewSessionTicket(x) =&gt; x.encode(bytes),
-<a href=#2609 id=2609 data-nosnippet>2609</a>            NewSessionTicketTls13(x) =&gt; x.encode(bytes),
-<a href=#2610 id=2610 data-nosnippet>2610</a>            EncryptedExtensions(x) =&gt; x.encode(bytes),
-<a href=#2611 id=2611 data-nosnippet>2611</a>            KeyUpdate(x) =&gt; x.encode(bytes),
-<a href=#2612 id=2612 data-nosnippet>2612</a>            Finished(x) =&gt; x.encode(bytes),
-<a href=#2613 id=2613 data-nosnippet>2613</a>            CertificateStatus(x) =&gt; x.encode(bytes),
-<a href=#2614 id=2614 data-nosnippet>2614</a>            MessageHash(x) =&gt; x.encode(bytes),
-<a href=#2615 id=2615 data-nosnippet>2615</a>            Unknown((<span class="kw">_</span>, x)) =&gt; x.encode(bytes),
-<a href=#2616 id=2616 data-nosnippet>2616</a>        }
-<a href=#2617 id=2617 data-nosnippet>2617</a>    }
-<a href=#2618 id=2618 data-nosnippet>2618</a>
-<a href=#2619 id=2619 data-nosnippet>2619</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>handshake_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HandshakeType {
-<a href=#2620 id=2620 data-nosnippet>2620</a>        <span class="kw">use </span><span class="self">self</span>::HandshakePayload::<span class="kw-2">*</span>;
-<a href=#2621 id=2621 data-nosnippet>2621</a>        <span class="kw">match </span><span class="self">self </span>{
-<a href=#2622 id=2622 data-nosnippet>2622</a>            HelloRequest =&gt; HandshakeType::HelloRequest,
-<a href=#2623 id=2623 data-nosnippet>2623</a>            ClientHello(<span class="kw">_</span>) =&gt; HandshakeType::ClientHello,
-<a href=#2624 id=2624 data-nosnippet>2624</a>            ServerHello(<span class="kw">_</span>) =&gt; HandshakeType::ServerHello,
-<a href=#2625 id=2625 data-nosnippet>2625</a>            HelloRetryRequest(<span class="kw">_</span>) =&gt; HandshakeType::HelloRetryRequest,
-<a href=#2626 id=2626 data-nosnippet>2626</a>            Certificate(<span class="kw">_</span>) | CertificateTls13(<span class="kw">_</span>) =&gt; HandshakeType::Certificate,
-<a href=#2627 id=2627 data-nosnippet>2627</a>            CompressedCertificate(<span class="kw">_</span>) =&gt; HandshakeType::CompressedCertificate,
-<a href=#2628 id=2628 data-nosnippet>2628</a>            ServerKeyExchange(<span class="kw">_</span>) =&gt; HandshakeType::ServerKeyExchange,
-<a href=#2629 id=2629 data-nosnippet>2629</a>            CertificateRequest(<span class="kw">_</span>) | CertificateRequestTls13(<span class="kw">_</span>) =&gt; HandshakeType::CertificateRequest,
-<a href=#2630 id=2630 data-nosnippet>2630</a>            CertificateVerify(<span class="kw">_</span>) =&gt; HandshakeType::CertificateVerify,
-<a href=#2631 id=2631 data-nosnippet>2631</a>            ServerHelloDone =&gt; HandshakeType::ServerHelloDone,
-<a href=#2632 id=2632 data-nosnippet>2632</a>            EndOfEarlyData =&gt; HandshakeType::EndOfEarlyData,
-<a href=#2633 id=2633 data-nosnippet>2633</a>            ClientKeyExchange(<span class="kw">_</span>) =&gt; HandshakeType::ClientKeyExchange,
-<a href=#2634 id=2634 data-nosnippet>2634</a>            NewSessionTicket(<span class="kw">_</span>) | NewSessionTicketTls13(<span class="kw">_</span>) =&gt; HandshakeType::NewSessionTicket,
-<a href=#2635 id=2635 data-nosnippet>2635</a>            EncryptedExtensions(<span class="kw">_</span>) =&gt; HandshakeType::EncryptedExtensions,
-<a href=#2636 id=2636 data-nosnippet>2636</a>            KeyUpdate(<span class="kw">_</span>) =&gt; HandshakeType::KeyUpdate,
-<a href=#2637 id=2637 data-nosnippet>2637</a>            Finished(<span class="kw">_</span>) =&gt; HandshakeType::Finished,
-<a href=#2638 id=2638 data-nosnippet>2638</a>            CertificateStatus(<span class="kw">_</span>) =&gt; HandshakeType::CertificateStatus,
-<a href=#2639 id=2639 data-nosnippet>2639</a>            MessageHash(<span class="kw">_</span>) =&gt; HandshakeType::MessageHash,
-<a href=#2640 id=2640 data-nosnippet>2640</a>            Unknown((t, <span class="kw">_</span>)) =&gt; <span class="kw-2">*</span>t,
-<a href=#2641 id=2641 data-nosnippet>2641</a>        }
-<a href=#2642 id=2642 data-nosnippet>2642</a>    }
-<a href=#2643 id=2643 data-nosnippet>2643</a>
-<a href=#2644 id=2644 data-nosnippet>2644</a>    <span class="kw">fn </span>wire_handshake_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HandshakeType {
-<a href=#2645 id=2645 data-nosnippet>2645</a>        <span class="kw">match </span><span class="self">self</span>.handshake_type() {
-<a href=#2646 id=2646 data-nosnippet>2646</a>            <span class="comment">// A `HelloRetryRequest` appears on the wire as a `ServerHello` with a magic `random` value.
-<a href=#2647 id=2647 data-nosnippet>2647</a>            </span>HandshakeType::HelloRetryRequest =&gt; HandshakeType::ServerHello,
-<a href=#2648 id=2648 data-nosnippet>2648</a>            other =&gt; other,
-<a href=#2649 id=2649 data-nosnippet>2649</a>        }
-<a href=#2650 id=2650 data-nosnippet>2650</a>    }
-<a href=#2651 id=2651 data-nosnippet>2651</a>
-<a href=#2652 id=2652 data-nosnippet>2652</a>    <span class="kw">fn </span>into_owned(<span class="self">self</span>) -&gt; HandshakePayload&lt;<span class="lifetime">'static</span>&gt; {
-<a href=#2653 id=2653 data-nosnippet>2653</a>        <span class="kw">use </span>HandshakePayload::<span class="kw-2">*</span>;
-<a href=#2654 id=2654 data-nosnippet>2654</a>
-<a href=#2655 id=2655 data-nosnippet>2655</a>        <span class="kw">match </span><span class="self">self </span>{
-<a href=#2656 id=2656 data-nosnippet>2656</a>            HelloRequest =&gt; HelloRequest,
-<a href=#2657 id=2657 data-nosnippet>2657</a>            ClientHello(x) =&gt; ClientHello(x),
-<a href=#2658 id=2658 data-nosnippet>2658</a>            ServerHello(x) =&gt; ServerHello(x),
-<a href=#2659 id=2659 data-nosnippet>2659</a>            HelloRetryRequest(x) =&gt; HelloRetryRequest(x),
-<a href=#2660 id=2660 data-nosnippet>2660</a>            Certificate(x) =&gt; Certificate(x.into_owned()),
-<a href=#2661 id=2661 data-nosnippet>2661</a>            CertificateTls13(x) =&gt; CertificateTls13(x.into_owned()),
-<a href=#2662 id=2662 data-nosnippet>2662</a>            CompressedCertificate(x) =&gt; CompressedCertificate(x.into_owned()),
-<a href=#2663 id=2663 data-nosnippet>2663</a>            ServerKeyExchange(x) =&gt; ServerKeyExchange(x),
-<a href=#2664 id=2664 data-nosnippet>2664</a>            CertificateRequest(x) =&gt; CertificateRequest(x),
-<a href=#2665 id=2665 data-nosnippet>2665</a>            CertificateRequestTls13(x) =&gt; CertificateRequestTls13(x),
-<a href=#2666 id=2666 data-nosnippet>2666</a>            CertificateVerify(x) =&gt; CertificateVerify(x),
-<a href=#2667 id=2667 data-nosnippet>2667</a>            ServerHelloDone =&gt; ServerHelloDone,
-<a href=#2668 id=2668 data-nosnippet>2668</a>            EndOfEarlyData =&gt; EndOfEarlyData,
-<a href=#2669 id=2669 data-nosnippet>2669</a>            ClientKeyExchange(x) =&gt; ClientKeyExchange(x.into_owned()),
-<a href=#2670 id=2670 data-nosnippet>2670</a>            NewSessionTicket(x) =&gt; NewSessionTicket(x),
-<a href=#2671 id=2671 data-nosnippet>2671</a>            NewSessionTicketTls13(x) =&gt; NewSessionTicketTls13(x),
-<a href=#2672 id=2672 data-nosnippet>2672</a>            EncryptedExtensions(x) =&gt; EncryptedExtensions(Box::new(x.into_owned())),
-<a href=#2673 id=2673 data-nosnippet>2673</a>            KeyUpdate(x) =&gt; KeyUpdate(x),
-<a href=#2674 id=2674 data-nosnippet>2674</a>            Finished(x) =&gt; Finished(x.into_owned()),
-<a href=#2675 id=2675 data-nosnippet>2675</a>            CertificateStatus(x) =&gt; CertificateStatus(x.into_owned()),
-<a href=#2676 id=2676 data-nosnippet>2676</a>            MessageHash(x) =&gt; MessageHash(x.into_owned()),
-<a href=#2677 id=2677 data-nosnippet>2677</a>            Unknown((t, x)) =&gt; Unknown((t, x.into_owned())),
-<a href=#2678 id=2678 data-nosnippet>2678</a>        }
-<a href=#2679 id=2679 data-nosnippet>2679</a>    }
-<a href=#2680 id=2680 data-nosnippet>2680</a>}
-<a href=#2681 id=2681 data-nosnippet>2681</a>
-<a href=#2682 id=2682 data-nosnippet>2682</a><span class="attr">#[derive(Debug)]
-<a href=#2683 id=2683 data-nosnippet>2683</a></span><span class="kw">pub struct </span>HandshakeMessagePayload&lt;<span class="lifetime">'a</span>&gt;(<span class="kw">pub</span>(<span class="kw">crate</span>) HandshakePayload&lt;<span class="lifetime">'a</span>&gt;);
-<a href=#2684 id=2684 data-nosnippet>2684</a>
-<a href=#2685 id=2685 data-nosnippet>2685</a><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Codec&lt;<span class="lifetime">'a</span>&gt; <span class="kw">for </span>HandshakeMessagePayload&lt;<span class="lifetime">'a</span>&gt; {
-<a href=#2686 id=2686 data-nosnippet>2686</a>    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
-<a href=#2687 id=2687 data-nosnippet>2687</a>        <span class="self">self</span>.payload_encode(bytes, Encoding::Standard);
-<a href=#2688 id=2688 data-nosnippet>2688</a>    }
-<a href=#2689 id=2689 data-nosnippet>2689</a>
-<a href=#2690 id=2690 data-nosnippet>2690</a>    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
-<a href=#2691 id=2691 data-nosnippet>2691</a>        <span class="self">Self</span>::read_version(r, ProtocolVersion::TLSv1_2)
-<a href=#2692 id=2692 data-nosnippet>2692</a>    }
-<a href=#2693 id=2693 data-nosnippet>2693</a>}
-<a href=#2694 id=2694 data-nosnippet>2694</a>
-<a href=#2695 id=2695 data-nosnippet>2695</a><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; HandshakeMessagePayload&lt;<span class="lifetime">'a</span>&gt; {
-<a href=#2696 id=2696 data-nosnippet>2696</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read_version(
-<a href=#2697 id=2697 data-nosnippet>2697</a>        r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'a</span>&gt;,
-<a href=#2698 id=2698 data-nosnippet>2698</a>        vers: ProtocolVersion,
-<a href=#2699 id=2699 data-nosnippet>2699</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
-<a href=#2700 id=2700 data-nosnippet>2700</a>        <span class="kw">let </span>typ = HandshakeType::read(r)<span class="question-mark">?</span>;
-<a href=#2701 id=2701 data-nosnippet>2701</a>        <span class="kw">let </span>len = codec::u24::read(r)<span class="question-mark">?</span>.<span class="number">0 </span><span class="kw">as </span>usize;
-<a href=#2702 id=2702 data-nosnippet>2702</a>        <span class="kw">let </span><span class="kw-2">mut </span>sub = r.sub(len)<span class="question-mark">?</span>;
-<a href=#2703 id=2703 data-nosnippet>2703</a>
-<a href=#2704 id=2704 data-nosnippet>2704</a>        <span class="kw">let </span>payload = <span class="kw">match </span>typ {
-<a href=#2705 id=2705 data-nosnippet>2705</a>            HandshakeType::HelloRequest <span class="kw">if </span>sub.left() == <span class="number">0 </span>=&gt; HandshakePayload::HelloRequest,
-<a href=#2706 id=2706 data-nosnippet>2706</a>            HandshakeType::ClientHello =&gt; {
-<a href=#2707 id=2707 data-nosnippet>2707</a>                HandshakePayload::ClientHello(ClientHelloPayload::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>)
-<a href=#2708 id=2708 data-nosnippet>2708</a>            }
-<a href=#2709 id=2709 data-nosnippet>2709</a>            HandshakeType::ServerHello =&gt; {
-<a href=#2710 id=2710 data-nosnippet>2710</a>                <span class="kw">let </span>version = ProtocolVersion::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
-<a href=#2711 id=2711 data-nosnippet>2711</a>                <span class="kw">let </span>random = Random::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
-<a href=#2712 id=2712 data-nosnippet>2712</a>
-<a href=#2713 id=2713 data-nosnippet>2713</a>                <span class="kw">if </span>random == HELLO_RETRY_REQUEST_RANDOM {
-<a href=#2714 id=2714 data-nosnippet>2714</a>                    <span class="kw">let </span><span class="kw-2">mut </span>hrr = HelloRetryRequest::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
-<a href=#2715 id=2715 data-nosnippet>2715</a>                    hrr.legacy_version = version;
-<a href=#2716 id=2716 data-nosnippet>2716</a>                    HandshakePayload::HelloRetryRequest(hrr)
-<a href=#2717 id=2717 data-nosnippet>2717</a>                } <span class="kw">else </span>{
-<a href=#2718 id=2718 data-nosnippet>2718</a>                    <span class="kw">let </span><span class="kw-2">mut </span>shp = ServerHelloPayload::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
-<a href=#2719 id=2719 data-nosnippet>2719</a>                    shp.legacy_version = version;
-<a href=#2720 id=2720 data-nosnippet>2720</a>                    shp.random = random;
-<a href=#2721 id=2721 data-nosnippet>2721</a>                    HandshakePayload::ServerHello(shp)
-<a href=#2722 id=2722 data-nosnippet>2722</a>                }
-<a href=#2723 id=2723 data-nosnippet>2723</a>            }
-<a href=#2724 id=2724 data-nosnippet>2724</a>            HandshakeType::Certificate <span class="kw">if </span>vers == ProtocolVersion::TLSv1_3 =&gt; {
-<a href=#2725 id=2725 data-nosnippet>2725</a>                <span class="kw">let </span>p = CertificatePayloadTls13::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
-<a href=#2726 id=2726 data-nosnippet>2726</a>                HandshakePayload::CertificateTls13(p)
-<a href=#2727 id=2727 data-nosnippet>2727</a>            }
-<a href=#2728 id=2728 data-nosnippet>2728</a>            HandshakeType::Certificate =&gt; {
-<a href=#2729 id=2729 data-nosnippet>2729</a>                HandshakePayload::Certificate(CertificateChain::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>)
-<a href=#2730 id=2730 data-nosnippet>2730</a>            }
-<a href=#2731 id=2731 data-nosnippet>2731</a>            HandshakeType::ServerKeyExchange =&gt; {
-<a href=#2732 id=2732 data-nosnippet>2732</a>                <span class="kw">let </span>p = ServerKeyExchangePayload::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
-<a href=#2733 id=2733 data-nosnippet>2733</a>                HandshakePayload::ServerKeyExchange(p)
-<a href=#2734 id=2734 data-nosnippet>2734</a>            }
-<a href=#2735 id=2735 data-nosnippet>2735</a>            HandshakeType::ServerHelloDone =&gt; {
-<a href=#2736 id=2736 data-nosnippet>2736</a>                sub.expect_empty(<span class="string">"ServerHelloDone"</span>)<span class="question-mark">?</span>;
-<a href=#2737 id=2737 data-nosnippet>2737</a>                HandshakePayload::ServerHelloDone
-<a href=#2738 id=2738 data-nosnippet>2738</a>            }
-<a href=#2739 id=2739 data-nosnippet>2739</a>            HandshakeType::ClientKeyExchange =&gt; {
-<a href=#2740 id=2740 data-nosnippet>2740</a>                HandshakePayload::ClientKeyExchange(Payload::read(<span class="kw-2">&amp;mut </span>sub))
-<a href=#2741 id=2741 data-nosnippet>2741</a>            }
-<a href=#2742 id=2742 data-nosnippet>2742</a>            HandshakeType::CertificateRequest <span class="kw">if </span>vers == ProtocolVersion::TLSv1_3 =&gt; {
-<a href=#2743 id=2743 data-nosnippet>2743</a>                <span class="kw">let </span>p = CertificateRequestPayloadTls13::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
-<a href=#2744 id=2744 data-nosnippet>2744</a>                HandshakePayload::CertificateRequestTls13(p)
-<a href=#2745 id=2745 data-nosnippet>2745</a>            }
-<a href=#2746 id=2746 data-nosnippet>2746</a>            HandshakeType::CertificateRequest =&gt; {
-<a href=#2747 id=2747 data-nosnippet>2747</a>                <span class="kw">let </span>p = CertificateRequestPayload::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
-<a href=#2748 id=2748 data-nosnippet>2748</a>                HandshakePayload::CertificateRequest(p)
-<a href=#2749 id=2749 data-nosnippet>2749</a>            }
-<a href=#2750 id=2750 data-nosnippet>2750</a>            HandshakeType::CompressedCertificate =&gt; HandshakePayload::CompressedCertificate(
-<a href=#2751 id=2751 data-nosnippet>2751</a>                CompressedCertificatePayload::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>,
-<a href=#2752 id=2752 data-nosnippet>2752</a>            ),
-<a href=#2753 id=2753 data-nosnippet>2753</a>            HandshakeType::CertificateVerify =&gt; {
-<a href=#2754 id=2754 data-nosnippet>2754</a>                HandshakePayload::CertificateVerify(DigitallySignedStruct::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>)
-<a href=#2755 id=2755 data-nosnippet>2755</a>            }
-<a href=#2756 id=2756 data-nosnippet>2756</a>            HandshakeType::NewSessionTicket <span class="kw">if </span>vers == ProtocolVersion::TLSv1_3 =&gt; {
-<a href=#2757 id=2757 data-nosnippet>2757</a>                <span class="kw">let </span>p = NewSessionTicketPayloadTls13::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
-<a href=#2758 id=2758 data-nosnippet>2758</a>                HandshakePayload::NewSessionTicketTls13(p)
-<a href=#2759 id=2759 data-nosnippet>2759</a>            }
-<a href=#2760 id=2760 data-nosnippet>2760</a>            HandshakeType::NewSessionTicket =&gt; {
-<a href=#2761 id=2761 data-nosnippet>2761</a>                <span class="kw">let </span>p = NewSessionTicketPayload::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
-<a href=#2762 id=2762 data-nosnippet>2762</a>                HandshakePayload::NewSessionTicket(p)
-<a href=#2763 id=2763 data-nosnippet>2763</a>            }
-<a href=#2764 id=2764 data-nosnippet>2764</a>            HandshakeType::EncryptedExtensions =&gt; {
-<a href=#2765 id=2765 data-nosnippet>2765</a>                HandshakePayload::EncryptedExtensions(Box::new(ServerExtensions::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>))
-<a href=#2766 id=2766 data-nosnippet>2766</a>            }
-<a href=#2767 id=2767 data-nosnippet>2767</a>            HandshakeType::KeyUpdate =&gt; {
-<a href=#2768 id=2768 data-nosnippet>2768</a>                HandshakePayload::KeyUpdate(KeyUpdateRequest::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>)
-<a href=#2769 id=2769 data-nosnippet>2769</a>            }
-<a href=#2770 id=2770 data-nosnippet>2770</a>            HandshakeType::EndOfEarlyData =&gt; {
-<a href=#2771 id=2771 data-nosnippet>2771</a>                sub.expect_empty(<span class="string">"EndOfEarlyData"</span>)<span class="question-mark">?</span>;
-<a href=#2772 id=2772 data-nosnippet>2772</a>                HandshakePayload::EndOfEarlyData
-<a href=#2773 id=2773 data-nosnippet>2773</a>            }
-<a href=#2774 id=2774 data-nosnippet>2774</a>            HandshakeType::Finished =&gt; HandshakePayload::Finished(Payload::read(<span class="kw-2">&amp;mut </span>sub)),
-<a href=#2775 id=2775 data-nosnippet>2775</a>            HandshakeType::CertificateStatus =&gt; {
-<a href=#2776 id=2776 data-nosnippet>2776</a>                HandshakePayload::CertificateStatus(CertificateStatus::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>)
-<a href=#2777 id=2777 data-nosnippet>2777</a>            }
-<a href=#2778 id=2778 data-nosnippet>2778</a>            HandshakeType::MessageHash =&gt; {
-<a href=#2779 id=2779 data-nosnippet>2779</a>                <span class="comment">// does not appear on the wire
-<a href=#2780 id=2780 data-nosnippet>2780</a>                </span><span class="kw">return </span><span class="prelude-val">Err</span>(InvalidMessage::UnexpectedMessage(<span class="string">"MessageHash"</span>));
-<a href=#2781 id=2781 data-nosnippet>2781</a>            }
-<a href=#2782 id=2782 data-nosnippet>2782</a>            HandshakeType::HelloRetryRequest =&gt; {
-<a href=#2783 id=2783 data-nosnippet>2783</a>                <span class="comment">// not legal on wire
-<a href=#2784 id=2784 data-nosnippet>2784</a>                </span><span class="kw">return </span><span class="prelude-val">Err</span>(InvalidMessage::UnexpectedMessage(<span class="string">"HelloRetryRequest"</span>));
-<a href=#2785 id=2785 data-nosnippet>2785</a>            }
-<a href=#2786 id=2786 data-nosnippet>2786</a>            <span class="kw">_ </span>=&gt; HandshakePayload::Unknown((typ, Payload::read(<span class="kw-2">&amp;mut </span>sub))),
-<a href=#2787 id=2787 data-nosnippet>2787</a>        };
-<a href=#2788 id=2788 data-nosnippet>2788</a>
-<a href=#2789 id=2789 data-nosnippet>2789</a>        sub.expect_empty(<span class="string">"HandshakeMessagePayload"</span>)
-<a href=#2790 id=2790 data-nosnippet>2790</a>            .map(|<span class="kw">_</span>| <span class="self">Self</span>(payload))
-<a href=#2791 id=2791 data-nosnippet>2791</a>    }
-<a href=#2792 id=2792 data-nosnippet>2792</a>
-<a href=#2793 id=2793 data-nosnippet>2793</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>encoding_for_binder_signing(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
-<a href=#2794 id=2794 data-nosnippet>2794</a>        <span class="kw">let </span><span class="kw-2">mut </span>ret = <span class="self">self</span>.get_encoding();
-<a href=#2795 id=2795 data-nosnippet>2795</a>        <span class="kw">let </span>ret_len = ret
-<a href=#2796 id=2796 data-nosnippet>2796</a>            .len()
-<a href=#2797 id=2797 data-nosnippet>2797</a>            .saturating_sub(<span class="self">self</span>.total_binder_length());
-<a href=#2798 id=2798 data-nosnippet>2798</a>        ret.truncate(ret_len);
-<a href=#2799 id=2799 data-nosnippet>2799</a>        ret
-<a href=#2800 id=2800 data-nosnippet>2800</a>    }
-<a href=#2801 id=2801 data-nosnippet>2801</a>
-<a href=#2802 id=2802 data-nosnippet>2802</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>total_binder_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
-<a href=#2803 id=2803 data-nosnippet>2803</a>        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span>{
-<a href=#2804 id=2804 data-nosnippet>2804</a>            HandshakePayload::ClientHello(ch) =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>ch.preshared_key_offer {
-<a href=#2805 id=2805 data-nosnippet>2805</a>                <span class="prelude-val">Some</span>(offer) =&gt; {
-<a href=#2806 id=2806 data-nosnippet>2806</a>                    <span class="kw">let </span><span class="kw-2">mut </span>binders_encoding = Vec::new();
-<a href=#2807 id=2807 data-nosnippet>2807</a>                    offer
-<a href=#2808 id=2808 data-nosnippet>2808</a>                        .binders
-<a href=#2809 id=2809 data-nosnippet>2809</a>                        .encode(<span class="kw-2">&amp;mut </span>binders_encoding);
-<a href=#2810 id=2810 data-nosnippet>2810</a>                    binders_encoding.len()
-<a href=#2811 id=2811 data-nosnippet>2811</a>                }
-<a href=#2812 id=2812 data-nosnippet>2812</a>                <span class="kw">_ </span>=&gt; <span class="number">0</span>,
-<a href=#2813 id=2813 data-nosnippet>2813</a>            },
-<a href=#2814 id=2814 data-nosnippet>2814</a>            <span class="kw">_ </span>=&gt; <span class="number">0</span>,
-<a href=#2815 id=2815 data-nosnippet>2815</a>        }
-<a href=#2816 id=2816 data-nosnippet>2816</a>    }
-<a href=#2817 id=2817 data-nosnippet>2817</a>
-<a href=#2818 id=2818 data-nosnippet>2818</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>payload_encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;, encoding: Encoding) {
-<a href=#2819 id=2819 data-nosnippet>2819</a>        <span class="comment">// output type, length, and encoded payload
-<a href=#2820 id=2820 data-nosnippet>2820</a>        </span><span class="self">self</span>.<span class="number">0
-<a href=#2821 id=2821 data-nosnippet>2821</a>            </span>.wire_handshake_type()
-<a href=#2822 id=2822 data-nosnippet>2822</a>            .encode(bytes);
-<a href=#2823 id=2823 data-nosnippet>2823</a>
-<a href=#2824 id=2824 data-nosnippet>2824</a>        <span class="kw">let </span>nested = LengthPrefixedBuffer::new(
-<a href=#2825 id=2825 data-nosnippet>2825</a>            ListLength::U24 {
-<a href=#2826 id=2826 data-nosnippet>2826</a>                max: usize::MAX,
-<a href=#2827 id=2827 data-nosnippet>2827</a>                error: InvalidMessage::MessageTooLarge,
-<a href=#2828 id=2828 data-nosnippet>2828</a>            },
-<a href=#2829 id=2829 data-nosnippet>2829</a>            bytes,
-<a href=#2830 id=2830 data-nosnippet>2830</a>        );
-<a href=#2831 id=2831 data-nosnippet>2831</a>
-<a href=#2832 id=2832 data-nosnippet>2832</a>        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span>{
-<a href=#2833 id=2833 data-nosnippet>2833</a>            <span class="comment">// for Server Hello and HelloRetryRequest payloads we need to encode the payload
-<a href=#2834 id=2834 data-nosnippet>2834</a>            // differently based on the purpose of the encoding.
-<a href=#2835 id=2835 data-nosnippet>2835</a>            </span>HandshakePayload::ServerHello(payload) =&gt; payload.payload_encode(nested.buf, encoding),
-<a href=#2836 id=2836 data-nosnippet>2836</a>            HandshakePayload::HelloRetryRequest(payload) =&gt; {
-<a href=#2837 id=2837 data-nosnippet>2837</a>                payload.payload_encode(nested.buf, encoding)
-<a href=#2838 id=2838 data-nosnippet>2838</a>            }
-<a href=#2839 id=2839 data-nosnippet>2839</a>
-<a href=#2840 id=2840 data-nosnippet>2840</a>            <span class="comment">// All other payload types are encoded the same regardless of purpose.
-<a href=#2841 id=2841 data-nosnippet>2841</a>            </span><span class="kw">_ </span>=&gt; <span class="self">self</span>.<span class="number">0</span>.encode(nested.buf),
-<a href=#2842 id=2842 data-nosnippet>2842</a>        }
-<a href=#2843 id=2843 data-nosnippet>2843</a>    }
-<a href=#2844 id=2844 data-nosnippet>2844</a>
-<a href=#2845 id=2845 data-nosnippet>2845</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build_handshake_hash(hash: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="self">Self </span>{
-<a href=#2846 id=2846 data-nosnippet>2846</a>        <span class="self">Self</span>(HandshakePayload::MessageHash(Payload::new(hash.to_vec())))
-<a href=#2847 id=2847 data-nosnippet>2847</a>    }
-<a href=#2848 id=2848 data-nosnippet>2848</a>
-<a href=#2849 id=2849 data-nosnippet>2849</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_owned(<span class="self">self</span>) -&gt; HandshakeMessagePayload&lt;<span class="lifetime">'static</span>&gt; {
-<a href=#2850 id=2850 data-nosnippet>2850</a>        HandshakeMessagePayload(<span class="self">self</span>.<span class="number">0</span>.into_owned())
-<a href=#2851 id=2851 data-nosnippet>2851</a>    }
-<a href=#2852 id=2852 data-nosnippet>2852</a>}
-<a href=#2853 id=2853 data-nosnippet>2853</a>
-<a href=#2854 id=2854 data-nosnippet>2854</a><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
-<a href=#2855 id=2855 data-nosnippet>2855</a></span><span class="kw">pub struct </span>HpkeSymmetricCipherSuite {
-<a href=#2856 id=2856 data-nosnippet>2856</a>    <span class="kw">pub </span>kdf_id: HpkeKdf,
-<a href=#2857 id=2857 data-nosnippet>2857</a>    <span class="kw">pub </span>aead_id: HpkeAead,
-<a href=#2858 id=2858 data-nosnippet>2858</a>}
-<a href=#2859 id=2859 data-nosnippet>2859</a>
-<a href=#2860 id=2860 data-nosnippet>2860</a><span class="kw">impl </span>Codec&lt;<span class="lifetime">'_</span>&gt; <span class="kw">for </span>HpkeSymmetricCipherSuite {
-<a href=#2861 id=2861 data-nosnippet>2861</a>    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
-<a href=#2862 id=2862 data-nosnippet>2862</a>        <span class="self">self</span>.kdf_id.encode(bytes);
-<a href=#2863 id=2863 data-nosnippet>2863</a>        <span class="self">self</span>.aead_id.encode(bytes);
-<a href=#2864 id=2864 data-nosnippet>2864</a>    }
-<a href=#2865 id=2865 data-nosnippet>2865</a>
-<a href=#2866 id=2866 data-nosnippet>2866</a>    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
-<a href=#2867 id=2867 data-nosnippet>2867</a>        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
-<a href=#2868 id=2868 data-nosnippet>2868</a>            kdf_id: HpkeKdf::read(r)<span class="question-mark">?</span>,
-<a href=#2869 id=2869 data-nosnippet>2869</a>            aead_id: HpkeAead::read(r)<span class="question-mark">?</span>,
-<a href=#2870 id=2870 data-nosnippet>2870</a>        })
-<a href=#2871 id=2871 data-nosnippet>2871</a>    }
-<a href=#2872 id=2872 data-nosnippet>2872</a>}
-<a href=#2873 id=2873 data-nosnippet>2873</a>
-<a href=#2874 id=2874 data-nosnippet>2874</a><span class="doccomment">/// draft-ietf-tls-esni-24: `HpkeSymmetricCipherSuite cipher_suites&lt;4..2^16-4&gt;;`
-<a href=#2875 id=2875 data-nosnippet>2875</a></span><span class="kw">impl </span>TlsListElement <span class="kw">for </span>HpkeSymmetricCipherSuite {
-<a href=#2876 id=2876 data-nosnippet>2876</a>    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::NonZeroU16 {
-<a href=#2877 id=2877 data-nosnippet>2877</a>        empty_error: InvalidMessage::IllegalEmptyList(<span class="string">"HpkeSymmetricCipherSuites"</span>),
-<a href=#2878 id=2878 data-nosnippet>2878</a>    };
-<a href=#2879 id=2879 data-nosnippet>2879</a>}
-<a href=#2880 id=2880 data-nosnippet>2880</a>
-<a href=#2881 id=2881 data-nosnippet>2881</a><span class="attr">#[derive(Clone, Debug, PartialEq)]
-<a href=#2882 id=2882 data-nosnippet>2882</a></span><span class="kw">pub struct </span>HpkeKeyConfig {
-<a href=#2883 id=2883 data-nosnippet>2883</a>    <span class="kw">pub </span>config_id: u8,
-<a href=#2884 id=2884 data-nosnippet>2884</a>    <span class="kw">pub </span>kem_id: HpkeKem,
-<a href=#2885 id=2885 data-nosnippet>2885</a>    <span class="doccomment">/// draft-ietf-tls-esni-24: `opaque HpkePublicKey&lt;1..2^16-1&gt;;`
-<a href=#2886 id=2886 data-nosnippet>2886</a>    </span><span class="kw">pub </span>public_key: PayloadU16&lt;NonEmpty&gt;,
-<a href=#2887 id=2887 data-nosnippet>2887</a>    <span class="kw">pub </span>symmetric_cipher_suites: Vec&lt;HpkeSymmetricCipherSuite&gt;,
-<a href=#2888 id=2888 data-nosnippet>2888</a>}
-<a href=#2889 id=2889 data-nosnippet>2889</a>
-<a href=#2890 id=2890 data-nosnippet>2890</a><span class="kw">impl </span>Codec&lt;<span class="lifetime">'_</span>&gt; <span class="kw">for </span>HpkeKeyConfig {
-<a href=#2891 id=2891 data-nosnippet>2891</a>    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
-<a href=#2892 id=2892 data-nosnippet>2892</a>        <span class="self">self</span>.config_id.encode(bytes);
-<a href=#2893 id=2893 data-nosnippet>2893</a>        <span class="self">self</span>.kem_id.encode(bytes);
-<a href=#2894 id=2894 data-nosnippet>2894</a>        <span class="self">self</span>.public_key.encode(bytes);
-<a href=#2895 id=2895 data-nosnippet>2895</a>        <span class="self">self</span>.symmetric_cipher_suites
-<a href=#2896 id=2896 data-nosnippet>2896</a>            .encode(bytes);
-<a href=#2897 id=2897 data-nosnippet>2897</a>    }
-<a href=#2898 id=2898 data-nosnippet>2898</a>
-<a href=#2899 id=2899 data-nosnippet>2899</a>    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
-<a href=#2900 id=2900 data-nosnippet>2900</a>        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
-<a href=#2901 id=2901 data-nosnippet>2901</a>            config_id: u8::read(r)<span class="question-mark">?</span>,
-<a href=#2902 id=2902 data-nosnippet>2902</a>            kem_id: HpkeKem::read(r)<span class="question-mark">?</span>,
-<a href=#2903 id=2903 data-nosnippet>2903</a>            public_key: PayloadU16::read(r)<span class="question-mark">?</span>,
-<a href=#2904 id=2904 data-nosnippet>2904</a>            symmetric_cipher_suites: Vec::&lt;HpkeSymmetricCipherSuite&gt;::read(r)<span class="question-mark">?</span>,
-<a href=#2905 id=2905 data-nosnippet>2905</a>        })
-<a href=#2906 id=2906 data-nosnippet>2906</a>    }
-<a href=#2907 id=2907 data-nosnippet>2907</a>}
-<a href=#2908 id=2908 data-nosnippet>2908</a>
-<a href=#2909 id=2909 data-nosnippet>2909</a><span class="attr">#[derive(Clone, Debug, PartialEq)]
-<a href=#2910 id=2910 data-nosnippet>2910</a></span><span class="kw">pub struct </span>EchConfigContents {
-<a href=#2911 id=2911 data-nosnippet>2911</a>    <span class="kw">pub </span>key_config: HpkeKeyConfig,
-<a href=#2912 id=2912 data-nosnippet>2912</a>    <span class="kw">pub </span>maximum_name_length: u8,
-<a href=#2913 id=2913 data-nosnippet>2913</a>    <span class="kw">pub </span>public_name: DnsName&lt;<span class="lifetime">'static</span>&gt;,
-<a href=#2914 id=2914 data-nosnippet>2914</a>    <span class="kw">pub </span>extensions: Vec&lt;EchConfigExtension&gt;,
-<a href=#2915 id=2915 data-nosnippet>2915</a>}
-<a href=#2916 id=2916 data-nosnippet>2916</a>
-<a href=#2917 id=2917 data-nosnippet>2917</a><span class="kw">impl </span>EchConfigContents {
-<a href=#2918 id=2918 data-nosnippet>2918</a>    <span class="doccomment">/// Returns true if there is more than one extension of a given
-<a href=#2919 id=2919 data-nosnippet>2919</a>    /// type.
-<a href=#2920 id=2920 data-nosnippet>2920</a>    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_duplicate_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-<a href=#2921 id=2921 data-nosnippet>2921</a>        has_duplicates::&lt;<span class="kw">_</span>, <span class="kw">_</span>, u16&gt;(
-<a href=#2922 id=2922 data-nosnippet>2922</a>            <span class="self">self</span>.extensions
-<a href=#2923 id=2923 data-nosnippet>2923</a>                .iter()
-<a href=#2924 id=2924 data-nosnippet>2924</a>                .map(|ext| ext.ext_type()),
-<a href=#2925 id=2925 data-nosnippet>2925</a>        )
-<a href=#2926 id=2926 data-nosnippet>2926</a>    }
-<a href=#2927 id=2927 data-nosnippet>2927</a>
-<a href=#2928 id=2928 data-nosnippet>2928</a>    <span class="doccomment">/// Returns true if there is at least one mandatory unsupported extension.
-<a href=#2929 id=2929 data-nosnippet>2929</a>    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_unknown_mandatory_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-<a href=#2930 id=2930 data-nosnippet>2930</a>        <span class="self">self</span>.extensions
-<a href=#2931 id=2931 data-nosnippet>2931</a>            .iter()
-<a href=#2932 id=2932 data-nosnippet>2932</a>            <span class="comment">// An extension is considered mandatory if the high bit of its type is set.
-<a href=#2933 id=2933 data-nosnippet>2933</a>            </span>.any(|ext| {
-<a href=#2934 id=2934 data-nosnippet>2934</a>                <span class="macro">matches!</span>(ext.ext_type(), ExtensionType::Unknown(<span class="kw">_</span>))
-<a href=#2935 id=2935 data-nosnippet>2935</a>                    &amp;&amp; u16::from(ext.ext_type()) &amp; <span class="number">0x8000 </span>!= <span class="number">0
-<a href=#2936 id=2936 data-nosnippet>2936</a>            </span>})
-<a href=#2937 id=2937 data-nosnippet>2937</a>    }
-<a href=#2938 id=2938 data-nosnippet>2938</a>}
-<a href=#2939 id=2939 data-nosnippet>2939</a>
-<a href=#2940 id=2940 data-nosnippet>2940</a><span class="kw">impl </span>Codec&lt;<span class="lifetime">'_</span>&gt; <span class="kw">for </span>EchConfigContents {
-<a href=#2941 id=2941 data-nosnippet>2941</a>    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
-<a href=#2942 id=2942 data-nosnippet>2942</a>        <span class="self">self</span>.key_config.encode(bytes);
-<a href=#2943 id=2943 data-nosnippet>2943</a>        <span class="self">self</span>.maximum_name_length.encode(bytes);
-<a href=#2944 id=2944 data-nosnippet>2944</a>        <span class="kw">let </span>dns_name = <span class="kw-2">&amp;</span><span class="self">self</span>.public_name.borrow();
-<a href=#2945 id=2945 data-nosnippet>2945</a>        PayloadU8::&lt;MaybeEmpty&gt;::encode_slice(dns_name.as_ref().as_ref(), bytes);
-<a href=#2946 id=2946 data-nosnippet>2946</a>        <span class="self">self</span>.extensions.encode(bytes);
-<a href=#2947 id=2947 data-nosnippet>2947</a>    }
-<a href=#2948 id=2948 data-nosnippet>2948</a>
-<a href=#2949 id=2949 data-nosnippet>2949</a>    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
-<a href=#2950 id=2950 data-nosnippet>2950</a>        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
-<a href=#2951 id=2951 data-nosnippet>2951</a>            key_config: HpkeKeyConfig::read(r)<span class="question-mark">?</span>,
-<a href=#2952 id=2952 data-nosnippet>2952</a>            maximum_name_length: u8::read(r)<span class="question-mark">?</span>,
-<a href=#2953 id=2953 data-nosnippet>2953</a>            public_name: {
-<a href=#2954 id=2954 data-nosnippet>2954</a>                DnsName::try_from(
-<a href=#2955 id=2955 data-nosnippet>2955</a>                    PayloadU8::&lt;MaybeEmpty&gt;::read(r)<span class="question-mark">?
-<a href=#2956 id=2956 data-nosnippet>2956</a>                        </span>.<span class="number">0
-<a href=#2957 id=2957 data-nosnippet>2957</a>                        </span>.as_slice(),
-<a href=#2958 id=2958 data-nosnippet>2958</a>                )
-<a href=#2959 id=2959 data-nosnippet>2959</a>                .map_err(|<span class="kw">_</span>| InvalidMessage::InvalidServerName)<span class="question-mark">?
-<a href=#2960 id=2960 data-nosnippet>2960</a>                </span>.to_owned()
-<a href=#2961 id=2961 data-nosnippet>2961</a>            },
-<a href=#2962 id=2962 data-nosnippet>2962</a>            extensions: Vec::read(r)<span class="question-mark">?</span>,
-<a href=#2963 id=2963 data-nosnippet>2963</a>        })
-<a href=#2964 id=2964 data-nosnippet>2964</a>    }
-<a href=#2965 id=2965 data-nosnippet>2965</a>}
-<a href=#2966 id=2966 data-nosnippet>2966</a>
-<a href=#2967 id=2967 data-nosnippet>2967</a><span class="doccomment">/// An encrypted client hello (ECH) config.
-<a href=#2968 id=2968 data-nosnippet>2968</a></span><span class="attr">#[derive(Clone, Debug, PartialEq)]
-<a href=#2969 id=2969 data-nosnippet>2969</a></span><span class="kw">pub enum </span>EchConfigPayload {
-<a href=#2970 id=2970 data-nosnippet>2970</a>    <span class="doccomment">/// A recognized V18 ECH configuration.
-<a href=#2971 id=2971 data-nosnippet>2971</a>    </span>V18(EchConfigContents),
-<a href=#2972 id=2972 data-nosnippet>2972</a>    <span class="doccomment">/// An unknown version ECH configuration.
-<a href=#2973 id=2973 data-nosnippet>2973</a>    </span>Unknown {
-<a href=#2974 id=2974 data-nosnippet>2974</a>        version: EchVersion,
-<a href=#2975 id=2975 data-nosnippet>2975</a>        contents: PayloadU16,
-<a href=#2976 id=2976 data-nosnippet>2976</a>    },
-<a href=#2977 id=2977 data-nosnippet>2977</a>}
-<a href=#2978 id=2978 data-nosnippet>2978</a>
-<a href=#2979 id=2979 data-nosnippet>2979</a><span class="kw">impl </span>TlsListElement <span class="kw">for </span>EchConfigPayload {
-<a href=#2980 id=2980 data-nosnippet>2980</a>    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U16;
-<a href=#2981 id=2981 data-nosnippet>2981</a>}
-<a href=#2982 id=2982 data-nosnippet>2982</a>
-<a href=#2983 id=2983 data-nosnippet>2983</a><span class="kw">impl </span>Codec&lt;<span class="lifetime">'_</span>&gt; <span class="kw">for </span>EchConfigPayload {
-<a href=#2984 id=2984 data-nosnippet>2984</a>    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
-<a href=#2985 id=2985 data-nosnippet>2985</a>        <span class="kw">match </span><span class="self">self </span>{
-<a href=#2986 id=2986 data-nosnippet>2986</a>            <span class="self">Self</span>::V18(c) =&gt; {
-<a href=#2987 id=2987 data-nosnippet>2987</a>                <span class="comment">// Write the version, the length, and the contents.
-<a href=#2988 id=2988 data-nosnippet>2988</a>                </span>EchVersion::V18.encode(bytes);
-<a href=#2989 id=2989 data-nosnippet>2989</a>                <span class="kw">let </span>inner = LengthPrefixedBuffer::new(ListLength::U16, bytes);
-<a href=#2990 id=2990 data-nosnippet>2990</a>                c.encode(inner.buf);
-<a href=#2991 id=2991 data-nosnippet>2991</a>            }
-<a href=#2992 id=2992 data-nosnippet>2992</a>            <span class="self">Self</span>::Unknown { version, contents } =&gt; {
-<a href=#2993 id=2993 data-nosnippet>2993</a>                <span class="comment">// Unknown configuration versions are opaque.
-<a href=#2994 id=2994 data-nosnippet>2994</a>                </span>version.encode(bytes);
-<a href=#2995 id=2995 data-nosnippet>2995</a>                contents.encode(bytes);
-<a href=#2996 id=2996 data-nosnippet>2996</a>            }
-<a href=#2997 id=2997 data-nosnippet>2997</a>        }
-<a href=#2998 id=2998 data-nosnippet>2998</a>    }
-<a href=#2999 id=2999 data-nosnippet>2999</a>
-<a href=#3000 id=3000 data-nosnippet>3000</a>    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
-<a href=#3001 id=3001 data-nosnippet>3001</a>        <span class="kw">let </span>version = EchVersion::read(r)<span class="question-mark">?</span>;
-<a href=#3002 id=3002 data-nosnippet>3002</a>        <span class="kw">let </span>length = u16::read(r)<span class="question-mark">?</span>;
-<a href=#3003 id=3003 data-nosnippet>3003</a>        <span class="kw">let </span><span class="kw-2">mut </span>contents = r.sub(length <span class="kw">as </span>usize)<span class="question-mark">?</span>;
-<a href=#3004 id=3004 data-nosnippet>3004</a>
-<a href=#3005 id=3005 data-nosnippet>3005</a>        <span class="prelude-val">Ok</span>(<span class="kw">match </span>version {
-<a href=#3006 id=3006 data-nosnippet>3006</a>            EchVersion::V18 =&gt; <span class="self">Self</span>::V18(EchConfigContents::read(<span class="kw-2">&amp;mut </span>contents)<span class="question-mark">?</span>),
-<a href=#3007 id=3007 data-nosnippet>3007</a>            <span class="kw">_ </span>=&gt; {
-<a href=#3008 id=3008 data-nosnippet>3008</a>                <span class="comment">// Note: we don't PayloadU16::read() here because we've already read the length prefix.
-<a href=#3009 id=3009 data-nosnippet>3009</a>                </span><span class="kw">let </span>data = PayloadU16::new(contents.rest().into());
-<a href=#3010 id=3010 data-nosnippet>3010</a>                <span class="self">Self</span>::Unknown {
-<a href=#3011 id=3011 data-nosnippet>3011</a>                    version,
-<a href=#3012 id=3012 data-nosnippet>3012</a>                    contents: data,
-<a href=#3013 id=3013 data-nosnippet>3013</a>                }
-<a href=#3014 id=3014 data-nosnippet>3014</a>            }
-<a href=#3015 id=3015 data-nosnippet>3015</a>        })
-<a href=#3016 id=3016 data-nosnippet>3016</a>    }
-<a href=#3017 id=3017 data-nosnippet>3017</a>}
-<a href=#3018 id=3018 data-nosnippet>3018</a>
-<a href=#3019 id=3019 data-nosnippet>3019</a><span class="attr">#[derive(Clone, Debug, PartialEq)]
-<a href=#3020 id=3020 data-nosnippet>3020</a></span><span class="kw">pub enum </span>EchConfigExtension {
-<a href=#3021 id=3021 data-nosnippet>3021</a>    Unknown(UnknownExtension),
-<a href=#3022 id=3022 data-nosnippet>3022</a>}
-<a href=#3023 id=3023 data-nosnippet>3023</a>
-<a href=#3024 id=3024 data-nosnippet>3024</a><span class="kw">impl </span>EchConfigExtension {
-<a href=#3025 id=3025 data-nosnippet>3025</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>ext_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ExtensionType {
-<a href=#3026 id=3026 data-nosnippet>3026</a>        <span class="kw">match </span><span class="self">self </span>{
-<a href=#3027 id=3027 data-nosnippet>3027</a>            <span class="self">Self</span>::Unknown(r) =&gt; r.typ,
-<a href=#3028 id=3028 data-nosnippet>3028</a>        }
-<a href=#3029 id=3029 data-nosnippet>3029</a>    }
-<a href=#3030 id=3030 data-nosnippet>3030</a>}
-<a href=#3031 id=3031 data-nosnippet>3031</a>
-<a href=#3032 id=3032 data-nosnippet>3032</a><span class="kw">impl </span>Codec&lt;<span class="lifetime">'_</span>&gt; <span class="kw">for </span>EchConfigExtension {
-<a href=#3033 id=3033 data-nosnippet>3033</a>    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
-<a href=#3034 id=3034 data-nosnippet>3034</a>        <span class="self">self</span>.ext_type().encode(bytes);
-<a href=#3035 id=3035 data-nosnippet>3035</a>
-<a href=#3036 id=3036 data-nosnippet>3036</a>        <span class="kw">let </span>nested = LengthPrefixedBuffer::new(ListLength::U16, bytes);
-<a href=#3037 id=3037 data-nosnippet>3037</a>        <span class="kw">match </span><span class="self">self </span>{
-<a href=#3038 id=3038 data-nosnippet>3038</a>            <span class="self">Self</span>::Unknown(r) =&gt; r.encode(nested.buf),
-<a href=#3039 id=3039 data-nosnippet>3039</a>        }
-<a href=#3040 id=3040 data-nosnippet>3040</a>    }
-<a href=#3041 id=3041 data-nosnippet>3041</a>
-<a href=#3042 id=3042 data-nosnippet>3042</a>    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
-<a href=#3043 id=3043 data-nosnippet>3043</a>        <span class="kw">let </span>typ = ExtensionType::read(r)<span class="question-mark">?</span>;
-<a href=#3044 id=3044 data-nosnippet>3044</a>        <span class="kw">let </span>len = u16::read(r)<span class="question-mark">? </span><span class="kw">as </span>usize;
-<a href=#3045 id=3045 data-nosnippet>3045</a>        <span class="kw">let </span><span class="kw-2">mut </span>sub = r.sub(len)<span class="question-mark">?</span>;
-<a href=#3046 id=3046 data-nosnippet>3046</a>
-<a href=#3047 id=3047 data-nosnippet>3047</a>        <span class="attr">#[allow(clippy::match_single_binding)] </span><span class="comment">// Future-proofing.
-<a href=#3048 id=3048 data-nosnippet>3048</a>        </span><span class="kw">let </span>ext = <span class="kw">match </span>typ {
-<a href=#3049 id=3049 data-nosnippet>3049</a>            <span class="kw">_ </span>=&gt; <span class="self">Self</span>::Unknown(UnknownExtension::read(typ, <span class="kw-2">&amp;mut </span>sub)),
-<a href=#3050 id=3050 data-nosnippet>3050</a>        };
-<a href=#3051 id=3051 data-nosnippet>3051</a>
-<a href=#3052 id=3052 data-nosnippet>3052</a>        sub.expect_empty(<span class="string">"EchConfigExtension"</span>)
-<a href=#3053 id=3053 data-nosnippet>3053</a>            .map(|<span class="kw">_</span>| ext)
-<a href=#3054 id=3054 data-nosnippet>3054</a>    }
-<a href=#3055 id=3055 data-nosnippet>3055</a>}
-<a href=#3056 id=3056 data-nosnippet>3056</a>
-<a href=#3057 id=3057 data-nosnippet>3057</a><span class="kw">impl </span>TlsListElement <span class="kw">for </span>EchConfigExtension {
-<a href=#3058 id=3058 data-nosnippet>3058</a>    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U16;
-<a href=#3059 id=3059 data-nosnippet>3059</a>}
-<a href=#3060 id=3060 data-nosnippet>3060</a>
-<a href=#3061 id=3061 data-nosnippet>3061</a><span class="doccomment">/// Representation of the `ECHClientHello` client extension specified in
-<a href=#3062 id=3062 data-nosnippet>3062</a>/// [draft-ietf-tls-esni Section 5].
-<a href=#3063 id=3063 data-nosnippet>3063</a>///
-<a href=#3064 id=3064 data-nosnippet>3064</a>/// [draft-ietf-tls-esni Section 5]: &lt;https://www.ietf.org/archive/id/draft-ietf-tls-esni-18.html#section-5&gt;
-<a href=#3065 id=3065 data-nosnippet>3065</a></span><span class="attr">#[derive(Clone, Debug)]
-<a href=#3066 id=3066 data-nosnippet>3066</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>EncryptedClientHello {
-<a href=#3067 id=3067 data-nosnippet>3067</a>    <span class="doccomment">/// A `ECHClientHello` with type [EchClientHelloType::ClientHelloOuter].
-<a href=#3068 id=3068 data-nosnippet>3068</a>    </span>Outer(EncryptedClientHelloOuter),
-<a href=#3069 id=3069 data-nosnippet>3069</a>    <span class="doccomment">/// An empty `ECHClientHello` with type [EchClientHelloType::ClientHelloInner].
-<a href=#3070 id=3070 data-nosnippet>3070</a>    ///
-<a href=#3071 id=3071 data-nosnippet>3071</a>    /// This variant has no payload.
-<a href=#3072 id=3072 data-nosnippet>3072</a>    </span>Inner,
-<a href=#3073 id=3073 data-nosnippet>3073</a>}
-<a href=#3074 id=3074 data-nosnippet>3074</a>
-<a href=#3075 id=3075 data-nosnippet>3075</a><span class="kw">impl </span>Codec&lt;<span class="lifetime">'_</span>&gt; <span class="kw">for </span>EncryptedClientHello {
-<a href=#3076 id=3076 data-nosnippet>3076</a>    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
-<a href=#3077 id=3077 data-nosnippet>3077</a>        <span class="kw">match </span><span class="self">self </span>{
-<a href=#3078 id=3078 data-nosnippet>3078</a>            <span class="self">Self</span>::Outer(payload) =&gt; {
-<a href=#3079 id=3079 data-nosnippet>3079</a>                EchClientHelloType::ClientHelloOuter.encode(bytes);
-<a href=#3080 id=3080 data-nosnippet>3080</a>                payload.encode(bytes);
-<a href=#3081 id=3081 data-nosnippet>3081</a>            }
-<a href=#3082 id=3082 data-nosnippet>3082</a>            <span class="self">Self</span>::Inner =&gt; {
-<a href=#3083 id=3083 data-nosnippet>3083</a>                EchClientHelloType::ClientHelloInner.encode(bytes);
-<a href=#3084 id=3084 data-nosnippet>3084</a>                <span class="comment">// Empty payload.
-<a href=#3085 id=3085 data-nosnippet>3085</a>            </span>}
-<a href=#3086 id=3086 data-nosnippet>3086</a>        }
-<a href=#3087 id=3087 data-nosnippet>3087</a>    }
-<a href=#3088 id=3088 data-nosnippet>3088</a>
-<a href=#3089 id=3089 data-nosnippet>3089</a>    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
-<a href=#3090 id=3090 data-nosnippet>3090</a>        <span class="kw">match </span>EchClientHelloType::read(r)<span class="question-mark">? </span>{
-<a href=#3091 id=3091 data-nosnippet>3091</a>            EchClientHelloType::ClientHelloOuter =&gt; {
-<a href=#3092 id=3092 data-nosnippet>3092</a>                <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Outer(EncryptedClientHelloOuter::read(r)<span class="question-mark">?</span>))
-<a href=#3093 id=3093 data-nosnippet>3093</a>            }
-<a href=#3094 id=3094 data-nosnippet>3094</a>            EchClientHelloType::ClientHelloInner =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Inner),
-<a href=#3095 id=3095 data-nosnippet>3095</a>            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(InvalidMessage::InvalidContentType),
-<a href=#3096 id=3096 data-nosnippet>3096</a>        }
-<a href=#3097 id=3097 data-nosnippet>3097</a>    }
-<a href=#3098 id=3098 data-nosnippet>3098</a>}
-<a href=#3099 id=3099 data-nosnippet>3099</a>
-<a href=#3100 id=3100 data-nosnippet>3100</a><span class="doccomment">/// Representation of the ECHClientHello extension with type outer specified in
-<a href=#3101 id=3101 data-nosnippet>3101</a>/// [draft-ietf-tls-esni Section 5].
-<a href=#3102 id=3102 data-nosnippet>3102</a>///
-<a href=#3103 id=3103 data-nosnippet>3103</a>/// [draft-ietf-tls-esni Section 5]: &lt;https://www.ietf.org/archive/id/draft-ietf-tls-esni-18.html#section-5&gt;
-<a href=#3104 id=3104 data-nosnippet>3104</a></span><span class="attr">#[derive(Clone, Debug)]
-<a href=#3105 id=3105 data-nosnippet>3105</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>EncryptedClientHelloOuter {
-<a href=#3106 id=3106 data-nosnippet>3106</a>    <span class="doccomment">/// The cipher suite used to encrypt ClientHelloInner. Must match a value from
-<a href=#3107 id=3107 data-nosnippet>3107</a>    /// ECHConfigContents.cipher_suites list.
-<a href=#3108 id=3108 data-nosnippet>3108</a>    </span><span class="kw">pub </span>cipher_suite: HpkeSymmetricCipherSuite,
-<a href=#3109 id=3109 data-nosnippet>3109</a>    <span class="doccomment">/// The ECHConfigContents.key_config.config_id for the chosen ECHConfig.
-<a href=#3110 id=3110 data-nosnippet>3110</a>    </span><span class="kw">pub </span>config_id: u8,
-<a href=#3111 id=3111 data-nosnippet>3111</a>    <span class="doccomment">/// The HPKE encapsulated key, used by servers to decrypt the corresponding payload field.
-<a href=#3112 id=3112 data-nosnippet>3112</a>    /// This field is empty in a ClientHelloOuter sent in response to a HelloRetryRequest.
-<a href=#3113 id=3113 data-nosnippet>3113</a>    </span><span class="kw">pub </span>enc: PayloadU16,
-<a href=#3114 id=3114 data-nosnippet>3114</a>    <span class="doccomment">/// The serialized and encrypted ClientHelloInner structure, encrypted using HPKE.
-<a href=#3115 id=3115 data-nosnippet>3115</a>    </span><span class="kw">pub </span>payload: PayloadU16&lt;NonEmpty&gt;,
-<a href=#3116 id=3116 data-nosnippet>3116</a>}
-<a href=#3117 id=3117 data-nosnippet>3117</a>
-<a href=#3118 id=3118 data-nosnippet>3118</a><span class="kw">impl </span>Codec&lt;<span class="lifetime">'_</span>&gt; <span class="kw">for </span>EncryptedClientHelloOuter {
-<a href=#3119 id=3119 data-nosnippet>3119</a>    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
-<a href=#3120 id=3120 data-nosnippet>3120</a>        <span class="self">self</span>.cipher_suite.encode(bytes);
-<a href=#3121 id=3121 data-nosnippet>3121</a>        <span class="self">self</span>.config_id.encode(bytes);
-<a href=#3122 id=3122 data-nosnippet>3122</a>        <span class="self">self</span>.enc.encode(bytes);
-<a href=#3123 id=3123 data-nosnippet>3123</a>        <span class="self">self</span>.payload.encode(bytes);
-<a href=#3124 id=3124 data-nosnippet>3124</a>    }
-<a href=#3125 id=3125 data-nosnippet>3125</a>
-<a href=#3126 id=3126 data-nosnippet>3126</a>    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
-<a href=#3127 id=3127 data-nosnippet>3127</a>        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
-<a href=#3128 id=3128 data-nosnippet>3128</a>            cipher_suite: HpkeSymmetricCipherSuite::read(r)<span class="question-mark">?</span>,
-<a href=#3129 id=3129 data-nosnippet>3129</a>            config_id: u8::read(r)<span class="question-mark">?</span>,
-<a href=#3130 id=3130 data-nosnippet>3130</a>            enc: PayloadU16::read(r)<span class="question-mark">?</span>,
-<a href=#3131 id=3131 data-nosnippet>3131</a>            payload: PayloadU16::read(r)<span class="question-mark">?</span>,
-<a href=#3132 id=3132 data-nosnippet>3132</a>        })
-<a href=#3133 id=3133 data-nosnippet>3133</a>    }
-<a href=#3134 id=3134 data-nosnippet>3134</a>}
-<a href=#3135 id=3135 data-nosnippet>3135</a>
-<a href=#3136 id=3136 data-nosnippet>3136</a><span class="doccomment">/// Representation of the ECHEncryptedExtensions extension specified in
-<a href=#3137 id=3137 data-nosnippet>3137</a>/// [draft-ietf-tls-esni Section 5].
-<a href=#3138 id=3138 data-nosnippet>3138</a>///
-<a href=#3139 id=3139 data-nosnippet>3139</a>/// [draft-ietf-tls-esni Section 5]: &lt;https://www.ietf.org/archive/id/draft-ietf-tls-esni-18.html#section-5&gt;
-<a href=#3140 id=3140 data-nosnippet>3140</a></span><span class="attr">#[derive(Clone, Debug)]
-<a href=#3141 id=3141 data-nosnippet>3141</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ServerEncryptedClientHello {
-<a href=#3142 id=3142 data-nosnippet>3142</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) retry_configs: Vec&lt;EchConfigPayload&gt;,
-<a href=#3143 id=3143 data-nosnippet>3143</a>}
-<a href=#3144 id=3144 data-nosnippet>3144</a>
-<a href=#3145 id=3145 data-nosnippet>3145</a><span class="kw">impl </span>Codec&lt;<span class="lifetime">'_</span>&gt; <span class="kw">for </span>ServerEncryptedClientHello {
-<a href=#3146 id=3146 data-nosnippet>3146</a>    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
-<a href=#3147 id=3147 data-nosnippet>3147</a>        <span class="self">self</span>.retry_configs.encode(bytes);
-<a href=#3148 id=3148 data-nosnippet>3148</a>    }
-<a href=#3149 id=3149 data-nosnippet>3149</a>
-<a href=#3150 id=3150 data-nosnippet>3150</a>    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
-<a href=#3151 id=3151 data-nosnippet>3151</a>        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
-<a href=#3152 id=3152 data-nosnippet>3152</a>            retry_configs: Vec::&lt;EchConfigPayload&gt;::read(r)<span class="question-mark">?</span>,
-<a href=#3153 id=3153 data-nosnippet>3153</a>        })
-<a href=#3154 id=3154 data-nosnippet>3154</a>    }
-<a href=#3155 id=3155 data-nosnippet>3155</a>}
-<a href=#3156 id=3156 data-nosnippet>3156</a>
-<a href=#3157 id=3157 data-nosnippet>3157</a><span class="doccomment">/// The method of encoding to use for a handshake message.
-<a href=#3158 id=3158 data-nosnippet>3158</a>///
-<a href=#3159 id=3159 data-nosnippet>3159</a>/// In some cases a handshake message may be encoded differently depending on the purpose
-<a href=#3160 id=3160 data-nosnippet>3160</a>/// the encoded message is being used for.
-<a href=#3161 id=3161 data-nosnippet>3161</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Encoding {
-<a href=#3162 id=3162 data-nosnippet>3162</a>    <span class="doccomment">/// Standard RFC 8446 encoding.
-<a href=#3163 id=3163 data-nosnippet>3163</a>    </span>Standard,
-<a href=#3164 id=3164 data-nosnippet>3164</a>    <span class="doccomment">/// Encoding for ECH confirmation for HRR.
-<a href=#3165 id=3165 data-nosnippet>3165</a>    </span>EchConfirmation,
-<a href=#3166 id=3166 data-nosnippet>3166</a>    <span class="doccomment">/// Encoding for ECH inner client hello.
-<a href=#3167 id=3167 data-nosnippet>3167</a>    </span>EchInnerHello { to_compress: Vec&lt;ExtensionType&gt; },
-<a href=#3168 id=3168 data-nosnippet>3168</a>}
-<a href=#3169 id=3169 data-nosnippet>3169</a>
-<a href=#3170 id=3170 data-nosnippet>3170</a><span class="kw">fn </span>has_duplicates&lt;I: IntoIterator&lt;Item = E&gt;, E: Into&lt;T&gt;, T: Eq + Ord&gt;(iter: I) -&gt; bool {
-<a href=#3171 id=3171 data-nosnippet>3171</a>    <span class="kw">let </span><span class="kw-2">mut </span>seen = BTreeSet::new();
-<a href=#3172 id=3172 data-nosnippet>3172</a>
-<a href=#3173 id=3173 data-nosnippet>3173</a>    <span class="kw">for </span>x <span class="kw">in </span>iter {
-<a href=#3174 id=3174 data-nosnippet>3174</a>        <span class="kw">if </span>!seen.insert(x.into()) {
-<a href=#3175 id=3175 data-nosnippet>3175</a>            <span class="kw">return </span><span class="bool-val">true</span>;
-<a href=#3176 id=3176 data-nosnippet>3176</a>        }
-<a href=#3177 id=3177 data-nosnippet>3177</a>    }
-<a href=#3178 id=3178 data-nosnippet>3178</a>
-<a href=#3179 id=3179 data-nosnippet>3179</a>    <span class="bool-val">false
-<a href=#3180 id=3180 data-nosnippet>3180</a></span>}
-<a href=#3181 id=3181 data-nosnippet>3181</a>
-<a href=#3182 id=3182 data-nosnippet>3182</a><span class="kw">struct </span>DuplicateExtensionChecker(BTreeSet&lt;u16&gt;);
-<a href=#3183 id=3183 data-nosnippet>3183</a>
-<a href=#3184 id=3184 data-nosnippet>3184</a><span class="kw">impl </span>DuplicateExtensionChecker {
-<a href=#3185 id=3185 data-nosnippet>3185</a>    <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
-<a href=#3186 id=3186 data-nosnippet>3186</a>        <span class="self">Self</span>(BTreeSet::new())
-<a href=#3187 id=3187 data-nosnippet>3187</a>    }
-<a href=#3188 id=3188 data-nosnippet>3188</a>
-<a href=#3189 id=3189 data-nosnippet>3189</a>    <span class="kw">fn </span>check(<span class="kw-2">&amp;mut </span><span class="self">self</span>, typ: ExtensionType) -&gt; <span class="prelude-ty">Result</span>&lt;(), InvalidMessage&gt; {
-<a href=#3190 id=3190 data-nosnippet>3190</a>        <span class="kw">let </span>u = u16::from(typ);
-<a href=#3191 id=3191 data-nosnippet>3191</a>        <span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>.insert(u) {
-<a href=#3192 id=3192 data-nosnippet>3192</a>            <span class="bool-val">true </span>=&gt; <span class="prelude-val">Ok</span>(()),
-<a href=#3193 id=3193 data-nosnippet>3193</a>            <span class="bool-val">false </span>=&gt; <span class="prelude-val">Err</span>(InvalidMessage::DuplicateExtension(u)),
-<a href=#3194 id=3194 data-nosnippet>3194</a>        }
-<a href=#3195 id=3195 data-nosnippet>3195</a>    }
-<a href=#3196 id=3196 data-nosnippet>3196</a>}
-<a href=#3197 id=3197 data-nosnippet>3197</a>
-<a href=#3198 id=3198 data-nosnippet>3198</a><span class="kw">fn </span>low_quality_integer_hash(<span class="kw-2">mut </span>x: u32) -&gt; u32 {
-<a href=#3199 id=3199 data-nosnippet>3199</a>    x = x
-<a href=#3200 id=3200 data-nosnippet>3200</a>        .wrapping_add(<span class="number">0x7ed55d16</span>)
-<a href=#3201 id=3201 data-nosnippet>3201</a>        .wrapping_add(x &lt;&lt; <span class="number">12</span>);
-<a href=#3202 id=3202 data-nosnippet>3202</a>    x = (x ^ <span class="number">0xc761c23c</span>) ^ (x &gt;&gt; <span class="number">19</span>);
-<a href=#3203 id=3203 data-nosnippet>3203</a>    x = x
-<a href=#3204 id=3204 data-nosnippet>3204</a>        .wrapping_add(<span class="number">0x165667b1</span>)
-<a href=#3205 id=3205 data-nosnippet>3205</a>        .wrapping_add(x &lt;&lt; <span class="number">5</span>);
-<a href=#3206 id=3206 data-nosnippet>3206</a>    x = x.wrapping_add(<span class="number">0xd3a2646c</span>) ^ (x &lt;&lt; <span class="number">9</span>);
-<a href=#3207 id=3207 data-nosnippet>3207</a>    x = x
-<a href=#3208 id=3208 data-nosnippet>3208</a>        .wrapping_add(<span class="number">0xfd7046c5</span>)
-<a href=#3209 id=3209 data-nosnippet>3209</a>        .wrapping_add(x &lt;&lt; <span class="number">3</span>);
-<a href=#3210 id=3210 data-nosnippet>3210</a>    x = (x ^ <span class="number">0xb55a4f09</span>) ^ (x &gt;&gt; <span class="number">16</span>);
-<a href=#3211 id=3211 data-nosnippet>3211</a>    x
-<a href=#3212 id=3212 data-nosnippet>3212</a>}
-<a href=#3213 id=3213 data-nosnippet>3213</a>
-<a href=#3214 id=3214 data-nosnippet>3214</a><span class="attr">#[cfg(test)]
-<a href=#3215 id=3215 data-nosnippet>3215</a></span><span class="kw">mod </span>tests {
-<a href=#3216 id=3216 data-nosnippet>3216</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
-<a href=#3217 id=3217 data-nosnippet>3217</a>
-<a href=#3218 id=3218 data-nosnippet>3218</a>    <span class="attr">#[test]
-<a href=#3219 id=3219 data-nosnippet>3219</a>    </span><span class="kw">fn </span>test_ech_config_dupe_exts() {
-<a href=#3220 id=3220 data-nosnippet>3220</a>        <span class="kw">let </span>unknown_ext = EchConfigExtension::Unknown(UnknownExtension {
-<a href=#3221 id=3221 data-nosnippet>3221</a>            typ: ExtensionType::Unknown(<span class="number">0x42</span>),
-<a href=#3222 id=3222 data-nosnippet>3222</a>            payload: Payload::new(<span class="macro">vec!</span>[<span class="number">0x42</span>]),
-<a href=#3223 id=3223 data-nosnippet>3223</a>        });
-<a href=#3224 id=3224 data-nosnippet>3224</a>        <span class="kw">let </span><span class="kw-2">mut </span>config = config_template();
-<a href=#3225 id=3225 data-nosnippet>3225</a>        config
-<a href=#3226 id=3226 data-nosnippet>3226</a>            .extensions
-<a href=#3227 id=3227 data-nosnippet>3227</a>            .push(unknown_ext.clone());
-<a href=#3228 id=3228 data-nosnippet>3228</a>        config.extensions.push(unknown_ext);
-<a href=#3229 id=3229 data-nosnippet>3229</a>
-<a href=#3230 id=3230 data-nosnippet>3230</a>        <span class="macro">assert!</span>(config.has_duplicate_extension());
-<a href=#3231 id=3231 data-nosnippet>3231</a>        <span class="macro">assert!</span>(!config.has_unknown_mandatory_extension());
-<a href=#3232 id=3232 data-nosnippet>3232</a>    }
-<a href=#3233 id=3233 data-nosnippet>3233</a>
-<a href=#3234 id=3234 data-nosnippet>3234</a>    <span class="attr">#[test]
-<a href=#3235 id=3235 data-nosnippet>3235</a>    </span><span class="kw">fn </span>test_ech_config_mandatory_exts() {
-<a href=#3236 id=3236 data-nosnippet>3236</a>        <span class="kw">let </span>mandatory_unknown_ext = EchConfigExtension::Unknown(UnknownExtension {
-<a href=#3237 id=3237 data-nosnippet>3237</a>            typ: ExtensionType::Unknown(<span class="number">0x42 </span>| <span class="number">0x8000</span>), <span class="comment">// Note: high bit set.
-<a href=#3238 id=3238 data-nosnippet>3238</a>            </span>payload: Payload::new(<span class="macro">vec!</span>[<span class="number">0x42</span>]),
-<a href=#3239 id=3239 data-nosnippet>3239</a>        });
-<a href=#3240 id=3240 data-nosnippet>3240</a>        <span class="kw">let </span><span class="kw-2">mut </span>config = config_template();
-<a href=#3241 id=3241 data-nosnippet>3241</a>        config
-<a href=#3242 id=3242 data-nosnippet>3242</a>            .extensions
-<a href=#3243 id=3243 data-nosnippet>3243</a>            .push(mandatory_unknown_ext);
-<a href=#3244 id=3244 data-nosnippet>3244</a>
-<a href=#3245 id=3245 data-nosnippet>3245</a>        <span class="macro">assert!</span>(!config.has_duplicate_extension());
-<a href=#3246 id=3246 data-nosnippet>3246</a>        <span class="macro">assert!</span>(config.has_unknown_mandatory_extension());
-<a href=#3247 id=3247 data-nosnippet>3247</a>    }
-<a href=#3248 id=3248 data-nosnippet>3248</a>
-<a href=#3249 id=3249 data-nosnippet>3249</a>    <span class="kw">fn </span>config_template() -&gt; EchConfigContents {
-<a href=#3250 id=3250 data-nosnippet>3250</a>        EchConfigContents {
-<a href=#3251 id=3251 data-nosnippet>3251</a>            key_config: HpkeKeyConfig {
-<a href=#3252 id=3252 data-nosnippet>3252</a>                config_id: <span class="number">0</span>,
-<a href=#3253 id=3253 data-nosnippet>3253</a>                kem_id: HpkeKem::DHKEM_P256_HKDF_SHA256,
-<a href=#3254 id=3254 data-nosnippet>3254</a>                public_key: PayloadU16::new(<span class="string">b"xxx"</span>.into()),
-<a href=#3255 id=3255 data-nosnippet>3255</a>                symmetric_cipher_suites: <span class="macro">vec!</span>[HpkeSymmetricCipherSuite {
-<a href=#3256 id=3256 data-nosnippet>3256</a>                    kdf_id: HpkeKdf::HKDF_SHA256,
-<a href=#3257 id=3257 data-nosnippet>3257</a>                    aead_id: HpkeAead::AES_128_GCM,
-<a href=#3258 id=3258 data-nosnippet>3258</a>                }],
-<a href=#3259 id=3259 data-nosnippet>3259</a>            },
-<a href=#3260 id=3260 data-nosnippet>3260</a>            maximum_name_length: <span class="number">0</span>,
-<a href=#3261 id=3261 data-nosnippet>3261</a>            public_name: DnsName::try_from(<span class="string">"example.com"</span>).unwrap(),
-<a href=#3262 id=3262 data-nosnippet>3262</a>            extensions: <span class="macro">vec!</span>[],
-<a href=#3263 id=3263 data-nosnippet>3263</a>        }
-<a href=#3264 id=3264 data-nosnippet>3264</a>    }
-<a href=#3265 id=3265 data-nosnippet>3265</a>}
+<a href=#2484 id=2484 data-nosnippet>2484</a>    <span class="doccomment">/// `opaque OCSPResponse&lt;1..2^24-1&gt;;`
+<a href=#2485 id=2485 data-nosnippet>2485</a>    </span><span class="kw">pub</span>(<span class="kw">crate</span>) ocsp_response: PayloadU24&lt;<span class="lifetime">'a</span>, NonEmpty&gt;,
+<a href=#2486 id=2486 data-nosnippet>2486</a>}
+<a href=#2487 id=2487 data-nosnippet>2487</a>
+<a href=#2488 id=2488 data-nosnippet>2488</a><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Codec&lt;<span class="lifetime">'a</span>&gt; <span class="kw">for </span>CertificateStatus&lt;<span class="lifetime">'a</span>&gt; {
+<a href=#2489 id=2489 data-nosnippet>2489</a>    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+<a href=#2490 id=2490 data-nosnippet>2490</a>        CertificateStatusType::OCSP.encode(bytes);
+<a href=#2491 id=2491 data-nosnippet>2491</a>        <span class="self">self</span>.ocsp_response.encode(bytes);
+<a href=#2492 id=2492 data-nosnippet>2492</a>    }
+<a href=#2493 id=2493 data-nosnippet>2493</a>
+<a href=#2494 id=2494 data-nosnippet>2494</a>    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+<a href=#2495 id=2495 data-nosnippet>2495</a>        <span class="kw">let </span>typ = CertificateStatusType::read(r)<span class="question-mark">?</span>;
+<a href=#2496 id=2496 data-nosnippet>2496</a>
+<a href=#2497 id=2497 data-nosnippet>2497</a>        <span class="kw">match </span>typ {
+<a href=#2498 id=2498 data-nosnippet>2498</a>            CertificateStatusType::OCSP =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+<a href=#2499 id=2499 data-nosnippet>2499</a>                ocsp_response: PayloadU24::read(r)<span class="question-mark">?</span>,
+<a href=#2500 id=2500 data-nosnippet>2500</a>            }),
+<a href=#2501 id=2501 data-nosnippet>2501</a>            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(InvalidMessage::InvalidCertificateStatusType),
+<a href=#2502 id=2502 data-nosnippet>2502</a>        }
+<a href=#2503 id=2503 data-nosnippet>2503</a>    }
+<a href=#2504 id=2504 data-nosnippet>2504</a>}
+<a href=#2505 id=2505 data-nosnippet>2505</a>
+<a href=#2506 id=2506 data-nosnippet>2506</a><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CertificateStatus&lt;<span class="lifetime">'a</span>&gt; {
+<a href=#2507 id=2507 data-nosnippet>2507</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(ocsp: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[u8]) -&gt; <span class="self">Self </span>{
+<a href=#2508 id=2508 data-nosnippet>2508</a>        CertificateStatus {
+<a href=#2509 id=2509 data-nosnippet>2509</a>            ocsp_response: PayloadU24::from(Payload::Borrowed(ocsp)),
+<a href=#2510 id=2510 data-nosnippet>2510</a>        }
+<a href=#2511 id=2511 data-nosnippet>2511</a>    }
+<a href=#2512 id=2512 data-nosnippet>2512</a>
+<a href=#2513 id=2513 data-nosnippet>2513</a>    <span class="attr">#[cfg(feature = <span class="string">"tls12"</span>)]
+<a href=#2514 id=2514 data-nosnippet>2514</a>    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_inner(<span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
+<a href=#2515 id=2515 data-nosnippet>2515</a>        <span class="self">self</span>.ocsp_response.<span class="number">0</span>.into_vec()
+<a href=#2516 id=2516 data-nosnippet>2516</a>    }
+<a href=#2517 id=2517 data-nosnippet>2517</a>
+<a href=#2518 id=2518 data-nosnippet>2518</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_owned(<span class="self">self</span>) -&gt; CertificateStatus&lt;<span class="lifetime">'static</span>&gt; {
+<a href=#2519 id=2519 data-nosnippet>2519</a>        CertificateStatus {
+<a href=#2520 id=2520 data-nosnippet>2520</a>            ocsp_response: <span class="self">self</span>.ocsp_response.into_owned(),
+<a href=#2521 id=2521 data-nosnippet>2521</a>        }
+<a href=#2522 id=2522 data-nosnippet>2522</a>    }
+<a href=#2523 id=2523 data-nosnippet>2523</a>}
+<a href=#2524 id=2524 data-nosnippet>2524</a>
+<a href=#2525 id=2525 data-nosnippet>2525</a><span class="comment">// -- RFC8879 compressed certificates
+<a href=#2526 id=2526 data-nosnippet>2526</a>
+<a href=#2527 id=2527 data-nosnippet>2527</a></span><span class="attr">#[derive(Debug)]
+<a href=#2528 id=2528 data-nosnippet>2528</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CompressedCertificatePayload&lt;<span class="lifetime">'a</span>&gt; {
+<a href=#2529 id=2529 data-nosnippet>2529</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) alg: CertificateCompressionAlgorithm,
+<a href=#2530 id=2530 data-nosnippet>2530</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) uncompressed_len: u32,
+<a href=#2531 id=2531 data-nosnippet>2531</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) compressed: PayloadU24&lt;<span class="lifetime">'a</span>&gt;,
+<a href=#2532 id=2532 data-nosnippet>2532</a>}
+<a href=#2533 id=2533 data-nosnippet>2533</a>
+<a href=#2534 id=2534 data-nosnippet>2534</a><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Codec&lt;<span class="lifetime">'a</span>&gt; <span class="kw">for </span>CompressedCertificatePayload&lt;<span class="lifetime">'a</span>&gt; {
+<a href=#2535 id=2535 data-nosnippet>2535</a>    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+<a href=#2536 id=2536 data-nosnippet>2536</a>        <span class="self">self</span>.alg.encode(bytes);
+<a href=#2537 id=2537 data-nosnippet>2537</a>        codec::u24(<span class="self">self</span>.uncompressed_len).encode(bytes);
+<a href=#2538 id=2538 data-nosnippet>2538</a>        <span class="self">self</span>.compressed.encode(bytes);
+<a href=#2539 id=2539 data-nosnippet>2539</a>    }
+<a href=#2540 id=2540 data-nosnippet>2540</a>
+<a href=#2541 id=2541 data-nosnippet>2541</a>    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+<a href=#2542 id=2542 data-nosnippet>2542</a>        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+<a href=#2543 id=2543 data-nosnippet>2543</a>            alg: CertificateCompressionAlgorithm::read(r)<span class="question-mark">?</span>,
+<a href=#2544 id=2544 data-nosnippet>2544</a>            uncompressed_len: codec::u24::read(r)<span class="question-mark">?</span>.<span class="number">0</span>,
+<a href=#2545 id=2545 data-nosnippet>2545</a>            compressed: PayloadU24::read(r)<span class="question-mark">?</span>,
+<a href=#2546 id=2546 data-nosnippet>2546</a>        })
+<a href=#2547 id=2547 data-nosnippet>2547</a>    }
+<a href=#2548 id=2548 data-nosnippet>2548</a>}
+<a href=#2549 id=2549 data-nosnippet>2549</a>
+<a href=#2550 id=2550 data-nosnippet>2550</a><span class="kw">impl </span>CompressedCertificatePayload&lt;<span class="lifetime">'_</span>&gt; {
+<a href=#2551 id=2551 data-nosnippet>2551</a>    <span class="kw">fn </span>into_owned(<span class="self">self</span>) -&gt; CompressedCertificatePayload&lt;<span class="lifetime">'static</span>&gt; {
+<a href=#2552 id=2552 data-nosnippet>2552</a>        CompressedCertificatePayload {
+<a href=#2553 id=2553 data-nosnippet>2553</a>            compressed: <span class="self">self</span>.compressed.into_owned(),
+<a href=#2554 id=2554 data-nosnippet>2554</a>            ..<span class="self">self
+<a href=#2555 id=2555 data-nosnippet>2555</a>        </span>}
+<a href=#2556 id=2556 data-nosnippet>2556</a>    }
+<a href=#2557 id=2557 data-nosnippet>2557</a>
+<a href=#2558 id=2558 data-nosnippet>2558</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_borrowed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CompressedCertificatePayload&lt;<span class="lifetime">'_</span>&gt; {
+<a href=#2559 id=2559 data-nosnippet>2559</a>        CompressedCertificatePayload {
+<a href=#2560 id=2560 data-nosnippet>2560</a>            alg: <span class="self">self</span>.alg,
+<a href=#2561 id=2561 data-nosnippet>2561</a>            uncompressed_len: <span class="self">self</span>.uncompressed_len,
+<a href=#2562 id=2562 data-nosnippet>2562</a>            compressed: PayloadU24::from(Payload::Borrowed(<span class="self">self</span>.compressed.<span class="number">0</span>.bytes())),
+<a href=#2563 id=2563 data-nosnippet>2563</a>        }
+<a href=#2564 id=2564 data-nosnippet>2564</a>    }
+<a href=#2565 id=2565 data-nosnippet>2565</a>}
+<a href=#2566 id=2566 data-nosnippet>2566</a>
+<a href=#2567 id=2567 data-nosnippet>2567</a><span class="attr">#[derive(Debug)]
+<a href=#2568 id=2568 data-nosnippet>2568</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>HandshakePayload&lt;<span class="lifetime">'a</span>&gt; {
+<a href=#2569 id=2569 data-nosnippet>2569</a>    HelloRequest,
+<a href=#2570 id=2570 data-nosnippet>2570</a>    ClientHello(ClientHelloPayload),
+<a href=#2571 id=2571 data-nosnippet>2571</a>    ServerHello(ServerHelloPayload),
+<a href=#2572 id=2572 data-nosnippet>2572</a>    HelloRetryRequest(HelloRetryRequest),
+<a href=#2573 id=2573 data-nosnippet>2573</a>    Certificate(CertificateChain&lt;<span class="lifetime">'a</span>&gt;),
+<a href=#2574 id=2574 data-nosnippet>2574</a>    CertificateTls13(CertificatePayloadTls13&lt;<span class="lifetime">'a</span>&gt;),
+<a href=#2575 id=2575 data-nosnippet>2575</a>    CompressedCertificate(CompressedCertificatePayload&lt;<span class="lifetime">'a</span>&gt;),
+<a href=#2576 id=2576 data-nosnippet>2576</a>    ServerKeyExchange(ServerKeyExchangePayload),
+<a href=#2577 id=2577 data-nosnippet>2577</a>    CertificateRequest(CertificateRequestPayload),
+<a href=#2578 id=2578 data-nosnippet>2578</a>    CertificateRequestTls13(CertificateRequestPayloadTls13),
+<a href=#2579 id=2579 data-nosnippet>2579</a>    CertificateVerify(DigitallySignedStruct),
+<a href=#2580 id=2580 data-nosnippet>2580</a>    ServerHelloDone,
+<a href=#2581 id=2581 data-nosnippet>2581</a>    EndOfEarlyData,
+<a href=#2582 id=2582 data-nosnippet>2582</a>    ClientKeyExchange(Payload&lt;<span class="lifetime">'a</span>&gt;),
+<a href=#2583 id=2583 data-nosnippet>2583</a>    NewSessionTicket(NewSessionTicketPayload),
+<a href=#2584 id=2584 data-nosnippet>2584</a>    NewSessionTicketTls13(NewSessionTicketPayloadTls13),
+<a href=#2585 id=2585 data-nosnippet>2585</a>    EncryptedExtensions(Box&lt;ServerExtensions&lt;<span class="lifetime">'a</span>&gt;&gt;),
+<a href=#2586 id=2586 data-nosnippet>2586</a>    KeyUpdate(KeyUpdateRequest),
+<a href=#2587 id=2587 data-nosnippet>2587</a>    Finished(Payload&lt;<span class="lifetime">'a</span>&gt;),
+<a href=#2588 id=2588 data-nosnippet>2588</a>    CertificateStatus(CertificateStatus&lt;<span class="lifetime">'a</span>&gt;),
+<a href=#2589 id=2589 data-nosnippet>2589</a>    MessageHash(Payload&lt;<span class="lifetime">'a</span>&gt;),
+<a href=#2590 id=2590 data-nosnippet>2590</a>    Unknown((HandshakeType, Payload&lt;<span class="lifetime">'a</span>&gt;)),
+<a href=#2591 id=2591 data-nosnippet>2591</a>}
+<a href=#2592 id=2592 data-nosnippet>2592</a>
+<a href=#2593 id=2593 data-nosnippet>2593</a><span class="kw">impl </span>HandshakePayload&lt;<span class="lifetime">'_</span>&gt; {
+<a href=#2594 id=2594 data-nosnippet>2594</a>    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+<a href=#2595 id=2595 data-nosnippet>2595</a>        <span class="kw">use </span><span class="self">self</span>::HandshakePayload::<span class="kw-2">*</span>;
+<a href=#2596 id=2596 data-nosnippet>2596</a>        <span class="kw">match </span><span class="self">self </span>{
+<a href=#2597 id=2597 data-nosnippet>2597</a>            HelloRequest | ServerHelloDone | EndOfEarlyData =&gt; {}
+<a href=#2598 id=2598 data-nosnippet>2598</a>            ClientHello(x) =&gt; x.encode(bytes),
+<a href=#2599 id=2599 data-nosnippet>2599</a>            ServerHello(x) =&gt; x.encode(bytes),
+<a href=#2600 id=2600 data-nosnippet>2600</a>            HelloRetryRequest(x) =&gt; x.encode(bytes),
+<a href=#2601 id=2601 data-nosnippet>2601</a>            Certificate(x) =&gt; x.encode(bytes),
+<a href=#2602 id=2602 data-nosnippet>2602</a>            CertificateTls13(x) =&gt; x.encode(bytes),
+<a href=#2603 id=2603 data-nosnippet>2603</a>            CompressedCertificate(x) =&gt; x.encode(bytes),
+<a href=#2604 id=2604 data-nosnippet>2604</a>            ServerKeyExchange(x) =&gt; x.encode(bytes),
+<a href=#2605 id=2605 data-nosnippet>2605</a>            ClientKeyExchange(x) =&gt; x.encode(bytes),
+<a href=#2606 id=2606 data-nosnippet>2606</a>            CertificateRequest(x) =&gt; x.encode(bytes),
+<a href=#2607 id=2607 data-nosnippet>2607</a>            CertificateRequestTls13(x) =&gt; x.encode(bytes),
+<a href=#2608 id=2608 data-nosnippet>2608</a>            CertificateVerify(x) =&gt; x.encode(bytes),
+<a href=#2609 id=2609 data-nosnippet>2609</a>            NewSessionTicket(x) =&gt; x.encode(bytes),
+<a href=#2610 id=2610 data-nosnippet>2610</a>            NewSessionTicketTls13(x) =&gt; x.encode(bytes),
+<a href=#2611 id=2611 data-nosnippet>2611</a>            EncryptedExtensions(x) =&gt; x.encode(bytes),
+<a href=#2612 id=2612 data-nosnippet>2612</a>            KeyUpdate(x) =&gt; x.encode(bytes),
+<a href=#2613 id=2613 data-nosnippet>2613</a>            Finished(x) =&gt; x.encode(bytes),
+<a href=#2614 id=2614 data-nosnippet>2614</a>            CertificateStatus(x) =&gt; x.encode(bytes),
+<a href=#2615 id=2615 data-nosnippet>2615</a>            MessageHash(x) =&gt; x.encode(bytes),
+<a href=#2616 id=2616 data-nosnippet>2616</a>            Unknown((<span class="kw">_</span>, x)) =&gt; x.encode(bytes),
+<a href=#2617 id=2617 data-nosnippet>2617</a>        }
+<a href=#2618 id=2618 data-nosnippet>2618</a>    }
+<a href=#2619 id=2619 data-nosnippet>2619</a>
+<a href=#2620 id=2620 data-nosnippet>2620</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>handshake_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HandshakeType {
+<a href=#2621 id=2621 data-nosnippet>2621</a>        <span class="kw">use </span><span class="self">self</span>::HandshakePayload::<span class="kw-2">*</span>;
+<a href=#2622 id=2622 data-nosnippet>2622</a>        <span class="kw">match </span><span class="self">self </span>{
+<a href=#2623 id=2623 data-nosnippet>2623</a>            HelloRequest =&gt; HandshakeType::HelloRequest,
+<a href=#2624 id=2624 data-nosnippet>2624</a>            ClientHello(<span class="kw">_</span>) =&gt; HandshakeType::ClientHello,
+<a href=#2625 id=2625 data-nosnippet>2625</a>            ServerHello(<span class="kw">_</span>) =&gt; HandshakeType::ServerHello,
+<a href=#2626 id=2626 data-nosnippet>2626</a>            HelloRetryRequest(<span class="kw">_</span>) =&gt; HandshakeType::HelloRetryRequest,
+<a href=#2627 id=2627 data-nosnippet>2627</a>            Certificate(<span class="kw">_</span>) | CertificateTls13(<span class="kw">_</span>) =&gt; HandshakeType::Certificate,
+<a href=#2628 id=2628 data-nosnippet>2628</a>            CompressedCertificate(<span class="kw">_</span>) =&gt; HandshakeType::CompressedCertificate,
+<a href=#2629 id=2629 data-nosnippet>2629</a>            ServerKeyExchange(<span class="kw">_</span>) =&gt; HandshakeType::ServerKeyExchange,
+<a href=#2630 id=2630 data-nosnippet>2630</a>            CertificateRequest(<span class="kw">_</span>) | CertificateRequestTls13(<span class="kw">_</span>) =&gt; HandshakeType::CertificateRequest,
+<a href=#2631 id=2631 data-nosnippet>2631</a>            CertificateVerify(<span class="kw">_</span>) =&gt; HandshakeType::CertificateVerify,
+<a href=#2632 id=2632 data-nosnippet>2632</a>            ServerHelloDone =&gt; HandshakeType::ServerHelloDone,
+<a href=#2633 id=2633 data-nosnippet>2633</a>            EndOfEarlyData =&gt; HandshakeType::EndOfEarlyData,
+<a href=#2634 id=2634 data-nosnippet>2634</a>            ClientKeyExchange(<span class="kw">_</span>) =&gt; HandshakeType::ClientKeyExchange,
+<a href=#2635 id=2635 data-nosnippet>2635</a>            NewSessionTicket(<span class="kw">_</span>) | NewSessionTicketTls13(<span class="kw">_</span>) =&gt; HandshakeType::NewSessionTicket,
+<a href=#2636 id=2636 data-nosnippet>2636</a>            EncryptedExtensions(<span class="kw">_</span>) =&gt; HandshakeType::EncryptedExtensions,
+<a href=#2637 id=2637 data-nosnippet>2637</a>            KeyUpdate(<span class="kw">_</span>) =&gt; HandshakeType::KeyUpdate,
+<a href=#2638 id=2638 data-nosnippet>2638</a>            Finished(<span class="kw">_</span>) =&gt; HandshakeType::Finished,
+<a href=#2639 id=2639 data-nosnippet>2639</a>            CertificateStatus(<span class="kw">_</span>) =&gt; HandshakeType::CertificateStatus,
+<a href=#2640 id=2640 data-nosnippet>2640</a>            MessageHash(<span class="kw">_</span>) =&gt; HandshakeType::MessageHash,
+<a href=#2641 id=2641 data-nosnippet>2641</a>            Unknown((t, <span class="kw">_</span>)) =&gt; <span class="kw-2">*</span>t,
+<a href=#2642 id=2642 data-nosnippet>2642</a>        }
+<a href=#2643 id=2643 data-nosnippet>2643</a>    }
+<a href=#2644 id=2644 data-nosnippet>2644</a>
+<a href=#2645 id=2645 data-nosnippet>2645</a>    <span class="kw">fn </span>wire_handshake_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HandshakeType {
+<a href=#2646 id=2646 data-nosnippet>2646</a>        <span class="kw">match </span><span class="self">self</span>.handshake_type() {
+<a href=#2647 id=2647 data-nosnippet>2647</a>            <span class="comment">// A `HelloRetryRequest` appears on the wire as a `ServerHello` with a magic `random` value.
+<a href=#2648 id=2648 data-nosnippet>2648</a>            </span>HandshakeType::HelloRetryRequest =&gt; HandshakeType::ServerHello,
+<a href=#2649 id=2649 data-nosnippet>2649</a>            other =&gt; other,
+<a href=#2650 id=2650 data-nosnippet>2650</a>        }
+<a href=#2651 id=2651 data-nosnippet>2651</a>    }
+<a href=#2652 id=2652 data-nosnippet>2652</a>
+<a href=#2653 id=2653 data-nosnippet>2653</a>    <span class="kw">fn </span>into_owned(<span class="self">self</span>) -&gt; HandshakePayload&lt;<span class="lifetime">'static</span>&gt; {
+<a href=#2654 id=2654 data-nosnippet>2654</a>        <span class="kw">use </span>HandshakePayload::<span class="kw-2">*</span>;
+<a href=#2655 id=2655 data-nosnippet>2655</a>
+<a href=#2656 id=2656 data-nosnippet>2656</a>        <span class="kw">match </span><span class="self">self </span>{
+<a href=#2657 id=2657 data-nosnippet>2657</a>            HelloRequest =&gt; HelloRequest,
+<a href=#2658 id=2658 data-nosnippet>2658</a>            ClientHello(x) =&gt; ClientHello(x),
+<a href=#2659 id=2659 data-nosnippet>2659</a>            ServerHello(x) =&gt; ServerHello(x),
+<a href=#2660 id=2660 data-nosnippet>2660</a>            HelloRetryRequest(x) =&gt; HelloRetryRequest(x),
+<a href=#2661 id=2661 data-nosnippet>2661</a>            Certificate(x) =&gt; Certificate(x.into_owned()),
+<a href=#2662 id=2662 data-nosnippet>2662</a>            CertificateTls13(x) =&gt; CertificateTls13(x.into_owned()),
+<a href=#2663 id=2663 data-nosnippet>2663</a>            CompressedCertificate(x) =&gt; CompressedCertificate(x.into_owned()),
+<a href=#2664 id=2664 data-nosnippet>2664</a>            ServerKeyExchange(x) =&gt; ServerKeyExchange(x),
+<a href=#2665 id=2665 data-nosnippet>2665</a>            CertificateRequest(x) =&gt; CertificateRequest(x),
+<a href=#2666 id=2666 data-nosnippet>2666</a>            CertificateRequestTls13(x) =&gt; CertificateRequestTls13(x),
+<a href=#2667 id=2667 data-nosnippet>2667</a>            CertificateVerify(x) =&gt; CertificateVerify(x),
+<a href=#2668 id=2668 data-nosnippet>2668</a>            ServerHelloDone =&gt; ServerHelloDone,
+<a href=#2669 id=2669 data-nosnippet>2669</a>            EndOfEarlyData =&gt; EndOfEarlyData,
+<a href=#2670 id=2670 data-nosnippet>2670</a>            ClientKeyExchange(x) =&gt; ClientKeyExchange(x.into_owned()),
+<a href=#2671 id=2671 data-nosnippet>2671</a>            NewSessionTicket(x) =&gt; NewSessionTicket(x),
+<a href=#2672 id=2672 data-nosnippet>2672</a>            NewSessionTicketTls13(x) =&gt; NewSessionTicketTls13(x),
+<a href=#2673 id=2673 data-nosnippet>2673</a>            EncryptedExtensions(x) =&gt; EncryptedExtensions(Box::new(x.into_owned())),
+<a href=#2674 id=2674 data-nosnippet>2674</a>            KeyUpdate(x) =&gt; KeyUpdate(x),
+<a href=#2675 id=2675 data-nosnippet>2675</a>            Finished(x) =&gt; Finished(x.into_owned()),
+<a href=#2676 id=2676 data-nosnippet>2676</a>            CertificateStatus(x) =&gt; CertificateStatus(x.into_owned()),
+<a href=#2677 id=2677 data-nosnippet>2677</a>            MessageHash(x) =&gt; MessageHash(x.into_owned()),
+<a href=#2678 id=2678 data-nosnippet>2678</a>            Unknown((t, x)) =&gt; Unknown((t, x.into_owned())),
+<a href=#2679 id=2679 data-nosnippet>2679</a>        }
+<a href=#2680 id=2680 data-nosnippet>2680</a>    }
+<a href=#2681 id=2681 data-nosnippet>2681</a>}
+<a href=#2682 id=2682 data-nosnippet>2682</a>
+<a href=#2683 id=2683 data-nosnippet>2683</a><span class="attr">#[derive(Debug)]
+<a href=#2684 id=2684 data-nosnippet>2684</a></span><span class="kw">pub struct </span>HandshakeMessagePayload&lt;<span class="lifetime">'a</span>&gt;(<span class="kw">pub</span>(<span class="kw">crate</span>) HandshakePayload&lt;<span class="lifetime">'a</span>&gt;);
+<a href=#2685 id=2685 data-nosnippet>2685</a>
+<a href=#2686 id=2686 data-nosnippet>2686</a><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Codec&lt;<span class="lifetime">'a</span>&gt; <span class="kw">for </span>HandshakeMessagePayload&lt;<span class="lifetime">'a</span>&gt; {
+<a href=#2687 id=2687 data-nosnippet>2687</a>    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+<a href=#2688 id=2688 data-nosnippet>2688</a>        <span class="self">self</span>.payload_encode(bytes, Encoding::Standard);
+<a href=#2689 id=2689 data-nosnippet>2689</a>    }
+<a href=#2690 id=2690 data-nosnippet>2690</a>
+<a href=#2691 id=2691 data-nosnippet>2691</a>    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+<a href=#2692 id=2692 data-nosnippet>2692</a>        <span class="self">Self</span>::read_version(r, ProtocolVersion::TLSv1_2)
+<a href=#2693 id=2693 data-nosnippet>2693</a>    }
+<a href=#2694 id=2694 data-nosnippet>2694</a>}
+<a href=#2695 id=2695 data-nosnippet>2695</a>
+<a href=#2696 id=2696 data-nosnippet>2696</a><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; HandshakeMessagePayload&lt;<span class="lifetime">'a</span>&gt; {
+<a href=#2697 id=2697 data-nosnippet>2697</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read_version(
+<a href=#2698 id=2698 data-nosnippet>2698</a>        r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'a</span>&gt;,
+<a href=#2699 id=2699 data-nosnippet>2699</a>        vers: ProtocolVersion,
+<a href=#2700 id=2700 data-nosnippet>2700</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+<a href=#2701 id=2701 data-nosnippet>2701</a>        <span class="kw">let </span>typ = HandshakeType::read(r)<span class="question-mark">?</span>;
+<a href=#2702 id=2702 data-nosnippet>2702</a>        <span class="kw">let </span>len = codec::u24::read(r)<span class="question-mark">?</span>.<span class="number">0 </span><span class="kw">as </span>usize;
+<a href=#2703 id=2703 data-nosnippet>2703</a>        <span class="kw">let </span><span class="kw-2">mut </span>sub = r.sub(len)<span class="question-mark">?</span>;
+<a href=#2704 id=2704 data-nosnippet>2704</a>
+<a href=#2705 id=2705 data-nosnippet>2705</a>        <span class="kw">let </span>payload = <span class="kw">match </span>typ {
+<a href=#2706 id=2706 data-nosnippet>2706</a>            HandshakeType::HelloRequest <span class="kw">if </span>sub.left() == <span class="number">0 </span>=&gt; HandshakePayload::HelloRequest,
+<a href=#2707 id=2707 data-nosnippet>2707</a>            HandshakeType::ClientHello =&gt; {
+<a href=#2708 id=2708 data-nosnippet>2708</a>                HandshakePayload::ClientHello(ClientHelloPayload::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>)
+<a href=#2709 id=2709 data-nosnippet>2709</a>            }
+<a href=#2710 id=2710 data-nosnippet>2710</a>            HandshakeType::ServerHello =&gt; {
+<a href=#2711 id=2711 data-nosnippet>2711</a>                <span class="kw">let </span>version = ProtocolVersion::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
+<a href=#2712 id=2712 data-nosnippet>2712</a>                <span class="kw">let </span>random = Random::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
+<a href=#2713 id=2713 data-nosnippet>2713</a>
+<a href=#2714 id=2714 data-nosnippet>2714</a>                <span class="kw">if </span>random == HELLO_RETRY_REQUEST_RANDOM {
+<a href=#2715 id=2715 data-nosnippet>2715</a>                    <span class="kw">let </span><span class="kw-2">mut </span>hrr = HelloRetryRequest::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
+<a href=#2716 id=2716 data-nosnippet>2716</a>                    hrr.legacy_version = version;
+<a href=#2717 id=2717 data-nosnippet>2717</a>                    HandshakePayload::HelloRetryRequest(hrr)
+<a href=#2718 id=2718 data-nosnippet>2718</a>                } <span class="kw">else </span>{
+<a href=#2719 id=2719 data-nosnippet>2719</a>                    <span class="kw">let </span><span class="kw-2">mut </span>shp = ServerHelloPayload::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
+<a href=#2720 id=2720 data-nosnippet>2720</a>                    shp.legacy_version = version;
+<a href=#2721 id=2721 data-nosnippet>2721</a>                    shp.random = random;
+<a href=#2722 id=2722 data-nosnippet>2722</a>                    HandshakePayload::ServerHello(shp)
+<a href=#2723 id=2723 data-nosnippet>2723</a>                }
+<a href=#2724 id=2724 data-nosnippet>2724</a>            }
+<a href=#2725 id=2725 data-nosnippet>2725</a>            HandshakeType::Certificate <span class="kw">if </span>vers == ProtocolVersion::TLSv1_3 =&gt; {
+<a href=#2726 id=2726 data-nosnippet>2726</a>                <span class="kw">let </span>p = CertificatePayloadTls13::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
+<a href=#2727 id=2727 data-nosnippet>2727</a>                HandshakePayload::CertificateTls13(p)
+<a href=#2728 id=2728 data-nosnippet>2728</a>            }
+<a href=#2729 id=2729 data-nosnippet>2729</a>            HandshakeType::Certificate =&gt; {
+<a href=#2730 id=2730 data-nosnippet>2730</a>                HandshakePayload::Certificate(CertificateChain::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>)
+<a href=#2731 id=2731 data-nosnippet>2731</a>            }
+<a href=#2732 id=2732 data-nosnippet>2732</a>            HandshakeType::ServerKeyExchange =&gt; {
+<a href=#2733 id=2733 data-nosnippet>2733</a>                <span class="kw">let </span>p = ServerKeyExchangePayload::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
+<a href=#2734 id=2734 data-nosnippet>2734</a>                HandshakePayload::ServerKeyExchange(p)
+<a href=#2735 id=2735 data-nosnippet>2735</a>            }
+<a href=#2736 id=2736 data-nosnippet>2736</a>            HandshakeType::ServerHelloDone =&gt; {
+<a href=#2737 id=2737 data-nosnippet>2737</a>                sub.expect_empty(<span class="string">"ServerHelloDone"</span>)<span class="question-mark">?</span>;
+<a href=#2738 id=2738 data-nosnippet>2738</a>                HandshakePayload::ServerHelloDone
+<a href=#2739 id=2739 data-nosnippet>2739</a>            }
+<a href=#2740 id=2740 data-nosnippet>2740</a>            HandshakeType::ClientKeyExchange =&gt; {
+<a href=#2741 id=2741 data-nosnippet>2741</a>                HandshakePayload::ClientKeyExchange(Payload::read(<span class="kw-2">&amp;mut </span>sub))
+<a href=#2742 id=2742 data-nosnippet>2742</a>            }
+<a href=#2743 id=2743 data-nosnippet>2743</a>            HandshakeType::CertificateRequest <span class="kw">if </span>vers == ProtocolVersion::TLSv1_3 =&gt; {
+<a href=#2744 id=2744 data-nosnippet>2744</a>                <span class="kw">let </span>p = CertificateRequestPayloadTls13::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
+<a href=#2745 id=2745 data-nosnippet>2745</a>                HandshakePayload::CertificateRequestTls13(p)
+<a href=#2746 id=2746 data-nosnippet>2746</a>            }
+<a href=#2747 id=2747 data-nosnippet>2747</a>            HandshakeType::CertificateRequest =&gt; {
+<a href=#2748 id=2748 data-nosnippet>2748</a>                <span class="kw">let </span>p = CertificateRequestPayload::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
+<a href=#2749 id=2749 data-nosnippet>2749</a>                HandshakePayload::CertificateRequest(p)
+<a href=#2750 id=2750 data-nosnippet>2750</a>            }
+<a href=#2751 id=2751 data-nosnippet>2751</a>            HandshakeType::CompressedCertificate =&gt; HandshakePayload::CompressedCertificate(
+<a href=#2752 id=2752 data-nosnippet>2752</a>                CompressedCertificatePayload::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>,
+<a href=#2753 id=2753 data-nosnippet>2753</a>            ),
+<a href=#2754 id=2754 data-nosnippet>2754</a>            HandshakeType::CertificateVerify =&gt; {
+<a href=#2755 id=2755 data-nosnippet>2755</a>                HandshakePayload::CertificateVerify(DigitallySignedStruct::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>)
+<a href=#2756 id=2756 data-nosnippet>2756</a>            }
+<a href=#2757 id=2757 data-nosnippet>2757</a>            HandshakeType::NewSessionTicket <span class="kw">if </span>vers == ProtocolVersion::TLSv1_3 =&gt; {
+<a href=#2758 id=2758 data-nosnippet>2758</a>                <span class="kw">let </span>p = NewSessionTicketPayloadTls13::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
+<a href=#2759 id=2759 data-nosnippet>2759</a>                HandshakePayload::NewSessionTicketTls13(p)
+<a href=#2760 id=2760 data-nosnippet>2760</a>            }
+<a href=#2761 id=2761 data-nosnippet>2761</a>            HandshakeType::NewSessionTicket =&gt; {
+<a href=#2762 id=2762 data-nosnippet>2762</a>                <span class="kw">let </span>p = NewSessionTicketPayload::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>;
+<a href=#2763 id=2763 data-nosnippet>2763</a>                HandshakePayload::NewSessionTicket(p)
+<a href=#2764 id=2764 data-nosnippet>2764</a>            }
+<a href=#2765 id=2765 data-nosnippet>2765</a>            HandshakeType::EncryptedExtensions =&gt; {
+<a href=#2766 id=2766 data-nosnippet>2766</a>                HandshakePayload::EncryptedExtensions(Box::new(ServerExtensions::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>))
+<a href=#2767 id=2767 data-nosnippet>2767</a>            }
+<a href=#2768 id=2768 data-nosnippet>2768</a>            HandshakeType::KeyUpdate =&gt; {
+<a href=#2769 id=2769 data-nosnippet>2769</a>                HandshakePayload::KeyUpdate(KeyUpdateRequest::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>)
+<a href=#2770 id=2770 data-nosnippet>2770</a>            }
+<a href=#2771 id=2771 data-nosnippet>2771</a>            HandshakeType::EndOfEarlyData =&gt; {
+<a href=#2772 id=2772 data-nosnippet>2772</a>                sub.expect_empty(<span class="string">"EndOfEarlyData"</span>)<span class="question-mark">?</span>;
+<a href=#2773 id=2773 data-nosnippet>2773</a>                HandshakePayload::EndOfEarlyData
+<a href=#2774 id=2774 data-nosnippet>2774</a>            }
+<a href=#2775 id=2775 data-nosnippet>2775</a>            HandshakeType::Finished =&gt; HandshakePayload::Finished(Payload::read(<span class="kw-2">&amp;mut </span>sub)),
+<a href=#2776 id=2776 data-nosnippet>2776</a>            HandshakeType::CertificateStatus =&gt; {
+<a href=#2777 id=2777 data-nosnippet>2777</a>                HandshakePayload::CertificateStatus(CertificateStatus::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>)
+<a href=#2778 id=2778 data-nosnippet>2778</a>            }
+<a href=#2779 id=2779 data-nosnippet>2779</a>            HandshakeType::MessageHash =&gt; {
+<a href=#2780 id=2780 data-nosnippet>2780</a>                <span class="comment">// does not appear on the wire
+<a href=#2781 id=2781 data-nosnippet>2781</a>                </span><span class="kw">return </span><span class="prelude-val">Err</span>(InvalidMessage::UnexpectedMessage(<span class="string">"MessageHash"</span>));
+<a href=#2782 id=2782 data-nosnippet>2782</a>            }
+<a href=#2783 id=2783 data-nosnippet>2783</a>            HandshakeType::HelloRetryRequest =&gt; {
+<a href=#2784 id=2784 data-nosnippet>2784</a>                <span class="comment">// not legal on wire
+<a href=#2785 id=2785 data-nosnippet>2785</a>                </span><span class="kw">return </span><span class="prelude-val">Err</span>(InvalidMessage::UnexpectedMessage(<span class="string">"HelloRetryRequest"</span>));
+<a href=#2786 id=2786 data-nosnippet>2786</a>            }
+<a href=#2787 id=2787 data-nosnippet>2787</a>            <span class="kw">_ </span>=&gt; HandshakePayload::Unknown((typ, Payload::read(<span class="kw-2">&amp;mut </span>sub))),
+<a href=#2788 id=2788 data-nosnippet>2788</a>        };
+<a href=#2789 id=2789 data-nosnippet>2789</a>
+<a href=#2790 id=2790 data-nosnippet>2790</a>        sub.expect_empty(<span class="string">"HandshakeMessagePayload"</span>)
+<a href=#2791 id=2791 data-nosnippet>2791</a>            .map(|<span class="kw">_</span>| <span class="self">Self</span>(payload))
+<a href=#2792 id=2792 data-nosnippet>2792</a>    }
+<a href=#2793 id=2793 data-nosnippet>2793</a>
+<a href=#2794 id=2794 data-nosnippet>2794</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>encoding_for_binder_signing(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
+<a href=#2795 id=2795 data-nosnippet>2795</a>        <span class="kw">let </span><span class="kw-2">mut </span>ret = <span class="self">self</span>.get_encoding();
+<a href=#2796 id=2796 data-nosnippet>2796</a>        <span class="kw">let </span>ret_len = ret
+<a href=#2797 id=2797 data-nosnippet>2797</a>            .len()
+<a href=#2798 id=2798 data-nosnippet>2798</a>            .saturating_sub(<span class="self">self</span>.total_binder_length());
+<a href=#2799 id=2799 data-nosnippet>2799</a>        ret.truncate(ret_len);
+<a href=#2800 id=2800 data-nosnippet>2800</a>        ret
+<a href=#2801 id=2801 data-nosnippet>2801</a>    }
+<a href=#2802 id=2802 data-nosnippet>2802</a>
+<a href=#2803 id=2803 data-nosnippet>2803</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>total_binder_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+<a href=#2804 id=2804 data-nosnippet>2804</a>        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span>{
+<a href=#2805 id=2805 data-nosnippet>2805</a>            HandshakePayload::ClientHello(ch) =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>ch.preshared_key_offer {
+<a href=#2806 id=2806 data-nosnippet>2806</a>                <span class="prelude-val">Some</span>(offer) =&gt; {
+<a href=#2807 id=2807 data-nosnippet>2807</a>                    <span class="kw">let </span><span class="kw-2">mut </span>binders_encoding = Vec::new();
+<a href=#2808 id=2808 data-nosnippet>2808</a>                    offer
+<a href=#2809 id=2809 data-nosnippet>2809</a>                        .binders
+<a href=#2810 id=2810 data-nosnippet>2810</a>                        .encode(<span class="kw-2">&amp;mut </span>binders_encoding);
+<a href=#2811 id=2811 data-nosnippet>2811</a>                    binders_encoding.len()
+<a href=#2812 id=2812 data-nosnippet>2812</a>                }
+<a href=#2813 id=2813 data-nosnippet>2813</a>                <span class="kw">_ </span>=&gt; <span class="number">0</span>,
+<a href=#2814 id=2814 data-nosnippet>2814</a>            },
+<a href=#2815 id=2815 data-nosnippet>2815</a>            <span class="kw">_ </span>=&gt; <span class="number">0</span>,
+<a href=#2816 id=2816 data-nosnippet>2816</a>        }
+<a href=#2817 id=2817 data-nosnippet>2817</a>    }
+<a href=#2818 id=2818 data-nosnippet>2818</a>
+<a href=#2819 id=2819 data-nosnippet>2819</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>payload_encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;, encoding: Encoding) {
+<a href=#2820 id=2820 data-nosnippet>2820</a>        <span class="comment">// output type, length, and encoded payload
+<a href=#2821 id=2821 data-nosnippet>2821</a>        </span><span class="self">self</span>.<span class="number">0
+<a href=#2822 id=2822 data-nosnippet>2822</a>            </span>.wire_handshake_type()
+<a href=#2823 id=2823 data-nosnippet>2823</a>            .encode(bytes);
+<a href=#2824 id=2824 data-nosnippet>2824</a>
+<a href=#2825 id=2825 data-nosnippet>2825</a>        <span class="kw">let </span>nested = LengthPrefixedBuffer::new(
+<a href=#2826 id=2826 data-nosnippet>2826</a>            ListLength::U24 {
+<a href=#2827 id=2827 data-nosnippet>2827</a>                max: usize::MAX,
+<a href=#2828 id=2828 data-nosnippet>2828</a>                error: InvalidMessage::MessageTooLarge,
+<a href=#2829 id=2829 data-nosnippet>2829</a>            },
+<a href=#2830 id=2830 data-nosnippet>2830</a>            bytes,
+<a href=#2831 id=2831 data-nosnippet>2831</a>        );
+<a href=#2832 id=2832 data-nosnippet>2832</a>
+<a href=#2833 id=2833 data-nosnippet>2833</a>        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span>{
+<a href=#2834 id=2834 data-nosnippet>2834</a>            <span class="comment">// for Server Hello and HelloRetryRequest payloads we need to encode the payload
+<a href=#2835 id=2835 data-nosnippet>2835</a>            // differently based on the purpose of the encoding.
+<a href=#2836 id=2836 data-nosnippet>2836</a>            </span>HandshakePayload::ServerHello(payload) =&gt; payload.payload_encode(nested.buf, encoding),
+<a href=#2837 id=2837 data-nosnippet>2837</a>            HandshakePayload::HelloRetryRequest(payload) =&gt; {
+<a href=#2838 id=2838 data-nosnippet>2838</a>                payload.payload_encode(nested.buf, encoding)
+<a href=#2839 id=2839 data-nosnippet>2839</a>            }
+<a href=#2840 id=2840 data-nosnippet>2840</a>
+<a href=#2841 id=2841 data-nosnippet>2841</a>            <span class="comment">// All other payload types are encoded the same regardless of purpose.
+<a href=#2842 id=2842 data-nosnippet>2842</a>            </span><span class="kw">_ </span>=&gt; <span class="self">self</span>.<span class="number">0</span>.encode(nested.buf),
+<a href=#2843 id=2843 data-nosnippet>2843</a>        }
+<a href=#2844 id=2844 data-nosnippet>2844</a>    }
+<a href=#2845 id=2845 data-nosnippet>2845</a>
+<a href=#2846 id=2846 data-nosnippet>2846</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build_handshake_hash(hash: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="self">Self </span>{
+<a href=#2847 id=2847 data-nosnippet>2847</a>        <span class="self">Self</span>(HandshakePayload::MessageHash(Payload::new(hash.to_vec())))
+<a href=#2848 id=2848 data-nosnippet>2848</a>    }
+<a href=#2849 id=2849 data-nosnippet>2849</a>
+<a href=#2850 id=2850 data-nosnippet>2850</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_owned(<span class="self">self</span>) -&gt; HandshakeMessagePayload&lt;<span class="lifetime">'static</span>&gt; {
+<a href=#2851 id=2851 data-nosnippet>2851</a>        HandshakeMessagePayload(<span class="self">self</span>.<span class="number">0</span>.into_owned())
+<a href=#2852 id=2852 data-nosnippet>2852</a>    }
+<a href=#2853 id=2853 data-nosnippet>2853</a>}
+<a href=#2854 id=2854 data-nosnippet>2854</a>
+<a href=#2855 id=2855 data-nosnippet>2855</a><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+<a href=#2856 id=2856 data-nosnippet>2856</a></span><span class="kw">pub struct </span>HpkeSymmetricCipherSuite {
+<a href=#2857 id=2857 data-nosnippet>2857</a>    <span class="kw">pub </span>kdf_id: HpkeKdf,
+<a href=#2858 id=2858 data-nosnippet>2858</a>    <span class="kw">pub </span>aead_id: HpkeAead,
+<a href=#2859 id=2859 data-nosnippet>2859</a>}
+<a href=#2860 id=2860 data-nosnippet>2860</a>
+<a href=#2861 id=2861 data-nosnippet>2861</a><span class="kw">impl </span>Codec&lt;<span class="lifetime">'_</span>&gt; <span class="kw">for </span>HpkeSymmetricCipherSuite {
+<a href=#2862 id=2862 data-nosnippet>2862</a>    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+<a href=#2863 id=2863 data-nosnippet>2863</a>        <span class="self">self</span>.kdf_id.encode(bytes);
+<a href=#2864 id=2864 data-nosnippet>2864</a>        <span class="self">self</span>.aead_id.encode(bytes);
+<a href=#2865 id=2865 data-nosnippet>2865</a>    }
+<a href=#2866 id=2866 data-nosnippet>2866</a>
+<a href=#2867 id=2867 data-nosnippet>2867</a>    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+<a href=#2868 id=2868 data-nosnippet>2868</a>        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+<a href=#2869 id=2869 data-nosnippet>2869</a>            kdf_id: HpkeKdf::read(r)<span class="question-mark">?</span>,
+<a href=#2870 id=2870 data-nosnippet>2870</a>            aead_id: HpkeAead::read(r)<span class="question-mark">?</span>,
+<a href=#2871 id=2871 data-nosnippet>2871</a>        })
+<a href=#2872 id=2872 data-nosnippet>2872</a>    }
+<a href=#2873 id=2873 data-nosnippet>2873</a>}
+<a href=#2874 id=2874 data-nosnippet>2874</a>
+<a href=#2875 id=2875 data-nosnippet>2875</a><span class="doccomment">/// draft-ietf-tls-esni-24: `HpkeSymmetricCipherSuite cipher_suites&lt;4..2^16-4&gt;;`
+<a href=#2876 id=2876 data-nosnippet>2876</a></span><span class="kw">impl </span>TlsListElement <span class="kw">for </span>HpkeSymmetricCipherSuite {
+<a href=#2877 id=2877 data-nosnippet>2877</a>    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::NonZeroU16 {
+<a href=#2878 id=2878 data-nosnippet>2878</a>        empty_error: InvalidMessage::IllegalEmptyList(<span class="string">"HpkeSymmetricCipherSuites"</span>),
+<a href=#2879 id=2879 data-nosnippet>2879</a>    };
+<a href=#2880 id=2880 data-nosnippet>2880</a>}
+<a href=#2881 id=2881 data-nosnippet>2881</a>
+<a href=#2882 id=2882 data-nosnippet>2882</a><span class="attr">#[derive(Clone, Debug, PartialEq)]
+<a href=#2883 id=2883 data-nosnippet>2883</a></span><span class="kw">pub struct </span>HpkeKeyConfig {
+<a href=#2884 id=2884 data-nosnippet>2884</a>    <span class="kw">pub </span>config_id: u8,
+<a href=#2885 id=2885 data-nosnippet>2885</a>    <span class="kw">pub </span>kem_id: HpkeKem,
+<a href=#2886 id=2886 data-nosnippet>2886</a>    <span class="doccomment">/// draft-ietf-tls-esni-24: `opaque HpkePublicKey&lt;1..2^16-1&gt;;`
+<a href=#2887 id=2887 data-nosnippet>2887</a>    </span><span class="kw">pub </span>public_key: PayloadU16&lt;NonEmpty&gt;,
+<a href=#2888 id=2888 data-nosnippet>2888</a>    <span class="kw">pub </span>symmetric_cipher_suites: Vec&lt;HpkeSymmetricCipherSuite&gt;,
+<a href=#2889 id=2889 data-nosnippet>2889</a>}
+<a href=#2890 id=2890 data-nosnippet>2890</a>
+<a href=#2891 id=2891 data-nosnippet>2891</a><span class="kw">impl </span>Codec&lt;<span class="lifetime">'_</span>&gt; <span class="kw">for </span>HpkeKeyConfig {
+<a href=#2892 id=2892 data-nosnippet>2892</a>    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+<a href=#2893 id=2893 data-nosnippet>2893</a>        <span class="self">self</span>.config_id.encode(bytes);
+<a href=#2894 id=2894 data-nosnippet>2894</a>        <span class="self">self</span>.kem_id.encode(bytes);
+<a href=#2895 id=2895 data-nosnippet>2895</a>        <span class="self">self</span>.public_key.encode(bytes);
+<a href=#2896 id=2896 data-nosnippet>2896</a>        <span class="self">self</span>.symmetric_cipher_suites
+<a href=#2897 id=2897 data-nosnippet>2897</a>            .encode(bytes);
+<a href=#2898 id=2898 data-nosnippet>2898</a>    }
+<a href=#2899 id=2899 data-nosnippet>2899</a>
+<a href=#2900 id=2900 data-nosnippet>2900</a>    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+<a href=#2901 id=2901 data-nosnippet>2901</a>        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+<a href=#2902 id=2902 data-nosnippet>2902</a>            config_id: u8::read(r)<span class="question-mark">?</span>,
+<a href=#2903 id=2903 data-nosnippet>2903</a>            kem_id: HpkeKem::read(r)<span class="question-mark">?</span>,
+<a href=#2904 id=2904 data-nosnippet>2904</a>            public_key: PayloadU16::read(r)<span class="question-mark">?</span>,
+<a href=#2905 id=2905 data-nosnippet>2905</a>            symmetric_cipher_suites: Vec::&lt;HpkeSymmetricCipherSuite&gt;::read(r)<span class="question-mark">?</span>,
+<a href=#2906 id=2906 data-nosnippet>2906</a>        })
+<a href=#2907 id=2907 data-nosnippet>2907</a>    }
+<a href=#2908 id=2908 data-nosnippet>2908</a>}
+<a href=#2909 id=2909 data-nosnippet>2909</a>
+<a href=#2910 id=2910 data-nosnippet>2910</a><span class="attr">#[derive(Clone, Debug, PartialEq)]
+<a href=#2911 id=2911 data-nosnippet>2911</a></span><span class="kw">pub struct </span>EchConfigContents {
+<a href=#2912 id=2912 data-nosnippet>2912</a>    <span class="kw">pub </span>key_config: HpkeKeyConfig,
+<a href=#2913 id=2913 data-nosnippet>2913</a>    <span class="kw">pub </span>maximum_name_length: u8,
+<a href=#2914 id=2914 data-nosnippet>2914</a>    <span class="kw">pub </span>public_name: DnsName&lt;<span class="lifetime">'static</span>&gt;,
+<a href=#2915 id=2915 data-nosnippet>2915</a>    <span class="kw">pub </span>extensions: Vec&lt;EchConfigExtension&gt;,
+<a href=#2916 id=2916 data-nosnippet>2916</a>}
+<a href=#2917 id=2917 data-nosnippet>2917</a>
+<a href=#2918 id=2918 data-nosnippet>2918</a><span class="kw">impl </span>EchConfigContents {
+<a href=#2919 id=2919 data-nosnippet>2919</a>    <span class="doccomment">/// Returns true if there is more than one extension of a given
+<a href=#2920 id=2920 data-nosnippet>2920</a>    /// type.
+<a href=#2921 id=2921 data-nosnippet>2921</a>    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_duplicate_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+<a href=#2922 id=2922 data-nosnippet>2922</a>        has_duplicates::&lt;<span class="kw">_</span>, <span class="kw">_</span>, u16&gt;(
+<a href=#2923 id=2923 data-nosnippet>2923</a>            <span class="self">self</span>.extensions
+<a href=#2924 id=2924 data-nosnippet>2924</a>                .iter()
+<a href=#2925 id=2925 data-nosnippet>2925</a>                .map(|ext| ext.ext_type()),
+<a href=#2926 id=2926 data-nosnippet>2926</a>        )
+<a href=#2927 id=2927 data-nosnippet>2927</a>    }
+<a href=#2928 id=2928 data-nosnippet>2928</a>
+<a href=#2929 id=2929 data-nosnippet>2929</a>    <span class="doccomment">/// Returns true if there is at least one mandatory unsupported extension.
+<a href=#2930 id=2930 data-nosnippet>2930</a>    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_unknown_mandatory_extension(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+<a href=#2931 id=2931 data-nosnippet>2931</a>        <span class="self">self</span>.extensions
+<a href=#2932 id=2932 data-nosnippet>2932</a>            .iter()
+<a href=#2933 id=2933 data-nosnippet>2933</a>            <span class="comment">// An extension is considered mandatory if the high bit of its type is set.
+<a href=#2934 id=2934 data-nosnippet>2934</a>            </span>.any(|ext| {
+<a href=#2935 id=2935 data-nosnippet>2935</a>                <span class="macro">matches!</span>(ext.ext_type(), ExtensionType::Unknown(<span class="kw">_</span>))
+<a href=#2936 id=2936 data-nosnippet>2936</a>                    &amp;&amp; u16::from(ext.ext_type()) &amp; <span class="number">0x8000 </span>!= <span class="number">0
+<a href=#2937 id=2937 data-nosnippet>2937</a>            </span>})
+<a href=#2938 id=2938 data-nosnippet>2938</a>    }
+<a href=#2939 id=2939 data-nosnippet>2939</a>}
+<a href=#2940 id=2940 data-nosnippet>2940</a>
+<a href=#2941 id=2941 data-nosnippet>2941</a><span class="kw">impl </span>Codec&lt;<span class="lifetime">'_</span>&gt; <span class="kw">for </span>EchConfigContents {
+<a href=#2942 id=2942 data-nosnippet>2942</a>    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+<a href=#2943 id=2943 data-nosnippet>2943</a>        <span class="self">self</span>.key_config.encode(bytes);
+<a href=#2944 id=2944 data-nosnippet>2944</a>        <span class="self">self</span>.maximum_name_length.encode(bytes);
+<a href=#2945 id=2945 data-nosnippet>2945</a>        <span class="kw">let </span>dns_name = <span class="kw-2">&amp;</span><span class="self">self</span>.public_name.borrow();
+<a href=#2946 id=2946 data-nosnippet>2946</a>        PayloadU8::&lt;MaybeEmpty&gt;::encode_slice(dns_name.as_ref().as_ref(), bytes);
+<a href=#2947 id=2947 data-nosnippet>2947</a>        <span class="self">self</span>.extensions.encode(bytes);
+<a href=#2948 id=2948 data-nosnippet>2948</a>    }
+<a href=#2949 id=2949 data-nosnippet>2949</a>
+<a href=#2950 id=2950 data-nosnippet>2950</a>    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+<a href=#2951 id=2951 data-nosnippet>2951</a>        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+<a href=#2952 id=2952 data-nosnippet>2952</a>            key_config: HpkeKeyConfig::read(r)<span class="question-mark">?</span>,
+<a href=#2953 id=2953 data-nosnippet>2953</a>            maximum_name_length: u8::read(r)<span class="question-mark">?</span>,
+<a href=#2954 id=2954 data-nosnippet>2954</a>            public_name: {
+<a href=#2955 id=2955 data-nosnippet>2955</a>                DnsName::try_from(
+<a href=#2956 id=2956 data-nosnippet>2956</a>                    PayloadU8::&lt;MaybeEmpty&gt;::read(r)<span class="question-mark">?
+<a href=#2957 id=2957 data-nosnippet>2957</a>                        </span>.<span class="number">0
+<a href=#2958 id=2958 data-nosnippet>2958</a>                        </span>.as_slice(),
+<a href=#2959 id=2959 data-nosnippet>2959</a>                )
+<a href=#2960 id=2960 data-nosnippet>2960</a>                .map_err(|<span class="kw">_</span>| InvalidMessage::InvalidServerName)<span class="question-mark">?
+<a href=#2961 id=2961 data-nosnippet>2961</a>                </span>.to_owned()
+<a href=#2962 id=2962 data-nosnippet>2962</a>            },
+<a href=#2963 id=2963 data-nosnippet>2963</a>            extensions: Vec::read(r)<span class="question-mark">?</span>,
+<a href=#2964 id=2964 data-nosnippet>2964</a>        })
+<a href=#2965 id=2965 data-nosnippet>2965</a>    }
+<a href=#2966 id=2966 data-nosnippet>2966</a>}
+<a href=#2967 id=2967 data-nosnippet>2967</a>
+<a href=#2968 id=2968 data-nosnippet>2968</a><span class="doccomment">/// An encrypted client hello (ECH) config.
+<a href=#2969 id=2969 data-nosnippet>2969</a></span><span class="attr">#[derive(Clone, Debug, PartialEq)]
+<a href=#2970 id=2970 data-nosnippet>2970</a></span><span class="kw">pub enum </span>EchConfigPayload {
+<a href=#2971 id=2971 data-nosnippet>2971</a>    <span class="doccomment">/// A recognized V18 ECH configuration.
+<a href=#2972 id=2972 data-nosnippet>2972</a>    </span>V18(EchConfigContents),
+<a href=#2973 id=2973 data-nosnippet>2973</a>    <span class="doccomment">/// An unknown version ECH configuration.
+<a href=#2974 id=2974 data-nosnippet>2974</a>    </span>Unknown {
+<a href=#2975 id=2975 data-nosnippet>2975</a>        version: EchVersion,
+<a href=#2976 id=2976 data-nosnippet>2976</a>        contents: PayloadU16,
+<a href=#2977 id=2977 data-nosnippet>2977</a>    },
+<a href=#2978 id=2978 data-nosnippet>2978</a>}
+<a href=#2979 id=2979 data-nosnippet>2979</a>
+<a href=#2980 id=2980 data-nosnippet>2980</a><span class="kw">impl </span>TlsListElement <span class="kw">for </span>EchConfigPayload {
+<a href=#2981 id=2981 data-nosnippet>2981</a>    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U16;
+<a href=#2982 id=2982 data-nosnippet>2982</a>}
+<a href=#2983 id=2983 data-nosnippet>2983</a>
+<a href=#2984 id=2984 data-nosnippet>2984</a><span class="kw">impl </span>Codec&lt;<span class="lifetime">'_</span>&gt; <span class="kw">for </span>EchConfigPayload {
+<a href=#2985 id=2985 data-nosnippet>2985</a>    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+<a href=#2986 id=2986 data-nosnippet>2986</a>        <span class="kw">match </span><span class="self">self </span>{
+<a href=#2987 id=2987 data-nosnippet>2987</a>            <span class="self">Self</span>::V18(c) =&gt; {
+<a href=#2988 id=2988 data-nosnippet>2988</a>                <span class="comment">// Write the version, the length, and the contents.
+<a href=#2989 id=2989 data-nosnippet>2989</a>                </span>EchVersion::V18.encode(bytes);
+<a href=#2990 id=2990 data-nosnippet>2990</a>                <span class="kw">let </span>inner = LengthPrefixedBuffer::new(ListLength::U16, bytes);
+<a href=#2991 id=2991 data-nosnippet>2991</a>                c.encode(inner.buf);
+<a href=#2992 id=2992 data-nosnippet>2992</a>            }
+<a href=#2993 id=2993 data-nosnippet>2993</a>            <span class="self">Self</span>::Unknown { version, contents } =&gt; {
+<a href=#2994 id=2994 data-nosnippet>2994</a>                <span class="comment">// Unknown configuration versions are opaque.
+<a href=#2995 id=2995 data-nosnippet>2995</a>                </span>version.encode(bytes);
+<a href=#2996 id=2996 data-nosnippet>2996</a>                contents.encode(bytes);
+<a href=#2997 id=2997 data-nosnippet>2997</a>            }
+<a href=#2998 id=2998 data-nosnippet>2998</a>        }
+<a href=#2999 id=2999 data-nosnippet>2999</a>    }
+<a href=#3000 id=3000 data-nosnippet>3000</a>
+<a href=#3001 id=3001 data-nosnippet>3001</a>    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+<a href=#3002 id=3002 data-nosnippet>3002</a>        <span class="kw">let </span>version = EchVersion::read(r)<span class="question-mark">?</span>;
+<a href=#3003 id=3003 data-nosnippet>3003</a>        <span class="kw">let </span>length = u16::read(r)<span class="question-mark">?</span>;
+<a href=#3004 id=3004 data-nosnippet>3004</a>        <span class="kw">let </span><span class="kw-2">mut </span>contents = r.sub(length <span class="kw">as </span>usize)<span class="question-mark">?</span>;
+<a href=#3005 id=3005 data-nosnippet>3005</a>
+<a href=#3006 id=3006 data-nosnippet>3006</a>        <span class="prelude-val">Ok</span>(<span class="kw">match </span>version {
+<a href=#3007 id=3007 data-nosnippet>3007</a>            EchVersion::V18 =&gt; <span class="self">Self</span>::V18(EchConfigContents::read(<span class="kw-2">&amp;mut </span>contents)<span class="question-mark">?</span>),
+<a href=#3008 id=3008 data-nosnippet>3008</a>            <span class="kw">_ </span>=&gt; {
+<a href=#3009 id=3009 data-nosnippet>3009</a>                <span class="comment">// Note: we don't PayloadU16::read() here because we've already read the length prefix.
+<a href=#3010 id=3010 data-nosnippet>3010</a>                </span><span class="kw">let </span>data = PayloadU16::new(contents.rest().into());
+<a href=#3011 id=3011 data-nosnippet>3011</a>                <span class="self">Self</span>::Unknown {
+<a href=#3012 id=3012 data-nosnippet>3012</a>                    version,
+<a href=#3013 id=3013 data-nosnippet>3013</a>                    contents: data,
+<a href=#3014 id=3014 data-nosnippet>3014</a>                }
+<a href=#3015 id=3015 data-nosnippet>3015</a>            }
+<a href=#3016 id=3016 data-nosnippet>3016</a>        })
+<a href=#3017 id=3017 data-nosnippet>3017</a>    }
+<a href=#3018 id=3018 data-nosnippet>3018</a>}
+<a href=#3019 id=3019 data-nosnippet>3019</a>
+<a href=#3020 id=3020 data-nosnippet>3020</a><span class="attr">#[derive(Clone, Debug, PartialEq)]
+<a href=#3021 id=3021 data-nosnippet>3021</a></span><span class="kw">pub enum </span>EchConfigExtension {
+<a href=#3022 id=3022 data-nosnippet>3022</a>    Unknown(UnknownExtension),
+<a href=#3023 id=3023 data-nosnippet>3023</a>}
+<a href=#3024 id=3024 data-nosnippet>3024</a>
+<a href=#3025 id=3025 data-nosnippet>3025</a><span class="kw">impl </span>EchConfigExtension {
+<a href=#3026 id=3026 data-nosnippet>3026</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>ext_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ExtensionType {
+<a href=#3027 id=3027 data-nosnippet>3027</a>        <span class="kw">match </span><span class="self">self </span>{
+<a href=#3028 id=3028 data-nosnippet>3028</a>            <span class="self">Self</span>::Unknown(r) =&gt; r.typ,
+<a href=#3029 id=3029 data-nosnippet>3029</a>        }
+<a href=#3030 id=3030 data-nosnippet>3030</a>    }
+<a href=#3031 id=3031 data-nosnippet>3031</a>}
+<a href=#3032 id=3032 data-nosnippet>3032</a>
+<a href=#3033 id=3033 data-nosnippet>3033</a><span class="kw">impl </span>Codec&lt;<span class="lifetime">'_</span>&gt; <span class="kw">for </span>EchConfigExtension {
+<a href=#3034 id=3034 data-nosnippet>3034</a>    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+<a href=#3035 id=3035 data-nosnippet>3035</a>        <span class="self">self</span>.ext_type().encode(bytes);
+<a href=#3036 id=3036 data-nosnippet>3036</a>
+<a href=#3037 id=3037 data-nosnippet>3037</a>        <span class="kw">let </span>nested = LengthPrefixedBuffer::new(ListLength::U16, bytes);
+<a href=#3038 id=3038 data-nosnippet>3038</a>        <span class="kw">match </span><span class="self">self </span>{
+<a href=#3039 id=3039 data-nosnippet>3039</a>            <span class="self">Self</span>::Unknown(r) =&gt; r.encode(nested.buf),
+<a href=#3040 id=3040 data-nosnippet>3040</a>        }
+<a href=#3041 id=3041 data-nosnippet>3041</a>    }
+<a href=#3042 id=3042 data-nosnippet>3042</a>
+<a href=#3043 id=3043 data-nosnippet>3043</a>    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+<a href=#3044 id=3044 data-nosnippet>3044</a>        <span class="kw">let </span>typ = ExtensionType::read(r)<span class="question-mark">?</span>;
+<a href=#3045 id=3045 data-nosnippet>3045</a>        <span class="kw">let </span>len = u16::read(r)<span class="question-mark">? </span><span class="kw">as </span>usize;
+<a href=#3046 id=3046 data-nosnippet>3046</a>        <span class="kw">let </span><span class="kw-2">mut </span>sub = r.sub(len)<span class="question-mark">?</span>;
+<a href=#3047 id=3047 data-nosnippet>3047</a>
+<a href=#3048 id=3048 data-nosnippet>3048</a>        <span class="attr">#[allow(clippy::match_single_binding)] </span><span class="comment">// Future-proofing.
+<a href=#3049 id=3049 data-nosnippet>3049</a>        </span><span class="kw">let </span>ext = <span class="kw">match </span>typ {
+<a href=#3050 id=3050 data-nosnippet>3050</a>            <span class="kw">_ </span>=&gt; <span class="self">Self</span>::Unknown(UnknownExtension::read(typ, <span class="kw-2">&amp;mut </span>sub)),
+<a href=#3051 id=3051 data-nosnippet>3051</a>        };
+<a href=#3052 id=3052 data-nosnippet>3052</a>
+<a href=#3053 id=3053 data-nosnippet>3053</a>        sub.expect_empty(<span class="string">"EchConfigExtension"</span>)
+<a href=#3054 id=3054 data-nosnippet>3054</a>            .map(|<span class="kw">_</span>| ext)
+<a href=#3055 id=3055 data-nosnippet>3055</a>    }
+<a href=#3056 id=3056 data-nosnippet>3056</a>}
+<a href=#3057 id=3057 data-nosnippet>3057</a>
+<a href=#3058 id=3058 data-nosnippet>3058</a><span class="kw">impl </span>TlsListElement <span class="kw">for </span>EchConfigExtension {
+<a href=#3059 id=3059 data-nosnippet>3059</a>    <span class="kw">const </span>SIZE_LEN: ListLength = ListLength::U16;
+<a href=#3060 id=3060 data-nosnippet>3060</a>}
+<a href=#3061 id=3061 data-nosnippet>3061</a>
+<a href=#3062 id=3062 data-nosnippet>3062</a><span class="doccomment">/// Representation of the `ECHClientHello` client extension specified in
+<a href=#3063 id=3063 data-nosnippet>3063</a>/// [draft-ietf-tls-esni Section 5].
+<a href=#3064 id=3064 data-nosnippet>3064</a>///
+<a href=#3065 id=3065 data-nosnippet>3065</a>/// [draft-ietf-tls-esni Section 5]: &lt;https://www.ietf.org/archive/id/draft-ietf-tls-esni-18.html#section-5&gt;
+<a href=#3066 id=3066 data-nosnippet>3066</a></span><span class="attr">#[derive(Clone, Debug)]
+<a href=#3067 id=3067 data-nosnippet>3067</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>EncryptedClientHello {
+<a href=#3068 id=3068 data-nosnippet>3068</a>    <span class="doccomment">/// A `ECHClientHello` with type [EchClientHelloType::ClientHelloOuter].
+<a href=#3069 id=3069 data-nosnippet>3069</a>    </span>Outer(EncryptedClientHelloOuter),
+<a href=#3070 id=3070 data-nosnippet>3070</a>    <span class="doccomment">/// An empty `ECHClientHello` with type [EchClientHelloType::ClientHelloInner].
+<a href=#3071 id=3071 data-nosnippet>3071</a>    ///
+<a href=#3072 id=3072 data-nosnippet>3072</a>    /// This variant has no payload.
+<a href=#3073 id=3073 data-nosnippet>3073</a>    </span>Inner,
+<a href=#3074 id=3074 data-nosnippet>3074</a>}
+<a href=#3075 id=3075 data-nosnippet>3075</a>
+<a href=#3076 id=3076 data-nosnippet>3076</a><span class="kw">impl </span>Codec&lt;<span class="lifetime">'_</span>&gt; <span class="kw">for </span>EncryptedClientHello {
+<a href=#3077 id=3077 data-nosnippet>3077</a>    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+<a href=#3078 id=3078 data-nosnippet>3078</a>        <span class="kw">match </span><span class="self">self </span>{
+<a href=#3079 id=3079 data-nosnippet>3079</a>            <span class="self">Self</span>::Outer(payload) =&gt; {
+<a href=#3080 id=3080 data-nosnippet>3080</a>                EchClientHelloType::ClientHelloOuter.encode(bytes);
+<a href=#3081 id=3081 data-nosnippet>3081</a>                payload.encode(bytes);
+<a href=#3082 id=3082 data-nosnippet>3082</a>            }
+<a href=#3083 id=3083 data-nosnippet>3083</a>            <span class="self">Self</span>::Inner =&gt; {
+<a href=#3084 id=3084 data-nosnippet>3084</a>                EchClientHelloType::ClientHelloInner.encode(bytes);
+<a href=#3085 id=3085 data-nosnippet>3085</a>                <span class="comment">// Empty payload.
+<a href=#3086 id=3086 data-nosnippet>3086</a>            </span>}
+<a href=#3087 id=3087 data-nosnippet>3087</a>        }
+<a href=#3088 id=3088 data-nosnippet>3088</a>    }
+<a href=#3089 id=3089 data-nosnippet>3089</a>
+<a href=#3090 id=3090 data-nosnippet>3090</a>    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+<a href=#3091 id=3091 data-nosnippet>3091</a>        <span class="kw">match </span>EchClientHelloType::read(r)<span class="question-mark">? </span>{
+<a href=#3092 id=3092 data-nosnippet>3092</a>            EchClientHelloType::ClientHelloOuter =&gt; {
+<a href=#3093 id=3093 data-nosnippet>3093</a>                <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Outer(EncryptedClientHelloOuter::read(r)<span class="question-mark">?</span>))
+<a href=#3094 id=3094 data-nosnippet>3094</a>            }
+<a href=#3095 id=3095 data-nosnippet>3095</a>            EchClientHelloType::ClientHelloInner =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Inner),
+<a href=#3096 id=3096 data-nosnippet>3096</a>            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(InvalidMessage::InvalidContentType),
+<a href=#3097 id=3097 data-nosnippet>3097</a>        }
+<a href=#3098 id=3098 data-nosnippet>3098</a>    }
+<a href=#3099 id=3099 data-nosnippet>3099</a>}
+<a href=#3100 id=3100 data-nosnippet>3100</a>
+<a href=#3101 id=3101 data-nosnippet>3101</a><span class="doccomment">/// Representation of the ECHClientHello extension with type outer specified in
+<a href=#3102 id=3102 data-nosnippet>3102</a>/// [draft-ietf-tls-esni Section 5].
+<a href=#3103 id=3103 data-nosnippet>3103</a>///
+<a href=#3104 id=3104 data-nosnippet>3104</a>/// [draft-ietf-tls-esni Section 5]: &lt;https://www.ietf.org/archive/id/draft-ietf-tls-esni-18.html#section-5&gt;
+<a href=#3105 id=3105 data-nosnippet>3105</a></span><span class="attr">#[derive(Clone, Debug)]
+<a href=#3106 id=3106 data-nosnippet>3106</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>EncryptedClientHelloOuter {
+<a href=#3107 id=3107 data-nosnippet>3107</a>    <span class="doccomment">/// The cipher suite used to encrypt ClientHelloInner. Must match a value from
+<a href=#3108 id=3108 data-nosnippet>3108</a>    /// ECHConfigContents.cipher_suites list.
+<a href=#3109 id=3109 data-nosnippet>3109</a>    </span><span class="kw">pub </span>cipher_suite: HpkeSymmetricCipherSuite,
+<a href=#3110 id=3110 data-nosnippet>3110</a>    <span class="doccomment">/// The ECHConfigContents.key_config.config_id for the chosen ECHConfig.
+<a href=#3111 id=3111 data-nosnippet>3111</a>    </span><span class="kw">pub </span>config_id: u8,
+<a href=#3112 id=3112 data-nosnippet>3112</a>    <span class="doccomment">/// The HPKE encapsulated key, used by servers to decrypt the corresponding payload field.
+<a href=#3113 id=3113 data-nosnippet>3113</a>    /// This field is empty in a ClientHelloOuter sent in response to a HelloRetryRequest.
+<a href=#3114 id=3114 data-nosnippet>3114</a>    </span><span class="kw">pub </span>enc: PayloadU16,
+<a href=#3115 id=3115 data-nosnippet>3115</a>    <span class="doccomment">/// The serialized and encrypted ClientHelloInner structure, encrypted using HPKE.
+<a href=#3116 id=3116 data-nosnippet>3116</a>    </span><span class="kw">pub </span>payload: PayloadU16&lt;NonEmpty&gt;,
+<a href=#3117 id=3117 data-nosnippet>3117</a>}
+<a href=#3118 id=3118 data-nosnippet>3118</a>
+<a href=#3119 id=3119 data-nosnippet>3119</a><span class="kw">impl </span>Codec&lt;<span class="lifetime">'_</span>&gt; <span class="kw">for </span>EncryptedClientHelloOuter {
+<a href=#3120 id=3120 data-nosnippet>3120</a>    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+<a href=#3121 id=3121 data-nosnippet>3121</a>        <span class="self">self</span>.cipher_suite.encode(bytes);
+<a href=#3122 id=3122 data-nosnippet>3122</a>        <span class="self">self</span>.config_id.encode(bytes);
+<a href=#3123 id=3123 data-nosnippet>3123</a>        <span class="self">self</span>.enc.encode(bytes);
+<a href=#3124 id=3124 data-nosnippet>3124</a>        <span class="self">self</span>.payload.encode(bytes);
+<a href=#3125 id=3125 data-nosnippet>3125</a>    }
+<a href=#3126 id=3126 data-nosnippet>3126</a>
+<a href=#3127 id=3127 data-nosnippet>3127</a>    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+<a href=#3128 id=3128 data-nosnippet>3128</a>        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+<a href=#3129 id=3129 data-nosnippet>3129</a>            cipher_suite: HpkeSymmetricCipherSuite::read(r)<span class="question-mark">?</span>,
+<a href=#3130 id=3130 data-nosnippet>3130</a>            config_id: u8::read(r)<span class="question-mark">?</span>,
+<a href=#3131 id=3131 data-nosnippet>3131</a>            enc: PayloadU16::read(r)<span class="question-mark">?</span>,
+<a href=#3132 id=3132 data-nosnippet>3132</a>            payload: PayloadU16::read(r)<span class="question-mark">?</span>,
+<a href=#3133 id=3133 data-nosnippet>3133</a>        })
+<a href=#3134 id=3134 data-nosnippet>3134</a>    }
+<a href=#3135 id=3135 data-nosnippet>3135</a>}
+<a href=#3136 id=3136 data-nosnippet>3136</a>
+<a href=#3137 id=3137 data-nosnippet>3137</a><span class="doccomment">/// Representation of the ECHEncryptedExtensions extension specified in
+<a href=#3138 id=3138 data-nosnippet>3138</a>/// [draft-ietf-tls-esni Section 5].
+<a href=#3139 id=3139 data-nosnippet>3139</a>///
+<a href=#3140 id=3140 data-nosnippet>3140</a>/// [draft-ietf-tls-esni Section 5]: &lt;https://www.ietf.org/archive/id/draft-ietf-tls-esni-18.html#section-5&gt;
+<a href=#3141 id=3141 data-nosnippet>3141</a></span><span class="attr">#[derive(Clone, Debug)]
+<a href=#3142 id=3142 data-nosnippet>3142</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ServerEncryptedClientHello {
+<a href=#3143 id=3143 data-nosnippet>3143</a>    <span class="kw">pub</span>(<span class="kw">crate</span>) retry_configs: Vec&lt;EchConfigPayload&gt;,
+<a href=#3144 id=3144 data-nosnippet>3144</a>}
+<a href=#3145 id=3145 data-nosnippet>3145</a>
+<a href=#3146 id=3146 data-nosnippet>3146</a><span class="kw">impl </span>Codec&lt;<span class="lifetime">'_</span>&gt; <span class="kw">for </span>ServerEncryptedClientHello {
+<a href=#3147 id=3147 data-nosnippet>3147</a>    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+<a href=#3148 id=3148 data-nosnippet>3148</a>        <span class="self">self</span>.retry_configs.encode(bytes);
+<a href=#3149 id=3149 data-nosnippet>3149</a>    }
+<a href=#3150 id=3150 data-nosnippet>3150</a>
+<a href=#3151 id=3151 data-nosnippet>3151</a>    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidMessage&gt; {
+<a href=#3152 id=3152 data-nosnippet>3152</a>        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+<a href=#3153 id=3153 data-nosnippet>3153</a>            retry_configs: Vec::&lt;EchConfigPayload&gt;::read(r)<span class="question-mark">?</span>,
+<a href=#3154 id=3154 data-nosnippet>3154</a>        })
+<a href=#3155 id=3155 data-nosnippet>3155</a>    }
+<a href=#3156 id=3156 data-nosnippet>3156</a>}
+<a href=#3157 id=3157 data-nosnippet>3157</a>
+<a href=#3158 id=3158 data-nosnippet>3158</a><span class="doccomment">/// The method of encoding to use for a handshake message.
+<a href=#3159 id=3159 data-nosnippet>3159</a>///
+<a href=#3160 id=3160 data-nosnippet>3160</a>/// In some cases a handshake message may be encoded differently depending on the purpose
+<a href=#3161 id=3161 data-nosnippet>3161</a>/// the encoded message is being used for.
+<a href=#3162 id=3162 data-nosnippet>3162</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Encoding {
+<a href=#3163 id=3163 data-nosnippet>3163</a>    <span class="doccomment">/// Standard RFC 8446 encoding.
+<a href=#3164 id=3164 data-nosnippet>3164</a>    </span>Standard,
+<a href=#3165 id=3165 data-nosnippet>3165</a>    <span class="doccomment">/// Encoding for ECH confirmation for HRR.
+<a href=#3166 id=3166 data-nosnippet>3166</a>    </span>EchConfirmation,
+<a href=#3167 id=3167 data-nosnippet>3167</a>    <span class="doccomment">/// Encoding for ECH inner client hello.
+<a href=#3168 id=3168 data-nosnippet>3168</a>    </span>EchInnerHello { to_compress: Vec&lt;ExtensionType&gt; },
+<a href=#3169 id=3169 data-nosnippet>3169</a>}
+<a href=#3170 id=3170 data-nosnippet>3170</a>
+<a href=#3171 id=3171 data-nosnippet>3171</a><span class="kw">fn </span>has_duplicates&lt;I: IntoIterator&lt;Item = E&gt;, E: Into&lt;T&gt;, T: Eq + Ord&gt;(iter: I) -&gt; bool {
+<a href=#3172 id=3172 data-nosnippet>3172</a>    <span class="kw">let </span><span class="kw-2">mut </span>seen = BTreeSet::new();
+<a href=#3173 id=3173 data-nosnippet>3173</a>
+<a href=#3174 id=3174 data-nosnippet>3174</a>    <span class="kw">for </span>x <span class="kw">in </span>iter {
+<a href=#3175 id=3175 data-nosnippet>3175</a>        <span class="kw">if </span>!seen.insert(x.into()) {
+<a href=#3176 id=3176 data-nosnippet>3176</a>            <span class="kw">return </span><span class="bool-val">true</span>;
+<a href=#3177 id=3177 data-nosnippet>3177</a>        }
+<a href=#3178 id=3178 data-nosnippet>3178</a>    }
+<a href=#3179 id=3179 data-nosnippet>3179</a>
+<a href=#3180 id=3180 data-nosnippet>3180</a>    <span class="bool-val">false
+<a href=#3181 id=3181 data-nosnippet>3181</a></span>}
+<a href=#3182 id=3182 data-nosnippet>3182</a>
+<a href=#3183 id=3183 data-nosnippet>3183</a><span class="kw">struct </span>DuplicateExtensionChecker(BTreeSet&lt;u16&gt;);
+<a href=#3184 id=3184 data-nosnippet>3184</a>
+<a href=#3185 id=3185 data-nosnippet>3185</a><span class="kw">impl </span>DuplicateExtensionChecker {
+<a href=#3186 id=3186 data-nosnippet>3186</a>    <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+<a href=#3187 id=3187 data-nosnippet>3187</a>        <span class="self">Self</span>(BTreeSet::new())
+<a href=#3188 id=3188 data-nosnippet>3188</a>    }
+<a href=#3189 id=3189 data-nosnippet>3189</a>
+<a href=#3190 id=3190 data-nosnippet>3190</a>    <span class="kw">fn </span>check(<span class="kw-2">&amp;mut </span><span class="self">self</span>, typ: ExtensionType) -&gt; <span class="prelude-ty">Result</span>&lt;(), InvalidMessage&gt; {
+<a href=#3191 id=3191 data-nosnippet>3191</a>        <span class="kw">let </span>u = u16::from(typ);
+<a href=#3192 id=3192 data-nosnippet>3192</a>        <span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>.insert(u) {
+<a href=#3193 id=3193 data-nosnippet>3193</a>            <span class="bool-val">true </span>=&gt; <span class="prelude-val">Ok</span>(()),
+<a href=#3194 id=3194 data-nosnippet>3194</a>            <span class="bool-val">false </span>=&gt; <span class="prelude-val">Err</span>(InvalidMessage::DuplicateExtension(u)),
+<a href=#3195 id=3195 data-nosnippet>3195</a>        }
+<a href=#3196 id=3196 data-nosnippet>3196</a>    }
+<a href=#3197 id=3197 data-nosnippet>3197</a>}
+<a href=#3198 id=3198 data-nosnippet>3198</a>
+<a href=#3199 id=3199 data-nosnippet>3199</a><span class="kw">fn </span>low_quality_integer_hash(<span class="kw-2">mut </span>x: u32) -&gt; u32 {
+<a href=#3200 id=3200 data-nosnippet>3200</a>    x = x
+<a href=#3201 id=3201 data-nosnippet>3201</a>        .wrapping_add(<span class="number">0x7ed55d16</span>)
+<a href=#3202 id=3202 data-nosnippet>3202</a>        .wrapping_add(x &lt;&lt; <span class="number">12</span>);
+<a href=#3203 id=3203 data-nosnippet>3203</a>    x = (x ^ <span class="number">0xc761c23c</span>) ^ (x &gt;&gt; <span class="number">19</span>);
+<a href=#3204 id=3204 data-nosnippet>3204</a>    x = x
+<a href=#3205 id=3205 data-nosnippet>3205</a>        .wrapping_add(<span class="number">0x165667b1</span>)
+<a href=#3206 id=3206 data-nosnippet>3206</a>        .wrapping_add(x &lt;&lt; <span class="number">5</span>);
+<a href=#3207 id=3207 data-nosnippet>3207</a>    x = x.wrapping_add(<span class="number">0xd3a2646c</span>) ^ (x &lt;&lt; <span class="number">9</span>);
+<a href=#3208 id=3208 data-nosnippet>3208</a>    x = x
+<a href=#3209 id=3209 data-nosnippet>3209</a>        .wrapping_add(<span class="number">0xfd7046c5</span>)
+<a href=#3210 id=3210 data-nosnippet>3210</a>        .wrapping_add(x &lt;&lt; <span class="number">3</span>);
+<a href=#3211 id=3211 data-nosnippet>3211</a>    x = (x ^ <span class="number">0xb55a4f09</span>) ^ (x &gt;&gt; <span class="number">16</span>);
+<a href=#3212 id=3212 data-nosnippet>3212</a>    x
+<a href=#3213 id=3213 data-nosnippet>3213</a>}
+<a href=#3214 id=3214 data-nosnippet>3214</a>
+<a href=#3215 id=3215 data-nosnippet>3215</a><span class="attr">#[cfg(test)]
+<a href=#3216 id=3216 data-nosnippet>3216</a></span><span class="kw">mod </span>tests {
+<a href=#3217 id=3217 data-nosnippet>3217</a>    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+<a href=#3218 id=3218 data-nosnippet>3218</a>
+<a href=#3219 id=3219 data-nosnippet>3219</a>    <span class="attr">#[test]
+<a href=#3220 id=3220 data-nosnippet>3220</a>    </span><span class="kw">fn </span>test_ech_config_dupe_exts() {
+<a href=#3221 id=3221 data-nosnippet>3221</a>        <span class="kw">let </span>unknown_ext = EchConfigExtension::Unknown(UnknownExtension {
+<a href=#3222 id=3222 data-nosnippet>3222</a>            typ: ExtensionType::Unknown(<span class="number">0x42</span>),
+<a href=#3223 id=3223 data-nosnippet>3223</a>            payload: Payload::new(<span class="macro">vec!</span>[<span class="number">0x42</span>]),
+<a href=#3224 id=3224 data-nosnippet>3224</a>        });
+<a href=#3225 id=3225 data-nosnippet>3225</a>        <span class="kw">let </span><span class="kw-2">mut </span>config = config_template();
+<a href=#3226 id=3226 data-nosnippet>3226</a>        config
+<a href=#3227 id=3227 data-nosnippet>3227</a>            .extensions
+<a href=#3228 id=3228 data-nosnippet>3228</a>            .push(unknown_ext.clone());
+<a href=#3229 id=3229 data-nosnippet>3229</a>        config.extensions.push(unknown_ext);
+<a href=#3230 id=3230 data-nosnippet>3230</a>
+<a href=#3231 id=3231 data-nosnippet>3231</a>        <span class="macro">assert!</span>(config.has_duplicate_extension());
+<a href=#3232 id=3232 data-nosnippet>3232</a>        <span class="macro">assert!</span>(!config.has_unknown_mandatory_extension());
+<a href=#3233 id=3233 data-nosnippet>3233</a>    }
+<a href=#3234 id=3234 data-nosnippet>3234</a>
+<a href=#3235 id=3235 data-nosnippet>3235</a>    <span class="attr">#[test]
+<a href=#3236 id=3236 data-nosnippet>3236</a>    </span><span class="kw">fn </span>test_ech_config_mandatory_exts() {
+<a href=#3237 id=3237 data-nosnippet>3237</a>        <span class="kw">let </span>mandatory_unknown_ext = EchConfigExtension::Unknown(UnknownExtension {
+<a href=#3238 id=3238 data-nosnippet>3238</a>            typ: ExtensionType::Unknown(<span class="number">0x42 </span>| <span class="number">0x8000</span>), <span class="comment">// Note: high bit set.
+<a href=#3239 id=3239 data-nosnippet>3239</a>            </span>payload: Payload::new(<span class="macro">vec!</span>[<span class="number">0x42</span>]),
+<a href=#3240 id=3240 data-nosnippet>3240</a>        });
+<a href=#3241 id=3241 data-nosnippet>3241</a>        <span class="kw">let </span><span class="kw-2">mut </span>config = config_template();
+<a href=#3242 id=3242 data-nosnippet>3242</a>        config
+<a href=#3243 id=3243 data-nosnippet>3243</a>            .extensions
+<a href=#3244 id=3244 data-nosnippet>3244</a>            .push(mandatory_unknown_ext);
+<a href=#3245 id=3245 data-nosnippet>3245</a>
+<a href=#3246 id=3246 data-nosnippet>3246</a>        <span class="macro">assert!</span>(!config.has_duplicate_extension());
+<a href=#3247 id=3247 data-nosnippet>3247</a>        <span class="macro">assert!</span>(config.has_unknown_mandatory_extension());
+<a href=#3248 id=3248 data-nosnippet>3248</a>    }
+<a href=#3249 id=3249 data-nosnippet>3249</a>
+<a href=#3250 id=3250 data-nosnippet>3250</a>    <span class="kw">fn </span>config_template() -&gt; EchConfigContents {
+<a href=#3251 id=3251 data-nosnippet>3251</a>        EchConfigContents {
+<a href=#3252 id=3252 data-nosnippet>3252</a>            key_config: HpkeKeyConfig {
+<a href=#3253 id=3253 data-nosnippet>3253</a>                config_id: <span class="number">0</span>,
+<a href=#3254 id=3254 data-nosnippet>3254</a>                kem_id: HpkeKem::DHKEM_P256_HKDF_SHA256,
+<a href=#3255 id=3255 data-nosnippet>3255</a>                public_key: PayloadU16::new(<span class="string">b"xxx"</span>.into()),
+<a href=#3256 id=3256 data-nosnippet>3256</a>                symmetric_cipher_suites: <span class="macro">vec!</span>[HpkeSymmetricCipherSuite {
+<a href=#3257 id=3257 data-nosnippet>3257</a>                    kdf_id: HpkeKdf::HKDF_SHA256,
+<a href=#3258 id=3258 data-nosnippet>3258</a>                    aead_id: HpkeAead::AES_128_GCM,
+<a href=#3259 id=3259 data-nosnippet>3259</a>                }],
+<a href=#3260 id=3260 data-nosnippet>3260</a>            },
+<a href=#3261 id=3261 data-nosnippet>3261</a>            maximum_name_length: <span class="number">0</span>,
+<a href=#3262 id=3262 data-nosnippet>3262</a>            public_name: DnsName::try_from(<span class="string">"example.com"</span>).unwrap(),
+<a href=#3263 id=3263 data-nosnippet>3263</a>            extensions: <span class="macro">vec!</span>[],
+<a href=#3264 id=3264 data-nosnippet>3264</a>        }
+<a href=#3265 id=3265 data-nosnippet>3265</a>    }
+<a href=#3266 id=3266 data-nosnippet>3266</a>}
 </code></pre></div></section></main></body></html>
