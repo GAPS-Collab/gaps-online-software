@@ -20,7 +20,7 @@ auto g::list_path_contents_sorted(const std::string& input, bool use_telemetry_r
   fs::path path(input);
   Vec<std::string> result;
   Vec<std::string> dirty_fnames;
-  std::regex re(R"(Run\d+_\d+\.(\d{6})_(\d{6})UTC\.gaps$)");
+  std::regex re(R"(Run\d+_\d+\.(\d{6})_(\d{6})(UTC)?\.gaps$)");
   if (use_telemetry_re) {
     spdlog::info("Using regular expression to match telemetry files!");
     re = std::regex(R"(RAW(\d{6})_(\d{6}).bin$)");
