@@ -24,7 +24,5 @@ namespace gondola {
     
     /// Decode layer, row, module, channel from the strip id 
     static auto decode_id(u32 hw_id) -> Vec<u32>;
-  
   };
-
 }
