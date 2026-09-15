@@ -23,7 +23,7 @@ L0_DIR="/data/stoessl/flight/GAPSI/dataset/L0/ground"
 
 echo "--------------------------------"
 echo "-- starting processing for $1"
-echo "-- ** GROUND DATAE **"
+echo "-- ** GROUND DATA **"
 
-uv run --isolated --cache-dir "$LOCAL_CACHE" python l1processing.py --remove-cmn --telemetry-dir $L0_DIR/$1 -o $L1_OUTDIR --quiet --ground
+uv run --isolated --cache-dir "$LOCAL_CACHE" python l1processing.py --remove-cmn --input-dir $L0_DIR/$1 -o $L1_OUTDIR --quiet --ground --run-id $1
 

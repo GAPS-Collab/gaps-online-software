@@ -11,6 +11,7 @@ import tqdm
 import gondola as go
 import time
 import numpy as np
+import csv
 
 from pathlib import Path
 from dataclasses import dataclass
@@ -55,13 +56,38 @@ except ImportError:
 #TRK_MEV_CUT=0.4
 TRK_MEV_CUT=0
 
+def get_refined_edep(paddle_num,edep, cc, temperature_paddle):
+    """
+    Fix the temperature dependent gain by 
+    applying Grace's constants
+    """
+    ## we need to apply the slope and y_intercept to each temperature value, to get a predicted MPV from the fit: 
+    slope        = cc["slope"]
+    y_int        = cc["y_intercept"]
+    t_avg        = cc["T_avg"] 
+    mpv_predicted  = temperature_paddle*slope + y_int
+    mpv_reference  = t_avg*slope + y_int
+    #print (mpv_reference) 
+    #print (mpv_predicted)
+    #print (edep)
+    # temperature calibration formula:
+    edep_corrected = edep*(mpv_reference/mpv_predicted)
+    
+    #print (edep,edep_corrected)
+    #print ('-----------------')
+    try:
+        coefficient    = 1.22/cc[paddle_num]["measured_mip"]
+    except KeyError:
+        return edep
+    return edep_corrected*coefficient
+
 # bridge the gap between the rust library and the C++ library. 
 # the difference is not immediately obvious, it is just the 
 # implementation. Since we can only deal with SD's root format 
 # in C++ because the member of CTrackRec* is not supported in 
 # either python (uproot) or any of the more popular rust root 
 # libraries (as of 2026)
-def rust_to_cxx_bridge(event, tof_paddles): 
+def rust_to_cxx_bridge(event, tof_paddles, cc = None, all_paddle_temps = None): 
     """
     This will bridge between rust and C++ 
     implementations of the gondola-core library 
@@ -81,11 +107,12 @@ def rust_to_cxx_bridge(event, tof_paddles):
     cxx_tof_event  = gxx.gondola_cxx.TofEventSummary()
     cxx_tof_event.event_id      = tof_event.event_id 
     cxx_event.event_id          = tof_event.event_id 
+    cxx_tof_event.set_timestamp48(tof_event.timestamp48)
     cxx_tof_event.run_id        = tof_event.run_id
     cxx_tof_event.dsi_j_mask    = tof_event.dsi_j_mask
     cxx_tof_event.channel_masks = tof_event.channel_masks 
     cxx_tof_event.trigger_sources_bytes = tof_event.trigger_sources_bytes
-    cxx_tof_event.status        = tof_event.status
+    cxx_tof_event.set_event_status(int(tof_event.status))
     #print (cxx_tof_event.dsi_j_mask, tof_event.dsi_j_mask)
     #print (f"--> Will bridge {len(tof_event.hits)} TOF hits")
     cxx_hits = []
@@ -101,6 +128,24 @@ def rust_to_cxx_bridge(event, tof_paddles):
         h_cxx.peak_b     = h.peak_b 
         h_cxx.paddle_len = h.paddle_len/10
         h_cxx.event_t0   = h.event_t0
+        if cc is not None: 
+            # energy correction - cc are the global 
+            # energy conrrecton constants 
+            print (h_cxx.edep, h_cxx.edep_att, h_cxx.edep_birk, h.edep, h.edep_att, h.edep_att_birk)
+            print ('-- -- -- -- --')
+            if h.paddle_id in cc.keys():
+                temp = all_paddle_temps[h.paddle_id].get_for_ts(cxx_tof_event.timestamp48)
+                if temp[0] == -273.0 or temp[1] == -273.0:
+                    h_cxx.edep_corrected = h.edep_att_birk
+                    #print (cxx_tof_event.timestamp48)
+                    #print (f'Paddle temperature {temp} invalid!')
+                else:
+                    temp = (temp[0] + temp[1]) / 2
+                    r_edep =  get_refined_edep(h.paddle_id, h.edep_att_birk, cc[h.paddle_id], temp)
+                    h_cxx.edep_corrected = r_edep
+                    print (h.edep_att, h.edep_att_birk)
+            else:
+                h_cxx.edep_corrected = h.edep_att_birk
         cxx_hits.append(h_cxx)
     cxx_tof_event.hits = cxx_hits 
     cxx_event.tof = cxx_tof_event
@@ -129,9 +174,13 @@ if __name__ == '__main__':
     #import sys
 
     parser      = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--telemetry-dir', default=Path('/data0/gaps/csbf/csbf-data/binaries/ethernet'),\
+    parser.add_argument('--input-dir', default=Path('/data0/gaps/csbf/csbf-data/binaries/ethernet'),\
                         help='A directory with telemetry binaries, as received from the telemetry stream',\
                         type=Path,
+                        )
+    parser.add_argument('--run-id', default=None,\
+                        help='Run id (currently only relevant for ground data, either 240,243,251',\
+                        type=int,
                         )
     parser.add_argument('-n', '--n-events', type=int,\
                         default=0, help='Only process -n number of events')
@@ -146,63 +195,131 @@ if __name__ == '__main__':
                         help='Outdir for .root output files',
                         type=Path,
                         default=None)
+
     
     #parser.add_argument('-v','--verbose', action='store_true',\
     #                    help='More verbose output')
     args = parser.parse_args()
+    # Grace's energy corrections
+    ## the calibration constants are stored in a .csv file: 
+    calibration_constants = {}
+    with open("/home/gtytus/analysis/grace/python/edeps/final/paddle_calibrations.csv", newline="") as f:
+        reader = csv.DictReader(f)
+    
+        for row in reader:
+            paddle = int(row["paddle"])
+            
+            ## the slope, y_intercept and T_avg are used for the intra-paddle temperature calibration, 
+            ## and the normalization_coeff is used for the inter-paddle MIP MPV calibration.
+            calibration_constants[paddle] = {
+                "slope": float(row["slope"]),
+                "y_intercept": float(row["y_intercept"]),
+                "T_avg": float(row["T_avg"]),
+                "coefficient": float(row["normalization_coeff"]),
+            }
     if args.ground:
-        cali_db = go.db.load_calibration_db_elena(CALI_DB)
-        if args.telemetry_dir.is_dir():
-            meta_files   = [k for k in sorted(args.telemetry_dir.glob('*.toml'))]
-            meta_files   = meta_files[0]
-            run_meta     = go.run.RunMeta.load(meta_files)
-            start_ts     = run_meta.start_gcu_time 
-            stop_ts      = run_meta.stop_gcu_time 
-            eligible_cali_files = []
-            cali_files   = {'mask': [], 'ped' : [], 'tfn': [], 'pls':[], 'gain':[]}
-            cft          = go.db.TrackerCalibrationFileType
-            for cf in cali_db:
-                if cf.from_timestamp > start_ts: 
-                    continue 
-                if cf.to_timestamp < stop_ts:
-                    continue
-                match cf.file_type:
-                    case cft.ChannelMask:
-                        cali_files['mask'].append(cf)
-                    case cft.Pedestal:
-                        cali_files['ped'].append(cf) 
-                    case cft.TransferFn:
-                        cali_files['tfn'].append(cf)
-                    case cft.PulsedChannels:
-                        cali_files['pls'].append(cf)
-                    case cft.Gains:
-                        cali_files['gain'].append(cf)
-                    case _:
-                        print ('-> Unknonw Trk calibration file type! {cf}')
-            for k in cali_files.keys():
-                if len(cali_files[k]) == 0:
-                    raise ValueError(f"Missing Tracker calibratoin files for {name}!")
-                if len(cali_files[k]) != 1:
-                    # iteratively clean the list to select the most suitable file 
-                    clean_cali_files = []
-                    for cf in cali_files[k]:
-                        if cf.from_timestamp == 0:
-                            continue
-                        clean_cali_files.append(cf)
-                    if len(clean_cali_files) != 1: 
-                        clean_cali_files = [j for j in clean_cali_files if not j.to_timestamp > 1834031538]
-                    cali_files[k] = clean_cali_files
-            for k in cali_files.keys():
-                if len(cali_files[k]) != 1: # we just fixed it above
-                    print (cali_files[k])
-                    raise ValueError(f'Ambiguous cali files {k}')
-                cali_files[k] = cali_files[k][0]
+        print('-> ground data!')
+        match args.run_id:
+            case 240:
+                TRK_MASK  = f"{CRANE_INSTALL}trk-2025/SiLi_mask_251204.txt"
+                TRK_PED   = f"{CRANE_INSTALL}trk-2025/pedestal_24November2025.txt"
+                TRK_TRF   = f"{CRANE_INSTALL}trk-2025/TF_Fit_Coefficients_Calibration_24November2025_Updated.txt" 
+                TRK_PLS   = f"{CRANE_INSTALL}trk-2025/pulch_240.txt"
+                TRK_GAIN  = f"{CRANE_INSTALL}trk-2025/List-251127-NZS.txt-gains-cn2-mod2.txt"  
+            case 243:
+                TRK_MASK  = f"{CRANE_INSTALL}trk-2025/SiLi_mask_251205.txt"
+                TRK_PED   = f"{CRANE_INSTALL}trk-2025/pedestal_24November2025.txt"
+                TRK_TRF   = f"{CRANE_INSTALL}trk-2025/TF_Fit_Coefficients_Calibration_24November2025_Updated.txt" 
+                TRK_PLS   = f"{CRANE_INSTALL}trk-2025/pulch_243.txt"
+                TRK_GAIN  = f"{CRANE_INSTALL}trk-2025/List-251127-NZS.txt-gains-cn2-mod2.txt"  
+            case 251:
+                # this really seems to be the same mask
+                TRK_MASK  = f"{CRANE_INSTALL}trk-2025/SiLi_mask_251205.txt"
+                TRK_PED   = f"{CRANE_INSTALL}trk-2025/pedestal_24November2025.txt"
+                TRK_TRF   = f"{CRANE_INSTALL}trk-2025/TF_Fit_Coefficients_Calibration_24November2025_Updated.txt" 
+                TRK_PLS   = f"{CRANE_INSTALL}trk-2025/pulch_251.txt"
+                TRK_GAIN  = f"{CRANE_INSTALL}trk-2025/List-251127-NZS.txt-gains-cn2-mod2.txt"  
+            case _:
+                raise ValueError(f"Selected ground data, but for an uknown run. --run-id must be either 240, 243, or 251! We got {args.run_id} instead!")
+        
+        for k in TRK_MASK, TRK_PED, TRK_TRF, TRK_PLS, TRK_GAIN:
+            print ('---- ---- ----')
+            print (f'-- {k}')
+        trk_mask = go.db.TrackerStripMask.parse_from_file            (TRK_MASK)
+        trk_ped  = go.db.TrackerStripPedestal.parse_from_file        (TRK_PED)
+        trk_trf  = go.db.TrackerStripTransferFunction.parse_from_file(TRK_TRF)
+        trk_pls  = go.db.TrackerStripPulse.parse_from_file           (TRK_PLS)
+        trk_gain = go.db.TrackerStripGain.parse_from_file            (TRK_GAIN)
+        
+        # currently, this is too annoying, hardcode the files here
+        #cali_db = go.db.load_calibration_db_elena(CALI_DB)
+        #if args.input_dir.is_dir():
+        #    meta_files   = [k for k in sorted(args.input_dir.glob('*.toml'))]
+        #    meta_files   = meta_files[0]
+        #    run_meta     = go.run.RunMeta.load(meta_files)
+        #    start_ts     = run_meta.start_gcu_time 
+        #    stop_ts      = run_meta.stop_gcu_time 
+        #    eligible_cali_files = []
+        #    cali_files   = {'mask': [], 'ped' : [], 'tfn': [], 'pls':[], 'gain':[]}
+        #    cft          = go.db.TrackerCalibrationFileType
+        #    for cf in cali_db:
+        #        # add a "safety margin" of 60 seconds around 
+        #        # the calibration files to account for ELOG/gcu/gps
+        #        # time mismatches
+        #        if start_ts < cf.from_timestamp and abs(start_ts - cf.from_timestamp) > 600:
+        #            print ('--- --- ---')
+        #            print (f'-> {start_ts}')
+        #            print (f'-> Removing {cf}!')
+        #            continue
+        #        match cf.file_type:
+        #            case cft.ChannelMask:
+        #                cali_files['mask'].append(cf)
+        #            case cft.Pedestal:
+        #                cali_files['ped'].append(cf) 
+        #            case cft.TransferFn:
+        #                cali_files['tfn'].append(cf)
+        #            case cft.PulsedChannels:
+        #                cali_files['pls'].append(cf)
+        #            case cft.Gains:
+        #                cali_files['gain'].append(cf)
+        #            case _:
+        #                print ('-> Unknonw Trk calibration file type! {cf}')
+        #    for k in cali_files.keys():
+        #        if len(cali_files[k]) == 0:
+        #            raise ValueError(f"Missing Tracker calibratoin files for {name}!")
+        #        if len(cali_files[k]) != 1:
+        #            # iteratively clean the list to select the most suitable file 
+        #            tmp_cali_files = []
+        #            for cf in cali_files[k]:
+        #                ts_start = abs(cf.from_timestamp - start_ts)  
+        #                ts_stop  = abs(cf.to_timestamp - stop_ts)
+        #                tmp_cali_files.append((ts_start, ts_stop, cf))
+        #            if len(tmp_cali_files) != 1: 
+        #                print ('Fixing cali files...')
+        #                clean_cali_files = []
+        #                smallest_window  = np.inf 
+        #                best_idx         = -1 
+        #                for idx,cf in enumerate(tmp_cali_files):
+        #                    
+        #                    if cf[0] + cf[1] <= smallest_window:
+        #                        best_idx = idx
+        #                        smallest_window = cf[0] + cf[1]
+        #                
+        #                clean_cali_files = [tmp_cali_files[best_idx][2]]
+        #            else:
+        #                clean_cali_files = [tmp_cali_files[0][0]]
+        #            cali_files[k] = clean_cali_files
+        #    for k in cali_files.keys():
+        #        print (f'-> Using {k}: {cali_files[k]}')
+        #        if len(cali_files[k]) != 1: # we just fixed it above
+        #            raise ValueError(f'Ambiguous cali files {k}')
+        #        cali_files[k] = cali_files[k][0]
 
-            trk_mask = go.db.TrackerStripMask.parse_from_file(cali_files['mask'].path) 
-            trk_ped  = go.db.TrackerStripPedestal.parse_from_file(cali_files['ped'].path) 
-            trk_trf  = go.db.TrackerStripTransferFunction.parse_from_file(cali_files['tfn'].path) 
-            trk_pls  = go.db.TrackerStripPulse.parse_from_file(cali_files['pls'].path) 
-            trk_gain = go.db.TrackerStripGain.parse_from_file(cali_files['gain'].path) 
+        #    trk_mask = go.db.TrackerStripMask.parse_from_file(cali_files['mask'].path) 
+        #    trk_ped  = go.db.TrackerStripPedestal.parse_from_file(cali_files['ped'].path) 
+        #    trk_trf  = go.db.TrackerStripTransferFunction.parse_from_file(cali_files['tfn'].path) 
+        #    trk_pls  = go.db.TrackerStripPulse.parse_from_file(cali_files['pls'].path) 
+        #    trk_gain = go.db.TrackerStripGain.parse_from_file(cali_files['gain'].path) 
     else:
         trk_mask = go.db.TrackerStripMask.parse_from_file            (TRK_MASK)
         trk_ped  = go.db.TrackerStripPedestal.parse_from_file        (TRK_PED)
@@ -227,7 +344,7 @@ if __name__ == '__main__':
     print (tracker_cali)
     #if args.ground:
     #    sys.exit(0)
-    
+   
     # paddle offsets as calculated by Grace
     tof_timing_offsets = go.db.TofPaddleTimingConstant.as_dict_by_name('GraceV1.5')
     tof_paddles        = go.db.TofPaddle.all_as_dict()
@@ -239,17 +356,20 @@ if __name__ == '__main__':
     # also be used directly 
     tof_timing_offsets = {k : tof_timing_offsets[k].paddle_constant - tof_timing_offsets[k].panel_constant for k in tof_timing_offsets}
 
+    # temperatures 
+    all_paddle_temps = go.db.TofPaddleTemp.all_data()
+
     print (f'--> Loaded TOF timing constants for  {len(tof_timing_offsets)} paddles from db!')
     is_caraspace = False
-    print (f'--> Reading {args.telemetry_dir}!')
-    if args.telemetry_dir.is_dir():
-        files   = [k for k in sorted(args.telemetry_dir.glob('*.bin'))]
+    print (f'--> Reading {args.input_dir}!')
+    if args.input_dir.is_dir():
+        files   = [k for k in sorted(args.input_dir.glob('*.bin'))]
         if not files:
-            files = [k for k in sorted(args.telemetry_dir.glob('*.gaps'))]
+            files = [k for k in sorted(args.input_dir.glob('*.gaps'))]
             is_caraspace = True
-    if args.telemetry_dir.is_file():
-        files   = [args.telemetry_dir]
-        if args.telemetry_dir.endswith('.gaps'):
+    if args.input_dir.is_file():
+        files   = [args.input_dir]
+        if args.input_dir.endswith('.gaps'):
             is_caraspace = True
     print (f'--> Found {len(files)} telemetry files!')
 
@@ -273,7 +393,7 @@ if __name__ == '__main__':
         print (f'-> Writing to {outfile}')
         root_writer = gxx.gondola_cxx.SDRootWriter(outfile, GEO) 
         root_writer.write_sdpar(0, "uhcra", CRANE_VERSION)
-        #reader  = go.io.TelemetryPacketReader(args.telemetry_dir) 
+        #reader  = go.io.TelemetryPacketReader(args.input_dir) 
         is_event = lambda x : x.is_event_packet
         if is_caraspace:
             reader  = go.io.CRReader(str(f)) 
@@ -335,19 +455,21 @@ if __name__ == '__main__':
                 # for reading from caraspace files, the paddles do not get set 
                 # automatically (yet) in all cases
                 ev.tof_set_paddles(tof_paddles)
-                ev.tof_set_timing_constants(tof_timing_offsets)
                 ev.tof_normalize_hit_times()
+                ev.tof_set_timing_constants(tof_timing_offsets)
                 #tracker_cali.calibrate_event(ev) 
                 #print (ev)
-                cxx_ev_for_raw = rust_to_cxx_bridge(ev, tof_paddles)
+                #print (calibration_constants)
+                cxx_ev_for_raw = rust_to_cxx_bridge(ev, tof_paddles, calibration_constants, all_paddle_temps)
                 # now we remove the pulsed hits for the rec part
                 ev.calibrate_trk_hits(tracker_cali, True)
-                cxx_ev_for_rec = rust_to_cxx_bridge(ev, tof_paddles)
+                cxx_ev_for_rec = rust_to_cxx_bridge(ev, tof_paddles, calibration_constants, all_paddle_temps)
             
+
 
                 #print (cxx_ev.tof.dsi_j_mask, "cxx dsi j mask")
                 #print (cxx_ev)
-                root_writer.add_event(cxx_ev_for_rec, cxx_ev_for_raw, pack_ptype, pack_gcutime)
+                root_writer.add_event(cxx_ev_for_rec, cxx_ev_for_raw, pack_ptype, pack_gcutime, True)
                 #nth_event += 1
                 #if nth_event % 500 == 0:
                 #    timedelta = time.time() - start_time
