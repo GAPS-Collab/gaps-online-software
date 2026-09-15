@@ -7,6 +7,7 @@
 #include <memory>
 #include "tof_typedefs.h"
 #include "packets/tof_packet.h"
+#include "events/tracker_hit.hpp"
 #include "telemetry_dataclasses.hpp"
 #include "io/telemetry_reader.hpp"
 #include "calibration.h"
@@ -69,9 +70,11 @@ namespace gondola {
     auto put_fobject(CRFrameObject const &fobj, std::string) -> void; 
 
     /// extract a tofpacket if this frame object is of the correct type
-    auto get_tofpacket(std::string name)       -> result::Result<TofPacket,IOError>;
-    auto get_telemetrypacket(std::string name) -> TelemetryPacket;
-  
+    auto get_tofpacket(std::string name)       const -> result::Result<TofPacket,IOError>;
+    auto get_telemetrypacket(std::string name) const -> TelemetryPacket;
+ 
+    /// get all tracker hits across multiple events in the same frame 
+    auto get_trackerhitseries(Option<std::string> name) const -> result::Result<Vec<TrkHit>,IOError>; 
     /// to write data on disk 
     auto to_bytestream()                 const -> Vec<u8>;
   };

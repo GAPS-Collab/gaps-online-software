@@ -1,0 +1,50 @@
+#pragma once
+
+#include "tof_typedefs.h"
+#include "sqlite_orm.h"
+
+namespace gondola {
+  struct TofPaddle {
+    u8  paddle_id         ; 
+    u64 volume_id         ; 
+    u8  panel_id          ; 
+    u8  mtb_link_id       ; 
+    u8  rb_id             ; 
+    u8  rb_chA            ; 
+    u8  rb_chB            ; 
+    /// LTB ID equals RAT ID - for confusion, there is another LTB id, which is 
+    /// only hardware
+    u8  ltb_id            ;         
+    u8  ltb_chA           ;         
+    u8  ltb_chB           ;         
+    u8  pb_id             ;         
+    u8  pb_chA            ;         
+    u8  pb_chB            ;         
+    f32 cable_len         ;         
+    u8  dsi               ;         
+    u8  j_rb              ;         
+    u8  j_ltb             ;         
+    f32 height            ;         
+    f32 width             ;         
+    f32 length            ;         
+    f32 normal_x          ;
+    f32 normal_y          ;
+    f32 normal_z          ;
+    f32 global_pos_x_l0   ;         
+    f32 global_pos_y_l0   ;         
+    f32 global_pos_z_l0   ;         
+    f32 global_pos_x_l0_A ;         
+    f32 global_pos_y_l0_A ;         
+    f32 global_pos_z_l0_A ;         
+    f32 global_pos_x_l0_B ;         
+    f32 global_pos_y_l0_B ;         
+    f32 global_pos_z_l0_B ;         
+    f32 coax_cable_time   ;
+    f32 harting_cable_time;
+  
+    auto to_string() const -> std::string;
+  
+    /// Vector along the longest axis
+    auto get_principal() const -> Vec<f32>;
+  };
+}

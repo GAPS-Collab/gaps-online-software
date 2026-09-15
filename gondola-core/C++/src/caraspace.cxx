@@ -13,6 +13,7 @@
 #include "io.hpp"
 #include "io/telemetry_reader.hpp"
 #include "io/parsers.h" 
+#include "packets/tracker_packet.hpp"
 
 namespace g    = gondola;
 namespace fs   = std::filesystem;
@@ -235,7 +236,7 @@ auto g::CRFrame::to_bytestream() const -> Vec<u8> {
 
 //--------------------------------------------------
 
-auto g::CRFrame::get_tofpacket(std::string name)
+auto g::CRFrame::get_tofpacket(std::string name) const
   -> Result<TofPacket,g::IOError> {
   TofPacket tp;
   //let mut lookup : (usize, CRFrameObjectType);
@@ -269,7 +270,9 @@ auto g::CRFrame::get_tofpacket(std::string name)
   return Ok(tp);
 }
 
-g::TelemetryPacket g::CRFrame::get_telemetrypacket(std::string name) {
+//----------------------------------------------------------
+
+g::TelemetryPacket g::CRFrame::get_telemetrypacket(std::string name) const {
   g::TelemetryPacket tp;
   usize pos = 0;
   CRFrameObjectType dtype = CRFrameObjectType::Unknown;
@@ -281,15 +284,49 @@ g::TelemetryPacket g::CRFrame::get_telemetrypacket(std::string name) {
   }
   if (dtype == CRFrameObjectType::TelemetryPacket) {
     auto f_obj = CRFrameObject::from_bytestream(bytestorage, pos);
-    //std::cout << f_obj.to_string() << std::endl;
     pos        = 0;
     tp         = g::TelemetryPacket::from_bytestream(f_obj.payload, pos); 
-    //std::cout << tp.to_string() << std::endl;
   } else {
-    spdlog::error("Trying to get TofPacket {}  however, that is of type {}", name, static_cast<u8>(dtype)); 
+    spdlog::error("Trying to get TelemetryPacket {}  however, that is of type {}", name, static_cast<u8>(dtype)); 
     return tp;
   }
   return tp;
+}
+
+//----------------------------------------------------------
+
+auto g::CRFrame::get_trackerhitseries(Option<std::string> name) const -> Result<Vec<g::TrkHit>,g::IOError> {
+  auto hits = Vec<g::TrkHit>();
+  std::string tracker_hit_name = "Tracker";
+  if (name.is_some()) {
+    tracker_hit_name = name.unwrap();
+  }
+  for (const auto& [key, value] : index) {
+    //C++ 23 - someday :) a boy can dream
+    //if (key.contains(tracker_hit_name)) {
+    if (key.find("world") != std::string::npos) { 
+      auto pack = get_telemetrypacket(key);
+      //let trk  = TrackerDAQEventPacket::from_telemetrypacket(&pack)?;
+      u64 pos_in_frame = 0;
+      auto trk_res = g::TrackerDAQEventPacket::from_bytestream(pack.payload, pos_in_frame);
+      if (!trk_res.is_ok()) {
+        //std::string msg = std::format("Can't extract TrackerDAQEventPacket from frame!");
+        auto err = trk_res.unwrap_err();
+        return Err(err);
+      } else {
+        auto trk = trk_res.unwrap();
+        for (auto const &ev : trk.events) {
+          for (auto const &h : ev.hits) {
+            hits.push_back(h);
+          }
+          //for h in ev.hits {
+          //  hits.push_back(h.clone);
+          //}
+        }
+      }
+    }
+  }
+  return Ok(hits);
 }
 
 //----------------------------------------------------------

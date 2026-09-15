@@ -5,8 +5,8 @@
 #include "result/result.h"
 
 #include "database.h"
-#include "version.h" 
-#include "events/event_quality.hpp"
+#include "version.h"
+#include "events/hit_quality.hpp"
 
 namespace r = result;
 
@@ -24,7 +24,7 @@ namespace gondola {
   
     // new variables for V1
     ProtocolVersion version;
-    EventQuality quality = EventQuality::Unknown;
+    HitQuality quality = HitQuality::Unknown;
     f32 baseline_a;
     f32 baseline_a_rms;
     f32 baseline_b;
@@ -137,5 +137,12 @@ namespace gondola {
       f32 tot_slp_high_b = 0;
   };
   
+  auto classify_side(f32 rms, f32 peak, f32 ped, f32 tot725) -> HitQuality;
+  
+  // Implemented in src/events.cxx
+  auto classify_hit(const TofHit& hit) -> HitQuality;
+ 
+ auto position_ok(const TofHit& hit) -> bool;
+
   std::ostream& operator<<(std::ostream& os, const TofHit& pad);
 }

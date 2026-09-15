@@ -10,6 +10,7 @@ namespace gondola {
         StreamTooShort,
         StreamTooLong,
         TooManyTrkEvents,
+        TooManyTrkHits,
         WrongDelimiter,
         PacketNotFound,
         WrongPacketType,

@@ -162,12 +162,6 @@ impl DataSinkHB {
   fn get_n_pack_write_disk(&self) -> PyResult<u64> {
     Ok(self.n_pack_write_disk)
   }  
-
-  #[getter]
-  #[pyo3(name="timestamp")]
-  fn get_timestamp_py(&self) -> PyResult<u64> {
-    Ok(self.timestamp) 
-  }
 }
 
 #[cfg(feature="pybindings")]

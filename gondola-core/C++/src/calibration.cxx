@@ -297,7 +297,8 @@ auto g::spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]) -> void 
   int rsp[10];
   int n_sp[NCHN];
   int n_rsp;
-  int nNeighbor, nSymmetric;
+  int nNeighbor;
+  //int nSymmetric;
   int nChn = NCHN;
   double_t filter, dfilter;
 
@@ -363,13 +364,13 @@ auto g::spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]) -> void 
   /* go through all spikes and look for neighbors */
   for (i = 0; i < nChn; i++) {
     for (j = 0; j < n_sp[i]; j++) {
-      nSymmetric = 0;
+      //nSymmetric = 0;
       nNeighbor = 0;
       /* check if this spike has a symmetric partner in any channel */
       for (k = 0; k < nChn; k++) {
         for (l = 0; l < n_sp[k]; l++) {
           if ((sp[i][j] + sp[k][l] - 2 * tCell) % 1024 == 1022) {
-            nSymmetric++;
+            //nSymmetric++;
             break;
           }
         }
@@ -445,6 +446,7 @@ auto g::spike_cleaning_drs4(Vec<Vec<f32>> &wf, u16 tCell, i32 spikes[]) -> void 
 }
 
 /************************************************/
+
 bool g::RBCalibration::serialize_event_data;
 
 g::RBCalibration::RBCalibration() {

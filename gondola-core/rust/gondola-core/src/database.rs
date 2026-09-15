@@ -63,6 +63,7 @@ pub use tracker_cali_times::{
 mod tof_paddle_temps;
 pub use tof_paddle_temps::{
   TofPaddleTemp,
+  TofPaddleTempDataSeries,
   create_tof_paddle_temp_table
 };
 

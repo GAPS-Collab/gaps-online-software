@@ -444,6 +444,22 @@ macro_rules! moniseries_general {
          }
          boards
        }
+       
+       /// The sizes of the underlying series for each board 
+       ///
+       /// # Returns:
+       ///   * HashMap<board id, size>  
+       #[getter]
+       #[pyo3(name="sizes")]
+       fn get_sizes(&self) -> HashMap<u16,usize> {
+         // use u16 here, so it apperas as numbers
+         // in python (u8 will be bytes)
+         let mut boards = HashMap::<u16,usize>::new();
+         for k in self.data.keys() {
+           boards.insert(*k as u16, self.data[k].len());
+         }
+         boards
+       }
 
        #[pyo3(name="get_var_for_board")]
        fn get_var_for_board_py(&self, varname : &str, rb_id : u8) -> Option<Vec<f32>> {

@@ -269,6 +269,7 @@ fn events_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<TrackerDAQEventPacket>()?;
   m.add_class::<TelemetryEvent>()?;
   m.add_function(wrap_pyfunction!(strip_id, m)?)?;
+  m.add_class::<HitQuality>()?;
   m.add_class::<EventQuality>()?;
   m.add_class::<TriggerType>()?;
   m.add_class::<LTBThreshold>()?;
@@ -429,6 +430,7 @@ fn db_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<TrackerCalibrationFileType>()?;
   m.add_class::<TrackerCaliTimeWindow>()?;
   m.add_class::<TofPaddleTemp>()?;
+  m.add_class::<TofPaddleTempDataSeries>()?;
   m.add_function(wrap_pyfunction!(load_calibration_db_elena, m)?)?;
   m.add_function(wrap_pyfunction!(get_all_rbids_in_db, m)?)?;
   m.add_function(wrap_pyfunction!(get_all_pbids_in_db, m)?)?;
