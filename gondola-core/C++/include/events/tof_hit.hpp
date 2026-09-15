@@ -24,12 +24,16 @@ namespace gondola {
   
     // new variables for V1
     ProtocolVersion version;
-    EventQuality quality = EventQuality::Unknown;;
+    EventQuality quality = EventQuality::Unknown;
     f32 baseline_a;
     f32 baseline_a_rms;
     f32 baseline_b;
     f32 baseline_b_rms;
     f32 phase;
+    /// This will allow to change the energy deposition 
+    /// during processing efforts. In the raw data, this 
+    /// is not filled and just a place holder 
+    f32 edep_corrected;
   
     // event wide calculated time
     f32 event_t0     = 0;
@@ -102,6 +106,8 @@ namespace gondola {
     auto get_cable_delay() const -> f32;
     auto get_t0()          const -> f32;
     auto get_edep()        const -> f32;
+    auto get_edep_noatt()  const -> f32;
+    auto get_edep_birk()   const -> f32;
     #endif
   
     static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos)

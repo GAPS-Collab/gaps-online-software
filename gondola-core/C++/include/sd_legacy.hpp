@@ -250,7 +250,8 @@ class CEventRec : public CEventBase {
                              Crane::Calibration::CRawTrk* raw_trk,
                              Crane::Calibration::CRawTof* raw_tof,
                              const bool apply_elena_cut=true,
-                             const double mev_cut = 0.4) -> void;
+                             const double mev_cut = 0.4,
+                             const bool use_corrected_edep = false) -> void;
     auto to_telemetry(HashMap<u32, u32> const &hid_vid_map) -> gondola::TelemetryEvent;
     
     auto get_tof_energies()             const -> Vec<f32>;
@@ -510,7 +511,7 @@ namespace gondola {
 
     /// Write events to the root tree. Writing to TreeRec and TreeRaw is 
     /// supported
-    auto add_event(TelemetryEvent* ev, TelemetryEvent* ev_for_raw, u8 packet_type, f64 gcutime) -> void;
+    auto add_event(TelemetryEvent* ev, TelemetryEvent* ev_for_raw, u8 packet_type, f64 gcutime, bool use_corrected_edep = false) -> void;
     /// The SimulationParameter tree  
     auto write_sdpar(u32 run_id, std::string hostname, std::string crane_version) -> void; 
     std::string filename = "";

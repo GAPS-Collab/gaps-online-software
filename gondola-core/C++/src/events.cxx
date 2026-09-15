@@ -1309,6 +1309,10 @@ auto g::TofHit::get_timestamp48() const -> f64 {
   return ts48;
 }
 
+auto g::TofHit::get_edep_noatt() const -> f32 {
+  return (1.29/34.3)*(get_peak_a() + get_peak_b()) / 2.0;
+}
+
 #ifdef BUILD_CXXDB
 /// simple calculation based on Philip's 
 /// attenuation function as used in pgaps
@@ -1320,6 +1324,16 @@ auto g::TofHit::get_edep() const -> f32 {
   f32 att_b = (std::exp(3.9-0.00126*(10.0*paddle_len - x0))+22.15)/ (std::exp(3.9)+22.15);
   //std::cout << "Att A, Att B, x0 " << att_a << " " << att_b << " " << x0 << std::endl;
   f32 edep  = 0.0159 * (get_peak_a()/att_a + get_peak_b()/att_b) / 2.; // vertical muon peak @ 0.97 MeV
+  return edep; 
+}
+
+auto g::TofHit::get_edep_birk() const -> f32 {
+  f32 x0    = get_x_pos();
+  //f32 edep  = 0.0159 * (get_peak_a()/att_a + get_peak_b()/att_b) / 2.; // vertical muon peak @ 0.97 MeV
+  f32 att_a = (std::exp(3.9-0.00126*( x0            ))+22.15)/ (std::exp(3.9)+22.15);
+  f32 att_b = (std::exp(3.9-0.00126*(10.0*paddle_len - x0))+22.15)/ (std::exp(3.9)+22.15);
+  f32 v  = (get_peak_a()/att_a + get_peak_b()/att_b) / 2.0; 
+  f32 edep  = -1000.0*v/(21.0*v - 35260.0);
   return edep; 
 }
 #endif
@@ -1462,6 +1476,14 @@ auto g::RBWaveform::to_string() const -> std::string {
   }
   repr += ">";
   return repr;
+}
+
+auto g::TofEventSummary::set_event_status(u8 int_status) -> void {
+  status = static_cast<EventStatus>(int_status);
+}
+
+auto g::TofEventSummary::get_event_status() const -> u8 {
+  return static_cast<u8>(status);
 }
 
 auto g::TofEventSummary::get_trigger_sources() const -> Vec<g::TriggerType> {
@@ -1668,6 +1690,11 @@ auto g::TofEventSummary::from_tofpacket(const TofPacket &packet)
 
 u64 g::TofEventSummary::get_timestamp48() const {
   return ((u64)timestamp16 << 32) | (u64)timestamp32;
+}
+
+auto g::TofEventSummary::set_timestamp48(u64 timestamp48) -> void {
+  timestamp16 = static_cast<u16>((timestamp48 >> 32) & 0xFFFF);
+  timestamp32 = static_cast<u32>(timestamp48 & 0xFFFFFFFF);
 }
 
 #ifdef BUILD_CXXDB

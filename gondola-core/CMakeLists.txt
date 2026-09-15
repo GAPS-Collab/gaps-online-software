@@ -143,8 +143,12 @@ if (BUILD_CXX_STATIC_LIB)
               C++/src/legacy.cxx
               C++/src/version.cxx
               C++/src/telemetry_dataclasses.cxx
+              C++/src/tracker_hit.cxx
               C++/src/caraspace.cxx
               C++/src/tracklet.cxx
+              C++/src/cooling.cxx
+              C++/src/telemetry_packet.cxx
+
               $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:C++/src/sd_legacy.cxx>
               $<$<BOOL:${BUILD_CXX_DB}>:C++/src/database.cxx>
               $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${GONDOLA_DICTIONARY}.cxx>

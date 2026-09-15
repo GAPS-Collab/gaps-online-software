@@ -245,7 +245,7 @@ auto gondola::SDRootWriter::write_sdpar(u32 run_id, std::string hostname, std::s
 }
 
 
-auto gondola::SDRootWriter::add_event(TelemetryEvent* ev, TelemetryEvent* ev_for_raw, u8 packet_type, f64 gcutime) -> void {
+auto gondola::SDRootWriter::add_event(TelemetryEvent* ev, TelemetryEvent* ev_for_raw, u8 packet_type, f64 gcutime, bool use_corrected_edep) -> void {
    if (ev == nullptr) {
      std::cout << "Received nullptr for TelemetryEvent!" << std::endl;
      return;
@@ -266,7 +266,7 @@ auto gondola::SDRootWriter::add_event(TelemetryEvent* ev, TelemetryEvent* ev_for
      rawtrk->fill_from_telemetry(ev);
    }
    rawtof->fill_from_telemetry(ev);
-   event ->fill_from_telemetry(ev, packet_type, gcutime, pmap, smap, lgmap, rawtrk, rawtof, true, 0.4);
+   event ->fill_from_telemetry(ev, packet_type, gcutime, pmap, smap, lgmap, rawtrk, rawtof, true, 0.4, use_corrected_edep);
    //std::cout << rawtrk->pretty_print() << std::endl;
    reco_tree->Fill();  
    raw_tree->Fill();
@@ -638,7 +638,8 @@ auto CEventRec::fill_from_telemetry(g::TelemetryEvent* event,
                                     cb::CRawTrk* raw_trk,
                                     cb::CRawTof* raw_tof,
                                     const bool apply_elena_cut,  
-                                    const double mev_cut) -> void {
+                                    const double mev_cut,
+                                    const bool use_corrected_edep) -> void {
   primaryBetaGenerated_ = NAN;
   //primaryMomentumDirectionGenerated_;
   primaryKineticEnergyGenerated_ = NAN;
@@ -710,7 +711,12 @@ auto CEventRec::fill_from_telemetry(g::TelemetryEvent* event,
     reco_hit.hit_position_  = pos           ;
     //reco_hit.SetTime    ( hit.get_t0() - first_time);//scaled to first hit
     reco_hit.hit_time_      = hit.event_t0  ;
-    reco_hit.energydep_     = hit.get_edep();
+    // change in Aug 2026 - new formulat for energy deposition
+    if (use_corrected_edep) {
+        reco_hit.energydep_     = hit.edep_corrected;
+    } else { 
+        reco_hit.energydep_     = hit.get_edep_birk();
+    }
     //std::cout << hit << std::endl;
     //std::cout << reco_hit.pretty_print() << std::endl;
     hitseries_.push_back(reco_hit); 

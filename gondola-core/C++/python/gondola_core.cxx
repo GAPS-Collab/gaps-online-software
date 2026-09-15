@@ -13,6 +13,7 @@
 #include "io.hpp" 
 #include "caraspace.hpp"
 #include "telemetry_dataclasses.hpp"
+#include "packets/telemetry_packet.hpp"
 #include "io/telemetry_reader.hpp"
 #include "calibration.h"
 #include "tracklet.hpp"
@@ -29,7 +30,24 @@ nb::tuple get_coordinates(f32 x, f32 y, f32 z) {
 NB_MODULE(gondola_cxx, m) {
 
 
-  nb::enum_<g::ProtocolVersion>(m, "ProtocolVersion") 
+  nb::enum_<g::EventStatus>(m, "EventStatus") 
+    .value("Unknown"               , g::EventStatus::Unknown) 
+    .value("Crc32Wrong"            , g::EventStatus::Crc32Wrong)
+    .value("TailWrong"             , g::EventStatus::TailWrong) 
+    .value("ChannelIDWrong"        , g::EventStatus::ChannelIDWrong)
+    .value("CellSyncErrors"        , g::EventStatus::CellSyncErrors) 
+    .value("ChnSyncErrors"         , g::EventStatus::ChnSyncErrors)
+    .value("CellAndChnSyncErrors"  , g::EventStatus::CellAndChnSyncErrors)
+    .value("AnyDataMangling"       , g::EventStatus::AnyDataMangling)
+    .value("IncompleteReadout"     , g::EventStatus::IncompleteReadout)
+    .value("IncompatibleData"      , g::EventStatus::IncompatibleData)
+    .value("EventTimeOut"          , g::EventStatus::EventTimeOut) 
+    .value("GoodNoCRCOrErrBitCheck", g::EventStatus::GoodNoCRCOrErrBitCheck) 
+    .value("GoodNoCRCCheck"        , g::EventStatus::GoodNoCRCCheck) 
+    .value("GoodNoErrBitCheck"     , g::EventStatus::GoodNoErrBitCheck) 
+    .value("Perfect"               , g::EventStatus::Perfect); 
+  
+nb::enum_<g::ProtocolVersion>(m, "ProtocolVersion") 
     .value("Unknown"           , g::ProtocolVersion::Unknown)
     .value("V1"                , g::ProtocolVersion::V1)
     .value("V2"                , g::ProtocolVersion::V2)
@@ -151,7 +169,10 @@ NB_MODULE(gondola_cxx, m) {
     .def_rw("charge_b"       , &g::TofHit::charge_b_f32)
     .def_rw("peak_a"         , &g::TofHit::peak_a_f32)
     .def_rw("peak_b"         , &g::TofHit::peak_b_f32)
-    .def_prop_ro("edep"      , &g::TofHit::get_edep)
+    .def_rw("edep_corrected" , &g::TofHit::edep_corrected)
+    .def_prop_ro("edep_birk" , &g::TofHit::get_edep_birk)
+    .def_prop_ro("edep_att"  , &g::TofHit::get_edep)
+    .def_prop_ro("edep"      , &g::TofHit::get_edep_noatt)
     .def_prop_ro("x0"        , &g::TofHit::get_x_pos)
     .def_prop_ro("t0_uncorr" , &g::TofHit::get_t0_relative)
     .def_prop_ro("obeys_causality", &g::TofHit::obeys_causality)
@@ -191,6 +212,10 @@ NB_MODULE(gondola_cxx, m) {
     .def_rw("run_id"               , &g::TofEventSummary::run_id)
     .def_rw("dsi_j_mask"           , &g::TofEventSummary::dsi_j_mask)
     .def_rw("channel_masks"        , &g::TofEventSummary::channel_mask)
+    .def_rw("status"               , &g::TofEventSummary::status)
+    .def("set_event_status"        , &g::TofEventSummary::set_event_status)
+    .def("get_event_status"        , &g::TofEventSummary::get_event_status)
+    .def("set_timestamp48"         , &g::TofEventSummary::set_timestamp48)
     //.def("normalize_hit_times"  , &g::TofEvent::normalize_hit_times)
     //.def_prop_ro("hits"         , &g::TofEvent::get_hits)
     .def_rw("hits"                , &g::TofEventSummary::hits)
