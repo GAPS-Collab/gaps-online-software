@@ -29,7 +29,7 @@ auto g::TelemetryPacketReader::set_path(std::string pathname) -> void {
     auto file_size = stream_file_.tellg();
     stream_file_.seekg (0, stream_file_.beg);
     auto fs_string = std::format("{:4.2f}", (f64)file_size/1e6);
-    spdlog::info("Will read packets from {} [{} MB]", files[0], fs_string);
+    SPDLOG_INFO("Will read packets from {} [{} MB]", files[0], fs_string);
   }
 }
 
@@ -41,7 +41,7 @@ g::TelemetryPacketReader::TelemetryPacketReader() :
                                                     filenames_      (Vec<std::string>()),
                                                     file_idx_       (0) {
   #ifdef BUILD_CXX_DB
-  spdlog::info("Will load tofpaddles from DB for this reader!");
+  SPDLOG_INFO("Will load tofpaddles from DB for this reader!");
   paddles = std::make_shared<g::TofPaddleMap>(g::get_tofpaddles());
   #endif 
 };
@@ -68,7 +68,7 @@ auto g::TelemetryPacketReader::prime_next_file_() -> void {
     stream_file_.seekg (0, stream_file_.beg);
   } else {
     exhausted_ = true;
-    spdlog::info("TelemetryPacketReader exhausted the packets in the current file!");
+    SPDLOG_INFO("TelemetryPacketReader exhausted the packets in the current file!");
     throw std::runtime_error("TelemetryPacketReader exhausted the packets in the current file!");
   }
 }
@@ -77,10 +77,17 @@ auto g::TelemetryPacketReader::prime_next_file_() -> void {
 
 auto g::TelemetryPacketReader::count_packets() -> u64 {
   u64 npacks = 0;
+  // FIXME - we need to think about the approach to propagate 
+  // the error here. Maybe we use Result ? 
   while (!is_exhausted()) {
-    get_next_packet();
-    ++npacks;
+    try {
+      get_next_packet();
+      ++npacks;
+    } catch (...) {
+      break;
+    }
   }
+  rewind();
   return npacks;
 }
 
@@ -135,6 +142,7 @@ auto g::TelemetryPacketReader::get_next_packet() -> g::TelemetryPacket {
   }
   while (true) { 
     if (stream_file_.eof()) {
+      SPDLOG_INFO("Priming next file!");
       prime_next_file_();
       return get_next_packet();
     } 
@@ -204,11 +212,15 @@ auto g::TelemetryPacketReader::print_packet_index() const -> void {
 //--------------------------------------------------------------------------
 
 auto g::TelemetryPacketReader::rewind() -> void {
+  SPDLOG_INFO("Rewinding!");
   exhausted_   = false;
   file_idx_    = 0;
   stream_file_ = std::ifstream(filenames_[0], std::ios::binary);   
   stream_file_.seekg (0, stream_file_.end);
   auto file_size = stream_file_.tellg();
+  stream_file_.seekg (0, stream_file_.beg);
+  auto fs_string = std::format("{:4.2f}", (f64)file_size/1e6);
+  //SPDLOG_INFO("Will read packets from {} [{} MB]", files[0], fs_string);
 }
 
 
