@@ -45,15 +45,15 @@ var searchData=
   ['cpu_5ffreq_42',['cpu_freq',['../structCPUMoniData.html#a88e2c65bd625a116d8d724b25661f4e9',1,'CPUMoniData']]],
   ['cpu_5ftemp_43',['cpu_temp',['../structCPUMoniData.html#a575e13975cca646b4ac138f9650a7380',1,'CPUMoniData']]],
   ['cpumonidata_44',['cpumonidata',['../structCPUMoniData.html',1,'CPUMoniData'],['../tof__packet_8h.html#aa69433dde428a8cd2a2242fb3592a565a290065ac442025f6fbe83611db302589',1,'CPUMoniData:&#160;tof_packet.h'],['../structCPUMoniData.html#ab8d928c85f13242c45c657c37e6de119',1,'CPUMoniData::CPUMoniData()']]],
-  ['crc_45',['crc',['../structgondola_1_1TrkHeader.html#a5de7667bcf3f603ea03532678a4da1d1',1,'gondola::TrkHeader']]],
+  ['crc_45',['crc',['../structgondola_1_1TrkHeader.html#a5de7667bcf3f603ea03532678a4da1d1',1,'gondola::TrkHeader::crc'],['../structgondola_1_1TrackerHeader.html#a0320df0c292dc01e88bfd08632beba76',1,'gondola::TrackerHeader::crc']]],
   ['crc32wrong_46',['Crc32Wrong',['../namespacegondola.html#ae4efa4080cf89476f85e917971613baaa1b8508e116432ac1383a292c6a0d05c1',1,'gondola']]],
-  ['create_5fid_47',['create_id',['../structgondola_1_1TrackerStrip.html#ae38a4fa9b10d4c96f7f3028b8cb60433',1,'gondola::TrackerStrip::create_id(u32 layer, u32 row, u32 module, u32 channel) -&gt; u32'],['../structgondola_1_1TrackerStrip.html#af09ff3a37a5e787b592035cf77712230',1,'gondola::TrackerStrip::create_id() const -&gt; u32']]],
+  ['create_5fid_47',['create_id',['../structgondola_1_1TrackerStrip.html#af09ff3a37a5e787b592035cf77712230',1,'gondola::TrackerStrip::create_id() const -&gt; u32'],['../structgondola_1_1TrackerStrip.html#ae38a4fa9b10d4c96f7f3028b8cb60433',1,'gondola::TrackerStrip::create_id(u32 layer, u32 row, u32 module, u32 channel) -&gt; u32']]],
   ['creation_5ftime_48',['creation_time',['../structgondola_1_1TelemetryEvent.html#a702b3e3b82ee020f57cd2c692677abd4',1,'gondola::TelemetryEvent']]],
   ['crframe_49',['CRFrame',['../structgondola_1_1CRFrame.html',1,'gondola']]],
   ['crframeindex_50',['CRFrameIndex',['../namespacegondola.html#adcb90f37f2ab2c20573b711d0210eb94',1,'gondola']]],
   ['crframeobject_51',['CRFrameObject',['../structgondola_1_1CRFrameObject.html',1,'gondola']]],
   ['crframeobjecttype_52',['CRFrameObjectType',['../namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68',1,'gondola']]],
-  ['crreader_53',['crreader',['../structgondola_1_1CRReader.html#a7f8accecfe3c59fe8e2507f8a2ce4ba5',1,'gondola::CRReader::CRReader()'],['../structgondola_1_1CRReader.html#ab6099ef66f4d227ff4130819db00c114',1,'gondola::CRReader::CRReader(std::string pathname)'],['../structgondola_1_1CRReader.html',1,'gondola::CRReader'],['../structgondola_1_1CRReader.html#a6f419b6f567f7f9d65d4389c91c523b2',1,'gondola::CRReader::CRReader()']]],
+  ['crreader_53',['crreader',['../structgondola_1_1CRReader.html#ab6099ef66f4d227ff4130819db00c114',1,'gondola::CRReader::CRReader()'],['../structgondola_1_1CRReader.html',1,'gondola::CRReader'],['../structgondola_1_1CRReader.html#a6f419b6f567f7f9d65d4389c91c523b2',1,'gondola::CRReader::CRReader(const CRReader &amp;)=delete'],['../structgondola_1_1CRReader.html#a7f8accecfe3c59fe8e2507f8a2ce4ba5',1,'gondola::CRReader::CRReader()']]],
   ['crwriter_54',['crwriter',['../structgondola_1_1CRWriter.html',1,'gondola::CRWriter'],['../structgondola_1_1CRWriter.html#a91b7dda052c79f22c25928e712182ba4',1,'gondola::CRWriter::CRWriter()']]],
   ['ctr_5fetx_55',['ctr_etx',['../structgondola_1_1TofHit.html#a469f5da9286a585fe86235fa80b7bdd0',1,'gondola::TofHit']]]
 ];

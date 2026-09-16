@@ -23,6 +23,8 @@ var annotated_dup =
       [ "TofPacketReader", "classgondola_1_1TofPacketReader.html", "classgondola_1_1TofPacketReader" ],
       [ "TofPaddle", "structgondola_1_1TofPaddle.html", "structgondola_1_1TofPaddle" ],
       [ "TofPaddleTimingConstant", "structgondola_1_1TofPaddleTimingConstant.html", "structgondola_1_1TofPaddleTimingConstant" ],
+      [ "TrackerDAQEventPacket", "structgondola_1_1TrackerDAQEventPacket.html", "structgondola_1_1TrackerDAQEventPacket" ],
+      [ "TrackerHeader", "structgondola_1_1TrackerHeader.html", "structgondola_1_1TrackerHeader" ],
       [ "TrackerStrip", "structgondola_1_1TrackerStrip.html", "structgondola_1_1TrackerStrip" ],
       [ "TrackerStripMask", "structgondola_1_1TrackerStripMask.html", "structgondola_1_1TrackerStripMask" ],
       [ "TrackerStripPedestal", "structgondola_1_1TrackerStripPedestal.html", "structgondola_1_1TrackerStripPedestal" ],

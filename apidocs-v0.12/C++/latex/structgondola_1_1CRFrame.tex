@@ -13,10 +13,12 @@
 \item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1CRFrame_a610c15220200558ca0ba16234385673c}{put\+\_\+fobject}} (\mbox{\hyperlink{structgondola_1_1CRFrameObject}{CRFrame\+Object}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{fobj}}, std\+::string) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{void}}
 \item 
-\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1CRFrame_ac736b9405ce559a4dfef8ba48286e185}{get\+\_\+tofpacket}} (std\+::string name) -\/$>$ result\+::\+Result$<$ \mbox{\hyperlink{structTofPacket}{Tof\+Packet}}, \mbox{\hyperlink{classgondola_1_1IOError}{IOError}} $>$
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1CRFrame_a9ecedecdb805713f361d0e88213febb2}{get\+\_\+tofpacket}} (std\+::string name) \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ result\+::\+Result$<$ \mbox{\hyperlink{structTofPacket}{Tof\+Packet}}, \mbox{\hyperlink{classgondola_1_1IOError}{IOError}} $>$
 \begin{DoxyCompactList}\small\item\em extract a tofpacket if this frame object is of the correct type \end{DoxyCompactList}\item 
-\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1CRFrame_a305ebb71b944e5b8e45686da8d3e7cce}{get\+\_\+telemetrypacket}} (std\+::string name) -\/$>$ \mbox{\hyperlink{structgondola_1_1TelemetryPacket}{Telemetry\+Packet}}
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1CRFrame_a509e9bba4d719e466b816afa1ef4d176}{get\+\_\+telemetrypacket}} (std\+::string name) \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{structgondola_1_1TelemetryPacket}{Telemetry\+Packet}}
 \item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1CRFrame_a40119f93d79316371c8f1073387e4d89}{get\+\_\+trackerhitseries}} (\mbox{\hyperlink{structOption}{Option}}$<$ std\+::string $>$ name) \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ result\+::\+Result$<$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{structgondola_1_1TrkHit}{Trk\+Hit}} $>$, \mbox{\hyperlink{classgondola_1_1IOError}{IOError}} $>$
+\begin{DoxyCompactList}\small\item\em get all tracker hits across multiple events in the same frame \end{DoxyCompactList}\item 
 \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1CRFrame_a513aeac0c4592d713385ad30753d5d14}{to\+\_\+bytestream}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$
 \begin{DoxyCompactList}\small\item\em to write data on disk \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsubsection*{Static Public Member Functions}
@@ -49,21 +51,31 @@
 \doxysubsubsection{\texorpdfstring{from\_bytestream()}{from\_bytestream()}}
 {\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+CRFrame\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$}]{stream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a5148c9c1252e19e12def2814f71690e3}{usize}} \&}]{pos }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{structgondola_1_1CRFrame}{CRFrame}}\hspace{0.3cm}{\ttfamily [static]}}
 
-\Hypertarget{structgondola_1_1CRFrame_a305ebb71b944e5b8e45686da8d3e7cce}\label{structgondola_1_1CRFrame_a305ebb71b944e5b8e45686da8d3e7cce} 
+\Hypertarget{structgondola_1_1CRFrame_a509e9bba4d719e466b816afa1ef4d176}\label{structgondola_1_1CRFrame_a509e9bba4d719e466b816afa1ef4d176} 
 \index{gondola::CRFrame@{gondola::CRFrame}!get\_telemetrypacket@{get\_telemetrypacket}}
 \index{get\_telemetrypacket@{get\_telemetrypacket}!gondola::CRFrame@{gondola::CRFrame}}
 \doxysubsubsection{\texorpdfstring{get\_telemetrypacket()}{get\_telemetrypacket()}}
-{\footnotesize\ttfamily \mbox{\hyperlink{structgondola_1_1TelemetryPacket}{g\+::\+Telemetry\+Packet}} gondola\+::\+CRFrame\+::get\+\_\+telemetrypacket (\begin{DoxyParamCaption}\item[{std\+::string}]{name }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{structgondola_1_1TelemetryPacket}{Telemetry\+Packet}}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structgondola_1_1TelemetryPacket}{g\+::\+Telemetry\+Packet}} gondola\+::\+CRFrame\+::get\+\_\+telemetrypacket (\begin{DoxyParamCaption}\item[{std\+::string}]{name }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{structgondola_1_1TelemetryPacket}{Telemetry\+Packet}}}
 
-\Hypertarget{structgondola_1_1CRFrame_ac736b9405ce559a4dfef8ba48286e185}\label{structgondola_1_1CRFrame_ac736b9405ce559a4dfef8ba48286e185} 
+\Hypertarget{structgondola_1_1CRFrame_a9ecedecdb805713f361d0e88213febb2}\label{structgondola_1_1CRFrame_a9ecedecdb805713f361d0e88213febb2} 
 \index{gondola::CRFrame@{gondola::CRFrame}!get\_tofpacket@{get\_tofpacket}}
 \index{get\_tofpacket@{get\_tofpacket}!gondola::CRFrame@{gondola::CRFrame}}
 \doxysubsubsection{\texorpdfstring{get\_tofpacket()}{get\_tofpacket()}}
-{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+CRFrame\+::get\+\_\+tofpacket (\begin{DoxyParamCaption}\item[{std\+::string}]{name }\end{DoxyParamCaption}) -\/$>$ result\+::\+Result$<$\mbox{\hyperlink{structTofPacket}{Tof\+Packet}},\mbox{\hyperlink{classgondola_1_1IOError}{IOError}}$>$}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+CRFrame\+::get\+\_\+tofpacket (\begin{DoxyParamCaption}\item[{std\+::string}]{name }\end{DoxyParamCaption}) const -\/$>$ result\+::\+Result$<$\mbox{\hyperlink{structTofPacket}{Tof\+Packet}},\mbox{\hyperlink{classgondola_1_1IOError}{IOError}}$>$}
 
 
 
 extract a tofpacket if this frame object is of the correct type 
+
+\Hypertarget{structgondola_1_1CRFrame_a40119f93d79316371c8f1073387e4d89}\label{structgondola_1_1CRFrame_a40119f93d79316371c8f1073387e4d89} 
+\index{gondola::CRFrame@{gondola::CRFrame}!get\_trackerhitseries@{get\_trackerhitseries}}
+\index{get\_trackerhitseries@{get\_trackerhitseries}!gondola::CRFrame@{gondola::CRFrame}}
+\doxysubsubsection{\texorpdfstring{get\_trackerhitseries()}{get\_trackerhitseries()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+CRFrame\+::get\+\_\+trackerhitseries (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structOption}{Option}}$<$ std\+::string $>$}]{name }\end{DoxyParamCaption}) const -\/$>$ result\+::\+Result$<$\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{structgondola_1_1TrkHit}{Trk\+Hit}}$>$,\mbox{\hyperlink{classgondola_1_1IOError}{IOError}}$>$}
+
+
+
+get all tracker hits across multiple events in the same frame 
 
 \Hypertarget{structgondola_1_1CRFrame_abb183d8f160d3ab062c70999d5bf6290}\label{structgondola_1_1CRFrame_abb183d8f160d3ab062c70999d5bf6290} 
 \index{gondola::CRFrame@{gondola::CRFrame}!parse\_index@{parse\_index}}

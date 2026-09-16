@@ -1,9 +1,12 @@
 var structgondola_1_1TofEventSummary =
 [
+    [ "get_event_status", "structgondola_1_1TofEventSummary.html#a6e0783aa516d32fb10c31cf605e562f9", null ],
     [ "get_rb_link_ids", "structgondola_1_1TofEventSummary.html#aef0ecf225b2416060c80c8168a853717", null ],
     [ "get_timestamp48", "structgondola_1_1TofEventSummary.html#a5fdf2515c8ade30200a851ba36fb47ab", null ],
     [ "get_trigger_hits", "structgondola_1_1TofEventSummary.html#a52272d947d0c4fa8a75fb532f5b04de2", null ],
     [ "get_trigger_sources", "structgondola_1_1TofEventSummary.html#a203f4aef2eaaa057763a8894054eb23d", null ],
+    [ "set_event_status", "structgondola_1_1TofEventSummary.html#a04a49b2e33df566a98582d59fb500925", null ],
+    [ "set_timestamp48", "structgondola_1_1TofEventSummary.html#a94aac8f6ac44d8f0d5a3a16a0c0b2ece", null ],
     [ "to_string", "structgondola_1_1TofEventSummary.html#aab3047d910763c5b440120e22b1f8faf", null ],
     [ "channel_mask", "structgondola_1_1TofEventSummary.html#af828cd81c1608dcb33f25aa1fb6599ac", null ],
     [ "drs_dead_lost_hits", "structgondola_1_1TofEventSummary.html#a988ac3fe001dfa162bb7156030816d7b", null ],

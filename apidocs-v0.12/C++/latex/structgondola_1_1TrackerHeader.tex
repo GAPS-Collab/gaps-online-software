@@ -1,0 +1,118 @@
+\doxysection{gondola\+::Tracker\+Header Struct Reference}
+\hypertarget{structgondola_1_1TrackerHeader}{}\label{structgondola_1_1TrackerHeader}\index{gondola::TrackerHeader@{gondola::TrackerHeader}}
+
+
+{\ttfamily \#include $<$tracker\+\_\+packet.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TrackerHeader_a02de85bf87faa56b01e655a3ea06851b}{to\+\_\+string}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ std\+::string
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TrackerHeader_a204cf54412415fb1812915e6ed53aab2}{from\+\_\+bytestream}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_ae4d34abafdf1602428db318ca44dfb84}{bytestream}}, \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}}) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{structgondola_1_1TrackerHeader}{Tracker\+Header}}, \mbox{\hyperlink{classgondola_1_1IOError}{IOError}} $>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1TrackerHeader_a3ce99cb0e080a83156ad363961417059}{sync}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1TrackerHeader_a0320df0c292dc01e88bfd08632beba76}{crc}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structgondola_1_1TrackerHeader_accbf534df10c65dc301ad00daac943a5}{sys\+\_\+id}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structgondola_1_1TrackerHeader_acdb9388b6a3ec65bc05c42be080859f6}{packet\+\_\+id}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1TrackerHeader_a2b52ef47805e70d80f58f7cb869c48bb}{length}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1TrackerHeader_af67c66e49c720f24dc7aa55dde8df136}{daq\+\_\+count}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \mbox{\hyperlink{structgondola_1_1TrackerHeader_a16f18312c21b5021f4cd9b38929bea9a}{sys\+\_\+time}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structgondola_1_1TrackerHeader_ad4018c3d8fe32e4787cccc4fda193e6f}{version}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structgondola_1_1TrackerHeader_a28499d230077d6735a7ea024d472d7cf}{SIZE}} = 17
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structgondola_1_1TrackerHeader_a204cf54412415fb1812915e6ed53aab2}\label{structgondola_1_1TrackerHeader_a204cf54412415fb1812915e6ed53aab2} 
+\index{gondola::TrackerHeader@{gondola::TrackerHeader}!from\_bytestream@{from\_bytestream}}
+\index{from\_bytestream@{from\_bytestream}!gondola::TrackerHeader@{gondola::TrackerHeader}}
+\doxysubsubsection{\texorpdfstring{from\_bytestream()}{from\_bytestream()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tracker\+Header\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{bytestream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \&}]{pos }\end{DoxyParamCaption}) -\/$>$ r\+::\+Result$<$\mbox{\hyperlink{structgondola_1_1TrackerHeader}{Tracker\+Header}}, \mbox{\hyperlink{classgondola_1_1IOError}{IOError}}$>$\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{structgondola_1_1TrackerHeader_a02de85bf87faa56b01e655a3ea06851b}\label{structgondola_1_1TrackerHeader_a02de85bf87faa56b01e655a3ea06851b} 
+\index{gondola::TrackerHeader@{gondola::TrackerHeader}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!gondola::TrackerHeader@{gondola::TrackerHeader}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tracker\+Header\+::to\+\_\+string (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ std\+::string}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structgondola_1_1TrackerHeader_a0320df0c292dc01e88bfd08632beba76}\label{structgondola_1_1TrackerHeader_a0320df0c292dc01e88bfd08632beba76} 
+\index{gondola::TrackerHeader@{gondola::TrackerHeader}!crc@{crc}}
+\index{crc@{crc}!gondola::TrackerHeader@{gondola::TrackerHeader}}
+\doxysubsubsection{\texorpdfstring{crc}{crc}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Tracker\+Header\+::crc}
+
+\Hypertarget{structgondola_1_1TrackerHeader_af67c66e49c720f24dc7aa55dde8df136}\label{structgondola_1_1TrackerHeader_af67c66e49c720f24dc7aa55dde8df136} 
+\index{gondola::TrackerHeader@{gondola::TrackerHeader}!daq\_count@{daq\_count}}
+\index{daq\_count@{daq\_count}!gondola::TrackerHeader@{gondola::TrackerHeader}}
+\doxysubsubsection{\texorpdfstring{daq\_count}{daq\_count}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Tracker\+Header\+::daq\+\_\+count}
+
+\Hypertarget{structgondola_1_1TrackerHeader_a2b52ef47805e70d80f58f7cb869c48bb}\label{structgondola_1_1TrackerHeader_a2b52ef47805e70d80f58f7cb869c48bb} 
+\index{gondola::TrackerHeader@{gondola::TrackerHeader}!length@{length}}
+\index{length@{length}!gondola::TrackerHeader@{gondola::TrackerHeader}}
+\doxysubsubsection{\texorpdfstring{length}{length}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Tracker\+Header\+::length}
+
+\Hypertarget{structgondola_1_1TrackerHeader_acdb9388b6a3ec65bc05c42be080859f6}\label{structgondola_1_1TrackerHeader_acdb9388b6a3ec65bc05c42be080859f6} 
+\index{gondola::TrackerHeader@{gondola::TrackerHeader}!packet\_id@{packet\_id}}
+\index{packet\_id@{packet\_id}!gondola::TrackerHeader@{gondola::TrackerHeader}}
+\doxysubsubsection{\texorpdfstring{packet\_id}{packet\_id}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} gondola\+::\+Tracker\+Header\+::packet\+\_\+id}
+
+\Hypertarget{structgondola_1_1TrackerHeader_a28499d230077d6735a7ea024d472d7cf}\label{structgondola_1_1TrackerHeader_a28499d230077d6735a7ea024d472d7cf} 
+\index{gondola::TrackerHeader@{gondola::TrackerHeader}!SIZE@{SIZE}}
+\index{SIZE@{SIZE}!gondola::TrackerHeader@{gondola::TrackerHeader}}
+\doxysubsubsection{\texorpdfstring{SIZE}{SIZE}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} gondola\+::\+Tracker\+Header\+::\+SIZE = 17\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+\Hypertarget{structgondola_1_1TrackerHeader_a3ce99cb0e080a83156ad363961417059}\label{structgondola_1_1TrackerHeader_a3ce99cb0e080a83156ad363961417059} 
+\index{gondola::TrackerHeader@{gondola::TrackerHeader}!sync@{sync}}
+\index{sync@{sync}!gondola::TrackerHeader@{gondola::TrackerHeader}}
+\doxysubsubsection{\texorpdfstring{sync}{sync}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Tracker\+Header\+::sync}
+
+\Hypertarget{structgondola_1_1TrackerHeader_accbf534df10c65dc301ad00daac943a5}\label{structgondola_1_1TrackerHeader_accbf534df10c65dc301ad00daac943a5} 
+\index{gondola::TrackerHeader@{gondola::TrackerHeader}!sys\_id@{sys\_id}}
+\index{sys\_id@{sys\_id}!gondola::TrackerHeader@{gondola::TrackerHeader}}
+\doxysubsubsection{\texorpdfstring{sys\_id}{sys\_id}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} gondola\+::\+Tracker\+Header\+::sys\+\_\+id}
+
+\Hypertarget{structgondola_1_1TrackerHeader_a16f18312c21b5021f4cd9b38929bea9a}\label{structgondola_1_1TrackerHeader_a16f18312c21b5021f4cd9b38929bea9a} 
+\index{gondola::TrackerHeader@{gondola::TrackerHeader}!sys\_time@{sys\_time}}
+\index{sys\_time@{sys\_time}!gondola::TrackerHeader@{gondola::TrackerHeader}}
+\doxysubsubsection{\texorpdfstring{sys\_time}{sys\_time}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} gondola\+::\+Tracker\+Header\+::sys\+\_\+time}
+
+\Hypertarget{structgondola_1_1TrackerHeader_ad4018c3d8fe32e4787cccc4fda193e6f}\label{structgondola_1_1TrackerHeader_ad4018c3d8fe32e4787cccc4fda193e6f} 
+\index{gondola::TrackerHeader@{gondola::TrackerHeader}!version@{version}}
+\index{version@{version}!gondola::TrackerHeader@{gondola::TrackerHeader}}
+\doxysubsubsection{\texorpdfstring{version}{version}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} gondola\+::\+Tracker\+Header\+::version}
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/packets/\mbox{\hyperlink{tracker__packet_8hpp}{tracker\+\_\+packet.\+hpp}}\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/\mbox{\hyperlink{tracker__packet_8cxx}{tracker\+\_\+packet.\+cxx}}\end{DoxyCompactItemize}

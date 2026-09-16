@@ -4,6 +4,7 @@ var classgondola_1_1IOError =
       [ "StreamTooShort", "classgondola_1_1IOError.html#a20f21d8609600d07946504f3bbd144f7a7700d8c06be44e20cc35c7b67bb196a6", null ],
       [ "StreamTooLong", "classgondola_1_1IOError.html#a20f21d8609600d07946504f3bbd144f7a13f7dd88a736896765373ad7d8ad76b0", null ],
       [ "TooManyTrkEvents", "classgondola_1_1IOError.html#a20f21d8609600d07946504f3bbd144f7a1af5bfa5aee6996e722fe0553a11d381", null ],
+      [ "TooManyTrkHits", "classgondola_1_1IOError.html#a20f21d8609600d07946504f3bbd144f7afb50b7ee04ecc3d9a4b9e243e3038211", null ],
       [ "WrongDelimiter", "classgondola_1_1IOError.html#a20f21d8609600d07946504f3bbd144f7ae88402395166afe541888385c1f08cea", null ],
       [ "PacketNotFound", "classgondola_1_1IOError.html#a20f21d8609600d07946504f3bbd144f7a6880a1b15a1ca734913a8fbafd20d9d8", null ],
       [ "WrongPacketType", "classgondola_1_1IOError.html#a20f21d8609600d07946504f3bbd144f7a332c27e37d34b4727f6023e6210a1b88", null ],

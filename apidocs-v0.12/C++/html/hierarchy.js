@@ -42,6 +42,8 @@ var hierarchy =
     [ "gondola::TofPacketReader", "classgondola_1_1TofPacketReader.html", null ],
     [ "gondola::TofPaddle", "structgondola_1_1TofPaddle.html", null ],
     [ "gondola::TofPaddleTimingConstant", "structgondola_1_1TofPaddleTimingConstant.html", null ],
+    [ "gondola::TrackerDAQEventPacket", "structgondola_1_1TrackerDAQEventPacket.html", null ],
+    [ "gondola::TrackerHeader", "structgondola_1_1TrackerHeader.html", null ],
     [ "gondola::TrackerStrip", "structgondola_1_1TrackerStrip.html", null ],
     [ "gondola::TrackerStripMask", "structgondola_1_1TrackerStripMask.html", null ],
     [ "gondola::TrackerStripPedestal", "structgondola_1_1TrackerStripPedestal.html", null ],

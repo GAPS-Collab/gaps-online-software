@@ -1,0 +1,102 @@
+\doxysection{gondola\+::Tracker\+DAQEvent\+Packet Struct Reference}
+\hypertarget{structgondola_1_1TrackerDAQEventPacket}{}\label{structgondola_1_1TrackerDAQEventPacket}\index{gondola::TrackerDAQEventPacket@{gondola::TrackerDAQEventPacket}}
+
+
+{\ttfamily \#include $<$tracker\+\_\+packet.\+hpp$>$}
+
+
+
+Collaboration diagram for gondola\+::Tracker\+DAQEvent\+Packet\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{structgondola_1_1TrackerDAQEventPacket__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TrackerDAQEventPacket_ad62c0268e73ad884253acfa1af78513b}{to\+\_\+string}} () \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ std\+::string
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TrackerDAQEventPacket_aa90344589b4c7d18a926b32548198cec}{from\+\_\+bytestream}} (\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{stream}}, \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{pos}}) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{structgondola_1_1TrackerDAQEventPacket}{Tracker\+DAQEvent\+Packet}}, \mbox{\hyperlink{classgondola_1_1IOError}{IOError}} $>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structgondola_1_1TelemetryPacketHeader}{Telemetry\+Packet\+Header}} \mbox{\hyperlink{structgondola_1_1TrackerDAQEventPacket_a690d6059630e8c4fe67dae92b6fb3ba9}{header}}
+\item 
+\mbox{\hyperlink{structgondola_1_1TrackerHeader}{Tracker\+Header}} \mbox{\hyperlink{structgondola_1_1TrackerDAQEventPacket_a54a7701a496ad807b698181d40334b05}{daq\+\_\+header}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{structgondola_1_1TrkEvent}{Trk\+Event}} $>$ \mbox{\hyperlink{structgondola_1_1TrackerDAQEventPacket_a7b6b01e706702f5d0ca06fceeace5752}{events}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1TrackerDAQEventPacket_a3ce9886e7675b65e679724d06689225d}{run\+\_\+id}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structgondola_1_1TrackerDAQEventPacket_a546e1ec9c7920694bbe24b5315c27ca2}{run\+\_\+id\+\_\+old}}
+\item 
+\mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1TrackerDAQEventPacket_ae0f880a96ae03b7aa776bdc125bdc3d9}{n\+\_\+hits}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structgondola_1_1TrackerDAQEventPacket_aa90344589b4c7d18a926b32548198cec}\label{structgondola_1_1TrackerDAQEventPacket_aa90344589b4c7d18a926b32548198cec} 
+\index{gondola::TrackerDAQEventPacket@{gondola::TrackerDAQEventPacket}!from\_bytestream@{from\_bytestream}}
+\index{from\_bytestream@{from\_bytestream}!gondola::TrackerDAQEventPacket@{gondola::TrackerDAQEventPacket}}
+\doxysubsubsection{\texorpdfstring{from\_bytestream()}{from\_bytestream()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tracker\+DAQEvent\+Packet\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{stream,  }\item[{\mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \&}]{pos }\end{DoxyParamCaption}) -\/$>$ r\+::\+Result$<$\mbox{\hyperlink{structgondola_1_1TrackerDAQEventPacket}{Tracker\+DAQEvent\+Packet}}, \mbox{\hyperlink{classgondola_1_1IOError}{IOError}}$>$\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{structgondola_1_1TrackerDAQEventPacket_ad62c0268e73ad884253acfa1af78513b}\label{structgondola_1_1TrackerDAQEventPacket_ad62c0268e73ad884253acfa1af78513b} 
+\index{gondola::TrackerDAQEventPacket@{gondola::TrackerDAQEventPacket}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!gondola::TrackerDAQEventPacket@{gondola::TrackerDAQEventPacket}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tracker\+DAQEvent\+Packet\+::to\+\_\+string (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ std\+::string}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structgondola_1_1TrackerDAQEventPacket_a54a7701a496ad807b698181d40334b05}\label{structgondola_1_1TrackerDAQEventPacket_a54a7701a496ad807b698181d40334b05} 
+\index{gondola::TrackerDAQEventPacket@{gondola::TrackerDAQEventPacket}!daq\_header@{daq\_header}}
+\index{daq\_header@{daq\_header}!gondola::TrackerDAQEventPacket@{gondola::TrackerDAQEventPacket}}
+\doxysubsubsection{\texorpdfstring{daq\_header}{daq\_header}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structgondola_1_1TrackerHeader}{Tracker\+Header}} gondola\+::\+Tracker\+DAQEvent\+Packet\+::daq\+\_\+header}
+
+\Hypertarget{structgondola_1_1TrackerDAQEventPacket_a7b6b01e706702f5d0ca06fceeace5752}\label{structgondola_1_1TrackerDAQEventPacket_a7b6b01e706702f5d0ca06fceeace5752} 
+\index{gondola::TrackerDAQEventPacket@{gondola::TrackerDAQEventPacket}!events@{events}}
+\index{events@{events}!gondola::TrackerDAQEventPacket@{gondola::TrackerDAQEventPacket}}
+\doxysubsubsection{\texorpdfstring{events}{events}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{structgondola_1_1TrkEvent}{Trk\+Event}}$>$ gondola\+::\+Tracker\+DAQEvent\+Packet\+::events}
+
+\Hypertarget{structgondola_1_1TrackerDAQEventPacket_a690d6059630e8c4fe67dae92b6fb3ba9}\label{structgondola_1_1TrackerDAQEventPacket_a690d6059630e8c4fe67dae92b6fb3ba9} 
+\index{gondola::TrackerDAQEventPacket@{gondola::TrackerDAQEventPacket}!header@{header}}
+\index{header@{header}!gondola::TrackerDAQEventPacket@{gondola::TrackerDAQEventPacket}}
+\doxysubsubsection{\texorpdfstring{header}{header}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structgondola_1_1TelemetryPacketHeader}{Telemetry\+Packet\+Header}} gondola\+::\+Tracker\+DAQEvent\+Packet\+::header}
+
+\Hypertarget{structgondola_1_1TrackerDAQEventPacket_ae0f880a96ae03b7aa776bdc125bdc3d9}\label{structgondola_1_1TrackerDAQEventPacket_ae0f880a96ae03b7aa776bdc125bdc3d9} 
+\index{gondola::TrackerDAQEventPacket@{gondola::TrackerDAQEventPacket}!n\_hits@{n\_hits}}
+\index{n\_hits@{n\_hits}!gondola::TrackerDAQEventPacket@{gondola::TrackerDAQEventPacket}}
+\doxysubsubsection{\texorpdfstring{n\_hits}{n\_hits}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Tracker\+DAQEvent\+Packet\+::n\+\_\+hits}
+
+internal counter for number of tracker hits in this event ~\newline
+ \Hypertarget{structgondola_1_1TrackerDAQEventPacket_a3ce9886e7675b65e679724d06689225d}\label{structgondola_1_1TrackerDAQEventPacket_a3ce9886e7675b65e679724d06689225d} 
+\index{gondola::TrackerDAQEventPacket@{gondola::TrackerDAQEventPacket}!run\_id@{run\_id}}
+\index{run\_id@{run\_id}!gondola::TrackerDAQEventPacket@{gondola::TrackerDAQEventPacket}}
+\doxysubsubsection{\texorpdfstring{run\_id}{run\_id}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Tracker\+DAQEvent\+Packet\+::run\+\_\+id}
+
+\Hypertarget{structgondola_1_1TrackerDAQEventPacket_a546e1ec9c7920694bbe24b5315c27ca2}\label{structgondola_1_1TrackerDAQEventPacket_a546e1ec9c7920694bbe24b5315c27ca2} 
+\index{gondola::TrackerDAQEventPacket@{gondola::TrackerDAQEventPacket}!run\_id\_old@{run\_id\_old}}
+\index{run\_id\_old@{run\_id\_old}!gondola::TrackerDAQEventPacket@{gondola::TrackerDAQEventPacket}}
+\doxysubsubsection{\texorpdfstring{run\_id\_old}{run\_id\_old}}
+{\footnotesize\ttfamily \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} gondola\+::\+Tracker\+DAQEvent\+Packet\+::run\+\_\+id\+\_\+old}
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/packets/\mbox{\hyperlink{tracker__packet_8hpp}{tracker\+\_\+packet.\+hpp}}\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/\mbox{\hyperlink{tracker__packet_8cxx}{tracker\+\_\+packet.\+cxx}}\end{DoxyCompactItemize}

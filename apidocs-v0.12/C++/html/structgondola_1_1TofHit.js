@@ -28,6 +28,7 @@ var structgondola_1_1TofHit =
     [ "charge_b_f32", "structgondola_1_1TofHit.html#a7007095576b02d9b621e93fcdb4d3d76", null ],
     [ "coax_cbl_time", "structgondola_1_1TofHit.html#af6091af290e37f29719aafc688f0febe", null ],
     [ "ctr_etx", "structgondola_1_1TofHit.html#a469f5da9286a585fe86235fa80b7bdd0", null ],
+    [ "edep_corrected", "structgondola_1_1TofHit.html#afefa94af6c0355692c83208196c864b1", null ],
     [ "event_t0", "structgondola_1_1TofHit.html#a4b8a41fc8bed5d1078c12977cc07fda1", null ],
     [ "hart_cbl_time", "structgondola_1_1TofHit.html#a58f7e2b5d1873bbecb3251f3f62356d3", null ],
     [ "paddle_id", "structgondola_1_1TofHit.html#afdf78983ce30ba2fca09781bf3096724", null ],

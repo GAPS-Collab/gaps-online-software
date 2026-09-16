@@ -15,9 +15,10 @@ var searchData=
   ['tofeventsummary_12',['TofEventSummary',['../tof__packet_8h.html#aa69433dde428a8cd2a2242fb3592a565a6046537136bf4784175124a473eb23c5',1,'tof_packet.h']]],
   ['tofpacket_13',['TofPacket',['../namespacegondola.html#a466ace2a4c29903ffca2f1f86b41ba68a0a5f7d79c74b92d33255fc332e25b536',1,'gondola']]],
   ['toomanytrkevents_14',['TooManyTrkEvents',['../classgondola_1_1IOError.html#a20f21d8609600d07946504f3bbd144f7a1af5bfa5aee6996e722fe0553a11d381',1,'gondola::IOError']]],
-  ['track_15',['Track',['../namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21a92ea731d3af6677905303c88689f5d55',1,'gondola']]],
-  ['trackcentral_16',['TrackCentral',['../namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21abc421fa7f533c3d639eeebfd29fdf499',1,'gondola']]],
-  ['tracker_17',['Tracker',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39ceda26b8a5f8cbb692e906c8eed4b88cc0bd',1,'gondola']]],
-  ['trackerdaqcntr_18',['TrackerDAQCntr',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39cedac673eb57c4b7d3d8227f8b7e0f844b08',1,'gondola']]],
-  ['trktempleak_19',['TrkTempLeak',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39ceda809a59ac536e0b86400daa219166044d',1,'gondola']]]
+  ['toomanytrkhits_15',['TooManyTrkHits',['../classgondola_1_1IOError.html#a20f21d8609600d07946504f3bbd144f7afb50b7ee04ecc3d9a4b9e243e3038211',1,'gondola::IOError']]],
+  ['track_16',['Track',['../namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21a92ea731d3af6677905303c88689f5d55',1,'gondola']]],
+  ['trackcentral_17',['TrackCentral',['../namespacegondola.html#aac91e1b082fd02305f77ee3d0338ff21abc421fa7f533c3d639eeebfd29fdf499',1,'gondola']]],
+  ['tracker_18',['Tracker',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39ceda26b8a5f8cbb692e906c8eed4b88cc0bd',1,'gondola']]],
+  ['trackerdaqcntr_19',['TrackerDAQCntr',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39cedac673eb57c4b7d3d8227f8b7e0f844b08',1,'gondola']]],
+  ['trktempleak_20',['TrkTempLeak',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39ceda809a59ac536e0b86400daa219166044d',1,'gondola']]]
 ];

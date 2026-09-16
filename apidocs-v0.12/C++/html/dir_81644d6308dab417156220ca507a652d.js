@@ -18,6 +18,7 @@ var dir_81644d6308dab417156220ca507a652d =
     [ "telemetry_reader.cxx", "telemetry__reader_8cxx.html", null ],
     [ "tof_packet.cxx", "tof__packet_8cxx.html", "tof__packet_8cxx" ],
     [ "tracker_hit.cxx", "tracker__hit_8cxx.html", null ],
+    [ "tracker_packet.cxx", "tracker__packet_8cxx.html", "tracker__packet_8cxx" ],
     [ "tracklet.cxx", "tracklet_8cxx.html", "tracklet_8cxx" ],
     [ "version.cxx", "version_8cxx.html", "version_8cxx" ]
 ];

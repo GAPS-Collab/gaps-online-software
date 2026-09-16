@@ -18,7 +18,7 @@ var searchData=
   ['cpu1_5ftemp_15',['cpu1_temp',['../structCPUMoniData.html#a116bbb7e2f2c2d213829ecf780f3ac60',1,'CPUMoniData']]],
   ['cpu_5ffreq_16',['cpu_freq',['../structCPUMoniData.html#a88e2c65bd625a116d8d724b25661f4e9',1,'CPUMoniData']]],
   ['cpu_5ftemp_17',['cpu_temp',['../structCPUMoniData.html#a575e13975cca646b4ac138f9650a7380',1,'CPUMoniData']]],
-  ['crc_18',['crc',['../structgondola_1_1TrkHeader.html#a5de7667bcf3f603ea03532678a4da1d1',1,'gondola::TrkHeader']]],
+  ['crc_18',['crc',['../structgondola_1_1TrackerHeader.html#a0320df0c292dc01e88bfd08632beba76',1,'gondola::TrackerHeader::crc'],['../structgondola_1_1TrkHeader.html#a5de7667bcf3f603ea03532678a4da1d1',1,'gondola::TrkHeader::crc']]],
   ['creation_5ftime_19',['creation_time',['../structgondola_1_1TelemetryEvent.html#a702b3e3b82ee020f57cd2c692677abd4',1,'gondola::TelemetryEvent']]],
   ['ctr_5fetx_20',['ctr_etx',['../structgondola_1_1TofHit.html#a469f5da9286a585fe86235fa80b7bdd0',1,'gondola::TofHit']]]
 ];
