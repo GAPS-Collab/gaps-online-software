@@ -582,21 +582,16 @@ impl TofHit {
   /// Elena's energy deposition including attenuation
   pub fn get_edep_att(&self) -> f32 {
     let x0    = self.get_pos();
-    let att_a = ((3.9-0.00126*( x0+self.paddle_len/2.))+22.15).exp() / ((3.9)+22.15).exp();
-    let att_b = ((3.9-0.00126*(-x0+self.paddle_len/2.))+22.15).exp() / ((3.9)+22.15).exp();
+    let att_a = ((3.9-0.00126*(x0)).exp()+22.15) / ((3.9).exp()+22.15);
+    let att_b = ((3.9-0.00126*(self.paddle_len - x0)).exp()+22.15) / ((3.9).exp()+22.15);
     let edep  = 0.0159 * (self.get_peak_a()/att_a + self.get_peak_b()/att_b) / 2.; // vertical muon peak @ 0.97 MeV
     return edep; 
   }
 
-  // whatever newest and latest stuff we could not have anticipated 
-  // 3 years ago
   pub fn get_edep_birk(&self) -> f32 { 
     let x0    = self.get_pos();
-    let att_a = ((3.9-0.00126*( x0+self.paddle_len/2.))+22.15).exp() / ((3.9)+22.15).exp();
-    let att_b = ((3.9-0.00126*(-x0+self.paddle_len/2.))+22.15).exp() / ((3.9)+22.15).exp();
-    //let edep  = 0.0159 * (self.get_peak_a()/att_a + self.get_peak_b()/att_b) / 2.; // vertical muon peak @ 0.97 MeV
-    //return edep; 
-  
+    let att_a = ((3.9-0.00126*(x0)).exp()+22.15) / ((3.9).exp()+22.15);
+    let att_b = ((3.9-0.00126*(self.paddle_len - x0)).exp()+22.15) / ((3.9).exp()+22.15);
     let v = (self.get_peak_a()/att_a + self.get_peak_b()/att_b) / 2.0; 
     let edep = -1000.0*v/(21.0*v - 35260.0);
     return edep;
