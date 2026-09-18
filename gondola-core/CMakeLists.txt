@@ -32,29 +32,35 @@ endif()
 
 ##============================================
 
+file(GLOB GONDOLA_CXX_FILES ${CMAKE_CURRENT_SOURCE_DIR}/C++/src/*.cxx)
+list(REMOVE_ITEM GONDOLA_CXX_FILES "${CMAKE_CURRENT_SOURCE_DIR}/C++/src/sd_legacy.cxx")
+list(REMOVE_ITEM GONDOLA_CXX_FILES "${CMAKE_CURRENT_SOURCE_DIR}/C++/src/database.cxx")
+list(REMOVE_ITEM GONDOLA_CXX_FILES "${CMAKE_CURRENT_SOURCE_DIR}/C++/src/${GONDOLA_DICTIONARY}.cxx")
+
 if (BUILD_CXX_BINDINGS)
   message(STATUS "-- Building gondola-core C++ library.")
   set(GONDOLA_LIBRARY_SHARED GondolaCore CACHE INTERNAL "gondola-core C++ shared library" FORCE)
   add_library(${GONDOLA_LIBRARY_SHARED} SHARED
-              C++/src/tof_packet.cxx
-              C++/src/calibration.cxx
-              C++/src/serialization.cxx
-              C++/src/parsers.cxx
-              C++/src/rb_event.cxx
-              C++/src/rb_event_header.cxx
-              C++/src/events.cxx
-              C++/src/io.cxx
-              C++/src/telemetry_reader.cxx
-              C++/src/monitoring.cxx
-              C++/src/legacy.cxx
-              C++/src/version.cxx
-              C++/src/telemetry_dataclasses.cxx
-              C++/src/tracker_hit.cxx
-              C++/src/caraspace.cxx
-              C++/src/tracklet.cxx
-              C++/src/cooling.cxx
-              C++/src/telemetry_packet.cxx
-              C++/src/tracker_packet.cxx
+              ${GONDOLA_CXX_FILES}
+              #C++/src/tof_packet.cxx
+              #C++/src/calibration.cxx
+              #C++/src/serialization.cxx
+              #C++/src/parsers.cxx
+              #C++/src/rb_event.cxx
+              #C++/src/rb_event_header.cxx
+              #C++/src/events.cxx
+              #C++/src/io.cxx
+              #C++/src/telemetry_reader.cxx
+              #C++/src/monitoring.cxx
+              #C++/src/legacy.cxx
+              #C++/src/version.cxx
+              #C++/src/telemetry_dataclasses.cxx
+              #C++/src/tracker_hit.cxx
+              #C++/src/caraspace.cxx
+              #C++/src/tracklet.cxx
+              #C++/src/cooling.cxx
+              #C++/src/telemetry_packet.cxx
+              #C++/src/tracker_packet.cxx
               $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:C++/src/sd_legacy.cxx>
               $<$<BOOL:${BUILD_CXX_DB}>:C++/src/database.cxx>
               $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${GONDOLA_DICTIONARY}.cxx>
@@ -135,22 +141,23 @@ if (BUILD_CXX_STATIC_LIB)
   message(STATUS "-- Building gondola-core C++ STATIC library (for the use with nanobind).")
   set(GONDOLA_LIBRARY_STATIC GondolaCoreStatic CACHE INTERNAL "gondola-core C++ static library" FORCE)
   add_library(${GONDOLA_LIBRARY_STATIC} STATIC 
-              C++/src/tof_packet.cxx
-              C++/src/calibration.cxx
-              C++/src/serialization.cxx
-              C++/src/parsers.cxx
-              C++/src/events.cxx
-              C++/src/io.cxx
-              C++/src/telemetry_reader.cxx
-              C++/src/monitoring.cxx
-              C++/src/legacy.cxx
-              C++/src/version.cxx
-              C++/src/telemetry_dataclasses.cxx
-              C++/src/tracker_hit.cxx
-              C++/src/caraspace.cxx
-              C++/src/tracklet.cxx
-              C++/src/cooling.cxx
-              C++/src/telemetry_packet.cxx
+              ${GONDOLA_CXX_FILES}
+              #C++/src/tof_packet.cxx
+              #C++/src/calibration.cxx
+              #C++/src/serialization.cxx
+              #C++/src/parsers.cxx
+              #C++/src/events.cxx
+              #C++/src/io.cxx
+              #C++/src/telemetry_reader.cxx
+              #C++/src/monitoring.cxx
+              #C++/src/legacy.cxx
+              #C++/src/version.cxx
+              #C++/src/telemetry_dataclasses.cxx
+              #C++/src/tracker_hit.cxx
+              #C++/src/caraspace.cxx
+              #C++/src/tracklet.cxx
+              #C++/src/cooling.cxx
+              #C++/src/telemetry_packet.cxx
 
               $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:C++/src/sd_legacy.cxx>
               $<$<BOOL:${BUILD_CXX_DB}>:C++/src/database.cxx>
