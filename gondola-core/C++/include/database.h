@@ -136,14 +136,14 @@ namespace gondola {
   auto get_tofpaddletimingconstants(std::string mask_name = "") -> TofPaddleTimingConstantMap;
 }
 
-std::ostream& operator<<(std::ostream& os, const gondola::TofPaddle& paddle);
-
-std::ostream& operator<<(std::ostream& os, const gondola::TrackerStrip& strip);
-
-std::ostream& operator<<(std::ostream& os, const gondola::TrackerStripMask& strip);
-
-std::ostream& operator<<(std::ostream& os, const gondola::TrackerStripPedestal& strip);
-
-std::ostream& operator<<(std::ostream& os, const gondola::TofPaddleTimingConstant& paddle);
+  std::ostream& operator<<(std::ostream& os, const gondola::TofPaddle& paddle);
+  
+  std::ostream& operator<<(std::ostream& os, const gondola::TrackerStrip& strip);
+  
+  std::ostream& operator<<(std::ostream& os, const gondola::TrackerStripMask& strip);
+  
+  std::ostream& operator<<(std::ostream& os, const gondola::TrackerStripPedestal& strip);
+  
+  std::ostream& operator<<(std::ostream& os, const gondola::TofPaddleTimingConstant& paddle);
 
 #endif
