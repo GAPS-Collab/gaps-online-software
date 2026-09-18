@@ -6,7 +6,7 @@
 #include "G4PVPlacement.hh"
 #include "G4Box.hh"
 
-#include "tof_typedefs.h"
+#include "gondola_typedefs.hpp"
 
 #include "materials.hpp"
 #include "volume_store.hpp"

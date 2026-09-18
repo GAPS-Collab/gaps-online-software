@@ -4,7 +4,7 @@
 #pragma once 
 
 #include <memory>
-#include "tof_typedefs.h"
+#include "gondola_typedefs.hpp"
 #include "result/result.h"
 #include "errors.hpp"
 #include "packets/telemetry_packet.hpp"

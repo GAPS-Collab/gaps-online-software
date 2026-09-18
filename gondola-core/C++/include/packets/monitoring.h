@@ -3,7 +3,7 @@
 
 #include <array>
 
-#include "tof_typedefs.h"
+#include "gondola_typedefs.hpp"
 #include "serialization.h"
 
 /**

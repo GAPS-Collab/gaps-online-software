@@ -25,7 +25,7 @@
 
 #include "result/result.h"
 
-#include "tof_typedefs.h"
+#include "gondola_typedefs.hpp"
 #include "packets/monitoring.h"
 #include "packets/tof_packet.h"
 #include "events/event_status.hpp"

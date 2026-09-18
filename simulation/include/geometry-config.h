@@ -1,4 +1,4 @@
-#include "tof_typedefs.h"
+#include "gondola_typedefs.hpp"
 
 struct GeometryConfig {
   Vec<bool> set_tof_panel {1,2,3,4,5,6,7,8,9,10,

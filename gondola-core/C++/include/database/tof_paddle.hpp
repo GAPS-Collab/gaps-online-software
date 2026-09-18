@@ -1,6 +1,6 @@
 #pragma once
 
-#include "tof_typedefs.h"
+#include "gondola_typedefs.hpp"
 #include "sqlite_orm.h"
 
 namespace gondola {

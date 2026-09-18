@@ -3,7 +3,7 @@
 #pragma once 
 
 #include "result/result.h"
-#include "tof_typedefs.h"
+#include "gondola_typedefs.hpp"
 #include "errors.hpp"
 #include "database.h"
 #include "version.h"

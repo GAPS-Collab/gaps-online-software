@@ -6,7 +6,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "tof_typedefs.h"
+#include "gondola_typedefs.hpp"
 #include "telemetry_dataclasses.hpp"
 #include "io.hpp"
 #ifdef BUILD_CXX_DB

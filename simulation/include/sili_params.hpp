@@ -5,7 +5,7 @@
 #include <algorithm>
 #include "G4SystemOfUnits.hh"
 
-#include "tof_typedefs.h"
+#include "gondola_typedefs.hpp"
 
 namespace gondola {
 

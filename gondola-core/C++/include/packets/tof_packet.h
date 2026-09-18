@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "result/result.h"
-#include "tof_typedefs.h"
+#include "gondola_typedefs.hpp"
 #include "errors.hpp"
 
 namespace r = result;

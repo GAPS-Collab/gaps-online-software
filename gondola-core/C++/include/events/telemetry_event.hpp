@@ -4,7 +4,7 @@
 #pragma once 
 
 #include "result/result.h"
-#include "tof_typedefs.h"
+#include "gondola_typedefs.hpp"
 #include "errors.hpp"
 #include "version.h"
 #include "events/event_status.hpp"

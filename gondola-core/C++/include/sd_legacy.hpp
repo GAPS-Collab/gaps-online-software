@@ -11,7 +11,7 @@
 #include "TH1D.h" 
 #include "TH2D.h"
 
-#include "tof_typedefs.h" 
+#include "gondola_typedefs.hpp" 
 #include "events/telemetry_event.hpp"
 #include "database.h"
 #include "tracklet.hpp"

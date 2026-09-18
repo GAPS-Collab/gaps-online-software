@@ -9,7 +9,7 @@
 #include "G4GDMLParser.hh"
 #include "G4Transform3D.hh"
 
-#include "tof_typedefs.h"
+#include "gondola_typedefs.hpp"
 #include "materials.hpp"
 #include "sim_config.hpp"
 

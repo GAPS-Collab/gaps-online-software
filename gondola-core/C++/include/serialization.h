@@ -9,7 +9,7 @@
 #include <assert.h>
 #include <concepts>
 
-#include "tof_typedefs.h"
+#include "gondola_typedefs.hpp"
 #include "packets/tof_packet.h"
 #include "serialization.h"
 

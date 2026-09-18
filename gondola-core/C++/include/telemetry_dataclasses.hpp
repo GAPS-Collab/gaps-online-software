@@ -6,7 +6,7 @@
 //!
 
 #include <memory>
-#include "tof_typedefs.h"
+#include "gondola_typedefs.hpp"
 #include "result/result.h"
 #include "errors.hpp"
 #include "events/telemetry_event.hpp"

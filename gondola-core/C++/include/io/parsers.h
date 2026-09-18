@@ -1,7 +1,7 @@
 #ifndef GAPSPARSERS_H_INCLUDED
 #define GAPSPARSERS_H_INCLUDED
 
-#include "tof_typedefs.h"
+#include "gondola_typedefs.hpp"
 
 namespace gondola {
   /// Reverse-parse a u16 a la rust's built in 

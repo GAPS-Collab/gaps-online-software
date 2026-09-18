@@ -1,7 +1,7 @@
 #ifndef VERSION_H_INCLUDED
 #define VERSION_H_INCLUDED
 
-#include "tof_typedefs.h"
+#include "gondola_typedefs.hpp"
 
 namespace gondola {
 

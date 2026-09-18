@@ -2,7 +2,6 @@
 #include "spdlog/spdlog.h"
 #include "spdlog/cfg/env.h"
 
-#include "tof_typedefs.h"
 #include "io/parsers.h"
 #include "serialization.h"
 

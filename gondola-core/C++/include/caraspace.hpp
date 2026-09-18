@@ -5,7 +5,7 @@
 #include <cmath>
 
 #include <memory>
-#include "tof_typedefs.h"
+#include "gondola_typedefs.hpp"
 #include "packets/tof_packet.h"
 #include "events/tracker_hit.hpp"
 #include "telemetry_dataclasses.hpp"

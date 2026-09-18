@@ -4,7 +4,7 @@
 
 #include <vector>
 
-#include "tof_typedefs.h"
+#include "gondola_typedefs.hpp"
 
 /** 
  * Legacy code, mostly written by 

@@ -16,7 +16,7 @@
 #include <string>
 #include <map>
 
-#include "tof_typedefs.h"
+#include "gondola_typedefs.hpp"
 #include "events.h"
 
 
