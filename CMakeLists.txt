@@ -137,7 +137,10 @@ if(DOXYGEN_FOUND)
   set(DOXYGEN_GENERATE_MAN NO) # You can enable this if you want man pages
   configure_file(${CMAKE_SOURCE_DIR}/doc/C++/Doxyfile.in ${CMAKE_BINARY_DIR}/doc/apidocs-v${PROJECT_VERSION}/C++/Doxyfile @ONLY)
   add_custom_target(doc
-    ALL
+    # docs need to be built seperately
+    # to speed up make and keep the output 
+    # clean
+    EXCLUDE_FROM_ALL
     COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/doc/apidocs-v${PROJECT_VERSION}/C++/Doxyfile
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc/apidocs-v${PROJECT_VERSION}/C++ 
     COMMENT "Generating C++ API documentation with Doxygen"
