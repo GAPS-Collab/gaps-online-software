@@ -10,6 +10,7 @@
 
 #include "database/tof_paddle.hpp"
 #include "database/tracker_strip.hpp"
+#include "database/tracker_strip_mask.hpp" 
 
 namespace gondola {
   
@@ -37,24 +38,6 @@ namespace gondola {
 
   /// Get a paddle if the dsi,j connection of a paddle is known (LTB, LG)
   auto get_dsi_j_paddles() -> DsiJChnPaddleIdMap;
-
-
-  /// Each module can have a mask, which allows to disable
-  /// trcker strips. The mask is typically a 32bit number
-  struct TrackerStripMask {
-    u32         strip_id ;
-    u64         volume_id;
-    u64         utc_timestamp;
-    std::string mask_name; 
-    bool        active     ; 
-  
-    auto to_string() const -> std::string;
-
-  };
-
-  typedef std::map<u32, bool> TrkStripMaskMap;
-
-  auto get_trackerstripmasks(std::string mask_name = "") -> TrkStripMaskMap;
 
   struct TrackerStripPedestal {
     u32     strip_id;
@@ -108,7 +91,6 @@ namespace gondola {
   std::ostream& operator<<(std::ostream& os, const gondola::TofPaddle& paddle);
   
   
-  std::ostream& operator<<(std::ostream& os, const gondola::TrackerStripMask& strip);
   
   std::ostream& operator<<(std::ostream& os, const gondola::TrackerStripPedestal& strip);
   
