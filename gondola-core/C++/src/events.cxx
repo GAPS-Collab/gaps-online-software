@@ -861,14 +861,18 @@ auto g::TofEvent::from_bytestream_alt(const Vec<u8> &stream, u64 &pos)
 
 auto g::TofEvent::from_tofpacket(const TofPacket &packet) -> TofEvent {
   TofEvent event;
-  if (packet.packet_type != PacketType::TofEvent) {
-    spdlog::error("Wrong packet type! {}", packet_type_to_string(packet.packet_type));
-    return event;
-  } 
   u64 _pos = 0;
-  // FIXME
-  event = TofEvent::from_bytestream(packet.payload, _pos).unwrap();
-  return event;
+  switch (packet.packet_type) {
+    case PacketType::TofEvent:
+      return TofEvent::from_bytestream(packet.payload, _pos).unwrap();
+      break;  
+    case PacketType::TofEventDeprecated: 
+      return TofEvent::from_bytestream_alt(packet.payload, _pos).unwrap();
+      break;
+    default:
+      spdlog::error("Wrong packet type! {}", packet_type_to_string(packet.packet_type));
+      return event;
+  }
 }
 
 /**********************************************************/
@@ -1727,7 +1731,9 @@ auto g::TofEventSummary::from_bytestream(const Vec<u8> &stream, u64 &pos)
 auto g::TofEventSummary::from_tofpacket(const TofPacket &packet) 
   -> Result<TofEventSummary, g::IOError> {
   TofEventSummary event;
-  if (packet.packet_type != PacketType::TofEventSummary) {
+  // this is not a bug. We are removing TofEventSummary, and there are some 
+  // changes to the packet type. TofEvent -> TofEventDeprecated TofEventSummary -> TofEvent
+  if (packet.packet_type != PacketType::TofEvent) {
     auto message = std::format("Wrong packet type! {}", packet_type_to_string(packet.packet_type));
     spdlog::error(message);
     auto err = g::IOError(g::IOError::ErrorKind::WrongPacketType, message);

@@ -13,9 +13,9 @@ namespace r = result;
 static const u8 UNKNOWN            =  0;
 static const u8 COMMAND            = 10;
 static const u8 RBEVENT            = 20;
-static const u8 TOFEVENT           = 21;
+static const u8 TOFEVENTDEPRECATED = 21;
 static const u8 RBWAVEFORM         = 22;
-static const u8 TOFEVENTSUMMARY    = 23;
+static const u8 TOFEVENT           = 23;
 static const u8 HEARTBEAT          = 40;
 static const u8 SCALAR             = 50;
 static const u8 MT                 = 60;
@@ -34,25 +34,25 @@ static const u8 RBCALIBRATION      = 130;
 /// individual TofPackets. This has to 
 /// resemble the Rust API
 enum class PacketType : u8 {
-  Unknown           = UNKNOWN            ,
-  Command           = COMMAND            ,
-  RBEvent           = RBEVENT            ,
-  TofEvent          = TOFEVENT           ,
-  RBWaveform        = RBWAVEFORM         ,
-  TofEventSummary   = TOFEVENTSUMMARY    ,
-  HeartBeat         = HEARTBEAT          ,
-  Scalar            = SCALAR             ,
-  MasterTrigger     = MT                 ,
-  RBHeader          = RBHEADER           ,
-  CPUMoniData       = CPUMONIDATA        ,
-  MTBMoni           = MTB_MONI           ,
-  RBMoni            = RB_MONI            ,
-  PBMoniData        = PBMONIDATA         , 
-  LTBMoniData       = LTBMONIDATA        ,
-  PAMoniData        = PAMONIDATA         , 
-  RBEventPayload    = RBEVENTPAYLOAD     ,
-  RBEventMemoryView = RBEVENTMEMORYVIEW  ,
-  RBCalibration     = RBCALIBRATION      ,
+  Unknown            = UNKNOWN            ,
+  Command            = COMMAND            ,
+  RBEvent            = RBEVENT            ,
+  TofEventDeprecated = TOFEVENTDEPRECATED ,
+  RBWaveform         = RBWAVEFORM         ,
+  TofEvent           = TOFEVENT           ,
+  HeartBeat          = HEARTBEAT          ,
+  Scalar             = SCALAR             ,
+  MasterTrigger      = MT                 ,
+  RBHeader           = RBHEADER           ,
+  CPUMoniData        = CPUMONIDATA        ,
+  MTBMoni            = MTB_MONI           ,
+  RBMoni             = RB_MONI            ,
+  PBMoniData         = PBMONIDATA         , 
+  LTBMoniData        = LTBMONIDATA        ,
+  PAMoniData         = PAMONIDATA         , 
+  RBEventPayload     = RBEVENTPAYLOAD     ,
+  RBEventMemoryView  = RBEVENTMEMORYVIEW  ,
+  RBCalibration      = RBCALIBRATION      ,
 };
 
 /// String representation of enum "PacketType"

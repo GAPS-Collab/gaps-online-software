@@ -200,8 +200,8 @@ int main(int argc, char *argv[]){
 	// this only works for the data I combined
 	// recently, NOT for the "stream" kind of data
 	// THe format will change as well soon.
-      case PacketType::TofEvent : 
-      case PacketType::TofEventSummary : {
+      case PacketType::TofEventDeprecated : 
+      case PacketType::TofEvent : {
 	
 	usize pos = 0;
 	usize ch_start;

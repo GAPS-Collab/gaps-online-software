@@ -20,14 +20,14 @@ auto packet_type_to_string(const PacketType pt) -> std::string {
       case PacketType::RBEvent : {
       return "RBEvent";
     }      
-      case PacketType::TofEvent : {
-      return "TofEvent";
+      case PacketType::TofEventDeprecated : {
+      return "TofEventDeprecated";
     }      
       case PacketType::RBWaveform : {
       return "RBWaveform";
     }      
-      case PacketType::TofEventSummary : {
-      return "TofEventSummary";
+      case PacketType::TofEvent : {
+      return "TofEvent";
     }      
       case PacketType::HeartBeat : {
       return "Heartbeat";
