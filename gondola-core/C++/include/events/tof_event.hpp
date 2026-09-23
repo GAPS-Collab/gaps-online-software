@@ -28,10 +28,10 @@ namespace gondola {
     static constexpr u16 HEAD = 0xAAAA;
     static constexpr u16 TAIL = 0x5555;
  
-    ProtocolVersion       version ;
-    EventStatus           status  ;
-    EventQuality          quality ;
-    u16         trigger_sources   ;
+    ProtocolVersion version        ;
+    EventStatus     status         ;
+    EventQuality    quality        ;
+    u16             trigger_sources;
     /// the number of triggered paddles coming
     /// from the MTB directly. This might NOT be
     /// the same as the number of hits!
@@ -78,6 +78,14 @@ namespace gondola {
      */
     static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos)
       -> r::Result<TofEvent, IOError>;
+
+    /// Allows to get TofEvent from a packet 
+    /// of the deprecate packet type TofEventDeprecated.
+    /// This packet type was formerly known as TofEvent
+    ///
+    /// This will produce an event with rbevents & hits.
+    static auto from_bytestream_alt(const Vec<u8> &bytestream, u64 &pos)
+      -> r::Result<TofEvent, IOError>;
   
     /**
      * Factory function for TofEvents.
@@ -97,6 +105,10 @@ namespace gondola {
     /// about the corresponding paddle
     auto set_paddlemap(const TofPaddleMap&) -> void;
     #endif
+    
+    /// Ensure compatibility with older data, which 
+    /// contained a different type of TofEvent
+    static auto decode_depr_tofevent_size_header(u32 mask) -> std::tuple<usize,usize>; 
       
     static auto get_n_rbevents(u32 mask) -> u32;
     /// Get all hits from all rb_events
@@ -106,6 +118,11 @@ namespace gondola {
     /// phase into account
     auto normalize_hit_times(const TofPaddleTimingConstantMap &offsets) -> void;
     #endif 
+
+    /// Check if th eassociated RBEvents have any of their
+    /// mangling stati set
+    auto has_any_mangling() -> bool;
+    
     /// string representation for printing
     auto to_string() const -> std::string;
   

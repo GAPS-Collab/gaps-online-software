@@ -26,6 +26,20 @@ namespace gondola {
       ErrorKind kind;
       std::string reason;
   };
+  
+  class AnalysisError {
+    public:
+   
+      enum class ErrorKind {
+        OutOfBounds
+      };
+     
+      AnalysisError(ErrorKind kind, std::string reason = ""):
+        kind(kind), reason(reason) {}
+      
+      ErrorKind kind;
+      std::string reason;
+  };
 
   //class FatalException : public std::exception {
   //  virtual const char* what() const throw() { 

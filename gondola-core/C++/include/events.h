@@ -70,6 +70,8 @@ namespace gondola {
   };
   
   std::ostream& operator<<(std::ostream& os, const gondola::CompressionLevel& level);  
+
+  auto mt_event_get_timestamp_abs48(u64 mtb_timestamp, u64 gps_timestamp, u64 tiu_timestamp) -> u64;
 } 
 
 

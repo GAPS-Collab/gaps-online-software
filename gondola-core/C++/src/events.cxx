@@ -56,6 +56,20 @@ const Vec<Vec<u8>> PHYSICAL_CHANNELS = {
 /**********************************************************/
 
 namespace gondola {
+
+  auto mt_event_get_timestamp_abs48(u64 mtb_timestamp, u64 gps_timestamp, u64 tiu_timestamp) -> u64 {
+    u64 gps       = gps_timestamp;
+    u64 timestamp = mtb_timestamp;
+    if (timestamp < tiu_timestamp){
+      // it has wrapped
+      timestamp += std::numeric_limits<u32>::max() + 1;
+    }
+    u64 hundred_m = 100000000;
+    u64 gps_mult = hundred_m*gps;
+    u64 ts = gps_mult + (timestamp - (u64)tiu_timestamp);
+    return ts;
+  }
+  
   std::ostream& operator<<(std::ostream& os, const g::EventQuality& qual) {
     os << "<EventQuality: " ;
     switch (qual) {
@@ -731,6 +745,118 @@ auto g::TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
   return Ok(event);
 }
   
+/**********************************************************/
+
+/// Check if th eassociated RBEvents have any of their
+/// mangling stati set
+auto g::TofEvent::has_any_mangling() -> bool {
+  for (auto const &rbev : rb_events) {
+    if ((rbev.status == EventStatus::CellAndChnSyncErrors) 
+    || (rbev.status == EventStatus::CellSyncErrors) 
+    || (rbev.status == EventStatus::ChnSyncErrors)) {
+      return true;
+    }
+  }
+  if (status == EventStatus::AnyDataMangling) {
+    return true;
+  }
+  return false;
+}
+  
+/**********************************************************/
+  
+auto g::TofEvent::decode_depr_tofevent_size_header(u32 mask) 
+  -> std::tuple<usize, usize> {
+  usize rb_event_len = (mask & 0xFF)         ;
+  usize miss_len     = ((mask & 0xFF00) >> 8);
+  return std::make_tuple(rb_event_len, miss_len);
+}
+
+/**********************************************************/
+  
+auto g::TofEvent::from_bytestream_alt(const Vec<u8> &stream, u64 &pos) 
+  -> Result<TofEvent, g::IOError> {
+  u16 head = g::parse_u16(stream, pos);
+  if (head != TofEvent::HEAD)  {
+    spdlog::error("No header signature found!");  
+    auto message = std::format("TofEvent has incorrect header!");
+    auto err = g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, message);
+    return Err(err);
+  }
+  auto te = TofEvent();
+  /// the compression level will always be 0 for old data
+  //auto _compression_level = parse_u8(stream, pos);
+  // however, since we don't use it, let's discard it completely
+  pos += 1;
+  te.quality              = static_cast<g::EventQuality>(g::parse_u8(stream, pos));
+  // at this position is the serialized TofEventHeader. We don't have that anymore (>v0.11). 
+  // However, the only information we need from it is the run id, the other fields are anyway
+  // empty
+  pos += 2; // for TofEventHeader::HEAD
+  // FIXME - potentially dangerous for u16 overflow!
+  te.run_id             = parse_u32(stream, pos);
+  pos += 43 - 6;// rest of TofEventHeader 
+  //let header         = TofEventHeader::from_bytestream(stream, &mut pos)?;
+  // now parse the "old" MasterTriggerEvent
+  pos += 2; // MasterTriggerEvent::HEAD
+  te.status   = (EventStatus)g::parse_u8 (stream, pos);
+  if (te.has_any_mangling()) {
+    te.status = EventStatus::AnyDataMangling;
+  }
+  te.event_id        = g::parse_u32(stream, pos);
+  auto mtb_timestamp  = g::parse_u32(stream, pos);
+  auto tiu_timestamp  = g::parse_u32(stream, pos);
+  auto tiu_gps32      = g::parse_u32(stream, pos);
+  pos += 2;
+  pos += 4;
+  //auto _tiu_gps16     = g::parse_u16(stream,pos);
+  //auto _crc           = g::parse_u32(stream, pos);
+  u64 mt_timestamp   = (u64)(std::floor(mt_event_get_timestamp_abs48(mtb_timestamp, tiu_gps32, tiu_timestamp )/1000.0)); 
+  te.timestamp32      = (u32)(mt_timestamp  & 0x00000000ffffffff );
+  te.timestamp16      = (u16)((mt_timestamp & 0x0000ffff00000000 ) >> 32);
+  te.trigger_sources  = g::parse_u16(stream, pos);
+  te.dsi_j_mask       = g::parse_u32(stream, pos);
+  auto n_channel_masks = g::parse_u8(stream, pos);
+  for (u8 i = 0; i < n_channel_masks; ++i) {
+    te.channel_mask.push_back(parse_u16(stream, pos));
+  }
+  te.mtb_link_mask      = g::parse_u64(stream, pos);
+  u16 mt_event_tail     = g::parse_u16(stream, pos);
+  if (mt_event_tail != TofEvent::TAIL) {
+    // (tail for mt event was the same)
+    spdlog::error("Parsed TAIL from MT event is incorrect! Got {} instead of {} at pos {}", mt_event_tail, TofEvent::TAIL, pos);
+  }
+  ////let mt_event      = MasterTriggerEvent::from_bytestream(stream, &mut pos)?;
+  auto v_sizes       = decode_depr_tofevent_size_header(g::parse_u32(stream, pos));
+  for (u8 i = 0; i < std::get<0>(v_sizes); ++i) {
+  //  // we are getting all waveforms for now, but we can 
+  //  // discard them later
+    auto next_rb_event_res = RBEvent::from_bytestream(stream, pos);
+    te.rb_events.push_back(next_rb_event_res);
+    //if (next_rb_event_res.is_ok()) {
+  //  //println!("{}", next_rb_event);
+    //  te.rb_events.push_back(next_rb_event_res.unwrap());
+    //}
+  }
+  // this is a little bit iffy. We are copying the events. This 
+  // tecnically would be better as a pointer, however, there is 
+  // a catch. In case of (ex) TofEventSummary, this would indeed 
+  // be hits, not a pointer to hits. Currently, the sacrifice to 
+  // have them both the same, seems to be this.
+  for (auto const &rbev : te.rb_events) {
+    for (auto const &h : rbev.hits) {
+      te.hits.push_back(h);
+    }
+  }
+  u16 tail = g::parse_u16(stream, pos);
+  if (tail != TofEvent::TAIL) {
+    auto message = std::format("Decoding of TAIL failed! Got {} instead!", tail);
+    auto err = g::IOError(g::IOError::ErrorKind::WrongTailBytes, message);
+    return Err(err);
+  }
+  return Ok(te);
+}
+
 /**********************************************************/
 
 auto g::TofEvent::from_tofpacket(const TofPacket &packet) -> TofEvent {

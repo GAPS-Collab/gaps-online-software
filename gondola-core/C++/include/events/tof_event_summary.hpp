@@ -20,9 +20,9 @@ namespace gondola {
     static constexpr u16 TAIL = 0x5555;
   
     gondola::ProtocolVersion    version ;
-    EventStatus status            ; 
-    u8          quality           ; 
-    u16         trigger_sources   ; 
+    EventStatus                 status            ; 
+    u8                          quality           ; 
+    u16                         trigger_sources   ; 
     /// the number of triggered paddles coming
     /// from the MTB directly. This might NOT be
     /// the same as the number of hits!
