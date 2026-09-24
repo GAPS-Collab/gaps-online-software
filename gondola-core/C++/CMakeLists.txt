@@ -57,4 +57,13 @@ target_link_libraries(${CXX_PYBINDINGS}
                           GapsOnlineSoftware::GondolaCoreStatic
                           ${ROOT_LIBRARIES}
 )
+
 install(TARGETS ${CXX_PYBINDINGS} LIBRARY DESTINATION gondola_cxx)
+
+# in case we are building this with root, we need to also install the *.pcm
+install(
+    FILES
+        "$ENV{GapsOnlineSoftware_DIR}/lib/libGondolaCore_rdict.pcm"
+    DESTINATION gondola_cxx
+    OPTIONAL 
+)
