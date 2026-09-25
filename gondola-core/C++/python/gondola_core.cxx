@@ -20,7 +20,9 @@
 
 namespace nb  = nanobind;
 namespace g   = gondola;
-  
+
+using namespace nb::literals;
+
 // helper to allow returning a tuple from seperately 
 // stored members for x,y,z coordinates
 nb::tuple get_coordinates(f32 x, f32 y, f32 z) {
@@ -55,25 +57,25 @@ nb::enum_<g::ProtocolVersion>(m, "ProtocolVersion")
 
   // packets 
   nb::enum_<PacketType>(m, "TofPacketType")
-    .value("Unknown"           , PacketType::Unknown            )
-    .value("Command"           , PacketType::Command            )
-    .value("RBEvent"           , PacketType::RBEvent            )
-    .value("TofEvent"          , PacketType::TofEvent           )
-    .value("RBWaveform"        , PacketType::RBWaveform         )
-    .value("TofEventSummary"   , PacketType::TofEventSummary    )
-    .value("HeartBeat"         , PacketType::HeartBeat          )
-    .value("Scalar"            , PacketType::Scalar             )
-    .value("MasterTrigger"     , PacketType::MasterTrigger      )
-    .value("RBHeader"          , PacketType::RBHeader           )
-    .value("CPUMoniData"       , PacketType::CPUMoniData        )
-    .value("MTBMoni"           , PacketType::MTBMoni            )
-    .value("RBMoni"            , PacketType::RBMoni             )
-    .value("PBMoniData"        , PacketType::PBMoniData         ) 
-    .value("LTBMoniData"       , PacketType::LTBMoniData        )
-    .value("PAMoniData"        , PacketType::PAMoniData         ) 
-    .value("RBEventPayload"    , PacketType::RBEventPayload     )
-    .value("RBEventMemoryView" , PacketType::RBEventMemoryView  )
-    .value("RBCalibration"     , PacketType::RBCalibration      );
+    .value("Unknown"            , PacketType::Unknown            )
+    .value("Command"            , PacketType::Command            )
+    .value("RBEvent"            , PacketType::RBEvent            )
+    .value("TofEventDeprecated" , PacketType::TofEventDeprecated )
+    .value("TofEvent"           , PacketType::TofEvent           )
+    .value("RBWaveform"         , PacketType::RBWaveform         )
+    .value("HeartBeat"          , PacketType::HeartBeat          )
+    .value("Scalar"             , PacketType::Scalar             )
+    .value("MasterTrigger"      , PacketType::MasterTrigger      )
+    .value("RBHeader"           , PacketType::RBHeader           )
+    .value("CPUMoniData"        , PacketType::CPUMoniData        )
+    .value("MTBMoni"            , PacketType::MTBMoni            )
+    .value("RBMoni"             , PacketType::RBMoni             )
+    .value("PBMoniData"         , PacketType::PBMoniData         ) 
+    .value("LTBMoniData"        , PacketType::LTBMoniData        )
+    .value("PAMoniData"         , PacketType::PAMoniData         ) 
+    .value("RBEventPayload"     , PacketType::RBEventPayload     )
+    .value("RBEventMemoryView"  , PacketType::RBEventMemoryView  )
+    .value("RBCalibration"      , PacketType::RBCalibration      );
   
   nb::enum_<g::LTBThreshold>(m, "LTBThreshold")
     .value("NoHit"   , g::LTBThreshold::NoHit)
@@ -103,7 +105,11 @@ nb::enum_<g::ProtocolVersion>(m, "ProtocolVersion")
   //#ifdef BUILD_CXX_WITH_ROOT
   m.def("read_sd_legacy_example",&g::read_sd_legacy_example); 
   nb::class_<g::SDRootReader>(m, "SDRootReader")
-    .def(nb::init<std::string>())
+    .def(nb::init<std::string, bool>(), 
+           "file_name"_a,     // Required positional argument
+           nb::kw_only(),     // Everything after this must be a keyword argument
+           "mc"_a = false)     // Required keyword-only argument
+    //.def(nb::init<std::string>())
     //.def("get_next_event", [](g::TofPacketReader &r) {
     //  return r.get_next_packet().unwrap();
     //})
@@ -120,9 +126,12 @@ nb::enum_<g::ProtocolVersion>(m, "ProtocolVersion")
         return nb::cast(prim_value);
       }
     })
-    .def("get_event_tof_energies", &g::SDRootReader::get_event_tof_energies)
-    .def("get_simple_beta"       , &g::SDRootReader::get_simple_beta) 
-    .def("get_event_trk_energies", &g::SDRootReader::get_event_trk_energies);
+    .def("get_event_tof_energies"  , &g::SDRootReader::get_event_tof_energies)
+    .def("get_simple_beta"         , &g::SDRootReader::get_simple_beta)
+    .def("get_mc_tracks_edeps"     , &g::SDRootReader::get_mc_tracks_edeps) 
+    .def("get_mc_tracks_edeps_trk" , &g::SDRootReader::get_mc_tracks_edeps_trk) 
+    .def("get_mc_tracks_edeps_tof" , &g::SDRootReader::get_mc_tracks_edeps_tof) 
+    .def("get_event_trk_energies"  , &g::SDRootReader::get_event_trk_energies);
 
   nb::class_<g::SDRootWriter>(m, "SDRootWriter")
     .def(nb::init<std::string, std::string>())
