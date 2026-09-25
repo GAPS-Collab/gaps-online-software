@@ -386,7 +386,7 @@ auto go::GapsDetector::Construct() -> G4VPhysicalVolume* {
   G4Transform3D of_transform;
   G4ThreeVector of_pos = G4ThreeVector(0,
                                        0,
-                                       0);
+                                       42);
   of_transform = G4Translate3D(of_pos)
      * G4RotateZ3D(90*deg)
      * G4RotateX3D(90*deg);

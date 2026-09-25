@@ -1,5 +1,5 @@
 [general] 
-parts_root_dir = "/home/achim/gaps/gaps-detector-parts"
+parts_root_dir = "/srv/gaps/gaps-detector-parts"
 
 [gun] 
 # the source can be set to a fixed position
