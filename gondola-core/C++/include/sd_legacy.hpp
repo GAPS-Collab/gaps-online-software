@@ -1,6 +1,8 @@
 #ifdef BUILD_CXX_WITH_ROOT
 #pragma once 
 
+// These are the classes from simple det - enhanced with easy to use I/O 
+
 #include <memory>
 
 #include "TObject.h"
@@ -193,6 +195,80 @@ class CTrackBase : public TObject {
     Vec<f64>      ColumnDensityUntilStep; // column density [g/cm2]
     
     ClassDef(CTrackBase, 5);
+};
+
+enum class CGeant4ProcessType {
+   NOTDEFINED        = 0,
+   TRANSPORTATION    = 10,
+   ELECTROMAGNETIC   = 20,
+   OPTICAL           = 30,
+   HADRONIC          = 40,
+   PHOTOLEPTONHADRON = 50,
+   DECAY             = 60,
+   GENERAL           = 70,
+   PARAMETRISATION   = 80,
+   USERDEFINED       = 90,
+   PARALLEL          = 100,
+   PHONON            = 110,
+   UCN               = 120,
+};
+
+class CTrackMc : public CTrackBase {
+
+  public:
+    CTrackMc() {};
+    //virtual ~CTrackMc();
+    
+    auto pretty_print() const -> std::string;
+    
+    i32 Pdg;
+    u32 ParentId;
+    f64 VertexKineticEnergy;
+    CGeant4ProcessType    ProcessType;    
+    
+    Vec<f64>      KineticEnergy;
+    Vec<f64>      PreKineticEnergy;    
+    Vec<i32>      PreStepStatus;
+    Vec<i32>      PostStepStatus;
+    Vec<TVector3> PreMomentumDirection;       
+
+    ClassDefOverride(CTrackMc, 3); 
+};
+
+class CEventMc : public CEventBase {
+  public:
+
+    CEventMc() {};
+    //virtual ~CEventMc();
+    
+    auto pretty_print() const -> std::string;
+    auto get_primary()  const -> gondola::Tracklet;
+    
+    // injection paramaters
+    TVector3 primaryPosition_;
+    f64      primaryTime_;
+    i32      primaryPdg_;
+    f64      primaryStoppingKineticEnergy_;    
+
+    u32      randomSeed_;
+    
+    // stopping
+    i32      primaryStoppingVolume_;
+    TVector3 primaryStoppingPosition_;
+    f64      primaryStoppingTime_;
+
+    Vec<i32> hitTrackIndex_;    
+
+    Vec<CTrackMc*> tracks_;
+    
+    // hits
+    // these 4 quantities represent the hits
+    Vec<f64>      totalEnergyDeposition_;
+    Vec<TVector3> meanPosition_;
+    Vec<i32>      volumeId_;
+    Vec<f64>      time_;
+    
+    ClassDefOverride(CEventMc, 8)
 };
 
 class CTrackRec : public CTrackBase {
@@ -479,25 +555,46 @@ namespace Crane{
   } // end of namespace Reconstruction
 } // end of namespace Crane
 
+//-------------------------------------------------------------
+// END OF SIMPLEDET CLASSES
+//-------------------------------------------------------------
+
 namespace gondola {
+
   auto read_sd_legacy_example(std::string filename) -> void; 
   
   /// Read SimpleDet Root files and emit 
   /// MergedEvents
   struct SDRootReader {
-    SDRootReader(std::string);
+    //! Create a new reader with a single file as input 
+    SDRootReader(std::string fname, bool is_mc = false);
     ~SDRootReader();
     auto get_event(u64 event_idx) -> void; 
     auto get_event_tof_energies(u64 event_idx) -> Vec<f32>; 
     auto get_event_trk_energies(u64 event_idx) -> Vec<f32>; 
     auto get_primary(u64 event_idx)            -> Option<Tracklet>;
     auto get_simple_beta(u64 event_id)         -> f32;
+    
+    /// Get all energy depositions on all Mc tracks for this event
+    /// These will only work if the underlying CEvent is a Mc event
+    auto get_mc_tracks_edeps(u64 event_id)     -> Vec<f32>;
+    
+    /// Get all energy depositions on all Mc tracks only for the TOF
+    auto get_mc_tracks_edeps_trk(u64 event_id)     -> Vec<f32>;
+    
+    /// Get all energy depositions on all Mc tracks only for the TOF
+    auto get_mc_tracks_edeps_tof(u64 event_id)     -> Vec<f32>;
+    
+    
     //auto trk_energy_response(u16 adc, u8 layer, u8 row, u8 module, u8 channel) -> double;
-    std::string filename;
+    std::string filename = "";
+    bool is_mc           = false;
     // root just hates modern memory management
-    TChain* tchain;
-    u64 nevents_total;
-    CEventRec* event;
+    TChain* tchain                           = nullptr;
+    TChain* mc_tchain                        = nullptr;
+    u64 nevents_total                        = 0;
+    CEventRec* event                         = nullptr;
+    CEventMc*  mc_event                      = nullptr;
     Crane::Calibration::CRawTrk*   rawtrk    = nullptr;
     Crane::Calibration::CRawTof*   rawtof    = nullptr;
     Crane::Calibration::CRawHeader* rawhd    = nullptr;

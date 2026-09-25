@@ -2,6 +2,8 @@
 #pragma link C++ class CEventBase+;
 #pragma link C++ class CEventRec+;
 #pragma link C++ class CTrackBase+;
+#pragma link C++ class CTrackMc+;
+#pragma link C++ class CEventMc+;
 #pragma link C++ class CTrackRec+;
 #pragma link C++ class GRecoHit+;
 #pragma link C++ class Crane::Calibration::CRawHeader+;

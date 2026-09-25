@@ -18,6 +18,8 @@ namespace  g = gondola;
 ClassImp(GRecoHit);
 ClassImp(CEventBase);
 ClassImp(CTrackBase);
+ClassImp(CTrackMc);
+ClassImp(CEventMc);
 ClassImp(CEventRec);
 ClassImp(CTrackRec);
 ClassImp(cb::CRawHeader);
@@ -76,29 +78,48 @@ void gondola::read_sd_legacy_example(std::string filename) {
   }
 }
 
+//========================================================================
+
+g::SDRootReader::SDRootReader(std::string fname, bool mc) {
+  filename            = fname;
+  if (!mc) {
+    tchain              = new TChain("TreeRec");
+    tchain->Add(fname.c_str());
+    event               = new CEventRec();
+    tchain->SetBranchAddress("Rec", &event);
+    nevents_total       = tchain->GetEntries();
+    rawtrk              = new Crane::Calibration::CRawTrk()   ;
+    rawtof              = new Crane::Calibration::CRawTof()   ;
+    rawhd               = new Crane::Calibration::CRawHeader();
+    raw_tree            = new TChain("TreeRaw");
+    raw_tree->Add(fname.c_str());
+    raw_tree->SetBranchAddress("Trk", &rawtrk); 
+    raw_tree->SetBranchAddress("Tof", &rawtof);
+    paddle_vid_hid_map  = gondola::get_vid_hid_map_tof(); 
+    is_mc               = false;
+  } else {
+    mc_tchain           = new TChain("TreeMc"); 
+    mc_tchain->Add(fname.c_str());
+    mc_event            = new CEventMc();
+    mc_tchain->SetBranchAddress("Mc", &mc_event);
+    nevents_total       = mc_tchain->GetEntries();
+    is_mc               = true;
+  }
+}
+
 //------------------------------------------------------------------------
 
-g::SDRootReader::SDRootReader(std::string fname) {
-  filename            = fname;
-  tchain              = new TChain("TreeRec");
-  tchain->Add(fname.c_str());
-  event               = new CEventRec();
-  tchain->SetBranchAddress("Rec", &event);
-  nevents_total       = tchain->GetEntries();
-  rawtrk              = new Crane::Calibration::CRawTrk()   ;
-  rawtof              = new Crane::Calibration::CRawTof()   ;
-  rawhd               = new Crane::Calibration::CRawHeader();
-  raw_tree            = new TChain("TreeRaw");
-  raw_tree->Add(fname.c_str());
-  raw_tree->SetBranchAddress("Trk", &rawtrk); 
-  raw_tree->SetBranchAddress("Tof", &rawtof);
-  paddle_vid_hid_map  = gondola::get_vid_hid_map_tof(); 
+g::SDRootReader::~SDRootReader() {
+  if (is_mc) {
+    delete mc_event;
+    delete mc_tchain;
+  } else {
+    delete event;
+    delete tchain;
+  }
 }
 
-g::SDRootReader::~SDRootReader() {
-  delete event;
-  delete tchain;
-}
+//------------------------------------------------------------------------
 
 auto g::SDRootReader::get_event(u64 event_idx) -> void {
   tchain->GetEntry(event_idx); 
@@ -113,11 +134,15 @@ auto g::SDRootReader::get_event(u64 event_idx) -> void {
   }
 }
 
+//------------------------------------------------------------------------
+
 auto g::SDRootReader::get_event_tof_energies(u64 event_idx) -> Vec<f32> {
   tchain->GetEntry(event_idx); 
   return event->get_tof_energies();
   //std::cout << event->pretty_print() << std::endl;
 }
+
+//------------------------------------------------------------------------
 
 auto g::SDRootReader::get_event_trk_energies(u64 event_idx) -> Vec<f32> {
   tchain->GetEntry(event_idx); 
@@ -125,6 +150,7 @@ auto g::SDRootReader::get_event_trk_energies(u64 event_idx) -> Vec<f32> {
   //std::cout << event->pretty_print() << std::endl;
 }
 
+//------------------------------------------------------------------------
 
 auto g::SDRootReader::get_simple_beta(u64 event_idx) -> f32 {
   tchain->GetEntry(event_idx);
@@ -163,12 +189,70 @@ auto g::SDRootReader::get_simple_beta(u64 event_idx) -> f32 {
 //------------------------------------------------------------------------
     
 auto g::SDRootReader::get_primary(u64 event_idx)            -> Option<g::Tracklet> {
-  tchain->GetEntry(event_idx);
-  auto primary   = event->get_primary();
-  return primary;
+  if (is_mc) {
+    mc_tchain->GetEntry(event_idx);
+    auto primary   = mc_event->get_primary();
+    return Some(primary); 
+  } else {
+    tchain->GetEntry(event_idx);
+    auto primary   = event->get_primary();
+    return primary;
+  }
 }
 
 //------------------------------------------------------------------------
+
+auto g::SDRootReader::get_mc_tracks_edeps(u64 event_id)     -> Vec<f32> {
+  Vec<f32> edeps;
+  if (is_mc) {
+    mc_tchain->GetEntry(event_id);
+    for (auto const &t : mc_event->tracks_) {
+      for (auto const &edep : t->EnergyDeposition) {
+        edeps.push_back((f32)edep);
+      } 
+    }
+    return edeps;
+  } 
+  return edeps;
+}
+
+//------------------------------------------------------------------------
+
+auto g::SDRootReader::get_mc_tracks_edeps_tof(u64 event_id)     -> Vec<f32> {
+  Vec<f32> edeps;
+  if (is_mc) {
+    mc_tchain->GetEntry(event_id);
+    for (auto const &t : mc_event->tracks_) {
+      for (usize idx = 0; idx<t->VolumeId.size(); idx++) {
+        if (t->VolumeId[idx] < 200000000) { 
+          edeps.push_back((f32)t->EnergyDeposition[idx]);
+        }
+      } 
+    }
+    return edeps;
+  } 
+  return edeps;
+}
+
+//------------------------------------------------------------------------
+
+auto g::SDRootReader::get_mc_tracks_edeps_trk(u64 event_id)     -> Vec<f32> {
+  Vec<f32> edeps;
+  if (is_mc) {
+    mc_tchain->GetEntry(event_id);
+    for (auto const &t : mc_event->tracks_) {
+      for (usize idx = 0; idx<t->VolumeId.size(); idx++) {
+        if (t->VolumeId[idx] >= 200000000) { 
+          edeps.push_back((f32)t->EnergyDeposition[idx]);
+        }
+      } 
+    }
+    return edeps;
+  } 
+  return edeps;
+}
+
+//========================================================================
 
 g::SDRootWriter::SDRootWriter(std::string fname, std::string geo_file,  std::string file_mode) {
   // databases
@@ -311,6 +395,13 @@ auto GRecoHit::pretty_print() const -> std::string {
 
 //------------------------------------------------------------------------
 
+auto CTrackMc::pretty_print() const -> std::string {
+  std::string repr = "<CTrackMc>";
+  return repr;
+}
+
+//------------------------------------------------------------------------
+
 auto CTrackRec::pretty_print() const -> std::string {
   // FIXME - provide pointers
   auto vid_hid_map_tof    = gondola::get_vid_hid_map_tof();
@@ -380,7 +471,29 @@ auto CTrackRec::pretty_print() const -> std::string {
   return repr;
 }
 
+//========================================================================
+
+auto CEventMc::pretty_print() const -> std::string {
+  std::string repr = "<CEventMc>";
+  return repr;
+}
+
 //------------------------------------------------------------------------
+
+auto CEventMc::get_primary() const -> g::Tracklet {
+  auto vertex          = std::make_shared<g::RecoHit>();
+  vertex->x            = primaryPosition_.X();
+  vertex->y            = primaryPosition_.Y();
+  vertex->z            = primaryPosition_.Z(); 
+  vertex->energy       = (f32)primaryKineticEnergyGenerated_; 
+  g::Tracklet primary(vertex);
+  primary.vertex_mom_x = primaryMomentumDirectionGenerated_.X(); 
+  primary.vertex_mom_y = primaryMomentumDirectionGenerated_.Y(); 
+  primary.vertex_mom_z = primaryMomentumDirectionGenerated_.Z();
+  return primary;
+}
+
+//========================================================================
 
 auto Crane::Calibration::CRawHeader::pretty_print() const -> std::string {
   std::string repr = "<CRawHeader (compat layer):";
@@ -605,30 +718,61 @@ auto CEventRec::get_primary() const -> Option<g::Tracklet> {
       primary.coldens.push_back(k);
     }
   }
+  
   if (!primaryMomentumDirection_.contains(activeReco_)) {
-    std::cerr << std::format("Unable to access reconstruction results for reco with name '{}'", activeReco_) << std::endl;
+    std::cerr << std::format("Unable to access reconstruction results [momentum direction] for reco with name '{}'", activeReco_) << std::endl;
     return Some(primary);
   }
   
-  auto stop            = std::make_shared<g::RecoHit>();
-  auto psp             = primaryStoppingPosition_.at(activeReco_); 
   auto dir             = primaryMomentumDirection_.at(activeReco_);
-  auto edeps           = primaryEnergyDepositions_.at(activeReco_);
+  primary.vertex_mom_x = dir.X();
+  primary.vertex_mom_y = dir.Y();
+  primary.vertex_mom_z = dir.Z(); 
+  
+  auto stop            = std::make_shared<g::RecoHit>();
+  
+  if (!primaryStoppingPosition_.contains(activeReco_)) {
+    std::cerr << std::format("Unable to access reconstruction results [stopping position] for reco with name '{}'", activeReco_) << std::endl;
+    return Some(primary);
+  }
+  auto psp             = primaryStoppingPosition_.at(activeReco_); 
   stop->x              = psp.X();
   stop->y              = psp.Y();
   stop->z              = psp.Z();
+  
+
+  if (!primaryStoppingTime_.contains(activeReco_)) {
+    std::cerr << std::format("Unable to access reconstruction results [stopping time] for reco with name '{}'", activeReco_) << std::endl;
+    return Some(primary);
+  } 
   stop->time           = primaryStoppingTime_.at(activeReco_);
+  
+  if (!primaryStoppingVolume_.contains(activeReco_)) {
+    std::cerr << std::format("Unable to access reconstruction results [stopping volume] for reco with name '{}'", activeReco_) << std::endl;
+    return Some(primary);
+  } 
   stop->volume         = primaryStoppingVolume_.at(activeReco_);
   
   // -- assign to priamry
   //primary.vertex     = vertex;
   //primary.stop       = stop;
-  
-  primary.vertex_mom_x = dir.X();
-  primary.vertex_mom_y = dir.Y();
-  primary.vertex_mom_z = dir.Z(); 
+  primary.set_stop(stop); 
+  if (!Chi2.contains(activeReco_)) {
+    std::cerr << std::format("Unable to access reconstruction results [chi2] for reco with name '{}'", activeReco_) << std::endl;
+    return Some(primary);
+  } 
   primary.gof          = Some(Chi2.at(activeReco_));
+  
+  if (!primaryBeta_.contains(activeReco_)) {
+    std::cerr << std::format("Unable to access reconstruction results [beta] for reco with name '{}'", activeReco_) << std::endl;
+    return Some(primary);
+  } 
   primary.beta         = primaryBeta_.at(activeReco_);
+  
+  if (!primaryBetaError_.contains(activeReco_)) {
+    std::cerr << std::format("Unable to access reconstruction results [beta error] for reco with name '{}'", activeReco_) << std::endl;
+    return Some(primary);
+  } 
   primary.beta_err     = primaryBetaError_.at(activeReco_);
   return Some(primary);
 }
