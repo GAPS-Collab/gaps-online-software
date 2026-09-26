@@ -41,7 +41,8 @@ namespace gondola {
     
     auto to_string() const -> std::string;
 
-    auto invert(f64 y, Option<f64> epsilon_opt) -> r::Result<f64, AnalysisError>;
+    // the epsilon parameter is the convergence criterion and a random default
+    auto invert(f64 y, f64 epsilon = 1e-12) -> r::Result<f64, AnalysisError>;
     
     friend std::ostream& operator<<(std::ostream& os, const TrackerStripTransferFunction& tfn);
   }; 

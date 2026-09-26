@@ -72,59 +72,53 @@ auto g::TrackerStripTransferFunction::derivative(f32 adc) const -> f32 {
 // Create the inverse of the transfer function, which then 
 // can be used in the simulation
 // FIXME - switch to f64, however, only store f32 in the db
-auto g::TrackerStripTransferFunction::invert(f64 y, Option<f64> epsilon_opt) -> Result<f64, g::AnalysisError> {
+auto g::TrackerStripTransferFunction::invert(f64 y, f64 epsilon) -> Result<f64, g::AnalysisError> {
   f64 x = 0;
-  auto x_min = 0.0f32;
-  auto x_max = 1600.0f32;
-  auto y_min = evaluate(x_min);
-  auto y_max = evaluate(x_max);
+  f64 x_min = 0;
+  f64 x_max = 1600;
+  f64 y_min = evaluate(x_min);
+  f64 y_max = evaluate(x_max);
   if ((y < y_min) || (y > y_max)){
     auto message = std::format("y value of {} is out of bounds for 0 <= x <= 1600", y);
     spdlog::error(message);
     auto err = g::AnalysisError(g::AnalysisError::ErrorKind::OutOfBounds, message);
     return Err(err);
   }
-  return Ok(x);
-  //let max_iterations = 50;
-  //let epsilon : f64;
-  //if epsilon_opt.is_some() {
-  //  epsilon = epsilon_opt.unwrap();
-  //} else {
-  //  epsilon = 1e-12; // random default
-  //}
+  u32 max_iterations = 50;
 
-  //let mut low  = x_min;
-  //let mut high = x_max;
-  //let mut x = 0.5 * (low + high);
-
-  //for _ in 0..max_iterations {
-  //  let f_x = self.evaluate(x) as f64 - y;
-  //  let df_x = self.derivative(x) as f64;
-  //  // If we are close enough, or if the derivative is effectively zero
-  //  if f_x.abs() < epsilon {
-  //    return Ok(x as f64);
-  //  }
-  //  // Update bisection bounds
-  //  if f_x > 0.0 {
-  //    high = x;
-  //  } else {
-  //    low = x;
-  //  }
-  //  // Attempt a Newton-Raphson step
-  //  if df_x.abs() > 1e-9 {
-  //    let next_x = x as f64 - f_x / df_x;
-  //    // Safety check: if Newton step jumps outside our bounded bracket,
-  //    // fallback to a safe Bisection step.
-  //    if next_x > low as f64 && next_x < high as f64 {
-  //      x = next_x as f32;
-  //      continue;
-  //    }
-  //  }
-  //  // Fallback to Bisection if Newton fails or is too slow
-  //  x = 0.5 * (low + high);
-  //}
-  //error!("We couldn't find a solution which is epsilon {} away! Try to reduce epsilon!", epsilon);
-  //Err(AnalysisError::DidNotConverge)
+  f64 low  = x_min;
+  f64 high = x_max;
+  x = 0.5 * (low + high);
+  for (u32 n=0;n<max_iterations;n++) {
+    f64 f_x  = evaluate(x) - y;
+    f64 df_x = derivative(x);
+    // If we are close enough, or if the derivative is effectively zero
+    if (std::abs(f_x) < epsilon) {
+      return Ok(x);
+    }
+    // Update bisection bounds
+    if (f_x > 0.0) {
+      high = x;
+    } else {
+      low = x;
+    }
+    // Attempt a Newton-Raphson step
+    if (std::abs(df_x) > 1e-9) {
+      f64 next_x = x - f_x / df_x;
+      // Safety check: if Newton step jumps outside our bounded bracket,
+      // fallback to a safe Bisection step.
+      if ((next_x > low) && (next_x < high)) {
+        x = next_x;
+        continue;
+      }
+    }
+    // Fallback to Bisection if Newton fails or is too slow
+    x = 0.5 * (low + high);
+  }
+  auto message = std::format("We couldn't find a solution whcih is epsilon {} away! Try to reduce epsilon", epsilon);
+  spdlog::error(message);
+  auto err = g::AnalysisError(g::AnalysisError::ErrorKind::DidNotConverge, message);
+  return Err(err);
 }
 
 
