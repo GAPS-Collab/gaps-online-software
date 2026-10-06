@@ -12,9 +12,10 @@ using namespace result;
 
 namespace g = gondola;
 
+//----------------------------------------------------------------------------
+
 auto g::TrackerStripTransferFunction::to_string() const -> std::string {
   auto repr = std::format("<TrackerStripTransferFunction [{}]:", strip_id);
-  return repr;
   repr += std::format("\n   vid           : {}", volume_id);
   repr += "\n   UTC Timestamps (Begin/End):";
   repr += std::format("\n   {}/{}", utc_timestamp_start, utc_timestamp_stop);    
@@ -27,6 +28,8 @@ auto g::TrackerStripTransferFunction::to_string() const -> std::string {
   repr += std::format("\n  Poly D    :{}*adc + {}*adc + {}*(adc**2) + {}*(adc**3) for 900 < adc <= 1600>", pol_d3_0, pol_d3_1, pol_d3_2, pol_d3_3);
   return repr;
 }
+
+//----------------------------------------------------------------------------
   
 auto g::TrackerStripTransferFunction::evaluate(f32 adc) const -> f32 {
   if (adc < 0.0) {
@@ -47,6 +50,8 @@ auto g::TrackerStripTransferFunction::evaluate(f32 adc) const -> f32 {
   }
   return 0.0;
 }
+
+//----------------------------------------------------------------------------
   
 /// First derivative of the transfer function
 auto g::TrackerStripTransferFunction::derivative(f32 adc) const -> f32 {
@@ -60,14 +65,16 @@ auto g::TrackerStripTransferFunction::derivative(f32 adc) const -> f32 {
     return pol_b3_1 + 2.0*pol_b3_2*adc + 3.0*pol_b3_3*(pow(adc,2));
   }
   if ((500.0 < adc) && (adc <= 900.0)) {
-    return pol_c3_1 + 2.0*pol_c3_2 + 3.0*pol_c3_3*(pow(adc,2));
+    return pol_c3_1 + 2.0*pol_c3_2*adc + 3.0*pol_c3_3*(pow(adc,2));
   }
   //if 900.0 < adc && adc <= 2047.0 {
   if ((900.0 < adc) && (adc <= 1600.0)) {
-    return pol_d3_1 + 2.0*pol_d3_2 + 3.0*pol_d3_3*(pow(adc,2));
+    return pol_d3_1 + 2.0*pol_d3_2*adc + 3.0*pol_d3_3*(pow(adc,2));
   }
   return 0.0;
 }
+
+//----------------------------------------------------------------------------
 
 // Create the inverse of the transfer function, which then 
 // can be used in the simulation
@@ -79,8 +86,8 @@ auto g::TrackerStripTransferFunction::invert(f64 y, f64 epsilon) -> Result<f64, 
   f64 y_min = evaluate(x_min);
   f64 y_max = evaluate(x_max);
   if ((y < y_min) || (y > y_max)){
-    auto message = std::format("y value of {} is out of bounds for 0 <= x <= 1600", y);
-    spdlog::error(message);
+    auto message = std::format("y value of {} is out of bounds for {} <= y <= {} [ for adc in 0 .. 1600]", y, y_min, y_max);
+    SPDLOG_ERROR(message);
     auto err = g::AnalysisError(g::AnalysisError::ErrorKind::OutOfBounds, message);
     return Err(err);
   }
@@ -116,12 +123,64 @@ auto g::TrackerStripTransferFunction::invert(f64 y, f64 epsilon) -> Result<f64, 
     x = 0.5 * (low + high);
   }
   auto message = std::format("We couldn't find a solution whcih is epsilon {} away! Try to reduce epsilon", epsilon);
-  spdlog::error(message);
+  SPDLOG_ERROR(message);
   auto err = g::AnalysisError(g::AnalysisError::ErrorKind::DidNotConverge, message);
   return Err(err);
 }
 
+//============================================================================ 
 
+auto g::get_trkstriptransferfn() -> TrkStripTransferFnMap {
+  TrkStripTransferFnMap tf_map;
+  auto db_path = std::getenv("GONDOLA_DB_URL");
+  if (db_path == nullptr) {
+    spdlog::error("Unable to retrieve database! The GONDOLA_DB_URL shell variable is not set. Did you load the setup-env.sh shell?");
+    return tf_map;
+  } 
+  std::string dbname(db_path);
+  auto storage = make_storage(dbname,
+    make_table("tof_db_trackerstriptransferfunction",
+      make_column("data_id"              , &g::TrackerStripTransferFunction::data_id, primary_key()),
+      make_column("strip_id"             , &g::TrackerStripTransferFunction::strip_id), 
+      make_column("volume_id"            , &g::TrackerStripTransferFunction::volume_id), 
+      make_column("utc_timestamp_start"  , &g::TrackerStripTransferFunction::utc_timestamp_start), 
+      make_column("utc_timestamp_stop"   , &g::TrackerStripTransferFunction::utc_timestamp_stop),  
+      make_column("name"                 , &g::TrackerStripTransferFunction::name),
+      make_column("pol_a2_0"             , &g::TrackerStripTransferFunction::pol_a2_0),
+      make_column("pol_a2_1"             , &g::TrackerStripTransferFunction::pol_a2_1),
+      make_column("pol_a2_2"             , &g::TrackerStripTransferFunction::pol_a2_2),
+      make_column("pol_b3_0"             , &g::TrackerStripTransferFunction::pol_b3_0),
+      make_column("pol_b3_1"             , &g::TrackerStripTransferFunction::pol_b3_1),
+      make_column("pol_b3_2"             , &g::TrackerStripTransferFunction::pol_b3_2),
+      make_column("pol_b3_3"             , &g::TrackerStripTransferFunction::pol_b3_3),
+      make_column("pol_c3_0"             , &g::TrackerStripTransferFunction::pol_c3_0),
+      make_column("pol_c3_1"             , &g::TrackerStripTransferFunction::pol_c3_1),  
+      make_column("pol_c3_2"             , &g::TrackerStripTransferFunction::pol_c3_2),  
+      make_column("pol_c3_3"             , &g::TrackerStripTransferFunction::pol_c3_3),  
+      make_column("pol_d3_0"             , &g::TrackerStripTransferFunction::pol_d3_0),  
+      make_column("pol_d3_1"             , &g::TrackerStripTransferFunction::pol_d3_1),  
+      make_column("pol_d3_2"             , &g::TrackerStripTransferFunction::pol_d3_2), 
+      make_column("pol_d3_3"             , &g::TrackerStripTransferFunction::pol_d3_3)
+  ));  
+  auto tfs = storage.get_all<g::TrackerStripTransferFunction>();
+  for (auto const &tf : tfs) {
+    tf_map.insert({tf.strip_id, tf});
+  }  
+  return tf_map;
+}    
+
+//============================================================================ 
+
+auto g::get_trkstriptransferfn_by_volumeid() -> TrkStripTransferFnMap {
+  TrkStripTransferFnMap hw_map = get_trkstriptransferfn();
+  TrkStripTransferFnMap tf_map; 
+  for (auto const &[hwid, s] : hw_map) {
+    tf_map.insert(std::make_pair(s.volume_id, s)); 
+  }
+  return tf_map;
+}    
+
+//============================================================================ 
 
 namespace gondola {
   std::ostream& operator<<(std::ostream& os, const g::TrackerStripTransferFunction& tf) {

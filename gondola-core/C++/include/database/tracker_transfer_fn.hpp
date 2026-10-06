@@ -46,4 +46,12 @@ namespace gondola {
     
     friend std::ostream& operator<<(std::ostream& os, const TrackerStripTransferFunction& tfn);
   }; 
+ 
+  typedef HashMap<u32, TrackerStripTransferFunction> TrkStripTransferFnMap;
+
+  /// Get a paddle from the database
+  auto get_trkstriptransferfn() -> TrkStripTransferFnMap;        
+
+  /// Get a paddle from the database
+  auto get_trkstriptransferfn_by_volumeid() -> TrkStripTransferFnMap;        
 }
