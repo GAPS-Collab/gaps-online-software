@@ -98,8 +98,11 @@ namespace gondola {
      *                PacketType::TofPacket 
      *                
      */
-    static auto from_tofpacket(const TofPacket &packet) -> TofEvent;
-  
+    static auto from_tofpacket(const TofPacket &packet)
+      -> r::Result<TofEvent, IOError>;
+
+    auto to_bytestream() const -> Vec<u8>;
+
     #ifdef BUILD_CXX_DB
     /// set a TofPaddle, that is enrich every tofhit with information
     /// about the corresponding paddle
@@ -117,6 +120,7 @@ namespace gondola {
     /// normalize all the hit times, taking the global ch9 
     /// phase into account
     auto normalize_hit_times(const TofPaddleTimingConstantMap &offsets) -> void;
+    auto get_trigger_pids(const gondola::DsiJChnPaddleIdMap& lgmap) const -> Vec<u8>;
     #endif 
 
     /// Check if th eassociated RBEvents have any of their

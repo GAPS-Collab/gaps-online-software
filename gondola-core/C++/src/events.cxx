@@ -552,6 +552,33 @@ auto g::TofEvent::normalize_hit_times(const g::TofPaddleTimingConstantMap &offse
     }
   }
 }
+
+//------------------------------------------------------------------------
+
+auto g::TofEvent::get_trigger_pids(const gondola::DsiJChnPaddleIdMap& lgmap) const -> Vec<u8> {
+  auto trigger_pids = Vec<u8>();
+  for (auto const &hit : get_trigger_hits()) {
+    u8 dsi = std::get<0>(hit);
+    u8 j   = std::get<1>(hit);
+    u8 ch  = std::get<2>(hit);
+    // don't care about the threshold here
+    //u8 thr = (u8)std::get<3>(hit);
+    if (!lgmap.contains(dsi)) {
+      SPDLOG_ERROR("Can not find DSI {} in LG map!", dsi);
+      continue;
+    } 
+    if (!lgmap.at(dsi).contains(j)) {
+      SPDLOG_ERROR("Can not find J {} for DSI {} in LG map!", j, dsi);
+      continue;
+    }
+    if (!lgmap.at(dsi).at(j).contains(ch)) {
+      SPDLOG_ERROR("Can not find Ch {} for DSI {} J {} in LG map!", ch, dsi, j);
+      continue;
+    }
+    trigger_pids.push_back(lgmap.at(dsi).at(j).at(ch));
+  }
+  return trigger_pids;
+}
 #endif
 
 /**********************************************************/
@@ -596,7 +623,7 @@ auto g::TofEvent::get_trigger_hits() const
   auto dsi_j_mask_bits = std::bitset<32>(dsi_j_mask);
   u32 n_masks_needed   = dsi_j_mask_bits.count();
   if (channel_mask.size() < n_masks_needed) {
-    spdlog::error("We need {} hit masks, but only have {}! This is bad!", n_masks_needed,  channel_mask.size());
+    SPDLOG_ERROR("We need {} hit masks, but only have {}! This is bad!", n_masks_needed,  channel_mask.size());
     return hits;
   }
   u8 n_mask = 0;
@@ -667,6 +694,35 @@ auto g::TofEvent::set_paddlemap(const g::TofPaddleMap& paddlemap) -> void {
 };
 #endif
 
+  
+/**********************************************************/
+
+/// Check if th eassociated RBEvents have any of their
+/// mangling stati set
+auto g::TofEvent::has_any_mangling() -> bool {
+  for (auto const &rbev : rb_events) {
+    if ((rbev.status == EventStatus::CellAndChnSyncErrors) 
+    || (rbev.status == EventStatus::CellSyncErrors) 
+    || (rbev.status == EventStatus::ChnSyncErrors)) {
+      return true;
+    }
+  }
+  if (status == EventStatus::AnyDataMangling) {
+    return true;
+  }
+  return false;
+}
+  
+/**********************************************************/
+  
+auto g::TofEvent::decode_depr_tofevent_size_header(u32 mask) 
+  -> std::tuple<usize, usize> {
+  usize rb_event_len = (mask & 0xFF)         ;
+  usize miss_len     = ((mask & 0xFF00) >> 8);
+  return std::make_tuple(rb_event_len, miss_len);
+}
+
+
 /**********************************************************/
 
 auto g::TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
@@ -676,7 +732,7 @@ auto g::TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
   spdlog::debug("Start decoding at pos ",pos);
   u16 head = g::parse_u16(stream, pos);
   if (head != TofEvent::HEAD)  {
-    spdlog::error("No header signature found!");  
+    SPDLOG_ERROR("No header signature found!");  
     auto message = std::format("TofEvent has incorrect header!");
     auto err = g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, message);
     return Err(err);
@@ -710,7 +766,7 @@ auto g::TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
   event.mtb_link_mask      = g::parse_u64(stream, pos);
   u16 nhits                = g::parse_u16(stream, pos);
   if (nhits > 160) {
-    spdlog::error("There are way too many hits in this event (more than 160)!");  
+    SPDLOG_ERROR("There are way too many hits in this event (more than 160)!");  
     auto message = std::format("TofEvent has too many hits (more than paddles)!");
     auto err = g::IOError(g::IOError::ErrorKind::StreamTooLong, message);
     return Err(err);
@@ -721,51 +777,27 @@ auto g::TofEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
       event.hits.push_back(hit_res.unwrap());
       nhits -= 1;
     } else {
+      SPDLOG_ERROR("Unable to decode TofHits!");
       return Err(hit_res.unwrap_err());
     }
   }
-  if (event.version == g::ProtocolVersion::V2 
-    || event.version == g::ProtocolVersion::V3) {
+  if ((event.version == g::ProtocolVersion::V2) 
+    || (event.version == g::ProtocolVersion::V3)) {
     u8 n_rb_events = g::parse_u8(stream, pos);
     while (n_rb_events > 0) {
       event.rb_events.push_back(RBEvent::from_bytestream(stream, pos));
       n_rb_events -= 1;
     }
   }
+  //std::cout << event.to_string() << std::endl;
   u16 tail = g::parse_u16(stream, pos);
   if (tail != TofEvent::TAIL) {
     auto message = std::format("Decoding of TAIL failed! Got {} instead!", tail);
+    SPDLOG_ERROR(message);
     auto err = g::IOError(g::IOError::ErrorKind::WrongTailBytes, message);
     return Err(err);
   }
   return Ok(event);
-}
-  
-/**********************************************************/
-
-/// Check if th eassociated RBEvents have any of their
-/// mangling stati set
-auto g::TofEvent::has_any_mangling() -> bool {
-  for (auto const &rbev : rb_events) {
-    if ((rbev.status == EventStatus::CellAndChnSyncErrors) 
-    || (rbev.status == EventStatus::CellSyncErrors) 
-    || (rbev.status == EventStatus::ChnSyncErrors)) {
-      return true;
-    }
-  }
-  if (status == EventStatus::AnyDataMangling) {
-    return true;
-  }
-  return false;
-}
-  
-/**********************************************************/
-  
-auto g::TofEvent::decode_depr_tofevent_size_header(u32 mask) 
-  -> std::tuple<usize, usize> {
-  usize rb_event_len = (mask & 0xFF)         ;
-  usize miss_len     = ((mask & 0xFF00) >> 8);
-  return std::make_tuple(rb_event_len, miss_len);
 }
 
 /**********************************************************/
@@ -774,7 +806,7 @@ auto g::TofEvent::from_bytestream_alt(const Vec<u8> &stream, u64 &pos)
   -> Result<TofEvent, g::IOError> {
   u16 head = g::parse_u16(stream, pos);
   if (head != TofEvent::HEAD)  {
-    spdlog::error("No header signature found!");  
+    SPDLOG_ERROR("No header signature found!");  
     auto message = std::format("TofEvent has incorrect header!");
     auto err = g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, message);
     return Err(err);
@@ -820,7 +852,7 @@ auto g::TofEvent::from_bytestream_alt(const Vec<u8> &stream, u64 &pos)
   u16 mt_event_tail     = g::parse_u16(stream, pos);
   if (mt_event_tail != TofEvent::TAIL) {
     // (tail for mt event was the same)
-    spdlog::error("Parsed TAIL from MT event is incorrect! Got {} instead of {} at pos {}", mt_event_tail, TofEvent::TAIL, pos);
+    SPDLOG_ERROR("Parsed TAIL from MT event is incorrect! Got {} instead of {} at pos {}", mt_event_tail, TofEvent::TAIL, pos);
   }
   ////let mt_event      = MasterTriggerEvent::from_bytestream(stream, &mut pos)?;
   auto v_sizes       = decode_depr_tofevent_size_header(g::parse_u32(stream, pos));
@@ -855,31 +887,85 @@ auto g::TofEvent::from_bytestream_alt(const Vec<u8> &stream, u64 &pos)
 
 /**********************************************************/
 
-auto g::TofEvent::from_tofpacket(const TofPacket &packet) -> TofEvent {
+auto g::TofEvent::from_tofpacket(const TofPacket &packet) -> r::Result<g::TofEvent, g::IOError> {
   TofEvent event;
   u64 _pos = 0;
   switch (packet.packet_type) {
     case PacketType::TofEvent:
-      return TofEvent::from_bytestream(packet.payload, _pos).unwrap();
+      return TofEvent::from_bytestream(packet.payload, _pos);
       break;  
     case PacketType::TofEventDeprecated: 
-      return TofEvent::from_bytestream_alt(packet.payload, _pos).unwrap();
+      return TofEvent::from_bytestream_alt(packet.payload, _pos);
       break;
     default:
-      spdlog::error("Wrong packet type! {}", packet_type_to_string(packet.packet_type));
-      return event;
+      SPDLOG_ERROR("Wrong packet type! {}", packet_type_to_string(packet.packet_type));
+      auto message = std::format("Wrong packet type! Got {} instead!", packet_type_to_string(packet.packet_type));
+      auto err = g::IOError(g::IOError::ErrorKind::WrongPacketType, message);
+      return Err(err);
   }
+}
+
+//----------------------------------------------------------
+
+auto g::TofEvent::to_bytestream() const -> Vec<u8> {
+  Vec<u8> stream;
+  bytestream_extend(stream, HEAD);
+  //  stream.extend_from_slice(&Self::HEAD.to_le_bytes());
+  u8 status_version = (u8)status | (u8)version;
+  stream.push_back(status_version);
+  bytestream_extend(stream, (u16)trigger_sources);
+  stream.push_back(n_trigger_paddles);
+  bytestream_extend(stream, event_id); 
+  if (version == g::ProtocolVersion::V1 
+    || version == g::ProtocolVersion::V3) {
+    bytestream_extend(stream, n_hits_umb  ); 
+    bytestream_extend(stream, n_hits_cbe  ); 
+    bytestream_extend(stream, n_hits_cor  ); 
+    bytestream_extend(stream, tot_edep_umb); 
+    bytestream_extend(stream, tot_edep_cbe); 
+    bytestream_extend(stream, tot_edep_cor); 
+  }
+  stream.push_back((u8)quality);
+  bytestream_extend(stream, (u32)timestamp32);
+  bytestream_extend(stream, (u16)timestamp16);
+  bytestream_extend(stream, (u16)run_id);
+  bytestream_extend(stream, (u16)drs_dead_lost_hits);
+  bytestream_extend(stream, dsi_j_mask);
+  u8 n_channel_masks  = (u8)channel_mask.size();
+  stream.push_back(n_channel_masks);
+  for (u8 k=0; k<n_channel_masks; k++) {
+    bytestream_extend(stream, channel_mask[k]);
+  }
+  bytestream_extend(stream, mtb_link_mask);
+  u16 nhits = (u16)hits.size();
+  bytestream_extend(stream, nhits);
+  for (auto const &h : hits) {
+    Vec<u8> hit_bytes = h.to_bytestream();
+    stream.insert(stream.end(), hit_bytes.begin(), hit_bytes.end());
+  }
+  // for the new (>=v0.11) event, we will always write 
+  // the rb events
+  if (version == ProtocolVersion::V2 
+    || version == ProtocolVersion::V3) {
+    stream.push_back((u8)rb_events.size());
+    for (auto const &rbev : rb_events) {
+      Vec<u8> rbev_stream = rbev.to_bytestream();;
+      stream.insert(stream.end(), rbev_stream.begin(), rbev_stream.end());
+    }
+  }
+  bytestream_extend(stream, TAIL);
+  return stream;
 }
 
 /**********************************************************/
   
-const g::RBEvent& g::TofEvent::get_rbevent(u8 board_id) const {
+auto g::TofEvent::get_rbevent(u8 board_id) const -> const g::RBEvent&  {
   for (const auto &ev : rb_events) {
     if (ev.header.rb_id == board_id) {
       return ev;
     }
   }
-  spdlog::error("No RBEvent for board ", board_id);
+  SPDLOG_ERROR("No RBEvent for board ", board_id);
   return _empty_event;
 }
 
@@ -896,7 +982,7 @@ Vec<u8> g::TofEvent::get_rbids() const {
 /**********************************************************/
     
 bool g::TofEvent::passed_consistency_check() {
-  spdlog::error("This is not implmented yet!");
+  SPDLOG_ERROR("This is not implmented yet!");
   return false;
 }
 
@@ -991,7 +1077,7 @@ bool g::TofEvent::passed_consistency_check() {
 //  auto dsi_j_mask_bits = std::bitset<32>(dsi_j_mask);
 //  u32 n_masks_needed   = dsi_j_mask_bits.count();
 //  if (channel_mask.size() < n_masks_needed) {
-//    spdlog::error("We need {} hit masks, but only have {}! This is bad!", n_masks_needed, channel_mask.size());
+//    SPDLOG_ERROR("We need {} hit masks, but only have {}! This is bad!", n_masks_needed, channel_mask.size());
 //    return hits;
 //  }
 //  u8 n_mask = 0;
@@ -1062,7 +1148,7 @@ bool g::TofEvent::passed_consistency_check() {
 //  
 //  u16 header = g::parse_u16(bytestream, pos);
 //  if (header != g::MasterTriggerEvent::HEAD) {
-//    spdlog::error("Wrong header signature!");
+//    SPDLOG_ERROR("Wrong header signature!");
 //    return event;
 //  }
 //  event.event_status   = (EventStatus)g::parse_u8 (bytestream, pos);
@@ -1086,7 +1172,7 @@ bool g::TofEvent::passed_consistency_check() {
 //  //u64 tail_pos = search_for_2byte_marker(bytestream,0x55,has_ended,pos);   
 //  u16 tail = g::parse_u16(bytestream, pos);
 //  if (tail != g::MasterTriggerEvent::TAIL) {
-//    spdlog::error("Invalid tail signature!");
+//    SPDLOG_ERROR("Invalid tail signature!");
 //  }
 //  //event.n_paddles          = g::parse_u8 (bytestream, pos);
 //
@@ -1154,6 +1240,7 @@ auto g::TofEvent::to_string() const -> std::string {
   repr += std::format("\n  EventID          : {}", event_id);
   repr += std::format("\n  RunID            : {}", run_id);
   repr += std::format("\n  EventStatus      : {}", (u8)status);
+  repr += std::format("\n  Quality          : {}", (u8)quality);
   //repr += std::format("\n  TriggerSources   : {:?}", get_trigger_sources()));
   repr += std::format("\n  NTrigPaddles     : {}", n_trigger_paddles);
   repr += std::format("\n  DRS dead hits    : {}", drs_dead_lost_hits);
@@ -1386,6 +1473,40 @@ auto g::TofHit::get_edep_birk() const -> f32 {
 }
 #endif
 
+//-----------------------------------
+
+auto g::TofHit::to_bytestream() const -> Vec<u8> {
+  Vec<u8> stream;
+  stream.reserve(SIZE);
+  bytestream_extend(stream, HEAD);
+  stream.push_back(paddle_id); 
+  bytestream_extend(stream, time_a_f32);
+  bytestream_extend(stream, time_b_f32);
+  bytestream_extend(stream, peak_a_f32);
+  bytestream_extend(stream, peak_b_f32);
+  bytestream_extend(stream, charge_a_f32);
+  bytestream_extend(stream, charge_b_f32);
+  bytestream_extend(stream, tot_low_a);
+  bytestream_extend(stream, baseline_a);
+  bytestream_extend(stream, baseline_a_rms);
+  bytestream_extend(stream, phase);
+  u8 quality_version = (u8)quality  | (u8)version;
+  stream.push_back(quality_version);
+  bytestream_extend(stream, baseline_b);
+  bytestream_extend(stream, baseline_b_rms);
+  bytestream_extend(stream, tot_low_b);
+  bytestream_extend(stream, tot_high_a);
+  bytestream_extend(stream, tot_high_b);
+  bytestream_extend(stream, tot_slp_low_a);
+  bytestream_extend(stream, tot_slp_low_b);
+  bytestream_extend(stream, tot_slp_high_a);
+  bytestream_extend(stream, tot_slp_high_b);
+  bytestream_extend(stream, TAIL);
+  return stream;
+}
+
+//-----------------------------------
+
 auto g::TofHit::from_bytestream(const Vec<u8> &bytestream, u64 &pos) 
  -> r::Result<g::TofHit,g::IOError> {
  auto hit = g::TofHit();
@@ -1434,8 +1555,8 @@ auto g::TofHit::from_bytestream(const Vec<u8> &bytestream, u64 &pos)
  //------------------------------
  u16 tail = g::parse_u16(bytestream, pos);
  if (tail != TAIL) {
-   spdlog::error("VERSION {}", quality_version_u8 & 0xc0); 
-   spdlog::error("TofHit TAIL signature {} is incorrect!", tail);
+   SPDLOG_ERROR("VERSION {}", quality_version_u8 & 0xc0); 
+   SPDLOG_ERROR("TofHit TAIL signature {} is incorrect!", tail);
  }
  return Ok(hit); 
 }
@@ -1499,7 +1620,7 @@ g::RBWaveform g::RBWaveform::from_bytestream(const Vec<u8> &stream,
   wf.adc_b = u8_to_u16(data_b);
   u16 tail   = g::parse_u16(stream, pos);
   if (tail != RBWaveform::TAIL) {
-    spdlog::error("After parsing, we found an invalid tail signature {}", tail);
+    SPDLOG_ERROR("After parsing, we found an invalid tail signature {}", tail);
   }
   return wf;
 } 

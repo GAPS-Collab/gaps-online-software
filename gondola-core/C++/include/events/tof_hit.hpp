@@ -19,6 +19,7 @@ namespace gondola {
   struct TofHit  {
     static constexpr u16 HEAD = 0xF0F0;
     static constexpr u16 TAIL = 0xF0F;
+    static constexpr usize SIZE = 44; // size in bytes with HEAD and TAIL
   
     u8   paddle_id;
   
@@ -115,7 +116,9 @@ namespace gondola {
    
     // String representation for printing
     auto to_string() const -> std::string;
-    
+   
+    auto to_bytestream() const -> Vec<u8>;
+
     public:
       f32 time_a_f32   = 0;
       f32 time_b_f32   = 0;
