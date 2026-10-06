@@ -12,7 +12,7 @@
 #include "events/trigger.hpp"
 #include "events/tracker_hit.hpp"
 #include "events/tracker_event.hpp"
-#include "events/tof_event_summary.hpp"
+#include "events/tof_event.hpp"
 #include "events/tracker_meta.hpp"
 #include "events/tof_meta.hpp"
 #include "packets/tof_packet.h"
@@ -33,14 +33,17 @@ namespace gondola {
     u16             n_trk_hits     = 0;
     Vec<TrkEvent>   tracker_events = {};  
     Vec<TrkHit>     trk_hits       = {};
-    TofEventSummary tof_event      = TofEventSummary();
+    TofEvent        tof_event      = TofEvent();
     Vec<u8>         raw_data       = {};
     TofMetaData     tof_meta;
     TrkMetaData     tracker_meta;
+    u8              osc_flags           = 0;
     Vec<u64>        tracker_oscillators = Vec<u64>(10,0) ;
-  
+    Vec<u8>         oscillator_idx      = {};
+
     auto to_string() const -> std::string;
 
+    auto to_bytestream() const -> Vec<u8>;
     static auto from_bytestream(Vec<u8> const &stream, usize &pos)
       -> r::Result<TelemetryEvent, IOError>;
     

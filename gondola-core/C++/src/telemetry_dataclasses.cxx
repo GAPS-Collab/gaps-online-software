@@ -1,3 +1,4 @@
+#include <limits>
 #include "spdlog/spdlog.h"
 #include "spdlog/cfg/env.h"
 
@@ -5,13 +6,13 @@
 #include "events/tracker_event.hpp"
 #include "events/tracker_hit.hpp"
 #include "packets/telemetry_packet.hpp"
+#include "packets/tof_packet.h"
 #include "io/parsers.h"
 
 namespace g   = gondola;
 
 // make it more look like rust
 using namespace result;
-
 
 //----------------------------------------
 
@@ -246,6 +247,8 @@ auto g::TelemetryEvent::to_string() const -> std::string {
   return repr;
 }
 
+//----------------------------------------
+
 auto g::TelemetryEvent::from_bytestream(Vec<u8> const &stream, usize &pos) 
     -> r::Result<TelemetryEvent, g::IOError> {
   // check if it has at least the fix part
@@ -277,6 +280,8 @@ auto g::TelemetryEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
   //  return evt;
   //}
   u16 num_tof_bytes = g::parse_u16(stream, pos);
+  //std::cout << "SAW TOF BYTES " << num_tof_bytes << std::endl;
+  //std::cout << "STREAM SIZE " << stream.size() << std::endl;
   if (stream.size() < pos + num_tof_bytes) {
     //spdlog::error("{}", evt.to_string());
     std::string message = std::format("Stream does not contain enough TOF bytes! We expect {} when the remaing size is only {}", num_tof_bytes, stream.size() - pos);
@@ -285,13 +290,21 @@ auto g::TelemetryEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
     return Err(err);
   }
   auto tof_data = g::slice(stream, pos, pos + num_tof_bytes);
+  std::cout << "TOF DATA SIZE " << tof_data.size() << std::endl;
   if (tof_data.size() > 0) {
     usize tpos = 0;
     auto tof_packet = TofPacket::from_bytestream(tof_data, tpos);
+    //std::cout << "Got Tofpacket " << std::endl;
     if (tof_packet.is_ok()) {
-      auto tof_event = gondola::TofEventSummary::from_tofpacket(tof_packet.unwrap());
-      if (tof_event.is_ok()) {
-        evt.tof_event = tof_event.unwrap();
+      auto tof_event_res = gondola::TofEvent::from_tofpacket(tof_packet.unwrap());
+      //std::cout << evt.to_string() << std::endl;
+      if (tof_event_res.is_ok()) {
+        //std::cout << "Got TofEvent " << std::endl;
+        evt.tof_event = std::move(tof_event_res.unwrap()); 
+      } else {
+        std::string message = std::format("Unable to decode TOF part!");
+        SPDLOG_ERROR("{}",message);
+        return Err(tof_event_res.unwrap_err());
       }
     }
   }
@@ -319,24 +332,24 @@ auto g::TelemetryEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
   u8 osci_delim = g::parse_u8(stream, pos);
   if(osci_delim != 0xcc) {
     std::string message = std::format("Incorrect osci delmiter flag ({})!", osci_delim);
-    spdlog::error("{}",message);
+    SPDLOG_ERROR("{}",message);
     auto err = g::IOError(g::IOError::ErrorKind::WrongDelimiter, message);
     return Err(err);
   }
-  u8 osc_flags = g::parse_u8(stream, pos);
-  Vec<u8> oscillator_idx;
+  evt.osc_flags = g::parse_u8(stream, pos);
+  //Vec<u8> oscillator_idx;
   for(u8 j = 0; j < 8; ++j) {
-    if((osc_flags >> j) & 0b1) {
-      oscillator_idx.push_back((u8)j);
+    if((evt.osc_flags >> j) & 0b1) {
+      evt.oscillator_idx.push_back((u8)j);
     }
   }
-  if (pos + 6*oscillator_idx.size() > stream.size()) {
-    std::string message = std::format("Stream does not contain enough bytes for {} trk oscillators!! Only {} bytes left!", oscillator_idx.size(), stream.size() - pos);
+  if (pos + 6*evt.oscillator_idx.size() > stream.size()) {
+    std::string message = std::format("Stream does not contain enough bytes for {} trk oscillators!! Only {} bytes left!", evt.oscillator_idx.size(), stream.size() - pos);
     spdlog::error("{}",message);
     auto err = g::IOError(g::IOError::ErrorKind::StreamTooShort, message);
     return Err(err);
   }
-  for(auto idx : oscillator_idx) {
+  for(auto idx : evt.oscillator_idx) {
     u32 lower = g::parse_u32(stream, pos);
     u16 upper = g::parse_u16(stream, pos);
     //std::cout << (int)idx << " pos " << pos << " size " << stream.size() << std::endl;
@@ -345,6 +358,8 @@ auto g::TelemetryEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
   }
   return Ok(evt);
 }  
+
+//----------------------------------------
       
 auto g::TelemetryEvent::from_telemetrypacket(TelemetryPacket const &packet) 
   -> r::Result<TelemetryEvent, g::IOError> {
@@ -358,6 +373,69 @@ auto g::TelemetryEvent::from_telemetrypacket(TelemetryPacket const &packet)
   return Ok(ev); 
 }
 
+//----------------------------------------
+
+auto g::TelemetryEvent::to_bytestream() const -> Vec<u8> {
+  Vec<u8> stream = {};
+  stream.push_back((u8)version);
+  stream.push_back((u8)flags0);
+  if ((u8)version == 0) {
+    stream.push_back((u8)flags1);
+  } else {
+    auto filler = Vec<u8>(8,0);
+    stream.insert(stream.end(), filler.begin(), filler.end());
+  }
+  g::bytestream_extend(stream, event_id); 
+  stream.push_back(0xaa); // tof delimiter
+  auto tofpack        = TofPacket();
+  tofpack.packet_type = PacketType::TofEvent;
+  auto tof_bytes      = tof_event.to_bytestream();
+  //std::cout << "GOT TOF BYTES " << tof_bytes.size() << std::endl; 
+  tofpack.payload     = tof_bytes; 
+  //std::cout << tofpack.to_string() << std::endl; 
+  auto tof_pack_bytes = tofpack.to_bytestream();
+  //usize foopos        = 0;
+  //auto foobar         = TofPacket::from_bytestream(tof_pack_bytes, foopos);
+  //std::cout << foobar.unwrap().to_string() << std::endl;
+  u16 num_tof_bytes   = (u16)tof_pack_bytes.size();
+  bytestream_extend(stream, num_tof_bytes);
+  stream.insert(stream.end(), tof_pack_bytes.begin(), tof_pack_bytes.end());
+  //let tof           = self.tof_event.pack();
+  //let tof_bytes     = tof.to_bytestream();
+  //auto num_tof_bytes = g::to_le_bytes((u16)tof_bytes.size());
+  //sdplog::debug("Will write {} bytes for tef event to stream!", tof_bytes.size());
+  //stream.insert(stream.end(), num_tof_bytes.begin(),num_tof_bytes.end());
+  //stream.extend_from_slice(&tof_bytes);
+  stream.push_back(0xbb);
+  u16 trk_hits_len = (u16)trk_hits.size();
+  bytestream_extend(stream, trk_hits_len);
+  ////println!("Will add bytes for {} tracker hits!", self.tracker_hits.len());
+  for (auto const &h : trk_hits) { 
+    u16 strip_id = 0;
+    // Shift each value to its respective position and OR them together
+    strip_id |= ((u16)h.channel & 0b11111);       // Bits 0-4
+    strip_id |= ((u16)h.module & 0b111) << 5;   // Bits 5-7
+    strip_id |= ((u16)h.row & 0b111) << 8;      // Bits 8-10
+    strip_id |= ((u16)h.layer & 0b1111) << 11; 
+    bytestream_extend(stream, (u16)strip_id);
+    bytestream_extend(stream, (u16)h.adc);
+  }
+  stream.push_back(0xcc); // oscillators delimiter
+  stream.push_back(osc_flags);
+  for (auto const &idx : oscillator_idx) { 
+  //for osc in &self.tracker_oscillators {
+    //deconstruct the timestamps    
+    u64 osc   = tracker_oscillators[idx];
+    u16 upper = (u16)((osc >> 32) & ((u64)std::numeric_limits<u16>::max()));
+    u32 lower = (u32)(osc & ((u64)std::numeric_limits<u32>::max())); 
+    //println!("TO: OSC {}, upper {}, lower {}", osc, upper, lower);
+    bytestream_extend(stream,lower);
+    bytestream_extend(stream,upper);
+  }
+  return stream;
+}
+
+//----------------------------------------
 
 //template <typename T> int unpack(const T& bytes, size_t i) {
 //
