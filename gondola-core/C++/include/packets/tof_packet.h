@@ -102,6 +102,8 @@ struct TofPacket {
   static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos) 
     -> r::Result<TofPacket, gondola::IOError>;
 
+  auto to_bytestream() const -> Vec<u8>;
+
   /// A representative representation of the TofPacket 
   /// very usefule for debugging
   auto to_string() const -> std::string;

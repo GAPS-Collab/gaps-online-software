@@ -139,11 +139,28 @@ auto TofPacket::from_bytestream(const Vec<u8> &bytestream, u64 &pos)
 
 auto TofPacket::to_string() const -> std::string {
   std::string repr = "<TofPacket - type : ";
-  repr += packet_type_to_string(static_cast<PacketType>(packet_type)) + " - payload size : " + std::to_string(payload_size) + ">";
+  repr += packet_type_to_string(static_cast<PacketType>(packet_type)) + " - payload size : " + std::to_string(payload_size) + " - actual payload " + std::to_string(payload.size()) + ">";
   return repr;
 }
 
 /**************************************************/
+
+auto TofPacket::to_bytestream() const -> Vec<u8> {
+  Vec<u8> stream = Vec<u8>();
+  stream.reserve(6 + payload.size());
+  g::bytestream_extend(stream, TofPacket::HEAD);
+  u8 p_type = (u8)packet_type;
+  stream.push_back(p_type);
+  // payload size of 32 bit accomodates up to 4 GB packet
+  // a 16 bit size would only hold 65k, which might be not
+  // good enough if we sent multiple events in a batch in 
+  // the same TofPacket (in case we do that)
+  u32 payload_len = (u32)payload.size();
+  g::bytestream_extend(stream, payload_len);
+  stream.insert(stream.end(), payload.begin(), payload.end());
+  g::bytestream_extend(stream, TofPacket::TAIL);
+  return stream;
+}
 
 std::ostream& operator<<(std::ostream& os, const TofPacket& pck) { 
   os << pck.to_string();
