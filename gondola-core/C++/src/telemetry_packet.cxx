@@ -135,6 +135,18 @@ auto  g::TelemetryPacket::from_bytestream(Vec<u8> const &stream,
   return packet;
 }
 
+//----------------------------------------
+
+auto g::TelemetryPacket::to_bytestream() const -> Vec<u8> {
+  Vec<u8> stream = {};
+  auto s_head = header.to_bytestream();
+  stream.insert(stream.end(), s_head.begin(), s_head.end());
+  stream.insert(stream.end(),payload.begin(), payload.end());
+  return stream;
+}
+
+//----------------------------------------
+
 auto g::TelemetryPacket::is_event_packet() const -> bool {
   return header.ptype == g::TelemetryPacketType::InterestingEvent   || 
          header.ptype == g::TelemetryPacketType::BoringEvent        || 
@@ -142,6 +154,7 @@ auto g::TelemetryPacket::is_event_packet() const -> bool {
          header.ptype == g::TelemetryPacketType::NoTofDataEvent;      
 }
 
+//----------------------------------------
 
 auto g::TelemetryPacket::to_string() const -> std::string {
   std::string repr = "<TelemetryPacket:";

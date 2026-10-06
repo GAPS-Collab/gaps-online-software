@@ -81,12 +81,16 @@ namespace gondola {
   
   struct TelemetryPacket {
     auto to_string() const -> std::string;
+    
+    /// Is the packet type of this packet one of the 
+    /// "merged" event types? Interesting, Boring, etc.
     auto is_event_packet() const -> bool;
     
     static auto from_bytestream(Vec<u8> const &stream, usize &pos) -> TelemetryPacket;
      
     TelemetryPacketHeader header;
     Vec<u8> payload;
+    auto to_bytestream() const -> Vec<u8>;
     #ifdef BUILD_CXX_DB
     /// The map of all paddles. This is needed later on to look up properties 
     /// of the TOF paddles when we are unpacking events 
