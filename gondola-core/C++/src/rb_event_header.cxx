@@ -26,9 +26,6 @@ g::RBEventHeader::RBEventHeader() {
   channel_mask       = 0; 
   status_byte        = 0;
   stop_cell          = 0; 
-  ch9_amp            = 0;
-  ch9_freq           = 0;
-  ch9_phase          = 0;
   fpga_temp          = 0;
   timestamp16        = 0; 
   timestamp32        = 0; 
@@ -37,7 +34,6 @@ g::RBEventHeader::RBEventHeader() {
 /*************************************/
 
 auto g::RBEventHeader::to_string() const -> std::string {
-  auto sfit = get_sine_fit();
   std::string repr = "<RBEventHeader";
   repr += "\n  rb id          " + std::to_string(rb_id)                 ;
   repr += "\n  event id       " + std::to_string(event_id)              ;
@@ -51,10 +47,6 @@ auto g::RBEventHeader::to_string() const -> std::string {
     repr += " " + std::to_string(ch) + " ";
   }
   repr += "\n  stop cell      " + std::to_string(stop_cell)             ;
-  repr += "\n  ** online ch9 fit amp, freq, phase";
-  repr += "\n    AMP " + std::to_string(sfit[0]);
-  repr += "  FREQ " + std::to_string(sfit[1]);
-  repr += "  PHASE " + std::to_string(sfit[2]); 
   repr += "\n  timestamp32    " + std::to_string(timestamp32)           ;
   repr += "\n  timestamp16    " + std::to_string(timestamp16)           ;
   repr += "\n  |->timestamp48 " + std::to_string(get_timestamp48())     ;
@@ -98,13 +90,25 @@ auto g::RBEventHeader::from_bytestream(const Vec<u8> &stream, u64 &pos)\
   }
   header.rb_id               = g::parse_u8(stream , pos);  
   header.event_id            = g::parse_u32(stream, pos);  
-  header.channel_mask        = g::parse_u16(stream, pos);   
+  u16 ch_mask                = g::parse_u16(stream, pos);   
+  auto ch_mask_deadtime      = g::RBEventHeader::parse_channel_mask(ch_mask);
+  header.deadtime_instead_temp = std::get<0>(ch_mask_deadtime);
+  header.set_channel_mask(std::get<1>(ch_mask_deadtime));
   header.status_byte         = g::parse_u8(stream , pos); 
   header.stop_cell           = g::parse_u16(stream, pos);  
-  header.ch9_amp             = g::parse_u16(stream, pos);  
-  header.ch9_freq            = g::parse_u16(stream, pos);  
-  header.ch9_phase           = g::parse_u32(stream, pos);  
-  header.fpga_temp           = g::parse_u16(stream, pos);  
+  header.pid_ch12            = g::parse_u8(stream, pos);
+  header.pid_ch34            = g::parse_u8(stream, pos);
+  header.pid_ch56            = g::parse_u8(stream, pos);
+  header.pid_ch78            = g::parse_u8(stream, pos);
+  header.pid_ch_order        = g::parse_u8(stream, pos);
+  header.rsvd1               = g::parse_u8(stream, pos);
+  header.rsvd2               = g::parse_u8(stream, pos);
+  header.rsvd3               = g::parse_u8(stream, pos);
+  if (header.deadtime_instead_temp) {
+    header.drs_deadtime      = g::parse_u16(stream, pos);
+  } else {
+    header.fpga_temp         = g::parse_u16(stream, pos);
+  }
   header.timestamp32         = g::parse_u32(stream, pos);
   header.timestamp16         = g::parse_u16(stream, pos);
   u16 tail                   = g::parse_u16(stream, pos);
@@ -188,14 +192,59 @@ auto g::RBEventHeader::get_n_datachan() const -> u8 {
   return (u8)active_channels.size();
 }
 
-/*************************************/
+//---------------------------------------------------
 
-auto g::RBEventHeader::get_sine_fit() const -> std::array<f32, 3> {
-  f32 u16_MAX = 65535;
-  f32 amp    = (20.0 * ch9_amp   /u16_MAX) - 10.0;
-  f32 freq   = (20.0 * ch9_freq  /u16_MAX) - 10.0;
-  f32 phase  = (20.0 * ch9_phase /u16_MAX) - 10.0;
-  std::array<f32, 3> result = {amp,freq,phase};
-  return result;
+auto g::RBEventHeader::to_bytestream() const -> Vec<u8> {
+  Vec<u8> stream = Vec<u8>(SIZE);
+  bytestream_extend(stream, HEAD);
+  bytestream_extend(stream, rb_id);
+  bytestream_extend(stream, event_id);
+  u16 ch_mask = (((u16)deadtime_instead_temp) << 15) | get_channel_mask();
+  bytestream_extend(stream, ch_mask);
+  bytestream_extend(stream, status_byte);
+  bytestream_extend(stream, stop_cell);
+  stream.push_back(pid_ch12    );
+  stream.push_back(pid_ch34    );
+  stream.push_back(pid_ch56    );
+  stream.push_back(pid_ch78    );
+  stream.push_back(pid_ch_order);
+  stream.push_back(rsvd1       );
+  stream.push_back(rsvd2       );
+  stream.push_back(rsvd3       );
+  if (deadtime_instead_temp) {
+    bytestream_extend(stream, drs_deadtime);
+  } else {
+    bytestream_extend(stream, fpga_temp );
+  }
+  bytestream_extend(stream, timestamp32 );
+  bytestream_extend(stream, timestamp16 );
+  bytestream_extend(stream, TAIL);
+  return stream;
 }
+
+//---------------------------------------------------
+  
+auto g::RBEventHeader::parse_channel_mask(u16 ch_mask) -> std::tuple<bool, u16> {
+  u16 channel_mask;;
+  bool deadtime_instead_temp = ch_mask >> 15 == 1;
+  channel_mask = ch_mask & 0x1ff;
+  return std::make_tuple(deadtime_instead_temp, channel_mask);
+}
+
+//---------------------------------------------------
+
+auto g::RBEventHeader::set_channel_mask(u16 ch_mask) -> void {
+  if (deadtime_instead_temp) {
+    channel_mask = 0x8000 | ch_mask; // 2**15 = 0x8000
+  } else {
+    channel_mask = ch_mask;
+  }
+}
+
+//---------------------------------------------------
+
+auto g::RBEventHeader::get_channel_mask() const -> u16 {
+  return channel_mask & 0x1ff; 
+}
+
 
