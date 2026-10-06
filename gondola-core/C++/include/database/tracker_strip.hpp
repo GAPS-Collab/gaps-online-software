@@ -38,7 +38,11 @@ namespace gondola {
   
   /// Retrieve all tracker strips from the database
   auto get_trackerstrips() -> TrkStripMap;        
-  
+
+  /// Retrieve all tracker strips from the database
+  /// but use the volume id a skeys 
+  auto get_trackerstrips_by_volumeid() -> TrkStripMap;
+    
   /// Get the position of a module - returns in cm
   auto get_module_position(u8 layer, u8 row, u8 mod, const TrkStripMap&) -> Vec<f32>;
   

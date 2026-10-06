@@ -36,7 +36,7 @@ auto g::TrackerStrip::create_id(u32 layer, u32 row, u32 module, u32 channel) -> 
 
 //------------------------------------------------------------------
 
-auto g::get_trackerstrips() -> std::map<u32, g::TrackerStrip> {
+auto g::get_trackerstrips() -> g::TrkStripMap {
   // FIXME - find a better name for the database variable
   //         env name
   auto strip_map = std::map<u32, g::TrackerStrip>();
@@ -69,6 +69,17 @@ auto g::get_trackerstrips() -> std::map<u32, g::TrackerStrip> {
     strip_map.insert({strip.strip_id, strip});
   }  
   return strip_map;
+}
+
+//------------------------------------------------------------------
+
+auto g::get_trackerstrips_by_volumeid() -> g::TrkStripMap {
+  TrkStripMap strip_by_vid;
+  auto strips = g::get_trackerstrips();
+  for (auto const &[hwid, s] : strips) {
+    strip_by_vid.insert(std::make_pair(s.volume_id, s)); 
+  }
+  return strip_by_vid;
 }
 
 //------------------------------------------------------------------
