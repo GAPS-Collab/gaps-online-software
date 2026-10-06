@@ -32,7 +32,15 @@ namespace gondola {
     end = std::min(end, vec.size());  // Clamp the end index to the vector size
     return Vec<T>(vec.begin() + start, vec.begin() + end);
   }
-  
+
+  template<typename T> 
+  void bytestream_extend(Vec<u8>& vec, T number) { 
+    Vec<u8> number_bytes = to_le_bytes(number);
+    vec.reserve(vec.size() + number_bytes.size());
+    vec.insert(vec.end(), number_bytes.begin(), number_bytes.end());
+  }
+
+
   bool parse_bool(const Vec<u8> &bytestream,
                   usize &pos);
   
