@@ -167,4 +167,34 @@ auto g::RBEvent::from_bytestream(const Vec<u8> &stream, u64 &pos)
   return event;
 }
 
+//-----------------------------------------
+
+auto g::RBEvent::to_bytestream() const -> Vec<u8> {
+  Vec<u8> stream;
+  bytestream_extend(stream, HEAD);
+  stream.push_back((u8)data_type);
+  stream.push_back((u8)status);
+  u8 n_hits = (u8)hits.size();
+  stream.push_back(n_hits);
+  Vec<u8> header_bytes = header.to_bytestream();
+  stream.insert(stream.end(), header_bytes.begin(), header_bytes.end());
+  bool adc_channels = !header.is_event_fragment() & !header.drs_lost_trigger();
+  if (adc_channels) {
+    for (usize n=0; n<9; n++) {
+      if (adc[n].size() == 0) {
+        continue;
+      }
+      for (usize k=0;k<1024;k++) {
+        bytestream_extend(stream, adc[n][k]);  
+      }
+    }
+  }
+  for (auto const &h : hits) {
+    auto hit_bytes = h.to_bytestream();
+    stream.insert(stream.end(), hit_bytes.begin(), hit_bytes.end());
+  }
+  bytestream_extend(stream, TAIL);
+  return stream;
+}
+
 

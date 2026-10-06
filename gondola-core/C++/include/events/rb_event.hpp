@@ -40,8 +40,10 @@ namespace gondola {
     static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos)
       -> RBEvent;
   
+    auto to_bytestream() const -> Vec<u8>;
+
     auto to_string() const -> std::string;
-  
+
     private:
   
       /**
