@@ -21,17 +21,11 @@ namespace gondola {
   };
 
 
-  /// A map of paddle id -> TofPaddle
-  typedef std::map<u8,  TofPaddle> TofPaddleMap;
-  /// Shared ptr to TofPaddleMap 
-  typedef std::shared_ptr<TofPaddleMap> TofPaddleMapPtr;
   /// A map of RBID, RBCh -> TofPaddle
   typedef std::map<u8, std::map<u8, std::tuple<u8, TofPaddleEnd>>> RbIdChannelPaddleIdMap;
   /// A map of DSI,J -> TofPaddle
   typedef std::map<u8, std::map<u8, std::map<u8, u8>>> DsiJChnPaddleIdMap;
 
-  /// Get a paddle from the database
-  auto get_tofpaddles() -> TofPaddleMap;        
  
   /// Get a paddle if the rb id and channel is known (HG)
   auto get_rb_id_paddles() -> RbIdChannelPaddleIdMap;
@@ -40,9 +34,11 @@ namespace gondola {
   auto get_dsi_j_paddles() -> DsiJChnPaddleIdMap;
 
   struct TrackerStripPedestal {
+    i32     data_id; // primary key
     u32     strip_id;
     u64     volume_id;
-    u64     utc_timestamp;
+    u64     utc_timestamp_start;
+    u64     utc_timestamp_stop;
     f32     pedestal_mean;
     f32     pedestal_sigma;
     bool    is_mean_value;
@@ -53,6 +49,8 @@ namespace gondola {
   typedef std::map<u32, TrackerStripPedestal> TrkStripPedMap;
   
   auto get_trackerstrippedestals() -> TrkStripPedMap;
+  
+  auto get_trackerstrippedestals_by_volumeid() -> TrkStripPedMap;
 
   /// The mapping of volume id to hardware id, in this case, strip id
   auto get_hid_vid_map_tracker() -> HashMap<u32, u32>;

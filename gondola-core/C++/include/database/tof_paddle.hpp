@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include "gondola_typedefs.hpp"
 #include "sqlite_orm.h"
 
@@ -47,4 +48,21 @@ namespace gondola {
     /// Vector along the longest axis
     auto get_principal() const -> Vec<f32>;
   };
+  
+  /// A map of paddle id -> TofPaddle
+  typedef std::map<u8,  TofPaddle> TofPaddleMap;
+
+  /// A map of volume id -> TofPaddle
+  typedef std::map<u32, TofPaddle> TofPaddleMapVolId;
+
+  /// Shared ptr to TofPaddleMap 
+  typedef std::shared_ptr<TofPaddleMap> TofPaddleMapPtr;
+  
+  /// Get a paddle from the database
+  auto get_tofpaddles() -> TofPaddleMap;        
+
+  /// Get a paddle from the database
+  auto get_tofpaddles_by_volumeid() -> TofPaddleMapVolId;        
+
+
 }

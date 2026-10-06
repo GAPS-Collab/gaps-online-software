@@ -103,6 +103,17 @@ auto g::get_tofpaddles() -> std::map<u8, g::TofPaddle> {
   return paddle_map;
 }
 
+//-------------------------------------------------------
+
+auto g::get_tofpaddles_by_volumeid() -> TofPaddleMapVolId {
+  TofPaddleMapVolId pmap; 
+  auto hw_map = get_tofpaddles();
+  for (auto const &[hwid, p] : hw_map) {
+    pmap.insert(std::make_pair(p.volume_id, p)); 
+  }
+  return pmap;
+}
+
 auto g::get_rb_id_paddles() -> RbIdChannelPaddleIdMap {
   RbIdChannelPaddleIdMap map;
   for (u8 rb_id=1; rb_id<50; rb_id++) {
@@ -156,12 +167,13 @@ auto g::TofPaddle::get_principal() const -> Vec<f32> {
 
 auto g::TrackerStripPedestal::to_string() const -> std::string {
   std::string repr = "<TrackerStripPedestal:";
-  repr += std::format("\n strip id        : {}",  strip_id );
-  repr += std::format("\n volume id       : {}",  volume_id);
-  repr += std::format("\n Timestamp (UTC) : {}",  utc_timestamp);
-  repr += std::format("\n Pedestal Mean   : {}",  pedestal_mean);
-  repr += std::format("\n Pedestal Sigma  : {}",  pedestal_sigma);
-  repr += std::format("\n IsMeanValue     : {}",  is_mean_value);
+  repr += std::format("\n strip id          : {}",  strip_id );
+  repr += std::format("\n volume id         : {}",  volume_id);
+  repr += std::format("\n Timestamp UTC beg : {}",  utc_timestamp_start);
+  repr += std::format("\n Timestamp UTC end : {}",  utc_timestamp_stop);
+  repr += std::format("\n Pedestal Mean     : {}",  pedestal_mean);
+  repr += std::format("\n Pedestal Sigma    : {}",  pedestal_sigma);
+  repr += std::format("\n IsMeanValue       : {}",  is_mean_value);
   return repr;
 }
 
@@ -175,9 +187,11 @@ auto g::get_trackerstrippedestals() -> g::TrkStripPedMap {
   std::string dbname(db_path);
   auto storage = make_storage(dbname,
     make_table("tof_db_trackerstrippedestal",
-      make_column("strip_id"             , &g::TrackerStripPedestal::strip_id, primary_key()),
+      make_column("data_id"              , &g::TrackerStripPedestal::data_id, primary_key()),
+      make_column("strip_id"             , &g::TrackerStripPedestal::strip_id),
       make_column("volume_id"            , &g::TrackerStripPedestal::volume_id),  
-      make_column("utc_timestamp"        , &g::TrackerStripPedestal::utc_timestamp),
+      make_column("utc_timestamp_start"  , &g::TrackerStripPedestal::utc_timestamp_start),
+      make_column("utc_timestamp_stop"   , &g::TrackerStripPedestal::utc_timestamp_stop),
       make_column("pedestal_mean"        , &g::TrackerStripPedestal::pedestal_mean),
       make_column("pedestal_sigma"       , &g::TrackerStripPedestal::pedestal_sigma),
       make_column("is_mean_value"        , &g::TrackerStripPedestal::is_mean_value)));  
@@ -188,6 +202,17 @@ auto g::get_trackerstrippedestals() -> g::TrkStripPedMap {
   }  
   return ped_map;
 }
+
+//===================================================================
+
+auto g::get_trackerstrippedestals_by_volumeid() -> g::TrkStripPedMap {
+  g::TrkStripPedMap hw_map = g::get_trackerstrippedestals();
+  g::TrkStripPedMap ped_map; 
+  for (auto const &[hwid, s] : hw_map) {
+    ped_map.insert(std::make_pair(s.volume_id, s)); 
+  }
+  return ped_map;
+}    
 
 //------------------------------------------------------------------
 
