@@ -162,10 +162,11 @@ impl Serialization for TofPacket {
         return Err(SerializationError::UnknownPayload);}
     }
     let payload_size = parse_u32(stream, pos) as usize;
-    *pos += payload_size; 
+    *pos += payload_size;
+    debug!("Attempting to decode {packet_type} : {payload_size} bytes!");
     let tail = parse_u16(stream, pos);
     if Self::TAIL != tail {
-      error!("Packet does not end with TAIL signature");
+      error!("Packet does not end with TAIL signature, but ends with {} instead", tail);
       return Err(SerializationError::TailInvalid);
     }
     *pos -= 2; // for tail parsing

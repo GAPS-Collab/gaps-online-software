@@ -272,8 +272,10 @@ impl Serialization for TelemetryEvent {
       return Err(SerializationError::StreamTooShort); 
     }
     let pos_before = *pos;
+    //println!("Expecting {} tof bytes", num_tof_bytes);
     if num_tof_bytes != 0 {
       let tof_pack   = TofPacket::from_bytestream(stream, pos)?;
+      //println!("Retrieved packet with {} bytes", tof_pack.payload.len());
       let ts         = tof_pack.unpack::<TofEvent>()?;
     // sanity check - is tofpacket as long as num_tof_bytes lets us believe?
       me.tof_event = ts;
@@ -286,6 +288,7 @@ impl Serialization for TelemetryEvent {
 
     //println!("TRK delim {}", trk_delim);
     if trk_delim != 0xbb {
+      error!("The TRK delim is incorrect! {trk_delim} instead of 0xbb!");
       return Err(SerializationError::HeadInvalid);
     }
     if version == 1 {
@@ -312,6 +315,7 @@ impl Serialization for TelemetryEvent {
       // oscillators
       let oscillators_delimiter = parse_u8(stream, pos);
       if oscillators_delimiter != 0xcc {
+        error!("Oscillators_delimiter is incorrect {oscillators_delimiter} instead of 0xcc");
         return Err(SerializationError::HeadInvalid);
       }
       me.osc_flags = parse_u8(stream, pos);

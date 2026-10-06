@@ -464,13 +464,12 @@ impl Serialization for RBEvent {
   }
   
   fn to_bytestream(&self) -> Vec<u8> {
+    //FIXME - allocate fewer bytes, usually we don't have a multipliciyt of 4
     let mut stream = Vec::<u8>::with_capacity(18530);
     //let mut stream = Vec::<u8>::new();
     stream.extend_from_slice(&Self::HEAD.to_le_bytes());
     stream.push(self.data_type as u8);
     stream.push(self.status as u8);
-    //let nchan_data  = self.adc.len() as u8;
-    //stream.push(nchan_data);
     let n_hits      = self.hits.len() as u8;
     stream.push(n_hits);
     stream.extend_from_slice(&self.header.to_bytestream());
@@ -478,10 +477,10 @@ impl Serialization for RBEvent {
     let add_channels = !self.header.is_event_fragment() & !self.header.drs_lost_trigger();
     if add_channels {
       for n in 0..NCHN {
+        if self.adc[n].len() == 0 {
+          continue;
+        }
         for k in 0..NWORDS {
-          if self.adc[n].len() == 0 {
-            continue;
-          }
           stream.extend_from_slice(&self.adc[n][k].to_le_bytes());  
         }
       }
@@ -490,9 +489,6 @@ impl Serialization for RBEvent {
       //  stream.extend_from_slice(&u16_to_u8(&channel_adc)); 
       //}
     }
-    //if self.ch9_adc.len() > 0 {
-    //  stream.extend_from_slice(&u16_to_u8(&self.ch9_adc));
-    //}
     for h in self.hits.iter() {
       stream.extend_from_slice(&h.to_bytestream());
     }
