@@ -32,7 +32,7 @@ public:
   void    NothingYet(void);
   void    InitPaddleInfo(void);
   void    GetPaddleInfo(void);
-  void    ProcessTofEventSummary(g::TofEventSummary *Tes, unsigned long int);
+  void    ProcessTofEventSummary(g::TofEvent *Tes, unsigned long int);
   
   // Stuff related to the actual data
   /*

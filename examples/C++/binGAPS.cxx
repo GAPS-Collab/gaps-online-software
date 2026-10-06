@@ -82,7 +82,7 @@ void PacketMethods::BeginRun(int run=5) {
 }
 
 ////////////////////////////////////////////////////////////////////////////
-void PacketMethods::ProcessTofEventSummary(g::TofEventSummary *Tes,
+void PacketMethods::ProcessTofEventSummary(g::TofEvent *Tes,
 					   unsigned long int evt_no){
   //std::cout << Tes->to_string() << std::endl;
   

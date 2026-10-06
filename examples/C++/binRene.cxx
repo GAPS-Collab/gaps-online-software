@@ -73,7 +73,7 @@ void PacketMethods::BeginRun(int run=5) {
 }
 
 ////////////////////////////////////////////////////////////////////////////
-void PacketMethods::ProcessTofEventSummary(g::TofEventSummary *Tes,
+void PacketMethods::ProcessTofEventSummary(g::TofEvent *Tes,
 					   unsigned long int evt_no){
   //printf("TES: %ld timestamp48 = %lu\n", evt_no,Tes->get_timestamp48());
   struct EventInfo EvtInfo;
