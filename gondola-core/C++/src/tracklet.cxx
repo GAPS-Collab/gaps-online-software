@@ -51,6 +51,33 @@ auto g::RecoHit::to_bytestream() const -> Vec<u8> {
 
 //-------------------------------------------
 
+namespace gondola {
+  RecoHit& RecoHit::operator+=(const RecoHit& rhs) {
+    if (volume != rhs.volume) {
+      //spdlog::error("Unable to merge hits in different volumes!"); 
+      return *this;
+    }
+    energy += rhs.energy;
+    if (rhs.time < time) {
+      time = rhs.time;
+    }
+    x = (x + rhs.x)/2;
+    y = (y + rhs.y)/2;
+    z = (z + rhs.z)/2;
+    if (rhs.x_err > x_err) {
+      x_err = rhs.x_err;
+    }
+    if (rhs.y_err > y_err) {
+      y_err = rhs.y_err;
+    }
+    if (rhs.z_err > z_err) {
+      z_err = rhs.z_err;
+    }
+    return *this;
+  }
+}
+//-------------------------------------------
+
 g::Tracklet::Tracklet() {
     vertex_ = std::make_shared<g::RecoHit>(); 
     stop_   = std::make_shared<g::RecoHit>();

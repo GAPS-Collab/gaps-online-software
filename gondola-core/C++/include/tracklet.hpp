@@ -25,9 +25,15 @@ namespace gondola {
     /// written to a file
     auto to_bytestream() const -> Vec<u8>;
 
+    RecoHit& operator+=(const RecoHit& rhs);
+    
+    friend std::ostream& operator<<(std::ostream& os, const RecoHit& et);
   };
   
-  std::ostream& operator<<(std::ostream& os, const gondola::RecoHit& et);
+  inline RecoHit operator+(RecoHit lhs, const RecoHit& rhs) {
+      lhs += rhs; 
+      return lhs;
+  }
 
   /// A straight line as it could be part of a track 
   struct Tracklet {
