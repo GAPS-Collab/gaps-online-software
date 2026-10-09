@@ -17,7 +17,8 @@ namespace gondola {
         WrongHeaderBytes,
         WrongTailBytes,
         EventHeaderCorrupt,
-        UnsupportedProtocolVersion
+        UnsupportedProtocolVersion,
+        EndOfFile
       };
      
       IOError(ErrorKind kind, std::string reason = ""):

@@ -139,14 +139,20 @@ auto g::TofPacketReader::get_next_packet() -> Result<TofPacket, g::IOError> {
   while (true) {
     if (stream_file_.eof()) {
       exhausted_ = true;
-      throw std::runtime_error("No more packets in file!");
+      auto message = std::format("End of file reached!");
+      //SPDLOG_ERROR(message);  
+      auto err = g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, message);
+      return Err(err);
     } 
     u8 byte = stream_file_.get();
     if (byte == 0xAA) {
       byte = stream_file_.get();
       if (stream_file_.eof()) {
         exhausted_ = true;
-        throw std::runtime_error("No more packets in file!");
+        auto message = std::format("End of file reached!");
+        //SPDLOG_ERROR(message);  
+        auto err = g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, message);
+        return Err(err);
       } 
       if (byte == 0xAA) {
         u8 packet_type = stream_file_.get();
