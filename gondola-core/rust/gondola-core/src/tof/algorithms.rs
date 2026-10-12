@@ -267,6 +267,9 @@ pub fn cfd_simple(voltages    : &Vec<f32>,
 
   let idx = get_max_value_idx(&voltages, start_peak, end_peak-start_peak)?;
   let mut sum : f32 = 0.0;
+  // FIXME - this might be a bug and an off-by-one error, since 
+  // the below loop has actually only 2 steps and later on we 
+  // divide by 3
   for n in idx-1..idx+1{
     sum += voltages[n];
   }

@@ -44,9 +44,14 @@ pub mod analysis;
 pub use analysis::*;
 pub mod panic;
 pub use panic::*;
+pub mod tof_pulse_template;
+pub use tof_pulse_template::*; 
+
 #[cfg(feature="pybindings")]
 use pyo3::pyfunction;
 /// Convert an int value to the board ID string.
+
+
 #[cfg_attr(feature="pybindings", pyfunction)]
 pub fn to_board_id_string(rb_id: u32) -> String {
   format!("RB{:02}", rb_id)
