@@ -35,9 +35,6 @@ namespace gondola {
   ///   * use_telemetry_re : use the regex for telemetry files to find the files.
   ///                        Default is set to false, which will find L0 or TOF files
   auto list_path_contents_sorted(const std::string& input, bool use_telemetry_re = false) -> Vec<std::string>;
-} 
-
-namespace gondola {
 
   /// Read serialized TofPackets from 
   /// a file and emit them as packets
