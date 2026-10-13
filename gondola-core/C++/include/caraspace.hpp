@@ -81,18 +81,22 @@ namespace gondola {
 
   struct CRWriter {
     CRWriter(std::string file_path, std::string filename, u32 run_id, Option<u32> subrun_id, Option<String> timestamp);  
-    std::ofstream  file           ;
-    std::string    file_path      ;
-    usize          frames_per_file;
-    usize          mbytes_per_file;
-    std::string    file_name      ;
-    u32            run_id         = 0;
-    u32            subrun_id      = 0;
-    usize          file_id        = 0; 
-    usize          n_frames       = 0; 
-    usize          file_nbytes_wr = 0; 
-    Option<String> file_timestamp = None;
+    std::ofstream  file                 ;
+    std::string    file_path            ;
+    usize          frames_per_file =   0;
+    // Set the default to 420MB
+    usize          mbytes_per_file = 420;
+    std::string    file_name           ;
+    u32            run_id          =   0;
+    u32            subrun_id       =   0;
+    usize          file_id         =   0; 
+    usize          n_frames        =   0; 
+    usize          file_nbytes_wr  =   0; 
+    Option<String> file_timestamp  =   None;
+
+    /// Adds any frame and will write it to disk
     auto add_frame(const CRFrame& frame)       -> void; 
+    /// Create a new file and use that for subsequent writing 
     auto new_file(Option<String>, bool is_sim) -> void;
   };
 
