@@ -33,7 +33,11 @@ namespace gondola {
    
       enum class ErrorKind {
         OutOfBounds,
-        DidNotConverge
+        DidNotConverge,
+        InvalidInput,
+        InvalidPeakRange,
+        NoThresholdCrossing,
+        CfdError
       };
      
       AnalysisError(ErrorKind kind, std::string reason = ""):
