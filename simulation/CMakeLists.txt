@@ -30,16 +30,18 @@ endif(${Geant4_gdml_FOUND})
 
 if(BUILD_SIM)
   set(GAPSSIM_LIBRARY_SHARED GapsSim CACHE INTERNAL "GapsSim shared library" FORCE)
+  file(GLOB SIMULATION_CXX_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cxx)
   add_library(${GAPSSIM_LIBRARY_SHARED} SHARED
-    src/volume_store.cxx
-    src/materials.cxx
-    src/detector.cxx
-    src/gun.cxx
-    src/event_action.cxx
-    src/sensitive_detectors.cxx
-    src/mc_hit.cxx 
-    src/mc_event.cxx 
-    src/sim_config.cxx 
+      ${SIMULATION_CXX_FILES} 
+      #src/volume_store.cxx
+      #src/materials.cxx
+      #src/detector.cxx
+      #src/gun.cxx
+      #src/event_action.cxx
+      #src/sensitive_detectors.cxx
+      #src/mc_hit.cxx 
+      #src/mc_event.cxx 
+      #src/sim_config.cxx 
   ) 
     
   set_property(TARGET ${GAPSSIM_LIBRARY_SHARED} PROPERTY CXX_STANDARD 20)
