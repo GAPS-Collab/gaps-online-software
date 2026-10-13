@@ -4,6 +4,11 @@
 #include "gondola_typedefs.hpp"
 
 namespace gondola {
+  /// Allow to write f16 to a bytestream.
+  /// The half type is used in TofHit to save 
+  /// telemetry bandwidth
+  auto f32_to_f16_le_bytes(f32 value) -> Vec<u8>; 
+
   /// Reverse-parse a u16 a la rust's built in 
   /// u16::to_le_bytes
   auto to_le_bytes(u16 number) -> Vec<u8>;
@@ -40,9 +45,10 @@ namespace gondola {
     vec.insert(vec.end(), number_bytes.begin(), number_bytes.end());
   }
 
+  /// Special version to write half type from f32
+  auto bytestream_extend_f32tof16(Vec<u8>& vec, f32 number) -> void;
 
-  bool parse_bool(const Vec<u8> &bytestream,
-                  usize &pos);
+  bool parse_bool(const Vec<u8> &bytestream, usize &pos);
   
   /// get an unsigned char from a vector of bytes, advancing pos by 1
   u8 parse_u8(const Vec<u8> &bytestream,

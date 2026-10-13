@@ -39,7 +39,25 @@ auto u32tof32(u32 val) -> f32 {
   return result;
 }
 
-/***********************************************/
+//==========================================================
+// Public interface 
+
+auto g::f32_to_f16_le_bytes(f32 value) -> Vec<u8> {
+  static_assert(sizeof(_Float16) == sizeof(u16));
+  const _Float16 half = static_cast<_Float16>(value);
+  const u16 bits = std::bit_cast<u16>(half);
+  return {
+    static_cast<u8>(bits & 0xFF),
+    static_cast<u8>((bits >> 8) & 0xFF)
+  };
+}
+
+/// Special version to write half type from f32
+auto g::bytestream_extend_f32tof16(Vec<u8>& vec, f32 number) -> void {
+  Vec<u8> number_bytes = f32_to_f16_le_bytes(number); 
+  vec.reserve(vec.size() + number_bytes.size());
+  vec.insert(vec.end(), number_bytes.begin(), number_bytes.end());
+}
 
 auto g::to_le_bytes(u16 number) -> Vec<u8> {
   Vec<u8> bytes;
