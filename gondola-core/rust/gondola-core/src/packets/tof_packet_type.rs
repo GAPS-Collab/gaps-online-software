@@ -67,6 +67,9 @@ pub enum TofPacketType {
   BfswAckPacket         = 212u8,
   /// Send out a panic message before death 
   PanicPacket           = 222u8,
+  /// Store simulation relevant pulse templates in 
+  /// TofPackets 
+  TofPulseTemplate      = 223u8,
   /// a MultiPacket consists of other TofPackets
   MultiPacket           = 255u8,
 }

@@ -5,7 +5,6 @@ use crate::prelude::*;
 use crate::database::schema;
 
 use diesel::prelude::*;
-use std::io::BufRead;
 
 #[cfg_attr(feature="pybindings", pyfunction)]
 pub fn create_tof_paddle_temp_table( db_path: &str, paddle_temps: Vec<TofPaddleTemp>) { 

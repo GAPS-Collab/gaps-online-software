@@ -201,6 +201,7 @@ fn tof_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<TofAnalysisCache>()?;
   m.add_class::<TofAnalysisPaddleCache>()?;
   m.add_class::<AnalysisEngineSettings>()?;
+  m.add_class::<TofPulseTemplate>()?;
   #[cfg(feature="tof-liftof")]
   m.add_class::<PyMasterTrigger>()?;
   m.add_function(wrap_pyfunction!(waveform_analysis, m)?)?;
