@@ -43,8 +43,6 @@ namespace gondola {
     f32  vertex_mom_z               ;
     /// particle type identifier (see PDG codes) 
     i32  pdg                        ;
-    // these are for SD interoperatibility and won't get 
-    // serialized
     f32  beta                       ;
     f32  beta_err                   ;
    

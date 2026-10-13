@@ -159,6 +159,7 @@ auto g::Tracklet::to_bytestream() const -> Vec<u8> {
   stream.insert(stream.end(),bytes.begin(), bytes.end());
   bytes      =   g::to_le_bytes(pdg)           ; 
   stream.insert(stream.end(),bytes.begin(), bytes.end());
+  bytestream_extend(stream, (f32)beta);
   stream.push_back(0x55);
   stream.push_back(0x55);
   return stream;
