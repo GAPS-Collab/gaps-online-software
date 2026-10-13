@@ -113,6 +113,7 @@ impl fmt::Display for RecoHit {
     repr += &(format!("\n  x {:.2} y {:.2} z {:.2}", self.x, self.y, self.z));
     repr += &(format!("\n  energy {:.2}", self.energy));
     repr += &(format!("\n  time   {:.2}>", self.time));
+    repr += &(format!("\n  volume {}>", self.volume));
     write!(f,"{}", repr)
   } 
 }
@@ -139,6 +140,7 @@ pub struct Tracklet {
   pub vertex_mom_z  : f32,
   /// particle identifier
   pub pdg           : i32,
+  pub beta          : f32,
 }
 
 impl Tracklet {
@@ -151,6 +153,7 @@ impl Tracklet {
       vertex_mom_y  : 0.0,
       vertex_mom_z  : 0.0,
       pdg           : 0,
+      beta          : 0.0,
     }
   }
 
@@ -181,6 +184,7 @@ impl Serialization for Tracklet {
     tracklet.vertex_mom_y  = parse_f32(stream, pos);
     tracklet.vertex_mom_z  = parse_f32(stream, pos);
     tracklet.pdg           = parse_i32(stream, pos);
+    tracklet.beta          = parse_f32(stream, pos);
     let tail   = parse_u16(stream, pos);
     if tail != Self::TAIL {
       //error!("Decoding of TAIL failed for version {}! Got {} instead!", version, tail);
@@ -212,12 +216,19 @@ impl Tracklet {
   fn get_vertex_pos_py(&self) -> (f32,f32,f32) {
     self.get_vertex_pos()
   }
+  
+  #[getter]
+  #[pyo3(name="beta")]
+  fn get_beta_py(&self) -> f32 {
+    self.beta
+  }
 }
 
 impl fmt::Display for Tracklet {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let mut repr = String::from("<Tracklet");
-    repr += &(format!("\n  vertex {:.2} {:.2} {:.2}", self.start.x, self.start.y, self.start.z));
+    repr += &(format!("\n  vertex {}", self.start));
+    //repr += &(format!("\n  vertex {:.2} {:.2} {:.2}", self.start.x, self.start.y, self.start.z));
     repr += &(format!("\n  pdg    {}>", self.pdg));
     write!(f,"{}", repr)
   } 
