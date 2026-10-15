@@ -65,6 +65,10 @@ MasterTrigger       = _gc.tof.MasterTrigger
 MasterTrigger.__module__ = __name__
 MasterTrigger.__name__   = 'MasterTrigger'
 
+TofPulseTemplate            = _gc.tof.TofPulseTemplate 
+TofPulseTemplate.__module__ = __name__ 
+TofPulseTemplate.__name__   = 'TofPulseTemplate'
+
 
 ## command factories
 start_run            = _gc.tof.start_run 
