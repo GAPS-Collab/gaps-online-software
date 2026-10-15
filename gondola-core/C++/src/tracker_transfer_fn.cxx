@@ -80,6 +80,12 @@ auto g::TrackerStripTransferFunction::derivative(f32 adc) const -> f32 {
 // can be used in the simulation
 // FIXME - switch to f64, however, only store f32 in the db
 auto g::TrackerStripTransferFunction::invert(f64 y, f64 epsilon) -> Result<f64, g::AnalysisError> {
+  // catch annoying cases where for some reason the input is too small. 
+  // FIXME - we will need to follow up with that. Returning and adc value 
+  // of 0 seems reasonable for now.
+  if (y < 1e-12) {
+    return Ok(0.0);
+  }
   f64 x = 0;
   f64 x_min = 0;
   f64 x_max = 1600;
