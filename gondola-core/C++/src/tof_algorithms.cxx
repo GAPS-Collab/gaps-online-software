@@ -36,7 +36,7 @@ auto g::find_cfd_simple_time(
   // [peak_begin, peak_end).
   if (peak_begin >= peak_end ||
     peak_end > voltages.size()) {
-    auto message = std::format("Invalid peak range!");
+    auto message = std::format("Invalid peak range for peak [{} {})!", peak_begin, peak_end);
     SPDLOG_ERROR(message);  
     auto err = g::AnalysisError(g::AnalysisError::ErrorKind::InvalidPeakRange, message);
     return Err(err);

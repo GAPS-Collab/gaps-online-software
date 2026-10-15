@@ -290,7 +290,7 @@ auto g::TelemetryEvent::from_bytestream(Vec<u8> const &stream, usize &pos)
     return Err(err);
   }
   auto tof_data = g::slice(stream, pos, pos + num_tof_bytes);
-  std::cout << "TOF DATA SIZE " << tof_data.size() << std::endl;
+  //std::cout << "TOF DATA SIZE " << tof_data.size() << std::endl;
   if (tof_data.size() > 0) {
     usize tpos = 0;
     auto tof_packet = TofPacket::from_bytestream(tof_data, tpos);

@@ -122,15 +122,20 @@ g::SDRootReader::~SDRootReader() {
 //------------------------------------------------------------------------
 
 auto g::SDRootReader::get_event(u64 event_idx) -> void {
-  tchain->GetEntry(event_idx); 
-  std::cout << event->pretty_print() << std::endl;
-  if (raw_tree != nullptr) {
-    raw_tree->GetEntry(event_idx);
-    std::cout << rawtrk->pretty_print() << std::endl;
-    std::cout << rawhd->pretty_print() << std::endl; 
-    std::cout << rawtof->pretty_print() << std::endl;
+  if (is_mc) {
+    mc_tchain->GetEntry(event_idx);
+    std::cout << mc_event->pretty_print() << std::endl;
   } else {
-    std::cout << "-- There is no raw_tree --" << std::endl;
+    tchain->GetEntry(event_idx); 
+    std::cout << event->pretty_print() << std::endl;
+    if (raw_tree != nullptr) {
+      raw_tree->GetEntry(event_idx);
+      std::cout << rawtrk->pretty_print() << std::endl;
+      std::cout << rawhd->pretty_print() << std::endl; 
+      std::cout << rawtof->pretty_print() << std::endl;
+    } else {
+      std::cout << "-- There is no raw_tree --" << std::endl;
+    }
   }
 }
 
@@ -202,10 +207,10 @@ auto g::SDRootReader::get_primary(u64 event_idx)            -> Option<g::Trackle
 
 //------------------------------------------------------------------------
 
-auto g::SDRootReader::get_mc_tracks_edeps(u64 event_id)     -> Vec<f32> {
+auto g::SDRootReader::get_mc_tracks_edeps(u64 event_idx)     -> Vec<f32> {
   Vec<f32> edeps;
   if (is_mc) {
-    mc_tchain->GetEntry(event_id);
+    mc_tchain->GetEntry(event_idx);
     for (auto const &t : mc_event->tracks_) {
       for (auto const &edep : t->EnergyDeposition) {
         edeps.push_back((f32)edep);
@@ -474,7 +479,8 @@ auto CTrackRec::pretty_print() const -> std::string {
 //========================================================================
 
 auto CEventMc::pretty_print() const -> std::string {
-  std::string repr = "<CEventMc>";
+  std::string repr = "<CEventMc";
+  repr += std::format("\n n mc tracks : {}>", tracks_.size());
   return repr;
 }
 
