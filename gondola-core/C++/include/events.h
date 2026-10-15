@@ -59,8 +59,6 @@ namespace gondola {
   
   /*********************************************************/
   
-  /// Speed of light in the paddle in cm/ns
-  static const f32 C_LIGHT_PADDLE = 15.4; 
   
   /*********************************************************/
 

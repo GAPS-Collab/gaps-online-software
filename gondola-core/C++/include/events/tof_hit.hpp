@@ -7,10 +7,14 @@
 #include "database.h"
 #include "version.h"
 #include "events/hit_quality.hpp"
+#include "errors.hpp"
 
 namespace r = result;
 
 namespace gondola {
+  
+  /// Speed of light in the paddle in cm/ns
+  static const f32 C_LIGHT_PADDLE = 15.4; 
 
   ///Reconstructed waveform peak information
   ///
@@ -24,31 +28,31 @@ namespace gondola {
     u8   paddle_id;
   
     // new variables for V1
-    ProtocolVersion version;
-    HitQuality quality = HitQuality::Unknown;
-    f32 baseline_a;
-    f32 baseline_a_rms;
-    f32 baseline_b;
-    f32 baseline_b_rms;
-    f32 phase;
+    ProtocolVersion version = ProtocolVersion::V1; // anything else is not supported rn
+    HitQuality quality      = HitQuality::Unknown;
+    f32 baseline_a          = 0;
+    f32 baseline_a_rms      = 0;
+    f32 baseline_b          = 0;
+    f32 baseline_b_rms      = 0;
+    f32 phase               = 0;
     /// This will allow to change the energy deposition 
     /// during processing efforts. In the raw data, this 
     /// is not filled and just a place holder 
-    f32 edep_corrected;
+    f32 edep_corrected      = 0;
   
     // event wide calculated time
-    f32 event_t0     = 0;
+    f32 event_t0            = 0;
   
-    u32 timestamp32;
-    u16 timestamp16;
+    u32 timestamp32         = 0;
+    u16 timestamp16         = 0;
     
     // don't serialize
-    f32 paddle_len    = 0;  
-    f32 coax_cbl_time = 0;
-    f32 hart_cbl_time = 0;
+    f32 paddle_len          = 0;  
+    f32 coax_cbl_time       = 0;
+    f32 hart_cbl_time       = 0;
  
     u8 ctr_etx;
-    u16 tail = 0xF0F; 
+    u16 tail                = 0xF0F; 
  
     // FIXME - remove these getters 
     auto get_time_a()       const -> f32;

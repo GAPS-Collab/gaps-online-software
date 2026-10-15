@@ -573,6 +573,9 @@ namespace gondola {
     auto get_event_tof_energies(u64 event_idx) -> Vec<f32>; 
     auto get_event_trk_energies(u64 event_idx) -> Vec<f32>; 
     auto get_primary(u64 event_idx)            -> Option<Tracklet>;
+    
+    /// Calculate a very crude beta estimate. This uses only the first inner 
+    /// and the first outer tof hit
     auto get_simple_beta(u64 event_id)         -> f32;
     
     /// Get all energy depositions on all Mc tracks for this event
