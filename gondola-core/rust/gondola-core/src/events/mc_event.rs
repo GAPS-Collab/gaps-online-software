@@ -124,7 +124,7 @@ impl McEvent {
     let mut hits = Vec::<(f32,f32,f32,f32,f32,u32,u32)>::new();
     for track_id in self.mctree.trackmap.keys() {
       for h in &self.mctree.trackmap[track_id].hits {
-        let hp = (h.pos_x, h.pos_y, h.pos_z, h.glob_time,h.kin_E,h.hw_id, h.volume_id);
+        let hp = (h.pos_x, h.pos_y, h.pos_z, h.glob_time,h.step_edep,h.hw_id, h.volume_id);
         hits.push(hp);
       }
     }
