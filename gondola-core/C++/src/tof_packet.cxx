@@ -11,62 +11,65 @@ using namespace result;
 
 auto packet_type_to_string(const PacketType pt) -> std::string {
   switch (pt) { 
-      case PacketType::Unknown : {
+    case PacketType::Unknown : {
       return "Unknown";
     }
-      case PacketType::Command : {
+    case PacketType::Command : {
       return "Command";
     }      
-      case PacketType::RBEvent : {
+    case PacketType::RBEvent : {
       return "RBEvent";
     }      
-      case PacketType::TofEventDeprecated : {
+    case PacketType::TofEventDeprecated : {
       return "TofEventDeprecated";
     }      
-      case PacketType::RBWaveform : {
+    case PacketType::RBWaveform : {
       return "RBWaveform";
     }      
-      case PacketType::TofEvent : {
+    case PacketType::TofEvent : {
       return "TofEvent";
     }      
-      case PacketType::HeartBeat : {
+    case PacketType::HeartBeat : {
       return "Heartbeat";
     }      
-      case PacketType::Scalar : {
-      return "Scalar";
-    }      
-      case PacketType::MasterTrigger : {
+    //case PacketType::Scalar : {
+    //  return "Scalar";
+    //}      
+    case PacketType::MasterTrigger : {
       return "MasterTriggerEvent";
     }      
-      case PacketType::RBHeader : {
+    case PacketType::RBHeader : {
       return "RBEventHeader";
     }
-      case PacketType::CPUMoniData : {
+    case PacketType::CPUMoniData : {
       return "CPUMoniData";
     }
-      case PacketType::MTBMoni : {
+    case PacketType::MTBMoni : {
       return "MtbMoni";
     }
-      case PacketType::RBMoni : {
+    case PacketType::RBMoni : {
       return "RBMoni";
     }
-      case PacketType::PBMoniData : {
+    case PacketType::PBMoniData : {
       return "PBMoniData";
     }
-      case PacketType::LTBMoniData : {
+    case PacketType::LTBMoniData : {
       return "LTBMoniData";
     }
-      case PacketType::PAMoniData : {
+    case PacketType::PAMoniData : {
       return "PAMoniData";
     }
-      case PacketType::RBCalibration : {
+    case PacketType::RBCalibration : {
       return "RBCalibration";
     }
-      case PacketType::RBEventMemoryView : {
+    case PacketType::RBEventMemoryView : {
       return "RBEventMemoryView";
     }
-      case PacketType::RBEventPayload : {
+    case PacketType::RBEventPayload : {
       return "RBEventMemoryView";
+    }
+    case PacketType::TofPulseTemplate : {
+      return "TofPulseTemplate";
     }
   }
   return "Unknown";

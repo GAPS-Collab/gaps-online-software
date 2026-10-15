@@ -10,49 +10,50 @@
 
 namespace r = result;
 
-static const u8 UNKNOWN            =  0;
-static const u8 COMMAND            = 10;
-static const u8 RBEVENT            = 20;
-static const u8 TOFEVENTDEPRECATED = 21;
-static const u8 RBWAVEFORM         = 22;
-static const u8 TOFEVENT           = 23;
-static const u8 HEARTBEAT          = 40;
-static const u8 SCALAR             = 50;
-static const u8 MT                 = 60;
-static const u8 RBHEADER           = 70;
-static const u8 CPUMONIDATA        = 80;
-static const u8 MTB_MONI           = 90;
-static const u8 RB_MONI            = 100;
-static const u8 PBMONIDATA         = 101;
-static const u8 LTBMONIDATA        = 102;
-static const u8 PAMONIDATA         = 103;
-static const u8 RBEVENTPAYLOAD     = 110;
-static const u8 RBEVENTMEMORYVIEW  = 120;
-static const u8 RBCALIBRATION      = 130;
+//static const u8 UNKNOWN            =  0;
+//static const u8 COMMAND            = 10;
+//static const u8 RBEVENT            = 20;
+//static const u8 TOFEVENTDEPRECATED = 21;
+//static const u8 RBWAVEFORM         = 22;
+//static const u8 TOFEVENT           = 23;
+//static const u8 HEARTBEAT          = 40;
+//static const u8 SCALAR             = 50;
+//static const u8 MT                 = 60;
+//static const u8 RBHEADER           = 70;
+//static const u8 CPUMONIDATA        = 80;
+//static const u8 MTB_MONI           = 90;
+//static const u8 RB_MONI            = 100;
+//static const u8 PBMONIDATA         = 101;
+//static const u8 LTBMONIDATA        = 102;
+//static const u8 PAMONIDATA         = 103;
+//static const u8 RBEVENTPAYLOAD     = 110;
+//static const u8 RBEVENTMEMORYVIEW  = 120;
+//static const u8 RBCALIBRATION      = 130;
 
 /// The PacketType is essential to identify 
 /// individual TofPackets. This has to 
 /// resemble the Rust API
 enum class PacketType : u8 {
-  Unknown            = UNKNOWN            ,
-  Command            = COMMAND            ,
-  RBEvent            = RBEVENT            ,
-  TofEventDeprecated = TOFEVENTDEPRECATED ,
-  RBWaveform         = RBWAVEFORM         ,
-  TofEvent           = TOFEVENT           ,
-  HeartBeat          = HEARTBEAT          ,
-  Scalar             = SCALAR             ,
-  MasterTrigger      = MT                 ,
-  RBHeader           = RBHEADER           ,
-  CPUMoniData        = CPUMONIDATA        ,
-  MTBMoni            = MTB_MONI           ,
-  RBMoni             = RB_MONI            ,
-  PBMoniData         = PBMONIDATA         , 
-  LTBMoniData        = LTBMONIDATA        ,
-  PAMoniData         = PAMONIDATA         , 
-  RBEventPayload     = RBEVENTPAYLOAD     ,
-  RBEventMemoryView  = RBEVENTMEMORYVIEW  ,
-  RBCalibration      = RBCALIBRATION      ,
+  Unknown            = 0   ,
+  Command            = 10  ,
+  RBEvent            = 20  ,
+  TofEventDeprecated = 21  ,
+  RBWaveform         = 22  ,
+  TofEvent           = 23  ,
+  HeartBeat          = 40  ,
+  //Scalar             = 50,
+  MasterTrigger      = 60  ,
+  RBHeader           = 70  ,
+  CPUMoniData        = 80  ,
+  MTBMoni            = 90  ,
+  RBMoni             = 100 ,
+  PBMoniData         = 101 , 
+  LTBMoniData        = 102 ,
+  PAMoniData         = 103 , 
+  RBEventPayload     = 110 ,
+  RBEventMemoryView  = 120 ,
+  RBCalibration      = 130 ,
+  TofPulseTemplate   = 223 ,
 };
 
 /// String representation of enum "PacketType"
