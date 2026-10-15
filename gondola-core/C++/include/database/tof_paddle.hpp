@@ -47,6 +47,9 @@ namespace gondola {
   
     /// Vector along the longest axis
     auto get_principal() const -> Vec<f32>;
+  
+    // Convert global coordinates into length on the paddle, calculated from the A side
+    auto get_position_from_a(f32 x, f32 y, f32 z) const -> f32;
   };
   
   /// A map of paddle id -> TofPaddle

@@ -163,7 +163,17 @@ auto g::TofPaddle::get_principal() const -> Vec<f32> {
   }
   return pr; 
 }
-  
+
+//-------------------------------------------------------------------
+
+auto g::TofPaddle::get_position_from_a(f32 x, f32 y, f32 z) const -> f32 {
+  const auto principal = get_principal();
+  const f32 dx = x - global_pos_x_l0_A*10;
+  const f32 dy = y - global_pos_y_l0_A*10;
+  const f32 dz = z - global_pos_z_l0_A*10;
+  return dx * principal[0] + dy * principal[1] + dz * principal[2];
+}
+
 
 auto g::TrackerStripPedestal::to_string() const -> std::string {
   std::string repr = "<TrackerStripPedestal:";
