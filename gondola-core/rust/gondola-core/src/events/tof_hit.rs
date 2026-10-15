@@ -378,6 +378,14 @@ impl TofHit {
   fn get_edep_att_birk_py(&self) -> f32 {
     self.get_edep_birk()
   }
+  
+  /// The "new" thing following Birk's law, 
+  /// but without attenuation
+  #[getter]
+  #[pyo3(name="edep_birk")]
+  fn get_edep_birk_no_att_py(&self) -> f32 {
+    self.get_edep_birk_no_att()
+  }
 
   /// Arrival time of the photons at side A
   #[getter]
@@ -596,6 +604,14 @@ impl TofHit {
     let edep = -1000.0*v/(21.0*v - 35260.0);
     return edep;
   }
+
+  pub fn get_edep_birk_no_att(&self) -> f32 {
+    let peak_a = self.peak_a.to_f32();
+    let peak_b = self.peak_b.to_f32();
+    let avg_peak = (peak_a + peak_b) / 2.0;
+    1000.0 * avg_peak / (35260.0 - 21.0 * avg_peak)
+  }
+
 
   /// Arrival time of the photons at side A
   pub fn get_time_a(&self) -> f32 {

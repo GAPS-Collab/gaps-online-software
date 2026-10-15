@@ -24,7 +24,6 @@ use diesel::serialize::ToSql;
 use diesel::backend::Backend;
 
 mod schema;    
-use schema::tof_db_rat::dsl::*;
 
 mod tracker_mask;
 pub use tracker_mask::{
