@@ -110,7 +110,21 @@ endif(BUILD_CXX_EXAMPLES)
 #endforeach()
 
 if (BUILD_SIM)
-  add_subdirectory(simulation)
+  find_package(Geant4 11 COMPONENTS gdml)
+  if(${Geant4_gdml_FOUND})
+    message(STATUS "Found Geant4 ${Geant4_VERSION} with gdml support!")
+    include(${Geant4_USE_FILE})
+    get_filename_component(G4LIBDIR ${Geant4_DIR} DIRECTORY)
+    message(STATUS "-- Found a suitable Geant4 version with GDML!")
+    message(STATUS "-- Found Geant4 libraries at ${G4LIBDIR}")
+    message(STATUS "-- Found Geant4 include dir at ${Geant4_INCLUDE_DIRS}")
+    message(STATUS "-- Will build geometry-builder")
+    add_definitions( -DBUILD_SIM)
+    add_subdirectory(simulation)
+  else()
+    message(WARNING "Can not find Geant4 C++ package, or the package does not have its gdml component compiled! Simulation part requires Geant4 with GDML!")
+    set(BUILD_SIM CACHE "Build C++ simulation code. This requires an installation of geant4" OFF FORCE) 
+  endif(${Geant4_gdml_FOUND})
 endif (BUILD_SIM)
 
 if (BUILD_CXX_PERSONAL_ANALYSIS_CODE)
@@ -140,13 +154,13 @@ if(DOXYGEN_FOUND)
     # docs need to be built seperately
     # to speed up make and keep the output 
     # clean
-    EXCLUDE_FROM_ALL
+    #EXCLUDE_FROM_ALL
     COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/doc/apidocs-v${PROJECT_VERSION}/C++/Doxyfile
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc/apidocs-v${PROJECT_VERSION}/C++ 
     COMMENT "Generating C++ API documentation with Doxygen"
     VERBATIM
   )
-  install(DIRECTORY ${CMAKE_BINARY_DIR}/doc/apidocs-v${PROJECT_VERSION}/C++/html DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/C++API/)
+  install(DIRECTORY ${CMAKE_BINARY_DIR}/doc/apidocs-v${PROJECT_VERSION}/C++/html DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/C++API/ OPTIONAL)
 endif()
 
 if (BUILD_LIFTOF)
@@ -155,7 +169,7 @@ if (BUILD_LIFTOF)
   else()
     add_dependencies(liftof-cc liftof-doc)
   endif()
-  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tof/liftof/target/doc/ DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/RustAPI/)
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tof/liftof/target/doc/ DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/RustAPI/ OPTIONAL)
 endif()
 
 ###################################
