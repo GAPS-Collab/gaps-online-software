@@ -2577,7 +2577,8 @@ impl TrackerStripPedestal {
     }
     return Ok(strips);
   }
-  
+ 
+  // FIXME - this fails
   pub fn all_names() -> Result<Vec<String>, ConnectionError> {
     let mut conn = connect_to_db()?;
     let mut names = Vec::<String>::new();

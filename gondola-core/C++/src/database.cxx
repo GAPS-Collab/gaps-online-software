@@ -174,6 +174,7 @@ auto g::TofPaddle::get_position_from_a(f32 x, f32 y, f32 z) const -> f32 {
   return dx * principal[0] + dy * principal[1] + dz * principal[2];
 }
 
+//==================================================================
 
 auto g::TrackerStripPedestal::to_string() const -> std::string {
   std::string repr = "<TrackerStripPedestal:";
@@ -187,7 +188,9 @@ auto g::TrackerStripPedestal::to_string() const -> std::string {
   return repr;
 }
 
-auto g::get_trackerstrippedestals() -> g::TrkStripPedMap {
+//-------------------------------------------------------------------
+
+auto g::get_trackerstrippedestals(std::string name) -> g::TrkStripPedMap {
   g::TrkStripPedMap ped_map;
   auto db_path = std::getenv("GONDOLA_DB_URL");
   if (db_path == nullptr) {
@@ -202,21 +205,24 @@ auto g::get_trackerstrippedestals() -> g::TrkStripPedMap {
       make_column("volume_id"            , &g::TrackerStripPedestal::volume_id),  
       make_column("utc_timestamp_start"  , &g::TrackerStripPedestal::utc_timestamp_start),
       make_column("utc_timestamp_stop"   , &g::TrackerStripPedestal::utc_timestamp_stop),
+      make_column("name"                 , &g::TrackerStripPedestal::name),
       make_column("pedestal_mean"        , &g::TrackerStripPedestal::pedestal_mean),
       make_column("pedestal_sigma"       , &g::TrackerStripPedestal::pedestal_sigma),
       make_column("is_mean_value"        , &g::TrackerStripPedestal::is_mean_value)));  
   
   auto pedestals = storage.get_all<g::TrackerStripPedestal>();
-  for (auto const &m : pedestals) {
-    ped_map.insert({m.strip_id, m});
+  for (auto const &ped : pedestals) {
+    if (name != "" && ped.name == name) {
+      ped_map.insert({ped.strip_id, ped});
+    } 
   }  
   return ped_map;
 }
 
-//===================================================================
+//-------------------------------------------------------------------
 
-auto g::get_trackerstrippedestals_by_volumeid() -> g::TrkStripPedMap {
-  g::TrkStripPedMap hw_map = g::get_trackerstrippedestals();
+auto g::get_trackerstrippedestals_by_volumeid(std::string name) -> g::TrkStripPedMap {
+  g::TrkStripPedMap hw_map = g::get_trackerstrippedestals(name);
   g::TrkStripPedMap ped_map; 
   for (auto const &[hwid, s] : hw_map) {
     ped_map.insert(std::make_pair(s.volume_id, s)); 

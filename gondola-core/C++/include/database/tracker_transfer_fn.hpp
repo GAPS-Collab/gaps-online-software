@@ -49,9 +49,10 @@ namespace gondola {
  
   typedef HashMap<u32, TrackerStripTransferFunction> TrkStripTransferFnMap;
 
-  /// Get a paddle from the database
-  auto get_trkstriptransferfn() -> TrkStripTransferFnMap;        
+  // Get all trackerstrip transfer function from the database which are stored under 
+  // a specific name
+  auto get_trkstriptransferfn(std::string name) -> TrkStripTransferFnMap;        
 
   /// Get a paddle from the database
-  auto get_trkstriptransferfn_by_volumeid() -> TrkStripTransferFnMap;        
+  auto get_trkstriptransferfn_by_volumeid(std::string name) -> TrkStripTransferFnMap;        
 }

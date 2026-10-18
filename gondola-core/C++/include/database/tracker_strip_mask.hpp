@@ -8,11 +8,13 @@ namespace gondola {
   /// Each module can have a mask, which allows to disable
   /// trcker strips. The mask is typically a 32bit number
   struct TrackerStripMask {
-    u32         strip_id ;
-    u64         volume_id;
-    u64         utc_timestamp;
-    std::string mask_name; 
-    bool        active     ; 
+    u32         data_id            ; // primary key in db
+    u32         strip_id           ;
+    u64         volume_id          ;
+    u64         utc_timestamp_start;
+    u64         utc_timestamp_stop ;
+    std::string name               ; 
+    bool        active             ; 
   
     auto to_string() const -> std::string;
     friend std::ostream& operator<<(std::ostream& os, const gondola::TrackerStripMask& strip);
@@ -21,5 +23,6 @@ namespace gondola {
 
   typedef std::map<u32, bool> TrkStripMaskMap;
 
-  auto get_trackerstripmasks(std::string mask_name = "") -> TrkStripMaskMap;
+  auto get_trackerstripmasks(std::string mask_name) -> TrkStripMaskMap;
+  auto get_trackerstripmasks_by_volumeid(std::string mask_name) -> TrkStripMaskMap;
 }

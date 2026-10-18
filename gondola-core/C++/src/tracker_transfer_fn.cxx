@@ -136,7 +136,7 @@ auto g::TrackerStripTransferFunction::invert(f64 y, f64 epsilon) -> Result<f64, 
 
 //============================================================================ 
 
-auto g::get_trkstriptransferfn() -> TrkStripTransferFnMap {
+auto g::get_trkstriptransferfn(std::string name) -> TrkStripTransferFnMap {
   TrkStripTransferFnMap tf_map;
   auto db_path = std::getenv("GONDOLA_DB_URL");
   if (db_path == nullptr) {
@@ -170,15 +170,17 @@ auto g::get_trkstriptransferfn() -> TrkStripTransferFnMap {
   ));  
   auto tfs = storage.get_all<g::TrackerStripTransferFunction>();
   for (auto const &tf : tfs) {
-    tf_map.insert({tf.strip_id, tf});
+    if (name != "" && tf.name == name) {
+      tf_map.insert({tf.strip_id, tf});
+    } 
   }  
   return tf_map;
 }    
 
 //============================================================================ 
 
-auto g::get_trkstriptransferfn_by_volumeid() -> TrkStripTransferFnMap {
-  TrkStripTransferFnMap hw_map = get_trkstriptransferfn();
+auto g::get_trkstriptransferfn_by_volumeid(std::string name) -> TrkStripTransferFnMap {
+  TrkStripTransferFnMap hw_map = get_trkstriptransferfn(name);
   TrkStripTransferFnMap tf_map; 
   for (auto const &[hwid, s] : hw_map) {
     tf_map.insert(std::make_pair(s.volume_id, s)); 
