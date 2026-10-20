@@ -227,6 +227,7 @@ int main(int argc, char *argv[]){
         continue;
       }
       auto m_ev = result.unwrap();
+      //std::cout << m_ev.to_string() << std::endl;
       for (g::TrkHit const &h : m_ev.trk_hits) {
         auto strip_id = g::TrackerStrip::create_id(h.layer, h.row, h.module, h.channel);
         //if (trk_mask[strip_id]) {

@@ -85,100 +85,110 @@ void PacketMethods::BeginRun(int run=5) {
 void PacketMethods::ProcessTofEventSummary(g::TofEvent *Tes,
 					   unsigned long int evt_no){
   //std::cout << Tes->to_string() << std::endl;
-  
-  //printf("TES: %d %ld %lu\n", Tes->run_id, evt_no, Tes->get_timestamp48());
-  struct EventInfo EvtInfo;
-  // First, initialize all the event values properly              
-  for (int i=0;i<NPAD;i++) {
-    for (int j=0;j<2;j++) {
-      EvtInfo.Ped[i][j]      = -999.0;
-      EvtInfo.PedRMS[i][j]   = -999.0;
-      EvtInfo.VPeak[i][j]    = -999.0;
-      EvtInfo.Charge[i][j]   = -999.0;
-      EvtInfo.TDC[i][j]      = -999.0;
-      EvtInfo.TOTLo[i][j]    = -999.0;
-      EvtInfo.TOTHi[i][j]    = -999.0;
-      EvtInfo.TOTSlLo[i][j]  = -999.0;
-      EvtInfo.TOTSlHi[i][j]  = -999.0;
-    }
-  }
-  for (int i=0;i<NRB;i++) {
-    EvtInfo.Phi[i] = -999.0;
-  }
-  // Now, parse the TofEventSummary data into EvtInfo. We want to look
-  // for when the 48-bit counter rolls over to accurately calculate
-  // the elapsed time. This code will find an arbitrary number of
-  // RollOvers, but in practice, a 48-bit number with 10ns precision
-  // will roll over only once every ~32 days (max twice per flight).
 
-  // First, get timestamp and add the number of RollOvers so far
-  unsigned long long tmpstamp = Tes->get_timestamp48() + nRollOvers*MAXstamp;
-  // Now demand a good timestamp (>0) and see if the
-  // timestamp-timeInit is too large. Using unsigned int means that
-  // "negative" values (at roll over) will get very large
-  if (tmpstamp > 0 && (tmpstamp - timeInit) > (nRollOvers+1)*MAXstamp) {
-    nRollOvers++;    
-    tmpstamp+=MAXstamp;  // Add RollOver value to timestamp
-  }
-  // Finally, convert our tmpstamp into a FlightTime (in seconds)
-  EvtInfo.FlightTime = (tmpstamp - timeInit)/1e8;
-  //printf("TES0: %llu  %lf\n", tmpstamp, EvtInfo.FlightTime);
+  bool tr_trig = false; 
+  auto t_types = Tes->get_trigger_sources(); 
+  // Technically, you want to index over all the t_type[] array, but I
+  // only want Track and TrackCentral triggers (and nothing that
+  // satisfies the GAPS trigger.
+  int tmp_trig = (int)t_types[0];
+  if (tmp_trig == 2 || tmp_trig == 3) tr_trig = true;
+  //for (int i=0;i<t_types.size();i++) printf(" %u",t_types[i]); printf("\n");
   
-  for (g::TofHit const &h : Tes->hits) {
-    int pad = h.paddle_id;
-    EvtInfo.Ped[pad][0]     = h.baseline_a;
-    EvtInfo.Ped[pad][1]     = h.baseline_b;
-    EvtInfo.PedRMS[pad][0]  = h.baseline_a_rms;
-    EvtInfo.PedRMS[pad][1]  = h.baseline_b_rms;
-    EvtInfo.VPeak[pad][0]   = h.get_peak_a();
-    EvtInfo.VPeak[pad][1]   = h.get_peak_b();
-    EvtInfo.Charge[pad][0]  = h.get_charge_a();
-    EvtInfo.Charge[pad][1]  = h.get_charge_b();
-    EvtInfo.TDC[pad][0]     = h.get_time_a();
-    EvtInfo.TDC[pad][1]     = h.get_time_b();
-    EvtInfo.TOTLo[pad][0]   = h.get_tot_low_a();
-    EvtInfo.TOTLo[pad][1]   = h.get_tot_low_b();
-    EvtInfo.TOTHi[pad][0]   = h.get_tot_high_a();
-    EvtInfo.TOTHi[pad][1]   = h.get_tot_high_b();
-    EvtInfo.TOTSlLo[pad][0] = h.get_tot_slp_low_a();
-    EvtInfo.TOTSlLo[pad][1] = h.get_tot_slp_low_b();
-    EvtInfo.TOTSlHi[pad][0] = h.get_tot_slp_high_a();
-    EvtInfo.TOTSlHi[pad][1] = h.get_tot_slp_high_b();
-    int sipm_a = PadInfo.SiPM_A[pad];
-    int rb     = SipmInfo.RB[sipm_a];
-    EvtInfo.Phi[rb]       = h.phase;
-    if (0) {
-    printf("Hit: %3d %5.2f %4.2f %5.2f %4.2f ",pad,
-	   h.baseline_a, h.baseline_a_rms,
-	   h.baseline_b, h.baseline_b_rms);
-    printf("%6.2f %6.2f %6.2f %6.2f %6.2f %6.2f\n",
-	   h.get_peak_a(), h.get_peak_b(),
-	   h.get_charge_a(), h.get_charge_b(),
-	   h.get_time_a(), h.get_time_b());
+  if ( tr_trig ) {
+    //printf("TES: %d %ld %lu\n", Tes->run_id, evt_no, Tes->get_timestamp48());
+    struct EventInfo EvtInfo;
+    // First, initialize all the event values properly              
+    for (int i=0;i<NPAD;i++) {
+      for (int j=0;j<2;j++) {
+	EvtInfo.Ped[i][j]      = -999.0;
+	EvtInfo.PedRMS[i][j]   = -999.0;
+	EvtInfo.VPeak[i][j]    = -999.0;
+	EvtInfo.Charge[i][j]   = -999.0;
+	EvtInfo.TDC[i][j]      = -999.0;
+	EvtInfo.TOTLo[i][j]    = -999.0;
+	EvtInfo.TOTHi[i][j]    = -999.0;
+	EvtInfo.TOTSlLo[i][j]  = -999.0;
+	EvtInfo.TOTSlHi[i][j]  = -999.0;
+      }
     }
+    for (int i=0;i<NRB;i++) {
+      EvtInfo.Phi[i] = -999.0;
+    }
+    // Now, parse the TofEventSummary data into EvtInfo. We want to look
+    // for when the 48-bit counter rolls over to accurately calculate
+    // the elapsed time. This code will find an arbitrary number of
+    // RollOvers, but in practice, a 48-bit number with 10ns precision
+    // will roll over only once every ~32 days (max twice per flight).
+    
+    // First, get timestamp and add the number of RollOvers so far
+    unsigned long long tmpstamp = Tes->get_timestamp48() + nRollOvers*MAXstamp;
+    // Now demand a good timestamp (>0) and see if the
+    // timestamp-timeInit is too large. Using unsigned int means that
+    // "negative" values (at roll over) will get very large
+    if (tmpstamp > 0 && (tmpstamp - timeInit) > (nRollOvers+1)*MAXstamp) {
+      nRollOvers++;    
+      tmpstamp+=MAXstamp;  // Add RollOver value to timestamp
+    }
+    // Finally, convert our tmpstamp into a FlightTime (in seconds)
+    EvtInfo.FlightTime = (tmpstamp - timeInit)/1e8;
+    //printf("TES0: %llu  %lf\n", tmpstamp, EvtInfo.FlightTime);
+    
+    for (g::TofHit const &h : Tes->hits) {
+      int pad = h.paddle_id;
+      EvtInfo.Ped[pad][0]     = h.baseline_a;
+      EvtInfo.Ped[pad][1]     = h.baseline_b;
+      EvtInfo.PedRMS[pad][0]  = h.baseline_a_rms;
+      EvtInfo.PedRMS[pad][1]  = h.baseline_b_rms;
+      EvtInfo.VPeak[pad][0]   = h.get_peak_a();
+      EvtInfo.VPeak[pad][1]   = h.get_peak_b();
+      EvtInfo.Charge[pad][0]  = h.get_charge_a();
+      EvtInfo.Charge[pad][1]  = h.get_charge_b();
+      EvtInfo.TDC[pad][0]     = h.get_time_a();
+      EvtInfo.TDC[pad][1]     = h.get_time_b();
+      EvtInfo.TOTLo[pad][0]   = h.get_tot_low_a();
+      EvtInfo.TOTLo[pad][1]   = h.get_tot_low_b();
+      EvtInfo.TOTHi[pad][0]   = h.get_tot_high_a();
+      EvtInfo.TOTHi[pad][1]   = h.get_tot_high_b();
+      EvtInfo.TOTSlLo[pad][0] = h.get_tot_slp_low_a();
+      EvtInfo.TOTSlLo[pad][1] = h.get_tot_slp_low_b();
+      EvtInfo.TOTSlHi[pad][0] = h.get_tot_slp_high_a();
+      EvtInfo.TOTSlHi[pad][1] = h.get_tot_slp_high_b();
+      int sipm_a = PadInfo.SiPM_A[pad];
+      int rb     = SipmInfo.RB[sipm_a];
+      EvtInfo.Phi[rb]       = h.phase;
+      if (0) {
+	printf("Hit: %3d %5.2f %4.2f %5.2f %4.2f ",pad,
+	       h.baseline_a, h.baseline_a_rms,
+	       h.baseline_b, h.baseline_b_rms);
+	printf("%6.2f %6.2f %6.2f %6.2f %6.2f %6.2f\n",
+	       h.get_peak_a(), h.get_peak_b(),
+	       h.get_charge_a(), h.get_charge_b(),
+	       h.get_time_a(), h.get_time_b());
+      }
+    }
+    
+    // Start the event analysis: initialize our variables
+    Event.InitializeVariables(Tes->run_id, evt_no);
+    
+    // Now, fill the appropriate quantities in EventGAPS                 
+    Event.FillEventValues(&EvtInfo);
+    Event.FixPedRMSValues();
+    
+    // Now, process the ch9 phases                                       
+    Event.AnalyzePhases(EvtInfo.Phi);
+    
+    // Analyze each paddle: position on paddle, hitmask, etc             
+    Event.AnalyzePaddles(10.0, 5.0); //Args: Peak and Charge cuts        
+    
+    // Now calculate beta, charge, and inner/outer tof x,y,z, etc.        
+    Event.AnalyzeEvent();
+    
+    // Now fill out histograms                                         
+    Event.FillChannelHistos(0);
+    Event.FillPaddleHistos();
+    Event.FillOffsetHistos();
   }
-  
-  // Start the event analysis: initialize our variables
-  Event.InitializeVariables(Tes->run_id, evt_no);
-  
-  // Now, fill the appropriate quantities in EventGAPS                 
-  Event.FillEventValues(&EvtInfo);
-  Event.FixPedRMSValues();
-  
-  // Now, process the ch9 phases                                       
-  Event.AnalyzePhases(EvtInfo.Phi);
-  
-  // Analyze each paddle: position on paddle, hitmask, etc             
-  Event.AnalyzePaddles(10.0, 5.0); //Args: Peak and Charge cuts        
-  
-  // Now calculate beta, charge, and inner/outer tof x,y,z, etc.        
-  Event.AnalyzeEvent();
-  
-  // Now fill out histograms                                         
-  Event.FillChannelHistos(0);
-  Event.FillPaddleHistos();
-  Event.FillOffsetHistos();
-  
 }
 
 ////////////////////////////////////////////////////////////////////////////

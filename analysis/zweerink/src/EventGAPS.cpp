@@ -932,9 +932,13 @@ void EventGAPS::AnalyzePaddles(float pk_cut = -999, float ch_cut = -999.0) {
 	    //	   TDC[chB], VPeak[chA],VPeak[chB], QInt[chA],QInt[chB]);
 	    //printf(" %7.4f %5.2f %5.2f %4.2f %4.2f\n",
 	    //	   Phi[RB[chB]], Pedestal[chA],Pedestal[chB],
-	    printf("WAVE %3d %6.3f %6.3f %5.3f %5.3f\n", i,
-		   Pedestal[chA],Pedestal[chB],
-		   PedRMS[chA],PedRMS[chB]);
+	    //printf("WAVE %3d %6.3f %6.3f %5.3f %5.3f\n", i,
+	    //	   Pedestal[chA],Pedestal[chB], PedRMS[chA],PedRMS[chB]);
+	    printf("%ld %3d %7.2f %7.2f %7.2f %7.2f %7.2f %7.2f %7.2f %7.2f\n",
+		   evtno, i, TDC[chA],TDC[chB], HitT[i],
+		   (TDC[chA]+TDC[chB]-Dimension[i][0]/sc_speed)/2.0,
+		   TShift[rbnum], Phi[rbnum],
+		   TCorrEvent[i], TCorrFixed[i] );
 	  }
 	}
 	HitT[i] -= Offset[i];

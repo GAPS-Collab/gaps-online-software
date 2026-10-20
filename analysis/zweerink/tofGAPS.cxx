@@ -79,7 +79,6 @@ void PacketMethods::BeginRun(int run=5) {
 void PacketMethods::ProcessTofEvent(g::TofEvent *Tev,
 				    std::map<u8,g::RBCalibration>& cali){
 
-  // Some useful variables (some initialized to default values)
   // but overwritten from file (if it exists)
   float Ped_low   = 350;
   float Ped_win   = 100;
@@ -113,6 +112,25 @@ void PacketMethods::ProcessTofEvent(g::TofEvent *Tev,
   //printf("Event %ld - RBs: \n", evt_ctr);
   //printf("%ld.", evt_ctr);
   
+  struct EventInfo EvtInfo;
+  // First, initialize all the event values properly              
+  for (int i=0;i<NPAD;i++) {
+    for (int j=0;j<2;j++) {
+      EvtInfo.Ped[i][j]      = -999.0;
+      EvtInfo.PedRMS[i][j]   = -999.0;
+      EvtInfo.VPeak[i][j]    = -999.0;
+      EvtInfo.Charge[i][j]   = -999.0;
+      EvtInfo.TDC[i][j]      = -999.0;
+      EvtInfo.TOTLo[i][j]    = -999.0;
+      EvtInfo.TOTHi[i][j]    = -999.0;
+      EvtInfo.TOTSlLo[i][j]  = -999.0;
+      EvtInfo.TOTSlHi[i][j]  = -999.0;
+    }
+  }
+  for (int i=0;i<NRB;i++) {
+    EvtInfo.Phi[i] = -999.0;
+  }
+
   for (auto const &rbid : Tev->get_rbids()) {
     g::RBEvent rb_event = Tev->get_rbevent(rbid);
     // Now that we know the RBID, we can set the starting ch_no
@@ -161,15 +179,38 @@ void PacketMethods::ProcessTofEvent(g::TofEvent *Tev,
       }
     }
     for (int i=0; i<rb_event.hits.size(); i++) {
+      int pad = rb_event.hits[i].paddle_id;
+      EvtInfo.Ped[pad][0]     = rb_event.hits[i].baseline_a;
+      EvtInfo.Ped[pad][1]     = rb_event.hits[i].baseline_b;
+      EvtInfo.PedRMS[pad][0]  = rb_event.hits[i].baseline_a_rms;
+      EvtInfo.PedRMS[pad][1]  = rb_event.hits[i].baseline_b_rms;
+      EvtInfo.VPeak[pad][0]   = rb_event.hits[i].get_peak_a();
+      EvtInfo.VPeak[pad][1]   = rb_event.hits[i].get_peak_b();
+      EvtInfo.Charge[pad][0]  = rb_event.hits[i].get_charge_a();
+      EvtInfo.Charge[pad][1]  = rb_event.hits[i].get_charge_b();
+      EvtInfo.TDC[pad][0]     = rb_event.hits[i].get_time_a();
+      EvtInfo.TDC[pad][1]     = rb_event.hits[i].get_time_b();
+      EvtInfo.TOTLo[pad][0]   = rb_event.hits[i].get_tot_low_a();
+      EvtInfo.TOTLo[pad][1]   = rb_event.hits[i].get_tot_low_b();
+      EvtInfo.TOTHi[pad][0]   = rb_event.hits[i].get_tot_high_a();
+      EvtInfo.TOTHi[pad][1]   = rb_event.hits[i].get_tot_high_b();
+      EvtInfo.TOTSlLo[pad][0] = rb_event.hits[i].get_tot_slp_low_a();
+      EvtInfo.TOTSlLo[pad][1] = rb_event.hits[i].get_tot_slp_low_b();
+      EvtInfo.TOTSlHi[pad][0] = rb_event.hits[i].get_tot_slp_high_a();
+      EvtInfo.TOTSlHi[pad][1] = rb_event.hits[i].get_tot_slp_high_b();
+      int sipm_a = PadInfo.SiPM_A[pad];
+      int rb     = SipmInfo.RB[sipm_a];
+      EvtInfo.Phi[rb]       = rb_event.hits[i].phase;
       if (rb_event.hits[i].paddle_id < 161) {
 	//printf("RUST %3d",rb_event.hits[i].paddle_id);
 	//printf(" %7.2f %7.2f %7.2f %7.2f %6.2f %6.2f",
-	//     rb_event.hits[i].get_time_a(), rb_event.hits[i].get_time_b(),
-	//     rb_event.hits[i].get_peak_a(), rb_event.hits[i].get_peak_b(),
-	//     rb_event.hits[i].get_charge_a(),
-	//     rb_event.hits[i].get_charge_b());
+	//printf(" %7.2f %7.2f %7.2f\n",
+	//       rb_event.hits[i].get_time_a(), rb_event.hits[i].get_time_b(),
+	//       rb_event.hits[i].get_peak_a(), rb_event.hits[i].get_peak_b(),
+	//       rb_event.hits[i].get_charge_a(),
+	//       rb_event.hits[i].get_charge_b());
 	//printf(" %7.4f %5.2f %5.2f %4.2f %4.2f\n",
-	//     Phi[rbid], rb_event.hits[i].baseline_a,
+	//       Phi[rbid]); //, rb_event.hits[i].baseline_a,
 	//printf(" %6.3f %6.3f %5.3f %5.3f\n",
 	//     rb_event.hits[i].baseline_a,
 	//     rb_event.hits[i].baseline_b, rb_event.hits[i].baseline_a_rms,
@@ -177,21 +218,33 @@ void PacketMethods::ProcessTofEvent(g::TofEvent *Tev,
       }
     }
   }
+
+  // CONVERT THIS TO WORK WITH THE TofHit values instead of
+  // calculating from waveforms.
   
   // Now that we have the waveforms in place, analyze the event.
   Event.InitializeVariables(Tev->run_id, evt_ctr);
-  Event.InitializeWaveforms(wave, wch9);
+  if (0) { // If 1, use TofHit values. If 0, use waveforms
+    // Now, fill the appropriate quantities in EventGAPS                 
+    Event.FillEventValues(&EvtInfo);
+    Event.FixPedRMSValues();
+    
+    // Now, process the ch9 phases                                       
+    Event.AnalyzePhases(EvtInfo.Phi);
+  } else {    
+    Event.InitializeWaveforms(wave, wch9);
   
-  // Calculate and store pedestals/RMSs for each channel
-  Event.AnalyzePedestals(Ped_low, Ped_win);
+    // Calculate and store pedestals/RMSs for each channel
+    Event.AnalyzePedestals(Ped_low, Ped_win);
+    
+    // Analyze the pulses in each channel
+    Event.SetThreshold(CThresh);
+    Event.SetCFDFraction(CFDS_frac);
+    Event.AnalyzePulses(Qwin_low, Qwin_size);
   
-  // Analyze the pulses in each channel
-  Event.SetThreshold(CThresh);
-  Event.SetCFDFraction(CFDS_frac);
-  Event.AnalyzePulses(Qwin_low, Qwin_size);
-  
-  // Now that we have TDC values available, process the ch9 phases
-  Event.AnalyzePhases(Phi);
+    // Now that we have TDC values available, process the ch9 phases
+    Event.AnalyzePhases(Phi);
+  }
   
   // Analyze each paddle: position on paddle, hitmask, etc
   Event.AnalyzePaddles(10.0, CHmin); //Args: Peak and Charge cuts
