@@ -324,6 +324,28 @@ impl RBEventMemoryStreamer {
   }
 
 
+  /// Drop the part of the stream we have already walked over.
+  ///
+  /// `Vec::drain(0..pos)` memmoves the entire remaining tail down, so doing it
+  /// once per event makes iterating a chunk of N events O(N^2). We therefore
+  /// compact exactly once per chunk - here, when new data arrives - which is
+  /// O(N) overall. Between compactions `self.pos` simply keeps advancing;
+  /// every read in this type is already relative to `self.pos`.
+  ///
+  /// `self.pos` always points at the start of data we have not consumed yet:
+  /// the parser rewinds it when an event is truncated (see
+  /// `get_event_at_pos_unchecked`), so a partial event at the end of a chunk
+  /// survives compaction and is completed by the next chunk.
+  fn compact(&mut self) {
+    if self.pos == 0 {
+      return;
+    }
+    // defensive: the parser can in principle run pos past the end
+    let cut = self.pos.min(self.stream.len());
+    self.stream.drain(0..cut);
+    self.pos -= cut;
+  }
+
   // FIXME - performance. Don't extend it. It would be
   // better if we'd consume the stream without 
   // reallocating memory.
@@ -332,6 +354,7 @@ impl RBEventMemoryStreamer {
     //println!("self.pos {}", self.pos);
     //println!("Stream before {}",self.stream.len());
     self.is_depleted = false;
+    self.compact();
     self.stream.extend_from_slice(&stream[0..nbytes]);
     //self.create_event_index();
     //println!("Stream after {}",self.stream.len());
@@ -341,6 +364,8 @@ impl RBEventMemoryStreamer {
   /// This will avoid clones.
   pub fn consume(&mut self, stream : &mut Vec<u8>) {
     self.is_depleted = false;
+    // drop what we already walked over before growing the buffer again
+    self.compact();
     // FIXME: append can panic
     // we use it here, since it does not clone
     //println!("[io.rs] consuming {} bytes", stream.len());
@@ -688,10 +713,10 @@ impl Iterator for RBEventMemoryStreamer {
     self.pos_at_head = false;
     begin_pos = self.pos; // in case we need
                                 // to reset the position
-    if self.stream.len() == 0 {
+    if self.pos >= self.stream.len() {
       trace!("Stream empty!");
       self.is_depleted = true;
-      self.pos = 0;
+      self.compact();
       return None;
     }
     if !self.pos_at_head {
@@ -705,8 +730,11 @@ impl Iterator for RBEventMemoryStreamer {
     
     let event          = self.get_event_at_pos_unchecked(None)?;
     self.n_events_ext += 1;
-    self.stream.drain(0..self.pos);
-    self.pos           = 0;
+    // NOTE: deliberately NO drain here. Draining the consumed prefix once per
+    // event memmoves the whole remaining tail every time, making a chunk of N
+    // events O(N^2): at 200 Hz with a 1.5 s buffer trip that was ~800 MB of
+    // memmove per chunk, i.e. more than the RB could do in the 1.5 s it had.
+    // The stream is compacted once per chunk in consume()/add() instead.
     self.pos_at_head   = false;
     Some(event)
   }

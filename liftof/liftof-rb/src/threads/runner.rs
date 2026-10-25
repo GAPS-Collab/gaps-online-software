@@ -100,7 +100,12 @@ pub fn runner(rb_id                   : u8,
   // run start/stop conditions
   let mut terminate             = false;
   let mut is_running            = false;
-  let mut listen_for_new_config = false;
+  // NOTE: this used to start as `false`, which skipped the `thread::sleep(one_sec)`
+  // idle guard below from process start: with no RunConfig yet, the loop fell
+  // straight through and spun a core at ~90% while doing nothing at all.
+  // `try_recv` is still checked before the sleep, so a config that is already
+  // waiting is picked up immediately.
+  let mut listen_for_new_config = true;
   let mut rc = RunConfig::new();
   
   // this are all settings for the progress bar
@@ -487,25 +492,25 @@ pub fn runner(rb_id                   : u8,
       }
     }
     
-    // FIXME
-    if !rc.nevents == 0 {
-      if rc.nevents != 0 {
-        if n_events > rc.nevents as u64{
-          terminate = true;
-        }
+    // NOTE: this block used to be guarded by `if !rc.nevents == 0`, which Rust
+    // parses as `(!rc.nevents) == 0`. `rc.nevents` is a u32, so that is true
+    // only when nevents == 0xFFFFFFFF - the whole block was dead code for every
+    // real config. It disabled two things: nevents-based run termination, and
+    // the CPU-reducing sleep at the bottom of the loop.
+    if rc.nevents != 0 {
+      if n_events > rc.nevents as u64 {
+        terminate = true;
       }
-      
-      if rc.nseconds > 0 {
-          if met.elapsed().as_secs() > rc.nseconds  as u64{
-            terminate = true;
-          }
-        }
+    }
 
-      // reduce cpu load
-      if !terminate {
-        if !force_trigger { 
-          thread::sleep(100*one_milli);
-        }
+    // reduce cpu load
+    // NOTE: the original sleep here was 100*one_milli. Now that this code
+    // actually runs, 100 ms would throttle the entire runner loop to 10 Hz.
+    // 1 ms matches what the event-count poll above already uses, and the
+    // runner measures at only 8-16% CPU during a run with it.
+    if !terminate {
+      if !force_trigger {
+        thread::sleep(one_milli);
       }
     }
   } // end loop

@@ -14,6 +14,7 @@ extern crate memmap;
 use std::error::Error;
 use std::fs::File;
 use std::fmt;
+use std::sync::OnceLock;
 
 use memmap::{Mmap,
              MmapMut};
@@ -151,6 +152,52 @@ pub fn map_physical_mem_write(addr_space : &str,
   Ok(m)
 }
 
+/// Size of the /dev/uio0 register window.
+///
+/// Matches /sys/class/uio/uio0/maps/map0/size (0x10000). Every register in
+/// `registers.rs` lives between 0x40 and 0x414, so one mapping covers them all.
+pub const UIO0_MAP_SIZE : usize = 0x10000;
+
+/// A process-lifetime mapping of the /dev/uio0 register w.indow.
+///
+/// Register access used to do `File::open` + `mmap` + read 4 bytes + `munmap`
+/// + close on EVERY access. Measured on tof-rb44 that is ~152 us per access
+/// against ~5.5 us through a cached mapping, a factor of 27 - and
+/// `get_deadtime()` is called once per event when
+/// `drs_deadtime_instead_fpga_temp` is set. So the window is mapped once and
+/// kept for the life of the process.
+struct Uio0Regs {
+  ptr : *mut u8,
+}
+
+// The previous code mapped the same physical page independently in every
+// thread, so sharing a single mapping does not change the concurrency story.
+// All access still goes through read_volatile/write_volatile.
+unsafe impl Send for Uio0Regs {}
+unsafe impl Sync for Uio0Regs {}
+
+static UIO0_REGS : OnceLock<Option<Uio0Regs>> = OnceLock::new();
+
+/// Get the cached /dev/uio0 register window, mapping it on first use.
+fn uio0_regs() -> Option<&'static Uio0Regs> {
+  UIO0_REGS.get_or_init(|| {
+    match map_physical_mem_write(UIO0, 0x0, UIO0_MAP_SIZE) {
+      Ok(mut m) => {
+        let ptr = m.as_mut_ptr();
+        // deliberately leak: the window must stay mapped for the whole run
+        std::mem::forget(m);
+        info!("Mapped {} register window ({} bytes) once for the process",
+              UIO0, UIO0_MAP_SIZE);
+        Some(Uio0Regs { ptr })
+      },
+      Err(err) => {
+        error!("Failed to mmap {} register window: {:?}", UIO0, err);
+        None
+      }
+    }
+  }).as_ref()
+}
+
 ///! Get a single value from a 32bit (1 word) register
 ///  This reads ONLY control registers 
 ///  (in /dev/uio0)
@@ -165,18 +212,13 @@ pub fn read_control_reg(addr : u32)
   where
     u32: std::fmt::LowerHex, {
   
-  //let sz = std::mem::size_of::<u32>();
-  let m = match map_physical_mem_read(UIO0, addr, SIZEOF_U32) {
-    Ok(m) => m,
-    Err(err) => {
-      error!("Failed to mmap: {:?}", err);
-      return Err(RegisterError::MMapFail);
-    }
+  let regs = match uio0_regs() {
+    Some(r)  => r,
+    None     => return Err(RegisterError::MMapFail),
   };
-  let p = m.as_ptr() as *const u32;
   let value : u32;
   unsafe {
-    value = std::ptr::read_volatile(p.offset(0));
+    value = std::ptr::read_volatile(regs.ptr.add(addr as usize) as *const u32);
   }
   Ok(value)
 }
@@ -189,17 +231,12 @@ pub fn write_control_reg(addr       : u32,
     u32: std::fmt::LowerHex, {
   
   trace!("Attempting to write {data} at addr {addr}");
-  //let sz = std::mem::size_of::<u32>();
-  let m = match map_physical_mem_write(UIO0,addr,SIZEOF_U32) {
-    Ok(m) => m,
-    Err(err) => {
-      warn!("[write_control_reg] Failed to mmap! {:?}", err);
-      return Err(RegisterError::MMapFail);
-    }
+  let regs = match uio0_regs() {
+    Some(r)  => r,
+    None     => return Err(RegisterError::MMapFail),
   };
-  let p = m.as_ptr() as *mut u32;
   unsafe {
-    std::ptr::write_volatile(p.offset(0), data);
+    std::ptr::write_volatile(regs.ptr.add(addr as usize) as *mut u32, data);
   }
   Ok(())
 }

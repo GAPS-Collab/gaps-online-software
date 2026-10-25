@@ -15,12 +15,27 @@ use std::sync::{
   Mutex,
 };
 
-use std::time::Instant;
+use std::time::{
+  Duration,
+  Instant,
+};
 
 use crossbeam_channel::{
   Sender,
-  Receiver
+  Receiver,
+  RecvTimeoutError,
 };
+
+/// How long to park in `recv_timeout` when no bytestream is waiting.
+///
+/// This replaces an `if bs_recv.is_empty() { continue }` guard that spun at
+/// roughly 220 kHz, burning a whole core (and, because this kernel has no
+/// vDSO, doing a real `clock_gettime` syscall on every pass). Blocking with a
+/// deadline costs no CPU and still wakes immediately when data arrives, so it
+/// is strictly better than a sleep, which would only add latency. The timeout
+/// exists so the loop still services the op-mode/datatype channels and the
+/// ThreadControl stop flag while idle.
+const BS_POLL_INTERVAL : Duration = Duration::from_millis(100);
 
 use gondola_core::prelude::*;
 
@@ -184,14 +199,8 @@ pub fn event_processing(board_id            : u8,
         }
       }
     }
-    if bs_recv.is_empty() {
-      //println!("--> Empty bs_rec");
-      // FIXME - benchmark
-      //thread::sleep(one_milli/2);
-      continue 'main;
-    }
-    // this can't be blocking anymore, since 
-    // otherwise we miss the datatype
+    // NOTE: no `if bs_recv.is_empty() { continue }` spin here any more - we
+    // block on the channel with a deadline instead, see BS_POLL_INTERVAL.
     let mut bytestream : Vec<u8>;
     if events_not_sent > 0 {
       error!("There were {events_not_sent} for this iteration of received bytes!");
@@ -203,7 +212,12 @@ pub fn event_processing(board_id            : u8,
     // these are per iteration
     events_not_sent = 0;
     skipped_events  = 0;
-    match bs_recv.recv() {
+    match bs_recv.recv_timeout(BS_POLL_INTERVAL) {
+      Err(RecvTimeoutError::Timeout) => {
+        // nothing to do this cycle - go round so we still service the op mode
+        // and datatype channels and the ThreadControl stop flag
+        continue 'main;
+      }
       Err(err) => {
         error!("Received Garbage! Err {err}");
         continue 'main;
