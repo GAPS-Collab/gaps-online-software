@@ -76,7 +76,7 @@ int main(int argc, char *argv[]){
     char tmpline[500];
     std::string ftype = ".bin";
     size_t found = path.string().find(ftype);
-    bool flist = ( found == path.string().size()-4 ? false : true);
+    bool flist = ( found == path.string().size()-ftype.size() ? false : true);
     if (flist) { // Doesn't end with .bin -> a file with files
       // Read files and and store in "filenames"
       FILE *fp = fopen(path.c_str(), "r");
@@ -227,6 +227,7 @@ int main(int argc, char *argv[]){
         continue;
       }
       auto m_ev = result.unwrap();
+      //std::cout << m_ev.to_string() << std::endl;
       for (g::TrkHit const &h : m_ev.trk_hits) {
         auto strip_id = g::TrackerStrip::create_id(h.layer, h.row, h.module, h.channel);
         //if (trk_mask[strip_id]) {

@@ -81,7 +81,8 @@ int main(int argc, char *argv[]){
     char tmpline[500];
     std::string ftype = ".tof.gaps";
     size_t found = path.string().find(ftype);
-    bool flist = ( found == path.string().size()-8 ? false : true);
+    bool flist = ( found == path.string().size()-ftype.size() ? false : true);
+    printf("%s %s %d\n", ftype.c_str(), path.c_str(), flist); fflush(stdout);
     if (flist) { // Doesn't end with .tof.gaps -> a file with files
       // Read files and and store in "filenames"
       FILE *fp = fopen(path.c_str(), "r");
@@ -118,15 +119,17 @@ int main(int argc, char *argv[]){
 
   // -> Gaps relevant code starts here
   // First, read in the specified calibrations
+  printf("Reading calibration files..."); fflush(stdout);
   auto calname = result["calibration"].as<std::string>();
-  std::map<u8,gondola::RBCalibration> cali;
+  std::map<u8,g::RBCalibration> cali;
   if (calname != "") {
     // obviously here we have to get all the calibration files,           
     // but for the sake of the example let's use only one                
     // Ultimatly, they will be stored in the stream.                 
     spdlog::info("Will use calibrations from {}", calname);
-    cali = gondola::load_tof_calibrations(calname);
+    cali = g::load_tof_calibrations(calname);
   }
+  printf("Done.\n"); fflush(stdout);
 
   // Some useful variables (some initialized to default values)
   // but overwritten from file (if it exists)
