@@ -51,6 +51,8 @@ def load_rb_calibrations(cali_dir : Path, load_event_data = False):
         calibs[rb_id] = cali 
     return calibs
 
+#------------------------------------------------
+
 def _plot_transfer_fn(self,strip_id):
     """
     Plot the transfer function for the respective strip over a 
@@ -64,4 +66,41 @@ def _plot_transfer_fn(self,strip_id):
         return fig
     print(f"Unable to plot transfer fn for {strip_id}. Are the transfer functions loaded/set?")
 
-TrackerOfflineCalibration.plot_transfer_fn = _plot_transfer_fn
+TrackerOfflineCalibration.plot_transfer_fn = _plot_transfer_fn 
+
+#------------------------------------------------
+
+def apply_energy_calibration_tof(edep, cc, temperature_paddle):
+    """
+    The gain of the paddles is temperature dependent. 
+    Correct the expected deposited energy by means of utilizing 
+    the individual paddle temperature. 
+
+    The correction is intended to unify the energy depositios accross 
+    the paddles. It is an effect on the order of a few % and will 
+    not deal with saturation. 
+
+    # Arguments:
+        * edep               - edep calcuated by whatever formula of choice. The 
+                               value is for a single paddle 
+        * cc                 - this is a dictionary, essentially provided by 
+                               Grace's analysis, with linear fits to
+                               temperature/edep data.
+        * temperature_paddle - the temperature of this paddle at the time the 
+                               energy deposition was supposed to be measured
+    """
+    ## we need to apply the slope and y_intercept to each temperature value, to get a predicted MPV from the fit: 
+    slope          = cc["slope"]
+    y_int          = cc["y_intercept"]
+    t_avg          = cc["T_avg"] 
+    mpv_predicted  = temperature_paddle*slope + y_int
+    mpv_reference  = t_avg*slope + y_int
+    # temperature calibration formula:
+    edep_corrected = edep*(mpv_reference/mpv_predicted)
+    # this coefficient of 1.22 is obtained by simulation 
+    # there is a difference if either the total energy 
+    # deposition is used or dE/dx
+    coefficient    = 1.22/cc["coefficient"]
+    return edep_corrected*coefficient
+
+
