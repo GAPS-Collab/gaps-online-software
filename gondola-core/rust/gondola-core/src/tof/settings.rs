@@ -1529,41 +1529,51 @@ fn mtb_config() {
   }
 }
 
+/// Write a default config to `dir` and return its path
+#[cfg(test)]
+fn write_test_config_file(dir: &Path) -> std::path::PathBuf {
+  let pth      = dir.join("liftof-config-test.toml");
+  let settings = LiftofSettings::new();
+  settings.to_toml(pth.to_string_lossy().into_owned());
+  pth
+}
+
 #[test]
 fn write_config_file() {
-  let settings = LiftofSettings::new();
-  //println!("{}", settings);
-  settings.to_toml(String::from("liftof-config-test.toml"));
+  let dir = tempfile::tempdir().unwrap();
+  let pth = write_test_config_file(dir.path());
+  assert!(pth.exists());
 }
 
 #[test] 
 fn compress_uncompress_config_file() {
-  write_config_file();
-  let pth         = Path::new("liftof-config-test.toml");
+  let dir         = tempfile::tempdir().unwrap();
+  let pth         = write_test_config_file(dir.path());
   let bytestream  = compress_toml(&pth).unwrap();
   println!("Compressed .toml file to a bytestream of {} bytes!", bytestream.len());
-  let output      = Path::new("liftof-config-decompressed.toml");
-  let _foo        = decompress_toml(&bytestream.as_slice(), output).unwrap(); 
+  let output      = dir.path().join("liftof-config-decompressed.toml");
+  let _foo        = decompress_toml(&bytestream.as_slice(), &output).unwrap(); 
 }
 
 #[test]
 fn diff_config_file_compress_uncompress() {
-  write_config_file();
+  let dir          = tempfile::tempdir().unwrap();
+  let pth          = write_test_config_file(dir.path());
   let mut settings = LiftofSettings::new();
-  settings.to_toml(String::from("liftof-config-test.toml"));
   settings.staging_dir = String::from("/foo/bar");
-  settings.to_toml(String::from("liftof-config-test-changed.toml"));
-  let pth         = Path::new("liftof-config-test.toml");
-  let pth_ch      = Path::new("liftof-config-test-changed.toml");
-  let diff        = create_compressed_diff(&pth, &pth_ch).unwrap();
+  let pth_ch       = dir.path().join("liftof-config-test-changed.toml");
+  settings.to_toml(pth_ch.to_string_lossy().into_owned());
+  let diff         = create_compressed_diff(&pth, &pth_ch).unwrap();
   println!("Diff has the size of {} bytes!", diff.len());
-  let output      = Path::new("liftof-config.diff");
-  let _foo        = decompress_toml(&diff.as_slice(), output);
+  let output       = dir.path().join("liftof-config.diff");
+  let _foo         = decompress_toml(&diff.as_slice(), &output);
 }
 
 #[test]
 fn read_config_file() {
-  let _settings = LiftofSettings::from_toml("liftof-config-test.toml");
+  let dir       = tempfile::tempdir().unwrap();
+  let pth       = write_test_config_file(dir.path());
+  let _settings = LiftofSettings::from_toml(pth.to_str().unwrap());
 }
 
 

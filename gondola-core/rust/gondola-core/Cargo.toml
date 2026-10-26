@@ -76,7 +76,7 @@ rev      = "23ab243acf48c4c71a994964dee0b612b8cb6132"
 
 [dev-dependencies]
 criterion = "0.4"
-#tempfile  = "3.10"
+tempfile   = "3.10"
 quickcheck = "1"
 
 [dependencies]
