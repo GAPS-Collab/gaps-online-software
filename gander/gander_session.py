@@ -86,14 +86,15 @@ def gander_line_plot(xs, ys,
 
 #################################################
 
-def gander_plot(h          : d.histogram.hist1d,
-                xlabel     : str,
-                title      : str,
-                figsize    = lo.FIGSIZE_A4_LANDSCAPE,
-                gauss_fit  = False,
+def gander_plot(h              : d.histogram.hist1d,
+                xlabel         : str,
+                title          : str,
+                figsize        = lo.FIGSIZE_A4_LANDSCAPE,
+                gauss_fit      = False,
                 use_gaps_style = False,
-                landau_fit = False,
-                log        = False,
+                landau_fit     = False,
+                log            = False,
+                scatter        = False,
                 **kwargs) -> matplotlib.figure.Figure:
     """
     A plot with a default style for the 
@@ -112,7 +113,10 @@ def gander_plot(h          : d.histogram.hist1d,
     #kwargs.update({'label' : label})
     fig = plt.figure(figsize=figsize)
     ax = fig.gca()
-    h.line(**kwargs)
+    if scatter:
+        h.scatter(**kwargs)
+    else:
+        h.line(**kwargs)
     #ax.legend(loc='upper right', frameon=False)
     text_xpos = 0.7
     if use_gaps_style:
