@@ -1,3 +1,5 @@
+#pragma once 
+
 #include "gondola.hpp"
 
 #include "mc_hit.hpp"
