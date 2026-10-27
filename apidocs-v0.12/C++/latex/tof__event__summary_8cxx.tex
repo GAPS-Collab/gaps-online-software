@@ -1,0 +1,118 @@
+\doxysection{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/tof\+\_\+event\+\_\+summary.cxx File Reference}
+\hypertarget{tof__event__summary_8cxx}{}\label{tof__event__summary_8cxx}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/src/tof\_event\_summary.cxx@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/src/tof\_event\_summary.cxx}}
+{\ttfamily \#include "{}io/parsers.\+h"{}}\newline
+{\ttfamily \#include "{}serialization.\+h"{}}\newline
+{\ttfamily \#include "{}version.\+h"{}}\newline
+{\ttfamily \#include "{}spdlog/spdlog.\+h"{}}\newline
+{\ttfamily \#include "{}spdlog/cfg/env.\+h"{}}\newline
+{\ttfamily \#include "{}events/tof\+\_\+event\+\_\+summary.\+hpp"{}}\newline
+Include dependency graph for tof\+\_\+event\+\_\+summary.\+cxx\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{tof__event__summary_8cxx__incl}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \mbox{\hyperlink{namespacegondola}{gondola}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{namespacegondola_ad142b09b980b0577047b677bd0750252}{gondola\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1TofEventSummary}{gondola\+::\+Tof\+Event\+Summary}} \&\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{tes}})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{tof__event__summary_8cxx_a0cf7e1f9e13dbe1db99b385adfee4f2e}{LTB\+\_\+\+CH0}} = 0x3
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{tof__event__summary_8cxx_a1b99a0fc8ba941f78112521f915e4512}{LTB\+\_\+\+CH1}} = 0xc
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{tof__event__summary_8cxx_a6310f7e8478886d2de265fe59229f81a}{LTB\+\_\+\+CH2}} = 0x30
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{tof__event__summary_8cxx_a12593d195796aebe9b823d731096ec95}{LTB\+\_\+\+CH3}} = 0xc0
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{tof__event__summary_8cxx_a3285216579d2fce5168f6b6f3c2678b5}{LTB\+\_\+\+CH4}} = 0x300
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{tof__event__summary_8cxx_a323d60d7047aae18761e97d628181d68}{LTB\+\_\+\+CH5}} = 0xc00
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{tof__event__summary_8cxx_a06fa3d542f01496f50b46b1bdc10bd83}{LTB\+\_\+\+CH6}} = 0x3000
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{tof__event__summary_8cxx_a3e53025bb5e0673d65b6e85c82d244a0}{LTB\+\_\+\+CH7}} = 0xc000
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{tof__event__summary_8cxx_a3d60db15337aed0c3fcb524a20f8abd4}{LTB\+\_\+\+CHANNELS}} \mbox{[}8\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Variable Documentation}
+\Hypertarget{tof__event__summary_8cxx_a0cf7e1f9e13dbe1db99b385adfee4f2e}\label{tof__event__summary_8cxx_a0cf7e1f9e13dbe1db99b385adfee4f2e} 
+\index{tof\_event\_summary.cxx@{tof\_event\_summary.cxx}!LTB\_CH0@{LTB\_CH0}}
+\index{LTB\_CH0@{LTB\_CH0}!tof\_event\_summary.cxx@{tof\_event\_summary.cxx}}
+\doxysubsubsection{\texorpdfstring{LTB\_CH0}{LTB\_CH0}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} LTB\+\_\+\+CH0 = 0x3}
+
+\Hypertarget{tof__event__summary_8cxx_a1b99a0fc8ba941f78112521f915e4512}\label{tof__event__summary_8cxx_a1b99a0fc8ba941f78112521f915e4512} 
+\index{tof\_event\_summary.cxx@{tof\_event\_summary.cxx}!LTB\_CH1@{LTB\_CH1}}
+\index{LTB\_CH1@{LTB\_CH1}!tof\_event\_summary.cxx@{tof\_event\_summary.cxx}}
+\doxysubsubsection{\texorpdfstring{LTB\_CH1}{LTB\_CH1}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} LTB\+\_\+\+CH1 = 0xc}
+
+\Hypertarget{tof__event__summary_8cxx_a6310f7e8478886d2de265fe59229f81a}\label{tof__event__summary_8cxx_a6310f7e8478886d2de265fe59229f81a} 
+\index{tof\_event\_summary.cxx@{tof\_event\_summary.cxx}!LTB\_CH2@{LTB\_CH2}}
+\index{LTB\_CH2@{LTB\_CH2}!tof\_event\_summary.cxx@{tof\_event\_summary.cxx}}
+\doxysubsubsection{\texorpdfstring{LTB\_CH2}{LTB\_CH2}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} LTB\+\_\+\+CH2 = 0x30}
+
+\Hypertarget{tof__event__summary_8cxx_a12593d195796aebe9b823d731096ec95}\label{tof__event__summary_8cxx_a12593d195796aebe9b823d731096ec95} 
+\index{tof\_event\_summary.cxx@{tof\_event\_summary.cxx}!LTB\_CH3@{LTB\_CH3}}
+\index{LTB\_CH3@{LTB\_CH3}!tof\_event\_summary.cxx@{tof\_event\_summary.cxx}}
+\doxysubsubsection{\texorpdfstring{LTB\_CH3}{LTB\_CH3}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} LTB\+\_\+\+CH3 = 0xc0}
+
+\Hypertarget{tof__event__summary_8cxx_a3285216579d2fce5168f6b6f3c2678b5}\label{tof__event__summary_8cxx_a3285216579d2fce5168f6b6f3c2678b5} 
+\index{tof\_event\_summary.cxx@{tof\_event\_summary.cxx}!LTB\_CH4@{LTB\_CH4}}
+\index{LTB\_CH4@{LTB\_CH4}!tof\_event\_summary.cxx@{tof\_event\_summary.cxx}}
+\doxysubsubsection{\texorpdfstring{LTB\_CH4}{LTB\_CH4}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} LTB\+\_\+\+CH4 = 0x300}
+
+\Hypertarget{tof__event__summary_8cxx_a323d60d7047aae18761e97d628181d68}\label{tof__event__summary_8cxx_a323d60d7047aae18761e97d628181d68} 
+\index{tof\_event\_summary.cxx@{tof\_event\_summary.cxx}!LTB\_CH5@{LTB\_CH5}}
+\index{LTB\_CH5@{LTB\_CH5}!tof\_event\_summary.cxx@{tof\_event\_summary.cxx}}
+\doxysubsubsection{\texorpdfstring{LTB\_CH5}{LTB\_CH5}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} LTB\+\_\+\+CH5 = 0xc00}
+
+\Hypertarget{tof__event__summary_8cxx_a06fa3d542f01496f50b46b1bdc10bd83}\label{tof__event__summary_8cxx_a06fa3d542f01496f50b46b1bdc10bd83} 
+\index{tof\_event\_summary.cxx@{tof\_event\_summary.cxx}!LTB\_CH6@{LTB\_CH6}}
+\index{LTB\_CH6@{LTB\_CH6}!tof\_event\_summary.cxx@{tof\_event\_summary.cxx}}
+\doxysubsubsection{\texorpdfstring{LTB\_CH6}{LTB\_CH6}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} LTB\+\_\+\+CH6 = 0x3000}
+
+\Hypertarget{tof__event__summary_8cxx_a3e53025bb5e0673d65b6e85c82d244a0}\label{tof__event__summary_8cxx_a3e53025bb5e0673d65b6e85c82d244a0} 
+\index{tof\_event\_summary.cxx@{tof\_event\_summary.cxx}!LTB\_CH7@{LTB\_CH7}}
+\index{LTB\_CH7@{LTB\_CH7}!tof\_event\_summary.cxx@{tof\_event\_summary.cxx}}
+\doxysubsubsection{\texorpdfstring{LTB\_CH7}{LTB\_CH7}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} LTB\+\_\+\+CH7 = 0xc000}
+
+\Hypertarget{tof__event__summary_8cxx_a3d60db15337aed0c3fcb524a20f8abd4}\label{tof__event__summary_8cxx_a3d60db15337aed0c3fcb524a20f8abd4} 
+\index{tof\_event\_summary.cxx@{tof\_event\_summary.cxx}!LTB\_CHANNELS@{LTB\_CHANNELS}}
+\index{LTB\_CHANNELS@{LTB\_CHANNELS}!tof\_event\_summary.cxx@{tof\_event\_summary.cxx}}
+\doxysubsubsection{\texorpdfstring{LTB\_CHANNELS}{LTB\_CHANNELS}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} LTB\+\_\+\+CHANNELS\mbox{[}8\mbox{]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=\ \{}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{tof__event__summary_8cxx_a0cf7e1f9e13dbe1db99b385adfee4f2e}{LTB\_CH0}},}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{tof__event__summary_8cxx_a1b99a0fc8ba941f78112521f915e4512}{LTB\_CH1}},}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{tof__event__summary_8cxx_a6310f7e8478886d2de265fe59229f81a}{LTB\_CH2}},}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{tof__event__summary_8cxx_a12593d195796aebe9b823d731096ec95}{LTB\_CH3}},}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{tof__event__summary_8cxx_a3285216579d2fce5168f6b6f3c2678b5}{LTB\_CH4}},}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{tof__event__summary_8cxx_a323d60d7047aae18761e97d628181d68}{LTB\_CH5}},}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{tof__event__summary_8cxx_a06fa3d542f01496f50b46b1bdc10bd83}{LTB\_CH6}},}
+\DoxyCodeLine{\ \ \ \ \mbox{\hyperlink{tof__event__summary_8cxx_a3e53025bb5e0673d65b6e85c82d244a0}{LTB\_CH7}}}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}

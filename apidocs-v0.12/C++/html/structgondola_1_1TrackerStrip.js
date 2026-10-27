@@ -1,8 +1,8 @@
 var structgondola_1_1TrackerStrip =
 [
     [ "create_id", "structgondola_1_1TrackerStrip.html#af09ff3a37a5e787b592035cf77712230", null ],
-    [ "get_principal", "structgondola_1_1TrackerStrip.html#ae63687ba7df5f1bb433b5dfd33c71314", null ],
     [ "to_string", "structgondola_1_1TrackerStrip.html#a2f9e96d0adc44928343b98a43a9ad765", null ],
+    [ "operator<<", "structgondola_1_1TrackerStrip.html#a6ebd732c72552fed0e2e9340379c54da", null ],
     [ "channel", "structgondola_1_1TrackerStrip.html#a10bed513a14dfc5d61ca2c8741b6e5bb", null ],
     [ "global_pos_x_det_l0", "structgondola_1_1TrackerStrip.html#a08a746554759dadfdf4ad3272f27479f", null ],
     [ "global_pos_x_l0", "structgondola_1_1TrackerStrip.html#aba9243f0545526660a63b8790d0702cc", null ],

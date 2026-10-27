@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["N_PULSE_TEMPLATE_BINS","PULSE_TEMPLATE_SIDE_A","PULSE_TEMPLATE_SIDE_B"],"struct":["TofPulseTemplate"]};

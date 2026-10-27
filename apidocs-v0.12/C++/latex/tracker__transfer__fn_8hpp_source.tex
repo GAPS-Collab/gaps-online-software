@@ -1,0 +1,58 @@
+\doxysection{tracker\+\_\+transfer\+\_\+fn.\+hpp}
+\hypertarget{tracker__transfer__fn_8hpp_source}{}\label{tracker__transfer__fn_8hpp_source}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/database/tracker\_transfer\_fn.hpp@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/database/tracker\_transfer\_fn.hpp}}
+\mbox{\hyperlink{tracker__transfer__fn_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ "{}result/result.h"{}}}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gondola__typedefs_8hpp}{gondola\_typedefs.hpp}}"{}}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{errors_8hpp}{errors.hpp}}"{}}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{keyword}{namespace\ }r\ =\ result;}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacegondola}{gondola}}\ \{}
+\DoxyCodeLine{00010\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction}{TrackerStripTransferFunction}}\ \{\ \ }
+\DoxyCodeLine{00011\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a48d6cd8e4135fb2ff7e7f2dac84089ec}{i32}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a545a504ac336c3053bea9d9e264016ac}{data\_id}}\ \ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00012\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a48d6cd8e4135fb2ff7e7f2dac84089ec}{i32}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a15cc342f3fa6b87c20dfc4342c3d8ab0}{strip\_id}}\ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00013\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a85cb35fbe5bf2961d7ad5f26814a91a2}{i64}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a5572989503927055d623fc48ec7f5484}{volume\_id}}\ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00014\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a85cb35fbe5bf2961d7ad5f26814a91a2}{i64}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_add113de57b9e7eda6ab9bcae365579c4}{utc\_timestamp\_start}};\ }
+\DoxyCodeLine{00015\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a85cb35fbe5bf2961d7ad5f26814a91a2}{i64}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a561cc60b1fe6ac4f4685ee86403a82c7}{utc\_timestamp\_stop}}\ ;\ }
+\DoxyCodeLine{00016\ \ \ \ \ std::string\ \ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_aaf15c0f1f09e474b17bcf884ec154e2a}{name}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00017\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a49b432b354071f8edf311c38cac6f235}{pol\_a2\_0}}\ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00018\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_aee6d743e73779115e88f297911cfcd68}{pol\_a2\_1}}\ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00019\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a1d63a542d2c377b05a66eb69562b0097}{pol\_a2\_2}}\ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00020\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a2baf72324b190bafb315667e211ddf6b}{pol\_b3\_0}}\ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00021\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_ab3565a0aa307802194df62564ae41142}{pol\_b3\_1}}\ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00022\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a5ea4bf63a25a3a4176fe6ad2e4df56a2}{pol\_b3\_2}}\ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00023\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_ad66897bd292176789cf9c5bbde87598c}{pol\_b3\_3}}\ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00024\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a6be2d767c0b1bb27a5d13b01a0695dd9}{pol\_c3\_0}}\ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00025\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_ab1afc103f6853d4d53674598c95b08e3}{pol\_c3\_1}}\ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00026\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a70fc09f5800206ed51ac9e8377fb09e5}{pol\_c3\_2}}\ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00027\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a10734b1135d46e656456de94ba530ff6}{pol\_c3\_3}}\ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00028\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_ad6aa31688520866318953ff919a60d17}{pol\_d3\_0}}\ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00029\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_af1b9059fcc534d25caec3a04443472fe}{pol\_d3\_1}}\ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00030\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_af7f90159e3694bd79cf4a4e6f33d9930}{pol\_d3\_2}}\ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00031\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a34caff8fc901b61e4ac473444ec268ab}{pol\_d3\_3}}\ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00032\ \ \ }
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_ad1964483a2c2ac7d875e865e56343f4d}{evaluate}}(\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ adc)\ \textcolor{keyword}{const}\ -\/>\ \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}};}
+\DoxyCodeLine{00039\ \ \ }
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_ae8481698717b9c7f25c1cc25b009e6f1}{derivative}}(\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}\ adc)\ \textcolor{keyword}{const}\ -\/>\ \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}};}
+\DoxyCodeLine{00041\ \ \ \ \ }
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_aae054fad46c818e66eaa8bdf14bd1522}{to\_string}}()\ const\ -\/>\ std::\textcolor{keywordtype}{string};}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{comment}{//\ the\ epsilon\ parameter\ is\ the\ convergence\ criterion\ and\ a\ random\ default}}
+\DoxyCodeLine{00045\ \ \ \ \ auto\ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a3f96ad60e7ed79940d6f66d7f265f603}{invert}}(\mbox{\hyperlink{gondola__typedefs_8hpp_a94dab5770726ccbef8c7d026cfbdf8e5}{f64}}\ y,\ \mbox{\hyperlink{gondola__typedefs_8hpp_a94dab5770726ccbef8c7d026cfbdf8e5}{f64}}\ epsilon\ =\ 1e-\/12)\ -\/>\ r::Result<\mbox{\hyperlink{gondola__typedefs_8hpp_a94dab5770726ccbef8c7d026cfbdf8e5}{f64}},\ \mbox{\hyperlink{classgondola_1_1AnalysisError}{AnalysisError}}>;}
+\DoxyCodeLine{00046\ \ \ \ \ }
+\DoxyCodeLine{00047\ \ \ \ \ friend\ std::ostream\&\ operator<<(std::ostream\&\ os,\ const\ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction}{TrackerStripTransferFunction}}\&\ tfn);}
+\DoxyCodeLine{00048\ \ \ \};\ }
+\DoxyCodeLine{00049\ \ }
+\DoxyCodeLine{00050\ \ \ typedef\ \mbox{\hyperlink{gondola__typedefs_8hpp_af5449d3b4076aa8188b912b9b069fc5a}{HashMap}}<\mbox{\hyperlink{gondola__typedefs_8hpp_afaa62991928fb9fb18ff0db62a040aba}{u32}},\ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction}{TrackerStripTransferFunction}}>\ \mbox{\hyperlink{namespacegondola_a6bc76420ae0b049db7a32b0ea3fb5203}{TrkStripTransferFnMap}};}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \textcolor{comment}{//\ Get\ all\ trackerstrip\ transfer\ function\ from\ the\ database\ which\ are\ stored\ under\ }}
+\DoxyCodeLine{00053\ \ \ \textcolor{comment}{//\ a\ specific\ name}}
+\DoxyCodeLine{00054\ \ \ auto\ \mbox{\hyperlink{namespacegondola_aab40b08cd09978f1f446337bcb41d6db}{get\_trkstriptransferfn}}(std::\textcolor{keywordtype}{string}\ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_aaf15c0f1f09e474b17bcf884ec154e2a}{name}})\ -\/>\ \mbox{\hyperlink{namespacegondola_a6bc76420ae0b049db7a32b0ea3fb5203}{TrkStripTransferFnMap}};\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00057\ \ \ auto\ \mbox{\hyperlink{namespacegondola_a9b90155b4dc5095eec4fc67005d48595}{get\_trkstriptransferfn\_by\_volumeid}}(std::\textcolor{keywordtype}{string}\ \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_aaf15c0f1f09e474b17bcf884ec154e2a}{name}})\ -\/>\ \mbox{\hyperlink{namespacegondola_a6bc76420ae0b049db7a32b0ea3fb5203}{TrkStripTransferFnMap}};\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00058\ \}}
+
+\end{DoxyCode}

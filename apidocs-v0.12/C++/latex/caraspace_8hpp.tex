@@ -4,7 +4,7 @@
 {\ttfamily \#include $<$fstream$>$}\newline
 {\ttfamily \#include $<$cmath$>$}\newline
 {\ttfamily \#include $<$memory$>$}\newline
-{\ttfamily \#include "{}tof\+\_\+typedefs.\+h"{}}\newline
+{\ttfamily \#include "{}gondola\+\_\+typedefs.\+hpp"{}}\newline
 {\ttfamily \#include "{}packets/tof\+\_\+packet.\+h"{}}\newline
 {\ttfamily \#include "{}events/tracker\+\_\+hit.\+hpp"{}}\newline
 {\ttfamily \#include "{}telemetry\+\_\+dataclasses.\+hpp"{}}\newline
@@ -47,7 +47,7 @@ namespace \mbox{\hyperlink{namespacegondola}{gondola}}
 \doxysubsubsection*{Typedefs}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ std\+::string, std\+::tuple$<$ \mbox{\hyperlink{tof__typedefs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}, \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68}{CRFrame\+Object\+Type}} $>$ $>$ \mbox{\hyperlink{namespacegondola_adcb90f37f2ab2c20573b711d0210eb94}{gondola\+::\+CRFrame\+Index}}
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ std\+::string, std\+::tuple$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}, \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68}{CRFrame\+Object\+Type}} $>$ $>$ \mbox{\hyperlink{namespacegondola_adcb90f37f2ab2c20573b711d0210eb94}{gondola\+::\+CRFrame\+Index}}
 \end{DoxyCompactItemize}
 \doxysubsubsection*{Enumerations}
 \begin{DoxyCompactItemize}
@@ -62,7 +62,7 @@ enum class \mbox{\hyperlink{namespacegondola_a466ace2a4c29903ffca2f1f86b41ba68}{
 \doxysubsubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a0fad83424699fde92f491a061f489158}{gondola\+::string\+\_\+to\+\_\+bytes}} (std\+::string \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{value}}) -\/$>$ \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{tof__typedefs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a0fad83424699fde92f491a061f489158}{gondola\+::string\+\_\+to\+\_\+bytes}} (std\+::string \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{value}}) -\/$>$ \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$
 \item 
-\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a54ec6dae0f685d42c5d7b4c62346499e}{gondola\+::get\+\_\+runfilename}} (\mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{run}}, \mbox{\hyperlink{tof__typedefs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{subrun}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{bool}} \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{is\+\_\+sim}}, \mbox{\hyperlink{structOption}{Option}}$<$ std\+::string $>$ timestamp) -\/$>$ std\+::string
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a54ec6dae0f685d42c5d7b4c62346499e}{gondola\+::get\+\_\+runfilename}} (\mbox{\hyperlink{gondola__typedefs_8hpp_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{run}}, \mbox{\hyperlink{gondola__typedefs_8hpp_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{subrun}}, \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{bool}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{is\+\_\+sim}}, \mbox{\hyperlink{structOption}{Option}}$<$ std\+::string $>$ timestamp) -\/$>$ std\+::string
 \begin{DoxyCompactList}\small\item\em A standardized way to tag files with run id/subrun id/ timestamp. \end{DoxyCompactList}\end{DoxyCompactItemize}

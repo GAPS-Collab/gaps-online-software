@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['wrongdelimiter_0',['WrongDelimiter',['../classgondola_1_1IOError.html#a20f21d8609600d07946504f3bbd144f7ae88402395166afe541888385c1f08cea',1,'gondola::IOError']]],
-  ['wrongheaderbytes_1',['WrongHeaderBytes',['../classgondola_1_1IOError.html#a20f21d8609600d07946504f3bbd144f7aad32eacf390a76aeb96d7b02aaa1704d',1,'gondola::IOError']]],
-  ['wrongpackettype_2',['WrongPacketType',['../classgondola_1_1IOError.html#a20f21d8609600d07946504f3bbd144f7a332c27e37d34b4727f6023e6210a1b88',1,'gondola::IOError']]],
-  ['wrongtailbytes_3',['WrongTailBytes',['../classgondola_1_1IOError.html#a20f21d8609600d07946504f3bbd144f7a288ce6c63e5e376ff77b0a0f8c44bd1e',1,'gondola::IOError']]]
+  ['v1_0',['V1',['../namespacegondola.html#af998b820a54bca400c19e03948e82c28ab4daca084ad9eabfc8de231929477ed6',1,'gondola']]],
+  ['v2_1',['V2',['../namespacegondola.html#af998b820a54bca400c19e03948e82c28aec765f1adc3b4253f2d3b131a4a8618f',1,'gondola']]],
+  ['v3_2',['V3',['../namespacegondola.html#af998b820a54bca400c19e03948e82c28ad5b50b8cf96bcc8aba90f306f5e6189c',1,'gondola']]],
+  ['veto_3',['Veto',['../namespacegondola.html#a3e679dd5cf65b9be26ead6c7555f2580a98865aa73ddbf0657187d430de3c38bc',1,'gondola']]]
 ];

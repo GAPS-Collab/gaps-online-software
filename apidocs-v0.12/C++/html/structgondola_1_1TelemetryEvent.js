@@ -1,5 +1,6 @@
 var structgondola_1_1TelemetryEvent =
 [
+    [ "to_bytestream", "structgondola_1_1TelemetryEvent.html#a2bd4c15aec809b204bac064f2955768f", null ],
     [ "to_string", "structgondola_1_1TelemetryEvent.html#ab63cf8fd14c7af05f4190aac42fc34d8", null ],
     [ "creation_time", "structgondola_1_1TelemetryEvent.html#a702b3e3b82ee020f57cd2c692677abd4", null ],
     [ "event_id", "structgondola_1_1TelemetryEvent.html#ade7af5914399f3bf63c46d20d2a1f59e", null ],
@@ -8,9 +9,11 @@ var structgondola_1_1TelemetryEvent =
     [ "header", "structgondola_1_1TelemetryEvent.html#aeea7ea2452b34c0a4e715f198f801ffe", null ],
     [ "n_tof_hits", "structgondola_1_1TelemetryEvent.html#a1c605f615168d231eb789987e770d934", null ],
     [ "n_trk_hits", "structgondola_1_1TelemetryEvent.html#a3f24ad42c6a1ebc1835b9ef96fcc8e08", null ],
+    [ "osc_flags", "structgondola_1_1TelemetryEvent.html#a56f3845fbfc51e525f150ad2d7d8684d", null ],
+    [ "oscillator_idx", "structgondola_1_1TelemetryEvent.html#aaf314ea0424647a6a96f241a3e8f8ca2", null ],
     [ "raw_data", "structgondola_1_1TelemetryEvent.html#a8f4ba4a6fa3ec18da67415249a4286cc", null ],
     [ "row_flags", "structgondola_1_1TelemetryEvent.html#a0fe3025c15921b47dff7a701fd1413ae", null ],
-    [ "tof_event", "structgondola_1_1TelemetryEvent.html#a89623b54267194807666ac4c9de112c5", null ],
+    [ "tof_event", "structgondola_1_1TelemetryEvent.html#a4ce3b9489cceb537237756da72c96a9e", null ],
     [ "tof_meta", "structgondola_1_1TelemetryEvent.html#a4d7c200e43e7a3e190cb975f103d90d7", null ],
     [ "tracker_events", "structgondola_1_1TelemetryEvent.html#af466059d0e78dff3afa38564fff33442", null ],
     [ "tracker_meta", "structgondola_1_1TelemetryEvent.html#a2cf14fdcdc6c8e973b85913a7fd916ad", null ],

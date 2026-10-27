@@ -1,0 +1,32 @@
+\doxysection{tracker\+\_\+strip\+\_\+mask.\+hpp}
+\hypertarget{tracker__strip__mask_8hpp_source}{}\label{tracker__strip__mask_8hpp_source}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/database/tracker\_strip\_mask.hpp@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/database/tracker\_strip\_mask.hpp}}
+\mbox{\hyperlink{tracker__strip__mask_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{//\ This\ file\ is\ part\ of\ gaps-\/online-\/software\ and\ published\ }}
+\DoxyCodeLine{00002\ \textcolor{comment}{//\ under\ the\ GPLv3\ license}}
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gondola__typedefs_8hpp}{gondola\_typedefs.hpp}}"{}}}
+\DoxyCodeLine{00006\ \ \ }
+\DoxyCodeLine{00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacegondola}{gondola}}\ \{}
+\DoxyCodeLine{00010\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structgondola_1_1TrackerStripMask}{TrackerStripMask}}\ \{}
+\DoxyCodeLine{00011\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_afaa62991928fb9fb18ff0db62a040aba}{u32}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripMask_ae772444fb532b2c54f8aad1f344e99be}{data\_id}}\ \ \ \ \ \ \ \ \ \ \ \ ;\ \textcolor{comment}{//\ primary\ key\ in\ db}}
+\DoxyCodeLine{00012\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_afaa62991928fb9fb18ff0db62a040aba}{u32}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripMask_ac58954deb3794ff706b46fe784f34715}{strip\_id}}\ \ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00013\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripMask_adcd4cfa050c205917e751db0507cfe7b}{volume\_id}}\ \ \ \ \ \ \ \ \ \ ;}
+\DoxyCodeLine{00014\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripMask_a00bb75edae71642733032f4e92926974}{utc\_timestamp\_start}};}
+\DoxyCodeLine{00015\ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripMask_a2bbec3dee8ff0ae70b2761b8e61b1dab}{utc\_timestamp\_stop}}\ ;}
+\DoxyCodeLine{00016\ \ \ \ \ std::string\ \mbox{\hyperlink{structgondola_1_1TrackerStripMask_ab9f3b588cb247c09cf77dc3c1ae8baaa}{name}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00017\ \ \ \ \ \textcolor{keywordtype}{bool}\ \ \ \ \ \ \ \ \mbox{\hyperlink{structgondola_1_1TrackerStripMask_acc288609b461cb708f940e0985bbab91}{active}}\ \ \ \ \ \ \ \ \ \ \ \ \ ;\ }
+\DoxyCodeLine{00018\ \ \ }
+\DoxyCodeLine{00019\ \ \ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{structgondola_1_1TrackerStripMask_aee18da06cb745fa56523491a97cc77ad}{to\_string}}()\ const\ -\/>\ std::\textcolor{keywordtype}{string};}
+\DoxyCodeLine{00020\ \ \ \ \ friend\ std::ostream\&\ operator<<(std::ostream\&\ os,\ const\ \mbox{\hyperlink{namespacegondola}{gondola}}::\mbox{\hyperlink{structgondola_1_1TrackerStripMask}{TrackerStripMask}}\&\ strip);}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \ \ \};}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \ \ typedef\ std::map<\mbox{\hyperlink{gondola__typedefs_8hpp_afaa62991928fb9fb18ff0db62a040aba}{u32}},\ \textcolor{keywordtype}{bool}>\ \mbox{\hyperlink{namespacegondola_ad266ce89247b083c1c156da2505d7818}{TrkStripMaskMap}};}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \ \ auto\ \mbox{\hyperlink{namespacegondola_a1263b65d7e01f35d3837565d55846331}{get\_trackerstripmasks}}(std::\textcolor{keywordtype}{string}\ mask\_name)\ -\/>\ \mbox{\hyperlink{namespacegondola_ad266ce89247b083c1c156da2505d7818}{TrkStripMaskMap}};}
+\DoxyCodeLine{00027\ \ \ auto\ \mbox{\hyperlink{namespacegondola_a55aa39855bef733f7b202a28a9b661f7}{get\_trackerstripmasks\_by\_volumeid}}(std::\textcolor{keywordtype}{string}\ mask\_name)\ -\/>\ \mbox{\hyperlink{namespacegondola_ad266ce89247b083c1c156da2505d7818}{TrkStripMaskMap}};}
+\DoxyCodeLine{00028\ \}}
+
+\end{DoxyCode}

@@ -1,6 +1,7 @@
 \doxysection{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/database/tof\+\_\+paddle.hpp File Reference}
 \hypertarget{tof__paddle_8hpp}{}\label{tof__paddle_8hpp}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/database/tof\_paddle.hpp@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/database/tof\_paddle.hpp}}
-{\ttfamily \#include "{}tof\+\_\+typedefs.\+h"{}}\newline
+{\ttfamily \#include $<$memory$>$}\newline
+{\ttfamily \#include "{}gondola\+\_\+typedefs.\+hpp"{}}\newline
 {\ttfamily \#include "{}sqlite\+\_\+orm.\+h"{}}\newline
 Include dependency graph for tof\+\_\+paddle.\+hpp\+:
 \nopagebreak
@@ -28,3 +29,19 @@ struct \mbox{\hyperlink{structgondola_1_1TofPaddle}{gondola\+::\+Tof\+Paddle}}
 \item 
 namespace \mbox{\hyperlink{namespacegondola}{gondola}}
 \end{DoxyCompactItemize}
+\doxysubsubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, \mbox{\hyperlink{structgondola_1_1TofPaddle}{Tof\+Paddle}} $>$ \mbox{\hyperlink{namespacegondola_afe901f112c6aac213f44b6dd5b614035}{gondola\+::\+Tof\+Paddle\+Map}}
+\begin{DoxyCompactList}\small\item\em A map of paddle id -\/\texorpdfstring{$>$}{>} \doxylink{structgondola_1_1TofPaddle}{Tof\+Paddle}. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{structgondola_1_1TofPaddle}{Tof\+Paddle}} $>$ \mbox{\hyperlink{namespacegondola_a61693850181f2b207990247d828c1943}{gondola\+::\+Tof\+Paddle\+Map\+Vol\+Id}}
+\begin{DoxyCompactList}\small\item\em A map of volume id -\/\texorpdfstring{$>$}{>} \doxylink{structgondola_1_1TofPaddle}{Tof\+Paddle}. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{namespacegondola_afe901f112c6aac213f44b6dd5b614035}{Tof\+Paddle\+Map}} $>$ \mbox{\hyperlink{namespacegondola_a22af79ae5530ccd2bc4a9caeb455e8c6}{gondola\+::\+Tof\+Paddle\+Map\+Ptr}}
+\begin{DoxyCompactList}\small\item\em Shared ptr to Tof\+Paddle\+Map. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_afcc490db45825de190a991267dacf561}{gondola\+::get\+\_\+tofpaddles}} () -\/$>$ \mbox{\hyperlink{namespacegondola_afe901f112c6aac213f44b6dd5b614035}{Tof\+Paddle\+Map}}
+\begin{DoxyCompactList}\small\item\em Get a paddle from the database. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a1fb17a69f9890ea25272253b183e84c6}{gondola\+::get\+\_\+tofpaddles\+\_\+by\+\_\+volumeid}} () -\/$>$ \mbox{\hyperlink{namespacegondola_a61693850181f2b207990247d828c1943}{Tof\+Paddle\+Map\+Vol\+Id}}
+\begin{DoxyCompactList}\small\item\em Get a paddle from the database. \end{DoxyCompactList}\end{DoxyCompactItemize}

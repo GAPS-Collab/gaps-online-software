@@ -12,7 +12,7 @@
 <area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="280,73,322,111,318,115,276,77"/>
 <area shape="rect" id="Node000007" href="$parsers_8h.html" title=" " alt="" coords="407,123,505,148"/>
 <area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="320,72,418,115,416,120,318,77"/>
-<area shape="rect" id="Node000008" href="$tof__typedefs_8h.html" title=" " alt="" coords="405,196,521,221"/>
+<area shape="rect" id="Node000008" href="$gondola__typedefs_8hpp.html" title=" " alt="" coords="379,196,546,221"/>
 <area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="460,148,463,182,458,183,454,149"/>
 <area shape="poly" id="edge12_Node000008_Node000004" title=" " alt="" coords="422,224,254,270,253,265,421,219"/>
 <area shape="rect" id="Node000009" title=" " alt="" coords="265,269,327,295"/>
@@ -28,5 +28,5 @@
 <area shape="rect" id="Node000014" title=" " alt="" coords="705,269,791,295"/>
 <area shape="poly" id="edge14_Node000008_Node000014" title=" " alt="" coords="509,219,692,264,691,269,508,224"/>
 <area shape="rect" id="Node000015" title=" " alt="" coords="815,269,875,295"/>
-<area shape="poly" id="edge15_Node000008_Node000015" title=" " alt="" coords="521,216,647,236,802,266,801,272,646,241,521,221"/>
+<area shape="poly" id="edge15_Node000008_Node000015" title=" " alt="" coords="541,219,660,238,803,267,802,272,659,244,540,224"/>
 </map>

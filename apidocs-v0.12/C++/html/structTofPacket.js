@@ -1,6 +1,7 @@
 var structTofPacket =
 [
     [ "TofPacket", "structTofPacket.html#a9d1f7acb627b78d888982e5877d6c119", null ],
+    [ "to_bytestream", "structTofPacket.html#a57e10a8e3975461094b46b236c134306", null ],
     [ "to_string", "structTofPacket.html#aff67f57ea880e444cd3e96079eb5432e", null ],
     [ "unpack", "structTofPacket.html#a7a348ad4e49dc8667f72d12d02b97653", null ],
     [ "head", "structTofPacket.html#a2f57d404f80bca725e6230a4d35e19d3", null ],

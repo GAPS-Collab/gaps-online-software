@@ -1,6 +1,6 @@
 <map id="/home/runner/work/gaps&#45;online&#45;software/gaps&#45;online&#45;software/gondola&#45;core/C++/include/events/tracker_hit.hpp" name="/home/runner/work/gaps&#45;online&#45;software/gaps&#45;online&#45;software/gondola&#45;core/C++/include/events/tracker_hit.hpp">
 <area shape="rect" id="Node000001" title=" " alt="" coords="241,5,430,89"/>
-<area shape="rect" id="Node000002" href="$tof__typedefs_8h.html" title=" " alt="" coords="277,137,393,163"/>
+<area shape="rect" id="Node000002" href="$gondola__typedefs_8hpp.html" title=" " alt="" coords="252,137,419,163"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="338,89,338,124,333,124,333,89"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="5,211,68,236"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="286,165,82,213,81,208,284,160"/>
@@ -17,5 +17,5 @@
 <area shape="rect" id="Node000009" title=" " alt="" coords="536,211,623,236"/>
 <area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="375,160,528,204,526,209,374,165"/>
 <area shape="rect" id="Node000010" title=" " alt="" coords="647,211,707,236"/>
-<area shape="poly" id="edge9_Node000002_Node000010" title=" " alt="" coords="394,159,634,208,633,213,393,164"/>
+<area shape="poly" id="edge9_Node000002_Node000010" title=" " alt="" coords="401,160,634,208,632,213,399,165"/>
 </map>

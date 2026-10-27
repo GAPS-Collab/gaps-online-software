@@ -1,0 +1,242 @@
+\doxysection{gondola\+::Tracker\+Strip\+Transfer\+Function Struct Reference}
+\hypertarget{structgondola_1_1TrackerStripTransferFunction}{}\label{structgondola_1_1TrackerStripTransferFunction}\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+
+
+{\ttfamily \#include $<$tracker\+\_\+transfer\+\_\+fn.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_ad1964483a2c2ac7d875e865e56343f4d}{evaluate}} (\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} adc) \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_ae8481698717b9c7f25c1cc25b009e6f1}{derivative}} (\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} adc) \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_aae054fad46c818e66eaa8bdf14bd1522}{to\+\_\+string}} () \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ std\+::string
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a3f96ad60e7ed79940d6f66d7f265f603}{invert}} (\mbox{\hyperlink{gondola__typedefs_8hpp_a94dab5770726ccbef8c7d026cfbdf8e5}{f64}} y, \mbox{\hyperlink{gondola__typedefs_8hpp_a94dab5770726ccbef8c7d026cfbdf8e5}{f64}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{epsilon}}=1\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{e}}-\/12) -\/$>$ r\+::\+Result$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_a94dab5770726ccbef8c7d026cfbdf8e5}{f64}}, \mbox{\hyperlink{classgondola_1_1AnalysisError}{Analysis\+Error}} $>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a48d6cd8e4135fb2ff7e7f2dac84089ec}{i32}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a545a504ac336c3053bea9d9e264016ac}{data\+\_\+id}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a48d6cd8e4135fb2ff7e7f2dac84089ec}{i32}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a15cc342f3fa6b87c20dfc4342c3d8ab0}{strip\+\_\+id}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a85cb35fbe5bf2961d7ad5f26814a91a2}{i64}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a5572989503927055d623fc48ec7f5484}{volume\+\_\+id}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a85cb35fbe5bf2961d7ad5f26814a91a2}{i64}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_add113de57b9e7eda6ab9bcae365579c4}{utc\+\_\+timestamp\+\_\+start}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a85cb35fbe5bf2961d7ad5f26814a91a2}{i64}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a561cc60b1fe6ac4f4685ee86403a82c7}{utc\+\_\+timestamp\+\_\+stop}}
+\item 
+std\+::string \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_aaf15c0f1f09e474b17bcf884ec154e2a}{name}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a49b432b354071f8edf311c38cac6f235}{pol\+\_\+a2\+\_\+0}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_aee6d743e73779115e88f297911cfcd68}{pol\+\_\+a2\+\_\+1}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a1d63a542d2c377b05a66eb69562b0097}{pol\+\_\+a2\+\_\+2}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a2baf72324b190bafb315667e211ddf6b}{pol\+\_\+b3\+\_\+0}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_ab3565a0aa307802194df62564ae41142}{pol\+\_\+b3\+\_\+1}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a5ea4bf63a25a3a4176fe6ad2e4df56a2}{pol\+\_\+b3\+\_\+2}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_ad66897bd292176789cf9c5bbde87598c}{pol\+\_\+b3\+\_\+3}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a6be2d767c0b1bb27a5d13b01a0695dd9}{pol\+\_\+c3\+\_\+0}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_ab1afc103f6853d4d53674598c95b08e3}{pol\+\_\+c3\+\_\+1}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a70fc09f5800206ed51ac9e8377fb09e5}{pol\+\_\+c3\+\_\+2}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a10734b1135d46e656456de94ba530ff6}{pol\+\_\+c3\+\_\+3}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_ad6aa31688520866318953ff919a60d17}{pol\+\_\+d3\+\_\+0}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_af1b9059fcc534d25caec3a04443472fe}{pol\+\_\+d3\+\_\+1}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_af7f90159e3694bd79cf4a4e6f33d9930}{pol\+\_\+d3\+\_\+2}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_a34caff8fc901b61e4ac473444ec268ab}{pol\+\_\+d3\+\_\+3}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+std\+::ostream \& \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction_ae91681c8f9c8fd37919a4c3a51a86cf3}{operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction}{Tracker\+Strip\+Transfer\+Function}} \&\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{tfn}})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_ae8481698717b9c7f25c1cc25b009e6f1}\label{structgondola_1_1TrackerStripTransferFunction_ae8481698717b9c7f25c1cc25b009e6f1} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!derivative@{derivative}}
+\index{derivative@{derivative}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{derivative()}{derivative()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::derivative (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}}]{adc }\end{DoxyParamCaption}) const -\/$>$  \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}}
+
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_ad1964483a2c2ac7d875e865e56343f4d}\label{structgondola_1_1TrackerStripTransferFunction_ad1964483a2c2ac7d875e865e56343f4d} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!evaluate@{evaluate}}
+\index{evaluate@{evaluate}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{evaluate()}{evaluate()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::evaluate (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}}]{adc }\end{DoxyParamCaption}) const -\/$>$  \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}}
+
+The actual transfer function for this strip. Calculate energy from adc values 
+\begin{DoxyParams}{Parameters}
+{\em } & adc -\/ the actual adc value for this strip. THe true value is an unsigned integer \\
+\hline
+\end{DoxyParams}
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_a3f96ad60e7ed79940d6f66d7f265f603}\label{structgondola_1_1TrackerStripTransferFunction_a3f96ad60e7ed79940d6f66d7f265f603} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!invert@{invert}}
+\index{invert@{invert}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{invert()}{invert()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::invert (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{gondola__typedefs_8hpp_a94dab5770726ccbef8c7d026cfbdf8e5}{f64}}}]{y,  }\item[{\mbox{\hyperlink{gondola__typedefs_8hpp_a94dab5770726ccbef8c7d026cfbdf8e5}{f64}}}]{epsilon = {\ttfamily 1\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{e}}-\/12} }\end{DoxyParamCaption}) -\/$>$  r\+::\+Result$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_a94dab5770726ccbef8c7d026cfbdf8e5}{f64}}, \mbox{\hyperlink{classgondola_1_1AnalysisError}{Analysis\+Error}} $>$}
+
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_aae054fad46c818e66eaa8bdf14bd1522}\label{structgondola_1_1TrackerStripTransferFunction_aae054fad46c818e66eaa8bdf14bd1522} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::to\+\_\+string (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$  std\+::string}
+
+
+
+\doxysubsection{Friends And Related Symbol Documentation}
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_ae91681c8f9c8fd37919a4c3a51a86cf3}\label{structgondola_1_1TrackerStripTransferFunction_ae91681c8f9c8fd37919a4c3a51a86cf3} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!operator$<$$<$@{operator$<$$<$}}
+\index{operator$<$$<$@{operator$<$$<$}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{operator$<$$<$}{operator<<}}
+{\footnotesize\ttfamily std\+::ostream \& \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{operator}}$<$$<$ (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{os,  }\item[{\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction}{Tracker\+Strip\+Transfer\+Function}} \&}]{tfn }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_a545a504ac336c3053bea9d9e264016ac}\label{structgondola_1_1TrackerStripTransferFunction_a545a504ac336c3053bea9d9e264016ac} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!data\_id@{data\_id}}
+\index{data\_id@{data\_id}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{data\_id}{data\_id}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a48d6cd8e4135fb2ff7e7f2dac84089ec}{i32}} gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::data\+\_\+id}
+
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_aaf15c0f1f09e474b17bcf884ec154e2a}\label{structgondola_1_1TrackerStripTransferFunction_aaf15c0f1f09e474b17bcf884ec154e2a} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!name@{name}}
+\index{name@{name}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{name}{name}}
+{\footnotesize\ttfamily std\+::string gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::name}
+
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_a49b432b354071f8edf311c38cac6f235}\label{structgondola_1_1TrackerStripTransferFunction_a49b432b354071f8edf311c38cac6f235} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!pol\_a2\_0@{pol\_a2\_0}}
+\index{pol\_a2\_0@{pol\_a2\_0}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{pol\_a2\_0}{pol\_a2\_0}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::pol\+\_\+a2\+\_\+0}
+
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_aee6d743e73779115e88f297911cfcd68}\label{structgondola_1_1TrackerStripTransferFunction_aee6d743e73779115e88f297911cfcd68} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!pol\_a2\_1@{pol\_a2\_1}}
+\index{pol\_a2\_1@{pol\_a2\_1}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{pol\_a2\_1}{pol\_a2\_1}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::pol\+\_\+a2\+\_\+1}
+
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_a1d63a542d2c377b05a66eb69562b0097}\label{structgondola_1_1TrackerStripTransferFunction_a1d63a542d2c377b05a66eb69562b0097} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!pol\_a2\_2@{pol\_a2\_2}}
+\index{pol\_a2\_2@{pol\_a2\_2}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{pol\_a2\_2}{pol\_a2\_2}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::pol\+\_\+a2\+\_\+2}
+
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_a2baf72324b190bafb315667e211ddf6b}\label{structgondola_1_1TrackerStripTransferFunction_a2baf72324b190bafb315667e211ddf6b} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!pol\_b3\_0@{pol\_b3\_0}}
+\index{pol\_b3\_0@{pol\_b3\_0}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{pol\_b3\_0}{pol\_b3\_0}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::pol\+\_\+b3\+\_\+0}
+
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_ab3565a0aa307802194df62564ae41142}\label{structgondola_1_1TrackerStripTransferFunction_ab3565a0aa307802194df62564ae41142} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!pol\_b3\_1@{pol\_b3\_1}}
+\index{pol\_b3\_1@{pol\_b3\_1}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{pol\_b3\_1}{pol\_b3\_1}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::pol\+\_\+b3\+\_\+1}
+
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_a5ea4bf63a25a3a4176fe6ad2e4df56a2}\label{structgondola_1_1TrackerStripTransferFunction_a5ea4bf63a25a3a4176fe6ad2e4df56a2} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!pol\_b3\_2@{pol\_b3\_2}}
+\index{pol\_b3\_2@{pol\_b3\_2}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{pol\_b3\_2}{pol\_b3\_2}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::pol\+\_\+b3\+\_\+2}
+
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_ad66897bd292176789cf9c5bbde87598c}\label{structgondola_1_1TrackerStripTransferFunction_ad66897bd292176789cf9c5bbde87598c} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!pol\_b3\_3@{pol\_b3\_3}}
+\index{pol\_b3\_3@{pol\_b3\_3}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{pol\_b3\_3}{pol\_b3\_3}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::pol\+\_\+b3\+\_\+3}
+
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_a6be2d767c0b1bb27a5d13b01a0695dd9}\label{structgondola_1_1TrackerStripTransferFunction_a6be2d767c0b1bb27a5d13b01a0695dd9} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!pol\_c3\_0@{pol\_c3\_0}}
+\index{pol\_c3\_0@{pol\_c3\_0}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{pol\_c3\_0}{pol\_c3\_0}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::pol\+\_\+c3\+\_\+0}
+
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_ab1afc103f6853d4d53674598c95b08e3}\label{structgondola_1_1TrackerStripTransferFunction_ab1afc103f6853d4d53674598c95b08e3} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!pol\_c3\_1@{pol\_c3\_1}}
+\index{pol\_c3\_1@{pol\_c3\_1}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{pol\_c3\_1}{pol\_c3\_1}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::pol\+\_\+c3\+\_\+1}
+
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_a70fc09f5800206ed51ac9e8377fb09e5}\label{structgondola_1_1TrackerStripTransferFunction_a70fc09f5800206ed51ac9e8377fb09e5} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!pol\_c3\_2@{pol\_c3\_2}}
+\index{pol\_c3\_2@{pol\_c3\_2}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{pol\_c3\_2}{pol\_c3\_2}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::pol\+\_\+c3\+\_\+2}
+
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_a10734b1135d46e656456de94ba530ff6}\label{structgondola_1_1TrackerStripTransferFunction_a10734b1135d46e656456de94ba530ff6} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!pol\_c3\_3@{pol\_c3\_3}}
+\index{pol\_c3\_3@{pol\_c3\_3}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{pol\_c3\_3}{pol\_c3\_3}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::pol\+\_\+c3\+\_\+3}
+
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_ad6aa31688520866318953ff919a60d17}\label{structgondola_1_1TrackerStripTransferFunction_ad6aa31688520866318953ff919a60d17} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!pol\_d3\_0@{pol\_d3\_0}}
+\index{pol\_d3\_0@{pol\_d3\_0}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{pol\_d3\_0}{pol\_d3\_0}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::pol\+\_\+d3\+\_\+0}
+
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_af1b9059fcc534d25caec3a04443472fe}\label{structgondola_1_1TrackerStripTransferFunction_af1b9059fcc534d25caec3a04443472fe} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!pol\_d3\_1@{pol\_d3\_1}}
+\index{pol\_d3\_1@{pol\_d3\_1}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{pol\_d3\_1}{pol\_d3\_1}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::pol\+\_\+d3\+\_\+1}
+
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_af7f90159e3694bd79cf4a4e6f33d9930}\label{structgondola_1_1TrackerStripTransferFunction_af7f90159e3694bd79cf4a4e6f33d9930} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!pol\_d3\_2@{pol\_d3\_2}}
+\index{pol\_d3\_2@{pol\_d3\_2}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{pol\_d3\_2}{pol\_d3\_2}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::pol\+\_\+d3\+\_\+2}
+
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_a34caff8fc901b61e4ac473444ec268ab}\label{structgondola_1_1TrackerStripTransferFunction_a34caff8fc901b61e4ac473444ec268ab} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!pol\_d3\_3@{pol\_d3\_3}}
+\index{pol\_d3\_3@{pol\_d3\_3}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{pol\_d3\_3}{pol\_d3\_3}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::pol\+\_\+d3\+\_\+3}
+
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_a15cc342f3fa6b87c20dfc4342c3d8ab0}\label{structgondola_1_1TrackerStripTransferFunction_a15cc342f3fa6b87c20dfc4342c3d8ab0} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!strip\_id@{strip\_id}}
+\index{strip\_id@{strip\_id}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{strip\_id}{strip\_id}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a48d6cd8e4135fb2ff7e7f2dac84089ec}{i32}} gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::strip\+\_\+id}
+
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_add113de57b9e7eda6ab9bcae365579c4}\label{structgondola_1_1TrackerStripTransferFunction_add113de57b9e7eda6ab9bcae365579c4} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!utc\_timestamp\_start@{utc\_timestamp\_start}}
+\index{utc\_timestamp\_start@{utc\_timestamp\_start}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{utc\_timestamp\_start}{utc\_timestamp\_start}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a85cb35fbe5bf2961d7ad5f26814a91a2}{i64}} gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::utc\+\_\+timestamp\+\_\+start}
+
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_a561cc60b1fe6ac4f4685ee86403a82c7}\label{structgondola_1_1TrackerStripTransferFunction_a561cc60b1fe6ac4f4685ee86403a82c7} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!utc\_timestamp\_stop@{utc\_timestamp\_stop}}
+\index{utc\_timestamp\_stop@{utc\_timestamp\_stop}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{utc\_timestamp\_stop}{utc\_timestamp\_stop}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a85cb35fbe5bf2961d7ad5f26814a91a2}{i64}} gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::utc\+\_\+timestamp\+\_\+stop}
+
+\Hypertarget{structgondola_1_1TrackerStripTransferFunction_a5572989503927055d623fc48ec7f5484}\label{structgondola_1_1TrackerStripTransferFunction_a5572989503927055d623fc48ec7f5484} 
+\index{gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}!volume\_id@{volume\_id}}
+\index{volume\_id@{volume\_id}!gondola::TrackerStripTransferFunction@{gondola::TrackerStripTransferFunction}}
+\doxysubsubsection{\texorpdfstring{volume\_id}{volume\_id}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a85cb35fbe5bf2961d7ad5f26814a91a2}{i64}} gondola\+::\+Tracker\+Strip\+Transfer\+Function\+::volume\+\_\+id}
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/database/\mbox{\hyperlink{tracker__transfer__fn_8hpp}{tracker\+\_\+transfer\+\_\+fn.\+hpp}}\end{DoxyCompactItemize}

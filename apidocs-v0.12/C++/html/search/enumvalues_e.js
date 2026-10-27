@@ -1,11 +1,14 @@
 var searchData=
 [
-  ['scalar_0',['Scalar',['../tof__packet_8h.html#aa69433dde428a8cd2a2242fb3592a565af60357a8d17e45793298323f1b372a74',1,'tof_packet.h']]],
-  ['silver_1',['Silver',['../namespacegondola.html#ac61bd1b8e62eab79a1089be6ecc1ca3daf96e345fdc19cbd4cf15256c251a39a0',1,'gondola']]],
-  ['sipgpsposition_2',['SipGpsPosition',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39cedad85e12b96f39b2783d06f69df001b0c0',1,'gondola']]],
-  ['sipgpstime_3',['SipGpsTime',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39ceda018fbb8d01faa0bb268ce465738f5499',1,'gondola']]],
-  ['sippressure_4',['SipPressure',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39ceda29745e313061fb2635274446022b51f8',1,'gondola']]],
-  ['streamtoolong_5',['StreamTooLong',['../classgondola_1_1IOError.html#a20f21d8609600d07946504f3bbd144f7a13f7dd88a736896765373ad7d8ad76b0',1,'gondola::IOError']]],
-  ['streamtooshort_6',['StreamTooShort',['../classgondola_1_1IOError.html#a20f21d8609600d07946504f3bbd144f7a7700d8c06be44e20cc35c7b67bb196a6',1,'gondola::IOError']]],
-  ['survivalpacket_7',['SurvivalPacket',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39cedaf6cc65b9a4c2c3fe30bf8fe8e1bb8ef4',1,'gondola']]]
+  ['ratepacket_0',['RatePacket',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39ceda936e3d7b33fd949eb7904493a5cdd7df',1,'gondola']]],
+  ['rbcalibration_1',['RBCalibration',['../tof__packet_8h.html#aa69433dde428a8cd2a2242fb3592a565ab31d9b68634b6ea4105b346f0a194f25',1,'tof_packet.h']]],
+  ['rbevent_2',['RBEvent',['../tof__packet_8h.html#aa69433dde428a8cd2a2242fb3592a565a802b5fdb165ab14edcc0cb12a56fb884',1,'tof_packet.h']]],
+  ['rbeventmemoryview_3',['RBEventMemoryView',['../tof__packet_8h.html#aa69433dde428a8cd2a2242fb3592a565aa123f32d4806410ef0c5d14d3ee393ae',1,'tof_packet.h']]],
+  ['rbeventpayload_4',['RBEventPayload',['../tof__packet_8h.html#aa69433dde428a8cd2a2242fb3592a565a66abd0c429817b4ba095225dea523ffb',1,'tof_packet.h']]],
+  ['rbheader_5',['RBHeader',['../tof__packet_8h.html#aa69433dde428a8cd2a2242fb3592a565a913389040de89788aad1047510832b0e',1,'tof_packet.h']]],
+  ['rbmoni_6',['RBMoni',['../tof__packet_8h.html#aa69433dde428a8cd2a2242fb3592a565a466f9c5a3fe78a1c234dc798e10c28c9',1,'tof_packet.h']]],
+  ['rbwaveform_7',['rbwaveform',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39ceda3f21342e6e827fe801c4cc55a3d0176d',1,'gondola::RBWaveform'],['../tof__packet_8h.html#aa69433dde428a8cd2a2242fb3592a565a3f21342e6e827fe801c4cc55a3d0176d',1,'RBWaveform:&#160;tof_packet.h']]],
+  ['reprocesshigh_8',['ReprocessHigh',['../namespacegondola.html#a6f6c2584bb01630af689a2c451eefae4a67ea1fe35548269eb4f4641423b5af7a',1,'gondola']]],
+  ['reprocesshighsat_9',['ReprocessHighSat',['../namespacegondola.html#a6f6c2584bb01630af689a2c451eefae4a6b6b617d15444be727ca8a526ddfc9e5',1,'gondola']]],
+  ['rpihkp_10',['RPiHKP',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39ceda763b7dbca83c667401a5aa0006e02edb',1,'gondola']]]
 ];

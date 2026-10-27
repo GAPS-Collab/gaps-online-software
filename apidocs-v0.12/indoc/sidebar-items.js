@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"macro":["concatdoc","eprintdoc","formatdoc","indoc","printdoc","writedoc"]};
+window.SIDEBAR_ITEMS = {"macro":["concatdoc","eprintdoc","formatdoc","indoc","panicdoc","printdoc","writedoc"]};

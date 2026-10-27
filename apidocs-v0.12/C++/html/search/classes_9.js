@@ -1,27 +1,4 @@
 var searchData=
 [
-  ['telemetryevent_0',['TelemetryEvent',['../structgondola_1_1TelemetryEvent.html',1,'gondola']]],
-  ['telemetrypacket_1',['TelemetryPacket',['../structgondola_1_1TelemetryPacket.html',1,'gondola']]],
-  ['telemetrypacketheader_2',['TelemetryPacketHeader',['../structgondola_1_1TelemetryPacketHeader.html',1,'gondola']]],
-  ['telemetrypacketreader_3',['TelemetryPacketReader',['../structgondola_1_1TelemetryPacketReader.html',1,'gondola']]],
-  ['tofevent_4',['TofEvent',['../structgondola_1_1TofEvent.html',1,'gondola']]],
-  ['tofeventsummary_5',['TofEventSummary',['../structgondola_1_1TofEventSummary.html',1,'gondola']]],
-  ['tofhit_6',['TofHit',['../structgondola_1_1TofHit.html',1,'gondola']]],
-  ['tofmetadata_7',['TofMetaData',['../structgondola_1_1TofMetaData.html',1,'gondola']]],
-  ['tofpacket_8',['TofPacket',['../structTofPacket.html',1,'']]],
-  ['tofpacketreader_9',['TofPacketReader',['../classgondola_1_1TofPacketReader.html',1,'gondola']]],
-  ['tofpaddle_10',['TofPaddle',['../structgondola_1_1TofPaddle.html',1,'gondola']]],
-  ['tofpaddletimingconstant_11',['TofPaddleTimingConstant',['../structgondola_1_1TofPaddleTimingConstant.html',1,'gondola']]],
-  ['trackerdaqeventpacket_12',['TrackerDAQEventPacket',['../structgondola_1_1TrackerDAQEventPacket.html',1,'gondola']]],
-  ['trackerheader_13',['TrackerHeader',['../structgondola_1_1TrackerHeader.html',1,'gondola']]],
-  ['trackerstrip_14',['TrackerStrip',['../structgondola_1_1TrackerStrip.html',1,'gondola']]],
-  ['trackerstripmask_15',['TrackerStripMask',['../structgondola_1_1TrackerStripMask.html',1,'gondola']]],
-  ['trackerstrippedestal_16',['TrackerStripPedestal',['../structgondola_1_1TrackerStripPedestal.html',1,'gondola']]],
-  ['tracklet_17',['Tracklet',['../structgondola_1_1Tracklet.html',1,'gondola']]],
-  ['trkcalibratedhit_18',['TrkCalibratedHit',['../structgondola_1_1TrkCalibratedHit.html',1,'gondola']]],
-  ['trkevent_19',['TrkEvent',['../structgondola_1_1TrkEvent.html',1,'gondola']]],
-  ['trkeventpacket_20',['TrkEventPacket',['../structgondola_1_1TrkEventPacket.html',1,'gondola']]],
-  ['trkheader_21',['TrkHeader',['../structgondola_1_1TrkHeader.html',1,'gondola']]],
-  ['trkhit_22',['TrkHit',['../structgondola_1_1TrkHit.html',1,'gondola']]],
-  ['trkmetadata_23',['TrkMetaData',['../structgondola_1_1TrkMetaData.html',1,'gondola']]]
+  ['simprimary_0',['SimPrimary',['../structSimPrimary.html',1,'']]]
 ];

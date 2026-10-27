@@ -1,5 +1,8 @@
 var parsers_8h =
 [
+    [ "bytestream_extend", "parsers_8h.html#ade5a7f690cf998932d0bb9d7f9f704c2", null ],
+    [ "bytestream_extend_f32tof16", "parsers_8h.html#a7fa291d67fda76dfec7369aeee7369cd", null ],
+    [ "f32_to_f16_le_bytes", "parsers_8h.html#a57a3e6184a95d5157db8226a94fff360", null ],
     [ "parse_bool", "parsers_8h.html#a4e34052f6dbf7321e933fbaa9000d94d", null ],
     [ "parse_f16", "parsers_8h.html#a5163d4a64edd471d4b43679ab6af6596", null ],
     [ "parse_f32", "parsers_8h.html#acb14b89a5c14cfd160a6bba0718e3773", null ],

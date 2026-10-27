@@ -1,0 +1,235 @@
+\doxysection{gondola\+::Tof\+Pulse\+Template Struct Reference}
+\hypertarget{structgondola_1_1TofPulseTemplate}{}\label{structgondola_1_1TofPulseTemplate}\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+
+
+{\ttfamily \#include $<$tof\+\_\+pulse\+\_\+template.\+hpp$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_a0294430efa0e15ce8eac1f539caa7614}{is\+\_\+side\+\_\+a}} () \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{noexcept}} -\/$>$ \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{bool}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_a1dc11d606c720406603382a4525ef1be}{is\+\_\+side\+\_\+b}} () \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{noexcept}} -\/$>$ \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{bool}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_acdccc35488dbd4860b81ebcdae617706}{time\+\_\+at}} (std\+::size\+\_\+t index) \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}
+\begin{DoxyCompactList}\small\item\em Throws std\+::out\+\_\+of\+\_\+range if index \texorpdfstring{$>$}{>}= N\+\_\+\+BINS. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_a62638b400fe8a8c78f0bf241dc87deba}{time\+\_\+axis}} () \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{noexcept}} -\/$>$ std\+::array$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}, \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_a26ce621d3d1fc5078977f76f1c266920}{N\+\_\+\+BINS}} $>$
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_a4558fb8758335c22c64737cfa56ee3aa}{to\+\_\+bytestream}} () \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_aae1f0586b89b8df6079e202e6d423815}{to\+\_\+string}} () \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ std\+::string
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_a090b88a268c3b167a1c580a7ef5c9147}{from\+\_\+bytestream}} (\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{gondola__typedefs_8hpp_ae4d34abafdf1602428db318ca44dfb84}{bytestream}}, \mbox{\hyperlink{gondola__typedefs_8hpp_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \&\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{pos}}) -\/$>$ result\+::\+Result$<$ \mbox{\hyperlink{structgondola_1_1TofPulseTemplate}{Tof\+Pulse\+Template}}, \mbox{\hyperlink{classgondola_1_1IOError}{IOError}} $>$
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_a5eb5383d812b172e9d864cac29a26d3c}{paddle\+\_\+id}} = 0
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_ae6ad5d149f8213232589fa8129c5b4bb}{side}} = \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_ac7bcf70fff9cb3826cef1029088e5e32}{SIDE\+\_\+A}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_afaa62991928fb9fb18ff0db62a040aba}{u32}} \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_a7710a865fa5bf3f8d15152f35b54c5ce}{n\+\_\+waveforms}} = 0
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_a7354bbbd7fe36124aa125ca0b1f49d74}{position\+\_\+low}} = 0.\+0f
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_a48c5335a53a0e5b88fd39590ce0be431}{position\+\_\+high}} = 0.\+0f
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_a92c9896a13a8c9578046441bab01aa85}{charge\+\_\+low}} = 0.\+0f
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_a7087aa0a30cda0763b3c6138b94b1245}{charge\+\_\+high}} = 0.\+0f
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_aa6881b3c9de523914e28cb02f20bba5f}{time\+\_\+start}} = 0.\+0f
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_aca444af4b27bb44b12addd03f426eac5}{time\+\_\+step}} = 1.\+0f
+\item 
+std\+::array$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}, \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_a26ce621d3d1fc5078977f76f1c266920}{N\+\_\+\+BINS}} $>$ \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_a8e246423f710dd180e86d52919225601}{mean}} \{\}
+\item 
+std\+::array$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}, \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_a26ce621d3d1fc5078977f76f1c266920}{N\+\_\+\+BINS}} $>$ \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_aa35bbe7703f27bb680d191bcadb4461f}{rms}} \{\}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{gondola__typedefs_8hpp_a5148c9c1252e19e12def2814f71690e3}{usize}} \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_a26ce621d3d1fc5078977f76f1c266920}{N\+\_\+\+BINS}} = 108
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{gondola__typedefs_8hpp_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_ac7bcf70fff9cb3826cef1029088e5e32}{SIDE\+\_\+A}} = 0
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{gondola__typedefs_8hpp_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_a2d19cb54ea6976c18df12d9f56e7c3ad}{SIDE\+\_\+B}} = 1
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_a0e1f10719db79d380cc81a4e9d70a3d8}{HEAD}} = 0x\+AAAA
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_af5e84d63e50bb8ef392903b119700a35}{TAIL}} = 0x5555
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{gondola__typedefs_8hpp_a5148c9c1252e19e12def2814f71690e3}{usize}} \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_a035f2a082d4bbd86e4aae76bf02985f0}{SIZE}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A TOF pulse template. Positions are measured from side A \mbox{[}mm\mbox{]}, charge is in pC, time in ns, and voltage in mV. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structgondola_1_1TofPulseTemplate_a090b88a268c3b167a1c580a7ef5c9147}\label{structgondola_1_1TofPulseTemplate_a090b88a268c3b167a1c580a7ef5c9147} 
+\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}!from\_bytestream@{from\_bytestream}}
+\index{from\_bytestream@{from\_bytestream}!gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+\doxysubsubsection{\texorpdfstring{from\_bytestream()}{from\_bytestream()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tof\+Pulse\+Template\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{bytestream,  }\item[{\mbox{\hyperlink{gondola__typedefs_8hpp_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \&}]{pos }\end{DoxyParamCaption}) -\/$>$ result\+::\+Result$<$\mbox{\hyperlink{structgondola_1_1TofPulseTemplate}{Tof\+Pulse\+Template}}, \mbox{\hyperlink{classgondola_1_1IOError}{IOError}}$>$\hspace{0.3cm}{\ttfamily [static]}}
+
+\Hypertarget{structgondola_1_1TofPulseTemplate_a0294430efa0e15ce8eac1f539caa7614}\label{structgondola_1_1TofPulseTemplate_a0294430efa0e15ce8eac1f539caa7614} 
+\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}!is\_side\_a@{is\_side\_a}}
+\index{is\_side\_a@{is\_side\_a}!gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+\doxysubsubsection{\texorpdfstring{is\_side\_a()}{is\_side\_a()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tof\+Pulse\+Template\+::is\+\_\+side\+\_\+a (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{bool}}\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+\Hypertarget{structgondola_1_1TofPulseTemplate_a1dc11d606c720406603382a4525ef1be}\label{structgondola_1_1TofPulseTemplate_a1dc11d606c720406603382a4525ef1be} 
+\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}!is\_side\_b@{is\_side\_b}}
+\index{is\_side\_b@{is\_side\_b}!gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+\doxysubsubsection{\texorpdfstring{is\_side\_b()}{is\_side\_b()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tof\+Pulse\+Template\+::is\+\_\+side\+\_\+b (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{bool}}\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+\Hypertarget{structgondola_1_1TofPulseTemplate_acdccc35488dbd4860b81ebcdae617706}\label{structgondola_1_1TofPulseTemplate_acdccc35488dbd4860b81ebcdae617706} 
+\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}!time\_at@{time\_at}}
+\index{time\_at@{time\_at}!gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+\doxysubsubsection{\texorpdfstring{time\_at()}{time\_at()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tof\+Pulse\+Template\+::time\+\_\+at (\begin{DoxyParamCaption}\item[{std\+::size\+\_\+t}]{index }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}}
+
+
+
+Throws std\+::out\+\_\+of\+\_\+range if index \texorpdfstring{$>$}{>}= N\+\_\+\+BINS. 
+
+\Hypertarget{structgondola_1_1TofPulseTemplate_a62638b400fe8a8c78f0bf241dc87deba}\label{structgondola_1_1TofPulseTemplate_a62638b400fe8a8c78f0bf241dc87deba} 
+\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}!time\_axis@{time\_axis}}
+\index{time\_axis@{time\_axis}!gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+\doxysubsubsection{\texorpdfstring{time\_axis()}{time\_axis()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tof\+Pulse\+Template\+::time\+\_\+axis (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ std\+::array$<$\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}, \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_a26ce621d3d1fc5078977f76f1c266920}{N\+\_\+\+BINS}}$>$\hspace{0.3cm}{\ttfamily [noexcept]}}
+
+\Hypertarget{structgondola_1_1TofPulseTemplate_a4558fb8758335c22c64737cfa56ee3aa}\label{structgondola_1_1TofPulseTemplate_a4558fb8758335c22c64737cfa56ee3aa} 
+\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}!to\_bytestream@{to\_bytestream}}
+\index{to\_bytestream@{to\_bytestream}!gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+\doxysubsubsection{\texorpdfstring{to\_bytestream()}{to\_bytestream()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tof\+Pulse\+Template\+::to\+\_\+bytestream (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$\mbox{\hyperlink{gondola__typedefs_8hpp_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}$>$}
+
+\Hypertarget{structgondola_1_1TofPulseTemplate_aae1f0586b89b8df6079e202e6d423815}\label{structgondola_1_1TofPulseTemplate_aae1f0586b89b8df6079e202e6d423815} 
+\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}!to\_string@{to\_string}}
+\index{to\_string@{to\_string}!gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+\doxysubsubsection{\texorpdfstring{to\_string()}{to\_string()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Tof\+Pulse\+Template\+::to\+\_\+string (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const -\/$>$ std\+::string}
+
+
+
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structgondola_1_1TofPulseTemplate_a7087aa0a30cda0763b3c6138b94b1245}\label{structgondola_1_1TofPulseTemplate_a7087aa0a30cda0763b3c6138b94b1245} 
+\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}!charge\_high@{charge\_high}}
+\index{charge\_high@{charge\_high}!gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+\doxysubsubsection{\texorpdfstring{charge\_high}{charge\_high}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tof\+Pulse\+Template\+::charge\+\_\+high = 0.\+0f}
+
+\Hypertarget{structgondola_1_1TofPulseTemplate_a92c9896a13a8c9578046441bab01aa85}\label{structgondola_1_1TofPulseTemplate_a92c9896a13a8c9578046441bab01aa85} 
+\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}!charge\_low@{charge\_low}}
+\index{charge\_low@{charge\_low}!gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+\doxysubsubsection{\texorpdfstring{charge\_low}{charge\_low}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tof\+Pulse\+Template\+::charge\+\_\+low = 0.\+0f}
+
+\Hypertarget{structgondola_1_1TofPulseTemplate_a0e1f10719db79d380cc81a4e9d70a3d8}\label{structgondola_1_1TofPulseTemplate_a0e1f10719db79d380cc81a4e9d70a3d8} 
+\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}!HEAD@{HEAD}}
+\index{HEAD@{HEAD}!gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+\doxysubsubsection{\texorpdfstring{HEAD}{HEAD}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Tof\+Pulse\+Template\+::\+HEAD = 0x\+AAAA\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+\Hypertarget{structgondola_1_1TofPulseTemplate_a8e246423f710dd180e86d52919225601}\label{structgondola_1_1TofPulseTemplate_a8e246423f710dd180e86d52919225601} 
+\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}!mean@{mean}}
+\index{mean@{mean}!gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+\doxysubsubsection{\texorpdfstring{mean}{mean}}
+{\footnotesize\ttfamily std\+::array$<$\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}, \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_a26ce621d3d1fc5078977f76f1c266920}{N\+\_\+\+BINS}}$>$ gondola\+::\+Tof\+Pulse\+Template\+::mean \{\}}
+
+\Hypertarget{structgondola_1_1TofPulseTemplate_a26ce621d3d1fc5078977f76f1c266920}\label{structgondola_1_1TofPulseTemplate_a26ce621d3d1fc5078977f76f1c266920} 
+\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}!N\_BINS@{N\_BINS}}
+\index{N\_BINS@{N\_BINS}!gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+\doxysubsubsection{\texorpdfstring{N\_BINS}{N\_BINS}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{gondola__typedefs_8hpp_a5148c9c1252e19e12def2814f71690e3}{usize}} gondola\+::\+Tof\+Pulse\+Template\+::\+N\+\_\+\+BINS = 108\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+\Hypertarget{structgondola_1_1TofPulseTemplate_a7710a865fa5bf3f8d15152f35b54c5ce}\label{structgondola_1_1TofPulseTemplate_a7710a865fa5bf3f8d15152f35b54c5ce} 
+\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}!n\_waveforms@{n\_waveforms}}
+\index{n\_waveforms@{n\_waveforms}!gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+\doxysubsubsection{\texorpdfstring{n\_waveforms}{n\_waveforms}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_afaa62991928fb9fb18ff0db62a040aba}{u32}} gondola\+::\+Tof\+Pulse\+Template\+::n\+\_\+waveforms = 0}
+
+\Hypertarget{structgondola_1_1TofPulseTemplate_a5eb5383d812b172e9d864cac29a26d3c}\label{structgondola_1_1TofPulseTemplate_a5eb5383d812b172e9d864cac29a26d3c} 
+\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}!paddle\_id@{paddle\_id}}
+\index{paddle\_id@{paddle\_id}!gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+\doxysubsubsection{\texorpdfstring{paddle\_id}{paddle\_id}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} gondola\+::\+Tof\+Pulse\+Template\+::paddle\+\_\+id = 0}
+
+\Hypertarget{structgondola_1_1TofPulseTemplate_a48c5335a53a0e5b88fd39590ce0be431}\label{structgondola_1_1TofPulseTemplate_a48c5335a53a0e5b88fd39590ce0be431} 
+\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}!position\_high@{position\_high}}
+\index{position\_high@{position\_high}!gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+\doxysubsubsection{\texorpdfstring{position\_high}{position\_high}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tof\+Pulse\+Template\+::position\+\_\+high = 0.\+0f}
+
+\Hypertarget{structgondola_1_1TofPulseTemplate_a7354bbbd7fe36124aa125ca0b1f49d74}\label{structgondola_1_1TofPulseTemplate_a7354bbbd7fe36124aa125ca0b1f49d74} 
+\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}!position\_low@{position\_low}}
+\index{position\_low@{position\_low}!gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+\doxysubsubsection{\texorpdfstring{position\_low}{position\_low}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tof\+Pulse\+Template\+::position\+\_\+low = 0.\+0f}
+
+\Hypertarget{structgondola_1_1TofPulseTemplate_aa35bbe7703f27bb680d191bcadb4461f}\label{structgondola_1_1TofPulseTemplate_aa35bbe7703f27bb680d191bcadb4461f} 
+\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}!rms@{rms}}
+\index{rms@{rms}!gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+\doxysubsubsection{\texorpdfstring{rms}{rms}}
+{\footnotesize\ttfamily std\+::array$<$\mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}}, \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_a26ce621d3d1fc5078977f76f1c266920}{N\+\_\+\+BINS}}$>$ gondola\+::\+Tof\+Pulse\+Template\+::rms \{\}}
+
+\Hypertarget{structgondola_1_1TofPulseTemplate_ae6ad5d149f8213232589fa8129c5b4bb}\label{structgondola_1_1TofPulseTemplate_ae6ad5d149f8213232589fa8129c5b4bb} 
+\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}!side@{side}}
+\index{side@{side}!gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+\doxysubsubsection{\texorpdfstring{side}{side}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} gondola\+::\+Tof\+Pulse\+Template\+::side = \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_ac7bcf70fff9cb3826cef1029088e5e32}{SIDE\+\_\+A}}}
+
+\Hypertarget{structgondola_1_1TofPulseTemplate_ac7bcf70fff9cb3826cef1029088e5e32}\label{structgondola_1_1TofPulseTemplate_ac7bcf70fff9cb3826cef1029088e5e32} 
+\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}!SIDE\_A@{SIDE\_A}}
+\index{SIDE\_A@{SIDE\_A}!gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+\doxysubsubsection{\texorpdfstring{SIDE\_A}{SIDE\_A}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{gondola__typedefs_8hpp_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} gondola\+::\+Tof\+Pulse\+Template\+::\+SIDE\+\_\+A = 0\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+\Hypertarget{structgondola_1_1TofPulseTemplate_a2d19cb54ea6976c18df12d9f56e7c3ad}\label{structgondola_1_1TofPulseTemplate_a2d19cb54ea6976c18df12d9f56e7c3ad} 
+\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}!SIDE\_B@{SIDE\_B}}
+\index{SIDE\_B@{SIDE\_B}!gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+\doxysubsubsection{\texorpdfstring{SIDE\_B}{SIDE\_B}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{gondola__typedefs_8hpp_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} gondola\+::\+Tof\+Pulse\+Template\+::\+SIDE\+\_\+B = 1\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+\Hypertarget{structgondola_1_1TofPulseTemplate_a035f2a082d4bbd86e4aae76bf02985f0}\label{structgondola_1_1TofPulseTemplate_a035f2a082d4bbd86e4aae76bf02985f0} 
+\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}!SIZE@{SIZE}}
+\index{SIZE@{SIZE}!gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+\doxysubsubsection{\texorpdfstring{SIZE}{SIZE}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{gondola__typedefs_8hpp_a5148c9c1252e19e12def2814f71690e3}{usize}} gondola\+::\+Tof\+Pulse\+Template\+::\+SIZE\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ 2\ +\ 1\ +\ 1\ +\ 4\ +\ 6\ *\ 4\ +\ 2\ *\ \mbox{\hyperlink{structgondola_1_1TofPulseTemplate_a26ce621d3d1fc5078977f76f1c266920}{N\_BINS}}\ *\ 4\ +\ 2}
+
+\end{DoxyCode}
+\Hypertarget{structgondola_1_1TofPulseTemplate_af5e84d63e50bb8ef392903b119700a35}\label{structgondola_1_1TofPulseTemplate_af5e84d63e50bb8ef392903b119700a35} 
+\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}!TAIL@{TAIL}}
+\index{TAIL@{TAIL}!gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+\doxysubsubsection{\texorpdfstring{TAIL}{TAIL}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Tof\+Pulse\+Template\+::\+TAIL = 0x5555\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+\Hypertarget{structgondola_1_1TofPulseTemplate_aa6881b3c9de523914e28cb02f20bba5f}\label{structgondola_1_1TofPulseTemplate_aa6881b3c9de523914e28cb02f20bba5f} 
+\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}!time\_start@{time\_start}}
+\index{time\_start@{time\_start}!gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+\doxysubsubsection{\texorpdfstring{time\_start}{time\_start}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tof\+Pulse\+Template\+::time\+\_\+start = 0.\+0f}
+
+\Hypertarget{structgondola_1_1TofPulseTemplate_aca444af4b27bb44b12addd03f426eac5}\label{structgondola_1_1TofPulseTemplate_aca444af4b27bb44b12addd03f426eac5} 
+\index{gondola::TofPulseTemplate@{gondola::TofPulseTemplate}!time\_step@{time\_step}}
+\index{time\_step@{time\_step}!gondola::TofPulseTemplate@{gondola::TofPulseTemplate}}
+\doxysubsubsection{\texorpdfstring{time\_step}{time\_step}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Tof\+Pulse\+Template\+::time\+\_\+step = 1.\+0f}
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/\mbox{\hyperlink{tof__pulse__template_8hpp}{tof\+\_\+pulse\+\_\+template.\+hpp}}\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/\mbox{\hyperlink{tof__pulse__template_8cxx}{tof\+\_\+pulse\+\_\+template.\+cxx}}\end{DoxyCompactItemize}

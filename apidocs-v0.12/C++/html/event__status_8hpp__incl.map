@@ -1,11 +1,11 @@
 <map id="/home/runner/work/gaps&#45;online&#45;software/gaps&#45;online&#45;software/gondola&#45;core/C++/include/events/event_status.hpp" name="/home/runner/work/gaps&#45;online&#45;software/gaps&#45;online&#45;software/gondola&#45;core/C++/include/events/event_status.hpp">
-<area shape="rect" id="Node000001" title=" " alt="" coords="121,5,310,89"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="87,137,154,163"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="179,91,143,129,139,125,175,88"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="178,137,253,163"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="218,89,218,124,213,124,213,89"/>
-<area shape="rect" id="Node000004" href="$tof__typedefs_8h.html" title=" " alt="" coords="277,137,393,163"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="266,87,313,127,310,131,262,91"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="95,5,285,89"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="62,137,129,163"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="153,91,118,129,114,125,150,88"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="153,137,227,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="193,89,193,124,187,124,187,89"/>
+<area shape="rect" id="Node000004" href="$gondola__typedefs_8hpp.html" title=" " alt="" coords="252,137,419,163"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="251,87,309,127,306,132,248,92"/>
 <area shape="rect" id="Node000005" title=" " alt="" coords="5,211,68,236"/>
 <area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="286,165,82,213,81,208,284,160"/>
 <area shape="rect" id="Node000006" title=" " alt="" coords="93,211,143,236"/>
@@ -21,5 +21,5 @@
 <area shape="rect" id="Node000011" title=" " alt="" coords="536,211,623,236"/>
 <area shape="poly" id="edge10_Node000004_Node000011" title=" " alt="" coords="375,160,528,204,526,209,374,165"/>
 <area shape="rect" id="Node000012" title=" " alt="" coords="647,211,707,236"/>
-<area shape="poly" id="edge11_Node000004_Node000012" title=" " alt="" coords="394,159,634,208,633,213,393,164"/>
+<area shape="poly" id="edge11_Node000004_Node000012" title=" " alt="" coords="401,160,634,208,632,213,399,165"/>
 </map>

@@ -1,5 +1,6 @@
 var structgondola_1_1TofPaddle =
 [
+    [ "get_position_from_a", "structgondola_1_1TofPaddle.html#ab64229080044e0f31f39ed55fcd8d688", null ],
     [ "get_principal", "structgondola_1_1TofPaddle.html#a96e25986cc97252516842e15d9e07248", null ],
     [ "to_string", "structgondola_1_1TofPaddle.html#ad41a41fa672224ed7f73998dd4d56d2b", null ],
     [ "cable_len", "structgondola_1_1TofPaddle.html#a77768b14f42da4df4886080b20f66a1c", null ],

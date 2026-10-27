@@ -11,7 +11,8 @@ var classgondola_1_1IOError =
       [ "WrongHeaderBytes", "classgondola_1_1IOError.html#a20f21d8609600d07946504f3bbd144f7aad32eacf390a76aeb96d7b02aaa1704d", null ],
       [ "WrongTailBytes", "classgondola_1_1IOError.html#a20f21d8609600d07946504f3bbd144f7a288ce6c63e5e376ff77b0a0f8c44bd1e", null ],
       [ "EventHeaderCorrupt", "classgondola_1_1IOError.html#a20f21d8609600d07946504f3bbd144f7aea8fdf52eb835a70c796c9105add11b9", null ],
-      [ "UnsupportedProtocolVersion", "classgondola_1_1IOError.html#a20f21d8609600d07946504f3bbd144f7afb626a076fbe74b96622376c090f4954", null ]
+      [ "UnsupportedProtocolVersion", "classgondola_1_1IOError.html#a20f21d8609600d07946504f3bbd144f7afb626a076fbe74b96622376c090f4954", null ],
+      [ "EndOfFile", "classgondola_1_1IOError.html#a20f21d8609600d07946504f3bbd144f7a9556e151da49cd4bcf0352857cb33509", null ]
     ] ],
     [ "IOError", "classgondola_1_1IOError.html#a165d5c8c8984364682bd033e396775e9", null ],
     [ "kind", "classgondola_1_1IOError.html#a555056abae816efb6399f6b907dc0642", null ],

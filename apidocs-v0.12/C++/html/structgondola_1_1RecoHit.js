@@ -1,7 +1,9 @@
 var structgondola_1_1RecoHit =
 [
+    [ "operator+=", "structgondola_1_1RecoHit.html#a842452d7357bf44b299825a2c3845efc", null ],
     [ "to_bytestream", "structgondola_1_1RecoHit.html#a6077855bb64b42e811668d448f64528c", null ],
     [ "to_string", "structgondola_1_1RecoHit.html#a81f0cb1df0d42d2d4e07569289993ddd", null ],
+    [ "operator<<", "structgondola_1_1RecoHit.html#a54f2fe661cd952d1fa29bdf634ac3028", null ],
     [ "energy", "structgondola_1_1RecoHit.html#addd5099e568639159e6a7b0689f43ed5", null ],
     [ "time", "structgondola_1_1RecoHit.html#adfb6e401e8b651ea0ccd410bf11438c1", null ],
     [ "volume", "structgondola_1_1RecoHit.html#a0b3be482fac3f5d0088785db9fe9a63d", null ],

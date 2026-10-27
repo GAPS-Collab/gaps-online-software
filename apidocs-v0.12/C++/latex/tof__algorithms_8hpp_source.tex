@@ -1,0 +1,32 @@
+\doxysection{tof\+\_\+algorithms.\+hpp}
+\hypertarget{tof__algorithms_8hpp_source}{}\label{tof__algorithms_8hpp_source}\index{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/tof\_algorithms.hpp@{/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/C++/include/tof\_algorithms.hpp}}
+\mbox{\hyperlink{tof__algorithms_8hpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <span>}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ "{}result/result.h"{}}}
+\DoxyCodeLine{00008\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{r}}\ =\ result;}
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{gondola__typedefs_8hpp}{gondola\_typedefs.hpp}}"{}}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{errors_8hpp}{errors.hpp}}"{}}}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacegondola}{gondola}}\ \{}
+\DoxyCodeLine{00014\ \ \ \ \ }
+\DoxyCodeLine{00015\ \ \ [[\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{nodiscard}}(\textcolor{stringliteral}{"{}CFD\ time\ extraction\ can\ fail"{}})]]}
+\DoxyCodeLine{00016\ \ \ \textcolor{keyword}{auto}\ \mbox{\hyperlink{namespacegondola_ae044d73e645b6622c0749af0d2c6bcb7}{find\_cfd\_simple\_time}}(}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ std::span<const\ f64>\ voltages,}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ std::span<const\ f64>\ \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{times\_ns}},}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a94dab5770726ccbef8c7d026cfbdf8e5}{f64}}\ \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{cfd\_fraction}},}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{peak\_begin}},}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \mbox{\hyperlink{gondola__typedefs_8hpp_a5148c9c1252e19e12def2814f71690e3}{usize}}\ \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{peak\_end}}}
+\DoxyCodeLine{00022\ \ \ )\ -\/>\ r::Result<f64,\ AnalysisError>;}
+\DoxyCodeLine{00023\ \}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ }
+
+\end{DoxyCode}

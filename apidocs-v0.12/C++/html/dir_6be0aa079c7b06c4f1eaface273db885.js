@@ -11,6 +11,7 @@ var dir_6be0aa079c7b06c4f1eaface273db885 =
     [ "errors.hpp", "errors_8hpp.html", "errors_8hpp" ],
     [ "events.h", "events_8h.html", "events_8h" ],
     [ "gondola.hpp", "gondola_8hpp.html", null ],
+    [ "gondola_typedefs.hpp", "gondola__typedefs_8hpp.html", "gondola__typedefs_8hpp" ],
     [ "io.hpp", "io_8hpp.html", "io_8hpp" ],
     [ "legacy.h", "legacy_8h.html", null ],
     [ "sd_legacy.hpp", "sd__legacy_8hpp.html", null ],
@@ -18,7 +19,8 @@ var dir_6be0aa079c7b06c4f1eaface273db885 =
     [ "serialization.h", "serialization_8h.html", "serialization_8h" ],
     [ "simclasses.h", "simclasses_8h.html", "simclasses_8h" ],
     [ "telemetry_dataclasses.hpp", "telemetry__dataclasses_8hpp.html", "telemetry__dataclasses_8hpp" ],
-    [ "tof_typedefs.h", "tof__typedefs_8h.html", "tof__typedefs_8h" ],
+    [ "tof_algorithms.hpp", "tof__algorithms_8hpp.html", "tof__algorithms_8hpp" ],
+    [ "tof_pulse_template.hpp", "tof__pulse__template_8hpp.html", "tof__pulse__template_8hpp" ],
     [ "tracklet.hpp", "tracklet_8hpp.html", "tracklet_8hpp" ],
     [ "version.h", "version_8h.html", "version_8h" ]
 ];

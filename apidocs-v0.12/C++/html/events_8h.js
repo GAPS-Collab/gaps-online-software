@@ -8,5 +8,6 @@ var events_8h =
       [ "Unknown", "events_8h.html#a62baa478e4adaaf6d242f135c1c9f84da88183b946cc5f0e8c96b2e66e1c74a7e", null ],
       [ "None", "events_8h.html#a62baa478e4adaaf6d242f135c1c9f84da6adf97f83acf6453d4a6a4b1070f3754", null ]
     ] ],
+    [ "mt_event_get_timestamp_abs48", "events_8h.html#a114055541b66e05a894b76d349104a4c", null ],
     [ "operator<<", "events_8h.html#a9086a1522bf1269d1824786811a08141", null ]
 ];

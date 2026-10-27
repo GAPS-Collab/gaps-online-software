@@ -1,5 +1,6 @@
 var hierarchy =
 [
+    [ "gondola::AnalysisError", "classgondola_1_1AnalysisError.html", null ],
     [ "gondola::Cooling", "structgondola_1_1Cooling.html", null ],
     [ "CPUMoniData", "structCPUMoniData.html", null ],
     [ "gondola::CRFrame", "structgondola_1_1CRFrame.html", null ],
@@ -14,8 +15,12 @@ var hierarchy =
     [ "FromTofPacket< MtbMoniData >", "structFromTofPacket.html", [
       [ "MtbMoniData", "structMtbMoniData.html", null ]
     ] ],
+    [ "G4VHit", null, [
+      [ "gondola::McHit", "structgondola_1_1McHit.html", null ]
+    ] ],
     [ "gondola::IOError", "classgondola_1_1IOError.html", null ],
     [ "LTBMoniData", "structLTBMoniData.html", null ],
+    [ "gondola::McEvent", "structgondola_1_1McEvent.html", null ],
     [ "std::optional", null, [
       [ "Option< String >", "structOption.html", null ],
       [ "Option< f32 >", "structOption.html", null ],
@@ -42,11 +47,14 @@ var hierarchy =
     [ "gondola::TofPacketReader", "classgondola_1_1TofPacketReader.html", null ],
     [ "gondola::TofPaddle", "structgondola_1_1TofPaddle.html", null ],
     [ "gondola::TofPaddleTimingConstant", "structgondola_1_1TofPaddleTimingConstant.html", null ],
+    [ "gondola::TofPulseTemplate", "structgondola_1_1TofPulseTemplate.html", null ],
     [ "gondola::TrackerDAQEventPacket", "structgondola_1_1TrackerDAQEventPacket.html", null ],
     [ "gondola::TrackerHeader", "structgondola_1_1TrackerHeader.html", null ],
     [ "gondola::TrackerStrip", "structgondola_1_1TrackerStrip.html", null ],
+    [ "gondola::TrackerStripGain", "structgondola_1_1TrackerStripGain.html", null ],
     [ "gondola::TrackerStripMask", "structgondola_1_1TrackerStripMask.html", null ],
     [ "gondola::TrackerStripPedestal", "structgondola_1_1TrackerStripPedestal.html", null ],
+    [ "gondola::TrackerStripTransferFunction", "structgondola_1_1TrackerStripTransferFunction.html", null ],
     [ "gondola::Tracklet", "structgondola_1_1Tracklet.html", null ],
     [ "gondola::TrkCalibratedHit", "structgondola_1_1TrkCalibratedHit.html", null ],
     [ "gondola::TrkEvent", "structgondola_1_1TrkEvent.html", null ],

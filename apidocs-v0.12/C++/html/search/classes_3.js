@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['ltbmonidata_0',['LTBMoniData',['../structLTBMoniData.html',1,'']]]
+  ['ioerror_0',['IOError',['../classgondola_1_1IOError.html',1,'gondola']]]
 ];

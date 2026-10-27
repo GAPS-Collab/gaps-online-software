@@ -9,7 +9,7 @@ Tof event classes.
 {\ttfamily \#include $<$array$>$}\newline
 {\ttfamily \#include $<$format$>$}\newline
 {\ttfamily \#include "{}result/result.\+h"{}}\newline
-{\ttfamily \#include "{}tof\+\_\+typedefs.\+h"{}}\newline
+{\ttfamily \#include "{}gondola\+\_\+typedefs.\+hpp"{}}\newline
 {\ttfamily \#include "{}packets/monitoring.\+h"{}}\newline
 {\ttfamily \#include "{}packets/tof\+\_\+packet.\+h"{}}\newline
 {\ttfamily \#include "{}events/event\+\_\+status.\+hpp"{}}\newline
@@ -50,13 +50,13 @@ namespace \mbox{\hyperlink{namespacegondola}{gondola}}
 \doxysubsubsection*{Macros}
 \begin{DoxyCompactItemize}
 \item 
-\#\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{define}} \mbox{\hyperlink{events_8h_a68c7ec06e4b37cff650691a741abe1ac}{NCHN}}~9
+\#\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{define}} \mbox{\hyperlink{events_8h_a68c7ec06e4b37cff650691a741abe1ac}{NCHN}}~9
 \item 
-\#\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{define}} \mbox{\hyperlink{events_8h_a3cd2baa6a4e5edb7a622ad2d706cac13}{NWORDS}}~1024
+\#\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{define}} \mbox{\hyperlink{events_8h_a3cd2baa6a4e5edb7a622ad2d706cac13}{NWORDS}}~1024
 \item 
-\#\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{define}} \mbox{\hyperlink{events_8h_a84533b2f9704f11dab3f2e06134a63bc}{N\+\_\+\+LTBS}}~25
+\#\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{define}} \mbox{\hyperlink{events_8h_a84533b2f9704f11dab3f2e06134a63bc}{N\+\_\+\+LTBS}}~25
 \item 
-\#\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{define}} \mbox{\hyperlink{events_8h_a218ed3684697b36f9858c9b3d26f2f71}{N\+\_\+\+CHN\+\_\+\+PER\+\_\+\+LTB}}~16
+\#\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{define}} \mbox{\hyperlink{events_8h_a218ed3684697b36f9858c9b3d26f2f71}{N\+\_\+\+CHN\+\_\+\+PER\+\_\+\+LTB}}~16
 \end{DoxyCompactItemize}
 \doxysubsubsection*{Enumerations}
 \begin{DoxyCompactItemize}
@@ -68,7 +68,9 @@ enum class \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84d}{
 \doxysubsubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-std\+::ostream \& \mbox{\hyperlink{namespacegondola_a9086a1522bf1269d1824786811a08141}{gondola\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84d}{gondola\+::\+Compression\+Level}} \&\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{level}})
+std\+::ostream \& \mbox{\hyperlink{namespacegondola_a9086a1522bf1269d1824786811a08141}{gondola\+::operator$<$$<$}} (std\+::ostream \&\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{os}}, \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{namespacegondola_a62baa478e4adaaf6d242f135c1c9f84d}{gondola\+::\+Compression\+Level}} \&\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{level}})
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a114055541b66e05a894b76d349104a4c}{gondola\+::mt\+\_\+event\+\_\+get\+\_\+timestamp\+\_\+abs48}} (\mbox{\hyperlink{gondola__typedefs_8hpp_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{mtb\+\_\+timestamp}}, \mbox{\hyperlink{gondola__typedefs_8hpp_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{gps\+\_\+timestamp}}, \mbox{\hyperlink{gondola__typedefs_8hpp_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{tiu\+\_\+timestamp}}) -\/$>$ \mbox{\hyperlink{gondola__typedefs_8hpp_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}}
 \end{DoxyCompactItemize}
 
 
@@ -94,23 +96,23 @@ This file is part of gaps-\/online-\/software and published under the GPLv3 lice
 \index{events.h@{events.h}!N\_CHN\_PER\_LTB@{N\_CHN\_PER\_LTB}}
 \index{N\_CHN\_PER\_LTB@{N\_CHN\_PER\_LTB}!events.h@{events.h}}
 \doxysubsubsection{\texorpdfstring{N\_CHN\_PER\_LTB}{N\_CHN\_PER\_LTB}}
-{\footnotesize\ttfamily \#\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{define}} N\+\_\+\+CHN\+\_\+\+PER\+\_\+\+LTB~16}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{define}} N\+\_\+\+CHN\+\_\+\+PER\+\_\+\+LTB~16}
 
 \Hypertarget{events_8h_a84533b2f9704f11dab3f2e06134a63bc}\label{events_8h_a84533b2f9704f11dab3f2e06134a63bc} 
 \index{events.h@{events.h}!N\_LTBS@{N\_LTBS}}
 \index{N\_LTBS@{N\_LTBS}!events.h@{events.h}}
 \doxysubsubsection{\texorpdfstring{N\_LTBS}{N\_LTBS}}
-{\footnotesize\ttfamily \#\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{define}} N\+\_\+\+LTBS~25}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{define}} N\+\_\+\+LTBS~25}
 
 \Hypertarget{events_8h_a68c7ec06e4b37cff650691a741abe1ac}\label{events_8h_a68c7ec06e4b37cff650691a741abe1ac} 
 \index{events.h@{events.h}!NCHN@{NCHN}}
 \index{NCHN@{NCHN}!events.h@{events.h}}
 \doxysubsubsection{\texorpdfstring{NCHN}{NCHN}}
-{\footnotesize\ttfamily \#\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{define}} NCHN~9}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{define}} NCHN~9}
 
 \Hypertarget{events_8h_a3cd2baa6a4e5edb7a622ad2d706cac13}\label{events_8h_a3cd2baa6a4e5edb7a622ad2d706cac13} 
 \index{events.h@{events.h}!NWORDS@{NWORDS}}
 \index{NWORDS@{NWORDS}!events.h@{events.h}}
 \doxysubsubsection{\texorpdfstring{NWORDS}{NWORDS}}
-{\footnotesize\ttfamily \#\mbox{\hyperlink{tof__typedefs_8h_a1b01c504448c96cd2191a5184dd31acf}{define}} NWORDS~1024}
+{\footnotesize\ttfamily \#\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{define}} NWORDS~1024}
 
