@@ -1,4 +1,9 @@
-#include "mc_hit.hpp"
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
+
+#ifdef BUILD_SIM
+
+#include "events/mc_hit.hpp"
 #include "io.hpp"
 #include "io/parsers.h"
 namespace go = gondola;
@@ -76,4 +81,4 @@ auto go::McHit::to_bytestream() const -> Vec<u8> {
   stream.insert(stream.end(), bytes.begin(), bytes.end());
   return stream;
 }
-
+#endif

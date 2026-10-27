@@ -1,4 +1,8 @@
-#include "mc_event.hpp"
+// This file is part of gaps-online-software and published 
+// under the GPLv3 license
+#ifdef BUILD_SIM
+
+#include "events/mc_event.hpp"
 #include "io/parsers.h"
 
 namespace go = gondola;
@@ -25,3 +29,4 @@ auto go::McEvent::to_bytestream() const -> Vec<u8> {
   return stream;
 }
 
+#endif
