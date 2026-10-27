@@ -15,6 +15,7 @@
 
 #include "gondola_typedefs.hpp" 
 #include "events/telemetry_event.hpp"
+#include "events/mc_event.hpp"
 #include "database.h"
 #include "tracklet.hpp"
 
@@ -606,30 +607,35 @@ namespace gondola {
   };
   
   struct SDRootWriter {
-    SDRootWriter(std::string fname, std::string geo_file = "", std::string file_mode = "RECREATE");
+    SDRootWriter(std::string fname, std::string geo_file = "", std::string file_mode = "RECREATE", bool write_sim = false);
     ~SDRootWriter();
 
     /// Write events to the root tree. Writing to TreeRec and TreeRaw is 
     /// supported
-    auto add_event(TelemetryEvent* ev, TelemetryEvent* ev_for_raw, u8 packet_type, f64 gcutime, bool use_corrected_edep = false) -> void;
+    auto add_event(TelemetryEvent* ev, TelemetryEvent* ev_for_raw, u8 packet_type, f64 gcutime, bool use_corrected_edep = false, f32 tracker_cut = 0.4 ) -> void;
     /// The SimulationParameter tree  
     auto write_sdpar(u32 run_id, std::string hostname, std::string crane_version) -> void; 
-    std::string filename = "";
+    /// Add a gaps-online-sw mc event and ultimate convert and write it into the 
+    /// raw tree 
+    auto add_mc_event(const McEvent& ev) -> void;
+    std::string filename                       = "";
     // root just hates modern memory management
-    TChain* tchain                           = nullptr;
-    TFile* output_file                       = nullptr;
-    u64 nevents_total                        = 0;
-    CEventRec* event                         = nullptr;
-    Crane::Calibration::CRawTrk*   rawtrk    = nullptr;
-    Crane::Calibration::CRawTof*   rawtof    = nullptr;
-    Crane::Calibration::CRawHeader* rawhd    = nullptr;
-    GSimulationParameter* par                = nullptr;
-    TTree* reco_tree                         = nullptr;
-    TTree* raw_tree                          = nullptr;
-    TTree* par_tree                          = nullptr;
-    TofPaddleMap       pmap ;
-    TrkStripMap        smap;
-    DsiJChnPaddleIdMap lgmap;
+    TChain*                          tchain    = nullptr;
+    TFile*                      output_file    = nullptr;
+    u64                       nevents_total    = 0;
+    CEventRec*                        event    = nullptr;
+    CEventMc*                      mc_event    = nullptr;
+    Crane::Calibration::CRawTrk*     rawtrk    = nullptr;
+    Crane::Calibration::CRawTof*     rawtof    = nullptr;
+    Crane::Calibration::CRawHeader*  rawhd     = nullptr;
+    GSimulationParameter*            par       = nullptr;
+    TTree*                           reco_tree = nullptr;
+    TTree*                           raw_tree  = nullptr;
+    TTree*                           par_tree  = nullptr;
+    TTree*                           sim_tree  = nullptr;
+    TofPaddleMap                     pmap      = {};
+    TrkStripMap                      smap      = {};
+    DsiJChnPaddleIdMap               lgmap     = {};
   };
 }
 

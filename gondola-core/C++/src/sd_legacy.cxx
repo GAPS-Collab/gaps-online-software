@@ -10,6 +10,7 @@
 #include "telemetry_dataclasses.hpp"
 #include "events.h"
 #include "database.h"
+#include "events/mc_event.hpp"
 
 namespace cb = Crane::Calibration;
 namespace tf = Crane::Reconstruction::TrackFit;
@@ -259,7 +260,7 @@ auto g::SDRootReader::get_mc_tracks_edeps_trk(u64 event_id)     -> Vec<f32> {
 
 //========================================================================
 
-g::SDRootWriter::SDRootWriter(std::string fname, std::string geo_file,  std::string file_mode) {
+g::SDRootWriter::SDRootWriter(std::string fname, std::string geo_file,  std::string file_mode, bool write_sim ) {
   // databases
   pmap     = g::get_tofpaddles();
   std::cout << "-> Loaded " << pmap.size() << " TofPaddles!" << std::endl;
@@ -295,6 +296,13 @@ g::SDRootWriter::SDRootWriter(std::string fname, std::string geo_file,  std::str
     par_tree          = new TTree("SimulationParameterTree", "SimulationParameterTree");
     par               = new GSimulationParameter();
     par_tree->Branch("SimulationParameter", &par);
+  }
+  if (write_sim) {
+    mc_event = new CEventMc();
+    // ROOT Tree, not a real mctree, to avoid 
+    // further confusion, let's call it sim_tree 
+    sim_tree  = new TTree("TreeMc", "TreeMc");
+    sim_tree->Branch("Mc", &mc_event);
   }
 }
 
@@ -334,7 +342,7 @@ auto gondola::SDRootWriter::write_sdpar(u32 run_id, std::string hostname, std::s
 }
 
 
-auto gondola::SDRootWriter::add_event(TelemetryEvent* ev, TelemetryEvent* ev_for_raw, u8 packet_type, f64 gcutime, bool use_corrected_edep) -> void {
+auto gondola::SDRootWriter::add_event(TelemetryEvent* ev, TelemetryEvent* ev_for_raw, u8 packet_type, f64 gcutime, bool use_corrected_edep, f32 tracker_cut) -> void {
    if (ev == nullptr) {
      std::cout << "Received nullptr for TelemetryEvent!" << std::endl;
      return;
@@ -355,13 +363,69 @@ auto gondola::SDRootWriter::add_event(TelemetryEvent* ev, TelemetryEvent* ev_for
      rawtrk->fill_from_telemetry(ev);
    }
    rawtof->fill_from_telemetry(ev);
-   event ->fill_from_telemetry(ev, packet_type, gcutime, pmap, smap, lgmap, rawtrk, rawtof, true, 0.4, use_corrected_edep);
+   event ->fill_from_telemetry(ev, packet_type, gcutime, pmap,
+                               smap, lgmap, rawtrk, rawtof, true,
+                               tracker_cut, use_corrected_edep);
    //std::cout << rawtrk->pretty_print() << std::endl;
    reco_tree->Fill();  
    raw_tree->Fill();
    //reco_tree->Write();
    //raw_tree->Write();
    //std::cout << event->pretty_print() << std::endl;
+}
+
+//------------------------------------------------------------------------
+
+auto gondola::SDRootWriter::add_mc_event(const McEvent& ev) -> void { 
+  // clear the event 
+  mc_event->tracks_.clear(); 
+  // primary proeprties 
+  mc_event->eventNumber_ = ev.event_id;
+  mc_event->primaryPdg_  = ev.primary.pdg; 
+  // FIXME - seed and run id missing
+  //mc_event->primaryKineticEnergy_ 
+  mc_event->primaryBetaGenerated_ = ev.primary.beta;
+  auto prim_pos          = TVector3(ev.primary.get_vertex()->x,
+                                    ev.primary.get_vertex()->y,
+                                    ev.primary.get_vertex()->z);
+  mc_event->primaryPosition_ = prim_pos;
+  // first we sort the hits by track id 
+  HashMap<u32,Vec<const McHit*>> track_hits = {};
+  for (auto const &h : ev.hits) {
+    if (track_hits.contains(h.track_id)) {
+      track_hits[h.track_id].push_back(&h);
+    } else {
+      track_hits.insert({h.track_id, {&h}});
+    }
+  }
+  // now as they are sorted, add them to the tracks in the 
+  // CEventMc 
+  for (auto &[track_id, thits] : track_hits) {
+    auto sd_track   = new CTrackMc();
+    for (auto const &h : thits) {
+      sd_track->TrackId            = track_id; 
+      sd_track->ParentId           = h->parent_id;
+      sd_track->Pdg                = h->pdg; 
+      sd_track->EnergyDeposition     .push_back(h->step_edep); 
+      sd_track->StepLength           .push_back(h->step_len); 
+      sd_track->PreKineticEnergy     .push_back(h->pre_kin_E);
+      sd_track->KineticEnergy        .push_back(h->kin_E); 
+      sd_track->GlobalTime           .push_back(h->glob_time); 
+      sd_track->VolumeId             .push_back( h->volume_id); 
+      sd_track->PreStepStatus        .push_back( h->pre_step_status);
+      sd_track->PostStepStatus       .push_back( h->post_step_status);
+      sd_track->Position             .push_back( TVector3(h->pos_x, h->pos_y, h->pos_z));
+      sd_track->PositionResidual     .push_back( TVector3(0,0,0));
+      sd_track->MomentumDirection    .push_back( TVector3(h->mom_x, h->mom_y, h->mom_z));
+      sd_track->PreMomentumDirection .push_back( TVector3(h->pre_mom_x, h->pre_mom_y, h->pre_mom_z));
+      sd_track->ColumnDensityUntilStep.push_back(std::numeric_limits<f64>::quiet_NaN()); 
+      sd_track->VertexPosition      = TVector3(h->vertex_pos_x, h->vertex_pos_y, h->vertex_pos_z); 
+      sd_track->VertexKineticEnergy = h->vertex_kin_E;
+      sd_track->VertexVolumeId      = h->vertex_vol_id;
+      sd_track->ProcessType         = static_cast<CGeant4ProcessType>(h->process_type); 
+    } 
+    mc_event->tracks_.push_back(sd_track);
+  } 
 }
 
 //------------------------------------------------------------------------
@@ -820,20 +884,6 @@ auto CEventRec::fill_from_telemetry(g::TelemetryEvent* event,
   Vec<g::TofHit> hits_for_recevent = {};
   usize hit_index = 0;
   for (auto const &hit : event->tof_event.hits) { // 
-  //  rawtof.hits.phase      .push_back(hit.phase);
-  //  rawtof.hits.base_a     .push_back(hit.baseline_a ); 
-  //  rawtof.hits.base_b     .push_back(hit.baseline_b ); 
-  //  rawtof.hits.base_a_rms .push_back(hit.baseline_a_rms ); 
-  //  rawtof.hits.base_b_rms .push_back(hit.baseline_b_rms ); 
-  //  rawtof.hits.time_a     .push_back(hit.get_time_a() ); 
-  //  rawtof.hits.time_b     .push_back(hit.get_time_b() ); 
-  //  rawtof.hits.peak_a     .push_back(hit.get_peak_a() ); 
-  //  rawtof.hits.peak_b     .push_back(hit.get_peak_b() ); 
-  //  rawtof.hits.charge_a   .push_back(hit.get_charge_a() ); 
-  //  rawtof.hits.charge_b   .push_back(hit.get_charge_b()); 
-  //  rawtof.hits.paddle_id  .push_back(hit.paddle_id);
-  //  rawtof.hits.t_0        .push_back(hit.event_t0);
-  //  rawtof.hits.x_0        .push_back(hit.get_x_pos());
     hit_index += 1;
     if (apply_elena_cut && !elena_cut(hit)) {
       continue;
