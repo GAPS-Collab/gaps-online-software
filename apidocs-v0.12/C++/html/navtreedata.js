@@ -72,9 +72,9 @@ var NAVTREEINDEX =
 "structSimPrimary.html#a50606a53db24c6e71551fb73793bdea8",
 "structgondola_1_1RBCalibration.html#a6a1ecc8b17d1c8bb310b581649648851",
 "structgondola_1_1TelemetryPacketReader.html#a6008e84c1ee2b9ab5b92ec4a4b564fb6",
-"structgondola_1_1TofMetaData.html#a61b01092073c39993a882f68581dd409",
-"structgondola_1_1TrackerStripMask.html#a2bbec3dee8ff0ae70b2761b8e61b1dab",
-"telemetry__packet_8hpp.html#a598dae982e3c16cd23a9e57c72d39ceda863e05d77b13fe3c0a7190499d80dbcc"
+"structgondola_1_1TofHit.html#afefa94af6c0355692c83208196c864b1",
+"structgondola_1_1TrackerStripGain.html#aee8e73a84d04185256ef71dd5cd48c27",
+"telemetry__packet_8hpp.html#a598dae982e3c16cd23a9e57c72d39ceda6f44f3023587714a8b55153eab21c599"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

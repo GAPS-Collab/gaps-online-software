@@ -1,6 +1,7 @@
 var structgondola_1_1TofEvent =
 [
     [ "TofEvent", "structgondola_1_1TofEvent.html#a472db40fd776f3517c095b83ed69b96d", null ],
+    [ "get_event_status", "structgondola_1_1TofEvent.html#a0ec349e01388f43290cbfa2dad20bd5b", null ],
     [ "get_hits", "structgondola_1_1TofEvent.html#aa33d8845699a6059b887d2b1171ffeb7", null ],
     [ "get_rb_link_ids", "structgondola_1_1TofEvent.html#a6c451847988c3cb35fc9a446b1c135e7", null ],
     [ "get_rbevent", "structgondola_1_1TofEvent.html#a4f848f5c10684809a660f5c6802e9625", null ],
@@ -9,6 +10,8 @@ var structgondola_1_1TofEvent =
     [ "get_trigger_hits", "structgondola_1_1TofEvent.html#a62848f7f2cee60cfba9909c6875fa977", null ],
     [ "get_trigger_sources", "structgondola_1_1TofEvent.html#a0d2750b1e4a05c404d26e4525500d4af", null ],
     [ "has_any_mangling", "structgondola_1_1TofEvent.html#a31d265dd1dec28908afbc2597edacb60", null ],
+    [ "set_event_status", "structgondola_1_1TofEvent.html#a1d968c1f570b69ef69fc5ad78ff37fc1", null ],
+    [ "set_timestamp48", "structgondola_1_1TofEvent.html#aa0c8068633b1a992007500929178d834", null ],
     [ "to_bytestream", "structgondola_1_1TofEvent.html#a435f3c3c822509324107cc533b9438aa", null ],
     [ "to_string", "structgondola_1_1TofEvent.html#a7346ea2a4a33ffe5a2c2e6100a625b3f", null ],
     [ "channel_mask", "structgondola_1_1TofEvent.html#ae3ebafe20044ee6ccced77eaf60c2242", null ],
