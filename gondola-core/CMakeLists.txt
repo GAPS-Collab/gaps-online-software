@@ -16,6 +16,7 @@ if(BUILD_CXX_WITH_ROOT AND BUILD_CXX_BINDINGS)
                       ${CMAKE_CURRENT_SOURCE_DIR}/C++/include/ 
                       ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/result
                       ${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/sqlite_orm/include/sqlite_orm
+                      $<$<BOOL:${BUILD_SIM}>:${Geant4_INCLUDE_DIRS}>
   )
   
 
@@ -42,25 +43,6 @@ if (BUILD_CXX_BINDINGS)
   set(GONDOLA_LIBRARY_SHARED GondolaCore CACHE INTERNAL "gondola-core C++ shared library" FORCE)
   add_library(${GONDOLA_LIBRARY_SHARED} SHARED
               ${GONDOLA_CXX_FILES}
-              #C++/src/tof_packet.cxx
-              #C++/src/calibration.cxx
-              #C++/src/serialization.cxx
-              #C++/src/parsers.cxx
-              #C++/src/rb_event.cxx
-              #C++/src/rb_event_header.cxx
-              #C++/src/events.cxx
-              #C++/src/io.cxx
-              #C++/src/telemetry_reader.cxx
-              #C++/src/monitoring.cxx
-              #C++/src/legacy.cxx
-              #C++/src/version.cxx
-              #C++/src/telemetry_dataclasses.cxx
-              #C++/src/tracker_hit.cxx
-              #C++/src/caraspace.cxx
-              #C++/src/tracklet.cxx
-              #C++/src/cooling.cxx
-              #C++/src/telemetry_packet.cxx
-              #C++/src/tracker_packet.cxx
               $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:C++/src/sd_legacy.cxx>
               $<$<BOOL:${BUILD_CXX_DB}>:C++/src/database.cxx>
               $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${GONDOLA_DICTIONARY}.cxx>
@@ -75,6 +57,7 @@ if (BUILD_CXX_BINDINGS)
                                SYSTEM PUBLIC
                                  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include>
                                  $<$<BOOL:${BUILD_CXX_DB}>:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/sqlite_orm/include/sqlite_orm>
+  
   )
   target_include_directories(${GONDOLA_LIBRARY_SHARED}
                                PUBLIC
@@ -82,6 +65,7 @@ if (BUILD_CXX_BINDINGS)
                                  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/result>
                                  $<INSTALL_INTERFACE:include> 
                                  $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${ROOT_INCLUDE_DIRS}>
+                                 $<$<BOOL:${BUILD_SIM}>:${Geant4_INCLUDE_DIRS}>
   )
   target_link_libraries(${GONDOLA_LIBRARY_SHARED}
                           PUBLIC
@@ -142,23 +126,6 @@ if (BUILD_CXX_STATIC_LIB)
   set(GONDOLA_LIBRARY_STATIC GondolaCoreStatic CACHE INTERNAL "gondola-core C++ static library" FORCE)
   add_library(${GONDOLA_LIBRARY_STATIC} STATIC 
               ${GONDOLA_CXX_FILES}
-              #C++/src/tof_packet.cxx
-              #C++/src/calibration.cxx
-              #C++/src/serialization.cxx
-              #C++/src/parsers.cxx
-              #C++/src/events.cxx
-              #C++/src/io.cxx
-              #C++/src/telemetry_reader.cxx
-              #C++/src/monitoring.cxx
-              #C++/src/legacy.cxx
-              #C++/src/version.cxx
-              #C++/src/telemetry_dataclasses.cxx
-              #C++/src/tracker_hit.cxx
-              #C++/src/caraspace.cxx
-              #C++/src/tracklet.cxx
-              #C++/src/cooling.cxx
-              #C++/src/telemetry_packet.cxx
-
               $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:C++/src/sd_legacy.cxx>
               $<$<BOOL:${BUILD_CXX_DB}>:C++/src/database.cxx>
               $<$<BOOL:${BUILD_CXX_WITH_ROOT}>:${GONDOLA_DICTIONARY}.cxx>
@@ -180,6 +147,7 @@ if (BUILD_CXX_STATIC_LIB)
                                SYSTEM PUBLIC
                                  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/spdlog/include>
                                  $<$<BOOL:${BUILD_CXX_DB}>:${CMAKE_CURRENT_SOURCE_DIR}/../resources/extern/sqlite_orm/include/sqlite_orm>
+                                 $<$<BOOL:${BUILD_SIM}>:${Geant4_INCLUDE_DIRS}>
   )
   target_include_directories(${GONDOLA_LIBRARY_STATIC}
                                PUBLIC
