@@ -84,9 +84,13 @@ int main(int argc, char *argv[]){
   G4RunManager* run_manager          = new G4RunManager();
   run_manager->SetUserInitialization(detector);
   run_manager->SetUserInitialization(physics);
-  G4UserEventAction * event_action   = new go::EventAction(output);
+  G4UserEventAction * event_action   = new go::EventAction(output, sim_config);
   run_manager->SetUserAction(event_action);
   PrimaryGeneratorAction* gun        = new PrimaryGeneratorAction(sim_config);
+  // this is a bit whacky. We should remove it once we are done 
+  // debugging. The only reason event action needs to store a ptr 
+  // to the gun is that we can access sampled primary properties
+  dynamic_cast<go::EventAction*>(event_action)->gun = gun;
   run_manager->SetUserAction(gun);
   run_manager->Initialize();
   if (check_overlap) {

@@ -6,7 +6,7 @@
 #include "G4VProcess.hh"
 #include "G4HCofThisEvent.hh"
 
-#include "mc_hit.hpp"
+#include "events/mc_hit.hpp"
 
 
 namespace gondola {

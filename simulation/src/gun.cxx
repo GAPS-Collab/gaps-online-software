@@ -7,6 +7,8 @@
 
 #include "database.h" 
 
+//---------------------------------------------------------------
+
 PrimaryGeneratorAction::PrimaryGeneratorAction(const SimConfig& cfg) {
   fParticleGun = new G4ParticleGun(1); // shoot 1 particle per event
 
@@ -30,6 +32,10 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(const SimConfig& cfg) {
                                                     cfg.gun_fixed_pos_y,
                                                     cfg.gun_fixed_pos_z));
   }
+  if (cfg.gun_uniform_beta) {
+    primary_beta = std::uniform_real_distribution<f64>(cfg.gun_beta_lim_low,
+                                                       cfg.gun_beta_lim_up); 
+  }
   if (cfg.gun_center_around_pid != 0) {
     u8 pid = cfg.gun_center_around_pid;
     auto paddle = gondola::get_tofpaddles()[pid];
@@ -50,13 +56,19 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(const SimConfig& cfg) {
   random_gen = std::mt19937(rd());  
 }
 
+//---------------------------------------------------------------
+
 PrimaryGeneratorAction::~PrimaryGeneratorAction() {
   delete fParticleGun;
 }
 
+//---------------------------------------------------------------
+
 auto PrimaryGeneratorAction::set_gun_position(f32 x, f32 y, f32 z) -> void {
     fParticleGun->SetParticlePosition(G4ThreeVector(x, y, z));
 }
+
+//---------------------------------------------------------------
 
 auto PrimaryGeneratorAction::random_sample_isotropic() -> void {
   // setting up random number generation 
@@ -140,6 +152,8 @@ auto PrimaryGeneratorAction::random_sample_isotropic() -> void {
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(n1, n2, n3));
 }
 
+//---------------------------------------------------------------
+
 auto PrimaryGeneratorAction::GeneratePrimaries(G4Event* event) -> void{
   if (sim_config.gun_sample_isotropic_box) {
     random_sample_isotropic();
@@ -148,8 +162,24 @@ auto PrimaryGeneratorAction::GeneratePrimaries(G4Event* event) -> void{
     auto p_en = primary_energy(random_gen);
     //std::cout << "-> Primary with energy " << p_en << std::endl;
     fParticleGun->SetParticleEnergy(p_en);
+  } else if (sim_config.gun_uniform_beta) {
+    sample_beta_box(); 
   }
   fParticleGun->GeneratePrimaryVertex(event);
   //event->GetPrimaryVertex()->Print();
+}
+
+//---------------------------------------------------------------
+
+auto PrimaryGeneratorAction::sample_beta_box() -> void {
+  f64 beta = primary_beta(random_gen);
+  f64 mass = G4ParticleTable::GetParticleTable()->FindParticle("proton")->GetPDGMass();
+  if(fParticleGun->GetParticleDefinition()->GetPDGMass() > 0) {
+    mass = fParticleGun->GetParticleDefinition()->GetPDGMass();
+  }
+  f64 ekin = mass*(std::sqrt(1/(1-beta*beta))-1);
+  event_beta = beta; // debug
+  //std::cout << "GET BETA " << beta << " FOR ENERGY " << ekin << std::endl;
+  fParticleGun->SetParticleEnergy(ekin);
 }
 

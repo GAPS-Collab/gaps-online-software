@@ -3,27 +3,33 @@ parts_root_dir = "/srv/gaps/gaps-detector-parts"
 
 [gun] 
 # the source can be set to a fixed position
-fixed_pos     = true 
+fixed_pos     = false 
 fixed_pos_x   = 0.0
 fixed_pos_y   = 0.0 
 fixed_pos_z   = 2100.0
+
 # if used with the isotropic setting, the 
 # source can be also set on a surface which 
 # has a certain Tof paddle in the center
 center_around_pid  = 0
-sample_isotropic_1 = false
-
+sample_isotropic_box = true 
+sample_isotropic_box_len = 2500 
 
 # incjected particle 
-particle_type = "anti_deuteron"
+particle_type = "anti_proton"
 #particle_type = "mu-"
 # energy of the primary
-fixed_energy  = true
+fixed_energy  = false
 energy        = 350
 # can be drawn from a distribution
+
 uniform_energy = false 
 min_e_per_n    = 0.0 
 max_e_per_n    = 0.0
+
+uniform_beta   = true 
+beta_lim_low   = 0.1 
+beta_lim_up    = 0.6
 
 [active_detectors]
 tof_active_from_db = false
@@ -66,3 +72,39 @@ trk_mod_psv    = true
 # sadly, especially the bottom foam makes it really slow 
 trk_foam_bot   = false 
 trk_foam_layer = true 
+
+[digitization] 
+# these paddles will participate in the 
+# trigger, but we won't read out hits 
+# from them
+# list from Kaliroe
+digi_tof_paddles_exclude_from_readout = [100100000,100100200,100100400,100300100,100300300, 100300400,100400200,100400400,100500100,100500300,100500500,100600100, 100600300,110000700,110000900, 110001100,111000600,111001100,113000000,113000400,113000600,115000000,115000200,115000400,115000600]
+use_digitization             = true
+use_advanced_features        = false
+digi_use_tof_legacy_fallback = true
+# variables for fallback 
+# the voltage width is the same as in SimpleDet for the default case 
+digi_tof_voltage_width       = 4.6 
+digi_tof_voltage_offset      = 0
+digi_tof_timing_offset       = 0
+digi_tof_timing_width        = 0.24
+digi_tof_pos_offset          = 0
+digi_tof_pos_width           = 38
+#digi_tof_pulse_template_file = "/srv/gaps/gaps-online-software/build-aulepe-root640/tofpulse_templates_new500k.tof.gaps" 
+digi_tof_pulse_template_file = "/srv/gaps/gaps-online-software/simulation/resources/tof-pulse-templates45M.tof"
+digi_tof_add_gauss_jitter    = true
+digi_tof_hit_threshold_mv    = 10 
+digi_tof_beta_threshold_mv   = 118.75 
+digi_tof_veto_threshold_mv   = 1425
+#------------------------------------
+# digi variables for the tracker 
+digi_trk_energy_offset       = 0
+digi_trk_energy_width        = 1.6985138004246285
+digi_trk_add_cmn_noise       = false 
+digi_trk_tf_name_in_db       = "TF_Fit_Coefficients_Calibration_1217_fit.txt" 
+digi_trk_ped_name_in_db     = "ped_1217.txt" 
+# the mask is a trick we are using - disable every strip that is in the mask, 
+# but also disable every strip we don't have a value in the mask for, thus 
+# identifying dummy layers and broken strips 
+digi_trk_mask_name_in_db      = "tracker_channel_enables_100.txt"
+

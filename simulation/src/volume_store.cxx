@@ -35,6 +35,7 @@ auto go::GetLogicalVolumeByName(const G4String& name) -> go::G4LogicalVolumePtr 
 auto go::GetAssemblyFromGdml(const G4String& f_name, bool validate) -> Vec<go::G4VPhysicalVolumePtr> {
   auto placements = Vec<G4VPhysicalVolumePtr>();
   G4GDMLParser parser = G4GDMLParser();
+  //parser.SetVerboseLevel(0);
   parser.Clear();
   parser.Read(f_name, validate);
   G4VPhysicalVolumePtr p_world = parser.GetWorldVolume();
@@ -97,6 +98,7 @@ auto go::GetTessSolidFromGdml(const G4String& f_name, bool validate) -> go::G4Te
    //         so they pass the validation step.
 
    G4GDMLParser parser = G4GDMLParser();
+   //parser.SetVerboseLevel(0);
    parser.Clear();
    parser.Read(f_name, validate);
    G4VPhysicalVolumePtr p_world = parser.GetWorldVolume();

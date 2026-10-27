@@ -3,6 +3,9 @@
 #include <toml++/toml.hpp>
 #include <iostream>
 
+#include "spdlog/spdlog.h"
+#include "spdlog/cfg/env.h"
+
 using namespace std::literals;
 
 auto SimConfig::from_file(std::string fname) -> SimConfig {
@@ -34,7 +37,17 @@ auto SimConfig::from_file(std::string fname) -> SimConfig {
       std::cout << "Upper energy bound as set in the config file is zero! However, a uniform energy between min/max was requested. Unable to comply!" << std::endl;
       exit(1);
     }
-  } 
+  }
+  sim.gun_uniform_beta  = config["gun"]["uniform_beta"].value_or(false); 
+  sim.gun_beta_lim_low  = (f64)config["gun"]["beta_lim_low"].value_or(0.0);
+  sim.gun_beta_lim_up   = (f64)config["gun"]["beta_lim_up"].value_or(0.0); 
+  // perform checks if the user's input for the gun are sane 
+  if (((u8)sim.gun_uniform_beta + (u8)sim.gun_uniform_energy + (u8)sim.gun_fixed_energy) > 1) { 
+    std::string message("Input can only be uniform beta, uniform energy or fixed energy, but not a combination of these!");
+    spdlog::error(message);
+    throw message;
+  }
+  
   //std::cout << sim.gun_min_e_per_n << std::endl;
   //std::cout << sim.gun_max_e_per_n << std::endl;
   //exit(1);
@@ -47,6 +60,7 @@ auto SimConfig::from_file(std::string fname) -> SimConfig {
   
   sim.ad_only_place_pid  = config["active_detectors"]["only_place_pid"].value_or(0);  
   sim.ad_all_sili        = config["active_detectors"]["all_sili"].value_or(true);  
+
   if (sim.ad_only_place_pid > 0) {
     sim.active_paddles = {sim.ad_only_place_pid};
   } else {
@@ -119,6 +133,32 @@ auto SimConfig::from_file(std::string fname) -> SimConfig {
     } 
     sim.active_paddles = active_pids;
   } 
+
+  sim.digitization               = config["digitization"]["use_digitization"].value_or(false); 
+  sim.use_advanced_digitization  = config["digitization"]["use_advanced_features"].value_or(false);
+  sim.digi_use_tof_legacy_fb     = config["digitization"]["digi_use_tof_legacy_fallback"].value_or(false);
+  for (auto&& el : *config["digitization"]["digi_tof_paddles_exclude_from_readout"].as_array()) {
+    sim.digi_tof_excluded_readout.push_back((u32)el.value_or(0)); 
+  } 
+  sim.digi_tof_voltage_width     = (f32)config["digitization"]["digi_tof_voltage_width"].value_or(0.0);
+  sim.digi_tof_voltage_offset    = (f32)config["digitization"]["digi_tof_voltage_offset"].value_or(0);
+  sim.digi_tof_timing_offset     = (f32)config["digitization"]["digi_tof_timing_offset"].value_or(0);
+  sim.digi_tof_timing_width      = (f32)config["digitization"]["digi_tof_timing_width"].value_or(0);
+  sim.digi_tof_pos_offset        = (f32)config["digitization"]["digi_tof_pos_offset"].value_or(0);
+  sim.digi_tof_pos_width         = (f32)config["digitization"]["digi_tof_pos_width"].value_or(0);
+  sim.digi_tof_pulse_templates   = config["digitization"]["digi_tof_pulse_template_file"].value_or("");
+  sim.digi_tof_add_gauss_jitter  = config["digitization"]["digi_tof_add_gauss_jitter"].value_or(false);
+  sim.digi_tof_hit_threshold_mv  = (f32)config["digitization"]["digi_tof_hit_threshold_mv"].value_or(0.0);
+  sim.digi_tof_beta_threshold_mv = (f32)config["digitization"]["digi_tof_beta_threshold_mv"].value_or(0.0);
+  sim.digi_tof_veto_threshold_mv = (f32)config["digitization"]["digi_tof_veta_threshold_mv"].value_or(0.0);
+  // tracker digitization part 
+  sim.digi_trk_tf_name           = config["digitization"]["digi_trk_tf_name_in_db"].value_or("");
+  sim.digi_trk_mask_name         = config["digitization"]["digi_trk_mask_name_in_db"].value_or(""); 
+  sim.digi_trk_ped_name          = config["digitization"]["digi_trk_ped_name_in_db"].value_or(""); 
+  
+  sim.digi_trk_energy_offset     = (f32)config["digitization"]["digi_trk_energy_offset"].value_or(0);
+  sim.digi_trk_energy_width      = (f32)config["digitization"]["digi_trk_energy_width"].value_or(04/2.355); // from SimpleDet 
+  sim.digi_trk_add_cmn_noise     = config["digitization"]["digi_trk_add_cmn_noise"].value_or(false); // from SimpleDet 
   //std::cout << "LOWER ENERGY BOUND " << sim.gun_min_e_per_n << std::endl;
   //std::cout << "UPPER ENERGY BOUND " << sim.gun_max_e_per_n << std::endl;
   //exit(1);

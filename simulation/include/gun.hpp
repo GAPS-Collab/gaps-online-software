@@ -21,17 +21,30 @@ class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
     auto GeneratePrimaries(G4Event* event) -> void override;
 
     auto set_gun_position(f32 x, f32 y, f32 z) -> void; 
-    /// The original SimpleDet Cube solver
+    /// Sample the primary direction from the surface 
+    /// of a cube, SimpleDet style
     auto random_sample_isotropic() -> void;
+    
+    /// Sample a random beta value from a box
+    /// distribution
+    auto sample_beta_box() -> void;
+
     f32 pos_offset_x = 0.0;
     f32 pos_offset_y = 0.0;
     f32 pos_offset_z = 0.0;
 
+    f64 beta_lim_low = 0.0;
+    f64 beta_lim_up  = 1.0;
+
+    // debugging 
+    f32 event_beta   = 0.0;
+
   private:
     G4ParticleGun* fParticleGun; // Or use G4GeneralParticleSource if preferred
-    SimConfig sim_config;
-    std::mt19937 random_gen;  
-    std::uniform_real_distribution<double> primary_energy; 
+    SimConfig      sim_config;
+    std::mt19937   random_gen;  
+    std::uniform_real_distribution<f64> primary_energy; 
+    std::uniform_real_distribution<f64> primary_beta;
 };
 
 #endif
