@@ -5,8 +5,8 @@ var NAVTREEINDEX1 =
 "functions_t.html":[4,3,0,19],
 "functions_u.html":[4,3,0,20],
 "functions_v.html":[4,3,0,21],
-"functions_vars.html":[4,3,2,0],
 "functions_vars.html":[4,3,2],
+"functions_vars.html":[4,3,2,0],
 "functions_vars_b.html":[4,3,2,1],
 "functions_vars_c.html":[4,3,2,2],
 "functions_vars_d.html":[4,3,2,3],
@@ -105,8 +105,6 @@ var NAVTREEINDEX1 =
 "mc__event_8hpp_source.html":[5,0,1,0,1,1,3],
 "mc__hit_8cxx.html":[5,0,1,0,3,8],
 "mc__hit_8hpp.html":[5,0,1,0,1,1,4],
-"mc__hit_8hpp.html#a01041e3d73c7323d52836585061a60a4":[5,0,1,0,1,1,4,1],
-"mc__hit_8hpp.html#a52b50bb38c2199d40d34cd708c26cbe0":[5,0,1,0,1,1,4,2],
 "mc__hit_8hpp_source.html":[5,0,1,0,1,1,4],
 "md__2home_2runner_2work_2gaps-online-software_2gaps-online-software_2gondola-core_2C_09_09_2README.html":[1],
 "monitoring_8cxx.html":[5,0,1,0,3,9],
@@ -249,5 +247,7 @@ var NAVTREEINDEX1 =
 "namespacegondola.html#a780cd89aae40feb241224637c97225f8":[2,0,0,139],
 "namespacegondola.html#a7b45ff07f8a68edbdf3c9046172e538d":[2,0,0,125],
 "namespacegondola.html#a7fa291d67fda76dfec7369aeee7369cd":[2,0,0,67],
-"namespacegondola.html#a801130bb64dc4827fdc3f24f8c8894eb":[2,0,0,104]
+"namespacegondola.html#a801130bb64dc4827fdc3f24f8c8894eb":[2,0,0,104],
+"namespacegondola.html#a81584f7b6b4909a158d6285da1fa855b":[2,0,0,85],
+"namespacegondola.html#a8b1462d66effc709585dbe29237850c9":[2,0,0,118]
 };

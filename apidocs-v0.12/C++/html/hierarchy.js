@@ -15,12 +15,10 @@ var hierarchy =
     [ "FromTofPacket< MtbMoniData >", "structFromTofPacket.html", [
       [ "MtbMoniData", "structMtbMoniData.html", null ]
     ] ],
-    [ "G4VHit", null, [
-      [ "gondola::McHit", "structgondola_1_1McHit.html", null ]
-    ] ],
     [ "gondola::IOError", "classgondola_1_1IOError.html", null ],
     [ "LTBMoniData", "structLTBMoniData.html", null ],
     [ "gondola::McEvent", "structgondola_1_1McEvent.html", null ],
+    [ "gondola::McHit", "structgondola_1_1McHit.html", null ],
     [ "std::optional", null, [
       [ "Option< String >", "structOption.html", null ],
       [ "Option< f32 >", "structOption.html", null ],

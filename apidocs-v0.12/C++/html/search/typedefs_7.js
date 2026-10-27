@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['mchitcollection_0',['McHitCollection',['../mc__hit_8hpp.html#a01041e3d73c7323d52836585061a60a4',1,'mc_hit.hpp']]]
+  ['pulsetemplatesbyside_0',['PulseTemplatesBySide',['../namespacegondola.html#ad34d94f5d333b937576ea6e3234e0515',1,'gondola']]]
 ];
