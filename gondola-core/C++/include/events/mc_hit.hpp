@@ -1,15 +1,20 @@
 #pragma once
-
+#ifdef BUILD_SIM 
 #include "G4VHit.hh" 
 #include "G4THitsCollection.hh"
 #include "G4Allocator.hh"
+#endif 
 #include "gondola.hpp"
 
 namespace gondola {
   /// McHit is inspired by SimplDet's CHit and combines
   /// information from G4Track and G4Step for further 
   /// processing
+  #ifdef BUILD_SIM
   struct McHit : public G4VHit {
+  #else 
+  struct McHit {
+  #endif
     u32 volume_id    = 0;
     u32 hw_id        = 0;
     u32 parent_id    = 0;
@@ -55,6 +60,7 @@ namespace gondola {
   };
 }
 
+#ifdef BUILD_SIM
 typedef G4THitsCollection<gondola::McHit> McHitCollection;
 extern G4Allocator<gondola::McHit> McHitAllocator;
-
+#endif 
