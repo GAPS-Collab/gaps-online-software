@@ -200,38 +200,38 @@ nb::enum_<g::ProtocolVersion>(m, "ProtocolVersion")
       return "<NBWrapper" + h.to_string() + ">";
     }); 
   
+  //nb::class_<g::TofEvent>(m, "TofEvent")
+  //  .def(nb::init<>())
+  //  .def_static("from_tofpacket", &g::TofEvent::from_tofpacket) 
+  //  .def_ro("dsi_j_mask"        , &g::TofEvent::dsi_j_mask)
+  //  .def("normalize_hit_times"  , &g::TofEvent::normalize_hit_times)
+  //  .def_prop_ro("hits"         , &g::TofEvent::get_hits)
+  //  .def_prop_ro("rb_ids"       , &g::TofEvent::get_rbids)
+  //  .def_prop_ro("timestamp48"  , &g::TofEvent::get_timestamp48)
+  //  .def_prop_ro("rb_link_ids"  , &g::TofEvent::get_rb_link_ids) 
+  //  .def_prop_ro("trigger_hits" , &g::TofEvent::get_trigger_hits) 
+  //  .def_prop_ro("trigger_sources", &g::TofEvent::get_trigger_sources)
+  //  .def("to_string"            , &g::TofEvent::to_string);
+  
   nb::class_<g::TofEvent>(m, "TofEvent")
     .def(nb::init<>())
-    .def_static("from_tofpacket", &g::TofEvent::from_tofpacket) 
-    .def_ro("dsi_j_mask"        , &g::TofEvent::dsi_j_mask)
-    .def("normalize_hit_times"  , &g::TofEvent::normalize_hit_times)
-    .def_prop_ro("hits"         , &g::TofEvent::get_hits)
-    .def_prop_ro("rb_ids"       , &g::TofEvent::get_rbids)
-    .def_prop_ro("timestamp48"  , &g::TofEvent::get_timestamp48)
-    .def_prop_ro("rb_link_ids"  , &g::TofEvent::get_rb_link_ids) 
-    .def_prop_ro("trigger_hits" , &g::TofEvent::get_trigger_hits) 
-    .def_prop_ro("trigger_sources", &g::TofEvent::get_trigger_sources)
-    .def("to_string"            , &g::TofEvent::to_string);
-  
-  nb::class_<g::TofEventSummary>(m, "TofEventSummary")
-    .def(nb::init<>())
-    .def_static("from_tofpacket"   , &g::TofEventSummary::from_tofpacket) 
-    .def_rw("event_id"             , &g::TofEventSummary::event_id)
-    .def_rw("run_id"               , &g::TofEventSummary::run_id)
-    .def_rw("dsi_j_mask"           , &g::TofEventSummary::dsi_j_mask)
-    .def_rw("channel_masks"        , &g::TofEventSummary::channel_mask)
-    .def_rw("status"               , &g::TofEventSummary::status)
-    .def("set_event_status"        , &g::TofEventSummary::set_event_status)
-    .def("get_event_status"        , &g::TofEventSummary::get_event_status)
-    .def("set_timestamp48"         , &g::TofEventSummary::set_timestamp48)
+    .def_static("from_tofpacket"   , &g::TofEvent::from_tofpacket) 
+    .def_rw("event_id"             , &g::TofEvent::event_id)
+    .def_rw("run_id"               , &g::TofEvent::run_id)
+    .def_rw("dsi_j_mask"           , &g::TofEvent::dsi_j_mask)
+    .def_rw("channel_masks"        , &g::TofEvent::channel_mask)
+    .def_rw("status"               , &g::TofEvent::status)
+    .def("set_event_status"        , &g::TofEvent::set_event_status)
+    .def("get_event_status"        , &g::TofEvent::get_event_status)
+    .def("set_timestamp48"         , &g::TofEvent::set_timestamp48)
     //.def("normalize_hit_times"  , &g::TofEvent::normalize_hit_times)
     //.def_prop_ro("hits"         , &g::TofEvent::get_hits)
-    .def_rw("hits"                , &g::TofEventSummary::hits)
-    .def_prop_ro("timestamp48"     , &g::TofEventSummary::get_timestamp48)
-    .def_prop_ro("rb_link_ids"     , &g::TofEventSummary::get_rb_link_ids) 
+    .def_rw("hits"                 , &g::TofEvent::hits)
+    .def_prop_ro("timestamp48"     , &g::TofEvent::get_timestamp48)
+    .def_prop_ro("rb_link_ids"     , &g::TofEvent::get_rb_link_ids) 
     //.def_prop_ro("trigger_hits"   , &g::TofEventSummary::get_trigger_hits) 
-    .def_prop_ro("trigger_pids"   , &g::TofEventSummary::get_trigger_pids)
-    .def_prop_ro("trigger_hits"   , [](g::TofEventSummary &self) {
+    .def_prop_ro("trigger_pids"    , &g::TofEvent::get_trigger_pids)
+    .def_prop_ro("trigger_hits"    , [](g::TofEvent &self) {
       auto thits        = self.get_trigger_hits();
       Vec<Vec<int>> thits_py = {};
       for (auto const &h : thits) {
@@ -244,9 +244,9 @@ nb::enum_<g::ProtocolVersion>(m, "ProtocolVersion")
       } 
       return thits_py;
     })
-    .def_prop_ro("trigger_sources", &g::TofEventSummary::get_trigger_sources)
-    .def_rw("trigger_sources_bytes", &g::TofEventSummary::trigger_sources)
-    .def("to_string"              , &g::TofEventSummary::to_string);
+    .def_prop_ro("trigger_sources" , &g::TofEvent::get_trigger_sources)
+    .def_rw("trigger_sources_bytes", &g::TofEvent::trigger_sources)
+    .def("to_string"               , &g::TofEvent::to_string);
 
   //---------------------------------------------------------
   // Telemetry packets & reader

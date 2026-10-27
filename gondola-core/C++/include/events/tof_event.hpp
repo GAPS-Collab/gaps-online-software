@@ -141,6 +141,8 @@ namespace gondola {
     
     // combined timestamp
     auto get_timestamp48() const -> u64;
+    // settter needed for pybindings
+    auto set_timestamp48(u64 timestamp48) -> void; 
    
     auto get_rb_link_ids() const -> Vec<u8>;
     
@@ -159,6 +161,9 @@ namespace gondola {
     auto get_trigger_hits() const -> Vec<std::tuple<u8, u8, u8, LTBThreshold>>;
     /// Get the trigger sources from trigger source byte
     auto get_trigger_sources() const -> Vec<TriggerType>; 
+    
+    auto set_event_status(u8 int_status) -> void;
+    auto get_event_status() const -> u8;   
 
     private:
       /**

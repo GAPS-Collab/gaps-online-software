@@ -555,6 +555,25 @@ auto g::TofEvent::normalize_hit_times(const g::TofPaddleTimingConstantMap &offse
 
 //------------------------------------------------------------------------
 
+auto g::TofEvent::set_timestamp48(u64 timestamp48) -> void {
+  timestamp16 = static_cast<u16>((timestamp48 >> 32) & 0xFFFF);
+  timestamp32 = static_cast<u32>(timestamp48 & 0xFFFFFFFF);
+}
+
+//------------------------------------------------------------------------
+
+auto g::TofEvent::set_event_status(u8 int_status) -> void {
+  status = static_cast<EventStatus>(int_status);
+}
+
+//------------------------------------------------------------------------
+
+auto g::TofEvent::get_event_status() const -> u8 {
+  return static_cast<u8>(status);
+}
+
+//------------------------------------------------------------------------
+
 auto g::TofEvent::get_trigger_pids(const gondola::DsiJChnPaddleIdMap& lgmap) const -> Vec<u8> {
   auto trigger_pids = Vec<u8>();
   for (auto const &hit : get_trigger_hits()) {
