@@ -393,3 +393,49 @@ impl From<Box<dyn std::error::Error>> for MasterTriggerError {
 
 //------------------------------------------------------------------------
 
+/// Issues when reading the detector geometry 
+/// from a GDML file or from its binary cache
+#[derive(Debug, Clone)]
+pub enum GeometryError {
+  Io(String),
+  Xml(String),
+  /// Invalid or unsupported content of the GDML file, 
+  /// with the byte position in the file where it occured
+  Gdml { pos : u64, msg : String },
+  Cache(String),
+}
+
+impl fmt::Display for GeometryError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    match self {
+      Self::Io(err)          => write!(f, "<GeometryError : Io {}>", err),
+      Self::Xml(err)         => write!(f, "<GeometryError : Xml {}>", err),
+      Self::Gdml {pos, msg}  => write!(f, "<GeometryError : Gdml {} (at byte {})>", msg, pos),
+      Self::Cache(err)       => write!(f, "<GeometryError : Cache {}>", err),
+    }
+  }
+}
+
+impl Error for GeometryError {
+}
+
+impl From<std::io::Error> for GeometryError {
+  fn from(err : std::io::Error) -> Self {
+    Self::Io(err.to_string())
+  }
+}
+
+impl From<quick_xml::Error> for GeometryError {
+  fn from(err : quick_xml::Error) -> Self {
+    Self::Xml(err.to_string())
+  }
+}
+
+impl From<postcard::Error> for GeometryError {
+  fn from(err : postcard::Error) -> Self {
+    Self::Cache(err.to_string())
+  }
+}
+
+//------------------------------------------------------------------------
+
