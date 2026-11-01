@@ -94,6 +94,14 @@ auto gon::EventAction::EndOfEventAction(const G4Event* event)   -> void {
     primary_track.vertex_mom_z = p_mom_dir.getZ();
     primary_track.pdg          = p_particle->GetPDGcode(); 
     primary_track.beta         = gun->event_beta;
+    auto p_stop                = std::shared_ptr<RecoHit>(new RecoHit);
+    p_stop->x                  = stepping_action->primary_stopping_x;
+    p_stop->y                  = stepping_action->primary_stopping_y;
+    p_stop->z                  = stepping_action->primary_stopping_z;
+    p_stop->time               = stepping_action->primary_stopping_t;
+    p_stop->energy             = stepping_action->primary_stopping_kinE;
+    primary_track.set_stop(p_stop);
+    //primary_track.stop->x      = stepping_action->primary_stopping_x; 
     mc_event.primary           = std::move(primary_track);
     //auto p_mom_tot  = p_particle->GetP(); // Magnitude of momentum
     //auto  momentumVector = primaryParticle->GetMomentum(); // 3D vector (pX, pY, pZ)

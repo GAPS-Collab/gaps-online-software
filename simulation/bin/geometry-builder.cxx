@@ -18,6 +18,7 @@
 #include "gun.hpp"
 #include "event_action.hpp"
 #include "sim_config.hpp"
+#include "stepping_action.hpp"
 
 // g is taken by CLHEP
 namespace go = gondola;
@@ -85,6 +86,9 @@ int main(int argc, char *argv[]){
   run_manager->SetUserInitialization(detector);
   run_manager->SetUserInitialization(physics);
   G4UserEventAction * event_action   = new go::EventAction(output, sim_config);
+  go::SteppingAction * step_action = new go::SteppingAction();
+  dynamic_cast<go::EventAction*>(event_action)->stepping_action = step_action;
+  run_manager->SetUserAction(step_action);
   run_manager->SetUserAction(event_action);
   PrimaryGeneratorAction* gun        = new PrimaryGeneratorAction(sim_config);
   // this is a bit whacky. We should remove it once we are done 
