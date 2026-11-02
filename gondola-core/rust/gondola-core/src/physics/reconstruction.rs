@@ -18,6 +18,10 @@ use argmin::solver::neldermead::NelderMead;
 pub enum FitStatus {
   Unknown        = 0u8,
   DidNotConverge = 10u8,
+  /// LineFit::fit_cleaned: the fit of the last iteration
+  /// failed (e.g. less than 2 hits accepted), this is the
+  /// fit of the iteration before
+  FallbackPreviousIteration = 20u8,
   Success        = 42u8,
 }
 
@@ -65,12 +69,19 @@ pub enum LineFitCost {
 /// most acceptance_radius(s), with s the distance along the
 /// line beyond the inner seed hit:
 ///
-/// r(s) = cylinder_radius + max(s, 0) * tan(cone_angle)
+/// r(s) = radius + max(s, 0) * tan(cone_angle)
 ///
 /// so hits before the inner seed hit (e.g. the outer TOF)
 /// have to be within the cylinder, and beyond it (e.g. the
 /// tracker) the acceptance widens like a cone, to allow for
 /// the uncertainty of the direction of the line.
+///
+/// The radius of the cylinder starts at cylinder_radius. If
+/// final_radius is smaller, it shrinks after each fit by
+/// shrink_factor, down to final_radius, so that a wide
+/// cylinder collects the hits around a poor first line and a
+/// narrow one removes the hits which do not belong to the
+/// track once the line is better known.
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[cfg_attr(feature="pybindings", pyclass)]
 pub struct LineFitCleaning {
@@ -82,10 +93,19 @@ pub struct LineFitCleaning {
   /// is added to the cylinder. 0 means cylinder only
   pub cone_angle      : f32,
   /// Maximum number of fits. The iteration stops earlier
-  /// once the set of accepted hits does not change anymore
+  /// once the final radius is reached and the set of
+  /// accepted hits does not change anymore
   pub max_iterations  : u32,
   /// The cost function for each fit
   pub cost            : LineFitCost,
+  /// The radius (in mm) the cylinder shrinks to. If it is
+  /// not smaller than cylinder_radius, the radius stays
+  /// the same (the default)
+  pub final_radius    : f32,
+  /// After each fit, the radius is multiplied by this
+  /// factor (but not below final_radius). A factor outside
+  /// of (0, 1) goes to final_radius right away
+  pub shrink_factor   : f32,
 }
 
 impl LineFitCleaning {
@@ -95,15 +115,32 @@ impl LineFitCleaning {
       cone_angle     : 0.0,
       max_iterations : 10,
       cost           : LineFitCost::Chi2,
+      final_radius   : cylinder_radius,
+      shrink_factor  : 0.5,
     }
   }
 
   /// The radius (in mm) within which hits are accepted at a
   /// distance s (in mm) along the line beyond the inner seed
-  /// hit (negative before it)
+  /// hit (negative before it), for the first fit
   pub fn acceptance_radius(&self, s : f32) -> f32 {
-    self.cylinder_radius + s.max(0.0)*self.cone_angle.tan()
+    acceptance_radius(self.cylinder_radius, self.cone_angle, s)
   }
+
+  /// The radius of the cylinder after the next fit
+  fn next_radius(&self, radius : f32) -> f32 {
+    let target = self.final_radius.min(self.cylinder_radius);
+    if self.shrink_factor > 0.0 && self.shrink_factor < 1.0 {
+      (radius*self.shrink_factor).max(target)
+    } else {
+      target
+    }
+  }
+}
+
+/// see LineFitCleaning
+fn acceptance_radius(radius : f32, cone_angle : f32, s : f32) -> f32 {
+  radius + s.max(0.0)*cone_angle.tan()
 }
 
 /// The result of LineFit::fit_cleaned
@@ -120,9 +157,14 @@ pub struct CleanedLineFit {
   pub seed       : (usize, usize),
   /// number of fits which have been performed
   pub iterations : u32,
-  /// true if the set of accepted hits did not change in
-  /// the last iteration, false if max_iterations was reached
+  /// true if the final radius was reached and the set of
+  /// accepted hits did not change anymore, false if
+  /// max_iterations was reached or the last fit failed
+  /// (then fit.status is FallbackPreviousIteration)
   pub converged  : bool,
+  /// the radius of the cylinder (in mm) the accepted hits
+  /// have been selected with
+  pub radius     : f32,
 }
 
 /// A straight line through a pointcloud, parametrized
@@ -308,13 +350,22 @@ impl LineFit {
   ///    cone is the inner (second) seed hit, projected on the
   ///    line, and it opens away from the outer (first) one.
   /// 3) The line is fitted to the accepted hits.
-  /// 4) Steps 2) and 3) are repeated with the fitted line
-  ///    until the accepted hits do not change anymore or
+  /// 4) The radius of the cylinder shrinks, if this is
+  ///    configured (LineFitCleaning::final_radius).
+  /// 5) Steps 2) to 4) are repeated with the fitted line
+  ///    until the final radius is reached and the accepted
+  ///    hits do not change anymore, or
   ///    LineFitCleaning::max_iterations is reached.
   ///
+  /// If a fit after the first one fails (e.g. less than 2 hits
+  /// are accepted with a smaller radius), the fit of the
+  /// iteration before is returned, with its accepted hits and
+  /// the status FitStatus::FallbackPreviousIteration.
+  ///
   /// Returns None if there are less than 2 hits with a time,
-  /// the first two of them are at the same position, or less
-  /// than 2 hits are accepted (or they can not be fit).
+  /// the first two of them are at the same position, or the
+  /// first fit fails (less than 2 hits are accepted or they
+  /// can not be fit).
   ///
   /// # Arguments:
   ///   * ts             : hit times, NaN for tracker hits
@@ -432,11 +483,16 @@ impl LineFit {
       return None;
     }
     let inner        = (xs[j], ys[j], zs[j]);
+    let final_radius = cleaning.final_radius.min(cleaning.cylinder_radius);
     let mut line     = (anchor, (dir.0/norm, dir.1/norm, dir.2/norm));
     let mut accepted : Vec<bool> = Vec::new();
-    let mut fit      = None;
+    let mut fit : Option<LineFit> = None;
     let mut converged = false;
     let mut iterations = 0;
+    // the radius for the next selection of hits, and the
+    // one the accepted hits of fit have been selected with
+    let mut radius   = cleaning.cylinder_radius;
+    let mut fit_radius = radius;
     while iterations < cleaning.max_iterations {
       // the cone opens away from the outer seed hit,
       // independent of the orientation of the fitted line
@@ -449,26 +505,54 @@ impl LineFit {
       let now : Vec<bool> = (0..n)
         .map(|k| {
           let p = (xs[k], ys[k], zs[k]);
-          usable[k] && distance_to_line(p, line.0, d) <= cleaning.acceptance_radius(along(p) - s_inner)
+          usable[k] && distance_to_line(p, line.0, d) <= acceptance_radius(radius, cleaning.cone_angle, along(p) - s_inner)
         })
         .collect();
       if fit.is_some() && now == accepted {
-        converged = true;
-        break;
+        // the same hits give the same fit
+        fit_radius = radius;
+        if radius <= final_radius {
+          converged = true;
+          break;
+        }
+        radius = cleaning.next_radius(radius);
+        continue;
       }
-      accepted = now;
       let select = |vs : &[f32]| -> Vec<f32> {
-        vs.iter().zip(&accepted).filter(|(_, a)| **a).map(|(v, _)| *v).collect()
+        vs.iter().zip(&now).filter(|(_, a)| **a).map(|(v, _)| *v).collect()
       };
       let (ex, ey) = (errs_x.map(select), errs_y.map(select));
       let (sx, sy, sz) = (select(xs), select(ys), select(zs));
-      let lf = match cleaning.cost {
-        LineFitCost::Chi2           => Self::fit(&sx, &sy, &sz, ex.as_deref(), ey.as_deref()),
-        LineFitCost::SumOfDistances => Self::fit_sum_of_distances(&sx, &sy, &sz, ex.as_deref(), ey.as_deref()),
-      }?;
+      // with a previous fit to fall back to, less than 2 hits
+      // are an expected outcome (e.g. of a shrinking cylinder)
+      // and not worth an error from the fit
+      let result = if fit.is_some() && sx.len() < 2 {
+        None
+      } else {
+        match cleaning.cost {
+          LineFitCost::Chi2           => Self::fit(&sx, &sy, &sz, ex.as_deref(), ey.as_deref()),
+          LineFitCost::SumOfDistances => Self::fit_sum_of_distances(&sx, &sy, &sz, ex.as_deref(), ey.as_deref()),
+        }
+      };
+      let Some(lf) = result else {
+        // keep the fit of the iteration before, if there is one
+        let mut previous = fit?;
+        previous.status  = FitStatus::FallbackPreviousIteration;
+        return Some(CleanedLineFit {
+          fit        : previous,
+          accepted,
+          seed,
+          iterations,
+          converged  : false,
+          radius     : fit_radius,
+        });
+      };
       iterations += 1;
-      line = ((lf.x0, lf.y0, lf.z0), lf.direction());
-      fit  = Some(lf);
+      accepted    = now;
+      fit_radius  = radius;
+      radius      = cleaning.next_radius(radius);
+      line        = ((lf.x0, lf.y0, lf.z0), lf.direction());
+      fit         = Some(lf);
     }
     Some(CleanedLineFit {
       fit  : fit?,
@@ -476,6 +560,7 @@ impl LineFit {
       seed,
       iterations,
       converged,
+      radius : fit_radius,
     })
   }
 
@@ -751,20 +836,32 @@ impl LineFit {
 #[cfg(feature="pybindings")]
 #[pymethods]
 impl LineFitCleaning {
+  /// Settings for the hit cleaning of LineFit.fit_cleaned.
+  /// The radius of the cylinder starts at cylinder_radius,
+  /// and shrinks by shrink_factor after each fit down to
+  /// final_radius, if that is given and smaller.
   #[new]
-  #[pyo3(signature = (cylinder_radius, cone_angle = 0.0, max_iterations = 10, cost = LineFitCost::Chi2))]
-  fn new_py(cylinder_radius : f32, cone_angle : f32, max_iterations : u32, cost : LineFitCost) -> Self {
+  #[pyo3(signature = (cylinder_radius, cone_angle = 0.0, max_iterations = 10, cost = LineFitCost::Chi2,
+                      final_radius = None, shrink_factor = 0.5))]
+  fn new_py(cylinder_radius : f32,
+            cone_angle      : f32,
+            max_iterations  : u32,
+            cost            : LineFitCost,
+            final_radius    : Option<f32>,
+            shrink_factor   : f32) -> Self {
     Self {
       cylinder_radius,
       cone_angle,
       max_iterations,
       cost,
+      final_radius : final_radius.unwrap_or(cylinder_radius),
+      shrink_factor,
     }
   }
 
   /// The radius (in mm) within which hits are accepted at a
   /// distance s (in mm) along the line beyond the inner seed
-  /// hit (negative before it)
+  /// hit (negative before it), for the first fit
   #[pyo3(name="acceptance_radius")]
   fn acceptance_radius_py(&self, s : f32) -> f32 {
     self.acceptance_radius(s)
@@ -795,8 +892,35 @@ impl LineFitCleaning {
     self.cone_angle = cone_angle;
   }
 
+  /// The radius (in mm) the cylinder shrinks to. If it is
+  /// not smaller than cylinder_radius, the radius stays
+  /// the same
+  #[getter]
+  fn get_final_radius(&self) -> f32 {
+    self.final_radius
+  }
+
+  #[setter]
+  fn set_final_radius(&mut self, final_radius : f32) {
+    self.final_radius = final_radius;
+  }
+
+  /// After each fit, the radius is multiplied by this
+  /// factor (but not below final_radius). A factor outside
+  /// of (0, 1) goes to final_radius right away
+  #[getter]
+  fn get_shrink_factor(&self) -> f32 {
+    self.shrink_factor
+  }
+
+  #[setter]
+  fn set_shrink_factor(&mut self, shrink_factor : f32) {
+    self.shrink_factor = shrink_factor;
+  }
+
   /// Maximum number of fits. The iteration stops earlier
-  /// once the set of accepted hits does not change anymore
+  /// once the final radius is reached and the set of
+  /// accepted hits does not change anymore
   #[getter]
   fn get_max_iterations(&self) -> u32 {
     self.max_iterations
@@ -819,8 +943,13 @@ impl LineFitCleaning {
   }
 
   fn __repr__(&self) -> String {
-    format!("<LineFitCleaning: cylinder_radius {} mm, cone_angle {} rad, max_iterations {}, cost {:?}>",
-            self.cylinder_radius, self.cone_angle, self.max_iterations, self.cost)
+    let shrinking = if self.final_radius < self.cylinder_radius {
+      format!(", shrinking to {} mm by {}", self.final_radius, self.shrink_factor)
+    } else {
+      String::new()
+    };
+    format!("<LineFitCleaning: cylinder_radius {} mm{}, cone_angle {} rad, max_iterations {}, cost {:?}>",
+            self.cylinder_radius, shrinking, self.cone_angle, self.max_iterations, self.cost)
   }
 }
 
@@ -853,16 +982,25 @@ impl CleanedLineFit {
     self.iterations
   }
 
-  /// True if the set of accepted hits did not change in
-  /// the last iteration, False if max_iterations was reached
+  /// True if the final radius was reached and the set of
+  /// accepted hits did not change anymore, False if
+  /// max_iterations was reached or the last fit failed
+  /// (then fit.status is FitStatus.FallbackPreviousIteration)
   #[getter]
   fn get_converged(&self) -> bool {
     self.converged
   }
 
+  /// The radius of the cylinder (in mm) the accepted hits
+  /// have been selected with
+  #[getter]
+  fn get_radius(&self) -> f32 {
+    self.radius
+  }
+
   fn __repr__(&self) -> String {
-    format!("<CleanedLineFit: {} of {} hits accepted, seed {:?}, {} iterations, converged {}\n{}>",
-            self.accepted.iter().filter(|a| **a).count(), self.accepted.len(),
+    format!("<CleanedLineFit: {} of {} hits accepted (radius {} mm), seed {:?}, {} iterations, converged {}\n{}>",
+            self.accepted.iter().filter(|a| **a).count(), self.accepted.len(), self.radius,
             self.seed, self.iterations, self.converged, self.fit)
   }
 }
@@ -1195,6 +1333,90 @@ mod tests {
     assert!(!cleaned.accepted[n-2]);
     // z = 1900 is 700 mm beyond the inner hit
     assert!(cleaned.accepted[n-1]);
+  }
+
+  #[test]
+  fn linefit_cleaning_next_radius() {
+    let mut cleaning = LineFitCleaning::new(300.0);
+    // no shrinking by default
+    assert_eq!(cleaning.next_radius(300.0), 300.0);
+    cleaning.final_radius = 50.0;
+    let mut radii = vec![300.0];
+    for _ in 0..4 {
+      radii.push(cleaning.next_radius(*radii.last().unwrap()));
+    }
+    assert_eq!(radii, vec![300.0, 150.0, 75.0, 50.0, 50.0]);
+    // a factor outside of (0, 1) goes to the final radius
+    for factor in [0.0, 1.0, 2.0] {
+      cleaning.shrink_factor = factor;
+      assert_eq!(cleaning.next_radius(300.0), 50.0);
+    }
+  }
+
+  /// A vertical track (x = y = 0) through an outer TOF hit at
+  /// z = 2000, an inner one at z = 1200 and 7 tracker layers,
+  /// plus two hits 120 mm off the track at z = 500 and 700
+  fn track_for_shrinking() -> (Vec<f32>, Vec<f32>, Vec<f32>, Vec<f32>) {
+    let mut zs : Vec<f32> = vec![2000.0, 1200.0];
+    zs.extend((0..7).map(|k| 400.0 + 100.0*k as f32));
+    let mut xs = vec![0.0; zs.len()];
+    let mut ts = vec![f32::NAN; zs.len()];
+    ts[0] = 0.0;
+    ts[1] = 3.0;
+    xs.extend([120.0, 120.0]);
+    zs.extend([500.0, 700.0]);
+    ts.extend([f32::NAN, f32::NAN]);
+    let ys = vec![0.0; zs.len()];
+    (xs, ys, zs, ts)
+  }
+
+  #[test]
+  fn linefit_cleaned_shrinking_cylinder() {
+    let (xs, ys, zs, ts) = track_for_shrinking();
+    let n = xs.len();
+    // a wide cylinder accepts the hits off the track
+    let mut cleaning = LineFitCleaning::new(300.0);
+    let wide = LineFit::fit_cleaned(&xs, &ys, &zs, &ts, None, None, &cleaning).unwrap();
+    assert!(wide.accepted.iter().all(|a| *a));
+    assert!(wide.converged);
+    assert_eq!(wide.radius, 300.0);
+    assert!(wide.fit.tx.abs() > 0.01);
+    // shrinking 300 -> 150 -> 75 -> 50 mm: the line pulled
+    // towards them is about 100 mm away from them, so they
+    // are dropped at 75 mm and the fit is exact
+    cleaning.final_radius = 50.0;
+    let shrunk = LineFit::fit_cleaned(&xs, &ys, &zs, &ts, None, None, &cleaning).unwrap();
+    assert!(shrunk.accepted[..n-2].iter().all(|a| *a));
+    assert!(!shrunk.accepted[n-2] && !shrunk.accepted[n-1]);
+    assert!(shrunk.converged);
+    assert_eq!(shrunk.radius, 50.0);
+    // a fit at 300 and at 75 mm, at 150 and 50 mm the hits
+    // did not change
+    assert_eq!(shrunk.iterations, 2);
+    assert!(shrunk.fit.tx.abs() < 1e-4);
+    assert_eq!(shrunk.fit.status, FitStatus::Success);
+  }
+
+  #[test]
+  fn linefit_cleaned_fallback_previous_iteration() {
+    // three hits, which all fit into 400 mm, but not into 1 mm
+    // around the line through them
+    let xs = vec![0.0, 100.0, -300.0];
+    let ys = vec![0.0, 0.0, 0.0];
+    let zs = vec![2000.0, 1200.0, 1600.0];
+    let ts = vec![0.0, 3.0, f32::NAN];
+    let mut cleaning = LineFitCleaning::new(400.0);
+    cleaning.final_radius  = 1.0;
+    cleaning.shrink_factor = 0.0;
+    let cleaned = LineFit::fit_cleaned(&xs, &ys, &zs, &ts, None, None, &cleaning).unwrap();
+    assert_eq!(cleaned.fit.status, FitStatus::FallbackPreviousIteration);
+    assert!(!cleaned.converged);
+    assert_eq!(cleaned.radius, 400.0);
+    assert_eq!(cleaned.iterations, 1);
+    assert_eq!(cleaned.accepted, vec![true, true, true]);
+    // the same as the fit to all three
+    let all = LineFit::fit(&xs, &ys, &zs, None, None).unwrap();
+    assert_eq!((cleaned.fit.tx, cleaned.fit.x0), (all.tx, all.x0));
   }
 
   fn tof_hit(paddle_id : u8, x : f32, z : f32, t : f32) -> TofHit {
