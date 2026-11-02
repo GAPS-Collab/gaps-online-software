@@ -151,7 +151,7 @@ auto SimConfig::from_file(std::string fname) -> SimConfig {
   sim.digi_tof_add_gauss_jitter  = config["digitization"]["digi_tof_add_gauss_jitter"].value_or(false);
   sim.digi_tof_hit_threshold_mv  = (f32)config["digitization"]["digi_tof_hit_threshold_mv"].value_or(0.0);
   sim.digi_tof_beta_threshold_mv = (f32)config["digitization"]["digi_tof_beta_threshold_mv"].value_or(0.0);
-  sim.digi_tof_veto_threshold_mv = (f32)config["digitization"]["digi_tof_veta_threshold_mv"].value_or(0.0);
+  sim.digi_tof_veto_threshold_mv = (f32)config["digitization"]["digi_tof_veto_threshold_mv"].value_or(0.0);
   // tracker digitization part 
   sim.digi_trk_tf_name           = config["digitization"]["digi_trk_tf_name_in_db"].value_or("");
   sim.digi_trk_mask_name         = config["digitization"]["digi_trk_mask_name_in_db"].value_or(""); 
