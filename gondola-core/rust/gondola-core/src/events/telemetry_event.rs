@@ -599,9 +599,18 @@ impl TelemetryEvent {
   /// Normalize the hit times so that the first 
   /// hit is at 0. This includes application 
   /// of the phase correction
-  #[pyo3(name="tof_normalize_hit_times")]
-  fn tof_normalize_hit_times_py(&mut self) {
-    self.tof_event.normalize_hit_times();
+  ///
+  /// This is only done once per event, further calls
+  /// do nothing (see tof.hit_times_normalized)
+  ///
+  /// # Arguments:
+  ///   * offsets : a dict paddle id -> timing offset. If
+  ///               None, the offsets which have been set
+  ///               before with set_tof_timing_offsets (by
+  ///               default none) are used
+  #[pyo3(name="tof_normalize_hit_times", signature = (offsets = None))]
+  fn tof_normalize_hit_times_py(&mut self, offsets : Option<HashMap<u8, f32>>) {
+    self.tof_event.normalize_hit_times_with_offsets(offsets.as_ref());
   }
 
   /// Apply a set of per-paddle timing constants 

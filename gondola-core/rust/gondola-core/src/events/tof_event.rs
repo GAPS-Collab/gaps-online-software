@@ -78,6 +78,9 @@ pub struct TofEvent {
   pub tot_edep_cbe       : f32,
   pub tot_edep_cor       : f32,
   pub paddles_set        : bool,
+  /// True after normalize_hit_times, so that the hit times
+  /// (and the timing offsets) are only normalized once
+  pub hit_times_normalized : bool,
   // this is new (v0.11) -> We are expanding TofEvent(Summary) 
   // so that it is the same as TofEvent in v0.10 and is able 
   // to carry waveforms. These then can be stripped off
@@ -117,6 +120,7 @@ impl TofEvent {
       mt_timestamp       : 0,
       mt_tiu_timestamp   : 0,
       paddles_set        : false,
+      hit_times_normalized : false,
       rb_events          : Vec::<RBEvent>::new(),
       creation_time      : Instant::now(),
       write_to_disk      : true,
@@ -433,14 +437,23 @@ impl TofEvent {
   /// do so, the hit times have to be "normalized" by 
   /// calling ev.normalize_hit_times 
   ///
+  /// Hits of paddles which are not in offsets get an offset
+  /// of 0, so an empty map removes all offsets.
+  ///
+  /// If the hit times have already been normalized, the
+  /// offsets can not be applied anymore. In that case,
+  /// nothing is changed and an error is logged.
+  ///
   /// # Arguments:
   ///   * offsets : a hashmap paddle id -> timing offset
   #[cfg(feature="database")]
   pub fn set_timing_offsets(&mut self, offsets : &HashMap<u8, f32>) {
+    if self.hit_times_normalized {
+      error!("The hit times of event {} have already been normalized, the timing offsets can not be applied anymore! Call set_timing_offsets before normalize_hit_times.", self.event_id);
+      return;
+    }
     for h in self.hits.iter_mut() {
-      if offsets.contains_key(&h.paddle_id) {
-        h.timing_offset = offsets[&h.paddle_id]; 
-      }
+      h.timing_offset = offsets.get(&h.paddle_id).copied().unwrap_or(0.0);
     }
   }
 
@@ -543,13 +556,15 @@ impl TofEvent {
   /// The order of functions calls needs to be 
   /// 1) ev.set_timing_offsets 
   /// 2) ev.normalize_hit_times
+  ///
+  /// This is only done once per event (see
+  /// hit_times_normalized), further calls do nothing.
   #[cfg(feature="database")]
   pub fn normalize_hit_times(&mut self) {
     if self.hits.len() == 0 {
       return;
     }
-    // check if hit times have already been normalized
-    if self.hits[0].event_t0 == 0.0 {
+    if self.hit_times_normalized {
       return;
     }
 
@@ -577,6 +592,28 @@ impl TofEvent {
     for h in self.hits.iter_mut() {
       h.event_t0 -= t0_first_hit;
     }
+    self.hit_times_normalized = true;
+  }
+
+  /// Set the timing offsets and normalize the hit times in
+  /// one go, see set_timing_offsets and normalize_hit_times.
+  ///
+  /// # Arguments:
+  ///   * offsets : a hashmap paddle id -> timing offset. If
+  ///               None, the offsets which have been set
+  ///               before (by default none) are used
+  #[cfg(feature="database")]
+  pub fn normalize_hit_times_with_offsets(&mut self, offsets : Option<&HashMap<u8, f32>>) {
+    if let Some(offsets) = offsets {
+      self.set_timing_offsets(offsets);
+    }
+    self.normalize_hit_times();
+  }
+
+  /// True if the hit times have been normalized with any
+  /// (non-zero) timing offset
+  pub fn timing_offsets_applied(&self) -> bool {
+    self.hit_times_normalized && self.hits.iter().any(|h| h.timing_offset != 0.0)
   }
 
   /// Certain quantitities can only be calculated if we know more 
@@ -1336,6 +1373,10 @@ impl TofEvent {
   /// do so, the hit times have to be "normalized" by 
   /// calling ev.normalize_hit_times 
   ///
+  /// Hits of paddles which are not in offsets get an offset
+  /// of 0. If the hit times have already been normalized,
+  /// nothing is changed and an error is logged.
+  ///
   /// # Arguments:
   ///   * offsets : a hashmap paddle id -> timing offset
   #[pyo3(name="set_timing_offsets")]
@@ -1348,12 +1389,19 @@ impl TofEvent {
   /// and global (phase difference, timing offsets) 
   /// applied and then after, sort them by time.
   ///
-  /// The order of functions calls needs to be 
-  /// 1) ev.set_timing_offsets 
-  /// 2) ev.normalize_hit_times
-  #[pyo3(name="normalize_hit_times")]
-  pub fn normalize_hit_times_py(&mut self) {
-    self.normalize_hit_times();
+  /// The timing offsets can either be given here, or set
+  /// before with ev.set_timing_offsets.
+  ///
+  /// This is only done once per event, further calls
+  /// do nothing (see hit_times_normalized)
+  ///
+  /// # Arguments:
+  ///   * offsets : a dict paddle id -> timing offset. If
+  ///               None, the offsets which have been set
+  ///               before (by default none) are used
+  #[pyo3(name="normalize_hit_times", signature = (offsets = None))]
+  pub fn normalize_hit_times_py(&mut self, offsets : Option<HashMap<u8, f32>>) {
+    self.normalize_hit_times_with_offsets(offsets.as_ref());
   }
   
   /// Remove hits from the hitseries which can not 
@@ -1410,6 +1458,22 @@ impl TofEvent {
   #[pyo3(name="pointcloud")]
   fn get_pointcloud_py(&self) -> Option<Vec<(f32,f32,f32,f32,f32)>> {
     self.get_pointcloud()
+  }
+
+  /// True if the hit times have been normalized (and the
+  /// timing offsets, if any, been applied)
+  #[getter]
+  #[pyo3(name="hit_times_normalized")]
+  fn get_hit_times_normalized_py(&self) -> bool {
+    self.hit_times_normalized
+  }
+
+  /// True if the hit times have been normalized with any
+  /// (non-zero) timing offset
+  #[getter]
+  #[pyo3(name="timing_offsets_applied")]
+  fn get_timing_offsets_applied_py(&self) -> bool {
+    self.timing_offsets_applied()
   }
 
   #[getter]
@@ -1810,6 +1874,107 @@ fn packable_tofeventv3() {
     assert_eq!(data, test);
   }
 }  
+
+/// An event with three hits in paddles 1, 2, 3 at the
+/// times 10, 20 and 30 ns (no paddle length, cable delays
+/// or phase, which TofHit::set_paddle would set)
+#[cfg(test)]
+#[cfg(feature="database")]
+fn event_for_timing_offsets() -> TofEvent {
+  let mut event = TofEvent::new();
+  for (pid, t) in [(1u8, 10.0f32), (2, 20.0), (3, 30.0)] {
+    let mut h  = TofHit::new();
+    h.paddle_id = pid;
+    h.time_a    = f16::from_f32(t);
+    h.time_b    = f16::from_f32(t);
+    h.paddle_len      = 0.0;
+    h.coax_cable_time = 0.0;
+    h.hart_cable_time = 0.0;
+    event.hits.push(h);
+  }
+  event
+}
+
+#[test]
+#[cfg(feature="database")]
+fn tofevent_timing_offsets_applied_once() {
+  let mut event = event_for_timing_offsets();
+  assert!(!event.hit_times_normalized);
+  // a stale offset, paddle 3 is not in the map
+  event.hits[2].timing_offset = 7.0;
+  let offsets = HashMap::from([(1u8, 1.0f32), (2, 4.0)]);
+  event.set_timing_offsets(&offsets);
+  let set : Vec<f32> = event.hits.iter().map(|h| h.timing_offset).collect();
+  assert_eq!(set, vec![1.0, 4.0, 0.0]);
+  event.normalize_hit_times();
+  assert!(event.hit_times_normalized);
+  // (10 - 1, 20 - 4, 30 - 0) relative to the first hit
+  let t0 : Vec<f32> = event.hits.iter().map(|h| h.event_t0).collect();
+  assert_eq!(t0, vec![0.0, 7.0, 21.0]);
+  // normalizing again does not change anything
+  event.normalize_hit_times();
+  let again : Vec<f32> = event.hits.iter().map(|h| h.event_t0).collect();
+  assert_eq!(again, t0);
+}
+
+#[test]
+#[cfg(feature="database")]
+fn tofevent_timing_offsets_after_normalization() {
+  let mut event = event_for_timing_offsets();
+  event.normalize_hit_times();
+  let t0 : Vec<f32> = event.hits.iter().map(|h| h.event_t0).collect();
+  assert_eq!(t0, vec![0.0, 10.0, 20.0]);
+  // too late, nothing changes
+  event.set_timing_offsets(&HashMap::from([(1u8, 1.0f32), (2, 4.0)]));
+  assert!(event.hits.iter().all(|h| h.timing_offset == 0.0));
+  event.normalize_hit_times();
+  let again : Vec<f32> = event.hits.iter().map(|h| h.event_t0).collect();
+  assert_eq!(again, t0);
+}
+
+#[test]
+#[cfg(feature="database")]
+fn tofevent_normalize_with_offsets() {
+  // the hits have NaN fields (no paddle information), so
+  // compare only the times and offsets
+  let times = |ev : &TofEvent| -> Vec<(f32, f32)> {
+    ev.hits.iter().map(|h| (h.event_t0, h.timing_offset)).collect()
+  };
+  let offsets = HashMap::from([(1u8, 1.0f32), (2, 4.0)]);
+  let mut separate = event_for_timing_offsets();
+  separate.set_timing_offsets(&offsets);
+  separate.normalize_hit_times();
+  let mut together = event_for_timing_offsets();
+  assert!(!together.timing_offsets_applied());
+  together.normalize_hit_times_with_offsets(Some(&offsets));
+  assert_eq!(times(&separate), times(&together));
+  assert!(together.hit_times_normalized && together.timing_offsets_applied());
+  // None uses the offsets set before
+  let mut before = event_for_timing_offsets();
+  before.set_timing_offsets(&offsets);
+  before.normalize_hit_times_with_offsets(None);
+  assert_eq!(times(&before), times(&separate));
+  // without any offsets
+  let mut none = event_for_timing_offsets();
+  none.normalize_hit_times_with_offsets(None);
+  assert!(none.hit_times_normalized && !none.timing_offsets_applied());
+  // too late, as for set_timing_offsets
+  none.normalize_hit_times_with_offsets(Some(&offsets));
+  assert!(!none.timing_offsets_applied());
+}
+
+#[test]
+#[cfg(feature="database")]
+fn tofevent_normalize_first_hit_at_zero() {
+  // the first hit being at 0 before normalization does
+  // not mean the hit times are already normalized
+  let mut event = event_for_timing_offsets();
+  event.hits[0].event_t0 = 0.0;
+  event.set_timing_offsets(&HashMap::from([(2u8, 4.0f32)]));
+  event.normalize_hit_times();
+  let t0 : Vec<f32> = event.hits.iter().map(|h| h.event_t0).collect();
+  assert_eq!(t0, vec![0.0, 6.0, 20.0]);
+}
 
 #[test]
 #[cfg(feature="random")]

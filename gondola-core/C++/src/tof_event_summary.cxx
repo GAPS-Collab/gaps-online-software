@@ -89,8 +89,10 @@ auto g::TofEventSummary::normalize_hit_times(const g::TofPaddleTimingConstantMap
     }
     auto t_shift = 50.0*phase_diff/(2.0*PI);
     h.event_t0 = t0 + t_shift;
-    if (!offsets.empty()) {
-      h.event_t0 -= offsets.at(h.paddle_id);
+    // paddles without a timing offset get 0
+    auto offset = offsets.find(h.paddle_id);
+    if (offset != offsets.end()) {
+      h.event_t0 -= offset->second;
     }
   }
 }
