@@ -57,13 +57,22 @@ namespace gondola {
       //spdlog::error("Unable to merge hits in different volumes!"); 
       return *this;
     }
-    energy += rhs.energy;
+    // the position is the energy weighted mean of both
+    // (the mean, in case they have no energy)
+    const f32 total = energy + rhs.energy;
+    if (total > 0) {
+      x = (x*energy + rhs.x*rhs.energy)/total;
+      y = (y*energy + rhs.y*rhs.energy)/total;
+      z = (z*energy + rhs.z*rhs.energy)/total;
+    } else {
+      x = (x + rhs.x)/2;
+      y = (y + rhs.y)/2;
+      z = (z + rhs.z)/2;
+    }
+    energy = total;
     if (rhs.time < time) {
       time = rhs.time;
     }
-    x = (x + rhs.x)/2;
-    y = (y + rhs.y)/2;
-    z = (z + rhs.z)/2;
     if (rhs.x_err > x_err) {
       x_err = rhs.x_err;
     }

@@ -25,6 +25,10 @@ namespace gondola {
     /// written to a file
     auto to_bytestream() const -> Vec<u8>;
 
+    /// Merge another hit in the same volume into this one
+    /// (hits in other volumes are ignored): the energies are
+    /// summed, the earliest time is kept, the position is the
+    /// energy weighted mean and the errors are the larger ones
     RecoHit& operator+=(const RecoHit& rhs);
     
     friend std::ostream& operator<<(std::ostream& os, const RecoHit& et);

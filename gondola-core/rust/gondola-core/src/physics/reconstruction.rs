@@ -599,8 +599,8 @@ impl LineFit {
   /// set for the event (event.tof_set_paddles or hydrate),
   /// there is no outer or no inner TOF hit with a time, or
   /// the fit fails. The TOF hits only have a time (event_t0)
-  /// after event.set_tof_timing_offsets and
-  /// event.tof_normalize_hit_times.
+  /// after event.tof_normalize_hit_times (with or without
+  /// timing offsets).
   #[staticmethod]
   #[pyo3(name="fit_cleaned_event")]
   fn fit_cleaned_event_py(event : &TelemetryEvent, cleaning : &LineFitCleaning) -> Option<CleanedLineFit> {
