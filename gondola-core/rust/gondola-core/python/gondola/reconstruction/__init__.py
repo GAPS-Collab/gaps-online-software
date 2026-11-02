@@ -1,6 +1,17 @@
 """
 GAPS first guess & prototype event reconstructions
 
+The straight line fit is implemented in gondola-core (rust),
+including a hit cleaning, which only uses hits within a
+cylinder around the line, optionally widening to a cone
+beyond the inner TOF hit:
+
+    fit      = LineFit.fit(xs, ys, zs)
+    cleaning = LineFitCleaning(50.0, cone_angle=np.radians(3))
+    cleaned  = LineFit.fit_cleaned_event(event, cleaning)
+    cleaned.fit, cleaned.accepted
+
+All lengths are in mm.
 """
 
 from enum import Enum
@@ -22,10 +33,28 @@ from .. import gondola_core as _gc
 #ERR_Y_TOF = 1
 #ERR_Z_TOF = 1
 #
-class FitStatus(Enum):
-    Unknown        = 0
-    DidNotConverge = 10
-    Success        = 42
+FitStatus = _gc.reconstruction.FitStatus
+FitStatus.__module__ = __name__
+FitStatus.__name__   = 'FitStatus'
+
+LineFit = _gc.reconstruction.LineFit
+LineFit.__module__ = __name__
+LineFit.__name__   = 'LineFit'
+
+LineFitCost = _gc.reconstruction.LineFitCost
+LineFitCost.__module__ = __name__
+LineFitCost.__name__   = 'LineFitCost'
+
+LineFitCleaning = _gc.reconstruction.LineFitCleaning
+LineFitCleaning.__module__ = __name__
+LineFitCleaning.__name__   = 'LineFitCleaning'
+
+CleanedLineFit = _gc.reconstruction.CleanedLineFit
+CleanedLineFit.__module__ = __name__
+CleanedLineFit.__name__   = 'CleanedLineFit'
+
+LINEFIT_DEFAULT_ERR_XY  = _gc.reconstruction.LINEFIT_DEFAULT_ERR_XY
+TOF_INNER_MAX_PADDLE_ID = _gc.reconstruction.TOF_INNER_MAX_PADDLE_ID
 
 ##############################################
 
