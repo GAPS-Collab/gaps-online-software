@@ -186,3 +186,65 @@ impl fmt::Display for McHit {
 
 #[cfg(feature="pybindings")]
 pythonize!(McHit);
+
+#[cfg(feature="pybindings")]
+#[pymethods]
+impl McHit {
+  #[getter]
+  fn get_volume_id(&self) -> u32 {
+    self.volume_id
+  }
+
+  #[getter]
+  fn get_hw_id(&self) -> u32 {
+    self.hw_id
+  }
+
+  #[getter]
+  fn get_parent_id(&self) -> u32 {
+    self.parent_id
+  }
+
+  #[getter]
+  fn get_track_id(&self) -> u32 {
+    self.track_id
+  }
+
+  #[getter]
+  fn get_pdg(&self) -> i32 {
+    self.pdg
+  }
+
+  /// Position of the step (x, y, z)
+  #[getter]
+  fn get_pos(&self) -> (f32, f32, f32) {
+    (self.pos_x, self.pos_y, self.pos_z)
+  }
+
+  /// Position where the track was created (x, y, z)
+  #[getter]
+  fn get_vertex_pos(&self) -> (f32, f32, f32) {
+    (self.vertex_pos_x, self.vertex_pos_y, self.vertex_pos_z)
+  }
+
+  #[getter]
+  fn get_glob_time(&self) -> f32 {
+    self.glob_time
+  }
+
+  #[getter]
+  fn get_step_edep(&self) -> f32 {
+    self.step_edep
+  }
+
+  #[getter]
+  #[allow(non_snake_case)]
+  fn get_kin_E(&self) -> f32 {
+    self.kin_E
+  }
+
+  #[getter]
+  fn get_process_type(&self) -> u8 {
+    self.process_type
+  }
+}

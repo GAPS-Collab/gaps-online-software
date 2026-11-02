@@ -1,4 +1,4 @@
-# all kind of created build directories 
+#gondola-core/rust/gondola-core/pyproject.toml all kind of created build directories 
 build*
 
 # directory for tests/development 
@@ -59,7 +59,7 @@ analysis/run_vetting/.ipynb_checkpoints/
 analysis/run_vetting/.python-version
 .ipynb_checkpoints/*
 
-*__pycache__/*
+__pycache__/
 
 # build artifacts
 tof/liftof/build/*

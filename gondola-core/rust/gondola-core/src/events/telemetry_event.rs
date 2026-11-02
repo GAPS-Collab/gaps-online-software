@@ -66,6 +66,20 @@ impl TelemetryEvent {
     }
   }
 
+  /// The tracker hits as (x, y, z, t, adc), with the
+  /// coordinates in mm. Tracker hits do not have a time,
+  /// so t is NaN.
+  pub fn get_tracker_pointcloud(&self) -> Vec<(f32, f32, f32, f32, f32)> {
+    let mut pts = Vec::<(f32,f32,f32,f32,f32)>::new();
+    for h in &self.tracker_hits {
+      // uses adc
+      // FIXME - factor 10!
+      let pt = (10.0*h.x, 10.0*h.y, 10.0*h.z, f32::NAN, h.adc as f32);
+      pts.push(pt);
+    }
+    pts
+  }
+
   /// This can be useful for single track analysis 
   pub fn has_only_one_hit_per_tlayer(&self) -> bool { 
     let mut layers = HashSet::<u8>::new();
@@ -648,14 +662,7 @@ impl TelemetryEvent {
 
   #[getter]
   fn tracker_pointcloud(&self) -> Vec<(f32, f32, f32, f32, f32)> {
-    let mut pts = Vec::<(f32,f32,f32,f32,f32)>::new();
-    for h in &self.tracker_hits {
-      // uses adc
-      // FIXME - factor 10!
-      let pt = (10.0*h.x, 10.0*h.y, 10.0*h.z, f32::NAN, h.adc as f32);
-      pts.push(pt);
-    }
-    pts
+    self.get_tracker_pointcloud()
   }
   
   /// Add tracker hits to the merged event (e.g. with hits from packet type 80

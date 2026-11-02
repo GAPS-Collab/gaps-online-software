@@ -222,6 +222,49 @@ impl Tracklet {
   fn get_beta_py(&self) -> f32 {
     self.beta
   }
+
+  /// Time at the vertex
+  #[getter]
+  #[pyo3(name="vertex_time")]
+  fn get_vertex_time_py(&self) -> f32 {
+    self.start.time
+  }
+
+  /// Position where the particle stopped (for the MC primary:
+  /// where it came to rest or interacted)
+  #[getter]
+  #[pyo3(name="stop_pos")]
+  fn get_stop_pos_py(&self) -> (f32,f32,f32) {
+    (self.stop.x, self.stop.y, self.stop.z)
+  }
+
+  /// Time at the stopping position
+  #[getter]
+  #[pyo3(name="stop_time")]
+  fn get_stop_time_py(&self) -> f32 {
+    self.stop.time
+  }
+
+  /// Kinetic energy at the stopping position
+  #[getter]
+  #[pyo3(name="stop_energy")]
+  fn get_stop_energy_py(&self) -> f32 {
+    self.stop.energy
+  }
+
+  /// True if the tracklet has no stopping position
+  #[getter]
+  #[pyo3(name="is_infinite")]
+  fn get_is_infinite_py(&self) -> bool {
+    self.is_infinite
+  }
+
+  /// Particle identifier
+  #[getter]
+  #[pyo3(name="pdg")]
+  fn get_pdg_py(&self) -> i32 {
+    self.pdg
+  }
 }
 
 impl fmt::Display for Tracklet {

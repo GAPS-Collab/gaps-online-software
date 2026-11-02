@@ -415,6 +415,21 @@ fn algo_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
 
 #[cfg(feature="pybindings")]
 #[pymodule]
+#[pyo3(name = "reconstruction")]
+fn reconstruction_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
+  use crate::physics::reconstruction::*;
+  m.add_class::<FitStatus>()?;
+  m.add_class::<LineFit>()?;
+  m.add_class::<LineFitCost>()?;
+  m.add_class::<LineFitCleaning>()?;
+  m.add_class::<CleanedLineFit>()?;
+  m.add("LINEFIT_DEFAULT_ERR_XY", LINEFIT_DEFAULT_ERR_XY)?;
+  m.add("TOF_INNER_MAX_PADDLE_ID", TOF_INNER_MAX_PADDLE_ID)?;
+  Ok(())
+}
+
+#[cfg(feature="pybindings")]
+#[pymodule]
 #[pyo3(name = "geometry")]
 fn geometry_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   use crate::geometry::*;
@@ -619,6 +634,7 @@ fn gondola_core_py<'_py>(m : &Bound<'_py, PyModule>) -> PyResult<()> { //: Pytho
   m.add_wrapped(wrap_pymodule!(algo_py))?;
   m.add_wrapped(wrap_pymodule!(calibration_py))?;
   m.add_wrapped(wrap_pymodule!(geometry_py))?;
+  m.add_wrapped(wrap_pymodule!(reconstruction_py))?;
   //m.add("SerializationError",  pyo3::types::PyAnyMethods::<PySerializationError>::get_type(m))?;
   //m.add("AnalysisError",  pyo3::types::PyAnyMethods::<PyAnalysisError>::get_type(m))?;
   Ok(())
