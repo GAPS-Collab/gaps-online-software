@@ -116,6 +116,13 @@ namespace gondola {
     static auto tof_propagation_time_offset(f64 position_mm, f64 paddle_length_mm,
                                             f64 velocity_mm_per_ns, u8 side) noexcept -> f64; 
 
+    /// The cable delay of a paddle in ns, as it is corrected for in the
+    /// reconstruction (TofHit::get_cable_delay: harting - coax cable time,
+    /// added to t0). The digitized times have it subtracted, so that the
+    /// corrected times are the true ones again
+    [[nodiscard("Returns the cable delay in ns")]]
+    static auto tof_cable_delay(const TofPaddle& paddle) noexcept -> f64;
+
     [[nodiscard("Returns a generated waveform, if possible")]]
     auto generate_tof_waveform(u8 paddle_id, u8 side, f64 energy_mev, f64 position_mm,
                                f64 paddle_length_mm, f64 velocity_mm_per_ns, f64 hit_time_ns
@@ -125,12 +132,14 @@ namespace gondola {
     //auto digitize_tof_hit(u8 paddle_id, f64 energy_mev,
     //                      f64 position_mm, f64 paddle_length_mm,
     //                      f64 velocity_mm_per_ns, f64 hit_time_ns) const -> Option<gondola::TofHit>;
+    // Speed of the pulse in the paddle, approximately 51% of the speed of light.
+    // C_LIGHT_PADDLE is in cm/ns, the same as used to reconstruct the position
+    // along the paddle (TofHit::get_pos)
     [[nodiscard]]
-    auto digitize_tof_hit(const RecoHit& hit, f64 velocity_mm_per_ns = 1.54e8) -> Option<gondola::TofHit>;
-    // Speed of the pulse, approximately 55% of the speed of light.
+    auto digitize_tof_hit(const RecoHit& hit, f64 velocity_mm_per_ns = 10.0*C_LIGHT_PADDLE) -> Option<gondola::TofHit>;
     
     auto tof_response_fn_fallback(RecoHit& hit) -> void;
-    auto digitize_tof_hit_fallback( const RecoHit& hit, f64 velocity_mm_per_ns = 1.54e8) -> Option<gondola::TofHit>;
+    auto digitize_tof_hit_fallback( const RecoHit& hit, f64 velocity_mm_per_ns = 10.0*C_LIGHT_PADDLE) -> Option<gondola::TofHit>;
 
     /// Print error/debugging statistics, counter etc. to std::out
     auto print_statistics() -> void;

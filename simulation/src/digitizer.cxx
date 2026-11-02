@@ -1103,6 +1103,12 @@ auto g::GapsDigitizer::tof_propagation_time_offset(f64 position_mm, f64 paddle_l
 
 //----------------------------------------------------------
 
+auto g::GapsDigitizer::tof_cable_delay(const TofPaddle& paddle) noexcept -> f64 {
+  return paddle.harting_cable_time - paddle.coax_cable_time;
+}
+
+//----------------------------------------------------------
+
 auto g::GapsDigitizer::add_waveform_fluctuations(
     Vec<f64>& waveform_mv,
     const Vec<f64>& rms_mv
@@ -1374,16 +1380,18 @@ auto g::GapsDigitizer::digitize_tof_hit_fallback( const g::RecoHit& hit, f64 vel
   // Propagation time from paddle center to either end.
   const f64 center_to_end_ns =
       paddle_length_mm / (2.0 * velocity_mm_per_ns);
+  // the reconstruction corrects for the cable delay
+  const f64 cable_delay_ns = tof_cable_delay(paddle);
 
   g::TofHit tof_hit;
   tof_hit.paddle_id = paddle.paddle_id;
   tof_hit.version   = g::ProtocolVersion::V1;
   // First approximation: identical arrival times at both ends.
   tof_hit.time_a_f32 = static_cast<f32>(
-      reco.time + center_to_end_ns
+      reco.time + center_to_end_ns - cable_delay_ns
   );
   tof_hit.time_b_f32 = static_cast<f32>(
-      reco.time + center_to_end_ns
+      reco.time + center_to_end_ns - cable_delay_ns
   );
   // Equivalent peak voltages corresponding to legacy energy.
   tof_hit.peak_a_f32 = static_cast<f32>(peak_voltage_mv);
@@ -1459,6 +1467,8 @@ auto g::GapsDigitizer::digitize_tof_hit(const RecoHit& hit,
   // Flight reconstruction expects propagation from the hit
   // to the paddle ends.
   const f64 center_to_end_ns = paddle_length_mm / (2.0 * velocity_mm_per_ns);
+  // the reconstruction corrects for the cable delay
+  const f64 cable_delay_ns   = tof_cable_delay(paddle);
   
   g::TofHit tof_hit;
   tof_hit.paddle_id = paddle.paddle_id;
@@ -1470,11 +1480,11 @@ auto g::GapsDigitizer::digitize_tof_hit(const RecoHit& hit,
   //);
 
   tof_hit.time_a_f32 = static_cast<f32>(
-    a.cfd_time_ns + center_to_end_ns
+    a.cfd_time_ns + center_to_end_ns - cable_delay_ns
   );
 
   tof_hit.time_b_f32 = static_cast<f32>(
-    b.cfd_time_ns + center_to_end_ns
+    b.cfd_time_ns + center_to_end_ns - cable_delay_ns
   );
 
   tof_hit.peak_a_f32   = static_cast<f32>(a.peak_voltage_mv);
