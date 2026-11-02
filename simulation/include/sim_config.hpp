@@ -36,6 +36,8 @@ struct SimConfig {
   bool        digitization;
   bool        use_advanced_digitization  ;
   bool        digi_use_tof_legacy_fb     ;
+  // only keep events with at least one outer and one inner TOF hit
+  bool        digi_require_tof_trigger   ;
   // volume id - should be paddle id
   Vec<u32>    digi_tof_excluded_readout  ;
   f64         digi_tof_voltage_width     ; 

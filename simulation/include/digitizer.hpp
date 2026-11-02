@@ -83,12 +83,24 @@ namespace gondola {
     //auto tof_pos_response_fn_simple(RecoHit& hit)                        -> f64; 
     /// Re-calculate energy for the hit and additionally return calculated adc values 
     auto trk_response_fn(RecoHit& hit)                                   -> u32;
-    auto digitize_event(const McEvent& ev, bool& check_trigger)          -> Option<TelemetryEvent>;
+    /// Digitize an event. If cfg.digi_require_tof_trigger is set, events
+    /// which do not pass tof_trigger are rejected (None).
+    ///
+    /// @param has_triggered : set to whether the event has passed the
+    ///                        trigger (always true without the trigger)
+    auto digitize_event(const McEvent& ev, bool& has_triggered)          -> Option<TelemetryEvent>;
     
     // From here on, this is related to TOF digitization 
     //
     //
-    auto tof_trigger(const Vec<RecoHit>& hits)                     const -> bool;
+    /// TOF paddles with ids up to this one form the inner TOF (cube),
+    /// the ones above the outer TOF (umbrella, cortina)
+    static constexpr u8 TOF_INNER_MAX_PADDLE_ID = 60;
+    /// A simple trigger: at least one outer and one inner TOF hit among
+    /// the read out (digitized) hits. This is a placeholder until the
+    /// trigger is simulated, which would also include the paddles
+    /// excluded from the readout and the trigger thresholds
+    auto tof_trigger(const TofEvent& ev)                           const -> bool;
     auto load_tof_pulse_templates(const std::string& filename)           -> void;
     auto n_tof_pulse_templates() const                                   -> usize;
     
@@ -151,7 +163,10 @@ namespace gondola {
     
     // keep a copy of the config 
     SimConfig cfg;
+    /// events which have been digitized (and passed the trigger)
     usize n_events                    = 0;
+    /// events which have been rejected by the trigger
+    usize n_events_no_trigger         = 0;
     // debugging counters for the TOF part
 
     /// The total number of TOF RecoHits we tried to put through 

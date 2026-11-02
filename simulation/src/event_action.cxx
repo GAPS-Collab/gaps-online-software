@@ -121,11 +121,13 @@ auto gon::EventAction::EndOfEventAction(const G4Event* event)   -> void {
   f_obj.payload = mc_event.to_bytestream();
   auto frame = CRFrame();
   frame.put_fobject(f_obj, "McEvent");
+  // events which do not pass the trigger (if it is
+  // enabled in the digitizer) are not written
+  bool write_frame = true;
   if (digitizer->use_digitizer) {
-    // currently, no trigger 
-    // setting this to false here will cause all events to trigger 
     bool event_has_triggered = false;
     auto tel_event_res = digitizer->digitize_event(mc_event, event_has_triggered); 
+    write_frame = event_has_triggered;
     if (tel_event_res.is_some()) {
       auto tel_ev       = tel_event_res.unwrap();
       tel_ev.version    = 1; // we did not test version 0
@@ -167,7 +169,9 @@ auto gon::EventAction::EndOfEventAction(const G4Event* event)   -> void {
       //f_obj_payload     
     }
   }
-  writer->add_frame(frame); 
+  if (write_frame) {
+    writer->add_frame(frame); 
+  }
   if (processed_events % 10000 == 0) {
     std::cout << "Processed " << processed_events << " events!" << std::endl;
   }

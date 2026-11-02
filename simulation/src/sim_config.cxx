@@ -137,6 +137,7 @@ auto SimConfig::from_file(std::string fname) -> SimConfig {
   sim.digitization               = config["digitization"]["use_digitization"].value_or(false); 
   sim.use_advanced_digitization  = config["digitization"]["use_advanced_features"].value_or(false);
   sim.digi_use_tof_legacy_fb     = config["digitization"]["digi_use_tof_legacy_fallback"].value_or(false);
+  sim.digi_require_tof_trigger   = config["digitization"]["digi_require_tof_trigger"].value_or(false);
   for (auto&& el : *config["digitization"]["digi_tof_paddles_exclude_from_readout"].as_array()) {
     sim.digi_tof_excluded_readout.push_back((u32)el.value_or(0)); 
   } 

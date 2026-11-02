@@ -80,6 +80,10 @@ trk_foam_layer = true
 # list from Kaliroe
 digi_tof_paddles_exclude_from_readout = [100100000,100100200,100100400,100300100,100300300, 100300400,100400200,100400400,100500100,100500300,100500500,100600100, 100600300,110000700,110000900, 110001100,111000600,111001100,113000000,113000400,113000600,115000000,115000200,115000400,115000600]
 use_digitization             = true
+# a simple trigger: events without at least one outer and one 
+# inner TOF hit (paddle id <= 60) after digitization are not 
+# written. The event id still counts all simulated events
+digi_require_tof_trigger     = true
 use_advanced_features        = false
 digi_use_tof_legacy_fallback = true
 # variables for fallback 

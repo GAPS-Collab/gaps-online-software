@@ -431,7 +431,7 @@ auto g::GapsDigitizer::print_statistics() -> void {
   const double denominator_sat    = tof_hits_sat > 0 ? static_cast<f64>(tof_hits_sat) : 1.0;
   const double denominator_fb     = tof_hits_digi_fallback > 0 ? static_cast<f64>(tof_hits_digi_fallback) : 1.0; 
   auto repr = std::format(
-    "[TofDigitizerStats] (total events {}) \n"
+    "[TofDigitizerStats] (total events {}, rejected by the trigger {}) \n"
     "  attempted: {} | "
     "succeeded: {} ({:.2f}%) | "
     "failed: {} ({:.2f}%) | "
@@ -457,6 +457,7 @@ auto g::GapsDigitizer::print_statistics() -> void {
     "fallbacks                     : {} \n"
     "  fallbacks with E==0              : {} ({:.2f}%)\n",
     n_events,
+    n_events_no_trigger,
     attempted,
     succeeded, 100.0 * succeeded / denominator,
     failed, 100.0 * failed / denominator,
@@ -724,13 +725,22 @@ auto g::GapsDigitizer::trk_response_fn(g::RecoHit& hit) -> u32 {
 
 //----------------------------------------------------------
     
-auto g::GapsDigitizer::tof_trigger(const Vec<g::RecoHit>& hits) const -> bool {
-  return true;
+auto g::GapsDigitizer::tof_trigger(const g::TofEvent& ev) const -> bool {
+  bool outer = false;
+  bool inner = false;
+  for (const auto& h : ev.hits) {
+    if (h.paddle_id <= TOF_INNER_MAX_PADDLE_ID) {
+      inner = true;
+    } else {
+      outer = true;
+    }
+  }
+  return outer && inner;
 }
 
 //----------------------------------------------------------
 
-auto g::GapsDigitizer::digitize_event(const g::McEvent& mc_ev, bool& check_trigger) -> Option<g::TelemetryEvent> {
+auto g::GapsDigitizer::digitize_event(const g::McEvent& mc_ev, bool& has_triggered) -> Option<g::TelemetryEvent> {
   g::TelemetryEvent ev;
   ev.tof_event.event_id = mc_ev.event_id;
   ev.event_id           = mc_ev.event_id;
@@ -817,27 +827,13 @@ auto g::GapsDigitizer::digitize_event(const g::McEvent& mc_ev, bool& check_trigg
   //if (ev.trk_hits.size() == 0) {
   //  return None;
   //}
-  bool ev_has_triggered = false;
-  if (false) {
-  //if (check_trigger) {
-    if (g::GapsDigitizer::tof_trigger(r_hits)) {
-      check_trigger = true;
-      ev_has_triggered = true;
-    } else {
-      check_trigger = false;
-    }
-  } else {
-    //check_trigger = false; 
-    ev_has_triggered = true; // always trigger
-  }
-  // debug!! 
-  ev_has_triggered = true;
-  if (ev_has_triggered) {
-    n_events++;
-    return Some(ev);
-  } else {
+  has_triggered = !cfg.digi_require_tof_trigger || tof_trigger(ev.tof_event);
+  if (!has_triggered) {
+    n_events_no_trigger++;
     return None;
   }
+  n_events++;
+  return Some(ev);
 }
 
 //----------------------------------------------------------
