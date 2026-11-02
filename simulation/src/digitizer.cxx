@@ -1382,16 +1382,25 @@ auto g::GapsDigitizer::digitize_tof_hit_fallback( const g::RecoHit& hit, f64 vel
       paddle_length_mm / (2.0 * velocity_mm_per_ns);
   // the reconstruction corrects for the cable delay
   const f64 cable_delay_ns = tof_cable_delay(paddle);
+  // Without a waveform, smear the true position along the paddle
+  // with the expected resolution (digi_tof_pos_offset/width) and
+  // calculate the arrival times at both ends from it, so that the
+  // reconstruction gets this position back from their difference.
+  // The energy response above uses the true position. The smeared
+  // position might be beyond the paddle ends, as it can be in data.
+  const f64 position_mm = paddle.get_position_from_a(hit.x, hit.y, hit.z)
+                          + tof_pos_smearing_(random_gen_);
 
   g::TofHit tof_hit;
   tof_hit.paddle_id = paddle.paddle_id;
   tof_hit.version   = g::ProtocolVersion::V1;
-  // First approximation: identical arrival times at both ends.
   tof_hit.time_a_f32 = static_cast<f32>(
       reco.time + center_to_end_ns - cable_delay_ns
+      + tof_propagation_time_offset(position_mm, paddle_length_mm, velocity_mm_per_ns, 0)
   );
   tof_hit.time_b_f32 = static_cast<f32>(
       reco.time + center_to_end_ns - cable_delay_ns
+      + tof_propagation_time_offset(position_mm, paddle_length_mm, velocity_mm_per_ns, 1)
   );
   // Equivalent peak voltages corresponding to legacy energy.
   tof_hit.peak_a_f32 = static_cast<f32>(peak_voltage_mv);
