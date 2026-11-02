@@ -32,6 +32,9 @@ dependencies = [
     "fancy-dataclass>=0.10.2",
 ]
 
+[project.scripts]
+gdml-summary = "gondola.geometry:main"
+
 [build-system]
 requires      = ["maturin>=1.0,<2.0"]
 build-backend = "maturin"

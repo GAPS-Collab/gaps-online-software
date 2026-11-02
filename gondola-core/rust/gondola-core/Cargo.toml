@@ -110,6 +110,14 @@ polars            = { version = "0.52", features = ["lazy", "timezones"], option
 pyo3-polars       = { version = "0.25", features = ["dtype-full"], optional = true }
 env_logger        = "0.10"
 flate2            = "1.1"
+# minimization for reconstruction algorithms (e.g. the linefit)
+argmin            = { version = "0.11", default-features = false }
+argmin-math       = { version = "0.5", default-features = false, features = ["vec"] }
+# detector geometry from GDML (streaming XML parser, the file is ~500 MB),
+# vector math and a compact binary cache of the parsed geometry
+quick-xml         = "0.38"
+glam              = { version = "0.30", features = ["serde"] }
+postcard          = { version = "1.1", default-features = false, features = ["use-std"] }
 
 # for the database - in case we want to use postgres, 
 # the feature needs to be added here, however, this would

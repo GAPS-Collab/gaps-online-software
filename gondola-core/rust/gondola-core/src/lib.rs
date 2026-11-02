@@ -18,6 +18,8 @@
 //! * tracker      - Very specific TRK related code which does not fall under any other 
 //!                  category
 //!
+//! * geometry     - The GAPS detector geometry, read from GDML
+//!
 //! # features:
 //!
 //! * random              - allow random number generated data classes for 
@@ -56,6 +58,7 @@ pub mod tracker;
 pub mod monitoring;
 pub mod stats;
 pub mod physics;
+pub mod geometry;
 #[cfg(feature="pybindings")]
 pub mod python;
 #[cfg(feature="database")]
@@ -410,6 +413,24 @@ fn algo_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   Ok(())
 }
 
+#[cfg(feature="pybindings")]
+#[pymodule]
+#[pyo3(name = "geometry")]
+fn geometry_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
+  use crate::geometry::*;
+  m.add_class::<Geometry>()?;
+  m.add_class::<Material>()?;
+  m.add_class::<Solid>()?;
+  m.add_class::<SolidKind>()?;
+  m.add_class::<Volume>()?;
+  m.add_class::<Placement>()?;
+  m.add_class::<WorldPlacement>()?;
+  m.add_class::<Transform>()?;
+  m.add_class::<Crossing>()?;
+  m.add_class::<TrackPath>()?;
+  Ok(())
+}
+
 #[cfg(feature="database")]
 #[cfg(feature="pybindings")]
 #[pymodule]
@@ -544,6 +565,8 @@ pyo3::create_exception!(gondola_core_py, PyIPBusError, pyo3::exceptions::PyExcep
 pyo3::create_exception!(gondola_core_py, PySerializationError, pyo3::exceptions::PyException);
 #[cfg(feature="pybindings")]
 pyo3::create_exception!(gondola_core_py, PyAnalysisError, pyo3::exceptions::PyException); 
+#[cfg(feature="pybindings")]
+pyo3::create_exception!(gondola_core_py, PyGeometryError, pyo3::exceptions::PyException);
 
 #[macro_export]
 macro_rules! pythonize_error {
@@ -568,6 +591,8 @@ pythonize_error!(AnalysisError, PyAnalysisError);
 pythonize_error!(CalibrationError, PyCalibrationError);
 #[cfg(feature="pybindings")]
 pythonize_error!(UserError, PyUserError);
+#[cfg(feature="pybindings")]
+pythonize_error!(GeometryError, PyGeometryError);
 
 /// Python API to rust version of tof-dataclasses.
 ///
@@ -593,6 +618,7 @@ fn gondola_core_py<'_py>(m : &Bound<'_py, PyModule>) -> PyResult<()> { //: Pytho
   m.add_wrapped(wrap_pymodule!(stats_py))?;
   m.add_wrapped(wrap_pymodule!(algo_py))?;
   m.add_wrapped(wrap_pymodule!(calibration_py))?;
+  m.add_wrapped(wrap_pymodule!(geometry_py))?;
   //m.add("SerializationError",  pyo3::types::PyAnyMethods::<PySerializationError>::get_type(m))?;
   //m.add("AnalysisError",  pyo3::types::PyAnyMethods::<PyAnalysisError>::get_type(m))?;
   Ok(())

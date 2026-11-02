@@ -37,6 +37,7 @@ from . import io
 from . import tof
 from . import db 
 from . import reconstruction 
+from . import geometry
 from . import tracker
 from . import packets 
 from . import monitoring
@@ -49,7 +50,8 @@ __all__ = ['events', 'packets',\
            'stats', 'algo',\
            'db', 'calibration',\
            'visual','tracker',\
-           'reconstruction', 'tof',\
+           'reconstruction', 'geometry',\
+           'tof',\
            'sim', 'run']
 
 # clean up the namespace, module still available as hidden through _gondola_core

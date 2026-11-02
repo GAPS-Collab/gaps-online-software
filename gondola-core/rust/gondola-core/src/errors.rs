@@ -403,6 +403,10 @@ pub enum GeometryError {
   /// with the byte position in the file where it occured
   Gdml { pos : u64, msg : String },
   Cache(String),
+  /// Two placements share the same Geant4 copy number
+  DuplicateCopynumber(i64),
+  /// A track for which no column density can be calculated
+  InvalidTrack(String),
 }
 
 impl fmt::Display for GeometryError {
@@ -412,6 +416,8 @@ impl fmt::Display for GeometryError {
       Self::Xml(err)         => write!(f, "<GeometryError : Xml {}>", err),
       Self::Gdml {pos, msg}  => write!(f, "<GeometryError : Gdml {} (at byte {})>", msg, pos),
       Self::Cache(err)       => write!(f, "<GeometryError : Cache {}>", err),
+      Self::DuplicateCopynumber(id) => write!(f, "<GeometryError : DuplicateCopynumber {}>", id),
+      Self::InvalidTrack(err)       => write!(f, "<GeometryError : InvalidTrack {}>", err),
     }
   }
 }

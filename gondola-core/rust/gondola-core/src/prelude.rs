@@ -197,6 +197,7 @@ pub use crate::tof::*;
 pub use crate::tracker::*;
 pub use crate::tof::algorithms::*;
 pub use crate::physics::*;
+pub use crate::geometry::*;
 //pub use crate::algorithms::*;
 
 pub use crate::packets::{
