@@ -3,11 +3,11 @@ GAPS first guess & prototype event reconstructions
 
 The straight line fit is implemented in gondola-core (rust),
 including a hit cleaning, which only uses hits within a
-cylinder around the line, optionally widening to a cone
-beyond the inner TOF hit:
+cylinder around the line, optionally shrinking from a wide
+to a narrow one:
 
     fit      = LineFit.fit(xs, ys, zs)
-    cleaning = LineFitCleaning(50.0, cone_angle=np.radians(3))
+    cleaning = LineFitCleaning(150.0, final_radius=75.0)
     cleaned  = LineFit.fit_cleaned_event(event, cleaning)
     cleaned.fit, cleaned.accepted
 

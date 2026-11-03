@@ -66,15 +66,7 @@ pub enum LineFitCost {
 /// Settings for the hit cleaning of LineFit::fit_cleaned
 ///
 /// A hit is accepted if its distance from the line is at
-/// most acceptance_radius(s), with s the distance along the
-/// line beyond the inner seed hit:
-///
-/// r(s) = radius + max(s, 0) * tan(cone_angle)
-///
-/// so hits before the inner seed hit (e.g. the outer TOF)
-/// have to be within the cylinder, and beyond it (e.g. the
-/// tracker) the acceptance widens like a cone, to allow for
-/// the uncertainty of the direction of the line.
+/// most the radius of a cylinder around the line.
 ///
 /// The radius of the cylinder starts at cylinder_radius. If
 /// final_radius is smaller, it shrinks after each fit by
@@ -88,10 +80,6 @@ pub struct LineFitCleaning {
   /// Only hits within a cylinder of this radius (in mm)
   /// around the line are used in the fit
   pub cylinder_radius : f32,
-  /// Half opening angle (in rad) of the cone, opening from
-  /// the inner seed hit away from the outer seed hit, which
-  /// is added to the cylinder. 0 means cylinder only
-  pub cone_angle      : f32,
   /// Maximum number of fits. The iteration stops earlier
   /// once the final radius is reached and the set of
   /// accepted hits does not change anymore
@@ -112,19 +100,11 @@ impl LineFitCleaning {
   pub fn new(cylinder_radius : f32) -> Self {
     Self {
       cylinder_radius,
-      cone_angle     : 0.0,
       max_iterations : 10,
       cost           : LineFitCost::Chi2,
       final_radius   : cylinder_radius,
       shrink_factor  : 0.5,
     }
-  }
-
-  /// The radius (in mm) within which hits are accepted at a
-  /// distance s (in mm) along the line beyond the inner seed
-  /// hit (negative before it), for the first fit
-  pub fn acceptance_radius(&self, s : f32) -> f32 {
-    acceptance_radius(self.cylinder_radius, self.cone_angle, s)
   }
 
   /// The radius of the cylinder after the next fit
@@ -136,11 +116,6 @@ impl LineFitCleaning {
       target
     }
   }
-}
-
-/// see LineFitCleaning
-fn acceptance_radius(radius : f32, cone_angle : f32, s : f32) -> f32 {
-  radius + s.max(0.0)*cone_angle.tan()
 }
 
 /// The result of LineFit::fit_cleaned
@@ -334,9 +309,7 @@ impl LineFit {
   }
 
   /// Fit a straight line, using only hits within a cylinder
-  /// around the line (LineFitCleaning::cylinder_radius), which
-  /// widens to a cone beyond the inner seed hit
-  /// (LineFitCleaning::cone_angle).
+  /// around the line (LineFitCleaning::cylinder_radius).
   ///
   /// The hits have to be ordered in time, with the TOF hits
   /// first. Tracker hits do not have a time (NaN).
@@ -345,10 +318,8 @@ impl LineFit {
   ///    hits with a time. These are not necessarily one outer
   ///    and one inner TOF hit, fit_cleaned_event makes sure
   ///    of that, using the paddle ids.
-  /// 2) All hits within the cylinder (and cone) around the
-  ///    line are accepted, the others rejected. The tip of the
-  ///    cone is the inner (second) seed hit, projected on the
-  ///    line, and it opens away from the outer (first) one.
+  /// 2) All hits within the cylinder around the line are
+  ///    accepted, the others rejected.
   /// 3) The line is fitted to the accepted hits.
   /// 4) The radius of the cylinder shrinks, if this is
   ///    configured (LineFitCleaning::final_radius).
@@ -482,7 +453,6 @@ impl LineFit {
       error!("The two seed hits are at the same position, can not construct a line!");
       return None;
     }
-    let inner        = (xs[j], ys[j], zs[j]);
     let final_radius = cleaning.final_radius.min(cleaning.cylinder_radius);
     let mut line     = (anchor, (dir.0/norm, dir.1/norm, dir.2/norm));
     let mut accepted : Vec<bool> = Vec::new();
@@ -494,19 +464,8 @@ impl LineFit {
     let mut radius   = cleaning.cylinder_radius;
     let mut fit_radius = radius;
     while iterations < cleaning.max_iterations {
-      // the cone opens away from the outer seed hit,
-      // independent of the orientation of the fitted line
-      let d = line.1;
-      let d = if d.0*dir.0 + d.1*dir.1 + d.2*dir.2 < 0.0 {(-d.0, -d.1, -d.2)} else {d};
-      let along = |p : (f32, f32, f32)| -> f32 {
-        (p.0 - line.0.0)*d.0 + (p.1 - line.0.1)*d.1 + (p.2 - line.0.2)*d.2
-      };
-      let s_inner = along(inner);
       let now : Vec<bool> = (0..n)
-        .map(|k| {
-          let p = (xs[k], ys[k], zs[k]);
-          usable[k] && distance_to_line(p, line.0, d) <= acceptance_radius(radius, cleaning.cone_angle, along(p) - s_inner)
-        })
+        .map(|k| usable[k] && distance_to_line((xs[k], ys[k], zs[k]), line.0, line.1) <= radius)
         .collect();
       if fit.is_some() && now == accepted {
         // the same hits give the same fit
@@ -841,30 +800,20 @@ impl LineFitCleaning {
   /// and shrinks by shrink_factor after each fit down to
   /// final_radius, if that is given and smaller.
   #[new]
-  #[pyo3(signature = (cylinder_radius, cone_angle = 0.0, max_iterations = 10, cost = LineFitCost::Chi2,
+  #[pyo3(signature = (cylinder_radius, max_iterations = 10, cost = LineFitCost::Chi2,
                       final_radius = None, shrink_factor = 0.5))]
   fn new_py(cylinder_radius : f32,
-            cone_angle      : f32,
             max_iterations  : u32,
             cost            : LineFitCost,
             final_radius    : Option<f32>,
             shrink_factor   : f32) -> Self {
     Self {
       cylinder_radius,
-      cone_angle,
       max_iterations,
       cost,
       final_radius : final_radius.unwrap_or(cylinder_radius),
       shrink_factor,
     }
-  }
-
-  /// The radius (in mm) within which hits are accepted at a
-  /// distance s (in mm) along the line beyond the inner seed
-  /// hit (negative before it), for the first fit
-  #[pyo3(name="acceptance_radius")]
-  fn acceptance_radius_py(&self, s : f32) -> f32 {
-    self.acceptance_radius(s)
   }
 
   /// Only hits within a cylinder of this radius (in mm)
@@ -877,19 +826,6 @@ impl LineFitCleaning {
   #[setter]
   fn set_cylinder_radius(&mut self, cylinder_radius : f32) {
     self.cylinder_radius = cylinder_radius;
-  }
-
-  /// Half opening angle (in rad) of the cone, opening from
-  /// the inner seed hit away from the outer seed hit, which
-  /// is added to the cylinder. 0 means cylinder only
-  #[getter]
-  fn get_cone_angle(&self) -> f32 {
-    self.cone_angle
-  }
-
-  #[setter]
-  fn set_cone_angle(&mut self, cone_angle : f32) {
-    self.cone_angle = cone_angle;
   }
 
   /// The radius (in mm) the cylinder shrinks to. If it is
@@ -948,8 +884,8 @@ impl LineFitCleaning {
     } else {
       String::new()
     };
-    format!("<LineFitCleaning: cylinder_radius {} mm{}, cone_angle {} rad, max_iterations {}, cost {:?}>",
-            self.cylinder_radius, shrinking, self.cone_angle, self.max_iterations, self.cost)
+    format!("<LineFitCleaning: cylinder_radius {} mm{}, max_iterations {}, cost {:?}>",
+            self.cylinder_radius, shrinking, self.max_iterations, self.cost)
   }
 }
 
@@ -1265,74 +1201,6 @@ mod tests {
     ts[3] = 1.0;
     let cleaned = LineFit::fit_cleaned(&xs, &ys, &zs, &ts, None, None, &LineFitCleaning::new(20.0)).unwrap();
     assert_eq!(cleaned.seed, (0, 3));
-  }
-
-  #[test]
-  fn linefit_cleaning_acceptance_radius() {
-    let mut cleaning = LineFitCleaning::new(50.0);
-    assert_eq!(cleaning.acceptance_radius(-100.0), 50.0);
-    assert_eq!(cleaning.acceptance_radius(500.0), 50.0);
-    cleaning.cone_angle = std::f32::consts::FRAC_PI_4;
-    assert_eq!(cleaning.acceptance_radius(-100.0), 50.0);
-    assert!((cleaning.acceptance_radius(100.0) - 150.0).abs() < 1e-3);
-  }
-
-  /// A vertical track (x = y = 0) through an outer TOF hit at
-  /// z = 2000, an inner one at z = 1200 and 7 tracker layers,
-  /// plus two hits 80 mm off the track: one before the inner
-  /// TOF hit (z = 1600) and one 700 mm beyond it (z = 500)
-  fn track_for_cone() -> (Vec<f32>, Vec<f32>, Vec<f32>, Vec<f32>) {
-    let mut zs : Vec<f32> = vec![2000.0, 1200.0];
-    zs.extend((0..7).map(|k| 400.0 + 100.0*k as f32));
-    let mut xs = vec![0.0; zs.len()];
-    let mut ts = vec![f32::NAN; zs.len()];
-    ts[0] = 0.0;
-    ts[1] = 3.0;
-    xs.extend([80.0, 80.0]);
-    zs.extend([1600.0, 500.0]);
-    ts.extend([f32::NAN, f32::NAN]);
-    let ys = vec![0.0; zs.len()];
-    (xs, ys, zs, ts)
-  }
-
-  #[test]
-  fn linefit_cleaned_cone() {
-    let (xs, ys, zs, ts) = track_for_cone();
-    let n = xs.len();
-    // cylinder only, both hits off the track are rejected
-    let mut cleaning = LineFitCleaning::new(50.0);
-    let cleaned = LineFit::fit_cleaned(&xs, &ys, &zs, &ts, None, None, &cleaning).unwrap();
-    assert!(cleaned.accepted[..n-2].iter().all(|a| *a));
-    assert!(!cleaned.accepted[n-2] && !cleaned.accepted[n-1]);
-    // a 5 deg cone gives r = 50 + 700*tan(5 deg) = 111 mm at
-    // the hit beyond the inner TOF hit, but does not change
-    // the acceptance before it
-    cleaning.cone_angle = 5.0f32.to_radians();
-    let cleaned = LineFit::fit_cleaned(&xs, &ys, &zs, &ts, None, None, &cleaning).unwrap();
-    assert!(cleaned.accepted[..n-2].iter().all(|a| *a));
-    assert!(!cleaned.accepted[n-2]);
-    assert!(cleaned.accepted[n-1]);
-    assert!(cleaned.converged);
-  }
-
-  #[test]
-  fn linefit_cleaned_cone_opens_away_from_outer_hit() {
-    // the same track mirrored in z (going upwards, outer TOF
-    // hit at z = 400, inner at z = 1200), the cone has to
-    // open towards +z now
-    let (xs, ys, mut zs, ts) = track_for_cone();
-    let n = xs.len();
-    for z in zs.iter_mut() {
-      *z = 2400.0 - *z;
-    }
-    let mut cleaning = LineFitCleaning::new(50.0);
-    cleaning.cone_angle = 5.0f32.to_radians();
-    let cleaned = LineFit::fit_cleaned(&xs, &ys, &zs, &ts, None, None, &cleaning).unwrap();
-    // z = 800 is before the inner hit (with the cone opening
-    // towards -z, r would be 50 + 400*tan(5 deg) = 85 mm)
-    assert!(!cleaned.accepted[n-2]);
-    // z = 1900 is 700 mm beyond the inner hit
-    assert!(cleaned.accepted[n-1]);
   }
 
   #[test]
