@@ -83,6 +83,16 @@ namespace gondola {
     //auto tof_pos_response_fn_simple(RecoHit& hit)                        -> f64; 
     /// Re-calculate energy for the hit and additionally return calculated adc values 
     auto trk_response_fn(RecoHit& hit)                                   -> u32;
+    /// keV per mV of the tracker transfer functions (as in the calibration)
+    static constexpr f64 TRK_KEV_PER_MV  = 0.841;
+    /// largest adc value the tracker transfer functions are defined for
+    static constexpr u32 TRK_TF_MAX_ADC  = 1600;
+    /// The adc value (0 .. TRK_TF_MAX_ADC) for which the transfer function
+    /// of the strip comes closest to the signal (in mV). The pieces of the
+    /// transfer functions do not join at their boundaries, so the transfer
+    /// function is made monotonic first (running maximum over the adc
+    /// values): a signal in a gap gets the adc value at its edge.
+    auto trk_adc_from_signal(u32 volume, const TrackerStripTransferFunction& tf, f64 signal_mv) -> u32;
     /// Digitize an event. If cfg.digi_require_tof_trigger is set, events
     /// which do not pass tof_trigger are rejected (None).
     ///
@@ -233,6 +243,9 @@ namespace gondola {
     TrkStripTransferFnMap         strip_tfns_; 
     TrkStripPedMap                strip_pedestals_;
     HashMap<u32,bool>             strip_mask_; 
+    /// the monotonic transfer function for each adc value, by volume id,
+    /// filled when a strip is hit for the first time
+    HashMap<u32,Vec<f32>>         strip_tf_tables_;
     HashMap<u32,u32>              strip_vid_hid_map_; 
 
     bool trk_add_cmn_noise_   = false;

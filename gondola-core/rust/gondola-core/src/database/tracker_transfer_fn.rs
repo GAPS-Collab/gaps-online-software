@@ -239,11 +239,11 @@ impl TrackerStripTransferFunction {
       return self.pol_b3_1 + 2.0*self.pol_b3_2*adc + 3.0*self.pol_b3_3*(adc.powi(2));
     }
     if 500.0 < adc && adc <= 900.0 {
-      return self.pol_c3_1 + 2.0*self.pol_c3_2 + 3.0*self.pol_c3_3*(adc.powi(2));
+      return self.pol_c3_1 + 2.0*self.pol_c3_2*adc + 3.0*self.pol_c3_3*(adc.powi(2));
     }
     //if 900.0 < adc && adc <= 2047.0 {
     if 900.0 < adc && adc <= 1600.0 {
-      return self.pol_d3_1 + 2.0*self.pol_d3_2 + 3.0*self.pol_d3_3*(adc.powi(2));
+      return self.pol_d3_1 + 2.0*self.pol_d3_2*adc + 3.0*self.pol_d3_3*(adc.powi(2));
     }
     0.0
   }
@@ -298,7 +298,7 @@ impl TrackerStripTransferFunction {
       // Fallback to Bisection if Newton fails or is too slow
       x = 0.5 * (low + high);
     }
-    error!("We couldn't find a solution which is epsilon {} away! Try to reduce epsilon!", epsilon);
+    error!("We couldn't find a solution which is epsilon {} away! The transfer function might not be continuous or monotonic, try a larger epsilon!", epsilon);
     Err(AnalysisError::DidNotConverge)
   }
 }
@@ -418,9 +418,10 @@ impl TrackerStripTransferFunction {
 
   /// The inverse transfer function as to be used 
   /// in the simulation. 
-  /// If this returns errors for values within 
-  /// range, try to reduce the convergence 
-  /// crtierion epsilon 
+  /// The pieces of the transfer functions do not
+  /// always join at adc 190, 500 and 900, so there
+  /// might be no solution for values in such a gap
+  /// (unless epsilon is larger than the gap)
   #[pyo3(signature = (mv , epsilon = None))] 
   #[pyo3(name="invert")]
   fn invert_py(&self, mv : f64, epsilon : Option<f64>) -> PyResult<f64> {
@@ -540,3 +541,24 @@ pub fn create_trk_transfer_fn_table( db_path: &str, transfer_fns: Vec<TrackerStr
   println!("Inserted {}", _query_result.unwrap());
 }
 
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn trk_transfer_fn_derivative() {
+    // coefficients of a typical strip
+    let mut tf = TrackerStripTransferFunction::new();
+    (tf.pol_a2_0, tf.pol_a2_1, tf.pol_a2_2) = (1.97, 1.098, 0.0018);
+    (tf.pol_b3_0, tf.pol_b3_1, tf.pol_b3_2, tf.pol_b3_3) = (-853.71, 10.29, -0.0322, 4.48e-5);
+    (tf.pol_c3_0, tf.pol_c3_1, tf.pol_c3_2, tf.pol_c3_3) = (5585.65, -13.69, -0.0104, 4.6e-5);
+    (tf.pol_d3_0, tf.pol_d3_1, tf.pol_d3_2, tf.pol_d3_3) = (-29596.45, 25.56, 0.028, 2.1e-6);
+    // compare with a central difference inside each piece
+    for adc in [50.0f32, 150.0, 300.0, 450.0, 600.0, 800.0, 1000.0, 1500.0] {
+      let h       = 0.5f32;
+      let numeric = (tf.evaluate(adc + h) - tf.evaluate(adc - h))/(2.0*h);
+      let exact   = tf.derivative(adc);
+      assert!((numeric - exact).abs() < 1e-3*exact.abs().max(1.0), "adc {adc}: {numeric} != {exact}");
+    }
+  }
+}

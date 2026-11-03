@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstdlib>
 #include <pthread.h>
 
@@ -377,7 +378,9 @@ g::GapsDigitizer::GapsDigitizer(const SimConfig& cfg) : cfg(cfg){
   tof_volt_smearing_       = std::normal_distribution<f64>(cfg.digi_tof_voltage_offset, cfg.digi_tof_voltage_width);
   tof_time_smearing_       = std::normal_distribution<f64>(cfg.digi_tof_timing_offset,  cfg.digi_tof_timing_width);
   tof_pos_smearing_        = std::normal_distribution<f64>(cfg.digi_tof_pos_offset,     cfg.digi_tof_pos_width);
-  trk_energy_smearing_     = std::normal_distribution<f64>(cfg.digi_trk_energy_offset,  cfg.digi_trk_energy_width);
+  // the tracker energy offset and width are given in keV, the energies are in MeV
+  trk_energy_smearing_     = std::normal_distribution<f64>(cfg.digi_trk_energy_offset/1000.0,
+                                                           cfg.digi_trk_energy_width/1000.0);
   paddles_                 = g::get_tofpaddles_by_volumeid();
   strips_                  = g::get_trackerstrips_by_volumeid();
   strip_tfns_              = g::get_trkstriptransferfn_by_volumeid(cfg.digi_trk_tf_name);
@@ -654,35 +657,15 @@ auto g::GapsDigitizer::trk_response_fn(g::RecoHit& hit) -> u32 {
   hit.x = strip.global_pos_x_l0;
   hit.y = strip.global_pos_y_l0;
   hit.z = strip.global_pos_z_l0;
-  f64 energy = hit.energy;
   hit.energy += trk_energy_smearing_(random_gen_);
   if (hit.energy < 0) {
     // cut off at 0
     hit.energy = 0;
   }
-  f64 simu_V = energy/.841;
-  // get the transfer function for this strip 
-  auto tf  = strip_tfns_[hit.volume];
-  // to get to adc, we need to invert it 
-  f32 adc_float  = 0;
-  auto adc_res = tf.invert(hit.energy*1000, 1e-2);
-  if (!(adc_res.is_ok())) {
-    // reduce epsilon and try again 
-    //spdlog::warn("Inversion of TF is not converging, reducing epsilon...");
-    auto adc_res_2 = tf.invert(hit.energy*1000, 1e-2);
-    if (!(adc_res_2.is_ok())) {
-      spdlog::error("Unable to invert TF for strip {}", tf.strip_id);
-      return 0; 
-    } else {
-      adc_float = adc_res_2.unwrap();
-    }
-  } else {
-    adc_float = adc_res.unwrap();
-  }  
-  i32 adc = std::round(adc_float);
-  if (adc < 0) {
-    spdlog::warn("Got adc < 0");
-  }
+  // get the transfer function for this strip. It gives the signal in mV
+  // for an adc value, so we need to invert it
+  auto tf = strip_tfns_[hit.volume];
+  i32 adc = trk_adc_from_signal(hit.volume, tf, 1000.0*hit.energy/TRK_KEV_PER_MV);
   // get the pedestal width for this strip 
   // and use it to jitter the adc around a litttle bit
   f64 res = strip_pedestals_[hit.volume].pedestal_sigma;
@@ -719,8 +702,35 @@ auto g::GapsDigitizer::trk_response_fn(g::RecoHit& hit) -> u32 {
   }
   // after the rounding and clipping, we convert back to the 
   // energy (admittedly the above steps where kind of minimal)
-  hit.energy = (tf.evaluate(adc)*.841)/1000; // mV to KeV to MeV
+  hit.energy = (tf.evaluate(adc)*TRK_KEV_PER_MV)/1000; // mV to KeV to MeV
   return (u32)adc;
+}
+
+//----------------------------------------------------------
+
+auto g::GapsDigitizer::trk_adc_from_signal(u32 volume, const TrackerStripTransferFunction& tf, f64 signal_mv) -> u32 {
+  auto& table = strip_tf_tables_[volume];
+  if (table.empty()) {
+    table.resize(TRK_TF_MAX_ADC + 1);
+    f32 running = tf.evaluate(0.0f);
+    for (u32 adc = 0; adc <= TRK_TF_MAX_ADC; adc++) {
+      running    = std::max(running, tf.evaluate(static_cast<f32>(adc)));
+      table[adc] = running;
+    }
+  }
+  if (signal_mv <= table.front()) {
+    return 0;
+  }
+  if (signal_mv >= table.back()) {
+    return TRK_TF_MAX_ADC;
+  }
+  // the first adc value which reaches the signal, or the one before it,
+  // whichever is closer
+  u32 adc = static_cast<u32>(std::lower_bound(table.begin(), table.end(), signal_mv) - table.begin());
+  if (signal_mv - table[adc - 1] < table[adc] - signal_mv) {
+    adc -= 1;
+  }
+  return adc;
 }
 
 //----------------------------------------------------------

@@ -128,7 +128,7 @@ auto g::TrackerStripTransferFunction::invert(f64 y, f64 epsilon) -> Result<f64, 
     // Fallback to Bisection if Newton fails or is too slow
     x = 0.5 * (low + high);
   }
-  auto message = std::format("We couldn't find a solution whcih is epsilon {} away! Try to reduce epsilon", epsilon);
+  auto message = std::format("We couldn't find a solution which is epsilon {} away! The transfer function might not be continuous or monotonic, try a larger epsilon", epsilon);
   SPDLOG_ERROR(message);
   auto err = g::AnalysisError(g::AnalysisError::ErrorKind::DidNotConverge, message);
   return Err(err);

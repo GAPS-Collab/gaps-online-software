@@ -119,6 +119,7 @@ digi_tof_beta_threshold_mv   = 118.75
 digi_tof_veto_threshold_mv   = 1425
 #------------------------------------
 # digi variables for the tracker 
+# energy resolution of the tracker strips (gaussian, in keV)
 digi_trk_energy_offset       = 0
 digi_trk_energy_width        = 1.6985138004246285
 digi_trk_add_cmn_noise       = false 
