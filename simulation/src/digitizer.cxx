@@ -702,7 +702,13 @@ auto g::GapsDigitizer::trk_response_fn(g::RecoHit& hit) -> u32 {
   }
   // after the rounding and clipping, we convert back to the 
   // energy (admittedly the above steps where kind of minimal)
-  hit.energy = (tf.evaluate(adc)*TRK_KEV_PER_MV)/1000; // mV to KeV to MeV
+  // Only the strip id and the adc are written to the TelemetryEvent, so
+  // this energy is only kept in memory. For simulation and data alike, the
+  // energy is calculated from the adc by the calibration in gondola
+  // (TrackerOfflineCalibration), which subtracts the pedestal and saturates
+  // at the largest adc of the transfer function in the same way.
+  f64 signal_adc = std::min(static_cast<f64>(adc) - mn, static_cast<f64>(TRK_TF_MAX_ADC));
+  hit.energy = (tf.evaluate(static_cast<f32>(signal_adc))*TRK_KEV_PER_MV)/1000; // mV to KeV to MeV
   return (u32)adc;
 }
 

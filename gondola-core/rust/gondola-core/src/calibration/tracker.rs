@@ -160,11 +160,13 @@ impl TrackerOfflineCalibration {
         energy -= cmn.0;
         hit_is_pulser = cmn.1;
       }
-      // apply transfer functions 
+      // apply transfer functions. They are only defined up to
+      // TrackerStripTransferFunction::MAX_ADC, so larger values
+      // saturate there
       hit_tf = self.tf_map.get(&hit.get_stripid());
       if let Some(tf) = hit_tf {
         //println!("energy before : {}", energy);
-        energy = tf.evaluate(energy);
+        energy = tf.evaluate(energy.min(TrackerStripTransferFunction::MAX_ADC));
         //println!("energy after : {}", energy);
       } else {
         error!("Trying to calibrate {}, but we don't have a transfer function for that!", hit.get_stripid());
@@ -181,7 +183,7 @@ impl TrackerOfflineCalibration {
             }
             p_avg -= hit_ped;
             if let Some(tf) = hit_tf {
-              p_avg = tf.evaluate(p_avg); 
+              p_avg = tf.evaluate(p_avg.min(TrackerStripTransferFunction::MAX_ADC));
               energy -= p_avg;
             }
           }
@@ -328,3 +330,33 @@ impl TrackerOfflineCalibration {
 #[cfg(feature="pybindings")]
 pythonize!(TrackerOfflineCalibration);
 
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn tracker_calibration_saturates_at_max_adc() {
+    let mut cali = TrackerOfflineCalibration::new();
+    let mut hit  = TrackerHit::new();
+    (hit.layer, hit.row, hit.module, hit.channel) = (1, 2, 3, 4);
+    let sid = hit.get_stripid();
+    let mut ped = TrackerStripPedestal::new();
+    ped.pedestal_mean = 100.0;
+    cali.ped_map.insert(sid, ped);
+    let mut tf = TrackerStripTransferFunction::new();
+    (tf.pol_d3_0, tf.pol_d3_1) = (10.0, 2.0);
+    cali.tf_map.insert(sid, tf.clone());
+    // adc - pedestal = 1800 is beyond the transfer function
+    hit.adc = 1900;
+    let mut hits = vec![hit.clone()];
+    cali.calibrate(&mut hits, false).unwrap();
+    let at_max = tf.evaluate(TrackerStripTransferFunction::MAX_ADC)*0.841/1000.0;
+    assert!(at_max > 0.0);
+    assert!((hits[0].energy - at_max).abs() < 1e-6);
+    // within the range, the transfer function is used as it is
+    hit.adc = 1100;
+    let mut hits = vec![hit];
+    cali.calibrate(&mut hits, false).unwrap();
+    assert!((hits[0].energy - tf.evaluate(1000.0)*0.841/1000.0).abs() < 1e-6);
+  }
+}

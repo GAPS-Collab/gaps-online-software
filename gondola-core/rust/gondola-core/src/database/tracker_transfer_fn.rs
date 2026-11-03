@@ -48,6 +48,10 @@ pub struct TrackerStripTransferFunction {
 
 impl TrackerStripTransferFunction {
 
+  /// The transfer functions are defined for adc values up to this
+  /// one (evaluate gives 0 above)
+  pub const MAX_ADC : f32 = 1600.0;
+
   pub fn new() -> Self {
     Self {
       data_id             : 0,
