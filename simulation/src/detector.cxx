@@ -355,12 +355,14 @@ auto go::GapsDetector::Construct() -> G4VPhysicalVolume* {
                             + 0.5*sp.thickness_p_layer};
     //G4Transform3D transform = G4Translate3D(strippos);
     G4Transform3D transform = G4Translate3D(detpos);
+    // The strip volumes are built with their offsets along y, strip A
+    // at negative y (see volume_store.cxx). In the database, the strips
+    // of even layers measure x with strip A at positive x, and the ones
+    // of odd layers measure y with strip A at negative y. So the strips
+    // of even layers are rotated by 90 degree around z, (0,-d) -> (d,0),
+    // and the ones of odd layers are placed as they are.
     if (strip.layer % 2 == 0) {
-      //continue;
-    } else {
-      // this transformation seems correct
       transform = transform*G4RotateZ3D(90*deg);
-      //continue;
     }
     auto s_label = sp.get_strip_label(strip.channel);
     //std::cout << s_label << std::endl;
