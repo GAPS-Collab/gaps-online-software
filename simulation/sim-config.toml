@@ -59,7 +59,24 @@ tof_panel_18   = [149,150,151]
 tof_panel_19   = [152,153,154]
 tof_panel_20   = [155,156,157]
 tof_panel_21   = [158,159,160]
+
+# configuration for the tracker 
+# ------------------------------ 
+
+# enables all tracker - this should in 
+# general be true, except a dedicated 
+# study on the TOF is desired 
 all_sili       = true 
+# should strips based on one of the existing masks be 
+# excluded?
+exclude_trk_strips_by_mask = true 
+# if the above setting is true, a name under which the mask 
+# can be retrieved from the database needs to be specified. 
+# this is typically the filename (without path) from which 
+# this mask has been originally parsed. An invalid mask or 
+# true in the setting right above and an empty string here 
+# will cause a ConfigurationError at runtime
+exclude_trk_strips_mask_name = "tracker_channel_enables_100.txt"
 
 [passive_materials]
 

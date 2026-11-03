@@ -60,6 +60,8 @@ auto SimConfig::from_file(std::string fname) -> SimConfig {
   
   sim.ad_only_place_pid  = config["active_detectors"]["only_place_pid"].value_or(0);  
   sim.ad_all_sili        = config["active_detectors"]["all_sili"].value_or(true);  
+  sim.ad_exclude_trk_strips_by_mask   = config["active_detectors"]["exclude_trk_strips_by_mask"].value_or(false);
+  sim.ad_exclude_trk_strips_mask_name = config["active_detectors"]["exclude_trk_strips_mask_name"].value_or("");
 
   if (sim.ad_only_place_pid > 0) {
     sim.active_paddles = {sim.ad_only_place_pid};

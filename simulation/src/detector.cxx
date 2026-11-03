@@ -27,6 +27,16 @@ go::GapsDetector::GapsDetector(const SimConfig& cfg) {
 auto go::GapsDetector::SaveGeometry(std::string fname) -> void {
   G4GDMLParser parser;
   parser.SetAddPointerToName(false); 
+  // prepare a tracker sili mask 
+  auto trk_strip_mask = go::TrkStripMaskMap();
+  if (sim_config.ad_exclude_trk_strips_by_mask && (sim_config.ad_exclude_trk_strips_mask_name != "")) {
+    trk_strip_mask = go::get_trackerstripmasks(sim_config.ad_exclude_trk_strips_mask_name);
+    if (trk_strip_mask.empty()) {
+      auto message = std::format("Tracker strip mask configured, but it is empty! Either mask_name_string is empty, or the given name does not exist. Given configuration : '{}'", sim_config.ad_exclude_trk_strips_mask_name);
+      throw go::ConfigurationError(go::ConfigurationError::ErrorKind::NonSensicalConfiguration, message);
+    }
+    trk_strip_mask_map_ = trk_strip_mask;
+  }
   // mark the active volumes 
   for (auto const &v : active_vols) {
     // FIXME - initialization of this. There is a compiler warning if unit ('mm') and 
@@ -583,6 +593,7 @@ auto go::GapsDetector::Construct() -> G4VPhysicalVolume* {
 auto go::GapsDetector::ConstructSDandField() -> void {
   // make the active volumes active 
   auto sd = new go::SensitiveDetector("foo");
+  sd->set_trk_strip_mask(trk_strip_mask_map_);
   auto* sd_man = G4SDManager::GetSDMpointer();
   sd_man->AddNewDetector(sd);
   

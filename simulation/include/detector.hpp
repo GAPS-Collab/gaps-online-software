@@ -32,7 +32,9 @@ namespace gondola {
     // constructors, destructors
     virtual ~GapsDetector(){};
     private:
-      SimConfig sim_config;
+      // FIXME - consistent naming!
+      SimConfig       sim_config;
+      TrkStripMaskMap trk_strip_mask_map_;
   };
 }
 

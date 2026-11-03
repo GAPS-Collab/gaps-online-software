@@ -46,6 +46,20 @@ namespace gondola {
       ErrorKind kind;
       std::string reason;
   };
+  
+  class ConfigurationError {
+    public:
+   
+      enum class ErrorKind {
+        NonSensicalConfiguration
+      };
+     
+      ConfigurationError(ErrorKind kind, std::string reason = ""):
+        kind(kind), reason(reason) {}
+      
+      ErrorKind kind;
+      std::string reason;
+  };
 
   //class FatalException : public std::exception {
   //  virtual const char* what() const throw() { 
