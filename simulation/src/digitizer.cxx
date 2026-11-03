@@ -1057,7 +1057,9 @@ auto g::GapsDigitizer::find_tof_pulse_template_by_peak(u8 paddle_id, u8 side, f6
     //  best_template = &pulse;
     //}
   //}
-  if (saturated && template_peak_mv < TOF_SATURATION_MV) {
+  // in the saturated case, only saturated templates can be chosen,
+  // so no template means no saturated template was found
+  if (saturated && best_template == nullptr) {
     tof_hits_sat_no_templ_found++;
   }
   return best_template;
