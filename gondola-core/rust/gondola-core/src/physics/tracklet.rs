@@ -237,6 +237,14 @@ impl Tracklet {
   fn get_stop_pos_py(&self) -> (f32,f32,f32) {
     (self.stop.x, self.stop.y, self.stop.z)
   }
+  
+  /// Volume where the particle stopped (for the MC primary:
+  /// where it came to rest or interacted)
+  #[getter]
+  #[pyo3(name="stop_volume")]
+  fn get_stop_volume_py(&self) -> u32 {
+    self.stop.volume
+  }
 
   /// Time at the stopping position
   #[getter]

@@ -10,6 +10,7 @@ auto gon::SteppingAction::UserSteppingAction(const G4Step* step) -> void {
   u32 vid = 0;
   if (step->GetTrack()->GetTrackID() == 1) {
     vid = step->GetTrack()->GetVolume()->GetCopyNo();
+	primary_stopping_volume = vid;
     if (step->GetPostStepPoint()->GetKineticEnergy() == 0) {
       // Workaround - in case the particle does not stop, these values 
       // remain at the ones where it actually stopped.

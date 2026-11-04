@@ -100,6 +100,7 @@ auto gon::EventAction::EndOfEventAction(const G4Event* event)   -> void {
     p_stop->z                  = stepping_action->primary_stopping_z;
     p_stop->time               = stepping_action->primary_stopping_t;
     p_stop->energy             = stepping_action->primary_stopping_kinE;
+    p_stop->volume             = stepping_action->primary_stopping_volume;
     primary_track.set_stop(p_stop);
     //primary_track.stop->x      = stepping_action->primary_stopping_x; 
     mc_event.primary           = std::move(primary_track);

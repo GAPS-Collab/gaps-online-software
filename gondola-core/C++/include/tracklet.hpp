@@ -3,6 +3,9 @@
 #pragma once 
 
 #include <memory>
+#include<limits>
+#include<cmath>
+
 #include "gondola.hpp" 
 
 namespace gondola {
@@ -10,15 +13,15 @@ namespace gondola {
   /// A calibrated hit, oblivious to everything which 
   /// happened on low-level
   struct RecoHit {
-    f32 x     ;
-    f32 x_err ;
-    f32 y     ;
-    f32 y_err ;
-    f32 z     ;
-    f32 z_err ;
-    f32 time  ;
-    f32 energy;
-    u32 volume;
+    f32 x      = std::numeric_limits<f32>::quiet_NaN();
+    f32 x_err  = std::numeric_limits<f32>::quiet_NaN();
+    f32 y      = std::numeric_limits<f32>::quiet_NaN();
+    f32 y_err  = std::numeric_limits<f32>::quiet_NaN();
+    f32 z      = std::numeric_limits<f32>::quiet_NaN();
+    f32 z_err  = std::numeric_limits<f32>::quiet_NaN();
+    f32 time   = std::numeric_limits<f32>::quiet_NaN();
+    f32 energy = std::numeric_limits<f32>::quiet_NaN();
+    u32 volume = 0;
 
     auto to_string() const -> std::string;
     /// Serializaton to bytes - needed to be 
@@ -41,14 +44,14 @@ namespace gondola {
 
   /// A straight line as it could be part of a track 
   struct Tracklet {
-    bool is_infinite                ; 
-    f32  vertex_mom_x               ; 
-    f32  vertex_mom_y               ; 
-    f32  vertex_mom_z               ;
+    bool is_infinite                = false; 
+    f32  vertex_mom_x               = std::numeric_limits<f32>::quiet_NaN(); 
+    f32  vertex_mom_y               = std::numeric_limits<f32>::quiet_NaN(); 
+    f32  vertex_mom_z               = std::numeric_limits<f32>::quiet_NaN();
     /// particle type identifier (see PDG codes) 
-    i32  pdg                        ;
-    f32  beta                       ;
-    f32  beta_err                   ;
+    i32  pdg                        = 0;
+    f32  beta                       = std::numeric_limits<f32>::quiet_NaN();
+    f32  beta_err                   = std::numeric_limits<f32>::quiet_NaN();
    
     Tracklet(std::shared_ptr<RecoHit> vertex);
     Tracklet();
