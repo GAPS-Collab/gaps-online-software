@@ -11,6 +11,9 @@ use argmin::core::{
 };
 use argmin::solver::neldermead::NelderMead;
 
+#[cfg(feature="database")]
+use std::collections::BTreeMap;
+
 
 #[derive(Debug, Copy, Clone, PartialEq,FromRepr, AsRefStr, EnumIter)]
 #[repr(u8)]
@@ -1018,7 +1021,10 @@ impl LineFitPoints {
       szv += ws[k]*(self.zs[k] - zbar)*(vs[k] - vbar);
     }
     if szz <= f64::EPSILON*sw {
-      error!("All points have the same z, can not fit a line as a function of z!");
+      // not an error of the program: the fit just returns None,
+      // e.g. for candidate lines of searchlight with all hits on
+      // one paddle plane
+      debug!("All points have the same z, can not fit a line as a function of z!");
       return None;
     }
     let b     = szv/szz;
@@ -1059,6 +1065,148 @@ impl CostFunction for LineFitPoints {
 }
 
 //------------------------------------------------------------
+
+/// The overlap of two neighbouring TOF paddles, see
+/// TofPaddleOverlaps
+#[cfg(feature="database")]
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct TofPaddleOverlap {
+  /// Unit vector across both paddles (perpendicular to their
+  /// principal axis and to their normal)
+  pub across   : [f32;3],
+  /// Position of the middle of the overlap along `across` (mm)
+  pub position : f32,
+  /// Width of the overlap (mm)
+  pub width    : f32,
+}
+
+/// Neighbouring TOF paddles of a panel overlap a little across
+/// their width (about 11 mm). If both paddles of such a pair are
+/// hit at the same time, the particle went through the overlap,
+/// which fixes its position across the paddles much better than
+/// the width of a single paddle (160 mm).
+///
+/// The overlaps are found once from the paddle geometry and can
+/// then be used for all events, see TofEvent::merge_overlapping_hits.
+#[cfg(feature="database")]
+#[derive(Debug, Clone, Default)]
+#[cfg_attr(feature="pybindings", pyclass)]
+pub struct TofPaddleOverlaps {
+  /// (paddle id a, paddle id b) with a < b -> their overlap
+  pub overlaps : BTreeMap<(u8, u8), TofPaddleOverlap>,
+}
+
+#[cfg(feature="database")]
+impl TofPaddleOverlaps {
+  /// Paddles further apart than this along their normal do not
+  /// belong to the same panel (mm)
+  pub const MAX_NORMAL_DISTANCE : f32 = 60.0;
+  /// Overlaps narrower than this are ignored (mm)
+  pub const MIN_WIDTH : f32 = 0.5;
+  /// Default for the largest time difference of two hits in
+  /// overlapping paddles to be merged (ns)
+  pub const DEFAULT_MAX_DT : f32 = 1.0;
+
+  /// Find the overlapping pairs: parallel paddles of the same
+  /// panel whose widths overlap
+  ///
+  /// # Arguments:
+  ///   * paddles : paddle id -> paddle, as from the database
+  pub fn new(paddles : &HashMap<u8, TofPaddle>) -> Self {
+    let dot   = |a : [f32;3], b : [f32;3]| a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+    let cross = |a : [f32;3], b : [f32;3]| [a[1]*b[2] - a[2]*b[1],
+                                            a[2]*b[0] - a[0]*b[2],
+                                            a[0]*b[1] - a[1]*b[0]];
+    let vec3  = |v : (f32, f32, f32)| [v.0, v.1, v.2];
+    let mut overlaps = BTreeMap::<(u8, u8), TofPaddleOverlap>::new();
+    let mut ids : Vec<u8> = paddles.keys().copied().collect();
+    ids.sort();
+    for (k, &a) in ids.iter().enumerate() {
+      for &b in &ids[k+1..] {
+        let (pa, pb) = (&paddles[&a], &paddles[&b]);
+        let (na, nb) = (vec3(pa.normal()), vec3(pb.normal()));
+        let (ra, rb) = (vec3(pa.principal()), vec3(pb.principal()));
+        if (dot(na, nb).abs() - 1.0).abs() > 1e-3 || (dot(ra, rb).abs() - 1.0).abs() > 1e-3 {
+          continue;
+        }
+        // the database has positions and sizes in cm
+        let (ca, cb) = (vec3(pa.center_pos()), vec3(pb.center_pos()));
+        let ca = [10.0*ca[0], 10.0*ca[1], 10.0*ca[2]];
+        let d  = [10.0*cb[0] - ca[0], 10.0*cb[1] - ca[1], 10.0*cb[2] - ca[2]];
+        if dot(d, na).abs() > Self::MAX_NORMAL_DISTANCE {
+          continue;
+        }
+        let across = cross(na, ra);
+        let norm   = dot(across, across).sqrt();
+        if norm < 0.5 {
+          // normal or principal axis not set
+          continue;
+        }
+        let across = [across[0]/norm, across[1]/norm, across[2]/norm];
+        let da     = dot(d, across);
+        let width  = 5.0*(pa.width + pb.width) - da.abs();
+        if width < Self::MIN_WIDTH || dot(d, ra).abs() >= 5.0*(pa.length + pb.length) {
+          continue;
+        }
+        let position = dot(ca, across) + da.signum()*(5.0*pa.width - 0.5*width);
+        overlaps.insert((a, b), TofPaddleOverlap { across, position, width });
+      }
+    }
+    Self { overlaps }
+  }
+
+  /// The overlap of the paddles a and b (in any order), if any
+  pub fn get(&self, a : u8, b : u8) -> Option<&TofPaddleOverlap> {
+    self.overlaps.get(&(a.min(b), a.max(b)))
+  }
+
+  pub fn len(&self) -> usize {
+    self.overlaps.len()
+  }
+
+  pub fn is_empty(&self) -> bool {
+    self.overlaps.is_empty()
+  }
+}
+
+#[cfg(feature="database")]
+#[cfg(feature="pybindings")]
+#[pymethods]
+impl TofPaddleOverlaps {
+  /// Find the overlapping pairs of TOF paddles: parallel paddles
+  /// of the same panel whose widths overlap
+  ///
+  /// # Arguments:
+  ///   * paddles : dict paddle id -> TofPaddle, e.g. from
+  ///               TofPaddle.all_as_dict()
+  #[new]
+  fn new_py(paddles : HashMap<u8, TofPaddle>) -> Self {
+    Self::new(&paddles)
+  }
+
+  /// The overlapping pairs (paddle id a, paddle id b), a < b
+  #[getter]
+  #[pyo3(name="pairs")]
+  fn get_pairs_py(&self) -> Vec<(u8, u8)> {
+    self.overlaps.keys().copied().collect()
+  }
+
+  /// The overlap of the paddles a and b as (unit vector across
+  /// the paddles, position of the middle of the overlap along
+  /// it in mm, width of the overlap in mm), or None
+  #[pyo3(name="overlap")]
+  fn overlap_py(&self, a : u8, b : u8) -> Option<((f32, f32, f32), f32, f32)> {
+    self.get(a, b).map(|o| ((o.across[0], o.across[1], o.across[2]), o.position, o.width))
+  }
+
+  fn __len__(&self) -> usize {
+    self.len()
+  }
+
+  fn __repr__(&self) -> String {
+    format!("<TofPaddleOverlaps: {} overlapping pairs>", self.len())
+  }
+}
 
 #[cfg(test)]
 mod tests {
@@ -1353,5 +1501,87 @@ mod tests {
     // no inner hit
     ev.tof_event.hits.pop();
     assert!(LineFit::fit_cleaned_event(&ev, &LineFitCleaning::new(20.0)).is_none());
+  }
+}
+
+#[cfg(test)]
+#[cfg(feature="database")]
+mod overlap_tests {
+  use super::*;
+
+  /// a horizontal paddle along y, 180 x 16 cm, centered at (x, 0, z) (cm)
+  fn paddle(pid : u8, x : f32, z : f32) -> TofPaddle {
+    let mut p = TofPaddle::new();
+    p.paddle_id = pid as i16;
+    p.width     = 16.0;
+    p.length    = 180.0;
+    p.height    = 0.635;
+    p.normal_z  = 1.0;
+    p.global_pos_x_l0   = x;
+    p.global_pos_z_l0   = z;
+    p.global_pos_x_l0_A = x;
+    p.global_pos_y_l0_A = -90.0;
+    p.global_pos_z_l0_A = z;
+    p.global_pos_x_l0_B = x;
+    p.global_pos_y_l0_B = 90.0;
+    p.global_pos_z_l0_B = z;
+    p
+  }
+
+  /// three paddles of a panel, neighbours overlapping by 10.9 mm
+  /// (staggered by 0.7 cm), and one paddle far away
+  fn paddles() -> HashMap<u8, TofPaddle> {
+    HashMap::from([(1u8, paddle(1, 0.0, 0.0)), (2, paddle(2, 14.91, 0.7)),
+                   (3, paddle(3, 29.82, 0.0)), (4, paddle(4, 0.0, 100.0))])
+  }
+
+  fn hit(pid : u8, x : f32, y : f32, z : f32, t : f32) -> TofHit {
+    let mut h = TofHit::new();
+    h.paddle_id = pid;
+    (h.x, h.y, h.z) = (x, y, z);
+    h.event_t0 = t;
+    h
+  }
+
+  #[test]
+  fn tof_paddle_overlaps_geometry() {
+    let ov = TofPaddleOverlaps::new(&paddles());
+    assert_eq!(ov.overlaps.keys().copied().collect::<Vec<_>>(), vec![(1, 2), (2, 3)]);
+    let o = ov.get(2, 1).unwrap();
+    assert!((o.width - 10.9).abs() < 1e-3);
+    // across is +-x, the middle of the overlap at x = 80 - 5.45 mm
+    assert!((o.across[0].abs() - 1.0).abs() < 1e-6);
+    assert!((o.position*o.across[0] - 74.55).abs() < 1e-3);
+  }
+
+  #[test]
+  fn tofevent_merge_overlapping_hits() {
+    let ov = TofPaddleOverlaps::new(&paddles());
+    let mut ev = TofEvent::new();
+    ev.hits.push(hit(1, 10.0, 300.0, 0.0, 0.0));
+    ev.hits.push(hit(2, 140.0, 320.0, 7.0, 0.4));
+    ev.hits.push(hit(4, 0.0, 0.0, 1000.0, 5.0));
+    // hit times not normalized, nothing happens
+    assert_eq!(ev.merge_overlapping_hits(&ov, 1.0), 0);
+    assert_eq!(ev.hits[0].x, 10.0);
+    ev.hit_times_normalized = true;
+    assert_eq!(ev.merge_overlapping_hits(&ov, 1.0), 1);
+    // both hits moved to the middle of the overlap across the
+    // paddles, along the paddles and the normal nothing changes
+    for (h, y, z) in [(&ev.hits[0], 300.0, 0.0), (&ev.hits[1], 320.0, 7.0)] {
+      assert!((h.x - 74.55).abs() < 1e-3);
+      assert_eq!((h.y, h.z), (y, z));
+    }
+    assert_eq!((ev.hits[2].x, ev.hits[2].y, ev.hits[2].z), (0.0, 0.0, 1000.0));
+    // merging again does not change anything
+    assert_eq!(ev.merge_overlapping_hits(&ov, 1.0), 1);
+    assert!((ev.hits[0].x - 74.55).abs() < 1e-3);
+    // too far apart in time
+    let mut late = TofEvent::new();
+    late.hits.push(hit(1, 10.0, 300.0, 0.0, 0.0));
+    late.hits.push(hit(2, 140.0, 320.0, 7.0, 1.5));
+    late.hit_times_normalized = true;
+    assert_eq!(late.merge_overlapping_hits(&ov, 1.0), 0);
+    assert_eq!(late.hits[1].x, 140.0);
   }
 }

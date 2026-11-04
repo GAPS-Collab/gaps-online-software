@@ -993,8 +993,10 @@ impl TofPaddle {
     return pr;
   }
 
-  /// Return normal axis - that is orthogonal to the principal ans 
-  /// paralel to the axis of "width" 
+  /// Return normal axis - that is orthogonal to the principal and
+  /// to the axis of "width", so parallel to the axis of "height"
+  /// (the thickness of the paddle). E.g. the paddles of the cube
+  /// top (panel 1) have the normal (0, 0, 1)
   #[getter]
   #[pyo3(name="normal")]
   pub fn normal_py(&self) -> (f32, f32, f32) {

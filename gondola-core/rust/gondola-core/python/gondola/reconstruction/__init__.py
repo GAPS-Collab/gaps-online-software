@@ -11,6 +11,33 @@ to a narrow one:
     cleaned  = LineFit.fit_cleaned_event(event, cleaning)
     cleaned.fit, cleaned.accepted
 
+Neighbouring TOF paddles overlap a little; hits in both paddles
+of an overlap at the same time are moved to the middle of the
+overlap (before the fit, after normalizing the hit times):
+
+    overlaps = TofPaddleOverlaps(gondola.db.TofPaddle.all_as_dict())
+    event.tof_normalize_hit_times()
+    event.tof_merge_overlapping_hits(overlaps)
+
+Searchlight reconstructs the primary: it flags seed hits which
+belong to secondaries and replaces them by the vertex, tracker
+hits or triggered paddles, and picks the best candidate line
+(normalized TOF hit times, calibrated tracker hits):
+
+    geometry = SearchlightGeometry(gondola.db.TofPaddle.all_as_dict(),
+                                   gondola.db.TrackerStrip.all_as_dict())
+    searchlight = Searchlight(geometry)
+    event.tof_normalize_hit_times()
+    result = searchlight.reconstruct(event)
+    result.direction, result.candidate, result.vertex
+
+The parts of searchlight can be switched in SearchlightSettings
+(independent_vertex, use_tracks, use_timing, ...);
+SearchlightSettings.phase_a() is the version without the
+independent vertex, the secondary tracks and the timing. The
+weights of the selection can be retrained with the module
+gondola.reconstruction.searchlight_training.
+
 All lengths are in mm.
 """
 
@@ -52,6 +79,30 @@ LineFitCleaning.__name__   = 'LineFitCleaning'
 CleanedLineFit = _gc.reconstruction.CleanedLineFit
 CleanedLineFit.__module__ = __name__
 CleanedLineFit.__name__   = 'CleanedLineFit'
+
+TofPaddleOverlaps = _gc.reconstruction.TofPaddleOverlaps
+TofPaddleOverlaps.__module__ = __name__
+TofPaddleOverlaps.__name__   = 'TofPaddleOverlaps'
+
+Searchlight = _gc.reconstruction.Searchlight
+Searchlight.__module__ = __name__
+Searchlight.__name__   = 'Searchlight'
+
+SearchlightGeometry = _gc.reconstruction.SearchlightGeometry
+SearchlightGeometry.__module__ = __name__
+SearchlightGeometry.__name__   = 'SearchlightGeometry'
+
+SearchlightSettings = _gc.reconstruction.SearchlightSettings
+SearchlightSettings.__module__ = __name__
+SearchlightSettings.__name__   = 'SearchlightSettings'
+
+SearchlightResult = _gc.reconstruction.SearchlightResult
+SearchlightResult.__module__ = __name__
+SearchlightResult.__name__   = 'SearchlightResult'
+
+SearchlightCandidate = _gc.reconstruction.SearchlightCandidate
+SearchlightCandidate.__module__ = __name__
+SearchlightCandidate.__name__   = 'SearchlightCandidate'
 
 LINEFIT_DEFAULT_ERR_XY  = _gc.reconstruction.LINEFIT_DEFAULT_ERR_XY
 TOF_INNER_MAX_PADDLE_ID = _gc.reconstruction.TOF_INNER_MAX_PADDLE_ID

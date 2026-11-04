@@ -6,3 +6,8 @@ pub use tracklet::*;
 
 pub mod reconstruction;
 pub use reconstruction::*;
+
+#[cfg(feature="database")]
+pub mod searchlight;
+#[cfg(feature="database")]
+pub use searchlight::*;

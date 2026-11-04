@@ -423,6 +423,17 @@ fn reconstruction_py<'_py>(m: &Bound<'_py, PyModule>) -> PyResult<()> {
   m.add_class::<LineFitCost>()?;
   m.add_class::<LineFitCleaning>()?;
   m.add_class::<CleanedLineFit>()?;
+  #[cfg(feature="database")]
+  m.add_class::<TofPaddleOverlaps>()?;
+  #[cfg(feature="database")]
+  {
+    use crate::physics::searchlight::*;
+    m.add_class::<Searchlight>()?;
+    m.add_class::<SearchlightGeometry>()?;
+    m.add_class::<SearchlightSettings>()?;
+    m.add_class::<SearchlightResult>()?;
+    m.add_class::<SearchlightCandidate>()?;
+  }
   m.add("LINEFIT_DEFAULT_ERR_XY", LINEFIT_DEFAULT_ERR_XY)?;
   m.add("TOF_INNER_MAX_PADDLE_ID", TOF_INNER_MAX_PADDLE_ID)?;
   Ok(())

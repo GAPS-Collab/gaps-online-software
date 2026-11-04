@@ -613,6 +613,23 @@ impl TelemetryEvent {
     self.tof_event.normalize_hit_times_with_offsets(offsets.as_ref());
   }
 
+  /// TOF hits in two overlapping paddles at the same time come
+  /// from a particle going through the overlap: move both hits
+  /// across the paddles to the middle of the overlap. Needs
+  /// normalized hit times (tof_normalize_hit_times).
+  ///
+  /// # Arguments:
+  ///   * overlaps : TofPaddleOverlaps
+  ///   * max_dt   : largest time difference of the two hits (ns)
+  ///
+  /// # Returns:
+  ///   * the number of merged pairs
+  #[cfg(feature="database")]
+  #[pyo3(name="tof_merge_overlapping_hits", signature = (overlaps, max_dt = TofPaddleOverlaps::DEFAULT_MAX_DT))]
+  fn tof_merge_overlapping_hits_py(&mut self, overlaps : &TofPaddleOverlaps, max_dt : f32) -> usize {
+    self.tof_event.merge_overlapping_hits(overlaps, max_dt)
+  }
+
   /// Apply a set of per-paddle timing constants 
   ///
   /// # Arguments:

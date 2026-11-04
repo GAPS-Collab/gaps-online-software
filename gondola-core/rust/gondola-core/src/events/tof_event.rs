@@ -610,6 +610,56 @@ impl TofEvent {
     self.normalize_hit_times();
   }
 
+  /// Hits in two overlapping paddles (see TofPaddleOverlaps) at
+  /// the same time come from a particle going through the
+  /// overlap: move both hits across the paddles to the middle of
+  /// the overlap. Their positions along the paddles and along the
+  /// normal are kept.
+  ///
+  /// Needs the hit positions (set_paddles) and normalized hit
+  /// times (normalize_hit_times), otherwise nothing is changed.
+  /// A hit whose paddle overlaps with two hit neighbours is moved
+  /// for each pair, the last pair (ordered by paddle ids) wins.
+  ///
+  /// # Arguments:
+  ///   * overlaps : the overlapping paddles
+  ///   * max_dt   : largest time difference of the two hits (ns)
+  ///
+  /// # Returns:
+  ///   * the number of merged pairs
+  #[cfg(feature="database")]
+  pub fn merge_overlapping_hits(&mut self, overlaps : &TofPaddleOverlaps, max_dt : f32) -> usize {
+    if !self.hit_times_normalized {
+      warn!("The hit times are not normalized, can not merge hits of overlapping paddles!");
+      return 0;
+    }
+    let mut index = HashMap::<u8, usize>::new();
+    for (k, h) in self.hits.iter().enumerate() {
+      index.entry(h.paddle_id).or_insert(k);
+    }
+    let mut nmerged = 0usize;
+    for (&(a, b), ov) in &overlaps.overlaps {
+      let (Some(&i), Some(&j)) = (index.get(&a), index.get(&b)) else {
+        continue;
+      };
+      let (hi, hj) = (&self.hits[i], &self.hits[j]);
+      if !(hi.event_t0.is_finite() && hj.event_t0.is_finite())
+         || (hi.event_t0 - hj.event_t0).abs() > max_dt
+         || !(hi.x.is_finite() && hj.x.is_finite()) {
+        continue;
+      }
+      for k in [i, j] {
+        let h     = &mut self.hits[k];
+        let shift = ov.position - (h.x*ov.across[0] + h.y*ov.across[1] + h.z*ov.across[2]);
+        h.x += shift*ov.across[0];
+        h.y += shift*ov.across[1];
+        h.z += shift*ov.across[2];
+      }
+      nmerged += 1;
+    }
+    nmerged
+  }
+
   /// True if the hit times have been normalized with any
   /// (non-zero) timing offset
   pub fn timing_offsets_applied(&self) -> bool {
@@ -1730,6 +1780,23 @@ impl TofEvent {
   #[pyo3(name="set_paddles")]
   fn set_paddles_py(&mut self, paddles : HashMap<u8, TofPaddle>) {
     self.set_paddles(&paddles); 
+  }
+
+  /// Hits in two overlapping paddles at the same time come from
+  /// a particle going through the overlap: move both hits across
+  /// the paddles to the middle of the overlap. Needs the hit
+  /// positions (set_paddles) and normalized hit times.
+  ///
+  /// # Arguments:
+  ///   * overlaps : TofPaddleOverlaps
+  ///   * max_dt   : largest time difference of the two hits (ns)
+  ///
+  /// # Returns:
+  ///   * the number of merged pairs
+  #[cfg(feature="database")]
+  #[pyo3(name="merge_overlapping_hits", signature = (overlaps, max_dt = TofPaddleOverlaps::DEFAULT_MAX_DT))]
+  fn merge_overlapping_hits_py(&mut self, overlaps : &TofPaddleOverlaps, max_dt : f32) -> usize {
+    self.merge_overlapping_hits(overlaps, max_dt)
   }
 
 }
