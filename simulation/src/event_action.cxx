@@ -134,7 +134,6 @@ auto gon::EventAction::EndOfEventAction(const G4Event* event)   -> void {
                              // in this context it does not matter
                              // which version it is
       tel_ev.tof_event.version = gon::ProtocolVersion::Unknown;
-      tel_ev.tof_event.n_trigger_paddles  = 69;
       tel_ev.tof_event.drs_dead_lost_hits = 67;
       tel_ev.tof_event.run_id             = 420;
       tel_ev.tof_event.timestamp32        = 67;

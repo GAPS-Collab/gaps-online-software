@@ -7,6 +7,7 @@
 #include<limits>
 #include<bitset>
 #include<cmath>
+#include <array>
 #include <sstream>
 #include <numbers>
 
@@ -693,6 +694,58 @@ auto g::TofEvent::get_rb_link_ids() const -> Vec<u8> {
     }
   }
   return links;
+}
+
+/**********************************************************/
+
+auto g::TofEvent::set_trigger_hits(const Vec<std::tuple<u8, u8, u8, g::LTBThreshold>>& hits) -> void {
+  // the thresholds of the 8 channel pairs, for each of the
+  // 25 LTBs (bit k = (DSI - 1)*5 + J - 1 of dsi_j_mask)
+  std::array<u16, 25> masks = {};
+  for (const auto& [dsi, j, ch, threshold] : hits) {
+    if (threshold == LTBThreshold::NoHit || threshold == LTBThreshold::Unknown) {
+      continue;
+    }
+    if (dsi < 1 || dsi > 5 || j < 1 || j > 5 || ch < 1 || ch > 16) {
+      SPDLOG_ERROR("Invalid trigger hit DSI {}, J {}, CH {}!", dsi, j, ch);
+      continue;
+    }
+    u8  k     = (dsi - 1)*5 + (j - 1);
+    u8  pair  = (ch - 1)/2;
+    u16 bits  = static_cast<u16>(threshold) & 0x3;
+    u16 old   = (masks[k] >> (2*pair)) & 0x3;
+    if (bits > old) {
+      masks[k] = (masks[k] & ~(u16)(0x3 << (2*pair))) | (u16)(bits << (2*pair));
+    }
+  }
+  dsi_j_mask        = 0;
+  channel_mask      = {};
+  n_trigger_paddles = 0;
+  for (u8 k=0; k<25; k++) {
+    if (masks[k] == 0) {
+      continue;
+    }
+    dsi_j_mask |= (u32)1 << k;
+    channel_mask.push_back(masks[k]);
+    for (u8 pair=0; pair<8; pair++) {
+      if (((masks[k] >> (2*pair)) & 0x3) > 0) {
+        n_trigger_paddles++;
+      }
+    }
+  }
+}
+
+/**********************************************************/
+
+auto g::TofEvent::set_rb_link_ids(const Vec<u8>& links) -> void {
+  mtb_link_mask = 0;
+  for (auto k : links) {
+    if (k >= 64) {
+      SPDLOG_ERROR("Invalid MTB link id {}!", k);
+      continue;
+    }
+    mtb_link_mask |= (u64)1 << k;
+  }
 }
 
 /**********************************************************/

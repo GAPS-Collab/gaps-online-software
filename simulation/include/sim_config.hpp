@@ -61,7 +61,13 @@ struct SimConfig {
   f64         digi_trk_energy_offset     ; 
   f64         digi_trk_energy_width      ; 
   bool        digi_trk_add_cmn_noise     ;
-  
+  /// allow all events to pass, independent if the pass 
+  /// any trigger criterion
+  bool        digi_ignore_trigger        ; 
+  /// allow events when they pass the track trigger 
+  bool        digi_track_trigger         ;
+  /// allow events when they pass the gaps trigger 
+  bool        digi_gaps_trigger          ;
   u64         n_events;
   /// Load a configuration from a .toml file
   static auto from_file(std::string fname) -> SimConfig;

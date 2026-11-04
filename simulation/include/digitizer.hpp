@@ -106,11 +106,31 @@ namespace gondola {
     /// TOF paddles with ids up to this one form the inner TOF (cube),
     /// the ones above the outer TOF (umbrella, cortina)
     static constexpr u8 TOF_INNER_MAX_PADDLE_ID = 60;
-    /// A simple trigger: at least one outer and one inner TOF hit among
-    /// the read out (digitized) hits. This is a placeholder until the
-    /// trigger is simulated, which would also include the paddles
-    /// excluded from the readout and the trigger thresholds
-    auto tof_trigger(const TofEvent& ev)                           const -> bool;
+    
+    /// The TOF trigger, currently as it was done in flight. This is 
+    /// a simple track trigger (outer + inner over HIT) + the GAPs 
+    /// 833 trigger, which is 3 inner + 3 outer + 2 either inner or outer, 
+    /// 2 of these hits have to be larger over the BETA threshold. THe 
+    /// passed TofEvent will have the respective trigger flags set,
+    /// and the triggered paddles in the fields the MTB fills
+    /// (dsi_j_mask, channel_mask, n_trigger_paddles, mtb_link_mask).
+    ///
+    /// FIXME - this needs to be made more configurable. Also, what is 
+    /// missing is the exclusion of paddles from the trigger. Currently 
+    /// ALL paddles participate in the trigger, however, as of Oct 2026, 
+    /// this seems to be what is desired for the moment by the collaboration. 
+    ///
+    /// # Arguments
+    ///
+    ///   * ev           : the event with the read out hits
+    ///   * trigger_only : hits of paddles which are not read out
+    ///                    (digi_tof_excluded_readout), they take
+    ///                    part in the trigger nevertheless
+    auto tof_trigger(TofEvent& ev, const Vec<TofHit>& trigger_only) const -> bool;
+    /// The highest LTB threshold the peak at either end of the
+    /// paddle passes (the LTB triggers on both ends)
+    auto tof_trigger_threshold(const TofHit& h)                    const -> LTBThreshold;
+    
     auto load_tof_pulse_templates(const std::string& filename)           -> void;
     auto n_tof_pulse_templates() const                                   -> usize;
     
@@ -203,6 +223,10 @@ namespace gondola {
     /// The number of (Tof) hits we created by using the fallback 
     /// method which then has a resulting energy of zero
     usize tof_hits_digi_fallback_e0   = 0;
+    /// The number of (Tof) hits from the fallback method which are
+    /// below the threshold for the read out (they only take part
+    /// in the trigger)
+    usize tof_hits_digi_fallback_below_th = 0;
 
     usize n_failed_reason_wf_bad      = 0;
     usize n_failed_reason_no_features = 0;
@@ -236,6 +260,8 @@ namespace gondola {
     std::normal_distribution<f64> trk_energy_smearing_;
     /// A map of all TOF paddles, mapping is by volumeID -> TofPaddle
     TofPaddleMapVolId             paddles_;
+    /// The same paddles by paddle id, for the trigger
+    std::unordered_map<u8, TofPaddle> paddles_by_id_;
     /// Tof Pulse templates as stored in an external file
     std::unordered_map<u8, PulseTemplatesBySide> pulse_templates_;
     // Tracker strips by volume id

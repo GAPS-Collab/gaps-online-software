@@ -151,9 +151,10 @@ auto SimConfig::from_file(std::string fname) -> SimConfig {
   sim.digi_tof_pos_width         = (f32)config["digitization"]["digi_tof_pos_width"].value_or(0);
   sim.digi_tof_pulse_templates   = config["digitization"]["digi_tof_pulse_template_file"].value_or("");
   sim.digi_tof_add_gauss_jitter  = config["digitization"]["digi_tof_add_gauss_jitter"].value_or(false);
-  sim.digi_tof_hit_threshold_mv  = (f32)config["digitization"]["digi_tof_hit_threshold_mv"].value_or(0.0);
-  sim.digi_tof_beta_threshold_mv = (f32)config["digitization"]["digi_tof_beta_threshold_mv"].value_or(0.0);
-  sim.digi_tof_veto_threshold_mv = (f32)config["digitization"]["digi_tof_veto_threshold_mv"].value_or(0.0);
+  // the trigger thresholds, translated from LG to HG (see digitizer.cxx)
+  sim.digi_tof_hit_threshold_mv  = (f32)config["digitization"]["digi_tof_hit_threshold_mv"].value_or(10.0);
+  sim.digi_tof_beta_threshold_mv = (f32)config["digitization"]["digi_tof_beta_threshold_mv"].value_or(47.5*2.5);
+  sim.digi_tof_veto_threshold_mv = (f32)config["digitization"]["digi_tof_veto_threshold_mv"].value_or(47.5*30);
   // tracker digitization part 
   sim.digi_trk_tf_name           = config["digitization"]["digi_trk_tf_name_in_db"].value_or("");
   sim.digi_trk_mask_name         = config["digitization"]["digi_trk_mask_name_in_db"].value_or(""); 
@@ -162,9 +163,9 @@ auto SimConfig::from_file(std::string fname) -> SimConfig {
   sim.digi_trk_energy_offset     = (f32)config["digitization"]["digi_trk_energy_offset"].value_or(0);
   sim.digi_trk_energy_width      = (f32)config["digitization"]["digi_trk_energy_width"].value_or(04/2.355); // from SimpleDet 
   sim.digi_trk_add_cmn_noise     = config["digitization"]["digi_trk_add_cmn_noise"].value_or(false); // from SimpleDet 
-  //std::cout << "LOWER ENERGY BOUND " << sim.gun_min_e_per_n << std::endl;
-  //std::cout << "UPPER ENERGY BOUND " << sim.gun_max_e_per_n << std::endl;
-  //exit(1);
+  sim.digi_ignore_trigger        = config["digitization"]["digi_ignore_trigger"].value_or(false); 
+  sim.digi_track_trigger         = config["digitization"]["digi_track_trigger"].value_or(true);
+  sim.digi_gaps_trigger          = config["digitization"]["digi_gaps_trigger"].value_or(true);
   sim.n_events = config["general"]["n_events"].value_or(0); 
   return sim;
 }

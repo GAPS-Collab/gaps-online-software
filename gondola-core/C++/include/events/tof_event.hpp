@@ -31,31 +31,39 @@ namespace gondola {
     ProtocolVersion version        ;
     EventStatus     status         ;
     EventQuality    quality        ;
-    u16             trigger_sources;
+    /// Encoded fired triggers. Multiple triggers can fire, this is 
+    /// what comes from the main trigger board and will get decoded 
+    /// into the "usual" types.
+    u16             trigger_sources = 0;
     /// the number of triggered paddles coming
     /// from the MTB directly. This might NOT be
     /// the same as the number of hits!
-    u8          n_trigger_paddles ;
-    u32         event_id          ;
-    u16         run_id            ;
-    u32         timestamp32       ;
-    u16         timestamp16       ;
+    u8          n_trigger_paddles  = 0;
+    u32         event_id           = 0;
+    u16         run_id             = 0;
+    u32         timestamp32        = 0;
+    u16         timestamp16        = 0;
     // deprecated, won't get serialized
     //u16         primary_beta      ;
     //u16         primary_charge    ;
 
-    u16         drs_dead_lost_hits;
-    u32         dsi_j_mask        ;
-    Vec<u16>    channel_mask      ;
-    u64         mtb_link_mask     ;
+    u16         drs_dead_lost_hits = 0;
+    /// the LTBs with triggered channels, one bit per
+    /// (DSI, J): bit (DSI - 1)*5 + J - 1
+    u32         dsi_j_mask         = 0;
+    /// for each set bit of dsi_j_mask (in increasing order) the
+    /// thresholds of the 8 channel pairs of that LTB, 2 bits each
+    Vec<u16>    channel_mask       = {};
+    /// the readout boards to read out, one bit per MTB link id
+    u64         mtb_link_mask      = 0;
 
     // flight computer event variable packet
-    u8          n_hits_umb        ;
-    u8          n_hits_cbe        ;
-    u8          n_hits_cor        ;
-    f32         tot_edep_umb      ;
-    f32         tot_edep_cbe      ;
-    f32         tot_edep_cor      ;
+    u8          n_hits_umb         = 0;
+    u8          n_hits_cbe         = 0;
+    u8          n_hits_cor         = 0;
+    f32         tot_edep_umb       = 0;
+    f32         tot_edep_cbe       = 0;
+    f32         tot_edep_cor       = 0;
     //MasterTriggerEvent mt_event;
 
     /// A container holding the individual events from all RBs with 
@@ -159,6 +167,23 @@ namespace gondola {
     ///
     ///   Vec<(hit)> where hit is (DSI, J, CH) 
     auto get_trigger_hits() const -> Vec<std::tuple<u8, u8, u8, LTBThreshold>>;
+
+    /// Set the trigger hits the way the MTB writes them
+    /// (dsi_j_mask, channel_mask and n_trigger_paddles), the
+    /// inverse of get_trigger_hits. If several hits are on the
+    /// same pair of LTB channels (the two ends of a paddle), the
+    /// highest threshold is kept.
+    ///
+    /// # Arguments
+    ///
+    ///   * hits : (DSI 1-5, J 1-5, LTB channel 1-16, threshold),
+    ///            hits with LTBThreshold::NoHit or Unknown are
+    ///            ignored
+    auto set_trigger_hits(const Vec<std::tuple<u8, u8, u8, LTBThreshold>>& hits) -> void;
+
+    /// Set mtb_link_mask from the MTB link ids of the readout
+    /// boards, the inverse of get_rb_link_ids
+    auto set_rb_link_ids(const Vec<u8>& links) -> void;
     /// Get the trigger sources from trigger source byte
     auto get_trigger_sources() const -> Vec<TriggerType>; 
     

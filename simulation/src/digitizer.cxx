@@ -1,3 +1,4 @@
+#include <map>
 #include <algorithm>
 #include <cstdlib>
 #include <pthread.h>
@@ -17,10 +18,27 @@ using namespace result;
 
 //----------------------------------------------------------
 
+/// Range of the DRS4 - dynamic range shifted by an offset, this is how the chip 
+/// is configured. Lower bound.
 constexpr f64 DRS4_MIN_MV = -250.0;
+/// Range of the DRS4 - dynamic range shifted by an offset, this is how the chip 
+/// is configured. Upper bound.
 constexpr f64 DRS4_MAX_MV =  750.0;
 constexpr f64 TOF_SATURATION_MV = 740.0;
+
 constexpr f64 TOF_SAT_TOT_THRESHOLD_MV = 550.0;
+
+// The three trigger thresholds (digi_tof_hit_threshold_mv,
+// digi_tof_beta_threshold_mv, digi_tof_veto_threshold_mv in the
+// config: 10, 47.5*2.5 and 47.5*30 mV) are NOT the LG thresholds, but 
+// the LG translated to HG. The TOF trigger as implemented 
+// here has to operate on the peak of the HG waveform, since, 
+// the templates only model the HG
+// there is a caveat. These values come from Padrick's implementation 
+// of the digitzer and seem consistent with his presentation. 
+// However, they should be cross-checked. There might be some notes 
+// from Antarctica 24 which are backed-up by Isaac. Needs more 
+// investigations
 
 //----------------------------------------------------------
 
@@ -382,6 +400,9 @@ g::GapsDigitizer::GapsDigitizer(const SimConfig& cfg) : cfg(cfg){
   trk_energy_smearing_     = std::normal_distribution<f64>(cfg.digi_trk_energy_offset/1000.0,
                                                            cfg.digi_trk_energy_width/1000.0);
   paddles_                 = g::get_tofpaddles_by_volumeid();
+  for (const auto& [vid, pdl] : paddles_) {
+    paddles_by_id_[pdl.paddle_id] = pdl;
+  }
   strips_                  = g::get_trackerstrips_by_volumeid();
   strip_tfns_              = g::get_trkstriptransferfn_by_volumeid(cfg.digi_trk_tf_name);
   spdlog::info("Loaded {} TRK transfer fns with name = {}", strip_tfns_.size(), cfg.digi_trk_tf_name);
@@ -458,7 +479,8 @@ auto g::GapsDigitizer::print_statistics() -> void {
     "  saturated TOF hits               : {}" 
     "  sat TOF hits no templ found      : {} ({:.2f}%)\n"
     "fallbacks                     : {} \n"
-    "  fallbacks with E==0              : {} ({:.2f}%)\n",
+    "  fallbacks with E==0              : {} ({:.2f}%)\n"
+    "  fallbacks below threshold        : {} ({:.2f}%) (not read out)\n",
     n_events,
     n_events_no_trigger,
     attempted,
@@ -483,7 +505,8 @@ auto g::GapsDigitizer::print_statistics() -> void {
     tof_hits_excluded_rb_mask,
     tof_hits_sat,
     tof_hits_sat_no_templ_found, 100.0*tof_hits_sat_no_templ_found /denominator_sat,
-    tof_hits_digi_fallback, tof_hits_digi_fallback_e0, 100.0*tof_hits_digi_fallback_e0 / denominator_fb
+    tof_hits_digi_fallback, tof_hits_digi_fallback_e0, 100.0*tof_hits_digi_fallback_e0 / denominator_fb,
+    tof_hits_digi_fallback_below_th, 100.0*tof_hits_digi_fallback_below_th / denominator_fb
   );
   std::cout << repr << std::endl;
 }
@@ -741,17 +764,103 @@ auto g::GapsDigitizer::trk_adc_from_signal(u32 volume, const TrackerStripTransfe
 
 //----------------------------------------------------------
     
-auto g::GapsDigitizer::tof_trigger(const g::TofEvent& ev) const -> bool {
-  bool outer = false;
-  bool inner = false;
-  for (const auto& h : ev.hits) {
-    if (h.paddle_id <= TOF_INNER_MAX_PADDLE_ID) {
-      inner = true;
-    } else {
-      outer = true;
-    }
+auto g::GapsDigitizer::tof_trigger_threshold(const g::TofHit& h) const -> g::LTBThreshold {
+  const f64 peak = std::max(h.peak_a_f32, h.peak_b_f32);
+  if (peak >= cfg.digi_tof_veto_threshold_mv) {
+    return LTBThreshold::Veto;
   }
-  return outer && inner;
+  if (peak >= cfg.digi_tof_beta_threshold_mv) {
+    return LTBThreshold::Beta;
+  }
+  if (peak >= cfg.digi_tof_hit_threshold_mv) {
+    return LTBThreshold::Hit;
+  }
+  return LTBThreshold::NoHit;
+}
+
+//----------------------------------------------------------
+    
+auto g::GapsDigitizer::tof_trigger(g::TofEvent& ev, const Vec<g::TofHit>& trigger_only) const -> bool {
+  // at this point, the TofHits in the event need to be populated with the 
+  // results from the peak finder/waveform template, or in the case of the 
+  // fallback, we have a generically calculated peak voltage.
+  // The triggered paddles, read out or not, with their highest threshold
+  std::map<u8, LTBThreshold> triggered;
+  auto add = [&](const g::TofHit& h) {
+    auto threshold = tof_trigger_threshold(h);
+    if (threshold == LTBThreshold::NoHit) {
+      return;
+    }
+    auto& t = triggered[h.paddle_id];
+    if (static_cast<u8>(threshold) > static_cast<u8>(t)) {
+      t = threshold;
+    }
+  };
+  for (const auto& h : ev.hits) {
+    add(h);
+  }
+  for (const auto& h : trigger_only) {
+    add(h);
+  }
+
+  u8   n_inner  = 0;
+  u8   n_outer  = 0;
+  u8   n_beta   = 0;
+  bool track_trigger = false;
+  bool gaps_trigger  = false;
+  // the triggered paddles as the MTB sees them: LTB (DSI, J) and
+  // channel, and the readout board (MTB link) to read out
+  Vec<std::tuple<u8, u8, u8, LTBThreshold>> trigger_hits;
+  Vec<u8> links;
+  for (const auto& [pid, threshold] : triggered) {
+    if (pid <= TOF_INNER_MAX_PADDLE_ID) {
+      n_inner++;
+    } else {
+      n_outer++;
+    }
+    if (static_cast<u8>(threshold) >= static_cast<u8>(LTBThreshold::Beta)) {
+      n_beta++;
+    }
+    auto pdl = paddles_by_id_.find(pid);
+    if (pdl == paddles_by_id_.end()) {
+      spdlog::warn("Paddle {} is not in the database, can not set its trigger channels!", pid);
+      continue;
+    }
+    // the two ends of a paddle are a pair of LTB channels
+    u8 ch = std::min(pdl->second.ltb_chA, pdl->second.ltb_chB);
+    trigger_hits.push_back(std::make_tuple(pdl->second.dsi, pdl->second.j_ltb, ch, threshold));
+    links.push_back(pdl->second.mtb_link_id);
+  }
+  ev.set_trigger_hits(trigger_hits);
+  ev.set_rb_link_ids(links);
+
+  // has the track trigger fired?
+  if ((n_outer > 0) && (n_inner > 0)) {
+    ev.trigger_sources |= (1 << 8);  
+    track_trigger = true;
+  }
+  // has the GAPS trigger fired? 3 inner + 3 outer + 2 more, 2 of
+  // them over the beta threshold
+  if ((n_outer >= 3) && (n_inner >= 3) && (n_inner + n_outer >= 8) && (n_beta >= 2)) {
+    gaps_trigger = true;
+    ev.trigger_sources |= (1 << 5);
+  } 
+  // in case all triggers are ignored by the config, always 
+  // return true (the trigger fields are set nevertheless)
+  if (cfg.digi_ignore_trigger) {
+    return true;
+  }
+  // check what is configured. The trigger decision is 
+  // an or. We need either one of these fired, if none 
+  // of them is fired, the event did not trigger. 
+  // FIXME - expend this to the other trigger types.
+  if (cfg.digi_track_trigger && track_trigger) {
+    return true;
+  }
+  if (cfg.digi_gaps_trigger && gaps_trigger) { 
+    return true;
+  }
+  return false; 
 }
 
 //----------------------------------------------------------
@@ -766,24 +875,34 @@ auto g::GapsDigitizer::digitize_event(const g::McEvent& mc_ev, bool& has_trigger
       n_total_mc_hits_zero_en++;
     }
   }
-  auto r_hits = g::GapsDigitizer::integrate_mc_hits(mc_ev.hits, 1e20);
   
-  //if (r_hits.size() > 0) {
-  //  //std::cout << "DIGITIZER GOT " << r_hits.size() << " RECO HITS AND " << mc_ev.hits.size() << " MC HITS" << std::endl;
-  //  std::cout << "------------------------------------" << std::endl;
-  //}
+  // transform mc hits in reco hits. This means, we have one hit per 
+  // volume after this point, all mc hits are merged
+  auto r_hits = g::GapsDigitizer::integrate_mc_hits(mc_ev.hits, 1e20);
+  // hits of paddles which are not read out, for the trigger
+  Vec<g::TofHit> trigger_only;
+  
   for (auto& h : r_hits) {
-    //std::cout << h.volume << std::endl;
     if (h.volume < 200000000) {
       if(h.energy == 0.0) {
         zero_energy_hits++;
       }
+      // the exclusion of hits here mimicks missing/problematic readout boards and is configurable 
+      // through the .toml file by an exclusion list of paddles.
       if (std::find(cfg.digi_tof_excluded_readout.begin(),cfg.digi_tof_excluded_readout.end(),h.volume)
           != cfg.digi_tof_excluded_readout.end()) {
         tof_hits_excluded_rb_mask++;
+        // not read out, but the paddle still takes part in the
+        // trigger (the LTBs do not depend on the readout boards)
+        auto trigger_hit = digitize_tof_hit(h);
+        if (trigger_hit.is_none() && cfg.digi_use_tof_legacy_fb) {
+          trigger_hit = digitize_tof_hit_fallback(h);
+        }
+        if (trigger_hit.is_some()) {
+          trigger_only.push_back(trigger_hit.unwrap());
+        }
         continue;
       }
-      //tof_response_fn_simple(h);
       auto digi_hit_res = digitize_tof_hit(h);
       tof_hits_attempted++;
       if (tof_hits_attempted % 10000 == 0) {
@@ -793,6 +912,9 @@ auto g::GapsDigitizer::digitize_event(const g::McEvent& mc_ev, bool& has_trigger
         ev.tof_event.hits.push_back(digi_hit_res.unwrap());
         ++tof_hits_succeeded;
       } else {
+        // the fallback. This happens if our new method of 
+        // using waveform templates does not succeed for some 
+        // reason - most likely a missing template. 
         if (cfg.digi_use_tof_legacy_fb) {
           auto fallback_result = digitize_tof_hit_fallback(h);
           tof_hits_digi_fallback++;  
@@ -801,6 +923,15 @@ auto g::GapsDigitizer::digitize_event(const g::McEvent& mc_ev, bool& has_trigger
 
             if (fallback_hit.peak_a_f32 == 0.0f) {
               //++tof_hits_fallback_zero_energy;
+            }
+            // the same threshold for the read out as for the hits
+            // with waveforms (digitize_tof_hit): both ends above it.
+            // Below it, the paddle can still take part in the trigger
+            if (!(fallback_hit.peak_a_f32 > cfg.digi_tof_hit_threshold_mv
+                  && fallback_hit.peak_b_f32 > cfg.digi_tof_hit_threshold_mv)) {
+              tof_hits_digi_fallback_below_th++;
+              trigger_only.push_back(fallback_hit);
+              continue;
             }
 
             ev.tof_event.hits.push_back(fallback_hit);
@@ -843,7 +974,10 @@ auto g::GapsDigitizer::digitize_event(const g::McEvent& mc_ev, bool& has_trigger
   //if (ev.trk_hits.size() == 0) {
   //  return None;
   //}
-  has_triggered = !cfg.digi_require_tof_trigger || tof_trigger(ev.tof_event);
+  // the trigger fields of the event are always set, the trigger
+  // decision only applies if it is required
+  bool tof_triggered = tof_trigger(ev.tof_event, trigger_only);
+  has_triggered = !cfg.digi_require_tof_trigger || tof_triggered;
   if (!has_triggered) {
     n_events_no_trigger++;
     return None;
