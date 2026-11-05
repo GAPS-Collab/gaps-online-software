@@ -13,7 +13,10 @@ fixed_pos_z   = 2100.0
 # has a certain Tof paddle in the center
 center_around_pid  = 0
 sample_isotropic_box = true 
+
+# the length of each side of the injection box in mm 
 sample_isotropic_box_len = 2500 
+
 
 # incjected particle 
 particle_type = "anti_proton"
@@ -67,16 +70,6 @@ tof_panel_21   = [158,159,160]
 # general be true, except a dedicated 
 # study on the TOF is desired 
 all_sili       = true 
-# should strips based on one of the existing masks be 
-# excluded?
-exclude_trk_strips_by_mask = true 
-# if the above setting is true, a name under which the mask 
-# can be retrieved from the database needs to be specified. 
-# this is typically the filename (without path) from which 
-# this mask has been originally parsed. An invalid mask or 
-# true in the setting right above and an empty string here 
-# will cause a ConfigurationError at runtime
-exclude_trk_strips_mask_name = "tracker_channel_enables_100.txt"
 
 [passive_materials]
 
@@ -97,10 +90,6 @@ trk_foam_layer = true
 # list from Kaliroe
 digi_tof_paddles_exclude_from_readout = [100100000,100100200,100100400,100300100,100300300, 100300400,100400200,100400400,100500100,100500300,100500500,100600100, 100600300,110000700,110000900, 110001100,111000600,111001100,113000000,113000400,113000600,115000000,115000200,115000400,115000600]
 use_digitization             = true
-# a simple trigger: events without at least one outer and one 
-# inner TOF hit (paddle id <= 60) after digitization are not 
-# written. The event id still counts all simulated events
-digi_require_tof_trigger     = true
 use_advanced_features        = false
 digi_use_tof_legacy_fallback = true
 # variables for fallback 
@@ -112,11 +101,23 @@ digi_tof_timing_width        = 0.24
 digi_tof_pos_offset          = 0
 digi_tof_pos_width           = 38
 #digi_tof_pulse_template_file = "/srv/gaps/gaps-online-software/build-aulepe-root640/tofpulse_templates_new500k.tof.gaps" 
-digi_tof_pulse_template_file = "/srv/gaps/gaps-online-software/simulation/resources/tof-pulse-templates45M.tof"
+#digi_tof_pulse_template_file = "/srv/gaps/gaps-online-software/simulation/resources/tof-pulse-templates45M.tof"
+digi_tof_pulse_template_file = "/srv/gaps/gaps-online-software/simulation/resources/tof-templates-45M-all.tof.gaps"
 digi_tof_add_gauss_jitter    = true
+# these are the thresholds as on the LTB, but translated to the 
+# HG system.
 digi_tof_hit_threshold_mv    = 10 
 digi_tof_beta_threshold_mv   = 118.75 
 digi_tof_veto_threshold_mv   = 1425
+# events which pass none of the enabled triggers below are not
+# written (the event id still counts all simulated events).
+# digi_ignore_trigger = true writes all events.
+digi_ignore_trigger          = false
+# the track trigger as in data  
+digi_track_trigger           = true 
+# the gaps (833) trigger as in data 
+digi_gaps_trigger            = true
+
 #------------------------------------
 # digi variables for the tracker 
 # energy resolution of the tracker strips (gaussian, in keV)
