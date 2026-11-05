@@ -93,11 +93,12 @@ namespace gondola {
     /// function is made monotonic first (running maximum over the adc
     /// values): a signal in a gap gets the adc value at its edge.
     auto trk_adc_from_signal(u32 volume, const TrackerStripTransferFunction& tf, f64 signal_mv) -> u32;
-    /// Digitize an event. If cfg.digi_require_tof_trigger is set, events
-    /// which do not pass tof_trigger are rejected (None).
+    /// Digitize an event. Events which do not pass tof_trigger are
+    /// rejected (None); with cfg.digi_ignore_trigger, all events pass.
     ///
     /// @param has_triggered : set to whether the event has passed the
-    ///                        trigger (always true without the trigger)
+    ///                        trigger (always true with
+    ///                        cfg.digi_ignore_trigger)
     auto digitize_event(const McEvent& ev, bool& has_triggered)          -> Option<TelemetryEvent>;
     
     // From here on, this is related to TOF digitization 

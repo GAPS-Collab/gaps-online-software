@@ -1,4 +1,5 @@
 #include "sim_config.hpp"
+#include "errors.hpp"
 
 #include <toml++/toml.hpp>
 #include <iostream>
@@ -139,7 +140,9 @@ auto SimConfig::from_file(std::string fname) -> SimConfig {
   sim.digitization               = config["digitization"]["use_digitization"].value_or(false); 
   sim.use_advanced_digitization  = config["digitization"]["use_advanced_features"].value_or(false);
   sim.digi_use_tof_legacy_fb     = config["digitization"]["digi_use_tof_legacy_fallback"].value_or(false);
-  sim.digi_require_tof_trigger   = config["digitization"]["digi_require_tof_trigger"].value_or(false);
+  if (config["digitization"]["digi_require_tof_trigger"]) {
+    spdlog::warn("digi_require_tof_trigger is not used anymore and will be ignored! Use digi_ignore_trigger = true to write all events.");
+  }
   for (auto&& el : *config["digitization"]["digi_tof_paddles_exclude_from_readout"].as_array()) {
     sim.digi_tof_excluded_readout.push_back((u32)el.value_or(0)); 
   } 
@@ -166,6 +169,10 @@ auto SimConfig::from_file(std::string fname) -> SimConfig {
   sim.digi_ignore_trigger        = config["digitization"]["digi_ignore_trigger"].value_or(false); 
   sim.digi_track_trigger         = config["digitization"]["digi_track_trigger"].value_or(true);
   sim.digi_gaps_trigger          = config["digitization"]["digi_gaps_trigger"].value_or(true);
+  if (sim.digitization && !sim.digi_ignore_trigger && !sim.digi_track_trigger && !sim.digi_gaps_trigger) {
+    auto message = std::string("All triggers are switched off (digi_track_trigger, digi_gaps_trigger) and digi_ignore_trigger is not set, so no event would be written!");
+    throw gondola::ConfigurationError(gondola::ConfigurationError::ErrorKind::NonSensicalConfiguration, message);
+  }
   sim.n_events = config["general"]["n_events"].value_or(0); 
   return sim;
 }

@@ -974,10 +974,9 @@ auto g::GapsDigitizer::digitize_event(const g::McEvent& mc_ev, bool& has_trigger
   //if (ev.trk_hits.size() == 0) {
   //  return None;
   //}
-  // the trigger fields of the event are always set, the trigger
-  // decision only applies if it is required
-  bool tof_triggered = tof_trigger(ev.tof_event, trigger_only);
-  has_triggered = !cfg.digi_require_tof_trigger || tof_triggered;
+  // the trigger fields of the event are always set; with
+  // digi_ignore_trigger, every event passes
+  has_triggered = tof_trigger(ev.tof_event, trigger_only);
   if (!has_triggered) {
     n_events_no_trigger++;
     return None;
