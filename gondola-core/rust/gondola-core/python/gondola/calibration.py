@@ -41,13 +41,15 @@ def load_rb_calibrations(cali_dir : Path, load_event_data = False):
     calib_files = [k for k in cali_dir.glob("*.tof.gaps")]
     calibs = dict()
     for fname in tqdm.tqdm(calib_files, desc="Loading calibration files"):
-        fname = str(fname)
         try:
-            rb_id = int(pattern.search(fname).groupdict()['rb_id'])
+            # only the file name: a directory name may contain 'RB..._' too
+            rb_id = int(pattern.search(fname.name).groupdict()['rb_id'])
         except Exception as e:
             print(f'Failed to get RB ID from file {fname}')   
             continue
-        cali = RBCalibrations.from_file(fname)
+        if rb_id in calibs:
+            print(f'More than one calibration file for RB {rb_id}, using {fname}')
+        cali = RBCalibrations.from_file(str(fname))
         calibs[rb_id] = cali 
     return calibs
 
