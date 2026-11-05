@@ -223,11 +223,13 @@ pub struct SearchlightSettings {
   /// triggered paddles without a hit: candidates through the point
   /// on the paddle closest to the best candidate, iterated
   /// trig_iter times, if the paddle is closer than trig_max_dist
-  /// (mm), with the error trig_err (mm)
+  /// (mm), with the error trig_err (mm) and the hit cleaning
+  /// trig_cleaning
   pub use_trigger   : bool,
   pub trig_max_dist : f64,
   pub trig_err      : f64,
   pub trig_iter     : usize,
+  pub trig_cleaning : LineFitCleaning,
   pub vertex        : SearchlightVertexSettings,
   /// For seeds which pass the flags: a vertex without the primary
   /// line (independent_vertex), offered as an outer+vertex candidate
@@ -251,24 +253,24 @@ pub struct SearchlightSettings {
 
 impl SearchlightSettings {
   /// Weights of the selection with all parts, trained on the
-  /// antiproton MC (strip fix, 2026-11) with 3000 events: a
-  /// candidate is good if it is within 4 degree of the true
-  /// direction
+  /// antiproton MC (production with the simulated trigger,
+  /// 2026-11, 192k events): a candidate is good if it is within
+  /// 8 degree of the true direction
   pub const DEFAULT_WEIGHTS : [f64; SEARCHLIGHT_N_FEATURES] = [
-    -2.0259056637107813, 0.51971947247767, 0.13084705001546879, 0.006778196617624869, 0.5340678300859675,
-    -0.5548880842904442, -1.6861963790174055, -0.2943184680426944, -0.19926527353671283, -0.2682748592678886,
-     0.31781599292015067, 0.2635642103483618, -1.5670455931791791, 0.2969754389763969, -1.3270707031738658,
-     0.4922798347333855, -0.9394941525994619, -0.09698240722520546, -0.43312250283369724, 0.485782776874773,
-    -0.0018643037252919084];
+    -0.8494083995063675, 0.7584998238102414, 0.08592165401335099, 0.040114369901218916, 0.5185677129006735,
+    -0.5941077354657184, -2.244138369268709, -0.4893904865525487, -0.31746972444501825, -0.5875908640284098,
+     0.371680731399341, 0.08268818689676119, -1.237103935997446, 0.2173878607865536, -1.151547480733513,
+     0.4583296484844057, -0.2357429216148299, -0.10091746314963247, -0.47632292759854833, 0.3141626758681832,
+     0.11300851234903934];
 
   /// Weights of the selection without the independent vertex
   /// (phase A), trained in the same way. The quality features
   /// are not used.
   pub const PHASE_A_WEIGHTS : [f64; SEARCHLIGHT_N_FEATURES] = [
-    -1.9597471282846652, 0.47967473408398714, 0.12602197075909988, -0.006924768098990917, 0.5338039876659284,
-    -0.5706451950812257, -1.4351559632915485, -0.18620606160329897, -0.2766281152833499, -0.42066000833750733,
-     0.2803266646748128, 0.4170075448442111, -1.597282633514432, 0.3642101986887803, -1.2901513177920285,
-     0.5578027382599217, -0.9227856213910649, 0.0, 0.0, 0.0, 0.0];
+    -0.7952501139522079, 0.6948167494268779, 0.08038157428138903, 0.015526220558748456, 0.5414003062777478,
+    -0.6417875932599839, -2.0934471491380564, -0.4371203851321739, -0.3478666071569252, -0.769967428049856,
+     0.24838499679929638, 0.38545048261935005, -1.2499039207707618, 0.2648171990587993, -1.1161143788445134,
+     0.5482811222449234, -0.18542233687419046, 0.0, 0.0, 0.0, 0.0];
 
   /// The settings without the independent vertex, the secondary
   /// tracks and the timing (phase A), with their weights
@@ -287,6 +289,9 @@ impl Default for SearchlightSettings {
   fn default() -> Self {
     let mut cleaning = LineFitCleaning::new(150.0);
     cleaning.final_radius = 75.0;
+    // a tight cylinder for the trigger candidates: their line
+    // continues into the vertex region with its secondaries
+    let trig_cleaning = LineFitCleaning::new(75.0);
     Self {
       cleaning,
       edep_min      : 4.0,
@@ -295,9 +300,10 @@ impl Default for SearchlightSettings {
       use_vertex    : true,
       use_tracker   : true,
       use_trigger   : true,
-      trig_max_dist : 400.0,
+      trig_max_dist : 1000.0,
       trig_err      : 50.0,
       trig_iter     : 3,
+      trig_cleaning,
       vertex        : SearchlightVertexSettings::default(),
       independent_vertex : true,
       use_tracks    : true,
@@ -319,9 +325,13 @@ pub struct SearchlightResult {
   pub seed       : Option<(usize, usize)>,
   /// (outer seed hit flagged, inner seed hit flagged)
   pub flags      : (bool, bool),
-  /// the vertex used for the candidates
+  /// the simple vertex (with the primary line if its seed passes
+  /// the flags), the best estimate of the stopping point
   pub vertex     : Option<DVec3>,
-  /// its quality, if it is the independent vertex
+  /// the independent vertex, if it was searched for and found; it
+  /// is used for the candidates instead of the simple vertex
+  pub independent_vertex : Option<DVec3>,
+  /// the quality of the independent vertex
   pub vertex_quality : Option<SearchlightVertexQuality>,
   /// all candidates, and the chosen one (index into candidates)
   pub candidates : Vec<SearchlightCandidateFit>,
@@ -391,30 +401,33 @@ impl Searchlight {
     let p = &hits.pos;
     let n = hits.len();
     let mut cands = Vec::<SearchlightCandidateFit>::new();
-    cands.extend(candidate(hits, (o, i), K::Today, s, None, p[o], p[i]));
+    cands.extend(candidate(hits, (o, i), K::Today, &s.cleaning, None, p[o], p[i]));
     // the independent vertex for seeds which pass the flags, the
-    // simple vertex otherwise
+    // simple vertex otherwise for the candidates; the simple vertex
+    // is the better stopping point, so it is always the result
+    let simple = if s.use_vertex { simple_vertex(hits, &s.vertex, &s.cleaning, (o, i)) } else { None };
     let independent = if s.use_vertex && s.independent_vertex { independent_vertex(hits, s, (o, i)) } else { None };
     let (v, quality) = match independent {
       Some(Some((v, q))) => (Some(v), Some(q)),
       Some(None)         => (None, None),
-      None               => (if s.use_vertex { simple_vertex(hits, &s.vertex, &s.cleaning, (o, i)) } else { None }, None),
+      None               => (simple, None),
     };
-    res.vertex = v;
+    res.vertex = simple;
+    res.independent_vertex = quality.and(v);
     res.vertex_quality = quality;
     if let Some(v) = v {
       if (v - p[o]).length() > 1.0 {
-        cands.extend(candidate(hits, (o, n), K::OuterVertex, s, Some((v, s.vertex_err)), p[o], v));
+        cands.extend(candidate(hits, (o, n), K::OuterVertex, &s.cleaning, Some((v, s.vertex_err)), p[o], v));
       }
       if (v - p[i]).length() > 1.0 {
-        cands.extend(candidate(hits, (i, n), K::InnerVertex, s, Some((v, s.vertex_err)), p[i], v));
+        cands.extend(candidate(hits, (i, n), K::InnerVertex, &s.cleaning, Some((v, s.vertex_err)), p[i], v));
       }
     }
     if s.use_tracker {
       for k in (0..n).filter(|&k| !hits.is_tof[k] && hits.e[k] >= s.trk_e_min) {
         for (seed, kind) in [(o, K::OuterTracker), (i, K::InnerTracker)] {
           if (p[k] - p[seed]).length() > 1.0 {
-            cands.extend(candidate(hits, (seed, k), kind, s, None, p[seed], p[k]));
+            cands.extend(candidate(hits, (seed, k), kind, &s.cleaning, None, p[seed], p[k]));
           }
         }
       }
@@ -474,7 +487,7 @@ impl Searchlight {
               found = None;
               break;
             }
-            let Some(c2) = candidate(hits, (keep, n), kind, s, Some((pt, s.trig_err)), DVec3::ZERO, DVec3::ZERO) else {
+            let Some(c2) = candidate(hits, (keep, n), kind, &s.trig_cleaning, Some((pt, s.trig_err)), DVec3::ZERO, DVec3::ZERO) else {
               break;
             };
             (a, u) = (c2.a, c2.u);
@@ -641,10 +654,13 @@ mod tests {
   #[test]
   fn searchlight_good_seed() {
     let (hits, u) = primary_event(false);
-    let sl  = Searchlight::new(geometry(), SearchlightSettings::default());
+    let s   = SearchlightSettings::default();
+    let sl  = Searchlight::new(geometry(), s.clone());
     let res = sl.reconstruct_hits(&hits, &[]);
     assert_eq!(res.seed, Some((0, 1)));
     assert_eq!(res.flags, (false, false));
+    // the result is the simple vertex, also with the independent one
+    assert_eq!(res.vertex, simple_vertex(&hits, &s.vertex, &s.cleaning, (0, 1)));
     let p = res.primary().unwrap();
     assert_eq!(p.kind, SearchlightCandidate::Today);
     assert!(angle(p.u, u) < 0.01);

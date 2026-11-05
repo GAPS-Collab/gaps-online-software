@@ -107,6 +107,19 @@ impl SearchlightSettings {
     self.cleaning = value;
   }
 
+  /// Hit cleaning of the candidates through triggered paddles
+  #[getter]
+  #[pyo3(name="trig_cleaning")]
+  fn get_trig_cleaning_py(&self) -> LineFitCleaning {
+    self.trig_cleaning
+  }
+
+  #[setter]
+  #[pyo3(name="trig_cleaning")]
+  fn set_trig_cleaning_py(&mut self, value : LineFitCleaning) {
+    self.trig_cleaning = value;
+  }
+
   /// TOF hits below this edep (MeV) are not primary-like, a
   /// seed hit below it is flagged
   #[getter]
@@ -184,6 +197,20 @@ impl SearchlightSettings {
     self.use_trigger = value;
   }
 
+  /// Triggered paddles without a hit are used as candidates if
+  /// they are closer than this to the best candidate (mm)
+  #[getter]
+  #[pyo3(name="trig_max_dist")]
+  fn get_trig_max_dist_py(&self) -> f64 {
+    self.trig_max_dist
+  }
+
+  #[setter]
+  #[pyo3(name="trig_max_dist")]
+  fn set_trig_max_dist_py(&mut self, value : f64) {
+    self.trig_max_dist = value;
+  }
+
   /// Weights of the logistic regression over the candidate
   /// features. Empty: the most energy-weighted inliers win.
   #[getter]
@@ -232,11 +259,20 @@ impl SearchlightResult {
     self.flags
   }
 
-  /// The vertex used for the candidates (mm)
+  /// The vertex, the best estimate of the stopping point (mm)
   #[getter]
   #[pyo3(name="vertex")]
   fn get_vertex_py(&self) -> Option<(f64, f64, f64)> {
     self.vertex.map(tuple)
+  }
+
+  /// The vertex without the primary line (mm), for seeds which
+  /// pass the flags; it is used for the candidates instead of the
+  /// vertex
+  #[getter]
+  #[pyo3(name="independent_vertex")]
+  fn get_independent_vertex_py(&self) -> Option<(f64, f64, f64)> {
+    self.independent_vertex.map(tuple)
   }
 
   /// Quality of the independent vertex: (TOF hits agreeing on the

@@ -65,13 +65,13 @@ pub struct SearchlightCandidateFit {
   pub allowed  : bool,
 }
 
-/// The cleaned fit seeded through the hits seed (indices into
-/// hits), optionally with an extra point with its own error
-/// (it gets the index hits.len())
+/// The fit seeded through the hits seed (indices into hits),
+/// cleaned with cleaning, optionally with an extra point with
+/// its own error (it gets the index hits.len())
 pub(crate) fn candidate(hits     : &SearchlightHits,
                         seed     : (usize, usize),
                         kind     : SearchlightCandidate,
-                        settings : &SearchlightSettings,
+                        cleaning : &LineFitCleaning,
                         extra    : Option<(DVec3, f64)>,
                         start    : DVec3,
                         target   : DVec3) -> Option<SearchlightCandidateFit> {
@@ -84,7 +84,7 @@ pub(crate) fn candidate(hits     : &SearchlightHits,
     }
   };
   let all : Vec<usize> = (0..h.len()).collect();
-  let (a, u, acc) = fit_line(h, &all, seed, &settings.cleaning)?;
+  let (a, u, acc) = fit_line(h, &all, seed, cleaning)?;
   Some(SearchlightCandidateFit { kind, a, u, hits : acc, start, target, features : vec![], prob : 0.0, allowed : false })
 }
 

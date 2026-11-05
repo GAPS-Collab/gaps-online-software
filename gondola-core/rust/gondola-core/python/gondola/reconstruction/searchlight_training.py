@@ -36,7 +36,7 @@ import numpy as np
 
 # a candidate is good if its direction is within this angle (deg)
 # of the true direction
-GOOD_ANGLE = 4.0
+GOOD_ANGLE = 8.0
 
 
 def angle(a, b):
