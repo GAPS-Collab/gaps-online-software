@@ -34,7 +34,6 @@ namespace gondola {
     private:
       // FIXME - consistent naming!
       SimConfig       sim_config;
-      TrkStripMaskMap trk_strip_mask_map_;
   };
 }
 

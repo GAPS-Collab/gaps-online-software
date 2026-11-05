@@ -29,8 +29,6 @@ struct SimConfig {
   bool        pm_trk_foam_layer;
   bool        pm_trk_mod_psv;
 
-  bool        ad_exclude_trk_strips_by_mask;
-  std::string ad_exclude_trk_strips_mask_name;
   bool        ad_all_sili;
   u8          ad_only_place_pid;
   Vec<u8>     active_paddles;

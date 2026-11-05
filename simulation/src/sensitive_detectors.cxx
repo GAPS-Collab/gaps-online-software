@@ -15,12 +15,6 @@ go::SensitiveDetector::~SensitiveDetector() {
 
 //-----------------------------------------------------
 
-auto go::SensitiveDetector::set_trk_strip_mask(const go::TrkStripMaskMap& strip_mask_map) -> void {
-  strip_mask_map_ = strip_mask_map;
-}  
-
-//-----------------------------------------------------
-
 auto go::SensitiveDetector::Initialize(G4HCofThisEvent* HCE) -> void {
   mchit_collection_ = new McHitCollection(SensitiveDetectorName, collectionName[0]);
   if (HCE != nullptr) {
@@ -34,18 +28,8 @@ auto go::SensitiveDetector::Initialize(G4HCofThisEvent* HCE) -> void {
 
 auto go::SensitiveDetector::ProcessHits(G4Step* step, G4TouchableHistory* history) -> G4bool {
   if (step->GetTrack() != nullptr) {
-    // first we check if the active volume is supposed to be excluded. 
-    // For the tracker this is given by the strip mask map. No entry for 
-    // a strip means its a dud and should definitely be excluded
-    if (!strip_mask_map_.empty()) {
-      auto copy_id = step->GetPreStepPoint()->GetTouchable()->GetCopyNumber(0);
-      if (!strip_mask_map_.contains((u32)copy_id)) {
-        return false;
-      }
-      if (!strip_mask_map_[(u32)copy_id]) {
-        return false;
-      }
-    }
+    // every step is recorded; dead tracker strips are masked in the
+    // digitizer
     if (step->GetTrack()->GetVolume() != nullptr) {
       //std::cout << "step " << step->GetTrack()->GetVolume()->GetCopyNo() << std::endl;
       auto hit                  = new McHit();
