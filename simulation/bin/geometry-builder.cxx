@@ -164,6 +164,10 @@ int main(int argc, char *argv[]){
     for (auto cmd : cmds) { 
       UImanager->ApplyCommand(cmd.c_str());
     }
+    // exit does not destroy the run manager and its user actions, so
+    // the writer has to be released here to flush and close the file
+    // (otherwise the last events are lost)
+    dynamic_cast<go::EventAction*>(event_action)->writer.reset();
     exit(EXIT_SUCCESS);
   }
 }
