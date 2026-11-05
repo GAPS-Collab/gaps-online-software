@@ -110,6 +110,9 @@ void g::TofPacketReader::set_filename(String filename) {
     spdlog::info("Will read packets from {} [{} MB]", filename, fs_string);
   } else {
     auto msg = std::format("File {} does not exist!", filename);
+    if (filename == "") {
+      msg = "Given filename is empty!";
+    }
     spdlog::critical(msg); 
     throw std::runtime_error(msg);
   }
