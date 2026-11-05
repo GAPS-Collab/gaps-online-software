@@ -178,6 +178,10 @@ namespace gondola {
     // Speed of the pulse in the paddle, approximately 51% of the speed of light.
     // C_LIGHT_PADDLE is in cm/ns, the same as used to reconstruct the position
     // along the paddle (TofHit::get_pos)
+    // Returns the hit whenever both waveforms and their features exist,
+    // also below the readout threshold (the caller applies it). None
+    // means no waveform, e.g. a missing template; only then the fallback
+    // is used.
     [[nodiscard]]
     auto digitize_tof_hit(const RecoHit& hit, f64 velocity_mm_per_ns = 10.0*C_LIGHT_PADDLE) -> Option<gondola::TofHit>;
     
@@ -206,9 +210,10 @@ namespace gondola {
     /// The number of TOF Reco hits we could successfully convert 
     /// using the machinery  
     usize tof_hits_succeeded          = 0;
+    /// The number of TOF hits read out from the fallback
     usize tof_hits_failed             = 0;
-    /// The number of TOF hits which, after reconstruction fall below 
-    /// the "HIT" threshold
+    /// The number of TOF hits of read-out paddles whose waveforms fall
+    /// below the readout threshold (they only take part in the trigger)
     usize tof_hits_below_th           = 0;
     /// The number of TOF hits we deliberately excluded from the events 
     /// by the config file 
@@ -218,8 +223,8 @@ namespace gondola {
     usize tof_hits_sat_no_templ_found = 0;
     /// The total number of saturated TOF hits
     usize tof_hits_sat                = 0;
-    /// The number of (Tof) hits we created by using the fallback 
-    /// method 
+    /// The number of (Tof) hits of read-out paddles without a
+    /// waveform, which we created by using the fallback method
     usize tof_hits_digi_fallback      = 0;
     /// The number of (Tof) hits we created by using the fallback 
     /// method which then has a resulting energy of zero

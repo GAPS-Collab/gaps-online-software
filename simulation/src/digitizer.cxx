@@ -442,7 +442,9 @@ auto g::GapsDigitizer::print_statistics() -> void {
   const auto below_threshold = tof_hits_below_th;
 
   const double denominator        = attempted > 0 ? static_cast<f64>(attempted) : 1.0;
-  const double denominator_failed = failed > 0 ? static_cast<f64>(failed) : 1.0;
+  // the reasons count all digitizations, the trigger-only paddles included
+  const usize all_no_waveform     = n_failed_reason_wf_bad + n_failed_reason_no_features;
+  const double denominator_failed = all_no_waveform > 0 ? static_cast<f64>(all_no_waveform) : 1.0;
   const usize all_wf              = wf_no_tof_pulse_found + wf_voltage_empty;
   const double denominator_wf     = all_wf > 0 ? static_cast<f64>(all_wf) : 1.0;
   const usize all_templ_finding   = expected_peak_mv_not_finite + no_template_for_pid; 
@@ -456,16 +458,17 @@ auto g::GapsDigitizer::print_statistics() -> void {
   const double denominator_fb     = tof_hits_digi_fallback > 0 ? static_cast<f64>(tof_hits_digi_fallback) : 1.0; 
   auto repr = std::format(
     "[TofDigitizerStats] (total events {}, rejected by the trigger {}) \n"
-    "  attempted: {} | "
-    "succeeded: {} ({:.2f}%) | "
-    "failed: {} ({:.2f}%) | "
-    "below threshold: {} ({:.2f}%) | \n"
-    "  failed reason wf: {} ({:.2f}%) | "
-    "failed reason no feat: {} ({:.2f}%)\n" 
+    "  read-out paddles, attempted: {} | "
+    "read out with waveform: {} ({:.2f}%) | "
+    "read out from fallback: {} ({:.2f}%) | "
+    "below threshold (trigger only): {} ({:.2f}%) | "
+    "no waveform, fallback: {} ({:.2f}%) | \n"
+    "  no waveform, all digitizations incl. trigger-only paddles: waveform failed: {} ({:.2f}%) | "
+    "no features: {} ({:.2f}%)\n" 
     "  wf failed no pulse: {} ({:.2f}%) | "
     "wf failed voltage 0: {} ({:.2f}%)\n"
     "  templ peak finding fail infinite : {} ({:.2f}%) | "
-    "templ peak finding fail no pid : {} ({:.2f}%)\n"
+    "templ peak finding fail no pid : {} ({:.2f}%) (mostly trigger-only paddles without templates)\n"
     "  empty volt - expected peak inval : {} ({:.2f}%) | " 
     "empty volt - max element inval : {} ({:.2f}%)\n"
     "  exp peak is NAN                  : {} ({:.2f}%) | "
@@ -487,6 +490,7 @@ auto g::GapsDigitizer::print_statistics() -> void {
     succeeded, 100.0 * succeeded / denominator,
     failed, 100.0 * failed / denominator,
     below_threshold, 100.0 * below_threshold / denominator,
+    tof_hits_digi_fallback, 100.0 * tof_hits_digi_fallback / denominator,
     n_failed_reason_wf_bad, 100.0* n_failed_reason_wf_bad / denominator_failed, 
     n_failed_reason_no_features, 100* n_failed_reason_no_features / denominator_failed, 
     wf_no_tof_pulse_found, 100.0* wf_no_tof_pulse_found / denominator_wf,
@@ -909,12 +913,21 @@ auto g::GapsDigitizer::digitize_event(const g::McEvent& mc_ev, bool& has_trigger
         print_statistics();
       }
       if (digi_hit_res.is_some()) {
-        ev.tof_event.hits.push_back(digi_hit_res.unwrap());
-        ++tof_hits_succeeded;
+        auto digi_hit = digi_hit_res.unwrap();
+        // the read out needs both ends above the hit threshold; below
+        // it, the paddle can still take part in the trigger
+        if (digi_hit.peak_a_f32 > cfg.digi_tof_hit_threshold_mv
+            && digi_hit.peak_b_f32 > cfg.digi_tof_hit_threshold_mv) {
+          ev.tof_event.hits.push_back(digi_hit);
+          ++tof_hits_succeeded;
+        } else {
+          tof_hits_below_th++;
+          trigger_only.push_back(digi_hit);
+        }
       } else {
-        // the fallback. This happens if our new method of 
-        // using waveform templates does not succeed for some 
-        // reason - most likely a missing template. 
+        // the fallback. This happens only if our new method of 
+        // using waveform templates gives no waveform at all - most
+        // likely a missing template. 
         if (cfg.digi_use_tof_legacy_fb) {
           auto fallback_result = digitize_tof_hit_fallback(h);
           tof_hits_digi_fallback++;  
@@ -1613,12 +1626,8 @@ auto g::GapsDigitizer::digitize_tof_hit(const RecoHit& hit,
   const auto& a = features_a.try_ok();
   const auto& b = features_b.try_ok();
 
-  // threshold for read out - this is different than the trigger but warrants a check
-  const bool accepted = a.peak_voltage_mv > cfg.digi_tof_hit_threshold_mv && b.peak_voltage_mv > cfg.digi_tof_hit_threshold_mv;
-  if (!accepted) {
-    tof_hits_below_th++;
-    return None;
-  }
+  // the threshold for the read out is applied by the caller: a hit
+  // below it still takes part in the trigger
   // Our waveform timing is referenced to the paddle center.
   // Flight reconstruction expects propagation from the hit
   // to the paddle ends.
