@@ -21,7 +21,7 @@ import logging
 logging.getLogger('go').addHandler(logging.NullHandler())
 
 # check gondola version
-GON_VERSION_REQUIRED = '0.12.31' 
+GON_VERSION_REQUIRED = '0.12.37' 
 if not go.version_at_least(GON_VERSION_REQUIRED):
     print(f'ERROR - got version {go.get_version()} but need version {GON_VERSION_REQUIRED}')
     raise ImportError("gondola needs to be at least version {GON_VERSION_REQUIRED}!")
@@ -40,7 +40,10 @@ TRK_GAIN  = f"{CRANE_INSTALL}trk-2025/List-251216-NZS-0.txt-gains-cn2-mod2.txt"
 GEO       = f"{CRANE_INSTALL}/resources/geometry/geometry.v25.09.root"
 
 GEO       = f"{CRANE_BASEDIR}/resources/geometry/geometry.v25.09.root"
-CALI_DB   = F"{CRANE_BASEDIR}/calibration/resources/CalibrationDB.db"
+CALI_DB   = f"{CRANE_BASEDIR}/calibration/resources/CalibrationDB.db"
+
+#FIXME
+TRK_PLS_10046 = f"{CRANE_INSTALL}trk-2025/pulch_10046_max.txt"
 
 for k in TRK_TRF, TRK_MASK, TRK_PED, TRK_PLS, TRK_GAIN, GEO:
     if not Path(k).exists():
@@ -53,33 +56,26 @@ except ImportError:
     import sys
     sys.exit(1)
 
-#TRK_MEV_CUT=0.4
-TRK_MEV_CUT=0
-
-def get_refined_edep(paddle_num,edep, cc, temperature_paddle):
-    """
-    Fix the temperature dependent gain by 
-    applying Grace's constants
-    """
-    ## we need to apply the slope and y_intercept to each temperature value, to get a predicted MPV from the fit: 
-    slope        = cc["slope"]
-    y_int        = cc["y_intercept"]
-    t_avg        = cc["T_avg"] 
-    mpv_predicted  = temperature_paddle*slope + y_int
-    mpv_reference  = t_avg*slope + y_int
-    #print (mpv_reference) 
-    #print (mpv_predicted)
-    #print (edep)
-    # temperature calibration formula:
-    edep_corrected = edep*(mpv_reference/mpv_predicted)
-    
-    #print (edep,edep_corrected)
-    #print ('-----------------')
-    try:
-        coefficient    = 1.22/cc[paddle_num]["measured_mip"]
-    except KeyError:
-        return edep
-    return edep_corrected*coefficient
+#def get_refined_edep(paddle_num, edep, cc, temperature_paddle):
+#    """
+#    Fix the temperature dependent gain by 
+#    applying Grace's constants
+#    """
+#    ## we need to apply the slope and y_intercept to each temperature value, to get a predicted MPV from the fit: 
+#    slope          = cc["slope"]
+#    y_int          = cc["y_intercept"]
+#    t_avg          = cc["T_avg"] 
+#    mpv_predicted  = temperature_paddle*slope + y_int
+#    mpv_reference  = t_avg*slope + y_int
+#    #print (mpv_reference) 
+#    #print (mpv_predicted)
+#    #print (edep)
+#    # temperature calibration formula:
+#    edep_corrected = edep*(mpv_reference/mpv_predicted)
+#    #print (edep,edep_corrected)
+#    #print ('-----------------')
+#    coefficient    = 1.22/cc["coefficient"]
+#    return edep_corrected*coefficient
 
 # bridge the gap between the rust library and the C++ library. 
 # the difference is not immediately obvious, it is just the 
@@ -104,7 +100,8 @@ def rust_to_cxx_bridge(event, tof_paddles, cc = None, all_paddle_temps = None):
                                # otherwise, it will be slow if we access 
                                # the fields since it will always copy the 
                                # complete struct
-    cxx_tof_event  = gxx.gondola_cxx.TofEventSummary()
+    #cxx_tof_event  = gxx.gondola_cxx.TofEventSummary()
+    cxx_tof_event   = gxx.gondola_cxx.TofEvent()
     cxx_tof_event.event_id      = tof_event.event_id 
     cxx_event.event_id          = tof_event.event_id 
     cxx_tof_event.set_timestamp48(tof_event.timestamp48)
@@ -128,24 +125,27 @@ def rust_to_cxx_bridge(event, tof_paddles, cc = None, all_paddle_temps = None):
         h_cxx.peak_b     = h.peak_b 
         h_cxx.paddle_len = h.paddle_len/10
         h_cxx.event_t0   = h.event_t0
+        # this is the uncorrected energy 
+        h_cxx.edep_corrected = h.edep
         if cc is not None: 
             # energy correction - cc are the global 
             # energy conrrecton constants 
-            print (h_cxx.edep, h_cxx.edep_att, h_cxx.edep_birk, h.edep, h.edep_att, h.edep_att_birk)
-            print ('-- -- -- -- --')
+            #print (f'cxx edep {h_cxx.edep}, cxx edep att {h_cxx.edep_att}, cxx edep birk {h_cxx.edep_birk}, rust edep {h.edep}, rust edep att {h.edep_att}, rust dedep birk {h.edep_att_birk}')
+            #print ('-- -- -- -- --')
             if h.paddle_id in cc.keys():
                 temp = all_paddle_temps[h.paddle_id].get_for_ts(cxx_tof_event.timestamp48)
                 if temp[0] == -273.0 or temp[1] == -273.0:
-                    h_cxx.edep_corrected = h.edep_att_birk
+                    pass # we have already filled the energy deposition and have to leave it
+                         # since we don't have temperature information
+                    #h_cxx.edep_corrected = h.edep_att_birk
                     #print (cxx_tof_event.timestamp48)
                     #print (f'Paddle temperature {temp} invalid!')
                 else:
                     temp = (temp[0] + temp[1]) / 2
-                    r_edep =  get_refined_edep(h.paddle_id, h.edep_att_birk, cc[h.paddle_id], temp)
+                    r_edep =  go.calibration.apply_energy_calibration_tof(h.paddle_id, h.edep_att_birk, cc[h.paddle_id], temp)
                     h_cxx.edep_corrected = r_edep
-                    print (h.edep_att, h.edep_att_birk)
             else:
-                h_cxx.edep_corrected = h.edep_att_birk
+                h_cxx.edep_corrected = h.edep
         cxx_hits.append(h_cxx)
     cxx_tof_event.hits = cxx_hits 
     cxx_event.tof = cxx_tof_event
@@ -158,12 +158,6 @@ def rust_to_cxx_bridge(event, tof_paddles, cc = None, all_paddle_temps = None):
         cxx_trk_hit.channel = h.channel 
         cxx_trk_hit.energy  = h.energy
         cxx_trk_hit.adc     = h.adc
-        # the "tracker" mev cut
-        #if h.energy < TRK_MEV_CUT:
-        #    #print (h) 
-        #    #exit()
-        #    pass
-        #else:
         cxx_hits.append(cxx_trk_hit) 
     cxx_event.tracker = cxx_hits
     return cxx_event 
@@ -184,6 +178,8 @@ if __name__ == '__main__':
                         )
     parser.add_argument('-n', '--n-events', type=int,\
                         default=0, help='Only process -n number of events')
+    parser.add_argument('--tracker-cut', type=float,\
+                        default=0.4, help='Only add tracker hits to CEventRec which are above this threshhold in MeV. The default is 0.4MeV')
     parser.add_argument('--remove-cmn', action='store_true',\
                         default=False,
                         help='Remove the common noise as identifier by the tracker team')
@@ -191,32 +187,36 @@ if __name__ == '__main__':
                         help='Advises the script that it is intended to deal with ground data. This will e.g. change the way how it deals with the tracker calibratoin files')
     parser.add_argument('--quiet', action='store_true',\
                         help='Suppress unnecessary output (e.g. progressbar) for use on cluster!')
+    parser.add_argument('--apply-energy-calib', action='store_true',\
+                        help="Apply Grace's temperature-gain calibration",\
+                        default=False)
     parser.add_argument('-o','--outdir',\
                         help='Outdir for .root output files',
                         type=Path,
                         default=None)
-
+    
     
     #parser.add_argument('-v','--verbose', action='store_true',\
     #                    help='More verbose output')
     args = parser.parse_args()
-    # Grace's energy corrections
-    ## the calibration constants are stored in a .csv file: 
-    calibration_constants = {}
-    with open("/home/gtytus/analysis/grace/python/edeps/final/paddle_calibrations.csv", newline="") as f:
-        reader = csv.DictReader(f)
-    
-        for row in reader:
-            paddle = int(row["paddle"])
-            
-            ## the slope, y_intercept and T_avg are used for the intra-paddle temperature calibration, 
-            ## and the normalization_coeff is used for the inter-paddle MIP MPV calibration.
-            calibration_constants[paddle] = {
-                "slope": float(row["slope"]),
-                "y_intercept": float(row["y_intercept"]),
-                "T_avg": float(row["T_avg"]),
-                "coefficient": float(row["normalization_coeff"]),
-            }
+    if args.apply_energy_calib:
+        # Grace's energy corrections
+        ## the calibration constants are stored in a .csv file: 
+        calibration_constants = {}
+        with open("/home/gtytus/analysis/grace/python/edeps/final/paddle_calibrations.csv", newline="") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                paddle = int(row["paddle"])
+                
+                ## the slope, y_intercept and T_avg are used for the intra-paddle temperature calibration, 
+                ## and the normalization_coeff is used for the inter-paddle MIP MPV calibration.
+                calibration_constants[paddle] = {
+                    "slope": float(row["slope"]),
+                    "y_intercept": float(row["y_intercept"]),
+                    "T_avg": float(row["T_avg"]),
+                    "coefficient": float(row["normalization_coeff"]),
+                }
+
     if args.ground:
         print('-> ground data!')
         match args.run_id:
@@ -242,9 +242,12 @@ if __name__ == '__main__':
             case _:
                 raise ValueError(f"Selected ground data, but for an uknown run. --run-id must be either 240, 243, or 251! We got {args.run_id} instead!")
         
-        for k in TRK_MASK, TRK_PED, TRK_TRF, TRK_PLS, TRK_GAIN:
-            print ('---- ---- ----')
-            print (f'-- {k}')
+        if not args.quiet:
+            for k in TRK_MASK, TRK_PED, TRK_TRF, TRK_PLS, TRK_GAIN:
+                print ('---- ---- ----')
+                print (f'-- {k}')
+       
+        # build a tracker offline calibration 
         trk_mask = go.db.TrackerStripMask.parse_from_file            (TRK_MASK)
         trk_ped  = go.db.TrackerStripPedestal.parse_from_file        (TRK_PED)
         trk_trf  = go.db.TrackerStripTransferFunction.parse_from_file(TRK_TRF)
@@ -321,6 +324,7 @@ if __name__ == '__main__':
         #    trk_pls  = go.db.TrackerStripPulse.parse_from_file(cali_files['pls'].path) 
         #    trk_gain = go.db.TrackerStripGain.parse_from_file(cali_files['gain'].path) 
     else:
+        # build the tracker offline calibration for non-ground data
         trk_mask = go.db.TrackerStripMask.parse_from_file            (TRK_MASK)
         trk_ped  = go.db.TrackerStripPedestal.parse_from_file        (TRK_PED)
         trk_trf  = go.db.TrackerStripTransferFunction.parse_from_file(TRK_TRF)
@@ -342,9 +346,9 @@ if __name__ == '__main__':
     tracker_cali.remove_cmn = args.remove_cmn
     print ('--- --- --- --- ---')
     print (tracker_cali)
-    #if args.ground:
-    #    sys.exit(0)
-   
+
+    # -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+
     # paddle offsets as calculated by Grace
     tof_timing_offsets = go.db.TofPaddleTimingConstant.as_dict_by_name('GraceV1.5')
     tof_paddles        = go.db.TofPaddle.all_as_dict()
@@ -356,8 +360,10 @@ if __name__ == '__main__':
     # also be used directly 
     tof_timing_offsets = {k : tof_timing_offsets[k].paddle_constant - tof_timing_offsets[k].panel_constant for k in tof_timing_offsets}
 
-    # temperatures 
-    all_paddle_temps = go.db.TofPaddleTemp.all_data()
+    if args.apply_energy_calib:
+        # temperatures from the database - this needs a version of the database whih 
+        # is currently not shipped with the code
+        all_paddle_temps = go.db.TofPaddleTemp.all_data()
 
     print (f'--> Loaded TOF timing constants for  {len(tof_timing_offsets)} paddles from db!')
     is_caraspace = False
@@ -386,14 +392,15 @@ if __name__ == '__main__':
             outfile_fname = fname.replace('.bin', '.root')
         if fname.endswith('.gaps'):
             outfile_fname = fname.split('.')[1] 
+            # FIXME - I want the run id in the outfile name!
             outfile_fname = 'RAW' + outfile_fname + '.root' 
 
         outfile = args.outdir / outfile_fname
         outfile = str(outfile)
         print (f'-> Writing to {outfile}')
         root_writer = gxx.gondola_cxx.SDRootWriter(outfile, GEO) 
+        # this is only for data in this way
         root_writer.write_sdpar(0, "uhcra", CRANE_VERSION)
-        #reader  = go.io.TelemetryPacketReader(args.input_dir) 
         is_event = lambda x : x.is_event_packet
         if is_caraspace:
             reader  = go.io.CRReader(str(f)) 
@@ -407,6 +414,7 @@ if __name__ == '__main__':
         else:
             reader   = go.io.TelemetryPacketReader(str(f))
             n_packs, _n_err, _data = reader.count_packets()
+        
         for pack in tqdm.tqdm(reader, total=n_packs, disable=args.quiet):
             if is_event(pack):
                 if nth_event >= args.n_events and args.n_events > 0:
@@ -457,19 +465,14 @@ if __name__ == '__main__':
                 ev.tof_set_paddles(tof_paddles)
                 ev.tof_normalize_hit_times()
                 ev.tof_set_timing_constants(tof_timing_offsets)
-                #tracker_cali.calibrate_event(ev) 
-                #print (ev)
-                #print (calibration_constants)
                 cxx_ev_for_raw = rust_to_cxx_bridge(ev, tof_paddles, calibration_constants, all_paddle_temps)
                 # now we remove the pulsed hits for the rec part
                 ev.calibrate_trk_hits(tracker_cali, True)
                 cxx_ev_for_rec = rust_to_cxx_bridge(ev, tof_paddles, calibration_constants, all_paddle_temps)
-            
-
 
                 #print (cxx_ev.tof.dsi_j_mask, "cxx dsi j mask")
                 #print (cxx_ev)
-                root_writer.add_event(cxx_ev_for_rec, cxx_ev_for_raw, pack_ptype, pack_gcutime, True)
+                root_writer.add_event(cxx_ev_for_rec, cxx_ev_for_raw, pack_ptype, pack_gcutime, True, args.tracker_cut)
                 #nth_event += 1
                 #if nth_event % 500 == 0:
                 #    timedelta = time.time() - start_time
@@ -477,5 +480,4 @@ if __name__ == '__main__':
                 #    start_time = time.time()
         # FIXME - if this is missing, all but the last root file will be garbage
         del root_writer # explicetly delete it here, there is some memory issue
-        #break
-
+#EOF
