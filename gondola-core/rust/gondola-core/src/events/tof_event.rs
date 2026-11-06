@@ -385,21 +385,27 @@ impl TofEvent {
  
   /// Calculate the TOF part of the interesting events mechanism, whcih is
   /// NHIT (CBE, COR, UMB) and EDEP (CBE, COR, UMB)
+  ///
+  /// The energies are the linear estimate without attenuation
+  /// (TofHit::get_edep_linear_noatt), not the default TofHit::get_edep:
+  /// this runs on the flight computer (liftof), where the hits do not
+  /// know their paddle, and the thresholds of the interesting events
+  /// are set for this estimate.
   pub fn calc_gcu_variables(&mut self) {
     if self.hits.len() == 0 {
       for rbev in &self.rb_events {
         for h in &rbev.hits {
           if h.paddle_id <= 60 {
             self.n_hits_cbe += 1;
-            self.tot_edep_cbe += h.get_edep();
+            self.tot_edep_cbe += h.get_edep_linear_noatt();
           }
           else if h.paddle_id <= 108 && h.paddle_id > 60 {
             self.n_hits_umb += 1;
-            self.tot_edep_umb += h.get_edep();
+            self.tot_edep_umb += h.get_edep_linear_noatt();
           }
           else {
             self.n_hits_cor += 1;
-            self.tot_edep_cor += h.get_edep();
+            self.tot_edep_cor += h.get_edep_linear_noatt();
           }
         }
       }
@@ -407,15 +413,15 @@ impl TofEvent {
       for h in &self.hits {
         if h.paddle_id <= 60 {
           self.n_hits_cbe += 1;
-          self.tot_edep_cbe += h.get_edep();
+          self.tot_edep_cbe += h.get_edep_linear_noatt();
         }
         else if h.paddle_id <= 108 && h.paddle_id > 60 {
           self.n_hits_umb += 1;
-          self.tot_edep_umb += h.get_edep();
+          self.tot_edep_umb += h.get_edep_linear_noatt();
         }
         else {
           self.n_hits_cor += 1;
-          self.tot_edep_cor += h.get_edep();
+          self.tot_edep_cor += h.get_edep_linear_noatt();
         }
       }
     }

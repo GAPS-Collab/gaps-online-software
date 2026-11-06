@@ -358,33 +358,36 @@ impl TofHit {
     self.get_t0_uncorrected()
   }
 
-  /// Philip's energy deposition based on peak height
+  /// Deposited energy (MeV), the default: Birk's law with the
+  /// attenuation model of the simulation's digitizer (see get_edep)
   #[getter]
   #[pyo3(name="edep")]
   fn get_edep_py(&self) -> f32 {
     self.get_edep()
   }
-  
-  /// Elena's energy deposition based on peak height
+
+  /// Deposited energy (MeV) following Birk's law, without the
+  /// attenuation correction
   #[getter]
-  #[pyo3(name="edep_att")]
-  fn get_edep_att_py(&self) -> f32 {
-    self.get_edep_att()
+  #[pyo3(name="edep_noatt")]
+  fn get_edep_noatt_py(&self) -> f32 {
+    self.get_edep_noatt()
   }
-  
-  /// The "new" thing following Birk's law
+
+  /// Deposited energy (MeV), linear in the peaks, with Elena's
+  /// attenuation correction
   #[getter]
-  #[pyo3(name="edep_att_birk")]
-  fn get_edep_att_birk_py(&self) -> f32 {
-    self.get_edep_birk()
+  #[pyo3(name="edep_linear")]
+  fn get_edep_linear_py(&self) -> f32 {
+    self.get_edep_linear()
   }
-  
-  /// The "new" thing following Birk's law, 
-  /// but without attenuation
+
+  /// Deposited energy (MeV), linear in the peaks, without the
+  /// attenuation correction (Philip's)
   #[getter]
-  #[pyo3(name="edep_birk")]
-  fn get_edep_birk_no_att_py(&self) -> f32 {
-    self.get_edep_birk_no_att()
+  #[pyo3(name="edep_linear_noatt")]
+  fn get_edep_linear_noatt_py(&self) -> f32 {
+    self.get_edep_linear_noatt()
   }
 
   /// Arrival time of the photons at side A
@@ -582,13 +585,39 @@ impl TofHit {
     0.5*(self.time_a.to_f32() + self.time_b.to_f32() - (self.paddle_len/(10.0*C_LIGHT_PADDLE)))
   }
 
-  /// Philip's energy deposition based on peak height
+  /// Deposited energy (MeV), the default. Birk's law with the
+  /// attenuation model of the simulation's digitizer (GapsDigitizer::
+  /// tof_energy_to_peak_voltage and tof_paddle_attenuation_factor):
+  /// per side its own coefficients, normalised at the paddle center.
+  /// Both peaks are corrected for the attenuation, averaged, and
+  /// the Birk's law relation peak = 35.26*E/(1 + 0.021*E) is inverted.
+  /// Needs the paddle (set_paddle) for the position along it.
   pub fn get_edep(&self) -> f32 {
-    (1.29/34.3)*(self.peak_a.to_f32() + self.peak_b.to_f32()) / 2.0
+    let len   = self.paddle_len;
+    // distance from side A, within the paddle
+    let x_a   = self.get_pos().clamp(0.0, len);
+    let att   = |p0 : f32, p1 : f32, p2 : f32, dist : f32| {
+      ((p0 - p1*dist).exp() + p2) / ((p0 - p1*0.5*len).exp() + p2)
+    };
+    let att_a = att(3.94,  0.001211,  20.87, x_a);
+    let att_b = att(3.831, 0.0013103, 23.42, len - x_a);
+    let v = (self.get_peak_a()/att_a + self.get_peak_b()/att_b) / 2.0;
+    1000.0 * v / (35260.0 - 21.0 * v)
   }
-  
-  /// Elena's energy deposition including attenuation
-  pub fn get_edep_att(&self) -> f32 {
+
+  /// Deposited energy (MeV) following Birk's law, without the
+  /// attenuation correction
+  pub fn get_edep_noatt(&self) -> f32 {
+    let peak_a = self.peak_a.to_f32();
+    let peak_b = self.peak_b.to_f32();
+    let avg_peak = (peak_a + peak_b) / 2.0;
+    1000.0 * avg_peak / (35260.0 - 21.0 * avg_peak)
+  }
+
+  /// Deposited energy (MeV), linear in the peaks, with Elena's
+  /// attenuation correction (normalised at the paddle end, vertical
+  /// muon peak at 0.97 MeV). Not the model of the simulation.
+  pub fn get_edep_linear(&self) -> f32 {
     let x0    = self.get_pos();
     let att_a = ((3.9-0.00126*(x0)).exp()+22.15) / ((3.9).exp()+22.15);
     let att_b = ((3.9-0.00126*(self.paddle_len - x0)).exp()+22.15) / ((3.9).exp()+22.15);
@@ -596,22 +625,11 @@ impl TofHit {
     return edep; 
   }
 
-  pub fn get_edep_birk(&self) -> f32 { 
-    let x0    = self.get_pos();
-    let att_a = ((3.9-0.00126*(x0)).exp()+22.15) / ((3.9).exp()+22.15);
-    let att_b = ((3.9-0.00126*(self.paddle_len - x0)).exp()+22.15) / ((3.9).exp()+22.15);
-    let v = (self.get_peak_a()/att_a + self.get_peak_b()/att_b) / 2.0; 
-    let edep = -1000.0*v/(21.0*v - 35260.0);
-    return edep;
+  /// Deposited energy (MeV), linear in the peaks, without the
+  /// attenuation correction (Philip's)
+  pub fn get_edep_linear_noatt(&self) -> f32 {
+    (1.29/34.3)*(self.peak_a.to_f32() + self.peak_b.to_f32()) / 2.0
   }
-
-  pub fn get_edep_birk_no_att(&self) -> f32 {
-    let peak_a = self.peak_a.to_f32();
-    let peak_b = self.peak_b.to_f32();
-    let avg_peak = (peak_a + peak_b) / 2.0;
-    1000.0 * avg_peak / (35260.0 - 21.0 * avg_peak)
-  }
-
 
   /// Arrival time of the photons at side A
   pub fn get_time_a(&self) -> f32 {
@@ -804,7 +822,7 @@ impl fmt::Display for TofHit {
     Hart cbl time {:.2}
   ** reconstructed interaction
     energy_dep    {:.2}   
-    edep_att      {:.2}
+    edep_linear   {:.2}
     pos_across    {:.2}   
     t0 (uncorr)   {:.2}  
     t0 (local c)  {:.2}  
@@ -838,7 +856,7 @@ impl fmt::Display for TofHit {
             self.coax_cable_time,
             self.hart_cable_time,
             self.get_edep(),
-            self.get_edep_att(),
+            self.get_edep_linear(),
             self.get_pos(),
             //self.get_t0(),
             self.get_t0_uncorrected(),
@@ -1040,5 +1058,36 @@ fn serialization_tofhit() {
     test.event_t0         = 0.0;
     assert_eq!(pos, TofHit::SIZE);
     assert_eq!(data, test);
+  }
+}
+
+#[test]
+fn edep_inverts_the_digitizer_model() {
+  // the simulation makes the peaks with Birk's law times its
+  // attenuation (normalised at the paddle center); get_edep has to
+  // give back the deposited energy anywhere along the paddle
+  let len = 1800.0_f32;
+  let att = |p0 : f32, p1 : f32, p2 : f32, dist : f32| {
+    ((p0 - p1*dist).exp() + p2) / ((p0 - p1*0.5*len).exp() + p2)
+  };
+  for x in [200.0_f32, 900.0, 1600.0] {
+    for energy in [1.0_f32, 5.0, 20.0] {
+      let peak = 35.26*energy/(1.0 + 0.021*energy);
+      let mut h = TofHit::new();
+      h.paddle_len = len;
+      // time difference of the two ends for a hit x from side A
+      let time_b = 50.0_f32;
+      h.time_b = f16::from_f32(time_b);
+      h.time_a = f16::from_f32(time_b + (2.0*x - len)/(10.0*C_LIGHT_PADDLE));
+      h.peak_a = f16::from_f32(peak*att(3.94,  0.001211,  20.87, x));
+      h.peak_b = f16::from_f32(peak*att(3.831, 0.0013103, 23.42, len - x));
+      assert!((h.get_pos() - x).abs() < 10.0, "position {} for {}", h.get_pos(), x);
+      let e = h.get_edep();
+      assert!((e/energy - 1.0).abs() < 0.02, "edep {} for {} MeV at {} mm", e, energy, x);
+      // without the attenuation correction, the energy is off away from the center
+      if x != 900.0 {
+        assert!((h.get_edep_noatt()/energy - 1.0).abs() > 0.02);
+      }
+    }
   }
 }
