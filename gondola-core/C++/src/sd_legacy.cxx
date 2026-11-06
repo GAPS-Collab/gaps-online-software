@@ -921,7 +921,7 @@ auto CEventRec::fill_from_telemetry(g::TelemetryEvent* event,
     if (use_corrected_edep) {
         reco_hit.energydep_     = hit.edep_corrected;
     } else { 
-        reco_hit.energydep_     = hit.get_edep_birk();
+        reco_hit.energydep_     = hit.get_edep();
     }
     //std::cout << hit << std::endl;
     //std::cout << reco_hit.pretty_print() << std::endl;

@@ -2,6 +2,7 @@
 // under the GPLv3 license
 
 #include <cmath>
+#include <algorithm>
 
 #include "spdlog/spdlog.h"
 
@@ -171,16 +172,27 @@ auto g::TofHit::get_timestamp48() const -> f64 {
 
 //-----------------------------------
 
-auto g::TofHit::get_edep_noatt() const -> f32 {
+/// linear in the peaks, without the attenuation correction
+/// (Philip's)
+auto g::TofHit::get_edep_linear_noatt() const -> f32 {
   return (1.29/34.3)*(get_peak_a() + get_peak_b()) / 2.0;
 }
 
 //-----------------------------------
 
+/// Birk's law without the attenuation correction
+auto g::TofHit::get_edep_noatt() const -> f32 {
+  f32 v = (get_peak_a() + get_peak_b()) / 2.0;
+  return 1000.0 * v / (35260.0 - 21.0 * v);
+}
+
+//-----------------------------------
+
 #ifdef BUILD_CXXDB
-/// simple calculation based on Philip's 
-/// attenuation function as used in pgaps
-auto g::TofHit::get_edep() const -> f32 {
+/// linear in the peaks, with Elena's attenuation correction
+/// (normalised at the paddle end, vertical muon peak at 0.97 MeV).
+/// Not the model of the simulation.
+auto g::TofHit::get_edep_linear() const -> f32 {
   f32 x0    = get_x_pos();
   f32 att_a = (std::exp(3.9-0.00126*( x0            ))+22.15)/ (std::exp(3.9)+22.15);
   f32 att_b = (std::exp(3.9-0.00126*(10.0*paddle_len - x0))+22.15)/ (std::exp(3.9)+22.15);
@@ -190,14 +202,24 @@ auto g::TofHit::get_edep() const -> f32 {
 
 //-----------------------------------
 
-auto g::TofHit::get_edep_birk() const -> f32 {
-  f32 x0    = get_x_pos();
-  //f32 edep  = 0.0159 * (get_peak_a()/att_a + get_peak_b()/att_b) / 2.; // vertical muon peak @ 0.97 MeV
-  f32 att_a = (std::exp(3.9-0.00126*( x0            ))+22.15)/ (std::exp(3.9)+22.15);
-  f32 att_b = (std::exp(3.9-0.00126*(10.0*paddle_len - x0))+22.15)/ (std::exp(3.9)+22.15);
-  f32 v  = (get_peak_a()/att_a + get_peak_b()/att_b) / 2.0; 
-  f32 edep  = -1000.0*v/(21.0*v - 35260.0);
-  return edep; 
+/// Deposited energy (MeV), the default. Birk's law with the
+/// attenuation model of the simulation's digitizer (GapsDigitizer::
+/// tof_energy_to_peak_voltage and tof_paddle_attenuation_factor):
+/// per side its own coefficients, normalised at the paddle center.
+/// Both peaks are corrected for the attenuation, averaged, and
+/// the Birk's law relation peak = 35.26*E/(1 + 0.021*E) is inverted.
+/// The same as TofHit::get_edep in the Rust library.
+auto g::TofHit::get_edep() const -> f32 {
+  f32 len = 10.0*paddle_len; // mm
+  // distance from side A, within the paddle
+  f32 x_a = std::clamp(get_x_pos(), 0.0f, len);
+  auto att = [len](f32 p0, f32 p1, f32 p2, f32 dist) -> f32 {
+    return (std::exp(p0 - p1*dist) + p2) / (std::exp(p0 - p1*0.5f*len) + p2);
+  };
+  f32 att_a = att(3.94,  0.001211,  20.87, x_a);
+  f32 att_b = att(3.831, 0.0013103, 23.42, len - x_a);
+  f32 v = (get_peak_a()/att_a + get_peak_b()/att_b) / 2.0;
+  return 1000.0 * v / (35260.0 - 21.0 * v);
 }
 #endif
 

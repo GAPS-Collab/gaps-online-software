@@ -110,9 +110,17 @@ namespace gondola {
     auto get_phase_delay() const -> f32;
     auto get_cable_delay() const -> f32;
     auto get_t0()          const -> f32;
-    auto get_edep()        const -> f32;
-    auto get_edep_noatt()  const -> f32;
-    auto get_edep_birk()   const -> f32;
+    /// Deposited energy (MeV), the default: Birk's law with the
+    /// attenuation model of the simulation's digitizer, per side,
+    /// normalised at the paddle center (needs the paddle length)
+    auto get_edep()              const -> f32;
+    /// Birk's law without the attenuation correction
+    auto get_edep_noatt()        const -> f32;
+    /// linear in the peaks, with Elena's attenuation correction
+    /// (normalised at the paddle end)
+    auto get_edep_linear()       const -> f32;
+    /// linear in the peaks, without the attenuation correction
+    auto get_edep_linear_noatt() const -> f32;
     #endif
   
     static auto from_bytestream(const Vec<u8> &bytestream, u64 &pos)
