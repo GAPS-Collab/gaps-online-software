@@ -108,7 +108,7 @@ impl Default for SearchlightVertexSettings {
       sigma0_prim      : 20.0,
       theta_prim       : 0.05,
       use_primary      : true,
-      seed_edep_min    : 4.0,
+      seed_edep_min    : 3.0,
       use_e_point      : true,
       e_point_min      : 5.0,
       e_point_err      : 30.0,
