@@ -174,11 +174,31 @@ pub fn load_calibration_db_elena(db_path : &str, cali_ftype : TrackerCalibration
 pub fn connect_to_db_path(db_path : &str) -> Result<diesel::SqliteConnection, ConnectionError> {
   info!("Will set GONDOLA_DB_URL to {}", db_path);
   warn!("Setting environment variables is not thread safe!");
+  check_db_file(db_path)?;
   unsafe {
     //env::set_var("GONDOLA_DB_URL", db_path);
     env::set_var("GONDOLA_DB_URL", db_path);
   }
   SqliteConnection::establish(db_path)
+}
+
+//---------------------------------------------------------------------
+
+/// Make sure the database file exists before connecting to it.
+///
+/// SQLite would otherwise silently create an empty database at a
+/// wrong path and all queries would return nothing. SQLite URIs
+/// ("file:...") and in-memory databases are passed through.
+fn check_db_file(db_path : &str) -> Result<(), ConnectionError> {
+  if db_path.starts_with("file:") || db_path == ":memory:" {
+    return Ok(());
+  }
+  if !Path::new(db_path).is_file() {
+    let msg = format!("No database file at '{}'!", db_path);
+    error!("{}", msg);
+    return Err(ConnectionError::BadConnection(msg));
+  }
+  Ok(())
 }
 
 //---------------------------------------------------------------------
@@ -189,6 +209,7 @@ pub fn connect_to_db() -> Result<diesel::SqliteConnection, ConnectionError>  {
   if db_path == "" {
     error!("Empty GONDOLA_DB_URL. Did you forget to load the gaps-online-software setup-env.sh shell?");
   }
+  check_db_file(&db_path)?;
   SqliteConnection::establish(&db_path)
 }
 

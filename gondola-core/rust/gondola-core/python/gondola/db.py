@@ -6,8 +6,75 @@ detector status data
 from . import _gondola_core as _gc  
 from matplotlib.patches import Rectangle
 
+import importlib.resources as _resources
+import os as _os
+import pathlib as _pathlib
+import sqlite3 as _sqlite3
+
 import vtk
 import numpy as np
+
+#-----------------------------------------------------------------
+
+def get_database() -> _pathlib.Path | None:
+    """
+    The path of the database currently in use (GONDOLA_DB_URL),
+    None if it is not set
+    """
+    db_path = _os.environ.get('GONDOLA_DB_URL', '')
+    return _pathlib.Path(db_path) if db_path else None
+
+#-----------------------------------------------------------------
+
+def get_packaged_database() -> _pathlib.Path:
+    """
+    The path of the database shipped with the gondola package
+    """
+    return _pathlib.Path(_resources.files('gondola') / 'gaps_flight.db')
+
+#-----------------------------------------------------------------
+
+def set_database(db_path) -> _pathlib.Path:
+    """
+    Use the database at db_path from now on.
+
+    This works at any time after the import, since the rust and
+    C++ parts read GONDOLA_DB_URL on every database access. Objects
+    which have been loaded from the previous database keep their
+    values. Set the database before any parallel work, changing
+    environment variables is not thread safe.
+
+    # Arguments:
+      * db_path : path to a gondola SQLite database file
+
+    # Raises:
+      * FileNotFoundError : there is no file at db_path
+      * ValueError        : the file is not a gondola database
+    """
+    db_path = _pathlib.Path(db_path).expanduser().resolve()
+    if not db_path.is_file():
+        raise FileNotFoundError(f'No database file at {db_path}!')
+    try:
+        # open read-only, so that we never create or alter the file
+        con = _sqlite3.connect(f'file:{db_path}?mode=ro', uri=True)
+        try:
+            tables = {k[0] for k in con.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+        finally:
+            con.close()
+    except _sqlite3.DatabaseError as err:
+        raise ValueError(f'{db_path} is not a SQLite database! {err}') from err
+    if 'tof_db_paddle' not in tables:
+        raise ValueError(f'{db_path} is not a gondola database (no tof_db_paddle table)!')
+    _os.environ['GONDOLA_DB_URL'] = str(db_path)
+    return db_path
+
+#-----------------------------------------------------------------
+
+def use_packaged_database() -> _pathlib.Path:
+    """
+    Switch back to the database shipped with the gondola package
+    """
+    return set_database(get_packaged_database())
 
 
 TofPaddle                                = _gc.db.TofPaddle
@@ -336,7 +403,11 @@ TofPaddle.draw_yz = _draw_yz
 
 #-----------------------------------------------------------------
 
-__all__ = ['TofPaddle',\
+__all__ = ['get_database',\
+           'get_packaged_database',\
+           'set_database',\
+           'use_packaged_database',\
+           'TofPaddle',\
            'ReadoutBoard',\
            'TofPaddleTimingConstant',\
            'TrackerStrip',\
