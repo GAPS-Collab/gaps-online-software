@@ -70,7 +70,6 @@ pub fn telly_packet_counter(pack_map : &mut HashMap<&str, usize>, packet_type : 
     TelemetryPacketType::PDUHK              => pack_key = "PDUHK",
     TelemetryPacketType::Tracker            => pack_key = "Tracker",
     TelemetryPacketType::TrackerDAQCntr     => pack_key = "TrakcerDAQCntr",
-    TelemetryPacketType::GPS                => pack_key = "GPS",
     TelemetryPacketType::TrkTempLeak        => pack_key = "TrkTempLeak",
     TelemetryPacketType::BoringEvent        => pack_key = "BoringEvent",
     TelemetryPacketType::RBWaveform         => pack_key = "RBWaveform",
@@ -88,7 +87,6 @@ pub fn telly_packet_counter(pack_map : &mut HashMap<&str, usize>, packet_type : 
     TelemetryPacketType::TmP34              => pack_key = "TmP34",
     TelemetryPacketType::TmP37              => pack_key = "TmP37",
     TelemetryPacketType::TmP38              => pack_key = "TmP38",
-    TelemetryPacketType::TmP55              => pack_key = "TmP55",
     TelemetryPacketType::TmP64              => pack_key = "TmP64",
     TelemetryPacketType::TmP96              => pack_key = "TmP96",
     TelemetryPacketType::TmP214             => pack_key = "TmP214",
@@ -186,6 +184,7 @@ fn packet_sorter(packet_type : &TofPacketType,
         TofPacketType::BfswAckPacket         => pack_key = "BfswAckPacket",
         TofPacketType::MultiPacket           => pack_key = "MultiPacket",
         TofPacketType::PanicPacket           => pack_key = "PanicPacket",
+        TofPacketType::TofPulseTemplate      => pack_key = "TofPulseTemplate"
       }
       if pm.get(pack_key).is_some() {
         pm.get_mut(pack_key).unwrap().0 += 1;

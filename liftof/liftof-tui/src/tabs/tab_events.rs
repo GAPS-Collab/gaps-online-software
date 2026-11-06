@@ -2,7 +2,7 @@
 
 
 use std::collections::{
-  //HashMap,
+  HashMap,
   VecDeque,
 };
 
@@ -35,6 +35,9 @@ pub struct EventTab {
   pub rbe_sender    : Sender<RBEvent>,
   pub th_sender     : Sender<TofHit>,
   pub te_sender     : Sender<TofEvent>,
+  /// the paddles, so that the hits can calculate positions,
+  /// times and energies
+  pub paddles       : HashMap<u8, TofPaddle>,
   //pub streamer   : Arc<Mutex<VecDeque<String>>>,
   //pub pack_stat  : Arc<Mutex<HashMap<String, usize>>>,
   //pub stream     : String,
@@ -47,6 +50,7 @@ impl EventTab {
              rbe_sender  : Sender<RBEvent>,
              th_sender   : Sender<TofHit>,
              te_sender   : Sender<TofEvent>,
+             paddles     : HashMap<u8, TofPaddle>,
              theme       : ColorTheme) -> Self {
              //streamer  : Arc<Mutex<VecDeque<String>>>,
              //pack_stat : Arc<Mutex<HashMap<String,usize>>>) -> HomeTab<T> {
@@ -58,7 +62,8 @@ impl EventTab {
       mte_sender,
       rbe_sender,  
       th_sender,
-      te_sender
+      te_sender,
+      paddles,
       //streamer, 
       //pack_stat,
       //stream     : String::from(""),
@@ -72,7 +77,8 @@ impl EventTab {
         return Ok(());
       },
       Ok(pack)    => {
-        let ev : TofEvent = pack.unpack()?;
+        let mut ev : TofEvent = pack.unpack()?;
+        ev.set_paddles(&self.paddles);
         match self.te_sender.send(ev.clone()) {
           Err(err) => error!("Can't send TofEvent! {err}"),
           Ok(_)    => ()

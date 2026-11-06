@@ -265,9 +265,9 @@ impl PaddleTab<'_> {
           if h.paddle_id == self.current_paddle.paddle_id as u8 {
             self.last_hit = format!("{}", h);
           }
+          // every hit knows its own paddle (set_paddles above)
           self.h_edep.get_mut(&(h.paddle_id as u8)).unwrap().fill(&h.get_edep());
-          h.set_paddle(&self.current_paddle);
-          let rel_pos = h.get_pos()/(self.current_paddle.length*10.0);
+          let rel_pos = h.get_pos()/h.paddle_len;
           self.h_rel_pos.get_mut(&h.paddle_id).unwrap().fill(&rel_pos);
           self.pha_histo.get_mut(&h.paddle_id).unwrap().fill(&h.get_peak_a());
           self.phb_histo.get_mut(&h.paddle_id).unwrap().fill(&h.get_peak_b());
