@@ -5,6 +5,8 @@
 #include "G4Allocator.hh"
 #endif 
 #include "gondola.hpp"
+#include "result/result.h"
+#include "errors.hpp"
 
 namespace gondola {
   /// McHit is inspired by SimplDet's CHit and combines
@@ -15,6 +17,11 @@ namespace gondola {
   #else 
   struct McHit {
   #endif
+    static constexpr u16   HEAD = 0xAAAA;
+    static constexpr u16   TAIL = 0x5555;
+    /// size of the serialized hit in bytes
+    static constexpr usize SIZE = 2 + 4*4 + 21*4 + 5*4 + 3 + 2;
+
     u32 volume_id    = 0;
     u32 hw_id        = 0;
     u32 parent_id    = 0;
@@ -56,6 +63,11 @@ namespace gondola {
     f32 beta                  = 0.0;
 
     auto to_bytestream() const -> Vec<u8>;
+    /// Deserialization, mirrors the rust implementation. 
+    /// Available without BUILD_SIM, e.g. for converting 
+    /// simulated data to SimpleDet root files.
+    static auto from_bytestream(const Vec<u8> &stream, usize &pos)
+      -> result::Result<McHit, IOError>;
    
   };
 }
