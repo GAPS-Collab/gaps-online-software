@@ -7,6 +7,7 @@
 #include "tracklet.hpp" 
 #include "io/parsers.h"
 namespace g = gondola;
+using namespace result;
 
 //-------------------------------------------
 
@@ -119,6 +120,12 @@ auto g::Tracklet::get_stop() const -> Option<std::shared_ptr<RecoHit>> {
 
 //-------------------------------------------
 
+auto g::Tracklet::get_stop_raw() const -> std::shared_ptr<RecoHit> {
+  return stop_; 
+}
+
+//-------------------------------------------
+
 auto g::Tracklet::set_stop(std::shared_ptr<RecoHit> stop) -> void {
   stop_ = stop; 
 }
@@ -189,3 +196,71 @@ namespace gondola {
   }
 }
 
+
+//-------------------------------------------
+
+auto g::RecoHit::from_bytestream(const Vec<u8> &stream, usize &pos)
+  -> result::Result<g::RecoHit, g::IOError> {
+  if (stream.size() < pos + RecoHit::SIZE) {
+    auto message = std::format("Stream too short for RecoHit! {} bytes left", stream.size() - pos);
+    return Err(g::IOError(g::IOError::ErrorKind::StreamTooShort, message));
+  }
+  u16 head = g::parse_u16(stream, pos);
+  if (head != RecoHit::HEAD) {
+    auto message = std::format("Decoding of HEAD failed! Got {} instead!", head);
+    return Err(g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, message));
+  }
+  auto hit   = RecoHit();
+  hit.x      = g::parse_f32(stream, pos);
+  hit.x_err  = g::parse_f32(stream, pos);
+  hit.y      = g::parse_f32(stream, pos);
+  hit.y_err  = g::parse_f32(stream, pos);
+  hit.z      = g::parse_f32(stream, pos);
+  hit.z_err  = g::parse_f32(stream, pos);
+  hit.time   = g::parse_f32(stream, pos);
+  hit.energy = g::parse_f32(stream, pos);
+  hit.volume = g::parse_u32(stream, pos);
+  u16 tail   = g::parse_u16(stream, pos);
+  if (tail != RecoHit::TAIL) {
+    auto message = std::format("Decoding of TAIL failed! Got {} instead!", tail);
+    return Err(g::IOError(g::IOError::ErrorKind::WrongTailBytes, message));
+  }
+  return Ok(hit);
+}
+
+//-------------------------------------------
+
+auto g::Tracklet::from_bytestream(const Vec<u8> &stream, usize &pos)
+  -> result::Result<g::Tracklet, g::IOError> {
+  if (stream.size() < pos + Tracklet::SIZE) {
+    auto message = std::format("Stream too short for Tracklet! {} bytes left", stream.size() - pos);
+    return Err(g::IOError(g::IOError::ErrorKind::StreamTooShort, message));
+  }
+  u16 head = g::parse_u16(stream, pos);
+  if (head != Tracklet::HEAD) {
+    auto message = std::format("Decoding of HEAD failed! Got {} instead!", head);
+    return Err(g::IOError(g::IOError::ErrorKind::WrongHeaderBytes, message));
+  }
+  auto vertex = RecoHit::from_bytestream(stream, pos);
+  if (vertex.is_err()) {
+    return Err(vertex.unwrap_err());
+  }
+  auto stop   = RecoHit::from_bytestream(stream, pos);
+  if (stop.is_err()) {
+    return Err(stop.unwrap_err());
+  }
+  auto tracklet = Tracklet(std::make_shared<RecoHit>(vertex.unwrap()));
+  tracklet.set_stop(std::make_shared<RecoHit>(stop.unwrap()));
+  tracklet.is_infinite  = g::parse_bool(stream, pos);
+  tracklet.vertex_mom_x = g::parse_f32(stream, pos);
+  tracklet.vertex_mom_y = g::parse_f32(stream, pos);
+  tracklet.vertex_mom_z = g::parse_f32(stream, pos);
+  tracklet.pdg          = g::parse_i32(stream, pos);
+  tracklet.beta         = g::parse_f32(stream, pos);
+  u16 tail = g::parse_u16(stream, pos);
+  if (tail != Tracklet::TAIL) {
+    auto message = std::format("Decoding of TAIL failed! Got {} instead!", tail);
+    return Err(g::IOError(g::IOError::ErrorKind::WrongTailBytes, message));
+  }
+  return Ok(tracklet);
+}

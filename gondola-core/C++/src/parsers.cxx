@@ -245,13 +245,13 @@ auto g::parse_u64(const Vec<u8> &bytestream,
 
 auto g::parse_i32(const Vec<u8> &bytestream,
                   usize &pos) -> i32 {
-  i32 result = 0;
+  u32 result = 0;
   // Assuming little-endian byte order (LSB first)
   for (int i = 0; i < 4; ++i) {
-    result |= (static_cast<int32_t>(bytestream[i]) << (i * 8));
+    result |= (static_cast<u32>(bytestream[pos + i]) << (i * 8));
   } 
   pos += 4; 
-  return result;
+  return static_cast<i32>(result);
 }
 
 /***********************************************/
