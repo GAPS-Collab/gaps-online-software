@@ -133,10 +133,24 @@ nb::enum_<g::ProtocolVersion>(m, "ProtocolVersion")
     .def("get_event_trk_energies"  , &g::SDRootReader::get_event_trk_energies);
 
   nb::class_<g::SDRootWriter>(m, "SDRootWriter")
-    .def(nb::init<std::string, std::string>())
+    .def(nb::init<std::string, std::string, std::string, bool>(),
+         nb::arg("fname"), nb::arg("geo_file") = "",
+         nb::arg("file_mode") = "RECREATE", nb::arg("write_sim") = false)
     .def_ro("filename",      &g::SDRootWriter::filename)
     .def("add_event",        &g::SDRootWriter::add_event)
+    .def("add_mc_event",     &g::SDRootWriter::add_mc_event,
+         "Convert a McEvent to CEventMc and write it to the TreeMc (requires write_sim)")
     .def("write_sdpar",      &g::SDRootWriter::write_sdpar)
+    .def("add_sim_primary",  &g::SDRootWriter::add_sim_primary,
+         nb::arg("event"), nb::arg("triggered"),
+         "Fill the primary into the generated (and triggered) histograms of the SimulationParameter tree")
+    .def("set_generator",    &g::SDRootWriter::set_generator,
+         nb::arg("uniform_beta"), nb::arg("beta_low"), nb::arg("beta_high"),
+         nb::arg("uniform_log_e"), nb::arg("log_e_low"), nb::arg("log_e_high"),
+         nb::arg("isotropic"), nb::arg("up_down_all"), nb::arg("limit"), nb::arg("pdg"),
+         nb::arg("use_trigger"), nb::arg("use_digitizer"),
+         nb::arg("g4_version") = "", nb::arg("physics_list") = "",
+         "Primary generator and simulation settings, in crane's conventions (limit: half length of the cube in cm)")
     .def_ro("nevents_total", &g::SDRootWriter::nevents_total);
   //#endif 
   
@@ -454,9 +468,32 @@ nb::enum_<g::ProtocolVersion>(m, "ProtocolVersion")
   
   // --------------------------------------------------
     
+  nb::class_<g::McEvent>(m, "McEvent")
+    .def(nb::init<>())
+    .def_static("from_bytestream", [](nb::bytes stream) {
+        auto data = Vec<u8>((const u8*)stream.c_str(),
+                            (const u8*)stream.c_str() + stream.size());
+        usize pos = 0;
+        auto ev   = g::McEvent::from_bytestream(data, pos);
+        if (ev.is_err()) {
+          throw nb::value_error(("Error when unpacking McEvent! " + ev.unwrap_err().reason).c_str());
+        }
+        return ev.unwrap();
+      }, nb::arg("stream"),
+      "Deserialize a McEvent, e.g. from the payload of a caraspace frame object")
+    .def_ro("run_id"             , &g::McEvent::run_id)
+    .def_ro("event_id"           , &g::McEvent::event_id)
+    .def_ro("primary"            , &g::McEvent::primary)
+    .def_prop_ro("nhits"         , [](const g::McEvent &ev) {
+      return ev.hits.size();
+    });
+  
+  // --------------------------------------------------
+    
   nb::class_<g::Tracklet>(m, "Tracklet")
     .def(nb::init<std::shared_ptr<g::RecoHit>>())
     .def_ro("is_infinite"        , &g::Tracklet::is_infinite) 
+    .def_ro("pdg"                , &g::Tracklet::pdg) 
     .def_ro("beta"               , &g::Tracklet::beta) 
     .def_ro("beta_err"           , &g::Tracklet::beta_err) 
     .def_prop_ro("edeps"         , [] (const g::Tracklet &t) {
@@ -476,6 +513,7 @@ nb::enum_<g::ProtocolVersion>(m, "ProtocolVersion")
     .def_ro("coldens"            , &g::Tracklet::coldens)
     .def_prop_ro("vertex"        , &g::Tracklet::get_vertex) 
     .def_prop_ro("stop"          , &g::Tracklet::get_stop) 
+    .def_prop_ro("stop_raw"      , &g::Tracklet::get_stop_raw) 
     .def_prop_ro("vertex_mom", [](const g::Tracklet &t) {
        return get_coordinates(t.vertex_mom_x, t.vertex_mom_y, t.vertex_mom_z);
     })
