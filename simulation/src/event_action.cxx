@@ -15,6 +15,7 @@ gon::EventAction::EventAction(std::string fname, const SimConfig& cfg){
   writer    = std::shared_ptr<CRWriter>(new CRWriter(path, fname, 0, Some(0), None));
   digitizer = std::shared_ptr<GapsDigitizer>(new GapsDigitizer(cfg));
   digitizer->load_tof_pulse_templates(cfg.digi_tof_pulse_templates);
+  write_untriggered_primary = cfg.digi_write_untriggered_primary;
   //std::cout << digitizer->n_tof_pulse_templates() << std::endl; 
 }
 
@@ -171,6 +172,17 @@ auto gon::EventAction::EndOfEventAction(const G4Event* event)   -> void {
   }
   if (write_frame) {
     writer->add_frame(frame); 
+  } else if (write_untriggered_primary) {
+    // the primary only, so that all generated primaries 
+    // are in the file. Such frames have no TelemetryEvent.
+    mc_event.hits.clear();
+    auto f_obj_prim    = CRFrameObject();
+    f_obj_prim.version = 0;
+    f_obj_prim.ftype   = CRFrameObjectType::McTree;
+    f_obj_prim.payload = mc_event.to_bytestream();
+    auto prim_frame    = CRFrame();
+    prim_frame.put_fobject(f_obj_prim, "McEvent");
+    writer->add_frame(prim_frame);
   }
   if (processed_events % 10000 == 0) {
     std::cout << "Processed " << processed_events << " events!" << std::endl;

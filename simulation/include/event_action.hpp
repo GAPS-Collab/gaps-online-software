@@ -26,6 +26,9 @@ namespace gondola {
                 
         // debug counter
         u64 processed_events = 0;
+        /// write the primary of events which do not 
+        /// pass the trigger (digi_write_untriggered_primary)
+        bool write_untriggered_primary = false;
         // keep a reference to the gun, so 
         // tat at the time of writing the file, 
         // priimary porperties can be accessed
