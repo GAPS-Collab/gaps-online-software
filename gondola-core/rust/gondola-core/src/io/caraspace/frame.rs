@@ -711,6 +711,24 @@ impl CRFrame {
     }
   }
 
+  /// The serialized payload of the object with the given name, 
+  /// e.g. to deserialize it with the C++ library 
+  /// (gondola_cxx.McEvent.from_bytestream)
+  ///
+  /// # Arguments:
+  ///   * name : The name of the object as it appears in the index
+  #[pyo3(name="get_payload")]
+  fn get_payload_py<'py>(&self, py : Python<'py>, name : &str) -> PyResult<Bound<'py, PyBytes>> {
+    match self.get_fobject(name) {
+      Err(err) => {
+        Err(PyValueError::new_err(format!("Unable to get {} from frame! {}", name, err)))
+      }
+      Ok(fobject) => {
+        Ok(PyBytes::new(py, &fobject.payload))
+      }
+    }
+  }
+
   /// Check if the frame contains an object with the given name
   ///
   /// # Arguments:
