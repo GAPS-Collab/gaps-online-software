@@ -630,13 +630,17 @@ impl CRFrame {
   ///            index
   //#[pyo3(signature = (name = None))]
   fn get_telemetrypacket(&mut self, name : &str) -> PyResult<TelemetryPacket> {
-    let packet    = self.get::<TelemetryPacket>(name).unwrap();
-    Ok(packet)
+    match self.get::<TelemetryPacket>(name) {
+      Err(err)   => Err(PyValueError::new_err(format!("Unable to get TelemetryPacket {} from frame! {}", name, err))),
+      Ok(packet) => Ok(packet)
+    }
   }
 
   fn get_mctree(&mut self, name : &str) -> PyResult<McEvent> {
-    let event = self.get::<McEvent>(name).unwrap();
-    Ok(event)
+    match self.get::<McEvent>(name) {
+      Err(err)  => Err(PyValueError::new_err(format!("Unable to get McEvent {} from frame! {}", name, err))),
+      Ok(event) => Ok(event)
+    }
   }
 
   /// Get a tofevent from the frame directly
@@ -689,8 +693,10 @@ impl CRFrame {
         name_ = n_;
       }
     }
-    // FIXME - better error catching
-    let packet    = self.get::<TelemetryPacket>(name_).unwrap();
+    let packet = match self.get::<TelemetryPacket>(name_) {
+      Err(err)   => return Err(PyValueError::new_err(format!("Unable to get TelemetryPacket {} from frame! {}", name_, err))),
+      Ok(packet) => packet
+    };
     match packet.unpack::<TelemetryEvent>() {
       Err(err) => {
         return Err(PyValueError::new_err(err.to_string())); 
