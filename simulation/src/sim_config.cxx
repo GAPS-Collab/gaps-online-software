@@ -2,6 +2,7 @@
 #include "errors.hpp"
 
 #include <toml++/toml.hpp>
+#include <format>
 #include <iostream>
 
 #include "spdlog/spdlog.h"
@@ -162,6 +163,15 @@ auto SimConfig::from_file(std::string fname) -> SimConfig {
   sim.digi_tof_hit_threshold_mv  = (f32)config["digitization"]["digi_tof_hit_threshold_mv"].value_or(10.0);
   sim.digi_tof_beta_threshold_mv = (f32)config["digitization"]["digi_tof_beta_threshold_mv"].value_or(47.5*2.5);
   sim.digi_tof_veto_threshold_mv = (f32)config["digitization"]["digi_tof_veto_threshold_mv"].value_or(47.5*30);
+  // the readout window of the TOF (in flight -80 to 320 ns around 
+  // the trigger, where -80 is a convention)
+  sim.digi_tof_readout_window_start_ns = config["digitization"]["digi_tof_readout_window_start_ns"].value_or(0.0);
+  sim.digi_tof_readout_window_end_ns   = config["digitization"]["digi_tof_readout_window_end_ns"].value_or(400.0);
+  if (sim.digi_tof_readout_window_end_ns <= sim.digi_tof_readout_window_start_ns) {
+    auto message = std::format("The TOF readout window is empty (digi_tof_readout_window_start_ns = {}, digi_tof_readout_window_end_ns = {})!",
+                               sim.digi_tof_readout_window_start_ns, sim.digi_tof_readout_window_end_ns);
+    throw gondola::ConfigurationError(gondola::ConfigurationError::ErrorKind::NonSensicalConfiguration, message);
+  }
   // tracker digitization part 
   sim.digi_trk_tf_name           = config["digitization"]["digi_trk_tf_name_in_db"].value_or("");
   sim.digi_trk_mask_name         = config["digitization"]["digi_trk_mask_name_in_db"].value_or(""); 
@@ -173,6 +183,7 @@ auto SimConfig::from_file(std::string fname) -> SimConfig {
   sim.digi_ignore_trigger        = config["digitization"]["digi_ignore_trigger"].value_or(false); 
   sim.digi_track_trigger         = config["digitization"]["digi_track_trigger"].value_or(true);
   sim.digi_gaps_trigger          = config["digitization"]["digi_gaps_trigger"].value_or(true);
+  sim.digi_write_untriggered_primary = config["digitization"]["digi_write_untriggered_primary"].value_or(false);
   if (sim.digitization && !sim.digi_ignore_trigger && !sim.digi_track_trigger && !sim.digi_gaps_trigger) {
     auto message = std::string("All triggers are switched off (digi_track_trigger, digi_gaps_trigger) and digi_ignore_trigger is not set, so no event would be written!");
     throw gondola::ConfigurationError(gondola::ConfigurationError::ErrorKind::NonSensicalConfiguration, message);

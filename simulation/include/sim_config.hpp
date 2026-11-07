@@ -50,6 +50,11 @@ struct SimConfig {
   f64         digi_tof_hit_threshold_mv  ;
   f64         digi_tof_beta_threshold_mv ; 
   f64         digi_tof_veto_threshold_mv ;
+  /// readout window of the TOF, relative to the first energy 
+  /// deposit in the TOF (ns). Energy deposited outside of it 
+  /// is not read out
+  f64         digi_tof_readout_window_start_ns;
+  f64         digi_tof_readout_window_end_ns;
   // tracker parameters for the digitizer
   std::string digi_trk_tf_name           ; 
   std::string digi_trk_mask_name         ; 
@@ -64,6 +69,9 @@ struct SimConfig {
   bool        digi_track_trigger         ;
   /// allow events when they pass the gaps trigger 
   bool        digi_gaps_trigger          ;
+  /// for events which do not pass the trigger, write the 
+  /// primary only (McEvent without steps, no TelemetryEvent)
+  bool        digi_write_untriggered_primary;
   u64         n_events;
   /// Load a configuration from a .toml file
   static auto from_file(std::string fname) -> SimConfig;

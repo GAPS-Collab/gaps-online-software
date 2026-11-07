@@ -31,6 +31,9 @@ min_e_per_n    = 0.0
 max_e_per_n    = 0.0
 
 uniform_beta   = true 
+# muon simulation 
+#beta_lim_low    = 0.99 
+#beta_lim_up     = 0.999
 beta_lim_low   = 0.1 
 beta_lim_up    = 0.6
 
@@ -109,6 +112,12 @@ digi_tof_add_gauss_jitter    = true
 digi_tof_hit_threshold_mv    = 10 
 digi_tof_beta_threshold_mv   = 118.75 
 digi_tof_veto_threshold_mv   = 1425
+# readout window of the TOF in ns, relative to the first energy 
+# deposit in the TOF. Energy deposited outside of it (e.g. by muon 
+# decay electrons) is not read out. In flight, the window is 
+# -80 to 320 ns around the trigger, where -80 is a convention.
+digi_tof_readout_window_start_ns = 0
+digi_tof_readout_window_end_ns   = 400
 # events which pass none of the enabled triggers below are not
 # written (the event id still counts all simulated events).
 # digi_ignore_trigger = true writes all events.
@@ -117,6 +126,11 @@ digi_ignore_trigger          = false
 digi_track_trigger           = true 
 # the gaps (833) trigger as in data 
 digi_gaps_trigger            = true
+# for events which do not pass the trigger, write a frame with 
+# the primary only (an McEvent without steps and no TelemetryEvent),
+# so that the generated primaries are known, e.g. for the
+# acceptance (GSimulationParameter histograms in L1)
+digi_write_untriggered_primary = true
 
 #------------------------------------
 # digi variables for the tracker 

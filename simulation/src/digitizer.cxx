@@ -1,6 +1,8 @@
 #include <map>
 #include <algorithm>
+#include <cmath>
 #include <cstdlib>
+#include <limits>
 #include <pthread.h>
 
 #include "database.h"
@@ -477,7 +479,8 @@ auto g::GapsDigitizer::print_statistics() -> void {
     "  exp peak input 0                 : {} ({:.2f}%) | "
     "hits with E == 0               : {}\n"
     "  mc hits                          : {} | "
-    "mc hits E == 0                 : {} ({:.2f}%)\n" 
+    "mc hits E == 0                 : {} ({:.2f}%) | "
+    "TOF mc hits outside readout window : {} ({:.2f}%)\n" 
     "  hits excluded due masking        : {}"
     "  saturated TOF hits               : {}" 
     "  sat TOF hits no templ found      : {} ({:.2f}%)\n"
@@ -506,6 +509,7 @@ auto g::GapsDigitizer::print_statistics() -> void {
     zero_energy_hits,
     n_total_mc_hits,
     n_total_mc_hits_zero_en, 100.0*n_total_mc_hits_zero_en / denominator_mc,
+    n_tof_mc_hits_outside_window, 100.0*n_tof_mc_hits_outside_window / denominator_mc,
     tof_hits_excluded_rb_mask,
     tof_hits_sat,
     tof_hits_sat_no_templ_found, 100.0*tof_hits_sat_no_templ_found /denominator_sat,
@@ -544,8 +548,45 @@ auto g::GapsDigitizer::integrate_mc_hits(const Vec<g::McHit>& hits, f64 min_time
     }
   }
   //std::cout << "Got " << hits.size() << " mc hits and " << reco_hits.size() << " reco hits!" << std::endl;
-  reco_hits = g::GapsDigitizer::merge_hits(reco_hits);
+  reco_hits = g::GapsDigitizer::merge_hits(reco_hits, min_time_delta);
   return reco_hits;
+}
+
+//----------------------------------------------------------
+
+auto g::GapsDigitizer::tof_readout_window(const Vec<g::McHit>& hits) -> Vec<g::McHit> {
+  // the DRS4 records a fixed window around the trigger. As the 
+  // reference, take the first energy deposit in the TOF. 
+  // Strictly, the reference would be the trigger time, which is 
+  // only known after digitization (thresholds). This would need a 
+  // second digitization pass, and in practice the first deposit is 
+  // the arriving primary, close to where the trigger forms.
+  // NOTE - the tracker is not windowed here. Its readout window is 
+  // much longer (of the order of microseconds), so it matters less, 
+  // but it should be added eventually.
+  f64 t_first = std::numeric_limits<f64>::infinity();
+  for (auto const &h : hits) {
+    if (h.volume_id < 200000000 && h.step_edep > 0) {
+      t_first = std::min(t_first, (f64)h.glob_time);
+    }
+  }
+  if (!std::isfinite(t_first)) {
+    return hits;
+  }
+  const f64 t_start = t_first + cfg.digi_tof_readout_window_start_ns;
+  const f64 t_end   = t_first + cfg.digi_tof_readout_window_end_ns;
+  Vec<g::McHit> in_window;
+  in_window.reserve(hits.size());
+  for (auto const &h : hits) {
+    if (h.volume_id < 200000000 && (h.glob_time < t_start || h.glob_time > t_end)) {
+      if (h.step_edep > 0) {
+        n_tof_mc_hits_outside_window++;
+      }
+      continue;
+    }
+    in_window.push_back(h);
+  }
+  return in_window;
 }
 
 //----------------------------------------------------------
@@ -881,8 +922,10 @@ auto g::GapsDigitizer::digitize_event(const g::McEvent& mc_ev, bool& has_trigger
   }
   
   // transform mc hits in reco hits. This means, we have one hit per 
-  // volume after this point, all mc hits are merged
-  auto r_hits = g::GapsDigitizer::integrate_mc_hits(mc_ev.hits, 1e20);
+  // volume after this point, all mc hits are merged. TOF energy 
+  // deposited outside the readout window is not read out (and 
+  // would otherwise be added to the hit of its paddle)
+  auto r_hits = g::GapsDigitizer::integrate_mc_hits(tof_readout_window(mc_ev.hits), 1e20);
   // hits of paddles which are not read out, for the trigger
   Vec<g::TofHit> trigger_only;
   

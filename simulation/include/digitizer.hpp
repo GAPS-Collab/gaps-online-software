@@ -73,6 +73,14 @@ namespace gondola {
     /// merge hits together if they are only sepearated by min_time_delta and 
     /// are in the same volume    
     static auto integrate_mc_hits(const Vec<McHit>& hits, f64 min_time_delta) -> Vec<RecoHit>;
+
+    /// The steps which are read out: all tracker steps, and the TOF 
+    /// steps inside the readout window (digi_tof_readout_window_start_ns 
+    /// to digi_tof_readout_window_end_ns after the first energy 
+    /// deposit in the TOF). Without any TOF deposit, all steps are kept.
+    /// The tracker has a readout window, too, but much longer (of the
+    /// order of microseconds); it is not applied yet.
+    auto tof_readout_window(const Vec<McHit>& hits) -> Vec<McHit>;
    
     //auto tof_response_fn_simple(RecoHit& hit)                            -> void;
     auto tof_energy_response_fn_simple(f64 energy, f64 pos_along_paddle) -> f64;
@@ -249,6 +257,8 @@ namespace gondola {
     usize zero_energy_hits            = 0;
     usize n_total_mc_hits             = 0;
     usize n_total_mc_hits_zero_en     = 0;
+    /// TOF steps with energy deposit outside the readout window
+    usize n_tof_mc_hits_outside_window = 0;
   private:
 
     //auto add_waveform_fluctuations(Vec<f64>& waveform_mv,
