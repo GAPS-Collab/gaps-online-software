@@ -4,6 +4,7 @@
 // These are the classes from simple det - enhanced with easy to use I/O 
 
 #include <memory>
+#include <limits>
 
 #include "TObject.h"
 #include "TVector3.h"
@@ -154,21 +155,27 @@ namespace Crane {
   }
 }
 
+// The default values of the following classes are the ones 
+// of the respective Reset() methods in crane. 
+// (crane's NANInt is std::numeric_limits<int>::quiet_NaN(), 
+// which is 0)
 class CEventBase : public TObject {
   public: 
     CEventBase() {}
  
-    u32      runNumber_;
-    u32      subRunNumber_;
-    u32      eventNumber_;
+    u32      runNumber_     = 0;
+    u32      subRunNumber_  = 0;
+    u32      eventNumber_   = 0;
     // upstream change in SD
-    long int eventTime_;
-    u32      eventId_;
+    long int eventTime_     = 0;
+    u32      eventId_       = 0;
 
     // generated primary
-    f64       primaryBetaGenerated_;
-    TVector3  primaryMomentumDirectionGenerated_;
-    f64       primaryKineticEnergyGenerated_;
+    f64       primaryBetaGenerated_              = std::numeric_limits<f64>::quiet_NaN();
+    TVector3  primaryMomentumDirectionGenerated_ = TVector3(std::numeric_limits<f64>::quiet_NaN(),
+                                                            std::numeric_limits<f64>::quiet_NaN(),
+                                                            std::numeric_limits<f64>::quiet_NaN());
+    f64       primaryKineticEnergyGenerated_     = 0;
     
     ClassDef(CEventBase, 13)
 };
@@ -177,13 +184,17 @@ class CTrackBase : public TObject {
   public:
     CTrackBase() {}
   //protected:
-    bool          Primary;
-    u32           TrackId;
-    u32           VertexVolumeId;
-    TVector3      VertexPosition;
-    u32           LastVolumeId;
-    TVector3      LastPosition;
-    f64           ColumnDensity; // column density [g/cm2]
+    bool          Primary        = false;
+    u32           TrackId        = 0;
+    u32           VertexVolumeId = 0;
+    TVector3      VertexPosition = TVector3(std::numeric_limits<f64>::quiet_NaN(),
+                                            std::numeric_limits<f64>::quiet_NaN(),
+                                            std::numeric_limits<f64>::quiet_NaN());
+    u32           LastVolumeId   = 0;
+    TVector3      LastPosition   = TVector3(std::numeric_limits<f64>::quiet_NaN(),
+                                            std::numeric_limits<f64>::quiet_NaN(),
+                                            std::numeric_limits<f64>::quiet_NaN());
+    f64           ColumnDensity  = std::numeric_limits<f64>::quiet_NaN(); // column density [g/cm2]
 
     Vec<f64>      EnergyDeposition;
     Vec<f64>      GlobalTime;
@@ -222,10 +233,10 @@ class CTrackMc : public CTrackBase {
     
     auto pretty_print() const -> std::string;
     
-    i32 Pdg;
-    u32 ParentId;
-    f64 VertexKineticEnergy;
-    CGeant4ProcessType    ProcessType;    
+    i32 Pdg                 = 0;
+    u32 ParentId            = 0;
+    f64 VertexKineticEnergy = std::numeric_limits<f64>::quiet_NaN();
+    CGeant4ProcessType    ProcessType = CGeant4ProcessType::NOTDEFINED;    
     
     Vec<f64>      KineticEnergy;
     Vec<f64>      PreKineticEnergy;    
@@ -244,19 +255,26 @@ class CEventMc : public CEventBase {
     
     auto pretty_print() const -> std::string;
     auto get_primary()  const -> gondola::Tracklet;
+    /// Delete all tracks and clear all fields, as 
+    /// crane's CEventMc::Reset 
+    auto reset() -> void;
     
     // injection paramaters
-    TVector3 primaryPosition_;
-    f64      primaryTime_;
-    i32      primaryPdg_;
-    f64      primaryStoppingKineticEnergy_;    
+    TVector3 primaryPosition_             = TVector3(std::numeric_limits<f64>::quiet_NaN(),
+                                                     std::numeric_limits<f64>::quiet_NaN(),
+                                                     std::numeric_limits<f64>::quiet_NaN());
+    f64      primaryTime_                 = std::numeric_limits<f64>::quiet_NaN();
+    i32      primaryPdg_                  = 0;
+    f64      primaryStoppingKineticEnergy_ = std::numeric_limits<f64>::quiet_NaN();    
 
-    u32      randomSeed_;
+    u32      randomSeed_                  = 0;
     
     // stopping
-    i32      primaryStoppingVolume_;
-    TVector3 primaryStoppingPosition_;
-    f64      primaryStoppingTime_;
+    i32      primaryStoppingVolume_       = 0;
+    TVector3 primaryStoppingPosition_     = TVector3(std::numeric_limits<f64>::quiet_NaN(),
+                                                     std::numeric_limits<f64>::quiet_NaN(),
+                                                     std::numeric_limits<f64>::quiet_NaN());
+    f64      primaryStoppingTime_         = std::numeric_limits<f64>::quiet_NaN();
 
     Vec<i32> hitTrackIndex_;    
 
@@ -389,8 +407,17 @@ class CEventRec : public CEventBase {
 
 class GSimulationParameter : public TObject {
   public:
+    /// Books the primary histograms with crane's binning and sets
+    /// the other fields to crane's defaults (GSimulationParameter::Reset)
     GSimulationParameter();
     ~GSimulationParameter();
+    /// Fill the histograms of the generated primaries, as crane's 
+    /// FillPrimaryHistograms (kinetic energy in MeV, cos_zen is the 
+    /// z component of the primary direction)
+    auto fill_generated(f64 beta, f64 kinetic_energy, f64 cos_zen) -> void;
+    /// The same for primaries of triggered events, as crane's 
+    /// FillPrimaryTriggeredHistograms
+    auto fill_triggered(f64 beta, f64 kinetic_energy, f64 cos_zen) -> void;
     int runId_;
     int subRunId_;
     std::string productionHostName_;
@@ -607,16 +634,50 @@ namespace gondola {
   };
   
   struct SDRootWriter {
+    /// # Arguments:
+    ///   * write_sim : also write the TreeMc (see add_mc_event)
     SDRootWriter(std::string fname, std::string geo_file = "", std::string file_mode = "RECREATE", bool write_sim = false);
     ~SDRootWriter();
 
     /// Write events to the root tree. Writing to TreeRec and TreeRaw is 
     /// supported
     auto add_event(TelemetryEvent* ev, TelemetryEvent* ev_for_raw, u8 packet_type, f64 gcutime, bool use_corrected_edep = false, f32 tracker_cut = 0.4 ) -> void;
-    /// The SimulationParameter tree  
+    /// Set the run id, host and version of the SimulationParameter 
+    /// tree. The tree is written when the writer is destroyed, so 
+    /// that the primary histograms (add_sim_primary) are complete.
     auto write_sdpar(u32 run_id, std::string hostname, std::string crane_version) -> void; 
-    /// Add a gaps-online-sw mc event and ultimate convert and write it into the 
-    /// raw tree 
+    /// Fill the primary of a simulated event into the histograms of 
+    /// the SimulationParameter tree, as crane does in the simulation 
+    /// for the acceptance. Call it for every generated event, also 
+    /// the ones which did not trigger (simulated with 
+    /// digi_write_untriggered_primary = true).
+    ///
+    /// # Arguments:
+    ///   * triggered : the event passed the trigger, its primary 
+    ///                 also goes into the Triggered histograms
+    auto add_sim_primary(const McEvent& ev, bool triggered) -> void;
+    /// The settings of the primary generator and the simulation, 
+    /// in crane's conventions (e.g. limit is the half length of 
+    /// the injection cube in cm, up_down_all -1 for downgoing only)
+    auto set_generator(bool uniform_beta, f64 beta_low, f64 beta_high,
+                       bool uniform_log_e, f64 log_e_low, f64 log_e_high,
+                       bool isotropic, i32 up_down_all, f64 limit, i32 pdg,
+                       bool use_trigger, bool use_digitizer, 
+                       std::string g4_version, std::string physics_list) -> void;
+    /// Convert a gaps-online-software McEvent and write it as CEventMc
+    /// to the TreeMc. 
+    ///
+    /// This follows crane's SimpleDetEventAction::SaveRoot, with one 
+    /// deliberate difference: the hit position (meanPosition_) is the 
+    /// energy weighted mean of the steps in the volume. Crane 
+    /// weights with the running sum of the energy on top 
+    /// ("combinedMeanPos += h.GetPosition()*combinedEDep", where the 
+    /// position is already multiplied by the step energy), so its 
+    /// meanPosition_ values are distorted.
+    ///
+    /// The TreeMc entries have to stay aligned with the TreeRec, so 
+    /// call add_mc_event once for every add_event (and vice versa).
+    /// Requires write_sim = true in the constructor.
     auto add_mc_event(const McEvent& ev) -> void;
     std::string filename                       = "";
     // root just hates modern memory management

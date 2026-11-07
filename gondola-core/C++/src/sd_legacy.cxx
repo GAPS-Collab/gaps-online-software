@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <algorithm> 
+#include <cmath>
+#include <initializer_list>
 
 #include "TChain.h"
 #include "TFileMerger.h"
@@ -307,11 +309,22 @@ g::SDRootWriter::SDRootWriter(std::string fname, std::string geo_file,  std::str
 }
 
 gondola::SDRootWriter::~SDRootWriter() {
-  reco_tree->Fill();
+  // all entries are filled in add_event. Filling here again 
+  // would duplicate the last event of each file
   reco_tree->Write();
   if (raw_tree != nullptr) {
-    raw_tree->Fill();
     raw_tree->Write();
+  }
+  if (sim_tree != nullptr) {
+    // all entries are filled in add_mc_event
+    sim_tree->Write();
+    mc_event->reset();
+  }
+  // one entry per file, with the primary histograms of all 
+  // events added with add_sim_primary
+  if (par_tree != nullptr) {
+    par_tree->Fill();
+    par_tree->Write();
   }
   output_file->Close();
   delete output_file;  
@@ -328,17 +341,46 @@ gondola::SDRootWriter::~SDRootWriter() {
 }
 
 auto gondola::SDRootWriter::write_sdpar(u32 run_id, std::string hostname, std::string crane_version) -> void {
-  if (par == nullptr) {
-    par = new GSimulationParameter();
-  }
-  if (par_tree == nullptr) {
-    par_tree = new TTree("GSimulationParameter", "GSimulationParameter");
-  }
+  // the tree is filled and written in the destructor
   par->runId_ = run_id;
   par->productionHostName_ = hostname;
   par->CraneVersion_.push_back(crane_version);
-  par_tree->Fill();
-  par_tree->Write();
+}
+
+//------------------------------------------------------------------------
+
+auto gondola::SDRootWriter::add_sim_primary(const McEvent& ev, bool triggered) -> void {
+  const f64 beta    = ev.primary.beta;
+  const f64 kin_e   = ev.primary.get_vertex()->energy;
+  const f64 cos_zen = ev.primary.vertex_mom_z;
+  par->fill_generated(beta, kin_e, cos_zen);
+  if (triggered) {
+    par->fill_triggered(beta, kin_e, cos_zen);
+  }
+  par->nEventsGeneratedPerFile_++;
+}
+
+//------------------------------------------------------------------------
+
+auto gondola::SDRootWriter::set_generator(bool uniform_beta, f64 beta_low, f64 beta_high,
+                                          bool uniform_log_e, f64 log_e_low, f64 log_e_high,
+                                          bool isotropic, i32 up_down_all, f64 limit, i32 pdg,
+                                          bool use_trigger, bool use_digitizer,
+                                          std::string g4_version, std::string physics_list) -> void {
+  par->UniformBeta               = uniform_beta;
+  par->PrimaryBetaLow            = beta_low;
+  par->PrimaryBetaHigh           = beta_high;
+  par->UniformLogE               = uniform_log_e;
+  par->PrimaryLogELow            = log_e_low;
+  par->PrimaryLogEHigh           = log_e_high;
+  par->PrimaryIsotropic          = isotropic;
+  par->PrimaryIsotropicUpDownAll = up_down_all;
+  par->PrimaryLimit              = limit;
+  par->PrimaryPdg                = pdg;
+  par->UseTrigger                = use_trigger;
+  par->UseDigitizer              = use_digitizer;
+  par->G4version_                = g4_version;
+  par->physicsList_              = physics_list;
 }
 
 
@@ -377,31 +419,53 @@ auto gondola::SDRootWriter::add_event(TelemetryEvent* ev, TelemetryEvent* ev_for
 //------------------------------------------------------------------------
 
 auto gondola::SDRootWriter::add_mc_event(const McEvent& ev) -> void { 
-  // clear the event 
-  mc_event->tracks_.clear(); 
-  // primary proeprties 
+  if (mc_event == nullptr) {
+    std::cerr << "[ERROR] SDRootWriter has been created with write_sim = false, unable to write McEvent!" << std::endl;
+    return;
+  }
+  constexpr f64 NaN = std::numeric_limits<f64>::quiet_NaN();
+  mc_event->reset(); 
+  // event and primary properties 
+  // (crane only sets the event number, eventId_ and eventTime_
+  // remain 0)
+  mc_event->runNumber_   = ev.run_id;
   mc_event->eventNumber_ = ev.event_id;
+  auto vertex            = ev.primary.get_vertex();
   mc_event->primaryPdg_  = ev.primary.pdg; 
-  // FIXME - seed and run id missing
-  //mc_event->primaryKineticEnergy_ 
-  mc_event->primaryBetaGenerated_ = ev.primary.beta;
-  auto prim_pos          = TVector3(ev.primary.get_vertex()->x,
-                                    ev.primary.get_vertex()->y,
-                                    ev.primary.get_vertex()->z);
-  mc_event->primaryPosition_ = prim_pos;
-  // first we sort the hits by track id 
+  mc_event->primaryBetaGenerated_          = ev.primary.beta;
+  mc_event->primaryKineticEnergyGenerated_ = vertex->energy;
+  mc_event->primaryMomentumDirectionGenerated_ = TVector3(ev.primary.vertex_mom_x,
+                                                          ev.primary.vertex_mom_y,
+                                                          ev.primary.vertex_mom_z);
+  mc_event->primaryPosition_ = TVector3(vertex->x, vertex->y, vertex->z);
+  mc_event->primaryTime_     = vertex->time;
+  // the simulation fills the stop also for primaries which
+  // do not stop (with NaN position). Crane's stopping volume 
+  // is only set if the primary stops, otherwise it is 
+  // NANInt (= 0)
+  auto stop = ev.primary.get_stop_raw();
+  mc_event->primaryStoppingPosition_      = TVector3(stop->x, stop->y, stop->z);
+  mc_event->primaryStoppingTime_          = stop->time;
+  mc_event->primaryStoppingKineticEnergy_ = stop->energy;
+  mc_event->primaryStoppingVolume_        = std::isnan(stop->x) ? 0 : stop->volume;
+  // no per event seed in the simulation 
+  mc_event->randomSeed_  = 0;
+
+  // tracks - in the order of their first step, as in crane. 
+  // The steps of a track keep their order.
+  Vec<u32>          track_order = {};
   HashMap<u32,Vec<const McHit*>> track_hits = {};
   for (auto const &h : ev.hits) {
-    if (track_hits.contains(h.track_id)) {
-      track_hits[h.track_id].push_back(&h);
-    } else {
-      track_hits.insert({h.track_id, {&h}});
+    if (!track_hits.contains(h.track_id)) {
+      track_order.push_back(h.track_id);
+      track_hits.insert({h.track_id, {}});
     }
+    track_hits[h.track_id].push_back(&h);
   }
-  // now as they are sorted, add them to the tracks in the 
-  // CEventMc 
-  for (auto &[track_id, thits] : track_hits) {
+  bool found_primary = false;
+  for (auto const &track_id : track_order) {
     auto sd_track   = new CTrackMc();
+    auto const &thits = track_hits[track_id];
     for (auto const &h : thits) {
       sd_track->TrackId            = track_id; 
       sd_track->ParentId           = h->parent_id;
@@ -418,14 +482,85 @@ auto gondola::SDRootWriter::add_mc_event(const McEvent& ev) -> void {
       sd_track->PositionResidual     .push_back( TVector3(0,0,0));
       sd_track->MomentumDirection    .push_back( TVector3(h->mom_x, h->mom_y, h->mom_z));
       sd_track->PreMomentumDirection .push_back( TVector3(h->pre_mom_x, h->pre_mom_y, h->pre_mom_z));
-      sd_track->ColumnDensityUntilStep.push_back(std::numeric_limits<f64>::quiet_NaN()); 
+      sd_track->ColumnDensityUntilStep.push_back(NaN); 
       sd_track->VertexPosition      = TVector3(h->vertex_pos_x, h->vertex_pos_y, h->vertex_pos_z); 
       sd_track->VertexKineticEnergy = h->vertex_kin_E;
       sd_track->VertexVolumeId      = h->vertex_vol_id;
-      sd_track->ProcessType         = static_cast<CGeant4ProcessType>(h->process_type); 
+      // G4ProcessType counts 0,1,2,..., crane's CGeant4ProcessType
+      // 0,10,20,... 
+      if (h->process_type <= 12) {
+        sd_track->ProcessType       = static_cast<CGeant4ProcessType>(10*h->process_type); 
+      } else {
+        sd_track->ProcessType       = CGeant4ProcessType::NOTDEFINED;
+      }
     } 
+    // as CEventMc::SetTrack
+    if (sd_track->Pdg == mc_event->primaryPdg_ && sd_track->ParentId == 0) {
+      sd_track->Primary = true;
+      found_primary     = true;
+    }
     mc_event->tracks_.push_back(sd_track);
   } 
+  // crane adds a primary track without steps if the 
+  // primary did not leave any steps (but only if there 
+  // are any tracks)
+  if (!found_primary && mc_event->tracks_.size() > 0) {
+    auto sd_track                 = new CTrackMc();
+    sd_track->Primary             = true;
+    sd_track->TrackId             = 1;
+    sd_track->VertexVolumeId      = 0;
+    sd_track->VertexPosition      = mc_event->primaryPosition_;
+    sd_track->LastVolumeId        = mc_event->primaryStoppingVolume_;
+    sd_track->LastPosition        = mc_event->primaryStoppingPosition_;
+    sd_track->ParentId            = 0;
+    sd_track->Pdg                 = mc_event->primaryPdg_;
+    sd_track->VertexKineticEnergy = mc_event->primaryKineticEnergyGenerated_;
+    mc_event->tracks_.push_back(sd_track);
+  }
+  
+  // the hits - one per volume, from all steps with energy 
+  // deposition. Volumes are in the order of their first 
+  // such step.
+  // NOTE - crane's meanPosition_ is distorted due to a bug in 
+  // SimpleDetEventAction::SaveRoot (see add_mc_event docs), 
+  // here it is the energy weighted mean of the step positions.
+  Vec<u32> volume_order = {};
+  HashMap<u32,usize> volume_idx = {};
+  Vec<f64>      edep_sum  = {};
+  Vec<TVector3> pos_sum   = {};
+  Vec<f64>      t_min     = {};
+  Vec<f64>      t_max     = {};
+  Vec<i32>      min_track = {};
+  for (auto const &h : ev.hits) {
+    if (!(h.step_edep > 0)) {
+      continue;
+    }
+    if (!volume_idx.contains(h.volume_id)) {
+      volume_idx.insert({h.volume_id, volume_order.size()});
+      volume_order.push_back(h.volume_id);
+      edep_sum .push_back(0);
+      pos_sum  .push_back(TVector3(0,0,0));
+      t_min    .push_back(std::numeric_limits<f64>::max());
+      t_max    .push_back(std::numeric_limits<f64>::lowest());
+      min_track.push_back(std::numeric_limits<i32>::max());
+    }
+    auto k        = volume_idx[h.volume_id];
+    edep_sum[k]  += h.step_edep;
+    pos_sum[k]   += h.step_edep*TVector3(h.pos_x, h.pos_y, h.pos_z);
+    t_min[k]      = std::min(t_min[k], (f64)h.glob_time);
+    t_max[k]      = std::max(t_max[k], (f64)h.glob_time);
+    min_track[k]  = std::min(min_track[k], (i32)h.track_id);
+  }
+  for (usize k=0; k<volume_order.size(); k++) {
+    mc_event->volumeId_             .push_back(volume_order[k]);
+    mc_event->totalEnergyDeposition_.push_back(edep_sum[k]);
+    mc_event->meanPosition_         .push_back(pos_sum[k]*(1.0/edep_sum[k]));
+    mc_event->time_                 .push_back(0.5*(t_min[k] + t_max[k]));
+    // as in crane, this is the smallest track id in the 
+    // volume, not an index
+    mc_event->hitTrackIndex_        .push_back(min_track[k]);
+  }
+  sim_tree->Fill();
 }
 
 //------------------------------------------------------------------------
@@ -546,6 +681,21 @@ auto CEventMc::pretty_print() const -> std::string {
   std::string repr = "<CEventMc";
   repr += std::format("\n n mc tracks : {}>", tracks_.size());
   return repr;
+}
+
+//------------------------------------------------------------------------
+
+auto CEventMc::reset() -> void {
+  for (auto t : tracks_) {
+    delete t;
+  }
+  tracks_.clear();
+  hitTrackIndex_        .clear();
+  totalEnergyDeposition_.clear();
+  meanPosition_         .clear();
+  volumeId_             .clear();
+  time_                 .clear();
+  *this = CEventMc();
 }
 
 //------------------------------------------------------------------------
@@ -1208,6 +1358,50 @@ auto CEventRec::pretty_print() const -> std::string {
 //------------------------------------------------------------------------
 
 GSimulationParameter::GSimulationParameter() {
+  // binning and names as in crane's GSimulationParameter
+  HPrimaryBetaGenerated       = TH1D("HPrimaryBetaGenerated", "", 100, 0, 1);
+  HPrimaryBetaTriggered       = TH1D("HPrimaryBetaTriggered", "", 100, 0, 1);
+  HPrimaryCosZenBetaGenerated = TH2D("HPrimaryCosZenBetaGenerated", "", 101, -1, 1, 100, 0, 1);
+  HPrimaryCosZenBetaTriggered = TH2D("HPrimaryCosZenBetaTriggered", "", 101, -1, 1, 100, 0, 1);
+  HPrimaryCosZenLogEGenerated = TH2D("HPrimaryCosZenLogEGenerated", "", 101, -1, 1, 80, -2, 6);
+  HPrimaryCosZenLogETriggered = TH2D("HPrimaryCosZenLogETriggered", "", 101, -1, 1, 80, -2, 6);
+  // the histograms are members, the file must not own them
+  for (TH1* h : std::initializer_list<TH1*>{&HPrimaryBetaGenerated, &HPrimaryBetaTriggered,
+                                            &HPrimaryCosZenBetaGenerated, &HPrimaryCosZenBetaTriggered,
+                                            &HPrimaryCosZenLogEGenerated, &HPrimaryCosZenLogETriggered}) {
+    h->SetDirectory(nullptr);
+  }
+  // defaults as in crane's GSimulationParameter::Reset
+  runId_                    = 0;
+  subRunId_                 = 0;
+  randomSeed_               = 0;
+  triggerLevel_             = 0;
+  UseTrigger                = false;
+  UseDigitizer              = false;
+  UniformBeta               = false;
+  PrimaryBetaLow            = -1;
+  PrimaryBetaHigh           = -1;
+  PrimaryIsotropic          = false;
+  PrimaryIsotropicUpDownAll = -1;
+  PrimaryLimit              = -1;
+  PrimaryFile               = false;
+  UniformLogE               = false;
+  PrimaryLogELow            = -1;
+  PrimaryLogEHigh           = -1;
+  PrimaryPdg                = 0;
+  nEventsGeneratedPerFile_  = 0;
+}
+
+auto GSimulationParameter::fill_generated(f64 beta, f64 kinetic_energy, f64 cos_zen) -> void {
+  HPrimaryBetaGenerated.Fill(beta);
+  HPrimaryCosZenBetaGenerated.Fill(cos_zen, beta);
+  HPrimaryCosZenLogEGenerated.Fill(cos_zen, std::log10(kinetic_energy));
+}
+
+auto GSimulationParameter::fill_triggered(f64 beta, f64 kinetic_energy, f64 cos_zen) -> void {
+  HPrimaryBetaTriggered.Fill(beta);
+  HPrimaryCosZenBetaTriggered.Fill(cos_zen, beta);
+  HPrimaryCosZenLogETriggered.Fill(cos_zen, std::log10(kinetic_energy));
 }
 
 GSimulationParameter::~GSimulationParameter() {
