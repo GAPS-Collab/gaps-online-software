@@ -512,6 +512,11 @@ fn emit_rbwaveform() {
     let ev = RBEvent::from_random();
     for wf in ev.get_rbwaveforms() {
       assert_eq!(ev.header.rb_id, wf.rb_id);
+      // the channel numbers have to belong to the adc data, 
+      // calibrate() uses them to pick the channel calibration
+      assert_eq!(wf.adc_a, ev.adc[wf.rb_channel_a as usize]);
+      assert_eq!(wf.adc_b, ev.adc[wf.rb_channel_b as usize]);
+      assert_ne!(wf.rb_channel_a, wf.rb_channel_b);
     }
   }
 }

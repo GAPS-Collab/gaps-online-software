@@ -222,8 +222,8 @@ impl RBEvent {
       } else {
         wf.adc_a   = self.adc[6].clone();
         wf.adc_b   = self.adc[7].clone();
-        wf.rb_channel_b = 6;
-        wf.rb_channel_a = 7;
+        wf.rb_channel_b = 7;
+        wf.rb_channel_a = 6;
       }
       waveforms.push(wf);
     }
