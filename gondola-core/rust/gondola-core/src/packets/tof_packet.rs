@@ -135,6 +135,24 @@ impl TofPacket {
   pub fn age(&self) -> u64 {
     self.creation_time.elapsed().as_secs()
   }
+
+  /// In case this packet is of type TofEvent, 
+  /// we can retrieve the event id without unpacking it 
+  ///
+  /// # Returns 
+  ///   * None in case this is not an packet of type 
+  ///     TofEvent 
+  ///   * Some(eventid ) - event id from packet for 
+  ///     TofEvents
+  pub fn get_event_id(&self) -> Option<u32> {
+    if self.packet_type != TofPacketType::TofEvent {
+      return None;
+    }
+    // the event id is at position 6 in the tofpacket bytestream 
+    let mut pos : usize  = 6;
+    let event_id = parse_u32(&self.payload,&mut pos);
+    Some(event_id)
+  }
 }
 
 
@@ -333,6 +351,20 @@ impl TofPacket {
   fn get_payload_py(&self) -> Vec<u8> {
     self.payload.clone()
   }
+  
+  /// In case this packet is of type TofEvent, 
+  /// we can retrieve the event id without unpacking it 
+  ///
+  /// # Returns 
+  ///   * None in case this is not an packet of type 
+  ///     TofEvent 
+  ///   * Some(eventid ) - event id from packet for 
+  ///     TofEvents
+  #[pyo3(name="event_id")] 
+  #[getter]
+  fn get_event_id_py(&self) -> Option<u32> { 
+    self.get_event_id() 
+  }
 
   #[pyo3(name="unpack")]
   fn unpack_py(&self,py: Python) -> PyResult<Py<PyAny>> {
@@ -443,4 +475,15 @@ impl TofPacket {
 
 #[cfg(feature="pybindings")]
 pythonize!(TofPacket);
+
+//--------------------------------------------------
+
+#[test]
+#[cfg(feature="random")] 
+fn tofpacket_get_event_id() {
+  let te = TofEvent::from_random();
+  let evid = te.event_id;
+  let pack = te.pack();
+  assert_eq!(evid, pack.get_event_id().unwrap());
+}
 
