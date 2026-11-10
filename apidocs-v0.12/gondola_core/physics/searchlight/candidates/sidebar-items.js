@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["SEARCHLIGHT_N_FEATURES"],"enum":["SearchlightCandidate"],"struct":["SearchlightCandidateFit","SearchlightCandidateIter"]};

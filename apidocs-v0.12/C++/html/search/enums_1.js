@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['errorkind_0',['errorkind',['../classgondola_1_1IOError.html#a20f21d8609600d07946504f3bbd144f7',1,'gondola::IOError::ErrorKind'],['../classgondola_1_1AnalysisError.html#a498e1aa09a70c9ace342b564677966c4',1,'gondola::AnalysisError::ErrorKind']]],
+  ['errorkind_0',['errorkind',['../classgondola_1_1IOError.html#a20f21d8609600d07946504f3bbd144f7',1,'gondola::IOError::ErrorKind'],['../classgondola_1_1AnalysisError.html#a498e1aa09a70c9ace342b564677966c4',1,'gondola::AnalysisError::ErrorKind'],['../classgondola_1_1ConfigurationError.html#ac018550b6ab985bc8004e9f9954723ae',1,'gondola::ConfigurationError::ErrorKind']]],
   ['eventquality_1',['EventQuality',['../namespacegondola.html#ac61bd1b8e62eab79a1089be6ecc1ca3d',1,'gondola']]],
   ['eventstatus_2',['EventStatus',['../namespacegondola.html#ae4efa4080cf89476f85e917971613baa',1,'gondola']]]
 ];

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["FitStatus"],"fn":["line3d"],"struct":["FitStatusIter","LineFit"]};
+window.SIDEBAR_ITEMS = {"constant":["LINEFIT_DEFAULT_ERR_XY","TOF_INNER_MAX_PADDLE_ID"],"enum":["FitStatus","LineFitCost"],"fn":["line3d"],"struct":["CleanedLineFit","FitStatusIter","LineFit","LineFitCleaning","TofPaddleOverlap","TofPaddleOverlaps"]};

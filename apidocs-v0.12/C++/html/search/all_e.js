@@ -18,7 +18,7 @@ var searchData=
   ['n_5ftrigger_5fpaddles_15',['n_trigger_paddles',['../structgondola_1_1TofEvent.html#a7e94a846bc4256f2d95c06c7a8e93b7a',1,'gondola::TofEvent::n_trigger_paddles'],['../structgondola_1_1TofEventSummary.html#aa2cc6620d029f9252afaf87daf77be4a',1,'gondola::TofEventSummary::n_trigger_paddles']]],
   ['n_5ftrk_5fhits_16',['n_trk_hits',['../structgondola_1_1TelemetryEvent.html#a3f24ad42c6a1ebc1835b9ef96fcc8e08',1,'gondola::TelemetryEvent']]],
   ['n_5fwaveforms_17',['n_waveforms',['../structgondola_1_1TofPulseTemplate.html#a7710a865fa5bf3f8d15152f35b54c5ce',1,'gondola::TofPulseTemplate']]],
-  ['name_18',['name',['../structgondola_1_1TrackerStripPedestal.html#aafb96d34c09757c7e0026ee0cab7a517',1,'gondola::TrackerStripPedestal::name'],['../structgondola_1_1TrackerStripTransferFunction.html#aaf15c0f1f09e474b17bcf884ec154e2a',1,'gondola::TrackerStripTransferFunction::name'],['../structgondola_1_1TofPaddleTimingConstant.html#a72baac53771b28d396bec1856e006b3b',1,'gondola::TofPaddleTimingConstant::name'],['../structgondola_1_1TrackerStripGain.html#a873f3194397b653d443e5bca3f5e5b31',1,'gondola::TrackerStripGain::name'],['../structgondola_1_1TrackerStripMask.html#ab9f3b588cb247c09cf77dc3c1ae8baaa',1,'gondola::TrackerStripMask::name']]],
+  ['name_18',['name',['../structgondola_1_1TrackerStripGain.html#a873f3194397b653d443e5bca3f5e5b31',1,'gondola::TrackerStripGain::name'],['../structgondola_1_1TrackerStripTransferFunction.html#aaf15c0f1f09e474b17bcf884ec154e2a',1,'gondola::TrackerStripTransferFunction::name'],['../structgondola_1_1TofPaddleTimingConstant.html#a72baac53771b28d396bec1856e006b3b',1,'gondola::TofPaddleTimingConstant::name'],['../structgondola_1_1TrackerStripPedestal.html#aafb96d34c09757c7e0026ee0cab7a517',1,'gondola::TrackerStripPedestal::name'],['../structgondola_1_1TrackerStripMask.html#ab9f3b588cb247c09cf77dc3c1ae8baaa',1,'gondola::TrackerStripMask::name']]],
   ['nanoseconds_19',['nanoseconds',['../structgondola_1_1RBCalibration.html#a207e61bc09f90bfae8f7f14f61a3066b',1,'gondola::RBCalibration::nanoseconds(const RBEvent &amp;event) const'],['../structgondola_1_1RBCalibration.html#ae040e341099dc47539a89791e3b95abd',1,'gondola::RBCalibration::nanoseconds(const RBEvent &amp;event, const u8 channel) const']]],
   ['nas_5ftemp_20',['nas_temp',['../structPBMoniData.html#a468db626b837765f2e8149681e6201d4',1,'PBMoniData']]],
   ['nb_5fmodule_21',['NB_MODULE',['../gondola__core_8cxx.html#accc81d6dd00b80e2e71706cae5f6ad6f',1,'gondola_core.cxx']]],
@@ -28,11 +28,12 @@ var searchData=
   ['nohit_25',['NoHit',['../namespacegondola.html#a3e679dd5cf65b9be26ead6c7555f2580af8246e1e45d89414e8bf56ffe1680a54',1,'gondola']]],
   ['noi_5fdata_26',['noi_data',['../structgondola_1_1RBCalibration.html#a6a1ecc8b17d1c8bb310b581649648851',1,'gondola::RBCalibration']]],
   ['none_27',['none',['../gondola__typedefs_8hpp.html#a6ddc42c787fc55e2094925ff1a8d7d38',1,'None:&#160;gondola_typedefs.hpp'],['../namespacegondola.html#a62baa478e4adaaf6d242f135c1c9f84da6adf97f83acf6453d4a6a4b1070f3754',1,'gondola::None']]],
-  ['normal_5fx_28',['normal_x',['../structgondola_1_1TofPaddle.html#a253d22fc36d24cc82e0e9de6b4bcc19d',1,'gondola::TofPaddle']]],
-  ['normal_5fy_29',['normal_y',['../structgondola_1_1TofPaddle.html#a177f3c1e6696785788bdaf669858f539',1,'gondola::TofPaddle']]],
-  ['normal_5fz_30',['normal_z',['../structgondola_1_1TofPaddle.html#ab6cc93747d3ebe74d688d657df5477eb',1,'gondola::TofPaddle']]],
-  ['nothresholdcrossing_31',['NoThresholdCrossing',['../classgondola_1_1AnalysisError.html#a498e1aa09a70c9ace342b564677966c4a998a5f6073ab476cf56c521236724217',1,'gondola::AnalysisError']]],
-  ['notofdataevent_32',['NoTofDataEvent',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39ceda853ccc9f2032abb9d46425b422483e41',1,'gondola']]],
-  ['num_5fhits_33',['num_hits',['../structgondola_1_1TrkMetaData.html#a9e9501bb2a191d73edb4db3c0dcde96d',1,'gondola::TrkMetaData']]],
-  ['nwords_34',['NWORDS',['../events_8h.html#a3cd2baa6a4e5edb7a622ad2d706cac13',1,'events.h']]]
+  ['nonsensicalconfiguration_28',['NonSensicalConfiguration',['../classgondola_1_1ConfigurationError.html#ac018550b6ab985bc8004e9f9954723aeaa2957d2f7b4b996fa1d31aabecfe3507',1,'gondola::ConfigurationError']]],
+  ['normal_5fx_29',['normal_x',['../structgondola_1_1TofPaddle.html#a253d22fc36d24cc82e0e9de6b4bcc19d',1,'gondola::TofPaddle']]],
+  ['normal_5fy_30',['normal_y',['../structgondola_1_1TofPaddle.html#a177f3c1e6696785788bdaf669858f539',1,'gondola::TofPaddle']]],
+  ['normal_5fz_31',['normal_z',['../structgondola_1_1TofPaddle.html#ab6cc93747d3ebe74d688d657df5477eb',1,'gondola::TofPaddle']]],
+  ['nothresholdcrossing_32',['NoThresholdCrossing',['../classgondola_1_1AnalysisError.html#a498e1aa09a70c9ace342b564677966c4a998a5f6073ab476cf56c521236724217',1,'gondola::AnalysisError']]],
+  ['notofdataevent_33',['NoTofDataEvent',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39ceda853ccc9f2032abb9d46425b422483e41',1,'gondola']]],
+  ['num_5fhits_34',['num_hits',['../structgondola_1_1TrkMetaData.html#a9e9501bb2a191d73edb4db3c0dcde96d',1,'gondola::TrkMetaData']]],
+  ['nwords_35',['NWORDS',['../events_8h.html#a3cd2baa6a4e5edb7a622ad2d706cac13',1,'events.h']]]
 ];

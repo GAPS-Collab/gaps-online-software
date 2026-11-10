@@ -3,6 +3,7 @@ var structgondola_1_1Tracklet =
     [ "Tracklet", "structgondola_1_1Tracklet.html#ab7529c2017ef53fd73822e4cc13ec41f", null ],
     [ "Tracklet", "structgondola_1_1Tracklet.html#a0a60fb2b160f57d4f52f6b52010f8d91", null ],
     [ "get_stop", "structgondola_1_1Tracklet.html#ad52b57299c0d7fa5dba9ab30ce509a37", null ],
+    [ "get_stop_raw", "structgondola_1_1Tracklet.html#a97c2a9d80386402232fb4eebb52ba986", null ],
     [ "get_vertex", "structgondola_1_1Tracklet.html#a371d4f1cef6345eedef955b5fc20a173", null ],
     [ "set_stop", "structgondola_1_1Tracklet.html#a096a586bcdbeba9b1a6c15322a0ff1d6", null ],
     [ "to_bytestream", "structgondola_1_1Tracklet.html#ad5c456b4d9bf4f97026eb02c0f783866", null ],

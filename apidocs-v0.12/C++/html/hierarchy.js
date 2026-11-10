@@ -1,6 +1,7 @@
 var hierarchy =
 [
     [ "gondola::AnalysisError", "classgondola_1_1AnalysisError.html", null ],
+    [ "gondola::ConfigurationError", "classgondola_1_1ConfigurationError.html", null ],
     [ "gondola::Cooling", "structgondola_1_1Cooling.html", null ],
     [ "CPUMoniData", "structCPUMoniData.html", null ],
     [ "gondola::CRFrame", "structgondola_1_1CRFrame.html", null ],

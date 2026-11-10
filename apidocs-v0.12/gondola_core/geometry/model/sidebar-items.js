@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["BooleanOp","Shape","SolidKind"],"struct":["Geometry","Material","Placement","Solid","SolidKindIter","Transform","Volume","WorldPlacement"],"type":["MaterialId","SolidId","VolumeId"]};

@@ -2,6 +2,7 @@ var annotated_dup =
 [
     [ "gondola", "namespacegondola.html", [
       [ "AnalysisError", "classgondola_1_1AnalysisError.html", "classgondola_1_1AnalysisError" ],
+      [ "ConfigurationError", "classgondola_1_1ConfigurationError.html", "classgondola_1_1ConfigurationError" ],
       [ "Cooling", "structgondola_1_1Cooling.html", "structgondola_1_1Cooling" ],
       [ "CRFrame", "structgondola_1_1CRFrame.html", "structgondola_1_1CRFrame" ],
       [ "CRFrameObject", "structgondola_1_1CRFrameObject.html", "structgondola_1_1CRFrameObject" ],

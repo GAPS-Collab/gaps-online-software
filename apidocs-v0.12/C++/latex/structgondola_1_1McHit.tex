@@ -9,6 +9,11 @@
 \item 
 \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1McHit_a5c3569c0fbf213bd4c2e7f8ce6373e3f}{to\+\_\+bytestream}} () \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} -\/$>$ \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$
 \end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{structgondola_1_1McHit_a9daa2324ca1fbacaef68755aaf4683e9}{from\+\_\+bytestream}} (\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{stream}}, \mbox{\hyperlink{gondola__typedefs_8hpp_a5148c9c1252e19e12def2814f71690e3}{usize}} \&\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{pos}}) -\/$>$ result\+::\+Result$<$ \mbox{\hyperlink{structgondola_1_1McHit}{Mc\+Hit}}, \mbox{\hyperlink{classgondola_1_1IOError}{IOError}} $>$
+\end{DoxyCompactItemize}
 \doxysubsubsection*{Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
@@ -80,13 +85,28 @@
 \item 
 \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} \mbox{\hyperlink{structgondola_1_1McHit_ae0136e843ab150dc585ea3ed531ff11b}{beta}} = 0.\+0
 \end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1McHit_a705c506b973e85a539c6031f19611501}{HEAD}} = 0x\+AAAA
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} \mbox{\hyperlink{structgondola_1_1McHit_a7293e5754029f19584b8f20ea52c1efe}{TAIL}} = 0x5555
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{static}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{gondola__typedefs_8hpp_a5148c9c1252e19e12def2814f71690e3}{usize}} \mbox{\hyperlink{structgondola_1_1McHit_aa7d63ef4d2c683262908d400b091171e}{SIZE}} = 2 + 4\texorpdfstring{$\ast$}{*}4 + 21\texorpdfstring{$\ast$}{*}4 + 5\texorpdfstring{$\ast$}{*}4 + 3 + 2
+\begin{DoxyCompactList}\small\item\em size of the serialized hit in bytes \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \doxysubsection{Detailed Description}
 \doxylink{structgondola_1_1McHit}{Mc\+Hit} is inspired by Simpl\+Det\textquotesingle{}s CHit and combines information from G4\+Track and G4\+Step for further processing 
 
 \doxysubsection{Member Function Documentation}
-\Hypertarget{structgondola_1_1McHit_a5c3569c0fbf213bd4c2e7f8ce6373e3f}\label{structgondola_1_1McHit_a5c3569c0fbf213bd4c2e7f8ce6373e3f} 
+\Hypertarget{structgondola_1_1McHit_a9daa2324ca1fbacaef68755aaf4683e9}\label{structgondola_1_1McHit_a9daa2324ca1fbacaef68755aaf4683e9} 
+\index{gondola::McHit@{gondola::McHit}!from\_bytestream@{from\_bytestream}}
+\index{from\_bytestream@{from\_bytestream}!gondola::McHit@{gondola::McHit}}
+\doxysubsubsection{\texorpdfstring{from\_bytestream()}{from\_bytestream()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::\+Mc\+Hit\+::from\+\_\+bytestream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ \&}]{stream,  }\item[{\mbox{\hyperlink{gondola__typedefs_8hpp_a5148c9c1252e19e12def2814f71690e3}{usize}} \&}]{pos }\end{DoxyParamCaption}) -\/$>$ result\+::\+Result$<$\mbox{\hyperlink{structgondola_1_1McHit}{Mc\+Hit}}, \mbox{\hyperlink{classgondola_1_1IOError}{IOError}}$>$\hspace{0.3cm}{\ttfamily [static]}}
+
+Deserialization, mirrors the rust implementation. Available without BUILD\+\_\+\+SIM, e.\+g. for converting simulated data to Simple\+Det root files. \Hypertarget{structgondola_1_1McHit_a5c3569c0fbf213bd4c2e7f8ce6373e3f}\label{structgondola_1_1McHit_a5c3569c0fbf213bd4c2e7f8ce6373e3f} 
 \index{gondola::McHit@{gondola::McHit}!to\_bytestream@{to\_bytestream}}
 \index{to\_bytestream@{to\_bytestream}!gondola::McHit@{gondola::McHit}}
 \doxysubsubsection{\texorpdfstring{to\_bytestream()}{to\_bytestream()}}
@@ -106,6 +126,12 @@
 \index{glob\_time@{glob\_time}!gondola::McHit@{gondola::McHit}}
 \doxysubsubsection{\texorpdfstring{glob\_time}{glob\_time}}
 {\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Mc\+Hit\+::glob\+\_\+time = 0}
+
+\Hypertarget{structgondola_1_1McHit_a705c506b973e85a539c6031f19611501}\label{structgondola_1_1McHit_a705c506b973e85a539c6031f19611501} 
+\index{gondola::McHit@{gondola::McHit}!HEAD@{HEAD}}
+\index{HEAD@{HEAD}!gondola::McHit@{gondola::McHit}}
+\doxysubsubsection{\texorpdfstring{HEAD}{HEAD}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Mc\+Hit\+::\+HEAD = 0x\+AAAA\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
 
 \Hypertarget{structgondola_1_1McHit_a0053c280aaf2e176e0791d5b45e2f23e}\label{structgondola_1_1McHit_a0053c280aaf2e176e0791d5b45e2f23e} 
 \index{gondola::McHit@{gondola::McHit}!hw\_id@{hw\_id}}
@@ -221,6 +247,16 @@
 \doxysubsubsection{\texorpdfstring{process\_type}{process\_type}}
 {\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} gondola\+::\+Mc\+Hit\+::process\+\_\+type = 0}
 
+\Hypertarget{structgondola_1_1McHit_aa7d63ef4d2c683262908d400b091171e}\label{structgondola_1_1McHit_aa7d63ef4d2c683262908d400b091171e} 
+\index{gondola::McHit@{gondola::McHit}!SIZE@{SIZE}}
+\index{SIZE@{SIZE}!gondola::McHit@{gondola::McHit}}
+\doxysubsubsection{\texorpdfstring{SIZE}{SIZE}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{gondola__typedefs_8hpp_a5148c9c1252e19e12def2814f71690e3}{usize}} gondola\+::\+Mc\+Hit\+::\+SIZE = 2 + 4\texorpdfstring{$\ast$}{*}4 + 21\texorpdfstring{$\ast$}{*}4 + 5\texorpdfstring{$\ast$}{*}4 + 3 + 2\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
+
+
+
+size of the serialized hit in bytes 
+
 \Hypertarget{structgondola_1_1McHit_a11368db32b9bde280e3721c0bde82ffd}\label{structgondola_1_1McHit_a11368db32b9bde280e3721c0bde82ffd} 
 \index{gondola::McHit@{gondola::McHit}!step\_edep@{step\_edep}}
 \index{step\_edep@{step\_edep}!gondola::McHit@{gondola::McHit}}
@@ -236,6 +272,12 @@ The total energy deposition of the step.
 \index{step\_len@{step\_len}!gondola::McHit@{gondola::McHit}}
 \doxysubsubsection{\texorpdfstring{step\_len}{step\_len}}
 {\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} gondola\+::\+Mc\+Hit\+::step\+\_\+len = 0}
+
+\Hypertarget{structgondola_1_1McHit_a7293e5754029f19584b8f20ea52c1efe}\label{structgondola_1_1McHit_a7293e5754029f19584b8f20ea52c1efe} 
+\index{gondola::McHit@{gondola::McHit}!TAIL@{TAIL}}
+\index{TAIL@{TAIL}!gondola::McHit@{gondola::McHit}}
+\doxysubsubsection{\texorpdfstring{TAIL}{TAIL}}
+{\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{constexpr}} \mbox{\hyperlink{gondola__typedefs_8hpp_ace9d960e74685e2cd84b36132dbbf8aa}{u16}} gondola\+::\+Mc\+Hit\+::\+TAIL = 0x5555\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [constexpr]}}
 
 \Hypertarget{structgondola_1_1McHit_aef016c22f4ebe5aac6d03f6dcb4e0e8c}\label{structgondola_1_1McHit_aef016c22f4ebe5aac6d03f6dcb4e0e8c} 
 \index{gondola::McHit@{gondola::McHit}!track\_id@{track\_id}}
@@ -305,6 +347,7 @@ The total energy deposition of the step.
 
 
 
-The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/events/\mbox{\hyperlink{mc__hit_8hpp}{mc\+\_\+hit.\+hpp}}\end{DoxyCompactItemize}
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/include/events/\mbox{\hyperlink{mc__hit_8hpp}{mc\+\_\+hit.\+hpp}}\item 
+/home/runner/work/gaps-\/online-\/software/gaps-\/online-\/software/gondola-\/core/\+C++/src/\mbox{\hyperlink{mc__hit_8cxx}{mc\+\_\+hit.\+cxx}}\end{DoxyCompactItemize}

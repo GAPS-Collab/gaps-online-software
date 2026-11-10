@@ -19,6 +19,6 @@ var searchData=
   ['anytofhk_16',['AnyTofHK',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39ceda1d633e18b49ad6ab196ff08b21e0a052',1,'gondola']]],
   ['anytrackerhk_17',['AnyTrackerHK',['../namespacegondola.html#a598dae982e3c16cd23a9e57c72d39cedac44f8f7d9b9f501fe9278cd56521f28a',1,'gondola']]],
   ['api_20software_20documentation_18',['gaps-online-software C++ API software documentation',['../index.html',1,'']]],
-  ['arguments_19',['Arguments',['../namespacegondola.html#autotoc_md2',1,'']]],
+  ['arguments_19',['arguments',['../structgondola_1_1TofEvent.html#autotoc_md1',1,'Arguments'],['../namespacegondola.html#autotoc_md3',1,'Arguments']]],
   ['asic_5fevent_5fcode_20',['asic_event_code',['../structgondola_1_1TrkHit.html#ae6b6120eb7a3dc0750e139e13e82ff2d',1,'gondola::TrkHit']]]
 ];

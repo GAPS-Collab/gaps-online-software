@@ -33,9 +33,10 @@ var searchData=
   ['tracker_5fstrip_5fgain_2ehpp_30',['tracker_strip_gain.hpp',['../tracker__strip__gain_8hpp.html',1,'']]],
   ['tracker_5fstrip_5fmask_2ecxx_31',['tracker_strip_mask.cxx',['../tracker__strip__mask_8cxx.html',1,'']]],
   ['tracker_5fstrip_5fmask_2ehpp_32',['tracker_strip_mask.hpp',['../tracker__strip__mask_8hpp.html',1,'']]],
-  ['tracker_5ftransfer_5ffn_2ecxx_33',['tracker_transfer_fn.cxx',['../tracker__transfer__fn_8cxx.html',1,'']]],
-  ['tracker_5ftransfer_5ffn_2ehpp_34',['tracker_transfer_fn.hpp',['../tracker__transfer__fn_8hpp.html',1,'']]],
-  ['tracklet_2ecxx_35',['tracklet.cxx',['../tracklet_8cxx.html',1,'']]],
-  ['tracklet_2ehpp_36',['tracklet.hpp',['../tracklet_8hpp.html',1,'']]],
-  ['trigger_2ehpp_37',['trigger.hpp',['../trigger_8hpp.html',1,'']]]
+  ['tracker_5fstrip_5fpedestal_2ehpp_33',['tracker_strip_pedestal.hpp',['../tracker__strip__pedestal_8hpp.html',1,'']]],
+  ['tracker_5ftransfer_5ffn_2ecxx_34',['tracker_transfer_fn.cxx',['../tracker__transfer__fn_8cxx.html',1,'']]],
+  ['tracker_5ftransfer_5ffn_2ehpp_35',['tracker_transfer_fn.hpp',['../tracker__transfer__fn_8hpp.html',1,'']]],
+  ['tracklet_2ecxx_36',['tracklet.cxx',['../tracklet_8cxx.html',1,'']]],
+  ['tracklet_2ehpp_37',['tracklet.hpp',['../tracklet_8hpp.html',1,'']]],
+  ['trigger_2ehpp_38',['trigger.hpp',['../trigger_8hpp.html',1,'']]]
 ];

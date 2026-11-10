@@ -5,6 +5,8 @@
 \item 
 class \mbox{\hyperlink{classgondola_1_1AnalysisError}{Analysis\+Error}}
 \item 
+class \mbox{\hyperlink{classgondola_1_1ConfigurationError}{Configuration\+Error}}
+\item 
 struct \mbox{\hyperlink{structgondola_1_1Cooling}{Cooling}}
 \item 
 struct \mbox{\hyperlink{structgondola_1_1CRFrame}{CRFrame}}
@@ -94,8 +96,6 @@ struct \mbox{\hyperlink{structgondola_1_1TrkMetaData}{Trk\+Meta\+Data}}
 \begin{DoxyCompactList}\small\item\em A map of RBID, RBCh -\/\texorpdfstring{$>$}{>} \doxylink{structgondola_1_1TofPaddle}{Tof\+Paddle}. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, std\+::map$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, std\+::map$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, \mbox{\hyperlink{gondola__typedefs_8hpp_a92c50087ca0e64fa93fc59402c55f8ca}{u8}} $>$ $>$ $>$ \mbox{\hyperlink{namespacegondola_a770bde374c96a3200b922ace0d70e09b}{Dsi\+JChn\+Paddle\+Id\+Map}}
 \begin{DoxyCompactList}\small\item\em A map of DSI,J -\/\texorpdfstring{$>$}{>} \doxylink{structgondola_1_1TofPaddle}{Tof\+Paddle}. \end{DoxyCompactList}\item 
-\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{structgondola_1_1TrackerStripPedestal}{Tracker\+Strip\+Pedestal}} $>$ \mbox{\hyperlink{namespacegondola_ade9651d29d2bd4c235bc490a57affaf2}{Trk\+Strip\+Ped\+Map}}
-\item 
 \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} $>$ \mbox{\hyperlink{namespacegondola_a1c2c2768738a98e4ab3c0aa6d31d88e0}{Tof\+Paddle\+Timing\+Constant\+Map}}
 \item 
 \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_a92c50087ca0e64fa93fc59402c55f8ca}{u8}}, \mbox{\hyperlink{structgondola_1_1TofPaddle}{Tof\+Paddle}} $>$ \mbox{\hyperlink{namespacegondola_afe901f112c6aac213f44b6dd5b614035}{Tof\+Paddle\+Map}}
@@ -109,6 +109,8 @@ struct \mbox{\hyperlink{structgondola_1_1TrkMetaData}{Trk\+Meta\+Data}}
 \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{gondola__typedefs_8hpp_a5f6906312a689f27d70e9d086649d3fd}{f32}} $>$ \mbox{\hyperlink{namespacegondola_a9d17670b58a3edb8eea63f0f23d950b0}{Trk\+Strip\+Gain\+Map}}
 \item 
 \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{bool}} $>$ \mbox{\hyperlink{namespacegondola_ad266ce89247b083c1c156da2505d7818}{Trk\+Strip\+Mask\+Map}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{typedef}} std\+::map$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{structgondola_1_1TrackerStripPedestal}{Tracker\+Strip\+Pedestal}} $>$ \mbox{\hyperlink{namespacegondola_ade9651d29d2bd4c235bc490a57affaf2}{Trk\+Strip\+Ped\+Map}}
 \item 
 \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{typedef}} \mbox{\hyperlink{gondola__typedefs_8hpp_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{structgondola_1_1TrackerStripTransferFunction}{Tracker\+Strip\+Transfer\+Function}} $>$ \mbox{\hyperlink{namespacegondola_a6bc76420ae0b049db7a32b0ea3fb5203}{Trk\+Strip\+Transfer\+Fn\+Map}}
 \item 
@@ -287,10 +289,6 @@ enum class \mbox{\hyperlink{namespacegondola_af998b820a54bca400c19e03948e82c28}{
 \begin{DoxyCompactList}\small\item\em Get a paddle if the rb id and channel is known (HG) \end{DoxyCompactList}\item 
 \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a6789ee24087165a3cefdf592965fb6cd}{get\+\_\+dsi\+\_\+j\+\_\+paddles}} () -\/$>$ \mbox{\hyperlink{namespacegondola_a770bde374c96a3200b922ace0d70e09b}{Dsi\+JChn\+Paddle\+Id\+Map}}
 \begin{DoxyCompactList}\small\item\em Get a paddle if the dsi,j connection of a paddle is known (LTB, LG) \end{DoxyCompactList}\item 
-\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a81584f7b6b4909a158d6285da1fa855b}{get\+\_\+trackerstrippedestals}} (std\+::string name) -\/$>$ \mbox{\hyperlink{namespacegondola_ade9651d29d2bd4c235bc490a57affaf2}{Trk\+Strip\+Ped\+Map}}
-\item 
-\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_afb9f34ea88da3f48b6b7534e43fdd1f1}{get\+\_\+trackerstrippedestals\+\_\+by\+\_\+volumeid}} (std\+::string name) -\/$>$ \mbox{\hyperlink{namespacegondola_ade9651d29d2bd4c235bc490a57affaf2}{Trk\+Strip\+Ped\+Map}}
-\item 
 \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a51e0333172307de3ac0e30e85bc059dd}{get\+\_\+hid\+\_\+vid\+\_\+map\+\_\+tracker}} () -\/$>$ \mbox{\hyperlink{gondola__typedefs_8hpp_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{gondola__typedefs_8hpp_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$
 \begin{DoxyCompactList}\small\item\em The mapping of volume id to hardware id, in this case, strip id. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_acb394640fc149ebaad55841d1e8b6125}{get\+\_\+vid\+\_\+hid\+\_\+map\+\_\+tracker}} () -\/$>$ \mbox{\hyperlink{gondola__typedefs_8hpp_af5449d3b4076aa8188b912b9b069fc5a}{Hash\+Map}}$<$ \mbox{\hyperlink{gondola__typedefs_8hpp_afaa62991928fb9fb18ff0db62a040aba}{u32}}, \mbox{\hyperlink{gondola__typedefs_8hpp_afaa62991928fb9fb18ff0db62a040aba}{u32}} $>$
@@ -316,6 +314,10 @@ enum class \mbox{\hyperlink{namespacegondola_af998b820a54bca400c19e03948e82c28}{
 \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a1263b65d7e01f35d3837565d55846331}{get\+\_\+trackerstripmasks}} (std\+::string \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{mask\+\_\+name}}) -\/$>$ \mbox{\hyperlink{namespacegondola_ad266ce89247b083c1c156da2505d7818}{Trk\+Strip\+Mask\+Map}}
 \item 
 \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a55aa39855bef733f7b202a28a9b661f7}{get\+\_\+trackerstripmasks\+\_\+by\+\_\+volumeid}} (std\+::string \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{mask\+\_\+name}}) -\/$>$ \mbox{\hyperlink{namespacegondola_ad266ce89247b083c1c156da2505d7818}{Trk\+Strip\+Mask\+Map}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_a81584f7b6b4909a158d6285da1fa855b}{get\+\_\+trackerstrippedestals}} (std\+::string name) -\/$>$ \mbox{\hyperlink{namespacegondola_ade9651d29d2bd4c235bc490a57affaf2}{Trk\+Strip\+Ped\+Map}}
+\item 
+\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_afb9f34ea88da3f48b6b7534e43fdd1f1}{get\+\_\+trackerstrippedestals\+\_\+by\+\_\+volumeid}} (std\+::string name) -\/$>$ \mbox{\hyperlink{namespacegondola_ade9651d29d2bd4c235bc490a57affaf2}{Trk\+Strip\+Ped\+Map}}
 \item 
 \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} \mbox{\hyperlink{namespacegondola_aab40b08cd09978f1f446337bcb41d6db}{get\+\_\+trkstriptransferfn}} (std\+::string name) -\/$>$ \mbox{\hyperlink{namespacegondola_a6bc76420ae0b049db7a32b0ea3fb5203}{Trk\+Strip\+Transfer\+Fn\+Map}}
 \item 
@@ -1302,7 +1304,7 @@ The mapping of hardwer id, in this case, strip id to volume id \Hypertarget{name
 \doxysubsubsection{\texorpdfstring{list\_path\_contents\_sorted()}{list\_path\_contents\_sorted()}}
 {\footnotesize\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{auto}} gondola\+::list\+\_\+path\+\_\+contents\+\_\+sorted (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{const}} std\+::string \&}]{input,  }\item[{\mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{bool}}}]{use\+\_\+telemetry\+\_\+re = {\ttfamily \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{false}}} }\end{DoxyParamCaption}) -\/$>$ \mbox{\hyperlink{gondola__typedefs_8hpp_a1b01c504448c96cd2191a5184dd31acf}{Vec}}$<$std\+::string$>$}
 
-Get all files in a certain directory in case it is a directory, for a single file just get the file \texorpdfstring{$<$}{<}3 Chat\+GPT\hypertarget{namespacegondola_autotoc_md2}{}\doxysubsection{\texorpdfstring{Arguments}{Arguments}}\label{namespacegondola_autotoc_md2}
+Get all files in a certain directory in case it is a directory, for a single file just get the file \texorpdfstring{$<$}{<}3 Chat\+GPT\hypertarget{namespacegondola_autotoc_md3}{}\doxysubsection{\texorpdfstring{Arguments}{Arguments}}\label{namespacegondola_autotoc_md3}
 
 \begin{DoxyItemize}
 \item input \+: path or filename

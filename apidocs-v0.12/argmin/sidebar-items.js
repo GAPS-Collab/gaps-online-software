@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"macro":[["argmin_error",1],["argmin_error_closure",1],["bulk",1],["check_param",1],["float",1],["kv",1]],"mod":["core","solver"]};

@@ -1,0 +1,85 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="argmin-math provides mathematics related abstractions needed in argmin. It supports implementations of these abstractions for basic `Vec`s and for the `ndarray`, `nalgebra`, and `faer` linear algebra libraries. The traits can of course also be implemented for your own types to make them compatible with argmin."><title>argmin_math - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../static.files/rustdoc-0c87338a.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="argmin_math" data-themes="" data-resource-suffix="" data-rustdoc-version="1.99.1 (58cf8f9c3 2026-10-13)" data-channel="1.99.1" data-search-js="search-cf4fc35e.js" data-stringdex-js="stringdex-b5109af9.js" data-settings-js="settings-170eb4bf.js" ><script src="../static.files/storage-41dd4d93.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-417ebf0a.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-9f56287d.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-044be391.svg"></head><body class="rustdoc mod crate"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">Crate argmin_math</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../argmin_math/index.html">argmin_<wbr>math</a><span class="version">0.5.1</span></h2></div><div class="sidebar-elems"><ul class="block"><li><a id="all-types" href="all.html">All Items</a></li></ul><section id="rustdoc-toc"><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#usage" title="Usage">Usage</a><ul><li><a href="#features" title="Features">Features</a></li><li><a href="#choosing-a-backend" title="Choosing a backend">Choosing a backend</a></li></ul></li><li><a href="#semantic-versioning" title="Semantic versioning">Semantic versioning</a></li><li><a href="#contributing" title="Contributing">Contributing</a></li><li><a href="#license" title="License">License</a><ul><li><a href="#contribution" title="Contribution">Contribution</a></li></ul></li></ul><h3><a href="#structs">Crate Items</a></h3><ul class="block"><li><a href="#structs" title="Structs">Structs</a></li><li><a href="#traits" title="Traits">Traits</a></li></ul></section><div id="rustdoc-modnav"></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1>Crate <span>argmin_<wbr>math</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../src/argmin_math/lib.rs.html#8-456">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>argmin-math provides mathematics related abstractions needed in argmin. It supports
+implementations of these abstractions for basic <code>Vec</code>s and for the <code>ndarray</code>, <code>nalgebra</code>,
+and <code>faer</code> linear algebra libraries. The traits can of course also be implemented
+for your own types to make them compatible with argmin.</p>
+<p>For an introduction on how to use argmin, please also have a look at the
+<a href="https://www.argmin-rs.org/book/">book</a>.</p>
+<h2 id="usage"><a class="doc-anchor" href="#usage">§</a>Usage</h2>
+<p>Add the following line to your dependencies list:</p>
+<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
+argmin-math = &quot;0.5.1&quot;</code></pre></div>
+<p>This will activate the <code>primitives</code> and <code>vec</code> features. For other backends see the section
+below.</p>
+<h3 id="features"><a class="doc-anchor" href="#features">§</a>Features</h3>
+<p>Support for the various backends can be switched on via features. Please read this section
+carefully to the end before choosing a backend.</p>
+<h4 id="default-features"><a class="doc-anchor" href="#default-features">§</a>Default features</h4><div><table><thead><tr><th>Feature</th><th>Default</th><th>Comment</th></tr></thead><tbody>
+<tr><td><code>primitives</code></td><td>yes</td><td>basic integer and floating point types</td></tr>
+<tr><td><code>vec</code></td><td>yes</td><td><code>Vec</code>s (basic functionality)</td></tr>
+</tbody></table>
+</div><h4 id="ndarray"><a class="doc-anchor" href="#ndarray">§</a><code>ndarray</code></h4><div><table><thead><tr><th>Feature</th><th>Default</th><th>Comment</th></tr></thead><tbody>
+<tr><td><code>ndarray_latest</code></td><td>no</td><td>latest supported version</td></tr>
+<tr><td><code>ndarray_latest-nolinalg</code></td><td>no</td><td>latest supported version without <code>ndarray-linalg</code></td></tr>
+<tr><td><code>ndarray_v0_15</code></td><td>no</td><td>version 0.15 with ndarray-linalg 0.16</td></tr>
+<tr><td><code>ndarray_v0_15-nolinalg</code></td><td>no</td><td>version 0.15 without <code>ndarray-linalg</code></td></tr>
+<tr><td><code>ndarray_v0_14-nolinalg</code></td><td>no</td><td>version 0.14 without <code>ndarray-linalg</code></td></tr>
+<tr><td><code>ndarray_v0_13-nolinalg</code></td><td>no</td><td>version 0.13 without <code>ndarray-linalg</code></td></tr>
+</tbody></table>
+</div>
+<p>Note that the <code>*-nolinalg*</code> features do NOT pull in <code>ndarray-linalg</code> as a dependency. This
+avoids linking against a BLAS library. This will however disable the implementation of
+<code>ArgminInv</code>, meaning that any solver which requires the matrix inverse will not work with the
+<code>ndarray</code> backend. It is recommended to use the <code>*-nolinalg*</code> options if the matrix inverse is
+not needed in order to keep the compilation times low and avoid problems when linking against a
+BLAS library.</p>
+<p>Using the <code>ndarray_*</code> features with <code>ndarray-linalg</code> support may require to explicitly choose
+the <code>ndarray-linalg</code> BLAS backend in your <code>Cargo.toml</code> (see the <a href="https://github.com/rust-ndarray/ndarray-linalg"><code>ndarray-linalg</code> documentation
+for details</a>):</p>
+<div class="example-wrap"><pre class="language-toml"><code>ndarray-linalg = { version = &quot;&lt;appropriate_version&gt;&quot;, features = [&quot;&lt;linalg_backend&gt;&quot;] }</code></pre></div><h4 id="nalgebra"><a class="doc-anchor" href="#nalgebra">§</a><code>nalgebra</code></h4><div><table><thead><tr><th>Feature</th><th>Default</th><th>Comment</th></tr></thead><tbody>
+<tr><td><code>nalgebra_latest</code></td><td>no</td><td>latest supported version</td></tr>
+<tr><td><code>nalgebra_v0_34</code></td><td>no</td><td>version 0.34</td></tr>
+<tr><td><code>nalgebra_v0_33</code></td><td>no</td><td>version 0.33</td></tr>
+<tr><td><code>nalgebra_v0_32</code></td><td>no</td><td>version 0.32</td></tr>
+<tr><td><code>nalgebra_v0_31</code></td><td>no</td><td>version 0.31</td></tr>
+<tr><td><code>nalgebra_v0_30</code></td><td>no</td><td>version 0.30</td></tr>
+<tr><td><code>nalgebra_v0_29</code></td><td>no</td><td>version 0.29</td></tr>
+</tbody></table>
+</div><h4 id="faer"><a class="doc-anchor" href="#faer">§</a><code>faer</code></h4><div><table><thead><tr><th>Feature</th><th>Default</th><th>Comment</th></tr></thead><tbody>
+<tr><td><code>faer_latest</code></td><td>no</td><td>latest supported version</td></tr>
+<tr><td><code>faer_v0_21</code></td><td>no</td><td>version 0.21</td></tr>
+<tr><td><code>faer_v0_20</code></td><td>no</td><td>version 0.20</td></tr>
+</tbody></table>
+</div><h3 id="choosing-a-backend"><a class="doc-anchor" href="#choosing-a-backend">§</a>Choosing a backend</h3>
+<p>It is not possible to activate two versions of the same backend.</p>
+<p>The features labeled <code>*latest*</code> are an alias for the most recent supported version of the
+respective backend. It is however recommended to explicitly specify the desired version instead
+of using any of the <code>*latest*</code> features (see section about semantic versioning below).</p>
+<p>The default features <code>primitives</code> and <code>vec</code> can be turned off in order to only compile the
+trait definitions. If another backend is chosen, <code>primitives</code> will automatically be turned on
+again.</p>
+<h4 id="example"><a class="doc-anchor" href="#example">§</a>Example</h4>
+<p>Activate support for the latest supported <code>ndarray</code> version:</p>
+<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
+argmin-math = { version = &quot;0.5.1&quot;, features = [&quot;ndarray_latest&quot;] }</code></pre></div><h2 id="semantic-versioning"><a class="doc-anchor" href="#semantic-versioning">§</a>Semantic versioning</h2>
+<p>This crate follows semantic versioning. Adding a new backend or a new version of a backend is
+not considered a breaking change. However, your code may still break if you use any of the
+features containing <code>*latest*</code>. It is therefore recommended to specify the actual version of the
+backend you are using.</p>
+<h2 id="contributing"><a class="doc-anchor" href="#contributing">§</a>Contributing</h2>
+<p>You found a bug? Your favorite backend is not supported? Feel free to open an issue or ideally
+submit a PR.</p>
+<h2 id="license"><a class="doc-anchor" href="#license">§</a>License</h2>
+<p>Licensed under either of</p>
+<ul>
+<li>Apache License, Version 2.0,
+(<a href="https://github.com/argmin-rs/argmin/blob/main/LICENSE-APACHE">LICENSE-APACHE</a> or
+<a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a>)</li>
+<li>MIT License (<a href="https://github.com/argmin-rs/argmin/blob/main/LICENSE-MIT">LICENSE-MIT</a> or
+<a href="http://opensource.org/licenses/MIT">http://opensource.org/licenses/MIT</a>)</li>
+</ul>
+<p>at your option.</p>
+<h3 id="contribution"><a class="doc-anchor" href="#contribution">§</a>Contribution</h3>
+<p>Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion
+in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above,
+without any additional terms or conditions.</p>
+</div></details><h2 id="structs" class="section-header">Structs<a href="#structs" class="anchor">§</a></h2><dl class="item-table"><dt><a class="struct" href="struct.Error.html" title="struct argmin_math::Error">Error</a></dt><dd>The <code>Error</code> type, a wrapper around a dynamic error type.</dd></dl><h2 id="traits" class="section-header">Traits<a href="#traits" class="anchor">§</a></h2><dl class="item-table"><dt><a class="trait" href="trait.ArgminAdd.html" title="trait argmin_math::ArgminAdd">Argmin<wbr>Add</a></dt><dd>Add a <code>T</code> to <code>self</code></dd><dt><a class="trait" href="trait.ArgminConj.html" title="trait argmin_math::ArgminConj">Argmin<wbr>Conj</a></dt><dd>Return the conjugate</dd><dt><a class="trait" href="trait.ArgminDiv.html" title="trait argmin_math::ArgminDiv">Argmin<wbr>Div</a></dt><dd>(Pointwise) Divide a <code>T</code> by <code>self</code></dd><dt><a class="trait" href="trait.ArgminDot.html" title="trait argmin_math::ArgminDot">Argmin<wbr>Dot</a></dt><dd>Dot/scalar product of <code>T</code> and <code>self</code></dd><dt><a class="trait" href="trait.ArgminEye.html" title="trait argmin_math::ArgminEye">Argmin<wbr>Eye</a></dt><dd>Identity matrix</dd><dt><a class="trait" href="trait.ArgminInv.html" title="trait argmin_math::ArgminInv">Argmin<wbr>Inv</a></dt><dd>Compute the inverse (<code>T</code>) of <code>self</code></dd><dt><a class="trait" href="trait.ArgminL1Norm.html" title="trait argmin_math::ArgminL1Norm">Argmin<wbr>L1Norm</a></dt><dd>Compute the l1-norm (<code>U</code>) of <code>self</code></dd><dt><a class="trait" href="trait.ArgminL2Norm.html" title="trait argmin_math::ArgminL2Norm">Argmin<wbr>L2Norm</a></dt><dd>Compute the l2-norm (<code>U</code>) of <code>self</code></dd><dt><a class="trait" href="trait.ArgminMinMax.html" title="trait argmin_math::ArgminMinMax">Argmin<wbr>MinMax</a></dt><dd>Minimum and Maximum of type <code>T</code></dd><dt><a class="trait" href="trait.ArgminMul.html" title="trait argmin_math::ArgminMul">Argmin<wbr>Mul</a></dt><dd>(Pointwise) Multiply a <code>T</code> with <code>self</code></dd><dt><a class="trait" href="trait.ArgminRandom.html" title="trait argmin_math::ArgminRandom">Argmin<wbr>Random</a></dt><dd>Create a random number</dd><dt><a class="trait" href="trait.ArgminScaledAdd.html" title="trait argmin_math::ArgminScaledAdd">Argmin<wbr>Scaled<wbr>Add</a></dt><dd>Add a <code>T</code> scaled by an <code>U</code> to <code>self</code></dd><dt><a class="trait" href="trait.ArgminScaledSub.html" title="trait argmin_math::ArgminScaledSub">Argmin<wbr>Scaled<wbr>Sub</a></dt><dd>Subtract a <code>T</code> scaled by an <code>U</code> from <code>self</code></dd><dt><a class="trait" href="trait.ArgminSignum.html" title="trait argmin_math::ArgminSignum">Argmin<wbr>Signum</a></dt><dd>Returns a number that represents the sign of <code>self</code>.</dd><dt><a class="trait" href="trait.ArgminSub.html" title="trait argmin_math::ArgminSub">Argmin<wbr>Sub</a></dt><dd>Subtract a <code>T</code> from <code>self</code></dd><dt><a class="trait" href="trait.ArgminTranspose.html" title="trait argmin_math::ArgminTranspose">Argmin<wbr>Transpose</a></dt><dd>Return the transpose (<code>U</code>) of <code>self</code></dd><dt><a class="trait" href="trait.ArgminWeightedDot.html" title="trait argmin_math::ArgminWeightedDot">Argmin<wbr>Weighted<wbr>Dot</a></dt><dd>Dot/scalar product of <code>T</code> and <code>self</code> weighted by W (p^TWv)</dd><dt><a class="trait" href="trait.ArgminZero.html" title="trait argmin_math::ArgminZero">Argmin<wbr>Zero</a></dt><dd>Return param vector of all zeros (for now, this is a hack. It should be done better)</dd><dt><a class="trait" href="trait.ArgminZeroLike.html" title="trait argmin_math::ArgminZeroLike">Argmin<wbr>Zero<wbr>Like</a></dt><dd>Zero for dynamically sized objects</dd><dt><a class="trait" href="trait.Rng.html" title="trait argmin_math::Rng">Rng</a></dt><dd>User-level interface for RNGs</dd></dl></section></div></main></body></html>

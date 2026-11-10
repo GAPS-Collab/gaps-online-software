@@ -50,13 +50,27 @@
 \DoxyCodeLine{00046\ \ \ \ \ \ \ \mbox{\hyperlink{classgondola_1_1AnalysisError_a498e1aa09a70c9ace342b564677966c4}{ErrorKind}}\ \mbox{\hyperlink{classgondola_1_1AnalysisError_a79a8c20dbf9d924f606d13c99d3d138b}{kind}};}
 \DoxyCodeLine{00047\ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{classgondola_1_1AnalysisError_a4da1f56bd1af324e91d85269f9685c1a}{reason}};}
 \DoxyCodeLine{00048\ \ \ \};}
-\DoxyCodeLine{00049\ }
-\DoxyCodeLine{00050\ \ \ \textcolor{comment}{//class\ FatalException\ :\ public\ std::exception\ \{}}
-\DoxyCodeLine{00051\ \ \ \textcolor{comment}{//\ \ virtual\ const\ char*\ what()\ const\ throw()\ \{\ }}
-\DoxyCodeLine{00052\ \ \ \textcolor{comment}{//\ \ \ \ return\ "{}Abort\ program\ due\ to\ a\ FatalException\ thrown\ in\ gaps-\/online-\/software!!"{};}}
-\DoxyCodeLine{00053\ \ \ \textcolor{comment}{//\ \ \}}}
-\DoxyCodeLine{00054\ \ \ \textcolor{comment}{//\};}}
-\DoxyCodeLine{00055\ \}\ \ }
-\DoxyCodeLine{00056\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00049\ \ \ }
+\DoxyCodeLine{00050\ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classgondola_1_1ConfigurationError}{ConfigurationError}}\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00052\ \ \ \ }
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \textcolor{keyword}{enum\ class}\ \mbox{\hyperlink{classgondola_1_1ConfigurationError_ac018550b6ab985bc8004e9f9954723ae}{ErrorKind}}\ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classgondola_1_1ConfigurationError_ac018550b6ab985bc8004e9f9954723aeaa2957d2f7b4b996fa1d31aabecfe3507}{NonSensicalConfiguration}}}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \};}
+\DoxyCodeLine{00056\ \ \ \ \ \ }
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \mbox{\hyperlink{classgondola_1_1ConfigurationError_a36d346c91a7302adfde6e2243cc812fb}{ConfigurationError}}(\mbox{\hyperlink{classgondola_1_1ConfigurationError_ac018550b6ab985bc8004e9f9954723ae}{ErrorKind}}\ \mbox{\hyperlink{classgondola_1_1ConfigurationError_af0b4154a1c7feb4865e8d4e01b4c43a7}{kind}},\ std::string\ \mbox{\hyperlink{classgondola_1_1ConfigurationError_ac3ee954f4ee40ea4212c53570c37f401}{reason}}\ =\ \textcolor{stringliteral}{"{}"{}}):}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classgondola_1_1ConfigurationError_af0b4154a1c7feb4865e8d4e01b4c43a7}{kind}}(\mbox{\hyperlink{classgondola_1_1ConfigurationError_af0b4154a1c7feb4865e8d4e01b4c43a7}{kind}}),\ \mbox{\hyperlink{classgondola_1_1ConfigurationError_ac3ee954f4ee40ea4212c53570c37f401}{reason}}(\mbox{\hyperlink{classgondola_1_1ConfigurationError_ac3ee954f4ee40ea4212c53570c37f401}{reason}})\ \{\}}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ }
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \mbox{\hyperlink{classgondola_1_1ConfigurationError_ac018550b6ab985bc8004e9f9954723ae}{ErrorKind}}\ \mbox{\hyperlink{classgondola_1_1ConfigurationError_af0b4154a1c7feb4865e8d4e01b4c43a7}{kind}};}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ std::string\ \mbox{\hyperlink{classgondola_1_1ConfigurationError_ac3ee954f4ee40ea4212c53570c37f401}{reason}};}
+\DoxyCodeLine{00062\ \ \ \};}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \textcolor{comment}{//class\ FatalException\ :\ public\ std::exception\ \{}}
+\DoxyCodeLine{00065\ \ \ \textcolor{comment}{//\ \ virtual\ const\ char*\ what()\ const\ throw()\ \{\ }}
+\DoxyCodeLine{00066\ \ \ \textcolor{comment}{//\ \ \ \ return\ "{}Abort\ program\ due\ to\ a\ FatalException\ thrown\ in\ gaps-\/online-\/software!!"{};}}
+\DoxyCodeLine{00067\ \ \ \textcolor{comment}{//\ \ \}}}
+\DoxyCodeLine{00068\ \ \ \textcolor{comment}{//\};}}
+\DoxyCodeLine{00069\ \}\ \ }
+\DoxyCodeLine{00070\ \textcolor{preprocessor}{\#endif}}
 
 \end{DoxyCode}

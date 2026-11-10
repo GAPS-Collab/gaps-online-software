@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["CheckpointingFrequency"],"trait":["Checkpoint"]};

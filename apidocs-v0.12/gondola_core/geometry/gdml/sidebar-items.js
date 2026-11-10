@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["parse_gdml_file","parse_gdml_str"]};

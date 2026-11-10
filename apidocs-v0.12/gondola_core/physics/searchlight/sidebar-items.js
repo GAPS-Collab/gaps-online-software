@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["candidates","detector","tracks","vertex"],"struct":["Searchlight","SearchlightHits","SearchlightResult","SearchlightSettings"]};
