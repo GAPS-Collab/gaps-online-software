@@ -16,7 +16,7 @@ if [ "$CURRENT_HOST" = "$TARGET_HOST" ]; then
       -Ccmake.define.Python_EXECUTABLE=/usr/bin/python3.11
 else
     # it's probably valkyrie
-    #python -m build 
+    python -m build 
     auditwheel repair dist/gondola_cxx-0.12.1-cp314-cp314-linux_x86_64.whl
 fi
 

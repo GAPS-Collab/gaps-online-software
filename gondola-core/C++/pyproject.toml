@@ -15,12 +15,15 @@ classifiers = [
 ]
 
 [build-system]
-requires = ["scikit-build-core>=0.8", "nanobind>=1.8"]
+requires = [
+    "scikit-build-core>=0.10",
+    "nanobind"
+]
 build-backend = "scikit_build_core.build"
 
 [tool.scikit-build]
 cmake.build-type = "Release" # Ensures an optimized release build
-cmake.targets = ["gondola_cxx"]
+build.targets = ["gondola_cxx"]
 
 [tool.cibuildwheel]
 skip = ["* univerzalis*"] # Skip building universal wheels, which are not needed for C++ extensions
