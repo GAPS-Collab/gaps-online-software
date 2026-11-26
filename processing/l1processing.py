@@ -56,6 +56,34 @@ except ImportError:
     import sys
     sys.exit(1)
 
+# saturated pulse corrector (sat_pulse_corrector/, model v2), enabled by --sat-correct
+SAT_CORRECTOR = None
+SAT_MV        = 740.0 # onboard peak at/above this is DRS4-saturated
+SAT_X_MAX_CM  = 90.0  # the model is valid for |x| < 90 cm
+
+def sat_corrected_peaks(h):
+    """
+    Peaks (a, b) in mV of a (rust) TofHit, where each DRS4-saturated
+    end is replaced by the prediction of the saturated pulse corrector.
+    The model is trained for end A, so each end is used as end A in turn.
+    Ends outside of the model's validity are left untouched.
+    """
+    x     = (h.pos - h.paddle_len/2)/10 # cm from the paddle center, positive away from A
+    peaks = [h.peak_a, h.peak_b]
+    for i, (a, b, x_ob) in enumerate((('a', 'b', x), ('b', 'a', -x))):
+        g  = lambda name, end : getattr(h, f'{name}_{end}')
+        ob = {'ob_tot550_A' : g('TOT_low', a)     , 'ob_tot725_A' : g('TOT_high', a),
+              'ob_rs550_A'  : g('TOT_slp_low', a) , 'ob_rs725_A'  : g('TOT_slp_high', a),
+              'ob_pedrms_A' : g('baseline', a + '_rms'),
+              'ob_q_A'      : g('charge', a)      , 'ob_q_B'      : g('charge', b),
+              'x_ob'        : x_ob}
+        valid = g('peak', a) >= SAT_MV and abs(x_ob) < SAT_X_MAX_CM \
+                and ob['ob_q_A'] > 0 and ob['ob_q_B'] > 0 and g('peak', b) > 0 \
+                and SAT_CORRECTOR.tot_in_range(ob)
+        if valid:
+            peaks[i] = float(SAT_CORRECTOR.predict(ob)[0])
+    return peaks
+
 #def get_refined_edep(paddle_num, edep, cc, temperature_paddle):
 #    """
 #    Fix the temperature dependent gain by 
@@ -127,6 +155,10 @@ def rust_to_cxx_bridge(event, tof_paddles, cc = None, all_paddle_temps = None):
         h_cxx.event_t0   = h.event_t0
         # this is the uncorrected energy 
         h_cxx.edep_corrected = h.edep
+        if SAT_CORRECTOR is not None and max(h.peak_a, h.peak_b) >= SAT_MV:
+            h_cxx.peak_a, h_cxx.peak_b = sat_corrected_peaks(h)
+            # same formula as h.edep, but with the corrected peaks
+            h_cxx.edep_corrected = h_cxx.edep
         if cc is not None: 
             # energy correction - cc are the global 
             # energy conrrecton constants 
@@ -190,6 +222,9 @@ if __name__ == '__main__':
     parser.add_argument('--apply-energy-calib', action='store_true',\
                         help="Apply Grace's temperature-gain calibration",\
                         default=False)
+    parser.add_argument('--sat-correct', action='store_true',\
+                        help="Replace the peaks of DRS4-saturated TOF hit ends with the prediction of the saturated pulse corrector (sat_pulse_corrector, v2) and recalculate the energy deposition",\
+                        default=False)
     parser.add_argument('-o','--outdir',\
                         help='Outdir for .root output files',
                         type=Path,
@@ -199,6 +234,10 @@ if __name__ == '__main__':
     #parser.add_argument('-v','--verbose', action='store_true',\
     #                    help='More verbose output')
     args = parser.parse_args()
+    if args.sat_correct:
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent / 'sat_pulse_corrector'))
+        from sat_corrector import SatCorrector
+        SAT_CORRECTOR = SatCorrector()
     if args.apply_energy_calib:
         # Grace's energy corrections
         ## the calibration constants are stored in a .csv file: 

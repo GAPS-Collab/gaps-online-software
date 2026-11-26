@@ -19,6 +19,7 @@ dependencies = [
     "gondola>=0.12.15",
     "fancy-dataclass>=0.10.2",
     "uproot>=5.7.3",
+    "lightgbm>=4.7.0",
 ]
 #"gondola @ file:///srv/gaps/gaps-online-software/gondola-core/rust/gondola-core/target/wheels/gondola-0.11.0-cp311-abi3-manylinux_2_34_x86_64.whl",
 readme = "README.md"
